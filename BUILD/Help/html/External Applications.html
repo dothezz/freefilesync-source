@@ -20,33 +20,25 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">External
-applications</FONT></FONT></H2>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">By
-default FreeFileSync opens the operating system's file browser on
-each mouse double-click by invoking &quot;</FONT><FONT FACE="Courier New, monospace">explorer
-/select, &quot;%item_path%&quot;</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-on Windows and &quot;</FONT><FONT FACE="Courier New, monospace">xdg-open
-&quot;%item_folder%&quot;</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-on Linux.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">However
-you may integrate other external applications into FreeFileSync:
-navigate to </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Menu
-&rarr; Advanced &rarr; Global settings: External Applications</B></SPAN></FONT>
-<FONT FACE="Tahoma, sans-serif">and add or replace a command. The
-first entry is executed when double-clicking a row or pressing ENTER
-on main grid while all other entries can only be accessed via the
-context menu shown after a right-click. The following internal macros
-are available:</FONT></P>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">External Applications</FONT></FONT></H2>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">
+When you double-click on one of the rows on the main dialog, FreeFileSync opens the operating system's file browser by default. On Windows it calls <FONT FACE="Courier New, monospace">explorer /select, &quot;%item_path%&quot;</FONT>, on Linux <FONT FACE="Courier New, monospace">xdg-open &quot;%item_folder%&quot;</FONT> and on OS X <FONT FACE="Courier New, monospace">open -R &quot;%item_path%&quot;</FONT>.
+</FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can customize this behavior and integrate other external applications into FreeFileSync:
+Navigate to </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Menu
+&rarr; Tools &rarr; Global settings: Customize context menu</B></SPAN></FONT>
+<FONT FACE="Tahoma, sans-serif">and add or replace a command. The first entry is executed when double-clicking a row on main grid or pressing ENTER while all other entries can be accessed via the
+context menu shown after a right mouse click. The following macros
+can be used:</FONT></P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
-	<FONT FACE="Courier New, monospace">%item_path%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
-	<FONT FACE="Tahoma, sans-serif">full file or folder
-	name</FONT><BR>%item_folder% &nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">folder
-	part only</FONT><BR>%item2_path%&nbsp;&nbsp;&nbsp;&nbsp;-
-	<FONT FACE="Tahoma, sans-serif">Counterpart of %item_path% on the
-	opposite grid</FONT><BR>%item2_folder%&nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">Counterpart
-	of %item_folder% on the opposite grid</FONT></FONT></P>
+	<FONT FACE="Courier New, monospace">
+	%item_path%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">full file or folder name</FONT><BR>
+	%item_folder% &nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">folder part only</FONT><BR>
+	%item2_path%&nbsp;&nbsp;&nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">Counterpart of %item_path% on the opposite grid</FONT><BR>
+	%item2_folder%&nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">Counterpart of %item_folder% on the opposite grid</FONT>
+	</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -57,21 +49,15 @@ are available:</FONT></P>
 	visual difference tool:<BR><FONT FACE="Courier New, monospace">&quot;C:\Program
 	Files\WinMerge\WinMergeU.exe&quot; &quot;%item_path%&quot;
 	&quot;%item2_path%&quot;<BR>&nbsp;</FONT></FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Show
-	file in Windows Explorer:<BR><FONT FACE="Courier New, monospace">explorer
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Show file in Windows Explorer:<BR><FONT FACE="Courier New, monospace">explorer
 	/select, &quot;%item_path%&quot;<BR>&nbsp;</FONT></FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
-	file in associated application:</FONT><BR><FONT FACE="Courier New, monospace">cmd
-	/c start &quot;&quot; &quot;%item_path%&quot; </FONT><FONT FACE="Tahoma, sans-serif">or
-	simply</FONT> <FONT FACE="Courier New, monospace">&quot;%item_path%&quot;</FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
-	console dialog:<BR><FONT FACE="Courier New, monospace">cmd /k cd /D
-	&quot;%item_folder%&quot;<BR>&nbsp;</FONT></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open file in associated application:</FONT><BR><FONT FACE="Courier New, monospace">cmd
+	/c start &quot;&quot; &quot;%item_path%&quot; </FONT><FONT FACE="Tahoma, sans-serif">or simply</FONT> <FONT FACE="Courier New, monospace">&quot;%item_path%&quot;</FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open console dialog:<BR><FONT FACE="Courier New, monospace">cmd /k cd /D &quot;%item_folder%&quot;<BR>&nbsp;</FONT></FONT></P>
 </UL>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif"><B>Note</B><BR>Don't forget to use
-	quotation marks if file names contain spaces!</FONT></P>
+	<FONT FACE="Tahoma, sans-serif"><B>Note</B><BR>You need to protect macros with quotation marks if they can resolve to a file path with space characters.</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 </BODY>

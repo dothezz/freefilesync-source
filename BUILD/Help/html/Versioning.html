@@ -20,12 +20,11 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">File
-versioning</FONT></FONT></H2>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">File Versioning</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">When
 you need to preserve files that have been deleted or overwritten it's
-often sufficient to select <B>Recycle Bin</B> in synchronization
-settings. However this is only available on local drives and offers
+often sufficient to select <B>Recycle bin</B> in synchronization
+settings. However this is only available for local drives and offers
 little control on how to store and how long to keep the files.
 FreeFileSync therefore has an additional option, <B>Versioning</B>.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -39,11 +38,10 @@ deleted files into the provided folder and add a time stamp to each
 file name. The structure of the synchronized folders is preserved so
 that old versions of a file can be conveniently accessed via a file
 browser.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:
-</B></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">A
-file &quot;</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">Folder\File.txt</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">&quot;
-was updated three times and old versions were moved to folder
-&quot;</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">C:\Revisions</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">&quot;</SPAN></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
+A file <FONT FACE="Courier New, monospace">Folder\File.txt</FONT> was updated three times and old versions were moved to folder <FONT FACE="Courier New, monospace">C:\Revisions</FONT>
+</FONT>
+</P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.04cm; border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Revisions\Folder\File.txt
 	</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
@@ -56,7 +54,7 @@ was updated three times and old versions were moved to folder
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>2.
-Save only most recent version</B></FONT></P>
+Save only the most recent version</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
 deletion handling to <B>Versioning</B> and naming convention to
 <B>Replace</B>. Deleted files will be moved to the specified folder
@@ -68,14 +66,16 @@ versions.</FONT></P>
 Save versions at certain intervals</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">With
 naming convention </FONT><FONT FACE="Tahoma, sans-serif"><B>Replace</B></FONT>
-<FONT FACE="Tahoma, sans-serif">it's possible to refine the
+<FONT FACE="Tahoma, sans-serif">it is possible to refine the
 granularity of versions to keep by adding <A HREF="Macros.html">macros</A>
 to the versioning folder path. For example you can save deleted files
 on a per sync session basis by adding the </FONT><FONT FACE="Tahoma, sans-serif"><B>%timestamp%</B></FONT>
 <FONT FACE="Tahoma, sans-serif">macro:</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:
-</B></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Using
-the dynamically generated folder name &quot;</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">C:\Revisions\%timestamp%</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">&quot;</SPAN></FONT></P>
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
+Using the dynamically generated folder name <FONT FACE="Courier New, monospace">C:\Revisions\%timestamp%</FONT></FONT>
+</P>
+
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.04cm; border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Revisions\</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
 	111111</B></FONT><FONT FACE="Courier New, monospace">\Folder\File.txt<BR>C:\Revisions\</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12

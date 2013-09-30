@@ -100,7 +100,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;wxUSE_UNICODE;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;WXUSINGDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\Boost;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc12_x86_debug_dll\mswud;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x86_debug_dll\mswud;.</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -115,12 +115,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_core.lib;wxbase29ud_net.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage\lib;C:\Program Files\C++\wxWidgets\lib\vc12_x86_debug_dll</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_debug_dll</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X86</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -130,7 +130,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;wxUSE_UNICODE;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;WXUSINGDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\Boost;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc12_x64_debug_dll\mswud;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x64_debug_dll\mswud;.</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -147,14 +147,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_adv.lib;wxmsw29ud_aui.lib;wxbase29ud_net.lib;wxpngd.lib;wxzlibd.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage_x64\lib;C:\Program Files\C++\wxWidgets\lib\vc12_x64_debug_dll</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_debug_dll</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
       <ManifestFile>
       </ManifestFile>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X64</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -165,7 +165,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;wxUSE_UNICODE;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\Boost;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc12_x86_release_lib\mswu;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib\mswu;.</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4512;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -179,16 +179,16 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage\lib;C:\Program Files\C++\wxWidgets\lib\vc12_x86_release_lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X86</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"C:\Program Files\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
+      <Command>"C:\Data\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -198,7 +198,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;wxUSE_UNICODE;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\Boost;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc12_x64_release_lib\mswu;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib\mswu;.</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4512;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -209,20 +209,20 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage_x64\lib;C:\Program Files\C++\wxWidgets\lib\vc12_x64_release_lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"C:\Program Files\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
+      <Command>"C:\Data\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -244,7 +244,6 @@
     <ClCompile Include="lib\perf_check.cpp" />
     <ClCompile Include="lib\process_xml.cpp" />
     <ClCompile Include="lib\resolve_path.cpp" />
-    <ClCompile Include="lib\resources.cpp" />
     <ClCompile Include="lib\shadow.cpp" />
     <ClCompile Include="lib\status_handler.cpp" />
     <ClCompile Include="lib\versioning.cpp" />
@@ -262,7 +261,6 @@
     <ClCompile Include="ui\gui_generated.cpp" />
     <ClCompile Include="ui\gui_status_handler.cpp" />
     <ClCompile Include="ui\main_dlg.cpp" />
-    <ClCompile Include="ui\msg_popup.cpp" />
     <ClCompile Include="ui\progress_indicator.cpp" />
     <ClCompile Include="ui\search.cpp" />
     <ClCompile Include="ui\small_dlgs.cpp" />
@@ -277,8 +275,11 @@
     </ClCompile>
     <ClCompile Include="wx+\graph.cpp" />
     <ClCompile Include="wx+\grid.cpp" />
+    <ClCompile Include="wx+\image_resources.cpp" />
     <ClCompile Include="wx+\image_tools.cpp" />
     <ClCompile Include="wx+\mouse_move_dlg.cpp" />
+    <ClCompile Include="wx+\popup_dlg.cpp" />
+    <ClCompile Include="wx+\popup_dlg_generated.cpp" />
     <ClCompile Include="wx+\tooltip.cpp" />
     <ClCompile Include="wx+\zlib_wrap.cpp" />
     <ClCompile Include="zenxml\unit_test.cpp" />
@@ -299,10 +300,10 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="WxWizFrame.fbp">
-      <FileType>Document</FileType>
+    <None Include="FreeFileSync.fbp">
       <SubType>Designer</SubType>
     </None>
+    <None Include="wx+\PopupDialog.fbp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

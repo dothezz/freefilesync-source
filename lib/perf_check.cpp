@@ -122,7 +122,7 @@ zen::Opt<std::wstring> PerfCheck::getItemsPerSecond() const
         const int  itemsDelta = itemBack.second.itemCount_ - itemFront.second.itemCount_;
 
         if (timeDelta != 0)
-            return replaceCpy(_("%x items"), L"%x", formatThreeDigitPrecision(itemsDelta * 1000.0 / timeDelta)) + _("/sec");
+            return replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsDelta * 1000.0 / timeDelta));
     }
     return NoValue();
 }
@@ -231,10 +231,10 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
     double q = 0;
     double r = 0;
     double s = 0;
-    for (std::list<record>::const_iterator i = measurements.begin(); i != measurements.end(); ++i)
+    for (const record& rec : measurements)
     {
-        const double x_i = i->x_i;
-        const double f_i = i->f_i;
+        const double x_i = rec.x_i;
+        const double f_i = rec.f_i;
         p += x_i * x_i;
         q += f_i * x_i;
         r += f_i;

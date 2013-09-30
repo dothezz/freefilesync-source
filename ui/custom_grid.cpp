@@ -16,8 +16,8 @@
 #include <wx+/string_conv.h>
 #include <wx+/rtl.h>
 #include <wx+/image_tools.h>
+#include <wx+/image_resources.h>
 #include "../file_hierarchy.h"
-#include "../lib/resources.h"
 
 using namespace zen;
 using namespace gridview;
@@ -266,7 +266,7 @@ private:
     }
 
 protected:
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
@@ -280,6 +280,16 @@ protected:
                     fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
                 else
                     clearArea(dc, rect, getBackGroundColor(row));
+
+                //draw horizontal border if required
+                DisplayType dispTp = getRowDisplayType(row);
+                if (dispTp != DISP_TYPE_NORMAL &&
+                    dispTp == getRowDisplayType(row + 1))
+                {
+                    const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
+                    wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
+                    dc.DrawLine(rect.GetBottomLeft(),  rect.GetBottomRight() + wxPoint(1, 0));
+                }
             }
         }
         else
@@ -464,21 +474,9 @@ private:
 
     static const int GAP_SIZE = 2;
 
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
     {
         wxRect rectTmp = rect;
-
-        //draw horizontal border if required
-        DisplayType dispTp = getRowDisplayType(row);
-        if (dispTp != DISP_TYPE_NORMAL &&
-            dispTp == getRowDisplayType(row + 1))
-        {
-            const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
-            wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
-            dc.DrawLine(rect.GetBottomLeft(),  rect.GetBottomRight() + wxPoint(1, 0));
-            rectTmp.height -= 1;
-        }
-        //wxRect rectTmp = drawCellBorder(dc, rect);
 
         const bool isActive = [&]() -> bool
         {
@@ -544,7 +542,7 @@ private:
             dummy3 = make_unique<wxDCTextColourChanger>(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
 
         //draw text
-        if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_SIZE && grid.GetLayoutDirection() != wxLayout_RightToLeft)
+        if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_SIZE && refGrid().GetLayoutDirection() != wxLayout_RightToLeft)
         {
             //have file size right-justified (but don't change for RTL languages)
             rectTmp.width -= GAP_SIZE;
@@ -558,7 +556,7 @@ private:
         }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         //  Partitioning:
         //   ________________________________
@@ -596,12 +594,10 @@ private:
         return wxEmptyString;
     }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted)
+    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
-
-        const int COLUMN_GAP_LEFT = 4;
 
         rectInside.x     += COLUMN_GAP_LEFT;
         rectInside.width -= COLUMN_GAP_LEFT;
@@ -651,7 +647,7 @@ private:
         return Zstring();
     }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const
+    virtual wxString getToolTip(size_t row, ColumnType colType) const override
     {
         wxString toolTip;
 
@@ -707,9 +703,9 @@ public:
     }
 
 private:
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
-        GridDataRim<LEFT_SIDE>::renderRowBackgound(dc, rect, row, enabled, selected, hasFocus);
+        GridDataRim<LEFT_SIDE>::renderRowBackgound(dc, rect, row, enabled, selected);
 
         //mark rows selected on navigation grid:
         if (enabled && !selected)
@@ -887,7 +883,7 @@ public:
     void highlightSyncAction(bool value) { highlightSyncAction_ = value; }
 
 private:
-    virtual wxString getValue(size_t row, ColumnType colType) const
+    virtual wxString getValue(size_t row, ColumnType colType) const override
     {
         if (const FileSystemObject* fsObj = getRawData(row))
             switch (static_cast<ColumnTypeMiddle>(colType))
@@ -902,15 +898,15 @@ private:
         return wxString();
     }
 
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         const FileSystemObject* fsObj = getRawData(row);
-        GridData::drawCellBackground(dc, rect, enabled, selected, hasFocus, highlightSyncAction_ ?
+        GridData::drawCellBackground(dc, rect, enabled, selected, highlightSyncAction_ ?
                                      getBackGroundColorSyncAction(fsObj) :
                                      getBackGroundColorCmpCategory(fsObj));
     }
 
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
     {
         auto drawInactiveColumBackground = [&](const FileSystemObject& fsObj)
         {
@@ -1005,7 +1001,7 @@ private:
         }
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const
+    virtual wxString getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
@@ -1019,9 +1015,9 @@ private:
         return wxEmptyString;
     }
 
-    virtual wxString getToolTip(ColumnType colType) const { return getColumnLabel(colType); }
+    virtual wxString getToolTip(ColumnType colType) const override { return getColumnLabel(colType); }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted)
+    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {

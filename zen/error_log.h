@@ -96,7 +96,7 @@ String formatMessageImpl(const LogEntry& entry) //internal linkage
             case TYPE_ERROR:
                 return _("Error");
             case TYPE_FATAL_ERROR:
-                return _("Fatal Error");
+                return _("Serious Error");
         }
         assert(false);
         return std::wstring();

@@ -16,15 +16,15 @@
 using namespace zen;
 
 
-class Tooltip::PopupDialogGenerated : public wxDialog
+class Tooltip::TooltipDialogGenerated : public wxDialog
 {
 public:
-    PopupDialogGenerated(wxWindow* parent,
-                         wxWindowID id = wxID_ANY,
-                         const wxString& title = wxEmptyString,
-                         const wxPoint& pos = wxDefaultPosition,
-                         const wxSize& size = wxDefaultSize,
-                         long style = 0) : wxDialog(parent, id, title, pos, size, style)
+    TooltipDialogGenerated(wxWindow* parent,
+                           wxWindowID id = wxID_ANY,
+                           const wxString& title = wxEmptyString,
+                           const wxPoint& pos = wxDefaultPosition,
+                           const wxSize& size = wxDefaultSize,
+                           long style = 0) : wxDialog(parent, id, title, pos, size, style)
     {
         //Suse Linux/X11: needs parent window, else there are z-order issues
 
@@ -43,7 +43,7 @@ public:
         this->Layout();
         bSizer158->Fit(this);
 
-#if defined ZEN_WIN //prevent window stealing focus!
+#ifdef ZEN_WIN //prevent window from stealing focus!
         Disable(); //= dark/grey text and image on Linux; no visible difference on OS X
 #endif
     }
@@ -56,7 +56,7 @@ public:
 void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 {
     if (!tipWindow)
-        tipWindow = new PopupDialogGenerated(&parent_); //ownership passed to parent
+        tipWindow = new TooltipDialogGenerated(&parent_); //ownership passed to parent
 
     const wxBitmap& newBmp = bmp ? *bmp : wxNullBitmap;
 
@@ -72,7 +72,8 @@ void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
         tipWindow->m_staticTextMain->Wrap(600);
     }
 
-    tipWindow->Fit(); //Linux: Fit() seems to be somewhat broken => this needs to be called EVERY time inside show, not only if text or bmp change
+    tipWindow->GetSizer()->SetSizeHints(tipWindow); //~=Fit() + SetMinSize()
+    //Linux: Fit() seems to be somewhat broken => this needs to be called EVERY time inside show, not only if text or bmp change
 
     const wxPoint newPos = wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft ?
                            mousePos - wxPoint(30 + tipWindow->GetSize().GetWidth(), 0) :

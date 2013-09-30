@@ -34,14 +34,14 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (!activeStrings.insert(std::make_pair(ptr, size)).second)
-            reportProblem("Fatal Error: New memory points into occupied space: " + rawMemToString(ptr, size));
+            reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
     void remove(const void* ptr)
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.erase(ptr) != 1)
-            reportProblem("Fatal Error: No memory available for deallocation at this location!");
+            reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
 
     static LeakChecker& instance() { static LeakChecker inst; return inst; }
@@ -154,7 +154,7 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
                                             static_cast<int>(sizeRhs), //__in  int cchCount2,
                                             true);                     //__in  BOOL bIgnoreCase
         if (rv <= 0)
-            throw std::runtime_error("Error comparing strings (ordinal)!");
+            throw std::runtime_error("Error comparing strings (CompareStringOrdinal).");
         else
             return rv - 2; //convert to C-style string compare result
     }
@@ -179,10 +179,10 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
                                   minSize,                  //__in   int cchSrc,
                                   bufferA,                  //__out  LPTSTR lpDestStr,
                                   MAX_PATH) == 0)           //__in   int cchDest
-                    throw std::runtime_error("Error comparing strings! (LCMapString)");
+                    throw std::runtime_error("Error comparing strings (LCMapString).");
 
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, bufferB, MAX_PATH) == 0)
-                    throw std::runtime_error("Error comparing strings! (LCMapString)");
+                    throw std::runtime_error("Error comparing strings (LCMapString).");
 
                 const int rv = ::wmemcmp(bufferA, bufferB, minSize);
                 if (rv != 0)
@@ -194,10 +194,10 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
                 std::vector<wchar_t> bufferB(minSize);
 
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, lhs, minSize, &bufferA[0], minSize) == 0)
-                    throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+                    throw std::runtime_error("Error comparing strings (LCMapString: FS).");
 
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, &bufferB[0], minSize) == 0)
-                    throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+                    throw std::runtime_error("Error comparing strings (LCMapString: FS).");
 
                 const int rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
                 if (rv != 0)

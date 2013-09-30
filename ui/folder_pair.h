@@ -12,12 +12,12 @@
 #include <wx+/context_menu.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/image_tools.h>
+#include <wx+/image_resources.h>
 #include "dir_name.h"
 #include "small_dlgs.h"
 #include "sync_cfg.h"
 #include "../lib/norm_filter.h"
 #include "../structures.h"
-#include "../lib/resources.h"
 
 namespace zen
 {
@@ -64,35 +64,34 @@ private:
         if (altCompConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, getResourceImage(L"cfg_compare_small"));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altCompConfig->compareVar));
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Alternate comparison settings") +  L" (" + getVariantName(altCompConfig->compareVar) + L")");
         }
         else
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(getResourceImage(L"cfg_compare_small")));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings"));
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Alternate comparison settings"));
         }
 
         if (altSyncConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, getResourceImage(L"cfg_sync_small"));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altSyncConfig->directionCfg.var));
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Alternate synchronization settings") +  L" (" + getVariantName(altSyncConfig->directionCfg.var) + L")");
         }
         else
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(getResourceImage(L"cfg_sync_small")));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Alternate synchronization settings"));
         }
 
-        //test for Null-filter
         if (!isNullFilter(localFilter))
         {
             setImage(*basicPanel_.m_bpButtonLocalFilter, getResourceImage(L"filter_small"));
-            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
+            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Local filter") + L" (" + _("Active") + L")");
         }
         else
         {
             setImage(*basicPanel_.m_bpButtonLocalFilter, greyScale(getResourceImage(L"filter_small")));
-            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
+            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Local filter") + L" (" + _("None") + L")");
         }
     }
 
@@ -169,7 +168,7 @@ private:
 
         CompConfig cmpCfg = altCompConfig.get() ? *altCompConfig : mainCfg.cmpConfig;
 
-        if (showCompareCfgDialog(getParentWindow(), cmpCfg) == ReturnSmallDlg::BUTTON_OKAY)
+        if (showCompareCfgDialog(getParentWindow(), cmpCfg, _("Alternate Comparison Settings")) == ReturnSmallDlg::BUTTON_OKAY)
         {
             altCompConfig = std::make_shared<CompConfig>(cmpCfg);
             refreshButtons();
@@ -187,6 +186,7 @@ private:
         if (showSyncConfigDlg(getParentWindow(),
                               cmpCfg.compareVar,
                               syncCfg,
+                              _("Alternate Synchronization Settings"),
                               nullptr,
                               nullptr) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
         {
@@ -200,9 +200,7 @@ private:
     {
         FilterConfig localFiltTmp = localFilter;
 
-        if (showFilterDialog(getParentWindow(),
-                             false, //is local filter dialog
-                             localFiltTmp) == ReturnSmallDlg::BUTTON_OKAY)
+        if (showFilterDialog(getParentWindow(), localFiltTmp, _("Local Filter")) == ReturnSmallDlg::BUTTON_OKAY)
         {
             localFilter = localFiltTmp;
             refreshButtons();

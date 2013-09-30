@@ -5,15 +5,16 @@
 // **************************************************************************
 
 #include "gui_status_handler.h"
-#include <wx/wupdlock.h>
-#include <wx+/shell_execute.h>
-#include <wx+/bitmap_button.h>
+#include <zen/shell_execute.h>
 #include <wx/app.h>
-#include "msg_popup.h"
+#include <wx/wupdlock.h>
+#include <wx+/bitmap_button.h>
+#include <wx+/popup_dlg.h>
 #include "main_dlg.h"
 #include "exec_finished_box.h"
 #include "../lib/generate_logfile.h"
 #include "../lib/resolve_path.h"
+#include "../lib/status_handler_impl.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -24,7 +25,9 @@ CompareStatusHandler::CompareStatusHandler(MainDialog& dlg) :
     ignoreErrors(false)
 {
     {
-        wxWindowUpdateLocker dummy(&mainDlg); //avoid display distortion
+#ifdef ZEN_WIN
+        wxWindowUpdateLocker dummy(&mainDlg); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
         //display status panel during compare
         mainDlg.compareStatus->init(*this); //clear old values before showing panel
@@ -78,7 +81,9 @@ void CompareStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase
             break;
         case PHASE_COMPARING_CONTENT:
         {
-            wxWindowUpdateLocker dummy(&mainDlg);
+#ifdef ZEN_WIN
+            wxWindowUpdateLocker dummy(&mainDlg); //leads to GUI corruption problems on Linux/OS X!
+#endif
             mainDlg.compareStatus->switchToCompareBytewise();
             mainDlg.Layout();  //show progress bar...
             mainDlg.Refresh(); //remove distortion...
@@ -88,27 +93,32 @@ void CompareStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase
 }
 
 
-ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& message)
+ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& errorMessage, size_t retryNumber)
 {
+    //no need to implement auto-retry here: 1. user is watching 2. comparison is fast
+    //=> similar behavior like "ignoreErrors" which does not honor sync settings
+
     if (ignoreErrors)
         return ProcessCallback::IGNORE_ERROR;
 
     forceUiRefresh();
 
     bool ignoreNextErrors = false;
-    switch (showErrorDlg(&mainDlg,
-                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
-                         message, &ignoreNextErrors))
+    switch (showConfirmationDialog3(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg3().
+                                    setDetailInstructions(errorMessage).
+                                    setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
+                                    _("&Ignore"), _("&Retry")))
     {
-        case ReturnErrorDlg::BUTTON_IGNORE:
+        case ConfirmationButton3::DO_IT: //ignore
             ignoreErrors = ignoreNextErrors;
             return ProcessCallback::IGNORE_ERROR;
 
-        case ReturnErrorDlg::BUTTON_RETRY:
+        case ConfirmationButton3::DONT_DO_IT: //retry
             return ProcessCallback::RETRY;
 
-        case ReturnErrorDlg::BUTTON_CANCEL:
+        case ConfirmationButton3::CANCEL:
             abortThisProcess();
+            break;
     }
 
     assert(false);
@@ -119,8 +129,7 @@ ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& 
 void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     forceUiRefresh();
-
-    showFatalErrorDlg(&mainDlg, ReturnFatalErrorDlg::BUTTON_CANCEL, errorMessage, nullptr);
+    showNotificationDialog(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(_("Serious Error")).setDetailInstructions(errorMessage));
 }
 
 
@@ -133,17 +142,15 @@ void CompareStatusHandler::reportWarning(const std::wstring& warningMessage, boo
 
     //show pop-up and ask user how to handle warning
     bool dontWarnAgain = false;
-    switch (showWarningDlg(&mainDlg,
-                           ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_CANCEL,
-                           warningMessage, dontWarnAgain))
+    switch (showConfirmationDialog(&mainDlg, DialogInfoType::WARNING,
+                                   PopupDialogCfg().setDetailInstructions(warningMessage).
+                                   setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
+                                   _("&Ignore")))
     {
-        case ReturnWarningDlg::BUTTON_IGNORE:
+        case ConfirmationButton::DO_IT:
             warningActive = !dontWarnAgain;
             break;
-
-        case ReturnWarningDlg::BUTTON_SWITCH:
-            assert(false);
-        case ReturnWarningDlg::BUTTON_CANCEL:
+        case ConfirmationButton::CANCEL:
             abortThisProcess();
             break;
     }
@@ -173,12 +180,16 @@ void CompareStatusHandler::abortThisProcess()
 SyncStatusHandler::SyncStatusHandler(wxFrame* parentDlg,
                                      size_t lastSyncsLogFileSizeMax,
                                      OnGuiError handleError,
+                                     size_t automaticRetryCount,
+                                     size_t automaticRetryDelay,
                                      const std::wstring& jobName,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
     progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory)),
             lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
             handleError_(handleError),
+            automaticRetryCount_(automaticRetryCount),
+            automaticRetryDelay_(automaticRetryDelay),
             jobName_(jobName)
 {
     totalTime.Start(); //measure total time
@@ -187,6 +198,33 @@ SyncStatusHandler::SyncStatusHandler(wxFrame* parentDlg,
 
 SyncStatusHandler::~SyncStatusHandler()
 {
+    //------------ "on completion" command conceptually is part of the sync, not cleanup --------------------------------------
+
+    //decide whether to stay on status screen or exit immediately...
+    bool showFinalResults = true;
+
+    if (progressDlg)
+    {
+        //execute "on completion" command (even in case of ignored errors)
+        if (!abortIsRequested()) //if aborted (manually), we don't execute the command
+        {
+            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            if (!finalCommand.empty())
+            {
+                if (isCloseProgressDlgCommand(finalCommand))
+                    showFinalResults = false; //take precedence over current visibility status
+                else
+                    try
+                    {
+                        tryReportingError([&] { shellExecute2(expandMacros(utfCvrtTo<Zstring>(finalCommand)), EXEC_TYPE_SYNC); }, //throw FileError, throw X?
+                                          *this);
+                    }
+                    catch (...) {}
+            }
+        }
+    }
+    //------------ end of sync: begin of cleanup --------------------------------------
+
     const int totalErrors   = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
     const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
 
@@ -194,7 +232,7 @@ SyncStatusHandler::~SyncStatusHandler()
     std::wstring finalStatus;
     if (abortIsRequested())
     {
-        finalStatus = _("Synchronization aborted");
+        finalStatus = _("Synchronization stopped");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
@@ -233,20 +271,6 @@ SyncStatusHandler::~SyncStatusHandler()
 
     if (progressDlg)
     {
-        bool showFinalResults = true;
-        //execute "on completion" command (even in case of ignored errors)
-        if (!abortIsRequested()) //if aborted (manually), we don't execute the command
-        {
-            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
-            if (!finalCommand.empty())
-            {
-                if (isCloseProgressDlgCommand(finalCommand))
-                    showFinalResults = false; //take precedence over current visibility status
-                else
-                    shellExecute(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
-            }
-        }
-
         //notify to progressDlg that current process has ended
         if (showFinalResults)
         {
@@ -299,8 +323,25 @@ void SyncStatusHandler::reportInfo(const std::wstring& text)
 }
 
 
-ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& errorMessage)
+ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& errorMessage, size_t retryNumber)
 {
+    //auto-retry
+    if (retryNumber < automaticRetryCount_)
+    {
+        errorLog.logMsg(errorMessage + L"\n=> " +
+                        _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...", automaticRetryDelay_), TYPE_INFO);
+        //delay
+        const int iterations = static_cast<int>(1000 * automaticRetryDelay_ / UI_UPDATE_INTERVAL); //always round down: don't allow for negative remaining time below
+        for (int i = 0; i < iterations; ++i)
+        {
+            reportStatus(_("Error") + L": " + _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...",
+                                                 (1000 * automaticRetryDelay_ - i * UI_UPDATE_INTERVAL + 999) / 1000)); //integer round up
+            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+        }
+        return ProcessCallback::RETRY;
+    }
+
+
     //always, except for "retry":
     zen::ScopeGuard guardWriteLog = zen::makeGuard([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
 
@@ -313,22 +354,22 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(progressDlg->getWindowIfVisible(),
-                                 ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
-                                 errorMessage,
-                                 &ignoreNextErrors))
+            switch (showConfirmationDialog3(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg3().
+                                            setDetailInstructions(errorMessage).
+                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
+                                            _("&Ignore"), _("&Retry")))
             {
-                case ReturnErrorDlg::BUTTON_IGNORE:
+                case ConfirmationButton3::DO_IT: //ignore
                     if (ignoreNextErrors) //falsify only
                         handleError_ = ON_GUIERROR_IGNORE;
                     return ProcessCallback::IGNORE_ERROR;
 
-                case ReturnErrorDlg::BUTTON_RETRY:
+                case ConfirmationButton3::DONT_DO_IT: //retry
                     guardWriteLog.dismiss();
-                    errorLog.logMsg(_("Retrying operation after error:") + L" " + errorMessage, TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
+                    errorLog.logMsg(errorMessage + L"\n=> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
                     return ProcessCallback::RETRY;
 
-                case ReturnErrorDlg::BUTTON_CANCEL:
+                case ConfirmationButton3::CANCEL:
                     abortThisProcess();
                     break;
             }
@@ -357,16 +398,17 @@ void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showFatalErrorDlg(progressDlg->getWindowIfVisible(),
-                                      ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
-                                      errorMessage, &ignoreNextErrors))
+            switch (showConfirmationDialog(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2,
+                                           PopupDialogCfg().setTitle(_("Serious Error")).
+                                           setDetailInstructions(errorMessage).
+                                           setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors")),
+                                           _("&Ignore")))
             {
-                case ReturnFatalErrorDlg::BUTTON_IGNORE:
+                case ConfirmationButton::DO_IT:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = ON_GUIERROR_IGNORE;
                     break;
-
-                case ReturnFatalErrorDlg::BUTTON_CANCEL:
+                case ConfirmationButton::CANCEL:
                     abortThisProcess();
                     break;
             }
@@ -395,17 +437,15 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showWarningDlg(progressDlg->getWindowIfVisible(),
-                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_CANCEL,
-                                   warningMessage, dontWarnAgain))
+            switch (showConfirmationDialog(progressDlg->getWindowIfVisible(), DialogInfoType::WARNING,
+                                           PopupDialogCfg().setDetailInstructions(warningMessage).
+                                           setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
+                                           _("&Ignore")))
             {
-                case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+                case ConfirmationButton::DO_IT:
                     warningActive = !dontWarnAgain;
                     break;
-
-                case ReturnWarningDlg::BUTTON_SWITCH:
-                    assert(false);
-                case ReturnWarningDlg::BUTTON_CANCEL:
+                case ConfirmationButton::CANCEL:
                     abortThisProcess();
                     break;
             }

@@ -137,7 +137,7 @@ void drawXLabel(wxDC& dc, double xMin, double xMax, int blockCount, const Conver
     if (blockCount <= 0)
         return;
 
-    wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
+    wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey => not accessible! but no big deal...
     wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
     const double valRangePerBlock = (xMax - xMin) / blockCount;
@@ -165,7 +165,7 @@ void drawYLabel(wxDC& dc, double yMin, double yMax, int blockCount, const Conver
     if (blockCount <= 0)
         return;
 
-    wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
+    wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey => not accessible! but no big deal...
     wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
     const double valRangePerBlock = (yMax - yMin) / blockCount;
@@ -555,8 +555,10 @@ void Graph2D::render(wxDC& dc) const
 
     {
         //paint graph background (excluding label area)
-        wxDCPenChanger   dummy (dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders
-        wxDCBrushChanger dummy2(dc, *wxWHITE); //accessibility: we have to set both back- and foreground colors or none at all!
+        wxDCPenChanger   dummy (dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
+        wxDCBrushChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+        //accessibility: consider system text and background colors; small drawback: color of graphs is NOT connected to the background! => responsibility of client to use correct colors
+
         dc.DrawRectangle(graphArea);
         graphArea.Deflate(1, 1); //attention more wxWidgets design mistakes: behavior of wxRect::Deflate depends on object being const/non-const!!!
     }

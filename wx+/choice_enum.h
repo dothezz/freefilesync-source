@@ -44,7 +44,7 @@ struct EnumDescrList
         descrList.push_back(std::make_pair(value, std::make_pair(text, tooltip)));
         return *this;
     }
-    typedef std::vector<std::pair<Enum, std::pair<wxString, wxString> > > DescrList;
+    typedef std::vector<std::pair<Enum, std::pair<wxString, wxString>>> DescrList;
     DescrList descrList;
 };
 template <class Enum> void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value);
@@ -71,15 +71,15 @@ void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value)
     ctrl.Clear();
 
     int selectedPos = 0;
-    for (typename EnumDescrList<Enum>::DescrList::const_iterator i = mapping.descrList.begin(); i != mapping.descrList.end(); ++i)
+    for (auto it = mapping.descrList.begin(); it != mapping.descrList.end(); ++it)
     {
-        ctrl.Append(i->second.first);
-        if (i->first == value)
+        ctrl.Append(it->second.first);
+        if (it->first == value)
         {
-            selectedPos = i - mapping.descrList.begin();
+            selectedPos = it - mapping.descrList.begin();
 
-            if (!i->second.second.empty())
-                ctrl.SetToolTip(i->second.second);
+            if (!it->second.second.empty())
+                ctrl.SetToolTip(it->second.second);
         }
     }
 
@@ -104,9 +104,9 @@ template <class Enum> void updateTooltipEnumVal(const EnumDescrList<Enum>& mappi
 {
     const Enum value = getEnumVal(mapping, ctrl);
 
-    for (typename EnumDescrList<Enum>::DescrList::const_iterator i = mapping.descrList.begin(); i != mapping.descrList.end(); ++i)
-        if (i->first == value)
-            ctrl.SetToolTip(i->second.second);
+    for (const auto& item : mapping.descrList)
+        if (item.first == value)
+            ctrl.SetToolTip(item.second.second);
 }
 
 }

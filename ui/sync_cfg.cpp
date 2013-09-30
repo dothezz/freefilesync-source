@@ -6,7 +6,7 @@
 
 #include "sync_cfg.h"
 #include <memory>
-#include <zen/format_unit.h>
+//#include <zen/format_unit.h>
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/rtl.h>
@@ -15,11 +15,13 @@
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
 #include <wx+/std_button_order.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "exec_finished_box.h"
 #include "dir_name.h"
 #include "../file_hierarchy.h"
-#include "../lib/resources.h"
+#include "../lib/help_provider.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -31,6 +33,7 @@ public:
     SyncCfgDialog(wxWindow* parent,
                   CompareVariant compareVar,
                   SyncConfig&    syncCfg,
+                  const wxString& caption,
                   xmlAccess::OnGuiError* handleError,     //
                   ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
 
@@ -56,7 +59,7 @@ private:
 
     virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
     virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
-    virtual void OnApply (wxCommandEvent& event);
+    virtual void OnOkay  (wxCommandEvent& event);
 
     virtual void OnParameterChange(wxCommandEvent& event) { updateGui(); }
 
@@ -66,6 +69,8 @@ private:
 
     virtual void OnErrorPopup (wxCommandEvent& event) { onGuiError = ON_GUIERROR_POPUP;  updateGui(); }
     virtual void OnErrorIgnore(wxCommandEvent& event) { onGuiError = ON_GUIERROR_IGNORE; updateGui(); }
+
+    virtual void OnHelpVersioning(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Versioning.html", this); }
 
     struct Config
     {
@@ -209,6 +214,7 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                              CompareVariant compareVar,
                              SyncConfig&    syncCfg,
+                             const wxString& title,
                              xmlAccess::OnGuiError* handleError,
                              ExecWhenFinishedCfg* execWhenFinished) :
     SyncCfgDlgGenerated(parent),
@@ -224,6 +230,8 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
+
+    SetTitle(title);
 
     //set icons for this dialog
     m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_left_only"  ))));
@@ -263,7 +271,8 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                     };
     setConfig(newCfg);
 
-    Fit();
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 
     m_buttonOK->SetFocus();
 }
@@ -312,14 +321,16 @@ SyncCfgDialog::Config SyncCfgDialog::getConfig() const
 
 void SyncCfgDialog::updateGui()
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
-    wxWindowUpdateLocker dummy2(m_panelVersioning); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+    wxWindowUpdateLocker dummy2(m_panelVersioning);
     wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
     wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
     wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
     wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
     wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
     wxWindowUpdateLocker dummy8(m_bpButtonConflict);
+#endif
 
     const Config cfg = getConfig(); //resolve parameter ownership: some on GUI controls, others member variables
 
@@ -400,9 +411,7 @@ void SyncCfgDialog::updateGui()
     }
 
     const bool versioningSelected = cfg.syncCfg.handleDeletion == DELETE_TO_VERSIONING;
-    bSizerVersioningNamingConvention->Show(versioningSelected);
-    bSizerVersioningStyle           ->Show(versioningSelected);
-    m_panelVersioning               ->Show(versioningSelected);
+    m_panelVersioning->Show(versioningSelected);
 
     if (versioningSelected)
     {
@@ -440,17 +449,34 @@ void SyncCfgDialog::updateGui()
     }
 
     Layout();
-    bSizerNamingConvention->Layout(); //[!] not handled by previous "Layout"
     Refresh(); //removes a few artifacts when toggling display of versioning folder
-    GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 }
 
 
-void SyncCfgDialog::OnApply(wxCommandEvent& event)
+void SyncCfgDialog::OnOkay(wxCommandEvent& event)
 {
     const Config cfg = getConfig();
 
-    //write configuration to main dialog
+    //parameter validation:
+
+    //check if user-defined directory for deletion was specified
+    if (cfg.syncCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
+    {
+        Zstring versioningDir = cfg.syncCfg.versioningDirectory;
+        trim(versioningDir);
+        if (versioningDir.empty())
+        {
+            showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().setMainInstructions(_("Please enter a target folder for versioning.")));
+            //don't show error icon to follow "Windows' encouraging tone"
+            m_panelVersioning->SetFocus();
+            return;
+        }
+    }
+
+    //apply config:
     outSyncCfg = cfg.syncCfg;
 
     if (outOptOnGuiError)
@@ -471,28 +497,28 @@ void SyncCfgDialog::OnSyncTwoWayDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncTwoWay(dummy);
-    OnApply(dummy);
+    OnOkay(dummy);
 }
 
 void SyncCfgDialog::OnSyncMirrorDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncMirror(dummy);
-    OnApply(dummy);
+    OnOkay(dummy);
 }
 
 void SyncCfgDialog::OnSyncUpdateDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncUpdate(dummy);
-    OnApply(dummy);
+    OnOkay(dummy);
 }
 
 void SyncCfgDialog::OnSyncCustomDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncCustom(dummy);
-    OnApply(dummy);
+    OnOkay(dummy);
 }
 
 namespace
@@ -600,14 +626,15 @@ void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
                                                        CompareVariant compareVar,
                                                        SyncConfig&    syncCfg,
+                                                       const wxString& title,
                                                        xmlAccess::OnGuiError* handleError,    //
                                                        ExecWhenFinishedCfg* execWhenFinished) //optional input parameter
 {
     SyncCfgDialog syncDlg(parent,
                           compareVar,
                           syncCfg,
+                          title,
                           handleError,
                           execWhenFinished);
-
     return static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
 }

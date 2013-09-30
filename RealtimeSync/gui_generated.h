@@ -32,10 +32,8 @@ namespace zen { class BitmapTextButton; }
 #include <wx/scrolwin.h>
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
-#include <wx/statbmp.h>
-#include <wx/dialog.h>
 
-#include "../zen/i18n.h"
+#include "zen/i18n.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +89,7 @@ protected:
 
 public:
 
-    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("dummy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
     ~MainDlgGenerated();
 
@@ -113,35 +111,6 @@ public:
 
     FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = 0 );
     ~FolderGenerated();
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class ErrorDlgGenerated
-///////////////////////////////////////////////////////////////////////////////
-class ErrorDlgGenerated : public wxDialog
-{
-private:
-
-protected:
-    wxPanel* m_panel3;
-    wxStaticBitmap* m_bitmap10;
-    wxTextCtrl* m_textCtrl8;
-    wxStaticLine* m_staticline2;
-    wxBoxSizer* bSizerStdButtons;
-    wxButton* m_buttonRetry;
-    wxButton* m_buttonCancel;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnRetry( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-    ~ErrorDlgGenerated();
 
 };
 

@@ -33,7 +33,7 @@ enum SymLinkHandling
 
 enum class SyncDirection : unsigned char //we need to save space for use in FileSystemObject!
 {
-    LEFT = 0,
+    LEFT,
     RIGHT,
     NONE
 };
@@ -41,32 +41,32 @@ enum class SyncDirection : unsigned char //we need to save space for use in File
 
 enum CompareFilesResult
 {
-    FILE_LEFT_SIDE_ONLY = 0,
+    FILE_EQUAL,
+    FILE_LEFT_SIDE_ONLY,
     FILE_RIGHT_SIDE_ONLY,
     FILE_LEFT_NEWER,  //CMP_BY_TIME_SIZE only!
     FILE_RIGHT_NEWER, //
     FILE_DIFFERENT, //CMP_BY_CONTENT only!
-    FILE_EQUAL,
     FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case, modification time
     FILE_CONFLICT
 };
 //attention make sure these /|\  \|/ three enums match!!!
 enum CompareDirResult
 {
+    DIR_EQUAL              = FILE_EQUAL,
     DIR_LEFT_SIDE_ONLY     = FILE_LEFT_SIDE_ONLY,
     DIR_RIGHT_SIDE_ONLY    = FILE_RIGHT_SIDE_ONLY,
-    DIR_EQUAL              = FILE_EQUAL,
     DIR_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA //both sides equal, but different metadata only: short name case
 };
 
 enum CompareSymlinkResult
 {
+    SYMLINK_EQUAL           = FILE_EQUAL,
     SYMLINK_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
     SYMLINK_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
     SYMLINK_LEFT_NEWER      = FILE_LEFT_NEWER,
     SYMLINK_RIGHT_NEWER     = FILE_RIGHT_NEWER,
     SYMLINK_DIFFERENT       = FILE_DIFFERENT,
-    SYMLINK_EQUAL           = FILE_EQUAL,
     SYMLINK_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };

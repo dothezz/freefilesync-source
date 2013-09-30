@@ -2,10 +2,16 @@
 	<language>한국어</language>
 	<translator>Simon Park</translator>
 	<locale>ko_KR</locale>
-	<flag_image>flag_south_korea.png</flag_image>
-	<plural_form_count>1</plural_form_count>
+	<image>flag_south_korea.png</image>
+	<plural_count>1</plural_count>
 	<plural_definition>0</plural_definition>
 </header>
+
+<source>&Check</source>
+<target></target>
+
+<source>Retrying operation...</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>마지막 동기화 작업 이후, 양측 모두 변경 되었습니다.</target>
@@ -58,9 +64,6 @@
 <source>Cannot open file %x.</source>
 <target>파일 %x을(를) 열 수 없습니다.</target>
 
-<source>Error</source>
-<target>오류</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>파일 %x 의 구성이 유효하지 않습니다.</target>
 
@@ -70,11 +73,11 @@
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
 <target>명령줄을 통해 설정된 디렉토리의 경우, 설정 파일은 디렉토리 페어 상의 설정을 포함할 수 없습니다.</target>
 
-<source>Warning</source>
-<target>경고</target>
-
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>디렉토리는 하나 이상의 설정 파일을 위해 설정될 수 없습니다.</target>
+
+<source>Command line</source>
+<target>명령줄(커맨드라인)</target>
 
 <source>Syntax:</source>
 <target>구문(Syntax):</target>
@@ -90,9 +93,6 @@
 
 <source>Any number of alternative directories for at most one config file.</source>
 <target>최대 한개 설정파일에 대한 대체 디렉토리 개수</target>
-
-<source>Command line</source>
-<target>명령줄(커맨드라인)</target>
 
 <source>A folder input field is empty.</source>
 <target>폴더 입력 필드 하나가 비어 있습니다.</target>
@@ -289,7 +289,7 @@
 <source>/sec</source>
 <target>/초</target>
 
-<source>%x items</source>
+<source>%x items/sec</source>
 <target>%x 항목</target>
 
 <source>Configuration file %x loaded partially only.</source>
@@ -319,11 +319,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>볼륨 이름 %x은(는) 파일 경로 %y의 일부가 아닙니다.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
+<source>Stop requested: Waiting for current operation to finish...</source>
 <target>사용자에 의한 작업 중단: 현재 작업 종료 대기 중...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>버저닝을 위한 타임 스탬프 생성 실패:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>버저닝을 위한 타임 스탬프 생성 불가:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>다음 XML 요소를 읽을 수 없습니다:</target>
@@ -340,8 +340,8 @@
 <source>&Program</source>
 <target>프로그램(&P)</target>
 
-<source>&Content</source>
-<target>도움말 내용(&C)</target>
+<source>&View help</source>
+<target>도움말 보기(&V)</target>
 
 <source>&About</source>
 <target>상세 정보(&A)</target>
@@ -364,8 +364,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>시작하려면 .ffs_batch file (일괄 파일)을 가져오십시오.</target>
 
-<source>Folders to watch</source>
-<target>열어 볼 폴더</target>
+<source>Folders to watch:</source>
+<target>열어 볼 폴더:</target>
 
 <source>Add folder</source>
 <target>폴더 추가</target>
@@ -379,11 +379,14 @@
 <source>Select a folder</source>
 <target>폴더 선택</target>
 
-<source>Idle time [seconds]</source>
-<target>유휴시간 [초]</target>
+<source>Idle time (in seconds):</source>
+<target>유휴 시간 (초 단위)</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>마지막으로 감지된 변화와 명령 실행 간의 유휴 시간</target>
+
+<source>Command line:</source>
+<target>명령줄(커맨드라인):</target>
 
 <source>
 The command is triggered if:
@@ -396,8 +399,8 @@ The command is triggered if:
 - 새 폴더가 생겼을 시 (예: USB 스틱 삽입)
 </target>
 
-<source>Start</source>
-<target>시작</target>
+<source>&Start</source>
+<target>시작(&S)</target>
 
 <source>&Retry</source>
 <target>다시 시도(&R)</target>
@@ -405,23 +408,26 @@ The command is triggered if:
 <source>Cancel</source>
 <target>취소</target>
 
-<source>RealtimeSync - Automated Synchronization</source>
-<target>실시간 동기화 - 자동 동기화</target>
+<source>About</source>
+<target>상세 정보</target>
 
 <source>Build: %x</source>
 <target>빌드: %x</target>
 
-<source>About</source>
-<target>상세 정보</target>
-
 <source>All files</source>
 <target>모든 파일</target>
+
+<source>Automated Synchronization</source>
+<target>자동 동기화</target>
 
 <source>Directory monitoring active</source>
 <target>디렉토리 모니터링 활성화</target>
 
 <source>Waiting until all directories are available...</source>
 <target>모든 디렉토리가 사용 가능할 때까지 대기 중...</target>
+
+<source>Error</source>
+<target>오류</target>
 
 <source>&Restore</source>
 <target>복원(&R)</target>
@@ -432,8 +438,8 @@ The command is triggered if:
 <source>&Exit</source>
 <target>나가기(&E)</target>
 
-<source>Invalid command line:</source>
-<target>잘못된 명령줄:</target>
+<source>Incorrect command line:</source>
+<target>부정확한 명령줄:</target>
 
 <source>File content</source>
 <target>파일 내용</target>
@@ -495,8 +501,8 @@ The command is triggered if:
 <source>Target folder input field must not be empty.</source>
 <target>대상 폴더 입력 필드가 비어 있어서는 안 됩니다.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>버저닝을 위한 폴더 입력 필드가 비어 있어서는 안 됩니다.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>버저닝을 위한 대상 폴더를 입력하세요.</target>
 
 <source>Source folder %x not found.</source>
 <target>소스 폴더 %x을(를) 찾을 수 없음.</target>
@@ -505,7 +511,7 @@ The command is triggered if:
 <target>아래의 항목들은 해결치 못 한 충돌로 인해 동기화할 수 없습니다:</target>
 
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target>다음 폴더들의 차이가 상당합니다. 동기화를 위해 올바른 폴더들이 매치되었는지 확인해 보십시오.</target>
+<target>다음 폴더들은 차이가 상당합니다. 동기화를 위해 올바른 폴더들이 매치되었는지 확인해 보십시오.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>사용 가능한 디스크 여유 공간이 부족합니다:</target>
@@ -534,7 +540,7 @@ The command is triggered if:
 <source>job name</source>
 <target>작업 이름</target>
 
-<source>Synchronization aborted</source>
+<source>Synchronization stopped</source>
 <target>동기화 중단</target>
 
 <source>Synchronization completed with errors</source>
@@ -552,14 +558,37 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>로그 파일 %x 저장 중...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>FreeFileSync 기본 대화 창에서 문제 해결을 하려면 "Switch" [전환]을 누르십시오.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>이 문제는 FreeFileSync 기본 창으로 전환해서 해결 가능합니다.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>FreeFileSync 기본 대화 창으로 전환</target>
+<source>&Don't show this warning again</source>
+<target>이 경고를 다시 표시하지 않음(&D)</target>
 
-<source>Retrying operation after error:</source>
-<target>오류 발생 후, 작업 재시도 중:</target>
+<source>&Ignore</source>
+<target>무시(&I)</target>
+
+<source>&Switch</source>
+<target>전환(&S)</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target>FreeFileSync 기본 창으로 전환 중</target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>%x초 이내에 자동 재시도...</pluralform>
+</target>
+
+<source>Serious Error</source>
+<target>심각한 오류</target>
+
+<source>&Ignore subsequent errors</source>
+<target>이후 오류 무시(&I)</target>
+
+<source>Check for Program Updates</source>
+<target>프로그램 업데이트 확인</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>새로운 버전의 FreeFileSync가 나왔습니다:</target>
@@ -567,17 +596,11 @@ The command is triggered if:
 <source>Download now?</source>
 <target>지금 다운로드 하시겠습니까?</target>
 
-<source>New version found</source>
-<target>새로운 버전이 발견되었습니다.</target>
-
 <source>&Download</source>
 <target>다운로드(&D)</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync는 현재 최신버전 상태입니다.</target>
-
-<source>Information</source>
-<target>인포메이션 (정보)</target>
 
 <source>Unable to connect to sourceforge.net.</source>
 <target>Sourceforge.net에 접속할 수 없습니다.</target>
@@ -636,20 +659,20 @@ The command is triggered if:
 <source>Hibernate</source>
 <target>최대절전모드</target>
 
-<source>Selected variant:</source>
-<target>선택한 베어리언트</target>
+<source>Alternate comparison settings</source>
+<target>비교 설정 변경</target>
 
-<source>Select alternate comparison settings</source>
-<target>대체 비교 설정 선택</target>
+<source>Alternate synchronization settings</source>
+<target>동기화 설정 변경</target>
 
-<source>Select alternate synchronization settings</source>
-<target>대체 동기화 설정 선택</target>
+<source>Local filter</source>
+<target>로컬 필터</target>
 
-<source>Filter is active</source>
-<target>필터 활성화</target>
+<source>Active</source>
+<target>활성화</target>
 
-<source>No filter selected</source>
-<target>선택한 필터가 없음</target>
+<source>None</source>
+<target>아무것도 안 함</target>
 
 <source>Remove alternate settings</source>
 <target>대체설정 제거</target>
@@ -663,8 +686,17 @@ The command is triggered if:
 <source>Paste</source>
 <target>붙여넣기</target>
 
+<source>Alternate Comparison Settings</source>
+<target>비교 설정 변경</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>동기화 설정 변경</target>
+
+<source>Local Filter</source>
+<target>로컬 필터</target>
+
 <source>&New</source>
-<target>신규 작업 (&N)</target>
+<target>신규 작업(&N)</target>
 
 <source>&Save</source>
 <target>저장(&S)</target>
@@ -678,14 +710,17 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. 동기화(&S)</target>
 
+<source>&Global settings</source>
+<target>전체 설정(&G)</target>
+
 <source>&Language</source>
 <target>언어 선택(&L)</target>
 
+<source>&Find...</source>
+<target>찾기(&F)</target>
+
 <source>&Export file list...</source>
 <target>파일 리스트 내보내기(&E)</target>
-
-<source>&Global settings</source>
-<target>전체 설정(&G)</target>
 
 <source>&Tools</source>
 <target>도구(&T)</target>
@@ -696,17 +731,11 @@ The command is triggered if:
 <source>Check &automatically once a week</source>
 <target>자동으로 주당 1회 확인(&a)</target>
 
-<source>Check for new &version</source>
-<target>신규 버전 확인(&v)</target>
+<source>&Check for new version</source>
+<target>신규 버전 확인(&C)</target>
 
 <source>Compare</source>
 <target>비  교</target>
-
-<source>Comparison settings</source>
-<target>비교 설정</target>
-
-<source>Synchronization settings</source>
-<target>동기화 설정</target>
 
 <source>Synchronize</source>
 <target>동  기  화</target>
@@ -719,6 +748,15 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>양측 위치 바꾸기</target>
+
+<source>Close search bar</source>
+<target>검색 창 닫기</target>
+
+<source>Find:</source>
+<target>찾기:</target>
+
+<source>Match case</source>
+<target>대문자/소문자 구분</target>
 
 <source>Save as batch job</source>
 <target>일괄 작업으로 저장</target>
@@ -741,6 +779,99 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>복사할 전체 바이트 크기</target>
 
+<source>Select a variant:</source>
+<target>베어리언트 선택:</target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target>수정 시간 및 크기를 비교하여 동일한 파일을 식별</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>파일 내용을 비교하여 동일한 파일을 식별</target>
+
+<source>Symbolic links:</source>
+<target>심볼링 링크:</target>
+
+<source>More information</source>
+<target>상세 정보</target>
+
+<source>OK</source>
+<target>OK</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>좌측 폴더 백업 미러 생성: 동기화 이후 좌측 및 우측 폴더는 완전히 똑같이 매치 됩니다.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>개인 동기화 규칙 설정</target>
+
+<source>Detect moved files</source>
+<target>이동 파일 탐지</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>데이터베이스 파일이 필요합니다. 모든 파일 시스템에서 지원되지는 않습니다.</target>
+
+<source>Delete files:</source>
+<target>파일 삭제:</target>
+
+<source>Permanent</source>
+<target>영구</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>파일 영구 삭제 또는 덮어쓰기</target>
+
+<source>&Recycle bin</source>
+<target>휴지통(&R)</target>
+
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>휴지통에 삭제되고 덮어 씌어진 파일 백업</target>
+
+<source>Versioning</source>
+<target>버저닝</target>
+
+<source>Move files to a user-defined folder</source>
+<target>사용자 정의 폴더로 파일 이동</target>
+
+<source>Naming convention:</source>
+<target>이름 지정:</target>
+
+<source>Show examples</source>
+<target>예 보이기</target>
+
+<source>Handle errors:</source>
+<target>오류 발생시:</target>
+
+<source>Ignore</source>
+<target>무시</target>
+
+<source>Hide all error and warning messages</source>
+<target>모든 오류/경고 메세지 숨기기</target>
+
+<source>Pop-up</source>
+<target>팝업</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>오류 또는 경고에 대한 팝업 보이기</target>
+
+<source>On completion:</source>
+<target>완료 시:</target>
+
+<source>Start synchronization now?</source>
+<target>지금 동기화를 시작하시겠습니까?</target>
+
+<source>Variant:</source>
+<target>베어리언트:</target>
+
+<source>Statistics</source>
+<target>통  계</target>
+
+<source>&Don't show this dialog again</source>
+<target>이 대화 창을 다시 표시 안 함(&D)</target>
+
 <source>Items found:</source>
 <target>발견된 항목:</target>
 
@@ -759,143 +890,119 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>알림 영역으로 최소화</target>
 
-<source>On completion</source>
-<target>완료 시</target>
-
 <source>Close</source>
 <target>닫기</target>
 
 <source>&Pause</source>
 <target>일시정지(&P)</target>
 
-<source>Variant</source>
-<target>베어리언트</target>
-
-<source>Statistics</source>
-<target>통계</target>
-
-<source>&Don't show this dialog again</source>
-<target>이 대화 창을 다시 표시 안 함 (&D)</target>
-
-<source>Select a variant</source>
-<target>베어리언트 선택</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-비교된 양쪽 파일은
-마지막 쓰기 시간과 날짜,
-그리고 파일 크기가 모두 같을 경우,
-동일한 파일로 간주됩니다.
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-비교된 양쪽 파일은
-파일 내용이 같을 경우,
-동일한 파일로 간주됩니다.
-</target>
-
-<source>Symbolic Link handling</source>
-<target>심볼릭 링크 처리</target>
-
-<source>Help</source>
-<target>도움말</target>
-
-<source>OK</source>
-<target>OK</target>
-
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>좌측 폴더 백업 미러. 동기화 이후 우측 폴더는 좌측 폴더와 완전히 똑같이 매치 되도록 변경 됩니다.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>개인 동기화 규칙 설정</target>
-
-<source>Detect moved files</source>
-<target>이동 파일 탐지</target>
-
-<source>Requires database files. Not supported by all file systems.</source>
-<target>데이터베이스 파일이 필요합니다. 모든 파일 시스템에서 지원되지는 않습니다.</target>
-
-<source>Error handling</source>
-<target>오류 발생시:</target>
-
-<source>Ignore</source>
-<target>무시</target>
-
-<source>Hide all error and warning messages</source>
-<target>모든 오류/경고 메세지 숨기기</target>
-
-<source>Pop-up</source>
-<target>팝업</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>오류 또는 경고에 대한 팝업 보이기</target>
-
-<source>Deletion handling</source>
-<target>삭제 처리 옵션</target>
-
-<source>Permanent</source>
-<target>영구</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>파일 영구 삭제 또는 덮어쓰기</target>
-
-<source>Recycle bin</source>
-<target>휴지통</target>
-
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>휴지통에 삭제되고 덮어 씌어진 파일 백업</target>
-
-<source>Versioning</source>
-<target>버저닝</target>
-
-<source>Move files to a user-defined folder</source>
-<target>사용자 정의 폴더로 파일 이동</target>
-
-<source>Naming convention:</source>
-<target>이름 지정:</target>
-
-<source>Batch job</source>
-<target>일괄 작업</target>
+<source>Stop</source>
+<target>중지</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>직접 지켜보지 않는 자동 동기화의 경우, 배치 파일을 만듭니다. 시작하려면 파일을 더블 클릭하거나 작업 플래너에서 일정을 만듭니다: %x</target>
 
-<source>Exit</source>
-<target>종료</target>
-
-<source>Abort synchronization on first error</source>
-<target>첫 번째 오류 시 동기화 중지</target>
+<source>Stop synchronization at first error</source>
+<target>첫 오류 발생 시 동기화 중지</target>
 
 <source>Show progress dialog</source>
 <target>진행 표시 창 보기</target>
 
-<source>Save log</source>
-<target>로그 저장</target>
+<source>Save log:</source>
+<target>로그 저장:</target>
 
-<source>Select folder to save log files</source>
-<target>로그 파일을 저장할 폴더 선택</target>
-
-<source>Limit</source>
-<target>제한</target>
+<source>Limit:</source>
+<target>제한:</target>
 
 <source>Limit maximum number of log files</source>
 <target>로그 파일의 최대 개수 제한</target>
+
+<source>How can I schedule a batch job?</source>
+<target>일괄 작업 예약 방법은?</target>
+
+<source>Delete on both sides</source>
+<target>양측 모두 삭제</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>어느 한쪽의 파일만 선택하더라도 양측 모두 삭제</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>동기화에서 특정 파일을 제외시키는 필터 규칙을 선택합니다. 해당 폴더 페어(짝)에 대한 상대 파일 경로를 입력하세요.</target>
+
+<source>Include:</source>
+<target>포함:</target>
+
+<source>Exclude:</source>
+<target>제외:</target>
+
+<source>Time span:</source>
+<target>시간 간격:</target>
+
+<source>File size:</source>
+<target>파일 크기:</target>
+
+<source>Minimum:</source>
+<target>최소:</target>
+
+<source>Maximum:</source>
+<target>최대:</target>
+
+<source>&Clear</source>
+<target>지우기(&C)</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>다음 설정은 모든 동기화 작업에 사용됩니다.</target>
+
+<source>Fail-safe file copy</source>
+<target>실패 - 안전 파일 복사</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+대상을 덮어쓰기 전에 임시파일(*.ffs_tmp)로 복사.
+이는 심각한 오류 발생시에도 일관된 상태 유지를 보장합니다.
+</target>
+
+<source>(recommended)</source>
+<target>(권장)</target>
+
+<source>Copy locked files</source>
+<target>락 걸린 파일 복사</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Volume Shadow Copy Service를 사용하여 공유 또는 잠긴 파일 복사</target>
+
+<source>(requires administrator rights)</source>
+<target>(관리자 권한 필요)</target>
+
+<source>Copy file access permissions</source>
+<target>파일 접근 권한 복사</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>파일 및 폴더 권한 전송</target>
+
+<source>Automatic retry on error:</source>
+<target>오류 발생 시 자동 재시도:</target>
+
+<source>Retry count:</source>
+<target>재시도 횟수:</target>
+
+<source>Delay (in seconds):</source>
+<target>지연 (초 단위):</target>
+
+<source>Customize context menu:</source>
+<target>컨텍스트 메뉴 커스터마이즈 (사용자 정의):</target>
+
+<source>Description</source>
+<target>설명</target>
+
+<source>Restore hidden windows</source>
+<target>숨겨진 창 복원</target>
+
+<source>&Default</source>
+<target>기본 설정/값(&D)</target>
 
 <source>Source code written in C++ using:</source>
 <target>소스코드는 C++ 언어로 아래 툴을 사용하여 작성되었습니다:</target>
@@ -905,9 +1012,6 @@ is the same
 
 <source>Donate with PayPal</source>
 <target>PayPal로 기부하기</target>
-
-<source>Many thanks for localization:</source>
-<target>현지화 작업에 깊은 감사 드립니다:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>모든 의견 및 건의/제안을 환영합니다</target>
@@ -921,101 +1025,26 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>GNU 일반 공용 라이센스에 의한 출시</target>
 
-<source>Delete on both sides</source>
-<target>양측 모두 삭제</target>
+<source>Many thanks for localization:</source>
+<target>현지화 작업에 깊은 감사 드립니다:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>어느 한쪽의 파일만 선택하더라도 양측 모두 삭제</target>
+<source>Save as Batch Job</source>
+<target>일괄 작업으로 저장</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-모든 필터 규칙에 준할 경우에만 파일을 동기화 시킵니다.
-참고: 파일 경로가 기본 디렉토리에 연결돼 있어야 합니다.
-</target>
+<source>Delete Items</source>
+<target>항목 삭제</target>
 
-<source>Include</source>
-<target>포함</target>
-
-<source>Exclude</source>
-<target>제외</target>
-
-<source>Time span</source>
-<target>시간간격(타임스팬)</target>
-
-<source>File size</source>
-<target>파일 크기</target>
-
-<source>Minimum</source>
-<target>최소</target>
-
-<source>Maximum</source>
-<target>최대</target>
-
-<source>&Clear</source>
-<target>지우기(&C)</target>
-
-<source>Global settings</source>
+<source>Global Settings</source>
 <target>전체 설정</target>
 
-<source>Fail-safe file copy</source>
-<target>실패 - 안전 파일 복사</target>
+<source>Select Time Span</source>
+<target>시간간격(타임스팬) 선택</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>일단 임시파일(*.ffs_tmp)로 복사한 후 이름 바꾸기. 이 같이 함으로써 치명적인 오류 발생시에도 일관된 상태 유지를 보장합니다.</target>
-
-<source>Copy locked files</source>
-<target>락 걸린 파일 복사</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Volume Shadow Copy Service를 사용하여 공유 또는 잠긴 파일 복사 (관리자 권한 필요)</target>
-
-<source>Copy file access permissions</source>
-<target>파일 접근 권한 복사</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>파일 및 폴더 권한 전송 (관리자 권한 필요)</target>
-
-<source>Restore hidden dialogs</source>
-<target>숨겨진 대화 창 복원</target>
-
-<source>External applications</source>
-<target>외부 응용 프로그램</target>
-
-<source>Description</source>
-<target>설명</target>
-
-<source>&Default</source>
-<target>기본 설정/값(&D)</target>
-
-<source>Find what:</source>
-<target>검색어:</target>
-
-<source>Match case</source>
-<target>대문자/소문자 구분</target>
-
-<source>&Find next</source>
-<target>다음 검색(&F)</target>
-
-<source>Start synchronization</source>
-<target>동기화 시작</target>
-
-<source>Delete</source>
-<target>삭제</target>
-
-<source>Configure filter</source>
-<target>필터 설정</target>
+<source>Folder Pairs</source>
+<target>폴더 페어(짝)</target>
 
 <source>Find</source>
 <target>검색</target>
-
-<source>Select time span</source>
-<target>시간간격(타임스팬) 선택</target>
-
-<source>Folder pairs</source>
-<target>폴더 페어(짝)</target>
 
 <source>Overview</source>
 <target>개요</target>
@@ -1023,13 +1052,13 @@ Note: File paths must be relative to base directories.
 <source>Configuration</source>
 <target>구성 설정</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>메인 바</target>
 
-<source>Filter files</source>
+<source>Filter Files</source>
 <target>파일 필터</target>
 
-<source>Select view</source>
+<source>Select View</source>
 <target>보기 선택</target>
 
 <source>Open...</source>
@@ -1041,16 +1070,25 @@ Note: File paths must be relative to base directories.
 <source>Compare both sides</source>
 <target>양측 비교</target>
 
+<source>Comparison settings</source>
+<target>비교 설정</target>
+
+<source>Synchronization settings</source>
+<target>동기화 설정</target>
+
+<source>Start synchronization</source>
+<target>동기화 시작</target>
+
+<source>Confirm</source>
+<target>확인</target>
+
 <source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
 <pluralform>정말로 %x 항목을 위해 %y 명령을 실행하기를 원하십니까?</pluralform>
 </target>
-
-<source>Confirm</source>
-<target>확인</target>
 
 <source>&Execute</source>
 <target>실행(&E)</target>
@@ -1082,12 +1120,6 @@ Note: File paths must be relative to base directories.
 <source>Set direction:</source>
 <target>방향 설정:</target>
 
-<source>Exclude temporarily</source>
-<target>임시 제외</target>
-
-<source>Include temporarily</source>
-<target>임시 포함</target>
-
 <source>multiple selection</source>
 <target>복수 선택</target>
 
@@ -1095,7 +1127,16 @@ Note: File paths must be relative to base directories.
 <target>필터를 통해 다음을 포함:</target>
 
 <source>Exclude via filter:</source>
-<target>필터를 통하여 제외</target>
+<target>필터를 통해 다음을 제외:</target>
+
+<source>Exclude temporarily</source>
+<target>임시 제외</target>
+
+<source>Include temporarily</source>
+<target>임시 포함</target>
+
+<source>Delete</source>
+<target>삭제</target>
 
 <source>Include all</source>
 <target>모두 포함</target>
@@ -1139,11 +1180,14 @@ Note: File paths must be relative to base directories.
 <source>Do you want to save changes to %x?</source>
 <target>%x의 변경사항을 저장하시겠습니까?</target>
 
+<source>Never save &changes</source>
+<target>변경사항을 절대 저장하기 않기(&c)</target>
+
 <source>Do&n't save</source>
 <target>저장하기 않기(&n)</target>
 
-<source>Never save &changes</source>
-<target>변경사항을 절대 저장하기 않기(&c)</target>
+<source>Filter</source>
+<target>필터</target>
 
 <source>Show files that exist on left side only</source>
 <target>좌측에만 존재하는 파일 표시</target>
@@ -1190,11 +1234,17 @@ Note: File paths must be relative to base directories.
 <source>Set as default</source>
 <target>기본 값으로 설정</target>
 
-<source>Operation aborted</source>
-<target>작업 중단</target>
-
 <source>All folders are in sync</source>
 <target>모든 폴더가 동기화 되었음</target>
+
+<source>Synchronization Settings</source>
+<target>동기화 설정</target>
+
+<source>Comparison Settings</source>
+<target>비교 설정</target>
+
+<source>Cannot find %x</source>
+<target>%x을(를) 찾을 수 없습니다.</target>
 
 <source>Comma-separated values</source>
 <target>쉼표로 구분된 값</target>
@@ -1205,30 +1255,6 @@ Note: File paths must be relative to base directories.
 <source>Searching for program updates...</source>
 <target>프로그램 업데이트 검색 중...</target>
 
-<source>&Ignore subsequent errors</source>
-<target>이후 오류 무시(&I)</target>
-
-<source>&Ignore</source>
-<target>무시(&I)</target>
-
-<source>Fatal Error</source>
-<target>치명적 오류</target>
-
-<source>&Don't show this warning again</source>
-<target>이 경고를 다시 표시하지 않음(&D)</target>
-
-<source>&Switch</source>
-<target>스위치[전환](&S)</target>
-
-<source>Question</source>
-<target>질문</target>
-
-<source>&Yes</source>
-<target>예(&Y)</target>
-
-<source>&No</source>
-<target>아니오(&N)</target>
-
 <source>Scanning...</source>
 <target>스캔 중...</target>
 
@@ -1238,14 +1264,17 @@ Note: File paths must be relative to base directories.
 <source>Info</source>
 <target>정보</target>
 
+<source>Warning</source>
+<target>경고</target>
+
 <source>Paused</source>
 <target>일시정지 중</target>
 
 <source>Initializing...</source>
 <target>초기화 작업 중...</target>
 
-<source>Aborted</source>
-<target>중단됨</target>
+<source>Stopped</source>
+<target>중단</target>
 
 <source>Completed</source>
 <target>완료</target>
@@ -1255,12 +1284,6 @@ Note: File paths must be relative to base directories.
 
 <source>Log</source>
 <target>로그</target>
-
-<source>Cannot find %x</source>
-<target>%x을(를) 찾을 수 없습니다.</target>
-
-<source>Inactive</source>
-<target>비활성화</target>
 
 <source>Today</source>
 <target>오늘</target>
@@ -1286,9 +1309,6 @@ Note: File paths must be relative to base directories.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>필터</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1297,6 +1317,9 @@ Note: File paths must be relative to base directories.
 <pluralform>다음 %x 항목을 정말로 휴지통으로 이동하기를 원하십니까?</pluralform>
 </target>
 
+<source>Move</source>
+<target>이동</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1304,6 +1327,9 @@ Note: File paths must be relative to base directories.
 <target>
 <pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>제외</target>
 
 <source>Direct</source>
 <target>다이렉트</target>
@@ -1329,8 +1355,8 @@ Note: File paths must be relative to base directories.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>% 항목_폴더 %의 반대편 대응부(카운터파트)</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>숨겨진 경고 창 또는 대화 창을 다시 보이게 하시겠습니까?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>모든 숨겨진 창 및 경고를 복원하시겠습니까?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>미해결 충돌로 놔두기</target>
@@ -1452,17 +1478,17 @@ Note: File paths must be relative to base directories.
 <pluralform>%x일</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>시스템 메시지를 받기 위한 등록에 실패하였습니다.</target>
+<source>Unable to register to receive system messages.</source>
+<target>시스템 메시지 수신을 위한 등록을 할 수 없습니다.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>권한 %x을(를) 설정할 수 없습니다.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>시스템 절전모드 중지 실패</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>시스템 절전모드 중지를 할 수 없습니다.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>I/O 우선순위 프로세스 변경 불가</target>
+<target>프로세스 I/O 우선순위 변경을 할 수 없습니다.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
 <target>휴지통으로 %x을(를) 이동할 수 없습니다.</target>

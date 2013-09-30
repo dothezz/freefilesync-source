@@ -2,8 +2,8 @@
 	<language>Norsk</language>
 	<translator>Bjørn Snoen</translator>
 	<locale>nb_NO</locale>
-	<flag_image>flag_norway.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_norway.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
@@ -13,7 +13,10 @@
 <source>Unable to move %x to the recycle bin.</source>
 <target></target>
 
-<source>Failed to register to receive system messages.</source>
+<source>Unable to suspend system sleep mode.</source>
+<target></target>
+
+<source>Unable to register to receive system messages.</source>
 <target></target>
 
 <source>Cannot create symbolic link %x.</source>
@@ -25,12 +28,18 @@
 <source>Time stamp</source>
 <target></target>
 
+<source>Restore all hidden windows and warnings?</source>
+<target></target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
 </target>
+
+<source>Move</source>
+<target></target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -45,7 +54,13 @@
 <source>&Continue</source>
 <target></target>
 
+<source>Stopped</source>
+<target></target>
+
 <source>&Don't show this warning again</source>
+<target></target>
+
+<source>Serious Error</source>
 <target></target>
 
 <source>&Ignore subsequent errors</source>
@@ -55,6 +70,12 @@
 <target></target>
 
 <source>Comma-separated values</source>
+<target></target>
+
+<source>Comparison Settings</source>
+<target></target>
+
+<source>Synchronization Settings</source>
 <target></target>
 
 <source>Never save &changes</source>
@@ -77,31 +98,136 @@
 <target></target>
 
 <source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
 </target>
 
-<source>Transfer file and folder permissions (requires administrator rights)</source>
+<source>Select View</source>
 <target></target>
 
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<source>Filter Files</source>
 <target></target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<source>Main Bar</source>
+<target></target>
+
+<source>Folder Pairs</source>
+<target></target>
+
+<source>Select Time Span</source>
+<target></target>
+
+<source>Global Settings</source>
+<target></target>
+
+<source>Delete Items</source>
+<target></target>
+
+<source>Save as Batch Job</source>
+<target></target>
+
+<source>Restore hidden windows</source>
+<target></target>
+
+<source>Customize context menu:</source>
+<target></target>
+
+<source>Delay (in seconds):</source>
+<target></target>
+
+<source>Retry count:</source>
+<target></target>
+
+<source>Automatic retry on error:</source>
+<target></target>
+
+<source>Transfer file and folder permissions.</source>
+<target></target>
+
+<source>(requires administrator rights)</source>
+<target></target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target></target>
+
+<source>(recommended)</source>
+<target></target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target></target>
+
+<source>The following settings are used for all synchronization jobs.</source>
 <target></target>
 
 <source>&Clear</source>
 <target></target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
+<source>Maximum:</source>
+<target></target>
+
+<source>Minimum:</source>
+<target></target>
+
+<source>File size:</source>
+<target></target>
+
+<source>Time span:</source>
+<target></target>
+
+<source>Exclude:</source>
+<target></target>
+
+<source>Include:</source>
+<target></target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target></target>
+
+<source>&Recycle bin</source>
+<target></target>
+
+<source>How can I schedule a batch job?</source>
+<target></target>
+
+<source>Limit:</source>
+<target></target>
+
+<source>Save log:</source>
+<target></target>
+
+<source>Stop synchronization at first error</source>
 <target></target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target></target>
+
+<source>Stop</source>
+<target></target>
+
+<source>Minimize to notification area</source>
+<target></target>
+
+<source>&Don't show this dialog again</source>
+<target></target>
+
+<source>Variant:</source>
+<target></target>
+
+<source>Start synchronization now?</source>
+<target></target>
+
+<source>On completion:</source>
+<target></target>
+
+<source>Handle errors:</source>
+<target></target>
+
+<source>Show examples</source>
 <target></target>
 
 <source>Move files to a user-defined folder</source>
@@ -113,25 +239,46 @@ Note: File paths must be relative to base directories.
 <source>Recycle bin</source>
 <target></target>
 
+<source>Delete files:</source>
+<target></target>
+
 <source>Requires database files. Not supported by all file systems.</source>
 <target></target>
 
 <source>Detect moved files</source>
 <target></target>
 
+<source>Copy new and updated files to the right folder.</source>
+<target></target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target></target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target></target>
 
-<source>Select a variant</source>
+<source>More information</source>
 <target></target>
 
-<source>&Don't show this dialog again</source>
+<source>Symbolic links:</source>
 <target></target>
 
-<source>Minimize to notification area</source>
+<source>Identify equal files by comparing the file content.</source>
 <target></target>
 
-<source>Check for new &version</source>
+<source>Identify equal files by comparing modification time and size.</source>
+<target></target>
+
+<source>Select a variant:</source>
+<target></target>
+
+<source>Find:</source>
+<target></target>
+
+<source>Close search bar</source>
+<target></target>
+
+<source>&Check for new version</source>
 <target></target>
 
 <source>Check &automatically once a week</source>
@@ -143,7 +290,34 @@ Note: File paths must be relative to base directories.
 <source>&Tools</source>
 <target></target>
 
+<source>&Find...</source>
+<target></target>
+
+<source>Local Filter</source>
+<target></target>
+
+<source>Alternate Synchronization Settings</source>
+<target></target>
+
+<source>Alternate Comparison Settings</source>
+<target></target>
+
 <source>Paste</source>
+<target></target>
+
+<source>None</source>
+<target></target>
+
+<source>Active</source>
+<target></target>
+
+<source>Local filter</source>
+<target></target>
+
+<source>Alternate synchronization settings</source>
+<target></target>
+
+<source>Alternate comparison settings</source>
 <target></target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
@@ -152,13 +326,26 @@ Note: File paths must be relative to base directories.
 <source>&Download</source>
 <target></target>
 
-<source>New version found</source>
+<source>Check for Program Updates</source>
 <target></target>
 
-<source>Retrying operation after error:</source>
+<source>Retrying operation</source>
 <target></target>
 
-<source>Switching to FreeFileSync main dialog</source>
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target></target>
+
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target></target>
+
+<source>Synchronization stopped</source>
 <target></target>
 
 <source>job name</source>
@@ -173,6 +360,12 @@ Note: File paths must be relative to base directories.
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
 <target></target>
 
+<source>Please enter a target folder for versioning.</source>
+<target></target>
+
+<source>Incorrect command line:</source>
+<target></target>
+
 <source>&Show error</source>
 <target></target>
 
@@ -180,6 +373,30 @@ Note: File paths must be relative to base directories.
 <target></target>
 
 <source>Directory monitoring active</source>
+<target></target>
+
+<source>Automated Synchronization</source>
+<target></target>
+
+<source>&Start</source>
+<target></target>
+
+<source>Command line:</source>
+<target></target>
+
+<source>Idle time (in seconds):</source>
+<target></target>
+
+<source>Folders to watch:</source>
+<target></target>
+
+<source>&View help</source>
+<target></target>
+
+<source>Unable to create timestamp for versioning:</source>
+<target></target>
+
+<source>Stop requested: Waiting for current operation to finish...</source>
 <target></target>
 
 <source>Volume name %x is not part of file path %y.</source>
@@ -191,7 +408,7 @@ Note: File paths must be relative to base directories.
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target></target>
 
-<source>%x items</source>
+<source>%x items/sec</source>
 <target></target>
 
 <source>
@@ -493,12 +710,6 @@ Note: File paths must be relative to base directories.
 <source>Cannot load file %x.</source>
 <target>Kan ikke laste filen %x.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Handling avbrutt: Venter på at nåværende handling fullføres...</target>
-
-<source>Failure to create timestamp for versioning:</source>
-<target>Feil ved opprettelse av tidsstempel for versjon:</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Kan ikke lese følgende XML-elementer:</target>
 
@@ -513,9 +724,6 @@ Note: File paths must be relative to base directories.
 
 <source>&Program</source>
 <target>&Program</target>
-
-<source>&Content</source>
-<target>&Innhold</target>
 
 <source>&About</source>
 <target>&Om programmet</target>
@@ -538,9 +746,6 @@ Note: File paths must be relative to base directories.
 <source>To get started just import a .ffs_batch file.</source>
 <target>Importer en .ffs_batch-fil for å komme i gang</target>
 
-<source>Folders to watch</source>
-<target>Mapper å overvåke</target>
-
 <source>Add folder</source>
 <target>Legg til mappe</target>
 
@@ -552,9 +757,6 @@ Note: File paths must be relative to base directories.
 
 <source>Select a folder</source>
 <target>Velg en mappe</target>
-
-<source>Idle time [seconds]</source>
-<target>Inaktiv tid [sekunder]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Inaktiv tid mellom forrige endring og utførelse av kommando</target>
@@ -570,17 +772,11 @@ Kommandoen utløses hvis:
 - nye mapper legges til (f.eks. en USB-pinne kobles til)
 </target>
 
-<source>Start</source>
-<target>Start</target>
-
 <source>&Retry</source>
 <target>&Prøv igjen</target>
 
 <source>Cancel</source>
 <target>Avbryt</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automatisk synkronisering</target>
 
 <source>Build: %x</source>
 <target>Build: %x</target>
@@ -596,9 +792,6 @@ Kommandoen utløses hvis:
 
 <source>&Exit</source>
 <target>&Avslutt</target>
-
-<source>Invalid command line:</source>
-<target>Ugyldig kommando:</target>
 
 <source>File content</source>
 <target>Filinnhold</target>
@@ -660,9 +853,6 @@ Kommandoen utløses hvis:
 <source>Target folder input field must not be empty.</source>
 <target>Feltet for målmappe kan ikke være tomt.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Mappefeltet for versjon kan ikke være tomt.</target>
-
 <source>Source folder %x not found.</source>
 <target>Kildemappe %x finnes ikke.</target>
 
@@ -687,9 +877,6 @@ Kommandoen utløses hvis:
 <source>Generating database...</source>
 <target>Oppretter database...</target>
 
-<source>Synchronization aborted</source>
-<target>Synkronisering avbrutt</target>
-
 <source>Synchronization completed with errors</source>
 <target>Synkronisering fullført med feil</target>
 
@@ -704,9 +891,6 @@ Kommandoen utløses hvis:
 
 <source>Saving log file %x...</source>
 <target>Lagrer loggfil %x...</target>
-
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Trykk "Skift" for å løse problemer i FreeFileSync hovedvindu.</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>En ny versjon av FreeFileSync er tilgjengelig</target>
@@ -774,21 +958,6 @@ Kommandoen utløses hvis:
 <source>Hibernate</source>
 <target>Sett i dvalemodus</target>
 
-<source>Selected variant:</source>
-<target>Valgt variant:</target>
-
-<source>Select alternate comparison settings</source>
-<target>Velg alternative innstillinger for sammenligning</target>
-
-<source>Select alternate synchronization settings</source>
-<target>Velg alternative innstillinger for synkronisering</target>
-
-<source>Filter is active</source>
-<target>Filter er aktivt</target>
-
-<source>No filter selected</source>
-<target>Ingen filter valgt</target>
-
 <source>Remove alternate settings</source>
 <target>Fjern alternative innstillinger</target>
 
@@ -813,23 +982,17 @@ Kommandoen utløses hvis:
 <source>2. &Synchronize</source>
 <target>2. &Synkroniser</target>
 
+<source>&Global settings</source>
+<target>&Felles innstillinger</target>
+
 <source>&Language</source>
 <target>&Språk</target>
 
 <source>&Export file list...</source>
 <target>&Eksporter filliste...</target>
 
-<source>&Global settings</source>
-<target>&Felles innstillinger</target>
-
 <source>Compare</source>
 <target>Sammenlign</target>
-
-<source>Comparison settings</source>
-<target>Innstillinger for sammenligning</target>
-
-<source>Synchronization settings</source>
-<target>Innstillinger for synkronisering</target>
 
 <source>Synchronize</source>
 <target>Synkroniser</target>
@@ -842,6 +1005,9 @@ Kommandoen utløses hvis:
 
 <source>Swap sides</source>
 <target>Bytt sider</target>
+
+<source>Match case</source>
+<target>Skill mellom store og små bokstaver</target>
 
 <source>Save as batch job</source>
 <target>Lagre som sammensatt oppgave</target>
@@ -864,6 +1030,39 @@ Kommandoen utløses hvis:
 <source>Total bytes to copy</source>
 <target>Mengde bytes å kopiere</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Still inn dine egne synkroniseringsregler.</target>
+
+<source>Permanent</source>
+<target>Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Slett eller overskriv filer permanent</target>
+
+<source>Versioning</source>
+<target>Versjonshåndtering</target>
+
+<source>Naming convention:</source>
+<target>Navnekonvensjon:</target>
+
+<source>Ignore</source>
+<target>Ignorer</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skjul feilmeldinger og advarsler</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Vis pop-upvindu ved feil eller advarsler</target>
+
+<source>Statistics</source>
+<target>Statistikk</target>
+
 <source>Items found:</source>
 <target>Elementer funnet:</target>
 
@@ -879,116 +1078,38 @@ Kommandoen utløses hvis:
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
 
-<source>On completion</source>
-<target>Ved fullføring</target>
-
 <source>Close</source>
 <target>Lukk</target>
 
 <source>&Pause</source>
 <target>&Pause</target>
 
-<source>Variant</source>
-<target>Variant</target>
-
-<source>Statistics</source>
-<target>Statistikk</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Filer blir funnet like hvis
-     - sist skrevne tid og dato
-     - filstørrelse
-er den samme
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Filer blir funnet like hvis
-     - filinnhold
-er det samme
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Symbolsk lenkehåndtering</target>
-
-<source>Help</source>
-<target>Hjelp</target>
-
-<source>OK</source>
-<target>OK</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Speilings-sikkerhetskopi av venstre mappe. Høyre mappe endres slik at den blir helt lik venstre mappe etter synkronisering.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopier nye og endrede filer til høyre mappe.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Still inn dine egne synkroniseringsregler.</target>
-
-<source>Error handling</source>
-<target>Feilhåndtering</target>
-
-<source>Ignore</source>
-<target>Ignorer</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skjul feilmeldinger og advarsler</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Vis pop-upvindu ved feil eller advarsler</target>
-
-<source>Deletion handling</source>
-<target>Slette-håndtering</target>
-
-<source>Permanent</source>
-<target>Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Slett eller overskriv filer permanent</target>
-
-<source>Versioning</source>
-<target>Versjonshåndtering</target>
-
-<source>Naming convention:</source>
-<target>Navnekonvensjon:</target>
-
-<source>Batch job</source>
-<target>Batch-jobb</target>
-
-<source>Exit</source>
-<target>Avslutt</target>
-
-<source>Abort synchronization on first error</source>
-<target>Stopp synkronisering ved første feil</target>
-
 <source>Show progress dialog</source>
 <target>Vis statuslinje</target>
 
-<source>Save log</source>
-<target>Lagre logg</target>
-
-<source>Select folder to save log files</source>
-<target>Velg mappe for lagring av loggfiler</target>
-
-<source>Limit</source>
-<target>Grense</target>
-
 <source>Limit maximum number of log files</source>
 <target>Begrens maks antall loggfiler</target>
+
+<source>Delete on both sides</source>
+<target>Slett på begge sider</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Slett på begge sider selv om filen bare er valgt på en side</target>
+
+<source>Fail-safe file copy</source>
+<target>Trygg filkopi</target>
+
+<source>Copy locked files</source>
+<target>Kopier låste filer</target>
+
+<source>Copy file access permissions</source>
+<target>Kopier filadgangstillatelser</target>
+
+<source>Description</source>
+<target>Beskrivelse</target>
+
+<source>&Default</source>
+<target>&Standard</target>
 
 <source>Source code written in C++ using:</source>
 <target>Kildekode skrevet i C++ med hjelp fra:</target>
@@ -998,9 +1119,6 @@ er det samme
 
 <source>Donate with PayPal</source>
 <target>Doner med PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Mange takk for lokalisering:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Tilbakemelding og forslag er velkomne</target>
@@ -1014,95 +1132,17 @@ er det samme
 <source>Published under the GNU General Public License</source>
 <target>Utgitt under GNU General Public Licence</target>
 
-<source>Delete on both sides</source>
-<target>Slett på begge sider</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Slett på begge sider selv om filen bare er valgt på en side</target>
-
-<source>Include</source>
-<target>Inkluder</target>
-
-<source>Exclude</source>
-<target>Ekskluder</target>
-
-<source>Time span</source>
-<target>Tidsrom</target>
-
-<source>File size</source>
-<target>Filstørrelse</target>
-
-<source>Minimum</source>
-<target>Minimum</target>
-
-<source>Maximum</source>
-<target>Maksimum</target>
-
-<source>Global settings</source>
-<target>Globale innstillinger</target>
-
-<source>Fail-safe file copy</source>
-<target>Trygg filkopi</target>
-
-<source>Copy locked files</source>
-<target>Kopier låste filer</target>
-
-<source>Copy file access permissions</source>
-<target>Kopier filadgangstillatelser</target>
-
-<source>Restore hidden dialogs</source>
-<target>Gjenopprett skjulte dialoger</target>
-
-<source>External applications</source>
-<target>Eksterne programmer</target>
-
-<source>Description</source>
-<target>Beskrivelse</target>
-
-<source>&Default</source>
-<target>&Standard</target>
-
-<source>Find what:</source>
-<target>Søk hva:</target>
-
-<source>Match case</source>
-<target>Skill mellom store og små bokstaver</target>
-
-<source>&Find next</source>
-<target>&Søk neste</target>
-
-<source>Start synchronization</source>
-<target>Start synkronisering</target>
-
-<source>Delete</source>
-<target>Slett</target>
-
-<source>Configure filter</source>
-<target>Still inn filter</target>
+<source>Many thanks for localization:</source>
+<target>Mange takk for lokalisering:</target>
 
 <source>Find</source>
 <target>Søk</target>
-
-<source>Select time span</source>
-<target>Velg tidsrom</target>
-
-<source>Folder pairs</source>
-<target>Mappepar</target>
 
 <source>Overview</source>
 <target>Oversikt</target>
 
 <source>Configuration</source>
 <target>Innstilling</target>
-
-<source>Main bar</source>
-<target>Hovedverktøylinje</target>
-
-<source>Filter files</source>
-<target>Filtrer filer</target>
-
-<source>Select view</source>
-<target>Velg visning</target>
 
 <source>Open...</source>
 <target>Åpne...</target>
@@ -1112,6 +1152,15 @@ er det samme
 
 <source>Compare both sides</source>
 <target>Sammenlign begge sider</target>
+
+<source>Comparison settings</source>
+<target>Innstillinger for sammenligning</target>
+
+<source>Synchronization settings</source>
+<target>Innstillinger for synkronisering</target>
+
+<source>Start synchronization</source>
+<target>Start synkronisering</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1134,17 +1183,20 @@ er det samme
 <source>Set direction:</source>
 <target>Still inn retningen:</target>
 
+<source>multiple selection</source>
+<target>flervalg</target>
+
+<source>Exclude via filter:</source>
+<target>Ekskluder via filter:</target>
+
 <source>Exclude temporarily</source>
 <target>Ekskluder midlertidig</target>
 
 <source>Include temporarily</source>
 <target>Inkluder midlertidig</target>
 
-<source>multiple selection</source>
-<target>flervalg</target>
-
-<source>Exclude via filter:</source>
-<target>Ekskluder via filter:</target>
+<source>Delete</source>
+<target>Slett</target>
 
 <source>Include all</source>
 <target>Inkluder alle</target>
@@ -1191,6 +1243,9 @@ er det samme
 <source>Do&n't save</source>
 <target>&Ikke lagre</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>Show files that exist on left side only</source>
 <target>Vis filer som bare finnes på venstre side</target>
 
@@ -1236,11 +1291,11 @@ er det samme
 <source>Set as default</source>
 <target>Set som standard</target>
 
-<source>Operation aborted</source>
-<target>Handling avbrutt</target>
-
 <source>All folders are in sync</source>
 <target>Alle mapper er synkroniserte</target>
+
+<source>Cannot find %x</source>
+<target>Kan ikke finne %x</target>
 
 <source>File list exported</source>
 <target>Filliste eksportert</target>
@@ -1248,14 +1303,8 @@ er det samme
 <source>&Ignore</source>
 <target>&Ignorer</target>
 
-<source>Fatal Error</source>
-<target>Fatal feil</target>
-
 <source>&Switch</source>
 <target>&Skift</target>
-
-<source>Question</source>
-<target>Spørsmål</target>
 
 <source>&Yes</source>
 <target>&Ja</target>
@@ -1278,17 +1327,8 @@ er det samme
 <source>Initializing...</source>
 <target>Initialiserer...</target>
 
-<source>Aborted</source>
-<target>Avbrutt</target>
-
 <source>Completed</source>
 <target>Fullført</target>
-
-<source>Cannot find %x</source>
-<target>Kan ikke finne %x</target>
-
-<source>Inactive</source>
-<target>Inaktiv</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1314,8 +1354,8 @@ er det samme
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Exclude</source>
+<target>Ekskluder</target>
 
 <source>Direct</source>
 <target>Direkte</target>
@@ -1340,9 +1380,6 @@ er det samme
 
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Den andre sidens motpart til %item_folder%</target>
-
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Gjør skjylte advarsler og dialoger synlige igjen?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Etterlat som uløste konflikter</target>
@@ -1460,9 +1497,6 @@ er det samme
 
 <source>Cannot set privilege %x.</source>
 <target>Kan ikke sette privilegie %x.</target>
-
-<source>Failed to suspend system sleep mode.</source>
-<target>Kan ikke sette systemet i hvilemodus</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Kan ikke endre I/O prioriet på prosess</target>

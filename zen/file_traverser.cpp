@@ -36,7 +36,7 @@ namespace
 template <class Command> inline //function object expecting to throw FileError if operation fails
 bool tryReportingDirError(Command cmd, zen::TraverseCallback& callback) //return "true" on success, "false" if error was ignored
 {
-    for (;;)
+    for (size_t retryNumber = 0;; ++retryNumber)
         try
         {
             cmd(); //throw FileError
@@ -44,7 +44,7 @@ bool tryReportingDirError(Command cmd, zen::TraverseCallback& callback) //return
         }
         catch (const FileError& e)
         {
-            switch (callback.reportDirError(e.toString()))
+            switch (callback.reportDirError(e.toString(), retryNumber))
             {
                 case TraverseCallback::ON_ERROR_RETRY:
                     break;
@@ -57,7 +57,7 @@ bool tryReportingDirError(Command cmd, zen::TraverseCallback& callback) //return
 template <class Command> inline //function object expecting to throw FileError if operation fails
 bool tryReportingItemError(Command cmd, zen::TraverseCallback& callback, const Zchar* shortName) //return "true" on success, "false" if error was ignored
 {
-    for (;;)
+    for (size_t retryNumber = 0;; ++retryNumber)
         try
         {
             cmd(); //throw FileError
@@ -65,7 +65,7 @@ bool tryReportingItemError(Command cmd, zen::TraverseCallback& callback, const Z
         }
         catch (const FileError& e)
         {
-            switch (callback.reportItemError(e.toString(), shortName))
+            switch (callback.reportItemError(e.toString(), retryNumber, shortName))
             {
                 case TraverseCallback::ON_ERROR_RETRY:
                     break;
@@ -559,7 +559,7 @@ private:
                 {
                     bufferUtfDecomposed.resize(lenMax);
                     if (::CFStringGetFileSystemRepresentation(cfStr, &bufferUtfDecomposed[0], lenMax)) //get decomposed UTF form (verified!) despite ambiguous documentation
-                        shortName = &bufferUtfDecomposed[0];
+                        shortName = &bufferUtfDecomposed[0]; //attention: => don't access "shortName" after recursion in "traverse"!
                 }
             }
             //const char* sampleDecomposed  = "\x6f\xcc\x81.txt";

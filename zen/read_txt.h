@@ -13,10 +13,10 @@
 
 namespace zen
 {
-class ExtractLines
+class LineExtractor
 {
 public:
-    ExtractLines(const Zstring& filename, const std::string& lineBreak = std::string()); //throw FileError
+    LineExtractor(const Zstring& filename, const std::string& lineBreak = std::string()); //throw FileError
     bool getLine(std::string& output); //throw FileError
 
 private:

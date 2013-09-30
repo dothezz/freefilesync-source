@@ -2,10 +2,27 @@
 	<language>Čeština</language>
 	<translator>ViCi</translator>
 	<locale>cs_CZ</locale>
-	<flag_image>flag_czech_republic.png</flag_image>
-	<plural_form_count>3</plural_form_count>
+	<image>flag_czech_republic.png</image>
+	<plural_count>3</plural_count>
 	<plural_definition>n==1 ? 0 : n>=2 && n<=4 ? 1 : 2</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Došlo ke změně obou stran od poslední synchronizace.</target>
@@ -295,8 +312,8 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>%x items</source>
-<target>%x položek</target>
+<source>%x items/sec</source>
+<target>%x položek/s</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Konfigurace ze souboru %x byla načtena jen částečně.</target>
@@ -325,11 +342,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Název disku %x není součástí cesty souboru %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Požadavek na přerušení: Čekání na ukončení aktuální operace...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Zastavování: Čekání na dokončení právě probíhající operace...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Chyba při vytvoření časové značky verzování:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Nelze vytvořit časové značky verzování:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Nelze načíst následující XML elementy:</target>
@@ -346,8 +363,8 @@
 <source>&Program</source>
 <target>&Nástroje</target>
 
-<source>&Content</source>
-<target>&Obsah</target>
+<source>&View help</source>
+<target>&Nápověda (pouze anglicky)</target>
 
 <source>&About</source>
 <target>O &Programu</target>
@@ -370,8 +387,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Můžete načíst také konfigurační soubor .ffs_batch</target>
 
-<source>Folders to watch</source>
-<target>Složka ke sledování</target>
+<source>Folders to watch:</source>
+<target>Sledovaná složka:</target>
 
 <source>Add folder</source>
 <target>Přidat adresář</target>
@@ -385,11 +402,14 @@
 <source>Select a folder</source>
 <target>Vyberte adresář</target>
 
-<source>Idle time [seconds]</source>
-<target>Prodleva (v sekundách)</target>
+<source>Idle time (in seconds):</source>
+<target>Prodleva (v sekundách):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Prodleva mezi zjištěním poslední změny a spuštěním příkazu</target>
+
+<source>Command line:</source>
+<target>Příkazová řádka:</target>
 
 <source>
 The command is triggered if:
@@ -402,8 +422,8 @@ Příkaz je spuštěn když:
 - je zjištěna nová složka (např. vložením USB disku)
 </target>
 
-<source>Start</source>
-<target>Start</target>
+<source>&Start</source>
+<target>&Start</target>
 
 <source>&Retry</source>
 <target>&Opakovat</target>
@@ -411,17 +431,17 @@ Příkaz je spuštěn když:
 <source>Cancel</source>
 <target>Zrušit</target>
 
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automatická synchronizace</target>
-
 <source>Build: %x</source>
 <target>Verze: %x</target>
 
 <source>About</source>
-<target>O Programu</target>
+<target>O programu</target>
 
 <source>All files</source>
 <target>Všechny soubory</target>
+
+<source>Automated Synchronization</source>
+<target>Automatická synchronizace</target>
 
 <source>Directory monitoring active</source>
 <target>Sledování adresářů je aktivní</target>
@@ -438,7 +458,7 @@ Příkaz je spuštěn když:
 <source>&Exit</source>
 <target>&Konec</target>
 
-<source>Invalid command line:</source>
+<source>Incorrect command line:</source>
 <target>Neplatný příkaz:</target>
 
 <source>File content</source>
@@ -501,8 +521,8 @@ Příkaz je spuštěn když:
 <source>Target folder input field must not be empty.</source>
 <target>Cílová složka nesmí být prázdná.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Složka pro verzování souborů nesmí být prázdná.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Prosím zadejte cílovou složku pro verzování.</target>
 
 <source>Source folder %x not found.</source>
 <target>Zdrojovou složku %x nelze najít.</target>
@@ -540,8 +560,8 @@ Příkaz je spuštěn když:
 <source>job name</source>
 <target>název úlohy</target>
 
-<source>Synchronization aborted</source>
-<target>Synchronizace zrušena</target>
+<source>Synchronization stopped</source>
+<target>Synchronizace zastavena</target>
 
 <source>Synchronization completed with errors</source>
 <target>Synchronizace dokončena s chybami</target>
@@ -558,14 +578,11 @@ Příkaz je spuštěn když:
 <source>Saving log file %x...</source>
 <target>Ukládání žurnálu %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Použijte tlačítko "Přepnout" k vyřešení problému pomocí hlavního okna FreeFileSync.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>K odstranění tohoto problému se přepněte do hlavního okna FreeFileSync.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
+<source>Switching to FreeFileSync's main window</source>
 <target>Přepínání do hlavního okna FreeFileSync</target>
-
-<source>Retrying operation after error:</source>
-<target>Opakovaní operace po chybě:</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Je dostupná novější verze FreeFileSync:</target>
@@ -573,8 +590,8 @@ Příkaz je spuštěn když:
 <source>Download now?</source>
 <target>Stáhnout nyní?</target>
 
-<source>New version found</source>
-<target>Nalezena novější verze</target>
+<source>Check for Program Updates</source>
+<target>Hledání aktualizací programu</target>
 
 <source>&Download</source>
 <target>&Stahování</target>
@@ -642,20 +659,20 @@ Příkaz je spuštěn když:
 <source>Hibernate</source>
 <target>Přepnout do režimu spánku</target>
 
-<source>Selected variant:</source>
-<target>Vybraná varianta:</target>
+<source>Alternate comparison settings</source>
+<target>Jiné nastavení porovnání</target>
 
-<source>Select alternate comparison settings</source>
-<target>Změnit nastavení porovnání</target>
+<source>Alternate synchronization settings</source>
+<target>Jiné nastavení synchronizace</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Změnit nastavení synchronizace</target>
+<source>Local filter</source>
+<target>Místní filtr</target>
 
-<source>Filter is active</source>
-<target>Filtr je zapnutý</target>
+<source>Active</source>
+<target>Zapnutý</target>
 
-<source>No filter selected</source>
-<target>Není vybrán žádný filtr</target>
+<source>None</source>
+<target>Žádný</target>
 
 <source>Remove alternate settings</source>
 <target>Zrušit jiné nastavení</target>
@@ -668,6 +685,15 @@ Příkaz je spuštěn když:
 
 <source>Paste</source>
 <target>Vložit</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Jiné nastavení porovnání</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Jiné nastavení synchronizace</target>
+
+<source>Local Filter</source>
+<target>Místní filtr</target>
 
 <source>&New</source>
 <target>&Nový</target>
@@ -684,14 +710,17 @@ Příkaz je spuštěn když:
 <source>2. &Synchronize</source>
 <target>2. &Synchronizovat</target>
 
+<source>&Global settings</source>
+<target>&Nastavení programu</target>
+
 <source>&Language</source>
 <target>&Jazyk</target>
 
+<source>&Find...</source>
+<target>&Najít...</target>
+
 <source>&Export file list...</source>
 <target>&Exportovat seznam souborů...</target>
-
-<source>&Global settings</source>
-<target>&Nastavení programu</target>
 
 <source>&Tools</source>
 <target>&Upřesnit</target>
@@ -702,7 +731,7 @@ Příkaz je spuštěn když:
 <source>Check &automatically once a week</source>
 <target>Kontrolovat &automaticky jednou týdně</target>
 
-<source>Check for new &version</source>
+<source>&Check for new version</source>
 <target>&Zkontrolovat aktualizace</target>
 
 <source>Compare</source>
@@ -719,6 +748,15 @@ Příkaz je spuštěn když:
 
 <source>Swap sides</source>
 <target>Změna stran</target>
+
+<source>Close search bar</source>
+<target>Zavřít hledání</target>
+
+<source>Find:</source>
+<target>Najít:</target>
+
+<source>Match case</source>
+<target>Rozlišovat malá a velká písmena</target>
 
 <source>Save as batch job</source>
 <target>Uložit jako dávku</target>
@@ -741,74 +779,20 @@ Příkaz je spuštěn když:
 <source>Total bytes to copy</source>
 <target>Celkový objem dat</target>
 
-<source>Items found:</source>
-<target>Nalezeno položek:</target>
+<source>Select a variant:</source>
+<target>Výběr varianty:</target>
 
-<source>Speed:</source>
-<target>Rychlost:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Rozpoznat shodné soubory porovnáním jejich data změny a velikosti.</target>
 
-<source>Time remaining:</source>
-<target>Zbývající čas:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Rozpoznat shodné soubory porovnáním jejich obsahu.</target>
 
-<source>Time elapsed:</source>
-<target>Uplynulý čas:</target>
+<source>Symbolic links:</source>
+<target>Symbolickéh odkazy:</target>
 
-<source>Synchronizing...</source>
-<target>Synchronizuji...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimalizovat do oznamovací oblasti</target>
-
-<source>On completion</source>
-<target>Po dokončení</target>
-
-<source>Close</source>
-<target>Zavřít</target>
-
-<source>&Pause</source>
-<target>&Pauza</target>
-
-<source>Variant</source>
-<target>Varianta</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
-
-<source>&Don't show this dialog again</source>
-<target>Tento dialog již &nezobrazovat</target>
-
-<source>Select a variant</source>
-<target>Výběr možnosti</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Soubory jsou shodné jestliže
-     - datum i čas poslední změny
-     - velikost souboru
-jsou stejné
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Soubory jsou shodné jestliže
-     - obsah souboru
-je stejný
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Zpracování symbolických odkazů</target>
-
-<source>Help</source>
-<target>Nápověda</target>
+<source>More information</source>
+<target>Více informací</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -816,11 +800,11 @@ je stejný
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Zrcadlení levého adresáře. Pravý adresář bude změněn tak, aby po synchronizaci byl totožný s levým.</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Vytvořit zrcadlovou kopii levé složky tak, aby po synchronizci pravá složka přesně odpovídala levé.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Kopírovat nové nebo aktualizované soubory do adresáře vpravo.</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopírovat nové a aktualizované soubory do pravé složky.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Nastavení vlastních pravidel synchronizace.</target>
@@ -831,23 +815,8 @@ je stejný
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Je nutný soubor databáze. Toto není dostupné na všech systémech.</target>
 
-<source>Error handling</source>
-<target>Zpracování chyb</target>
-
-<source>Ignore</source>
-<target>Přeskočit</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skrýt všechny chyby a varování</target>
-
-<source>Pop-up</source>
-<target>Hlášení</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Zobrazit hlášení při chybě nebo varování</target>
-
-<source>Deletion handling</source>
-<target>Nastavení mazání</target>
+<source>Delete files:</source>
+<target>Mazání souborů:</target>
 
 <source>Permanent</source>
 <target>Trvale</target>
@@ -870,32 +839,170 @@ je stejný
 <source>Naming convention:</source>
 <target>Pojmenování:</target>
 
-<source>Batch job</source>
-<target>Dávkový soubor</target>
+<source>Show examples</source>
+<target>Ukázat příklady</target>
+
+<source>Handle errors:</source>
+<target>Zpracování chyb:</target>
+
+<source>Ignore</source>
+<target>Přeskočit</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skrýt všechny chyby a varování</target>
+
+<source>Pop-up</source>
+<target>Hlášení</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Zobrazit hlášení při chybě nebo varování</target>
+
+<source>On completion:</source>
+<target>Po dokončení:</target>
+
+<source>Start synchronization now?</source>
+<target>Začít synchronizovat nyní?</target>
+
+<source>Variant:</source>
+<target>Varianta:</target>
+
+<source>Statistics</source>
+<target>Statistika</target>
+
+<source>&Don't show this dialog again</source>
+<target>Tento dialog již &nezobrazovat</target>
+
+<source>Items found:</source>
+<target>Nalezeno položek:</target>
+
+<source>Speed:</source>
+<target>Rychlost:</target>
+
+<source>Time remaining:</source>
+<target>Zbývající čas:</target>
+
+<source>Time elapsed:</source>
+<target>Uplynulý čas:</target>
+
+<source>Synchronizing...</source>
+<target>Synchronizuji...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimalizovat do oznamovací oblasti</target>
+
+<source>Close</source>
+<target>Zavřít</target>
+
+<source>&Pause</source>
+<target>&Pauza</target>
+
+<source>Stop</source>
+<target>Ukončit</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Vytvoří dávkový souboru pro automatickou synchronizaci. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo využijte plánovač úloh vašeho systému: %x</target>
 
-<source>Exit</source>
-<target>Konec</target>
-
-<source>Abort synchronization on first error</source>
+<source>Stop synchronization at first error</source>
 <target>Ukončit synchronizaci při první chybě</target>
 
 <source>Show progress dialog</source>
 <target>Zobrazit průběh zpracování</target>
 
-<source>Save log</source>
-<target>Uložit žurnál</target>
+<source>Save log:</source>
+<target>Uložit žurnál:</target>
 
-<source>Select folder to save log files</source>
-<target>Vyberte složku pro žurnály</target>
-
-<source>Limit</source>
-<target>Omezení</target>
+<source>Limit:</source>
+<target>Omezení:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Omezení maximálního počtu žurnálů</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Jak nastavit spouštění dávky?</target>
+
+<source>&Recycle bin</source>
+<target>&Koš</target>
+
+<source>Delete on both sides</source>
+<target>Smazat z obou stran</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávajte cesty relativně k odpovídající složce.</target>
+
+<source>Include:</source>
+<target>Zahrnout:</target>
+
+<source>Exclude:</source>
+<target>Vynechat:</target>
+
+<source>Time span:</source>
+<target>Časové rozmezí:</target>
+
+<source>File size:</source>
+<target>Velikost soubor:</target>
+
+<source>Minimum:</source>
+<target>Od:</target>
+
+<source>Maximum:</source>
+<target>Do:</target>
+
+<source>&Clear</source>
+<target>&Smazat</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Toto nastavení je platné pro všechny synchronizační úlohy.</target>
+
+<source>Fail-safe file copy</source>
+<target>Bezpečné kopírování souborů</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>Kopírovat nejprve do pomocného souboru (*.ffs_tmp) před přepisem cíle. Tento postup zajišťuje bezpečné chování i v případě závažné chyby.</target>
+
+<source>(recommended)</source>
+<target>(doporučeno)</target>
+
+<source>Copy locked files</source>
+<target>Kopírovat zamčené soubory</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Kopírovat sdílené nebo zamčené soubory pomocí služby Stínové kopie</target>
+
+<source>(requires administrator rights)</source>
+<target>(vyžaduje administrátorská oprávnění)</target>
+
+<source>Copy file access permissions</source>
+<target>Kopírovat přístupová oprávnění k souborům</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Přenést přístupová oprávnění souborů a složek</target>
+
+<source>Automatic retry on error:</source>
+<target>Automaticky opakovat při chybě:</target>
+
+<source>Retry count:</source>
+<target>Počet opakování:</target>
+
+<source>Delay (in seconds):</source>
+<target>Prodleva (v sekundách):</target>
+
+<source>Customize context menu:</source>
+<target>Přizpůsobit kontextovou nabídku:</target>
+
+<source>Description</source>
+<target>Popis</target>
+
+<source>Restore hidden windows</source>
+<target>Obnovit skryté dialogy</target>
+
+<source>&Default</source>
+<target>&Předdefinované</target>
 
 <source>Source code written in C++ using:</source>
 <target>Zdrojový kód byl napsán kompletně v C++ pomocí:</target>
@@ -921,107 +1028,23 @@ je stejný
 <source>Many thanks for localization:</source>
 <target>Poděkování za překlad FreeFileSync:</target>
 
-<source>Delete on both sides</source>
-<target>Smazat z obou stran</target>
+<source>Save as Batch Job</source>
+<target>Uložit jako dávku</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich</target>
+<source>Delete Items</source>
+<target>Smazané položky</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Pouze soubory odpovídající nastavenému filtru budou vybrány pro synchronizaci.
-Poznámka: Filtr je aplikován relativně k základním adresářům.
-</target>
-
-<source>Include</source>
-<target>Přidat</target>
-
-<source>Exclude</source>
-<target>Vynechat</target>
-
-<source>Time span</source>
-<target>Časové rozmezí</target>
-
-<source>File size</source>
-<target>Velikost souboru</target>
-
-<source>Minimum</source>
-<target>Od</target>
-
-<source>Maximum</source>
-<target>Do</target>
-
-<source>&Clear</source>
-<target>&Smazat</target>
-
-<source>Global settings</source>
+<source>Global Settings</source>
 <target>Nastavení programu</target>
 
-<source>Fail-safe file copy</source>
-<target>Bezpečné kopírování souborů</target>
+<source>Select Time Span</source>
+<target>Časové rozmezí</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Kopírovat nejprve do pomocného souboru (*.ffs_tmp) a teprve poté soubor přejmenovat. Tento postup zajišťuje bezpečné chování i v případě chyby během přenosu</target>
-
-<source>Copy locked files</source>
-<target>Kopírovat zamčené soubory</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopírovat sdílené nebo zamčené soubory pomocí služby Stínové kopie (Vyžaduje administrátorské oprávnění)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopírovat přístupová oprávnění k souborům</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Přenést přístupová oprávnění souborů a složek (Vyžaduje administrátorské oprávnění)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Obnovit skryté dialogy</target>
-
-<source>External applications</source>
-<target>Externí aplikace</target>
-
-<source>Description</source>
-<target>Popis</target>
-
-<source>&Default</source>
-<target>&Předdefinované</target>
-
-<source>Find what:</source>
-<target>Najít:</target>
-
-<source>Match case</source>
-<target>Rozlišovat malá a velká písmena</target>
-
-<source>&Find next</source>
-<target>&Najít další</target>
-
-<source>Start synchronization</source>
-<target>Start synchronizace</target>
-
-<source>Comparison settings</source>
-<target>Nastavení porovnání</target>
-
-<source>Synchronization settings</source>
-<target>Nastavení synchronizace</target>
-
-<source>Delete</source>
-<target>Smazat</target>
-
-<source>Configure filter</source>
-<target>Nastavení filtru</target>
+<source>Folder Pairs</source>
+<target>Adresářové páry</target>
 
 <source>Find</source>
 <target>Najít</target>
-
-<source>Select time span</source>
-<target>Časové rozmezí</target>
-
-<source>Folder pairs</source>
-<target>Adresářové páry</target>
 
 <source>Overview</source>
 <target>Přehled</target>
@@ -1029,14 +1052,14 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Configuration</source>
 <target>Konfigurace</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>Hlavní lišta</target>
 
-<source>Filter files</source>
+<source>Filter Files</source>
 <target>Filtr souborů</target>
 
-<source>Select view</source>
-<target>Vyberte zobrazení</target>
+<source>Select View</source>
+<target>Zobrazení</target>
 
 <source>Open...</source>
 <target>Otevřít...</target>
@@ -1047,15 +1070,14 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Compare both sides</source>
 <target>Porovnat obě strany</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Opravdu chcete provést příkaz %y pro 1 položku?</pluralform>
-<pluralform>Opravdu chcete provést příkaz %y pro %x položky?</pluralform>
-<pluralform>Opravdu chcete provést příkaz %y pro %x položek?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Nastavení porovnání</target>
+
+<source>Synchronization settings</source>
+<target>Nastavení synchronizace</target>
+
+<source>Start synchronization</source>
+<target>Start synchronizace</target>
 
 <source>Confirm</source>
 <target>Potvrdit</target>
@@ -1096,12 +1118,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Set direction:</source>
 <target>Nastavit adresář:</target>
 
-<source>Exclude temporarily</source>
-<target>Vynechat dočasně</target>
-
-<source>Include temporarily</source>
-<target>Přidat dočasně</target>
-
 <source>multiple selection</source>
 <target>vícenásobný výběr</target>
 
@@ -1110,6 +1126,15 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Exclude via filter:</source>
 <target>Vynechat pomocí filtru:</target>
+
+<source>Exclude temporarily</source>
+<target>Vynechat dočasně</target>
+
+<source>Include temporarily</source>
+<target>Přidat dočasně</target>
+
+<source>Delete</source>
+<target>Smazat</target>
 
 <source>Include all</source>
 <target>Zahrnout vše</target>
@@ -1142,7 +1167,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Poslední sezení</target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Porovnání a Synchronizace adresářů</target>
+<target>porovnání a synchronizace složek</target>
 
 <source>Configuration saved</source>
 <target>Konfigurace uložena</target>
@@ -1158,6 +1183,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Never save &changes</source>
 <target>Nikdy &neukládat změny</target>
+
+<source>Filter</source>
+<target>Filtr</target>
 
 <source>Show files that exist on left side only</source>
 <target>Zobrazit soubory existující pouze vlevo</target>
@@ -1204,11 +1232,17 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Set as default</source>
 <target>Nastavit jako výchozí</target>
 
-<source>Operation aborted</source>
-<target>Operace zrušena</target>
-
 <source>All folders are in sync</source>
 <target>Všechny složky jsou synchronizovány</target>
+
+<source>Synchronization Settings</source>
+<target>Nastavení synchronizace</target>
+
+<source>Comparison Settings</source>
+<target>Nastavení porovnání</target>
+
+<source>Cannot find %x</source>
+<target>Nelze najít %x</target>
 
 <source>Comma-separated values</source>
 <target>Text oddělený čárkami</target>
@@ -1225,7 +1259,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>&Ignore</source>
 <target>&Pokračovat</target>
 
-<source>Fatal Error</source>
+<source>Serious Error</source>
 <target>Závažná chyba</target>
 
 <source>&Don't show this warning again</source>
@@ -1233,9 +1267,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>&Switch</source>
 <target>&Přepnout</target>
-
-<source>Question</source>
-<target>Dotaz</target>
 
 <source>&Yes</source>
 <target>&Ano</target>
@@ -1258,8 +1289,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Initializing...</source>
 <target>Inicializace...</target>
 
-<source>Aborted</source>
-<target>Přerušeno</target>
+<source>Stopped</source>
+<target>Zastaveno</target>
 
 <source>Completed</source>
 <target>Hotovo</target>
@@ -1269,12 +1300,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Log</source>
 <target>Záznam zpracování</target>
-
-<source>Cannot find %x</source>
-<target>Nelze najít %x</target>
-
-<source>Inactive</source>
-<target>Vypnuto</target>
 
 <source>Today</source>
 <target>Dnes</target>
@@ -1300,9 +1325,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filtr</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1313,6 +1335,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
 </target>
 
+<source>Move</source>
+<target>Přesunout</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1322,6 +1347,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
 <pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Vynechat</target>
 
 <source>Direct</source>
 <target>Zachovat</target>
@@ -1347,8 +1375,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- pouze cesta z opačného panelu pro %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Povolit opět zobrazování skrytých dialogů a hlášení?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Obnovit všechny skryté dialogy a varování?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ponechat jako nevyřešený konflikt</target>
@@ -1476,14 +1504,14 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <pluralform>%x dnů</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Nepodařilo se zaregistrovat pro příjem systémových zpráv.</target>
+<source>Unable to register to receive system messages.</source>
+<target>Nepodařilo se zaregistrovat k odběru systémových zpráv.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Nelze nastavit práva pro %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Nepodařilo se uspat systém</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Nelze pozastavit Režim spánku.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Nelze nastavit priority procesu.</target>

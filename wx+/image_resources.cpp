@@ -4,23 +4,16 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#include "resources.h"
+#include "image_resources.h"
 #include <memory>
+#include <map>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 #include <wx/image.h>
 #include <wx/mstream.h>
 #include <zen/utf.h>
-#include "ffs_paths.h"
 
 using namespace zen;
-
-
-const GlobalResources& GlobalResources::instance()
-{
-    static GlobalResources inst;
-    return inst;
-}
 
 
 namespace
@@ -41,12 +34,35 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation& anim)
 
     anim.Load(seekAbleStream, wxANIMATION_TYPE_GIF);
 }
-}
 
 
-GlobalResources::GlobalResources()
+class GlobalResources
 {
-    wxFFileInputStream input(utfCvrtTo<wxString>(zen::getResourceDir()) + L"Resources.zip");
+public:
+    static GlobalResources& instance()
+    {
+        static GlobalResources inst;
+        return inst;
+    }
+
+    void init(const Zstring& filename);
+
+    const wxBitmap& getImage(const wxString& name) const;
+    const wxAnimation& getAnimation(const wxString& name) const;
+
+private:
+    GlobalResources() {}
+    GlobalResources(const GlobalResources&);
+    GlobalResources& operator=(const GlobalResources&);
+
+    std::map<wxString, wxBitmap> bitmaps;
+    std::map<wxString, wxAnimation> anims;
+};
+
+
+void GlobalResources::init(const Zstring& filename)
+{
+    wxFFileInputStream input(utfCvrtTo<wxString>(filename));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -64,42 +80,40 @@ GlobalResources::GlobalResources()
             const wxString name = entry->GetName();
 
             //generic image loading
-            if (name.EndsWith(L".png"))
+            if (endsWith(name, L".png"))
                 bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
-            else if (name == L"wink.gif")
-                loadAnimFromZip(resourceFile, aniWink);
-            else if (name == L"working.gif")
-                loadAnimFromZip(resourceFile, aniWorking);
+            else if (endsWith(name, L".gif"))
+                loadAnimFromZip(resourceFile, anims[name]);
         }
     }
-
-#ifdef ZEN_WIN
-    //for compatibility it seems we need to stick with a "real" icon
-    programIconFFS = wxIcon(L"A_FFS_ICON");
-
-#elif defined ZEN_LINUX
-    //attention: make sure to not implicitly call "instance()" again => deadlock on Linux
-    programIconFFS.CopyFromBitmap(getImage(L"FreeFileSync")); //use big logo bitmap for better quality
-
-#elif defined ZEN_MAC
-    assert(getImage(L"FreeFileSync").GetWidth () == getImage(L"FreeFileSync").GetHeight() &&
-           getImage(L"FreeFileSync").GetWidth() % 128 == 0);
-    //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes
-    programIconFFS.CopyFromBitmap(getImage(L"FreeFileSync").ConvertToImage().Scale(128, 128, wxIMAGE_QUALITY_HIGH)); //"von hinten durch die Brust ins Auge"
-#endif
 }
 
 
-const wxBitmap& GlobalResources::getImage(const wxString& imageName) const
+const wxBitmap& GlobalResources::getImage(const wxString& name) const
 {
-    auto it = bitmaps.find(!contains(imageName, L'.') ? //assume .png ending if nothing else specified
-                           imageName + L".png" :
-                           imageName);
+    auto it = bitmaps.find(contains(name, L'.') ? name : name + L".png"); //assume .png ending if nothing else specified
     if (it != bitmaps.end())
         return it->second;
-    else
-    {
-        assert(false);
-        return wxNullBitmap;
-    }
+
+    assert(false);
+    return wxNullBitmap;
 }
+
+
+const wxAnimation& GlobalResources::getAnimation(const wxString& name) const
+{
+    auto it = anims.find(contains(name, L'.') ? name : name + L".gif");
+    if (it != anims.end())
+        return it->second;
+
+    assert(false);
+    return wxNullAnimation;
+}
+}
+
+
+void zen::initResourceImages(const Zstring& filename) { GlobalResources::instance().init(filename); }
+
+const wxBitmap& zen::getResourceImage(const wxString& name) { return GlobalResources::instance().getImage(name); }
+
+const wxAnimation& zen::getResourceAnimation(const wxString& name) { return GlobalResources::instance().getAnimation(name); }

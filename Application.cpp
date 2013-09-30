@@ -7,11 +7,12 @@
 #include "application.h"
 #include <memory>
 #include <zen/file_handling.h>
-#include <wx/msgdlg.h>
-#include <wx/tooltip.h> //wxWidgets v2.9
+#include <wx/tooltip.h>
 #include <wx/log.h>
 #include <wx+/app_main.h>
 #include <wx+/string_conv.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include "comparison.h"
 #include "algorithm.h"
 #include "synchronization.h"
@@ -19,7 +20,6 @@
 #include "ui/check_version.h"
 #include "ui/main_dlg.h"
 #include "ui/switch_to_gui.h"
-#include "lib/resources.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
 
@@ -142,6 +142,8 @@ bool Application::OnInit()
 
     SetAppName(L"FreeFileSync"); //if not set, the default is the executable's name!
 
+    initResourceImages(getResourceDir() + Zstr("Resources.zip"));
+
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
 
@@ -206,7 +208,7 @@ int Application::OnRun()
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
         logError(utfCvrtTo<std::string>(msg));
-        wxSafeShowMessage(_("An exception occurred"), msg);
+        wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), msg);
     };
 
     try
@@ -248,8 +250,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 {
     //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
     wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
-    auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
-    ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
+    ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) wxTheApp->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     try
     {
@@ -258,9 +259,9 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     }
     catch (const FileError&) { assert(false); } //no messagebox: consider batch job!
 
-    auto notifyError = [&](const std::wstring& msg, const std::wstring& header)
+    auto notifyError = [&](const std::wstring& msg, const std::wstring& title)
     {
-        wxMessageBox(msg.c_str(), L"FreeFileSync - " + header, wxOK | wxICON_ERROR);
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(title).setDetailInstructions(msg));
         raiseReturnCode(returnCode, FFS_RC_ABORTED);
     };
 
@@ -313,7 +314,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         filename += Zstr(".ffs_gui");
                     else
                     {
-                        notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), _("Error"));
+                        notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), std::wstring());
                         return;
                     }
                 }
@@ -322,7 +323,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 {
                     case XML_TYPE_GLOBAL:
                     case XML_TYPE_OTHER:
-                        notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), _("Error"));
+                        notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), std::wstring());
                         return;
 
                     case XML_TYPE_GUI:
@@ -406,7 +407,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             catch (const xmlAccess::FfsXmlError& e)
             {
                 //batch mode: break on errors AND even warnings!
-                notifyError(e.toString(), _("Error"));
+                notifyError(e.toString(), std::wstring());
                 return;
             }
             if (!replaceDirectories(batchCfg.mainCfg)) return;
@@ -423,11 +424,11 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             catch (const xmlAccess::FfsXmlError& e)
             {
                 if (e.getSeverity() == FfsXmlError::WARNING)
-                    wxMessageBox(e.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING);
+                    showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
                 //what about simulating changed config on parsing errors????
                 else
                 {
-                    notifyError(e.toString(), _("Error"));
+                    notifyError(e.toString(), std::wstring());
                     return;
                 }
             }
@@ -459,11 +460,11 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         catch (const FfsXmlError& e)
         {
             if (e.getSeverity() == FfsXmlError::WARNING)
-                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING);
+                showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
             //what about simulating changed config on parsing errors????
             else
             {
-                notifyError(e.toString(), _("Error"));
+                notifyError(e.toString(), std::wstring());
                 return;
             }
         }
@@ -484,15 +485,16 @@ void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg,
 
 void showSyntaxHelp()
 {
-    wxMessageBox(_("Syntax:") + L"\n" +
-                 L"FreeFileSync [" + _("config files") + L"]\n[-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n" +
-                 L"\n" +
-                 _("config files") + L"\n" +
-                 _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n"
+    showNotificationDialog(nullptr, DialogInfoType::INFO, PopupDialogCfg().
+                           setTitle(_("Command line")).
+                           setDetailInstructions(_("Syntax:") + L"\n" +
+                                                 L"FreeFileSync [" + _("config files") + L"]\n[-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n" +
+                                                 L"\n" +
+                                                 _("config files") + L"\n" +
+                                                 _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n"
 
-                 L"-leftdir " + _("directory") + L" -rightdir " + _("directory") + L"\n" +
-                 _("Any number of alternative directories for at most one config file."),
-                 L"FreeFileSync - " + _("Command line"), wxOK | wxICON_INFORMATION);
+                                                 L"-leftdir " + _("directory") + L" -rightdir " + _("directory") + L"\n" +
+                                                 _("Any number of alternative directories for at most one config file.")));
 }
 
 
@@ -501,7 +503,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     auto notifyError = [&](const std::wstring& msg, FfsReturnCode rc)
     {
         if (batchCfg.handleError == ON_ERROR_POPUP)
-            wxMessageBox(msg.c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(msg));
         else //"exit" or "ignore"
             logError(utfCvrtTo<std::string>(msg));
 
@@ -553,6 +555,8 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
                                          batchCfg.logfilesCountLimit,
                                          globalCfg.lastSyncsLogFileSizeMax,
                                          batchCfg.handleError,
+                                         globalCfg.automaticRetryCount,
+                                         globalCfg.automaticRetryDelay,
                                          switchBatchToGui,
                                          returnCode,
                                          batchCfg.mainCfg.onCompletion,
@@ -567,7 +571,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
                 allowPwPrompt = true;
                 break;
             case ON_ERROR_IGNORE:
-            case ON_ERROR_ABORT:
+            case ON_ERROR_STOP:
                 break;
         }
 
@@ -596,7 +600,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,
-                    globalCfg.transactionalFileCopy,
+                    globalCfg.failsafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
                     syncProcessCfg,
                     folderCmp,

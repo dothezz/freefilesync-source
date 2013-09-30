@@ -49,9 +49,9 @@ LRESULT CALLBACK mouseInputHook(int nCode, WPARAM wParam, LPARAM lParam)
     return ::CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
-struct Dummy
+struct InstallMouseHook
 {
-    Dummy()
+    InstallMouseHook()
     {
         hHook = ::SetWindowsHookEx(WH_GETMESSAGE,  //__in  int idHook,
                                    mouseInputHook, //__in  HOOKPROC lpfn,
@@ -60,7 +60,7 @@ struct Dummy
         assert(hHook);
     }
 
-    ~Dummy()
+    ~InstallMouseHook()
     {
         if (hHook)
             ::UnhookWindowsHookEx(hHook);

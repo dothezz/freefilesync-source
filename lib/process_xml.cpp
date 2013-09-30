@@ -10,6 +10,7 @@
 #include "ffs_paths.h"
 #include <zen/file_handling.h>
 #include <zen/file_io.h>
+//#include <zen/time.h>
 #include "xml_base.h"
 
 using namespace zen;
@@ -20,8 +21,8 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const int XML_FORMAT_VER_GLOBAL    = 1;
-const int XML_FORMAT_VER_FFS_GUI   = 2;
-const int XML_FORMAT_VER_FFS_BATCH = 2;
+const int XML_FORMAT_VER_FFS_GUI   = 3; //for FFS 5.22
+const int XML_FORMAT_VER_FFS_BATCH = 3; //
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -111,7 +112,7 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
     switch (batchCfg.handleError)
     {
         case ON_ERROR_POPUP:
-        case ON_ERROR_ABORT:
+        case ON_ERROR_STOP:
             output.handleError = ON_GUIERROR_POPUP;
             break;
         case ON_ERROR_IGNORE:
@@ -261,8 +262,8 @@ void writeText(const OnError& value, std::string& output)
         case ON_ERROR_POPUP:
             output = "Popup";
             break;
-        case ON_ERROR_ABORT:
-            output = "Abort";
+        case ON_ERROR_STOP:
+            output = "Stop";
             break;
     }
 }
@@ -274,15 +275,17 @@ bool readText(const std::string& input, OnError& value)
     zen::trim(tmp);
     warn_static("remove after migration. 2013.08.20")
     if (tmp == "Exit") //obsolete
-        value = ON_ERROR_ABORT;
+        value = ON_ERROR_STOP;
+    else if (tmp == "Abort") //obsolete: 2013.09.04
+        value = ON_ERROR_STOP;
     else
 
         if (tmp == "Ignore")
             value = ON_ERROR_IGNORE;
         else if (tmp == "Popup")
             value = ON_ERROR_POPUP;
-        else if (tmp == "Abort")
-            value = ON_ERROR_ABORT;
+        else if (tmp == "Stop")
+            value = ON_ERROR_STOP;
         else
             return false;
     return true;
@@ -797,6 +800,25 @@ void writeStruc(const ViewFilterDefault& value, XmlElement& output)
     actView.attribute("DeleteRight", value.deleteRight);
     actView.attribute("DoNothing"  , value.doNothing);
 }
+
+
+template <> inline
+bool readStruc(const XmlElement& input, ConfigHistoryItem& value)
+{
+    XmlIn in(input);
+    bool rv1 = in(value.configFile);
+    //bool rv2 = in.attribute("LastUsed", value.lastUseTime);
+    return rv1 /*&& rv2*/;
+}
+
+
+template <> inline
+void writeStruc(const ConfigHistoryItem& value, XmlElement& output)
+{
+    XmlOut out(output);
+    out(value.configFile);
+    //out.attribute("LastUsed", value.lastUseTime);
+}
 }
 
 
@@ -805,7 +827,12 @@ namespace
 void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
     in["Variant"       ](cmpConfig.compareVar);
-    in["HandleSymlinks"](cmpConfig.handleSymlinks);
+
+    warn_static("remove check after migration. 2013.09.7")
+    if (in["HandleSymlinks"])//obsolete name
+        in["HandleSymlinks"](cmpConfig.handleSymlinks);
+    else
+        in["Symlinks"](cmpConfig.handleSymlinks);
 }
 
 
@@ -1028,15 +1055,17 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 {
     XmlIn inShared = in["Shared"];
 
-    inShared["Language"].attribute("id", config.programLanguage);
+    inShared["Language"].attribute("Id", config.programLanguage);
 
-    inShared["FailSafeFileCopy"         ].attribute("Enabled", config.transactionalFileCopy);
+    inShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
     inShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     inShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    inShared["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
+    inShared["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    inShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     inShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
     inShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     inShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    inShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     inShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
 
     XmlIn inOpt = inShared["OptionalDialogs"];
@@ -1103,6 +1132,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //load config file history
     inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
+
     inGui["ConfigHistory"](config.gui.cfgFileHistory);
     inGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
 
@@ -1117,7 +1147,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inGui["ExternalApplications"](config.gui.externelApplications);
 
     //last update check
-    inGui["LastUpdateCheck"](config.gui.lastUpdateCheck);
+    inGui["LastVersionCheck"](config.gui.lastUpdateCheck);
 
     //batch specific global settings
     //XmlIn inBatch = in["Batch"];
@@ -1263,8 +1293,8 @@ namespace
 {
 void writeConfig(const CompConfig& cmpConfig, XmlOut& out)
 {
-    out["Variant"       ](cmpConfig.compareVar);
-    out["HandleSymlinks"](cmpConfig.handleSymlinks);
+    out["Variant" ](cmpConfig.compareVar);
+    out["Symlinks"](cmpConfig.handleSymlinks);
 }
 
 
@@ -1409,15 +1439,17 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 {
     XmlOut outShared = out["Shared"];
 
-    outShared["Language"].attribute("id", config.programLanguage);
+    outShared["Language"].attribute("Id", config.programLanguage);
 
-    outShared["FailSafeFileCopy"         ].attribute("Enabled", config.transactionalFileCopy);
+    outShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
     outShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     outShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    outShared["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
+    outShared["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    outShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     outShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
     outShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     outShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    outShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     outShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
 
     XmlOut outOpt = outShared["OptionalDialogs"];
@@ -1482,6 +1514,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     //load config file history
     outGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
+
     outGui["ConfigHistory" ](config.gui.cfgFileHistory);
     outGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
 
@@ -1496,7 +1529,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGui["ExternalApplications"](config.gui.externelApplications);
 
     //last update check
-    outGui["LastUpdateCheck"](config.gui.lastUpdateCheck);
+    outGui["LastVersionCheck"](config.gui.lastUpdateCheck);
 
     //batch specific global settings
     //XmlOut outBatch = out["Batch"];

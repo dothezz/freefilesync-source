@@ -5,24 +5,27 @@
 // **************************************************************************
 
 #include "main_dlg.h"
-#include "resources.h"
-#include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include <wx/filedlg.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/string_conv.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/font_size.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include <zen/assert_static.h>
 #include <zen/file_handling.h>
 #include <zen/build_info.h>
 #include "xml_proc.h"
 #include "tray_menu.h"
 #include "xml_ffs.h"
+#include "app_icon.h"
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
-#ifdef ZEN_MAC
+#ifdef ZEN_LINUX
+#include <gtk/gtk.h>
+#elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -34,7 +37,14 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        dirName(*this, *m_buttonSelectDir, *m_txtCtrlDirectory) {}
+        dirName(*this, *m_buttonSelectDir, *m_txtCtrlDirectory)
+    {
+#ifdef ZEN_LINUX
+        //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
+        if (GtkWidget* widget = m_txtCtrlDirectory->GetConnectWidget())
+            ::gtk_drag_dest_unset(widget);
+#endif
+    }
 
     void setName(const wxString& dirname) { dirName.setName(dirname); }
     wxString getName() const { return dirName.getName(); }
@@ -55,10 +65,16 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
 {
 #ifdef ZEN_WIN
     new MouseMoveWindow(*this); //ownership passed to "this"
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
 #endif
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    SetIcon(GlobalResources::instance().programIconRTS); //set application icon
+#ifdef ZEN_LINUX
+    //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
+    if (GtkWidget* widget = m_txtCtrlDirectoryMain->GetConnectWidget())
+        ::gtk_drag_dest_unset(widget);
+#endif
+
+    SetIcon(getRtsIcon()); //set application icon
 
     setRelativeFontSize(*m_buttonStart, 1.5);
 
@@ -67,8 +83,6 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
 
     m_bpButtonAddFolder      ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_remove"));
-    ///m_buttonStart            ->setBitmapFront(getResourceImage(L"startRts"), 5);
-
     setBitmapTextLabel(*m_buttonStart, getResourceImage(L"startRts").ConvertToImage(), m_buttonStart->GetLabel(), 5, 8);
 
 
@@ -89,12 +103,12 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
             rts::readRealOrBatchConfig(currentConfigFile, newConfig); //throw FfsXmlError
             loadCfgSuccess = true;
         }
-        catch (const xmlAccess::FfsXmlError& error)
+        catch (const xmlAccess::FfsXmlError& e)
         {
-            if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                wxMessageBox(error.toString(),L"RealtimeSync" +  _("Warning"), wxOK | wxICON_WARNING, this);
+            if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
+                showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
             else
-                wxMessageBox(error.toString(), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR, this);
+                showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         }
 
     const bool startWatchingImmediately = loadCfgSuccess && !cfgFileName.empty();
@@ -102,15 +116,6 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     setConfiguration(newConfig);
     setLastUsedConfig(currentConfigFile);
     //-----------------------------------------------------------------------------------------
-    //Layout();
-    //Fit();
-
-    m_scrolledWinFolders->Fit(); //adjust scrolled window size
-    m_scrolledWinFolders->Layout(); //fix small layout problem
-    m_panelMain->Layout();       //adjust stuff inside scrolled window
-    Fit();                       //adapt dialog size
-
-    Center();
 
     if (startWatchingImmediately) //start watch mode directly
     {
@@ -124,9 +129,9 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
         Show();
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon, even if we're not an application bundle
         //if the executable is not yet in a bundle or if it is called through a launcher, we need to set focus manually:
-        ::SetFrontProcess(&psn);
 #endif
     }
 
@@ -147,9 +152,9 @@ MainDialog::~MainDialog()
     {
         writeRealConfig(currentCfg, lastConfigFileName()); //throw FfsXmlError
     }
-    catch (const xmlAccess::FfsXmlError& error)
+    catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(error.toString().c_str(), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR, this);
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
     }
 }
 
@@ -193,17 +198,20 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
         build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build), _("About"), wxOK, this);
+    showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
+                           setTitle(_("About")).
+                           setMainInstructions(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build)));
 }
 
 
 void MainDialog::OnKeyPressed(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
-
     if (keyCode == WXK_ESCAPE)
+    {
         Close();
-
+        return;
+    }
     event.Skip();
 }
 
@@ -230,8 +238,9 @@ void MainDialog::OnStart(wxCommandEvent& event)
     }
     Show(); //don't show for EXIT_APP
 #ifdef ZEN_MAC
+    ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+    //why isn't this covered by wxWindows::Raise()??
     ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-    ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
     Raise();
 }
@@ -266,7 +275,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(e.toString().c_str(), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR, this);
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
     }
 }
 
@@ -279,13 +288,13 @@ void MainDialog::loadConfig(const Zstring& filename)
     {
         rts::readRealOrBatchConfig(filename, newConfig);
     }
-    catch (const xmlAccess::FfsXmlError& error)
+    catch (const xmlAccess::FfsXmlError& e)
     {
-        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            wxMessageBox(error.toString(), L"RealtimeSync" + _("Warning"), wxOK | wxICON_WARNING, this);
+        if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
+            showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
         else
         {
-            wxMessageBox(error.toString(), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR, this);
+            showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
             return;
         }
     }
@@ -300,7 +309,7 @@ void MainDialog::setLastUsedConfig(const Zstring& filename)
     //set title
     if (filename == lastConfigFileName())
     {
-        SetTitle(_("RealtimeSync - Automated Synchronization"));
+        SetTitle(L"RealtimeSync - " + _("Automated Synchronization"));
         currentConfigFileName.clear();
     }
     else
@@ -317,7 +326,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
                             wxEmptyString,
                             utfCvrtTo<wxString>(beforeLast(currentConfigFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
                             wxEmptyString,
-                            wxString(L"RealtimeSync (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
+                            wxString(L"RealtimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)
         loadConfig(utfCvrtTo<Zstring>(filePicker.GetPath()));
@@ -336,7 +345,6 @@ void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
 {
     //clear existing folders
     dirNameFirst->setName(wxString());
-
     clearAddFolders();
 
     if (!cfg.directories.empty())
@@ -389,10 +397,10 @@ void MainDialog::OnRemoveFolder(wxCommandEvent& event)
 {
     //find folder pair originating the event
     const wxObject* const eventObj = event.GetEventObject();
-    for (std::vector<DirectoryPanel*>::const_iterator i = dirNamesExtra.begin(); i != dirNamesExtra.end(); ++i)
-        if (eventObj == static_cast<wxObject*>((*i)->m_bpButtonRemoveFolder))
+    for (auto it = dirNamesExtra.begin(); it != dirNamesExtra.end(); ++it)
+        if (eventObj == static_cast<wxObject*>((*it)->m_bpButtonRemoveFolder))
         {
-            removeAddFolder(i - dirNamesExtra.begin());
+            removeAddFolder(it - dirNamesExtra.begin());
             return;
         }
 }
@@ -423,7 +431,9 @@ void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront
     if (newFolders.size() == 0)
         return;
 
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
     int folderHeight = 0;
     for (auto it = newFolders.begin(); it != newFolders.end(); ++it)
@@ -459,19 +469,18 @@ void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront
 
     //adapt delete top folder pair button
     m_bpButtonRemoveTopFolder->Show();
-    m_panelMainFolder->Layout();
 
-    //update controls
-    m_scrolledWinFolders->Fit(); //adjust scrolled window size
-    m_scrolledWinFolders->Layout(); //fix small layout problem
-    m_panelMain->Layout();       //adjust stuff inside scrolled window
-    Fit();                       //adapt dialog size
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    Layout();
+    Refresh(); //remove a little flicker near the start button
 }
 
 
 void MainDialog::removeAddFolder(size_t pos)
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
     if (pos < dirNamesExtra.size())
     {
@@ -498,24 +507,28 @@ void MainDialog::removeAddFolder(size_t pos)
             m_panelMainFolder->Layout();
         }
 
-        //update controls
-        m_scrolledWinFolders->Fit(); //adjust scrolled window size
-        m_panelMain->Layout();       //adjust stuff inside scrolled window
-        Fit();                       //adapt dialog size
+        GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+        Layout();
+        Refresh(); //remove a little flicker near the start button
     }
 }
 
 
 void MainDialog::clearAddFolders()
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
-    dirNamesExtra.clear();
     bSizerFolders->Clear(true);
+    dirNamesExtra.clear();
+
+    m_scrolledWinFolders->SetMinSize(wxSize(-1, 0));
 
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_scrolledWinFolders->SetMinSize(wxSize(-1, 0));
-    Fit();                       //adapt dialog size
+    GetSizer()->SetSizeHints(this); //~=Fit()
+    Layout();
+    Refresh(); //remove a little flicker near the start button
 }

@@ -2,181 +2,15 @@
 	<language>Cрпски</language>
 	<translator>Балкански Шпијун</translator>
 	<locale>sr_RS</locale>
-	<flag_image>flag_serbia.png</flag_image>
-	<plural_form_count>3</plural_form_count>
+	<image>flag_serbia.png</image>
+	<plural_count>3</plural_count>
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>Unable to move %x to the recycle bin.</source>
+<source>&Check</source>
 <target></target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-</target>
-
-<source>Log</source>
-<target></target>
-
-<source>&Continue</source>
-<target></target>
-
-<source>&Don't show this warning again</source>
-<target></target>
-
-<source>&Ignore subsequent errors</source>
-<target></target>
-
-<source>Comma-separated values</source>
-<target></target>
-
-<source>Never save &changes</source>
-<target></target>
-
-<source>Include via filter:</source>
-<target></target>
-
-<source>&Execute</source>
-<target></target>
-
-<source>Confirm</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target></target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target></target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target></target>
-
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target></target>
-
-<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target></target>
-
-<source>Move files to a user-defined folder</source>
-<target></target>
-
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target></target>
-
-<source>Recycle bin</source>
-<target></target>
-
-<source>Requires database files. Not supported by all file systems.</source>
-<target></target>
-
-<source>Detect moved files</source>
-<target></target>
-
-<source>&Don't show this dialog again</source>
-<target></target>
-
-<source>Minimize to notification area</source>
-<target></target>
-
-<source>Retrying operation after error:</source>
-<target></target>
-
-<source>job name</source>
-<target></target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target></target>
-
-<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target></target>
-
-<source>&Show error</source>
-<target></target>
-
-<source>Waiting until all directories are available...</source>
-<target></target>
-
-<source>Directory monitoring active</source>
-<target></target>
-
-<source>Volume name %x is not part of file path %y.</source>
-<target></target>
-
-<source>Cannot access the Volume Shadow Copy Service.</source>
-<target></target>
-
-<source>%x items</source>
-<target></target>
-
-<source>
-<pluralform>1 thread</pluralform>
-<pluralform>%x threads</pluralform>
-</source>
-<target>
-</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-</target>
-
-<source>Any number of alternative directories for at most one config file.</source>
-<target></target>
-
-<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target></target>
-
-<source>directory</source>
-<target></target>
-
-<source>config files</source>
-<target></target>
-
-<source>Syntax:</source>
-<target></target>
-
-<source>Directories cannot be set for more than one configuration file.</source>
-<target></target>
-
-<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target></target>
-
-<source>Unequal number of left and right directories specified.</source>
-<target></target>
-
-<source>Cannot open file %x.</source>
-<target></target>
-
-<source>Syntax error</source>
-<target></target>
-
-<source>A directory path is expected after %x.</source>
-<target></target>
-
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target></target>
-
-<source>Moving symbolic link %x to the recycle bin</source>
-<target></target>
-
-<source>Moving folder %x to the recycle bin</source>
-<target></target>
-
-<source>Moving file %x to the recycle bin</source>
+<source>Retrying operation...</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -197,6 +31,15 @@ Note: File paths must be relative to base directories.
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Проверавам доступност Корпе за смеће за фолдер %x...</target>
 
+<source>Moving file %x to the recycle bin</source>
+<target>Премештам датотеку %x у Корпи за смеће</target>
+
+<source>Moving folder %x to the recycle bin</source>
+<target>Премештам фолдер %x у Корпи за смеће</target>
+
+<source>Moving symbolic link %x to the recycle bin</source>
+<target>Премештам симболичну везу %x у Корпи за смеће</target>
+
 <source>Deleting file %x</source>
 <target>Брисање датотеке %x</target>
 
@@ -206,20 +49,50 @@ Note: File paths must be relative to base directories.
 <source>Deleting symbolic link %x</source>
 <target>Брисање симболичне везе %x</target>
 
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>Корпа за смеће није доступна за следеће фолдере. Уместо тога датотеке биће обрисане трајно:</target>
+
 <source>An exception occurred</source>
 <target>Догодило се изузеће</target>
 
-<source>Error</source>
-<target>Грешка</target>
+<source>A directory path is expected after %x.</source>
+<target>Путања фолдера се очекује после %x.</target>
+
+<source>Syntax error</source>
+<target>Синтаксичка грешка</target>
+
+<source>Cannot open file %x.</source>
+<target>Не могу отворити датотеку %x.</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Датотека %x не садржи валидну конфигурацију.</target>
 
-<source>Warning</source>
-<target>Упозорење</target>
+<source>Unequal number of left and right directories specified.</source>
+<target>Неједнак број левих и десних фолдера је дефинисан.</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>Конфигурациона датотека не сме садржавати подешавања на нивоу фолдерског пара када су фолдери подешени по командној линији.</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>Фолдери не могу бити подешени за више од једне конфигурационе датотеке.</target>
 
 <source>Command line</source>
 <target>Командна линија</target>
+
+<source>Syntax:</source>
+<target>Синтакса:</target>
+
+<source>config files</source>
+<target>конфигурационе датотеке</target>
+
+<source>directory</source>
+<target>фолдер</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>Било који број FreeFileSync .ffs_gui и/или .ffs_batch конфигурационих датотека.</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>Било који број алтернативних фолдера за најмање једну конфигурациону датотеку.</target>
 
 <source>A folder input field is empty.</source>
 <target>Поље за одабир фолдера је празно.</target>
@@ -378,6 +251,16 @@ Note: File paths must be relative to base directories.
 <source>Total time:</source>
 <target>Укупно време:</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x бајт</pluralform>
+<pluralform>%x бајта</pluralform>
+<pluralform>%x бајтова</pluralform>
+</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -396,11 +279,24 @@ Note: File paths must be relative to base directories.
 <source>Scanning:</source>
 <target>Претражујем:</target>
 
+<source>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
+</source>
+<target>
+<pluralform>%x нит</pluralform>
+<pluralform>%x нити</pluralform>
+<pluralform>%x нити</pluralform>
+</target>
+
 <source>Encoding extended time information: %x</source>
 <target>Кодирам проширене информације о времену: %x</target>
 
 <source>/sec</source>
 <target>/сек</target>
+
+<source>%x items/sec</source>
+<target>%x ставки/секунди</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Датотека подешавања %x учитана само делимично.</target>
@@ -414,6 +310,9 @@ Note: File paths must be relative to base directories.
 <source>Browse directory</source>
 <target>Одабери фолдер</target>
 
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target>Не могу приступити Volume Shadow Copy сервису.</target>
+
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Молимо користите FreeFileSync 64-битну верзију за израду shadow копија на овом систему.</target>
 
@@ -423,11 +322,14 @@ Note: File paths must be relative to base directories.
 <source>Cannot determine volume name for %x.</source>
 <target>Не могу утврдити назив партиције за %x.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Прекид захтеван: Чека се да се тренутна акција заврши...</target>
+<source>Volume name %x is not part of file path %y.</source>
+<target>Назив партиције %x није део путање датотеке %y.</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Неуспело стварање временске ознаке за верзију:</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Заустављање захтевано: Чека се да се тренутна акција заврши...</target>
+
+<source>Unable to create timestamp for versioning:</source>
+<target>Није могуће стварање временске ознаке за верзију:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Не могу прочитати следеће XML елементе:</target>
@@ -444,8 +346,8 @@ Note: File paths must be relative to base directories.
 <source>&Program</source>
 <target>&Програм</target>
 
-<source>&Content</source>
-<target>&Садржај</target>
+<source>&View help</source>
+<target>&Погледај помоћ</target>
 
 <source>&About</source>
 <target>&О програму</target>
@@ -468,8 +370,8 @@ Note: File paths must be relative to base directories.
 <source>To get started just import a .ffs_batch file.</source>
 <target>Да би почели увезите .ffs_batch датотеку.</target>
 
-<source>Folders to watch</source>
-<target>Фолдери за надгледање</target>
+<source>Folders to watch:</source>
+<target>Фолдери за надгледање:</target>
 
 <source>Add folder</source>
 <target>Додај фолдер</target>
@@ -483,11 +385,14 @@ Note: File paths must be relative to base directories.
 <source>Select a folder</source>
 <target>Одаберите фолдер</target>
 
-<source>Idle time [seconds]</source>
-<target>Време мировања [секунди]</target>
+<source>Idle time (in seconds):</source>
+<target>Време мировања (у секундама):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Време мировања између задње препознате промене и извршења наредбе</target>
+
+<source>Command line:</source>
+<target>Командна линија:</target>
 
 <source>
 The command is triggered if:
@@ -500,35 +405,44 @@ The command is triggered if:
 - нови фолдери појаве (нпр. укључење USB стика)
 </target>
 
-<source>Start</source>
-<target>Старт</target>
-
-<source>&Retry</source>
-<target>&Понови</target>
-
-<source>Cancel</source>
-<target>Одустани</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Аутоматска Синхронизација</target>
-
-<source>Build: %x</source>
-<target>Подверзија: %x</target>
+<source>&Start</source>
+<target>&Покрени</target>
 
 <source>About</source>
 <target>О програму</target>
 
+<source>Build: %x</source>
+<target>Подверзија: %x</target>
+
 <source>All files</source>
 <target>Све датотеке</target>
+
+<source>Automated Synchronization</source>
+<target>Аутоматска синхронизација</target>
+
+<source>Directory monitoring active</source>
+<target>Активно надгледање фолдера</target>
+
+<source>Waiting until all directories are available...</source>
+<target>Чекање да сви фолдери буду доступни...</target>
+
+<source>Error</source>
+<target>Грешка</target>
 
 <source>&Restore</source>
 <target>&Врати</target>
 
+<source>&Show error</source>
+<target>&Прикажи грешку</target>
+
 <source>&Exit</source>
 <target>&Излаз</target>
 
-<source>Invalid command line:</source>
+<source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
+
+<source>&Retry</source>
+<target>&Понови</target>
 
 <source>File content</source>
 <target>Садржај датотеке</target>
@@ -590,14 +504,17 @@ The command is triggered if:
 <source>Target folder input field must not be empty.</source>
 <target>Поље за одабир одредишног фолдера не може бити празно.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Поље за одабир фолдера за верзионирање не може бити празно.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Молим унесите одредишни фолдер за верзионирање.</target>
 
 <source>Source folder %x not found.</source>
 <target>Изворни фолдер %x није пронађен.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следеће ставке имају неразрешених конфликата и неће бити синхронизоване:</target>
+
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>Следећи фолдери су значајно различити. Обезбедите да сигурно упарујете праве фолдере за синхронизацију.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Недовољно простора на диску у:</target>
@@ -617,11 +534,17 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>Генерисање базе података...</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Креирање Volume Shadow Copy за %x...</target>
+
 <source>Data verification error: %x and %y have different content.</source>
 <target>Грешка при провери података: %x и %y имају различит садржај.</target>
 
-<source>Synchronization aborted</source>
-<target>Синхронизација прекинута</target>
+<source>job name</source>
+<target>име задатка</target>
+
+<source>Synchronization stopped</source>
+<target>Синхронизација заустављена</target>
 
 <source>Synchronization completed with errors</source>
 <target>Синхронизација завршена с грешкама</target>
@@ -638,11 +561,39 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Уписујем лог датотеку %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Притисни "Замени" за решавање проблема у FreeFileSync главном оквиру дијалога.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>Можете се пребацити на главни прозор FreeFileSync-а да би разрешили ову ствар.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>Пребацујем се на главни оквир диалога FreeFileSync-а</target>
+<source>&Don't show this warning again</source>
+<target>&Не приказуј ово упозорење поновно</target>
+
+<source>&Ignore</source>
+<target>&Игнориши</target>
+
+<source>&Switch</source>
+<target>&Замени</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target>Пребацујем се на главни прозор FreeFileSync-а</target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>Аутоматски покушај за %x секунду...</pluralform>
+<pluralform>Аутоматски покушај за %x секунде...</pluralform>
+<pluralform>Аутоматски покушај за %x секунди...</pluralform>
+</target>
+
+<source>&Ignore subsequent errors</source>
+<target>&Занемари грешке које даље следе</target>
+
+<source>Serious Error</source>
+<target>Озбиљна грешка</target>
+
+<source>Check for Program Updates</source>
+<target>Провери постојање надоградње програма</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Нова верзија FreeFileSync је доступна:</target>
@@ -650,23 +601,20 @@ The command is triggered if:
 <source>Download now?</source>
 <target>Преузети сада?</target>
 
-<source>New version found</source>
-<target>Пронађена нова верзија</target>
-
 <source>&Download</source>
 <target>&Преузми</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync је ажуриран.</target>
 
-<source>Information</source>
-<target>Информација</target>
-
 <source>Unable to connect to sourceforge.net.</source>
 <target>Не могу се повезати на sourceforge.net.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Да ли желите да проверите ручно?</target>
+
+<source>Copy</source>
+<target>Копирај</target>
 
 <source>Symlink</source>
 <target>Сим-веза</target>
@@ -719,20 +667,20 @@ The command is triggered if:
 <source>Hibernate</source>
 <target>Хибернација</target>
 
-<source>Selected variant:</source>
-<target>Одабрана варијанта:</target>
+<source>Alternate comparison settings</source>
+<target>Алтернативна подешавања упоређивања</target>
 
-<source>Select alternate comparison settings</source>
-<target>Изаберите алтернативна подешавања упоређивања</target>
+<source>Alternate synchronization settings</source>
+<target>Алтернативна подешавања синхронизације</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Изаберите алтернативна подешавања синхронизације</target>
+<source>Local filter</source>
+<target>Локални филтер</target>
 
-<source>Filter is active</source>
-<target>Филтер је активан</target>
+<source>Active</source>
+<target>Активан</target>
 
-<source>No filter selected</source>
-<target>Ниједан филтер није одабран</target>
+<source>None</source>
+<target>Ниједан</target>
 
 <source>Remove alternate settings</source>
 <target>Уклони алтернативна подешавања</target>
@@ -740,11 +688,17 @@ The command is triggered if:
 <source>Clear filter settings</source>
 <target>Уклони подешавања филтера</target>
 
-<source>Copy</source>
-<target>Копирај</target>
-
 <source>Paste</source>
 <target>Залепи</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Алтернативна подешавања упоређивања</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Алтернативна подешавања синхронизације</target>
+
+<source>Local Filter</source>
+<target>Локални филтер</target>
 
 <source>&New</source>
 <target>&Ново</target>
@@ -761,14 +715,17 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &Синхронизуј</target>
 
+<source>&Global settings</source>
+<target>&Глобална подешавања</target>
+
 <source>&Language</source>
 <target>&Језик</target>
 
+<source>&Find...</source>
+<target>&Нађи...</target>
+
 <source>&Export file list...</source>
 <target>&Извоз листе датотека...</target>
-
-<source>&Global settings</source>
-<target>&Глобална подешавања</target>
 
 <source>&Tools</source>
 <target>&Алати</target>
@@ -779,17 +736,14 @@ The command is triggered if:
 <source>Check &automatically once a week</source>
 <target>Провери &аутоматски једном недељно</target>
 
-<source>Check for new &version</source>
-<target>Провери постојање нове &верзије</target>
+<source>&Check for new version</source>
+<target>&Провери постојање нове верзије</target>
 
 <source>Compare</source>
 <target>Упореди</target>
 
-<source>Comparison settings</source>
-<target>Подешавања упоређивања</target>
-
-<source>Synchronization settings</source>
-<target>Подешавања синхронизације</target>
+<source>Cancel</source>
+<target>Одустани</target>
 
 <source>Synchronize</source>
 <target>Синхронизуј</target>
@@ -802,6 +756,15 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>Замени стране</target>
+
+<source>Close search bar</source>
+<target>Затвори траку за претраживање</target>
+
+<source>Find:</source>
+<target>Нађи:</target>
+
+<source>Match case</source>
+<target>По величини слова</target>
 
 <source>Save as batch job</source>
 <target>Сачувај као беч задатак</target>
@@ -824,6 +787,99 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Укупно бајтова за копирање</target>
 
+<source>Select a variant:</source>
+<target>Одаберите варијанту:</target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Идентификуј једнаке датотеке упоређивањем времена промена и величина.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Идентификуј једнаке датотеке упоређивањем садржаја датотека.</target>
+
+<source>Symbolic links:</source>
+<target>Симболичне везе:</target>
+
+<source>More information</source>
+<target>Више информација</target>
+
+<source>OK</source>
+<target>У реду</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Креирај огледални бекап левог фолдера који ће се тачно подударати са десним фолдером након синхронизације.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Копирај нове и ажуриране датотеке у десни фолдер.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Конфигуришите ваша властита синхронизациона правила.</target>
+
+<source>Detect moved files</source>
+<target>Уочи премештене датотеке</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Потребне датотеке базе. Није подржано за све системе датотека.</target>
+
+<source>Delete files:</source>
+<target>Обриши датотеке:</target>
+
+<source>Permanent</source>
+<target>Трајно</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Трајно избриши или замени датотеке</target>
+
+<source>Recycle bin</source>
+<target>Корпа за смеће</target>
+
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Направи резервне копије обрисаних и замењених датотека у Корпи за смеће</target>
+
+<source>Versioning</source>
+<target>Верзионирање</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Премести датотеке у кориснички одабран фолдер</target>
+
+<source>Naming convention:</source>
+<target>Правило именовања:</target>
+
+<source>Show examples</source>
+<target>Прикажи примере</target>
+
+<source>Handle errors:</source>
+<target>Обрада грешака:</target>
+
+<source>Ignore</source>
+<target>Игнориши</target>
+
+<source>Hide all error and warning messages</source>
+<target>Сакриј све грешке и упозорења</target>
+
+<source>Pop-up</source>
+<target>Искачући прозор</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Прикажи искачући прозор при грешкама и упозорењима</target>
+
+<source>On completion:</source>
+<target>При завршетку:</target>
+
+<source>Start synchronization now?</source>
+<target>Почни синхронизацију сада?</target>
+
+<source>Variant:</source>
+<target>Варијанта:</target>
+
+<source>Statistics</source>
+<target>Статистика</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Не приказуј овај диалог поновно</target>
+
 <source>Items found:</source>
 <target>Пронађене ставке:</target>
 
@@ -839,8 +895,8 @@ The command is triggered if:
 <source>Synchronizing...</source>
 <target>Синхронизујем...</target>
 
-<source>On completion</source>
-<target>При завршетку</target>
+<source>Minimize to notification area</source>
+<target>Минимизирај у области за обавештења</target>
 
 <source>Close</source>
 <target>Затвори</target>
@@ -848,113 +904,116 @@ The command is triggered if:
 <source>&Pause</source>
 <target>&Пауза</target>
 
-<source>Variant</source>
-<target>Варијанта</target>
+<source>Stop</source>
+<target>Заустави</target>
 
-<source>Statistics</source>
-<target>Статистика</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Креирај беч датотеку за ненадзирану синхронизацију. Да би почели, кликните дуплим кликом ову датотеку или додајте задатак у таск менаџеру: %x</target>
 
-<source>Select a variant</source>
-<target>Одаберите варијанту</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Датотеке се сматрају једнаке ако су им
-     - време задње промене и датум
-     - величине датотека
-једнаки
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Датотеке се сматрају једнаке ако им је
-     - садржај датотеке
-једнак
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Управљање симболичним везама</target>
-
-<source>Help</source>
-<target>Помоћ</target>
-
-<source>OK</source>
-<target>У реду</target>
-
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Огледални бекап левог фолдера. Десни фолдер се модификује да би био једнак левом фолдеру након синхронизације.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Копирај нове или ажуриране датотеке у десни фолдер.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Конфигуришите ваша властита синхронизациона правила.</target>
-
-<source>Error handling</source>
-<target>Грешка при обради</target>
-
-<source>Ignore</source>
-<target>Игнориши</target>
-
-<source>Hide all error and warning messages</source>
-<target>Сакриј све грешке и упозорења</target>
-
-<source>Pop-up</source>
-<target>Искачући прозор</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Прикажи искачући прозор при грешкама и упозорењима</target>
-
-<source>Deletion handling</source>
-<target>Управљање при брисању</target>
-
-<source>Permanent</source>
-<target>Трајно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Трајно избриши или замени датотеке</target>
-
-<source>Versioning</source>
-<target>Верзионирање</target>
-
-<source>Naming convention:</source>
-<target>Правило именовања:</target>
-
-<source>Batch job</source>
-<target>Беч задатак</target>
-
-<source>Exit</source>
-<target>Изађи</target>
-
-<source>Abort synchronization on first error</source>
-<target>Прекини синхронизацију при првој грешци</target>
+<source>Stop synchronization at first error</source>
+<target>Заустави синхронизацију при првој грешци</target>
 
 <source>Show progress dialog</source>
 <target>Прикажи дијалог прогреса</target>
 
-<source>Save log</source>
-<target>Сачувај лог</target>
+<source>Save log:</source>
+<target>Сачувај лог:</target>
 
-<source>Select folder to save log files</source>
-<target>Одабери фолдер за чување лог датотека</target>
-
-<source>Limit</source>
-<target>Ограничи</target>
+<source>Limit:</source>
+<target>Ограничи:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Ограничи максималан број лог датотека</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Како могу заказати беч задатак?</target>
+
+<source>&Recycle bin</source>
+<target>&Корпа за смеће</target>
+
+<source>Delete on both sides</source>
+<target>Избриши на обе стране</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Избриши на обе стране чак иако је датотека селектована само на једној страни</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
+
+<source>Include:</source>
+<target>Укључи:</target>
+
+<source>Exclude:</source>
+<target>Искључи:</target>
+
+<source>Time span:</source>
+<target>Временско ограничење:</target>
+
+<source>File size:</source>
+<target>Величина датотеке:</target>
+
+<source>Minimum:</source>
+<target>Минимум:</target>
+
+<source>Maximum:</source>
+<target>Максимум:</target>
+
+<source>&Clear</source>
+<target>&Уклони</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
+
+<source>Fail-safe file copy</source>
+<target>Копирање заштићено од грешака</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Копирај у привремену датотеку (*.ffs_tmp) пре уклањања циљане ставке.
+Ово гарантује непромењивост чак и у случају озбиљне грешке.
+</target>
+
+<source>(recommended)</source>
+<target>(препоручено)</target>
+
+<source>Copy locked files</source>
+<target>Копирај закључане датотеке</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Копирај дељене или закључане датотеке користећи Volume Shadow Copy сервис.</target>
+
+<source>(requires administrator rights)</source>
+<target>(потребна администраторска права)</target>
+
+<source>Copy file access permissions</source>
+<target>Копирај овлашћења приступа датотекама</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Премести овлашћења приступа датотека и фолдера.</target>
+
+<source>Automatic retry on error:</source>
+<target>Аутоматски покушај при грешци:</target>
+
+<source>Retry count:</source>
+<target>Број покушаја:</target>
+
+<source>Delay (in seconds):</source>
+<target>Паузирање (у секундама):</target>
+
+<source>Customize context menu:</source>
+<target>Прилагоди контекстни мени:</target>
+
+<source>Description</source>
+<target>Опис</target>
+
+<source>Restore hidden windows</source>
+<target>Прикажи скривене прозоре</target>
+
+<source>&Default</source>
+<target>&Подразумевано</target>
 
 <source>Source code written in C++ using:</source>
 <target>Изворни код написан у C++ уз коришћење:</target>
@@ -964,9 +1023,6 @@ is the same
 
 <source>Donate with PayPal</source>
 <target>Донација са PayPal-ом</target>
-
-<source>Many thanks for localization:</source>
-<target>Велике похвале за локализацију:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Повратне информације и предлози су добродошли</target>
@@ -980,83 +1036,26 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Објављено под ГНУ Општом јавном лиценцом</target>
 
-<source>Delete on both sides</source>
-<target>Избриши на обе стране</target>
+<source>Many thanks for localization:</source>
+<target>Велике похвале за локализацију:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Избриши на обе стране чак иако је датотека селектована само на једној страни</target>
+<source>Save as Batch Job</source>
+<target>Сачувај као беч задатак</target>
 
-<source>Include</source>
-<target>Укључи</target>
+<source>Delete Items</source>
+<target>Избриши ставке</target>
 
-<source>Exclude</source>
-<target>Искључи</target>
-
-<source>Time span</source>
-<target>Временско ограничење</target>
-
-<source>File size</source>
-<target>Величина датотеке</target>
-
-<source>Minimum</source>
-<target>Минимум</target>
-
-<source>Maximum</source>
-<target>Максимум</target>
-
-<source>&Clear</source>
-<target>&Уклони</target>
-
-<source>Global settings</source>
+<source>Global Settings</source>
 <target>Глобална подешавања</target>
 
-<source>Fail-safe file copy</source>
-<target>Копирање заштићено од грешака</target>
+<source>Select Time Span</source>
+<target>Изаберите временски распон</target>
 
-<source>Copy locked files</source>
-<target>Копирај закључане датотеке</target>
-
-<source>Copy file access permissions</source>
-<target>Копирај овлашћења приступа датотекама</target>
-
-<source>Restore hidden dialogs</source>
-<target>Прикажи скривене диалоге</target>
-
-<source>External applications</source>
-<target>Спољне апликације</target>
-
-<source>Description</source>
-<target>Опис</target>
-
-<source>&Default</source>
-<target>&Подразумевано</target>
-
-<source>Find what:</source>
-<target>Нађи шта:</target>
-
-<source>Match case</source>
-<target>По величини слова</target>
-
-<source>&Find next</source>
-<target>&Нађи следеће</target>
-
-<source>Start synchronization</source>
-<target>Почни синхронизацију</target>
-
-<source>Delete</source>
-<target>Избриши</target>
-
-<source>Configure filter</source>
-<target>Конфигуриши филтер</target>
+<source>Folder Pairs</source>
+<target>Фолдерски парови</target>
 
 <source>Find</source>
 <target>Пронађи</target>
-
-<source>Select time span</source>
-<target>Изаберите временски распон</target>
-
-<source>Folder pairs</source>
-<target>Фолдерски парови</target>
 
 <source>Overview</source>
 <target>Преглед</target>
@@ -1064,13 +1063,13 @@ is the same
 <source>Configuration</source>
 <target>Подешавања</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>Главна трака</target>
 
-<source>Filter files</source>
-<target>Филтрирај датотеке</target>
+<source>Filter Files</source>
+<target>Филтрирање датотека</target>
 
-<source>Select view</source>
+<source>Select View</source>
 <target>Изаберите приказ</target>
 
 <source>Open...</source>
@@ -1081,6 +1080,31 @@ is the same
 
 <source>Compare both sides</source>
 <target>Упореди обе стране</target>
+
+<source>Comparison settings</source>
+<target>Подешавања упоређивања</target>
+
+<source>Synchronization settings</source>
+<target>Подешавања синхронизације</target>
+
+<source>Start synchronization</source>
+<target>Почни синхронизацију</target>
+
+<source>Confirm</source>
+<target>Потврди</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>Да ли стварно желите да извршите команду %y за %x ставку?</pluralform>
+<pluralform>Да ли стварно желите да извршите команду %y за %x ставке?</pluralform>
+<pluralform>Да ли стварно желите да извршите команду %y за %x ставки?</pluralform>
+</target>
+
+<source>&Execute</source>
+<target>&Изврши</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1115,17 +1139,23 @@ is the same
 <source>Set direction:</source>
 <target>Одабери смер:</target>
 
+<source>multiple selection</source>
+<target>вишеструки одабир</target>
+
+<source>Include via filter:</source>
+<target>Укључи по филтеру:</target>
+
+<source>Exclude via filter:</source>
+<target>Искључи преко филтера:</target>
+
 <source>Exclude temporarily</source>
 <target>Тренутно искључи</target>
 
 <source>Include temporarily</source>
 <target>Тренутно укључи</target>
 
-<source>multiple selection</source>
-<target>вишеструки одабир</target>
-
-<source>Exclude via filter:</source>
-<target>Искључи преко филтера:</target>
+<source>Delete</source>
+<target>Избриши</target>
 
 <source>Include all</source>
 <target>Укључи све</target>
@@ -1169,8 +1199,14 @@ is the same
 <source>Do you want to save changes to %x?</source>
 <target>Да ли желите сачувати промене за %x?</target>
 
+<source>Never save &changes</source>
+<target>Никад не сачувај &промене</target>
+
 <source>Do&n't save</source>
 <target>Не&мој сачувати</target>
+
+<source>Filter</source>
+<target>Филтрирање</target>
 
 <source>Show files that exist on left side only</source>
 <target>Прикажи датотеке које постоје само на левој страни</target>
@@ -1217,35 +1253,26 @@ is the same
 <source>Set as default</source>
 <target>Постави као подразумевано</target>
 
-<source>Operation aborted</source>
-<target>Операција отказана</target>
-
 <source>All folders are in sync</source>
 <target>Сви фолдери су синхронизовани</target>
+
+<source>Synchronization Settings</source>
+<target>Подешавања синхронизације</target>
+
+<source>Comparison Settings</source>
+<target>Подешавања упоређивања</target>
+
+<source>Cannot find %x</source>
+<target>Немогу пронаћи %x</target>
+
+<source>Comma-separated values</source>
+<target>Зарезом одвојене вредности</target>
 
 <source>File list exported</source>
 <target>Листа датотека експортована</target>
 
 <source>Searching for program updates...</source>
 <target>Претражујем ажурирање за програм...</target>
-
-<source>&Ignore</source>
-<target>&Игнориши</target>
-
-<source>Fatal Error</source>
-<target>Критична грешка</target>
-
-<source>&Switch</source>
-<target>&Замени</target>
-
-<source>Question</source>
-<target>Питање</target>
-
-<source>&Yes</source>
-<target>&Да</target>
-
-<source>&No</source>
-<target>&Не</target>
 
 <source>Scanning...</source>
 <target>Прегледавање...</target>
@@ -1256,23 +1283,26 @@ is the same
 <source>Info</source>
 <target>Инфо</target>
 
+<source>Warning</source>
+<target>Упозорење</target>
+
 <source>Paused</source>
 <target>Паузирано</target>
 
 <source>Initializing...</source>
 <target>Покретање...</target>
 
-<source>Aborted</source>
-<target>Прекинуто</target>
+<source>Stopped</source>
+<target>Заустављено</target>
 
 <source>Completed</source>
 <target>Завршено</target>
 
-<source>Cannot find %x</source>
-<target>Немогу пронаћи %x</target>
+<source>&Continue</source>
+<target>&Настави</target>
 
-<source>Inactive</source>
-<target>Неактивно</target>
+<source>Log</source>
+<target>Лог</target>
 
 <source>Today</source>
 <target>Данас</target>
@@ -1298,8 +1328,18 @@ is the same
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Филтрирање</target>
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Да ли стварно желите да преместите следећу %x ставку у Корпи за смеће?</pluralform>
+<pluralform>Да ли стварно желите да преместите следеће %x ставке у Корпи за смеће?</pluralform>
+<pluralform>Да ли стварно желите да преместите следећих %x ставки у Корпи за смеће?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Премести</target>
 
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
@@ -1310,6 +1350,9 @@ is the same
 <pluralform>Да ли стварно желите да обришете следеће %x ставке?</pluralform>
 <pluralform>Да ли стварно желите да обришете следећих %x ставки?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Искључи</target>
 
 <source>Direct</source>
 <target>Непосредно</target>
@@ -1335,8 +1378,8 @@ is the same
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Дупликат с друге стране у %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Врати скривена упозорења и диалоге поновно видљивим?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Прикажи све скривене прозоре и упозорења?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Остави као неразрешени конфликт</target>
@@ -1393,10 +1436,10 @@ is the same
 <target>Не могу уписати време промене %x.</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Не могу читати безбедоносни садржај %x.</target>
+<target>Не могу читати безбедносни садржај %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>Не могу уписати безбедоносни садржај %x.</target>
+<target>Не могу уписати безбедносни садржај %x.</target>
 
 <source>Cannot read permissions of %x.</source>
 <target>Не могу читати овлашћења од %x.</target>
@@ -1464,17 +1507,20 @@ is the same
 <pluralform>%x дана</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Неуспела регистрација намењена пријему системских порука.</target>
+<source>Unable to register to receive system messages.</source>
+<target>Није могућа регистрација примања системских порука.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Не могу поставити права за %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Неуспео покушај суспендовања мода спавања рачунара</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Није могуће суспендовање мода спавања система.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Не може се променити процес I/O приоритета</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Није могуће преместити %x у Корпи за смеће.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Не могу утврдити коначну путању за %x.</target>

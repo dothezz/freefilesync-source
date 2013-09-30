@@ -12,9 +12,9 @@
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/dirdlg.h>
-#include <wx/msgdlg.h>
 #include <wx/scrolwin.h>
 #include <wx+/string_conv.h>
+#include <wx+/popup_dlg.h>
 #include "../lib/resolve_path.h"
 #include "folder_history_box.h"
 
@@ -227,7 +227,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
                              errorMsg);      //out, optional: call freeString() after use!
             if (errorMsg)
             {
-                wxMessageBox(errorMsg, /*L"FreeFileSync - " +*/ _("Error"), wxOK | wxICON_ERROR); //component used by FFS *and* RTS!
+                showNotificationDialog(&dropWindow_, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(errorMsg));
                 return;
             }
             if (cancelled || !selectedFolder)

@@ -34,7 +34,7 @@ public:
 
     int getConflict() const { return static_cast<int>(conflictMsgs.size()); }
 
-    typedef std::vector<std::pair<Zstring, std::wstring> > ConflictTexts; // Pair(filename/conflict text)
+    typedef std::vector<std::pair<Zstring, std::wstring>> ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getConflictMessages() const { return conflictMsgs; }
 
     Int64 getDataToProcess() const { return dataToProcess; }

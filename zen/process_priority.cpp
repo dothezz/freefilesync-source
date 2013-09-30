@@ -28,7 +28,7 @@ struct PreventStandby::Pimpl {};
 PreventStandby::PreventStandby()
 {
     if (::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED) == 0)
-        throw FileError(_("Failed to suspend system sleep mode.")); //no GetLastError() support?
+        throw FileError(_("Unable to suspend system sleep mode.")); //no GetLastError() support?
 }
 
 
@@ -116,7 +116,7 @@ PreventStandby::PreventStandby() : pimpl(make_unique<Pimpl>())
                                                 CFSTR("FreeFileSync"),
                                                 &pimpl->assertionID);
     if (rv != kIOReturnSuccess)
-        throw FileError(_("Failed to suspend system sleep mode."), replaceCpy<std::wstring>(L"IOReturn Code %x", L"%x", numberTo<std::wstring>(rv))); //could not find a better way to convert IOReturn to string
+        throw FileError(_("Unable to suspend system sleep mode."), replaceCpy<std::wstring>(L"IOReturn Code %x", L"%x", numberTo<std::wstring>(rv))); //could not find a better way to convert IOReturn to string
 }
 
 PreventStandby::~PreventStandby()

@@ -2,10 +2,27 @@
 	<language>Italiano</language>
 	<translator>Luciano Paravella</translator>
 	<locale>it_IT</locale>
-	<flag_image>flag_italy.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_italy.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Entrambi i lati sono cambiati dall'ultima sincronizzazione.</target>
@@ -143,10 +160,10 @@
 <target>Memoria insufficiente.</target>
 
 <source>Item exists on left side only</source>
-<target>L'elemento esiste solo sul lato sinistro</target>
+<target>L'oggetto esiste solo sul lato sinistro</target>
 
 <source>Item exists on right side only</source>
-<target>L'elemento esiste solo sul lato destro</target>
+<target>L'oggetto esiste solo sul lato destro</target>
 
 <source>Left side is newer</source>
 <target>Il più recente è sul lato sinistro</target>
@@ -155,25 +172,25 @@
 <target>Il più recente è sul lato destro</target>
 
 <source>Items have different content</source>
-<target>Gli elementi hanno contenuto differente</target>
+<target>Gli oggetti hanno contenuto differente</target>
 
 <source>Both sides are equal</source>
 <target>Entrambi i lati sono uguali</target>
 
 <source>Conflict/item cannot be categorized</source>
-<target>Conflitto/elemento non categorizzabile</target>
+<target>Conflitto/oggetto non categorizzabile</target>
 
 <source>Copy new item to left</source>
-<target>Copia nuovo elemento a sinistra</target>
+<target>Copia nuovo oggetto a sinistra</target>
 
 <source>Copy new item to right</source>
-<target>Copia nuovo elemento a destra</target>
+<target>Copia nuovo oggetto a destra</target>
 
 <source>Delete left item</source>
-<target>Elimina elemento di sinistra</target>
+<target>Elimina oggetto di sinistra</target>
 
 <source>Delete right item</source>
-<target>Elimina elemento di destra</target>
+<target>Elimina oggetto di destra</target>
 
 <source>Move file on left</source>
 <target>Sposta il file a sinistra</target>
@@ -182,10 +199,10 @@
 <target>Sposta il file a destra</target>
 
 <source>Overwrite left item</source>
-<target>Sovrascrivi elemento di sinistra</target>
+<target>Sovrascrivi oggetto di sinistra</target>
 
 <source>Overwrite right item</source>
-<target>Sovrascrivi elemento di destra</target>
+<target>Sovrascrivi oggetto di destra</target>
 
 <source>Do nothing</source>
 <target>Non fare nulla</target>
@@ -242,10 +259,10 @@
 <target>Creazione file %x</target>
 
 <source>Items processed:</source>
-<target>Elementi processati:</target>
+<target>Oggetti processati:</target>
 
 <source>Items remaining:</source>
-<target>Elementi rimanenti:</target>
+<target>Oggetti rimanenti:</target>
 
 <source>Total time:</source>
 <target>Tempo totale:</target>
@@ -292,8 +309,8 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>%x items</source>
-<target>%x articoli</target>
+<source>%x items/sec</source>
+<target>%x elementi/sec</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>File di configurazione %x caricato solo parzialmente.</target>
@@ -322,11 +339,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Nome volume %x non fa parte del percorso del file %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Richiesta interruazione: attendere conclusione dell'operazione...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Bloccata richiesta: Aspettare la fine dell'operazione in corso ...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Errore nella creazione di data e ora per il controllo delle versioni:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Impossibile creare l'ora per la versione:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Impossibile leggere i seguenti elementi XML:</target>
@@ -343,8 +360,8 @@
 <source>&Program</source>
 <target>&Programma</target>
 
-<source>&Content</source>
-<target>&Contenuto</target>
+<source>&View help</source>
+<target>&Vedere aiuto</target>
 
 <source>&About</source>
 <target>&Informazioni</target>
@@ -367,8 +384,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Per iniziare è sufficiente importare un file con estensione .ffs_batch</target>
 
-<source>Folders to watch</source>
-<target>Cartelle da controllare</target>
+<source>Folders to watch:</source>
+<target>Cartelle da guardare:</target>
 
 <source>Add folder</source>
 <target>Aggiungi cartella</target>
@@ -382,11 +399,14 @@
 <source>Select a folder</source>
 <target>Seleziona una cartella</target>
 
-<source>Idle time [seconds]</source>
-<target>Tempo di attesa [secondi]</target>
+<source>Idle time (in seconds):</source>
+<target>Tempo di inattività (in secondi):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tempo di attesa tra ultimo cambiamento rilevato ed l'esecuzione del comando</target>
+
+<source>Command line:</source>
+<target>Riga di comando:</target>
 
 <source>
 The command is triggered if:
@@ -399,17 +419,14 @@ Il comando è attivato se:
 - nuove cartelle vengono aggiunte (es. inserimento di memoria USB)
 </target>
 
-<source>Start</source>
-<target>Avvia</target>
+<source>&Start</source>
+<target>&Start</target>
 
 <source>&Retry</source>
 <target>&Riprova</target>
 
 <source>Cancel</source>
 <target>Annulla</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>SyncTempoReale - Sincronizzazione automatizzata</target>
 
 <source>Build: %x</source>
 <target>Versione: %x</target>
@@ -419,6 +436,9 @@ Il comando è attivato se:
 
 <source>All files</source>
 <target>Tutti i file</target>
+
+<source>Automated Synchronization</source>
+<target>Sincronizzazione automatizzata</target>
 
 <source>Directory monitoring active</source>
 <target>Directory di monitoraggio attiva</target>
@@ -435,8 +455,8 @@ Il comando è attivato se:
 <source>&Exit</source>
 <target>&Esci</target>
 
-<source>Invalid command line:</source>
-<target>Linea di comando non valida:</target>
+<source>Incorrect command line:</source>
+<target>Linea di comando non corretta:</target>
 
 <source>File content</source>
 <target>Contenuto del file</target>
@@ -498,8 +518,8 @@ Il comando è attivato se:
 <source>Target folder input field must not be empty.</source>
 <target>Il campo per la cartella di destinazione non può essere vuoto.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Il campo per la cartella di versione non può essere vuoto.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Inserisci una cartella di destinazione per il controllo delle versioni.</target>
 
 <source>Source folder %x not found.</source>
 <target>Cartella sorgente %x non trovata.</target>
@@ -537,8 +557,8 @@ Il comando è attivato se:
 <source>job name</source>
 <target>nome del lavoro</target>
 
-<source>Synchronization aborted</source>
-<target>Sincronizzazione abortita</target>
+<source>Synchronization stopped</source>
+<target>Sincronizzazione fermata</target>
 
 <source>Synchronization completed with errors</source>
 <target>Sincronizzazione completata con errori</target>
@@ -555,14 +575,11 @@ Il comando è attivato se:
 <source>Saving log file %x...</source>
 <target>Salvataggio file di log %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Premere "Passa" per risolvere i problemi nella finestra principale di FreeFileSync.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>È possibile passare alla finestra principale di FreeFileSync per risolvere questo problema.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>Passaggio alla finestra di dialogo principale FreeFileSync</target>
-
-<source>Retrying operation after error:</source>
-<target>Ripetere l'operazione dopo l'errore:</target>
+<source>Switching to FreeFileSync's main window</source>
+<target>Passaggio alla finestra principale di FreeFileSync</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>E' disponibile una nuova versione di FreeFileSync:</target>
@@ -570,8 +587,8 @@ Il comando è attivato se:
 <source>Download now?</source>
 <target>Scaricarla ora?</target>
 
-<source>New version found</source>
-<target>Nuova versione trovata</target>
+<source>Check for Program Updates</source>
+<target>Controlla Aggiornamenti del Programma</target>
 
 <source>&Download</source>
 <target>&Scaricare</target>
@@ -639,20 +656,20 @@ Il comando è attivato se:
 <source>Hibernate</source>
 <target>Iberna</target>
 
-<source>Selected variant:</source>
-<target>Variante selezionata:</target>
+<source>Alternate comparison settings</source>
+<target>Impostazioni di Confronto Alternativi</target>
 
-<source>Select alternate comparison settings</source>
-<target>Seleziona impostazioni di comparazione alternative</target>
+<source>Alternate synchronization settings</source>
+<target>Impostazioni di Sincronizzazione Alternativi</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Seleziona impostazioni di sincronizzazione alternative</target>
+<source>Local filter</source>
+<target>Filtro Locale</target>
 
-<source>Filter is active</source>
-<target>Il filtro e' attivo</target>
+<source>Active</source>
+<target>Attivo</target>
 
-<source>No filter selected</source>
-<target>Nessun filtro selezionato</target>
+<source>None</source>
+<target>Nessuno</target>
 
 <source>Remove alternate settings</source>
 <target>Rimuovi impostazioni alternative</target>
@@ -665,6 +682,15 @@ Il comando è attivato se:
 
 <source>Paste</source>
 <target>Incolla</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Impostazioni di Confronto Alternativi</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Impostazioni di Sincronizzazione Alternativi</target>
+
+<source>Local Filter</source>
+<target>Filtro Locale</target>
 
 <source>&New</source>
 <target>&Nuovo</target>
@@ -681,14 +707,17 @@ Il comando è attivato se:
 <source>2. &Synchronize</source>
 <target>2. &Sincronizza</target>
 
+<source>&Global settings</source>
+<target>&Preferenze</target>
+
 <source>&Language</source>
 <target>&Lingua</target>
 
+<source>&Find...</source>
+<target>&Trova ...</target>
+
 <source>&Export file list...</source>
 <target>&Esporta l'elenco dei file...</target>
-
-<source>&Global settings</source>
-<target>&Preferenze</target>
 
 <source>&Tools</source>
 <target>&Strumenti</target>
@@ -699,17 +728,11 @@ Il comando è attivato se:
 <source>Check &automatically once a week</source>
 <target>Controlla &automaticamente una volta a settimana</target>
 
-<source>Check for new &version</source>
-<target>Verificare presenza nuove &versione</target>
+<source>&Check for new version</source>
+<target>&Controlla nuova versione</target>
 
 <source>Compare</source>
 <target>Compara</target>
-
-<source>Comparison settings</source>
-<target>Impostazioni di comparazione</target>
-
-<source>Synchronization settings</source>
-<target>Parametri di sincronizzazione</target>
 
 <source>Synchronize</source>
 <target>Sincronizza</target>
@@ -722,6 +745,15 @@ Il comando è attivato se:
 
 <source>Swap sides</source>
 <target>Inverti i lati</target>
+
+<source>Close search bar</source>
+<target>Chiudi barra di ricerca</target>
+
+<source>Find:</source>
+<target>Trova:</target>
+
+<source>Match case</source>
+<target>Corrispondenza</target>
 
 <source>Save as batch job</source>
 <target>Salva come processo batch</target>
@@ -744,74 +776,20 @@ Il comando è attivato se:
 <source>Total bytes to copy</source>
 <target>Bytes totali da copiare</target>
 
-<source>Items found:</source>
-<target>Elementi trovati:</target>
+<source>Select a variant:</source>
+<target>Scegli una variante:</target>
 
-<source>Speed:</source>
-<target>Velocita':</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identificare i file uguali confrontando data di modifica e dimensione.</target>
 
-<source>Time remaining:</source>
-<target>Tempo rimanente:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Identificare i file uguali confrontando il contenuto del file.</target>
 
-<source>Time elapsed:</source>
-<target>Tempo trascorso:</target>
+<source>Symbolic links:</source>
+<target>Link simbolici:</target>
 
-<source>Synchronizing...</source>
-<target>Sincronizzazione...</target>
-
-<source>Minimize to notification area</source>
-<target>Ridurre al minimo l'area di notifica</target>
-
-<source>On completion</source>
-<target>In completamento</target>
-
-<source>Close</source>
-<target>Chiudi</target>
-
-<source>&Pause</source>
-<target>&Pausa</target>
-
-<source>Variant</source>
-<target>Variante</target>
-
-<source>Statistics</source>
-<target>Statistiche</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Non mostrare più questo avviso</target>
-
-<source>Select a variant</source>
-<target>Seleziona una variante</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-I file sono considerati identici se
-     - data e ora di ultima modifica
-     - dimensione
-sono identici
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-I file sono considerati identici se
-     - il contenuto
-è identico
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Gestione Collegamenti</target>
-
-<source>Help</source>
-<target>Aiuto</target>
+<source>More information</source>
+<target>Maggiori informazioni</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -819,11 +797,11 @@ I file sono considerati identici se
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifica e propaga cambiamenti su entrambi i lati. Cancellazioni, spostamenti e conflitti sono identificati automaticamente usando un database.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Backup a Specchio della cartella di sinistra. La cartella di destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Creare un backup specchio della cartella di sinistra, che corrisponde esattamente alla cartella giusta dopo la sincronizzazione.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Copia file nuovi o aggiornati nella cartella di destra.</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Copiare i file nuovi e aggiornati nella cartella giusta.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configura le tue regole di sincronizzazione.</target>
@@ -834,23 +812,8 @@ I file sono considerati identici se
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Richiede il file di database. Non è supportato da tutti i sistemi di file.</target>
 
-<source>Error handling</source>
-<target>Gestione degli errori</target>
-
-<source>Ignore</source>
-<target>Ignora</target>
-
-<source>Hide all error and warning messages</source>
-<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Mostra popup di errore o avviso</target>
-
-<source>Deletion handling</source>
-<target>Gestione cancellazione</target>
+<source>Delete files:</source>
+<target>Eliminare i file:</target>
 
 <source>Permanent</source>
 <target>Permanente</target>
@@ -873,32 +836,173 @@ I file sono considerati identici se
 <source>Naming convention:</source>
 <target>Modalità di rinomina:</target>
 
-<source>Batch job</source>
-<target>Attività batch</target>
+<source>Show examples</source>
+<target>Mostra esempi</target>
+
+<source>Handle errors:</source>
+<target>Gestire gli errori:</target>
+
+<source>Ignore</source>
+<target>Ignora</target>
+
+<source>Hide all error and warning messages</source>
+<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Mostra popup di errore o avviso</target>
+
+<source>On completion:</source>
+<target>Al termine:</target>
+
+<source>Start synchronization now?</source>
+<target>Avviare la sincronizzazione ora?</target>
+
+<source>Variant:</source>
+<target>Variante:</target>
+
+<source>Statistics</source>
+<target>Statistiche</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Non mostrare più questo avviso</target>
+
+<source>Items found:</source>
+<target>Oggetti trovati:</target>
+
+<source>Speed:</source>
+<target>Velocita':</target>
+
+<source>Time remaining:</source>
+<target>Tempo rimanente:</target>
+
+<source>Time elapsed:</source>
+<target>Tempo trascorso:</target>
+
+<source>Synchronizing...</source>
+<target>Sincronizzazione...</target>
+
+<source>Minimize to notification area</source>
+<target>Ridurre al minimo l'area di notifica</target>
+
+<source>Close</source>
+<target>Chiudi</target>
+
+<source>&Pause</source>
+<target>&Pausa</target>
+
+<source>Stop</source>
+<target>Arresto</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Creare un file batch per la sincronizzazione automatica. Per iniziare, fare doppio clic su questo file o programmarlo in un pianificatore di compiti: %x</target>
 
-<source>Exit</source>
-<target>Esci</target>
-
-<source>Abort synchronization on first error</source>
-<target>Interrompi sincronizzazione al primo errore</target>
+<source>Stop synchronization at first error</source>
+<target>Interrompere la sincronizzazione al primo errore</target>
 
 <source>Show progress dialog</source>
 <target>Mostra stato di avanzamento</target>
 
-<source>Save log</source>
-<target>Salva log</target>
+<source>Save log:</source>
+<target>Salva log:</target>
 
-<source>Select folder to save log files</source>
-<target>Seleziona cartella dove salvare i file log</target>
-
-<source>Limit</source>
-<target>Limita</target>
+<source>Limit:</source>
+<target>Limite:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Limita il numero massimo di file log</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Come posso programmare un lavoro batch?</target>
+
+<source>&Recycle bin</source>
+<target>&Cestino</target>
+
+<source>Delete on both sides</source>
+<target>Elimina su entrambi i lati</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Elimina su entrambi i lati anche se il file è selezionato su un solo lato.</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Selezionare le regole del filtro per escludere alcuni file dalla sincronizzazione. Immettere i percorsi dei file relativi alla loro corrispondente coppia di cartelle.</target>
+
+<source>Include:</source>
+<target>Includi:</target>
+
+<source>Exclude:</source>
+<target>Escludi:</target>
+
+<source>Time span:</source>
+<target>Intervallo di tempo:</target>
+
+<source>File size:</source>
+<target>Dimensione del file:</target>
+
+<source>Minimum:</source>
+<target>Minimo:</target>
+
+<source>Maximum:</source>
+<target>Massimo:</target>
+
+<source>&Clear</source>
+<target>&Pulisci</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Le seguenti impostazioni vengono utilizzate per tutti i processi di sincronizzazione.</target>
+
+<source>Fail-safe file copy</source>
+<target>Copia file di fail-safe</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Copiare in un file temporaneo ( *.ffs_tmp ) prima di sovrascrivere il bersaglio.
+Questo garantisce uno stato costante anche in caso di un errore grave.
+</target>
+
+<source>(recommended)</source>
+<target>(consigliato)</target>
+
+<source>Copy locked files</source>
+<target>Copia file bloccati</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Copiare file condivisi o bloccati con il Volume Shadow Copy Service.</target>
+
+<source>(requires administrator rights)</source>
+<target>(richiede i diritti di amministratore)</target>
+
+<source>Copy file access permissions</source>
+<target>Copia permessi di accesso file</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Trasferimento file e autorizzazioni delle cartelle.</target>
+
+<source>Automatic retry on error:</source>
+<target>Tentativo Automaticoin caso di errore:</target>
+
+<source>Retry count:</source>
+<target>Riprova conta:</target>
+
+<source>Delay (in seconds):</source>
+<target>Ritardo (in secondi):</target>
+
+<source>Customize context menu:</source>
+<target>Personalizzare menu contestuale:</target>
+
+<source>Description</source>
+<target>Descrizione</target>
+
+<source>Restore hidden windows</source>
+<target>Ripristina le finestre nascoste</target>
+
+<source>&Default</source>
+<target>&Predefinito</target>
 
 <source>Source code written in C++ using:</source>
 <target>Codice sorgente scritto in C++ utilizzando:</target>
@@ -908,9 +1012,6 @@ I file sono considerati identici se
 
 <source>Donate with PayPal</source>
 <target>Fai una donazione con PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Ringraziamenti per la localizzazione:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Ogni commento o suggerimento è ben accetto</target>
@@ -924,101 +1025,26 @@ I file sono considerati identici se
 <source>Published under the GNU General Public License</source>
 <target>Pubblicato sotto licenza GNU General Public</target>
 
-<source>Delete on both sides</source>
-<target>Elimina su entrambi i lati</target>
+<source>Many thanks for localization:</source>
+<target>Ringraziamenti per la localizzazione:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Elimina su entrambi i lati anche se il file è selezionato su un solo lato.</target>
+<source>Save as Batch Job</source>
+<target>Salva come Processo Batch</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-I file verranno sincronizzati solo se passano tutte le regole di filtraggio.
-Nota: percorso dei file deve essere relativo alla directory di base.
-</target>
+<source>Delete Items</source>
+<target>Elimina Elementi</target>
 
-<source>Include</source>
-<target>Includi</target>
+<source>Global Settings</source>
+<target>Impostazioni Globali</target>
 
-<source>Exclude</source>
-<target>Escludi</target>
+<source>Select Time Span</source>
+<target>Selezionare Intervallo di Tempo</target>
 
-<source>Time span</source>
-<target>Intervallo di tempo</target>
-
-<source>File size</source>
-<target>Dimensione file</target>
-
-<source>Minimum</source>
-<target>Minimo</target>
-
-<source>Maximum</source>
-<target>Massimo</target>
-
-<source>&Clear</source>
-<target>&Pulisci</target>
-
-<source>Global settings</source>
-<target>Preferenze</target>
-
-<source>Fail-safe file copy</source>
-<target>Copia file di fail-safe</target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Copiare prima in un file temporaneo (*.ffs_tmp) poi rinominarlo. Questo garantisce uno stato costante anche in caso di un errore fatale.</target>
-
-<source>Copy locked files</source>
-<target>Copia file bloccati</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Copiare i file condivisi o bloccati usando il Volume Shadow Copy Service (richiede i diritti di amministratore)</target>
-
-<source>Copy file access permissions</source>
-<target>Copia permessi di accesso file</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Trasferimento di file e autorizzazioni cartelle (richiede i diritti di amministratore)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Ripristina i messaggi nascosti</target>
-
-<source>External applications</source>
-<target>Applicazioni esterne</target>
-
-<source>Description</source>
-<target>Descrizione</target>
-
-<source>&Default</source>
-<target>&Predefinito</target>
-
-<source>Find what:</source>
-<target>Trova questo:</target>
-
-<source>Match case</source>
-<target>Corrispondenza</target>
-
-<source>&Find next</source>
-<target>&Trova successivo</target>
-
-<source>Start synchronization</source>
-<target>Avvia sincronizzazione</target>
-
-<source>Delete</source>
-<target>Elimina</target>
-
-<source>Configure filter</source>
-<target>Configurazione dei filtri</target>
+<source>Folder Pairs</source>
+<target>Coppie di Cartelle</target>
 
 <source>Find</source>
 <target>Trova</target>
-
-<source>Select time span</source>
-<target>Seleziona intervallo di tempo</target>
-
-<source>Folder pairs</source>
-<target>Coppia di cartelle</target>
 
 <source>Overview</source>
 <target>Anteprima</target>
@@ -1026,14 +1052,14 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Configuration</source>
 <target>Configurazione</target>
 
-<source>Main bar</source>
-<target>Barra principale</target>
+<source>Main Bar</source>
+<target>Barra Principale</target>
 
-<source>Filter files</source>
-<target>Filtro dei file</target>
+<source>Filter Files</source>
+<target>Filtrare i file</target>
 
-<source>Select view</source>
-<target>Seleziona vista</target>
+<source>Select View</source>
+<target>Selezionare Visualizza</target>
 
 <source>Open...</source>
 <target>Apri...</target>
@@ -1044,14 +1070,14 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Compare both sides</source>
 <target>Confronta entrambi i lati</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vuoi veramente eseguire il comando %y  per 1 articolo?</pluralform>
-<pluralform>Vuoi veramente eseguire %y comando per %x articoli?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Impostazioni di comparazione</target>
+
+<source>Synchronization settings</source>
+<target>Parametri di sincronizzazione</target>
+
+<source>Start synchronization</source>
+<target>Avvia sincronizzazione</target>
 
 <source>Confirm</source>
 <target>Confermare</target>
@@ -1089,12 +1115,6 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Set direction:</source>
 <target>Imposta direzione:</target>
 
-<source>Exclude temporarily</source>
-<target>Escludi temporaneamente</target>
-
-<source>Include temporarily</source>
-<target>Includi temporaneamente</target>
-
 <source>multiple selection</source>
 <target>selezione multipla</target>
 
@@ -1103,6 +1123,15 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 
 <source>Exclude via filter:</source>
 <target>Escludi tramite filtro:</target>
+
+<source>Exclude temporarily</source>
+<target>Escludi temporaneamente</target>
+
+<source>Include temporarily</source>
+<target>Includi temporaneamente</target>
+
+<source>Delete</source>
+<target>Elimina</target>
 
 <source>Include all</source>
 <target>Includi tutto</target>
@@ -1152,6 +1181,9 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Never save &changes</source>
 <target>Non salvare mai &modifiche</target>
 
+<source>Filter</source>
+<target>Filtro</target>
+
 <source>Show files that exist on left side only</source>
 <target>Mostra file esistenti solo a sinistra</target>
 
@@ -1197,11 +1229,17 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Set as default</source>
 <target>Imposta come predefinito</target>
 
-<source>Operation aborted</source>
-<target>Operazione abortita</target>
-
 <source>All folders are in sync</source>
 <target>Tutte le cartelle sono sincronizzate</target>
+
+<source>Synchronization Settings</source>
+<target>Impostazioni di Sincronizzazione</target>
+
+<source>Comparison Settings</source>
+<target>Impostazioni di Confronto</target>
+
+<source>Cannot find %x</source>
+<target>Impossibile trovare %x</target>
 
 <source>Comma-separated values</source>
 <target>Valori separati da virgole</target>
@@ -1218,17 +1256,14 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>&Ignore</source>
 <target>&Ignora</target>
 
-<source>Fatal Error</source>
-<target>Errore fatale</target>
+<source>Serious Error</source>
+<target>Errore Grave</target>
 
 <source>&Don't show this warning again</source>
 <target>&Non mostrare più questo avviso</target>
 
 <source>&Switch</source>
 <target>&Passa</target>
-
-<source>Question</source>
-<target>Domanda</target>
 
 <source>&Yes</source>
 <target>&Si</target>
@@ -1251,8 +1286,8 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>Initializing...</source>
 <target>Inizializzazione...</target>
 
-<source>Aborted</source>
-<target>Interrotto</target>
+<source>Stopped</source>
+<target>Arrestato</target>
 
 <source>Completed</source>
 <target>Completato</target>
@@ -1262,12 +1297,6 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 
 <source>Log</source>
 <target>Log</target>
-
-<source>Cannot find %x</source>
-<target>Impossibile trovare %x</target>
-
-<source>Inactive</source>
-<target>Inattivo</target>
 
 <source>Today</source>
 <target>Oggi</target>
@@ -1293,17 +1322,17 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filtro</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Vuoi davvero spostare la seguente voce nel cestino?</pluralform>
-<pluralform>Vuoi davvero spostare i seguenti %x articoli nel cestino?</pluralform>
+<pluralform>Vuoi davvero spostare il seguente oggetto nel cestino?</pluralform>
+<pluralform>Vuoi davvero spostare i seguenti %x oggetti nel cestino?</pluralform>
 </target>
+
+<source>Move</source>
+<target>Spostare</target>
 
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
@@ -1313,6 +1342,9 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <pluralform>Vuoi veramente eliminare il seguente oggetto?</pluralform>
 <pluralform>Vuoi veramente eliminare i seguenti %x oggetti?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Escludi</target>
 
 <source>Direct</source>
 <target>Diretto</target>
@@ -1338,8 +1370,8 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Omologo dell'altro lato a %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Vuoi visualizzare nuovamente i dialoghi e gli avvisi nascosti?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Ripristina tutte le finestre nascoste e gli avvisi?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Lascia come conflitti irrisolti</target>
@@ -1366,7 +1398,7 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <target>File</target>
 
 <source>Items</source>
-<target>Articoli</target>
+<target>Oggetti</target>
 
 <source>Percentage</source>
 <target>Percentuale</target>
@@ -1464,14 +1496,14 @@ Nota: percorso dei file deve essere relativo alla directory di base.
 <pluralform>%x giorni</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
+<source>Unable to register to receive system messages.</source>
 <target>Impossibile registrarsi per ricevere i messaggi di sistema.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Impossibile impostare privilegi %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Sospensione sistema fallita.</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Impossibile sospendere la modalità di sonno del sistema.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Impossibile modificare le priorità I/O del processo.</target>

@@ -164,20 +164,20 @@ public:
         itemsScanned(0),
         activeWorker(0) {}
 
-    FillBufferCallback::HandleError reportError(const std::wstring& msg) //blocking call: context of worker thread
+    FillBufferCallback::HandleError reportError(const std::wstring& msg, size_t retryNumber) //blocking call: context of worker thread
     {
-        boost::unique_lock<boost::mutex> dummy(lockErrorMsg);
-        while (!errorMsg.empty() || errorResponse.get())
+        boost::unique_lock<boost::mutex> dummy(lockErrorInfo);
+        while (errorInfo.get() || errorResponse.get())
             conditionCanReportError.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 
-        errorMsg = BasicWString(msg);
+        errorInfo = make_unique<std::pair<BasicWString, size_t>>(BasicWString(msg), retryNumber);
 
         while (!errorResponse.get())
             conditionGotResponse.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 
         FillBufferCallback::HandleError rv = *errorResponse;
 
-        errorMsg.clear();
+        errorInfo.reset();
         errorResponse.reset();
 
         dummy.unlock(); //optimization for condition_variable::notify_all()
@@ -188,10 +188,10 @@ public:
 
     void processErrors(FillBufferCallback& callback) //context of main thread, call repreatedly
     {
-        boost::unique_lock<boost::mutex> dummy(lockErrorMsg);
-        if (!errorMsg.empty() && !errorResponse.get())
+        boost::unique_lock<boost::mutex> dummy(lockErrorInfo);
+        if (errorInfo.get() && !errorResponse.get())
         {
-            FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorMsg)); //throw!
+            FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorInfo->first), errorInfo->second); //throw!
             errorResponse = make_unique<FillBufferCallback::HandleError>(rv);
 
             dummy.unlock(); //optimization for condition_variable::notify_all()
@@ -254,10 +254,10 @@ public:
 
 private:
     //---- error handling ----
-    boost::mutex lockErrorMsg;
+    boost::mutex lockErrorInfo;
     boost::condition_variable conditionCanReportError;
     boost::condition_variable conditionGotResponse;
-    BasicWString errorMsg;
+    std::unique_ptr<std::pair<BasicWString, size_t>> errorInfo; //error message + retry number
     std::unique_ptr<FillBufferCallback::HandleError> errorResponse;
 
     //---- status updates ----
@@ -318,8 +318,8 @@ public:
     virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName);
     virtual void releaseDirTraverser(TraverseCallback* trav);
 
-    virtual HandleError reportDirError (const std::wstring& msg);
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName);
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber);
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName);
 
 private:
     TraverserShared& cfg;
@@ -385,7 +385,16 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
             return LINK_SKIP;
 
         case SYMLINK_FOLLOW_LINK:
-            return cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName) ? LINK_FOLLOW : LINK_SKIP; //filter broken symlinks before trying to follow them!
+            //filter symlinks before trying to follow them: handle user-excluded broken symlinks!
+            //since we don't know what the symlink will resolve to, only do this when both variants agree:
+            if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName))
+            {
+                bool subObjMightMatch = true;
+                if (!cfg.filterInstance->passDirFilter(relNameParentPf_ + shortName, &subObjMightMatch))
+                    if (!subObjMightMatch)
+                        return LINK_SKIP;
+            }
+            return LINK_FOLLOW;
     }
 
     assert(false);
@@ -401,11 +410,11 @@ TraverseCallback* DirCallback::onDir(const Zchar* shortName, const Zstring& full
     cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
 
     //------------------------------------------------------------------------------------
-    const Zstring& relName = relNameParentPf_ + shortName;
+    const Zstring& relPath = relNameParentPf_ + shortName;
 
     //apply filter before processing (use relative name!)
     bool subObjMightMatch = true;
-    const bool passFilter = cfg.filterInstance->passDirFilter(relName, &subObjMightMatch);
+    const bool passFilter = cfg.filterInstance->passDirFilter(relPath, &subObjMightMatch);
     if (!passFilter && !subObjMightMatch)
         return nullptr; //do NOT traverse subdirs
     //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
@@ -414,7 +423,7 @@ TraverseCallback* DirCallback::onDir(const Zchar* shortName, const Zstring& full
     if (passFilter)
         cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
-    return new DirCallback(cfg, relName + FILE_NAME_SEPARATOR, subDir); //releaseDirTraverser() is guaranteed to be called in any case
+    return new DirCallback(cfg, relPath + FILE_NAME_SEPARATOR, subDir); //releaseDirTraverser() is guaranteed to be called in any case
 }
 
 
@@ -425,9 +434,9 @@ void DirCallback::releaseDirTraverser(TraverseCallback* trav)
 }
 
 
-DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg)
+DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, size_t retryNumber)
 {
-    switch (cfg.acb_.reportError(msg))
+    switch (cfg.acb_.reportError(msg, retryNumber))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedDirReads_.insert(relNameParentPf_);
@@ -441,9 +450,9 @@ DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg)
 }
 
 
-DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, const Zchar* shortName)
+DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)
 {
-    switch (cfg.acb_.reportError(msg))
+    switch (cfg.acb_.reportError(msg, retryNumber))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedItemReads_.insert(relNameParentPf_ + shortName);

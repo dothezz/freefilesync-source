@@ -43,7 +43,7 @@ public:
         timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)) //e.g. "2012-05-15 131513"
     {
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10000!
-            throw FileError(_("Failure to create timestamp for versioning:") + L" \'" + timeStamp_ + L"\'");
+            throw FileError(_("Unable to create timestamp for versioning:") + L" \"" + timeStamp_ + L"\"");
     }
 
     bool revisionFile(const Zstring& fullName, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError; return "false" if file is not existing

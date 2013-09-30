@@ -52,8 +52,8 @@ struct TraverseCallback
     //nullptr: ignore directory, non-nullptr: traverse into using the (new) callback => implement releaseDirTraverser() if necessary!
     virtual void releaseDirTraverser(TraverseCallback* trav) {}
 
-    virtual HandleError reportDirError (const std::wstring& msg) = 0; //failed directory traversal -> consider directory data as incomplete!
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data as incomplete!
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
 };
 
 

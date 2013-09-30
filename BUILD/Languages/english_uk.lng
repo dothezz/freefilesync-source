@@ -2,13 +2,10 @@
 	<language>English (UK)</language>
 	<translator>Robert Readman</translator>
 	<locale>en_GB</locale>
-	<flag_image>flag_england.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_england.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
-
-<source>Close search bar</source>
-<target>Close search bar</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
@@ -295,8 +292,8 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>%x items</source>
-<target>%x items</target>
+<source>%x items/sec</source>
+<target>%x items/sec</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Configuration file %x loaded partially only.</target>
@@ -325,11 +322,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Volume name %x is not part of file path %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Abort requested: Waiting for current operation to finish...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Stop requested: Waiting for current operation to finish...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Failure to create time stamp for versioning:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Unable to create timestamp for versioning:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Cannot read the following XML elements:</target>
@@ -346,8 +343,8 @@
 <source>&Program</source>
 <target>&Program</target>
 
-<source>&Content</source>
-<target>&Content</target>
+<source>&View help</source>
+<target>&View help</target>
 
 <source>&About</source>
 <target>&About</target>
@@ -370,8 +367,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>To get started just import a .ffs_batch file.</target>
 
-<source>Folders to watch</source>
-<target>Folders to watch</target>
+<source>Folders to watch:</source>
+<target>Folders to watch:</target>
 
 <source>Add folder</source>
 <target>Add folder</target>
@@ -385,11 +382,14 @@
 <source>Select a folder</source>
 <target>Select a folder</target>
 
-<source>Idle time [seconds]</source>
-<target>Idle time [seconds]</target>
+<source>Idle time (in seconds):</source>
+<target>Idle time (in seconds):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Idle time between last detected change and execution of command</target>
+
+<source>Command line:</source>
+<target>Command line:</target>
 
 <source>
 The command is triggered if:
@@ -402,17 +402,14 @@ The command is triggered if:
 - new folders arrive (e.g. USB stick insert)
 </target>
 
-<source>Start</source>
-<target>Start</target>
+<source>&Start</source>
+<target>&Start</target>
 
 <source>&Retry</source>
 <target>&Retry</target>
 
 <source>Cancel</source>
 <target>Cancel</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automated Synchronisation</target>
 
 <source>Build: %x</source>
 <target>Build: %x</target>
@@ -422,6 +419,9 @@ The command is triggered if:
 
 <source>All files</source>
 <target>All files</target>
+
+<source>Automated Synchronization</source>
+<target>Automated Synchronisation</target>
 
 <source>Directory monitoring active</source>
 <target>Directory monitoring active</target>
@@ -438,8 +438,8 @@ The command is triggered if:
 <source>&Exit</source>
 <target>&Exit</target>
 
-<source>Invalid command line:</source>
-<target>Invalid command line:</target>
+<source>Incorrect command line:</source>
+<target>Incorrect command line:</target>
 
 <source>File content</source>
 <target>File content</target>
@@ -501,8 +501,8 @@ The command is triggered if:
 <source>Target folder input field must not be empty.</source>
 <target>Target folder input field must not be empty.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Folder input field for versioning must not be empty.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Please enter a target folder for versioning.</target>
 
 <source>Source folder %x not found.</source>
 <target>Source folder %x not found.</target>
@@ -540,8 +540,8 @@ The command is triggered if:
 <source>job name</source>
 <target>job name</target>
 
-<source>Synchronization aborted</source>
-<target>Synchronisation aborted</target>
+<source>Synchronization stopped</source>
+<target>Synchronisation stopped</target>
 
 <source>Synchronization completed with errors</source>
 <target>Synchronisation completed with errors</target>
@@ -558,14 +558,23 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Saving log file %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Press "Switch" to resolve issues in FreeFileSync main dialogue.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>You can switch to FreeFileSync's main window to resolve this issue.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>Switching to FreeFileSync main dialogue</target>
+<source>Switching to FreeFileSync's main window</source>
+<target>Switching to FreeFileSync's main window</target>
 
-<source>Retrying operation after error:</source>
-<target>Retrying operation after error:</target>
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</target>
+
+<source>Retrying operation</source>
+<target>Retrying operation</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>A new version of FreeFileSync is available:</target>
@@ -573,8 +582,8 @@ The command is triggered if:
 <source>Download now?</source>
 <target>Download now?</target>
 
-<source>New version found</source>
-<target>New version found</target>
+<source>Check for Program Updates</source>
+<target>Check for Program Updates</target>
 
 <source>&Download</source>
 <target>&Download</target>
@@ -642,20 +651,20 @@ The command is triggered if:
 <source>Hibernate</source>
 <target>Hibernate</target>
 
-<source>Selected variant:</source>
-<target>Selected variant:</target>
+<source>Alternate comparison settings</source>
+<target>Alternate comparison settings</target>
 
-<source>Select alternate comparison settings</source>
-<target>Select alternate comparison settings</target>
+<source>Alternate synchronization settings</source>
+<target>Alternate synchronisation settings</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Select alternate synchronisation settings</target>
+<source>Local filter</source>
+<target>Local filter</target>
 
-<source>Filter is active</source>
-<target>Filter is active</target>
+<source>Active</source>
+<target>Active</target>
 
-<source>No filter selected</source>
-<target>No filter selected</target>
+<source>None</source>
+<target>None</target>
 
 <source>Remove alternate settings</source>
 <target>Remove alternate settings</target>
@@ -668,6 +677,15 @@ The command is triggered if:
 
 <source>Paste</source>
 <target>Paste</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Alternate Comparison Settings</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Alternate Synchronisation Settings</target>
+
+<source>Local Filter</source>
+<target>Local Filter</target>
 
 <source>&New</source>
 <target>&New</target>
@@ -684,14 +702,17 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &Synchronise</target>
 
+<source>&Global settings</source>
+<target>&Global settings</target>
+
 <source>&Language</source>
 <target>&Language</target>
 
+<source>&Find...</source>
+<target>&Find...</target>
+
 <source>&Export file list...</source>
 <target>&Export file list...</target>
-
-<source>&Global settings</source>
-<target>&Global settings</target>
 
 <source>&Tools</source>
 <target>&Tools</target>
@@ -702,8 +723,8 @@ The command is triggered if:
 <source>Check &automatically once a week</source>
 <target>Check &automatically once a week</target>
 
-<source>Check for new &version</source>
-<target>Check for new &version</target>
+<source>&Check for new version</source>
+<target>&Check for new version</target>
 
 <source>Compare</source>
 <target>Compare</target>
@@ -720,8 +741,11 @@ The command is triggered if:
 <source>Swap sides</source>
 <target>Swap sides</target>
 
-<source>Find what:</source>
-<target>Find what:</target>
+<source>Close search bar</source>
+<target>Close search bar</target>
+
+<source>Find:</source>
+<target>Find:</target>
 
 <source>Match case</source>
 <target>Match case</target>
@@ -747,74 +771,20 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Total bytes to copy</target>
 
-<source>Items found:</source>
-<target>Elements found:</target>
+<source>Select a variant:</source>
+<target>Select a variant:</target>
 
-<source>Speed:</source>
-<target>Speed:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identify equal files by comparing modification time and size.</target>
 
-<source>Time remaining:</source>
-<target>Time remaining:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Identify equal files by comparing the file content.</target>
 
-<source>Time elapsed:</source>
-<target>Time elapsed:</target>
+<source>Symbolic links:</source>
+<target>Symbolic links:</target>
 
-<source>Synchronizing...</source>
-<target>Synchronising...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimize to notification area</target>
-
-<source>On completion</source>
-<target>On completion</target>
-
-<source>Close</source>
-<target>Close</target>
-
-<source>&Pause</source>
-<target>&Pause</target>
-
-<source>Variant</source>
-<target>Variant</target>
-
-<source>Statistics</source>
-<target>Statistics</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Don't show this dialogue again</target>
-
-<source>Select a variant</source>
-<target>Select a variant</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Files are found equal if
-     - file content
-is the same
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Symbolic Link handling</target>
-
-<source>Help</source>
-<target>Help</target>
+<source>More information</source>
+<target>More information</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -822,11 +792,11 @@ is the same
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronisation.</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Create a mirror backup of the left folder which exactly matches the right folder after synchronisation.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Copy new or updated files to right folder.</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Copy new and updated files to the right folder.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configure your own synchronisation rules.</target>
@@ -837,23 +807,8 @@ is the same
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Requires database files. Not supported by all file systems.</target>
 
-<source>Error handling</source>
-<target>Error handling</target>
-
-<source>Ignore</source>
-<target>Ignore</target>
-
-<source>Hide all error and warning messages</source>
-<target>Hide all error and warning messages</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Show pop-up on errors or warnings</target>
-
-<source>Deletion handling</source>
-<target>Deletion handling</target>
+<source>Delete files:</source>
+<target>Delete files:</target>
 
 <source>Permanent</source>
 <target>Permanent</target>
@@ -876,32 +831,89 @@ is the same
 <source>Naming convention:</source>
 <target>Naming convention:</target>
 
-<source>Batch job</source>
-<target>Batch job</target>
+<source>Show examples</source>
+<target>Show examples</target>
+
+<source>Handle errors:</source>
+<target>Handle errors:</target>
+
+<source>Ignore</source>
+<target>Ignore</target>
+
+<source>Hide all error and warning messages</source>
+<target>Hide all error and warning messages</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Show pop-up on errors or warnings</target>
+
+<source>On completion:</source>
+<target>On completion:</target>
+
+<source>Start synchronization now?</source>
+<target>Start synchronisation now?</target>
+
+<source>Variant:</source>
+<target>Variant:</target>
+
+<source>Statistics</source>
+<target>Statistics</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Don't show this dialogue again</target>
+
+<source>Items found:</source>
+<target>Elements found:</target>
+
+<source>Speed:</source>
+<target>Speed:</target>
+
+<source>Time remaining:</source>
+<target>Time remaining:</target>
+
+<source>Time elapsed:</source>
+<target>Time elapsed:</target>
+
+<source>Synchronizing...</source>
+<target>Synchronising...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimize to notification area</target>
+
+<source>Close</source>
+<target>Close</target>
+
+<source>&Pause</source>
+<target>&Pause</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Create a batch file for unattended synchronisation. To start, double-click this file or schedule in a task planner: %x</target>
 
-<source>Exit</source>
-<target>Exit</target>
-
-<source>Abort synchronization on first error</source>
-<target>Abort synchronisation on first error</target>
+<source>Stop synchronization at first error</source>
+<target>Stop synchronisation at first error</target>
 
 <source>Show progress dialog</source>
 <target>Show progress dialogue</target>
 
-<source>Save log</source>
-<target>Save log</target>
+<source>Save log:</source>
+<target>Save log:</target>
 
-<source>Select folder to save log files</source>
-<target>Select folder to save log files</target>
-
-<source>Limit</source>
-<target>Limit</target>
+<source>Limit:</source>
+<target>Limit:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Limit maximum number of log files</target>
+
+<source>How can I schedule a batch job?</source>
+<target>How can I schedule a batch job?</target>
+
+<source>&Recycle bin</source>
+<target>&Recycle bin</target>
 
 <source>Delete on both sides</source>
 <target>Delete on both sides</target>
@@ -909,65 +921,80 @@ is the same
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Delete on both sides even if the file is selected on one side only</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Files will only be synchronised if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</target>
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Select filter rules to exclude certain files from synchronisation. Enter file paths relative to their corresponding folder pair.</target>
 
-<source>Include</source>
-<target>Include</target>
+<source>Include:</source>
+<target>Include:</target>
 
-<source>Exclude</source>
-<target>Exclude</target>
+<source>Exclude:</source>
+<target>Exclude:</target>
 
-<source>Time span</source>
-<target>Time span</target>
+<source>Time span:</source>
+<target>Time span:</target>
 
-<source>File size</source>
-<target>File size</target>
+<source>File size:</source>
+<target>File size:</target>
 
-<source>Minimum</source>
-<target>Minimum</target>
+<source>Minimum:</source>
+<target>Minimum:</target>
 
-<source>Maximum</source>
-<target>Maximum</target>
+<source>Maximum:</source>
+<target>Maximum:</target>
 
 <source>&Clear</source>
 <target>&Clear</target>
 
-<source>Global settings</source>
-<target>Global settings</target>
+<source>The following settings are used for all synchronization jobs.</source>
+<target>The following settings are used for all synchronisation jobs.</target>
 
 <source>Fail-safe file copy</source>
 <target>Fail-safe file copy</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</target>
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</target>
+
+<source>(recommended)</source>
+<target>(recommended)</target>
 
 <source>Copy locked files</source>
 <target>Copy locked files</target>
 
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Copy shared or locked files using the Volume Shadow Copy Service.</target>
+
+<source>(requires administrator rights)</source>
+<target>(requires administrator rights)</target>
 
 <source>Copy file access permissions</source>
 <target>Copy file access permissions</target>
 
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Transfer file and folder permissions (requires administrator rights)</target>
+<source>Transfer file and folder permissions.</source>
+<target>Transfer file and folder permissions.</target>
 
-<source>Restore hidden dialogs</source>
-<target>Restore hidden dialogues</target>
+<source>Automatic retry on error:</source>
+<target>Automatic retry on error:</target>
 
-<source>External applications</source>
-<target>External applications</target>
+<source>Retry count:</source>
+<target>Retry count:</target>
+
+<source>Delay (in seconds):</source>
+<target>Delay (in seconds):</target>
+
+<source>Customize context menu:</source>
+<target>Customise context menu:</target>
 
 <source>Description</source>
 <target>Description</target>
+
+<source>Restore hidden windows</source>
+<target>Restore hidden windows</target>
 
 <source>&Default</source>
 <target>&Default</target>
@@ -996,26 +1023,20 @@ Note: File paths must be relative to base directories.
 <source>Many thanks for localization:</source>
 <target>Many thanks for localisation:</target>
 
-<source>Start synchronization</source>
-<target>Start synchronisation</target>
+<source>Save as Batch Job</source>
+<target>Save as Batch Job</target>
 
-<source>Comparison settings</source>
-<target>Comparison settings</target>
+<source>Delete Items</source>
+<target>Delete Items</target>
 
-<source>Synchronization settings</source>
-<target>Synchronisation settings</target>
+<source>Global Settings</source>
+<target>Global Settings</target>
 
-<source>Delete</source>
-<target>Delete</target>
+<source>Select Time Span</source>
+<target>Select Time Span</target>
 
-<source>Configure filter</source>
-<target>Configure filter</target>
-
-<source>Select time span</source>
-<target>Select time span</target>
-
-<source>Folder pairs</source>
-<target>Folder pairs</target>
+<source>Folder Pairs</source>
+<target>Folder Pairs</target>
 
 <source>Find</source>
 <target>Find</target>
@@ -1026,14 +1047,14 @@ Note: File paths must be relative to base directories.
 <source>Configuration</source>
 <target>Configuration</target>
 
-<source>Main bar</source>
-<target>Main bar</target>
+<source>Main Bar</source>
+<target>Main Bar</target>
 
-<source>Filter files</source>
-<target>Filter files</target>
+<source>Filter Files</source>
+<target>Filter Files</target>
 
-<source>Select view</source>
-<target>Select view</target>
+<source>Select View</source>
+<target>Select View</target>
 
 <source>Open...</source>
 <target>Open...</target>
@@ -1044,12 +1065,21 @@ Note: File paths must be relative to base directories.
 <source>Compare both sides</source>
 <target>Compare both sides</target>
 
+<source>Comparison settings</source>
+<target>Comparison settings</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisation settings</target>
+
+<source>Start synchronization</source>
+<target>Start synchronisation</target>
+
 <source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </target>
 
@@ -1104,6 +1134,9 @@ Note: File paths must be relative to base directories.
 <source>Include temporarily</source>
 <target>Include temporarily</target>
 
+<source>Delete</source>
+<target>Delete</target>
+
 <source>Include all</source>
 <target>Include all</target>
 
@@ -1152,6 +1185,9 @@ Note: File paths must be relative to base directories.
 <source>Never save &changes</source>
 <target>Never save &changes</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>Show files that exist on left side only</source>
 <target>Show files that exist on left side only</target>
 
@@ -1197,11 +1233,14 @@ Note: File paths must be relative to base directories.
 <source>Set as default</source>
 <target>Set as default</target>
 
-<source>Operation aborted</source>
-<target>Operation aborted</target>
-
 <source>All folders are in sync</source>
 <target>All folders are in sync</target>
+
+<source>Synchronization Settings</source>
+<target>Synchronisation Settings</target>
+
+<source>Comparison Settings</source>
+<target>Comparison Settings</target>
 
 <source>Cannot find %x</source>
 <target>Cannot find %x</target>
@@ -1221,17 +1260,14 @@ Note: File paths must be relative to base directories.
 <source>&Ignore</source>
 <target>&Ignore</target>
 
-<source>Fatal Error</source>
-<target>Fatal Error</target>
+<source>Serious Error</source>
+<target>Serious Error</target>
 
 <source>&Don't show this warning again</source>
 <target>&Don't show this warning again</target>
 
 <source>&Switch</source>
 <target>&Switch</target>
-
-<source>Question</source>
-<target>Question</target>
 
 <source>&Yes</source>
 <target>&Yes</target>
@@ -1254,8 +1290,8 @@ Note: File paths must be relative to base directories.
 <source>Initializing...</source>
 <target>Initialising...</target>
 
-<source>Aborted</source>
-<target>Aborted</target>
+<source>Stopped</source>
+<target>Stopped</target>
 
 <source>Completed</source>
 <target>Completed</target>
@@ -1265,9 +1301,6 @@ Note: File paths must be relative to base directories.
 
 <source>Log</source>
 <target>Log</target>
-
-<source>Inactive</source>
-<target>Inactive</target>
 
 <source>Today</source>
 <target>Today</target>
@@ -1293,9 +1326,6 @@ Note: File paths must be relative to base directories.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filter</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1305,6 +1335,9 @@ Note: File paths must be relative to base directories.
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </target>
 
+<source>Move</source>
+<target>Move</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1313,6 +1346,9 @@ Note: File paths must be relative to base directories.
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Exclude</target>
 
 <source>Direct</source>
 <target>Direct</target>
@@ -1338,8 +1374,8 @@ Note: File paths must be relative to base directories.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Other side's counterpart to %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Make hidden warnings and dialogues visible again?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Restore all hidden windows and warnings?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
@@ -1464,14 +1500,14 @@ Note: File paths must be relative to base directories.
 <pluralform>%x days</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Failed to register to receive system messages.</target>
+<source>Unable to register to receive system messages.</source>
+<target>Unable to register to receive system messages.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Cannot set privilege %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Failed to suspend system sleep mode.</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Unable to suspend system sleep mode.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Cannot change process I/O priorities.</target>

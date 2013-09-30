@@ -351,9 +351,24 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         case SO_OVERWRITE_RIGHT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
+            return getSyncOpDescription(op); //use generic description
+
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
-            return getSyncOpDescription(op); //use generic description
+            //harmonize with synchronization.cpp::SynchronizeFolderPair::synchronizeFileInt, ect!!
+        {
+            Zstring shortNameOld = fsObj.getShortName<RIGHT_SIDE>();
+            Zstring shortNameNew = fsObj.getShortName<LEFT_SIDE >();
+            if (op == SO_COPY_METADATA_TO_LEFT)
+                std::swap(shortNameOld, shortNameNew);
+
+            if (shortNameOld != shortNameNew) //detected change in case
+                return getSyncOpDescription(op) + L"\n" +
+                       fmtFileName(shortNameOld) + L" ->\n" + //show short name only
+                       fmtFileName(shortNameNew);
+        }
+        //fallback:
+        return getSyncOpDescription(op);
 
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
@@ -384,6 +399,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                     //attention: ::SetWindowText() doesn't handle tab characters correctly in combination with certain file names, so don't use them
                 }
             break;
+
         case SO_UNRESOLVED_CONFLICT:
             return fsObj.getSyncOpConflict();
     }

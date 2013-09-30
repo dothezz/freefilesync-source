@@ -12,6 +12,7 @@
 #include "xml_base.h"
 #include "localization.h"
 #include "../ui/column_attr.h"
+#include "../ui/folder_history_types.h"
 //#include "ffs_paths.h"
 
 namespace xmlAccess
@@ -31,7 +32,7 @@ enum OnError
 {
     ON_ERROR_IGNORE,
     ON_ERROR_POPUP,
-    ON_ERROR_ABORT
+    ON_ERROR_STOP
 };
 
 enum OnGuiError
@@ -42,7 +43,7 @@ enum OnGuiError
 
 typedef std::wstring Description;
 typedef std::wstring Commandline;
-typedef std::vector<std::pair<Description, Commandline> > ExternalApps;
+typedef std::vector<std::pair<Description, Commandline>> ExternalApps;
 
 //---------------------------------------------------------------------
 struct XmlGuiConfig
@@ -135,26 +136,30 @@ struct XmlGlobalSettings
     //Shared (GUI/BATCH) settings
     XmlGlobalSettings() :
         programLanguage(zen::retrieveSystemLanguage()),
+        failsafeFileCopy(true),
         copyLockedFiles(true),
         copyFilePermissions(false),
-        runWithBackgroundPriority(false),
+        automaticRetryCount(0),
+        automaticRetryDelay(5),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-        lastSyncsLogFileSizeMax(100000), //maximum size for LastSyncs.log: use a human-readable number
+        runWithBackgroundPriority(false),
+        createLockFile(true),
         verifyFileCopy(false),
-        transactionalFileCopy(true),
-        createLockFile(true) {}
+        lastSyncsLogFileSizeMax(100000) //maximum size for LastSyncs.log: use a human-readable number
+    {}
 
     int programLanguage;
-    bool copyLockedFiles;          //VSS usage
+    bool failsafeFileCopy;
+    bool copyLockedFiles;
     bool copyFilePermissions;
-
-    bool runWithBackgroundPriority;
+    size_t automaticRetryCount;
+    size_t automaticRetryDelay; //unit: [sec]
 
     size_t fileTimeTolerance; //max. allowed file time deviation
-    size_t lastSyncsLogFileSizeMax;
-    bool verifyFileCopy;   //verify copied files
-    bool transactionalFileCopy;
+    bool runWithBackgroundPriority;
     bool createLockFile;
+    bool verifyFileCopy;   //verify copied files
+    size_t lastSyncsLogFileSizeMax;
 
     OptionalDialogs optDialogs;
 
@@ -238,7 +243,7 @@ struct XmlGlobalSettings
 
         ExternalApps externelApplications;
 
-        std::vector<Zstring> cfgFileHistory;
+        std::vector<zen::ConfigHistoryItem> cfgFileHistory;
         size_t cfgFileHistMax;
 
         std::vector<Zstring> lastUsedConfigFiles;
@@ -259,7 +264,7 @@ struct XmlGlobalSettings
         bool showIcons;
         FileIconSize iconSize;
 
-        long lastUpdateCheck;          //time of last update check
+        long lastUpdateCheck; //time of last update check
 
         ViewFilterDefault viewFilterDefault;
         wxString guiPerspectiveLast; //used by wxAuiManager

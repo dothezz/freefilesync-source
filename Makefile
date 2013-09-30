@@ -59,7 +59,7 @@ CXXFLAGS += -DZEN_MAC
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
 CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
-MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 
 #-Wl,-Bstatic not supported on OSX!
 
@@ -89,7 +89,6 @@ CPP_LIST+=ui/tree_view.cpp
 CPP_LIST+=ui/gui_generated.cpp
 CPP_LIST+=ui/gui_status_handler.cpp
 CPP_LIST+=ui/main_dlg.cpp
-CPP_LIST+=ui/msg_popup.cpp
 CPP_LIST+=ui/progress_indicator.cpp
 CPP_LIST+=ui/search.cpp
 CPP_LIST+=ui/small_dlgs.cpp
@@ -106,7 +105,6 @@ CPP_LIST+=lib/localization.cpp
 CPP_LIST+=lib/parallel_scan.cpp
 CPP_LIST+=lib/process_xml.cpp
 CPP_LIST+=lib/resolve_path.cpp
-CPP_LIST+=lib/resources.cpp
 CPP_LIST+=lib/perf_check.cpp
 CPP_LIST+=lib/status_handler.cpp
 CPP_LIST+=lib/versioning.cpp
@@ -124,6 +122,9 @@ CPP_LIST+=wx+/grid.cpp
 CPP_LIST+=wx+/image_tools.cpp
 CPP_LIST+=wx+/graph.cpp
 CPP_LIST+=wx+/tooltip.cpp
+CPP_LIST+=wx+/image_resources.cpp
+CPP_LIST+=wx+/popup_dlg.cpp
+CPP_LIST+=wx+/popup_dlg_generated.cpp
 CPP_LIST+=wx+/zlib_wrap.cpp
 
 # OS X

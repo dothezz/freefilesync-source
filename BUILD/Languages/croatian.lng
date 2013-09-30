@@ -2,12 +2,269 @@
 	<language>Hrvatski</language>
 	<translator>Miroslav Vranić</translator>
 	<locale>hr_HR</locale>
-	<flag_image>flag_croatia.png</flag_image>
-	<plural_form_count>3</plural_form_count>
+	<image>flag_croatia.png</image>
+	<plural_count>3</plural_count>
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
+<source>Unable to suspend system sleep mode.</source>
+<target></target>
+
+<source>Unable to register to receive system messages.</source>
+<target></target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target></target>
+
+<source>Move</source>
+<target></target>
+
+<source>Stopped</source>
+<target></target>
+
+<source>Serious Error</source>
+<target></target>
+
+<source>Comparison Settings</source>
+<target></target>
+
+<source>Synchronization Settings</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Select View</source>
+<target></target>
+
+<source>Filter Files</source>
+<target></target>
+
+<source>Main Bar</source>
+<target></target>
+
+<source>Folder Pairs</source>
+<target></target>
+
+<source>Select Time Span</source>
+<target></target>
+
+<source>Global Settings</source>
+<target></target>
+
+<source>Delete Items</source>
+<target></target>
+
+<source>Save as Batch Job</source>
+<target></target>
+
+<source>Restore hidden windows</source>
+<target></target>
+
+<source>Customize context menu:</source>
+<target></target>
+
+<source>Delay (in seconds):</source>
+<target></target>
+
+<source>Retry count:</source>
+<target></target>
+
+<source>Automatic retry on error:</source>
+<target></target>
+
+<source>Transfer file and folder permissions.</source>
+<target></target>
+
+<source>(requires administrator rights)</source>
+<target></target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target></target>
+
+<source>(recommended)</source>
+<target></target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target></target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target></target>
+
+<source>Maximum:</source>
+<target></target>
+
+<source>Minimum:</source>
+<target></target>
+
+<source>File size:</source>
+<target></target>
+
+<source>Time span:</source>
+<target></target>
+
+<source>Exclude:</source>
+<target></target>
+
+<source>Include:</source>
+<target></target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target></target>
+
+<source>&Recycle bin</source>
+<target></target>
+
+<source>How can I schedule a batch job?</source>
+<target></target>
+
+<source>Limit:</source>
+<target></target>
+
+<source>Save log:</source>
+<target></target>
+
+<source>Stop synchronization at first error</source>
+<target></target>
+
+<source>Stop</source>
+<target></target>
+
+<source>Variant:</source>
+<target></target>
+
+<source>Start synchronization now?</source>
+<target></target>
+
+<source>On completion:</source>
+<target></target>
+
+<source>Handle errors:</source>
+<target></target>
+
+<source>Show examples</source>
+<target></target>
+
+<source>Delete files:</source>
+<target></target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target></target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target></target>
+
+<source>More information</source>
+<target></target>
+
+<source>Symbolic links:</source>
+<target></target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target></target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target></target>
+
+<source>Select a variant:</source>
+<target></target>
+
+<source>Find:</source>
+<target></target>
+
 <source>Close search bar</source>
+<target></target>
+
+<source>&Check for new version</source>
+<target></target>
+
+<source>&Find...</source>
+<target></target>
+
+<source>Local Filter</source>
+<target></target>
+
+<source>Alternate Synchronization Settings</source>
+<target></target>
+
+<source>Alternate Comparison Settings</source>
+<target></target>
+
+<source>None</source>
+<target></target>
+
+<source>Active</source>
+<target></target>
+
+<source>Local filter</source>
+<target></target>
+
+<source>Alternate synchronization settings</source>
+<target></target>
+
+<source>Alternate comparison settings</source>
+<target></target>
+
+<source>Check for Program Updates</source>
+<target></target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target></target>
+
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target></target>
+
+<source>Synchronization stopped</source>
+<target></target>
+
+<source>Please enter a target folder for versioning.</source>
+<target></target>
+
+<source>Incorrect command line:</source>
+<target></target>
+
+<source>Automated Synchronization</source>
+<target></target>
+
+<source>&Start</source>
+<target></target>
+
+<source>Command line:</source>
+<target></target>
+
+<source>Idle time (in seconds):</source>
+<target></target>
+
+<source>Folders to watch:</source>
+<target></target>
+
+<source>&View help</source>
+<target></target>
+
+<source>Unable to create timestamp for versioning:</source>
+<target></target>
+
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target></target>
+
+<source>%x items/sec</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -298,9 +555,6 @@
 <source>/sec</source>
 <target>/sek</target>
 
-<source>%x items</source>
-<target>%x stavke</target>
-
 <source>Configuration file %x loaded partially only.</source>
 <target>Datoteka postavki %x učitana samo djelomično</target>
 
@@ -328,12 +582,6 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Ime voumena %x nije dio puta datotke %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Prekid zahtjevan: čekam da se trenutna akcija završi...</target>
-
-<source>Failure to create timestamp for versioning:</source>
-<target>Nije moguća vremenska oznaka za varijantu</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Ne mogu čitati slijedeće XML elemente</target>
 
@@ -348,9 +596,6 @@
 
 <source>&Program</source>
 <target>&Program</target>
-
-<source>&Content</source>
-<target>&Sadržaj</target>
 
 <source>&About</source>
 <target>&O programu</target>
@@ -373,9 +618,6 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Za započeti uvezite .ffs slijednu datoteku.</target>
 
-<source>Folders to watch</source>
-<target>Mape za nadziranje</target>
-
 <source>Add folder</source>
 <target>Dodaj mapu</target>
 
@@ -387,9 +629,6 @@
 
 <source>Select a folder</source>
 <target>Izaberite mapu</target>
-
-<source>Idle time [seconds]</source>
-<target>Vrijeme mirovanja [sekundi]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Vrijeme čekanja između zadnje prepoznate promjene i izvršenja naredbe</target>
@@ -405,17 +644,11 @@ Naredba će biti pokrenuta ako se:
 - nove mape pojave (npr. umetanje USB sticka)
 </target>
 
-<source>Start</source>
-<target>Start</target>
-
 <source>&Retry</source>
 <target>&Ponovi</target>
 
 <source>Cancel</source>
 <target>Odustani</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automatska Sinkronizacija</target>
 
 <source>Build: %x</source>
 <target>Inačnica: %x</target>
@@ -440,9 +673,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>&Exit</source>
 <target>&Izlaz</target>
-
-<source>Invalid command line:</source>
-<target>Netočna naredba:</target>
 
 <source>File content</source>
 <target>Sadržaj datoteke</target>
@@ -504,9 +734,6 @@ Naredba će biti pokrenuta ako se:
 <source>Target folder input field must not be empty.</source>
 <target>Odredišna mapa ne može biti prazna.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Mapa unosa ne smije biti prazna.</target>
-
 <source>Source folder %x not found.</source>
 <target>Izvorna mapa %x nije pronađena.</target>
 
@@ -543,9 +770,6 @@ Naredba će biti pokrenuta ako se:
 <source>job name</source>
 <target>Ime zadatka</target>
 
-<source>Synchronization aborted</source>
-<target>Sinkronizacija prekinuta</target>
-
 <source>Synchronization completed with errors</source>
 <target>Sinkronizacija završena s greškama</target>
 
@@ -561,23 +785,11 @@ Naredba će biti pokrenuta ako se:
 <source>Saving log file %x...</source>
 <target>Spremam izješće %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Preisni "Zamjeni" za riješavanje problema u FreeFileSync glavnom dijaloškom okviru</target>
-
-<source>Switching to FreeFileSync main dialog</source>
-<target>Prebacujem na FreeFileSync glavni dijaloški prozor</target>
-
-<source>Retrying operation after error:</source>
-<target>Ponavljam operaciju nakon greške:</target>
-
 <source>A new version of FreeFileSync is available:</source>
 <target>Nova verzija FreeFileSync je dostupna:</target>
 
 <source>Download now?</source>
 <target>Preuzeti sada?</target>
-
-<source>New version found</source>
-<target>Nova verzija je nađena</target>
 
 <source>&Download</source>
 <target>&Preuzmi</target>
@@ -645,21 +857,6 @@ Naredba će biti pokrenuta ako se:
 <source>Hibernate</source>
 <target>Hibernacija</target>
 
-<source>Selected variant:</source>
-<target>Odaberite način</target>
-
-<source>Select alternate comparison settings</source>
-<target>Izaberite alternativne postavke usporedbe</target>
-
-<source>Select alternate synchronization settings</source>
-<target>Izaberite alternativne postavke sinkronizacije</target>
-
-<source>Filter is active</source>
-<target>Filter je aktivan</target>
-
-<source>No filter selected</source>
-<target>Nijedan filter odabran</target>
-
 <source>Remove alternate settings</source>
 <target>Ukloni alternativne postavke</target>
 
@@ -687,14 +884,14 @@ Naredba će biti pokrenuta ako se:
 <source>2. &Synchronize</source>
 <target>2. &Sinkroniziraj</target>
 
+<source>&Global settings</source>
+<target>&Globalne postavke</target>
+
 <source>&Language</source>
 <target>&Jezik</target>
 
 <source>&Export file list...</source>
 <target>&Izvoz liste datoteka...</target>
-
-<source>&Global settings</source>
-<target>&Globalne postavke</target>
 
 <source>&Tools</source>
 <target>&Alati</target>
@@ -704,9 +901,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Check &automatically once a week</source>
 <target>Provjeri &automatski jednom tjedno</target>
-
-<source>Check for new &version</source>
-<target>Prvojeri dostupnost nove &verzije</target>
 
 <source>Compare</source>
 <target>Usporedi</target>
@@ -722,9 +916,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Swap sides</source>
 <target>Zamjeni strane</target>
-
-<source>Find what:</source>
-<target>Nađi što:</target>
 
 <source>Match case</source>
 <target>Poklopi se</target>
@@ -750,86 +941,11 @@ Naredba će biti pokrenuta ako se:
 <source>Total bytes to copy</source>
 <target>Ukupno bajta za kopirati</target>
 
-<source>Items found:</source>
-<target>Pronađene stavke:</target>
-
-<source>Speed:</source>
-<target>Brzina:</target>
-
-<source>Time remaining:</source>
-<target>Preostalo vremena:</target>
-
-<source>Time elapsed:</source>
-<target>Proteklo vremena:</target>
-
-<source>Synchronizing...</source>
-<target>Sinkroniziram...</target>
-
-<source>Minimize to notification area</source>
-<target>Spusti u notifikacije</target>
-
-<source>On completion</source>
-<target>Pri završetku</target>
-
-<source>Close</source>
-<target>Zatvori</target>
-
-<source>&Pause</source>
-<target>&Pauziraj</target>
-
-<source>Variant</source>
-<target>Način</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
-
-<source>Select a variant</source>
-<target>Odaberite varijantu</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Datoteke se smatraju jednake ako su im
-     - vrijeme zadnje promjene i datum
-     - veličina datoteke
-jednaki
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Datoteke se smatraju jednake ako im je
-     - sadržaj datoteke
-jednak
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Upravljanje simboličnim poveznicama</target>
-
-<source>Help</source>
-<target>Pomoć</target>
-
 <source>OK</source>
 <target>U redu</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Pronađi i izvrši izmjene na obje strane. Izbrisano, premješteno te sukobe se otkrije automatski pomoću baze.</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Zrcalna pričuva lijeve mape. Desna mapa je uređena da bi bila jednaka lijevom folderu nakon sinkronizacije.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiraj nove ili ažurirane datoteke u desnu mapu.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurirajte vaša vlastita sinkronizacijska pravila.</target>
@@ -839,24 +955,6 @@ jednak
 
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Zahtjevaju se datoteke baze. Nisu podržai svi datotečni sustavi.</target>
-
-<source>Error handling</source>
-<target>Greška pri obradi</target>
-
-<source>Ignore</source>
-<target>Ignoriraj</target>
-
-<source>Hide all error and warning messages</source>
-<target>Sakrij sve greške i upozorenja</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Prikaži skočni prozor pri greškama i upozorenjima</target>
-
-<source>Deletion handling</source>
-<target>Upravljanje pri brisanju</target>
 
 <source>Permanent</source>
 <target>Trajno</target>
@@ -879,29 +977,53 @@ jednak
 <source>Naming convention:</source>
 <target>Pravilo imena:</target>
 
-<source>Batch job</source>
-<target>Slijedni zadatak</target>
+<source>Ignore</source>
+<target>Ignoriraj</target>
+
+<source>Hide all error and warning messages</source>
+<target>Sakrij sve greške i upozorenja</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Prikaži skočni prozor pri greškama i upozorenjima</target>
+
+<source>Statistics</source>
+<target>Statistika</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
+
+<source>Items found:</source>
+<target>Pronađene stavke:</target>
+
+<source>Speed:</source>
+<target>Brzina:</target>
+
+<source>Time remaining:</source>
+<target>Preostalo vremena:</target>
+
+<source>Time elapsed:</source>
+<target>Proteklo vremena:</target>
+
+<source>Synchronizing...</source>
+<target>Sinkroniziram...</target>
+
+<source>Minimize to notification area</source>
+<target>Spusti u notifikacije</target>
+
+<source>Close</source>
+<target>Zatvori</target>
+
+<source>&Pause</source>
+<target>&Pauziraj</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Stvaranje batch datoteka za sinkronizaciju bez nadzora. Za početak, dvaput kliknite na ovu datoteku ili planirajte u planeru zadataka: %x</target>
 
-<source>Exit</source>
-<target>Izađi</target>
-
-<source>Abort synchronization on first error</source>
-<target>Prekini sinkronizaciju pri prvoj pogrešci</target>
-
 <source>Show progress dialog</source>
 <target>Prikaži napredak</target>
-
-<source>Save log</source>
-<target>Spremi izvješće</target>
-
-<source>Select folder to save log files</source>
-<target>Odaberi mapu za spremanje izvješća</target>
-
-<source>Limit</source>
-<target>Ograniči</target>
 
 <source>Limit maximum number of log files</source>
 <target>Ograniči maksimalan broj izvješća</target>
@@ -912,62 +1034,17 @@ jednak
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Izbriši na obje strane iako je označena datoteka samo na jednoj strani</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Datoteke će biti kopirane ukoliko zadovolje sve zahtjeve filtera.
-Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
-</target>
-
-<source>Include</source>
-<target>Uključi</target>
-
-<source>Exclude</source>
-<target>Isključi</target>
-
-<source>Time span</source>
-<target>Vremensko ograničenje</target>
-
-<source>File size</source>
-<target>Veličina datoteke</target>
-
-<source>Minimum</source>
-<target>Minimum</target>
-
-<source>Maximum</source>
-<target>Maksimum</target>
-
 <source>&Clear</source>
 <target>&Brisati</target>
-
-<source>Global settings</source>
-<target>Globalne postavke</target>
 
 <source>Fail-safe file copy</source>
 <target>Kopiranje zaštićeno od grešaka</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Prvo kopiraj u privremenu datoteku (*ffs_tmp) zatim promijeni ime. Ovo osigurava dosljedno stanje čak i kod fatalne greške.</target>
-
 <source>Copy locked files</source>
 <target>Kopiraj zaključane datoteke</target>
 
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopiraj dijeljene ili zaključane datoteke koristeći Volume Shadow Copy servis (potrebna su administratorska ovlaštenja)</target>
-
 <source>Copy file access permissions</source>
 <target>Kopiraj datotečna dopuštenja</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Prenesi dozvole za mape i datoteke (potrebna su administratorska ovlaštenja)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Prikaži skrivene prozore</target>
-
-<source>External applications</source>
-<target>Vanjske aplikacije</target>
 
 <source>Description</source>
 <target>Opis</target>
@@ -999,27 +1076,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Many thanks for localization:</source>
 <target>Velike zahvale idu:</target>
 
-<source>Start synchronization</source>
-<target>Započni sinkronizaciju</target>
-
-<source>Comparison settings</source>
-<target>Postavke usporedbe</target>
-
-<source>Synchronization settings</source>
-<target>Postavke sinkronizacije</target>
-
-<source>Delete</source>
-<target>Izbriši</target>
-
-<source>Configure filter</source>
-<target>Konfiguriraj filter</target>
-
-<source>Select time span</source>
-<target>Izaberite mjerni raspon</target>
-
-<source>Folder pairs</source>
-<target>Par mape</target>
-
 <source>Find</source>
 <target>Pronađi</target>
 
@@ -1028,15 +1084,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 
 <source>Configuration</source>
 <target>Postavke</target>
-
-<source>Main bar</source>
-<target>Glavna traka</target>
-
-<source>Filter files</source>
-<target>Filtriraj datoteke</target>
-
-<source>Select view</source>
-<target>Izaberite pogled</target>
 
 <source>Open...</source>
 <target>Otvori...</target>
@@ -1047,15 +1094,14 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Compare both sides</source>
 <target>Usporedi obje strane</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Dali stvarno želite izvršiti nardebu %y za %x stavku?</pluralform>
-<pluralform>Dali stvarno želite izvršiti nardebu %y za %x stavke?</pluralform>
-<pluralform>Dali stvarno želite izvršiti nardebu %y za %x stavki?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Postavke usporedbe</target>
+
+<source>Synchronization settings</source>
+<target>Postavke sinkronizacije</target>
+
+<source>Start synchronization</source>
+<target>Započni sinkronizaciju</target>
 
 <source>Confirm</source>
 <target>Potvrdi</target>
@@ -1111,6 +1157,9 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Include temporarily</source>
 <target>Trenutno uključi</target>
 
+<source>Delete</source>
+<target>Izbriši</target>
+
 <source>Include all</source>
 <target>Uključi sve</target>
 
@@ -1159,6 +1208,9 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Never save &changes</source>
 <target>Nikad ne spremaj &promjene</target>
 
+<source>Filter</source>
+<target>Filtriranje</target>
+
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke koje postoje samo na lijevoj strani</target>
 
@@ -1204,9 +1256,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Set as default</source>
 <target>Postavi kao zadano</target>
 
-<source>Operation aborted</source>
-<target>Operacija otkazana</target>
-
 <source>All folders are in sync</source>
 <target>Sve mape su u sinkronizaciji</target>
 
@@ -1228,17 +1277,11 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>&Ignore</source>
 <target>&Ignoriraj</target>
 
-<source>Fatal Error</source>
-<target>Kritična greška</target>
-
 <source>&Don't show this warning again</source>
 <target>&Ne prikazuj više ovo upozorenje.</target>
 
 <source>&Switch</source>
 <target>&Zamjeni</target>
-
-<source>Question</source>
-<target>Pitanje</target>
 
 <source>&Yes</source>
 <target>&Da</target>
@@ -1261,9 +1304,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>Initializing...</source>
 <target>Učitavam</target>
 
-<source>Aborted</source>
-<target>Prekinuto</target>
-
 <source>Completed</source>
 <target>Završeno</target>
 
@@ -1272,9 +1312,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 
 <source>Log</source>
 <target>Dnevnik</target>
-
-<source>Inactive</source>
-<target>Neaktivno</target>
 
 <source>Today</source>
 <target>Danas</target>
@@ -1300,9 +1337,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filtriranje</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1322,6 +1356,9 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <pluralform>Dali stvarno želite obristi sljedeće %x stavke?</pluralform>
 <pluralform>Dali stvarno želite obristi sljedećih %x stavki?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Isključi</target>
 
 <source>Direct</source>
 <target>Neposredno</target>
@@ -1346,9 +1383,6 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Duplikat s druge strane u %item_folder%</target>
-
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Vrati skrivena upozorenja i dijaloški okvir ponovno vidljivim?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ostavi kao neriješeni sukob</target>
@@ -1476,14 +1510,8 @@ Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 <pluralform>%x dana</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Neuspijela registracija za primanje sistemskih poruka.</target>
-
 <source>Cannot set privilege %x.</source>
 <target>Ne mogu postaviti prava za %x.</target>
-
-<source>Failed to suspend system sleep mode.</source>
-<target>Nije moguće odgoditi mod spavanja računala</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Ne može se promjeniti proces I/O prioriteta</target>

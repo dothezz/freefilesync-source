@@ -7,11 +7,10 @@
 #include "batch_status_handler.h"
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
-#include <zen/format_unit.h>
-//#include <wx+/app_main.h>
-#include <wx+/shell_execute.h>
+//#include <zen/format_unit.h>
+#include <zen/shell_execute.h>
+#include <wx+/popup_dlg.h>
 #include <wx/app.h>
-#include "msg_popup.h"
 #include "exec_finished_box.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/resolve_path.h"
@@ -38,8 +37,8 @@ private:
 
     virtual TraverseCallback* onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual HandleError reportDirError (const std::wstring& msg)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
@@ -103,6 +102,8 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        int logfilesCountLimit,
                                        size_t lastSyncsLogFileSizeMax,
                                        const xmlAccess::OnError handleError,
+                                       size_t automaticRetryCount,
+                                       size_t automaticRetryDelay,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        FfsReturnCode& returnCode,
                                        const std::wstring& execWhenFinished,
@@ -110,24 +111,24 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     switchBatchToGui_(switchBatchToGui),
     showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
+    logfilesCountLimit_(logfilesCountLimit),
     lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
     handleError_(handleError),
     returnCode_(returnCode),
+    automaticRetryCount_(automaticRetryCount),
+    automaticRetryDelay_(automaticRetryDelay),
     progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory)),
             jobName_(jobName)
 {
-    if (logfilesCountLimit != 0) //init log file: starts internal timer!
+    if (logfilesCountLimit != 0)
     {
-        zen::Opt<std::wstring> errMsg = tryReportingError2([&] { logFile = prepareNewLogfile(logfileDirectory, jobName, timeStamp); }, //throw FileError; return value always bound!
-                                                           *this);
+        zen::Opt<std::wstring> errMsg = tryReportingError([&] { logFile = prepareNewLogfile(logfileDirectory, jobName, timeStamp); }, //throw FileError; return value always bound!
+                                                          *this);
         if (errMsg)
         {
             raiseReturnCode(returnCode_, FFS_RC_ABORTED);
             throw BatchAbortProcess();
         }
-
-        if (logfilesCountLimit >= 0)
-            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit); //throw()
     }
 
     totalTime.Start(); //measure total time
@@ -139,6 +140,43 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
 
 BatchStatusHandler::~BatchStatusHandler()
 {
+    //------------ "on completion" command conceptually is part of the sync, not cleanup --------------------------------------
+
+    //decide whether to stay on status screen or exit immediately...
+    if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode
+    {
+        try
+        {
+            switchBatchToGui_.execute(); //open FreeFileSync GUI
+        }
+        catch (...) {}
+        showFinalResults = false;
+    }
+    else if (progressDlg)
+    {
+        if (progressDlg->getWindowIfVisible())
+            showFinalResults = true;
+
+        //execute "on completion" command (even in case of ignored errors)
+        if (!abortIsRequested()) //if aborted (manually), we don't execute the command
+        {
+            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            if (!finalCommand.empty())
+            {
+                if (isCloseProgressDlgCommand(finalCommand))
+                    showFinalResults = false; //take precedence over current visibility status
+                else
+                    try
+                    {
+                        tryReportingError([&] { shellExecute2(expandMacros(utfCvrtTo<Zstring>(finalCommand)), EXEC_TYPE_SYNC); }, //throw FileError, throw X?
+                                          *this);
+                    }
+                    catch (...) {}
+            }
+        }
+    }
+    //------------ end of sync: begin of cleanup --------------------------------------
+
     const int totalErrors   = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
     const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
 
@@ -147,7 +185,7 @@ BatchStatusHandler::~BatchStatusHandler()
     if (abortIsRequested())
     {
         raiseReturnCode(returnCode_, FFS_RC_ABORTED);
-        finalStatus = _("Synchronization aborted");
+        finalStatus = _("Synchronization stopped");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
@@ -191,12 +229,15 @@ BatchStatusHandler::~BatchStatusHandler()
             forceUiRefresh(); //
         }
         catch (...) {}
+
+        if (logfilesCountLimit_ > 0)
+            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit_); //throw()
+
         try
         {
             saveLogToFile(summary, errorLog, *logFile); //throw FileError
         }
         catch (FileError&) {}
-        logFile.reset(); //close file now: user may do something with it in "on completion"
     }
     try
     {
@@ -206,52 +247,23 @@ BatchStatusHandler::~BatchStatusHandler()
 
     if (progressDlg)
     {
-        //decide whether to stay on status screen or exit immediately...
-        if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode
+        if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!
         {
-            try
-            {
-                switchBatchToGui_.execute(); //open FreeFileSync GUI
-            }
-            catch (...) {}
-            progressDlg->closeWindowDirectly(); //progressDlg is not main window anymore
+            //notify about (logical) application main window => program won't quit, but stay on this dialog
+            //setMainWindow(progressDlg->getAsWindow()); -> not required anymore since we block waiting until dialog is closed below
+
+            //notify to progressDlg that current process has ended
+            if (abortIsRequested())
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
+            else if (totalErrors > 0)
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
+            else if (totalWarnings > 0)
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
+            else
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
         }
         else
-        {
-            if (progressDlg->getWindowIfVisible())
-                showFinalResults = true;
-
-            //execute "on completion" command (even in case of ignored errors)
-            if (!abortIsRequested()) //if aborted (manually), we don't execute the command
-            {
-                const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
-                if (!finalCommand.empty())
-                {
-                    if (isCloseProgressDlgCommand(finalCommand))
-                        showFinalResults = false; //take precedence over current visibility status
-                    else
-                        shellExecute(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
-                }
-            }
-
-            if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!
-            {
-                //notify about (logical) application main window => program won't quit, but stay on this dialog
-                //setMainWindow(progressDlg->getAsWindow()); -> not required anymore since we block waiting until dialog is closed below
-
-                //notify to progressDlg that current process has ended
-                if (abortIsRequested())
-                    progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
-                else if (totalErrors > 0)
-                    progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
-                else if (totalWarnings > 0)
-                    progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
-                else
-                    progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
-            }
-            else
-                progressDlg->closeWindowDirectly(); //progressDlg is main window => program will quit directly
-        }
+            progressDlg->closeWindowDirectly(); //progressDlg is main window => program will quit directly
 
         //wait until progress dialog notified shutdown via onProgressDialogTerminate()
         //-> required since it has our "this" pointer captured in lambda "notifyWindowTerminate"!
@@ -263,7 +275,6 @@ BatchStatusHandler::~BatchStatusHandler()
         }
     }
 }
-
 
 
 void BatchStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, ProcessCallback::Phase phaseID)
@@ -307,29 +318,29 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showWarningDlg(progressDlg->getWindowIfVisible(),
-                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_CANCEL,
-                                   warningMessage + L"\n\n" + _("Press \"Switch\" to resolve issues in FreeFileSync main dialog."),
-                                   dontWarnAgain))
+            switch (showConfirmationDialog3(progressDlg->getWindowIfVisible(), DialogInfoType::WARNING, PopupDialogCfg3().
+                                            setDetailInstructions(warningMessage + L"\n\n" + _("You can switch to FreeFileSync's main window to resolve this issue.")).
+                                            setCheckBox(dontWarnAgain, _("&Don't show this warning again"), ConfirmationButton3::DONT_DO_IT),
+                                            _("&Ignore"), _("&Switch")))
             {
-                case ReturnWarningDlg::BUTTON_CANCEL:
-                    abortThisProcess();
+                case ConfirmationButton3::DO_IT: //ignore
+                    warningActive = !dontWarnAgain;
                     break;
 
-                case ReturnWarningDlg::BUTTON_SWITCH:
-                    errorLog.logMsg(_("Switching to FreeFileSync main dialog"), TYPE_INFO);
+                case ConfirmationButton3::DONT_DO_IT: //switch
+                    errorLog.logMsg(_("Switching to FreeFileSync's main window"), TYPE_INFO);
                     switchToGuiRequested = true;
                     abortThisProcess();
                     break;
 
-                case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
-                    warningActive = !dontWarnAgain;
+                case ConfirmationButton3::CANCEL:
+                    abortThisProcess();
                     break;
             }
         }
         break; //keep it! last switch might not find match
 
-        case xmlAccess::ON_ERROR_ABORT:
+        case xmlAccess::ON_ERROR_STOP:
             abortThisProcess();
             break;
 
@@ -339,8 +350,25 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
 }
 
 
-ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& errorMessage)
+ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& errorMessage, size_t retryNumber)
 {
+    //auto-retry
+    if (retryNumber < automaticRetryCount_)
+    {
+        errorLog.logMsg(errorMessage + L"\n=> " +
+                        _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...", automaticRetryDelay_), TYPE_INFO);
+        //delay
+        const int iterations = static_cast<int>(1000 * automaticRetryDelay_ / UI_UPDATE_INTERVAL); //always round down: don't allow for negative remaining time below
+        for (int i = 0; i < iterations; ++i)
+        {
+            reportStatus(_("Error") + L": " + _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...",
+                                                 (1000 * automaticRetryDelay_ - i * UI_UPDATE_INTERVAL + 999) / 1000)); //integer round up
+            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+        }
+        return ProcessCallback::RETRY;
+    }
+
+
     //always, except for "retry":
     zen::ScopeGuard guardWriteLog = zen::makeGuard([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
 
@@ -353,28 +381,29 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(progressDlg->getWindowIfVisible(),
-                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
-                                 errorMessage, &ignoreNextErrors))
+            switch (showConfirmationDialog3(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg3().
+                                            setDetailInstructions(errorMessage).
+                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
+                                            _("&Ignore"), _("&Retry")))
             {
-                case ReturnErrorDlg::BUTTON_IGNORE:
+                case ConfirmationButton3::DO_IT: //ignore
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
                     return ProcessCallback::IGNORE_ERROR;
 
-                case ReturnErrorDlg::BUTTON_RETRY:
+                case ConfirmationButton3::DONT_DO_IT: //retry
                     guardWriteLog.dismiss();
-                    errorLog.logMsg(_("Retrying operation after error:") + L" " + errorMessage, TYPE_INFO);
+                    errorLog.logMsg(errorMessage + L"\n=> " + _("Retrying operation..."), TYPE_INFO);
                     return ProcessCallback::RETRY;
 
-                case ReturnErrorDlg::BUTTON_CANCEL:
+                case ConfirmationButton3::CANCEL:
                     abortThisProcess();
                     break;
             }
         }
         break; //used if last switch didn't find a match
 
-        case xmlAccess::ON_ERROR_ABORT:
+        case xmlAccess::ON_ERROR_STOP:
             abortThisProcess();
             break;
 
@@ -400,23 +429,24 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showFatalErrorDlg(progressDlg->getWindowIfVisible(),
-                                      ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
-                                      errorMessage, &ignoreNextErrors))
+            switch (showConfirmationDialog(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2,
+                                           PopupDialogCfg().setTitle(_("Serious Error")).
+                                           setDetailInstructions(errorMessage).
+                                           setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors")),
+                                           _("&Ignore")))
             {
-                case ReturnFatalErrorDlg::BUTTON_IGNORE:
+                case ConfirmationButton::DO_IT:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
                     break;
-
-                case ReturnFatalErrorDlg::BUTTON_CANCEL:
+                case ConfirmationButton::CANCEL:
                     abortThisProcess();
                     break;
             }
         }
         break;
 
-        case xmlAccess::ON_ERROR_ABORT:
+        case xmlAccess::ON_ERROR_STOP:
             abortThisProcess();
             break;
 

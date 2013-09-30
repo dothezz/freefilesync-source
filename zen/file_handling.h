@@ -29,7 +29,6 @@ enum ProcSymlink
     SYMLINK_FOLLOW
 };
 
-Int64 getFileTime(const Zstring& filename, ProcSymlink procSl); //throw FileError
 void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSymlink procSl); //throw FileError
 
 //symlink handling: always evaluate target

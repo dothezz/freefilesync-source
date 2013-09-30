@@ -61,8 +61,8 @@ public:
         ON_ERROR_RETRY,
         ON_ERROR_IGNORE
     };
-    virtual HandleError reportError (const std::wstring& msg) = 0;                 //may throw!
-    virtual void        reportStatus(const std::wstring& msg, int itemsTotal) = 0; //
+    virtual HandleError reportError (const std::wstring& msg, size_t retryNumber) = 0; //may throw!
+    virtual void        reportStatus(const std::wstring& msg, int    itemsTotal ) = 0; //
 };
 
 //attention: ensure directory filtering is applied later to exclude filtered directories which have been kept as parent folders

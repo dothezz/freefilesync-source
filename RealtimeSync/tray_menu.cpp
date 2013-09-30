@@ -5,20 +5,17 @@
 // **************************************************************************
 
 #include "tray_menu.h"
-#include <zen/build_info.h>
-#include <zen/tick_count.h>
 #include <zen/thread.h>
-#include <wx+/mouse_move_dlg.h>
-#include <wx+/image_tools.h>
-//#include <wx+/string_conv.h>
-#include <wx+/shell_execute.h>
-#include <wx+/std_button_order.h>
+#include <zen/tick_count.h>
 #include <wx/taskbar.h>
 #include <wx/icon.h> //Linux needs this
 #include <wx/app.h>
+#include <wx/menu.h>
 #include <wx/timer.h>
-#include "resources.h"
-#include "gui_generated.h"
+#include <wx+/image_tools.h>
+#include <zen/shell_execute.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include "monitor.h"
 #include "../lib/resolve_path.h"
 
@@ -67,7 +64,7 @@ public:
         trayBmp(getResourceImage(L"RTS_tray_24x24")) //use a 24x24 bitmap for perfect fit
 #endif
     {
-        Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconObject::OnDoubleClick), nullptr, this);
+        Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxEventHandler(TrayIconObject::OnDoubleClick), nullptr, this);
         setMode(mode);
     }
 
@@ -122,24 +119,29 @@ private:
     {
         CONTEXT_RESTORE = 1, //wxWidgets: "A MenuItem ID of zero does not work under Mac"
         CONTEXT_SHOW_ERROR,
-        CONTEXT_ABORT = wxID_EXIT,
-        CONTEXT_ABOUT = wxID_ABOUT
+        CONTEXT_ABORT = wxID_EXIT
     };
 
     virtual wxMenu* CreatePopupMenu()
     {
         wxMenu* contextMenu = new wxMenu;
+
+        wxMenuItem* defaultItem = nullptr;
         switch (mode)
         {
             case TRAY_MODE_ACTIVE:
             case TRAY_MODE_WAITING:
-                contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
+                defaultItem = new wxMenuItem(contextMenu, CONTEXT_RESTORE, _("&Restore"));
                 break;
             case TRAY_MODE_ERROR:
-                contextMenu->Append(CONTEXT_SHOW_ERROR, _("&Show error"));
+                defaultItem = new wxMenuItem(contextMenu, CONTEXT_SHOW_ERROR, _("&Show error"));
                 break;
         }
-        contextMenu->Append(CONTEXT_ABOUT, _("&About"));
+#ifdef ZEN_WIN //no wxMenuItem::SetFont() on Linux and OS X: wasn't wxWidgets supposed to be *portable* at some point in time?????
+        defaultItem->SetFont(wxNORMAL_FONT->Bold());
+#endif
+        contextMenu->Append(defaultItem);
+
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_ABORT, _("&Exit"));
         //event handling
@@ -163,34 +165,10 @@ private:
             case CONTEXT_SHOW_ERROR:
                 showErrorMsgRequested = true;
                 break;
-
-            case CONTEXT_ABOUT:
-            {
-                //ATTENTION: the modal dialog below does NOT disable all GUI input, e.g. user may still double-click on tray icon
-                //no crash in this context, but the double-click is remembered and executed after the modal dialog quits
-                SetEvtHandlerEnabled(false);
-                ZEN_ON_SCOPE_EXIT(SetEvtHandlerEnabled(true));
-
-                wxString build = __TDATE__;
-#if wxUSE_UNICODE
-                build += L" - Unicode";
-#else
-                build += L" - ANSI";
-#endif //wxUSE_UNICODE
-
-                if (zen::is64BitBuild)
-                    build += L" x64";
-                else
-                    build += L" x86";
-                assert_static(zen::is32BitBuild || zen::is64BitBuild);
-
-                wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build), _("About"), wxOK);
-            }
-            break;
         }
     }
 
-    void OnDoubleClick(wxCommandEvent& event)
+    void OnDoubleClick(wxEvent& event)
     {
         switch (mode)
         {
@@ -262,85 +240,6 @@ private:
 };
 
 //##############################################################################################################
-
-//#define ERROR_DLG_ENABLE_TIMEOUT
-class ErrorDlgWithTimeout : public ErrorDlgGenerated
-{
-public:
-    ErrorDlgWithTimeout(wxWindow* parent, const wxString& messageText) :
-        ErrorDlgGenerated(parent)
-#ifdef ERROR_DLG_ENABLE_TIMEOUT
-        , secondsLeft(15) //give user some time to read msg!?
-#endif
-    {
-#ifdef ZEN_WIN
-        new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
-        setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonRetry).setCancel(m_buttonCancel));
-
-        m_bitmap10->SetBitmap(getResourceImage(L"msg_error"));
-        m_textCtrl8->SetValue(messageText);
-
-#ifdef ERROR_DLG_ENABLE_TIMEOUT
-        //count down X seconds then automatically press "retry"
-        timer.Connect(wxEVT_TIMER, wxEventHandler(ErrorDlgWithTimeout::OnTimerEvent), nullptr, this);
-        timer.Start(1000); //timer interval in ms
-        updateButtonLabel();
-#endif
-        Fit(); //child-element widths have changed: image was set
-        m_buttonRetry->SetFocus();
-    }
-
-    enum ButtonPressed
-    {
-        BUTTON_RETRY,
-        BUTTON_ABORT
-    };
-
-private:
-#ifdef ERROR_DLG_ENABLE_TIMEOUT
-    void OnTimerEvent(wxEvent& event)
-    {
-        if (secondsLeft <= 0)
-        {
-            EndModal(BUTTON_RETRY);
-            return;
-        }
-        --secondsLeft;
-        updateButtonLabel();
-    }
-
-    void updateButtonLabel()
-    {
-        m_buttonRetry->SetLabel(_("&Retry") + L" (" + replaceCpy(_P("1 sec", "%x sec", secondsLeft), L"%x", numberTo<std::wstring>(secondsLeft)) + L")");
-        Layout();
-    }
-#endif
-
-    void OnClose(wxCloseEvent&   event) { EndModal(BUTTON_ABORT); }
-    void OnRetry(wxCommandEvent& event) { EndModal(BUTTON_RETRY); }
-    void OnAbort(wxCommandEvent& event) { EndModal(BUTTON_ABORT); }
-
-#ifdef ERROR_DLG_ENABLE_TIMEOUT
-    int secondsLeft;
-    wxTimer timer;
-#endif
-};
-
-
-bool reportErrorTimeout(const std::wstring& msg) //return true: "retry"; false: "abort"
-{
-    ErrorDlgWithTimeout errorDlg(nullptr, msg);
-    errorDlg.Raise();
-    switch (static_cast<ErrorDlgWithTimeout::ButtonPressed>(errorDlg.ShowModal()))
-    {
-        case ErrorDlgWithTimeout::BUTTON_RETRY:
-            return true;
-        case ErrorDlgWithTimeout::BUTTON_ABORT:
-            return false;
-    }
-    return false;
-}
 }
 
 
@@ -351,7 +250,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 
     if (dirNamesNonFmt.empty())
     {
-        wxMessageBox(_("A folder input field is empty."), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR);
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("A folder input field is empty.")));
         return SHOW_GUI;
     }
 
@@ -360,7 +259,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 
     if (cmdLine.empty())
     {
-        wxMessageBox(_("Invalid command line:") + L" \"\"", L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR);
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Incorrect command line:") + L" \"\""));
         return SHOW_GUI;
     }
 
@@ -385,7 +284,15 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
         virtual void executeExternalCommand()
         {
             auto cmdLineExp = expandMacros(cmdLine_);
-            zen::shellExecute(cmdLineExp, zen::EXEC_TYPE_SYNC);
+            try
+            {
+                shellExecute2(cmdLineExp, EXEC_TYPE_SYNC); //throw FileError
+            }
+            catch (const FileError& e)
+            {
+                warn_static("fix dialog hiding on OSX !!")
+                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+            }
         }
 
         virtual void requestUiRefresh()
@@ -406,12 +313,14 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 trayIcon.doUiRefreshNow(); //throw AbortMonitoring
 
                 if (trayIcon.getShowErrorRequested())
-                {
-                    if (reportErrorTimeout(msg)) //return true: "retry"; false: "abort"
-                        return;
-                    else
-                        throw AbortMonitoring(SHOW_GUI);
-                }
+                    switch (showConfirmationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().
+                                                   setDetailInstructions(msg), _("&Retry")))
+                    {
+                        case ConfirmationButton::DO_IT: //retry
+                            return;
+                        case ConfirmationButton::CANCEL:
+                            throw AbortMonitoring(SHOW_GUI);
+                    }
                 boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
             }
         }

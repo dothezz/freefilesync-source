@@ -7,9 +7,11 @@
 #include "folder_history_box.h"
 #include <list>
 #include <zen/scope_guard.h>
-//#include <wx/scrolwin.h>
 #include <wx+/string_conv.h>
 #include "../lib/resolve_path.h"
+#ifdef ZEN_LINUX
+#include <gtk/gtk.h>
+#endif
 
 using namespace zen;
 
@@ -46,6 +48,16 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
 
     On OS attaching to wxEVT_LEFT_DOWN leads to occasional crashes, especially when double-clicking
     */
+#endif
+
+#ifdef ZEN_LINUX
+    //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"
+    //1. this format's implementation is a mess: http://www.lephpfacile.com/manuel-php-gtk/tutorials.filednd.urilist.php
+    //2. even if we handle "drag-data-received" for "text/uri-list" this doesn't consider logic in dirname.cpp
+    //=> disable all drop events on the text control (disables text drop, too, but not a big loss)
+    //=> all drops are nicely propagated as regular file drop events like they should have been in the first place!
+    if (GtkWidget* widget = GetConnectWidget())
+        ::gtk_drag_dest_unset(widget);
 #endif
 }
 

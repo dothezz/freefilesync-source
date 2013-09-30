@@ -21,25 +21,25 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Expert
-settings</FONT></FONT></H2>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Expert Settings</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
 has a number of special purpose settings that can only be accessed
-directly via the global configuration file &quot;<FONT FACE="Courier New, monospace">GlobalSettings.xml</FONT>&quot;.
-To locate this file enter &quot;<FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT>&quot;
-in the Windows Explorer address bar or go to the FreeFileSync
+directly via the global configuration file <FONT FACE="Courier New, monospace">GlobalSettings.xml</FONT>.
+To locate this file enter <FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT> in the Windows Explorer address bar or go to the FreeFileSync
 installation folder if you are using the portable installation.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%; height: 0.04cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">&lt;?xml
-	version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;<BR>&lt;FreeFileSync
-	XmlType=&quot;GLOBAL&quot;&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&lt;Shared&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>FileTimeTolerance</B>
-	Seconds=&quot;2&quot;/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>RunWithBackgroundPriority</B>
-	Enabled=&quot;false&quot;/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>LockDirectoriesDuringSync</B>
-	Enabled=&quot;true&quot;/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>VerifyCopiedFiles</B>
-	Enabled=&quot;false&quot;/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>LastSyncsLogSizeMax</B>
-	Bytes=&quot;100000&quot;/&gt;</FONT></P>
+
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm">
+	<FONT FACE="Courier New, monospace">
+	&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;<BR>
+	&lt;FreeFileSync XmlType=&quot;GLOBAL&quot;&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;Shared&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>FileTimeTolerance</B> Seconds=&quot;2&quot;/&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>RunWithBackgroundPriority</B> Enabled=&quot;false&quot;/&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>LockDirectoriesDuringSync</B> Enabled=&quot;true&quot;/&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>VerifyCopiedFiles</B> Enabled=&quot;false&quot;/&gt;<BR>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<B>LastSyncsLogSizeMax</B> Bytes=&quot;100000&quot;/&gt;
+	</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -66,7 +66,7 @@ significantly slower synchronization speed.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>LockDirectoriesDuringSync:</B></FONT><BR><FONT FACE="Tahoma, sans-serif">In
 order to avoid race conditions of multiple FreeFileSync instances
 writing to the same folder at the same time, accesses are serialized
-by lock files (&quot;</FONT><FONT FACE="Courier New, monospace">sync.ffs_lock</FONT><FONT FACE="Tahoma, sans-serif">&quot;).
+by lock files (<FONT FACE="Courier New, monospace">sync.ffs_lock</FONT>).
 This allows to operate FreeFileSync with an arbitrary number of users
 in a network out of the box.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -83,8 +83,7 @@ destination successfully?</FONT></A></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>LastSyncsLogSizeMax:<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
-progress logs of the most recent synchronizations (for both GUI and
-batch jobs) are collected automatically in the file &quot;</FONT><FONT FACE="Courier New, monospace">LastSyncs.log</FONT><FONT FACE="Tahoma, sans-serif">&quot;.
+progress logs of the most recent synchronizations (for both GUI and batch jobs) are collected automatically in the file <FONT FACE="Courier New, monospace">LastSyncs.log</FONT>.
 The maximum size of this log file can be set here.</FONT></P>
 </BODY>
 </HTML>

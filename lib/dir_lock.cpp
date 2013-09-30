@@ -443,7 +443,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             const UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError
 
             if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !now.isValid())
-                throw FileError(L"System Timer failed!"); //no i18n: "should" never throw ;)
+                throw FileError(L"System timer failed."); //no i18n: "should" never throw ;)
 
             if (fileSizeNew != fileSizeOld) //received life sign from lock
             {

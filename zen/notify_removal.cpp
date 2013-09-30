@@ -82,7 +82,7 @@ MessageProvider::MessageProvider() :
     windowHandle(nullptr)
 {
     if (!hMainModule)
-        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"GetModuleHandle", getLastError()));
+        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"GetModuleHandle", getLastError()));
 
     //register the main window class
     WNDCLASS wc = {};
@@ -91,7 +91,7 @@ MessageProvider::MessageProvider() :
     wc.lpszClassName = dummyWindowName;
 
     if (::RegisterClass(&wc) == 0)
-        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"RegisterClass", getLastError()));
+        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"RegisterClass", getLastError()));
 
     ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(dummyWindowName, hMainModule); });
 
@@ -108,7 +108,7 @@ MessageProvider::MessageProvider() :
                                   hMainModule, //HINSTANCE hInstance,
                                   nullptr);    //LPVOID lpParam
     if (!windowHandle)
-        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"CreateWindow", getLastError()));
+        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"CreateWindow", getLastError()));
 
     guardClass.dismiss();
 }
@@ -156,7 +156,7 @@ public:
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                 lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                 lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                throw zen::FileError(_("Failed to register to receive system messages."), formatSystemError(L"RegisterDeviceNotification", lastError));
+                throw zen::FileError(_("Unable to register to receive system messages."), formatSystemError(L"RegisterDeviceNotification", lastError));
         }
 
         guardProvider.dismiss();

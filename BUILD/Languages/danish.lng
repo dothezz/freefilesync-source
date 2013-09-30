@@ -2,10 +2,27 @@
 	<language>Dansk</language>
 	<translator>Regmos</translator>
 	<locale>da_DK</locale>
-	<flag_image>flag_denmark.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_denmark.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Begge sider ændret siden sidste synkronisering.</target>
@@ -292,8 +309,8 @@
 <source>/sec</source>
 <target>/sek</target>
 
-<source>%x items</source>
-<target>%x emner</target>
+<source>%x items/sec</source>
+<target>%x emner/sek</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Indstillingsfilen %x er kun delvist indlæst.</target>
@@ -322,10 +339,10 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Volumennavnet %x er ikke del af filstien %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
+<source>Stop requested: Waiting for current operation to finish...</source>
 <target>Afbrydelse: Venter på aktuel opgave afsluttes...</target>
 
-<source>Failure to create timestamp for versioning:</source>
+<source>Unable to create timestamp for versioning:</source>
 <target>Kunne ikke oprette versioneringstid:</target>
 
 <source>Cannot read the following XML elements:</source>
@@ -343,7 +360,7 @@
 <source>&Program</source>
 <target>&Filer</target>
 
-<source>&Content</source>
+<source>&View help</source>
 <target>&Åben hjælp</target>
 
 <source>&About</source>
@@ -367,8 +384,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Importer en .ffs_batchfil (Filer > Åben...) for at komme igang.</target>
 
-<source>Folders to watch</source>
-<target>Jobbets mapper</target>
+<source>Folders to watch:</source>
+<target>Jobbets mapper:</target>
 
 <source>Add folder</source>
 <target>Tilføj mappe</target>
@@ -382,11 +399,14 @@
 <source>Select a folder</source>
 <target>Vælg en mappe</target>
 
-<source>Idle time [seconds]</source>
-<target>Køres når computeren har ledige resourcer  i [sek.]</target>
+<source>Idle time (in seconds):</source>
+<target>Efter PC tomgang i (sek)</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tid imellem sidst fundne ændring og udførsel</target>
+
+<source>Command line:</source>
+<target>Kommando:</target>
 
 <source>
 The command is triggered if:
@@ -399,17 +419,14 @@ Kommandoen udføres hvis:
 - nye mapper findes (f.eks USB nøgle)
 </target>
 
-<source>Start</source>
-<target>Start</target>
+<source>&Start</source>
+<target>&Start</target>
 
 <source>&Retry</source>
 <target>&Prøv igen</target>
 
 <source>Cancel</source>
 <target>Annuller</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>Realtids synk - automatisk synkronisering</target>
 
 <source>Build: %x</source>
 <target>Udgivet: %x</target>
@@ -419,6 +436,9 @@ Kommandoen udføres hvis:
 
 <source>All files</source>
 <target>Alle filer</target>
+
+<source>Automated Synchronization</source>
+<target>Automatisk synkronisering</target>
 
 <source>Directory monitoring active</source>
 <target>Mappeovervågning aktiv</target>
@@ -435,7 +455,7 @@ Kommandoen udføres hvis:
 <source>&Exit</source>
 <target>&Luk</target>
 
-<source>Invalid command line:</source>
+<source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
 
 <source>File content</source>
@@ -498,8 +518,8 @@ Kommandoen udføres hvis:
 <source>Target folder input field must not be empty.</source>
 <target>Destinationsmappen skal angives.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Mappe til versionering skal angives.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Angiv mappe til versionering.</target>
 
 <source>Source folder %x not found.</source>
 <target>Kildemappen %x blev ikke fundet.</target>
@@ -537,7 +557,7 @@ Kommandoen udføres hvis:
 <source>job name</source>
 <target>Jobnavn</target>
 
-<source>Synchronization aborted</source>
+<source>Synchronization stopped</source>
 <target>Synkronisering afbrudt</target>
 
 <source>Synchronization completed with errors</source>
@@ -555,14 +575,11 @@ Kommandoen udføres hvis:
 <source>Saving log file %x...</source>
 <target>Gemmer rapport %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Klik "Skift" for at løse problemerne fra hovedvinduet.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>Skift til FreeFileSyncs hovedvindue for at løse problemet.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
+<source>Switching to FreeFileSync's main window</source>
 <target>Skifter til hovedvinduet</target>
-
-<source>Retrying operation after error:</source>
-<target>Prøver igen efter fejl:</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Opdatering tilgængelig:</target>
@@ -570,8 +587,8 @@ Kommandoen udføres hvis:
 <source>Download now?</source>
 <target>Download nu?</target>
 
-<source>New version found</source>
-<target>Opdatering fundet</target>
+<source>Check for Program Updates</source>
+<target>Søg efter opdatering</target>
 
 <source>&Download</source>
 <target>&Download</target>
@@ -639,20 +656,20 @@ Kommandoen udføres hvis:
 <source>Hibernate</source>
 <target>Dvale</target>
 
-<source>Selected variant:</source>
-<target>Valgt variant:</target>
-
-<source>Select alternate comparison settings</source>
+<source>Alternate comparison settings</source>
 <target>Tilpas analyse</target>
 
-<source>Select alternate synchronization settings</source>
+<source>Alternate synchronization settings</source>
 <target>Tilpas synkronisering</target>
 
-<source>Filter is active</source>
-<target>Aktivt filter</target>
+<source>Local filter</source>
+<target>Lokalt filter</target>
 
-<source>No filter selected</source>
-<target>Intet filter valgt</target>
+<source>Active</source>
+<target>Aktiv</target>
+
+<source>None</source>
+<target>Ingen</target>
 
 <source>Remove alternate settings</source>
 <target>Fjern tilpassede indstillinger</target>
@@ -665,6 +682,15 @@ Kommandoen udføres hvis:
 
 <source>Paste</source>
 <target>Indsæt</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Tilpas analyse</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Tilpas synkronisering</target>
+
+<source>Local Filter</source>
+<target>Lokalt filter</target>
 
 <source>&New</source>
 <target>&Ny</target>
@@ -681,14 +707,17 @@ Kommandoen udføres hvis:
 <source>2. &Synchronize</source>
 <target>2. &Synkroniser</target>
 
+<source>&Global settings</source>
+<target>&Programindstillinger</target>
+
 <source>&Language</source>
 <target>&Sprog</target>
 
+<source>&Find...</source>
+<target>S&øg</target>
+
 <source>&Export file list...</source>
 <target>&Eksporter filliste...</target>
-
-<source>&Global settings</source>
-<target>&Programindstillinger</target>
 
 <source>&Tools</source>
 <target>&Værktøj</target>
@@ -699,20 +728,14 @@ Kommandoen udføres hvis:
 <source>Check &automatically once a week</source>
 <target>Søg &automatisk en gang om ugen</target>
 
-<source>Check for new &version</source>
-<target>&Søg efter opdatering</target>
+<source>&Check for new version</source>
+<target>Søg &efter opdatering</target>
 
 <source>Compare</source>
-<target>Analyser</target>
-
-<source>Comparison settings</source>
-<target>Analyseindstillinger</target>
-
-<source>Synchronization settings</source>
-<target>Synkroniseringsindstillinger</target>
+<target>Analysér</target>
 
 <source>Synchronize</source>
-<target>Synkroniser</target>
+<target>Synkronisér</target>
 
 <source>Add folder pair</source>
 <target>Tilføj mappepar</target>
@@ -722,6 +745,15 @@ Kommandoen udføres hvis:
 
 <source>Swap sides</source>
 <target>Byt side</target>
+
+<source>Close search bar</source>
+<target>Luk søgelinie</target>
+
+<source>Find:</source>
+<target>Søg:</target>
+
+<source>Match case</source>
+<target>Versalfølsom (a/A)</target>
 
 <source>Save as batch job</source>
 <target>Gem som batchfil</target>
@@ -744,74 +776,20 @@ Kommandoen udføres hvis:
 <source>Total bytes to copy</source>
 <target>Antal bytes der kopieres</target>
 
-<source>Items found:</source>
-<target>Emner fundet:</target>
+<source>Select a variant:</source>
+<target>Vælg metode:</target>
 
-<source>Speed:</source>
-<target>Hastighed:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Genkend ens filer efter filtid og størrelse.</target>
 
-<source>Time remaining:</source>
-<target>Resterende tid:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Genkend ens filer efter indhold.</target>
 
-<source>Time elapsed:</source>
-<target>Brugt tid:</target>
+<source>Symbolic links:</source>
+<target>Symbolske link:</target>
 
-<source>Synchronizing...</source>
-<target>Synkroniserer...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimér til uret</target>
-
-<source>On completion</source>
-<target>Ved gennemført</target>
-
-<source>Close</source>
-<target>Luk</target>
-
-<source>&Pause</source>
-<target>&Pause</target>
-
-<source>Variant</source>
-<target>Jobtype</target>
-
-<source>Statistics</source>
-<target>Statistik</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Vis ikke igen</target>
-
-<source>Select a variant</source>
-<target>Vælg metode</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Filer betragtes som ens hvis
-     - senest ændret
-     - filstørrelse
-er identisk
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Filer betragtes som ens hvis
-     - filindhold
-er identisk
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Symlink håndtering</target>
-
-<source>Help</source>
-<target>Hjælp</target>
+<source>More information</source>
+<target>Mere information</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -819,10 +797,10 @@ er identisk
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Find og udbred ændringer på begge sider. Sletninger, omdøbninger og konflikter findes automatisk i en database.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
 <target>Spejl venstre mappe. Efter synkronisering er højre mappe en kopi af venstre.</target>
 
-<source>Copy new or updated files to right folder.</source>
+<source>Copy new and updated files to the right folder.</source>
 <target>Kopier nye og opdaterede filer til højre mappe.</target>
 
 <source>Configure your own synchronization rules.</source>
@@ -834,23 +812,8 @@ er identisk
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Kræver databasefiler. Ikke understøttet i alle filsystemer</target>
 
-<source>Error handling</source>
-<target>Fejlhåndtering</target>
-
-<source>Ignore</source>
-<target>Ignorer</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skjul fejlbeskeder og advarsler</target>
-
-<source>Pop-up</source>
-<target>Besked</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Vis fejlbeskeder og advarsler</target>
-
-<source>Deletion handling</source>
-<target>Sletning</target>
+<source>Delete files:</source>
+<target>Filsletning:</target>
 
 <source>Permanent</source>
 <target>Permanent</target>
@@ -873,32 +836,170 @@ er identisk
 <source>Naming convention:</source>
 <target>Navneregler:</target>
 
-<source>Batch job</source>
-<target>Batchfil</target>
+<source>Show examples</source>
+<target>Vis eksempler</target>
+
+<source>Handle errors:</source>
+<target>Fejlhåndtering:</target>
+
+<source>Ignore</source>
+<target>Ignorer</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skjul fejlbeskeder og advarsler</target>
+
+<source>Pop-up</source>
+<target>Besked</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Vis fejlbeskeder og advarsler</target>
+
+<source>On completion:</source>
+<target>Ved gennemført:</target>
+
+<source>Start synchronization now?</source>
+<target>Synkroniser nu?</target>
+
+<source>Variant:</source>
+<target>Jobtype:</target>
+
+<source>Statistics</source>
+<target>Statistik</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Vis ikke igen</target>
+
+<source>Items found:</source>
+<target>Emner fundet:</target>
+
+<source>Speed:</source>
+<target>Hastighed:</target>
+
+<source>Time remaining:</source>
+<target>Resterende tid:</target>
+
+<source>Time elapsed:</source>
+<target>Brugt tid:</target>
+
+<source>Synchronizing...</source>
+<target>Synkroniserer...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimér til uret</target>
+
+<source>Close</source>
+<target>Luk</target>
+
+<source>&Pause</source>
+<target>&Pause</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Opret batchfil til automatisk synkronisering. Start ved at dobbeltklikke på filen eller planlæg via opgavestyring: %x</target>
 
-<source>Exit</source>
-<target>Luk</target>
-
-<source>Abort synchronization on first error</source>
+<source>Stop synchronization at first error</source>
 <target>Stop synkronisering ved første fejl</target>
 
 <source>Show progress dialog</source>
 <target>Vis fremskridt</target>
 
-<source>Save log</source>
-<target>Gem rapport</target>
+<source>Save log:</source>
+<target>Gem log:</target>
 
-<source>Select folder to save log files</source>
-<target>Vælg mappe til rapporter</target>
-
-<source>Limit</source>
-<target>Antal</target>
+<source>Limit:</source>
+<target>Højst:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Begræns antal rapporter</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Hvordan oprettes en batchfil?</target>
+
+<source>&Recycle bin</source>
+<target>&Papirkurv</target>
+
+<source>Delete on both sides</source>
+<target>Slet på begge sider</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Slet på begge sider selvom selvom filen kun er valgt på en side</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
+
+<source>Include:</source>
+<target>Inkludér:</target>
+
+<source>Exclude:</source>
+<target>Ekskludér:</target>
+
+<source>Time span:</source>
+<target>Interval:</target>
+
+<source>File size:</source>
+<target>Filstørrelse:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maksimum:</target>
+
+<source>&Clear</source>
+<target>&Ryd</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Disse indstillinger gælder alle synkroniseringer.</target>
+
+<source>Fail-safe file copy</source>
+<target>Sikker filkopiering</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>Kopiér til midlertidig fil (*.ffs_tmp) før overskrivning. Sikrer processen ved alvorlige fejl.</target>
+
+<source>(recommended)</source>
+<target>(anbefalet)</target>
+
+<source>Copy locked files</source>
+<target>Kopier låste filer</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Kopiér delte eller låste filer med VSS kopiering.</target>
+
+<source>(requires administrator rights)</source>
+<target>(administrator)</target>
+
+<source>Copy file access permissions</source>
+<target>Kopier adgangstilladelser</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Overfør fil og mappetilladelser.</target>
+
+<source>Automatic retry on error:</source>
+<target>Antal forsøg ved fejl:</target>
+
+<source>Retry count:</source>
+<target>Antal forsøg:</target>
+
+<source>Delay (in seconds):</source>
+<target>Forsinkelse (sek):</target>
+
+<source>Customize context menu:</source>
+<target>Tilpas kontekstmenu:</target>
+
+<source>Description</source>
+<target>Beskrivelse</target>
+
+<source>Restore hidden windows</source>
+<target>Gendan skjulte vinduer</target>
+
+<source>&Default</source>
+<target>S&tandard</target>
 
 <source>Source code written in C++ using:</source>
 <target>Kildekoden er skrevet i C++ med hjælp fra:</target>
@@ -908,9 +1009,6 @@ er identisk
 
 <source>Donate with PayPal</source>
 <target>Donér med PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Tak for oversættelse:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Kritik og forslag er meget velkomne</target>
@@ -924,101 +1022,26 @@ er identisk
 <source>Published under the GNU General Public License</source>
 <target>Udgivet under GNU General Public Licence</target>
 
-<source>Delete on both sides</source>
-<target>Slet på begge sider</target>
+<source>Many thanks for localization:</source>
+<target>Tak for oversættelse:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Slet på begge sider selvom selvom filen kun er valgt på en side</target>
+<source>Save as Batch Job</source>
+<target>Gem som batchfil</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Filer synkroniseres kun hvis de opfyldet alle filterregler.
-Bemærk: Filstier skal relatere til kildemappen.
-</target>
+<source>Delete Items</source>
+<target>Slet emner</target>
 
-<source>Include</source>
-<target>Inkluder</target>
-
-<source>Exclude</source>
-<target>Ekskluder</target>
-
-<source>Time span</source>
-<target>Tidsinterval</target>
-
-<source>File size</source>
-<target>Filstørrelse</target>
-
-<source>Minimum</source>
-<target>Minimum</target>
-
-<source>Maximum</source>
-<target>Maksimum</target>
-
-<source>&Clear</source>
-<target>&Ryd</target>
-
-<source>Global settings</source>
+<source>Global Settings</source>
 <target>Programindstillinger</target>
 
-<source>Fail-safe file copy</source>
-<target>Sikker filkopiering</target>
+<source>Select Time Span</source>
+<target>Vælg tidsinterval</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Kopiér til midlertidig fil (*.ffs_tmp) før omdøbning. Sikrer processen ved alvorlige fejl.</target>
-
-<source>Copy locked files</source>
-<target>Kopier låste filer</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopiér delte eller låste filer med VSS kopiering (administrator)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopier adgangstilladelser</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Overfør fil og mappetilladelser (administrator)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Gendan skjulte dialoger</target>
-
-<source>External applications</source>
-<target>Eksterne programmer</target>
-
-<source>Description</source>
-<target>Beskrivelse</target>
-
-<source>&Default</source>
-<target>S&tandard</target>
-
-<source>Find what:</source>
-<target>Søg efter:</target>
-
-<source>Match case</source>
-<target>Versalfølsom (a/A)</target>
-
-<source>&Find next</source>
-<target>&Find næste</target>
-
-<source>Start synchronization</source>
-<target>Start synkronisering</target>
-
-<source>Delete</source>
-<target>Slet</target>
-
-<source>Configure filter</source>
-<target>Indstil filter</target>
+<source>Folder Pairs</source>
+<target>Mappepar</target>
 
 <source>Find</source>
 <target>Søg</target>
-
-<source>Select time span</source>
-<target>Vælg tidsinterval</target>
-
-<source>Folder pairs</source>
-<target>Mappepar</target>
 
 <source>Overview</source>
 <target>Oversigt</target>
@@ -1026,13 +1049,13 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Configuration</source>
 <target>Indstilling</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>Hovedlinie</target>
 
-<source>Filter files</source>
+<source>Filter Files</source>
 <target>Filtrer filer</target>
 
-<source>Select view</source>
+<source>Select View</source>
 <target>Tilpas visning</target>
 
 <source>Open...</source>
@@ -1044,14 +1067,14 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Compare both sides</source>
 <target>Analyser begge sider</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vil du køre kommandoen %y for 1 emne?</pluralform>
-<pluralform>Vil du køre kommandoen %y for %x emner?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Analyseindstillinger</target>
+
+<source>Synchronization settings</source>
+<target>Synkroniseringsindstillinger</target>
+
+<source>Start synchronization</source>
+<target>Start synkronisering</target>
 
 <source>Confirm</source>
 <target>Bekræft</target>
@@ -1089,12 +1112,6 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Set direction:</source>
 <target>Retning:</target>
 
-<source>Exclude temporarily</source>
-<target>Ekskluder midlertidigt</target>
-
-<source>Include temporarily</source>
-<target>Inkluder midlertidigt</target>
-
 <source>multiple selection</source>
 <target>vælg flere</target>
 
@@ -1103,6 +1120,15 @@ Bemærk: Filstier skal relatere til kildemappen.
 
 <source>Exclude via filter:</source>
 <target>Ekskluder m. filter:</target>
+
+<source>Exclude temporarily</source>
+<target>Ekskluder midlertidigt</target>
+
+<source>Include temporarily</source>
+<target>Inkluder midlertidigt</target>
+
+<source>Delete</source>
+<target>Slet</target>
 
 <source>Include all</source>
 <target>Vælg alle</target>
@@ -1152,6 +1178,9 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Never save &changes</source>
 <target>Gem &aldrig ændringer</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>Show files that exist on left side only</source>
 <target>Vis filer der kun findes på venstre side</target>
 
@@ -1197,11 +1226,17 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Set as default</source>
 <target>Sæt som standard</target>
 
-<source>Operation aborted</source>
-<target>Handling afbrudt</target>
-
 <source>All folders are in sync</source>
 <target>Alle mapper er synkrone</target>
+
+<source>Synchronization Settings</source>
+<target>Synkroniseringsindstillinger</target>
+
+<source>Comparison Settings</source>
+<target>Analyseindstillinger</target>
+
+<source>Cannot find %x</source>
+<target>Kan ikke finde %x</target>
 
 <source>Comma-separated values</source>
 <target>Kommaopdelte værdier</target>
@@ -1218,17 +1253,14 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>&Ignore</source>
 <target>&Ignorer</target>
 
-<source>Fatal Error</source>
-<target>Fatal fejl</target>
+<source>Serious Error</source>
+<target>Kritisk fejl</target>
 
 <source>&Don't show this warning again</source>
 <target>&Vis ikke igen</target>
 
 <source>&Switch</source>
 <target>&Skift</target>
-
-<source>Question</source>
-<target>Spørgsmål</target>
 
 <source>&Yes</source>
 <target>&Ja</target>
@@ -1251,7 +1283,7 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>Initializing...</source>
 <target>Forbereder...</target>
 
-<source>Aborted</source>
+<source>Stopped</source>
 <target>Afbrudt</target>
 
 <source>Completed</source>
@@ -1262,12 +1294,6 @@ Bemærk: Filstier skal relatere til kildemappen.
 
 <source>Log</source>
 <target>Log</target>
-
-<source>Cannot find %x</source>
-<target>Kan ikke finde %x</target>
-
-<source>Inactive</source>
-<target>Inaktiv</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1293,9 +1319,6 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filter</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1305,6 +1328,9 @@ Bemærk: Filstier skal relatere til kildemappen.
 <pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
 </target>
 
+<source>Move</source>
+<target>Flyt</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1313,6 +1339,9 @@ Bemærk: Filstier skal relatere til kildemappen.
 <pluralform>Vil du slette følgende emne?</pluralform>
 <pluralform>Vil du slette følgende %x emner?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Ekskludér</target>
 
 <source>Direct</source>
 <target>Direkte</target>
@@ -1338,8 +1367,8 @@ Bemærk: Filstier skal relatere til kildemappen.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>Modsat sides pendant til %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Vis skjulte advarsler og dialoger igen?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Gendan skjulte vinduer og advarsler?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Efterlad som uløst konflikt</target>
@@ -1464,14 +1493,14 @@ Bemærk: Filstier skal relatere til kildemappen.
 <pluralform>%x dage</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Kunne ikke registrere modtagelse af systembeskeder</target>
+<source>Unable to register to receive system messages.</source>
+<target>Kunne ikke registrere modtagelse af systembeskeder.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Kan ikke sætte %x privilegier.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Kunne ikke suspendere systemets standby funktion.</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Kunne ikke ophæve standby.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Kan ikke ændre I/O prioriteter.</target>

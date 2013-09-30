@@ -25,7 +25,7 @@ Shadow Copy Service <SPAN STYLE="font-weight: normal">(Windows only)</SPAN></FON
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
 supports copying locked or shared files by creating a Volume Shadow
 Copy of the source drive. This feature can be configured via </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Menu
-&rarr; Advanced &rarr; Global settings: Copy locked files</B></SPAN></FONT><FONT FACE="Tahoma, sans-serif">.</FONT></P>
+&rarr; Tools &rarr; Global settings: Copy locked files</B></SPAN></FONT><FONT FACE="Tahoma, sans-serif">.</FONT></P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
@@ -40,16 +40,25 @@ Copy of the source drive. This feature can be configured via </FONT><FONT FACE="
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Troubleshooting</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If you
 experience problems using the Volume Shadow Copy Service a renewal of
-registration might help. Create and execute a *.cmd batch file with
-the follow content or enter directly via command line:</FONT></P>
+registration might help. Create and execute a cmd batch file and insert the following lines or enter directly via command line:</FONT></P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
-	<FONT FACE="Courier New, monospace">cd /d %windir%\system32<BR>Net
-	stop vss<BR>Net stop swprv<BR>regsvr32 ole32.dll<BR>regsvr32
-	oleaut32.dll<BR>regsvr32 vss_ps.dll<BR>Vssvc /register<BR>regsvr32
-	/i swprv.dll<BR>regsvr32 /i eventcls.dll<BR>regsvr32 es.dll<BR>regsvr32
-	stdprov.dll<BR>regsvr32 vssui.dll<BR>regsvr32 msxml.dll<BR>regsvr32
-	msxml3.dll<BR>regsvr32 msxml4.dll</FONT></P>
+	<FONT FACE="Courier New, monospace">
+	cd /d %windir%\system32<BR>
+	Net stop vss<BR>
+	Net stop swprv<BR>
+	regsvr32 ole32.dll<BR>
+	regsvr32 oleaut32.dll<BR>
+	regsvr32 vss_ps.dll<BR>
+	Vssvc /register<BR>
+	regsvr32 /i swprv.dll<BR>
+	regsvr32 /i eventcls.dll<BR>
+	regsvr32 es.dll<BR>
+	regsvr32 stdprov.dll<BR>
+	regsvr32 vssui.dll<BR>
+	regsvr32 msxml.dll<BR>
+	regsvr32 msxml3.dll<BR>
+	regsvr32 msxml4.dll</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P ALIGN=LEFT STYLE=" margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Reference:

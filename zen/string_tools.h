@@ -535,7 +535,7 @@ Num stringTo(const S& str, Int2Type<NUM_TYPE_OTHER>) //default string to number 
 {
     typedef typename GetCharType<S>::Type CharType;
     Num number = 0;
-    std::basic_istringstream<CharType>(copyStringTo<std::basic_string<CharType> >(str)) >> number;
+    std::basic_istringstream<CharType>(copyStringTo<std::basic_string<CharType>>(str)) >> number;
     return number;
 }
 

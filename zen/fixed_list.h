@@ -12,7 +12,7 @@
 namespace zen
 {
 //std::list(C++11) compatible class for inplace element construction supporting non-copyable/movable types
-//may be replaced by C++11 std::list when available
+//may be replaced by C++11 std::list when available...or never...
 template <class T>
 class FixedList
 {
@@ -48,7 +48,7 @@ public:
         ListIterator& operator++() { iter = iter->next; return *this; }
         inline friend bool operator==(const ListIterator& lhs, const ListIterator& rhs) { return lhs.iter == rhs.iter; }
         inline friend bool operator!=(const ListIterator& lhs, const ListIterator& rhs) { return !(lhs == rhs); }
-        U& operator* () { return iter->val; }
+        U& operator* () { return  iter->val; }
         U* operator->() { return &iter->val; }
     private:
         NodeT* iter;

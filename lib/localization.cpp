@@ -38,7 +38,7 @@ public:
 
     wxLanguage langId() const { return langId_; }
 
-    virtual std::wstring translate(const std::wstring& text)
+    virtual std::wstring translate(const std::wstring& text) override
     {
         //look for translation in buffer table
         auto it = transMapping.find(text);
@@ -47,16 +47,16 @@ public:
         return text; //fallback
     }
 
-    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n)
+    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) override
     {
         auto it = transMappingPl.find(std::make_pair(singular, plural));
         if (it != transMappingPl.end())
         {
             const size_t formNo = pluralParser->getForm(n);
             if (formNo < it->second.size())
-                return it->second[formNo];
+                return replaceCpy(it->second[formNo], L"%x", toGuiString(n));
         }
-        return n == 1 ? singular : plural; //fallback
+        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n)); //fallback
     }
 
 private:
@@ -87,27 +87,26 @@ FFSTranslation::FFSTranslation(const Zstring& filename, wxLanguage languageId) :
     lngfile::TranslationPluralMap transPluralInput;
     lngfile::parseLng(inputStream, header, transInput, transPluralInput); //throw ParsingError
 
-    for (lngfile::TranslationMap::const_iterator i = transInput.begin(); i != transInput.end(); ++i)
+    for (const auto& item : transInput)
     {
-        const std::wstring original    = utfCvrtTo<std::wstring>(i->first);
-        const std::wstring translation = utfCvrtTo<std::wstring>(i->second);
+        const std::wstring original    = utfCvrtTo<std::wstring>(item.first);
+        const std::wstring translation = utfCvrtTo<std::wstring>(item.second);
         transMapping.insert(std::make_pair(original, translation));
     }
 
-    for (lngfile::TranslationPluralMap::const_iterator i = transPluralInput.begin(); i != transPluralInput.end(); ++i)
+    for (const auto& item : transPluralInput)
     {
-        const std::wstring singular = utfCvrtTo<std::wstring>(i->first.first);
-        const std::wstring plural   = utfCvrtTo<std::wstring>(i->first.second);
-        const lngfile::PluralForms& plForms = i->second;
+        const std::wstring engSingular = utfCvrtTo<std::wstring>(item.first.first);
+        const std::wstring engPlural   = utfCvrtTo<std::wstring>(item.first.second);
 
         std::vector<std::wstring> plFormsWide;
-        for (lngfile::PluralForms::const_iterator j = plForms.begin(); j != plForms.end(); ++j)
-            plFormsWide.push_back(utfCvrtTo<std::wstring>(*j));
+        for (const std::string& pf : item.second)
+            plFormsWide.push_back(utfCvrtTo<std::wstring>(pf));
 
-        transMappingPl.insert(std::make_pair(std::make_pair(singular, plural), plFormsWide));
+        transMappingPl.insert(std::make_pair(std::make_pair(engSingular, engPlural), plFormsWide));
     }
 
-    pluralParser.reset(new parse_plural::PluralForm(header.pluralDefinition)); //throw parse_plural::ParsingError
+    pluralParser = make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
 }
 
 
@@ -124,15 +123,15 @@ public:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
-    virtual HandleError reportDirError (const std::wstring& msg)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
 private:
     std::vector<Zstring>& lngFiles_;
 };
 
 
-struct LessTranslation : public std::binary_function<ExistingTranslations::Entry, ExistingTranslations::Entry, bool>
+struct LessTranslation
 {
     bool operator()(const ExistingTranslations::Entry& lhs, const ExistingTranslations::Entry& rhs) const
     {
@@ -145,7 +144,7 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
                                        rhs.languageName.c_str(), //__in  LPCTSTR lpString2,
                                        static_cast<int>(rhs.languageName.size())); //__in  int cchCount2
         if (rv == 0)
-            throw std::runtime_error("Error comparing strings!");
+            throw std::runtime_error("Error comparing strings.");
         else
             return rv == CSTR_LESS_THAN; //convert to C-style string compare result
 
@@ -194,10 +193,11 @@ ExistingTranslations::ExistingTranslations()
     traverseFolder(zen::getResourceDir() +  Zstr("Languages"), //throw();
                    traverseCallback);
 
-    for (auto it = lngFiles.begin(); it != lngFiles.end(); ++it)
+    for (const Zstring& filename : lngFiles)
+    {
         try
         {
-            const std::string stream = loadBinStream<std::string>(utfCvrtTo<Zstring>(*it)); //throw FileError
+            const std::string stream = loadBinStream<std::string>(filename); //throw FileError
 
             lngfile::TransHeader lngHeader;
             lngfile::parseHeader(stream, lngHeader); //throw ParsingError
@@ -215,7 +215,7 @@ ExistingTranslations::ExistingTranslations()
                 ExistingTranslations::Entry newEntry;
                 newEntry.languageID     = locInfo->Language;
                 newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
-                newEntry.languageFile   = utfCvrtTo<std::wstring>(*it);
+                newEntry.languageFile   = utfCvrtTo<std::wstring>(filename);
                 newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
                 newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
                 locMapping.push_back(newEntry);
@@ -224,6 +224,7 @@ ExistingTranslations::ExistingTranslations()
         }
         catch (FileError&) { assert(false); }
         catch (lngfile::ParsingError&) { assert(false); } //better not show an error message here; scenario: batch jobs
+    }
 
     std::sort(locMapping.begin(), locMapping.end(), LessTranslation());
 }

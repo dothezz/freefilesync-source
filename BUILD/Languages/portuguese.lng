@@ -2,10 +2,16 @@
 	<language>Português</language>
 	<translator>Carlos Balseiro</translator>
 	<locale>pt_PT</locale>
-	<flag_image>flag_portugal.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_portugal.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>&Check</source>
+<target></target>
+
+<source>Retrying operation...</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Ambos os lados tiveram alterações desde a última sincronização.</target>
@@ -58,9 +64,6 @@
 <source>Cannot open file %x.</source>
 <target>Não é possível abrir o ficheiro %x.</target>
 
-<source>Error</source>
-<target>Erro</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Ficheiro %x não tem uma configuração válida.</target>
 
@@ -70,11 +73,11 @@
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
 <target>O ficheiro de configuração não deve conter configurações ao nível de par-directório quando os directórios são definidos pela linha de comandos.</target>
 
-<source>Warning</source>
-<target>Atenção</target>
-
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>Os directórios não podem ser definidos em mais do que um ficheiro de configuração.</target>
+
+<source>Command line</source>
+<target>Linha de comandos</target>
 
 <source>Syntax:</source>
 <target>Sintaxe:</target>
@@ -90,9 +93,6 @@
 
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Qualquer número de directórios alternativos para apenas um ficheiro de configuração.</target>
-
-<source>Command line</source>
-<target>Linha de comandos</target>
 
 <source>A folder input field is empty.</source>
 <target>Um dos campos de directório para comparar está vazio.</target>
@@ -292,8 +292,8 @@
 <source>/sec</source>
 <target>/seg</target>
 
-<source>%x items</source>
-<target>%x itens</target>
+<source>%x items/sec</source>
+<target>%x itens/seg</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Ficheiro de configuração %x carregado parcialmente.</target>
@@ -322,11 +322,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Nome de volume %x não faz parte do caminho do ficheiro %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Abortar pedido: À espera do fim da operação atual...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Paragem solicitada: À espera que termine a operação actual...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Falha ao criar selo temporal para versões anteriores:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Não é possível criar timestamp para controle de versões:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Não é possível ler os elementos XML:</target>
@@ -343,8 +343,8 @@
 <source>&Program</source>
 <target>&Programa</target>
 
-<source>&Content</source>
-<target>C&onteúdo</target>
+<source>&View help</source>
+<target>&Ver ajuda</target>
 
 <source>&About</source>
 <target>So&bre</target>
@@ -367,8 +367,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Para começar basta importar um ficheiro .ffs_batch.</target>
 
-<source>Folders to watch</source>
-<target>Pastas a observar</target>
+<source>Folders to watch:</source>
+<target>Pastas a verificar:</target>
 
 <source>Add folder</source>
 <target>Adicionar pasta</target>
@@ -382,11 +382,14 @@
 <source>Select a folder</source>
 <target>Selecione uma pasta</target>
 
-<source>Idle time [seconds]</source>
-<target>Tempo de espera [segundos]</target>
+<source>Idle time (in seconds):</source>
+<target>Tempo de espera (em segundos):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tempo de espera entre a última alteração detetada e a execução do comando</target>
+
+<source>Command line:</source>
+<target>Linha de comandos:</target>
 
 <source>
 The command is triggered if:
@@ -399,32 +402,29 @@ O comando é executado se:
 - forem detetadas novas pastas (p.e. pen USB)
 </target>
 
-<source>Start</source>
-<target>Iniciar</target>
-
-<source>&Retry</source>
-<target>&Tentar de Novo</target>
-
-<source>Cancel</source>
-<target>Cancelar</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Sincronização Automatizada</target>
-
-<source>Build: %x</source>
-<target>Build: %x</target>
+<source>&Start</source>
+<target>&Início</target>
 
 <source>About</source>
 <target>Sobre</target>
 
+<source>Build: %x</source>
+<target>Build: %x</target>
+
 <source>All files</source>
 <target>Todos os ficheiros</target>
+
+<source>Automated Synchronization</source>
+<target>Sincronização Automática</target>
 
 <source>Directory monitoring active</source>
 <target>Monitorização de directório activa</target>
 
 <source>Waiting until all directories are available...</source>
 <target>A aguardar que todos os directórios fiquem disponíveis...</target>
+
+<source>Error</source>
+<target>Erro</target>
 
 <source>&Restore</source>
 <target>&Restaurar</target>
@@ -435,8 +435,11 @@ O comando é executado se:
 <source>&Exit</source>
 <target>&Sair</target>
 
-<source>Invalid command line:</source>
-<target>Linha de comando inválida:</target>
+<source>Incorrect command line:</source>
+<target>Linha de comandos incorrecta:</target>
+
+<source>&Retry</source>
+<target>&Tentar de Novo</target>
 
 <source>File content</source>
 <target>Conteúdo do ficheiro</target>
@@ -498,8 +501,8 @@ O comando é executado se:
 <source>Target folder input field must not be empty.</source>
 <target>Campo de directório de destino não deve estar vazio.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Campo do directório para manter versões não deve estar vazio.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Introduza uma pasta de destino para o controlo de versões.</target>
 
 <source>Source folder %x not found.</source>
 <target>Directório %x não encontrado.</target>
@@ -537,8 +540,8 @@ O comando é executado se:
 <source>job name</source>
 <target>nome da tarefa</target>
 
-<source>Synchronization aborted</source>
-<target>Sincronização abortada</target>
+<source>Synchronization stopped</source>
+<target>Sincronização parada</target>
 
 <source>Synchronization completed with errors</source>
 <target>Sincronização completa com erros</target>
@@ -555,14 +558,38 @@ O comando é executado se:
 <source>Saving log file %x...</source>
 <target>A guardar ficheiro log %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Pressionar "Trocar" para resolver problemas com a interface principal do FreeFileSync.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>Pode mudar para a janela principal do FreeFileSync para resovler este problema.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>A mudar para o diálogo principal do FreeFileSync</target>
+<source>&Don't show this warning again</source>
+<target>&Não mostrar este aviso novamente</target>
 
-<source>Retrying operation after error:</source>
-<target>A tentar novamente a operação após erro:</target>
+<source>&Ignore</source>
+<target>&Ignorar</target>
+
+<source>&Switch</source>
+<target>&Trocar</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target>A mudar para a janela principal do FreeFileSync</target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>Repetir automaticamente dentro de 1 segundo...</pluralform>
+<pluralform>Repetir automaticamente dentro de %x segundos...</pluralform>
+</target>
+
+<source>&Ignore subsequent errors</source>
+<target>&Ignorar erros subsequentes</target>
+
+<source>Serious Error</source>
+<target>Erro Grave</target>
+
+<source>Check for Program Updates</source>
+<target>Procurar actualizações do programa</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Uma nova versão do FreeFileSync está disponível:</target>
@@ -570,17 +597,11 @@ O comando é executado se:
 <source>Download now?</source>
 <target>Fazer download agora?</target>
 
-<source>New version found</source>
-<target>Nova versão encontrada</target>
-
 <source>&Download</source>
 <target>&Download</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync está actualizado.</target>
-
-<source>Information</source>
-<target>Informação</target>
 
 <source>Unable to connect to sourceforge.net.</source>
 <target>Não é possível ligar a sourceforge.net.</target>
@@ -639,20 +660,20 @@ O comando é executado se:
 <source>Hibernate</source>
 <target>Hibernar</target>
 
-<source>Selected variant:</source>
-<target>Variante selecionada:</target>
+<source>Alternate comparison settings</source>
+<target>Definições de comparação alternativas</target>
 
-<source>Select alternate comparison settings</source>
-<target>Selecionar opções alternativas de comparação</target>
+<source>Alternate synchronization settings</source>
+<target>Definições de sincronização alternativas</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Selecionar opções alternativas de sincronização</target>
+<source>Local filter</source>
+<target>Filtro local</target>
 
-<source>Filter is active</source>
-<target>Filtro activo</target>
+<source>Active</source>
+<target>Activo</target>
 
-<source>No filter selected</source>
-<target>Nenhum filtro selecionado</target>
+<source>None</source>
+<target>Nenhum</target>
 
 <source>Remove alternate settings</source>
 <target>Remover opções alternativas</target>
@@ -665,6 +686,15 @@ O comando é executado se:
 
 <source>Paste</source>
 <target>Colar</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Definições de comparação alternativas</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Definições de sincronização alternativas</target>
+
+<source>Local Filter</source>
+<target>Filtro local</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -681,14 +711,17 @@ O comando é executado se:
 <source>2. &Synchronize</source>
 <target>2. &Sincronizar</target>
 
+<source>&Global settings</source>
+<target>&Opções</target>
+
 <source>&Language</source>
 <target>&Língua</target>
 
+<source>&Find...</source>
+<target>&Procurar...</target>
+
 <source>&Export file list...</source>
 <target>&Exportar lista de ficheiros...</target>
-
-<source>&Global settings</source>
-<target>&Opções</target>
 
 <source>&Tools</source>
 <target>&Ferramentas</target>
@@ -699,17 +732,14 @@ O comando é executado se:
 <source>Check &automatically once a week</source>
 <target>Verificar &automaticamente uma vez por semana</target>
 
-<source>Check for new &version</source>
-<target>Verificar nova &versão</target>
+<source>&Check for new version</source>
+<target>&Procurar por actualizações</target>
 
 <source>Compare</source>
 <target>Comparar</target>
 
-<source>Comparison settings</source>
-<target>Opções de comparação</target>
-
-<source>Synchronization settings</source>
-<target>Parametros de sincronização</target>
+<source>Cancel</source>
+<target>Cancelar</target>
 
 <source>Synchronize</source>
 <target>Sincronizar</target>
@@ -722,6 +752,15 @@ O comando é executado se:
 
 <source>Swap sides</source>
 <target>Trocar lados</target>
+
+<source>Close search bar</source>
+<target>Fechar barra de pesquisa</target>
+
+<source>Find:</source>
+<target>Procurar:</target>
+
+<source>Match case</source>
+<target>Correspondência</target>
 
 <source>Save as batch job</source>
 <target>Guardar como batch</target>
@@ -744,73 +783,20 @@ O comando é executado se:
 <source>Total bytes to copy</source>
 <target>Total em bytes a copiar</target>
 
-<source>Items found:</source>
-<target>Elementos encontrados:</target>
+<source>Select a variant:</source>
+<target>Seleccionar uma variante:</target>
 
-<source>Speed:</source>
-<target>Velocidade:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identificar ficheiros iguais ao comparar hora de modificação e tamanho.</target>
 
-<source>Time remaining:</source>
-<target>Tempo restante:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Identificar ficheiros iguais ao comparar o conteúdo.</target>
 
-<source>Time elapsed:</source>
-<target>Tempo decorrido</target>
+<source>Symbolic links:</source>
+<target>Links simbólicos:</target>
 
-<source>Synchronizing...</source>
-<target>A sincronizar...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimizar para a área de notificação</target>
-
-<source>On completion</source>
-<target>Ao terminar</target>
-
-<source>Close</source>
-<target>Fechar</target>
-
-<source>&Pause</source>
-<target>&Pausa</target>
-
-<source>Variant</source>
-<target>Variável</target>
-
-<source>Statistics</source>
-<target>Estatísticas</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Não mostrar este diálogo novamente</target>
-
-<source>Select a variant</source>
-<target>Seleccione uma variante</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Ficheiros considerados iguais se
-	 - data da última modificação
-	 - tamanho
-são iguais
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Os ficheiros são considerados iguais se
-     - o conteúdo é o mesmo
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Tratamento de links simbólicos</target>
-
-<source>Help</source>
-<target>Ajuda</target>
+<source>More information</source>
+<target>Mais informação</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -818,11 +804,11 @@ Os ficheiros são considerados iguais se
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificar e propagar mudanças nos dois lados. Eliminações, cópias e conflitos são detectados automaticamente usando base de dados.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Cópia de segurança do directório à esquerda. O directório da direita é alterado para ficar igual ao da esquerda após sincronização.</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Criar uma cópia exacta da pasta à esquerda, que vai corresponder à pasta da direita após a sincronização.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Copiar ficheiros novos ou actualizados para a direita</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Copiar ficheiros novos e actualizados para a pasta à direita.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configure as suas regras de sincronização.</target>
@@ -833,23 +819,8 @@ Os ficheiros são considerados iguais se
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Requer base de dados. Não é suportado por todos os sistemas de ficheiros.</target>
 
-<source>Error handling</source>
-<target>Controlador de erros</target>
-
-<source>Ignore</source>
-<target>Ignorar</target>
-
-<source>Hide all error and warning messages</source>
-<target>Ocultar todas as mensagens de erro/aviso</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Mostrar popup em caso de erros ou avisos</target>
-
-<source>Deletion handling</source>
-<target>Controlo eliminação</target>
+<source>Delete files:</source>
+<target>Eliminar ficheiros:</target>
 
 <source>Permanent</source>
 <target>Permanente</target>
@@ -872,32 +843,173 @@ Os ficheiros são considerados iguais se
 <source>Naming convention:</source>
 <target>Convenção de nomes:</target>
 
-<source>Batch job</source>
-<target>Ficheiro Batch</target>
+<source>Show examples</source>
+<target>Mostrar exemplos</target>
+
+<source>Handle errors:</source>
+<target>Tratar erros:</target>
+
+<source>Ignore</source>
+<target>Ignorar</target>
+
+<source>Hide all error and warning messages</source>
+<target>Ocultar todas as mensagens de erro/aviso</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Mostrar popup em caso de erros ou avisos</target>
+
+<source>On completion:</source>
+<target>Ao completar:</target>
+
+<source>Start synchronization now?</source>
+<target>Iniciar sincronização agora?</target>
+
+<source>Variant:</source>
+<target>Variante:</target>
+
+<source>Statistics</source>
+<target>Estatísticas</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Não mostrar este diálogo novamente</target>
+
+<source>Items found:</source>
+<target>Elementos encontrados:</target>
+
+<source>Speed:</source>
+<target>Velocidade:</target>
+
+<source>Time remaining:</source>
+<target>Tempo restante:</target>
+
+<source>Time elapsed:</source>
+<target>Tempo decorrido</target>
+
+<source>Synchronizing...</source>
+<target>A sincronizar...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimizar para a área de notificação</target>
+
+<source>Close</source>
+<target>Fechar</target>
+
+<source>&Pause</source>
+<target>&Pausa</target>
+
+<source>Stop</source>
+<target>Parar</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Criar ficheiro batch para sincronização automática. Para iniciar, fazer duplo clique no ficheiro ou acrescentar ao planeador de tarefas: %x</target>
 
-<source>Exit</source>
-<target>Sair</target>
-
-<source>Abort synchronization on first error</source>
-<target>Abortar sincronização ao primeiro erro</target>
+<source>Stop synchronization at first error</source>
+<target>Para sincronização ao primeiro erro</target>
 
 <source>Show progress dialog</source>
 <target>Mostrar diálogo de progresso</target>
 
-<source>Save log</source>
-<target>Guardar log</target>
+<source>Save log:</source>
+<target>Guardar registo:</target>
 
-<source>Select folder to save log files</source>
-<target>Seleccionar pasta para guardar ficheiros log</target>
-
-<source>Limit</source>
-<target>Limitar</target>
+<source>Limit:</source>
+<target>Limitar:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Limitar o número máximo de ficheiros log</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Como posso agendar um trabalho batch?</target>
+
+<source>&Recycle bin</source>
+<target>&Reciclagem</target>
+
+<source>Delete on both sides</source>
+<target>Eliminar em ambos os lados</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Seleccionar regras de filtro para excluir certos ficheiros da sincronização. Insira os caminhos relativos ao par de directórios correspondente.</target>
+
+<source>Include:</source>
+<target>Incluir:</target>
+
+<source>Exclude:</source>
+<target>Excluir:</target>
+
+<source>Time span:</source>
+<target>Intervalo de tempo:</target>
+
+<source>File size:</source>
+<target>Tamanho ficheiro:</target>
+
+<source>Minimum:</source>
+<target>Mínimo:</target>
+
+<source>Maximum:</source>
+<target>Máximo</target>
+
+<source>&Clear</source>
+<target>&Limpar</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>As seguintes definições são usadas para todas as sincronizações.</target>
+
+<source>Fail-safe file copy</source>
+<target>Cópia à prova de falhas</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Copiar para um ficheiro temporário (*.ffs_tmp) antes de substituir.
+Isto garante um estado consistente mesmo em caso de falha grave.
+</target>
+
+<source>(recommended)</source>
+<target>(recomendado)</target>
+
+<source>Copy locked files</source>
+<target>Copiar ficheiros bloqueados</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy.</target>
+
+<source>(requires administrator rights)</source>
+<target>(requer permissões de administrador)</target>
+
+<source>Copy file access permissions</source>
+<target>Copiar permissões de acesso do ficheiro</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Transferir permissões de pasta e ficheiro.</target>
+
+<source>Automatic retry on error:</source>
+<target>Retentar automaticamente em caso de erro:</target>
+
+<source>Retry count:</source>
+<target>Nº de tentativas:</target>
+
+<source>Delay (in seconds):</source>
+<target>Atraso (em segundos):</target>
+
+<source>Customize context menu:</source>
+<target>Personalizar menu de contexto:</target>
+
+<source>Description</source>
+<target>Descrição</target>
+
+<source>Restore hidden windows</source>
+<target>Restaurar janelas escondidas</target>
+
+<source>&Default</source>
+<target>&Config. Iniciais</target>
 
 <source>Source code written in C++ using:</source>
 <target>Código fonte escrito em C++ utilizando:</target>
@@ -907,9 +1019,6 @@ Os ficheiros são considerados iguais se
 
 <source>Donate with PayPal</source>
 <target>Doar usando PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Muito obrigado pela localização:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Comentários e sugestões são apreciados</target>
@@ -923,101 +1032,26 @@ Os ficheiros são considerados iguais se
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre GNU General Public License</target>
 
-<source>Delete on both sides</source>
-<target>Eliminar em ambos os lados</target>
+<source>Many thanks for localization:</source>
+<target>Muito obrigado pela localização:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado</target>
+<source>Save as Batch Job</source>
+<target>Guardar como Ficheiro Batch</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Os ficheiros só serão sincronizados se passarem todos os filtros.
-Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
-</target>
+<source>Delete Items</source>
+<target>Eliminar Itens</target>
 
-<source>Include</source>
-<target>Incluir</target>
+<source>Global Settings</source>
+<target>Opções Globais</target>
 
-<source>Exclude</source>
-<target>Excluir</target>
+<source>Select Time Span</source>
+<target>Seleccionar Intervalo de Tempo</target>
 
-<source>Time span</source>
-<target>Intervalo de tempo</target>
-
-<source>File size</source>
-<target>Tamanho ficheiro</target>
-
-<source>Minimum</source>
-<target>Mínimo</target>
-
-<source>Maximum</source>
-<target>Máximo</target>
-
-<source>&Clear</source>
-<target>&Limpar</target>
-
-<source>Global settings</source>
-<target>Opções</target>
-
-<source>Fail-safe file copy</source>
-<target>Cópia à prova de falhas</target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Copiar para um ficheiro temporário (*.ffs_tmp) e depois renomear. Isto garante consistência mesmo em caso de erro fatal.</target>
-
-<source>Copy locked files</source>
-<target>Copiar ficheiros bloqueados</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy(necessita direitos de administrador)</target>
-
-<source>Copy file access permissions</source>
-<target>Copiar permissões de acesso do ficheiro</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Transferir permissões de ficheiros e pastas (necessita direitos de administrador)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Restaurar diálogos escondidos</target>
-
-<source>External applications</source>
-<target>Aplicações externas</target>
-
-<source>Description</source>
-<target>Descrição</target>
-
-<source>&Default</source>
-<target>&Config. Iniciais</target>
-
-<source>Find what:</source>
-<target>Procurar:</target>
-
-<source>Match case</source>
-<target>Correspondência</target>
-
-<source>&Find next</source>
-<target>&Procurar seguinte</target>
-
-<source>Start synchronization</source>
-<target>Iniciar a sincronização</target>
-
-<source>Delete</source>
-<target>Eliminar</target>
-
-<source>Configure filter</source>
-<target>Configurar filtros</target>
+<source>Folder Pairs</source>
+<target>Par de Pastas</target>
 
 <source>Find</source>
 <target>Procurar</target>
-
-<source>Select time span</source>
-<target>Selecionar intervalo de tempo</target>
-
-<source>Folder pairs</source>
-<target>Par de directório</target>
 
 <source>Overview</source>
 <target>Vista</target>
@@ -1025,14 +1059,14 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Configuration</source>
 <target>Configuração</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>Barra principal</target>
 
-<source>Filter files</source>
-<target>Filtrar ficheiros</target>
+<source>Filter Files</source>
+<target>Filtrar Ficheiros</target>
 
-<source>Select view</source>
-<target>Selecionar vista</target>
+<source>Select View</source>
+<target>Seleccionar Vista</target>
 
 <source>Open...</source>
 <target>Abrir...</target>
@@ -1043,17 +1077,26 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Compare both sides</source>
 <target>Comparar listas</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Deseja mesmo executar o comando %y para 1 item?</pluralform>
-<pluralform>Deseja mesmo executar o comando %y para %x itens?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Opções de comparação</target>
+
+<source>Synchronization settings</source>
+<target>Parametros de sincronização</target>
+
+<source>Start synchronization</source>
+<target>Iniciar a sincronização</target>
 
 <source>Confirm</source>
 <target>Confirmar</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>Deseja mesmo executar o comando %y para um item?</pluralform>
+<pluralform>Deseja mesmo executar o comando %y para %x itens?</pluralform>
+</target>
 
 <source>&Execute</source>
 <target>&Executar</target>
@@ -1088,12 +1131,6 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Set direction:</source>
 <target>Escolher direcção:</target>
 
-<source>Exclude temporarily</source>
-<target>Excluir temporariamente</target>
-
-<source>Include temporarily</source>
-<target>Incluir temporariamente</target>
-
 <source>multiple selection</source>
 <target>seleção múltipla</target>
 
@@ -1102,6 +1139,15 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 
 <source>Exclude via filter:</source>
 <target>Excluir por filtro:</target>
+
+<source>Exclude temporarily</source>
+<target>Excluir temporariamente</target>
+
+<source>Include temporarily</source>
+<target>Incluir temporariamente</target>
+
+<source>Delete</source>
+<target>Eliminar</target>
 
 <source>Include all</source>
 <target>Incluir tudo</target>
@@ -1145,11 +1191,14 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Do you want to save changes to %x?</source>
 <target>Deseja guardar as alterações a %x?</target>
 
+<source>Never save &changes</source>
+<target>Nunca guardar &alterações</target>
+
 <source>Do&n't save</source>
 <target>Não g&uardar</target>
 
-<source>Never save &changes</source>
-<target>Nunca guardar &alterações</target>
+<source>Filter</source>
+<target>Filtro</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar ficheiros existentes somente à esquerda</target>
@@ -1196,11 +1245,17 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Set as default</source>
 <target>Definir como padrão</target>
 
-<source>Operation aborted</source>
-<target>Operação abortada</target>
-
 <source>All folders are in sync</source>
 <target>Todas as pastas estão sincronizadas</target>
+
+<source>Synchronization Settings</source>
+<target>Definições de Sincronização</target>
+
+<source>Comparison Settings</source>
+<target>Definições de Comparação</target>
+
+<source>Cannot find %x</source>
+<target>Não é possível descobrir %x</target>
 
 <source>Comma-separated values</source>
 <target>Valores separados por virgula</target>
@@ -1211,30 +1266,6 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Searching for program updates...</source>
 <target>A procurar actualizações do programa...</target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignorar erros subsequentes</target>
-
-<source>&Ignore</source>
-<target>&Ignorar</target>
-
-<source>Fatal Error</source>
-<target>Erro crítico</target>
-
-<source>&Don't show this warning again</source>
-<target>&Não mostrar este aviso novamente</target>
-
-<source>&Switch</source>
-<target>&Trocar</target>
-
-<source>Question</source>
-<target>Questão</target>
-
-<source>&Yes</source>
-<target>&Sim</target>
-
-<source>&No</source>
-<target>&Não</target>
-
 <source>Scanning...</source>
 <target>A pesquisar...</target>
 
@@ -1244,14 +1275,17 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>Info</source>
 <target>Info</target>
 
+<source>Warning</source>
+<target>Atenção</target>
+
 <source>Paused</source>
 <target>Em pausa</target>
 
 <source>Initializing...</source>
 <target>A iniciar...</target>
 
-<source>Aborted</source>
-<target>Abortado</target>
+<source>Stopped</source>
+<target>Parado</target>
 
 <source>Completed</source>
 <target>Terminado</target>
@@ -1261,12 +1295,6 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 
 <source>Log</source>
 <target>Registo</target>
-
-<source>Cannot find %x</source>
-<target>Não é possível descobrir %x</target>
-
-<source>Inactive</source>
-<target>Inactivo</target>
 
 <source>Today</source>
 <target>Hoje</target>
@@ -1292,9 +1320,6 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filtro</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1304,6 +1329,9 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <pluralform>Deseja mesmo mover os seguintes %x itens para a reciclagem?</pluralform>
 </target>
 
+<source>Move</source>
+<target>Mover</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1312,6 +1340,9 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <pluralform>Deseja mesmo eliminar o seguinte item?</pluralform>
 <pluralform>Deseja mesmo eliminar os seguintes %x itens?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Excluir</target>
 
 <source>Direct</source>
 <target>Direto</target>
@@ -1337,8 +1368,8 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Contrapartida de %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Tornar visiveis os diálogos e avisos escondidos novamente?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Restaurar todas as janelas e avisos escondidos?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Deixar como conflito</target>
@@ -1463,14 +1494,14 @@ Nota: O caminho dos ficheiros deve ser relativo ao directório raiz.
 <pluralform>%x dias</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Falhou o registo para receber mensagens de sistema.</target>
+<source>Unable to register to receive system messages.</source>
+<target>Não foi possível registar para receber mensagens do sistema.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Não é possível definir o privilégio %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Falha ao suspender o modo de hibernação do sistema.</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Não é possível retornar do modo de suspensão do sistema.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Não é possível alterar as prioridades de E / S do processo.</target>

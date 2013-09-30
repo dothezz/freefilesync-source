@@ -36,30 +36,25 @@ void zen::clearArea(wxDC& dc, const wxRect& rect, const wxColor& col)
     dc.DrawRectangle(rect);
 }
 
+const int GridData::COLUMN_GAP_LEFT = 4;
+
 namespace
 {
 //------------ Grid Constants --------------------------------
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value as Explorer!
-const int DEFAULT_COL_LABEL_HEIGHT = 24;
-const int COLUMN_BORDER_LEFT       = 4; //for left-aligned text
-const int COLUMN_LABEL_BORDER      = COLUMN_BORDER_LEFT;
+const int DEFAULT_COL_LABEL_BORDER = 6; //top + bottom border in addition to label height
+const int COLUMN_LABEL_BORDER      = GridData::COLUMN_GAP_LEFT;
 const int COLUMN_MOVE_DELAY        = 5;  //unit: [pixel] (from Explorer)
 const int COLUMN_MIN_WIDTH         = 40; //only honored when resizing manually!
 const int ROW_LABEL_BORDER         = 3;
 const int COLUMN_RESIZE_TOLERANCE  = 6; //unit [pixel]
 const int COLUMN_FILL_GAP_TOLERANCE = 10; //enlarge column to fill full width when resizing
 
-const wxColor COLOR_SELECTION_GRADIENT_NO_FOCUS_FROM = wxColour(192, 192, 192); //light grey  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW);
-const wxColor COLOR_SELECTION_GRADIENT_NO_FOCUS_TO   = wxColour(228, 228, 228);
+const wxColor COLOR_LABEL_GRADIENT_FROM = *wxWHITE;
+const wxColor COLOR_LABEL_GRADIENT_TO   = wxColour(200, 200, 200); //light grey
 
-const wxColor COLOR_LABEL_GRADIENT_FROM = wxColour(200, 200, 200); //light grey
-const wxColor COLOR_LABEL_GRADIENT_TO = *wxWHITE;
-
-const wxColor COLOR_LABEL_GRADIENT_FROM_FOCUS = getColorSelectionGradientFrom();
-const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = COLOR_LABEL_GRADIENT_TO;
-
-//wxColor getColorRowLabel         () { return wxPanel::GetClassDefaultAttributes  ().colBg; } //
-wxColor getColorMainWinBackground() { return wxListBox::GetClassDefaultAttributes().colBg; } //cannot be initialized statically on wxGTK!
+const wxColor COLOR_LABEL_GRADIENT_FROM_FOCUS = COLOR_LABEL_GRADIENT_FROM;
+const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = getColorSelectionGradientFrom();
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
 }
@@ -76,25 +71,25 @@ const wxEventType zen::EVENT_GRID_MOUSE_RIGHT_UP        = wxNewEventType();
 const wxEventType zen::EVENT_GRID_SELECT_RANGE          = wxNewEventType();
 //----------------------------------------------------------------------------------------------------------------
 
-void GridData::renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
+void GridData::renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected)
 {
-    drawCellBackground(dc, rect, enabled, selected, hasFocus, getColorMainWinBackground());
+    drawCellBackground(dc, rect, enabled, selected, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 }
 
 
-void GridData::renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+void GridData::renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected)
 {
     wxRect rectTmp = drawCellBorder(dc, rect);
 
-    rectTmp.x     += COLUMN_BORDER_LEFT;
-    rectTmp.width -= COLUMN_BORDER_LEFT;
+    rectTmp.x     += COLUMN_GAP_LEFT;
+    rectTmp.width -= COLUMN_GAP_LEFT;
     drawCellText(dc, rectTmp, getValue(row, colType), true);
 }
 
 
 int GridData::getBestSize(wxDC& dc, size_t row, ColumnType colType)
 {
-    return dc.GetTextExtent(getValue(row, colType)).GetWidth() + 2 * COLUMN_BORDER_LEFT; //some border on left and right side
+    return dc.GetTextExtent(getValue(row, colType)).GetWidth() + 2 * COLUMN_GAP_LEFT + 1; //gap on left and right side + border
 }
 
 
@@ -108,17 +103,12 @@ wxRect GridData::drawCellBorder(wxDC& dc, const wxRect& rect) //returns remainin
 }
 
 
-void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, bool hasFocus, const wxColor& backgroundColor)
+void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor)
 {
     if (enabled)
     {
         if (selected)
-        {
-            //if (hasFocus)
             dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
-            //else -> doesn't look too good...
-            //    dc.GradientFillLinear(rect, COLOR_SELECTION_GRADIENT_NO_FOCUS_FROM, COLOR_SELECTION_GRADIENT_NO_FOCUS_TO, wxEAST);
-        }
         else
             clearArea(dc, rect, backgroundColor);
     }
@@ -193,8 +183,8 @@ void GridData::renderColumnLabel(Grid& grid, wxDC& dc, const wxRect& rect, Colum
     wxRect rectTmp = drawColumnLabelBorder(dc, rect);
     drawColumnLabelBackground(dc, rectTmp, highlighted);
 
-    rectTmp.x     += COLUMN_BORDER_LEFT;
-    rectTmp.width -= COLUMN_BORDER_LEFT;
+    rectTmp.x     += COLUMN_GAP_LEFT;
+    rectTmp.width -= COLUMN_GAP_LEFT;
     drawColumnLabelText(dc, rectTmp, getColumnLabel(colType));
 }
 
@@ -210,7 +200,7 @@ wxRect GridData::drawColumnLabelBorder(wxDC& dc, const wxRect& rect) //returns r
     //draw border (with gradient)
     {
         wxDCPenChanger dummy(dc, wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW), 1, wxSOLID));
-        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight()), dc.GetPen().GetColour(), COLOR_LABEL_GRADIENT_TO, wxNORTH);
+        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
         dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight() + wxPoint(1, 0));
     }
 
@@ -221,9 +211,9 @@ wxRect GridData::drawColumnLabelBorder(wxDC& dc, const wxRect& rect) //returns r
 void GridData::drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool highlighted)
 {
     if (highlighted)
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM_FOCUS, COLOR_LABEL_GRADIENT_TO_FOCUS, wxNORTH);
+        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM_FOCUS, COLOR_LABEL_GRADIENT_TO_FOCUS, wxSOUTH);
     else //regular background gradient
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxNORTH); //clear overlapping cells
+        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxSOUTH); //clear overlapping cells
 }
 
 
@@ -386,17 +376,17 @@ private:
     {
         const wxRect& clientRect = GetClientRect();
 
-        dc.GradientFillLinear(clientRect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxNORTH);
+        dc.GradientFillLinear(clientRect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxSOUTH);
 
         dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW), 1, wxSOLID));
 
         {
-            wxDCPenChanger dummy(dc, COLOR_LABEL_GRADIENT_TO);
+            wxDCPenChanger dummy(dc, COLOR_LABEL_GRADIENT_FROM);
             dc.DrawLine(clientRect.GetTopLeft(), clientRect.GetTopRight());
         }
 
-        dc.GradientFillLinear(wxRect(clientRect.GetBottomLeft (), clientRect.GetTopLeft ()), dc.GetPen().GetColour(), COLOR_LABEL_GRADIENT_TO, wxNORTH);
-        dc.GradientFillLinear(wxRect(clientRect.GetBottomRight(), clientRect.GetTopRight()), dc.GetPen().GetColour(), COLOR_LABEL_GRADIENT_TO, wxNORTH);
+        dc.GradientFillLinear(wxRect(clientRect.GetBottomLeft (), clientRect.GetTopLeft ()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
+        dc.GradientFillLinear(wxRect(clientRect.GetBottomRight(), clientRect.GetTopRight()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
 
         dc.DrawLine(clientRect.GetBottomLeft(), clientRect.GetBottomRight());
 
@@ -492,7 +482,7 @@ private:
         (Similar problem on Win 7: e.g. directly click sync button without comparing first)
         */
         if (IsThisEnabled())
-            clearArea(dc, rect, getColorMainWinBackground());
+            clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
         else
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
@@ -515,7 +505,7 @@ private:
     void drawRowLabel(wxDC& dc, const wxRect& rect, size_t row)
     {
         //clearArea(dc, rect, getColorRowLabel());
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxWEST); //clear overlapping cells
+        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxEAST); //clear overlapping cells
         wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
 
         //label text
@@ -620,10 +610,11 @@ private:
     virtual void render(wxDC& dc, const wxRect& rect)
     {
         if (IsThisEnabled())
-            clearArea(dc, rect, getColorMainWinBackground());
+            clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
         else
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
+        //coordinate with "colLabelHeight" in Grid constructor:
         wxFont labelFont = GetFont();
         labelFont.SetWeight(wxFONTWEIGHT_BOLD);
         dc.SetFont(labelFont);
@@ -666,9 +657,9 @@ private:
                 if (activeMove && activeMove->isRealMove() && activeMove->getComponentPos() == compPos)
                 {
                     if (col + 1 == activeMove->refColumnTo()) //handle pos 1, 2, .. up to "at end" position
-                        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight() + wxPoint(-2, 0)), *wxBLUE, COLOR_LABEL_GRADIENT_TO, wxNORTH);
+                        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight() + wxPoint(-2, 0)), COLOR_LABEL_GRADIENT_FROM, *wxBLUE, wxSOUTH);
                     else if (col == activeMove->refColumnTo() && col == 0) //pos 0
-                        dc.GradientFillLinear(wxRect(rect.GetTopLeft(), rect.GetBottomLeft() + wxPoint(2, 0)), *wxBLUE, COLOR_LABEL_GRADIENT_TO, wxNORTH);
+                        dc.GradientFillLinear(wxRect(rect.GetTopLeft(), rect.GetBottomLeft() + wxPoint(2, 0)), COLOR_LABEL_GRADIENT_FROM, *wxBLUE, wxSOUTH);
                 }
         }
     }
@@ -914,7 +905,7 @@ private:
     virtual void render(wxDC& dc, const wxRect& rect)
     {
         if (IsThisEnabled())
-            clearArea(dc, rect, getColorMainWinBackground());
+            clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
         else
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
@@ -944,10 +935,12 @@ private:
             if (auto prov = refParent().getDataProvider(compPos))
             {
                 //draw background lines
+                for (int row = rowFirst; row < rowLast; ++row)
                 {
-                    RecursiveDcClipper dummy2(dc, rect); //solve issues with drawBackground() painting in area outside of rect (which is not also refreshed by renderCell()) -> keep small scope!
-                    for (int row = rowFirst; row < rowLast; ++row)
-                        drawBackground(*prov, dc, wxRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(compWidth, rowHeight)), row, compPos);
+                    const wxRect rowRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(compWidth, rowHeight));
+                    RecursiveDcClipper dummy2(dc, rowRect); //solve issues with drawBackground() painting in area outside of rect
+                    //(which is not also refreshed by renderCell()) -> keep small scope!
+                    prov->renderRowBackgound(dc, rowRect, row, refParent().IsThisEnabled(), drawAsSelected(row, compPos));
                 }
 
                 //draw single cells, column by column
@@ -959,9 +952,10 @@ private:
                     if (cellAreaTL.x + cw.width_ > rect.x)
                         for (int row = rowFirst; row < rowLast; ++row)
                         {
-                            const wxRect& cellRect = wxRect(cellAreaTL.x, cellAreaTL.y + row * rowHeight, cw.width_, rowHeight);
+                            const wxRect cellRect(cellAreaTL.x, cellAreaTL.y + row * rowHeight, cw.width_, rowHeight);
                             RecursiveDcClipper clip(dc, cellRect);
-                            prov->renderCell(refParent(), dc, cellRect, row, cw.type_);
+
+                            prov->renderCell(dc, cellRect, row, cw.type_, drawAsSelected(row, compPos));
                         }
                     cellAreaTL.x += cw.width_;
                 }
@@ -971,21 +965,17 @@ private:
         }
     }
 
-    void drawBackground(GridData& prov, wxDC& dc, const wxRect& rect, size_t row, size_t compPos)
+    bool drawAsSelected(size_t row, size_t compPos) const
     {
-        Grid& grid = refParent();
-        //check if user is currently selecting with mouse
-        bool drawSelection = grid.isSelected(row, compPos);
-        if (activeSelection)
+        if (activeSelection) //check if user is currently selecting with mouse
         {
             const size_t rowFrom = std::min(activeSelection->getStartRow(), activeSelection->getCurrentRow());
             const size_t rowTo   = std::max(activeSelection->getStartRow(), activeSelection->getCurrentRow());
 
             if (compPos == activeSelection->getComponentPos() && rowFrom <= row && row <= rowTo)
-                drawSelection = activeSelection->isPositiveSelect(); //overwrite default
+                return activeSelection->isPositiveSelect(); //overwrite default
         }
-
-        prov.renderRowBackgound(dc, rect, row, grid.IsThisEnabled(), drawSelection, wxWindow::FindFocus() == &grid.getMainWin());
+        return refParent().isSelected(row, compPos);
     }
 
     virtual void onMouseLeftDown (wxMouseEvent& event) { onMouseDown(event); }
@@ -1423,19 +1413,27 @@ Grid::Grid(wxWindow* parent,
            const wxString& name) : wxScrolledWindow(parent, id, pos, size, style | wxWANTS_CHARS, name),
     showScrollbarX(SB_SHOW_AUTOMATIC),
     showScrollbarY(SB_SHOW_AUTOMATIC),
-    colLabelHeight(DEFAULT_COL_LABEL_HEIGHT),
+    colLabelHeight(0), //dummy init
     drawRowLabel(true),
     comp(1),
     rowCountOld(0)
 {
-    Connect(wxEVT_PAINT,            wxPaintEventHandler(Grid::onPaintEvent     ), nullptr, this);
-    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
-    Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
-
     cornerWin_   = new CornerWin  (*this); //
     rowLabelWin_ = new RowLabelWin(*this); //owership handled by "this"
     colLabelWin_ = new ColLabelWin(*this); //
     mainWin_     = new MainWin    (*this, *rowLabelWin_, *colLabelWin_); //
+
+    colLabelHeight = 2 * DEFAULT_COL_LABEL_BORDER + [&]() -> int
+    {
+        //coordinate with ColLabelWin::render():
+        wxFont labelFont = colLabelWin_->GetFont();
+        labelFont.SetWeight(wxFONTWEIGHT_BOLD);
+        return labelFont.GetPixelSize().GetHeight();
+    }();
+
+    Connect(wxEVT_PAINT,            wxPaintEventHandler(Grid::onPaintEvent     ), nullptr, this);
+    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
+    Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
 
     SetTargetWindow(mainWin_);
 
@@ -1621,7 +1619,21 @@ void Grid::showRowLabel(bool show)
 
 std::vector<size_t> Grid::getSelectedRows(size_t compPos) const
 {
-    return compPos < comp.size() ? comp[compPos].selection.get() : std::vector<size_t>();
+    if (compPos < comp.size())
+        return comp[compPos].selection.get();
+    assert(false);
+    return std::vector<size_t>();
+}
+
+
+void Grid::setSelectedRows(const std::vector<size_t>& sel, size_t compPos)
+{
+    if (compPos < comp.size())
+    {
+        comp[compPos].selection.set(sel);
+        Refresh();
+    }
+    else assert(false);
 }
 
 
@@ -1665,10 +1677,13 @@ void Grid::Refresh(bool eraseBackground, const wxRect* rect)
     if (rowCountOld != rowCountNew)
     {
         rowCountOld = rowCountNew;
-        for (Component& c : comp)
-            c.selection.init(rowCountNew);
         updateWindowSizes();
     }
+
+    for (Component& c : comp)
+        if (c.selection.size() != rowCountNew) //clear selection only when needed (consider setSelectedRows())
+            c.selection.init(rowCountNew);
+
     wxScrolledWindow::Refresh(eraseBackground, rect);
 }
 

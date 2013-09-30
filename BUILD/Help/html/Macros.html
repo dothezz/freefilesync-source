@@ -107,34 +107,26 @@ E.g. <FONT FACE="Courier New, monospace">csidl_MyMusic</FONT> &rarr;
 </P>
 
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Hint:</B></FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can
-add a great amount of flexibility to batch synchronization
-(*.ffs_batch) by creating new temporary environment variables in a
-*.bat/*.cmd file that are evaluated by FreeFileSync at runtime!</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can add a great amount of flexibility to a ffs_batch configuration file
+ by creating new temporary environment variables in a bat or cmd file that are evaluated by FreeFileSync at runtime.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
-The FreeFileSync batch file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch
-</FONT>contains macro <FONT FACE="Courier New, monospace">%MyVar%
-</FONT>instead of an absolute target folder and is invoked by a *.cmd
-file:</FONT></P>
+The FreeFileSync batch file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT> contains macro <FONT FACE="Courier New, monospace">%MyVar%</FONT> instead of an absolute target folder and is invoked by a cmd file:</FONT>
+</P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">set
-	MyVar=C:\Target<BR>&quot;C:\Program
-	files\FreeFileSync\FreeFileSync.exe&quot;
-	C:\SyncJob.ffs_batch<BR></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::%MyVar%
-	is resolved as C:\Target during synchronization</B></I></FONT></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">set
+	MyVar=C:\Target<BR>&quot;C:\Program files\FreeFileSync\FreeFileSync.exe&quot; C:\SyncJob.ffs_batch<BR>
+	<FONT COLOR="#808080"><I><B>::%MyVar% is resolved as C:\Target during synchronization</B></I></FONT></FONT>
+</P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 	<P><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B><BR>Temporary
-		environment variables created with the &quot;<FONT FACE="Courier New, monospace">set</FONT>&quot;
-		command are only valid if the batch job is started by calling the
-		executable directly! Using &quot;<FONT FACE="Courier New, monospace">start
-		/wait</FONT>&quot; or relying on Shell Execute creates a new
-		program context without these temporal variables.</FONT></P>
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B><BR>
+		Temporary environment variables created with the <FONT FACE="Courier New, monospace">set</FONT> command are only valid if the synchronization is started by calling the
+		FreeFileSync executable directly. Using <FONT FACE="Courier New, monospace">start /wait</FONT> creates a new program context without these temporal variables.</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </BODY>

@@ -27,7 +27,7 @@ struct ReturnSmallDlg
 
 void showAboutDialog(wxWindow* parent);
 
-ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, bool isGlobalFilter, FilterConfig& filter);
+ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, FilterConfig& filter, const wxString& caption);
 
 ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
                                                const std::vector<FileSystemObject*>& rowsOnLeft,
@@ -35,12 +35,12 @@ ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
                                                bool& deleteOnBothSides,
                                                bool& useRecycleBin);
 
-ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(wxWindow* parent,
-                                                 const wxString& variantName,
-                                                 const SyncStatistics& statistics,
-                                                 bool& dontShowAgain);
+ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,
+                                                      const wxString& variantName,
+                                                      const SyncStatistics& statistics,
+                                                      bool& dontShowAgain);
 
-ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig);
+ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig, const wxString& title);
 
 ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 

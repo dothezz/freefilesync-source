@@ -6,12 +6,14 @@
 
 #include "tray_icon.h"
 #include <zen/basic_math.h>
+#include <zen/i18n.h>
 #include <wx/taskbar.h>
 #include <wx/menu.h>
 #include <wx/icon.h> //req. by Linux
 #include <wx+/image_tools.h>
-#include "small_dlgs.h"
-#include "../lib/resources.h"
+#include <wx+/image_resources.h>
+
+using namespace zen;
 
 
 namespace
@@ -109,8 +111,7 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
 
 enum Selection
 {
-    CONTEXT_RESTORE = 1, //wxWidgets: "A MenuItem ID of zero does not work under Mac"
-    CONTEXT_ABOUT = wxID_ABOUT
+    CONTEXT_RESTORE = 1 //wxWidgets: "A MenuItem ID of zero does not work under Mac"
 };
 }
 
@@ -120,7 +121,12 @@ class FfsTrayIcon::TaskBarImpl : public wxTaskBarIcon
 public:
     TaskBarImpl(const std::function<void()>& onRequestResume) : onRequestResume_(onRequestResume)
     {
-        Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TaskBarImpl::OnDoubleClick), nullptr, this); //register double-click
+        Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxEventHandler(TaskBarImpl::OnDoubleClick), nullptr, this);
+
+        //Windows User Experience Guidelines: show the context menu rather than doing *nothing* on single left clicks; however:
+        //MSDN: "Double-clicking the left mouse button actually generates a sequence of four messages: WM_LBUTTONDOWN, WM_LBUTTONUP, WM_LBUTTONDBLCLK, and WM_LBUTTONUP."
+        //Reference: http://msdn.microsoft.com/en-us/library/windows/desktop/ms645606%28v=vs.85%29.aspx
+        //=> the only way to distinguish single left click and double-click is to wait wxSystemSettings::GetMetric(wxSYS_DCLICK_MSEC) (480ms) which is way too long!
     }
 
     //virtual ~TaskBarImpl(){}
@@ -134,9 +140,16 @@ private:
             return nullptr;
 
         wxMenu* contextMenu = new wxMenu;
-        contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
-        contextMenu->AppendSeparator();
-        contextMenu->Append(CONTEXT_ABOUT, _("&About"));
+
+        wxMenuItem* defaultItem = new wxMenuItem(contextMenu, CONTEXT_RESTORE, _("&Restore"));
+        //wxWidgets font messup:
+        //1. font must be set *before* wxMenu::Append()!
+        //2. don't use defaultItem->GetFont(); making it bold creates a huge font size for some reason
+#ifdef ZEN_WIN //no wxMenuItem::SetFont() on Linux and OS X: wasn't wxWidgets supposed to be *portable* at some point in time?????
+        defaultItem->SetFont(wxNORMAL_FONT->Bold()); //make default selection bold/align with double-click
+#endif
+        contextMenu->Append(defaultItem);
+
         //event handling
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TaskBarImpl::OnContextMenuSelection), nullptr, this);
 
@@ -147,17 +160,6 @@ private:
     {
         switch (static_cast<Selection>(event.GetId()))
         {
-            case CONTEXT_ABOUT:
-            {
-                //ATTENTION: the modal dialog below does NOT disable all GUI input, e.g. user may still double-click on tray icon
-                //which will implicitly destroy the tray icon while still showing the modal dialog
-                SetEvtHandlerEnabled(false);
-                ZEN_ON_SCOPE_EXIT(SetEvtHandlerEnabled(true));
-
-                zen::showAboutDialog(nullptr);
-            }
-            break;
-
             case CONTEXT_RESTORE:
                 if (onRequestResume_)
                     onRequestResume_();
@@ -165,11 +167,21 @@ private:
         }
     }
 
-    void OnDoubleClick(wxCommandEvent& event)
+    void OnDoubleClick(wxEvent& event)
     {
         if (onRequestResume_)
             onRequestResume_();
     }
+
+    //void OnLeftDownClick(wxEvent& event)
+    //{
+    //	//copied from wxTaskBarIconBase::OnRightButtonDown()
+    //   if (wxMenu* menu = CreatePopupMenu())
+    //   {
+    //       PopupMenu(menu);
+    //       delete menu;
+    //   }
+    //}
 
     std::function<void()> onRequestResume_;
 };
@@ -206,7 +218,7 @@ FfsTrayIcon::~FfsTrayIcon()
 
     trayIcon->RemoveIcon(); //required on Windows: unlike on OS X, wxPendingDelete does not kick in before main event loop!
     //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
-    wxPendingDelete.Append(trayIcon);
+    wxPendingDelete.Append(trayIcon); //identical to wxTaskBarIconBase::Destroy() in wxWidgets 2.9.5
 }
 
 

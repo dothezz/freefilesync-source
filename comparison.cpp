@@ -80,18 +80,17 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
 {
     std::set<Zstring, LessFilename> dirsEx;
 
-    tryReportingError2([&]
+    warn_static("retry klappt nicht für [] + env vars!")
+
+    tryReportingError([&]
     {
-        dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
-
-        //get list of not existing directories
-        std::set<Zstring, LessFilename> dirsMissing = dirnames;
-        set_remove_if(dirsMissing, [&](const Zstring& dirname) { return dirname.empty() || dirsEx.find(dirname) != dirsEx.end(); });
-
-        if (!dirsMissing.empty())
+        std::set<Zstring, LessFilename> missing;
+        dirsEx = getExistingDirsUpdating(dirnames, missing, allowUserInteraction, callback); //check *all* directories on each try!
+        if (!missing.empty())
         {
             std::wstring msg = _("Cannot find the following folders:") + L"\n";
-            std::for_each(dirsMissing.begin(), dirsMissing.end(), [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
+            for (const Zstring& dirname : missing)
+                msg += std::wstring(L"\n") + dirname;
             throw FileError(msg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
         }
     }, callback);
@@ -102,7 +101,7 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
 
 //check whether one side is subdirectory of other side (folder pair wise!)
 //similar check if one directory is read/written by multiple pairs not before beginning of synchronization
-void checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm, bool& warningDependentFolders, ProcessCallback& callback) //returns warning message, empty if all ok
+void checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsFmt, bool& warningDependentFolders, ProcessCallback& callback) //returns warning message, empty if all ok
 {
     std::vector<std::pair<Zstring, Zstring>> dependentDirs;
 
@@ -112,11 +111,11 @@ void checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm, bo
                                Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
     };
 
-    for (std::vector<FolderPairCfg>::const_iterator i = folderPairsForm.begin(); i != folderPairsForm.end(); ++i)
-        if (!i->leftDirectoryFmt.empty() && !i->rightDirectoryFmt.empty()) //empty folders names may be accepted by user
+    for (const FolderPairCfg& fpCfg : folderPairsFmt)
+        if (!fpCfg.leftDirectoryFmt.empty() && !fpCfg.rightDirectoryFmt.empty()) //empty folders names may be accepted by user
         {
-            if (dependentDir(i->leftDirectoryFmt, i->rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(i->leftDirectoryFmt, i->rightDirectoryFmt));
+            if (dependentDir(fpCfg.leftDirectoryFmt, fpCfg.rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
+                dependentDirs.push_back(std::make_pair(fpCfg.leftDirectoryFmt, fpCfg.rightDirectoryFmt));
         }
 
     if (!dependentDirs.empty())
@@ -220,9 +219,9 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
             //callback_.requestUiRefresh(); //already called by reportStatus()
         }
 
-        virtual HandleError reportError(const std::wstring& msg)
+        virtual HandleError reportError(const std::wstring& msg, size_t retryNumber)
         {
-            switch (callback_.reportError(msg))
+            switch (callback_.reportError(msg, retryNumber))
             {
                 case ProcessCallback::IGNORE_ERROR:
                     return ON_ERROR_IGNORE;
@@ -387,7 +386,7 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, size_t fileTimeTolerance, 
     //categorize symlinks that exist on both sides
     Zstring targetPathRawL;
     Zstring targetPathRawR;
-    Opt<std::wstring> errMsg = tryReportingError2([&]
+    Opt<std::wstring> errMsg = tryReportingError([&]
     {
         callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullName<LEFT_SIDE>())));
         targetPathRawL = getSymlinkTargetRaw(linkObj.getFullName<LEFT_SIDE>()); //throw FileError
@@ -485,7 +484,7 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
         //check files that exist in left and right model but have different content
 
         bool haveSameContent = false;
-        Opt<std::wstring> errMsg = tryReportingError2([&]
+        Opt<std::wstring> errMsg = tryReportingError([&]
         {
             haveSameContent = filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
             fileObj->getFullName<RIGHT_SIDE>(),

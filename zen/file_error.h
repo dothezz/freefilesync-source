@@ -49,9 +49,9 @@ inline
 std::wstring fmtFileName(const Zstring& filename)
 {
     std::wstring output;
-    output += L'\'';
+    output += L'\"';
     output += utfCvrtTo<std::wstring>(filename);
-    output += L'\'';
+    output += L'\"';
     return output;
 }
 }

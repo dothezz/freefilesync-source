@@ -224,8 +224,8 @@ private:
         return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
     }
 
-    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
 
     std::vector<Zstring>& files_;
     std::vector<Zstring>& dirs_;

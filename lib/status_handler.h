@@ -87,7 +87,7 @@ protected:
     virtual void requestAbortion()
     {
         abortRequested = true;
-        statusText_ =_("Abort requested: Waiting for current operation to finish...");
+        statusText_ =_("Stop requested: Waiting for current operation to finish...");
     } //this does NOT call abortThisProcess immediately, but when we're out of the C GUI call stack
 
     //implement Statistics

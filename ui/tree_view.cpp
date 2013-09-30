@@ -14,8 +14,8 @@
 #include <zen/format_unit.h>
 #include <wx+/rtl.h>
 #include <wx+/context_menu.h>
+#include <wx+/image_resources.h>
 #include "../lib/icon_buffer.h"
-#include "../lib/resources.h"
 
 using namespace zen;
 
@@ -765,7 +765,7 @@ public:
 private:
     virtual size_t getRowCount() const { return treeDataView_ ? treeDataView_->linesTotal() : 0; }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const
+    virtual wxString getToolTip(size_t row, ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
@@ -818,12 +818,10 @@ private:
         return wxString();
     }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted)
+    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
-
-        const int COLUMN_GAP_LEFT = 4;
 
         rectInside.x     += COLUMN_GAP_LEFT;
         rectInside.width -= COLUMN_GAP_LEFT;
@@ -843,7 +841,7 @@ private:
 
     static const int GAP_SIZE = 2;
 
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
@@ -857,7 +855,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
     {
         //wxRect rectTmp= drawCellBorder(dc, rect);
         wxRect rectTmp = rect;
@@ -1012,7 +1010,7 @@ private:
 
             //have file size and item count right-justified (but don't change for RTL languages)
             if ((static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_BYTES ||
-                 static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_ITEM_COUNT) && grid.GetLayoutDirection() != wxLayout_RightToLeft)
+                 static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_ITEM_COUNT) && grid_.GetLayoutDirection() != wxLayout_RightToLeft)
             {
                 rectTmp.width -= 2 * GAP_SIZE;
                 alignment = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
@@ -1027,7 +1025,7 @@ private:
         }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 

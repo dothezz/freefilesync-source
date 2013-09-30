@@ -205,12 +205,20 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
     const int rv = procSl == SYMLINK_FOLLOW ?
                    :: stat(filename.c_str(), &fileInfo) :
                    ::lstat(filename.c_str(), &fileInfo);
-    if (rv != 0) //follow symbolic links
+    if (rv != 0)
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"stat", getLastError()));
 
     attr.fileSize         = UInt64(fileInfo.st_size);
     attr.modificationTime = fileInfo.st_mtime;
 #endif
+}
+
+
+Int64 getFileTime(const Zstring& filename, ProcSymlink procSl) //throw FileError
+{
+    FileAttrib attr;
+    getFileAttrib(filename, attr, procSl); //throw FileError
+    return attr.modificationTime;
 }
 }
 
@@ -220,14 +228,6 @@ UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
     FileAttrib attr;
     getFileAttrib(filename, attr, SYMLINK_FOLLOW); //throw FileError
     return attr.fileSize;
-}
-
-
-Int64 zen::getFileTime(const Zstring& filename, ProcSymlink procSl) //throw FileError
-{
-    FileAttrib attr;
-    getFileAttrib(filename, attr, procSl); //throw FileError
-    return attr.modificationTime;
 }
 
 
@@ -537,8 +537,8 @@ public:
         dirs_.push_back(fullName);
         return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
     }
-    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
 
 private:
     CollectFilesFlat(const CollectFilesFlat&);
@@ -1821,14 +1821,17 @@ struct CallbackData
                  const Zstring& targetFile) :
         sourceFile_(sourceFile),
         targetFile_(targetFile),
-        userCallback(cb) {}
+        userCallback(cb),
+        fileInfoSrc(),
+        fileInfoTrg() {}
 
     const Zstring& sourceFile_;
     const Zstring& targetFile_;
 
     CallbackCopyFile* const userCallback; //optional!
     ErrorHandling errorHandler;
-    FileAttrib newAttrib; //modified by CopyFileEx() at beginning
+    BY_HANDLE_FILE_INFORMATION fileInfoSrc; //modified by CopyFileEx() at beginning
+    BY_HANDLE_FILE_INFORMATION fileInfoTrg; //
 
     Int64 bytesReported; //used internally to calculate bytes transferred delta
 };
@@ -1852,7 +1855,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         if source is a symlink and COPY_FILE_COPY_SYMLINK is NOT specified, this callback is called and hSourceFile is a handle to the *target* of the link!
 
     file time handling:
-        ::CopyFileEx() will copy file modification time (only) over from source file AFTER the last invokation of this callback
+        ::CopyFileEx() will (only) copy file modification time over from source file AFTER the last invokation of this callback
         => it is possible to adapt file creation time of target in here, but NOT file modification time!
     	CAVEAT: if ::CopyFileEx() fails to set modification time, it silently ignores this error and returns success!!!
     	see procmon log in: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
@@ -1870,38 +1873,31 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         dwStreamNumber == 1) //consider ADS!
     {
         //#################### return source file attributes ################################
-        BY_HANDLE_FILE_INFORMATION fileInfoSrc = {};
-        if (!::GetFileInformationByHandle(hSourceFile, &fileInfoSrc))
+        if (!::GetFileInformationByHandle(hSourceFile, &cbd.fileInfoSrc))
         {
             cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.sourceFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
             return PROGRESS_CANCEL;
         }
 
-        BY_HANDLE_FILE_INFORMATION fileInfoTrg = {};
-        if (!::GetFileInformationByHandle(hDestinationFile, &fileInfoTrg))
+        if (!::GetFileInformationByHandle(hDestinationFile, &cbd.fileInfoTrg))
         {
             cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
             return PROGRESS_CANCEL;
         }
 
-        cbd.newAttrib.fileSize         = UInt64(fileInfoSrc.nFileSizeLow, fileInfoSrc.nFileSizeHigh);
-        cbd.newAttrib.modificationTime = toTimeT(fileInfoSrc.ftLastWriteTime); //no DST hack (yet)
-        cbd.newAttrib.sourceFileId     = extractFileID(fileInfoSrc);
-        cbd.newAttrib.targetFileId     = extractFileID(fileInfoTrg);
-
         //#################### switch to sparse file copy if req. #######################
-        if (canCopyAsSparse(fileInfoSrc.dwFileAttributes, cbd.targetFile_)) //throw ()
+        if (canCopyAsSparse(cbd.fileInfoSrc.dwFileAttributes, cbd.targetFile_)) //throw ()
         {
             cbd.errorHandler.reportErrorShouldCopyAsSparse(); //use a different copy routine!
             return PROGRESS_CANCEL;
         }
 
         //#################### copy file creation time ################################
-        ::SetFileTime(hDestinationFile, &fileInfoSrc.ftCreationTime, nullptr, nullptr); //no error handling!
+        ::SetFileTime(hDestinationFile, &cbd.fileInfoSrc.ftCreationTime, nullptr, nullptr); //no error handling!
 
         //#################### copy NTFS compressed attribute #########################
-        const bool sourceIsCompressed = (fileInfoSrc.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
-        const bool targetIsCompressed = (fileInfoTrg.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; //already set by CopyFileEx if target parent folder is compressed!
+        const bool sourceIsCompressed = (cbd.fileInfoSrc.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
+        const bool targetIsCompressed = (cbd.fileInfoTrg.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; //already set by CopyFileEx if target parent folder is compressed!
         if (sourceIsCompressed && !targetIsCompressed)
         {
             USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
@@ -2026,7 +2022,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             if (lastError == ERROR_INVALID_PARAMETER &&
                 dst::isFatDrive(targetFile) &&
                 getFilesize(sourceFile) >= 4U * UInt64(1024U * 1024 * 1024)) //throw FileError
-                errorDescr += L"\nFAT volume cannot store files larger than 4 gigabyte!";
+                errorDescr += L"\nFAT volumes cannot store files larger than 4 gigabyte.";
 
             //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filename is of a restricted type.
         }
@@ -2036,13 +2032,18 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     }
 
     if (newAttrib)
-        *newAttrib = cbd.newAttrib;
+    {
+        newAttrib->fileSize         = UInt64(cbd.fileInfoSrc.nFileSizeLow, cbd.fileInfoSrc.nFileSizeHigh);
+        newAttrib->modificationTime = toTimeT(cbd.fileInfoSrc.ftLastWriteTime); //no DST hack (yet)
+        newAttrib->sourceFileId     = extractFileID(cbd.fileInfoSrc);
+        newAttrib->targetFileId     = extractFileID(cbd.fileInfoTrg);
+    }
 
     {
         //DST hack
         const Int64 modTime = getFileTime(sourceFile, SYMLINK_FOLLOW); //throw FileError
         setFileTime(targetFile, modTime, SYMLINK_FOLLOW); //throw FileError
-        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we need to set again in order to catch such errors!
+        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we need to set it again but with proper error checking!
         //	      - this sequence leads to a loss of precision of up to 1 sec!
         //	      - perf-loss on USB sticks with many small files of about 30%! damn!
 

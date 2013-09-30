@@ -7,6 +7,7 @@
 #include "ffs_paths.h"
 #include <zen/file_handling.h>
 #include <wx/stdpaths.h>
+#include <wx/app.h>
 #include <wx+/string_conv.h>
 
 #ifdef ZEN_MAC
@@ -61,6 +62,11 @@ bool zen::manualProgramUpdateRequired()
 
 Zstring zen::getResourceDir()
 {
+    //make independent from wxWidgets global variable "appname"; support being called by RealtimeSync
+    auto appName = wxTheApp->GetAppName();
+    wxTheApp->SetAppName(L"FreeFileSync");
+    ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
+
 #ifdef ZEN_WIN
     return getInstallDir();
 #elif defined ZEN_LINUX
@@ -76,6 +82,11 @@ Zstring zen::getResourceDir()
 
 Zstring zen::getConfigDir()
 {
+    //make independent from wxWidgets global variable "appname"; support being called by RealtimeSync
+    auto appName = wxTheApp->GetAppName();
+    wxTheApp->SetAppName(L"FreeFileSync");
+    ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
+
 #ifdef ZEN_WIN
     if (isPortableVersion())
         return getInstallDir();

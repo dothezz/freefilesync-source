@@ -2,18 +2,42 @@
 	<language>Lietuvių</language>
 	<translator>Tadas Norbutas</translator>
 	<locale>lt_LT</locale>
-	<flag_image>flag_lithuania.png</flag_image>
-	<plural_form_count>4</plural_form_count>
+	<image>flag_lithuania.png</image>
+	<plural_count>4</plural_count>
 	<plural_definition>n==1 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : n%10==0 || (n%100>10 && n%100<20) ? 2 : 3</plural_definition>
 </header>
 
+<source>Unable to suspend system sleep mode.</source>
+<target></target>
+
+<source>Unable to register to receive system messages.</source>
+<target></target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target></target>
+
+<source>Move</source>
+<target></target>
+
 <source>&Continue</source>
+<target></target>
+
+<source>Stopped</source>
 <target></target>
 
 <source>&Don't show this warning again</source>
 <target></target>
 
+<source>Serious Error</source>
+<target></target>
+
 <source>&Ignore subsequent errors</source>
+<target></target>
+
+<source>Comparison Settings</source>
+<target></target>
+
+<source>Synchronization Settings</source>
 <target></target>
 
 <source>Never save &changes</source>
@@ -29,22 +53,252 @@
 <source>&Execute</source>
 <target></target>
 
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Select View</source>
+<target></target>
+
+<source>Filter Files</source>
+<target></target>
+
+<source>Main Bar</source>
+<target></target>
+
+<source>Folder Pairs</source>
+<target></target>
+
+<source>Select Time Span</source>
+<target></target>
+
+<source>Global Settings</source>
+<target></target>
+
+<source>Delete Items</source>
+<target></target>
+
+<source>Save as Batch Job</source>
+<target></target>
+
+<source>Restore hidden windows</source>
+<target></target>
+
+<source>Customize context menu:</source>
+<target></target>
+
+<source>Delay (in seconds):</source>
+<target></target>
+
+<source>Retry count:</source>
+<target></target>
+
+<source>Automatic retry on error:</source>
+<target></target>
+
+<source>Transfer file and folder permissions.</source>
+<target></target>
+
+<source>(requires administrator rights)</source>
+<target></target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target></target>
+
+<source>(recommended)</source>
+<target></target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target></target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target></target>
+
+<source>Maximum:</source>
+<target></target>
+
+<source>Minimum:</source>
+<target></target>
+
+<source>File size:</source>
+<target></target>
+
+<source>Time span:</source>
+<target></target>
+
+<source>Exclude:</source>
+<target></target>
+
+<source>Include:</source>
+<target></target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target></target>
+
+<source>&Recycle bin</source>
+<target></target>
+
+<source>How can I schedule a batch job?</source>
+<target></target>
+
+<source>Limit:</source>
+<target></target>
+
+<source>Save log:</source>
+<target></target>
+
+<source>Stop synchronization at first error</source>
+<target></target>
+
+<source>Stop</source>
+<target></target>
+
 <source>&Don't show this dialog again</source>
+<target></target>
+
+<source>Variant:</source>
+<target></target>
+
+<source>Start synchronization now?</source>
+<target></target>
+
+<source>On completion:</source>
+<target></target>
+
+<source>Handle errors:</source>
+<target></target>
+
+<source>Show examples</source>
+<target></target>
+
+<source>Delete files:</source>
+<target></target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target></target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target></target>
+
+<source>More information</source>
+<target></target>
+
+<source>Symbolic links:</source>
+<target></target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target></target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target></target>
+
+<source>Select a variant:</source>
+<target></target>
+
+<source>Find:</source>
 <target></target>
 
 <source>Close search bar</source>
 <target></target>
 
-<source>Check for new &version</source>
+<source>&Check for new version</source>
 <target></target>
 
 <source>&Tools</source>
 <target></target>
 
+<source>&Find...</source>
+<target></target>
+
+<source>Local Filter</source>
+<target></target>
+
+<source>Alternate Synchronization Settings</source>
+<target></target>
+
+<source>Alternate Comparison Settings</source>
+<target></target>
+
+<source>None</source>
+<target></target>
+
+<source>Active</source>
+<target></target>
+
+<source>Local filter</source>
+<target></target>
+
+<source>Alternate synchronization settings</source>
+<target></target>
+
+<source>Alternate comparison settings</source>
+<target></target>
+
 <source>&Download</source>
 <target></target>
 
+<source>Check for Program Updates</source>
+<target></target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target></target>
+
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target></target>
+
+<source>Synchronization stopped</source>
+<target></target>
+
+<source>Please enter a target folder for versioning.</source>
+<target></target>
+
+<source>Incorrect command line:</source>
+<target></target>
+
 <source>&Show error</source>
+<target></target>
+
+<source>Automated Synchronization</source>
+<target></target>
+
+<source>&Start</source>
+<target></target>
+
+<source>Command line:</source>
+<target></target>
+
+<source>Idle time (in seconds):</source>
+<target></target>
+
+<source>Folders to watch:</source>
+<target></target>
+
+<source>&View help</source>
+<target></target>
+
+<source>Unable to create timestamp for versioning:</source>
+<target></target>
+
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target></target>
+
+<source>%x items/sec</source>
 <target></target>
 
 <source>
@@ -330,9 +584,6 @@
 <source>/sec</source>
 <target>/sek.</target>
 
-<source>%x items</source>
-<target>%x pozicijos</target>
-
 <source>Configuration file %x loaded partially only.</source>
 <target>Nustatymų failas %x įkeltas tik dalinai.</target>
 
@@ -360,12 +611,6 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Vietos vardas %x nėra failo kelio %y dalis.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Nutraukti: laukiama kol baigsis esama operacija...</target>
-
-<source>Failure to create timestamp for versioning:</source>
-<target>Nepavyo sukurti laiko žymės versijavimui:</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Nepavyksta perskaityti sekančių XML elementų:</target>
 
@@ -380,9 +625,6 @@
 
 <source>&Program</source>
 <target>&Programa</target>
-
-<source>&Content</source>
-<target>&Turinys</target>
 
 <source>&About</source>
 <target>&Apie</target>
@@ -405,9 +647,6 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Kad pradėti tiesiog importuokite .ffs_batch failą.</target>
 
-<source>Folders to watch</source>
-<target>Stebimi aplankai</target>
-
 <source>Add folder</source>
 <target>Pridėti aplanką</target>
 
@@ -419,9 +658,6 @@
 
 <source>Select a folder</source>
 <target>Pažymėti aplanką</target>
-
-<source>Idle time [seconds]</source>
-<target>Neveiklus laikas [sek.]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Neveiklus laikas tarp paskutinio aptikto pokyčio ir komandos įvykdymo</target>
@@ -437,17 +673,11 @@ Komanda inicijuojama jei:
 - atsiranda nauji aplankai (pvz.: įkišamas USB raktas)
 </target>
 
-<source>Start</source>
-<target>Pradėti</target>
-
 <source>&Retry</source>
 <target>&Bandyti vėl</target>
 
 <source>Cancel</source>
 <target>Atšaukti</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automatizuotas sinchronizavimas</target>
 
 <source>Build: %x</source>
 <target>Versija: %x</target>
@@ -469,9 +699,6 @@ Komanda inicijuojama jei:
 
 <source>&Exit</source>
 <target>&Išeiti</target>
-
-<source>Invalid command line:</source>
-<target>Netinkama komandinė eilutė:</target>
 
 <source>File content</source>
 <target>Failo turinį</target>
@@ -533,9 +760,6 @@ Komanda inicijuojama jei:
 <source>Target folder input field must not be empty.</source>
 <target>Tikslo aplanko įvesties laukas negali būti tuščias.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Aplanko įvesties laukas versijavimui negali būti tuščias.</target>
-
 <source>Source folder %x not found.</source>
 <target>Šaltinio aplankas %x nerastas.</target>
 
@@ -572,9 +796,6 @@ Komanda inicijuojama jei:
 <source>job name</source>
 <target>Užduoties pavadinimas</target>
 
-<source>Synchronization aborted</source>
-<target>Synchronizavimas nutrauktas</target>
-
 <source>Synchronization completed with errors</source>
 <target>Synchronizavimas baigtas su klaidomis</target>
 
@@ -590,23 +811,11 @@ Komanda inicijuojama jei:
 <source>Saving log file %x...</source>
 <target>Saugmas žurnalo failas %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Spauskite „Perjungti“, kad išspręsti problemas pagrindiniame FreeFileSync lange.</target>
-
-<source>Switching to FreeFileSync main dialog</source>
-<target>Keičiama į pagrindinį FreeFileSync langą</target>
-
-<source>Retrying operation after error:</source>
-<target>Po klaidos kartojama operacija:</target>
-
 <source>A new version of FreeFileSync is available:</source>
 <target>Yra nauja FreeFileSync versija:</target>
 
 <source>Download now?</source>
 <target>Atsiųsti dabar?</target>
-
-<source>New version found</source>
-<target>Rasta nauja versija</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync yra naujausia.</target>
@@ -671,21 +880,6 @@ Komanda inicijuojama jei:
 <source>Hibernate</source>
 <target>Stabdyti į operatyviąją atmintį</target>
 
-<source>Selected variant:</source>
-<target>Pasirinktas variantas:</target>
-
-<source>Select alternate comparison settings</source>
-<target>Pasirinkite alternatyvius sulyginimo nustatymus</target>
-
-<source>Select alternate synchronization settings</source>
-<target>Pasirinkite alternatyvius sinchronizavimo nustatymus</target>
-
-<source>Filter is active</source>
-<target>Filtas yra aktyvus</target>
-
-<source>No filter selected</source>
-<target>Nepažymėti jokie filtrai</target>
-
 <source>Remove alternate settings</source>
 <target>Pašalinti alternatyvius nustatymus</target>
 
@@ -713,14 +907,14 @@ Komanda inicijuojama jei:
 <source>2. &Synchronize</source>
 <target>2. &Sinchronizuoti</target>
 
+<source>&Global settings</source>
+<target>&Bendri nustatymai</target>
+
 <source>&Language</source>
 <target>&Kalba</target>
 
 <source>&Export file list...</source>
 <target>&Eksportuoti failų sąrašą...</target>
-
-<source>&Global settings</source>
-<target>&Bendri nustatymai</target>
 
 <source>&Check now</source>
 <target>&Tikrinti dabar</target>
@@ -742,9 +936,6 @@ Komanda inicijuojama jei:
 
 <source>Swap sides</source>
 <target>Sukeisti puses</target>
-
-<source>Find what:</source>
-<target>Rasti kas:</target>
 
 <source>Match case</source>
 <target>Atitikti atveją</target>
@@ -770,83 +961,11 @@ Komanda inicijuojama jei:
 <source>Total bytes to copy</source>
 <target>Viso baitų kopijuoti</target>
 
-<source>Items found:</source>
-<target>Rasta elementų:</target>
-
-<source>Speed:</source>
-<target>Greitis:</target>
-
-<source>Time remaining:</source>
-<target>Likęs laikas:</target>
-
-<source>Time elapsed:</source>
-<target>Praėjęs laikas:</target>
-
-<source>Synchronizing...</source>
-<target>Sinchronizuojama...</target>
-
-<source>Minimize to notification area</source>
-<target>Nuleisti į apačią dešinėje</target>
-
-<source>On completion</source>
-<target>Baigus</target>
-
-<source>Close</source>
-<target>Uždaryti</target>
-
-<source>&Pause</source>
-<target>&Pauzė</target>
-
-<source>Variant</source>
-<target>Variantas</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
-
-<source>Select a variant</source>
-<target>Pasirinkti</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Failai laikomi lygiais jei
-     - paskutinis rašymo laikas ir data
-     - failo dydis
-yra tokie patys
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Failai laikomi lygiais jei
-     - failo turinys
-yra toks pats
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Simbolinių nuorodų valdymas</target>
-
-<source>Help</source>
-<target>Pagalba</target>
-
 <source>OK</source>
 <target>Gerai</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Nustatyti ir skatinti pokyčius apbiejose pusėse. Trinimai, perkėlimai ir konfliktai yra aptinkami automatiškai naudojant duomenų bazę.</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Veidrodinė kairiojo aplanko kopija. Dešinysis aplankas yra pakeičiamas taip, kad po sinchronizavimo tiksliai atitiktų kairyjį aplanką.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopijuoti naujus ar atnaujintus failus į dešinyjį aplanką.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Nustatyti Jūsų pačių sinchronizavimo taisykles.</target>
@@ -856,24 +975,6 @@ yra toks pats
 
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Reikalauja duomenų bazės failų. Visų failų sistemų nėra palaikoma.</target>
-
-<source>Error handling</source>
-<target>Klaidų valdymas</target>
-
-<source>Ignore</source>
-<target>Ignoruoti</target>
-
-<source>Hide all error and warning messages</source>
-<target>Slėpti visus klaidų ir perspėjimų pranešimus</target>
-
-<source>Pop-up</source>
-<target>Iššokti</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Rodyti pranešimą esant klaidoms ar perspėjimams</target>
-
-<source>Deletion handling</source>
-<target>Trinimo valdymas</target>
 
 <source>Permanent</source>
 <target>Visiškai</target>
@@ -896,29 +997,50 @@ yra toks pats
 <source>Naming convention:</source>
 <target>Pavadinimų taisyklės:</target>
 
-<source>Batch job</source>
-<target>Paketinė užduotis</target>
+<source>Ignore</source>
+<target>Ignoruoti</target>
+
+<source>Hide all error and warning messages</source>
+<target>Slėpti visus klaidų ir perspėjimų pranešimus</target>
+
+<source>Pop-up</source>
+<target>Iššokti</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Rodyti pranešimą esant klaidoms ar perspėjimams</target>
+
+<source>Statistics</source>
+<target>Statistika</target>
+
+<source>Items found:</source>
+<target>Rasta elementų:</target>
+
+<source>Speed:</source>
+<target>Greitis:</target>
+
+<source>Time remaining:</source>
+<target>Likęs laikas:</target>
+
+<source>Time elapsed:</source>
+<target>Praėjęs laikas:</target>
+
+<source>Synchronizing...</source>
+<target>Sinchronizuojama...</target>
+
+<source>Minimize to notification area</source>
+<target>Nuleisti į apačią dešinėje</target>
+
+<source>Close</source>
+<target>Uždaryti</target>
+
+<source>&Pause</source>
+<target>&Pauzė</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Sukurti paleidimo failą sinchronizacijai be priežiūros. Norint jį paleisti reikia paspausti and failo du kartus pele arba nustatyti su užduočių planuotoju: %x</target>
 
-<source>Exit</source>
-<target>Išeiti</target>
-
-<source>Abort synchronization on first error</source>
-<target>Nutraukti sinchronizavimą su pirma klaida</target>
-
 <source>Show progress dialog</source>
 <target>Rodyti eigos langą</target>
-
-<source>Save log</source>
-<target>Saugoti žurnalus</target>
-
-<source>Select folder to save log files</source>
-<target>Pasirinkite aplanką ataskaitos failų saugojimui</target>
-
-<source>Limit</source>
-<target>Riba</target>
 
 <source>Limit maximum number of log files</source>
 <target>Apriboti ataskaitų failų skaičių</target>
@@ -929,62 +1051,17 @@ yra toks pats
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Ištrinti abiejose pusėse net jei failas yra pažymėtas tik vienoje pusėje</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Failai gali būti sinchronizuoti tik tada, kai atitinka filtrų taisykles
-Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
-</target>
-
-<source>Include</source>
-<target>Įtraukti</target>
-
-<source>Exclude</source>
-<target>Neįtraukti</target>
-
-<source>Time span</source>
-<target>Laiko tarpas</target>
-
-<source>File size</source>
-<target>Failo dydis</target>
-
-<source>Minimum</source>
-<target>Mažiausiai</target>
-
-<source>Maximum</source>
-<target>Daugiausiai</target>
-
 <source>&Clear</source>
 <target>&Išvalyti</target>
-
-<source>Global settings</source>
-<target>Bendri nustatymai</target>
 
 <source>Fail-safe file copy</source>
 <target>Apsauginė failo kopija</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Kopijuoti į laikiną failą (*.ffs_tmp), o tik po to pervadinti. Tai garantuoją stabilią būseną net įvykus nepataisomai klaidai.</target>
-
 <source>Copy locked files</source>
 <target>Kopijuoti užrakintus failus</target>
 
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopijuoti bendrintus ar užrakintus failus naudojant Volume Shadow Copy paslaugą (administratoriaus teisės privalomos)</target>
-
 <source>Copy file access permissions</source>
 <target>Kopijuoti failo leidimus</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Išsaugoti failų ir katalogų teises (administratoriaus teisės privalomos)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Atstatyti paslėptus langus</target>
-
-<source>External applications</source>
-<target>Išorinės programos</target>
 
 <source>Description</source>
 <target>Apibūdinimas</target>
@@ -1016,27 +1093,6 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>Many thanks for localization:</source>
 <target>Labai dėkojame už vertimą:</target>
 
-<source>Start synchronization</source>
-<target>Pradėti sinchronizavimą</target>
-
-<source>Comparison settings</source>
-<target>Sulyginimo nustatymai</target>
-
-<source>Synchronization settings</source>
-<target>Sinchronizavimo nustatymai</target>
-
-<source>Delete</source>
-<target>Trinti</target>
-
-<source>Configure filter</source>
-<target>Nustatyti filtrą</target>
-
-<source>Select time span</source>
-<target>Pažymėti laiko trukmę</target>
-
-<source>Folder pairs</source>
-<target>Aplankų poros</target>
-
 <source>Find</source>
 <target>Rasti</target>
 
@@ -1045,15 +1101,6 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 
 <source>Configuration</source>
 <target>Nustatymai</target>
-
-<source>Main bar</source>
-<target>Pagrindinė juosta</target>
-
-<source>Filter files</source>
-<target>Filtruoti failus</target>
-
-<source>Select view</source>
-<target>Pasirinkti rodomus</target>
 
 <source>Open...</source>
 <target>Atverti...</target>
@@ -1064,16 +1111,14 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>Compare both sides</source>
 <target>Sulyginti abi puses</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Ar tikrai norite paleisti %y komandą 1-ai pozicijai?</pluralform>
-<pluralform>Ar tikrai norite paleisti %y komandą %x pozicijoms?</pluralform>
-<pluralform>Ar tikrai norite paleisti %y komandą %x pozicijų?</pluralform>
-<pluralform>Ar tikrai norite paleisti %y komandą %x pozicijai?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Sulyginimo nustatymai</target>
+
+<source>Synchronization settings</source>
+<target>Sinchronizavimo nustatymai</target>
+
+<source>Start synchronization</source>
+<target>Pradėti sinchronizavimą</target>
 
 <source>Confirm</source>
 <target>Patvirtinti</target>
@@ -1117,6 +1162,9 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 
 <source>Include temporarily</source>
 <target>Įtraukti laikinai</target>
+
+<source>Delete</source>
+<target>Trinti</target>
 
 <source>Include all</source>
 <target>Įtraukti visus</target>
@@ -1163,6 +1211,9 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>Do&n't save</source>
 <target>&Nesaugoti</target>
 
+<source>Filter</source>
+<target>Filtras</target>
+
 <source>Show files that exist on left side only</source>
 <target>Rodyti failus, kurie egzistuoja tik kairėje pusėje</target>
 
@@ -1208,9 +1259,6 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>Set as default</source>
 <target>Nustatyti kaip numatytą</target>
 
-<source>Operation aborted</source>
-<target>Operacija nutraukta</target>
-
 <source>All folders are in sync</source>
 <target>Visi aplankai susinchronizuoti</target>
 
@@ -1229,14 +1277,8 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>&Ignore</source>
 <target>&Ignoruoti</target>
 
-<source>Fatal Error</source>
-<target>Kritinė klaida</target>
-
 <source>&Switch</source>
 <target>&Perjungti</target>
-
-<source>Question</source>
-<target>Klausimas</target>
 
 <source>&Yes</source>
 <target>&Taip</target>
@@ -1259,17 +1301,11 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>Initializing...</source>
 <target>Pradedama...</target>
 
-<source>Aborted</source>
-<target>Nutraukta</target>
-
 <source>Completed</source>
 <target>Baigta</target>
 
 <source>Log</source>
 <target>Archyvas</target>
-
-<source>Inactive</source>
-<target>Neaktyvus</target>
 
 <source>Today</source>
 <target>Šiandien</target>
@@ -1295,9 +1331,6 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filtras</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1319,6 +1352,9 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
 <pluralform>Ar tikrai norite ištrinti šį %x elementą?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Neįtraukti</target>
 
 <source>Direct</source>
 <target>Tiesiogiai</target>
@@ -1343,9 +1379,6 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Kitos pusės atitikmuo %item_folder%</target>
-
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Ar vėl rodyti paslėptus perspėjimus ir langus?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Palikti kaip neišpręstą konfliktą</target>
@@ -1476,14 +1509,8 @@ Pastaba: Failų keliai turi būti nurodyti tik iki pagrindinių katalogų
 <pluralform>%x diena</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Užregistruoti sistemos pranešimų gavimui nepavyko</target>
-
 <source>Cannot set privilege %x.</source>
 <target>Nepavyksta nustatyti privilegijos %x.</target>
-
-<source>Failed to suspend system sleep mode.</source>
-<target>Nepavyko sustabdyti sistemos į miegojimo veikseną.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Nepavyksta pakeisti proceso I/O prioritetų.</target>

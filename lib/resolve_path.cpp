@@ -508,12 +508,9 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
             return startsWith(path, prefix);
 #endif
         };
-        std::for_each(envToDir.begin(), envToDir.end(),
-                      [&](const std::pair<Zstring, Zstring>& entry)
-        {
+        for (const auto& entry : envToDir)
             if (pathStartsWith(dirname, entry.second))
                 output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirname.c_str() + entry.second.size()));
-        });
     }
 
     //4. replace (all) macros: %USERPROFILE% -> C:\Users\<user>

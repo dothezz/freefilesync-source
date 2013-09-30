@@ -23,8 +23,8 @@ public:
     void hide();
 
 private:
-    class PopupDialogGenerated;
-    PopupDialogGenerated* tipWindow;
+    class TooltipDialogGenerated;
+    TooltipDialogGenerated* tipWindow;
     wxWindow& parent_;
 };
 }

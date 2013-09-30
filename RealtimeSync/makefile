@@ -42,7 +42,7 @@ CXXFLAGS += -DZEN_MAC
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
 CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
-MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 #-Wl,-Bstatic not supported on OSX!
 
 # link wxWidgets and boost statically -> check dependencies with: otool -L RealtimeSync
@@ -56,7 +56,6 @@ CPP_LIST= #internal list of all *.cpp files needed for compilation
 CPP_LIST+=application.cpp
 CPP_LIST+=gui_generated.cpp
 CPP_LIST+=main_dlg.cpp
-CPP_LIST+=resources.cpp
 CPP_LIST+=tray_menu.cpp
 CPP_LIST+=monitor.cpp
 CPP_LIST+=xml_ffs.cpp
@@ -74,7 +73,11 @@ CPP_LIST+=../zen/file_handling.cpp
 CPP_LIST+=../zen/file_io.cpp
 CPP_LIST+=../zen/file_traverser.cpp
 CPP_LIST+=../zen/zstring.cpp
+CPP_LIST+=../zen/format_unit.cpp
 CPP_LIST+=../wx+/image_tools.cpp
+CPP_LIST+=../wx+/image_resources.cpp
+CPP_LIST+=../wx+/popup_dlg.cpp
+CPP_LIST+=../wx+/popup_dlg_generated.cpp
 
 #list of all *.o files (we need the "RTS" subdirectory to handle "../*.cpp" files
 OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_GCC_Make_Release/RTS/%.o)

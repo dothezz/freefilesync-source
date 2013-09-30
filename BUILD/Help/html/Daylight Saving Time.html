@@ -20,27 +20,26 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt"><SPAN STYLE="font-style: normal">Daylight
-saving time </SPAN><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">(Windows)</SPAN></SPAN></FONT></FONT></H2>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt"><SPAN STYLE="font-style: normal">Daylight Saving Time </SPAN><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">(Windows)</SPAN></SPAN></FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">A
-common problem synchronization software has to deal with are +-1 hour
+common problem synchronization software has to handle are +-1 hour
 file time shifts after a Daylight Saving Time (DST) switch has
 occurred. This can be observed for example when a FAT-formatted
-volume is compared against an NTFS volume as frequently happens with
-USB memory sticks. Files that previously appeared to be in sync are
-now shown with a one hour modification time offset, although they
-have not been modified by the user or by other means.</FONT></P>
+volume is compared against an NTFS volume as is the case when synchronizing a local disk against a
+USB memory stick. Files that previously appeared to be in sync are
+now shown with an one hour modification time offset, although they
+have not been modified by the user or the operating system.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-reason for this strange behavior lies in the way NTFS and FAT drives
+reason for this behavior lies in the way NTFS and FAT drives
 store file times: NTFS stores time in UTC format, while FAT uses
 local time.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">When
-times stored in these two different formats are compared, one format
-has to be converted into the other first. In both cases Windows uses
-the current DST status as well as current time zone information for
+times of these two different formats are compared, one format
+has to be converted into the other first. In either way Windows uses
+the current DST status as well as the current time zone for
 its calculations. Consequently the result of this comparison is
 dependent from current system settings and in particular file times
-that used to be the same can show up as different after a DST switch.</FONT></P>
+that used to be the same can show up as different after a DST switch or when the time zone is changed.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For a
@@ -49,8 +48,8 @@ detailed discussion about this issue refer to:
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Solution:</B></FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Luckily
-FreeFileSync users need not to worry about this issue. Each file on a
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">
+FreeFileSync automatically handles this problem by adding the missing time information. Each file on a
 FAT volume automatically gets additional meta data encoded in its
 creation date that enables a correct file time calculation. This not
 only solves all DST issues but also time shifts that occur due to
@@ -62,7 +61,7 @@ travel between different time zones.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
 		order for FreeFileSync to start handling DST and timezone
 		differences, an initial full synchronization is required.
-		Subsequent syncs will never show a time difference again.</FONT></P>
+		Subsequent syncs will then never show a time difference again for unchanged files.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm; font-style: normal">
 		<FONT FACE="Tahoma, sans-serif">If a FAT volume is scanned the
 		first time by FreeFileSync this will take longer than usual since

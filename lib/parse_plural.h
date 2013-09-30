@@ -8,6 +8,7 @@
 #define PARSE_PLURAL_H_INCLUDED
 
 #include <memory>
+#include <cstdint>
 #include <functional>
 #include <zen/string_base.h>
 
@@ -30,11 +31,11 @@ class PluralForm
 {
 public:
     PluralForm(const std::string& stream); //throw ParsingError
-    int getForm(int n) const { n_ = n ; return expr->eval(); }
+    int getForm(std::int64_t n) const { n_ = std::abs(n) ; return static_cast<int>(expr->eval()); }
 
 private:
-    std::shared_ptr<Expr<int>> expr;
-    mutable int n_;
+    std::shared_ptr<Expr<std::int64_t>> expr;
+    mutable std::int64_t n_;
 };
 
 
@@ -46,11 +47,18 @@ class PluralFormInfo
 public:
     PluralFormInfo(const std::string& definition, int pluralCount); //throw InvalidPluralForm
 
-    int getCount() const { return static_cast<int>(formCount.size()); }
-    bool isSingleNumberForm(int n) const { return 0 <= n && n < static_cast<int>(formCount.size()) ? formCount[n] == 1 : false; }
+    int getCount() const { return static_cast<int>(forms.size()); }
+    bool isSingleNumberForm(int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].count == 1 : false; }
+    int getFirstNumber     (int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].firstNumber : -1; }
 
 private:
-    std::vector<int> formCount;
+    struct FormInfo
+    {
+        FormInfo() : count(0), firstNumber(0) {}
+        int count;
+        int firstNumber; //which maps to the plural form index position
+    };
+    std::vector<FormInfo> forms;
 };
 
 
@@ -145,20 +153,20 @@ private:
     std::shared_ptr<Expr<T>> elseExp_;
 };
 
-struct ConstNumberExp : public Expr<int>
+struct ConstNumberExp : public Expr<std::int64_t>
 {
-    ConstNumberExp(int n) : n_(n) {}
-    virtual int eval() const { return n_; }
+    ConstNumberExp(std::int64_t n) : n_(n) {}
+    virtual std::int64_t eval() const { return n_; }
 private:
-    int n_;
+    std::int64_t n_;
 };
 
-struct VariableNumberNExp : public Expr<int>
+struct VariableNumberNExp : public Expr<std::int64_t>
 {
-    VariableNumberNExp(int& n) : n_(n) {}
-    virtual int eval() const { return n_; }
+    VariableNumberNExp(std::int64_t& n) : n_(n) {}
+    virtual std::int64_t eval() const { return n_; }
 private:
-    int& n_;
+    std::int64_t& n_;
 };
 
 //-------------------------------------------------------------------------------
@@ -186,10 +194,10 @@ struct Token
     };
 
     Token(Type t) : type(t), number(0) {}
-    Token(int num) : type(TK_CONST_NUMBER), number(num) {}
+    Token(std::int64_t num) : type(TK_CONST_NUMBER), number(num) {}
 
     Type type;
-    int number; //if type == TK_CONST_NUMBER
+    std::int64_t number; //if type == TK_CONST_NUMBER
 };
 
 class Scanner
@@ -233,7 +241,7 @@ public:
 
         if (digitEnd != pos)
         {
-            int number = zen::stringTo<int>(std::string(pos, digitEnd));
+            auto number = zen::stringTo<std::int64_t>(std::string(pos, digitEnd));
             pos = digitEnd;
             return number;
         }
@@ -249,7 +257,7 @@ private:
         return std::equal(prefix.begin(), prefix.end(), pos);
     }
 
-    typedef std::vector<std::pair<std::string, Token::Type> > TokenList;
+    typedef std::vector<std::pair<std::string, Token::Type>> TokenList;
     TokenList tokens;
 
     const std::string stream_;
@@ -261,14 +269,14 @@ private:
 class Parser
 {
 public:
-    Parser(const std::string& stream, int& n) :
+    Parser(const std::string& stream, std::int64_t& n) :
         scn(stream),
         tk(scn.nextToken()),
         n_(n) {}
 
-    std::shared_ptr<Expr<int>> parse() //throw ParsingError; return value always bound!
+    std::shared_ptr<Expr<std::int64_t>> parse() //throw ParsingError; return value always bound!
     {
-        auto e = std::dynamic_pointer_cast<Expr<int>>(parseExpression()); //throw ParsingError
+        auto e = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //throw ParsingError
         if (!e)
             throw ParsingError();
         expectToken(Token::TK_END);
@@ -287,15 +295,15 @@ private:
             nextToken();
 
             auto ifExp   = std::dynamic_pointer_cast<Expr<bool>>(e);
-            auto thenExp = std::dynamic_pointer_cast<Expr<int>>(parseExpression()); //associativity: <-
+            auto thenExp = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //associativity: <-
 
             expectToken(Token::TK_TERNARY_COLON);
             nextToken();
 
-            auto elseExp = std::dynamic_pointer_cast<Expr<int>>(parseExpression()); //
+            auto elseExp = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //
             if (!ifExp || !thenExp || !elseExp)
                 throw ParsingError();
-            return std::make_shared<ConditionalExp<int>>(ifExp, thenExp, elseExp);
+            return std::make_shared<ConditionalExp<std::int64_t>>(ifExp, thenExp, elseExp);
         }
         return e;
     }
@@ -337,8 +345,8 @@ private:
             nextToken();
             std::shared_ptr<Expression> rhs = parseRelational();
 
-            if (t == Token::TK_EQUAL)     return makeBiExp(e, rhs, std::equal_to    <int>()); //throw ParsingError
-            if (t == Token::TK_NOT_EQUAL) return makeBiExp(e, rhs, std::not_equal_to<int>()); //
+            if (t == Token::TK_EQUAL)     return makeBiExp(e, rhs, std::equal_to    <std::int64_t>()); //throw ParsingError
+            if (t == Token::TK_NOT_EQUAL) return makeBiExp(e, rhs, std::not_equal_to<std::int64_t>()); //
         }
         return e;
     }
@@ -356,10 +364,10 @@ private:
             nextToken();
             std::shared_ptr<Expression> rhs = parseMultiplicative();
 
-            if (t == Token::TK_LESS)          return makeBiExp(e, rhs, std::less         <int>()); //
-            if (t == Token::TK_LESS_EQUAL)    return makeBiExp(e, rhs, std::less_equal   <int>()); //throw ParsingError
-            if (t == Token::TK_GREATER)       return makeBiExp(e, rhs, std::greater      <int>()); //
-            if (t == Token::TK_GREATER_EQUAL) return makeBiExp(e, rhs, std::greater_equal<int>()); //
+            if (t == Token::TK_LESS)          return makeBiExp(e, rhs, std::less         <std::int64_t>()); //
+            if (t == Token::TK_LESS_EQUAL)    return makeBiExp(e, rhs, std::less_equal   <std::int64_t>()); //throw ParsingError
+            if (t == Token::TK_GREATER)       return makeBiExp(e, rhs, std::greater      <std::int64_t>()); //
+            if (t == Token::TK_GREATER_EQUAL) return makeBiExp(e, rhs, std::greater_equal<std::int64_t>()); //
         }
         return e;
     }
@@ -378,7 +386,7 @@ private:
                 if (literal->eval() == 0)
                     throw ParsingError();
 
-            e = makeBiExp(e, rhs, std::modulus<int>()); //throw ParsingError
+            e = makeBiExp(e, rhs, std::modulus<std::int64_t>()); //throw ParsingError
         }
         return e;
     }
@@ -392,7 +400,7 @@ private:
         }
         else if (token().type == Token::TK_CONST_NUMBER)
         {
-            const int number = token().number;
+            const std::int64_t number = token().number;
             nextToken();
             return std::make_shared<ConstNumberExp>(number);
         }
@@ -420,7 +428,7 @@ private:
 
     Scanner scn;
     Token tk;
-    int& n_;
+    std::int64_t& n_;
 };
 }
 
@@ -431,7 +439,7 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
     if (pluralCount < 1)
         throw InvalidPluralForm();
 
-    formCount.resize(pluralCount);
+    forms.resize(pluralCount);
     try
     {
         parse_plural::PluralForm pf(definition); //throw parse_plural::ParsingError
@@ -442,8 +450,12 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
         for (int j = 0; j < 1000; ++j)
         {
             int form = pf.getForm(j);
-            if (0 <= form && form < static_cast<int>(formCount.size()))
-                ++formCount[form];
+            if (0 <= form && form < static_cast<int>(forms.size()))
+            {
+                if (forms[form].count == 0)
+                    forms[form].firstNumber = j;
+                ++forms[form].count;
+            }
             else
                 throw InvalidPluralForm();
         }
@@ -454,7 +466,7 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
     }
 
     //ensure each form is used at least once:
-    if (!std::all_of(formCount.begin(), formCount.end(), [](int count) { return count >= 1; }))
+    if (!std::all_of(forms.begin(), forms.end(), [](const FormInfo& fi) { return fi.count >= 1; }))
     throw InvalidPluralForm();
 }
 

@@ -2,10 +2,27 @@
 	<language>Svenska</language>
 	<translator>Åke Engelbrektson</translator>
 	<locale>sv_SE</locale>
-	<flag_image>flag_sweden.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_sweden.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Bägge sidor har ändrats sedan senaste synkroniseringen.</target>
@@ -292,8 +309,8 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>%x items</source>
-<target>%x objekt</target>
+<source>%x items/sec</source>
+<target>%x objekt/sek.</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Konfigurationsfilen %x lästes bara delvis in.</target>
@@ -322,11 +339,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Volymnamnet %x är inte en del av sökvägen %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Avbryter: Väntar på att aktuell process skall slutföras...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Stopp begärt: Väntar på att aktuell åtgärd skall slutföras...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Kunde inte skapa tidsstämpel för versionshantering</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Kunde inte skapa tidsstämpel för versionshantering:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan inte läsa följande XML-element:</target>
@@ -343,8 +360,8 @@
 <source>&Program</source>
 <target>&Program</target>
 
-<source>&Content</source>
-<target>&Innehåll</target>
+<source>&View help</source>
+<target>&Visa hjälpen</target>
 
 <source>&About</source>
 <target>&Om</target>
@@ -367,8 +384,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Importera en .ffs_batch-fil för att komma igång</target>
 
-<source>Folders to watch</source>
-<target>Mappar att bevaka</target>
+<source>Folders to watch:</source>
+<target>Mappar att övervaka:</target>
 
 <source>Add folder</source>
 <target>Lägg till mapp</target>
@@ -380,13 +397,16 @@
 <target>Bläddra</target>
 
 <source>Select a folder</source>
-<target>Markera en mapp</target>
+<target>Välj en mapp</target>
 
-<source>Idle time [seconds]</source>
-<target>Inaktivitet [sekunder]</target>
+<source>Idle time (in seconds):</source>
+<target>Vilotid (i sekunder)</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Väntetid mellan senast upptäckta förändring och kommandoexekvering</target>
+
+<source>Command line:</source>
+<target>Kommandorad:</target>
 
 <source>
 The command is triggered if:
@@ -399,17 +419,14 @@ Kommandot triggas om:
 - nya mappar upptäcks (ex. USB-minne ansluts)
 </target>
 
-<source>Start</source>
-<target>Start</target>
+<source>&Start</source>
+<target>&Start</target>
 
 <source>&Retry</source>
 <target>&Försök igen</target>
 
 <source>Cancel</source>
 <target>Avbryt</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Automatiserad synkronisering</target>
 
 <source>Build: %x</source>
 <target>Bygge: %x</target>
@@ -419,6 +436,9 @@ Kommandot triggas om:
 
 <source>All files</source>
 <target>Alla filer</target>
+
+<source>Automated Synchronization</source>
+<target>Automatiserad synkronisering</target>
 
 <source>Directory monitoring active</source>
 <target>Mappövervakning aktiv</target>
@@ -435,8 +455,8 @@ Kommandot triggas om:
 <source>&Exit</source>
 <target>&Avsluta</target>
 
-<source>Invalid command line:</source>
-<target>Ogiltig kommandorad:</target>
+<source>Incorrect command line:</source>
+<target>Felaktig kommandorad:</target>
 
 <source>File content</source>
 <target>Filinnehåll</target>
@@ -498,8 +518,8 @@ Kommandot triggas om:
 <source>Target folder input field must not be empty.</source>
 <target>Indatafältet för målmapp får inte vara tomt.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Indatafältet för versionshantering får inte vara tomt.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Ange en målmapp för versionshantering.</target>
 
 <source>Source folder %x not found.</source>
 <target>Källmappen %x kan inte hittas.</target>
@@ -537,8 +557,8 @@ Kommandot triggas om:
 <source>job name</source>
 <target>åtgärdsnamn</target>
 
-<source>Synchronization aborted</source>
-<target>Synkronisering avbruten</target>
+<source>Synchronization stopped</source>
+<target>Synkroniseringen stoppad</target>
 
 <source>Synchronization completed with errors</source>
 <target>Synkronisering slutförd med fel</target>
@@ -555,14 +575,11 @@ Kommandot triggas om:
 <source>Saving log file %x...</source>
 <target>Sparar loggfil %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Tryck "Växla" för att lösa problem i FreeFileSyncs huvudfönster</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>Du kan växla till FreeFileSyncs programfönster för att lösa problemet.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>Växlar till FreeFileSyncs huvuddialog</target>
-
-<source>Retrying operation after error:</source>
-<target>Försöker utföra åtgärden igen, efter fel:</target>
+<source>Switching to FreeFileSync's main window</source>
+<target>Växla till FreeFileSyncs programfönster</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Det finns en ny version av FreeFileSync</target>
@@ -570,8 +587,8 @@ Kommandot triggas om:
 <source>Download now?</source>
 <target>Ladda ner nu?</target>
 
-<source>New version found</source>
-<target>Ny version hittad</target>
+<source>Check for Program Updates</source>
+<target>Sök efter programuppdateringar</target>
 
 <source>&Download</source>
 <target>&Ladda ner</target>
@@ -639,20 +656,20 @@ Kommandot triggas om:
 <source>Hibernate</source>
 <target>Viloläge</target>
 
-<source>Selected variant:</source>
-<target>Vald variant:</target>
+<source>Alternate comparison settings</source>
+<target>Alternativa jämförelseinställningar</target>
 
-<source>Select alternate comparison settings</source>
-<target>Välj alternativa jämförelseinställningar</target>
+<source>Alternate synchronization settings</source>
+<target>Alternativa synkroniseringsinställningar</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Välj alternativa synkroniseringsinställningar</target>
+<source>Local filter</source>
+<target>Lokalt filter</target>
 
-<source>Filter is active</source>
-<target>Filter är aktiverat</target>
+<source>Active</source>
+<target>Aktiv</target>
 
-<source>No filter selected</source>
-<target>Inga filter aktiverade</target>
+<source>None</source>
+<target>Inget</target>
 
 <source>Remove alternate settings</source>
 <target>Ta bort alternativa inställningar</target>
@@ -665,6 +682,15 @@ Kommandot triggas om:
 
 <source>Paste</source>
 <target>Klistra in</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Alternativa jämförelseinställningar</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Alternativa synkroniseringsinställningar</target>
+
+<source>Local Filter</source>
+<target>Lokalt filter</target>
 
 <source>&New</source>
 <target>&Nytt</target>
@@ -681,14 +707,17 @@ Kommandot triggas om:
 <source>2. &Synchronize</source>
 <target>2. &Synkronisera</target>
 
+<source>&Global settings</source>
+<target>&Allmäna inställningar</target>
+
 <source>&Language</source>
 <target>&Språk</target>
 
+<source>&Find...</source>
+<target>&Sök...</target>
+
 <source>&Export file list...</source>
 <target>&Exportera fillista...</target>
-
-<source>&Global settings</source>
-<target>&Allmäna inställningar</target>
 
 <source>&Tools</source>
 <target>&Verktyg</target>
@@ -699,17 +728,11 @@ Kommandot triggas om:
 <source>Check &automatically once a week</source>
 <target>Sök &automatiskt en gång per vecka</target>
 
-<source>Check for new &version</source>
-<target>Sök efter ny &version</target>
+<source>&Check for new version</source>
+<target>&Sök efter uppdateringar</target>
 
 <source>Compare</source>
 <target>Jämför</target>
-
-<source>Comparison settings</source>
-<target>Jämförelseinställningar</target>
-
-<source>Synchronization settings</source>
-<target>Synkroniseringsinställningar</target>
 
 <source>Synchronize</source>
 <target>Synkronisera</target>
@@ -722,6 +745,15 @@ Kommandot triggas om:
 
 <source>Swap sides</source>
 <target>Byt sida</target>
+
+<source>Close search bar</source>
+<target>Stäng sökfältet</target>
+
+<source>Find:</source>
+<target>Sök:</target>
+
+<source>Match case</source>
+<target>Matcha gemener/VERSALER</target>
 
 <source>Save as batch job</source>
 <target>Spara som batch-fil</target>
@@ -744,74 +776,20 @@ Kommandot triggas om:
 <source>Total bytes to copy</source>
 <target>Byte att kopiera</target>
 
-<source>Items found:</source>
-<target>Funna poster:</target>
+<source>Select a variant:</source>
+<target>Välj ett alternativ:</target>
 
-<source>Speed:</source>
-<target>Hastighet:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identifiera likadana filer genom att jämföra tidsstämpling och filstorlek.</target>
 
-<source>Time remaining:</source>
-<target>Återstående tid:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Identifiera likadana filer genom att jämföra filinnehåll.</target>
 
-<source>Time elapsed:</source>
-<target>Förfluten tid:</target>
+<source>Symbolic links:</source>
+<target>Symboliska länkar:</target>
 
-<source>Synchronizing...</source>
-<target>Synkroniserar...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimera till meddelandefältet</target>
-
-<source>On completion</source>
-<target>Vid slutfört</target>
-
-<source>Close</source>
-<target>Stäng</target>
-
-<source>&Pause</source>
-<target>&Paus</target>
-
-<source>Variant</source>
-<target>Variant</target>
-
-<source>Statistics</source>
-<target>Statistik</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Visa inte den här dialogen igen</target>
-
-<source>Select a variant</source>
-<target>Välj en variant</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Filer betraktas som likvärdiga om
-     - tidsstämpel för 'Senast ändrad'
-     - filstorlek
-är samma.
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Filerna betecknas som lika om, 
-     - filinnehållet
-är lika
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Hantering av Symboliska länkar</target>
-
-<source>Help</source>
-<target>Hjälp</target>
+<source>More information</source>
+<target>Mer information</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -819,11 +797,11 @@ Filerna betecknas som lika om,
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Speglar säkerhetskopia av vänster mapp. Höger mapp ändras för att exakt matcha vänster efter synkroniseringen.</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Skapar en speglad kopia av vänster mapp, som exakt matchas av höger mapp efter synkronisering.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiera nya och uppdaterade filer till höger mapp.</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopierar nya och uppdaterade filer till höger mapp.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurera dina egna synkroniseringsregler.</target>
@@ -834,23 +812,8 @@ Filerna betecknas som lika om,
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Kräver databasfiler som inte stöds av alla filsystem</target>
 
-<source>Error handling</source>
-<target>Felhantering</target>
-
-<source>Ignore</source>
-<target>Ignorera</target>
-
-<source>Hide all error and warning messages</source>
-<target>Visa inte fel- och varningsmeddelanden</target>
-
-<source>Pop-up</source>
-<target>Popup</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Visa popup vid fel och varningar</target>
-
-<source>Deletion handling</source>
-<target>Borttagning</target>
+<source>Delete files:</source>
+<target>Ta bort filer:</target>
 
 <source>Permanent</source>
 <target>Permanent</target>
@@ -873,32 +836,173 @@ Filerna betecknas som lika om,
 <source>Naming convention:</source>
 <target>Regler för namngivning</target>
 
-<source>Batch job</source>
-<target>Batch-jobb</target>
+<source>Show examples</source>
+<target>Visa exempel</target>
+
+<source>Handle errors:</source>
+<target>Felhantering:</target>
+
+<source>Ignore</source>
+<target>Ignorera</target>
+
+<source>Hide all error and warning messages</source>
+<target>Visa inte fel- och varningsmeddelanden</target>
+
+<source>Pop-up</source>
+<target>Popup</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Visa popup vid fel och varningar</target>
+
+<source>On completion:</source>
+<target>Vid slutfört:</target>
+
+<source>Start synchronization now?</source>
+<target>Vill du starta synkroniseringen nu?</target>
+
+<source>Variant:</source>
+<target>Alternativ:</target>
+
+<source>Statistics</source>
+<target>Statistik</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Visa inte den här dialogen igen</target>
+
+<source>Items found:</source>
+<target>Funna poster:</target>
+
+<source>Speed:</source>
+<target>Hastighet:</target>
+
+<source>Time remaining:</source>
+<target>Återstående tid:</target>
+
+<source>Time elapsed:</source>
+<target>Förfluten tid:</target>
+
+<source>Synchronizing...</source>
+<target>Synkroniserar...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimera till meddelandefältet</target>
+
+<source>Close</source>
+<target>Stäng</target>
+
+<source>&Pause</source>
+<target>&Paus</target>
+
+<source>Stop</source>
+<target>Stoppa</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Skapa en batch-fil för obevakad synkronisering. Dubbelklicka på filen för att starta den, eller schemalägg i en åtgärdshanterare: %x</target>
 
-<source>Exit</source>
-<target>Avsluta</target>
-
-<source>Abort synchronization on first error</source>
-<target>Avbryt synkronisering vid första felet</target>
+<source>Stop synchronization at first error</source>
+<target>Stoppa synkroniseringen vid första fel som uppstår</target>
 
 <source>Show progress dialog</source>
 <target>Visa förloppsindikator</target>
 
-<source>Save log</source>
-<target>Spara logg</target>
+<source>Save log:</source>
+<target>Spara logg:</target>
 
-<source>Select folder to save log files</source>
-<target>Väl en mapp att spara loggfiler i</target>
-
-<source>Limit</source>
-<target>Begränsa</target>
+<source>Limit:</source>
+<target>Gräns:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Begränsa antalet loggfiler</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Hur schemalägger jag en batch-fil?</target>
+
+<source>&Recycle bin</source>
+<target>&Papperskorgen</target>
+
+<source>Delete on both sides</source>
+<target>Ta bort på båda sidor</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Ta bort på båda sidor, även om filen är markerad på endast en sida</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande mapp-par</target>
+
+<source>Include:</source>
+<target>Inkludera:</target>
+
+<source>Exclude:</source>
+<target>Undanta:</target>
+
+<source>Time span:</source>
+<target>Tidsrymd:</target>
+
+<source>File size:</source>
+<target>Filstorlek:</target>
+
+<source>Minimum:</source>
+<target>Min:</target>
+
+<source>Maximum:</source>
+<target>Max:</target>
+
+<source>&Clear</source>
+<target>&Rensa</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Följande inställningar används för all synkronisering</target>
+
+<source>Fail-safe file copy</source>
+<target>Felsäker filkopiering</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Kopierar till en temporär fil (*.ffs_tmp), före överskrivning av målet.
+Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
+</target>
+
+<source>(recommended)</source>
+<target>(rekommenderas)</target>
+
+<source>Copy locked files</source>
+<target>Kopiera låsta filer</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Kopierar delade eller låsta filer med hjälp av tjänsten 'Volume Shadow Copy'</target>
+
+<source>(requires administrator rights)</source>
+<target>(kräver administratörsbehörighet)</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiera filåtkomstbehörigheter</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Överför behörighetsinställningar</target>
+
+<source>Automatic retry on error:</source>
+<target>Automatiska återförsök vid fel:</target>
+
+<source>Retry count:</source>
+<target>Antal försök:</target>
+
+<source>Delay (in seconds):</source>
+<target>Fördröjning (i sekunder)</target>
+
+<source>Customize context menu:</source>
+<target>Anpassad kontextmeny:</target>
+
+<source>Description</source>
+<target>Beskrivning</target>
+
+<source>Restore hidden windows</source>
+<target>Återställ dolda vyer</target>
+
+<source>&Default</source>
+<target>&Standard</target>
 
 <source>Source code written in C++ using:</source>
 <target>Källkod skriven i C++ med hjälp av:</target>
@@ -908,9 +1012,6 @@ Filerna betecknas som lika om,
 
 <source>Donate with PayPal</source>
 <target>Donera via PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Tack för översättning:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Återkoppling och förslag är välkommna</target>
@@ -924,101 +1025,26 @@ Filerna betecknas som lika om,
 <source>Published under the GNU General Public License</source>
 <target>Publiserad under GNU General Public License</target>
 
-<source>Delete on both sides</source>
-<target>Ta bort på båda sidor</target>
+<source>Many thanks for localization:</source>
+<target>Tack för översättning:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Ta bort på båda sidor, även om filen är markerad på endast en sida</target>
+<source>Save as Batch Job</source>
+<target>Spara som batch-fil</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Filer synkroniseras endast om de klarar alla filterregler.
-OBS! Sökvägar måste vara relaterade till ursprungsmappar.
-</target>
+<source>Delete Items</source>
+<target>Ta bort objekt</target>
 
-<source>Include</source>
-<target>Inkludera</target>
+<source>Global Settings</source>
+<target>Globala inställningar</target>
 
-<source>Exclude</source>
-<target>Undanta</target>
+<source>Select Time Span</source>
+<target>Välj tidsrymd</target>
 
-<source>Time span</source>
-<target>Tidsintervall</target>
-
-<source>File size</source>
-<target>Filstorlek</target>
-
-<source>Minimum</source>
-<target>Minimum</target>
-
-<source>Maximum</source>
-<target>Maximum</target>
-
-<source>&Clear</source>
-<target>&Rensa</target>
-
-<source>Global settings</source>
-<target>Allmäna inställningar</target>
-
-<source>Fail-safe file copy</source>
-<target>Felsäker filkopiering</target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Kopiera till en temporär fil först (*.ffs_tmp), och byt sedan namn på den. Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.</target>
-
-<source>Copy locked files</source>
-<target>Kopiera låsta filer</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopiera delade eller låsta filer med tjänsten 'Volume Shadow Copy' (kräver administratörsbehörighet)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiera filåtkomstbehörigheter</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Överför fil- och mappbehörigheter (kräver administratörsbehörighet)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Återställ dolda dialoger</target>
-
-<source>External applications</source>
-<target>Externa program</target>
-
-<source>Description</source>
-<target>Beskrivning</target>
-
-<source>&Default</source>
-<target>&Standard</target>
-
-<source>Find what:</source>
-<target>Sök efter:</target>
-
-<source>Match case</source>
-<target>Matcha gemener/VERSALER</target>
-
-<source>&Find next</source>
-<target>&Sök nästa</target>
-
-<source>Start synchronization</source>
-<target>Starta synkronisering</target>
-
-<source>Delete</source>
-<target>Ta bort</target>
-
-<source>Configure filter</source>
-<target>Filterinställningar</target>
+<source>Folder Pairs</source>
+<target>Mapp-par</target>
 
 <source>Find</source>
 <target>Sök</target>
-
-<source>Select time span</source>
-<target>Välj tidsintervall</target>
-
-<source>Folder pairs</source>
-<target>Mapp-par</target>
 
 <source>Overview</source>
 <target>Översikt</target>
@@ -1026,13 +1052,13 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Configuration</source>
 <target>Inställningar</target>
 
-<source>Main bar</source>
-<target>Huvudfält</target>
+<source>Main Bar</source>
+<target>Primärt verktygsfält</target>
 
-<source>Filter files</source>
-<target>Undantag</target>
+<source>Filter Files</source>
+<target>Filtrera filer</target>
 
-<source>Select view</source>
+<source>Select View</source>
 <target>Välj vy</target>
 
 <source>Open...</source>
@@ -1044,14 +1070,14 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Compare both sides</source>
 <target>Jämför båda sidor</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vill du verkligen köra kommandot %y för 1 objekt?</pluralform>
-<pluralform>Vill du verkligen köra kommandot %y för %x objekt?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Jämförelseinställningar</target>
+
+<source>Synchronization settings</source>
+<target>Synkroniseringsinställningar</target>
+
+<source>Start synchronization</source>
+<target>Starta synkronisering</target>
 
 <source>Confirm</source>
 <target>Bekräfta</target>
@@ -1089,12 +1115,6 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Set direction:</source>
 <target>Ange riktning:</target>
 
-<source>Exclude temporarily</source>
-<target>Undanta tillfälligt</target>
-
-<source>Include temporarily</source>
-<target>Inkludera tillfälligt</target>
-
 <source>multiple selection</source>
 <target>flerval</target>
 
@@ -1103,6 +1123,15 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 
 <source>Exclude via filter:</source>
 <target>Lägg till i undantag:</target>
+
+<source>Exclude temporarily</source>
+<target>Undanta tillfälligt</target>
+
+<source>Include temporarily</source>
+<target>Inkludera tillfälligt</target>
+
+<source>Delete</source>
+<target>Ta bort</target>
 
 <source>Include all</source>
 <target>Inkludera alla</target>
@@ -1152,6 +1181,9 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Never save &changes</source>
 <target>Spara aldrig &ändringar</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>Show files that exist on left side only</source>
 <target>Visa filer som endast finns till vänster</target>
 
@@ -1197,11 +1229,17 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Set as default</source>
 <target>Ange som standard</target>
 
-<source>Operation aborted</source>
-<target>Processen avbruten</target>
-
 <source>All folders are in sync</source>
 <target>Alla mappar är synkroniserade</target>
+
+<source>Synchronization Settings</source>
+<target>Synkroniseringsinställningar</target>
+
+<source>Comparison Settings</source>
+<target>Jämförelseinställningar</target>
+
+<source>Cannot find %x</source>
+<target>Kan inte hitta %x</target>
 
 <source>Comma-separated values</source>
 <target>Kommaseparerade värden</target>
@@ -1218,7 +1256,7 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>&Ignore</source>
 <target>&Ignorera</target>
 
-<source>Fatal Error</source>
+<source>Serious Error</source>
 <target>Allvarligt fel</target>
 
 <source>&Don't show this warning again</source>
@@ -1226,9 +1264,6 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 
 <source>&Switch</source>
 <target>&Växla</target>
-
-<source>Question</source>
-<target>Fråga</target>
 
 <source>&Yes</source>
 <target>&Ja</target>
@@ -1251,8 +1286,8 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>Initializing...</source>
 <target>Initierar...</target>
 
-<source>Aborted</source>
-<target>Användaren avbröt</target>
+<source>Stopped</source>
+<target>Stoppad</target>
 
 <source>Completed</source>
 <target>Slutförd</target>
@@ -1262,12 +1297,6 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 
 <source>Log</source>
 <target>Logg</target>
-
-<source>Cannot find %x</source>
-<target>Kan inte hitta %x</target>
-
-<source>Inactive</source>
-<target>Inaktiv</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1293,9 +1322,6 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filter</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1305,6 +1331,9 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <pluralform>Vill du verkligen flytta följande %x objekt till papperskorgen?</pluralform>
 </target>
 
+<source>Move</source>
+<target>Flytta</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1313,6 +1342,9 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <pluralform>Vill du verkligen ta bort följande objekt?</pluralform>
 <pluralform>Vill du verkligen ta bort följande %x objekt?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Undanta</target>
 
 <source>Direct</source>
 <target>Direkt</target>
@@ -1338,8 +1370,8 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Andra sidans motsvarighet till %item_folder%</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Vill du göra dolda varningar och dialoger, synliga igen?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Vill du återställa alla dolda vyer och varningar</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ignorera konflikt</target>
@@ -1464,14 +1496,14 @@ OBS! Sökvägar måste vara relaterade till ursprungsmappar.
 <pluralform>%x dagar</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Kunde inte registrera att ta emot systemmeddelanden</target>
+<source>Unable to register to receive system messages.</source>
+<target>Det gick inte att registrera mottagning av systemmeddelanden</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Kan inte att ange behörigheten %x.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Kunde inte avbryta systemet vänteläge</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Det går inte att avbryta systemets viloläge</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Kan inte ändra process I/O-prioritet</target>

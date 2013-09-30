@@ -9,10 +9,9 @@
 #include <zen/string_tools.h>
 #include <zen/i18n.h>
 #include <zen/utf.h>
-#include <wx/msgdlg.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
-#include "msg_popup.h"
+#include <wx+/popup_dlg.h>
 #include "../version/version.h"
 ////#include "../lib/ffs_paths.h"
 #include <zen/scope_guard.h>
@@ -227,24 +226,42 @@ void zen::checkForUpdateNow(wxWindow* parent)
         case GET_VER_SUCCESS:
             if (haveNewerVersion(onlineVersion))
             {
-                if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?"),
-                                    QuestConfig().setCaption(_("New version found")).setLabelYes(_("&Download"))) == ReturnQuestionDlg::BUTTON_YES)
-                    wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
+                                               setTitle(_("Check for Program Updates")).
+                                               setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")),
+                                               _("&Download")))
+                {
+                    case ConfirmationButton::DO_IT:
+                        wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                        break;
+                    case ConfirmationButton::CANCEL:
+                        break;
+                }
             }
             else
-                wxMessageBox(_("FreeFileSync is up to date."), L"FreeFileSync - " + _("Information"), wxOK | wxICON_INFORMATION, parent);
+                showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
+                                       setTitle(_("Check for Program Updates")).
+                                       setMainInstructions(_("FreeFileSync is up to date.")));
             break;
 
         case GET_VER_NO_CONNECTION:
-            wxMessageBox(_("Unable to connect to sourceforge.net."), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, parent);
+            showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+                                   setTitle(("Check for Program Updates")).
+                                   setMainInstructions(_("Unable to connect to sourceforge.net.")));
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
-            if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                _("Cannot find current FreeFileSync version number online. Do you want to check manually?"),
-                                QuestConfig().setCaption(_("Error"))) == ReturnQuestionDlg::BUTTON_YES)
-                wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+            switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+                                           setTitle(_("Check for Program Updates")).
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
+                                           _("&Check")))
+            {
+                case ConfirmationButton::DO_IT:
+                    wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+                    break;
+                case ConfirmationButton::CANCEL:
+                    break;
+            }
             break;
     }
 }
@@ -254,26 +271,6 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
 {
     if (lastUpdateCheck != -1)
     {
-        //if (lastUpdateCheck == 0)
-        //{
-        //    switch (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
-        //                            ("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
-        //                            ("(Requires an Internet connection!)")))
-        //    {
-        //        case ReturnQuestionDlg::BUTTON_YES:
-        //            lastUpdateCheck = 123; //some old date (few seconds after 1970) different from 0 and -1
-        //            checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
-        //            break;
-
-        //        case ReturnQuestionDlg::BUTTON_NO:
-        //            lastUpdateCheck = -1; //don't check for updates anymore
-        //            break;
-
-        //        case ReturnQuestionDlg::BUTTON_CANCEL:
-        //            break;
-        //    }
-        //}
-        //else
         if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
             onBeforeInternetAccess(); //notify client before (potentially) blocking some time
@@ -285,10 +282,17 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
 
                     if (haveNewerVersion(onlineVersion))
                     {
-                        if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?"),
-                                            QuestConfig().setCaption(_("New version found")).setLabelYes(_("&Download"))) == ReturnQuestionDlg::BUTTON_YES)
-                            wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                        switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
+                                                       setTitle(_("Check for Program Updates")).
+                                                       setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")),
+                                                       _("&Download")))
+                        {
+                            case ConfirmationButton::DO_IT:
+                                wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                                break;
+                            case ConfirmationButton::CANCEL:
+                                break;
+                        }
                     }
                     break;
 
@@ -296,10 +300,17 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
                     break; //ignore this error
 
                 case GET_VER_PAGE_NOT_FOUND:
-                    if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                        _("Cannot find current FreeFileSync version number online. Do you want to check manually?"),
-                                        QuestConfig().setCaption(_("Error"))) == ReturnQuestionDlg::BUTTON_YES)
-                        wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+                    switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+                                                   setTitle(_("Check for Program Updates")).
+                                                   setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
+                                                   _("&Check")))
+                    {
+                        case ConfirmationButton::DO_IT:
+                            wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+                            break;
+                        case ConfirmationButton::CANCEL:
+                            break;
+                    }
                     break;
             }
         }

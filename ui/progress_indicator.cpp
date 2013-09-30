@@ -11,7 +11,6 @@
 #include <wx/wupdlock.h>
 #include <wx/sound.h>
 #include <wx/clipbrd.h>
-#include <wx/msgdlg.h>
 #include <wx/dcclient.h>
 #include <wx/dataobj.h> //wxTextDataObject
 #include <zen/basic_math.h>
@@ -26,16 +25,17 @@
 #include <wx+/no_flicker.h>
 #include <wx+/font_size.h>
 #include <wx+/std_button_order.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include <zen/file_handling.h>
 #include <zen/thread.h>
 #include "gui_generated.h"
 #include "../lib/ffs_paths.h"
-#include "../lib/resources.h"
 #include "../lib/perf_check.h"
 #include "tray_icon.h"
 #include "taskbar.h"
 #include "exec_finished_box.h"
-//#include <wx/msgdlg.h>
+#include "app_icon.h"
 #ifdef ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
 #endif
@@ -155,8 +155,6 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
 {
     if (!syncStat_) //no comparison running!!
         return;
-
-    //wxWindowUpdateLocker dummy(this) -> not needed
 
     const wxString& scannedObjects = toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
 
@@ -410,8 +408,6 @@ enum ColumnTypeMsg
 //Grid data implementation referencing MessageView
 class GridDataMessages : public GridData
 {
-    static const int COLUMN_BORDER_LEFT = 4; //for left-aligned text
-
 public:
     GridDataMessages(const std::shared_ptr<MessageView>& msgView) : msgView_(msgView) {}
 
@@ -439,7 +435,7 @@ public:
                             case TYPE_ERROR:
                                 return _("Error");
                             case TYPE_FATAL_ERROR:
-                                return _("Fatal Error");
+                                return _("Serious Error");
                         }
                     break;
 
@@ -449,7 +445,7 @@ public:
         return wxEmptyString;
     }
 
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
     {
         wxRect rectTmp = rect;
 
@@ -499,15 +495,15 @@ public:
 
                 case COL_TYPE_MSG_TEXT:
                 {
-                    rectTmp.x     += COLUMN_BORDER_LEFT;
-                    rectTmp.width -= COLUMN_BORDER_LEFT;
+                    rectTmp.x     += COLUMN_GAP_LEFT;
+                    rectTmp.width -= COLUMN_GAP_LEFT;
                     drawCellText(dc, rectTmp, getValue(row, colType), true);
                 }
                 break;
             }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         // -> synchronize renderCell() <-> getBestSize()
 
@@ -516,13 +512,13 @@ public:
             switch (static_cast<ColumnTypeMsg>(colType))
             {
                 case COL_TYPE_MSG_TIME:
-                    return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
+                    return 2 * COLUMN_GAP_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
 
                 case COL_TYPE_MSG_CATEGORY:
                     return getResourceImage(L"msg_info_small").GetWidth();
 
                 case COL_TYPE_MSG_TEXT:
-                    return COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
+                    return COLUMN_GAP_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
             }
         return 0;
     }
@@ -531,7 +527,7 @@ public:
     {
         wxClientDC dc(&grid.getMainWin());
         dc.SetFont(grid.getMainWin().GetFont());
-        return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(formatTime<wxString>(FORMAT_TIME)).GetWidth();
+        return 2 * COLUMN_GAP_LEFT + dc.GetTextExtent(formatTime<wxString>(FORMAT_TIME)).GetWidth();
     }
 
     static int getColumnCategoryDefaultWidth()
@@ -544,7 +540,7 @@ public:
         return std::max(getResourceImage(L"msg_info_small").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
     }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const
+    virtual wxString getToolTip(size_t row, ColumnType colType) const override
     {
         MessageView::LogEntryView entry = {};
         if (msgView_ && msgView_->getEntry(row, entry))
@@ -717,7 +713,7 @@ private:
         }
         catch (const std::bad_alloc& e)
         {
-            wxMessageBox(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what())));
         }
     }
 
@@ -745,8 +741,13 @@ public:
         //return;
 
         timeNow = timeNowMs;
-        if (!samples.empty() && samples.rbegin()->second == value)
-            return; //don't insert duplicate values
+
+        //don't allow for more samples per second than there are UI updates (handles duplicate inserts, too!)
+        if (!samples.empty() && timeNowMs / UI_UPDATE_INTERVAL == samples.rbegin()->first / UI_UPDATE_INTERVAL)
+        {
+            samples.rbegin()->second = value;
+            return;
+        }
 
         samples.insert(samples.end(), std::make_pair(timeNowMs, value)); //time is "expected" to be monotonously ascending
         //documentation differs about whether "hint" should be before or after the to be inserted element!
@@ -757,7 +758,7 @@ public:
     }
 
 private:
-    virtual std::pair<double, double> getRangeX() const final
+    virtual std::pair<double, double> getRangeX() const override
     {
         if (samples.empty()) return std::make_pair(0.0, 0.0);
 
@@ -772,7 +773,7 @@ private:
                               upperEndMs / 1000.0);
     }
 
-    virtual Opt<CurvePoint> getLessEq(double x) const final //x: seconds since begin
+    virtual Opt<CurvePoint> getLessEq(double x) const override //x: seconds since begin
     {
         const long timex = std::floor(x * 1000);
         //------ add artifical last sample value -------
@@ -790,7 +791,7 @@ private:
         return CurvePoint(it->first / 1000.0, it->second);
     }
 
-    virtual Opt<CurvePoint> getGreaterEq(double x) const final
+    virtual Opt<CurvePoint> getGreaterEq(double x) const override
     {
         const long timex = std::ceil(x * 1000);
         //------ add artifical last sample value -------
@@ -820,9 +821,9 @@ public:
     void setValue(long xTimeNowMs, double yCurrent, double yTotal) { x = xTimeNowMs / 1000.0; yCurrent_ = yCurrent; yTotal_ = yTotal; }
 
 private:
-    virtual std::pair<double, double> getRangeX() const  final { return std::make_pair(x, x); } //conceptually just a vertical line!
+    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(x, x); } //conceptually just a vertical line!
 
-    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
     {
         //points.push_back(CurvePoint(-1, 0));
         //points.push_back(CurvePoint(0, 0));
@@ -854,9 +855,9 @@ public:
     void setValue(long xTimeNowMs, double yTotal) { x = xTimeNowMs / 1000.0; yTotal_ = yTotal; }
 
 private:
-    virtual std::pair<double, double> getRangeX() const  final { return std::make_pair(x, x); } //conceptually just a vertical line!
+    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(x, x); } //conceptually just a vertical line!
 
-    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
     {
         if (x <= maxX)
         {
@@ -940,7 +941,7 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
     {
         if (!drawLabel_) return wxString();
         return timeElapsed < 60 ?
-               replaceCpy(_P("1 sec", "%x sec", numeric::round(timeElapsed)), L"%x", zen::numberTo<std::wstring>(numeric::round(timeElapsed))) :
+               _P("1 sec", "%x sec", numeric::round(timeElapsed)) :
                timeElapsed < 3600 ?
                wxTimeSpan::Seconds(timeElapsed).Format(   L"%M:%S") :
                wxTimeSpan::Seconds(timeElapsed).Format(L"%H:%M:%S");
@@ -953,7 +954,7 @@ private:
 
 
 template <class TopLevelDialog> //can be a wxFrame or wxDialog
-class SyncProgressDialogImpl : private TopLevelDialog, public SyncProgressDialog
+class SyncProgressDialogImpl : public TopLevelDialog, public SyncProgressDialog
 /*we need derivation, not composition!
       1. SyncProgressDialogImpl IS a wxFrame/wxDialog
 	  2. implement virtual ~wxFrame()
@@ -1092,9 +1093,9 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler  (SyncProgressDialogImpl<TopLevelDialog>::OnClose));
     this->Connect(wxEVT_ICONIZE,      wxIconizeEventHandler(SyncProgressDialogImpl<TopLevelDialog>::OnIconize));
     this->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressed), nullptr, this);
-    pnl.m_buttonClose ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnOkay  ), NULL, this);
-    pnl.m_buttonPause ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnPause ), NULL, this);
-    pnl.m_buttonCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnCancel), NULL, this);
+    pnl.m_buttonClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnOkay  ), NULL, this);
+    pnl.m_buttonPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnPause ), NULL, this);
+    pnl.m_buttonStop ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnCancel), NULL, this);
     pnl.m_bpButtonMinimizeToTray->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnMinimizeToTray), NULL, this);
 
 #ifdef ZEN_WIN
@@ -1108,10 +1109,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     if (parentFrame_)
         parentFrameTitleBackup = parentFrame_->GetTitle(); //save old title (will be used as progress indicator)
 
-    pnl.m_animCtrlSyncing->SetAnimation(GlobalResources::instance().aniWorking);
+    pnl.m_animCtrlSyncing->SetAnimation(getResourceAnimation(L"working"));
     pnl.m_animCtrlSyncing->Play();
-
-    this->SetIcon(GlobalResources::instance().programIconFFS);
 
     this->EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
 
@@ -1129,7 +1128,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_panelItemsProcessed->Hide();
     pnl.m_buttonClose    ->Show(false);
     //set std order after button visibility was set
-    setStandardButtonOrder(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonPause).setCancel(pnl.m_buttonCancel));
+    setStandardButtonOrder(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonPause).setCancel(pnl.m_buttonStop));
 
     pnl.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
 
@@ -1175,7 +1174,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks
 
-    this->Fit();
+    this->GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     pnl.Layout();
 
     if (showProgress)
@@ -1183,11 +1182,11 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
         this->Show();
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider non-silent batch mode)
-        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
 
-        pnl.m_buttonCancel->SetFocus(); //don't steal focus when starting in sys-tray!
+        pnl.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
 
         //clear gui flicker, remove dummy texts: window must be visible to make this work!
         updateGuiInt(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
@@ -1208,8 +1207,9 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
         parentFrame_->Show();
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        //why isn't this covered by wxWindows::Raise()??
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider GUI mode with "close progress dialog")
-        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
         //if (parentFrame_->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
         //    parentFrame_->Iconize(false);
@@ -1228,9 +1228,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnKeyPressed(wxKeyEvent& event)
         wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
 
         //simulate click on abort button
-        if (pnl.m_buttonCancel->IsShown()) //delegate to "cancel" button if available
+        if (pnl.m_buttonStop->IsShown()) //delegate to "cancel" button if available
         {
-            if (wxEvtHandler* handler = pnl.m_buttonCancel->GetEventHandler())
+            if (wxEvtHandler* handler = pnl.m_buttonStop->GetEventHandler())
                 handler->ProcessEvent(dummy);
             return;
         }
@@ -1342,7 +1342,7 @@ std::wstring getDialogPhaseText(const Statistics* syncStat, bool paused, SyncPro
         switch (finalResult)
         {
             case SyncProgressDialog::RESULT_ABORTED:
-                return _("Aborted");
+                return _("Stopped");
             case SyncProgressDialog::RESULT_FINISHED_WITH_ERROR:
             case SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS:
             case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
@@ -1357,29 +1357,29 @@ template <class TopLevelDialog>
 void SyncProgressDialogImpl<TopLevelDialog>::setExternalStatus(const wxString& status, const wxString& progress) //progress may be empty!
 {
     //sys tray: order "top-down": jobname, status, progress
-    wxString newTrayInfo = jobName_.empty() ? status : L"\"" + jobName_ + L"\"\n" + status;
+    wxString systrayTooltip = jobName_.empty() ? status : L"\"" + jobName_ + L"\"\n" + status;
     if (!progress.empty())
-        newTrayInfo += L" " + progress;
+        systrayTooltip += L" " + progress;
 
     //window caption/taskbar; inverse order: progress, status, jobname
-    wxString newCaption = progress.empty() ? status : progress + L" - " + status;
+    wxString title = progress.empty() ? status : progress + L" - " + status;
     if (!jobName_.empty())
-        newCaption += L" - \"" + jobName_ + L"\"";
+        title += L" - \"" + jobName_ + L"\"";
 
     //systray tooltip, if window is minimized
     if (trayIcon.get())
-        trayIcon->setToolTip(newTrayInfo);
+        trayIcon->setToolTip(systrayTooltip);
 
     //show text in dialog title (and at the same time in taskbar)
     if (parentFrame_)
     {
-        if (parentFrame_->GetTitle() != newCaption)
-            parentFrame_->SetTitle(newCaption);
+        if (parentFrame_->GetTitle() != title)
+            parentFrame_->SetTitle(title);
     }
 
     //always set a title: we don't wxGTK to show "nameless window" instead
-    if (this->GetTitle() != newCaption)
-        this->SetTitle(newCaption);
+    if (this->GetTitle() != title)
+        this->SetTitle(title);
 }
 
 
@@ -1388,8 +1388,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
 {
     if (!syncStat_) //sync not running
         return;
-
-    //wxWindowUpdateLocker dummy(this); -> not needed
 
     bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
     const long timeNow = timeElapsed.Time();
@@ -1614,7 +1612,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
         switch (finalResult)
         {
             case RESULT_ABORTED:
-                setStatusBitmap(L"status_aborted", _("Synchronization aborted"));
+                setStatusBitmap(L"status_aborted", _("Synchronization stopped"));
                 break;
 
             case RESULT_FINISHED_WITH_ERROR:
@@ -1729,7 +1727,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             const long timeDelta = timeElapsed.Time() - phaseStartMs; //we need to consider "time within current phase" not total "timeElapsed"!
 
             const wxString overallBytesPerSecond = timeDelta == 0 ? wxString() : filesizeToShortString(dataCurrent * 1000 / timeDelta) + _("/sec");
-            const wxString overallItemsPerSecond = timeDelta == 0 ? wxString() : replaceCpy(_("%x items"), L"%x", formatThreeDigitPrecision(itemsCurrent * 1000.0 / timeDelta)) + _("/sec");
+            const wxString overallItemsPerSecond = timeDelta == 0 ? wxString() : replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsCurrent * 1000.0 / timeDelta));
 
             pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setCornerText(overallBytesPerSecond, Graph2D::CORNER_TOP_LEFT));
             pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setCornerText(overallItemsPerSecond, Graph2D::CORNER_TOP_LEFT));
@@ -1762,8 +1760,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     this->EnableCloseButton(true);
 
     pnl.m_bpButtonMinimizeToTray->Hide();
-    pnl.m_buttonCancel->Disable();
-    pnl.m_buttonCancel->Hide();
+    pnl.m_buttonStop->Disable();
+    pnl.m_buttonStop->Hide();
     pnl.m_buttonPause->Disable();
     pnl.m_buttonPause->Hide();
     pnl.m_buttonClose->Show();
@@ -1807,7 +1805,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         pnl.m_notebookResult->ChangeSelection(posLog);
 
-    //this->Fit(); //not a good idea: will shrink even if window is maximized or was enlarged by the user
+    //GetSizer()->SetSizeHints(this); //~=Fit() //not a good idea: will shrink even if window is maximized or was enlarged by the user
     pnl.Layout();
 
     pnl.m_panelProgress->Layout();
@@ -1971,8 +1969,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
 
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        //why isn't this covered by wxWindows::Raise()??
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
     }
 }
@@ -1993,7 +1992,13 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
         [&](wxDialog& progDlg) { return parentWindow; }, abortCb,
     notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
     else //FFS batch job
-        return new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE,
+    {
+        auto dlg = new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE,
         [](wxFrame& progDlg) { return &progDlg; }, abortCb,
-    notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
+        notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
+
+        //only top level windows should have an icon:
+        dlg->SetIcon(getFfsIcon());
+        return dlg;
+    }
 }

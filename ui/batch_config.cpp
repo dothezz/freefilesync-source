@@ -9,11 +9,11 @@
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/std_button_order.h>
 #include <wx+/font_size.h>
+#include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "dir_name.h"
 #include "../ui/exec_finished_box.h"
 #include "../lib/help_provider.h"
-#include "../lib/resources.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -37,13 +37,13 @@ public:
                 size_t onCompletionHistoryMax);
 
 private:
-    virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
     virtual void OnClose       (wxCloseEvent&   event) { EndModal(BUTTON_CANCEL); }
     virtual void OnCancel      (wxCommandEvent& event) { EndModal(BUTTON_CANCEL); }
     virtual void OnSaveBatchJob(wxCommandEvent& event);
     virtual void OnErrorPopup (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
     virtual void OnErrorIgnore(wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
-    virtual void OnErrorAbort (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_ABORT;  updateGui(); }
+    virtual void OnErrorStop  (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
+    virtual void OnHelpScheduleBatch(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
 
     virtual void OnToggleGenerateLogfile(wxCommandEvent& event) { updateGui(); }
     virtual void OnToggleLogfilesLimit  (wxCommandEvent& event) { updateGui(); }
@@ -70,25 +70,24 @@ BatchDialog::BatchDialog(wxWindow* parent,
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
-
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
-    setRelativeFontSize(*m_staticTextHeader, 1.25);
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
 
     m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
 
-    m_bpButtonHelp  ->SetBitmapLabel(getResourceImage(L"help"));
-    m_bitmapBatchJob->SetBitmap     (getResourceImage(L"batch"));
+    m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = make_unique<DirectoryName<FolderHistoryBox>>(*this, *m_buttonSelectLogfileDir, *m_logfileDir);
+    logfileDir = make_unique<DirectoryName<FolderHistoryBox>>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_logfileDir);
 
     setConfig(batchCfg);
 
-    Fit(); //child-element widths have changed: image was set
-    Layout();
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
+    //   Layout();
 
     m_buttonSaveAs->SetFocus();
 }
@@ -103,7 +102,7 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
 
     m_toggleBtnErrorIgnore->SetValue(false);
     m_toggleBtnErrorPopup ->SetValue(false);
-    m_toggleBtnErrorAbort ->SetValue(false);
+    m_toggleBtnErrorStop  ->SetValue(false);
     switch (cfg.handleError) //*not* owned by GUI controls
     {
         case ON_ERROR_IGNORE:
@@ -112,8 +111,8 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
         case ON_ERROR_POPUP:
             m_toggleBtnErrorPopup->SetValue(true);
             break;
-        case ON_ERROR_ABORT:
-            m_toggleBtnErrorAbort->SetValue(true);
+        case ON_ERROR_STOP:
+            m_toggleBtnErrorStop->SetValue(true);
             break;
     }
 }
@@ -121,7 +120,9 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
 
 void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
     localBatchCfg = batchCfg; //contains some parameters not owned by GUI controls
 

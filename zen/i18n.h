@@ -9,16 +9,20 @@
 
 #include <string>
 #include <memory>
+#include <cstdint>
+#include "string_tools.h"
+
 
 //minimal layer enabling text translation - without platform/library dependencies!
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
 #endif
 
-#define ZEN_CONCAT_SUB(X, Y) X ## Y
-#define _(s) zen::implementation::translate(ZEN_CONCAT_SUB(L, s))
-#define _P(s, p, n) zen::implementation::translate(ZEN_CONCAT_SUB(L, s), ZEN_CONCAT_SUB(L, p), n)
-
+#define ZEN_TRANS_CONCAT_SUB(X, Y) X ## Y
+#define _(s) zen::implementation::translate(ZEN_TRANS_CONCAT_SUB(L, s))
+#define _P(s, p, n) zen::implementation::translate(ZEN_TRANS_CONCAT_SUB(L, s), ZEN_TRANS_CONCAT_SUB(L, p), n)
+//source and translation are required to use %x as number placeholder
+//for plural form, which will be substituted automatically!!!
 
 namespace zen
 {
@@ -28,19 +32,11 @@ struct TranslationHandler
     virtual ~TranslationHandler() {}
 
     virtual std::wstring translate(const std::wstring& text) = 0; //simple translation
-    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n) = 0;
+    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) = 0;
 };
 
 void setTranslator(TranslationHandler* newHandler = nullptr); //takes ownership
 TranslationHandler* getTranslator();
-
-
-
-
-
-
-
-
 
 
 
@@ -64,18 +60,27 @@ std::wstring translate(const std::wstring& text)
 }
 
 //translate plural forms: "%x day" "%x days"
-//returns "%x day" if n == 1; "%x days" else for english language
+//returns "1 day" if n == 1; "123 days" if n == 123 for english language
 inline
-std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n)
+std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n)
 {
-    if (n < 0) n = -n;
-    return getTranslator() ? getTranslator()->translate(singular, plural, n) : n == 1 ? singular : plural;
+    assert(contains(plural, L"%x"));
+
+    if (getTranslator())
+    {
+        std::wstring translation = getTranslator()->translate(singular, plural, n);
+        assert(!contains(translation, L"%x"));
+        return translation;
+    }
+    else
+        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", zen::numberTo<std::wstring>(n));
 }
 
 template <class T> inline
 std::wstring translate(const std::wstring& singular, const std::wstring& plural, T n)
 {
-    return translate(singular, plural, static_cast<int>(n % 1000000));
+    static_assert(sizeof(n) <= sizeof(std::int64_t), "");
+    return translate(singular, plural, static_cast<std::int64_t>(n));
 }
 
 inline

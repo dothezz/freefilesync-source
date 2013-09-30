@@ -93,9 +93,9 @@ private:
     void removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filenames);
     void removeCfgHistoryItems(const std::vector<Zstring>& filenames);
 
-    void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
+    void addAddFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
-    void clearAddFolderPairs();
+    void setAddFolderPairs(const std::vector<zen::FolderPairEnh>& newPairs);
 
     void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
 
@@ -238,6 +238,7 @@ private:
     //menu events
     virtual void OnMenuGlobalSettings(wxCommandEvent& event) override;
     virtual void OnMenuExportFileList(wxCommandEvent& event) override;
+    virtual void OnMenuFindItem      (wxCommandEvent& event) override;
     virtual void OnMenuCheckVersion  (wxCommandEvent& event) override;
     virtual void OnMenuCheckVersionAutomatically(wxCommandEvent& event) override;
     virtual void OnMenuAbout         (wxCommandEvent& event) override;

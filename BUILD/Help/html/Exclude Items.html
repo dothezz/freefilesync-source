@@ -21,11 +21,10 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Exclude
-items</FONT></FONT></H2>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Exclude Items</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Files
 and directories are only considered for synchronization if they pass
-the filter. They have to match <B>at least one</B> entry in the
+all filter rules. They have to match <B>at least one</B> entry in the
 include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
@@ -41,9 +40,8 @@ include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 </P>
 
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
-<FONT FACE="Tahoma, sans-serif">Exclude items for mirror-sync from
-</FONT><FONT FACE="Courier New, monospace">C:\Source</FONT> <FONT FACE="Tahoma, sans-serif">to
-</FONT><FONT FACE="Courier New, monospace">D:\Target</FONT></P>
+<FONT FACE="Tahoma, sans-serif">Exclude items for mirror-sync from <FONT FACE="Courier New, monospace">C:\Source</FONT> to <FONT FACE="Courier New, monospace">D:\Target</FONT></FONT>
+</P>
 
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; border: none; padding: 0cm; background: #e6e6e6">
 	<TABLE DIR="LTR" WIDTH=100% CELLPADDING=0 CELLSPACING=0>
@@ -67,16 +65,15 @@ include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 		<TR>
 			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
 				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Single folder
-				<FONT FACE="Courier New, monospace">C:\Source\subfolder</FONT></FONT></P>
+				<FONT FACE="Courier New, monospace">C:\Source\SubFolder</FONT></FONT></P>
 			</TD>
 			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\subfolder\</FONT></P>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\SubFolder\</FONT></P>
 			</TD>
 		</TR>
 		<TR>
 			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All files (and
-				folders) named <FONT FACE="Courier New, monospace">thumbs.db</FONT>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All files (and folders) named <FONT FACE="Courier New, monospace">thumbs.db</FONT>
 				</FONT>
 				</P>
 			</TD>
@@ -86,19 +83,15 @@ include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 		</TR>
 		<TR>
 			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All <FONT FACE="Courier New, monospace">*.tmp</FONT>
-				files located in <FONT FACE="Courier New, monospace">subfolder</FONT>
-				only</FONT></P>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All <FONT FACE="Courier New, monospace">*.tmp</FONT> files located in <FONT FACE="Courier New, monospace">SubFolder</FONT> only</FONT></P>
 			</TD>
 			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\subfolder\*.tmp</FONT></P>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\SubFolder\*.tmp</FONT></P>
 			</TD>
 		</TR>
 		<TR>
 			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Files and folders
-				containing <FONT FACE="Courier New, monospace">temp</FONT>
-				somewhere in their path</FONT></P>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Files and folders containing <FONT FACE="Courier New, monospace">temp</FONT> somewhere in their path</FONT></P>
 			</TD>
 			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
 				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">*temp*</FONT></P>
@@ -124,8 +117,7 @@ include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 		</TR>
 		<TR>
 			<TD WIDTH=65% STYLE="border: none; padding: 0cm">
-				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Exclude only *.txt files
-located in subdirectories of base directories</FONT></P>
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Exclude only <FONT FACE="Courier New, monospace">*.txt</FONT> files located in subdirectories of base directories</FONT></P>
 			</TD>
 			<TD WIDTH=35% STYLE="border-top: none; border-bottom: none; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.05cm; padding-right: 0cm">
 				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\*\*.txt</FONT></P>
@@ -137,7 +129,7 @@ located in subdirectories of base directories</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 
-
+<BR>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For
@@ -146,7 +138,7 @@ located in subdirectories of base directories</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm; font-variant: normal; font-style: normal">
 		<FONT FACE="Tahoma, sans-serif">A filter phrase is compared against
 		both file and directory paths. If you want to consider directories
-		only, you can give a hint by appending a path separator (<FONT FACE="Courier New, monospace"><B>\</B></FONT>).</FONT></P>
+		only, you can give a hint by appending a path separator (<B>\</B>).</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>

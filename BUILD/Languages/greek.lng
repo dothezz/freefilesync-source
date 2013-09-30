@@ -2,10 +2,23 @@
 	<language>Eλληνικά</language>
 	<translator>Γιώργος Δ. Γιαγλής</translator>
 	<locale>el_GR</locale>
-	<flag_image>flag_greece.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_greece.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>&Check</source>
+<target></target>
+
+<source>Retrying operation...</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Και οι δυο πλευρές έχουν αλλάξει από τον τελευταίο συγχρονισμό.</target>
@@ -58,9 +71,6 @@
 <source>Cannot open file %x.</source>
 <target>Δεν είναι δυνατό το άνοιγμα του αρχείου %x.</target>
 
-<source>Error</source>
-<target>Σφάλματα</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Το αρχείο %x δεν περιέχει μια έγκυρη διάταξη.</target>
 
@@ -70,11 +80,11 @@
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
 <target>Το αρχείο διάταξης δεν πρέπει να περιλαμβάνει ρυθμίσεις στο επίπεδο του ζεύγους των υποκαταλόγων, όταν οι υποκατάλογοι ορίζονται μέσω της γραμμής εργασιών.</target>
 
-<source>Warning</source>
-<target>Προειδοποίηση</target>
-
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>Δεν μπορούν να οριστούν υποκατάλογοι για περισσότερα από ένα αρχεία διάταξης.</target>
+
+<source>Command line</source>
+<target>Γραμμή εντολών</target>
 
 <source>Syntax:</source>
 <target>Σύνταξη:</target>
@@ -90,9 +100,6 @@
 
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Οποιοσδήποτε αριθμός εναλλακτικών υποκαταλόγων για το πολύ ένα αρχείο διάταξης.</target>
-
-<source>Command line</source>
-<target>Γραμμή εντολών</target>
 
 <source>A folder input field is empty.</source>
 <target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
@@ -292,8 +299,8 @@
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 
-<source>%x items</source>
-<target>%x αντικείμενα</target>
+<source>%x items/sec</source>
+<target>%x στοιχεία</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Το αρχείο διάταξης %x έχει φορτωθεί μόνο κατά ένα μέρος.</target>
@@ -322,11 +329,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Το όνομα τόμου %x δεν είναι μέρος της διαδρομής %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Ζητήθηκε ματαίωση: Αναμονή για την λήξη της τρέχουσας εργασίας...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>Αίτημα διακοπής: Αναμονή για την ολοκλήρωση της τρέχουσας εργασίας...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Αποτυχία να δημιουργηθεί χρονική σήμανση για τη διατήρηση παλιών εκδόσεων:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>Αδυναμία δημιουργίας χρονικής σήμανσης για διατήρηση εκδόσεων:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
@@ -343,8 +350,8 @@
 <source>&Program</source>
 <target>&Πρόγραμμα</target>
 
-<source>&Content</source>
-<target>&Περιεχόμενα</target>
+<source>&View help</source>
+<target>&Προβολή βοήθειας</target>
 
 <source>&About</source>
 <target>&Σχετικά</target>
@@ -367,8 +374,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Για να ξεκινήσετε μπορείτε απλά να εισάγετε ένα αρχείο .ffs_batch.</target>
 
-<source>Folders to watch</source>
-<target>Υποκατάλογοι που θα παρακολουθούνται</target>
+<source>Folders to watch:</source>
+<target>Υποκατάλογοι για παρακολούθηση:</target>
 
 <source>Add folder</source>
 <target>Προσθήκη υποκαταλόγου</target>
@@ -382,11 +389,14 @@
 <source>Select a folder</source>
 <target>Επιλογή υποκαταλόγου</target>
 
-<source>Idle time [seconds]</source>
-<target>Λανθάνων χρόνος [δευτερόλεπτα]</target>
+<source>Idle time (in seconds):</source>
+<target>Λανθάνων χρόνος (σε δευτερόλεπτα):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Λανθάνων χρόνος μεταξύ τελευταίας αλλαγής που ανιχνεύθηκε και εκτέλεσης της εντολής</target>
+
+<source>Command line:</source>
+<target>Γραμμή εντολών</target>
 
 <source>
 The command is triggered if:
@@ -399,32 +409,29 @@ The command is triggered if:
 -παρουσιαστούν νέοι υποκατάλογοι (π.χ. εισαχθεί ένα φλασάκι USB)
 </target>
 
-<source>Start</source>
-<target>Έναρξη</target>
-
-<source>&Retry</source>
-<target>&Επανάληψη</target>
-
-<source>Cancel</source>
-<target>Άκυρο</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Αυτοματοποιημένος Συγχρονισμός</target>
-
-<source>Build: %x</source>
-<target>Δημιουργήθηκε : %x</target>
+<source>&Start</source>
+<target>Έ&ναρξη</target>
 
 <source>About</source>
 <target>Σχετικά με το...</target>
 
+<source>Build: %x</source>
+<target>Δημιουργήθηκε : %x</target>
+
 <source>All files</source>
 <target>Όλα τα αρχεία</target>
+
+<source>Automated Synchronization</source>
+<target>Αυτοματοποιημένος Συγχρονισμός</target>
 
 <source>Directory monitoring active</source>
 <target>Η παρακολούθηση των υποκαταλόγων είναι ενεργή</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Αναμονή μέχρι να είναι διαθέσιμοι όλοι οι υποκατάλογοι...</target>
+
+<source>Error</source>
+<target>Σφάλματα</target>
 
 <source>&Restore</source>
 <target>&Επαναφορά</target>
@@ -435,8 +442,11 @@ The command is triggered if:
 <source>&Exit</source>
 <target>Έ&ξοδος</target>
 
-<source>Invalid command line:</source>
-<target>Σφάλμα στη γραμμή εντολών:</target>
+<source>Incorrect command line:</source>
+<target>Εσφαλμένη γραμμή εντολών:</target>
+
+<source>&Retry</source>
+<target>&Επανάληψη</target>
 
 <source>File content</source>
 <target>Περιεχόμενο αρχείων</target>
@@ -498,8 +508,8 @@ The command is triggered if:
 <source>Target folder input field must not be empty.</source>
 <target>Το πεδίο εισαγωγής του υποκαταλόγου-στόχου πρέπει να μην είναι κενό.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Το πεδίο εισαγωγής του υποκαταλόγου για διατήρηση παλιών εκδόσεων πρέπει να μην είναι κενό.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>Παρακαλώ εισάγετε έναν υποκατάλογο για αποθήκευση εκδόσεων.</target>
 
 <source>Source folder %x not found.</source>
 <target>Ο υποκατάλογος %x δε βρέθηκε.</target>
@@ -537,8 +547,8 @@ The command is triggered if:
 <source>job name</source>
 <target>όνομα ενέργειας</target>
 
-<source>Synchronization aborted</source>
-<target>Ο συγχρονισμός ματαιώθηκε</target>
+<source>Synchronization stopped</source>
+<target>Ο συγχρονισμός διακόπηκε</target>
 
 <source>Synchronization completed with errors</source>
 <target>Ο συγχρονισμός ολοκληρώθηκε με σφάλματα</target>
@@ -555,14 +565,38 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Αποθήκευση του αρχείου καταγραφής %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Πατήστε "Εναλλαγή" για να επιλύσετε τα θέματα στο κεντρικό παράθυρο του FreeFileSync.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>Μπορείτε να επιστρέψετε στο κύριο παράθυρο του FreeFileSync για να επιλύσετε αυτό το θέμα.</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>Εναλλαγή στο βασικό παράθυρο του FreeFileSync</target>
+<source>&Don't show this warning again</source>
+<target>&Να μην εμφανιστεί ξανά αυτή η προειδοποίηση</target>
 
-<source>Retrying operation after error:</source>
-<target>Επανάληψη της προσπάθειας μετά από σφάλμα:</target>
+<source>&Ignore</source>
+<target>&Παράβλεψη</target>
+
+<source>&Switch</source>
+<target>&Εναλλαγή</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target>Επιστροφή στο κύριο παράθυρο του FreeFileSync</target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>Αυτόματη επανάληψη σε 1 δευτερόλεπτο...</pluralform>
+<pluralform>Αυτόματη επανάληψη σε %x δευτερόλεπτα...</pluralform>
+</target>
+
+<source>&Ignore subsequent errors</source>
+<target>&Αγνόηση επόμενων σφαλμάτων</target>
+
+<source>Serious Error</source>
+<target>Σοβαρό Σφάλμα</target>
+
+<source>Check for Program Updates</source>
+<target>Έλεγχος για Ενημερώσεις του Προγράμματος</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
@@ -570,17 +604,11 @@ The command is triggered if:
 <source>Download now?</source>
 <target>Λήψη τώρα;</target>
 
-<source>New version found</source>
-<target>Βρέθηκε νέα έκδοση</target>
-
 <source>&Download</source>
 <target>&Λήψη</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>Το FreeFileSync είναι ενημερωμένο.</target>
-
-<source>Information</source>
-<target>Πληροφορία</target>
 
 <source>Unable to connect to sourceforge.net.</source>
 <target>Δεν είναι δυνατή η σύνδεση με το sourceforge.net.</target>
@@ -639,20 +667,20 @@ The command is triggered if:
 <source>Hibernate</source>
 <target>Αδρανοποίηση</target>
 
-<source>Selected variant:</source>
-<target>Μέθοδος που επιλέχθηκε:</target>
+<source>Alternate comparison settings</source>
+<target>Διαφοροποιημένες ρυθμίσεις σύγκρισης</target>
 
-<source>Select alternate comparison settings</source>
-<target>Επιλογή διαφοροποιημένων ρυθμίσεων σύγκρισης</target>
+<source>Alternate synchronization settings</source>
+<target>Διαφοροποιημένες ρυθμίσεις συγχρονισμού</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Επιλογή διαφοροποιημένων ρυθμίσεων συγχρονισμού</target>
+<source>Local filter</source>
+<target>Τοπικό φίλτρο</target>
 
-<source>Filter is active</source>
-<target>Το φίλτρο είναι ενεργό</target>
+<source>Active</source>
+<target>Ενεργό</target>
 
-<source>No filter selected</source>
-<target>Δεν έχει επιλεχθεί φίλτρο</target>
+<source>None</source>
+<target>Καθόλου</target>
 
 <source>Remove alternate settings</source>
 <target>Διαγραφή των διαφοροποιημένων ρυθμίσεων</target>
@@ -665,6 +693,15 @@ The command is triggered if:
 
 <source>Paste</source>
 <target>Επικόλληση</target>
+
+<source>Alternate Comparison Settings</source>
+<target>Διαφοροποιημένες Ρυθμίσεις Σύγκρισης</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>Διαφοροποιημένες Ρυθμίσεις Συγχρονισμού</target>
+
+<source>Local Filter</source>
+<target>Τοπικό Φίλτρο</target>
 
 <source>&New</source>
 <target>&Δημιουργία</target>
@@ -681,14 +718,17 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. Συ&γχρονισμός</target>
 
+<source>&Global settings</source>
+<target>Γενικές &ρυθμίσεις</target>
+
 <source>&Language</source>
 <target>&Γλώσσα</target>
 
+<source>&Find...</source>
+<target>&Εύρεση</target>
+
 <source>&Export file list...</source>
 <target>Ε&ξαγωγή καταλόγου αρχείων...</target>
-
-<source>&Global settings</source>
-<target>Γενικές &ρυθμίσεις</target>
 
 <source>&Tools</source>
 <target>&Εργαλεία</target>
@@ -699,17 +739,14 @@ The command is triggered if:
 <source>Check &automatically once a week</source>
 <target>&Aυτόματος έλεγχος μια φορά την εβδομάδα</target>
 
-<source>Check for new &version</source>
+<source>&Check for new version</source>
 <target>Έλεγχος για &νέα έκδοση</target>
 
 <source>Compare</source>
 <target>Σύγκριση</target>
 
-<source>Comparison settings</source>
-<target>Ρυθμίσεις σύγκρισης</target>
-
-<source>Synchronization settings</source>
-<target>Ρυθμίσεις συγχρονισμού</target>
+<source>Cancel</source>
+<target>Άκυρο</target>
 
 <source>Synchronize</source>
 <target>Συγχρονισμός</target>
@@ -722,6 +759,15 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>Ανταλλαγή πλευρών</target>
+
+<source>Close search bar</source>
+<target>Κλείσιμο γραμμής εύρεσης</target>
+
+<source>Find:</source>
+<target>Εύρεση:</target>
+
+<source>Match case</source>
+<target>Αντιστοίχιση πεζών-κεφαλαίων</target>
 
 <source>Save as batch job</source>
 <target>Αποθήκευση ως δέσμη ενεργειών</target>
@@ -744,74 +790,20 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Συνολικός αριθμός bytes προς αντιγραφή</target>
 
-<source>Items found:</source>
-<target>Βρέθηκαν στοιχεία:</target>
+<source>Select a variant:</source>
+<target>Επιλογή μεθόδου:</target>
 
-<source>Speed:</source>
-<target>Ταχύτητα:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του χρόνου τροποποίησης και του μεγέθους.</target>
 
-<source>Time remaining:</source>
-<target>Απομένει χρόνος:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του περιεχομένου τους.</target>
 
-<source>Time elapsed:</source>
-<target>Πέρασε χρόνος:</target>
+<source>Symbolic links:</source>
+<target>Συμβολικοί δεσμοί:</target>
 
-<source>Synchronizing...</source>
-<target>Γίνεται συγχρονισμός...</target>
-
-<source>Minimize to notification area</source>
-<target>Ελαχιστοποίηση στην περιοχή ειδοποιήσεων</target>
-
-<source>On completion</source>
-<target>Μετά την ολοκλήρωση</target>
-
-<source>Close</source>
-<target>Κλείσιμο</target>
-
-<source>&Pause</source>
-<target>&Παύση</target>
-
-<source>Variant</source>
-<target>Μέθοδος</target>
-
-<source>Statistics</source>
-<target>Στατιστικά</target>
-
-<source>&Don't show this dialog again</source>
-<target>&Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
-
-<source>Select a variant</source>
-<target>Επιλέξτε μια μέθοδο</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Τα αρχεία θεωρούνται ίδια εάν
-     - η ημερομηνία και ώρα τελευταίας τροποποίησης
-     - το μέγεθός τους
-είναι ίδια
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Τα αρχεία θεωρούνται ίδια, εάν
-     - το περιεχόμενό τους
-είναι ίδιο
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Τρόπος διαχείρισης των συμβολικών δεσμών</target>
-
-<source>Help</source>
-<target>Βοήθεια</target>
+<source>More information</source>
+<target>Περισσότερες πληροφορίες</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -819,11 +811,11 @@ is the same
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου. Ο υποκατάλογος δεξιά θα τροποποιηθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>Δημιουργία ενός κατοπτρικού αντιγράφου του υποκαταλόγου αριστερά, ώστε μετά το συγχρονισμό ο υποκατάλογος δεξιά να είναι ένα ακριβές αντίγραφό του.</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>Αντιγραφή των νέων ή πιο πρόσφατων αρχείων στον υποκατάλογο δεξιά.</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>Αντιγραφή των νέων και των τροποποιημένων αρχείων στον υποκατάλογο δεξιά.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
@@ -834,23 +826,8 @@ is the same
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Απαιτεί αρχεία βάσης δεδομένων. Δεν υποστηρίζεται από όλα τα συστήματα αρχείων.</target>
 
-<source>Error handling</source>
-<target>Διαχείριση σφαλμάτων</target>
-
-<source>Ignore</source>
-<target>Παράβλεψη</target>
-
-<source>Hide all error and warning messages</source>
-<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
-
-<source>Pop-up</source>
-<target>Αναδυόμενο μήνυμα</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
-
-<source>Deletion handling</source>
-<target>Διαγραφή των αρχείων</target>
+<source>Delete files:</source>
+<target>Διαγραφή αρχείων:</target>
 
 <source>Permanent</source>
 <target>Μόνιμα</target>
@@ -873,32 +850,173 @@ is the same
 <source>Naming convention:</source>
 <target>Τρόπος ονομασίας:</target>
 
-<source>Batch job</source>
-<target>Δέσμη ενεργειών</target>
+<source>Show examples</source>
+<target>Εμφάνιση παραδειγμάτων</target>
+
+<source>Handle errors:</source>
+<target>Χειρισμός σφαλμάτων:</target>
+
+<source>Ignore</source>
+<target>Παράβλεψη</target>
+
+<source>Hide all error and warning messages</source>
+<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
+
+<source>Pop-up</source>
+<target>Αναδυόμενο μήνυμα</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
+
+<source>On completion:</source>
+<target>Μετά την ολοκλήρωση:</target>
+
+<source>Start synchronization now?</source>
+<target>Να ξεκινήσει ο συγχρονισμός τώρα;</target>
+
+<source>Variant:</source>
+<target>Μέθοδος:</target>
+
+<source>Statistics</source>
+<target>Στατιστικά</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
+
+<source>Items found:</source>
+<target>Βρέθηκαν στοιχεία:</target>
+
+<source>Speed:</source>
+<target>Ταχύτητα:</target>
+
+<source>Time remaining:</source>
+<target>Απομένει χρόνος:</target>
+
+<source>Time elapsed:</source>
+<target>Πέρασε χρόνος:</target>
+
+<source>Synchronizing...</source>
+<target>Γίνεται συγχρονισμός...</target>
+
+<source>Minimize to notification area</source>
+<target>Ελαχιστοποίηση στην περιοχή ειδοποιήσεων</target>
+
+<source>Close</source>
+<target>Κλείσιμο</target>
+
+<source>&Pause</source>
+<target>&Παύση</target>
+
+<source>Stop</source>
+<target>Διακοπή</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Δημιουργία ενός αρχείου δέσμης για αυτόματο συγχρονισμό. Για να ξεκινήσετε, κάντε διπλό κλικ σε αυτό το αρχείο ή ενσωματώστε το σε ένα χρονοδιάγραμμα εργασιών: %x</target>
 
-<source>Exit</source>
-<target>Έξοδος</target>
-
-<source>Abort synchronization on first error</source>
-<target>Ματαίωση του συγχρονισμού με το πρώτο σφάλμα</target>
+<source>Stop synchronization at first error</source>
+<target>Διακοπή του συγχρονισμού με το πρώτο σφάλμα</target>
 
 <source>Show progress dialog</source>
 <target>Εμφάνιση της αναφοράς προόδου</target>
 
-<source>Save log</source>
-<target>Αποθήκευση αρχείου καταγραφής</target>
+<source>Save log:</source>
+<target>Αποθήκευση αρχείου καταγραφής:</target>
 
-<source>Select folder to save log files</source>
-<target>Επιλογή υποκαταλόγου για την αποθήκευση των αρχείων καταγραφής</target>
-
-<source>Limit</source>
-<target>Μέγιστος αριθμός</target>
+<source>Limit:</source>
+<target>Όριο:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Μέγιστος αριθμός αρχείων καταγραφής</target>
+
+<source>How can I schedule a batch job?</source>
+<target>Πώς μπορώ να προγραμματίσω μια εργασία με δέσμη ενεργειών;</target>
+
+<source>&Recycle bin</source>
+<target>&Κάδος ανακύκλωσης</target>
+
+<source>Delete on both sides</source>
+<target>Διαγραφή και στις δυο πλευρές</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Διαγραφή και στις δυο πλευρές, ακόμα κι αν το αρχείο έχει επιλεχθεί μόνο στη μια πλευρά</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος υποκαταλόγων.</target>
+
+<source>Include:</source>
+<target>Συμπερίληψη:</target>
+
+<source>Exclude:</source>
+<target>Αποκλεισμός:</target>
+
+<source>Time span:</source>
+<target>Χρονικό εύρος:</target>
+
+<source>File size:</source>
+<target>Μέγεθος αρχείου:</target>
+
+<source>Minimum:</source>
+<target>Ελάχιστο:</target>
+
+<source>Maximum:</source>
+<target>Μέγιστο</target>
+
+<source>&Clear</source>
+<target>&Καθαρισμός</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>Οι ακόλουθες ρυθμίσεις χρησιμοποιούνται για όλες τις εργασίες συγχρονισμού.</target>
+
+<source>Fail-safe file copy</source>
+<target>Ασφαλής αντιγραφή αρχείων</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+Αντιγραφή σε ένα προσωρινό αρχείο (*.ffs_tmp) πριν την αντικατάσταση του προορισμού.
+Αυτό εγγυάται μια συνεπή κατάσταση ακόμα και στην περίπτωση σοβαρού σφάλματος.
+</target>
+
+<source>(recommended)</source>
+<target>(προτεινόμενο)</target>
+
+<source>Copy locked files</source>
+<target>Αντιγραφή κλειδωμένων αρχείων</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>Αντιγραφή των κοινών ή κλειδωμένων αρχείων με τη χρήση της Υπηρεσίας Σκιωδών Αντιγράφων Τόμου.</target>
+
+<source>(requires administrator rights)</source>
+<target>(απαιτεί δικαιώματα διαχειριστή)</target>
+
+<source>Copy file access permissions</source>
+<target>Αντιγραφή των αδειών προσπέλασης των αρχείων</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>Μεταφορά των αδειών προσπέλασης αρχείων και υποκαταλόγων.</target>
+
+<source>Automatic retry on error:</source>
+<target>Αυτόματη επανάληψη σε περίπτωση σφάλματος:</target>
+
+<source>Retry count:</source>
+<target>Αριθμός προσπαθειών:</target>
+
+<source>Delay (in seconds):</source>
+<target>Καθυστέρηση (σε δευτερόλεπτα):</target>
+
+<source>Customize context menu:</source>
+<target>Προσαρμογή μενού επιλογών:</target>
+
+<source>Description</source>
+<target>Περιγραφή</target>
+
+<source>Restore hidden windows</source>
+<target>Επαναφορά των κρυμμένων διαλόγων</target>
+
+<source>&Default</source>
+<target>&Προεπιλογή</target>
 
 <source>Source code written in C++ using:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
@@ -908,9 +1026,6 @@ is the same
 
 <source>Donate with PayPal</source>
 <target>Κάντε μια δωρεά μέσω PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Πολλές ευχαριστίες για τις μεταφράσεις:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Τα σχόλια και οι προτάσεις σας είναι ευπρόσδεκτα</target>
@@ -924,101 +1039,26 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU</target>
 
-<source>Delete on both sides</source>
-<target>Διαγραφή και στις δυο πλευρές</target>
+<source>Many thanks for localization:</source>
+<target>Πολλές ευχαριστίες για τις μεταφράσεις:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Διαγραφή και στις δυο πλευρές, ακόμα κι αν το αρχείο έχει επιλεχθεί μόνο στη μια πλευρά</target>
+<source>Save as Batch Job</source>
+<target>Αποθήκευση ως Δέσμη Εργασιών</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-Θα συγχρονιστούν τα αρχεία που ικανοποιούν όλους τους κανόνες των φίλτρων.
-Σημείωση: Οι διαδρομές των αρχείων πρέπει να είναι σχετικές ως προς τους βασικούς υποκαταλόγους.
-</target>
+<source>Delete Items</source>
+<target>Διαγραφή Στοιχείων</target>
 
-<source>Include</source>
-<target>Συμπερίληψη</target>
+<source>Global Settings</source>
+<target>Γενικές Ρυθμίσεις</target>
 
-<source>Exclude</source>
-<target>Εξαίρεση</target>
+<source>Select Time Span</source>
+<target>Επιλογή Χρονικού Εύρους</target>
 
-<source>Time span</source>
-<target>Εύρος χρόνου</target>
-
-<source>File size</source>
-<target>Μέγεθος αρχείου</target>
-
-<source>Minimum</source>
-<target>Ελάχιστο</target>
-
-<source>Maximum</source>
-<target>Μέγιστο</target>
-
-<source>&Clear</source>
-<target>&Καθαρισμός</target>
-
-<source>Global settings</source>
-<target>Γενικές ρυθμίσεις</target>
-
-<source>Fail-safe file copy</source>
-<target>Ασφαλής αντιγραφή αρχείων</target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Αντιγραφή αρχικά σε ένα προσωρινό αρχείο (*.ffs_tmp) και στη συνέχεια μετονομασία του. Αυτό εγγυάται μια συνεπή κατάσταση ακόμα και σε περίπτωση μοιραίου σφάλματος.</target>
-
-<source>Copy locked files</source>
-<target>Αντιγραφή κλειδωμένων αρχείων</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Αντιγραφή των κοινόχρηστων ή κλειδωμένων αρχείων με τη χρήση της Υπηρεσίας Σκιώδους Αντίγραφου Τόμου (απαιτεί δικαιώματα διαχειριστή)</target>
-
-<source>Copy file access permissions</source>
-<target>Αντιγραφή των αδειών προσπέλασης των αρχείων</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Μεταφορά των αδειών προσπέλασης των αρχείων και των υποκαταλόγων(απαιτεί δικαιώματα διαχειριστή)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Επανεμφάνιση κρυμμένων μηνυμάτων</target>
-
-<source>External applications</source>
-<target>Εξωτερικές εφαρμογές</target>
-
-<source>Description</source>
-<target>Περιγραφή</target>
-
-<source>&Default</source>
-<target>&Προεπιλογή</target>
-
-<source>Find what:</source>
-<target>Αναζήτηση του:</target>
-
-<source>Match case</source>
-<target>Αντιστοίχιση πεζών-κεφαλαίων</target>
-
-<source>&Find next</source>
-<target>&Εύρεση επομένου</target>
-
-<source>Start synchronization</source>
-<target>Έναρξη του συγχρονισμού</target>
-
-<source>Delete</source>
-<target>Διαγραφή</target>
-
-<source>Configure filter</source>
-<target>Ρύθμιση του φίλτρου</target>
+<source>Folder Pairs</source>
+<target>Ζεύγη Υποκαταλόγων</target>
 
 <source>Find</source>
 <target>Αναζήτηση</target>
-
-<source>Select time span</source>
-<target>Επιλογή χρονικού διαστήματος</target>
-
-<source>Folder pairs</source>
-<target>Ζεύγη υποκαταλόγων</target>
 
 <source>Overview</source>
 <target>Σύνοψη</target>
@@ -1026,14 +1066,14 @@ Note: File paths must be relative to base directories.
 <source>Configuration</source>
 <target>Διάταξη</target>
 
-<source>Main bar</source>
-<target>Γραμμή εργαλείων</target>
+<source>Main Bar</source>
+<target>Κύρια Γραμμή</target>
 
-<source>Filter files</source>
-<target>Φιλτράρισμα</target>
+<source>Filter Files</source>
+<target>Φιλτράρισμα Αρχείων</target>
 
-<source>Select view</source>
-<target>Επιλογή εμφάνισης</target>
+<source>Select View</source>
+<target>Επιλογή Εμφάνισης</target>
 
 <source>Open...</source>
 <target>Άνοιγμα...</target>
@@ -1044,14 +1084,14 @@ Note: File paths must be relative to base directories.
 <source>Compare both sides</source>
 <target>Σύγκριση των δύο πλευρών</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Είστε σίγουροι ότι θέλετε να εκτελέσετε την εντολή %y για 1 αντικείμενο;</pluralform>
-<pluralform>Είστε σίγουροι ότι θέλετε να εκτελέσετε την εντολή %y για %x αντικείμενα;</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Ρυθμίσεις σύγκρισης</target>
+
+<source>Synchronization settings</source>
+<target>Ρυθμίσεις συγχρονισμού</target>
+
+<source>Start synchronization</source>
+<target>Έναρξη του συγχρονισμού</target>
 
 <source>Confirm</source>
 <target>Επιβεβαίωση</target>
@@ -1089,12 +1129,6 @@ Note: File paths must be relative to base directories.
 <source>Set direction:</source>
 <target>Επιλογή κατεύθυνσης:</target>
 
-<source>Exclude temporarily</source>
-<target>Προσωρινή εξαίρεση</target>
-
-<source>Include temporarily</source>
-<target>Προσωρινή συμπερίληψη</target>
-
 <source>multiple selection</source>
 <target>πολλαπλή επιλογή</target>
 
@@ -1103,6 +1137,15 @@ Note: File paths must be relative to base directories.
 
 <source>Exclude via filter:</source>
 <target>Εξαίρεση με βάση το φίλτρο:</target>
+
+<source>Exclude temporarily</source>
+<target>Προσωρινή εξαίρεση</target>
+
+<source>Include temporarily</source>
+<target>Προσωρινή συμπερίληψη</target>
+
+<source>Delete</source>
+<target>Διαγραφή</target>
 
 <source>Include all</source>
 <target>Συμπερίληψη όλων</target>
@@ -1146,11 +1189,14 @@ Note: File paths must be relative to base directories.
 <source>Do you want to save changes to %x?</source>
 <target>Θέλετε να αποθηκεύσετε τις αλλαγές στο %x;</target>
 
+<source>Never save &changes</source>
+<target>Να &μην αποθηκεύονται οι αλλαγές</target>
+
 <source>Do&n't save</source>
 <target>Να &μην αποθηκευθούν</target>
 
-<source>Never save &changes</source>
-<target>Να &μην αποθηκεύονται οι αλλαγές</target>
+<source>Filter</source>
+<target>Φίλτρο</target>
 
 <source>Show files that exist on left side only</source>
 <target>Εμφάνιση των αρχείων που υπάρχουν μόνο στα αριστερά</target>
@@ -1197,11 +1243,17 @@ Note: File paths must be relative to base directories.
 <source>Set as default</source>
 <target>Ορισμός ως προεπιλογής</target>
 
-<source>Operation aborted</source>
-<target>Η λειτουργία ματαιώθηκε</target>
-
 <source>All folders are in sync</source>
 <target>Όλοι οι υποκατάλογοι είναι συγχρονισμένοι</target>
+
+<source>Synchronization Settings</source>
+<target>Ρυθμίσεις συγχρονισμού</target>
+
+<source>Comparison Settings</source>
+<target>Ρυθμίσεις Σύγκρισης</target>
+
+<source>Cannot find %x</source>
+<target>Δεν μπορεί να βρεθεί το %x</target>
 
 <source>Comma-separated values</source>
 <target>Αρχείο χωρισμένο με κόμματα</target>
@@ -1212,30 +1264,6 @@ Note: File paths must be relative to base directories.
 <source>Searching for program updates...</source>
 <target>Αναζήτηση καινούριας έκδοσης...</target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Αγνόηση επόμενων σφαλμάτων</target>
-
-<source>&Ignore</source>
-<target>&Παράβλεψη</target>
-
-<source>Fatal Error</source>
-<target>Σημαντικό Σφάλμα</target>
-
-<source>&Don't show this warning again</source>
-<target>&Να μην εμφανιστεί ξανά αυτή η προειδοποίηση</target>
-
-<source>&Switch</source>
-<target>&Εναλλαγή</target>
-
-<source>Question</source>
-<target>Ερώτηση</target>
-
-<source>&Yes</source>
-<target>&Ναι</target>
-
-<source>&No</source>
-<target>Ό&χι</target>
-
 <source>Scanning...</source>
 <target>Ανίχνευση...</target>
 
@@ -1245,14 +1273,17 @@ Note: File paths must be relative to base directories.
 <source>Info</source>
 <target>Πληροφορίες</target>
 
+<source>Warning</source>
+<target>Προειδοποίηση</target>
+
 <source>Paused</source>
 <target>Σε παύση</target>
 
 <source>Initializing...</source>
 <target>Αρχικοποίηση...</target>
 
-<source>Aborted</source>
-<target>Ματαιώθηκε</target>
+<source>Stopped</source>
+<target>Διεκόπη</target>
 
 <source>Completed</source>
 <target>Ολοκληρώθηκε</target>
@@ -1262,12 +1293,6 @@ Note: File paths must be relative to base directories.
 
 <source>Log</source>
 <target>Καταγραφή</target>
-
-<source>Cannot find %x</source>
-<target>Δεν μπορεί να βρεθεί το %x</target>
-
-<source>Inactive</source>
-<target>Ανενεργό</target>
 
 <source>Today</source>
 <target>Σήμερα</target>
@@ -1293,9 +1318,6 @@ Note: File paths must be relative to base directories.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Φίλτρο</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1304,6 +1326,9 @@ Note: File paths must be relative to base directories.
 <pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε το ακόλουθο αντικείμενο στον κάδο ανακύκλωσης;</pluralform>
 <pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε τα ακόλουθα %x αντικείμενα στον κάδο ανακύκλωσης;</pluralform>
 </target>
+
+<source>Move</source>
+<target>Μεταφορά</target>
 
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
@@ -1314,11 +1339,14 @@ Note: File paths must be relative to base directories.
 <pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
 </target>
 
+<source>Exclude</source>
+<target>Εξαίρεση</target>
+
 <source>Direct</source>
-<target>Ως δεσμού</target>
+<target>Ως δεσμοί</target>
 
 <source>Follow</source>
-<target>Ως περιεχομένου</target>
+<target>Ως περιεχόμενο</target>
 
 <source>Copy NTFS permissions</source>
 <target>Αντιγραφή αδειών προσπέλασης NTFS</target>
@@ -1338,8 +1366,8 @@ Note: File paths must be relative to base directories.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Το αντίστοιχο του %item_folder% της άλλης πλευράς</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Να επανεμφανιστούν τα κρυμμένα μηνύματα και προειδοποιήσεις;</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>Να γίνει επαναφορά όλων των κρυμμένων μηνυμάτων και προειδοποιήσεων;</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
@@ -1464,14 +1492,14 @@ Note: File paths must be relative to base directories.
 <pluralform>%x μέρες</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Αποτυχία στην καταχώρηση για τη λήψη μηνυμάτων του συστήματος.</target>
+<source>Unable to register to receive system messages.</source>
+<target>Δεν μπορεί να καταχωρηθεί η λήψη μηνυμάτων συστήματος.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Τα δικαιώματα %x δεν μπορούν να οριστούν.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>Απέτυχε η αναβολή της αναστολής λειτουργίας του υπολογιστή.</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>Δεν μπορεί να διακοπεί η αναστολή του συστήματος.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Δεν μπορούν να αλλάξουν οι προτεραιότητες I/O της διεργασίας.</target>

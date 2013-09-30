@@ -33,6 +33,7 @@ struct ExecWhenFinishedCfg
 ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
                                                   CompareVariant compareVar,
                                                   SyncConfig&    syncCfg,
+                                                  const wxString& title,
                                                   xmlAccess::OnGuiError* handleError,     //
                                                   ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
 }

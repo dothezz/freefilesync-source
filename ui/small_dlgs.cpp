@@ -18,10 +18,10 @@
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
 #include <wx+/std_button_order.h>
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include "gui_generated.h"
-#include "msg_popup.h"
 #include "custom_grid.h"
-#include "../lib/resources.h"
 #include "../algorithm.h"
 #include "../synchronization.h"
 #include "../lib/help_provider.h"
@@ -39,7 +39,7 @@ public:
 private:
     virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnOK    (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
-    virtual void OnDonate(wxCommandEvent& event) { wxLaunchDefaultBrowser(L"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zenju@gmx.de&no_shipping=1&lc=US&currency_code=EUR"); }
+    virtual void OnDonate(wxCommandEvent& event) { wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/donate.php"); }
 };
 
 
@@ -56,7 +56,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     m_bitmap13->SetBitmap(getResourceImage(L"gpl"));
     //m_bitmapSmiley->SetBitmap(getResourceImage(L"smiley"));
 
-    m_animCtrlWink->SetAnimation(GlobalResources::instance().aniWink);
+    m_animCtrlWink->SetAnimation(getResourceAnimation(L"wink"));
     m_animCtrlWink->Play();
 
     //create language credits
@@ -95,12 +95,9 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    m_build->SetLabel(replaceCpy(_("Build: %x"), L"%x", build));
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
 
-    Fit(); //child-element widths have changed: image was set
-
-    //generate logo
-    //-> put *after* first Fit()
+    //generate logo: put *after* first Fit()
     Layout(); //make sure m_panelLogo has final width (required by wxGTK)
 
     wxBitmap bmpLogo;
@@ -111,13 +108,22 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     }
     {
         wxMemoryDC dc(bmpLogo);
-        dc.SetTextForeground(wxColor(2, 2, 2)); //for some unknown reason SetBitmap below seems to replace wxBLACK with white on accessibility high contrast schemes!!
-        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"));
-        dc.DrawLabel(wxString(L"FreeFileSync ") + zen::currentVersion, wxNullBitmap, wxRect(0, 0, bmpLogo.GetWidth(), bmpLogo.GetHeight()), wxALIGN_CENTER);
+
+        wxImage labelImage = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
+                                                 wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"),
+                                                 *wxBLACK); //accessibility: align foreground/background colors!
+        wxImage buildImage = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
+                                                 *wxNORMAL_FONT,
+                                                 *wxBLACK);
+        wxImage dynImage = stackImages(labelImage, buildImage, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
+
+        dc.DrawBitmap(dynImage, wxPoint((bmpLogo.GetWidth () - dynImage.GetWidth ()) / 2,
+                                        (bmpLogo.GetHeight() - dynImage.GetHeight()) / 2));
     }
     m_bitmapLogo->SetBitmap(bmpLogo);
 
-    Fit(); //child-element widths have changed: image was set
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 
     m_buttonClose->SetFocus(); //on GTK ESC is only associated with wxID_OK correctly if we set at least *any* focus at all!!!
 }
@@ -135,16 +141,16 @@ class FilterDlg : public FilterDlgGenerated
 {
 public:
     FilterDlg(wxWindow* parent,
-              bool isGlobalFilter,
-              FilterConfig& filter);
+              FilterConfig& filter,
+              const wxString& title);
     ~FilterDlg() {}
 
 private:
-    virtual void OnClose       (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
-    virtual void OnClear       (wxCommandEvent& event);
-    virtual void OnApply       (wxCommandEvent& event);
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnHelpShowExamples(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
+    virtual void OnClear (wxCommandEvent& event);
+    virtual void OnOkay  (wxCommandEvent& event);
     virtual void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
     virtual void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
 
@@ -161,8 +167,8 @@ private:
 
 
 FilterDlg::FilterDlg(wxWindow* parent,
-                     bool isGlobalFilter, //global or local filter dialog?
-                     FilterConfig& filter) :
+                     FilterConfig& filter,
+                     const wxString& title) :
     FilterDlgGenerated(parent),
     outputRef(filter) //just hold reference
 {
@@ -171,7 +177,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOk).setCancel(m_buttonCancel));
 
-    setRelativeFontSize(*m_staticTextHeader, 1.25);
+    SetTitle(title);
 
 #ifndef __WXGTK__  //wxWidgets holds portability promise by not supporting for multi-line controls...not
     m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
@@ -182,7 +188,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FilterDlg::onKeyEvent), nullptr, this);
 
     enumTimeDescr.
-    add(UTIME_NONE, L"(" + _("Inactive") + L")"). //meta options should be enclosed in parentheses
+    add(UTIME_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
     add(UTIME_TODAY,       _("Today")).
     //    add(UTIME_THIS_WEEK,   _("This week")).
     add(UTIME_THIS_MONTH,  _("This month")).
@@ -190,28 +196,20 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(UTIME_LAST_X_DAYS, _("Last x days"));
 
     enumSizeDescr.
-    add(USIZE_NONE, L"(" + _("Inactive") + L")"). //meta options should be enclosed in parentheses
+    add(USIZE_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
     add(USIZE_BYTE, _("Byte")).
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
 
-    m_bitmap26->SetBitmap(getResourceImage(L"filter"));
-    m_bpButtonHelp->SetBitmapLabel(getResourceImage(L"help"));
+    m_bitmapFilter->SetBitmap(getResourceImage(L"filter"));
 
     setFilter(filter);
 
     m_buttonOk->SetFocus();
 
-    //adapt header for global/local dialog
-    //    if (isGlobalFilter_)
-    //        m_staticTexHeader->SetLabel("Filter all folder pairs"));
-    //    else
-    //        m_staticTexHeader->SetLabel("Filter single folder pair"));
-    //
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 
-    m_staticTextHeader->SetLabel(_("Filter"));
-
-    Fit(); //child-element widths have changed: image was set
     Layout();
 }
 
@@ -252,7 +250,7 @@ void FilterDlg::updateGui()
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
     m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
 
-    m_buttonClear  ->Enable(!(activeCfg == FilterConfig()));
+    m_buttonClear->Enable(!(activeCfg == FilterConfig()));
 }
 
 
@@ -292,21 +290,33 @@ void FilterDlg::OnClear(wxCommandEvent& event)
 }
 
 
-void FilterDlg::OnApply(wxCommandEvent& event)
+void FilterDlg::OnOkay(wxCommandEvent& event)
 {
-    //changes to mainDialog are only committed when the OK button is pressed
-    outputRef = getFilter();
+    FilterConfig cfg = getFilter();
+
+    //parameter validation:
+
+    //include filter must not be empty:
+    {
+        Zstring tmp = cfg.includeFilter;
+        trim(tmp);
+        if (tmp.empty())
+            cfg.includeFilter = FilterConfig().includeFilter; //no need to show error message, just correct user input
+    }
+
+    //apply config:
+    outputRef = cfg;
 
     //when leaving dialog: filter and redraw grid, if filter is active
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showFilterDialog(wxWindow* parent, bool isGlobalFilter, FilterConfig& filter)
+ReturnSmallDlg::ButtonPressed zen::showFilterDialog(wxWindow* parent, FilterConfig& filter, const wxString& title)
 {
     FilterDlg filterDlg(parent,
-                        isGlobalFilter, //is main filter dialog
-                        filter);
+                        filter,
+                        title);
     return static_cast<ReturnSmallDlg::ButtonPressed>(filterDlg.ShowModal());
 }
 
@@ -335,7 +345,6 @@ private:
     bool& outRefdeleteOnBothSides;
     bool& outRefuseRecycleBin;
     const TickVal tickCountStartup;
-    const std::int64_t ticksPerSec_;
 };
 
 
@@ -349,13 +358,14 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     rowsToDeleteOnRight(rowsOnRight),
     outRefdeleteOnBothSides(deleteOnBothSides),
     outRefuseRecycleBin(useRecycleBin),
-    tickCountStartup(getTicks()),
-    ticksPerSec_(ticksPerSec())
+    tickCountStartup(getTicks())
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
+
+    setMainInstructionFont(*m_staticTextHeader);
 
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
@@ -373,7 +383,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
     updateGui();
 
-    Fit(); //child-element widths have changed: image was set: "fit" only *once* on construction!
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
     Layout();
 
     m_buttonOK->SetFocus();
@@ -382,7 +394,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
 void DeleteDialog::updateGui()
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
     const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(rowsToDeleteOnLeft,
                                                                             rowsToDeleteOnRight,
@@ -392,16 +406,19 @@ void DeleteDialog::updateGui()
     {
         header = _P("Do you really want to move the following item to the recycle bin?",
                     "Do you really want to move the following %x items to the recycle bin?", delInfo.second);
-        m_bitmapDeleteType->SetBitmap(getResourceImage(L"recycler"));
+        m_bitmapDeleteType->SetBitmap(getResourceImage(L"delete_recycler"));
+        m_buttonOK->SetLabel(_("Move")); //no access key needed: use ENTER!
     }
     else
     {
         header = _P("Do you really want to delete the following item?",
                     "Do you really want to delete the following %x items?", delInfo.second);
-        m_bitmapDeleteType->SetBitmap(getResourceImage(L"deleteFile"));
+        m_bitmapDeleteType->SetBitmap(getResourceImage(L"delete_permanently"));
+        m_buttonOK->SetLabel(_("Delete"));
     }
-    replace(header, L"%x", toGuiString(delInfo.second));
     m_staticTextHeader->SetLabel(header);
+    //it seems like Wrap() needs to be reapplied after SetLabel()
+    m_staticTextHeader->Wrap(460);
 
     const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
     m_textCtrlFileList->ChangeValue(fileList);
@@ -412,16 +429,19 @@ void DeleteDialog::updateGui()
     => another Unity problem like the following?
     http://trac.wxwidgets.org/ticket/14823 "Menu not disabled when showing modal dialogs in wxGTK under Unity"
     */
+
     Layout();
+    Refresh(); //needed after m_buttonOK label change
 }
 
 
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
     //additional safety net, similar to Windows Explorer: time delta between DEL and ENTER must be at least 50ms to avoid accidental deletion!
-    const TickVal now = getTicks(); //0 on error
-    if (now.isValid() && tickCountStartup.isValid() && ticksPerSec_ != 0)
-        if (dist(tickCountStartup, now) * 1000 / ticksPerSec_ < 50)
+    const TickVal now = getTicks();   //0 on error
+    std::int64_t tps = ticksPerSec(); //
+    if (now.isValid() && tickCountStartup.isValid() && tps != 0)
+        if (dist(tickCountStartup, now) * 1000 / tps < 50)
             return;
 
     outRefuseRecycleBin = m_checkBoxUseRecycler->GetValue();
@@ -458,13 +478,13 @@ ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(wxWindow* parent,
 
 //########################################################################################
 
-class SyncPreviewDlg : public SyncConfirmationDlgGenerated
+class SyncConfirmationDlg : public SyncConfirmationDlgGenerated
 {
 public:
-    SyncPreviewDlg(wxWindow* parent,
-                   const wxString& variantName,
-                   const zen::SyncStatistics& st,
-                   bool& dontShowAgain);
+    SyncConfirmationDlg(wxWindow* parent,
+                        const wxString& variantName,
+                        const zen::SyncStatistics& st,
+                        bool& dontShowAgain);
 private:
     virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
@@ -474,10 +494,10 @@ private:
 };
 
 
-SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
-                               const wxString& variantName,
-                               const SyncStatistics& st,
-                               bool& dontShowAgain) :
+SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
+                                         const wxString& variantName,
+                                         const SyncStatistics& st,
+                                         bool& dontShowAgain) :
     SyncConfirmationDlgGenerated(parent),
     m_dontShowAgain(dontShowAgain)
 {
@@ -486,7 +506,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
 
-    //setRelativeFontSize(*m_buttonStartSync, 1.5);
+    setMainInstructionFont(*m_staticTextHeader);
     m_bitmapSync->SetBitmap(getResourceImage(L"sync"));
 
     m_staticTextVariant->SetLabel(variantName);
@@ -516,31 +536,32 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
     setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
 
-    m_panelStatistics->Layout(); //m_buttonStartSync changed => this *is* required!
+    m_panelStatistics->Layout();
 
-    Fit();
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
     m_buttonStartSync->SetFocus();
 }
 
 
-void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
+void SyncConfirmationDlg::OnStartSync(wxCommandEvent& event)
 {
     m_dontShowAgain = m_checkBoxDontShowAgain->GetValue();
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(wxWindow* parent,
-                                                      const wxString& variantName,
-                                                      const zen::SyncStatistics& statistics,
-                                                      bool& dontShowAgain)
+ReturnSmallDlg::ButtonPressed zen::showSyncConfirmationDlg(wxWindow* parent,
+                                                           const wxString& variantName,
+                                                           const zen::SyncStatistics& statistics,
+                                                           bool& dontShowAgain)
 {
-    SyncPreviewDlg preview(parent,
-                           variantName,
-                           statistics,
-                           dontShowAgain);
-
-    return static_cast<ReturnSmallDlg::ButtonPressed>(preview.ShowModal());
+    SyncConfirmationDlg dlg(parent,
+                            variantName,
+                            statistics,
+                            dontShowAgain);
+    return static_cast<ReturnSmallDlg::ButtonPressed>(dlg.ShowModal());
 }
 
 //########################################################################################
@@ -548,13 +569,13 @@ ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(wxWindow* parent,
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
-    CompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig);
+    CompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig, const wxString& caption);
 
 private:
     virtual void OnOkay(wxCommandEvent& event);
     virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html", this); }
+    virtual void OnHelpComparisonSettings(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Comparison Settings.html", this); }
 
     virtual void OnTimeSize(wxCommandEvent& event) { compareVar = CMP_BY_TIME_SIZE; updateGui(); }
     virtual void OnContent (wxCommandEvent& event) { compareVar = CMP_BY_CONTENT;   updateGui(); }
@@ -571,7 +592,7 @@ private:
 
 
 CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
-                                   CompConfig& cmpConfig) :
+                                   CompConfig& cmpConfig, const wxString& title) :
     CmpCfgDlgGenerated(parent),
     cmpConfigOut(cmpConfig),
     compareVar(cmpConfig.compareVar)
@@ -584,7 +605,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
     setRelativeFontSize(*m_toggleBtnContent,  1.25);
 
-    m_bpButtonHelp->SetBitmapLabel(getResourceImage(L"help"));
+    SetTitle(title);
 
     enumDescrHandleSyml.
     add(SYMLINK_EXCLUDE,      _("Exclude")).
@@ -597,7 +618,9 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     //   Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
     updateGui();
-    Fit();
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 
     m_buttonOkay->SetFocus();
 }
@@ -656,13 +679,13 @@ void CompareCfgDialog::OnContentDouble(wxMouseEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig)
+ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig, const wxString& title)
 {
-    CompareCfgDialog syncDlg(parent, cmpConfig);
+    CompareCfgDialog syncDlg(parent, cmpConfig, title);
     return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }
-//########################################################################################
 
+//########################################################################################
 
 class GlobalSettingsDlg : public GlobalSettingsDlgGenerated
 {
@@ -677,7 +700,11 @@ private:
     virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnAddRow(wxCommandEvent& event);
     virtual void OnRemoveRow(wxCommandEvent& event);
+    virtual void OnHelpShowExamples(wxHyperlinkEvent& event) { displayHelpEntry(L"html/External Applications.html", this); }
     void onResize(wxSizeEvent& event);
+    void updateGui();
+
+    virtual void OnToggleAutoRetryCount(wxCommandEvent& event) { updateGui(); }
 
     void setExtApp(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp();
@@ -695,25 +722,29 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 #endif
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
-    setRelativeFontSize(*m_staticTextHeader, 1.25);
+    //setMainInstructionFont(*m_staticTextHeader);
 
     m_bitmapSettings    ->SetBitmap     (getResourceImage(L"settings"));
     m_bpButtonAddRow    ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonRemoveRow ->SetBitmapLabel(getResourceImage(L"item_remove"));
     setBitmapTextLabel(*m_buttonResetDialogs, getResourceImage(L"reset_dialogs").ConvertToImage(), m_buttonResetDialogs->GetLabel());
 
+    m_checkBoxFailSafe       ->SetValue(globalSettings.failsafeFileCopy);
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
-    m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
+
+    m_spinCtrlAutoRetryCount->SetValue(globalSettings.automaticRetryCount);
+    m_spinCtrlAutoRetryDelay->SetValue(globalSettings.automaticRetryDelay);
+
+    setExtApp(globalSettings.gui.externelApplications);
+
+    updateGui();
 
 #ifdef ZEN_WIN
     m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    m_checkBoxCopyLocked->Hide();
-    m_staticTextCopyLocked->Hide();
+    bSizerLockedFiles->Show(false);
 #endif
-
-    setExtApp(globalSettings.gui.externelApplications);
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
                              L"%item_path%    \t" + _("- full file or folder name") + L"\n" +
@@ -725,10 +756,12 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);
     m_gridCustomCommand->SetMargins(0, 0);
 
-    Fit(); //child-element widths have changed: image was set
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
     Layout();
 
-    //automatically fit column width to match totl grid width
+    //automatically fit column width to match total grid width
     Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::onResize), nullptr, this);
     wxSizeEvent dummy;
     onResize(dummy);
@@ -739,11 +772,11 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 
 void GlobalSettingsDlg::onResize(wxSizeEvent& event)
 {
-    const int widthTotal = m_gridCustomCommand->GetGridWindow()->GetClientSize().GetWidth() - 20;
+    const int widthTotal = m_gridCustomCommand->GetGridWindow()->GetClientSize().GetWidth();
 
     if (widthTotal >= 0 && m_gridCustomCommand->GetCols() == 2)
     {
-        const int w0 = widthTotal / 2;
+        const int w0 = widthTotal * 2 / 5; //ratio 2 : 3
         const int w1 = widthTotal - w0;
         m_gridCustomCommand->SetColumnWidth(0, w0);
         m_gridCustomCommand->SetColumnWidth(1, w1);
@@ -755,12 +788,24 @@ void GlobalSettingsDlg::onResize(wxSizeEvent& event)
 }
 
 
+void GlobalSettingsDlg::updateGui()
+{
+    const bool autoRetryActive = m_spinCtrlAutoRetryCount->GetValue() > 0;
+    m_staticTextAutoRetryDelay->Enable(autoRetryActive);
+    m_spinCtrlAutoRetryDelay->Enable(autoRetryActive);
+}
+
+
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-    settings.copyLockedFiles       = m_checkBoxCopyLocked->GetValue();
-    settings.transactionalFileCopy = m_checkBoxTransCopy->GetValue();
-    settings.copyFilePermissions   = m_checkBoxCopyPermissions->GetValue();
+    settings.failsafeFileCopy    = m_checkBoxFailSafe->GetValue();
+    settings.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
+    settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
+
+    settings.automaticRetryCount = m_spinCtrlAutoRetryCount->GetValue();
+    settings.automaticRetryDelay = m_spinCtrlAutoRetryDelay->GetValue();
+
     settings.gui.externelApplications = getExtApp();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
@@ -769,9 +814,16 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    if (showQuestionDlg(this, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                        _("Make hidden warnings and dialogs visible again?"), QuestConfig().setCaption(_("Restore hidden dialogs")).setLabelYes(_("&Restore"))) == ReturnQuestionDlg::BUTTON_YES)
-        settings.optDialogs.resetDialogs();
+    switch (showConfirmationDialog(this, DialogInfoType::INFO,
+                                   PopupDialogCfg().setMainInstructions(_("Restore all hidden windows and warnings?")),
+                                   _("&Restore")))
+    {
+        case ConfirmationButton::DO_IT:
+            settings.optDialogs.resetDialogs();
+            break;
+        case ConfirmationButton::CANCEL:
+            break;
+    }
 }
 
 
@@ -779,10 +831,16 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
     xmlAccess::XmlGlobalSettings defaultCfg;
 
+    m_checkBoxFailSafe       ->SetValue(defaultCfg.failsafeFileCopy);
     m_checkBoxCopyLocked     ->SetValue(defaultCfg.copyLockedFiles);
-    m_checkBoxTransCopy      ->SetValue(defaultCfg.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
+
+    m_spinCtrlAutoRetryCount->SetValue(defaultCfg.automaticRetryCount);
+    m_spinCtrlAutoRetryDelay->SetValue(defaultCfg.automaticRetryDelay);
+
     setExtApp(defaultCfg.gui.externelApplications);
+
+    updateGui();
 }
 
 
@@ -804,7 +862,6 @@ void GlobalSettingsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
         m_gridCustomCommand->SetCellValue(row, 0, it->first);  //description
         m_gridCustomCommand->SetCellValue(row, 1, it->second); //commandline
     }
-    //Fit();
 }
 
 
@@ -825,14 +882,15 @@ xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp()
 
 void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
 {
-    wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
     const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
     if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
         m_gridCustomCommand->InsertRows(selectedRow);
     else
         m_gridCustomCommand->AppendRows();
-    //Fit();
 }
 
 
@@ -840,14 +898,15 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 {
     if (m_gridCustomCommand->GetNumberRows() > 0)
     {
-        wxWindowUpdateLocker dummy(this); //avoid display distortion
+#ifdef ZEN_WIN
+        wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+#endif
 
         const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
         if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
             m_gridCustomCommand->DeleteRows(selectedRow);
         else
             m_gridCustomCommand->DeleteRows(m_gridCustomCommand->GetNumberRows() - 1);
-        //Fit();
     }
 }
 
@@ -945,7 +1004,9 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     m_calendarTo  ->SetMinSize(minSz);
 #endif
 
-    Fit();
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
     m_buttonOkay->SetFocus();
 }
 

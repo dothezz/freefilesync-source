@@ -40,7 +40,7 @@ std::wstring zen::filesizeToShortString(Int64 size)
     //if (size < 0) return _("Error"); -> really?
 
     if (numeric::abs(size) <= 999)
-        return replaceCpy(_P("1 byte", "%x bytes", to<int>(size)), L"%x", numberTo<std::wstring>(size));
+        return _P("1 byte", "%x bytes", to<int>(size));
 
     double sizeInUnit = to<double>(size);
     auto formatUnit = [&](const std::wstring& unitTxt) { return replaceCpy(unitTxt, L"%x", formatThreeDigitPrecision(sizeInUnit)); };
@@ -79,17 +79,16 @@ enum UnitRemTime
 
 std::wstring formatUnitTime(int val, UnitRemTime unit)
 {
-    auto subst = [&](const std::wstring& output) { return replaceCpy(output, L"%x", zen::numberTo<std::wstring>(val)); };
     switch (unit)
     {
         case URT_SEC:
-            return subst(_P("1 sec", "%x sec", val));
+            return _P("1 sec", "%x sec", val);
         case URT_MIN:
-            return subst(_P("1 min", "%x min", val));
+            return _P("1 min", "%x min", val);
         case URT_HOUR:
-            return subst(_P("1 hour", "%x hours", val));
+            return _P("1 hour", "%x hours", val);
         case URT_DAY:
-            return subst(_P("1 day", "%x days", val));
+            return _P("1 day", "%x days", val);
     }
     assert(false);
     return _("Error");
@@ -256,8 +255,8 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
     const lconv* localInfo = ::localeconv(); //always bound according to doc
     const std::wstring& thousandSep = utfCvrtTo<std::wstring>(localInfo->thousands_sep);
 
-    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep(); - why not working?
-    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
+    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t>>(std::locale("")).thousands_sep(); - why not working?
+    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t>>(std::locale("")).decimal_point();
 
     std::wstring output(number);
     size_t i = output.size();

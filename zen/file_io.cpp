@@ -177,7 +177,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
 
     if (bytesRead < bytesToRead)
         if (!eof()) //pathologic!?
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete read!"); //user should never see this
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete read."); //user should never see this
 #endif
 
     if (bytesRead > bytesToRead)
@@ -305,7 +305,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), formatSystemError(functionName, getLastError()));
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete write!"); //user should never see this
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete write."); //user should never see this
 }
 
 
@@ -318,12 +318,7 @@ FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBas
 
     fdFile = ::open(filename.c_str(), O_RDONLY);
     if (fdFile == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
-    {
-        const ErrorCode lastError = getLastError(); //copy before making other system calls!
-        const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename));
-        const std::wstring errorDescr = formatSystemError(L"open", lastError);
-        throw FileError(errorMsg, errorDescr);
-    }
+        throw FileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), formatSystemError(L"open", getLastError()));
 }
 
 

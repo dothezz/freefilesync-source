@@ -94,9 +94,9 @@ public:
 
     //grid area
     virtual wxString getValue(size_t row, ColumnType colType) const = 0;
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus); //default implementation
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType); //
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected); //default implementation
+    virtual void renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected); //
+    virtual int  getBestSize       (wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
     virtual wxString getToolTip(size_t row, ColumnType colType) const { return wxString(); }
 
     //label area
@@ -104,9 +104,11 @@ public:
     virtual void renderColumnLabel(Grid& grid, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted); //default implementation
     virtual wxString getToolTip(ColumnType colType) const { return wxString(); }
 
+    static const int COLUMN_GAP_LEFT; //for left-aligned text
+
 protected: //optional helper routines
     static wxRect drawCellBorder  (wxDC& dc, const wxRect& rect); //returns inner rectangle
-    static void drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, bool hasFocus, const wxColor& backgroundColor);
+    static void drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor);
     static void drawCellText      (wxDC& dc, const wxRect& rect, const wxString& text, bool enabled, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 
     static wxRect drawColumnLabelBorder  (wxDC& dc, const wxRect& rect); //returns inner rectangle
@@ -165,6 +167,7 @@ public:
     void showScrollBars(ScrollBarStatus horizontal, ScrollBarStatus vertical);
 
     std::vector<size_t> getSelectedRows(size_t compPos = 0) const;
+    void setSelectedRows(const std::vector<size_t>& sel, size_t compPos = 0);
     void clearSelection(bool emitSelectRangeEvent = true, size_t compPos = 0); //turn off range selection event when calling this function in an event handler to avoid recursion!
 
     void scrollDelta(int deltaX, int deltaY); //in scroll units
@@ -226,6 +229,8 @@ private:
     public:
         void init(size_t rowCount) { rowSelectionValue.resize(rowCount); clear(); }
 
+        size_t size() const { return rowSelectionValue.size(); }
+
         std::vector<size_t> get() const
         {
             std::vector<size_t> selection;
@@ -233,6 +238,14 @@ private:
                 if (rowSelectionValue[row] != 0)
                     selection.push_back(row);
             return selection;
+        }
+
+        void set(const std::vector<size_t>& newSel)
+        {
+            clear();
+            for (size_t row : newSel)
+                if (row < rowSelectionValue.size())
+                    rowSelectionValue[row] = true;
         }
 
         void clear() { selectRange(0, rowSelectionValue.size(), false); }

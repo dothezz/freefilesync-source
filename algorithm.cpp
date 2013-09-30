@@ -12,7 +12,7 @@
 #include <zen/stl_tools.h>
 #include <zen/scope_guard.h>
 #include <zen/thread.h>
-#include "lib/resources.h"
+#include <wx+/image_resources.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"

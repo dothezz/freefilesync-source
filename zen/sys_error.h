@@ -73,13 +73,17 @@ std::wstring formatSystemError(const std::wstring& functionName, long long lastE
 inline
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError)
 {
-    //determine error code if none was specified -> still required??
+    const ErrorCode currentError = getLastError(); //not necessarily == lastError
+
+    //determine error code if none was specified
     if (lastError == 0)
-        lastError = getLastError();
+        lastError = currentError;
 
     std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", numberTo<std::wstring>(lastError));
 
 #ifdef ZEN_WIN
+    ZEN_ON_SCOPE_EXIT(::SetLastError(currentError)); //this function must not change active system error variable!
+
     LPWSTR buffer = nullptr;
     if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
                         FORMAT_MESSAGE_MAX_WIDTH_MASK |
@@ -91,13 +95,12 @@ std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastE
             output += L" ";
             output += buffer;
         }
-    ::SetLastError(lastError); //restore last error
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
+    ZEN_ON_SCOPE_EXIT(errno = currentError);
+
     output += L" ";
     output += utfCvrtTo<std::wstring>(::strerror(lastError));
-
-    errno = lastError; //restore errno
 #endif
     if (!endsWith(output, L" ")) //Windows messages seem to end with a blank...
         output += L" ";

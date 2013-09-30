@@ -2,10 +2,270 @@
 	<language>Nederlands</language>
 	<translator>Edwin Dierssen</translator>
 	<locale>nl_NL</locale>
-	<flag_image>flag_holland.png</flag_image>
-	<plural_form_count>2</plural_form_count>
+	<image>flag_holland.png</image>
+	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>Unable to suspend system sleep mode.</source>
+<target></target>
+
+<source>Unable to register to receive system messages.</source>
+<target></target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target></target>
+
+<source>Move</source>
+<target></target>
+
+<source>Stopped</source>
+<target></target>
+
+<source>Serious Error</source>
+<target></target>
+
+<source>Comparison Settings</source>
+<target></target>
+
+<source>Synchronization Settings</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Select View</source>
+<target></target>
+
+<source>Filter Files</source>
+<target></target>
+
+<source>Main Bar</source>
+<target></target>
+
+<source>Folder Pairs</source>
+<target></target>
+
+<source>Select Time Span</source>
+<target></target>
+
+<source>Global Settings</source>
+<target></target>
+
+<source>Delete Items</source>
+<target></target>
+
+<source>Save as Batch Job</source>
+<target></target>
+
+<source>Restore hidden windows</source>
+<target></target>
+
+<source>Customize context menu:</source>
+<target></target>
+
+<source>Delay (in seconds):</source>
+<target></target>
+
+<source>Retry count:</source>
+<target></target>
+
+<source>Automatic retry on error:</source>
+<target></target>
+
+<source>Transfer file and folder permissions.</source>
+<target></target>
+
+<source>(requires administrator rights)</source>
+<target></target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target></target>
+
+<source>(recommended)</source>
+<target></target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target></target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target></target>
+
+<source>Maximum:</source>
+<target></target>
+
+<source>Minimum:</source>
+<target></target>
+
+<source>File size:</source>
+<target></target>
+
+<source>Time span:</source>
+<target></target>
+
+<source>Exclude:</source>
+<target></target>
+
+<source>Include:</source>
+<target></target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target></target>
+
+<source>&Recycle bin</source>
+<target></target>
+
+<source>How can I schedule a batch job?</source>
+<target></target>
+
+<source>Limit:</source>
+<target></target>
+
+<source>Save log:</source>
+<target></target>
+
+<source>Stop synchronization at first error</source>
+<target></target>
+
+<source>Stop</source>
+<target></target>
+
+<source>Variant:</source>
+<target></target>
+
+<source>Start synchronization now?</source>
+<target></target>
+
+<source>On completion:</source>
+<target></target>
+
+<source>Handle errors:</source>
+<target></target>
+
+<source>Show examples</source>
+<target></target>
+
+<source>Delete files:</source>
+<target></target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target></target>
+
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target></target>
+
+<source>More information</source>
+<target></target>
+
+<source>Symbolic links:</source>
+<target></target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target></target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target></target>
+
+<source>Select a variant:</source>
+<target></target>
+
+<source>Find:</source>
+<target></target>
+
+<source>Close search bar</source>
+<target></target>
+
+<source>&Check for new version</source>
+<target></target>
+
+<source>&Find...</source>
+<target></target>
+
+<source>Local Filter</source>
+<target></target>
+
+<source>Alternate Synchronization Settings</source>
+<target></target>
+
+<source>Alternate Comparison Settings</source>
+<target></target>
+
+<source>None</source>
+<target></target>
+
+<source>Active</source>
+<target></target>
+
+<source>Local filter</source>
+<target></target>
+
+<source>Alternate synchronization settings</source>
+<target></target>
+
+<source>Alternate comparison settings</source>
+<target></target>
+
+<source>Check for Program Updates</source>
+<target></target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
+
+<source>Switching to FreeFileSync's main window</source>
+<target></target>
+
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target></target>
+
+<source>Synchronization stopped</source>
+<target></target>
+
+<source>Please enter a target folder for versioning.</source>
+<target></target>
+
+<source>Incorrect command line:</source>
+<target></target>
+
+<source>Automated Synchronization</source>
+<target></target>
+
+<source>&Start</source>
+<target></target>
+
+<source>Command line:</source>
+<target></target>
+
+<source>Idle time (in seconds):</source>
+<target></target>
+
+<source>Folders to watch:</source>
+<target></target>
+
+<source>&View help</source>
+<target></target>
+
+<source>Unable to create timestamp for versioning:</source>
+<target></target>
+
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target></target>
+
+<source>%x items/sec</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide zijdes zijn veranderd sinds de laatste synchronisatie.</target>
@@ -292,9 +552,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>%x items</source>
-<target>%x items</target>
-
 <source>Configuration file %x loaded partially only.</source>
 <target>Configuratiebestand %x alleen deels geladen.</target>
 
@@ -322,12 +579,6 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>Schijfnaam %x is geen deel van bestandspad %y.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
-
-<source>Failure to create timestamp for versioning:</source>
-<target>Het creëren van een tijdsstempen voor versiebeheer is mislukt:</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Kan de volgende XML elementen niet lezen:</target>
 
@@ -342,9 +593,6 @@
 
 <source>&Program</source>
 <target>&Programma</target>
-
-<source>&Content</source>
-<target>&Inhoud</target>
 
 <source>&About</source>
 <target>&Over</target>
@@ -367,9 +615,6 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>Importeer een .ffs_batch bestand om te beginnen.</target>
 
-<source>Folders to watch</source>
-<target>Mappen om te bekijken</target>
-
 <source>Add folder</source>
 <target>Map toevoegen</target>
 
@@ -381,9 +626,6 @@
 
 <source>Select a folder</source>
 <target>Selecteer een map</target>
-
-<source>Idle time [seconds]</source>
-<target>Inactiviteit [seconden]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tijd tussen de laatste gedetecteerde verandering en de uitvoering van het commando</target>
@@ -399,17 +641,11 @@ De opdracht word geactiveerd als:
 - nieuwe folders worden gevonden (bijvoorbeeld bij invoeging van USB stick)
 </target>
 
-<source>Start</source>
-<target>Start</target>
-
 <source>&Retry</source>
 <target>&Opnieuw proberen</target>
 
 <source>Cancel</source>
 <target>Annuleren</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
 
 <source>Build: %x</source>
 <target>Build: %x</target>
@@ -434,9 +670,6 @@ De opdracht word geactiveerd als:
 
 <source>&Exit</source>
 <target>&Afsluiten</target>
-
-<source>Invalid command line:</source>
-<target>Ongeldige opdrachtregel:</target>
 
 <source>File content</source>
 <target>Bestandsinhoud</target>
@@ -498,9 +731,6 @@ De opdracht word geactiveerd als:
 <source>Target folder input field must not be empty.</source>
 <target>Doelmap mag niet leeg zijn.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>Bronmap voor versiebeheer mag niet leeg zijn.</target>
-
 <source>Source folder %x not found.</source>
 <target>Bronmap %x niet gevonden.</target>
 
@@ -537,9 +767,6 @@ De opdracht word geactiveerd als:
 <source>job name</source>
 <target>taaknaam</target>
 
-<source>Synchronization aborted</source>
-<target>Synchronisatie afgebroken</target>
-
 <source>Synchronization completed with errors</source>
 <target>Synchronisatie is met fouten afgerond</target>
 
@@ -555,23 +782,11 @@ De opdracht word geactiveerd als:
 <source>Saving log file %x...</source>
 <target>Opslaan van logbestand %x...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Druk op "Omschakelen" om problemen op te lossen in het hoofdscherm van FreeFileSync.</target>
-
-<source>Switching to FreeFileSync main dialog</source>
-<target>Wisselen naar FreeFileSync hoofdscherm</target>
-
-<source>Retrying operation after error:</source>
-<target>Bewerking opnieuw proberen na fout:</target>
-
 <source>A new version of FreeFileSync is available:</source>
 <target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
 
 <source>Download now?</source>
 <target>Nu downloaden?</target>
-
-<source>New version found</source>
-<target>Nieuwe versie gevonden</target>
 
 <source>&Download</source>
 <target>&Download</target>
@@ -639,21 +854,6 @@ De opdracht word geactiveerd als:
 <source>Hibernate</source>
 <target>Slaapstand</target>
 
-<source>Selected variant:</source>
-<target>Selecter variant:</target>
-
-<source>Select alternate comparison settings</source>
-<target>Selecteer alternatieve vergelijkingsinstellingen</target>
-
-<source>Select alternate synchronization settings</source>
-<target>Selecteer alternatieve synchronisatieinstellingen</target>
-
-<source>Filter is active</source>
-<target>Filter is actief</target>
-
-<source>No filter selected</source>
-<target>Geen filter geselecteerd</target>
-
 <source>Remove alternate settings</source>
 <target>Verwijder alternatieve instellingen</target>
 
@@ -681,14 +881,14 @@ De opdracht word geactiveerd als:
 <source>2. &Synchronize</source>
 <target>2. &Synchroniseer</target>
 
+<source>&Global settings</source>
+<target>&Algemene instellingen</target>
+
 <source>&Language</source>
 <target>&Taal</target>
 
 <source>&Export file list...</source>
 <target>&Exporteer bestandslijst...</target>
-
-<source>&Global settings</source>
-<target>&Algemene instellingen</target>
 
 <source>&Tools</source>
 <target>&Gereedschap</target>
@@ -699,17 +899,8 @@ De opdracht word geactiveerd als:
 <source>Check &automatically once a week</source>
 <target>Controleer &automatisch eens per week</target>
 
-<source>Check for new &version</source>
-<target>Kijk voor een nieuwe &versie</target>
-
 <source>Compare</source>
 <target>Vergelijk</target>
-
-<source>Comparison settings</source>
-<target>Vergelijksinstellingen</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisatieinstellingen</target>
 
 <source>Synchronize</source>
 <target>Synchroniseer</target>
@@ -722,6 +913,9 @@ De opdracht word geactiveerd als:
 
 <source>Swap sides</source>
 <target>Wissel zijdes</target>
+
+<source>Match case</source>
+<target>Hoofdlettergevoelig</target>
 
 <source>Save as batch job</source>
 <target>Opslaan als batch opdracht</target>
@@ -744,86 +938,11 @@ De opdracht word geactiveerd als:
 <source>Total bytes to copy</source>
 <target>Aantal bytes om te kopiëren</target>
 
-<source>Items found:</source>
-<target>Onderdelen gevonden:</target>
-
-<source>Speed:</source>
-<target>Snelheid:</target>
-
-<source>Time remaining:</source>
-<target>Resterende tijd:</target>
-
-<source>Time elapsed:</source>
-<target>Verstreken tijd:</target>
-
-<source>Synchronizing...</source>
-<target>Synchroniseert...</target>
-
-<source>Minimize to notification area</source>
-<target>Minimaliseer naar systeemvak</target>
-
-<source>On completion</source>
-<target>Na voltooiing</target>
-
-<source>Close</source>
-<target>Sluiten</target>
-
-<source>&Pause</source>
-<target>&Pauze</target>
-
-<source>Variant</source>
-<target>Variant</target>
-
-<source>Statistics</source>
-<target>Statistieken</target>
-
-<source>&Don't show this dialog again</source>
-<target>Laat deze dialoog &niet meer zien</target>
-
-<source>Select a variant</source>
-<target>Selecteer een variant</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Bestanden worden als gelijk bevonden indien
-     - de laatste schrijf tijd en datum
-     - de bestandsgrootte
-gelijk zijn
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Bestanden worden als gelijk beschouwd indien
-     - de bestandsinhoud
-overeenkomt
-</target>
-
-<source>Symbolic Link handling</source>
-<target>Afhandeling van snelkoppelingen</target>
-
-<source>Help</source>
-<target>Help</target>
-
 <source>OK</source>
 <target>OK</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificeer en pas veranderingen toe aan beide kanten. Verwijderingen, verplaatsingen en conflicten worden automatisch gevonden met behulp van een database.</target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spiegel backup van linker map. Rechter map is na synchronisatie een exacte kopie van de linker map.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configureer uw eigen synchronisatieregels.</target>
@@ -833,24 +952,6 @@ overeenkomt
 
 <source>Requires database files. Not supported by all file systems.</source>
 <target>Heeft database bestanden nodig. Wordt niet ondersteund door alle bestandssystemen</target>
-
-<source>Error handling</source>
-<target>Fout afhandeling</target>
-
-<source>Ignore</source>
-<target>Negeer</target>
-
-<source>Hide all error and warning messages</source>
-<target>Verberg alle fout- en waarschuwingsberichten</target>
-
-<source>Pop-up</source>
-<target>Pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
-
-<source>Deletion handling</source>
-<target>Verwijder-afhandeling</target>
 
 <source>Permanent</source>
 <target>Permanent</target>
@@ -873,32 +974,80 @@ overeenkomt
 <source>Naming convention:</source>
 <target>Naamgevingsconventie</target>
 
-<source>Batch job</source>
-<target>Taaklijst</target>
+<source>Ignore</source>
+<target>Negeer</target>
+
+<source>Hide all error and warning messages</source>
+<target>Verberg alle fout- en waarschuwingsberichten</target>
+
+<source>Pop-up</source>
+<target>Pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
+
+<source>Statistics</source>
+<target>Statistieken</target>
+
+<source>&Don't show this dialog again</source>
+<target>Laat deze dialoog &niet meer zien</target>
+
+<source>Items found:</source>
+<target>Onderdelen gevonden:</target>
+
+<source>Speed:</source>
+<target>Snelheid:</target>
+
+<source>Time remaining:</source>
+<target>Resterende tijd:</target>
+
+<source>Time elapsed:</source>
+<target>Verstreken tijd:</target>
+
+<source>Synchronizing...</source>
+<target>Synchroniseert...</target>
+
+<source>Minimize to notification area</source>
+<target>Minimaliseer naar systeemvak</target>
+
+<source>Close</source>
+<target>Sluiten</target>
+
+<source>&Pause</source>
+<target>&Pauze</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Maak een batchbestand voor onbeheerde synchronisatie. Om te starten dubbelklikt u dit bestand of rooster in een taakplanner: %x</target>
 
-<source>Exit</source>
-<target>Sluiten</target>
-
-<source>Abort synchronization on first error</source>
-<target>Synchronisatie stoppen bij eerste foutmelding</target>
-
 <source>Show progress dialog</source>
 <target>Toon voortgangsdialoogvenster</target>
 
-<source>Save log</source>
-<target>Logbestand opslaan</target>
-
-<source>Select folder to save log files</source>
-<target>Selecteer map om log bestanden op te slaan</target>
-
-<source>Limit</source>
-<target>Limiet</target>
-
 <source>Limit maximum number of log files</source>
 <target>Limiteer maximaal aantal log bestanden</target>
+
+<source>Delete on both sides</source>
+<target>Verwijder aan beide zijdes</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Verwijder aan beide zijdes ook al is het bestand maar aan één zijde geselecteerd</target>
+
+<source>&Clear</source>
+<target>&Leegmaken</target>
+
+<source>Fail-safe file copy</source>
+<target>Fail-safe bestandskopie</target>
+
+<source>Copy locked files</source>
+<target>Kopiëer vergrendelde bestanden</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiëer toegangsrechten van bestand.</target>
+
+<source>Description</source>
+<target>Omschrijving</target>
+
+<source>&Default</source>
+<target>&Standaard</target>
 
 <source>Source code written in C++ using:</source>
 <target>Broncode geschreven in C++ met behulp van:</target>
@@ -908,9 +1057,6 @@ overeenkomt
 
 <source>Donate with PayPal</source>
 <target>Doneer met PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Veel dank voor de vertalingen:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback en suggesties zijn welkom</target>
@@ -924,113 +1070,17 @@ overeenkomt
 <source>Published under the GNU General Public License</source>
 <target>Gepubliceerd onder de GNU General Public License</target>
 
-<source>Delete on both sides</source>
-<target>Verwijder aan beide zijdes</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Verwijder aan beide zijdes ook al is het bestand maar aan één zijde geselecteerd</target>
-
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>Bestanden zullen alleen gesynchroniseerd worden als ze aan alle filterregels voldoen.</target>
-
-<source>Include</source>
-<target>Opnemen</target>
-
-<source>Exclude</source>
-<target>Uitsluiten</target>
-
-<source>Time span</source>
-<target>Tijdspanne</target>
-
-<source>File size</source>
-<target>Bestandsgrootte</target>
-
-<source>Minimum</source>
-<target>Minimum</target>
-
-<source>Maximum</source>
-<target>Maximum</target>
-
-<source>&Clear</source>
-<target>&Leegmaken</target>
-
-<source>Global settings</source>
-<target>Algemene instellingen</target>
-
-<source>Fail-safe file copy</source>
-<target>Fail-safe bestandskopie</target>
-
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>Kopiëer eerst naar een tijdelijk bestand (*.ffs_tmp) en hernoem het daarna. Dit garandeert consistentie, zelfs in het geval van een fatale fout.</target>
-
-<source>Copy locked files</source>
-<target>Kopiëer vergrendelde bestanden</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>Kopiëer gedeelde of afgesloten bestanden met behulp van de Volume Shadow Copy Service (vereist administrator rechten)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiëer toegangsrechten van bestand.</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>Verplaats bestands en map permissies (vereist administrator rechten)</target>
-
-<source>Restore hidden dialogs</source>
-<target>Herstel verborgen dialogen</target>
-
-<source>External applications</source>
-<target>Externe applicaties</target>
-
-<source>Description</source>
-<target>Omschrijving</target>
-
-<source>&Default</source>
-<target>&Standaard</target>
-
-<source>Find what:</source>
-<target>Vind wat:</target>
-
-<source>Match case</source>
-<target>Hoofdlettergevoelig</target>
-
-<source>&Find next</source>
-<target>&Vind volgende</target>
-
-<source>Start synchronization</source>
-<target>Start synchronisatie</target>
-
-<source>Delete</source>
-<target>Verwijderen</target>
-
-<source>Configure filter</source>
-<target>Filterconfiguratie</target>
+<source>Many thanks for localization:</source>
+<target>Veel dank voor de vertalingen:</target>
 
 <source>Find</source>
 <target>Vind</target>
-
-<source>Select time span</source>
-<target>Selecteer tijdsspanne</target>
-
-<source>Folder pairs</source>
-<target>Map paren</target>
 
 <source>Overview</source>
 <target>Overzicht</target>
 
 <source>Configuration</source>
 <target>Configuratie</target>
-
-<source>Main bar</source>
-<target>Hoofdbalk</target>
-
-<source>Filter files</source>
-<target>Filter bestanden</target>
-
-<source>Select view</source>
-<target>Selecteer weergave</target>
 
 <source>Open...</source>
 <target>Open...</target>
@@ -1041,14 +1091,14 @@ Note: File paths must be relative to base directories.
 <source>Compare both sides</source>
 <target>Vergelijk beide zijdes</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>Weet u zeker dat u commando %y wilt uitvoeren voor 1 item?</pluralform>
-<pluralform>Weet u zeker dat u commando %y wilt uitvoeren voor %x items?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>Vergelijksinstellingen</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisatieinstellingen</target>
+
+<source>Start synchronization</source>
+<target>Start synchronisatie</target>
 
 <source>Confirm</source>
 <target>Bevestigen</target>
@@ -1086,12 +1136,6 @@ Note: File paths must be relative to base directories.
 <source>Set direction:</source>
 <target>Stel richting in:</target>
 
-<source>Exclude temporarily</source>
-<target>Tijdelijk uitsluiten</target>
-
-<source>Include temporarily</source>
-<target>Tijdelijk opnemen</target>
-
 <source>multiple selection</source>
 <target>meervoudige selectie</target>
 
@@ -1100,6 +1144,15 @@ Note: File paths must be relative to base directories.
 
 <source>Exclude via filter:</source>
 <target>Sluit via filter uit:</target>
+
+<source>Exclude temporarily</source>
+<target>Tijdelijk uitsluiten</target>
+
+<source>Include temporarily</source>
+<target>Tijdelijk opnemen</target>
+
+<source>Delete</source>
+<target>Verwijderen</target>
 
 <source>Include all</source>
 <target>Alles opnemen</target>
@@ -1149,6 +1202,9 @@ Note: File paths must be relative to base directories.
 <source>Never save &changes</source>
 <target>Sla &veranderingen nooit op</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>Show files that exist on left side only</source>
 <target>Toon bestanden die alleen aan de linkerzijde bestaan</target>
 
@@ -1194,11 +1250,11 @@ Note: File paths must be relative to base directories.
 <source>Set as default</source>
 <target>Instellen als standaard</target>
 
-<source>Operation aborted</source>
-<target>Bewerking afgebroken</target>
-
 <source>All folders are in sync</source>
 <target>Alle mappen zijn gesynchroniseerd</target>
+
+<source>Cannot find %x</source>
+<target>Kan %x niet vinden</target>
 
 <source>Comma-separated values</source>
 <target>Door komma gescheiden waarden</target>
@@ -1215,17 +1271,11 @@ Note: File paths must be relative to base directories.
 <source>&Ignore</source>
 <target>&Negeren</target>
 
-<source>Fatal Error</source>
-<target>Kritieke fout</target>
-
 <source>&Don't show this warning again</source>
 <target>Laat deze &waarschuwing niet meer zien</target>
 
 <source>&Switch</source>
 <target>&Omschakelen</target>
-
-<source>Question</source>
-<target>Vraag</target>
 
 <source>&Yes</source>
 <target>&Ja</target>
@@ -1248,9 +1298,6 @@ Note: File paths must be relative to base directories.
 <source>Initializing...</source>
 <target>Initialiseren...</target>
 
-<source>Aborted</source>
-<target>Afgebroken</target>
-
 <source>Completed</source>
 <target>Voltooid</target>
 
@@ -1259,12 +1306,6 @@ Note: File paths must be relative to base directories.
 
 <source>Log</source>
 <target>Log</target>
-
-<source>Cannot find %x</source>
-<target>Kan %x niet vinden</target>
-
-<source>Inactive</source>
-<target>Niet actief</target>
 
 <source>Today</source>
 <target>Vandaag</target>
@@ -1290,9 +1331,6 @@ Note: File paths must be relative to base directories.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>Filter</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1310,6 +1348,9 @@ Note: File paths must be relative to base directories.
 <pluralform>Wilt u het volgende item echt verwijderen?</pluralform>
 <pluralform>Wilt u echt de volgende %x items verwijderen?</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>Uitsluiten</target>
 
 <source>Direct</source>
 <target>Direct</target>
@@ -1334,9 +1375,6 @@ Note: File paths must be relative to base directories.
 
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Tegenhanger van de andere kant naar %item_folder%</target>
-
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>Verborgen waarschuwingen en dialogen zichtbaar maken?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Beschouw als onopgelost conflict</target>
@@ -1461,14 +1499,8 @@ Note: File paths must be relative to base directories.
 <pluralform>%x dagen</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>Registreren voor het ontvangen van systeemmeldingen is mislukt.</target>
-
 <source>Cannot set privilege %x.</source>
 <target>Kan privilege %x niet instellen.</target>
-
-<source>Failed to suspend system sleep mode.</source>
-<target>Het opschorten van slaapstand is mislukt.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Kan de I/O prioriteiten niet aanpassen.</target>

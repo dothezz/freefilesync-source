@@ -2,10 +2,27 @@
 	<language>日本語</language>
 	<translator>Tilt</translator>
 	<locale>ja_JP</locale>
-	<flag_image>flag_japan.png</flag_image>
-	<plural_form_count>1</plural_form_count>
+	<image>flag_japan.png</image>
+	<plural_count>1</plural_count>
 	<plural_definition>0</plural_definition>
 </header>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Retrying operation</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>前回最後の同期処理以降、両側とも変更があります.</target>
@@ -289,8 +306,8 @@
 <source>/sec</source>
 <target>/秒</target>
 
-<source>%x items</source>
-<target>%x 個の項目</target>
+<source>%x items/sec</source>
+<target>%x 項目/秒</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>構成ファイル %x は部分的のみ読み込まれます.</target>
@@ -319,11 +336,11 @@
 <source>Volume name %x is not part of file path %y.</source>
 <target>ボリューム名 %x は、ファイルパス %y の一部ではありません.</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>ユーザによる中断: 現在の処理を終了しています.. お待ちください...</target>
+<source>Stop requested: Waiting for current operation to finish...</source>
+<target>停止の要求: 現在の操作が完了するのを待機しています...</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>バージョン付けのタイムスタンプ作成に失敗:</target>
+<source>Unable to create timestamp for versioning:</source>
+<target>バージョン付けのタイムスタンプを作成出来ません:</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>次の XML要素を読み込めません:</target>
@@ -340,8 +357,8 @@
 <source>&Program</source>
 <target>プログラム(&P)</target>
 
-<source>&Content</source>
-<target>トピック(&C)</target>
+<source>&View help</source>
+<target>ヘルプを表示(&V)</target>
 
 <source>&About</source>
 <target>情報(&A)</target>
@@ -364,8 +381,8 @@
 <source>To get started just import a .ffs_batch file.</source>
 <target>一括ファイル(.ffs)からインポートして開始</target>
 
-<source>Folders to watch</source>
-<target>監視するフォルダ</target>
+<source>Folders to watch:</source>
+<target>監視するフォルダ:</target>
 
 <source>Add folder</source>
 <target>フォルダを追加</target>
@@ -379,11 +396,14 @@
 <source>Select a folder</source>
 <target>フォルダを選択</target>
 
-<source>Idle time [seconds]</source>
-<target>待機時間 [秒]</target>
+<source>Idle time (in seconds):</source>
+<target>待機時間(秒で指定):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>最後にコマンドを実行してから、次に変更を検出するまでの待機時間</target>
+
+<source>Command line:</source>
+<target>コマンドライン:</target>
 
 <source>
 The command is triggered if:
@@ -396,17 +416,14 @@ The command is triggered if:
 - 新規フォルダの追加 (例. USB の挿入)
 </target>
 
-<source>Start</source>
-<target>開始</target>
+<source>&Start</source>
+<target>開始(&S)</target>
 
 <source>&Retry</source>
 <target>再試行(&R)</target>
 
 <source>Cancel</source>
 <target>キャンセル</target>
-
-<source>RealtimeSync - Automated Synchronization</source>
-<target>リアルタイム同期 - 自動同期</target>
 
 <source>Build: %x</source>
 <target>ビルド: %x</target>
@@ -416,6 +433,9 @@ The command is triggered if:
 
 <source>All files</source>
 <target>すべてのファイル</target>
+
+<source>Automated Synchronization</source>
+<target>自動同期</target>
 
 <source>Directory monitoring active</source>
 <target>ディレクトリの監視アクティブ</target>
@@ -432,8 +452,8 @@ The command is triggered if:
 <source>&Exit</source>
 <target>終了(&E)</target>
 
-<source>Invalid command line:</source>
-<target>無効なコマンドライン:</target>
+<source>Incorrect command line:</source>
+<target>不正なコマンドライン:</target>
 
 <source>File content</source>
 <target>ファイルの内容</target>
@@ -495,8 +515,8 @@ The command is triggered if:
 <source>Target folder input field must not be empty.</source>
 <target>対象フォルダ入力欄が空白になっています.</target>
 
-<source>Folder input field for versioning must not be empty.</source>
-<target>バージョン管理のためフォルダ入力欄に空白は使えません.</target>
+<source>Please enter a target folder for versioning.</source>
+<target>バージョン付けをする対象フォルダを入力</target>
 
 <source>Source folder %x not found.</source>
 <target>ソースフォルダ %x が見つかりません</target>
@@ -520,7 +540,7 @@ The command is triggered if:
 <target>複数フォルダペアの一部であるフォルダが変更されています. 同期設定を確認してください.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>フォルダペアを同期処理中:</target>
+<target>フォルダペアを同期処理:</target>
 
 <source>Generating database...</source>
 <target>データベースを作成中...</target>
@@ -534,8 +554,8 @@ The command is triggered if:
 <source>job name</source>
 <target>ジョブ名</target>
 
-<source>Synchronization aborted</source>
-<target>同期処理を中断</target>
+<source>Synchronization stopped</source>
+<target>同期処理を停止</target>
 
 <source>Synchronization completed with errors</source>
 <target>同期処理はエラーで終了しています</target>
@@ -552,14 +572,11 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>ログファイル %x を保存中...</target>
 
-<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>"切り替え"を押すと FreeFileSync ダイアログの問題を解決します.</target>
+<source>You can switch to FreeFileSync's main window to resolve this issue.</source>
+<target>FreeFileSync のメインウィンドウを切り替えることでこの問題を解決</target>
 
-<source>Switching to FreeFileSync main dialog</source>
-<target>FreeFileSync メインダイアログを切り替え中</target>
-
-<source>Retrying operation after error:</source>
-<target>エラーの後で処理を再試行:</target>
+<source>Switching to FreeFileSync's main window</source>
+<target>FreeFileSync メインウィンドウの切り替え</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync の新しいバージョンが利用できます:</target>
@@ -567,8 +584,8 @@ The command is triggered if:
 <source>Download now?</source>
 <target>ダウンロードしますか?</target>
 
-<source>New version found</source>
-<target>新たなバージョンがあります</target>
+<source>Check for Program Updates</source>
+<target>プログラムのアップデートを確認</target>
 
 <source>&Download</source>
 <target>ダウンロード(&D)</target>
@@ -636,20 +653,20 @@ The command is triggered if:
 <source>Hibernate</source>
 <target>休止状態</target>
 
-<source>Selected variant:</source>
-<target>選択されたバリアント:</target>
+<source>Alternate comparison settings</source>
+<target>代替比較設定</target>
 
-<source>Select alternate comparison settings</source>
-<target>代替比較設定を選択</target>
+<source>Alternate synchronization settings</source>
+<target>代替同期設定</target>
 
-<source>Select alternate synchronization settings</source>
-<target>代替同期設定を選択</target>
+<source>Local filter</source>
+<target>ローカル フィルター</target>
 
-<source>Filter is active</source>
-<target>フィルターを有効化</target>
+<source>Active</source>
+<target>アクティブ</target>
 
-<source>No filter selected</source>
-<target>フィルター選択なし</target>
+<source>None</source>
+<target>なし</target>
 
 <source>Remove alternate settings</source>
 <target>代替設定を除去</target>
@@ -662,6 +679,15 @@ The command is triggered if:
 
 <source>Paste</source>
 <target>貼り付け</target>
+
+<source>Alternate Comparison Settings</source>
+<target>代替比較設定</target>
+
+<source>Alternate Synchronization Settings</source>
+<target>代替同期設定</target>
+
+<source>Local Filter</source>
+<target>ローカル フィルター</target>
 
 <source>&New</source>
 <target>新規(&N)</target>
@@ -678,14 +704,17 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. 同期処理(&S)</target>
 
+<source>&Global settings</source>
+<target>全般的な設定(&G)</target>
+
 <source>&Language</source>
 <target>使用言語(&L)</target>
 
+<source>&Find...</source>
+<target>検索(&F)...</target>
+
 <source>&Export file list...</source>
 <target>ファイル一覧をエクスポート(&E)...</target>
-
-<source>&Global settings</source>
-<target>全般的な設定(&G)</target>
 
 <source>&Tools</source>
 <target>ツール(&T)</target>
@@ -696,17 +725,11 @@ The command is triggered if:
 <source>Check &automatically once a week</source>
 <target>週に一回、自動的に確認する(&A)</target>
 
-<source>Check for new &version</source>
-<target>新バージョンの確認(&V)</target>
+<source>&Check for new version</source>
+<target>新バージョンの確認(&C)</target>
 
 <source>Compare</source>
 <target>比較</target>
-
-<source>Comparison settings</source>
-<target>比較設定</target>
-
-<source>Synchronization settings</source>
-<target>同期処理設定</target>
 
 <source>Synchronize</source>
 <target>同期処理</target>
@@ -719,6 +742,15 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>パネルを入れ替え</target>
+
+<source>Close search bar</source>
+<target>検索バーを閉じる</target>
+
+<source>Find:</source>
+<target>検索:</target>
+
+<source>Match case</source>
+<target>文字種を区別</target>
 
 <source>Save as batch job</source>
 <target>一括ジョブで保存</target>
@@ -741,74 +773,20 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>コピーする合計バイト</target>
 
-<source>Items found:</source>
-<target>見つかった要素:</target>
+<source>Select a variant:</source>
+<target>メソッドを選択:</target>
 
-<source>Speed:</source>
-<target>速度:</target>
+<source>Identify equal files by comparing modification time and size.</source>
+<target>更新時刻とサイズを比較して、同一ファイルを識別します</target>
 
-<source>Time remaining:</source>
-<target>残り時間:</target>
+<source>Identify equal files by comparing the file content.</source>
+<target>ファイルの内容を比較して、同一ファイルを識別します</target>
 
-<source>Time elapsed:</source>
-<target>経過時間</target>
+<source>Symbolic links:</source>
+<target>シンボリック リンク:</target>
 
-<source>Synchronizing...</source>
-<target>同期処理中...</target>
-
-<source>Minimize to notification area</source>
-<target>通知領域に最小化</target>
-
-<source>On completion</source>
-<target>完了時の動作</target>
-
-<source>Close</source>
-<target>閉じる</target>
-
-<source>&Pause</source>
-<target>一時停止(&P)</target>
-
-<source>Variant</source>
-<target>変化</target>
-
-<source>Statistics</source>
-<target>統計</target>
-
-<source>&Don't show this dialog again</source>
-<target>次回以降から表示しない(&D)</target>
-
-<source>Select a variant</source>
-<target>バリアントを選択</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-ファイルが同様だった場合
-     - 最終書き込み時刻、日時
-     - ファイルサイズ
-で判断する
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-ファイルが同様だった場合
-     - ファイル内容
-で判断する
-</target>
-
-<source>Symbolic Link handling</source>
-<target>ｼﾝﾎﾞﾘｯｸ・ﾘﾝｸの取り扱い</target>
-
-<source>Help</source>
-<target>ヘルプ</target>
+<source>More information</source>
+<target>更に詳細な情報</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -816,11 +794,11 @@ is the same
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>変更箇所を識別して両側に変更を反映します。データベースを使用することで、削除、移動および競合などが自動的に検出されます。</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>左側に合わせてバックアップ. 右側のフォルダ内容が同期処理後に左側と同じになるようにします。</target>
+<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<target>同意処理後、右側フォルダと厳密に合致する左側フォルダのミラーバックアップを作成</target>
 
-<source>Copy new or updated files to right folder.</source>
-<target>新しい(更新)ファイルを右フォルダにコピー</target>
+<source>Copy new and updated files to the right folder.</source>
+<target>新しい、または更新されたファイルを右フォルダにコピー</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>あなたの設定した同期規則を使用します。</target>
@@ -831,23 +809,8 @@ is the same
 <source>Requires database files. Not supported by all file systems.</source>
 <target>データベースファイルが必要です(すべてのシステムには未対応).</target>
 
-<source>Error handling</source>
-<target>ハンドリングのエラー時:</target>
-
-<source>Ignore</source>
-<target>無視</target>
-
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-
-<source>Pop-up</source>
-<target>ポップアップ</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>エラーと警告をポップアップで表示</target>
-
-<source>Deletion handling</source>
-<target>削除の取り扱い</target>
+<source>Delete files:</source>
+<target>ファイルの削除:</target>
 
 <source>Permanent</source>
 <target>完全消去</target>
@@ -870,32 +833,173 @@ is the same
 <source>Naming convention:</source>
 <target>命名規則:</target>
 
-<source>Batch job</source>
-<target>一括処理</target>
+<source>Show examples</source>
+<target>入力例を表示</target>
+
+<source>Handle errors:</source>
+<target>エラーの取り扱い:</target>
+
+<source>Ignore</source>
+<target>無視</target>
+
+<source>Hide all error and warning messages</source>
+<target>すべてのエラーと警告メッセージを非表示</target>
+
+<source>Pop-up</source>
+<target>ポップアップ</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>エラーと警告をポップアップで表示</target>
+
+<source>On completion:</source>
+<target>完了時の動作:</target>
+
+<source>Start synchronization now?</source>
+<target>今すぐ同期を開始しますか?</target>
+
+<source>Variant:</source>
+<target>メソッド:</target>
+
+<source>Statistics</source>
+<target>統計</target>
+
+<source>&Don't show this dialog again</source>
+<target>次回以降から表示しない(&D)</target>
+
+<source>Items found:</source>
+<target>見つかった要素:</target>
+
+<source>Speed:</source>
+<target>速度:</target>
+
+<source>Time remaining:</source>
+<target>残り時間:</target>
+
+<source>Time elapsed:</source>
+<target>経過時間</target>
+
+<source>Synchronizing...</source>
+<target>同期処理中...</target>
+
+<source>Minimize to notification area</source>
+<target>通知領域に最小化</target>
+
+<source>Close</source>
+<target>閉じる</target>
+
+<source>&Pause</source>
+<target>一時停止(&P)</target>
+
+<source>Stop</source>
+<target>停止</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>無人で同期を行う為のバッチファイルを作成 - このファイルか、タスクプランナーからスケジュールをダブルクリックすることで開始: %x</target>
 
-<source>Exit</source>
-<target>終了</target>
-
-<source>Abort synchronization on first error</source>
-<target>最初のエラー発生時に同期を中断する</target>
+<source>Stop synchronization at first error</source>
+<target>最初のエラーで同期処理を停止</target>
 
 <source>Show progress dialog</source>
 <target>進捗ダイアログを表示</target>
 
-<source>Save log</source>
-<target>ログを保存</target>
+<source>Save log:</source>
+<target>ログ保存:</target>
 
-<source>Select folder to save log files</source>
-<target>ログファイル保存先フォルダを選択</target>
-
-<source>Limit</source>
-<target>制限</target>
+<source>Limit:</source>
+<target>制限:</target>
 
 <source>Limit maximum number of log files</source>
 <target>ログファイルの最大数を制限</target>
+
+<source>How can I schedule a batch job?</source>
+<target>一括ジョブ スケジュールの作成方法</target>
+
+<source>&Recycle bin</source>
+<target>ゴミ箱(&R)</target>
+
+<source>Delete on both sides</source>
+<target>両方を削除</target>
+
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>片側のペインのみ選択されている場合でも両方を削除する</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>同期処理から特定のファイルを除外するフィルター規則を選択します。対応するそれらフォルダ ペアからの相対ファイルパスを入力.</target>
+
+<source>Include:</source>
+<target>含める:</target>
+
+<source>Exclude:</source>
+<target>除外:</target>
+
+<source>Time span:</source>
+<target>タイムスパン:</target>
+
+<source>File size:</source>
+<target>ファイルサイズ:</target>
+
+<source>Minimum:</source>
+<target>最小:</target>
+
+<source>Maximum:</source>
+<target>最大:</target>
+
+<source>&Clear</source>
+<target>クリア(&C)</target>
+
+<source>The following settings are used for all synchronization jobs.</source>
+<target>以下の設定は、すべての同期ジョブで使用されます</target>
+
+<source>Fail-safe file copy</source>
+<target>安全なファイルコピーを実施</target>
+
+<source>
+Copy to a temporary file (*.ffs_tmp) before overwriting target.
+This guarantees a consistent state even in case of a serious error.
+</source>
+<target>
+対象を上書きする前に一時ファイル (*.ffs_tmp) にコピーします.
+これにより、エラーが発生した場合も一貫性ある状態が保証されます.
+</target>
+
+<source>(recommended)</source>
+<target>(推奨)</target>
+
+<source>Copy locked files</source>
+<target>ロックされたファイルをコピーする</target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
+<target>共有、ロックされたファイルをボリュームシャドウコピーサービスを使用してコピー</target>
+
+<source>(requires administrator rights)</source>
+<target>(管理者権限が必要)</target>
+
+<source>Copy file access permissions</source>
+<target>ファイルのアクセスパーミッションをコピーする</target>
+
+<source>Transfer file and folder permissions.</source>
+<target>ファイルとフォルダのパーミッションを転送します</target>
+
+<source>Automatic retry on error:</source>
+<target>エラー時の自動再試行:</target>
+
+<source>Retry count:</source>
+<target>再試行回数:</target>
+
+<source>Delay (in seconds):</source>
+<target>遅延 (秒で指定):</target>
+
+<source>Customize context menu:</source>
+<target>コンテキストメニューのカスタマイズ:</target>
+
+<source>Description</source>
+<target>説明</target>
+
+<source>Restore hidden windows</source>
+<target>非表示ウィンドウを復帰</target>
+
+<source>&Default</source>
+<target>デフォルト(&D)</target>
 
 <source>Source code written in C++ using:</source>
 <target>ソースコードは C++ で書かれています</target>
@@ -905,9 +1009,6 @@ is the same
 
 <source>Donate with PayPal</source>
 <target>PayPal から寄付</target>
-
-<source>Many thanks for localization:</source>
-<target>ローカライズのご協力に感謝します:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>フィードバック、提案などはこちらから</target>
@@ -921,101 +1022,26 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>GNU 一般共有使用許諾に基づき公開されています</target>
 
-<source>Delete on both sides</source>
-<target>両方を削除</target>
+<source>Many thanks for localization:</source>
+<target>ローカライズのご協力に感謝します:</target>
 
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>片側のペインのみ選択されている場合でも両方を削除する</target>
+<source>Save as Batch Job</source>
+<target>一括ジョブを保存</target>
 
-<source>
-Files will only be synchronized if they pass all filter rules.
-Note: File paths must be relative to base directories.
-</source>
-<target>
-すべてのフィルター規則に適合した場合のみ、ファイルの同期が行われます.
-注意: ファイルパスは基準ディレクトリからの相対パスを使用してください.
-</target>
+<source>Delete Items</source>
+<target>項目の削除</target>
 
-<source>Include</source>
-<target>含める</target>
-
-<source>Exclude</source>
-<target>除外</target>
-
-<source>Time span</source>
-<target>時間間隔</target>
-
-<source>File size</source>
-<target>ファイルサイズ</target>
-
-<source>Minimum</source>
-<target>最小</target>
-
-<source>Maximum</source>
-<target>最大</target>
-
-<source>&Clear</source>
-<target>クリア(&C)</target>
-
-<source>Global settings</source>
+<source>Global Settings</source>
 <target>全般的な設定</target>
 
-<source>Fail-safe file copy</source>
-<target>安全なファイルコピーを実施</target>
+<source>Select Time Span</source>
+<target>タイムスパンを選択</target>
 
-<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
-<target>リネームする前に一時ファイル(*.ffs_tmp)へコピーする。これにより、予期せぬエラーが発生した場合も一貫性を保つことが可能です.</target>
-
-<source>Copy locked files</source>
-<target>ロックされたファイルをコピーする</target>
-
-<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
-<target>共有のコピーとファイルのロックにﾎﾞﾘｭｰﾑ ｼｬﾄﾞｳ ｺﾋﾟｰｻｰﾋﾞｽを使用する (管理者権限が必要)</target>
-
-<source>Copy file access permissions</source>
-<target>ファイルのアクセスパーミッションをコピーする</target>
-
-<source>Transfer file and folder permissions (requires administrator rights)</source>
-<target>ファイル転送とフォルダのパーミッション(管理者権限が必要)</target>
-
-<source>Restore hidden dialogs</source>
-<target>隠したダイアログを復帰</target>
-
-<source>External applications</source>
-<target>外部アプリケーション</target>
-
-<source>Description</source>
-<target>説明</target>
-
-<source>&Default</source>
-<target>デフォルト(&D)</target>
-
-<source>Find what:</source>
-<target>検索語:</target>
-
-<source>Match case</source>
-<target>文字種を区別</target>
-
-<source>&Find next</source>
-<target>次を検索(&F)</target>
-
-<source>Start synchronization</source>
-<target>同期の開始</target>
-
-<source>Delete</source>
-<target>削除</target>
-
-<source>Configure filter</source>
-<target>フィルター設定</target>
+<source>Folder Pairs</source>
+<target>フォルダ ペア</target>
 
 <source>Find</source>
 <target>検索</target>
-
-<source>Select time span</source>
-<target>タイムスパンを選択</target>
-
-<source>Folder pairs</source>
-<target>フォルダ・ペア</target>
 
 <source>Overview</source>
 <target>概要</target>
@@ -1023,14 +1049,14 @@ Note: File paths must be relative to base directories.
 <source>Configuration</source>
 <target>構成設定</target>
 
-<source>Main bar</source>
+<source>Main Bar</source>
 <target>メインバー</target>
 
-<source>Filter files</source>
-<target>ﾌｧｲﾙﾌｨﾙﾀｰ</target>
+<source>Filter Files</source>
+<target>ファイルフィルター</target>
 
-<source>Select view</source>
-<target>表示選択</target>
+<source>Select View</source>
+<target>表示を選択</target>
 
 <source>Open...</source>
 <target>開く...</target>
@@ -1041,13 +1067,14 @@ Note: File paths must be relative to base directories.
 <source>Compare both sides</source>
 <target>両方を比較</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-<pluralform>本当に合計 %x この項目に対してコマンド %y を実行しますか?</pluralform>
-</target>
+<source>Comparison settings</source>
+<target>比較設定</target>
+
+<source>Synchronization settings</source>
+<target>同期処理設定</target>
+
+<source>Start synchronization</source>
+<target>同期の開始</target>
 
 <source>Confirm</source>
 <target>確認</target>
@@ -1082,12 +1109,6 @@ Note: File paths must be relative to base directories.
 <source>Set direction:</source>
 <target>方向の設定:</target>
 
-<source>Exclude temporarily</source>
-<target>一時的に除外</target>
-
-<source>Include temporarily</source>
-<target>一時的に含める</target>
-
 <source>multiple selection</source>
 <target>複数選択</target>
 
@@ -1096,6 +1117,15 @@ Note: File paths must be relative to base directories.
 
 <source>Exclude via filter:</source>
 <target>フィルターを経由して除外</target>
+
+<source>Exclude temporarily</source>
+<target>一時的に除外</target>
+
+<source>Include temporarily</source>
+<target>一時的に含める</target>
+
+<source>Delete</source>
+<target>削除</target>
 
 <source>Include all</source>
 <target>すべて含める</target>
@@ -1145,6 +1175,9 @@ Note: File paths must be relative to base directories.
 <source>Never save &changes</source>
 <target>変更の保存をしない(&C)</target>
 
+<source>Filter</source>
+<target>フィルター</target>
+
 <source>Show files that exist on left side only</source>
 <target>左側のみに存在するファイルを表示</target>
 
@@ -1190,11 +1223,17 @@ Note: File paths must be relative to base directories.
 <source>Set as default</source>
 <target>デフォルトにセット</target>
 
-<source>Operation aborted</source>
-<target>操作の中断</target>
-
 <source>All folders are in sync</source>
 <target>すべてのフォルダを同期</target>
+
+<source>Synchronization Settings</source>
+<target>同期の設定</target>
+
+<source>Comparison Settings</source>
+<target>比較の設定</target>
+
+<source>Cannot find %x</source>
+<target>%x は見つかりません</target>
 
 <source>Comma-separated values</source>
 <target>カンマ区切りの値</target>
@@ -1211,17 +1250,14 @@ Note: File paths must be relative to base directories.
 <source>&Ignore</source>
 <target>無視(&I)</target>
 
-<source>Fatal Error</source>
-<target>致命的なエラー</target>
+<source>Serious Error</source>
+<target>重大なエラー</target>
 
 <source>&Don't show this warning again</source>
 <target>次回からこの警告を表示しない(&D)</target>
 
 <source>&Switch</source>
 <target>切り替え(&S)</target>
-
-<source>Question</source>
-<target>質問</target>
 
 <source>&Yes</source>
 <target>はい(&Y)</target>
@@ -1244,8 +1280,8 @@ Note: File paths must be relative to base directories.
 <source>Initializing...</source>
 <target>初期化中...</target>
 
-<source>Aborted</source>
-<target>中断</target>
+<source>Stopped</source>
+<target>停止</target>
 
 <source>Completed</source>
 <target>完了しました!</target>
@@ -1255,12 +1291,6 @@ Note: File paths must be relative to base directories.
 
 <source>Log</source>
 <target>ログ</target>
-
-<source>Cannot find %x</source>
-<target>%x は見つかりません</target>
-
-<source>Inactive</source>
-<target>非アクティブ</target>
 
 <source>Today</source>
 <target>今日</target>
@@ -1286,9 +1316,6 @@ Note: File paths must be relative to base directories.
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter</source>
-<target>フィルター</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1297,6 +1324,9 @@ Note: File paths must be relative to base directories.
 <pluralform>本当に以下 %x 個の項目をゴミ箱に移動しますか?</pluralform>
 </target>
 
+<source>Move</source>
+<target>移動</target>
+
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
@@ -1304,6 +1334,9 @@ Note: File paths must be relative to base directories.
 <target>
 <pluralform>本当に以下の %x 個の項目を削除しますか</pluralform>
 </target>
+
+<source>Exclude</source>
+<target>除外</target>
 
 <source>Direct</source>
 <target>ダイレクト</target>
@@ -1329,8 +1362,8 @@ Note: File paths must be relative to base directories.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- %item_folder% の反対側の対象</target>
 
-<source>Make hidden warnings and dialogs visible again?</source>
-<target>非表示にした警告ダイアログを再び表示しますか?</target>
+<source>Restore all hidden windows and warnings?</source>
+<target>すべての非表示ウィンドウと警告を元に戻しますか?</target>
 
 <source>Leave as unresolved conflict</source>
 <target>未解決の競合はそのまま残す</target>
@@ -1452,14 +1485,14 @@ Note: File paths must be relative to base directories.
 <pluralform>%x 日</pluralform>
 </target>
 
-<source>Failed to register to receive system messages.</source>
-<target>受信したシステムメッセージの登録に失敗.</target>
+<source>Unable to register to receive system messages.</source>
+<target>システム受信メッセージに登録できません</target>
 
 <source>Cannot set privilege %x.</source>
 <target>%x の特権をセットできません.</target>
 
-<source>Failed to suspend system sleep mode.</source>
-<target>システム スリープモードの中断に失敗</target>
+<source>Unable to suspend system sleep mode.</source>
+<target>システム スリープモードを中断できません</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>プロセスの I/O 優先度を変更できません</target>

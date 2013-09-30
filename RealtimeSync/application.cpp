@@ -10,9 +10,10 @@
 #include <zen/thread.h>
 #include <wx/event.h>
 #include <wx/log.h>
-#include <wx/msgdlg.h>
+#include <wx/tooltip.h>
 #include <wx+/string_conv.h>
-//#include "resources.h"
+#include <wx+/popup_dlg.h>
+#include <wx+/image_resources.h>
 #include "xml_ffs.h"
 #include "../lib/localization.h"
 #include "../lib/ffs_paths.h"
@@ -71,7 +72,15 @@ bool Application::OnInit()
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
-    SetAppName(L"FreeFileSync"); //reuse FFS's name, to have "GetUserDataDir()/GetResourcesDir()" return the same directory in ffs_paths.cpp
+#ifdef ZEN_WIN
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
+#endif
+    //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
+    wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
+
+    SetAppName(L"RealtimeSync");
+
+    initResourceImages(getResourceDir() + Zstr("Resources.zip"));
 
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
@@ -101,7 +110,7 @@ void Application::onEnterEventLoop(wxEvent& event)
     }
     catch (const FileError& e)
     {
-        wxMessageBox(e.toString(), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR);
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         //continue!
     }
 
@@ -119,7 +128,7 @@ void Application::onEnterEventLoop(wxEvent& event)
                 filename += Zstr(".ffs_batch");
             else
             {
-                wxMessageBox(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), L"RealtimeSync" + _("Error"), wxOK | wxICON_ERROR);
+                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename))));
                 return;
             }
         }

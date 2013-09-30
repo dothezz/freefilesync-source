@@ -132,7 +132,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
                          reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
     }
     else
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"Not a symbolic link or junction!");
+        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"Not a symbolic link or junction.");
 
     //absolute symlinks and junctions technically start with \??\ while relative ones do not
     if (startsWith(output, Zstr("\\??\\")))

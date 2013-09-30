@@ -32,6 +32,8 @@ public:
                        int logfilesCountLimit, //0: logging inactive; < 0: no limit
                        size_t lastSyncsLogFileSizeMax,
                        const xmlAccess::OnError handleError,
+                       size_t automaticRetryCount,
+                       size_t automaticRetryDelay,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        zen::FfsReturnCode& returnCode,
                        const std::wstring& execWhenFinished,
@@ -44,7 +46,7 @@ public:
     virtual void forceUiRefresh();
 
     virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
-    virtual Response reportError(const std::wstring& errorMessage);
+    virtual Response reportError(const std::wstring& errorMessage, size_t retryNumber);
     virtual void reportFatalError(const std::wstring& errorMessage);
 
 private:
@@ -54,10 +56,14 @@ private:
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool showFinalResults;
     bool switchToGuiRequested;
+    const int logfilesCountLimit_;
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnError handleError_;
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;
+
+    const size_t automaticRetryCount_;
+    const size_t automaticRetryDelay_;
 
     SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
     std::unique_ptr<zen::FileOutput> logFile; //optional!

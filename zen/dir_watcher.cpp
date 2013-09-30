@@ -21,7 +21,10 @@
 #include "file_traverser.h"
 
 #elif defined ZEN_MAC
-//#include <CoreFoundation/FSEvents.h>
+//#include <sys/types.h>
+#include <sys/event.h>
+//#include <sys/time.h>
+#include "file_traverser.h"
 #endif
 
 using namespace zen;
@@ -39,7 +42,7 @@ public:
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
         if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
-            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, L"Overflow!"));
+            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, L"Overflow."));
         else
         {
             const char* bufPos = &buffer[0];
@@ -49,13 +52,10 @@ public:
 
                 const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
 
-                //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
-                //and if this child element is a .ffs_lock file we'll want to ignore all associated events!
                 [&]
                 {
-                    //if (notifyInfo.Action == FILE_ACTION_RENAMED_OLD_NAME) //reporting FILE_ACTION_RENAMED_NEW_NAME should suffice;
-                    //    return; //note: this is NOT a cross-directory move, which will show up as create + delete
-
+                    //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
+                    //and if this child element is a .ffs_lock file we'll want to ignore all associated events!
                     if (notifyInfo.Action == FILE_ACTION_MODIFIED)
                     {
                         //note: this check will not work if top watched directory has been renamed
@@ -64,6 +64,7 @@ public:
                             return;
                     }
 
+                    //note: a move across directories will show up as FILE_ACTION_ADDED/FILE_ACTION_REMOVED!
                     switch (notifyInfo.Action)
                     {
                         case FILE_ACTION_ADDED:
@@ -156,12 +157,7 @@ public:
                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
                             nullptr);
         if (hDir == INVALID_HANDLE_VALUE)
-        {
-            const DWORD lastError = ::GetLastError(); //copy before making other system calls!
-            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory));
-            const std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
-            throw FileError(errorMsg, errorDescr);
-        }
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"CreateFile", getLastError()));
 
         //end of constructor, no need to start managing "hDir"
     }
@@ -374,14 +370,6 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 
 
 #elif defined ZEN_LINUX
-struct DirWatcher::Pimpl
-{
-    Zstring dirname;
-    int notifDescr;
-    std::map<int, Zstring> watchDescrs; //watch descriptor and corresponding (sub-)directory name (postfixed with separator!)
-};
-
-
 namespace
 {
 class DirsOnlyTraverser : public zen::TraverseCallback
@@ -396,8 +384,8 @@ public:
         dirs_.push_back(fullName);
         return this;
     }
-    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
 
 private:
     std::vector<Zstring>& dirs_;
@@ -405,26 +393,33 @@ private:
 }
 
 
+struct DirWatcher::Pimpl
+{
+    Zstring baseDirname;
+    int notifDescr;
+    std::map<int, Zstring> watchDescrs; //watch descriptor and (sub-)directory name (postfixed with separator) -> owned by "notifDescr"
+};
+
+
 DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     pimpl_(new Pimpl)
 {
-    //still in main thread
+    //get all subdirectories
     Zstring dirname = directory;
     if (endsWith(dirname, FILE_NAME_SEPARATOR))
         dirname.resize(dirname.size() - 1);
 
-    //get all subdirectories
-    std::vector<Zstring> fullDirList;
-    fullDirList.push_back(dirname);
-
-    DirsOnlyTraverser traverser(fullDirList); //throw FileError
-    zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
+    std::vector<Zstring> fullDirList { dirname };
+    {
+        DirsOnlyTraverser traverser(fullDirList); //throw FileError
+        zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
+    }
 
     //init
-    pimpl_->dirname    = directory;
+    pimpl_->baseDirname = directory;
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"inotify_init", getLastError()));
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"inotify_init", getLastError()));
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -436,14 +431,13 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"fcntl", getLastError()));
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"fcntl", getLastError()));
 
     //add watches
-    std::for_each(fullDirList.begin(), fullDirList.end(),
-                  [&](Zstring subdir)
+    for (const Zstring& subdir : fullDirList)
     {
         int wd = ::inotify_add_watch(pimpl_->notifDescr, subdir.c_str(),
-                                     IN_ONLYDIR     | //watch directories only
+                                     IN_ONLYDIR     | //"Only watch pathname if it is a directory."
                                      IN_DONT_FOLLOW | //don't follow symbolic links
                                      IN_CREATE   	|
                                      IN_MODIFY 	    |
@@ -454,15 +448,10 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
                                      IN_MOVED_TO    |
                                      IN_MOVE_SELF);
         if (wd == -1)
-        {
-            const ErrorCode lastError = getLastError(); //copy before making other system calls!
-            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir));
-            const std::wstring errorDescr = formatSystemError(L"inotify_add_watch", lastError);
-            throw FileError(errorMsg, errorDescr);
-        }
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)), formatSystemError(L"inotify_add_watch", getLastError()));
 
         pimpl_->watchDescrs.insert(std::make_pair(wd, appendSeparator(subdir)));
-    });
+    }
 
     guardDescr.dismiss();
 }
@@ -476,12 +465,12 @@ DirWatcher::~DirWatcher()
 
 std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
-    //non-blocking call, see O_NONBLOCK
-    std::vector<char> buffer(1024 * (sizeof(struct ::inotify_event) + 16));
+    std::vector<char> buffer(512 * (sizeof(struct ::inotify_event) + NAME_MAX + 1));
 
     ssize_t bytesRead = 0;
     do
     {
+        //non-blocking call, see O_NONBLOCK
         bytesRead = ::read(pimpl_->notifDescr, &buffer[0], buffer.size());
     }
     while (bytesRead < 0 && errno == EINTR); //"Interrupted function call; When this happens, you should try the call again."
@@ -491,7 +480,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)), formatSystemError(L"read", getLastError()));
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), formatSystemError(L"read", getLastError()));
     }
 
     std::vector<Entry> output;
@@ -530,27 +519,178 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 }
 
 #elif defined ZEN_MAC
+namespace
+{
+class DirsOnlyTraverser : public zen::TraverseCallback
+{
+public:
+    DirsOnlyTraverser(std::vector<Zstring>& dirs) : dirs_(dirs) {}
+
+    virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
+    {
+        dirs_.push_back(fullName);
+        return this;
+    }
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
+
+private:
+    std::vector<Zstring>& dirs_;
+};
+
+
+class DirDescriptor //throw FileError
+{
+public:
+    DirDescriptor(const Zstring& dirname) : dirname_(dirname)
+    {
+        fdDir = ::open(dirname.c_str(), O_EVTONLY); //"descriptor requested for event notifications only"; O_EVTONLY does not exist on Linux
+        if (fdDir == -1)
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"open", getLastError()));
+    }
+
+    ~DirDescriptor() { if (fdDir != -1) ::close(fdDir); } //check for "-1" only needed by move-constructor
+
+    DirDescriptor(DirDescriptor&& other) : fdDir(other.fdDir), dirname_(std::move(other.dirname_)) { other.fdDir = -1; }
+
+    int getDescriptor() const { return fdDir; }
+    Zstring getDirname() const { return dirname_; }
+
+private:
+    DirDescriptor(const DirDescriptor&) = delete;
+    DirDescriptor& operator=(const DirDescriptor&) = delete;
+
+    int fdDir;
+    Zstring dirname_;
+};
+}
 
 warn_static("finish")
 struct DirWatcher::Pimpl
 {
+    Zstring baseDirname;
+    int queueDescr;
+    std::map<int, DirDescriptor> watchDescrs; //directory descriptors and corresponding (sub-)directory name (postfixed with separator!)
+    std::vector<struct ::kevent> changelist;
 };
 
 
-DirWatcher::DirWatcher(const Zstring& directory)  //throw FileError
+DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
+    pimpl_(new Pimpl)
 {
-    throw FileError(L"Dir Watcher is not yet implemented!");
+    //get all subdirectories
+    Zstring dirname = directory;
+    if (endsWith(dirname, FILE_NAME_SEPARATOR))
+        dirname.resize(dirname.size() - 1);
+
+    std::vector<Zstring> fullDirList { dirname };
+    {
+        DirsOnlyTraverser traverser(fullDirList); //throw FileError
+        zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
+    }
+
+    pimpl_->baseDirname = directory;
+
+    pimpl_->queueDescr = ::kqueue();
+    if (pimpl_->queueDescr == -1)
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"kqueue", getLastError()));
+    zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->queueDescr); });
+
+    for (const Zstring& subdir : fullDirList)
+    {
+        DirDescriptor descr(subdir);
+        const int rawDescr = descr.getDescriptor();
+        pimpl_->watchDescrs.insert(std::make_pair(rawDescr, std::move(descr)));
+
+        pimpl_->changelist.push_back({});
+        EV_SET(&pimpl_->changelist.back(),
+               rawDescr,          //identifier for this event
+               EVFILT_VNODE,      //filter for event
+               EV_ADD | EV_CLEAR, //general flags
+               NOTE_DELETE | NOTE_REVOKE | NOTE_RENAME | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB, //filter-specific flags
+               0,        //filter-specific data
+               nullptr); //opaque user data identifier
+    }
+
+    //what about EINTR?
+    struct ::timespec timeout = {}; //=> poll
+    if (::kevent(pimpl_->queueDescr, &pimpl_->changelist[0], pimpl_->changelist.size(), nullptr, 0, &timeout) < 0)
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"kevent", getLastError()));
+
+    guardDescr.dismiss();
 }
 
 
 DirWatcher::~DirWatcher()
 {
+    ::close(pimpl_->queueDescr);
 }
 
 
 std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
     std::vector<Entry> output;
+
+    std::vector<struct ::kevent> events(512);
+    for (;;)
+    {
+        assert(!pimpl_->changelist.empty()); //contains at least parent directory
+        struct ::timespec timeout = {}; //=> poll
+
+        int evtCount = 0;
+        do
+        {
+            evtCount = ::kevent(pimpl_->queueDescr,        //int kq,
+                                &pimpl_->changelist[0],    //const struct kevent* changelist,
+                                pimpl_->changelist.size(), //int nchanges,
+                                &events[0],    //struct kevent* eventlist,
+                                events.size(), //int nevents,
+                                &timeout);     //const struct timespec* timeout
+        }
+        while (evtCount < 0 && errno == EINTR);
+
+        if (evtCount == -1)
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), formatSystemError(L"kevent", getLastError()));
+
+        for (int i = 0; i < evtCount; ++i)
+        {
+            const auto& evt = events[i];
+
+            auto it = pimpl_->watchDescrs.find(static_cast<int>(evt.ident));
+            if (it == pimpl_->watchDescrs.end())
+                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), L"Received event from unknown source.");
+
+            //"If an error occurs [...] and there is enough room in the eventlist, then the event will
+            // be placed in the eventlist with EV_ERROR set in flags and the system error in data."
+            if (evt.flags & EV_ERROR)
+                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(it->second.getDirname())), formatSystemError(L"kevent", static_cast<ErrorCode>(evt.data)));
+
+            assert(evt.filter == EVFILT_VNODE);
+            if (evt.filter == EVFILT_VNODE)
+            {
+                if (evt.fflags & NOTE_DELETE)
+                    wxMessageBox(L"NOTE_DELETE "+ it->second.getDirname());
+                else if (evt.fflags & NOTE_REVOKE)
+                    wxMessageBox(L"NOTE_REVOKE "+ it->second.getDirname());
+                else if (evt.fflags & NOTE_RENAME)
+                    wxMessageBox(L"NOTE_RENAME "+ it->second.getDirname());
+                else if (evt.fflags & NOTE_WRITE)
+                    wxMessageBox(L"NOTE_WRITE "+ it->second.getDirname());
+                else if (evt.fflags & NOTE_EXTEND)
+                    wxMessageBox(L"NOTE_EXTEND "+ it->second.getDirname());
+                else if (evt.fflags & NOTE_ATTRIB)
+                    wxMessageBox(L"NOTE_ATTRIB "+ it->second.getDirname());
+                else
+                    assert(false);
+            }
+        }
+
+        if (evtCount < events.size())
+            break;
+    }
+
     return output;
 }
 #endif

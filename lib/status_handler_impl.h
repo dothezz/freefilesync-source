@@ -11,32 +11,11 @@
 #include <zen/file_error.h>
 #include "process_callback.h"
 
-//template <typename Function> inline
-//bool tryReportingError(Function cmd, ProcessCallback& handler) //return "true" on success, "false" if error was ignored
-//{
-//    for (;;)
-//        try
-//        {
-//            cmd(); //throw FileError
-//            return true;
-//        }
-//        catch (zen::FileError& error)
-//        {
-//            switch (handler.reportError(error.toString())) //may throw!
-//            {
-//                case ProcessCallback::IGNORE_ERROR:
-//                    return false;
-//                case ProcessCallback::RETRY:
-//                    break; //continue with loop
-//            }
-//        }
-//}
-
 
 template <typename Function> inline
-zen::Opt<std::wstring> tryReportingError2(Function cmd, ProcessCallback& handler) //return ignored error message if available
+zen::Opt<std::wstring> tryReportingError(Function cmd, ProcessCallback& handler) //return ignored error message if available
 {
-    for (;;)
+    for (size_t retryNumber = 0;; ++retryNumber)
         try
         {
             cmd(); //throw FileError
@@ -44,7 +23,7 @@ zen::Opt<std::wstring> tryReportingError2(Function cmd, ProcessCallback& handler
         }
         catch (zen::FileError& error)
         {
-            switch (handler.reportError(error.toString())) //may throw!
+            switch (handler.reportError(error.toString(), retryNumber)) //may throw!
             {
                 case ProcessCallback::IGNORE_ERROR:
                     return error.toString();

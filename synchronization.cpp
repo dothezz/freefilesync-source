@@ -6,7 +6,6 @@
 
 #include "synchronization.h"
 #include <memory>
-#include <random>
 #include <deque>
 #include <stdexcept>
 #include <wx/file.h> //get rid!?
@@ -17,12 +16,12 @@
 #include <zen/recycler.h>
 #include <zen/optional.h>
 #include <zen/symlink_target.h>
+#include <zen/file_io.h>
+#include <zen/time.h>
 #include "lib/resolve_path.h"
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
 #include "lib/cmp_filetime.h"
-#include <zen/file_io.h>
-#include <zen/time.h>
 #include "lib/status_handler_impl.h"
 #include "lib/versioning.h"
 
@@ -316,11 +315,13 @@ public:
                      ProcessCallback& procCallback);
     ~DeletionHandling()
     {
+        //always (try to) clean up, even if synchronization is aborted!
         try
         {
-            tryCleanup(false); //throw FileError
+            tryCleanup(false); //throw FileError, (throw X)
         }
-        catch (...) {} //always (try to) clean up, even if synchronization is aborted!
+        catch (FileError&) {}
+        catch (...) { assert(false); }  //what is this?
         /*
         may block heavily, but still do not allow user callback:
         -> avoid throwing user cancel exception again, leading to incomplete clean-up!
@@ -328,7 +329,7 @@ public:
     }
 
     //clean-up temporary directory (recycle bin optimization)
-    void tryCleanup(bool allowUserCallback = true); //throw FileError -> call this in non-exceptional coding, i.e. somewhere after sync!
+    void tryCleanup(bool allowUserCallback = true); //throw FileError; throw X -> call this in non-exceptional coding, i.e. somewhere after sync!
 
     template <class Function> void removeFileUpdating(const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion); //throw FileError
     template <class Function> void removeDirUpdating (const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion); //reports ONLY data delta via updateProcessedData()!
@@ -431,37 +432,6 @@ private:
     ProcessCallback& statusHandler_;
     const std::wstring txtRecyclingFile;
 };
-
-Zstring createUniqueRandomTempDir(const Zstring& baseDirPf) //throw FileError
-{
-    assert(endsWith(baseDirPf, FILE_NAME_SEPARATOR));
-
-    //1. generate random directory name
-    static std::default_random_engine rng(std::time(nullptr)); //a pseudo-random number engine with seconds-precision seed is sufficient!
-    //the alternative std::random_device may not always be available and can even throw an exception!
-
-    const Zstring chars(Zstr("abcdefghijklmnopqrstuvwxyz")
-                        Zstr("1234567890"));
-    std::uniform_int_distribution<size_t> distrib(0, chars.size() - 1); //takes closed range
-
-    auto generatePath = [&]() -> Zstring //e.g. C:\Source\3vkf74fq.ffs_tmp
-    {
-        Zstring path = baseDirPf;
-        for (int i = 0; i < 8; ++i)
-            path += chars[distrib(rng)];
-        return path + TEMP_FILE_ENDING;
-    };
-
-    //2. ensure uniqueness (at least for this base directory)
-    for (;;)
-        try
-        {
-            Zstring dirname = generatePath();
-            makeDirectory(dirname, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
-            return dirname;
-        }
-        catch (const ErrorTargetExisting&) {}
-}
 }
 
 //create + returns temporary directory postfixed with file name separator
@@ -473,14 +443,52 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
         return Zstring();
 
     if (recyclerTmpDir.empty())
-        recyclerTmpDir = createUniqueRandomTempDir(baseDirPf_); //throw FileError
+    {
+        recyclerTmpDir = [&]
+        {
+            assert(endsWith(baseDirPf_, FILE_NAME_SEPARATOR));
+            /*
+            -> this naming convention is too cute and confusing for end users:
+
+            //1. generate random directory name
+            static std::mt19937 rng(std::time(nullptr)); //don't use std::default_random_engine and leave the choice to the STL implementer!
+            //- the alternative std::random_device may not always be available and can even throw an exception!
+            //- seed with second precision is sufficient: collisions are handled below
+
+            const Zstring chars(Zstr("abcdefghijklmnopqrstuvwxyz")
+                                Zstr("1234567890"));
+            std::uniform_int_distribution<size_t> distrib(0, chars.size() - 1); //takes closed range
+
+            auto generatePath = [&]() -> Zstring //e.g. C:\Source\3vkf74fq.ffs_tmp
+            {
+                Zstring path = baseDirPf;
+                for (int i = 0; i < 8; ++i)
+                    path += chars[distrib(rng)];
+                return path + TEMP_FILE_ENDING;
+            };
+            */
+
+            //ensure unique ownership:
+            Zstring dirname = baseDirPf_ + Zstr("RecycleBin") + TEMP_FILE_ENDING;
+            for (int i = 1;; ++i)
+                try
+                {
+                    makeDirectory(dirname, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
+                    return dirname;
+                }
+                catch (const ErrorTargetExisting&)
+                {
+                    dirname = baseDirPf_ + Zstr("RecycleBin") + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
+                }
+        }();
+    }
     //assemble temporary recycle bin directory with random name and .ffs_tmp ending
     return appendSeparator(recyclerTmpDir);
 }
 #endif
 
 
-void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
+void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError; throw X
 {
     switch (deletionPolicy_)
     {
@@ -1169,7 +1177,7 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
                 FilePair* sourceObj = &fileObj;
                 if (FilePair* targetObj = dynamic_cast<FilePair*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
                 {
-                    zen::Opt<std::wstring> errMsg = tryReportingError2([&]
+                    zen::Opt<std::wstring> errMsg = tryReportingError([&]
                     {
                         if (syncOp == SO_MOVE_LEFT_SOURCE)
                             this->manageFileMove<LEFT_SIDE>(*sourceObj, *targetObj); //throw FileError
@@ -1336,18 +1344,18 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
     //synchronize files:
     for (FilePair& fileObj : hierObj.refSubFiles())
         if (pass == this->getPass(fileObj)) //"this->" required by two-pass lookup as enforced by GCC 4.7
-            tryReportingError2([&] { synchronizeFile(fileObj); }, procCallback_);
+            tryReportingError([&] { synchronizeFile(fileObj); }, procCallback_);
 
     //synchronize symbolic links:
     for (SymlinkPair& linkObj : hierObj.refSubLinks())
         if (pass == this->getPass(linkObj))
-            tryReportingError2([&] { synchronizeLink(linkObj); }, procCallback_);
+            tryReportingError([&] { synchronizeLink(linkObj); }, procCallback_);
 
     //synchronize folders:
     for (DirPair& dirObj : hierObj.refSubDirs())
     {
         if (pass == this->getPass(dirObj))
-            tryReportingError2([&] { synchronizeFolder(dirObj); }, procCallback_);
+            tryReportingError([&] { synchronizeFolder(dirObj); }, procCallback_);
 
         this->runPass<pass>(dirObj); //recurse
     }
@@ -1548,6 +1556,8 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation 
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
         {
+            //harmonize with file_hierarchy.cpp::getSyncOpDescription!!
+
             reportInfo(txtWritingAttributes, fileObj.getFullName<sideTrg>());
 
             if (fileObj.getShortName<sideTrg>() != fileObj.getShortName<sideSrc>()) //adapt difference in case (windows only)
@@ -1875,10 +1885,10 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
     if (baseDirObj.isExisting<side>()) //atomicity: do NOT check directory existence again!
     {
         //just convenience: exit sync right here instead of showing tons of error messages during file copy
-        zen::Opt<std::wstring> errMsg = tryReportingError2([&]
+        zen::Opt<std::wstring> errMsg = tryReportingError([&]
         {
             if (!dirExistsUpdating(dirname, false, callback))
-                throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
+                throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //should be logged as a "fatal error" if ignored by the user...
         }, callback); //may throw in error-callback!
 
         return !errMsg;
@@ -1886,7 +1896,7 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
     else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
     {
         bool temporaryNetworkDrop = false;
-        zen::Opt<std::wstring> errMsg = tryReportingError2([&]
+        zen::Opt<std::wstring> errMsg = tryReportingError([&]
         {
             try
             {
@@ -2078,7 +2088,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             //check if user-defined directory for deletion was specified
             if (folderPairCfg.versioningFolder.empty()) //already trimmed by getFormattedDirectoryName()
             {
-                callback.reportFatalError(_("Folder input field for versioning must not be empty."));
+                //should never arrive here: already checked in SyncCfgDialog
+                callback.reportFatalError(_("Please enter a target folder for versioning."));
                 skipFolderPair[folderIndex] = true;
                 continue;
             }
@@ -2277,7 +2288,7 @@ void zen::synchronize(const TimeComp& timeStamp,
             ZEN_ON_SCOPE_EXIT(BaseDirPair::removeEmpty(*j););
 
             bool copyPermissionsFp = false;
-            tryReportingError2([&]
+            tryReportingError([&]
             {
                 copyPermissionsFp = copyFilePermissions && //copy permissions only if asked for and supported by *both* sides!
                 !j->getBaseDirPf<LEFT_SIDE >().empty() && //scenario: directory selected on one side only
@@ -2325,8 +2336,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             syncFP.startSync(*j);
 
             //(try to gracefully) cleanup temporary Recycle bin folders and versioning -> will be done in ~DeletionHandling anyway...
-            tryReportingError2([&] { delHandlerL.tryCleanup(); }, callback); //show error dialog if necessary
-            tryReportingError2([&] { delHandlerR.tryCleanup(); }, callback); //
+            tryReportingError([&] { delHandlerL.tryCleanup(); }, callback); //show error dialog if necessary
+            tryReportingError([&] { delHandlerR.tryCleanup(); }, callback); //
 
             //(try to gracefully) write database file
             if (folderPairCfg.saveSyncDB_)
@@ -2334,7 +2345,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 callback.reportStatus(_("Generating database..."));
                 callback.forceUiRefresh();
 
-                tryReportingError2([&] { zen::saveLastSynchronousState(*j); }, callback); //throw FileError
+                tryReportingError([&] { zen::saveLastSynchronousState(*j); }, callback); //throw FileError
                 guardUpdateDb.dismiss();
             }
         }
@@ -2521,5 +2532,5 @@ void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring&
     procCallback_.reportInfo(replaceCpy(txtVerifying, L"%x", fmtFileName(target)));
 
     VerifyStatusUpdater callback(procCallback_);
-    tryReportingError2([&] { ::verifyFiles(source, target, callback); }, procCallback_);
+    tryReportingError([&] { ::verifyFiles(source, target, callback); }, procCallback_);
 }

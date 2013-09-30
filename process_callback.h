@@ -67,7 +67,7 @@ struct ProcessCallback
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError     (const std::wstring& errorMessage) = 0; //recoverable error situation
+    virtual Response reportError     (const std::wstring& errorMessage, size_t retryNumber) = 0; //recoverable error situation
     virtual void     reportFatalError(const std::wstring& errorMessage) = 0; //non-recoverable error situation
 };
 

@@ -31,7 +31,7 @@ public:
     virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void forceUiRefresh();
 
-    virtual Response reportError(const std::wstring& text);
+    virtual Response reportError(const std::wstring& text, size_t retryNumber);
     virtual void reportFatalError(const std::wstring& errorMessage);
     virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
 
@@ -52,6 +52,8 @@ public:
     SyncStatusHandler(wxFrame* parentDlg,
                       size_t lastSyncsLogFileSizeMax,
                       xmlAccess::OnGuiError handleError,
+                      size_t automaticRetryCount,
+                      size_t automaticRetryDelay,
                       const std::wstring& jobName,
                       const std::wstring& execWhenFinished,
                       std::vector<std::wstring>& execFinishedHistory);
@@ -62,7 +64,7 @@ public:
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 
-    virtual Response reportError(const std::wstring& text);
+    virtual Response reportError(const std::wstring& text, size_t retryNumber);
     virtual void reportFatalError(const std::wstring& errorMessage);
     virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
 
@@ -74,6 +76,8 @@ private:
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog;
+    const size_t automaticRetryCount_;
+    const size_t automaticRetryDelay_;
     const std::wstring jobName_;
     wxStopWatch totalTime;
 };

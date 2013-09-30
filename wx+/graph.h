@@ -54,7 +54,7 @@ struct ContinuousCurveData : public CurveData
     virtual double getValue(double x) const = 0;
 
 private:
-    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final;
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override;
 };
 
 struct SparseCurveData : public CurveData
@@ -65,7 +65,7 @@ struct SparseCurveData : public CurveData
     virtual Opt<CurvePoint> getGreaterEq(double x) const = 0;
 
 private:
-    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final;
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override;
     bool addSteps_;
 };
 
@@ -75,9 +75,9 @@ struct ArrayCurveData : public SparseCurveData
     virtual size_t getSize() const = 0;
 
 private:
-    virtual std::pair<double, double> getRangeX() const final { const size_t sz = getSize(); return std::make_pair(0.0, sz == 0 ? 0.0 : sz - 1.0); }
+    virtual std::pair<double, double> getRangeX() const override { const size_t sz = getSize(); return std::make_pair(0.0, sz == 0 ? 0.0 : sz - 1.0); }
 
-    virtual Opt<CurvePoint> getLessEq(double x) const final
+    virtual Opt<CurvePoint> getLessEq(double x) const override
     {
         const size_t sz = getSize();
         const size_t pos = std::min<ptrdiff_t>(std::floor(x), sz - 1); //[!] expect unsigned underflow if empty!
@@ -86,7 +86,7 @@ private:
         return NoValue();
     }
 
-    virtual Opt<CurvePoint> getGreaterEq(double x) const final
+    virtual Opt<CurvePoint> getGreaterEq(double x) const override
     {
         const size_t pos = std::max<ptrdiff_t>(std::ceil(x), 0); //[!] use std::max with signed type!
         if (pos < getSize())
@@ -99,8 +99,8 @@ struct VectorCurveData : public ArrayCurveData
 {
     std::vector<double>& refData() { return data; }
 private:
-    virtual double getValue(size_t pos) const final { return pos < data.size() ? data[pos] : 0; }
-    virtual size_t getSize() const final { return data.size(); }
+    virtual double getValue(size_t pos) const override { return pos < data.size() ? data[pos] : 0; }
+    virtual size_t getSize() const override { return data.size(); }
     std::vector<double> data;
 };
 

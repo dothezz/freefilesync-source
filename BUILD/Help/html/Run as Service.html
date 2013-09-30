@@ -20,46 +20,38 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Run
-as service <SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></FONT></H2>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
-is designed as a background process which does not need further
-attention once it is running. Depending on your requirements there
-are a number of ways to start it together with the operating system.
-Generally the goal is to execute a command line like the following:
-</FONT><SPAN STYLE="font-variant: normal"><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">&lt;installation
-folder&gt;\RealtimeSync.exe &lt;path to *.ffs_real or *.ffs_batch
-file&gt;</SPAN></SPAN></FONT></SPAN></P>
-<P STYLE="margin-bottom: 0cm"><BR>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Run as Service <SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></FONT></H2>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">
+	RealtimeSync is designed to run as a background process which does not need further
+	attention. Depending on your requirements there are a number of ways you can start it automatically.
+	Generally the goal is to execute a command line like:</FONT><br>	
+	<br>
+	<FONT FACE="Courier New, monospace">&lt;FreeFileSync installation folder&gt;\RealtimeSync.exe &lt;path to *.ffs_real or *.ffs_batch file&gt;</FONT>
 </P>
+
+<BR>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
 <UL>
 	<P><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.04cm; border: none; padding: 0cm; background: #e6e6e6">
-		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">&quot;C:\Program
-		Files\FreeFileSync\RealtimeSync.exe&quot; &quot;<FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-weight: normal">D</SPAN></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-weight: normal">:\</SPAN></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-weight: normal">Backup
-		Projects</SPAN></FONT></FONT>.ffs_real&quot;</FONT></P>
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">
+		&quot;C:\Program Files\FreeFileSync\RealtimeSync.exe&quot; &quot;D:\Backup Projects.ffs_real&quot;</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </UL>
-<P><BR><BR>
-</P>
+<BR><BR>
 <OL>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">RealtimeSync
-	should be monitoring only while a specific user is logged in: </SPAN></SPAN></SPAN>Create
-	a new shortcut, enter the command line from above as target and
-	place it into the user's autostart folder.</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">
+	RealtimeSync should be monitoring only while a specific user is logged in: Create
+	a new shortcut, enter the command line from above as target and place it into the user's autostart folder.</FONT></P>
+	
 	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/create_shortcut.png" NAME="Grafik3" ALIGN=BOTTOM BORDER=0></P>
 	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/shortcut_properties.png" NAME="Grafik4" ALIGN=BOTTOM  BORDER=0></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
-	should be monitoring while Windows is online irrespective of
-	currently logged in users: Create a new task in your operating
-	systems's task scheduler and have it execute the command line above
-	when the system starts. See <A HREF="Schedule%20a%20batch%20job.html">Schedule
-	a Batch Job</A> for an example how to add a new task. Then change
-	the user to run the task to </FONT><FONT FACE="Tahoma, sans-serif"><B>SYSTEM</B></FONT>
-	<FONT FACE="Tahoma, sans-serif">- a special user account always
-	running in the background.</FONT></P>
+	
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync should be monitoring while Windows is running irrespective of
+	currently logged in users: Create a new task in your operating systems's task scheduler and have it execute the command line above
+	when the system starts. See <A HREF="Schedule%20a%20batch%20job.html">Schedule a Batch Job</A> for an example how to add a task. Then change
+	the user which runs the task to <B>SYSTEM</B> - a special user account always running in the background.</FONT></P>
 	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/schedule_realtimesync.png" NAME="Grafik1" ALIGN=BOTTOM BORDER=0></P>
 </OL>
 <P STYLE="margin-bottom: 0cm"><BR>

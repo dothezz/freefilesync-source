@@ -7,22 +7,15 @@
 #ifndef EXECUTE_HEADER_23482134578134134
 #define EXECUTE_HEADER_23482134578134134
 
-#include <zen/zstring.h>
-#include <zen/scope_guard.h>
-#include <zen/i18n.h>
-#include <zen/utf.h>
-#include <wx/msgdlg.h>
+#include "file_error.h"
 
 #ifdef ZEN_WIN
-#include <zen/sys_error.h>
-//#include <zen/string_tools.h>
-#include <zen/win.h> //includes "windows.h"
+#include "scope_guard.h"
+#include "win.h" //includes "windows.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <zen/thread.h>
+#include "thread.h"
 #include <stdlib.h> //::system()
-//#include <wx/utils.h>
-//#include <wx/log.h>
 #endif
 
 
@@ -38,14 +31,14 @@ enum ExecutionType
 
 namespace
 {
-void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
+void shellExecute2(const Zstring& command, ExecutionType type) //throw FileError
 {
 #ifdef ZEN_WIN
     //parse commandline
     Zstring commandTmp = command;
     trim(commandTmp, true, false); //CommandLineToArgvW() does not like leading spaces
 
-    std::vector<std::wstring> argv;
+    std::vector<Zstring> argv;
     int argc = 0;
     if (LPWSTR* tmp = ::CommandLineToArgvW(commandTmp.c_str(), &argc))
     {
@@ -53,8 +46,8 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
         std::copy(tmp, tmp + argc, std::back_inserter(argv));
     }
 
-    std::wstring filename;
-    std::wstring arguments;
+    Zstring filename;
+    Zstring arguments;
     if (!argv.empty())
     {
         filename = argv[0];
@@ -75,11 +68,8 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
     execInfo.nShow        = SW_SHOWNORMAL;
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
-    {
-        wxString cmdFmt = L"File: " + filename + L"\nArg: " + arguments;
-        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + formatSystemError(L"ShellExecuteEx", getLastError()), /*L"FreeFileSync - " + */_("Error"), wxOK | wxICON_ERROR);
-        return;
-    }
+        throw FileError(_("Incorrect command line:") + L"\nFile: " + filename + L"\nArg: " + arguments,
+                        formatSystemError(L"ShellExecuteEx", getLastError()));
 
     if (execInfo.hProcess)
     {
@@ -94,7 +84,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
     we cannot use wxExecute due to various issues:
     - screws up encoding on OS X for non-ASCII characters
     - does not provide any reasonable error information
-    - uses a zero-sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
+    - uses a zero-sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list in Windows
     */
 
     if (type == EXEC_TYPE_SYNC)
@@ -102,11 +92,10 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
         //Posix::system - execute a shell command
         int rv = ::system(command.c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
-            wxMessageBox(_("Invalid command line:") + L"\n" + utfCvrtTo<wxString>(command), /*L"FreeFileSync - " +*/ _("Error"), wxOK | wxICON_ERROR);
+            throw FileError(_("Incorrect command line:") + L"\n" + command);
     }
     else
         async([=] { int rv = ::system(command.c_str()); (void)rv; });
-    //unfortunately we are not allowed to show a wxMessageBox from a worker thread
 #endif
 }
 }
