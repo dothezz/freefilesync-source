@@ -95,7 +95,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
         std::vector<const wchar_t*> cNames;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) //caution to not create temporary strings here!!
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) //CAUTION: to not create temporary strings here!!
             cNames.push_back(it->c_str());
 
         CallbackData cbd(callback);
@@ -114,9 +114,9 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
     else //regular recycle bin usage: available since XP
     {
         Zstring filenamesDoubleNull;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it)
+        for (const Zstring& filename : filenames)
         {
-            filenamesDoubleNull += *it;
+            filenamesDoubleNull += filename;
             filenamesDoubleNull += L'\0';
         }
 

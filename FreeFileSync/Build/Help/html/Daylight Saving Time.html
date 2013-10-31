@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<link rel="stylesheet" type="text/css" href="base.css" >
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+
+<H2>Daylight Saving Time<SPAN STYLE="font-weight: normal"> (Windows)</SPAN></H2>
+
+<P>A common problem synchronization software has to handle are +-1 hour
+file time shifts after a Daylight Saving Time (DST) switch has
+occurred. This can be observed for example when a FAT-formatted
+volume is compared against an NTFS volume as is the case when synchronizing a local disk against a
+USB memory stick. Files that previously appeared to be in sync are
+now shown with an one hour modification time offset, although they
+have not been modified by the user or the operating system.</P>
+
+<P>The reason for this behavior lies in the way NTFS and FAT drives
+store file times: NTFS stores time in UTC format, while FAT uses
+local time.</P>
+
+<P>When times of these two different formats are compared, one format
+has to be converted into the other first. In either way Windows uses
+the current DST status as well as the current time zone for
+its calculations. Consequently the result of this comparison is
+dependent from current system settings and in particular file times
+that used to be the same can show up as different after a DST switch or when the time zone is changed.</P>
+
+<P>For a detailed discussion about this issue refer to:
+<A HREF="http://www.codeproject.com/KB/datetime/dstbugs.aspx">http://www.codeproject.com/KB/datetime/dstbugs.aspx</A>
+</P>
+
+<BR>
+
+<h3>Solution:</h3>
+
+<P>FreeFileSync automatically handles this problem by adding the missing time information. Each file on a
+FAT volume automatically gets additional meta data encoded in its
+creation date that enables a correct file time calculation. This not
+only solves all DST issues but also time shifts that occur due to
+travel between different time zones.</P>
+
+<BR>
+
+<div class="bluebox">
+	<div class="bluebox_inner">
+			<B>Note</B>
+			<ul STYLE="margin: 0">
+				<LI>In order for FreeFileSync to start handling DST and timezone differences, an initial full synchronization 
+				is required. Subsequent syncs will then never show a time difference again for unchanged files.
+				
+				<LI>If a FAT volume is scanned the first time by FreeFileSync this will take longer than usual 
+				since additional meta data is written for each file.
+			</ul>		
+	</div>
+</div>
+<BR CLEAR=LEFT>
+
+</BODY>
+</HTML>

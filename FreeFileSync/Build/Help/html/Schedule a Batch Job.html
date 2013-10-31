@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<link rel="stylesheet" type="text/css" href="base.css" >
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+
+<H2>Schedule a Batch Job</H2>
+
+<OL>
+	<LI>Create a new batch job via FreeFileSync's main dialog: <B>Menu &rarr; Program &rarr; Save as batch job...</B><BR>&nbsp;
+	
+	<LI>If the batch job shall run without user interaction or as part of an
+	unattended batch script, make sure that no popup dialog stops the progress:<BR>Disable checkbox <B>Show progress dialog</B> to avoid blocking while showing
+	the result after synchronization. Alternatively you can leave this option checked and select the <i>On completion</i> action <B>Close progress dialog</B>
+	located in synchronization settings. FreeFileSync will then show a progress dialog but close it automatically when it is finished.<BR>
+	<br>
+	<B>Note:</B> Even if the progress dialog is not shown at the beginning, you can make it
+	visible <B>during</B> synchronization by double-clicking the FreeFileSync notification area icon.<BR>
+	<BR>
+	<IMG SRC="../img/SetupBatch.png">
+	<br><br>
+	
+	<LI>In order to prevent error or warning popup messages from stopping progress, set <B>Handle errors</B> to either <B>Ignore</B> or <B>Stop</B>.
+	<br>&nbsp;
+	
+	<LI>Setup your operating system's scheduler
+	<BR>&nbsp;
+	
+	<OL TYPE=A>
+		<LI><B>Windows 7 Task Scheduler:</B>
+		<UL>
+			<LI>Go to Start and run <FONT FACE="Courier New, monospace"><B>taskschd.msc</B></FONT>.			
+			
+			<LI>Create a new basic task and follow the wizard.			
+			
+			<LI>Make <B>Program/script</B> point to the location of FreeFileSync.exe and insert the ffs_batch file into <B>Add arguments</B>.
+			
+			<LI>Use quotation marks to protect spaces in path names, e.g. <FONT FACE="Courier New, monospace">&quot;D:\Backup Projects.ffs_batch&quot;</FONT><BR>
+			<BR>
+			<IMG SRC="../img/win7scheduler.png">
+		</UL>
+		
+		<BR>
+		
+		<div class="bluebox">
+			<div class="bluebox_inner">
+					<B>Note</B><BR>
+					Beginning with Windows Vista the <i>Program/script</i> always needs point to an executable file like FreeFileSync.exe even
+					if ffs_batch file association is set. If a ffs_batch file is entered instead the task will return with
+					error code 0xC1, &quot;%1 is not a valid Win32 application&quot;.
+			</div>
+		</div>
+		<BR CLEAR=LEFT>
+
+		<BR>
+		
+		<LI><B>Windows XP Scheduled Tasks:</B>
+		<UL>
+			<LI VALUE=1>Go to <B>Start &rarr; Control Panel &rarr; Scheduled Tasks</B> and select <B>Add Scheduled Task</B>.
+			
+			<LI>Follow the wizard and select FreeFileSync.exe as program to run.
+			
+			<LI>Fill the input field <B>Run:</B>
+			<FONT FACE="Courier New, monospace">&lt;FreeFileSync installation folder&gt;\FreeFileSync.exe &lt;job name&gt;.ffs_batch</FONT><BR>
+			<BR>
+			<IMG SRC="../img/ScheduleBatch.png"><BR>&nbsp;
+		</UL>
+		
+		<LI><B>Ubuntu Linux Gnome-schedule:</B>
+		<UL>
+			<LI>Install Gnome-schedule, if necessary: <FONT FACE="Courier New, monospace">sudo apt-get install gnome-schedule</FONT>
+			
+			<LI>Go to <B>System &rarr; Preferences &rarr; Scheduled tasks</B>
+			
+			<LI>Enter the command:
+			<FONT FACE="Courier New, monospace">&lt;FreeFileSync installation folder&gt;/FreeFileSync &lt;job name&gt;.ffs_batch</FONT><BR>
+			<BR>
+			<IMG SRC="../img/ubuntuScheduler.png">
+		</UL>
+
+	</OL>
+	
+	
+</OL>
+
+</BODY>
+</HTML>

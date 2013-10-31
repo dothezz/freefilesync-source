@@ -38,32 +38,30 @@ extern const wxEventType EVENT_GRID_SELECT_RANGE; //generates: GridRangeSelectEv
 
 struct GridClickEvent : public wxMouseEvent
 {
-    GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, ColumnType colType, size_t compPos) : wxMouseEvent(me), row_(row), colType_(colType), compPos_(compPos) { SetEventType(et); }
+    GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, ColumnType colType) : wxMouseEvent(me), row_(row), colType_(colType) { SetEventType(et); }
     virtual wxEvent* Clone() const { return new GridClickEvent(*this); }
+
     const ptrdiff_t row_; //-1 for invalid position, >= rowCount if out of range
     const ColumnType colType_;
-    const size_t compPos_;
 };
 
 struct GridColumnResizeEvent : public wxCommandEvent
 {
-    GridColumnResizeEvent(int offset, ColumnType colType, size_t compPos) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset), compPos_(compPos) {}
+    GridColumnResizeEvent(int offset, ColumnType colType) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset) {}
     virtual wxEvent* Clone() const { return new GridColumnResizeEvent(*this); }
 
     const ColumnType colType_;
     const int        offset_;
-    const size_t     compPos_;
 };
 
 struct GridRangeSelectEvent : public wxCommandEvent
 {
-    GridRangeSelectEvent(size_t rowFirst, size_t rowLast, size_t compPos, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), rowFirst_(rowFirst), rowLast_(rowLast), compPos_(compPos), positive_(positive) { assert(rowFirst <= rowLast); }
+    GridRangeSelectEvent(size_t rowFirst, size_t rowLast, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), positive_(positive), rowFirst_(rowFirst), rowLast_(rowLast) { assert(rowFirst <= rowLast); }
     virtual wxEvent* Clone() const { return new GridRangeSelectEvent(*this); }
 
+    const bool   positive_; //"false" when clearing selection!
     const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
-    const size_t rowLast_;  //range is empty when clearing selection
-    const size_t compPos_;
-    const bool   positive_;
+    const size_t rowLast_;
 };
 
 typedef void (wxEvtHandler::*GridClickEventFunction       )(GridClickEvent&);
@@ -90,7 +88,7 @@ class GridData
 public:
     virtual ~GridData() {}
 
-    virtual size_t getRowCount() const = 0; //if there are multiple grid components, only the first one will be polled for row count!
+    virtual size_t getRowCount() const = 0;
 
     //grid area
     virtual wxString getValue(size_t row, ColumnType colType) const = 0;
@@ -116,6 +114,12 @@ protected: //optional helper routines
     static void drawColumnLabelText      (wxDC& dc, const wxRect& rect, const wxString& text);
 };
 
+enum GridEventPolicy
+{
+    ALLOW_GRID_EVENT,
+    DENY_GRID_EVENT
+};
+
 
 class Grid : public wxScrolledWindow
 {
@@ -131,10 +135,6 @@ public:
 
     void setRowHeight(int height);
 
-    //grid component := a grid is divided into multiple components each of which is essentially a set of connected columns
-    void setComponentCount(size_t count) { comp.resize(count); updateWindowSizes(); }
-    size_t getComponentCount() const { return comp.size(); }
-
     struct ColumnAttribute
     {
         ColumnAttribute(ColumnType type, int offset, int stretch, bool visible = true) : type_(type), visible_(visible), stretch_(std::max(stretch, 0)), offset_(offset) { assert(stretch >=0 ); }
@@ -146,12 +146,12 @@ public:
         int offset_;
     };
 
-    void setColumnConfig(const std::vector<ColumnAttribute>& attr, size_t compPos = 0); //set column count + widths
-    std::vector<ColumnAttribute> getColumnConfig(size_t compPos = 0) const;
+    void setColumnConfig(const std::vector<ColumnAttribute>& attr); //set column count + widths
+    std::vector<ColumnAttribute> getColumnConfig() const;
 
-    void setDataProvider(const std::shared_ptr<GridData>& dataView, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].dataView_ = dataView; }
-    /**/  GridData* getDataProvider(size_t compPos = 0)       { return compPos < comp.size() ? comp[compPos].dataView_.get() : nullptr; }
-    const GridData* getDataProvider(size_t compPos = 0) const { return compPos < comp.size() ? comp[compPos].dataView_.get() : nullptr; }
+    void setDataProvider(const std::shared_ptr<GridData>& dataView) { dataView_ = dataView; }
+    /**/  GridData* getDataProvider()       { return dataView_.get(); }
+    const GridData* getDataProvider() const { return dataView_.get(); }
     //-----------------------------------------------------------------------------
 
     void setColumnLabelHeight(int height);
@@ -166,9 +166,9 @@ public:
     //alternative until wxScrollHelper::ShowScrollbars() becomes available in wxWidgets 2.9
     void showScrollBars(ScrollBarStatus horizontal, ScrollBarStatus vertical);
 
-    std::vector<size_t> getSelectedRows(size_t compPos = 0) const;
-    void setSelectedRows(const std::vector<size_t>& sel, size_t compPos = 0);
-    void clearSelection(bool emitSelectRangeEvent = true, size_t compPos = 0); //turn off range selection event when calling this function in an event handler to avoid recursion!
+    std::vector<size_t> getSelectedRows() const { return selection.get(); }
+    void selectAllRows (GridEventPolicy rangeEventPolicy);
+    void clearSelection(GridEventPolicy rangeEventPolicy); //turn off range selection event when calling this function in an event handler to avoid recursion!
 
     void scrollDelta(int deltaX, int deltaY); //in scroll units
 
@@ -179,21 +179,20 @@ public:
     const wxWindow& getMainWin() const;
 
     ptrdiff_t getRowAtPos(int posY) const; //return -1 for invalid position, >= rowCount if out of range; absolute coordinates!
-    Opt<std::pair<ColumnType, size_t>> getColumnAtPos(int posX) const; //returns (column type, component pos)
+    Opt<ColumnType> getColumnAtPos(int posX) const;
 
-    wxRect getCellArea(size_t row, ColumnType colType, size_t compPos = 0) const; //returns empty rect if column not found; absolute coordinates!
+    wxRect getCellArea(size_t row, ColumnType colType) const; //returns empty rect if column not found; absolute coordinates!
 
-    void enableColumnMove  (bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnMove   = value; }
-    void enableColumnResize(bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnResize = value; }
+    void enableColumnMove  (bool value) { allowColumnMove   = value; }
+    void enableColumnResize(bool value) { allowColumnResize = value; }
 
-    void setGridCursor(size_t row, size_t compPos = 0); //set + show + select cursor (+ emit range selection event)
-    std::pair<size_t, size_t> getGridCursor() const; //(row, component pos)
+    void setGridCursor(size_t row); //set + show + select cursor (+ emit range selection event)
+    size_t getGridCursor() const; //returns row
 
     void scrollTo(size_t row);
 
     virtual void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr);
     virtual bool Enable( bool enable = true) { Refresh(); return wxScrolledWindow::Enable(enable); }
-    void autoSizeColumns(size_t compPos = 0);
     //############################################################################################################
 
 private:
@@ -211,11 +210,9 @@ private:
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
 #endif
 
-#ifdef ZEN_WIN
-    virtual WXLRESULT MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam); //support horizontal mouse wheel
-#endif
+    int getBestColumnSize(size_t col) const; //return -1 on error
 
-    int getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error
+    void autoSizeColumns(GridEventPolicy columnResizeEventPolicy);
 
     friend class GridData;
     class SubWindow;
@@ -240,15 +237,8 @@ private:
             return selection;
         }
 
-        void set(const std::vector<size_t>& newSel)
-        {
-            clear();
-            for (size_t row : newSel)
-                if (row < rowSelectionValue.size())
-                    rowSelectionValue[row] = true;
-        }
-
-        void clear() { selectRange(0, rowSelectionValue.size(), false); }
+        void selectAll() { selectRange(0, rowSelectionValue.size(), true); }
+        void clear    () { selectRange(0, rowSelectionValue.size(), false); }
 
         bool isSelected(size_t row) const { return row < rowSelectionValue.size() ? rowSelectionValue[row] != 0 : false; }
 
@@ -276,70 +266,52 @@ private:
         int offset_;
     };
 
-    struct Component
-    {
-        Component() : allowColumnMove(true), allowColumnResize(true) {}
-
-        std::shared_ptr<GridData> dataView_;
-        Selection selection;
-        bool allowColumnMove;
-        bool allowColumnResize;
-
-        std::vector<VisibleColumn> visibleCols; //individual widths, type and total column count
-        std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
-    };
-
     struct ColumnWidth
     {
         ColumnWidth(ColumnType type, int width) : type_(type), width_(width) {}
         ColumnType type_;
         int width_;
     };
-    std::vector<std::vector<ColumnWidth>> getColWidths()                 const; //
-    std::vector<std::vector<ColumnWidth>> getColWidths(int mainWinWidth) const; //evaluate stretched columns; structure matches "comp"
+    std::vector<ColumnWidth> getColWidths()                 const; //
+    std::vector<ColumnWidth> getColWidths(int mainWinWidth) const; //evaluate stretched columns
     int                                   getColWidthsSum(int mainWinWidth) const;
-    std::vector<std::vector<int>> getColStretchedWidths(int clientWidth) const; //final width = (normalized) (stretchedWidth + offset)
+    std::vector<int> getColStretchedWidths(int clientWidth) const; //final width = (normalized) (stretchedWidth + offset)
 
-    Opt<int> getColWidth(size_t col, size_t compPos) const
+    Opt<int> getColWidth(size_t col) const
     {
         const auto& widths = getColWidths();
-        if (compPos < widths.size() && col < widths[compPos].size())
-            return widths[compPos][col].width_;
+        if (col < widths.size())
+            return widths[col].width_;
         return NoValue();
     }
 
-    void setColWidthAndNotify(int width, size_t col, size_t compPos, bool notifyAsync = false);
+    void setColumnWidth(int width, size_t col, GridEventPolicy columnResizeEventPolicy, bool notifyAsync = false);
 
-    wxRect getColumnLabelArea(ColumnType colType, size_t compPos) const; //returns empty rect if column not found
+    wxRect getColumnLabelArea(ColumnType colType) const; //returns empty rect if column not found
 
-    void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive = true); //select inclusive range [rowFrom, rowTo] + notify event!
+    void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive = true); //select inclusive range [rowFrom, rowTo] + notify event!
 
-    void clearSelectionAllAndNotify(); //clear selection + notify event
-
-    bool isSelected(size_t row, size_t compPos) const { return compPos < comp.size() ? comp[compPos].selection.isSelected(row) : false; }
-
-    bool columnMoveAllowed  (size_t compPos) const { return compPos < comp.size() ? comp[compPos].allowColumnMove   : false; }
-    bool columnResizeAllowed(size_t compPos) const { return compPos < comp.size() ? comp[compPos].allowColumnResize : false; }
+    bool isSelected(size_t row) const { return selection.isSelected(row); }
 
     struct ColAction
     {
         bool wantResize; //"!wantResize" means "move" or "single click"
         size_t col;
-        size_t compPos;
     };
     Opt<ColAction> clientPosToColumnAction(const wxPoint& pos) const;
-    void moveColumn(size_t colFrom, size_t colTo, size_t compPos);
-    ptrdiff_t clientPosToMoveTargetColumn(const wxPoint& pos, size_t compPos) const; //return < 0 on error
+    void moveColumn(size_t colFrom, size_t colTo);
+    ptrdiff_t clientPosToMoveTargetColumn(const wxPoint& pos) const; //return < 0 on error
 
-    Opt<ColumnType> colToType(size_t col, size_t compPos) const;
+    Opt<ColumnType> colToType(size_t col) const;
 
     /*
     Visual layout:
-        ------------------------------------------------
-        |CornerWin   | ColLabelWin:                    |
-        |--------------------------  Comp1 | Comp2 ... |   row label and main window are vertically tiled into one or more "components"
-        |RowLabelWin | MainWin:                        |
-        ------------------------------------------------
+        --------------------------------
+        |CornerWin   | ColLabelWin     |
+        |------------------------------|
+        |RowLabelWin | MainWin         |
+        |            |                 |
+        --------------------------------
     */
     CornerWin*   cornerWin_;
     RowLabelWin* rowLabelWin_;
@@ -352,7 +324,14 @@ private:
     int colLabelHeight;
     bool drawRowLabel;
 
-    std::vector<Component> comp;
+    std::shared_ptr<GridData> dataView_;
+    Selection selection;
+    bool allowColumnMove;
+    bool allowColumnResize;
+
+    std::vector<VisibleColumn> visibleCols; //individual widths, type and total column count
+    std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
+
     size_t rowCountOld; //at the time of last Grid::Refresh()
 };
 }

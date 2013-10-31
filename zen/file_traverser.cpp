@@ -464,7 +464,7 @@ private:
             //even at this point it's not sure whether data was written correctly, again cloud storages tend to lie about success status
             if (filesToValidate-- > 0)
             {
-                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(tofiletime(it->second)); //throw std::runtime_error
+                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(toFileTime(it->second)); //throw std::runtime_error
 
                 //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
                 WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};

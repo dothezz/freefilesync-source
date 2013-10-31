@@ -52,7 +52,7 @@ void makeDirectory(const Zstring& directory, bool failIfExists = false); //throw
 //templateDir may be empty
 void makeDirectoryPlain(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
 
-struct FileAttrib
+struct InSyncAttributes
 {
     UInt64 fileSize;
     Int64 modificationTime; //time_t UTC compatible
@@ -65,7 +65,7 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
               bool copyFilePermissions,
               bool transactionalCopy,
               CallbackCopyFile* callback, //may be nullptr
-              FileAttrib* newAttrib = nullptr);  //return current attributes at the time of copy
+              InSyncAttributes* newAttrib = nullptr);  //return current attributes at the time of copy
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");

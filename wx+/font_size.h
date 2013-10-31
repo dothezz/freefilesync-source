@@ -48,7 +48,7 @@ void setMainInstructionFont(wxWindow& control)
 {
     wxFont font = control.GetFont();
 #ifdef ZEN_WIN //http://msdn.microsoft.com/de-DE/library/windows/desktop/aa974176#fonts
-    font.SetPointSize(numeric::round(wxNORMAL_FONT->GetPointSize() * 4.0 / 3));
+    font.SetPointSize(wxNORMAL_FONT->GetPointSize() * 4 / 3); //integer round down
 
     //get main instruction color: don't hard-code, respect accessibility!
     typedef HTHEME  (WINAPI* OpenThemeDataFun )(HWND hwnd, LPCWSTR pszClassList);

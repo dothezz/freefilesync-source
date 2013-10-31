@@ -219,7 +219,7 @@ Int64 toTimeT(const FILETIME& ft)
 }
 
 inline
-FILETIME tofiletime(const Int64& utcTime)
+FILETIME toFileTime(const Int64& utcTime)
 {
     const UInt64 fileTimeLong = to<UInt64>(utcTime + Int64(3054539008UL, 2)) * 10000000U;
     const FILETIME output = { fileTimeLong.getLo(), fileTimeLong.getHi() };

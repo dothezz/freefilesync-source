@@ -143,9 +143,10 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
     return Zstring();
 }
 #endif
+}
 
 
-void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl) //throw FileError
+UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
 {
 #ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
@@ -160,24 +161,8 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
     //                                   GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
     //                                   &sourceAttr))                           //__out  LPVOID lpFileInformation
 
-    if (!isSymlink(fileInfo) || procSl == SYMLINK_DIRECT)
-    {
-        //####################################### DST hack ###########################################
-        const bool isDirectory = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-        if (!isDirectory && dst::isFatDrive(filename)) //throw()
-        {
-            const dst::RawTime rawTime(fileInfo.ftCreationTime, fileInfo.ftLastWriteTime);
-            if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
-            {
-                fileInfo.ftLastWriteTime = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
-                ::GetSystemTimeAsFileTime(&fileInfo.ftCreationTime); //real creation time information is not available...
-            }
-        }
-        //####################################### DST hack ###########################################
-
-        attr.fileSize         = UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
-        attr.modificationTime = toTimeT(fileInfo.ftLastWriteTime);
-    }
+    if (!isSymlink(fileInfo))
+        return UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     else
     {
         const HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(), //open handle to target of symbolic link
@@ -195,39 +180,16 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
         if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
             throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
 
-        attr.fileSize         = UInt64(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
-        attr.modificationTime = toTimeT(fileInfoHnd.ftLastWriteTime);
+        return UInt64(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
-
-    const int rv = procSl == SYMLINK_FOLLOW ?
-                   :: stat(filename.c_str(), &fileInfo) :
-                   ::lstat(filename.c_str(), &fileInfo);
-    if (rv != 0)
+    if (::stat(filename.c_str(), &fileInfo) != 0)
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"stat", getLastError()));
 
-    attr.fileSize         = UInt64(fileInfo.st_size);
-    attr.modificationTime = fileInfo.st_mtime;
+    return UInt64(fileInfo.st_size);
 #endif
-}
-
-
-Int64 getFileTime(const Zstring& filename, ProcSymlink procSl) //throw FileError
-{
-    FileAttrib attr;
-    getFileAttrib(filename, attr, procSl); //throw FileError
-    return attr.modificationTime;
-}
-}
-
-
-UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
-{
-    FileAttrib attr;
-    getFileAttrib(filename, attr, SYMLINK_FOLLOW); //throw FileError
-    return attr.fileSize;
 }
 
 
@@ -614,34 +576,11 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
         //Sample code: http://us.generation-nt.com/answer/createfile-directory-handles-removing-parent-help-29126332.html
     }
 }
-}
 
 
-void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
-{
-    //no error situation if directory is not existing! manual deletion relies on it!
-    if (!somethingExists(directory))
-        return; //neither directory nor any other object (e.g. broken symlink) with that name existing
-    removeDirectoryImpl(directory, callback);
-}
-
-
-
-void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink procSl) //throw FileError
-{
 #ifdef ZEN_WIN
-    FILETIME creationTime  = {};
-    FILETIME lastWriteTime = tofiletime(modTime);
-
-    //####################################### DST hack ###########################################
-    if (dst::isFatDrive(filename)) //throw()
-    {
-        const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTime); //throw std::runtime_error
-        creationTime  = encodedTime.createTimeRaw;
-        lastWriteTime = encodedTime.writeTimeRaw;
-    }
-    //####################################### DST hack ###########################################
-
+void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const FILETIME& lastWriteTime, ProcSymlink procSl) //throw FileError
+{
     {
         //extra scope for debug check below
 
@@ -856,31 +795,59 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                 throw FileError(errorMsg, errorDescr);
         }
     }
-#ifndef NDEBUG //dst hack: verify data written
-    if (dst::isFatDrive(filename) && fileExists(filename)) //throw()
-    {
-        FILETIME creationTimeDbg  = {};
-        FILETIME lastWriteTimeDbg = {};
+#ifndef NDEBUG //verify written data: mainly required to check consistency of DST hack
+    FILETIME creationTimeDbg  = {};
+    FILETIME lastWriteTimeDbg = {};
 
-        HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),
-                                    FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
-                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                    nullptr,
-                                    OPEN_EXISTING,
-                                    0,
-                                    nullptr);
-        assert(hFile != INVALID_HANDLE_VALUE);
-        ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
+    HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                                FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                nullptr,
+                                OPEN_EXISTING,
+                                FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
+                                (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0),
+                                nullptr);
+    assert(hFile != INVALID_HANDLE_VALUE);
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
-        assert(::GetFileTime(hFile, //probably more up to date than GetFileAttributesEx()!?
-                             &creationTimeDbg,
-                             nullptr,
-                             &lastWriteTimeDbg));
+    assert(::GetFileTime(hFile, //probably more up to date than GetFileAttributesEx()!?
+                         &creationTimeDbg,
+                         nullptr,
+                         &lastWriteTimeDbg));
 
-        assert(::CompareFileTime(&creationTimeDbg,  &creationTime)  == 0);
-        assert(::CompareFileTime(&lastWriteTimeDbg, &lastWriteTime) == 0);
-    }
+    assert(::CompareFileTime(&creationTimeDbg,  &creationTime)  == 0);
+    assert(::CompareFileTime(&lastWriteTimeDbg, &lastWriteTime) == 0);
 #endif
+}
+#endif
+}
+
+
+void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
+{
+    //no error situation if directory is not existing! manual deletion relies on it!
+    if (!somethingExists(directory))
+        return; //neither directory nor any other object (e.g. broken symlink) with that name existing
+    removeDirectoryImpl(directory, callback);
+}
+
+
+void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink procSl) //throw FileError
+{
+#ifdef ZEN_WIN
+    FILETIME creationTime  = {};
+    FILETIME lastWriteTime = toFileTime(modTime);
+
+    //####################################### DST hack ###########################################
+    if (dst::isFatDrive(filename)) //throw(); hacky: does not consider symlinks pointing to FAT!
+    {
+        const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTime); //throw std::runtime_error
+        creationTime  = encodedTime.createTimeRaw;
+        lastWriteTime = encodedTime.writeTimeRaw;
+    }
+    //####################################### DST hack ###########################################
+
+    setFileTimeRaw(filename, creationTime, lastWriteTime, procSl); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     //sigh, we can't use utimensat on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
@@ -1423,10 +1390,22 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     });
 
     //file times: essential for sync'ing a symlink: enforce this! (don't just try!)
-    {
-        const Int64 modTime = getFileTime(sourceLink, SYMLINK_DIRECT); //throw FileError
-        setFileTime(targetLink, modTime, SYMLINK_DIRECT); //throw FileError
-    }
+#ifdef ZEN_WIN
+    WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
+    if (!::GetFileAttributesEx(applyLongPathPrefix(sourceLink).c_str(), //__in   LPCTSTR lpFileName,
+                               GetFileExInfoStandard,                   //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+                               &sourceAttr))                            //__out  LPVOID lpFileInformation
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"GetFileAttributesEx", getLastError()));
+
+    setFileTimeRaw(targetLink, sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, SYMLINK_DIRECT); //throw FileError
+
+#elif defined ZEN_LINUX || defined ZEN_MAC
+    struct ::stat srcInfo = {};
+    if (::lstat(sourceLink.c_str(), &srcInfo) != 0)
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"lstat", getLastError()));
+
+    setFileTime(targetLink, Int64(srcInfo.st_mtime), SYMLINK_DIRECT); //throw FileError
+#endif
 
     if (copyFilePermissions)
         copyObjectPermissions(sourceLink, targetLink, SYMLINK_DIRECT); //throw FileError
@@ -1538,7 +1517,7 @@ bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //thr
 void copyFileWindowsSparse(const Zstring& sourceFile,
                            const Zstring& targetFile,
                            CallbackCopyFile* callback,
-                           FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+                           InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 {
     assert(canCopyAsSparse(sourceFile, targetFile));
 
@@ -1894,6 +1873,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
 
         //#################### copy file creation time ################################
         ::SetFileTime(hDestinationFile, &cbd.fileInfoSrc.ftCreationTime, nullptr, nullptr); //no error handling!
+        //=> not really needed here, creation time is set anyway at the end of copyFileWindowsDefault()!
 
         //#################### copy NTFS compressed attribute #########################
         const bool sourceIsCompressed = (cbd.fileInfoSrc.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
@@ -1945,7 +1925,7 @@ const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destinat
 void copyFileWindowsDefault(const Zstring& sourceFile,
                             const Zstring& targetFile,
                             CallbackCopyFile* callback,
-                            FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
+                            InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
 {
     //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
     try { activatePrivilege(SE_BACKUP_NAME); }
@@ -2034,21 +2014,44 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     if (newAttrib)
     {
         newAttrib->fileSize         = UInt64(cbd.fileInfoSrc.nFileSizeLow, cbd.fileInfoSrc.nFileSizeHigh);
-        newAttrib->modificationTime = toTimeT(cbd.fileInfoSrc.ftLastWriteTime); //no DST hack (yet)
+        //newAttrib->modificationTime = -> set further below
         newAttrib->sourceFileId     = extractFileID(cbd.fileInfoSrc);
         newAttrib->targetFileId     = extractFileID(cbd.fileInfoTrg);
     }
 
     {
-        //DST hack
-        const Int64 modTime = getFileTime(sourceFile, SYMLINK_FOLLOW); //throw FileError
-        setFileTime(targetFile, modTime, SYMLINK_FOLLOW); //throw FileError
-        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we need to set it again but with proper error checking!
-        //	      - this sequence leads to a loss of precision of up to 1 sec!
-        //	      - perf-loss on USB sticks with many small files of about 30%! damn!
+        FILETIME creationtime     = cbd.fileInfoSrc.ftCreationTime;
+        FILETIME lastWriteTimeRaw = cbd.fileInfoSrc.ftLastWriteTime;
+        //####################################### DST hack ###########################################
+        if (dst::isFatDrive(sourceFile)) //throw(); hacky: does not consider symlinks pointing to FAT!
+        {
+            const dst::RawTime rawTime(creationtime, lastWriteTimeRaw);
+            if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
+            {
+                lastWriteTimeRaw = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
+                ::GetSystemTimeAsFileTime(&creationtime); //real creation time information is not available...
+            }
+        }
+        //####################################### DST hack ###########################################
 
         if (newAttrib)
-            newAttrib->modificationTime = modTime;
+            newAttrib->modificationTime = toTimeT(lastWriteTimeRaw);
+
+        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we always need to set it again but with proper error checking!
+        //	      - perf-loss on USB sticks with many small files of about 30%!
+        FILETIME creationTimeOut  = creationtime;
+        FILETIME lastWriteTimeOut = lastWriteTimeRaw;
+
+        //####################################### DST hack ###########################################
+        if (dst::isFatDrive(targetFile)) //throw(); target cannot be a symlink in this context!
+        {
+            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTimeRaw); //throw std::runtime_error
+            creationTimeOut  = encodedTime.createTimeRaw;
+            lastWriteTimeOut = encodedTime.writeTimeRaw;
+        }
+        //####################################### DST hack ###########################################
+
+        setFileTimeRaw(targetFile, creationTimeOut, lastWriteTimeOut, SYMLINK_FOLLOW); //throw FileError
     }
 
     guardTarget.dismiss(); //target has been created successfully!
@@ -2057,7 +2060,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
 //another layer to support copying sparse files
 inline
-void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, FileAttrib* sourceAttr)
+void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
 {
     try
     {
@@ -2072,7 +2075,7 @@ void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targ
 
 //another layer of indirection solving 8.3 name clashes
 inline
-void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, FileAttrib* sourceAttr)
+void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
 {
     try
     {
@@ -2096,7 +2099,7 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
 void copyFileLinuxMac(const Zstring& sourceFile,
                       const Zstring& targetFile,
                       CallbackCopyFile* callback,
-                      FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+                      InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
     //open sourceFile for reading
     FileInputUnbuffered fileIn(sourceFile); //throw FileError
@@ -2187,7 +2190,7 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsSparse(::BackupRead/::Backu
 */
 
 inline
-void copyFileSelectOs(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, FileAttrib* sourceAttr)
+void copyFileSelectOs(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
 {
 #ifdef ZEN_WIN
     copyFileWindows(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
@@ -2204,7 +2207,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
                    bool copyFilePermissions,
                    bool transactionalCopy,
                    CallbackCopyFile* callback,
-                   FileAttrib* sourceAttr)
+                   InSyncAttributes* sourceAttr)
 {
     if (transactionalCopy)
     {

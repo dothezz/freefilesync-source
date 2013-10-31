@@ -721,13 +721,13 @@ void Graph2D::render(wxDC& dc) const
                         *low = *high = (*low + *high) / 2;
                 };
 
-                for (auto it = allSelections.begin(); it != allSelections.end(); ++it)
+                for (const SelectionBlock& sel : allSelections)
                 {
                     //harmonize with active mouse selection above
-                    double screenFromX = cvrtX.realToScreen(it->from.x);
-                    double screenFromY = cvrtY.realToScreen(it->from.y);
-                    double screenToX   = cvrtX.realToScreen(it->to.x);
-                    double screenToY   = cvrtY.realToScreen(it->to.y);
+                    double screenFromX = cvrtX.realToScreen(sel.from.x);
+                    double screenFromY = cvrtY.realToScreen(sel.from.y);
+                    double screenToX   = cvrtX.realToScreen(sel.to.x);
+                    double screenToY   = cvrtY.realToScreen(sel.to.y);
                     shrink(&screenFromX, &screenToX);
                     shrink(&screenFromY, &screenToY);
 

@@ -14,7 +14,6 @@
 
 using namespace zen;
 
-
 namespace
 {
 void setAsStandard(wxButton& btn)
@@ -62,7 +61,12 @@ void setBestInitialSize(wxTextCtrl& ctrl, const wxString& text, wxSize maxSize)
         it = itEnd + 1;
     }
 
-    const wxSize bestSize(bestWidth + scrollbarWidth, std::min(rowCount * rowHeight, maxSize.y));
+#if defined ZEN_WIN || defined ZEN_LINUX
+	const int rowGap = 0;
+#elif defined ZEN_MAC
+	const int rowGap = 1;
+#endif
+	const wxSize bestSize(bestWidth + scrollbarWidth, std::min(rowCount * (rowHeight + rowGap), maxSize.y));
     ctrl.SetMinSize(bestSize); //alas, SetMinClientSize() is just not working!
 }
 }

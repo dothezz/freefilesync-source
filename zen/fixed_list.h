@@ -34,7 +34,7 @@ class FixedList
 
 public:
     FixedList() :
-        first(nullptr),
+        firstInsert(nullptr),
         lastInsert(nullptr),
         sz(0) {}
 
@@ -60,17 +60,17 @@ public:
     typedef T& reference;
     typedef const T& const_reference;
 
-    iterator begin() { return first; }
+    iterator begin() { return firstInsert; }
     iterator end()   { return iterator(); }
 
-    const_iterator begin() const { return first; }
+    const_iterator begin() const { return firstInsert; }
     const_iterator end  () const { return const_iterator(); }
 
-    const_iterator cbegin() const { return first; }
+    const_iterator cbegin() const { return firstInsert; }
     const_iterator cend  () const { return const_iterator(); }
 
-    reference       front()       { return first->val; }
-    const_reference front() const { return first->val; }
+    reference       front()       { return firstInsert->val; }
+    const_reference front() const { return firstInsert->val; }
 
     reference&       back()       { return lastInsert->val; }
     const_reference& back() const { return lastInsert->val; }
@@ -88,18 +88,20 @@ public:
     void remove_if(Predicate pred)
     {
         Node* prev = nullptr;
-        Node* ptr = first;
+        Node* ptr = firstInsert;
 
         while (ptr)
             if (pred(ptr->val))
             {
-                Node* tmp = ptr->next;
+                Node* next = ptr->next;
                 deleteNode(ptr);
+                ptr = next;
+
                 if (prev)
-                    prev->next = ptr = tmp;
+                    prev->next = next;
                 else
-                    first = ptr = tmp;
-                if (!tmp)
+                    firstInsert = next;
+                if (!next)
                     lastInsert = prev;
             }
             else
@@ -111,19 +113,19 @@ public:
 
     void clear()
     {
-        Node* ptr = first;
+        Node* ptr = firstInsert;
         while (ptr)
         {
-            Node* tmp = ptr;
-            ptr = ptr->next;
-            delete tmp;
+            Node* next = ptr->next;
+            deleteNode(ptr);
+            ptr = next;
         }
 
-        first = lastInsert = nullptr;
-        sz = 0;
+        firstInsert = lastInsert = nullptr;
+        assert(sz == 0);
     }
 
-    bool empty() const { return first == nullptr; }
+    bool empty() const { return firstInsert == nullptr; }
     size_t size() const { return sz; }
 
 private:
@@ -132,11 +134,10 @@ private:
 
     void pushNode(Node* newNode) //throw()
     {
-        ++sz;
         if (lastInsert == nullptr)
         {
-            assert(first == nullptr);
-            first = lastInsert = newNode;
+            assert(firstInsert == nullptr && sz == 0);
+            firstInsert = lastInsert = newNode;
         }
         else
         {
@@ -144,6 +145,7 @@ private:
             lastInsert->next = newNode;
             lastInsert = newNode;
         }
+        ++sz;
     }
 
     void deleteNode(Node* oldNode)
@@ -153,7 +155,7 @@ private:
         delete oldNode;
     }
 
-    Node* first;
+    Node* firstInsert;
     Node* lastInsert; //point to last insertion; required by efficient emplace_back()
     size_t sz;
 };

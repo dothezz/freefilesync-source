@@ -22,7 +22,7 @@
 
 #elif defined ZEN_MAC
 //#include <sys/types.h>
-#include <sys/event.h>
+//#include <sys/event.h>
 //#include <sys/time.h>
 #include "file_traverser.h"
 #endif
@@ -519,6 +519,13 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 }
 
 #elif defined ZEN_MAC
+warn_static("finish");
+struct DirWatcher::Pimpl {};
+DirWatcher::DirWatcher(const Zstring& directory) {}
+DirWatcher::~DirWatcher() {}
+std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) { return std::vector<DirWatcher::Entry>(); }
+
+#if 0
 namespace
 {
 class DirsOnlyTraverser : public zen::TraverseCallback
@@ -693,4 +700,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 
     return output;
 }
+#endif
+
+
 #endif

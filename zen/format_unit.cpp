@@ -287,11 +287,12 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 
 #ifdef ZEN_WIN
-    FILETIME lastWriteTimeUtc = tofiletime(utcTime); //convert ansi C time to FILETIME
+    FILETIME lastWriteTimeUtc = toFileTime(utcTime); //convert ansi C time to FILETIME
 
     SYSTEMTIME systemTimeLocal = {};
 
-    if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx
+    //http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx
+    if (useNewLocalTimeCalculation) //DST conversion  like in Windows 7: NTFS stays fixed, but FAT jumps by one hour
     {
         SYSTEMTIME systemTimeUtc = {};
         if (!::FileTimeToSystemTime(&lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
@@ -303,7 +304,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
                                                &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
             return errorMsg();
     }
-    else //use DST setting (like in Windows 2000 and XP)
+    else //DST conversion like in Windows 2000 and XP: FAT times stay fixed, while NTFS jumps
     {
         FILETIME fileTimeLocal = {};
         if (!::FileTimeToLocalFileTime(&lastWriteTimeUtc, //_In_   const FILETIME *lpFileTime,
