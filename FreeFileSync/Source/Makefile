@@ -42,9 +42,9 @@ CXXFLAGS  += `wx-config --cxxflags      --debug=no`
 LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system -lz
 else
 #static wxWidgets and boost library linkage for precompiled release
-WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
-BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
+WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets/lib/release/bin/wx-config
+CXXFLAGS  += -I$(HOME)/Desktop/boost
+BOOST_LIB_DIR =$(HOME)/Desktop/boost/stage/lib
 
 CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
 LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a -lX11
@@ -56,9 +56,9 @@ ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
 CXXFLAGS += -DZEN_MAC
 
-WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
-BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
+WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets/lib/release/bin/wx-config
+CXXFLAGS  += -I$(HOME)/Desktop/boost
+BOOST_LIB_DIR =$(HOME)/Desktop/boost/stage/lib
 MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 
 #-Wl,-Bstatic not supported on OSX!

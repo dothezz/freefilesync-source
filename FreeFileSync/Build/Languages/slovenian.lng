@@ -7,6 +7,18 @@
 	<plural_definition>n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3</plural_definition>
 </header>
 
+<source>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
+</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Obe strani sta se spremenili od zadnje sinhronizacije.</target>
 
@@ -88,17 +100,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Poljubno število alternatvnih imenikov za največ eno konfiguracijsko datoteko.</target>
 
-<source>A folder input field is empty.</source>
-<target>Vnosno polje za mapo je prazno.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Ustrezajoča mapa bo smatrana kot prazna.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Ne morem najti naslednjih map:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>To napako, ki smatra vsako mapo kot prazno, lahko ignorirate. Mape bodo potem samodejno ustvarjene med sinhronizacijo.</target>
+
+<source>A folder input field is empty.</source>
+<target>Vnosno polje za mapo je prazno.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Ustrezajoča mapa bo smatrana kot prazna.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Naslednje mape imajo odvisne poti. Bodite previdni pri nastavitvi sinhronizacijskih pravil:</target>
@@ -220,8 +232,11 @@
 <source>Cannot get process information.</source>
 <target>Ne morem pridobiti informacij o procesu.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Čakam, medtem ko se zaklepa imenik (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Čakam dokler je imenik zaklenjen:</target>
+
+<source>Lock owner:</source>
+<target>Lastnik zaklepa:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -233,6 +248,9 @@
 <pluralform>%x sek</pluralform>
 <pluralform>%x sek</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Zaznavanje opuščenega zaklepa...</target>
 
 <source>Creating file %x</source>
 <target>Ustvarjam datoteko %x</target>
@@ -492,6 +510,12 @@ Ukaz se sproži če:
 <source>Updating attributes of %x</source>
 <target>Posodabljam atribute od %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Ustvarjam Volume Shadow Copy za %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Napaka pri preverjanju podatkov: %x in %y imata drugačno vsebino.</target>
+
 <source>Cannot find %x.</source>
 <target>Ne morem najti %x.</target>
 
@@ -530,12 +554,6 @@ Ukaz se sproži če:
 
 <source>Generating database...</source>
 <target>Ustvarjam podatkovno bazo...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Ustvarjam Volume Shadow Copy za %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Napaka pri preverjanju podatkov: %x in %y imata drugačno vsebino.</target>
 
 <source>job name</source>
 <target>naziv opravila</target>
@@ -588,7 +606,7 @@ Ukaz se sproži če:
 <target>&Ignoriraj nadaljnje napake</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Ponovni poizkus operacije...</target>
 
 <source>Serious Error</source>
 <target>Resna napaka</target>
@@ -615,7 +633,7 @@ Ukaz se sproži če:
 <target>Na omrežju ne najdem obstoječe verzije FreeFileSync-a. Ali želite preveriti lastnoročno?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Preveri</target>
 
 <source>Symlink</source>
 <target>Simbolična povezava</target>
@@ -773,12 +791,6 @@ Ukaz se sproži če:
 <source>Save as batch job</source>
 <target>Shrani kot serijsko opravilo</target>
 
-<source>Hide excluded items</source>
-<target>Skrij izključene elemente</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Pokaži filtrirane ali začasno izključene datoteke</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Število datotek in map, ki bodo ustvarjene</target>
 
@@ -812,8 +824,8 @@ Ukaz se sproži če:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificiraj in razširjaj spremembe na obeh straneh. Izbrisi, premiki in spori so samodejno zaznani z uporabo podatkovne baze.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Ustvari zrcalno kopijo levega imenika, tako da se bo desni imenik po sinhnorizaciji popolnoma ujemal.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Ustvari zrcalno kopijo levega imenika s prilagoditvijo desnega imenika, tako da se ujemata.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Kopiraj nove in posodobljene datoteke v desni imenik.</target>
@@ -824,8 +836,16 @@ Ukaz se sproži če:
 <source>Detect moved files</source>
 <target>Zaznaj premaknjene datoteke</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Zahteva podatkovno bazo. Ni podprt s strani vseh datotečnih sistemov.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Zahteva in ustvari datoteke podatkovne baze
+- Zaznavane je aktivno po začetnem sinhnoriziranju
+- Ni podprto s strani vseh datotečnih sistemov
+</target>
 
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
@@ -1061,6 +1081,9 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Find</source>
 <target>Najdi</target>
 
+<source>Select View</source>
+<target>Izberi pogled</target>
+
 <source>Overview</source>
 <target>Pregled</target>
 
@@ -1069,12 +1092,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Main Bar</source>
 <target>Glavna vrstica</target>
-
-<source>Filter Files</source>
-<target>Filtriraj datoteke</target>
-
-<source>Select View</source>
-<target>Izberi pogled</target>
 
 <source>Open...</source>
 <target>Odpri...</target>
@@ -1096,13 +1113,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Confirm</source>
 <target>Potrdi</target>
-
-<source>
-<pluralform>Do you really want to execute the command %y for one item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-</target>
 
 <source>&Execute</source>
 <target>&Izvedi</target>
@@ -1127,17 +1137,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <pluralform>%x datoteki</pluralform>
 <pluralform>%x datoteke</pluralform>
 <pluralform>%x datotek</pluralform>
-</target>
-
-<source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
-</source>
-<target>
-<pluralform>%y od %x vrstice prikazana</pluralform>
-<pluralform>%y od %x vrstic prikazanih</pluralform>
-<pluralform>%y od %x vrstic prikazanih</pluralform>
-<pluralform>%y od %x vrstic prikazanih</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1254,6 +1253,9 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Show files that won't be copied</source>
 <target>Prikaži datoteke, ki ne bodo kopirane</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Pokaži filtrirane ali začasno izključene datoteke</target>
+
 <source>Set as default</source>
 <target>Nastavi kot privzeto</target>
 
@@ -1289,6 +1291,9 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Warning</source>
 <target>Pozor</target>
+
+<source>Select all</source>
+<target>Izberi vse</target>
 
 <source>Paused</source>
 <target>Na premoru</target>

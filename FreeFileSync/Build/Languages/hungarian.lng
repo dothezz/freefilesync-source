@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Tetszőleges számú alternatív könyvtár legfeljebb egy konfigurációs fájlhoz</target>
 
-<source>A folder input field is empty.</source>
-<target>A könyvtár beviteli mező üres.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>A kapcsolódó könyvtárat üresként kezeli.</target>
-
 <source>Cannot find the following folders:</source>
 <target>A következő könyvtárak nem találhatóak:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Figyelmen kívül hagyhatod ezt a hibát, ezzel üresnek tekintve minden egyes könyvtárat. A könytárak ekkor automatikusan létrejönnek a szinkronizálás folyamán.</target>
+
+<source>A folder input field is empty.</source>
+<target>A könyvtár beviteli mező üres.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>A kapcsolódó könyvtárat üresként kezeli.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>A következő könyvtárak egymástól függő útvonalat tartalmaznak. Légy óvatos a szinkronizálás szabályainak meghatározásánál!</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Nem sikerült lekérdezni processz-információkat.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Várakozás a könyvtár zárolásának a feloldására (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Várakozás amíg a könyvtár zárolt:</target>
+
+<source>Lock owner:</source>
+<target>Zárolás gazdája:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 másodperc</pluralform>
 <pluralform>%x másodperc</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Elhagyott zárolást érzékel...</target>
 
 <source>Creating file %x</source>
 <target>%x fájl létrehozása</target>
@@ -486,6 +492,12 @@ A parancs végrehajtódik, ha:
 <source>Updating attributes of %x</source>
 <target>%x attribútumainak frissítése</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Készít egy árnyékmásolat-kötetet %x számára</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Adat-ellenőrzési hiba: %x és %y tartalma különböző.</target>
+
 <source>Cannot find %x.</source>
 <target>%x nem található.</target>
 
@@ -524,12 +536,6 @@ A parancs végrehajtódik, ha:
 
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Készít egy árnyékmásolat-kötetet %x számára</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Adat-ellenőrzési hiba: %x és %y tartalma különböző.</target>
 
 <source>job name</source>
 <target>feladat neve</target>
@@ -572,13 +578,15 @@ A parancs végrehajtódik, ha:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Automatikus ismételt próbálkozás 1 másodperc múlva...</pluralform>
+<pluralform>Automatikus ismételt próbálkozás %x másodperc múlva...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>F&igyelmen kívül hagyja az utána következő hibákat</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Újra próbálja a műveletet...</target>
 
 <source>Serious Error</source>
 <target>Komoly hiba</target>
@@ -605,7 +613,7 @@ A parancs végrehajtódik, ha:
 <target>Nem lehet online megtalálni a jelenlegi FreeFileSync verziószámot. Meg akarod keresni manuálisan?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Ellenőriz</target>
 
 <source>Symlink</source>
 <target>Symlink</target>
@@ -763,12 +771,6 @@ A parancs végrehajtódik, ha:
 <source>Save as batch job</source>
 <target>Mentse kötegelt feladatként</target>
 
-<source>Hide excluded items</source>
-<target>Rejtse el a kizárt elemeket</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Mutassa a szűrt vagy ideiglenesen kizárt fájlokat</target>
-
 <source>Number of files and folders that will be created</source>
 <target>A létrehozandó fájlok és könyvtárak száma</target>
 
@@ -802,8 +804,8 @@ A parancs végrehajtódik, ha:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Változások keresése és bemutatása mindkét oldalon. A törléseket, mozgatásokat és ütközéseket automatikusan ismeri fel egy adatbázis segítségével.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Készítse el a bal oldali könyvtár egy tükör-másolatát, amely pontosan megegyezik a jobb oldali könyvtárral a szinkronizálás után.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>A baloldali könyvtár tükörmásolatát készíti el úgy, hogy a jobb oldali könyvtár egyezzen meg</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Másolja az új és módosult fájlokat a jobb oldali könyvtárba.</target>
@@ -814,8 +816,16 @@ A parancs végrehajtódik, ha:
 <source>Detect moved files</source>
 <target>Érzékelje a mozgatott fájlokat</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Adatbázis fájlok szükségesek. Nem minden fájlrendszer támogatja.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Adatbázis fájlokat feltételez és készít
+- Az érzékelés a kezdeti szinkronizálás után válik aktívvá
+- Nem minden fájlrendszer támogatja
+</target>
 
 <source>Delete files:</source>
 <target>Törölje a következő fájlokat:</target>
@@ -1051,6 +1061,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Find</source>
 <target>Keres</target>
 
+<source>Select View</source>
+<target>Válasszon nézetet</target>
+
 <source>Overview</source>
 <target>Áttekintés</target>
 
@@ -1059,12 +1072,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Main Bar</source>
 <target>Fő sáv</target>
-
-<source>Filter Files</source>
-<target>Szűrje a fájlokat</target>
-
-<source>Select View</source>
-<target>Válasszon nézetet</target>
 
 <source>Open...</source>
 <target>Megnyit...</target>
@@ -1118,12 +1125,12 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>1 sorból %y sor látható</pluralform>
-<pluralform>%x sorból %y látható</pluralform>
+<pluralform>%y sort mutat az 1-ből</pluralform>
+<pluralform>%y sort mutat az %x közül</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1240,6 +1247,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Show files that won't be copied</source>
 <target>Mutassa a nem másolandó fájlokat</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Mutassa a szűrt vagy ideiglenesen kizárt fájlokat</target>
+
 <source>Set as default</source>
 <target>Beállítás alapértelmezettként</target>
 
@@ -1275,6 +1285,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Warning</source>
 <target>Figyelmeztetés</target>
+
+<source>Select all</source>
+<target>Összeset kiválasztja</target>
 
 <source>Paused</source>
 <target>Megállítva</target>

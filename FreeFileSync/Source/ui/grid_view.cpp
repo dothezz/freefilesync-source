@@ -109,20 +109,21 @@ ptrdiff_t GridView::findRowFirstChild(const HierarchyObject* hierObj) const
 
 
 GridView::StatusCmpResult::StatusCmpResult() :
+    existsExcluded  (false),
+    existsEqual     (false),
+    existsConflict  (false),
     existsLeftOnly  (false),
     existsRightOnly (false),
     existsLeftNewer (false),
     existsRightNewer(false),
     existsDifferent (false),
-    existsEqual     (false),
-    existsConflict  (false),
     filesOnLeftView   (0),
     foldersOnLeftView (0),
     filesOnRightView  (0),
     foldersOnRightView(0) {}
 
 
-GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps sortedRef to viewRef
+GridView::StatusCmpResult GridView::updateCmpResult(bool showExcluded, //maps sortedRef to viewRef
                                                     bool leftOnlyFilesActive,
                                                     bool rightOnlyFilesActive,
                                                     bool leftNewerFilesActive,
@@ -135,8 +136,12 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
 
     updateView([&](const FileSystemObject& fsObj) -> bool
     {
-        if (hideFiltered && !fsObj.isActive())
-            return false;
+        if (!fsObj.isActive())
+        {
+            output.existsExcluded = true;
+            if (!showExcluded)
+                return false;
+        }
 
         switch (fsObj.getCategory())
         {
@@ -180,6 +185,9 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
 
 
 GridView::StatusSyncPreview::StatusSyncPreview() :
+    existsExcluded       (false),
+    existsEqual          (false),
+    existsConflict       (false),
     existsSyncCreateLeft (false),
     existsSyncCreateRight(false),
     existsSyncDeleteLeft (false),
@@ -187,15 +195,13 @@ GridView::StatusSyncPreview::StatusSyncPreview() :
     existsSyncDirLeft    (false),
     existsSyncDirRight   (false),
     existsSyncDirNone    (false),
-    existsSyncEqual      (false),
-    existsConflict       (false),
     filesOnLeftView   (0),
     foldersOnLeftView (0),
     filesOnRightView  (0),
     foldersOnRightView(0) {}
 
 
-GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //maps sortedRef to viewRef
+GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //maps sortedRef to viewRef
                                                         bool syncCreateLeftActive,
                                                         bool syncCreateRightActive,
                                                         bool syncDeleteLeftActive,
@@ -210,8 +216,12 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
 
     updateView([&](const FileSystemObject& fsObj) -> bool
     {
-        if (hideFiltered && !fsObj.isActive())
-            return false;
+        if (!fsObj.isActive())
+        {
+            output.existsExcluded = true;
+            if (!showExcluded)
+                return false;
+        }
 
         switch (fsObj.getSyncOperation()) //evaluate comparison result and sync direction
         {
@@ -250,7 +260,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
                 if (!syncDirNoneActive) return false;
                 break;
             case SO_EQUAL:
-                output.existsSyncEqual = true;
+                output.existsEqual = true;
                 if (!syncEqualActive) return false;
                 break;
             case SO_UNRESOLVED_CONFLICT:
@@ -532,14 +542,14 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
             else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>());
             break;
-            //case SORT_BY_CMP_RESULT:
-            //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >());
-            //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>());
-            //    break;
-            //case SORT_BY_SYNC_DIRECTION:
-            //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
-            //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
-            //    break;
+        //case SORT_BY_CMP_RESULT:
+        //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >());
+        //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>());
+        //    break;
+        //case SORT_BY_SYNC_DIRECTION:
+        //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
+        //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
+        //    break;
         case COL_TYPE_DIRECTORY:
             if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex < b.folderIndex; });
             else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex > b.folderIndex; });

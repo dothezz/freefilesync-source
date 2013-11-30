@@ -199,8 +199,12 @@ private:
     void onPaintEvent(wxPaintEvent& event);
     void onEraseBackGround(wxEraseEvent& event) {} //[!]
     void onSizeEvent(wxSizeEvent& event) { updateWindowSizes(); event.Skip(); }
+    void onKeyDown(wxKeyEvent& event);
 
     void updateWindowSizes(bool updateScrollbar = true);
+
+    void selectWithCursor(ptrdiff_t row);
+    void makeRowVisible(size_t row);
 
     void redirectRowLabelEvent(wxMouseEvent& event);
 

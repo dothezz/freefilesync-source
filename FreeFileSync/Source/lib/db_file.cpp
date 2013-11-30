@@ -812,8 +812,9 @@ void zen::saveLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileEr
     //operation finished: rename temp files -> this should work transactionally:
     //if there were no write access, creation of temp files would have failed
     removeFile(dbNameLeft);                  //
-    removeFile(dbNameRight);                 //throw FileError
-    renameFile(dbNameLeftTmp,  dbNameLeft);  //
+    renameFile(dbNameLeftTmp, dbNameLeft);   //throw FileError
+
+    removeFile(dbNameRight);                 //
     renameFile(dbNameRightTmp, dbNameRight); //
 
     guardTempFileLeft. dismiss(); //no need to delete temp files anymore

@@ -49,13 +49,11 @@ typedef std::vector<std::pair<Description, Commandline>> ExternalApps;
 struct XmlGuiConfig
 {
     XmlGuiConfig() :
-        hideExcludedItems(false),
         handleError(ON_GUIERROR_POPUP),
         highlightSyncAction(true) {} //initialize values
 
     zen::MainConfiguration mainCfg;
 
-    bool hideExcludedItems;
     OnGuiError handleError; //reaction on error situation during synchronization
     bool highlightSyncAction;
 };
@@ -65,7 +63,6 @@ inline
 bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 {
     return lhs.mainCfg             == rhs.mainCfg           &&
-           lhs.hideExcludedItems   == rhs.hideExcludedItems &&
            lhs.handleError         == rhs.handleError       &&
            lhs.highlightSyncAction == rhs.highlightSyncAction;
 }
@@ -118,13 +115,15 @@ enum FileIconSize
 
 struct ViewFilterDefault
 {
-    ViewFilterDefault() : equal(false)
+    ViewFilterDefault() : equal(false), conflict(true), excluded(true)
     {
-        leftOnly = rightOnly = leftNewer = rightNewer = different = conflict = true;
+        leftOnly = rightOnly = leftNewer = rightNewer = different = true;
         createLeft = createRight = updateLeft = updateRight = deleteLeft = deleteRight = doNothing = true;
     }
-    bool equal;
-    bool leftOnly, rightOnly, leftNewer, rightNewer, different, conflict; //category view
+    bool equal;    //
+    bool conflict; //shared
+    bool excluded; //
+    bool leftOnly, rightOnly, leftNewer, rightNewer, different; //category view
     bool createLeft, createRight, updateLeft, updateRight, deleteLeft, deleteRight, doNothing; //action view
 };
 
@@ -155,7 +154,7 @@ struct XmlGlobalSettings
     size_t automaticRetryCount;
     size_t automaticRetryDelay; //unit: [sec]
 
-    size_t fileTimeTolerance; //max. allowed file time deviation
+    int fileTimeTolerance; //max. allowed file time deviation; < 0 means unlimited tolerance
     bool runWithBackgroundPriority;
     bool createLockFile;
     bool verifyFileCopy;   //verify copied files
@@ -195,8 +194,8 @@ struct XmlGlobalSettings
             defaultExclusionFilter(Zstr("/.fseventsd/")      Zstr("\n")
                                    Zstr("/.Spotlight-V100/") Zstr("\n")
                                    Zstr("/.Trashes/")        Zstr("\n")
-                                   Zstr("/._.Trashes")       Zstr("\n")
-                                   Zstr("*/.DS_Store")),
+                                   Zstr("*/.DS_Store")       Zstr("\n")
+                                   Zstr("*/._.*")),
 #endif
             //deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message

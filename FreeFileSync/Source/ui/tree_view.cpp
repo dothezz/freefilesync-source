@@ -550,7 +550,7 @@ ptrdiff_t TreeView::getParent(size_t row) const
 }
 
 
-void TreeView::updateCmpResult(bool hideFiltered,
+void TreeView::updateCmpResult(bool showExcluded,
                                bool leftOnlyFilesActive,
                                bool rightOnlyFilesActive,
                                bool leftNewerFilesActive,
@@ -559,7 +559,7 @@ void TreeView::updateCmpResult(bool hideFiltered,
                                bool equalFilesActive,
                                bool conflictFilesActive)
 {
-    updateView([hideFiltered, //make sure the predicate can be stored safely!
+    updateView([showExcluded, //make sure the predicate can be stored safely!
                 leftOnlyFilesActive,
                 rightOnlyFilesActive,
                 leftNewerFilesActive,
@@ -568,7 +568,7 @@ void TreeView::updateCmpResult(bool hideFiltered,
                 equalFilesActive,
                 conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
-        if (hideFiltered && !fsObj.isActive())
+        if (!fsObj.isActive() && !showExcluded)
             return false;
 
         switch (fsObj.getCategory())
@@ -595,7 +595,7 @@ void TreeView::updateCmpResult(bool hideFiltered,
 }
 
 
-void TreeView::updateSyncPreview(bool hideFiltered,
+void TreeView::updateSyncPreview(bool showExcluded,
                                  bool syncCreateLeftActive,
                                  bool syncCreateRightActive,
                                  bool syncDeleteLeftActive,
@@ -606,7 +606,7 @@ void TreeView::updateSyncPreview(bool hideFiltered,
                                  bool syncEqualActive,
                                  bool conflictFilesActive)
 {
-    updateView([hideFiltered, //make sure the predicate can be stored safely!
+    updateView([showExcluded, //make sure the predicate can be stored safely!
                 syncCreateLeftActive,
                 syncCreateRightActive,
                 syncDeleteLeftActive,
@@ -617,7 +617,7 @@ void TreeView::updateSyncPreview(bool hideFiltered,
                 syncEqualActive,
                 conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
-        if (hideFiltered && !fsObj.isActive())
+        if (!fsObj.isActive() && !showExcluded)
             return false;
 
         switch (fsObj.getSyncOperation())

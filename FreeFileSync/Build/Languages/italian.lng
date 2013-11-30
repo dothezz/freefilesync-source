@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Qualsiasi numero di directory alternative per al massimo un file di configurazione.</target>
 
-<source>A folder input field is empty.</source>
-<target>Un campo di input cartella è vuoto.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>La cartella corrispondente sarà considerata come vuota.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Impossibile trovare le seguenti cartelle:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>È possibile ignorare questo errore che considera ogni cartella come vuota. Le cartelle poi verranno create automaticamente durante la sincronizzazione.</target>
+
+<source>A folder input field is empty.</source>
+<target>Un campo di input cartella è vuoto.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>La cartella corrispondente sarà considerata come vuota.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Le seguenti cartelle hanno percorsi dipendenti. Fare attenzione quando si imposta le regole di sincronizzazione:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Impossibile ottenere informazioni sul processo.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Attendere, la cartella viene bloccata (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>In attesa mentre la cartella è bloccata:</target>
+
+<source>Lock owner:</source>
+<target>Bloccare il proprietario:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Rilevamento blocco abbandonato ...</target>
 
 <source>Creating file %x</source>
 <target>Creazione file %x</target>
@@ -412,10 +418,10 @@ Il comando è attivato se:
 <target>Sincronizzazione automatizzata</target>
 
 <source>Directory monitoring active</source>
-<target>Monitoraggio directory attivo</target>
+<target>Monitoraggio Cartella attivo</target>
 
 <source>Waiting until all directories are available...</source>
-<target>Attendere finchè tutte le directory diventano disponibili...</target>
+<target>Attendere finchè tutte le cartelle diventano disponibili...</target>
 
 <source>Error</source>
 <target>Errore</target>
@@ -486,6 +492,12 @@ Il comando è attivato se:
 <source>Updating attributes of %x</source>
 <target>Aggiornamento attributi di %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Creazione di un Volume Shadow Copy per %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Dati di verifica errore: %x e %y hanno un contenuto diverso.</target>
+
 <source>Cannot find %x.</source>
 <target>Impossibile trovare %x.</target>
 
@@ -524,12 +536,6 @@ Il comando è attivato se:
 
 <source>Generating database...</source>
 <target>Generazione database...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Creazione di un Volume Shadow Copy per %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Dati di verifica errore: %x e %y hanno un contenuto diverso.</target>
 
 <source>job name</source>
 <target>nome del lavoro</target>
@@ -765,12 +771,6 @@ Il comando è attivato se:
 <source>Save as batch job</source>
 <target>Salva come processo batch</target>
 
-<source>Hide excluded items</source>
-<target>Nascondi oggetti esclusi</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Mostra file filtrati o temporaneamente esclusi</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Numero di file e cartelle che verranno creati</target>
 
@@ -804,8 +804,8 @@ Il comando è attivato se:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifica e propaga cambiamenti su entrambi i lati. Cancellazioni, spostamenti e conflitti sono identificati automaticamente usando un database.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Creare un backup specchio della cartella di sinistra, che corrisponda esattamente alla cartella destra dopo la sincronizzazione.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Creare un backup specchio della cartella di sinistra aggiornando la cartella giusta.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copiare i file nuovi e aggiornati nella cartella destra.</target>
@@ -816,8 +816,16 @@ Il comando è attivato se:
 <source>Detect moved files</source>
 <target>Rileva file spostati</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Richiede il file di database. Non è supportato da tutti i sistemi di file.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Richiede e crea file di database
+- Rilevamento attivo dopo la sincronizzazione iniziale
+- Non supportato da tutti i sistemi
+</target>
 
 <source>Delete files:</source>
 <target>Eliminare i file:</target>
@@ -1053,6 +1061,9 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Find</source>
 <target>Trova</target>
 
+<source>Select View</source>
+<target>Selezionare Visualizza</target>
+
 <source>Overview</source>
 <target>Anteprima</target>
 
@@ -1061,12 +1072,6 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 
 <source>Main Bar</source>
 <target>Barra Principale</target>
-
-<source>Filter Files</source>
-<target>Filtrare i file</target>
-
-<source>Select View</source>
-<target>Selezionare Visualizza</target>
 
 <source>Open...</source>
 <target>Apri...</target>
@@ -1120,12 +1125,12 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y di 1 riga nella vista</pluralform>
-<pluralform>%y di %x righe nella vista</pluralform>
+<pluralform>Risultati %y di 1 riga</pluralform>
+<pluralform>Risultati %y di %x righe</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1242,6 +1247,9 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Show files that won't be copied</source>
 <target>Mostra i file che non saranno copiati</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Mostra file filtrati o temporaneamente esclusi</target>
+
 <source>Set as default</source>
 <target>Imposta come predefinito</target>
 
@@ -1277,6 +1285,9 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 
 <source>Warning</source>
 <target>Attenzione</target>
+
+<source>Select all</source>
+<target>Seleziona tutto</target>
 
 <source>Paused</source>
 <target>In pausa</target>
@@ -1402,7 +1413,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Percentuale</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>Impossibile monitorare la cartella %x.</target>
+<target>Impossibile monitorare la directory %x.</target>
 
 <source>Conversion error:</source>
 <target>Errore di conversione:</target>
@@ -1417,7 +1428,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Impossibile spostare il file %x in %y.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>Impossibile eliminare la cartella %x.</target>
+<target>Impossibile eliminare la directory %x.</target>
 
 <source>Cannot write file attributes of %x.</source>
 <target>Impossibile scrivere gli attributi del file %x.</target>

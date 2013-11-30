@@ -603,9 +603,9 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     SetTitle(title);
 
     enumDescrHandleSyml.
-    add(SYMLINK_EXCLUDE,      _("Exclude")).
-    add(SYMLINK_USE_DIRECTLY, _("Direct")).
-    add(SYMLINK_FOLLOW_LINK,  _("Follow"));
+    add(SYMLINK_EXCLUDE, _("Exclude")).
+    add(SYMLINK_DIRECT,  _("Direct")).
+    add(SYMLINK_FOLLOW,  _("Follow"));
 
     setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpConfig.handleSymlinks);
 
@@ -718,6 +718,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     //setMainInstructionFont(*m_staticTextHeader);
+
+    m_gridCustomCommand->SetTabBehaviour(wxGrid::Tab_Leave);
 
     m_bitmapSettings    ->SetBitmap     (getResourceImage(L"settings"));
     m_bpButtonAddRow    ->SetBitmapLabel(getResourceImage(L"item_add"));

@@ -259,18 +259,18 @@ Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
             locTimeStruc.hour   = 0; //0-23
             return localToTimeT(locTimeStruc); //convert local time back to UTC
 
-            //case UTIME_THIS_WEEK:
-            //{
-            //    localTimeFmt->tm_sec  = 0; //0-61
-            //    localTimeFmt->tm_min  = 0; //0-59
-            //    localTimeFmt->tm_hour = 0; //0-23
-            //    const time_t timeFrom = ::mktime(localTimeFmt);
+        //case UTIME_THIS_WEEK:
+        //{
+        //    localTimeFmt->tm_sec  = 0; //0-61
+        //    localTimeFmt->tm_min  = 0; //0-59
+        //    localTimeFmt->tm_hour = 0; //0-23
+        //    const time_t timeFrom = ::mktime(localTimeFmt);
 
-            //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
-            //    // +6 == -1 in Z_7
+        //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
+        //    // +6 == -1 in Z_7
 
-            //    return Int64(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
-            //}
+        //    return Int64(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
+        //}
 
         case UTIME_THIS_MONTH:
             locTimeStruc.second = 0; //0-61

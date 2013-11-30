@@ -34,13 +34,15 @@ public:
     {
         StatusCmpResult();
 
+        bool existsExcluded;
+        bool existsEqual;
+        bool existsConflict;
+
         bool existsLeftOnly;
         bool existsRightOnly;
         bool existsLeftNewer;
         bool existsRightNewer;
         bool existsDifferent;
-        bool existsEqual;
-        bool existsConflict;
 
         unsigned int filesOnLeftView;
         unsigned int foldersOnLeftView;
@@ -52,7 +54,7 @@ public:
     };
 
     //comparison results view
-    StatusCmpResult updateCmpResult(bool hideFiltered,
+    StatusCmpResult updateCmpResult(bool showExcluded,
                                     bool leftOnlyFilesActive,
                                     bool rightOnlyFilesActive,
                                     bool leftNewerFilesActive,
@@ -65,6 +67,10 @@ public:
     {
         StatusSyncPreview();
 
+        bool existsExcluded;
+        bool existsEqual;
+        bool existsConflict;
+
         bool existsSyncCreateLeft;
         bool existsSyncCreateRight;
         bool existsSyncDeleteLeft;
@@ -72,8 +78,6 @@ public:
         bool existsSyncDirLeft;
         bool existsSyncDirRight;
         bool existsSyncDirNone;
-        bool existsSyncEqual;
-        bool existsConflict;
 
         unsigned int filesOnLeftView;
         unsigned int foldersOnLeftView;
@@ -85,7 +89,7 @@ public:
     };
 
     //synchronization preview
-    StatusSyncPreview updateSyncPreview(bool hideFiltered,
+    StatusSyncPreview updateSyncPreview(bool showExcluded,
                                         bool syncCreateLeftActive,
                                         bool syncCreateRightActive,
                                         bool syncDeleteLeftActive,

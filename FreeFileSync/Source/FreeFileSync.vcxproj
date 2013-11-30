@@ -110,7 +110,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_core.lib;wxbase29ud_net.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30ud_aui.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud_net.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_debug_dll</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -137,7 +137,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_core.lib;wxbase29ud_net.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30ud_aui.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud_net.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_debug_dll</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -160,7 +160,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30u_aui.lib;wxmsw30u_adv.lib;wxmsw30u_core.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxbase30u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib</AdditionalLibraryDirectories>
     </Link>
@@ -187,7 +187,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30u_aui.lib;wxmsw30u_adv.lib;wxmsw30u_core.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxbase30u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib</AdditionalLibraryDirectories>
     </Link>

@@ -7,6 +7,52 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
+<source>Select all</source>
+<target></target>
+
+<source>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
+</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target></target>
+
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target></target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target></target>
+
+<source>&Check</source>
+<target></target>
+
+<source>Retrying operation...</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target></target>
+
+<source>Detecting abandoned lock...</source>
+<target></target>
+
+<source>Lock owner:</source>
+<target></target>
+
+<source>Waiting while directory is locked:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>З моменту останньої синхронізації з обох сторін відбулися зміни.</target>
 
@@ -91,17 +137,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Будь-яка кількість альтернативних каталогів для щонайбільше одного конфігураційного файлу.</target>
 
-<source>A folder input field is empty.</source>
-<target>Порожнє поле папки.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Відповідна папка буде вважатися порожньою.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Не вдається знайти такі папки:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Ви можете ігнорувати цю помилку, вважаючи кожну папку порожньою. Папки будуть автоматично створені під час синхронізації.</target>
+
+<source>A folder input field is empty.</source>
+<target>Порожнє поле папки.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Відповідна папка буде вважатися порожньою.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Наступні папки мають залежні шляхи. Будьте обережні при налаштуванні правил синхронізації:</target>
@@ -222,9 +268,6 @@
 
 <source>Cannot get process information.</source>
 <target>Не вдається отримати інформацію процесу</target>
-
-<source>Waiting while directory is locked (%x)...</source>
-<target>Очікування зняття блокування з каталогу (%x)...</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -492,6 +535,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>Оновлення атрибутів %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Створення Тіньової Копії для %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Помилка перевірки даних: %x та %y мають різний вміст.</target>
+
 <source>Cannot find %x.</source>
 <target>Не вдається знайти %x.</target>
 
@@ -531,12 +580,6 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>Створення бази даних...</target>
 
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Створення Тіньової Копії для %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Помилка перевірки даних: %x та %y мають різний вміст.</target>
-
 <source>job name</source>
 <target>назва завдання</target>
 
@@ -573,18 +616,8 @@ The command is triggered if:
 <source>Switching to FreeFileSync's main window</source>
 <target>Перехід до головного вікна FreeFileSync</target>
 
-<source>
-<pluralform>Automatic retry in 1 second...</pluralform>
-<pluralform>Automatic retry in %x seconds...</pluralform>
-</source>
-<target>
-</target>
-
 <source>&Ignore subsequent errors</source>
 <target>&Ігнорувати наступні помилки</target>
-
-<source>Retrying operation...</source>
-<target></target>
 
 <source>Serious Error</source>
 <target>Серйозна помилка</target>
@@ -609,9 +642,6 @@ The command is triggered if:
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Не вдається знайти номер поточної версії FreeFileSync онлайн. Бажаєте перевірити вручну?</target>
-
-<source>&Check</source>
-<target></target>
 
 <source>Symlink</source>
 <target>Символьне посилання</target>
@@ -769,12 +799,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Зберегти як пакетне завдання</target>
 
-<source>Hide excluded items</source>
-<target>Приховати виключені елементи</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Показати відфільтровані чи тимчасово виключені елементи</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Кількість файлів і папок, які будуть створені</target>
 
@@ -808,9 +832,6 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Створити дзеркальну копію лівої частини, після синхронізації права папка повністю дорівнюватиме лівій.</target>
-
 <source>Copy new and updated files to the right folder.</source>
 <target>Скопіювати нові та оновлені файли в праву папку.</target>
 
@@ -819,9 +840,6 @@ The command is triggered if:
 
 <source>Detect moved files</source>
 <target>Виявляти переміщені файли</target>
-
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Потрібні файли бази даних. Підтримується не всіма файловими системами.</target>
 
 <source>Delete files:</source>
 <target>Вилучити файли:</target>
@@ -1057,6 +1075,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Знайти</target>
 
+<source>Select View</source>
+<target>Вибрати перегляд</target>
+
 <source>Overview</source>
 <target>Головна</target>
 
@@ -1065,12 +1086,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Головна панель</target>
-
-<source>Filter Files</source>
-<target>Фільтрування файлів</target>
-
-<source>Select View</source>
-<target>Вибрати перегляд</target>
 
 <source>Open...</source>
 <target>Відкрити...</target>
@@ -1093,13 +1108,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Confirm</source>
 <target>Підтвердити</target>
 
-<source>
-<pluralform>Do you really want to execute the command %y for one item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-</target>
-
 <source>&Execute</source>
 <target>&Виконати</target>
 
@@ -1121,16 +1129,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>%x файл</pluralform>
 <pluralform>%x файли</pluralform>
 <pluralform>%x файлів</pluralform>
-</target>
-
-<source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
-</source>
-<target>
-<pluralform>%y of %x рядка</pluralform>
-<pluralform>%y of %x рядків</pluralform>
-<pluralform>%y of %x рядків</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1246,6 +1244,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Show files that won't be copied</source>
 <target>Показати файли, які не будуть зкопійовані</target>
+
+<source>Show filtered or temporarily excluded files</source>
+<target>Показати відфільтровані чи тимчасово виключені елементи</target>
 
 <source>Set as default</source>
 <target>Встановити за замовчуванням</target>

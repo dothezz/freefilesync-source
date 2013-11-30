@@ -17,9 +17,6 @@
 
 namespace zen
 {
-struct CallbackMoveDir;
-struct CallbackMoveFile;
-
 //e.g. move C:\Source\subdir\Sample.txt -> D:\Revisions\subdir\Sample.txt 2012-05-15 131513.txt
 //scheme: <revisions directory>\<relpath>\<filename>.<ext> YYYY-MM-DD HHMMSS.<ext>
 /*
@@ -46,14 +43,31 @@ public:
             throw FileError(_("Unable to create timestamp for versioning:") + L" \"" + timeStamp_ + L"\"");
     }
 
-    bool revisionFile(const Zstring& fullName, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError; return "false" if file is not existing
-    void revisionDir (const Zstring& fullName,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    bool revisionFile(const Zstring& fullName, //throw FileError; return "false" if file is not existing
+                      const Zstring& relativeName,
+
+                      //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
+                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //may be nullptr
+
+    void revisionDir (const Zstring& fullName,  const Zstring& relativeName, //throw FileError
+
+                      //optional callbacks: may be nullptr
+                      const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove, //one call for each *existing* object!
+                      const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,  //
+                      //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
+                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus);
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
-    bool revisionFileImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
-    void revisionDirImpl (const Zstring& fullName,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    bool revisionFileImpl(const Zstring& fullName, const Zstring& relativeName,
+                          const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
+                          const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //throw FileError
+
+    void revisionDirImpl (const Zstring& fullName,  const Zstring& relativeName,
+                          const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
+                          const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,
+                          const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //throw FileError
 
     const VersioningStyle versioningStyle_;
     const Zstring versioningDirectory_;
@@ -61,24 +75,6 @@ private:
 
     //std::vector<Zstring> fileRelNames; //store list of revisioned file and symlink relative names for limitVersions()
 };
-
-
-struct CallbackMoveFile //see CallbackCopyFile for limitations when throwing exceptions!
-{
-    virtual ~CallbackMoveFile() {}
-    virtual void updateStatus(Int64 bytesDelta) = 0; //called frequently if move has to revert to copy + delete:
-};
-
-struct CallbackMoveDir //see CallbackCopyFile for limitations when throwing exceptions!
-{
-    virtual ~CallbackMoveDir() {}
-
-    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) = 0; //one call for each *existing* object!
-    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) = 0; //
-    virtual void updateStatus(Int64 bytesDelta) = 0; //called frequently if move has to revert to copy + delete:
-};
-
-
 
 namespace impl //declare for unit tests:
 {

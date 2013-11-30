@@ -69,7 +69,7 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec();
 }
 
 
-bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
+bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, const std::function<void(Int64 bytesDelta)>& onUpdateStatus)
 {
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
@@ -98,7 +98,8 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
         const size_t length1 = file1.read(&memory1[0], bufferSize); //throw FileError
         const size_t length2 = file2.read(&memory2[0], bufferSize); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
-        callback.updateCompareStatus(to<Int64>(std::max(length1, length2)));
+        if (onUpdateStatus)
+            onUpdateStatus(to<Int64>(std::max(length1, length2)));
 
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
             return false;

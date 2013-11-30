@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Cualquier número de directorios alternativos para un archivo de configuración como máximo.</target>
 
-<source>A folder input field is empty.</source>
-<target>Un campo de entrada de la carpeta está vacío.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>La siguiente carpeta será considerada como vacía.</target>
-
 <source>Cannot find the following folders:</source>
 <target>No se pudieron encontrar las siguiente carpetas:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Ignore este error si desea tratar cada carpeta como vacía. En tal caso, se crearán estas carpetas automáticamente durante la sincronización.</target>
+
+<source>A folder input field is empty.</source>
+<target>Un campo de entrada de la carpeta está vacío.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>La siguiente carpeta será considerada como vacía.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Las carpetas siguientes usan rutas dependientes. Tenga cuidado al definir reglas de sincronización:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>No se puede obtener información del proceso.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Esperando mientras el directorio se encuentre bloqueado (%x)…</target>
+<source>Waiting while directory is locked:</source>
+<target>Esperando mientras el directorio está bloqueado:</target>
+
+<source>Lock owner:</source>
+<target>Bloquear propietario:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 seg.</pluralform>
 <pluralform>%x seg.</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Detección de bloqueo abandonado…</target>
 
 <source>Creating file %x</source>
 <target>Creando archivo %x</target>
@@ -356,7 +362,7 @@
 <target>2. Introduzca una línea de comandos.</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. Presione 'Inicio'.</target>
+<target>3. Presione ’Inicio’.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
 <target>Para comenzar, importe un archivo .ffs_batch.</target>
@@ -486,6 +492,12 @@ El comando es disparado si:
 <source>Updating attributes of %x</source>
 <target>Actualizar atributos de %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Creando una Instantánea de volumen para %x…</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Error al comprobar los datos: %x y %y tienen contenidos diferentes.</target>
+
 <source>Cannot find %x.</source>
 <target>No se pudo encontrar %x.</target>
 
@@ -524,12 +536,6 @@ El comando es disparado si:
 
 <source>Generating database...</source>
 <target>Generando base de datos…</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Creando una Instantánea de volumen para %x…</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Error al comprobar los datos: %x y %y tienen contenidos diferentes.</target>
 
 <source>job name</source>
 <target>nombre de tarea</target>
@@ -580,7 +586,7 @@ El comando es disparado si:
 <target>&Ignorar errores posteriores</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Reintentando la operación…</target>
 
 <source>Serious Error</source>
 <target>Error grave</target>
@@ -607,7 +613,7 @@ El comando es disparado si:
 <target>No se encuentra el número de versión actual de FreeFileSync en línea. ¿Desea comprobarla manualmente?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Comprobar</target>
 
 <source>Symlink</source>
 <target>Enlace simbólico</target>
@@ -733,7 +739,7 @@ El comando es disparado si:
 <target>Comprobar &automáticamente una vez por semana</target>
 
 <source>&Check for new version</source>
-<target>&Comprobar si hay una nueva versión</target>
+<target>&Comprobar nueva versión</target>
 
 <source>Compare</source>
 <target>Comparar</target>
@@ -757,19 +763,13 @@ El comando es disparado si:
 <target>Cerrar la barra de búsqueda</target>
 
 <source>Find:</source>
-<target>Find:</target>
+<target>Buscar:</target>
 
 <source>Match case</source>
-<target>Distinción entre mayúsculas y minúsculas</target>
+<target>Coincidir mayúsculas y minúsculas</target>
 
 <source>Save as batch job</source>
 <target>Salvar como tarea por lotes</target>
-
-<source>Hide excluded items</source>
-<target>Ocultar elementos excluidos</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Mostrar archivos excluidos temporalmente o filtrados</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Número de archivos y carpetas que serán creados</target>
@@ -802,22 +802,30 @@ El comando es disparado si:
 <target>OK</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identificar y propagar cambios en ambos lados. Eliminaciones, movimientos y conflictos serán detectados automáticamente usando una base de datos.</target>
+<target>Identificar y propagar cambios en ambos lados. Archivos eliminados, movidos y conflictos se detectan automáticamente usando una base de datos.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Crear una copia de respaldo reflejo de la carpeta izquierda que corresponda exactamente a la carpeta derecha después de la sincronización.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Crear una copia de respaldo espejo de la carpeta izquierda, adaptando y haciendo coincidir la carpeta derecha.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copiar archivos nuevos y actualizados a la carpeta de la derecha.</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>Configuración de sus propias reglas de sincronización.</target>
+<target>Configurar reglas de sincronización personalizadas.</target>
 
 <source>Detect moved files</source>
 <target>Detectar archivos movidos</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Archivos de base de datos requeridos. No son compatibles en todos los sistemas de archivos.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Requiere y crea archivos de bases de datos
+- Detección activa tras syncronización inicial
+- No compatible con todos los sistemas de archivos
+</target>
 
 <source>Delete files:</source>
 <target>Eliminar archivos:</target>
@@ -826,22 +834,22 @@ El comando es disparado si:
 <target>Permanente</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>Borrar o Sobrescribir archivos permanentemente</target>
+<target>Borrar o sobrescribir los archivos permanentemente</target>
 
 <source>Recycle bin</source>
 <target>Papelera de reciclaje</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Se eliminó la copia de respaldo y se reemplazaron archivos en la papelera de reciclaje</target>
+<target>Copiar a la papelera de reciclaje los archivos eliminados y reemplazados</target>
 
 <source>Versioning</source>
 <target>Control de versiones</target>
 
 <source>Move files to a user-defined folder</source>
-<target>Mover archivos a una carpeta del usuario</target>
+<target>Mover los archivos a una carpeta del usuario</target>
 
 <source>Naming convention:</source>
-<target>Convención de nombrado:</target>
+<target>Convención de nombre:</target>
 
 <source>Show examples</source>
 <target>Mostrar ejemplos</target>
@@ -1053,20 +1061,17 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Find</source>
 <target>Buscar</target>
 
+<source>Select View</source>
+<target>Seleccione vista</target>
+
 <source>Overview</source>
-<target>Visión global</target>
+<target>Vista general</target>
 
 <source>Configuration</source>
 <target>Configuración</target>
 
 <source>Main Bar</source>
 <target>Barra principal</target>
-
-<source>Filter Files</source>
-<target>Filtrar archivos</target>
-
-<source>Select View</source>
-<target>Seleccione vista</target>
 
 <source>Open...</source>
 <target>Abrir…</target>
@@ -1120,12 +1125,12 @@ Se garantiza un estado coherente incluso en caso de error grave.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y de 1 fila en la vista</pluralform>
-<pluralform>%y de %x filas en vista</pluralform>
+<pluralform>Mostrando %y de 1 fila</pluralform>
+<pluralform>Mostrando %y de %x filas</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1242,6 +1247,9 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Show files that won't be copied</source>
 <target>Mostrar archivos que no serán copiados</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Mostrar archivos excluidos temporalmente o filtrados</target>
+
 <source>Set as default</source>
 <target>Predeterminado</target>
 
@@ -1277,6 +1285,9 @@ Se garantiza un estado coherente incluso en caso de error grave.
 
 <source>Warning</source>
 <target>Atención</target>
+
+<source>Select all</source>
+<target>Seleccionar todo</target>
 
 <source>Paused</source>
 <target>Pausado</target>

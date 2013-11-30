@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>任意数量的替代目录中至多有一个配置文件.</target>
 
-<source>A folder input field is empty.</source>
-<target>有一个文件夹输入框为空.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>相应的文件夹将被视为空.</target>
-
 <source>Cannot find the following folders:</source>
 <target>无法找到如下文件夹:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>你可忽略此错误而将每个文件夹视为空. 这些文件夹将会在同步过程中被自动创建.</target>
+
+<source>A folder input field is empty.</source>
+<target>有一个文件夹输入框为空.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>相应的文件夹将被视为空.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>如下的文件夹有路径依赖性. 请在设置同步规则时特别小心:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>无法取得进程信息.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>由于目录已锁定而正在等待(%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>正在等待因目录被锁定:</target>
+
+<source>Lock owner:</source>
+<target>锁定的所有者:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -230,6 +233,9 @@
 <target>
 <pluralform>%x 秒</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>正在检测被遗弃的锁定...</target>
 
 <source>Creating file %x</source>
 <target>正在创建文件 %x</target>
@@ -483,6 +489,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>更新 %x 的属性</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>为 %x 创建一个卷影副本...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>数据校验错误: %x 和 %y 有不同的内容.</target>
+
 <source>Cannot find %x.</source>
 <target>无法找到 %x.</target>
 
@@ -521,12 +533,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>正在生成数据库...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>为 %x 创建一个卷影副本...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>数据校验错误: %x 和 %y 有不同的内容.</target>
 
 <source>job name</source>
 <target>作业名称</target>
@@ -569,13 +575,14 @@ The command is triggered if:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>在 %x 秒后自动重试...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>忽略后续的错误(&I)</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>正在重试操作...</target>
 
 <source>Serious Error</source>
 <target>严重错误</target>
@@ -602,7 +609,7 @@ The command is triggered if:
 <target>无法在线找到当前FreeFileSync版本号. 你要手动检查吗?</target>
 
 <source>&Check</source>
-<target></target>
+<target>检查(&C)</target>
 
 <source>Symlink</source>
 <target>符号连接</target>
@@ -760,12 +767,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>另存为批处理作业</target>
 
-<source>Hide excluded items</source>
-<target>隐藏排除项目</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>显示已被过滤或被临时排除的文件</target>
-
 <source>Number of files and folders that will be created</source>
 <target>将被创建的文件和文件夹数</target>
 
@@ -799,8 +800,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>创建左侧文件夹的镜像备份, 在同步之后右侧文件夹完全精确匹配.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>以适配右侧文件夹来匹配从而创建左侧文件夹的镜像备份.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>复制新的和已更新的文件到右侧文件夹.</target>
@@ -811,8 +812,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>检测被移动的文件</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>需要数据库文件. 不是所有文件系统都支持.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- 需求和创建数据库文件
+- 在初始同步后检测活动
+- 不是所有文件系统都支持
+</target>
 
 <source>Delete files:</source>
 <target>删除文件:</target>
@@ -1045,6 +1054,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>查找</target>
 
+<source>Select View</source>
+<target>选择视图</target>
+
 <source>Overview</source>
 <target>摘要</target>
 
@@ -1053,12 +1065,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>主工具栏</target>
-
-<source>Filter Files</source>
-<target>过滤器文件</target>
-
-<source>Select View</source>
-<target>选择视图</target>
 
 <source>Open...</source>
 <target>打开...</target>
@@ -1086,6 +1092,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>你是否要为 %x 个项目执行 %y 命令?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1108,11 +1115,11 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%x 中的 %y 行在视图中</pluralform>
+<pluralform>显示 %x 中的 %y 行</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1229,6 +1236,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>显示将不被复制的文件</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>显示已被过滤或被临时排除的文件</target>
+
 <source>Set as default</source>
 <target>设置为默认值</target>
 
@@ -1264,6 +1274,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>警告</target>
+
+<source>Select all</source>
+<target>选择全部</target>
 
 <source>Paused</source>
 <target>已暂停</target>

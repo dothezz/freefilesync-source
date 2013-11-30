@@ -62,6 +62,8 @@ private:
 
 void GlobalResources::init(const Zstring& filename)
 {
+	assert(bitmaps.empty() && anims.empty());
+
     wxFFileInputStream input(utfCvrtTo<wxString>(filename));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {

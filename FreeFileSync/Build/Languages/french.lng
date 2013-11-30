@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>N'importe quel nombre de répertoires alternatifs pour au plus un fichier de configuration.</target>
 
-<source>A folder input field is empty.</source>
-<target>Une entrée dossier est vide.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Le dossier correspondant sera considéré comme vide.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Impossible de trouver les dossiers suivants :</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Vous pouvez ignorer cette erreur en considérant chaque dossier comme vide. Les dossiers seront automatiquement créés pendant la synchronisation.</target>
+
+<source>A folder input field is empty.</source>
+<target>Une entrée dossier est vide.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Le dossier correspondant sera considéré comme vide.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Les fichiers suivants ont des chemins interdépendants. Attention à la mise à jour des règles de synchronisation :</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Impossible d'obtenir les informations du traitement.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>En attente tant que le répertoire est verrouillé (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>En attente tant que le répertoire est verrouillé :</target>
+
+<source>Lock owner:</source>
+<target>Propriétaire du verrou :</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>%x sec</pluralform>
 <pluralform>%x sec</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Détection de verrouillage abandonné ...</target>
 
 <source>Creating file %x</source>
 <target>Création du fichier %x</target>
@@ -486,6 +492,12 @@ La commande est déclenchée si :
 <source>Updating attributes of %x</source>
 <target>Mise à jour des attributs de %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Création d'un Volume Shadow Copy pour %x ...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Erreur lors de la vérification des données : %x et %y ont des contenus différents.</target>
+
 <source>Cannot find %x.</source>
 <target>Impossible de trouver %x</target>
 
@@ -524,12 +536,6 @@ La commande est déclenchée si :
 
 <source>Generating database...</source>
 <target>Génération de la base de données...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Création d'un Volume Shadow Copy pour %x ...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Erreur lors de la vérification des données : %x et %y ont des contenus différents.</target>
 
 <source>job name</source>
 <target>nom du job</target>
@@ -572,13 +578,15 @@ La commande est déclenchée si :
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Nouvel essai dans %x seconde ...</pluralform>
+<pluralform>Nouvel essai dans %x secondes ...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>&Ignorer les erreurs suivantes</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Opération retentée ...</target>
 
 <source>Serious Error</source>
 <target>Erreur Grave</target>
@@ -605,7 +613,7 @@ La commande est déclenchée si :
 <target>Impossible de trouver en ligne une nouvelle version de FreeFileSync.Voulez-vous le faire manuellement ?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Contrôle</target>
 
 <source>Symlink</source>
 <target>Lien symbolique</target>
@@ -763,12 +771,6 @@ La commande est déclenchée si :
 <source>Save as batch job</source>
 <target>Enrgistrer en temps que fichier batch</target>
 
-<source>Hide excluded items</source>
-<target>Cacher les éléments exclus</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Afficher les fichiers filtrés ou temporairement exclus</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Nombre de fichiers et de dossiers qui seront créés</target>
 
@@ -802,8 +804,8 @@ La commande est déclenchée si :
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifier et propager les modifications des deux côtés. Suppressions, déplacements et conflits sont détectés automatiquement en utilisant une base de données.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Créer une copie miroir du dossier de gauche qui correspondra exactement à celui de droite après la synchronisation.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Créer une sauvegarde miroir du dossier de gauche de telle sorte que le dossier de droite lui corresponde exactement.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copier les fichiers nouveaux ou mis à jour dans le dossier de droite.</target>
@@ -814,8 +816,16 @@ La commande est déclenchée si :
 <source>Detect moved files</source>
 <target>Détection des fichiers déplacés</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Exige les fichiers de la base de données. Non supporté par tous les systèmes de fichiers.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Nécessite et crée les fichiers de la base de données
+- Détection active après la synchronisation initiale
+- Non supporté par tout les fichiers système
+</target>
 
 <source>Delete files:</source>
 <target>Supprimer les fichiers :</target>
@@ -1051,6 +1061,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Find</source>
 <target>Rechercher</target>
 
+<source>Select View</source>
+<target>Sélection de l'Affichage</target>
+
 <source>Overview</source>
 <target>Présentation</target>
 
@@ -1059,12 +1072,6 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>Main Bar</source>
 <target>Barre Principale</target>
-
-<source>Filter Files</source>
-<target>Filtrage des Fichiers</target>
-
-<source>Select View</source>
-<target>Sélection de l'Affichage</target>
 
 <source>Open...</source>
 <target>Ouvrir ...</target>
@@ -1092,6 +1099,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Êtes-vous sûr de vouloir exécuter la commande %y pour %x élément ?</pluralform>
+<pluralform>Êtes-vous sûr de vouloir exécuter la commande %y pour %x éléments ?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1116,12 +1125,12 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>vue de %y ligne sur %x</pluralform>
-<pluralform>vue de %y lignes sur %x</pluralform>
+<pluralform>Affiche %y sur %x ligne</pluralform>
+<pluralform>Affiche %y sur %x lignes</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1238,6 +1247,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Show files that won't be copied</source>
 <target>Afficher les fichiers qui ne seront pas copiés</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Afficher les fichiers filtrés ou temporairement exclus</target>
+
 <source>Set as default</source>
 <target>Définir par défaut</target>
 
@@ -1273,6 +1285,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>Warning</source>
 <target>Attention</target>
+
+<source>Select all</source>
+<target>Tout sélectionner</target>
 
 <source>Paused</source>
 <target>En pause</target>

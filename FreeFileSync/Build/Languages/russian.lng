@@ -91,17 +91,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Любое количество альтернативных папок для одного конфигурационного файла.</target>
 
-<source>A folder input field is empty.</source>
-<target>Поле ввода папки пустое.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Соответствующая папка будет считаться пустой.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Вы можете проигнорировать эту ошибку, приняв каждую папку за пустую. При этом папки будут созданы автоматически во время синхронизации.</target>
+
+<source>A folder input field is empty.</source>
+<target>Поле ввода папки пустое.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Соответствующая папка будет считаться пустой.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Следующие папки имеют зависимые пути. Будьте осторожны при настройке правил синхронизации:</target>
@@ -223,8 +223,11 @@
 <source>Cannot get process information.</source>
 <target>Невозможно получить информацию о процессе.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Ожидание снятия блокировки с папки %x...</target>
+<source>Waiting while directory is locked:</source>
+<target>Ожидание снятия блокировки с папки:</target>
+
+<source>Lock owner:</source>
+<target>Источник блокировки:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -235,6 +238,9 @@
 <pluralform>%x секунды</pluralform>
 <pluralform>%x секунд</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Обнаружение заброшенной блокировки...</target>
 
 <source>Creating file %x</source>
 <target>Создание файла %x</target>
@@ -492,6 +498,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>Обновление атрибутов %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Создание Тома Теневого Копирования для %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Ошибка проверки данных: %x и %y имеют разное содержание!</target>
+
 <source>Cannot find %x.</source>
 <target>Невозможно найти %x.</target>
 
@@ -534,12 +546,6 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>Создание базы данных...</target>
 
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Создание Тома Теневого Копирования для %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Ошибка проверки данных: %x и %y имеют разное содержание!</target>
-
 <source>job name</source>
 <target>название</target>
 
@@ -581,13 +587,16 @@ The command is triggered if:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Автоматически повторить через %x секунду...</pluralform>
+<pluralform>Автоматически повторить через %x секунды...</pluralform>
+<pluralform>Автоматически повторить через %x секунд...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>И&гнорировать последующие ошибки</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Повторение операции...</target>
 
 <source>Serious Error</source>
 <target>Серьезная ошибка</target>
@@ -614,7 +623,7 @@ The command is triggered if:
 <target>Невозможно найти номер текущей версии FreeFileSync онлайн! Вы хотите проверить вручную?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Проверить</target>
 
 <source>Symlink</source>
 <target>Символьная ссылка</target>
@@ -772,12 +781,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Сохранить как пакетное задание</target>
 
-<source>Hide excluded items</source>
-<target>Скрыть исключенные элементы</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Показать отфильтрованные или временно исключенные файлы</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Количество файлов и папок, которые будут созданы</target>
 
@@ -811,8 +814,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Выявять и распространять изменения на обе стороны. Удаленные, перемещенные и конфликтующие файлы определяются автоматически с использованием базы данных.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Создавать зеркальную копию левой части. После синхронизации правая часть будет полностью соответствовать левой.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Создавать зеркальную копию левой части, приводя правую часть в полное соответствие.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Копировать новые или обновленные файлы на правую сторону.</target>
@@ -823,8 +826,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>Обнаруживать перемещенные файлы</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Требуются файлы баз данных. Поддерживается не всеми файловыми системами.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Создает базу данных файлов
+- Обнаруживает активность после начальной синхронизации
+- Поддерживается не всеми файловыми системами
+</target>
 
 <source>Delete files:</source>
 <target>Удаление файлов:</target>
@@ -836,7 +847,7 @@ The command is triggered if:
 <target>Удалять или перезаписывать файлы, не помещая в "Корзину"</target>
 
 <source>Recycle bin</source>
-<target></target>
+<target>Перемещать в "Корзину"</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Делать резервную копию удаленных и перезаписанных файлов в "Корзине"</target>
@@ -1064,6 +1075,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Поиск</target>
 
+<source>Select View</source>
+<target>Вид списка файлов</target>
+
 <source>Overview</source>
 <target>Главная</target>
 
@@ -1072,12 +1086,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Главная панель</target>
-
-<source>Filter Files</source>
-<target>Фильтр</target>
-
-<source>Select View</source>
-<target>Вид списка файлов</target>
 
 <source>Open...</source>
 <target>Открыть...</target>
@@ -1105,6 +1113,9 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Вы действительно хотите выполнить команду %y для %x элемента?</pluralform>
+<pluralform>Вы действительно хотите выполнить команду %y для %x элементов?</pluralform>
+<pluralform>Вы действительно хотите выполнить команду %y для %x элементов?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1131,13 +1142,13 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y из %x строки показано</pluralform>
-<pluralform>%y из %x строк показано</pluralform>
-<pluralform>%y из %x строк показано</pluralform>
+<pluralform>Показано %y из %x строки</pluralform>
+<pluralform>Показано %y из %x строк</pluralform>
+<pluralform>Показано %y из %x строк</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1254,6 +1265,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>Показать файлы, которые не будут скопированы</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Показать отфильтрованные или временно исключенные файлы</target>
+
 <source>Set as default</source>
 <target>Установить по умолчанию</target>
 
@@ -1289,6 +1303,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>Внимание</target>
+
+<source>Select all</source>
+<target>Выделить все</target>
 
 <source>Paused</source>
 <target>Пауза</target>

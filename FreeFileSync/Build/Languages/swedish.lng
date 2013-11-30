@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Valfritt antal alternativa mappar för max en konfigurationsfil.</target>
 
-<source>A folder input field is empty.</source>
-<target>Ett inmatningsfält är tomt</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Motsvarande mapp kommer att betraktas som tom.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Kan inte hitta följande mappar:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Du kan bortse från detta fel, och betrakta varje mapp som tom. Mapparna kommer då att skapas automatiskt, under synkroniseringen</target>
+
+<source>A folder input field is empty.</source>
+<target>Ett inmatningsfält är tomt</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Motsvarande mapp kommer att betraktas som tom.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Följande mappar har beroende sökvägar. Var försiktig vid konfigurering av synkroniseringsregler:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Processinformation kan inte inhämtas</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Väntar medan mappen låses (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Väntar medan mappen låses:</target>
+
+<source>Lock owner:</source>
+<target>Låsägare:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 sek</pluralform>
 <pluralform>%x sek</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Söker övergivna lås...</target>
 
 <source>Creating file %x</source>
 <target>Skapar fil %x</target>
@@ -486,6 +492,12 @@ Kommandot triggas om:
 <source>Updating attributes of %x</source>
 <target>Uppdaterar attribut för %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Skapar en 'Volume Shadow Copy' för %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Dataverifieringsfel: %x och %y har olika innehåll.</target>
+
 <source>Cannot find %x.</source>
 <target>Kan inte hitta %x.</target>
 
@@ -524,12 +536,6 @@ Kommandot triggas om:
 
 <source>Generating database...</source>
 <target>Skapar databas...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Skapar en 'Volume Shadow Copy' för %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Dataverifieringsfel: %x och %y har olika innehåll.</target>
 
 <source>job name</source>
 <target>åtgärdsnamn</target>
@@ -572,13 +578,15 @@ Kommandot triggas om:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Automatiskt återförsök om 1 sekund...</pluralform>
+<pluralform>Automatiskt återförsök om %x sekunder...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>&Ignorera efterföljande fel</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Upprepar åtgärden...</target>
 
 <source>Serious Error</source>
 <target>Allvarligt fel</target>
@@ -605,7 +613,7 @@ Kommandot triggas om:
 <target>Kan inte hitta aktuellt versionsnummer online. Vill du kontrollera manuellt?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Kontrollera</target>
 
 <source>Symlink</source>
 <target>Symboliska länkar</target>
@@ -763,12 +771,6 @@ Kommandot triggas om:
 <source>Save as batch job</source>
 <target>Spara som batch-fil</target>
 
-<source>Hide excluded items</source>
-<target>Dölj undantagna objekt</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Dölj filtrerade eller temporärt undantagna filer</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Antal filer och mappar som kommer att skapas</target>
 
@@ -802,8 +804,8 @@ Kommandot triggas om:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Skapar en speglad kopia av vänster mapp, som exakt matchas av höger mapp efter synkronisering.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Skapar en speglad säkerhetskopia av vänstra mappen genom att anpassa den högra</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Kopierar nya och uppdaterade filer till höger mapp.</target>
@@ -814,8 +816,16 @@ Kommandot triggas om:
 <source>Detect moved files</source>
 <target>Hitta flyttade filer</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Kräver databasfiler som inte stöds av alla filsystem</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Kräver och skapar databasfiler
+- Övervakning aktiv efter initial synkronisering
+- Stöds ej av alla filsystem
+</target>
 
 <source>Delete files:</source>
 <target>Ta bort filer:</target>
@@ -860,7 +870,7 @@ Kommandot triggas om:
 <target>Visa popup vid fel och varningar</target>
 
 <source>On completion:</source>
-<target>Vid slutfört:</target>
+<target>Vid slutförd åtgärd:</target>
 
 <source>Start synchronization now?</source>
 <target>Vill du starta synkroniseringen nu?</target>
@@ -1051,6 +1061,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Find</source>
 <target>Sök</target>
 
+<source>Select View</source>
+<target>Välj vy</target>
+
 <source>Overview</source>
 <target>Översikt</target>
 
@@ -1059,12 +1072,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Main Bar</source>
 <target>Primärt verktygsfält</target>
-
-<source>Filter Files</source>
-<target>Filtrera filer</target>
-
-<source>Select View</source>
-<target>Välj vy</target>
 
 <source>Open...</source>
 <target>Öppna...</target>
@@ -1092,6 +1099,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Vill du verkligen verkställa kommandot %y för ett objekt?</pluralform>
+<pluralform>Vill du verkligen verkställa kommandot %y för %x objekt?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1116,12 +1125,12 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y av 1 rad i vyn</pluralform>
-<pluralform>%y av %x rader i vyn</pluralform>
+<pluralform>Visar %y av 1 rad</pluralform>
+<pluralform>Visar %y av %x rader</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1238,6 +1247,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Show files that won't be copied</source>
 <target>Visa filer som inte kommer att kopieras</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Dölj filtrerade eller temporärt undantagna filer</target>
+
 <source>Set as default</source>
 <target>Ange som standard</target>
 
@@ -1273,6 +1285,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Warning</source>
 <target>Varning</target>
+
+<source>Select all</source>
+<target>Markera alla</target>
 
 <source>Paused</source>
 <target>Pausad</target>

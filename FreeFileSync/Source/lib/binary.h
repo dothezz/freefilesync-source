@@ -7,19 +7,16 @@
 #ifndef BINARY_H_INCLUDED
 #define BINARY_H_INCLUDED
 
+#include <functional>
 #include <zen/zstring.h>
 #include <zen/file_error.h>
 #include <zen/int64.h>
 
 namespace zen
 {
-struct CompareCallback
-{
-    virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(Int64 bytesDelta) = 0;
-};
-
-bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError
+bool filesHaveSameContent(const Zstring& filename1,  //throw FileError
+                          const Zstring& filename2,
+                          const std::function<void(Int64 bytesDelta)>& onUpdateStatus); //may be nullptr
 }
 
 #endif // BINARY_H_INCLUDED

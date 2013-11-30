@@ -49,22 +49,23 @@ const bool useIFileOperation = vistaOrLater(); //caveat: function scope static i
 
 struct CallbackData
 {
-    CallbackData(CallbackRecycling* cb) :
-        userCallback(cb),
+    CallbackData(const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus) :
+        notifyDeletionStatus_(notifyDeletionStatus),
         exceptionInUserCallback(false) {}
 
-    CallbackRecycling* const userCallback; //optional!
+    const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus_; //optional!
     bool exceptionInUserCallback;
 };
+
 
 bool recyclerCallback(const wchar_t* filename, void* sink)
 {
     CallbackData& cbd = *static_cast<CallbackData*>(sink); //sink is NOT optional here
 
-    if (cbd.userCallback)
+    if (cbd.notifyDeletionStatus_)
         try
         {
-            cbd.userCallback->updateStatus(filename); //throw ?
+            cbd.notifyDeletionStatus_(filename); //throw ?
         }
         catch (...)
         {
@@ -75,7 +76,7 @@ bool recyclerCallback(const wchar_t* filename, void* sink)
 }
 }
 
-void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycling* callback)
+void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus)
 {
     if (filenames.empty())
         return;
@@ -95,14 +96,20 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
         std::vector<const wchar_t*> cNames;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) //CAUTION: to not create temporary strings here!!
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) //CAUTION: do not create temporary strings here!!
             cNames.push_back(it->c_str());
 
-        CallbackData cbd(callback);
+        CallbackData cbd(notifyDeletionStatus);
         if (!moveToRecycler(&cNames[0], cNames.size(), recyclerCallback, &cbd))
         {
-            if (cbd.exceptionInUserCallback) //now we may throw...
-                callback->updateStatus(Zstring()); //should throw again!
+            if (cbd.exceptionInUserCallback)
+				try
+				{
+					assert(notifyDeletionStatus);
+					notifyDeletionStatus(Zstring()); //should throw again!!!
+					assert(false);
+				}
+				catch (...) { throw; }
 
             std::wstring filenameFmt = fmtFileName(filenames[0]); //probably not the correct file name for file lists larger than 1!
             if (filenames.size() > 1)

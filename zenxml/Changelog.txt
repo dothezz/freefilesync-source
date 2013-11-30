@@ -4,11 +4,13 @@
 
 zen::Xml 2.0
 ------------
+zen library update
 Skip XML comments while parsing
 Added move constructor for XmlDoc
 zen::parse and zen::load directly return XmlDoc
 New macros to specify platform: ZEN_WIN, ZEN_LINUX, ZEN_MAC
 Support serializing all integer limits (INT_MIN, INT_MAX, ect.)
+Moved license from Boost Software License 1.0 to GPL v3
 
 
 zen::Xml 1.9

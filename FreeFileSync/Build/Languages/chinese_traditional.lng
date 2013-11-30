@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>備用目錄的任意數量中最多有一個配置文件。</target>
 
-<source>A folder input field is empty.</source>
-<target>資料夾輸入欄位是空的。</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>對應的資料夾將視為空的。</target>
-
 <source>Cannot find the following folders:</source>
 <target>找不到下列資料夾：</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>您可以忽略每個資料夾視為空的錯誤。資料夾會在同步過程中自動新建。</target>
+
+<source>A folder input field is empty.</source>
+<target>資料夾輸入欄位是空的。</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>對應的資料夾將視為空的。</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>下列資料夾有相依路徑。請小心設定同步規則：</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>無法得到進程資訊。</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>等待同時目錄被鎖定(%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>等待同時目錄被鎖定...</target>
+
+<source>Lock owner:</source>
+<target>鎖定擁有者：</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -230,6 +233,9 @@
 <target>
 <pluralform>%x 秒</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>正在檢測被放棄的鎖定...</target>
 
 <source>Creating file %x</source>
 <target>正在新建檔案 %x</target>
@@ -483,6 +489,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>正在更新 %x 個屬性</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>正在新建卷影複製為 %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>資料驗證錯誤：%x 和 %y 內容不同！</target>
+
 <source>Cannot find %x.</source>
 <target>找不到 %x。</target>
 
@@ -521,12 +533,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>正在產生資料庫...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>正在新建卷影複製為 %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>資料驗證錯誤：%x 和 %y 內容不同！</target>
 
 <source>job name</source>
 <target>作業名稱</target>
@@ -576,7 +582,7 @@ The command is triggered if:
 <target>忽略後續的錯誤(&I)</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>重試操作...</target>
 
 <source>Serious Error</source>
 <target>嚴重錯誤</target>
@@ -603,7 +609,7 @@ The command is triggered if:
 <target>找不到目前線上FreeFileSync版號！是否要手動檢查？</target>
 
 <source>&Check</source>
-<target></target>
+<target>檢查(&C)</target>
 
 <source>Symlink</source>
 <target>符號連結</target>
@@ -761,12 +767,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>另存為批次處理作業</target>
 
-<source>Hide excluded items</source>
-<target>隱藏排除項目</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>顯示已篩選或暫時排除的檔案</target>
-
 <source>Number of files and folders that will be created</source>
 <target>將被新建的檔案和資料夾數量</target>
 
@@ -800,8 +800,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>識別和傳播兩邊的變更。自動檢測刪除、移動和衝突使用的資料庫。</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>新建左邊資料夾的鏡像備份，同步後完整匹配右邊資料夾。</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>新建一個鏡像備份的左邊資料夾來調整匹配右邊資料夾。</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>將新的和已更新的檔案複製到右邊資料夾。</target>
@@ -812,8 +812,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>檢測被移動的檔案</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>需要資料庫檔案。不支援所有檔案系統。</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- 要求並新建資料庫檔案
+- 初始化同步後檢測活動
+- 不支援所有檔案系統
+</target>
 
 <source>Delete files:</source>
 <target>刪除檔案：</target>
@@ -1049,6 +1057,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>尋找</target>
 
+<source>Select View</source>
+<target>選擇檢視</target>
+
 <source>Overview</source>
 <target>摘要</target>
 
@@ -1057,12 +1068,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>主欄位</target>
-
-<source>Filter Files</source>
-<target>篩選檔案</target>
-
-<source>Select View</source>
-<target>選擇檢視</target>
 
 <source>Open...</source>
 <target>開啟...</target>
@@ -1113,11 +1118,11 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>視圖中的第 %x 列中的第 %y 列</pluralform>
+<pluralform>顯示第 %x 列中的第 %y 列</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1234,6 +1239,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>顯示將不會被複製的檔案</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>顯示已篩選或暫時排除的檔案</target>
+
 <source>Set as default</source>
 <target>設為預設值</target>
 
@@ -1269,6 +1277,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>警告</target>
+
+<source>Select all</source>
+<target>全選</target>
 
 <source>Paused</source>
 <target>已暫停</target>

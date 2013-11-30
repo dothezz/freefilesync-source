@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Οποιοσδήποτε αριθμός εναλλακτικών υποκαταλόγων για το πολύ ένα αρχείο διάταξης.</target>
 
-<source>A folder input field is empty.</source>
-<target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Ο αντίστοιχος υποκατάλογος θα θεωρηθεί κενός.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Μπορείτε να αγνοήσετε αυτό το σφάλμα, για να αντιμετωπίσετε κάθε υποκατάλογο ως κενό. Οι υποκατάλογοι θα δημιουργηθούν αυτόματα κατά τη διάρκεια του συγχρονισμού.</target>
+
+<source>A folder input field is empty.</source>
+<target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Ο αντίστοιχος υποκατάλογος θα θεωρηθεί κενός.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Οι παρακάτω υποκατάλογοι δεν έχουν σταθερή διαδρομή. Προσοχή όταν ορίσετε κανόνες συγχρονισμού:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Δεν μπορούν να ληφθούν πληροφορίες για τις τρέχουσες διαδικασίες.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος:</target>
+
+<source>Lock owner:</source>
+<target>Ιδιοκτήτης κλειδώματος:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 δ/λεπτο</pluralform>
 <pluralform>%x δ/λεπτα</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Ανίχνευση κλειδώματος που εγκαταλείφθηκε...</target>
 
 <source>Creating file %x</source>
 <target>Δημιουργία του αρχείου %x</target>
@@ -486,6 +492,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>Ενημέρωση των χαρακτηριστικών αρχείου του %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Δημιουργία Σκιώδους Αντίγραφου Τόμου για το %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Σφάλμα επαλήθευσης δεδομένων: το %x και το %y έχουν διαφορετικό περιεχόμενο.</target>
+
 <source>Cannot find %x.</source>
 <target>Το %x δεν μπορεί να βρεθεί.</target>
 
@@ -524,12 +536,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>Δημιουργία βάσης δεδομένων...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Δημιουργία Σκιώδους Αντίγραφου Τόμου για το %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Σφάλμα επαλήθευσης δεδομένων: το %x και το %y έχουν διαφορετικό περιεχόμενο.</target>
 
 <source>job name</source>
 <target>όνομα ενέργειας</target>
@@ -580,13 +586,13 @@ The command is triggered if:
 <target>&Αγνόηση επόμενων σφαλμάτων</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Επανάληψη της προσπάθειας...</target>
 
 <source>Serious Error</source>
 <target>Σοβαρό Σφάλμα</target>
 
 <source>Check for Program Updates</source>
-<target>Έλεγχος για Ενημερώσεις του Προγράμματος</target>
+<target>Έλεγχος για ενημερώσεις του προγράμματος</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
@@ -607,7 +613,7 @@ The command is triggered if:
 <target>Ο αριθμός της τρέχουσας έκδοσης του FreeFileSync δεν βρέθηκε στο δίκτυο. Θέλετε να το ελέγξετε εσείς;</target>
 
 <source>&Check</source>
-<target></target>
+<target>Έλε&γχος</target>
 
 <source>Symlink</source>
 <target>Συμβολικός δεσμός</target>
@@ -765,12 +771,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Αποθήκευση ως δέσμη ενεργειών</target>
 
-<source>Hide excluded items</source>
-<target>Απόκρυψη στοιχείων που εξαιρέθηκαν</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Εμφάνιση φιλτραρισμένων ή προσωρινά εξαιρεθέντων αρχείων</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα δημιουργηθούν</target>
 
@@ -804,8 +804,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Δημιουργία ενός κατοπτρικού αντιγράφου του υποκαταλόγου αριστερά, ώστε μετά το συγχρονισμό ο υποκατάλογος δεξιά να είναι ένα ακριβές αντίγραφό του.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Τροποποίηση του υποκαταλόγου δεξιά, ώστε να γίνει ακριβές αντίγραφο του υποκαταλόγου αριστερά.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Αντιγραφή των νέων και των τροποποιημένων αρχείων στον υποκατάλογο δεξιά.</target>
@@ -816,8 +816,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>Ανίχνευση των αρχείων που μεταφέρθηκαν</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Απαιτεί αρχεία βάσης δεδομένων. Δεν υποστηρίζεται από όλα τα συστήματα αρχείων.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Απαιτεί και δημιουργεί αρχεία-βάσεις δεδομένων
+- Η ανίχνευση είναι ενεργή μετά τον αρχικό συγχρονισμό
+- Δεν υποστηρίζεται από όλα τα συστήματα αρχείων
+</target>
 
 <source>Delete files:</source>
 <target>Διαγραφή αρχείων:</target>
@@ -1053,6 +1061,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Αναζήτηση</target>
 
+<source>Select View</source>
+<target>Επιλογή Εμφάνισης</target>
+
 <source>Overview</source>
 <target>Σύνοψη</target>
 
@@ -1061,12 +1072,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Κύρια Γραμμή</target>
-
-<source>Filter Files</source>
-<target>Φιλτράρισμα Αρχείων</target>
-
-<source>Select View</source>
-<target>Επιλογή Εμφάνισης</target>
 
 <source>Open...</source>
 <target>Άνοιγμα...</target>
@@ -1094,6 +1099,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Είστε σίγουροι ότι θέλετε να εκτελέσετε την εντολή %y σε ένα στοιχείο;</pluralform>
+<pluralform>Είστε σίγουροι ότι θέλετε να εκτελέσετε την εντολή %y σε %x στοιχεία;</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1118,12 +1125,12 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y από τη 1 φανερή γραμμή</pluralform>
-<pluralform>%y από τις %x φανερές γραμμές</pluralform>
+<pluralform>Εμφανίζεται %y από 1 γραμμή</pluralform>
+<pluralform>Εμφανίζονται %y από %x γραμμές</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1240,6 +1247,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>Εμφάνιση των αρχείων που δε θα αντιγραφούν</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Εμφάνιση φιλτραρισμένων ή προσωρινά εξαιρεθέντων αρχείων</target>
+
 <source>Set as default</source>
 <target>Ορισμός ως προεπιλογής</target>
 
@@ -1275,6 +1285,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>Προειδοποίηση</target>
+
+<source>Select all</source>
+<target>Επιλογή όλων</target>
 
 <source>Paused</source>
 <target>Σε παύση</target>

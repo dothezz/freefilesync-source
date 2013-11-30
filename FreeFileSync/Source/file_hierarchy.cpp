@@ -367,7 +367,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                        fmtFileName(shortNameOld) + L" ->\n" + //show short name only
                        fmtFileName(shortNameNew);
         }
-        //fallback:
+            //fallback:
         return getSyncOpDescription(op);
 
         case SO_MOVE_LEFT_SOURCE:

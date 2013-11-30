@@ -33,6 +33,7 @@ public:
 
     const wxBitmap& genericFileIcon() { return genFileIcon; }
     const wxBitmap& genericDirIcon () { return genDirIcon;  }
+    const wxBitmap& linkOverlayIcon() { return linkIcon;    }
 
     bool readyForRetrieval(const Zstring& filename);
     Opt<wxBitmap> retrieveFileIcon(const Zstring& filename); //... and mark as hot
@@ -46,7 +47,10 @@ private:
     const IconSize iconSizeType;
     const wxBitmap genDirIcon;
     const wxBitmap genFileIcon;
+    const wxBitmap linkIcon;
 };
+
+bool hasLinkExtension(const Zstring& filename);
 }
 
 #endif // ICONBUFFER_H_INCLUDED

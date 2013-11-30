@@ -37,8 +37,6 @@ const wxColour COLOR_SYNC_BLUE   (185, 188, 255);
 const wxColour COLOR_SYNC_GREEN  (196, 255, 185);
 const wxColour COLOR_NOT_ACTIVE  (228, 228, 228); //light grey
 
-
-const Zstring ICON_FILE_FOLDER = Zstr("folder");
 const size_t ROW_COUNT_NO_DATA = 10;
 
 /*
@@ -227,18 +225,18 @@ public:
 
                 if (isFailedLoad(currentRow)) //find failed attempts to load icon
                 {
-                    const Zstring filename = getIconFile(currentRow);
-                    if (!filename.empty() && filename != ICON_FILE_FOLDER)
+                    const IconInfo ii = getIconInfo(currentRow);
+                    if (!ii.iconPath.empty())
                     {
                         //test if they are already loaded in buffer:
-                        if (iconMgr_->refIconBuffer().readyForRetrieval(filename))
+                        if (iconMgr_->refIconBuffer().readyForRetrieval(ii.iconPath))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
                             refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME));
                             setFailedLoad(currentRow, false);
                         }
                         else //not yet in buffer: mark for async. loading
-                            newLoad.push_back(filename);
+                            newLoad.push_back(ii.iconPath);
                     }
                 }
             }
@@ -260,10 +258,10 @@ public:
             {
                 const ptrdiff_t currentRow = rowsOnScreen.first - (preloadSize + 1) / 2 + getAlternatingPos(i, visibleRowCount + preloadSize); //for odd preloadSize start one row earlier
 
-                const Zstring filename = getIconFile(currentRow);
-                if (!filename.empty() && filename != ICON_FILE_FOLDER)
-                    if (!iconMgr_->refIconBuffer().readyForRetrieval(filename))
-                        newLoad.push_back(std::make_pair(i, filename)); //insert least-important items on outer rim first
+                const IconInfo ii = getIconInfo(currentRow);
+                if (!ii.iconPath.empty())
+                    if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.iconPath))
+                        newLoad.push_back(std::make_pair(i, ii.iconPath)); //insert least-important items on outer rim first
             }
         }
     }
@@ -528,37 +526,42 @@ private:
                 //Note: it's not sufficient to start up on failed icon loads only, since we support prefetching of not yet visible rows!!!
                 iconMgr_->startIconUpdater();
 
-                const Zstring filename = getIconFile(row);
-                if (!filename.empty())
+                const IconInfo ii = getIconInfo(row);
+
+                wxBitmap fileIcon;
+                if (ii.drawAsFolder)
+                    fileIcon = iconMgr_->refIconBuffer().genericDirIcon();
+                else if (!ii.iconPath.empty()) //retrieve file icon
                 {
-                    wxBitmap fileIcon;
-
-                    //first check if it is a directory icon:
-                    if (filename == ICON_FILE_FOLDER)
-                        fileIcon = iconMgr_->refIconBuffer().genericDirIcon();
-                    else //retrieve file icon
+                    if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.iconPath))
+                        fileIcon = *tmpIco;
+                    else
                     {
-                        if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(filename))
-                            fileIcon = *tmpIco;
-                        else
-                        {
-                            fileIcon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
-                            setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
-                            //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
-                            //see repaint behavior of ::ScrollWindow() function!
-                        }
+                        fileIcon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
+                        setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
+                        //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
+                        //see repaint behavior of ::ScrollWindow() function!
                     }
+                }
 
-                    if (fileIcon.IsOk())
+                if (fileIcon.IsOk())
+                {
+                    wxRect rectIcon = rectTmp;
+                    rectIcon.width = iconSize; //support small thumbnail centering
+
+                    auto drawIcon = [&](const wxBitmap& icon)
                     {
-                        wxRect rectIcon = rectTmp;
-                        rectIcon.width = iconSize; //support small thumbnail centering
                         if (isActive)
-                            drawBitmapRtlNoMirror(dc, fileIcon, rectIcon, wxALIGN_CENTER, buffer);
+                            drawBitmapRtlNoMirror(dc, icon, rectIcon, wxALIGN_CENTER, this->buffer); //without "this->" GCC 4.7.2 compiler crash on Debian
                         else
-                            drawBitmapRtlNoMirror(dc, wxBitmap(fileIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
-                                                  rectIcon, wxALIGN_CENTER, buffer);
-                    }
+                            drawBitmapRtlNoMirror(dc, wxBitmap(icon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
+                                                  rectIcon, wxALIGN_CENTER, this->buffer);
+                    };
+
+                    drawIcon(fileIcon);
+
+                    if (ii.drawAsLink)
+                        drawIcon(iconMgr_->refIconBuffer().linkOverlayIcon());
                 }
             }
             rectTmp.x     += iconSize;
@@ -647,32 +650,45 @@ private:
         }
     }
 
-    Zstring getIconFile(size_t row) const  //return ICON_FILE_FOLDER if row points to a folder
+    struct IconInfo
     {
+        Zstring iconPath;  //mutually exclusive: either non-empty iconPath, or folder, or neither if no entry at this row
+        bool drawAsFolder; //
+        bool drawAsLink;
+    };
+
+    IconInfo getIconInfo(size_t row) const  //return ICON_FILE_FOLDER if row points to a folder
+    {
+        IconInfo out = {};
+
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<side>())
         {
             struct GetIcon : public FSObjectVisitor
             {
+                GetIcon(IconInfo& ii) : ii_(ii) {}
+
                 virtual void visit(const FilePair& fileObj)
                 {
-                    iconName = fileObj.getFullName<side>();
+                    ii_.iconPath = fileObj.getFullName<side>();
+                    ii_.drawAsLink = fileObj.isFollowedSymlink<side>() || hasLinkExtension(ii_.iconPath);
                 }
                 virtual void visit(const SymlinkPair& linkObj)
                 {
-                    iconName = linkObj.getFullName<side>();
+                    ii_.iconPath = linkObj.getFullName<side>();
+                    ii_.drawAsLink = true;
                 }
                 virtual void visit(const DirPair& dirObj)
                 {
-                    iconName = ICON_FILE_FOLDER;
+                    ii_.drawAsFolder = true;
+                    //todo: if ("is followed symlink") ii_.drawAsLink = true;
                 }
 
-                Zstring iconName;
-            } getIcon;
+                IconInfo& ii_;
+            } getIcon(out);
             fsObj->accept(getIcon);
-            return getIcon.iconName;
         }
-        return Zstring();
+        return out;
     }
 
     virtual wxString getToolTip(size_t row, ColumnType colType) const override
@@ -1036,9 +1052,9 @@ private:
             case COL_TYPE_CHECKBOX:
                 break;
             case COL_TYPE_CMP_CATEGORY:
-                return _("Category") + L" (F9)";
+                return _("Category") + L" (F10)";
             case COL_TYPE_SYNC_ACTION:
-                return _("Action") + L" (F9)";
+                return _("Action")   + L" (F10)";
         }
         return wxEmptyString;
     }

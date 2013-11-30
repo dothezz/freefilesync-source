@@ -74,6 +74,7 @@ void determineExistentDirs(const std::vector<FolderPairCfg>& cfgList, //in
         for (const FolderPairCfg& fpCfg : cfgList)
             resolvedPairs.push_back(ResolvedFolderPair(getFormattedDirectoryName(fpCfg.dirnamePhraseLeft),
             getFormattedDirectoryName(fpCfg.dirnamePhraseRight)));
+        warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryName, but currently not thread-safe")
 
         std::set<Zstring, LessFilename> dirnames;
         for (const ResolvedFolderPair& fp : resolvedPairs)
@@ -145,54 +146,12 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
     }
 }
 
-
-class CmpCallbackImpl : public CompareCallback
-{
-public:
-    CmpCallbackImpl(ProcessCallback& pc, Int64& bytesReported) :
-        pc_(pc),
-        bytesReported_(bytesReported) {}
-
-    virtual void updateCompareStatus(Int64 bytesDelta)
-    {
-        //inform about the (differential) processed amount of data
-        pc_.updateProcessedData(0, bytesDelta); //throw()! -> ensure client and service provider are in sync!
-        bytesReported_ += bytesDelta;           //
-
-        pc_.requestUiRefresh(); //may throw
-    }
-
-private:
-    ProcessCallback& pc_;
-    Int64& bytesReported_;
-};
-
-
-bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, Int64 expectedBytesToCmp, ProcessCallback& pc) //throw FileError
-{
-    Int64 bytesReported; //amount of bytes that have been compared and communicated to status handler
-
-    //error = unexpected increase of total workload
-    zen::ScopeGuard guardStatistics = zen::makeGuard([&] { pc.updateTotalData(0, bytesReported); });
-
-    CmpCallbackImpl callback(pc, bytesReported);
-    bool sameContent = filesHaveSameContent(filename1, filename2, callback); //throw FileError
-
-    guardStatistics.dismiss();
-
-    //update statistics to consider the real amount of data processed: consider short-cut behavior if first bytes differ!
-    if (bytesReported != expectedBytesToCmp)
-        pc.updateTotalData(0, bytesReported - expectedBytesToCmp);
-
-    return sameContent;
-}
-
 //#############################################################################################################################
 
 class ComparisonBuffer
 {
 public:
-    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, size_t fileTimeTol, ProcessCallback& callback);
+    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int fileTimeTol, ProcessCallback& callback);
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
     std::shared_ptr<BaseDirPair> compareByTimeSize(const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const;
@@ -208,13 +167,13 @@ private:
                                                    std::vector<SymlinkPair*>& undefinedLinks) const;
 
     std::map<DirectoryKey, DirectoryValue> directoryBuffer; //contains only *existing* directories
-    const size_t fileTimeTolerance;
+    const int fileTimeTolerance;
     ProcessCallback& callback_;
 };
 
 
 ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
-                                   size_t fileTimeTol,
+                                   int fileTimeTol,
                                    ProcessCallback& callback) :
     fileTimeTolerance(fileTimeTol),
     callback_(callback)
@@ -305,7 +264,7 @@ std::wstring getDescrDiffMetaDate(const FileOrLinkPair& fileObj)
 
 //-----------------------------------------------------------------------------
 
-void categorizeSymlinkByTime(SymlinkPair& linkObj, size_t fileTimeTolerance)
+void categorizeSymlinkByTime(SymlinkPair& linkObj, int fileTimeTolerance)
 {
     //categorize symlinks that exist on both sides
     switch (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(),
@@ -395,7 +354,7 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::compareByTimeSize(const ResolvedF
 }
 
 
-void categorizeSymlinkByContent(SymlinkPair& linkObj, size_t fileTimeTolerance, ProcessCallback& callback)
+void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, ProcessCallback& callback)
 {
     //categorize symlinks that exist on both sides
     Zstring targetPathRawL;
@@ -428,8 +387,8 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, size_t fileTimeTolerance, 
             //symlinks have same "content"
             if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>())
                 linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
-            else if (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(),
-                                            linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
+            else if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(),
+                                   linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
                 linkObj.setCategoryDiffMetadata(getDescrDiffMetaDate(linkObj));
             else
                 linkObj.setCategory<FILE_EQUAL>();
@@ -497,13 +456,15 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
         bool haveSameContent = false;
         Opt<std::wstring> errMsg = tryReportingError([&]
         {
-            haveSameContent = filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
-            fileObj->getFullName<RIGHT_SIDE>(),
-            to<Int64>(fileObj->getFileSize<LEFT_SIDE>()),
-            callback_);
+            StatisticsReporter statReporter(1, to<Int64>(fileObj->getFileSize<LEFT_SIDE>()), callback_);
 
-            callback_.updateProcessedData(1, 0); //processed bytes are reported in subfunctions!
-            callback_.requestUiRefresh(); //may throw
+            auto onUpdateStatus = [&](Int64 bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+
+            haveSameContent = filesHaveSameContent(fileObj->getFullName<LEFT_SIDE>(),
+                                                   fileObj->getFullName<RIGHT_SIDE>(), onUpdateStatus); //throw FileError
+            statReporter.reportDelta(1, 0);
+
+            statReporter.reportFinished();
         }, callback_);
 
         if (errMsg)
@@ -518,8 +479,8 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
                 //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
                 if (fileObj->getShortName<LEFT_SIDE>() != fileObj->getShortName<RIGHT_SIDE>())
                     fileObj->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*fileObj));
-                else if (CmpFileTime::getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
-                                                fileObj->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
+                else if (!sameFileTime(fileObj->getLastWriteTime<LEFT_SIDE>(),
+                                       fileObj->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
                     fileObj->setCategoryDiffMetadata(getDescrDiffMetaDate(*fileObj));
                 else
                     fileObj->setCategory<FILE_EQUAL>();
@@ -760,7 +721,7 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
 }
 
 
-void zen::compare(size_t fileTimeTolerance,
+void zen::compare(int fileTimeTolerance,
                   xmlAccess::OptionalDialogs& warnings,
                   bool allowUserInteraction,
                   bool runWithBackgroundPriority,
@@ -836,7 +797,7 @@ void zen::compare(size_t fileTimeTolerance,
 
         for (const auto& w : totalWorkLoad)
         {
-            if (dirAvailable(w.first.dirnameLeft)) //only request *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+            if (dirAvailable(w.first.dirnameLeft)) //only traverse *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
                 dirsToRead.insert(DirectoryKey(w.first.dirnameLeft,  w.second.filter.nameFilter, w.second.handleSymlinks));
             if (dirAvailable(w.first.dirnameRight))
                 dirsToRead.insert(DirectoryKey(w.first.dirnameRight, w.second.filter.nameFilter, w.second.handleSymlinks));

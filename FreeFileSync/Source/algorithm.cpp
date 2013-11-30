@@ -204,7 +204,7 @@ bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbF
     else if (!dbFile)
         return false;
 
-    const Zstring&    shortNameDb = dbFile->first;
+    const Zstring&     shortNameDb = dbFile->first;
     const InSyncDescrFile& descrDb = getDescriptor<side>(dbFile->second);
 
     return fileObj.getShortName<side>() == shortNameDb && //detect changes in case (windows)
@@ -217,7 +217,7 @@ bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbF
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fileTimeTolerance)
+bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTimeTolerance)
 {
     switch (compareVar)
     {
@@ -225,8 +225,8 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
             if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
-            //dbFile.left.fileSize == dbFile.right.fileSize;
+                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance);
+        //dbFile.left.fileSize == dbFile.right.fileSize;
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -255,7 +255,7 @@ bool isEqual(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* 
     else if (!dbLink)
         return false;
 
-    const Zstring&    shortNameDb = dbLink->first;
+    const Zstring&     shortNameDb = dbLink->first;
     const InSyncDescrLink& descrDb = getDescriptor<side>(dbLink->second);
 
     return linkObj.getShortName<side>() == shortNameDb &&
@@ -266,7 +266,7 @@ bool isEqual(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* 
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, size_t fileTimeTolerance)
+bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fileTimeTolerance)
 {
     switch (compareVar)
     {
@@ -274,7 +274,7 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, size_t 
             if (dbLink.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                CmpFileTime::getResult(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
+                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -410,7 +410,7 @@ private:
     }
 
     const CompareVariant cmpVar;
-    const size_t fileTimeTolerance;
+    const int fileTimeTolerance;
 
     std::map<FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
     std::map<FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
@@ -605,7 +605,7 @@ private:
     const std::wstring txtDbNotInSync;
 
     const CompareVariant cmpVar;
-    const size_t fileTimeTolerance;
+    const int fileTimeTolerance;
 };
 }
 
@@ -631,7 +631,7 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
+void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& baseDirectory, std::function<void(const std::wstring& msg)> reportWarning)
 {
     //try to load sync-database files
     std::shared_ptr<InSyncDir> lastSyncState;
@@ -668,7 +668,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& b
 }
 
 
-void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, std::function<void(const std::wstring&)> reportWarning)
+void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, std::function<void(const std::wstring& msg)> reportWarning)
 {
     if (folderCmp.empty())
         return;
@@ -1225,7 +1225,7 @@ template <SelectedSide side>
 struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow constructor!!!
 {
     ItemDeleter(bool useRecycleBin, DeleteFilesHandler& handler) :
-        handler_(handler), useRecycleBin_(useRecycleBin), remCallback(*this)
+        handler_(handler), useRecycleBin_(useRecycleBin)
     {
         if (useRecycleBin_)
         {
@@ -1268,26 +1268,20 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
 
     virtual void visit(const DirPair& dirObj)
     {
-        notifyDirectoryDeletion(dirObj.getFullName<side>()); //notfied twice! see RemoveCallbackImpl -> no big deal
+        notifyDirectoryDeletion(dirObj.getFullName<side>()); //notfied twice; see below -> no big deal
 
         if (useRecycleBin_)
             zen::recycleOrDelete(dirObj.getFullName<side>()); //throw FileError
         else
-            zen::removeDirectory(dirObj.getFullName<side>(), &remCallback); //throw FileError
+        {
+            auto onBeforeFileDeletion = [&](const Zstring& filename) { this->notifyFileDeletion     (filename); }; //without "this->" GCC 4.7.2 runtime crash on Debian
+            auto onBeforeDirDeletion  = [&](const Zstring& dirname ) { this->notifyDirectoryDeletion(dirname ); };
+
+            zen::removeDirectory(dirObj.getFullName<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+        }
     }
 
 private:
-    struct RemoveCallbackImpl : public zen::CallbackRemoveDir
-    {
-        RemoveCallbackImpl(ItemDeleter& itemDeleter) : itemDeleter_(itemDeleter) {}
-
-        virtual void onBeforeFileDeletion(const Zstring& filename) { itemDeleter_.notifyFileDeletion     (filename); }
-        virtual void onBeforeDirDeletion (const Zstring& dirname)  { itemDeleter_.notifyDirectoryDeletion(dirname ); }
-
-    private:
-        ItemDeleter& itemDeleter_;
-    };
-
     void notifyFileDeletion     (const Zstring& objName) { notifyItemDeletion(txtRemovingFile     , objName); }
     void notifyDirectoryDeletion(const Zstring& objName) { notifyItemDeletion(txtRemovingDirectory, objName); }
     void notifySymlinkDeletion  (const Zstring& objName) { notifyItemDeletion(txtRemovingSymlink  , objName); }
@@ -1299,7 +1293,6 @@ private:
 
     DeleteFilesHandler& handler_;
     const bool useRecycleBin_;
-    RemoveCallbackImpl remCallback;
 
     std::wstring txtRemovingFile;
     std::wstring txtRemovingDirectory;

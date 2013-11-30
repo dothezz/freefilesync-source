@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Било који број алтернативних фолдера за најмање једну конфигурациону датотеку.</target>
 
-<source>A folder input field is empty.</source>
-<target>Поље за одабир фолдера је празно.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Одговарајући фолдер сматраће се празним.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Не могу пронаћи следеће фолдере:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Можете игнорисати ову грешку да би сматрали сваки фолдер празним. Фолдери ће бити креирани аутоматски током синхронизације.</target>
+
+<source>A folder input field is empty.</source>
+<target>Поље за одабир фолдера је празно.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Одговарајући фолдер сматраће се празним.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Следећи фолдери имају зависне путање. Будите пажљиви када подешавате синхронизациона правила:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Не могу добити информације о процесу.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Чека се док се фолдер не закључа (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Чека се док је фолдер закључан:</target>
+
+<source>Lock owner:</source>
+<target>Власник закључавања:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -232,6 +235,9 @@
 <pluralform>%x сек</pluralform>
 <pluralform>%x сек</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Детекција обустављеног закључавања...</target>
 
 <source>Creating file %x</source>
 <target>Правим датотеку %x</target>
@@ -489,6 +495,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>Обнављам атрибуте од %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Креирање Volume Shadow Copy за %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Грешка при провери података: %x и %y имају различит садржај.</target>
+
 <source>Cannot find %x.</source>
 <target>Не могу пронаћи %x.</target>
 
@@ -527,12 +539,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>Генерисање базе података...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Креирање Volume Shadow Copy за %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Грешка при провери података: %x и %y имају различит садржај.</target>
 
 <source>job name</source>
 <target>име задатка</target>
@@ -584,7 +590,7 @@ The command is triggered if:
 <target>&Занемари грешке које даље следе</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Поновни покушај операције...</target>
 
 <source>Serious Error</source>
 <target>Озбиљна грешка</target>
@@ -611,7 +617,7 @@ The command is triggered if:
 <target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Да ли желите да проверите ручно?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Провера</target>
 
 <source>Symlink</source>
 <target>Сим-веза</target>
@@ -769,12 +775,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Сачувај као беч задатак</target>
 
-<source>Hide excluded items</source>
-<target>Сакриј искључене ставке</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Прикажи филтриране или привремено искључене датотеке</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Број датотека и фолдера који ће бити креирани</target>
 
@@ -808,8 +808,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Креирај огледални бекап левог фолдера који ће се тачно подударати са десним фолдером након синхронизације.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Креирај огледални бекап левог фолдера прилагођавајући га потпуно десном фолдеру.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Копирај нове и ажуриране датотеке у десни фолдер.</target>
@@ -820,8 +820,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>Уочи премештене датотеке</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Потребне датотеке базе. Није подржано за све системе датотека.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Потребује и креира датотеке база
+- Детекција активна после иницијалног синка
+- Није подржано за све системе датотека
+</target>
 
 <source>Delete files:</source>
 <target>Обриши датотеке:</target>
@@ -1057,6 +1065,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Пронађи</target>
 
+<source>Select View</source>
+<target>Изаберите приказ</target>
+
 <source>Overview</source>
 <target>Преглед</target>
 
@@ -1065,12 +1076,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Главна трака</target>
-
-<source>Filter Files</source>
-<target>Филтрирање датотека</target>
-
-<source>Select View</source>
-<target>Изаберите приказ</target>
 
 <source>Open...</source>
 <target>Отвори...</target>
@@ -1127,13 +1132,13 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y од %x реда у приказу</pluralform>
-<pluralform>%y од %x реда у приказу</pluralform>
-<pluralform>%y од %x редова у приказу</pluralform>
+<pluralform>Приказ %y од %x реда</pluralform>
+<pluralform>Приказ %y од %x реда</pluralform>
+<pluralform>Приказ %y од %x редова</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1250,6 +1255,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>Прикажи датотеке које неће бити копиране</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Прикажи филтриране или привремено искључене датотеке</target>
+
 <source>Set as default</source>
 <target>Постави као подразумевано</target>
 
@@ -1285,6 +1293,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>Упозорење</target>
+
+<source>Select all</source>
+<target>Одабери све</target>
 
 <source>Paused</source>
 <target>Паузирано</target>

@@ -205,8 +205,6 @@ private:
     void OnResizeLeftFolderWidth(wxEvent& event);
     void OnResizeConfigPanel    (wxEvent& event);
     void OnResizeViewPanel      (wxEvent& event);
-    void OnResizeStatisticsPanel(wxEvent& event);
-    virtual void OnShowExcluded         (wxCommandEvent& event) override;
     virtual void OnConfigureFilter      (wxCommandEvent& event) override;
     virtual void OnSwapSides            (wxCommandEvent& event) override;
     virtual void OnCompare              (wxCommandEvent& event) override;

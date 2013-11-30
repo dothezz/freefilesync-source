@@ -1,5 +1,22 @@
-FreeFileSync 5.23
------------------
+FreeFileSync 6.0 [2013-12-01]
+-----------------------------
+Revised main dialog panel layout
+Show arrow icon for shortcut files and symlinks
+Execute the "on completion" command asynchronously
+Resolved invalid grid background when context menu is shown
+Set negative file time tolerance to disable file time check
+Optimized sequence of steps when saving database files
+Prevent temporary incorrect statistics after unexpected increase in workload
+Fixed default height when mixing panels with and without caption on main dialog
+New view filter button "show excluded items"
+New keyboard shortcuts for file filter and sync settings
+Removed libpng15.so dependency for openSUSE 13.1
+Updated help file
+Updated translation files
+
+
+FreeFileSync 5.23 [2013-11-01]
+------------------------------
 Allow sorting root nodes on overview panel
 Support retry on failure to resolve path by volume name
 Copy high-precision modification times for files and symlinks
@@ -13,7 +30,7 @@ Save RealtimeSync settings before forced exit due to shutdown or log off
 Resolved contract violation error due to out of memory
 RealtimeSync does not block system shutdown anymore
 Added "select all" context menu option for progess log
-Handle progress log keyboard input ignoring input focus
+Have progress log keyboard input ignore focus
 Fixed category icon background color issues
 Report error when reading active config file failed during save
 Preload adjacent file icons on grid

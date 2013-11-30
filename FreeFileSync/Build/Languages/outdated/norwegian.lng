@@ -88,16 +88,16 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target></target>
 
-<source>A folder input field is empty.</source>
-<target>Et mappefelt er tomt.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target></target>
-
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finne følgende mapper:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target></target>
+
+<source>A folder input field is empty.</source>
+<target>Et mappefelt er tomt.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
 <target></target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Kan ikke hente prosessinformasjon.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Venter mens mappe er låst (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target></target>
+
+<source>Lock owner:</source>
+<target></target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 sekund</pluralform>
 <pluralform>%x sekunder</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target></target>
 
 <source>Creating file %x</source>
 <target>Oppretter fil %x</target>
@@ -248,8 +254,7 @@
 <pluralform>1 byte</pluralform>
 <pluralform>%x bytes</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -273,8 +278,7 @@
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>Encoding extended time information: %x</source>
 <target>Koder utvided tidsinformasjon: %x</target>
@@ -482,6 +486,12 @@ Kommandoen utløses hvis:
 <source>Updating attributes of %x</source>
 <target>Oppdaterer attributter til %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target></target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target></target>
+
 <source>Cannot find %x.</source>
 <target>Kan ikke finne %x.</target>
 
@@ -520,12 +530,6 @@ Kommandoen utløses hvis:
 
 <source>Generating database...</source>
 <target>Oppretter database...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target></target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target></target>
 
 <source>job name</source>
 <target></target>
@@ -567,8 +571,7 @@ Kommandoen utløses hvis:
 <pluralform>Automatic retry in 1 second...</pluralform>
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>&Ignore subsequent errors</source>
 <target></target>
@@ -759,12 +762,6 @@ Kommandoen utløses hvis:
 <source>Save as batch job</source>
 <target>Lagre som sammensatt oppgave</target>
 
-<source>Hide excluded items</source>
-<target>Skjul ekskluderte elementer</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Vis filtrerte eller midlertidig ekskluderte filer</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Antall filer og mapper som vil opprettes</target>
 
@@ -798,7 +795,7 @@ Kommandoen utløses hvis:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target></target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
 <target></target>
 
 <source>Copy new and updated files to the right folder.</source>
@@ -810,7 +807,11 @@ Kommandoen utløses hvis:
 <source>Detect moved files</source>
 <target></target>
 
-<source>Requires database files. Not supported by all file systems.</source>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
 <target></target>
 
 <source>Delete files:</source>
@@ -1044,6 +1045,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Søk</target>
 
+<source>Select View</source>
+<target></target>
+
 <source>Overview</source>
 <target>Oversikt</target>
 
@@ -1051,12 +1055,6 @@ This guarantees a consistent state even in case of a serious error.
 <target>Innstilling</target>
 
 <source>Main Bar</source>
-<target></target>
-
-<source>Filter Files</source>
-<target></target>
-
-<source>Select View</source>
 <target></target>
 
 <source>Open...</source>
@@ -1084,8 +1082,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>&Execute</source>
 <target></target>
@@ -1109,11 +1106,10 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>Set direction:</source>
 <target>Still inn retningen:</target>
@@ -1229,6 +1225,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>Vis filer som ikke blir kopiert</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Vis filtrerte eller midlertidig ekskluderte filer</target>
+
 <source>Set as default</source>
 <target>Set som standard</target>
 
@@ -1264,6 +1263,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>Advarsel</target>
+
+<source>Select all</source>
+<target></target>
 
 <source>Paused</source>
 <target>Pauset</target>
@@ -1311,8 +1313,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>Move</source>
 <target></target>
@@ -1321,8 +1322,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
-<target>
-</target>
+<target></target>
 
 <source>Exclude</source>
 <target>Ekskluder</target>

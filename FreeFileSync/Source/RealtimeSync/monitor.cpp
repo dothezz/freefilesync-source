@@ -54,7 +54,7 @@ struct WaitResult
 
 
 WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw FileError
-                          const std::function<void(bool)>& onRefreshGui)  //bool: readyForSync
+                          const std::function<void(bool readyForSync)>& onRefreshGui)
 {
     const std::vector<Zstring> dirNamesFmt = getFormattedDirs(dirnamePhrases); //throw FileError
     if (dirNamesFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
@@ -148,7 +148,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
 
 //wait until all directories become available (again) + logs in network share
 void waitForMissingDirs(const std::vector<Zstring>& dirnamePhrases, //throw FileError
-                        const std::function<void(const Zstring&)>& onRefreshGui) //Zstring: the directory that is currently being waited for
+                        const std::function<void(const Zstring& dirname)>& onRefreshGui)
 {
     while (true)
     {

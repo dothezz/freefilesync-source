@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Àireamh sam bith de phasganan eile airson aon fhaidhle rèiteachaidh air a' char as fhaide.</target>
 
-<source>A folder input field is empty.</source>
-<target>Tha co-dhiù aon raon pasgain ann a tha falamh.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Thèid am pasgan a leanas a làimhseachadh mar phasgan falamh.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Chan urrainn dhuinn na pasgain a leanas a lorg:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>'S urrainn dhut a' mhearachd seo a leigeil seachad ma tha thu airson 's gun dèilig sinn ri gach pasgan mar gum biodh iad falamh. Thèid na pasgain a chruthachadh gu fèin-obrachail an uairsin rè an t-sioncronachaidh</target>
+
+<source>A folder input field is empty.</source>
+<target>Tha co-dhiù aon raon pasgain ann a tha falamh.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Thèid am pasgan a leanas a làimhseachadh mar phasgan falamh.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Tha slighean eisimeileachdach aig na pasganan a leanas. Bi faiceallach nuair a chruthaicheas tu riaghailtean sioncronachaidh:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Chan urrainn dhuinn greim fhaighinn air fiosrachadh a' phròiseis.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>A' feitheamh fhad 's a tha am pasgan glaiste (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>A' feitheamh fhad 's a thèid am pasgan a ghlasadh:</target>
+
+<source>Lock owner:</source>
+<target>Glais an sealbhadair:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -233,6 +236,9 @@
 <pluralform>%x diogan</pluralform>
 <pluralform>%x diog</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>A' mothachadh ri glasan trèigte...</target>
 
 <source>Creating file %x</source>
 <target>A' cruthachadh an fhaidhle %x</target>
@@ -492,6 +498,12 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Updating attributes of %x</source>
 <target>Ag ùrachadh buadhan %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>A' cruthachadh lethbhreac sgàil draibh airson %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Mearachd le dearbhadh an dàta: tha susbaint eadar-dhealaichte ann an %x agus %y.</target>
+
 <source>Cannot find %x.</source>
 <target>Cha ghabh %x a lorg.</target>
 
@@ -530,12 +542,6 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Generating database...</source>
 <target>A' gintinn an stòir-dhàta...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>A' cruthachadh lethbhreac sgàil draibh airson %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Mearachd le dearbhadh an dàta: tha susbaint eadar-dhealaichte ann an %x agus %y.</target>
 
 <source>job name</source>
 <target>ainm na h-obrach</target>
@@ -588,7 +594,7 @@ Thèid an loidhne-àithne a chur gu dol:
 <target>Le&ig seachad mearachdan às a dhèidh seo</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>A' feuchainn ris a-rithist...</target>
 
 <source>Serious Error</source>
 <target>Mearachd mhòr</target>
@@ -615,7 +621,7 @@ Thèid an loidhne-àithne a chur gu dol:
 <target>Chan urrainn dhuinn àireamh an tionndaidh làithrich aig FreeFileSync a lorg air loidhne. A bheil thu airson sùil a thoirt thu fhèin?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Sgrùd</target>
 
 <source>Symlink</source>
 <target>Symlink</target>
@@ -651,7 +657,7 @@ Thèid an loidhne-àithne a chur gu dol:
 <target>Gnìomh</target>
 
 <source>Drag && drop</source>
-<target>Slaod ┐ leig às</target>
+<target>Slaod ⁊ leig às</target>
 
 <source>Close progress dialog</source>
 <target>Dùin còmhradh an adhartais</target>
@@ -773,12 +779,6 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Save as batch job</source>
 <target>Sàbhail mar obair baidse</target>
 
-<source>Hide excluded items</source>
-<target>Falaich nithean a chaidh a dhùnadh às</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Seall faidhlichean a tha 'gan dùnadh a-mach no air an criathradh a-mach an-dràsta fhèin</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Àireamh nam faidhle 's nam pasgan a thèid a chruthachadh</target>
 
@@ -812,8 +812,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Lorg is sìolaich na h-atharraichean air an dà thaobh. Mothaichidh sinn do rudan a chaidh a sguabadh às, a ghluasad no còmhstrithean gu fèin-obrachail le stòr-dàta.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Cruthaich lethbhreac-glèidhidh sgàthanaichte dhen phasgan air an taobh chlì a bhios gu tur co-ionnann ris a' phasgan air an taobh deas an dèidh sioncronachaidh.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Cruthaich lethbhreac-glèidhidh sgàthanaichte dhen phasgan air an taobh clì 's am pasgan air an taobh deas 'ga atharrachadh d' a rèir.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Cuir lethbhreac de dh'fhaidhlichean ùra 's ùraichte dhan phasgan air an taobh deas.</target>
@@ -824,8 +824,16 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Detect moved files</source>
 <target>Mothaich do dh'fhaidhlichean a chaidh a ghluasad</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Feumaidh seo faidhlichean stòir-dhàta. Chan eil gach siostam fhaidhlichean a' cur taic ri seo.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Feumaidh seo faidhlichean stòir-dhàta 's cruthaichidh seo faidhlichean mar sin
+- Bidh am mothachadh an gnìomh an dèidh a' chiad sioncronachaidh
+- Chan eil gach siostam fhaidhlichean a' cur taic ris
+</target>
 
 <source>Delete files:</source>
 <target>Sguab às na faidhlichean:</target>
@@ -1061,6 +1069,9 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Find</source>
 <target>Lorg</target>
 
+<source>Select View</source>
+<target>Tagh sealladh</target>
+
 <source>Overview</source>
 <target>Foir-shealladh</target>
 
@@ -1069,12 +1080,6 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 
 <source>Main Bar</source>
 <target>Am prìomh-bhàr</target>
-
-<source>Filter Files</source>
-<target>Criathraich na faidhlichean</target>
-
-<source>Select View</source>
-<target>Tagh sealladh</target>
 
 <source>Open...</source>
 <target>Fosgail...</target>
@@ -1134,14 +1139,14 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y de %x ràgh san t-sealladh</pluralform>
-<pluralform>%y de %x ràgh san t-sealladh</pluralform>
-<pluralform>%y de %x ràghan san t-sealladh</pluralform>
-<pluralform>%y de %x ràgh san t-sealladh</pluralform>
+<pluralform>A' sealltainn %y à %x ràgh</pluralform>
+<pluralform>A' sealltainn %y à %x ràgh</pluralform>
+<pluralform>A' sealltainn %y à %x ràghan</pluralform>
+<pluralform>A' sealltainn %y à %x ràgh</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1258,6 +1263,9 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Show files that won't be copied</source>
 <target>Seall faidhlichean nach dèid lethbhreac a dhèanamh dhiubh</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Seall faidhlichean a tha 'gan dùnadh a-mach no air an criathradh a-mach an-dràsta fhèin</target>
+
 <source>Set as default</source>
 <target>Suidhich mar a' bhun-roghainn</target>
 
@@ -1293,6 +1301,9 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 
 <source>Warning</source>
 <target>Rabhadh</target>
+
+<source>Select all</source>
+<target>Tagh na h-uile</target>
 
 <source>Paused</source>
 <target>'Na stad</target>

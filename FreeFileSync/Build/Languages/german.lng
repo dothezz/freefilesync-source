@@ -771,12 +771,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Save as batch job</source>
 <target>Als Batch-Auftrag speichern</target>
 
-<source>Hide excluded items</source>
-<target>Ausgeschlossene Elemente verstecken</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Gefilterte oder temporär ausgeschlossene Dateien zeigen</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Anzahl der zu erstellenden Dateien und Ordner</target>
 
@@ -810,7 +804,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifiziere und propagiere Änderungen auf beiden Seiten. Löschungen, Verschiebungen und Konflikte werden automatisch mit Hilfe einer Datenbank erkannt.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
 <target>Eine Spiegelkopie des linken Ordners erstellen, indem der rechte Ordner angeglichen wird.</target>
 
 <source>Copy new and updated files to the right folder.</source>
@@ -822,8 +816,16 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Detect moved files</source>
 <target>Verschobene Dateien erkennen</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Benötigt Datenbankdateien. Wird nicht von allen Dateisystemen unterstützt.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Benötigt und erstellt Datenbankdateien.
+- Erst nach einmaliger Synchronisation aktiv.
+- Wird nicht von allen Dateisystemen unterstützt.
+</target>
 
 <source>Delete files:</source>
 <target>Dateien löschen:</target>
@@ -1059,6 +1061,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Find</source>
 <target>Suchen</target>
 
+<source>Select View</source>
+<target>Ansicht auswählen</target>
+
 <source>Overview</source>
 <target>Übersicht</target>
 
@@ -1067,12 +1072,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Main Bar</source>
 <target>Hauptleiste</target>
-
-<source>Filter Files</source>
-<target>Dateien filtern</target>
-
-<source>Select View</source>
-<target>Ansicht auswählen</target>
 
 <source>Open...</source>
 <target>Öffnen...</target>
@@ -1126,8 +1125,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
 <pluralform>Zeige %y von 1 Zeile</pluralform>
@@ -1247,6 +1246,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Show files that won't be copied</source>
 <target>Dateien die nicht kopiert werden anzeigen</target>
+
+<source>Show filtered or temporarily excluded files</source>
+<target>Gefilterte oder temporär ausgeschlossene Dateien zeigen</target>
 
 <source>Set as default</source>
 <target>Als Standard festlegen</target>

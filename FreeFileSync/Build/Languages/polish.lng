@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Dowolna liczba katalogów w przypadku użycia jednego pliku konfiguracyjnego.</target>
 
-<source>A folder input field is empty.</source>
-<target>Pole katalog źródłowy jest puste.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Katalog będzie oznaczony jako pusty.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Możesz zignorować ten błąd aby uznając katalogi jako puste. Katalog zostanie utworzony automatycznie podczas synchronizacji.</target>
+
+<source>A folder input field is empty.</source>
+<target>Pole katalog źródłowy jest puste.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Katalog będzie oznaczony jako pusty.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Podane katalogi mają zależne ścieżki. Bądź ostrożny podczas ustawiania reguł synchronizacji:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Nie można uzyskać informacji dla procesu.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Blokada katalogu (%x), oczekiwanie...</target>
+<source>Waiting while directory is locked:</source>
+<target>Oczekiwanie przez blokadę katalogu:</target>
+
+<source>Lock owner:</source>
+<target>Właściciel blokady:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -232,6 +235,9 @@
 <pluralform>%x sekundy</pluralform>
 <pluralform>%x sekund</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Wykrywanie nieaktywnej blokady...</target>
 
 <source>Creating file %x</source>
 <target>Tworzenie pliku %x</target>
@@ -386,7 +392,7 @@
 <target>Czas pomiędzy ostatnią wykrytą zmianą, a uruchomieniem komendy</target>
 
 <source>Command line:</source>
-<target>Linia komend:</target>
+<target>Polecenie:</target>
 
 <source>
 The command is triggered if:
@@ -489,6 +495,12 @@ Komenda jest wykonywana gdy:
 <source>Updating attributes of %x</source>
 <target>Aktualizowanie atrybutów %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Tworzenie Volume Shadow Copy dla %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Nastąpił błąd weryfikacji: %x oraz %y różnią się zawartością.</target>
+
 <source>Cannot find %x.</source>
 <target>Nie można znaleźć %x.</target>
 
@@ -527,12 +539,6 @@ Komenda jest wykonywana gdy:
 
 <source>Generating database...</source>
 <target>Generowanie bazy danych...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Tworzenie Volume Shadow Copy dla %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Nastąpił błąd weryfikacji: %x oraz %y różnią się zawartością.</target>
 
 <source>job name</source>
 <target>nazwa zadania</target>
@@ -575,13 +581,16 @@ Komenda jest wykonywana gdy:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Automatyczne ponowienie za 1 sekundę...</pluralform>
+<pluralform>Automatyczne ponowienie za %x sekundy...</pluralform>
+<pluralform>Automatyczne ponowienie za %x sekund...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>&Ignoruj kolejne błędy</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Ponawianie operacji...</target>
 
 <source>Serious Error</source>
 <target>Poważny błąd</target>
@@ -608,7 +617,7 @@ Komenda jest wykonywana gdy:
 <target>Nie można znaleźć obecnej wersji FreeFileSync. Czy chcesz sprawdzić ręcznie?</target>
 
 <source>&Check</source>
-<target></target>
+<target>S&prawdź</target>
 
 <source>Symlink</source>
 <target>Dowiązanie symboliczne</target>
@@ -766,12 +775,6 @@ Komenda jest wykonywana gdy:
 <source>Save as batch job</source>
 <target>Zapisz w trybie wsadowym</target>
 
-<source>Hide excluded items</source>
-<target>Ukryj wykluczone elementy</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Pokaż pliki wykluczone tymczasowo lub pliki wykluczone tymczasowo</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Liczba plików i katalogów, które zostaną utworzone</target>
 
@@ -805,8 +808,8 @@ Komenda jest wykonywana gdy:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Wyszukaj oraz zastosuj zmiany po obu stronach. Wszystkie operacje na plikach takie jak usunięcia, zmiany oraz konflikty wykrywane są automatycznie przy użyciu bazy danych.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Kopia lustrzana lewego katalogu. Po synchronizacji, zawartość prawego katalogu będzie będzie identyczna jak w lewym katalogu.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Utwórz lustrzaną kopię lewego katalogu. Cała zawartość prawego katalogu będzie usunięta bądź nadpisana zawartością lewego katalogu.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Kopiuj nowe i zmodyfikowane pliki do prawego katalogu.</target>
@@ -817,8 +820,16 @@ Komenda jest wykonywana gdy:
 <source>Detect moved files</source>
 <target>Wykryj przeniesione pliki.</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Wymaga plików bazy danych. Nie wspierane przez wszystkie systemy plików.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Wymagane utworzenie pliku bazy danych
+- Funkcja aktywna po pierwszej synchronizacji
+- Niewspierany przez wszystkie systemy plików
+</target>
 
 <source>Delete files:</source>
 <target>Usuwanie plików:</target>
@@ -887,7 +898,7 @@ Komenda jest wykonywana gdy:
 <target>Do ukończenia:</target>
 
 <source>Time elapsed:</source>
-<target>Szacowany czas:</target>
+<target>Upłynęło:</target>
 
 <source>Synchronizing...</source>
 <target>Synchronizuję...</target>
@@ -905,7 +916,7 @@ Komenda jest wykonywana gdy:
 <target>Przerwij</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>Utwórz plik wsadowy do zautomatyzowania procesu synchronizacji. Aby rozpocząć, klknij dwa razy plik lub zaplanuj zadanie w: %x</target>
+<target>Utwórz plik wsadowy do zautomatyzowania procesu synchronizacji. Aby rozpocząć, klknij dwa razy plik lub zaplanuj zadanie w harmonogramie zadań: %x</target>
 
 <source>Stop synchronization at first error</source>
 <target>Przerwij synchronizację przy pierwszym błędzie</target>
@@ -1054,6 +1065,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Find</source>
 <target>Znajdź</target>
 
+<source>Select View</source>
+<target>Widok</target>
+
 <source>Overview</source>
 <target>Przegląd</target>
 
@@ -1062,12 +1076,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Main Bar</source>
 <target>Główny pasek</target>
-
-<source>Filter Files</source>
-<target>Filtr</target>
-
-<source>Select View</source>
-<target>Widok</target>
 
 <source>Open...</source>
 <target>Otwórz...</target>
@@ -1095,6 +1103,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Czy na pewno wykonać polecenie %y dla jednego elementu?</pluralform>
+<pluralform>Czy na pewno wykonać polecenie %y dla jednego %x elementów?</pluralform>
+<pluralform>Czy na pewno wykonać polecenie %y dla jednego %x elementów?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1121,13 +1132,13 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>Widok %y z 1 lini</pluralform>
-<pluralform>Widok %y z %x lini</pluralform>
-<pluralform>Widok %y z %x lini</pluralform>
+<pluralform>Widok %y z 1 wiersza</pluralform>
+<pluralform>Widok %y z %x wierszy</pluralform>
+<pluralform>Widok %y z %x wierszy</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1244,6 +1255,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Show files that won't be copied</source>
 <target>Pokaż pliki, które nie będą kopiowane</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Pokaż pliki wykluczone tymczasowo lub pliki wykluczone tymczasowo</target>
+
 <source>Set as default</source>
 <target>Zapisz jako domyślne</target>
 
@@ -1279,6 +1293,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Warning</source>
 <target>Ostrzeżenie</target>
+
+<source>Select all</source>
+<target>Zaznacz wszystko</target>
 
 <source>Paused</source>
 <target>Pauza</target>

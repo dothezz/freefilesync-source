@@ -1,25 +1,27 @@
 #ifndef CMP_FILETIME_H_INCLUDED
 #define CMP_FILETIME_H_INCLUDED
 
-//#include <wx/stopwatch.h>
-#include <wx/time.h>
+#include <ctime>
 #include <zen/int64.h>
 
 namespace zen
 {
 //---------------------------------------------------------------------------------------------------------------
 inline
-bool sameFileTime(const Int64& a, const Int64& b, size_t tolerance)
+bool sameFileTime(const Int64& lhs, const Int64& rhs, int tolerance)
 {
-    if (a < b)
-        return b <= a + static_cast<ptrdiff_t>(tolerance);
+    if (tolerance < 0) //= unlimited tolerance by convention!
+        return true;
+
+    if (lhs < rhs)
+        return rhs - lhs <= tolerance;
     else
-        return a <= b + static_cast<ptrdiff_t>(tolerance);
+        return lhs - rhs <= tolerance;
 }
 //---------------------------------------------------------------------------------------------------------------
 
 //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
-static const long oneYearFromNow = wxGetUTCTime() + 365 * 24 * 3600; //init at program startup alas in *each* compilation untit -> avoid MT issues
+static const Int64 oneYearFromNow = std::time(nullptr) + 365 * 24 * 3600; //init at program startup in *each* compilation untit -> avoid MT issues
 //refactor when C++11 thread-safe static initialization is availalbe in VS (already in GCC)
 
 class CmpFileTime
@@ -34,7 +36,7 @@ public:
         TIME_RIGHT_INVALID
     };
 
-    static Result getResult(const Int64& lhs, const Int64& rhs, size_t tolerance)
+    static Result getResult(const Int64& lhs, const Int64& rhs, int tolerance)
     {
         if (sameFileTime(lhs, rhs, tolerance)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
             return TIME_EQUAL;

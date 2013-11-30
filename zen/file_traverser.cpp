@@ -452,7 +452,7 @@ private:
             try
             {
                 //set modification time including DST hack: this function is too clever to not introduce this dependency
-                setFileTime(it->first, it->second, SYMLINK_FOLLOW); //throw FileError
+                setFileTime(it->first, it->second, ProcSymlink::FOLLOW); //throw FileError
             }
             catch (FileError&)
             {

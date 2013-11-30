@@ -62,11 +62,11 @@ void setBestInitialSize(wxTextCtrl& ctrl, const wxString& text, wxSize maxSize)
     }
 
 #if defined ZEN_WIN || defined ZEN_LINUX
-	const int rowGap = 0;
+    const int rowGap = 0;
 #elif defined ZEN_MAC
-	const int rowGap = 1;
+    const int rowGap = 1;
 #endif
-	const wxSize bestSize(bestWidth + scrollbarWidth, std::min(rowCount * (rowHeight + rowGap), maxSize.y));
+    const wxSize bestSize(bestWidth + scrollbarWidth, std::min(rowCount * (rowHeight + rowGap), maxSize.y));
     ctrl.SetMinSize(bestSize); //alas, SetMinClientSize() is just not working!
 }
 }

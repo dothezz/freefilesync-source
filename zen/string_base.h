@@ -60,7 +60,7 @@ template <typename Char, //Character Type
 */
 
 template <class Char, //Character Type
-         class AP>   //Allocator Policy
+          class AP>   //Allocator Policy
 class StorageDeepCopy : public AP
 {
 protected:
@@ -113,7 +113,7 @@ private:
 
 
 template <class Char, //Character Type
-         class AP>   //Allocator Policy
+          class AP>   //Allocator Policy
 class StorageRefCountThreadSafe : public AP
 {
 protected:
@@ -188,8 +188,8 @@ private:
 //perf note: interestingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
 template <class Char,  							                       //Character Type
-         template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
-         class AP = AllocatorOptimalSpeed>				               //Allocator Policy
+          template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
+          class AP = AllocatorOptimalSpeed>				               //Allocator Policy
 class Zbase : public SP<Char, AP>
 {
 public:

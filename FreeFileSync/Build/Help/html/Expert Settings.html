@@ -11,9 +11,12 @@
 
 <P>FreeFileSync has a number of special purpose settings that can only be accessed
 directly via the global configuration file <FONT FACE="Courier New, monospace">GlobalSettings.xml</FONT>.
-To locate this file enter <FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT> in the Windows Explorer address bar or go to the FreeFileSync
+Note that this file is read once when FreeFileSync starts and saved when it closes. Therefore do only apply changes while FreeFileSync is not running. <br>
+ <br>
+To locate this file on Windows enter <FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT> in the Windows Explorer address bar or go to the FreeFileSync
 installation folder if you are using the portable installation. 
-Note that this file is read once when FreeFileSync starts and saved when it closes. Therefore do only apply changes while FreeFileSync is not running.
+On Linux you can find the file in <FONT FACE="Courier New, monospace">~/.FreeFileSync</FONT> for the Launchpad release and in the installation folder for the portable version. 
+On OS X go to <FONT FACE="Courier New, monospace">~/Library/Application Support/FreeFileSync</FONT>.
 </P>
 
 <div class="greybox">
@@ -41,10 +44,11 @@ are allowed to have a 2 second difference while still being
 considered equal. This is required by FAT/FAT32 file systems which
 store file times with a 2 second precision only.<BR>This setting
 can also be used to simulate a &quot;compare by file size&quot;,
-ignoring last modification times: If tolerance is set to some high
-value, e.g. 2000000000, then changed files will be detected as a
+ignoring last modification times: 
+Set tolerance to -1 which will be considered as an unlimited file time tolerance.
+Changed files will then be detected as a
 conflict (same date, different file size) and the
-synchronization direction for conflicts can be set accordingly.
+synchronization direction for conflicts can be used accordingly.
 </P>
 
 <P><B>RunWithBackgroundPriority:</B><BR>

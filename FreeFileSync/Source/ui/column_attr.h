@@ -55,7 +55,7 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
     attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH, 250, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  200, 0, false)); //already shown on left side
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  200, 0, true));  
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  200, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, 0, false));

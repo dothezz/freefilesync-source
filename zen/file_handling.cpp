@@ -511,7 +511,9 @@ private:
 };
 
 
-void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) //throw FileError
+void removeDirectoryImpl(const Zstring& directory, //throw FileError
+                         const std::function<void (const Zstring& filename)>& onBeforeFileDeletion,
+                         const std::function<void (const Zstring& dirname)>&  onBeforeDirDeletion)
 {
     assert(somethingExists(directory)); //[!]
 
@@ -525,7 +527,8 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
     //attention: check if directory is a symlink! Do NOT traverse into it deleting contained files!!!
     if (symlinkExists(directory)) //remove symlink directly
     {
-        if (callback) callback->onBeforeDirDeletion(directory); //once per symlink
+        if (onBeforeDirDeletion)
+            onBeforeDirDeletion(directory); //once per symlink
 #ifdef ZEN_WIN
         const wchar_t functionName[] = L"RemoveDirectory";
         if (!::RemoveDirectory(directoryFmt.c_str()))
@@ -546,22 +549,20 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
         }
 
         //delete directories recursively
-        std::for_each(dirList.begin(), dirList.end(),
-                      [&](const Zstring& dirname)
-        {
-            removeDirectoryImpl(dirname, callback); //throw FileError; call recursively to correctly handle symbolic links
-        });
+        for (const Zstring& dirname : dirList)
+            removeDirectoryImpl(dirname, onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError; call recursively to correctly handle symbolic links
 
         //delete files
-        std::for_each(fileList.begin(), fileList.end(),
-                      [&](const Zstring& filename)
+        for (const Zstring& filename : fileList)
         {
-            if (callback) callback->onBeforeFileDeletion(filename); //call once per file
+            if (onBeforeFileDeletion)
+                onBeforeFileDeletion(filename); //call once per file
             removeFile(filename); //throw FileError
-        });
+        }
 
         //parent directory is deleted last
-        if (callback) callback->onBeforeDirDeletion(directory); //and once per folder
+        if (onBeforeDirDeletion)
+            onBeforeDirDeletion(directory); //and once per folder
 #ifdef ZEN_WIN
         const wchar_t functionName[] = L"RemoveDirectory";
         if (!::RemoveDirectory(directoryFmt.c_str()))
@@ -647,7 +648,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                                 nullptr,
                                 OPEN_EXISTING,
                                 FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                                (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
+                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
                                 nullptr);
         };
 
@@ -805,7 +806,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                                 nullptr,
                                 OPEN_EXISTING,
                                 FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                                (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0),
+                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0),
                                 nullptr);
     assert(hFile != INVALID_HANDLE_VALUE);
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
@@ -823,12 +824,14 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
 }
 
 
-void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
+void zen::removeDirectory(const Zstring& directory, //throw FileError
+                          const std::function<void (const Zstring& filename)>& onBeforeFileDeletion,
+                          const std::function<void (const Zstring& dirname)>&  onBeforeDirDeletion)
 {
     //no error situation if directory is not existing! manual deletion relies on it!
     if (!somethingExists(directory))
         return; //neither directory nor any other object (e.g. broken symlink) with that name existing
-    removeDirectoryImpl(directory, callback);
+    removeDirectoryImpl(directory, onBeforeFileDeletion, onBeforeDirDeletion);
 }
 
 
@@ -865,7 +868,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
     newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
     newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
 
-    const int rv = procSl == SYMLINK_FOLLOW ?
+    const int rv = procSl == ProcSymlink::FOLLOW ?
                    :: utimes(filename.c_str(), newTimes) : //utimensat() not yet implemented on OS X
                    ::lutimes(filename.c_str(), newTimes);
     if (rv != 0)
@@ -960,8 +963,8 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
     //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks! getResolvedFilePath() requires Vista or later!
-    const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getResolvedFilePath(source) : source; //throw FileError
-    const Zstring targetResolved = procSl == SYMLINK_FOLLOW && symlinkExists(target) ? getResolvedFilePath(target) : target; //
+    const Zstring sourceResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(source) ? getResolvedFilePath(source) : source; //throw FileError
+    const Zstring targetResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(target) ? getResolvedFilePath(target) : target; //
 
     //setting privileges requires admin rights!
     try
@@ -1111,7 +1114,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
 #endif
 
     struct stat fileInfo = {};
-    if (procSl == SYMLINK_FOLLOW)
+    if (procSl == ProcSymlink::FOLLOW)
     {
         if (::stat(source.c_str(), &fileInfo) != 0)
             throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), formatSystemError(L"stat", getLastError()));
@@ -1339,7 +1342,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
 
         //enforce copying file permissions: it's advertized on GUI...
         if (copyFilePermissions)
-            copyObjectPermissions(templateDir, directory, SYMLINK_FOLLOW); //throw FileError
+            copyObjectPermissions(templateDir, directory, ProcSymlink::FOLLOW); //throw FileError
 
         guardNewDir.dismiss(); //target has been created successfully!
     }
@@ -1397,18 +1400,18 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
                                &sourceAttr))                            //__out  LPVOID lpFileInformation
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"GetFileAttributesEx", getLastError()));
 
-    setFileTimeRaw(targetLink, sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, SYMLINK_DIRECT); //throw FileError
+    setFileTimeRaw(targetLink, sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, ProcSymlink::DIRECT); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat srcInfo = {};
     if (::lstat(sourceLink.c_str(), &srcInfo) != 0)
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"lstat", getLastError()));
 
-    setFileTime(targetLink, Int64(srcInfo.st_mtime), SYMLINK_DIRECT); //throw FileError
+    setFileTime(targetLink, Int64(srcInfo.st_mtime), ProcSymlink::DIRECT); //throw FileError
 #endif
 
     if (copyFilePermissions)
-        copyObjectPermissions(sourceLink, targetLink, SYMLINK_DIRECT); //throw FileError
+        copyObjectPermissions(sourceLink, targetLink, ProcSymlink::DIRECT); //throw FileError
 
     guardNewLink.dismiss(); //target has been created successfully!
 }
@@ -1516,7 +1519,7 @@ bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //thr
 //precondition: canCopyAsSparse() must return "true"!
 void copyFileWindowsSparse(const Zstring& sourceFile,
                            const Zstring& targetFile,
-                           CallbackCopyFile* callback,
+                           const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
                            InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 {
     assert(canCopyAsSparse(sourceFile, targetFile));
@@ -1701,8 +1704,8 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         //total bytes transferred may be larger than file size! context information + ADS or smaller (sparse, compressed)!
 
         //invoke callback method to update progress indicators
-        if (callback)
-            callback->updateCopyStatus(Int64(bytesRead)); //throw X!
+        if (onUpdateCopyStatus)
+            onUpdateCopyStatus(Int64(bytesRead)); //throw X!
 
         if (bytesRead > 0)
             someBytesWritten = true;
@@ -1764,12 +1767,12 @@ DEFINE_NEW_FILE_ERROR(ErrorShouldCopyAsSparse);
 class ErrorHandling
 {
 public:
-    ErrorHandling() : shouldCopyAsSparse(false), exceptionInUserCallback(nullptr) {}
+    ErrorHandling() : shouldCopyAsSparse(false) {}
 
     //call context: copyCallbackInternal()
     void reportErrorShouldCopyAsSparse() { shouldCopyAsSparse = true; }
 
-    void reportUserException(CallbackCopyFile& userCallback) { exceptionInUserCallback = &userCallback; }
+    void reportUserException(const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus) { exceptionInUserCallback = onUpdateCopyStatus; }
 
     void reportError(const std::wstring& msg, const std::wstring& description) { errorMsg = std::make_pair(msg, description); }
 
@@ -1780,7 +1783,12 @@ public:
             throw ErrorShouldCopyAsSparse(L"sparse dummy value");
 
         if (exceptionInUserCallback)
-            exceptionInUserCallback->updateCopyStatus(0); //rethrow (hopefully!)
+				try
+				{
+					exceptionInUserCallback(0); //should throw again!!!
+					assert(false);
+				}
+				catch (...) { throw; }
 
         if (!errorMsg.first.empty())
             throw FileError(errorMsg.first, errorMsg.second);
@@ -1789,25 +1797,25 @@ public:
 private:
     bool shouldCopyAsSparse;                        //
     std::pair<std::wstring, std::wstring> errorMsg; //these are exclusive!
-    CallbackCopyFile* exceptionInUserCallback;      //
+    std::function<void(Int64 bytesDelta)> exceptionInUserCallback;      // -> optional
 };
 
 
 struct CallbackData
 {
-    CallbackData(CallbackCopyFile* cb, //may be nullptr
+    CallbackData(const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
                  const Zstring& sourceFile,
                  const Zstring& targetFile) :
         sourceFile_(sourceFile),
         targetFile_(targetFile),
-        userCallback(cb),
+        onUpdateCopyStatus_(onUpdateCopyStatus),
         fileInfoSrc(),
         fileInfoTrg() {}
 
     const Zstring& sourceFile_;
     const Zstring& targetFile_;
+    const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus_;
 
-    CallbackCopyFile* const userCallback; //optional!
     ErrorHandling errorHandler;
     BY_HANDLE_FILE_INFORMATION fileInfoSrc; //modified by CopyFileEx() at beginning
     BY_HANDLE_FILE_INFORMATION fileInfoTrg; //
@@ -1899,18 +1907,17 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
 
     //called after copy operation is finished - note: for 0-sized files this callback is invoked just ONCE!
     //if (totalFileSize.QuadPart == totalBytesTransferred.QuadPart && dwStreamNumber == 1) {}
-    if (cbd.userCallback &&
-        totalBytesTransferred.QuadPart >= 0) //should be always true, but let's still check
+    if (cbd.onUpdateCopyStatus_ && totalBytesTransferred.QuadPart >= 0) //should be always true, but let's still check
         try
         {
-            cbd.userCallback->updateCopyStatus(totalBytesTransferred.QuadPart - cbd.bytesReported); //throw X!
+            cbd.onUpdateCopyStatus_(totalBytesTransferred.QuadPart - cbd.bytesReported); //throw X!
             cbd.bytesReported = totalBytesTransferred.QuadPart;
         }
         catch (...)
         {
             //#warning migrate to std::exception_ptr when available
 
-            cbd.errorHandler.reportUserException(*cbd.userCallback);
+            cbd.errorHandler.reportUserException(cbd.onUpdateCopyStatus_);
             return PROGRESS_CANCEL;
         }
     return PROGRESS_CONTINUE;
@@ -1924,7 +1931,7 @@ const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destinat
 
 void copyFileWindowsDefault(const Zstring& sourceFile,
                             const Zstring& targetFile,
-                            CallbackCopyFile* callback,
+                            const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
                             InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
 {
     //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
@@ -1947,7 +1954,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     //documentation on CopyFile2() even states: "It is not recommended to pause copies that are using this flag." How dangerous is this thing, why offer it at all???
     //perf advantage: ~15% faster
 
-    CallbackData cbd(callback, sourceFile, targetFile);
+    CallbackData cbd(onUpdateCopyStatus, sourceFile, targetFile);
 
     const bool success = ::CopyFileEx( //same performance like CopyFile()
                              applyLongPathPrefix(sourceFile).c_str(), //__in      LPCTSTR lpExistingFileName,
@@ -2051,7 +2058,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
         }
         //####################################### DST hack ###########################################
 
-        setFileTimeRaw(targetFile, creationTimeOut, lastWriteTimeOut, SYMLINK_FOLLOW); //throw FileError
+        setFileTimeRaw(targetFile, creationTimeOut, lastWriteTimeOut, ProcSymlink::FOLLOW); //throw FileError
     }
 
     guardTarget.dismiss(); //target has been created successfully!
@@ -2060,26 +2067,29 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
 //another layer to support copying sparse files
 inline
-void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
+void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targetFile, const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus, InSyncAttributes* sourceAttr)
 {
     try
     {
-        copyFileWindowsDefault(sourceFile, targetFile, callback, sourceAttr); //throw ErrorShouldCopyAsSparse et al.
+        copyFileWindowsDefault(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw ErrorShouldCopyAsSparse et al.
     }
     catch (ErrorShouldCopyAsSparse&) //we cheaply check for this condition within callback of ::CopyFileEx()!
     {
-        copyFileWindowsSparse(sourceFile, targetFile, callback, sourceAttr);
+        copyFileWindowsSparse(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr);
     }
 }
 
 
 //another layer of indirection solving 8.3 name clashes
 inline
-void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
+void copyFileWindows(const Zstring& sourceFile,
+                     const Zstring& targetFile,
+                     const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
+                     InSyncAttributes* sourceAttr)
 {
     try
     {
-        copyFileWindowsSelectRoutine(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+        copyFileWindowsSelectRoutine(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
     }
     catch (const ErrorTargetExisting&)
     {
@@ -2087,7 +2097,7 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
         if (have8dot3NameClash(targetFile))
         {
             Fix8Dot3NameClash dummy(targetFile); //throw FileError; move clashing filename to the side
-            copyFileWindowsSelectRoutine(sourceFile, targetFile, callback, sourceAttr); //throw FileError; the short filename name clash is solved, this should work now
+            copyFileWindowsSelectRoutine(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError; the short filename name clash is solved, this should work now
             return;
         }
         throw;
@@ -2098,7 +2108,7 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
 #elif defined ZEN_LINUX || defined ZEN_MAC
 void copyFileLinuxMac(const Zstring& sourceFile,
                       const Zstring& targetFile,
-                      CallbackCopyFile* callback,
+                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
                       InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
     //open sourceFile for reading
@@ -2123,8 +2133,8 @@ void copyFileLinuxMac(const Zstring& sourceFile,
             fileOut.write(&buffer[0], bytesRead); //throw FileError
 
             //invoke callback method to update progress indicators
-            if (callback)
-                callback->updateCopyStatus(Int64(bytesRead)); //throw X!
+            if (onUpdateCopyStatus)
+                onUpdateCopyStatus(Int64(bytesRead)); //throw X!
         }
         while (!fileIn.eof());
 
@@ -2155,7 +2165,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
     //http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
     //http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
     //on the other hand we thereby have to reopen https://sourceforge.net/p/freefilesync/bugs/230/
-    setFileTime(targetFile, sourceInfo.st_mtime, SYMLINK_FOLLOW); //throw FileError
+    setFileTime(targetFile, sourceInfo.st_mtime, ProcSymlink::FOLLOW); //throw FileError
 
     guardTarget.dismiss(); //target has been created successfully!
 }
@@ -2190,13 +2200,16 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsSparse(::BackupRead/::Backu
 */
 
 inline
-void copyFileSelectOs(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, InSyncAttributes* sourceAttr)
+void copyFileSelectOs(const Zstring& sourceFile,
+                      const Zstring& targetFile,
+                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
+                      InSyncAttributes* sourceAttr)
 {
 #ifdef ZEN_WIN
-    copyFileWindows(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+    copyFileWindows(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    copyFileLinuxMac(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    copyFileLinuxMac(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 #endif
 }
 }
@@ -2206,7 +2219,8 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
                    const Zstring& targetFile,
                    bool copyFilePermissions,
                    bool transactionalCopy,
-                   CallbackCopyFile* callback,
+                   const std::function<void()>& onDeleteTargetFile,
+                   const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus,
                    InSyncAttributes* sourceAttr)
 {
     if (transactionalCopy)
@@ -2216,7 +2230,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         //raw file copy
         try
         {
-            copyFileSelectOs(sourceFile, temporary, callback, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+            copyFileSelectOs(sourceFile, temporary, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
         }
         catch (ErrorTargetExisting&)
         {
@@ -2225,15 +2239,15 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
             temporary = findUnusedTempName(targetFile);
 
             //retry
-            copyFileSelectOs(sourceFile, temporary, callback, sourceAttr); //throw FileError
+            copyFileSelectOs(sourceFile, temporary, onUpdateCopyStatus, sourceAttr); //throw FileError
         }
 
         //transactional behavior: ensure cleanup; not needed before copyFileSelectOs() which is already transactional
         zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(temporary); } catch (FileError&) {} });
 
         //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
-        if (callback)
-            callback->deleteTargetFile(targetFile); //throw X
+        if (onDeleteTargetFile)
+            onDeleteTargetFile(); //throw X
 
         //rename temporary file:
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
@@ -2264,9 +2278,10 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     }
     else
     {
-        if (callback) callback->deleteTargetFile(targetFile);
+        if (onDeleteTargetFile)
+            onDeleteTargetFile();
 
-        copyFileSelectOs(sourceFile, targetFile, callback, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+        copyFileSelectOs(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
     }
     /*
        Note: non-transactional file copy solves at least four problems:
@@ -2281,7 +2296,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     {
         zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {}});
 
-        copyObjectPermissions(sourceFile, targetFile, SYMLINK_FOLLOW); //throw FileError
+        copyObjectPermissions(sourceFile, targetFile, ProcSymlink::FOLLOW); //throw FileError
 
         guardTargetFile.dismiss(); //target has been created successfully!
     }

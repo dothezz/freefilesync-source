@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>أي عدد من المسارات البديلة لملف خيارات وحيد على الأكثر.</target>
 
-<source>A folder input field is empty.</source>
-<target>حقل إدخال خاص بمجلد فارغ.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>سيتم اعتبار المجلد الموافق كمجلد فارغ</target>
-
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>بإمكانك إهمال هذا الخطأ لاعتبار كل مجلد على أنه مجلد فارغ. سيتم إنشاء المجلدات تلقائياً خلال المزامنة</target>
+
+<source>A folder input field is empty.</source>
+<target>حقل إدخال خاص بمجلد فارغ.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>سيتم اعتبار المجلد الموافق كمجلد فارغ</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>للمجلدات التالية مسارات مستقلة عن بعضها. انتبه عند ضبط إعدادات المزامنة:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>لا يمكن الحصول على معلومات العملية.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>في انتظار تأمين قفل للمسار (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>انتظر بينما يتم إنشاء قفل للمسار:</target>
+
+<source>Lock owner:</source>
+<target>صاحب القفل:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -235,6 +238,9 @@
 <pluralform>%x ثانية</pluralform>
 <pluralform>%x ثانية</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>اكتشاف قفل مهمل...</target>
 
 <source>Creating file %x</source>
 <target>إنشاء الملف %x</target>
@@ -314,7 +320,7 @@
 <target>تصفح المسار</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>لا يمكن الوصول إلى خدمة النسخ الظلي الوسيط.</target>
+<target>لا يمكن الوصول إلى خدمة "نسخ الظل لوحدة التخزين".</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>الرجاء استخدام إصدار الـ 64-bit للبرنامج لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
@@ -326,7 +332,7 @@
 <target>تعذر تحديد اسم الوسط %x</target>
 
 <source>Volume name %x is not part of file path %y.</source>
-<target>اسم الوسط %x ليس جزءا من مسار الملق %y.</target>
+<target>اسم وحدة التخزين %x ليس جزءاُ من اسم الملف %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>طلب إحباط المهمة: في انتظار انتهاء المهمة الحالية...</target>
@@ -374,7 +380,7 @@
 <target>للبدء قم باستيراد ملف .ffs_batch.</target>
 
 <source>Folders to watch:</source>
-<target>المجلدات المراقبة</target>
+<target>المجلدات للمتابعة:</target>
 
 <source>Add folder</source>
 <target>إضافة مجلد</target>
@@ -498,6 +504,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>تحديث سمات %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>جاري إنشاء نسخة ظل وسيطة لـ %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>خطأ في التحقق من البيانات: يحتوي %x و %y بيانات مختلفة.</target>
+
 <source>Cannot find %x.</source>
 <target>تعذر العثور على %x.</target>
 
@@ -536,12 +548,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>إنشاء قاعدة بيانات...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>جاري إنشاء نسخة ظل وسيطة لـ %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>خطأ في التحقق من البيانات: يحتوي %x و %y بيانات مختلفة.</target>
 
 <source>job name</source>
 <target>اسم المهمة</target>
@@ -584,13 +590,19 @@ The command is triggered if:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>إعادة المحاولة بعد 0 ثانية...</pluralform>
+<pluralform>إعادة المحاولة بعد 1 ثانية واحدة...</pluralform>
+<pluralform>إعادة المحاولة بعد 2 ثانيتين...</pluralform>
+<pluralform>إعادة المحاولة بعد %x ثواني...</pluralform>
+<pluralform>إعادة المحاولة بعد %x ثانية...</pluralform>
+<pluralform>إعادة المحاولة بعد %x ثانية...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>&تجاهلا الأخطاء المماثلة</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>إعادة محاولة العملية...</target>
 
 <source>Serious Error</source>
 <target>خطأ فادح</target>
@@ -617,7 +629,7 @@ The command is triggered if:
 <target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
 
 <source>&Check</source>
-<target></target>
+<target>&تحقق</target>
 
 <source>Symlink</source>
 <target>ارتباط-رمزي</target>
@@ -775,12 +787,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
 
-<source>Hide excluded items</source>
-<target>إخفاء العناصر المستبعدة</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>إظهار الملفات التي تم فلترتها أو استبعادها بشكل مؤقت</target>
-
 <source>Number of files and folders that will be created</source>
 <target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
 
@@ -812,10 +818,10 @@ The command is triggered if:
 <target>موافق</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة بواسطة قواعد البيانات</target>
+<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>إنشاء نسخة نظيرة للمجلد على اليسار بحيث يطابق المجلد على اليمين بعد المزامنة</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>إنشاء نسخة احتياطية من الجانب الأيمن عن طريق تعديل الطرف الأيسر ليطابق الأيمن.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>نسخ الملفات المحدثة إلى المجلد المناسب</target>
@@ -826,8 +832,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>يتطلب ملفات قواعد بيانات. غير مدعوم من قبل جميع أنظمة الملفات.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- بحاجة لإنشاء قواعد بيانات لجميع الملفات
+- يبدأ التعرف على التغيرات بعد المزامنة الأولية
+- غير مدعوم من قبل جميع أنطمة الملفات (file systems)
+</target>
 
 <source>Delete files:</source>
 <target>حذف الملفات:</target>
@@ -917,7 +931,7 @@ The command is triggered if:
 <target>إنشاء ملف دفعي من أجل عمليات المزامنة غير المحضورة. للبدأ, انقر نقراً مزدوجاً على الملف أو المهمة المجدولة في منظم المهام: %x</target>
 
 <source>Stop synchronization at first error</source>
-<target>إيقاف المزامنة عند أول خطأ</target>
+<target>إحباط المزامنة عند أول خطأ</target>
 
 <source>Show progress dialog</source>
 <target>إظهار نافذة حوار تقدم العملية</target>
@@ -959,10 +973,10 @@ The command is triggered if:
 <target>حجم الملف:</target>
 
 <source>Minimum:</source>
-<target>أصغري</target>
+<target>الحد الأدنى:</target>
 
 <source>Maximum:</source>
-<target>أعظمي</target>
+<target>الحد الأقصى:</target>
 
 <source>&Clear</source>
 <target>&إزالة</target>
@@ -1063,6 +1077,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>بحث</target>
 
+<source>Select View</source>
+<target>اخيار طريقة العرض</target>
+
 <source>Overview</source>
 <target>نظرة عامة</target>
 
@@ -1071,12 +1088,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>الشريط الرئيسي</target>
-
-<source>Filter Files</source>
-<target>فلترة الملفات</target>
-
-<source>Select View</source>
-<target>اخيار طريقة العرض</target>
 
 <source>Open...</source>
 <target>فتح...</target>
@@ -1104,6 +1115,12 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل عنصر 0</pluralform>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل عنصر وحيد 1</pluralform>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل عنصرين اثنين 2</pluralform>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل %x عناصر</pluralform>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل %x عنصراً</pluralform>
+<pluralform>هل تريد حقاً تنفيذ العملية %y من أجل %x عنصر</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1136,13 +1153,13 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>الظاهر %y من أصل 0 سطر</pluralform>
-<pluralform>الظاهر %y من أصل 1 (سطر وحيد)</pluralform>
-<pluralform>الظاهر %y من أصل 2 (سطرين)</pluralform>
+<pluralform>الظاهر %y من أصل سطر 0</pluralform>
+<pluralform>الظاهر %y من أصل سطر وحيد 1</pluralform>
+<pluralform>الظاهر %y من أصل سطرين اثنين 2</pluralform>
 <pluralform>الظاهر %y من أصل %x سطور</pluralform>
 <pluralform>الظاهر %y من أصل %x سطراً</pluralform>
 <pluralform>الظاهر %y من أصل %x سطر</pluralform>
@@ -1262,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>إظهار الملفات التي لن يتم نسخها</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>إظهار الملفات التي تم فلترتها أو استبعادها بشكل مؤقت</target>
+
 <source>Set as default</source>
 <target>تحديد كوضع افتراضي</target>
 
@@ -1269,16 +1289,16 @@ This guarantees a consistent state even in case of a serious error.
 <target>جميع المجلدات متزامنة</target>
 
 <source>Synchronization Settings</source>
-<target>خيارات المزامنة</target>
+<target>إعدادات المزامنة</target>
 
 <source>Comparison Settings</source>
-<target>خيارات المقارنة</target>
+<target>إعدادات المقارنة</target>
 
 <source>Cannot find %x</source>
 <target>لا يمكن العثور على  %x</target>
 
 <source>Comma-separated values</source>
-<target>قيم مفصولة بواسطة فواصل</target>
+<target>قائمة قيم مفصولة بفواصل</target>
 
 <source>File list exported</source>
 <target>تم تصدير قائمة الملفات</target>
@@ -1298,6 +1318,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Warning</source>
 <target>تحذير</target>
 
+<source>Select all</source>
+<target>اختيار الجميع</target>
+
 <source>Paused</source>
 <target>تم الإيقاف مؤقتاً</target>
 
@@ -1308,10 +1331,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>توقف</target>
 
 <source>Completed</source>
-<target>تم الإنتهاء</target>
+<target>انتهت العملية</target>
 
 <source>&Continue</source>
-<target>&متابعة</target>
+<target>&مواصلة</target>
 
 <source>Log</source>
 <target>السجل</target>
@@ -1547,7 +1570,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>تعذر تغيير أولويات I/O للعملية</target>
 
 <source>Unable to move %x to the recycle bin.</source>
-<target>تعذر نقل %x إلى سلة المهملات.</target>
+<target>تعذر نقل %x إلى سلة المحذوفات.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>تعذر تحديد المسار النهائي لـ %x.</target>

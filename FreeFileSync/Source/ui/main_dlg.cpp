@@ -481,9 +481,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     bSizerPanelHolder->Detach(m_gridNavi);
     bSizerPanelHolder->Detach(m_panelCenter);
     bSizerPanelHolder->Detach(m_panelConfig);
-    bSizerPanelHolder->Detach(m_panelFilter);
     bSizerPanelHolder->Detach(m_panelViewFilter);
-    bSizerPanelHolder->Detach(m_panelStatistics);
 
     auiMgr.SetManagedWindow(this);
     auiMgr.SetFlags(wxAUI_MGR_DEFAULT | wxAUI_MGR_LIVE_RESIZE);
@@ -492,39 +490,33 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelCenter,
-                   wxAuiPaneInfo().Name(L"Panel3").CenterPane().PaneBorder(false));
+                   wxAuiPaneInfo().Name(L"PanelCenter").CenterPane().PaneBorder(false));
 
     auiMgr.AddPane(m_panelDirectoryPairs,
-                   wxAuiPaneInfo().Name(L"Panel2").Layer(2).Top().Caption(_("Folder Pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
+                   wxAuiPaneInfo().Name(L"PanelFolders").Layer(2).Top().Caption(_("Folder Pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
 
     auiMgr.AddPane(m_panelSearch,
-                   wxAuiPaneInfo().Name(L"PanelFind").Layer(2).Bottom().Caption(_("Find")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(200, m_bpButtonHideSearch->GetSize().GetHeight()).Hide());
+                   wxAuiPaneInfo().Name(L"PanelFind").Layer(2).Bottom().Row(2).Caption(_("Find")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(200, m_bpButtonHideSearch->GetSize().GetHeight()).Hide());
+
+    auiMgr.AddPane(m_panelViewFilter,
+                   wxAuiPaneInfo().Name(L"PanelView").Layer(2).Bottom().Row(1).Caption(_("Select View")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_gridNavi,
-                   wxAuiPaneInfo().Name(L"Panel10").Layer(3).Left().Position(1).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
+                   wxAuiPaneInfo().Name(L"PanelOverview").Layer(3).Left().Position(1).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
 
     auiMgr.AddPane(m_panelConfig,
-                   wxAuiPaneInfo().Name(L"Panel4").Layer(3).Left().Position(2).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelConfig").Layer(3).Left().Position(2).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
 
     //set comparison button label tentatively for m_panelTopButtons to receive final height:
     updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
     m_panelTopButtons->GetSizer()->SetSizeHints(m_panelTopButtons); //~=Fit() + SetMinSize()
 
     auiMgr.AddPane(m_panelTopButtons,
-                   wxAuiPaneInfo().Name(L"Panel1").Layer(4).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelTop").Layer(4).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
     //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
     auiMgr.AddPane(compareStatus->getAsWindow(),
-                   wxAuiPaneInfo().Name(L"Panel9").Layer(4).Top().Row(2).CaptionVisible(false).PaneBorder(false).Hide());
-
-    auiMgr.AddPane(m_panelFilter,
-                   wxAuiPaneInfo().Name(L"Panel5").Layer(4).Bottom().Position(1).Caption(_("Filter Files")).MinSize(m_bpButtonFilter->GetSize().GetWidth(), m_panelFilter->GetSize().GetHeight()));
-
-    auiMgr.AddPane(m_panelViewFilter,
-                   wxAuiPaneInfo().Name(L"Panel6").Layer(4).Bottom().Position(2).Caption(_("Select View")).MinSize(m_bpButtonShowDoNothing->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
-
-    auiMgr.AddPane(m_panelStatistics,
-                   wxAuiPaneInfo().Name(L"Panel7").Layer(4).Bottom().Position(3).Caption(_("Statistics")).MinSize(m_bitmapData->GetSize().GetWidth() + m_staticTextData->GetSize().GetWidth(), m_panelStatistics->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelProgress").Layer(4).Top().Row(2).CaptionVisible(false).PaneBorder(false).Hide());
 
     auiMgr.Update();
 
@@ -548,9 +540,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     //register view layout context menu
     m_panelTopButtons->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
     m_panelConfig    ->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
-    m_panelFilter    ->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
     m_panelViewFilter->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
-    m_panelStatistics->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
     m_panelStatusBar ->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainDialog::OnContextSetLayout), nullptr, this);
     //----------------------------------------------------------------------------------
 
@@ -582,8 +572,8 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     m_bpButtonSave ->SetToolTip(_("Save")    + L" (Ctrl+S)");
     m_buttonCompare     ->SetToolTip(_("Compare both sides")       + L" (F5)");
     m_bpButtonCmpConfig ->SetToolTip(_("Comparison settings")      + L" (F6)");
-    m_bpButtonSyncConfig->SetToolTip(_("Synchronization settings") + L" (F7)");
-    m_buttonSync        ->SetToolTip(_("Start synchronization")    + L" (F8)");
+    m_bpButtonSyncConfig->SetToolTip(_("Synchronization settings") + L" (F8)");
+    m_buttonSync        ->SetToolTip(_("Start synchronization")    + L" (F9)");
 
     gridDataView = std::make_shared<GridView>();
     treeDataView = std::make_shared<TreeView>();
@@ -701,11 +691,9 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     //dynamically change sizer direction depending on size
     m_panelConfig    ->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeConfigPanel),     nullptr, this);
     m_panelViewFilter->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeViewPanel),       nullptr, this);
-    m_panelStatistics->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeStatisticsPanel), nullptr, this);
     wxSizeEvent dummy3;
     OnResizeConfigPanel    (dummy3); //call once on window creation
     OnResizeViewPanel      (dummy3); //
-    OnResizeStatisticsPanel(dummy3); //
 
     //event handler for manual (un-)checking of rows and setting of sync direction
     m_gridMainC->Connect(EVENT_GRID_CHECK_ROWS,     CheckRowsEventHandler    (MainDialog::onCheckRows), nullptr, this);
@@ -902,8 +890,8 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     auiMgr.LoadPerspective(globalSettings.gui.guiPerspectiveLast);
 
     //restore original captions
-    for (auto it = captionNameMap.begin(); it != captionNameMap.end(); ++it)
-        auiMgr.GetPane(it->second).Caption(it->first);
+    for (const auto& item : captionNameMap)
+        auiMgr.GetPane(item.second).Caption(item.first);
 
     //if MainDialog::onQueryEndSession() is called while comparison is active, this panel is saved and restored as "visible"
     auiMgr.GetPane(compareStatus->getAsWindow()).Hide();
@@ -986,13 +974,11 @@ void MainDialog::setSyncDirManually(const std::vector<FileSystemObject*>& select
 {
     if (!selection.empty())
     {
-        std::for_each(selection.begin(), selection.end(),
-                      [&](FileSystemObject* fsObj)
+        for (FileSystemObject* fsObj : selection)
         {
             setSyncDirectionRec(direction, *fsObj); //set new direction (recursively)
             zen::setActiveStatus(true, *fsObj); //works recursively for directories
-        });
-
+        }
         updateGui();
     }
 }
@@ -1001,21 +987,21 @@ void MainDialog::setSyncDirManually(const std::vector<FileSystemObject*>& select
 void MainDialog::setFilterManually(const std::vector<FileSystemObject*>& selection, bool setIncluded)
 {
     //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
-    assert(!currentCfg.hideExcludedItems || !setIncluded);
+    assert(m_bpButtonShowExcluded->isActive() || !setIncluded);
 
     if (!selection.empty())
     {
-        std::for_each(selection.begin(), selection.end(),
-        [&](FileSystemObject* fsObj) { zen::setActiveStatus(setIncluded, *fsObj); }); //works recursively for directories
+        for (FileSystemObject* fsObj : selection)
+            zen::setActiveStatus(setIncluded, *fsObj); //works recursively for directories
 
-        updateGuiDelayedIf(currentCfg.hideExcludedItems); //show update GUI before removing rows
+        updateGuiDelayedIf(!m_bpButtonShowExcluded->isActive()); //show update GUI before removing rows
     }
 }
 
 
 namespace
 {
-//perf: wxString doesn't model exponential growth and so is unusable for large data sets
+//perf: wxString doesn't model exponential growth and is unsuitable for large data sets
 typedef Zbase<wchar_t> zxString; //guaranteed exponential growth
 }
 
@@ -1032,10 +1018,7 @@ void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRe
                 std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig();
                 vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
                 if (!colAttr.empty())
-                {
-                    const std::vector<size_t> selection = grid.getSelectedRows();
-                    std::for_each(selection.begin(), selection.end(),
-                                  [&](size_t row)
+                    for (size_t row : grid.getSelectedRows())
                     {
                         std::for_each(colAttr.begin(), colAttr.end() - 1,
                                       [&](const Grid::ColumnAttribute& ca)
@@ -1045,8 +1028,7 @@ void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRe
                         });
                         clipboardString += copyStringTo<zxString>(prov->getValue(row, colAttr.back().type_));
                         clipboardString += L'\n';
-                    });
-                }
+                    }
             }
         };
 
@@ -1092,10 +1074,7 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
 {
     std::vector<FileSystemObject*> output;
 
-    const std::vector<size_t>& sel = m_gridNavi->getSelectedRows();
-    std::for_each(sel.begin(), sel.end(),
-                  [&](size_t row)
-    {
+    for (size_t row : m_gridNavi->getSelectedRows())
         if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(row))
         {
             if (auto root = dynamic_cast<const TreeView::RootNode*>(node.get()))
@@ -1109,8 +1088,8 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
                 output.push_back(&(dir->dirObj_));
             else if (auto file = dynamic_cast<const TreeView::FilesNode*>(node.get()))
                 output.insert(output.end(), file->filesAndLinks_.begin(), file->filesAndLinks_.end());
+            else assert(false);
         }
-    });
     return output;
 }
 
@@ -1445,7 +1424,7 @@ void MainDialog::setStatusBarFileStatistics(size_t filesOnLeftView,
     wxString statusMiddleNew;
     if (gridDataView->rowsTotal() > 0)
     {
-        statusMiddleNew = _P("%y of 1 row in view", "%y of %x rows in view", gridDataView->rowsTotal());
+        statusMiddleNew = _P("Showing %y of 1 row", "Showing %y of %x rows", gridDataView->rowsTotal());
         replace(statusMiddleNew, L"%y", toGuiString(gridDataView->rowsOnView()), false); //%x is already used as plural form placeholder!
     }
 
@@ -1540,9 +1519,7 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_panelDirectoryPairs->Disable();
     m_splitterMain       ->Disable(); //includes m_panelCenter, but not m_panelStatusBar!
     m_panelViewFilter    ->Disable();
-    m_panelFilter        ->Disable();
     m_panelConfig        ->Disable();
-    m_panelStatistics    ->Disable();
     m_gridNavi           ->Disable();
 
     if (enableAbort)
@@ -1576,9 +1553,7 @@ void MainDialog::enableAllElements()
     m_panelDirectoryPairs->Enable();
     m_splitterMain       ->Enable();
     m_panelViewFilter    ->Enable();
-    m_panelFilter        ->Enable();
     m_panelConfig        ->Enable();
-    m_panelStatistics    ->Enable();
     m_gridNavi           ->Enable();
 
     //show compare button
@@ -1618,21 +1593,10 @@ void MainDialog::OnResizeConfigPanel(wxEvent& event)
 
 void MainDialog::OnResizeViewPanel(wxEvent& event)
 {
-    updateSizerOrientation(*bSizerViewFilter, *m_panelViewFilter, 1.0);
-    event.Skip();
-}
-
-
-void MainDialog::OnResizeStatisticsPanel(wxEvent& event)
-{
-    //updateSizerOrientation(*bSizerStatistics, *m_panelStatistics);
-
-    //we need something more fancy:
-    const int parentOrient = m_panelStatistics->GetSize().GetWidth() > m_panelStatistics->GetSize().GetHeight() ? wxHORIZONTAL : wxVERTICAL; //check window NOT sizer width!
-    if (bSizerStatistics->GetOrientation() != parentOrient)
+    //we need something more fancy for the statistics:
+    const int parentOrient = m_panelViewFilter->GetSize().GetWidth() > m_panelViewFilter->GetSize().GetHeight() ? wxHORIZONTAL : wxVERTICAL; //check window NOT sizer width!
+    if (bSizerViewFilter->GetOrientation() != parentOrient)
     {
-        bSizerStatistics->SetOrientation(parentOrient);
-
         //apply opposite orientation for child sizers
         const int childOrient = parentOrient == wxHORIZONTAL ? wxVERTICAL : wxHORIZONTAL;
         wxSizerItemList& sl = bSizerStatistics->GetChildren();
@@ -1643,6 +1607,10 @@ void MainDialog::OnResizeStatisticsPanel(wxEvent& event)
                 if (sizerChild->GetOrientation() != childOrient)
                     sizerChild->SetOrientation(childOrient);
         }
+
+        bSizerStatistics->SetOrientation(parentOrient);
+        bSizerViewFilter->SetOrientation(parentOrient);
+        m_panelViewFilter->Layout();
         m_panelStatistics->Layout();
     }
 
@@ -1885,22 +1853,22 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
         case WXK_F7:
         {
             wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
+            if (wxEvtHandler* evtHandler = m_bpButtonFilter->GetEventHandler())
+                evtHandler->ProcessEvent(dummy2); //synchronous call
+        }
+        return; //-> swallow event!
+
+        case WXK_F8:
+        {
+            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
             if (wxEvtHandler* evtHandler = m_bpButtonSyncConfig->GetEventHandler())
                 evtHandler->ProcessEvent(dummy2); //synchronous call
         }
         return; //-> swallow event!
 
-        case WXK_F9:
+        case WXK_F10:
             setViewTypeSyncAction(!m_bpButtonViewTypeSyncAction->isActive());
             return; //-> swallow event!
-
-        case WXK_F10:
-        {
-            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
-            if (wxEvtHandler* evtHandler = m_bpButtonFilter->GetEventHandler())
-                evtHandler->ProcessEvent(dummy2); //synchronous call
-        }
-        return; //-> swallow event!
 
         //redirect certain (unhandled) keys directly to grid!
         case WXK_UP:
@@ -2104,21 +2072,24 @@ void MainDialog::onMainGridContextC(GridClickEvent& event)
     menu.addItem(_("Exclude all"), [&]
     {
         zen::setActiveStatus(false, folderCmp);
-        updateGuiDelayedIf(currentCfg.hideExcludedItems); //show update GUI before removing rows
+        updateGuiDelayedIf(!m_bpButtonShowExcluded->isActive()); //show update GUI before removing rows
     }, nullptr, gridDataView->rowsTotal() > 0);
 
     menu.popup(*this);
 }
+
 
 void MainDialog::onMainGridContextL(GridClickEvent& event)
 {
     onMainGridContextRim(true);
 }
 
+
 void MainDialog::onMainGridContextR(GridClickEvent& event)
 {
     onMainGridContextRim(false);
 }
+
 
 void MainDialog::onMainGridContextRim(bool leftSide)
 {
@@ -2333,11 +2304,9 @@ void MainDialog::onGridLabelContextC(GridClickEvent& event)
     ContextMenu menu;
 
     const bool actionView = m_bpButtonViewTypeSyncAction->isActive();
-    menu.addRadio(_("Category") + (actionView  ? L"\tF9" : L""), [&] { setViewTypeSyncAction(false); }, !actionView);
-    menu.addRadio(_("Action")   + (!actionView ? L"\tF9" : L""), [&] { setViewTypeSyncAction(true ); },  actionView);
+    menu.addRadio(_("Category") + (actionView  ? L"\tF10" : L""), [&] { setViewTypeSyncAction(false); }, !actionView);
+    menu.addRadio(_("Action")   + (!actionView ? L"\tF10" : L""), [&] { setViewTypeSyncAction(true ); },  actionView);
 
-    //menu.addItem(_("Category") + L"\tF9", [&] { setViewTypeSyncAction(false); }, m_bpButtonViewTypeSyncAction->isActive() ? nullptr : &getResourceImage(L"compare_small"));
-    //menu.addItem(_("Action"),             [&] { setViewTypeSyncAction(true ); }, m_bpButtonViewTypeSyncAction->isActive() ? &getResourceImage(L"sync_small") : nullptr);
     menu.popup(*this);
 }
 
@@ -2413,7 +2382,7 @@ void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::v
             if (showSelectTimespanDlg(this, manualTimeSpanFrom, manualTimeSpanTo) == ReturnSmallDlg::BUTTON_OKAY)
             {
                 applyTimeSpanFilter(folderCmp, manualTimeSpanFrom, manualTimeSpanTo); //overwrite current active/inactive settings
-                //updateGuiDelayedIf(currentCfg.hideExcludedItems); //show update GUI before removing rows
+                //updateGuiDelayedIf(!m_bpButtonShowExcluded->isActive()); //show update GUI before removing rows
                 updateGui();
             }
         };
@@ -3172,8 +3141,6 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::
     setAddFolderPairs(currentCfg.mainCfg.additionalPairs);
 
     //read GUI layout
-    m_checkBoxHideExcluded->SetValue(currentCfg.hideExcludedItems);
-
     setViewTypeSyncAction(currentCfg.highlightSyncAction);
 
     clearGrid(); //+ update GUI!
@@ -3238,17 +3205,6 @@ void MainDialog::updateGuiDelayedIf(bool condition)
 
         wxMilliSleep(delay); //some delay to show the changed GUI before removing rows from sight
     }
-
-    updateGui();
-}
-
-
-void MainDialog::OnShowExcluded(wxCommandEvent& event)
-{
-    //toggle showing filtered rows
-    currentCfg.hideExcludedItems = !currentCfg.hideExcludedItems;
-    //make sure, checkbox and value are in sync
-    m_checkBoxHideExcluded->SetValue(currentCfg.hideExcludedItems);
 
     updateGui();
 }
@@ -3356,6 +3312,8 @@ void MainDialog::initViewFilterButtons()
     initButton(*m_bpButtonShowUpdateLeft,  "so_update_left",  _("Show files that will be overwritten on left side"));
     initButton(*m_bpButtonShowUpdateRight, "so_update_right", _("Show files that will be overwritten on right side"));
     initButton(*m_bpButtonShowDoNothing,   "so_none",         _("Show files that won't be copied"));
+
+    initButton(*m_bpButtonShowExcluded, "checkboxFalse", _("Show filtered or temporarily excluded files"));
 }
 
 
@@ -3364,13 +3322,15 @@ void MainDialog::setViewFilterDefault()
     auto setButton = [](ToggleButton* tb, bool value) { tb->setActive(value); };
 
     const auto& def = globalCfg.gui.viewFilterDefault;
+    setButton(m_bpButtonShowExcluded,	def.excluded);
+    setButton(m_bpButtonShowEqual,		def.equal);
+    setButton(m_bpButtonShowConflict,	def.conflict);
+
     setButton(m_bpButtonShowLeftOnly,	def.leftOnly);
     setButton(m_bpButtonShowRightOnly,	def.rightOnly);
     setButton(m_bpButtonShowLeftNewer,	def.leftNewer);
     setButton(m_bpButtonShowRightNewer,	def.rightNewer);
-    setButton(m_bpButtonShowEqual,		def.equal);
     setButton(m_bpButtonShowDifferent,	def.different);
-    setButton(m_bpButtonShowConflict,	def.conflict);
 
     setButton(m_bpButtonShowCreateLeft,	def.createLeft);
     setButton(m_bpButtonShowCreateRight,def.createRight);
@@ -3390,16 +3350,18 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
             defaultValue = tb->isActive();
     };
 
-    auto setDefault = [&]
+    auto saveDefault = [&]
     {
         auto& def = globalCfg.gui.viewFilterDefault;
+        setButtonDefault(m_bpButtonShowExcluded,   def.excluded);
+        setButtonDefault(m_bpButtonShowEqual,      def.equal);
+        setButtonDefault(m_bpButtonShowConflict,   def.conflict);
+
         setButtonDefault(m_bpButtonShowLeftOnly,   def.leftOnly);
         setButtonDefault(m_bpButtonShowRightOnly,  def.rightOnly);
         setButtonDefault(m_bpButtonShowLeftNewer,  def.leftNewer);
         setButtonDefault(m_bpButtonShowRightNewer, def.rightNewer);
-        setButtonDefault(m_bpButtonShowEqual,      def.equal);
         setButtonDefault(m_bpButtonShowDifferent,  def.different);
-        setButtonDefault(m_bpButtonShowConflict,   def.conflict);
 
         setButtonDefault(m_bpButtonShowCreateLeft,  def.createLeft);
         setButtonDefault(m_bpButtonShowCreateRight, def.createRight);
@@ -3411,7 +3373,7 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
     };
 
     ContextMenu menu;
-    menu.addItem( _("Set as default"), setDefault);
+    menu.addItem( _("Set as default"), saveDefault);
     menu.popup(*this);
 }
 
@@ -3422,12 +3384,12 @@ void MainDialog::updateGlobalFilterButton()
     if (!isNullFilter(currentCfg.mainCfg.globalFilter))
     {
         setImage(*m_bpButtonFilter, getResourceImage(L"filter"));
-        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F10) (" + _("Active") + L")");
+        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + _("Active") + L")");
     }
     else
     {
         setImage(*m_bpButtonFilter, greyScale(getResourceImage(L"filter")));
-        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F10) (" + _("None") + L")");
+        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + _("None") + L")");
     }
 }
 
@@ -3729,10 +3691,13 @@ void MainDialog::onGridDoubleClickL(GridClickEvent& event)
 {
     onGridDoubleClickRim(event.row_, true);
 }
+
+
 void MainDialog::onGridDoubleClickR(GridClickEvent& event)
 {
     onGridDoubleClickRim(event.row_, false);
 }
+
 
 void MainDialog::onGridDoubleClickRim(size_t row, bool leftSide)
 {
@@ -3768,6 +3733,8 @@ void MainDialog::onGridLabelLeftClickL(GridClickEvent& event)
 {
     onGridLabelLeftClick(true, static_cast<ColumnTypeRim>(event.colType_));
 }
+
+
 void MainDialog::onGridLabelLeftClickR(GridClickEvent& event)
 {
     onGridLabelLeftClick(false, static_cast<ColumnTypeRim>(event.colType_));
@@ -3837,26 +3804,15 @@ void MainDialog::updateGridViewData()
     zen::UInt64 filesizeLeftView;
     zen::UInt64 filesizeRightView;
 
-    //disable all buttons per default
-    m_bpButtonShowLeftOnly  ->Show(false);
-    m_bpButtonShowRightOnly ->Show(false);
-    m_bpButtonShowLeftNewer ->Show(false);
-    m_bpButtonShowRightNewer->Show(false);
-    m_bpButtonShowDifferent ->Show(false);
-    m_bpButtonShowEqual     ->Show(false);
-    m_bpButtonShowConflict  ->Show(false);
-
-    m_bpButtonShowCreateLeft ->Show(false);
-    m_bpButtonShowCreateRight->Show(false);
-    m_bpButtonShowDeleteLeft ->Show(false);
-    m_bpButtonShowDeleteRight->Show(false);
-    m_bpButtonShowUpdateLeft ->Show(false);
-    m_bpButtonShowUpdateRight->Show(false);
-    m_bpButtonShowDoNothing  ->Show(false);
+    auto updateVisibility = [](ToggleButton* btn, bool shown)
+    {
+        if (btn->IsShown() != shown)
+            btn->Show(shown);
+    };
 
     if (m_bpButtonViewTypeSyncAction->isActive())
     {
-        const GridView::StatusSyncPreview result = gridDataView->updateSyncPreview(currentCfg.hideExcludedItems,
+        const GridView::StatusSyncPreview result = gridDataView->updateSyncPreview(m_bpButtonShowExcluded   ->isActive(),
                                                                                    m_bpButtonShowCreateLeft ->isActive(),
                                                                                    m_bpButtonShowCreateRight->isActive(),
                                                                                    m_bpButtonShowDeleteLeft ->isActive(),
@@ -3864,8 +3820,8 @@ void MainDialog::updateGridViewData()
                                                                                    m_bpButtonShowUpdateLeft ->isActive(),
                                                                                    m_bpButtonShowUpdateRight->isActive(),
                                                                                    m_bpButtonShowDoNothing  ->isActive(),
-                                                                                   m_bpButtonShowEqual            ->isActive(),
-                                                                                   m_bpButtonShowConflict         ->isActive());
+                                                                                   m_bpButtonShowEqual      ->isActive(),
+                                                                                   m_bpButtonShowConflict   ->isActive());
         filesOnLeftView    = result.filesOnLeftView;
         foldersOnLeftView  = result.foldersOnLeftView;
         filesOnRightView   = result.filesOnRightView;
@@ -3873,40 +3829,28 @@ void MainDialog::updateGridViewData()
         filesizeLeftView   = result.filesizeLeftView;
         filesizeRightView  = result.filesizeRightView;
 
-
         //sync preview buttons
-        m_bpButtonShowCreateLeft  ->Show(result.existsSyncCreateLeft);
-        m_bpButtonShowCreateRight ->Show(result.existsSyncCreateRight);
-        m_bpButtonShowDeleteLeft  ->Show(result.existsSyncDeleteLeft);
-        m_bpButtonShowDeleteRight ->Show(result.existsSyncDeleteRight);
-        m_bpButtonShowUpdateLeft  ->Show(result.existsSyncDirLeft);
-        m_bpButtonShowUpdateRight ->Show(result.existsSyncDirRight);
-        m_bpButtonShowDoNothing   ->Show(result.existsSyncDirNone);
-        m_bpButtonShowEqual       ->Show(result.existsSyncEqual);
-        m_bpButtonShowConflict    ->Show(result.existsConflict);
+        updateVisibility(m_bpButtonShowExcluded   , result.existsExcluded);
+        updateVisibility(m_bpButtonShowEqual      , result.existsEqual);
+        updateVisibility(m_bpButtonShowConflict   , result.existsConflict);
 
-        const bool anyViewFilterButtonShown = m_bpButtonShowCreateLeft ->IsShown() ||
-                                              m_bpButtonShowCreateRight->IsShown() ||
-                                              m_bpButtonShowDeleteLeft ->IsShown() ||
-                                              m_bpButtonShowDeleteRight->IsShown() ||
-                                              m_bpButtonShowUpdateLeft ->IsShown() ||
-                                              m_bpButtonShowUpdateRight->IsShown() ||
-                                              m_bpButtonShowDoNothing  ->IsShown() ||
-                                              m_bpButtonShowEqual      ->IsShown() ||
-                                              m_bpButtonShowConflict   ->IsShown();
-        m_bpButtonViewTypeSyncAction->Show(anyViewFilterButtonShown);
+        updateVisibility(m_bpButtonShowCreateLeft , result.existsSyncCreateLeft);
+        updateVisibility(m_bpButtonShowCreateRight, result.existsSyncCreateRight);
+        updateVisibility(m_bpButtonShowDeleteLeft , result.existsSyncDeleteLeft);
+        updateVisibility(m_bpButtonShowDeleteRight, result.existsSyncDeleteRight);
+        updateVisibility(m_bpButtonShowUpdateLeft , result.existsSyncDirLeft);
+        updateVisibility(m_bpButtonShowUpdateRight, result.existsSyncDirRight);
+        updateVisibility(m_bpButtonShowDoNothing  , result.existsSyncDirNone);
 
-        if (anyViewFilterButtonShown)
-        {
-            m_panelViewFilter->Show();
-            m_panelViewFilter->Layout();
-        }
-        else
-            m_panelViewFilter->Hide();
+        updateVisibility(m_bpButtonShowLeftOnly  , false);
+        updateVisibility(m_bpButtonShowRightOnly , false);
+        updateVisibility(m_bpButtonShowLeftNewer , false);
+        updateVisibility(m_bpButtonShowRightNewer, false);
+        updateVisibility(m_bpButtonShowDifferent , false);
     }
     else
     {
-        const GridView::StatusCmpResult result = gridDataView->updateCmpResult(currentCfg.hideExcludedItems,
+        const GridView::StatusCmpResult result = gridDataView->updateCmpResult(m_bpButtonShowExcluded  ->isActive(),
                                                                                m_bpButtonShowLeftOnly  ->isActive(),
                                                                                m_bpButtonShowRightOnly ->isActive(),
                                                                                m_bpButtonShowLeftNewer ->isActive(),
@@ -3922,37 +3866,59 @@ void MainDialog::updateGridViewData()
         filesizeRightView  = result.filesizeRightView;
 
         //comparison result view buttons
-        m_bpButtonShowLeftOnly  ->Show(result.existsLeftOnly);
-        m_bpButtonShowRightOnly ->Show(result.existsRightOnly);
-        m_bpButtonShowLeftNewer ->Show(result.existsLeftNewer);
-        m_bpButtonShowRightNewer->Show(result.existsRightNewer);
-        m_bpButtonShowDifferent ->Show(result.existsDifferent);
-        m_bpButtonShowEqual     ->Show(result.existsEqual);
-        m_bpButtonShowConflict  ->Show(result.existsConflict);
+        updateVisibility(m_bpButtonShowExcluded  , result.existsExcluded);
+        updateVisibility(m_bpButtonShowEqual     , result.existsEqual);
+        updateVisibility(m_bpButtonShowConflict  , result.existsConflict);
 
-        const bool anyViewFilterButtonShown = m_bpButtonShowLeftOnly  ->IsShown() ||
-                                              m_bpButtonShowRightOnly ->IsShown() ||
-                                              m_bpButtonShowLeftNewer ->IsShown() ||
-                                              m_bpButtonShowRightNewer->IsShown() ||
-                                              m_bpButtonShowDifferent ->IsShown() ||
-                                              m_bpButtonShowEqual     ->IsShown() ||
-                                              m_bpButtonShowConflict  ->IsShown();
-        m_bpButtonViewTypeSyncAction->Show(anyViewFilterButtonShown);
+        updateVisibility(m_bpButtonShowCreateLeft , false);
+        updateVisibility(m_bpButtonShowCreateRight, false);
+        updateVisibility(m_bpButtonShowDeleteLeft , false);
+        updateVisibility(m_bpButtonShowDeleteRight, false);
+        updateVisibility(m_bpButtonShowUpdateLeft , false);
+        updateVisibility(m_bpButtonShowUpdateRight, false);
+        updateVisibility(m_bpButtonShowDoNothing  , false);
 
-        if (anyViewFilterButtonShown)
-        {
-            m_panelViewFilter->Show();
-            m_panelViewFilter->Layout();
-        }
-        else
-            m_panelViewFilter->Hide();
+        updateVisibility(m_bpButtonShowLeftOnly  , result.existsLeftOnly);
+        updateVisibility(m_bpButtonShowRightOnly , result.existsRightOnly);
+        updateVisibility(m_bpButtonShowLeftNewer , result.existsLeftNewer);
+        updateVisibility(m_bpButtonShowRightNewer, result.existsRightNewer);
+        updateVisibility(m_bpButtonShowDifferent , result.existsDifferent);
     }
+
+    const bool anyViewFilterButtonShown = m_bpButtonShowExcluded   ->IsShown() ||
+                                          m_bpButtonShowEqual      ->IsShown() ||
+                                          m_bpButtonShowConflict   ->IsShown() ||
+
+                                          m_bpButtonShowCreateLeft ->IsShown() ||
+                                          m_bpButtonShowCreateRight->IsShown() ||
+                                          m_bpButtonShowDeleteLeft ->IsShown() ||
+                                          m_bpButtonShowDeleteRight->IsShown() ||
+                                          m_bpButtonShowUpdateLeft ->IsShown() ||
+                                          m_bpButtonShowUpdateRight->IsShown() ||
+                                          m_bpButtonShowDoNothing  ->IsShown() ||
+
+                                          m_bpButtonShowLeftOnly  ->IsShown() ||
+                                          m_bpButtonShowRightOnly ->IsShown() ||
+                                          m_bpButtonShowLeftNewer ->IsShown() ||
+                                          m_bpButtonShowRightNewer->IsShown() ||
+                                          m_bpButtonShowDifferent ->IsShown();
+    m_bpButtonViewTypeSyncAction->Show(anyViewFilterButtonShown);
+
+    if (anyViewFilterButtonShown)
+    {
+        m_panelViewFilter->Show();
+        m_panelViewFilter->Layout();
+    }
+    else
+        m_panelViewFilter->Hide();
+
+
     //all three grids retrieve their data directly via gridDataView
     gridview::refresh(*m_gridMainL, *m_gridMainC, *m_gridMainR);
 
     //navigation tree
     if (m_bpButtonViewTypeSyncAction->isActive())
-        treeDataView->updateSyncPreview(currentCfg.hideExcludedItems,
+        treeDataView->updateSyncPreview(m_bpButtonShowExcluded   ->isActive(),
                                         m_bpButtonShowCreateLeft ->isActive(),
                                         m_bpButtonShowCreateRight->isActive(),
                                         m_bpButtonShowDeleteLeft ->isActive(),
@@ -3963,7 +3929,7 @@ void MainDialog::updateGridViewData()
                                         m_bpButtonShowEqual      ->isActive(),
                                         m_bpButtonShowConflict   ->isActive());
     else
-        treeDataView->updateCmpResult(currentCfg.hideExcludedItems,
+        treeDataView->updateCmpResult(m_bpButtonShowExcluded  ->isActive(),
                                       m_bpButtonShowLeftOnly  ->isActive(),
                                       m_bpButtonShowRightOnly ->isActive(),
                                       m_bpButtonShowLeftNewer ->isActive(),
@@ -4561,7 +4527,7 @@ void MainDialog::setViewTypeSyncAction(bool value)
     //if (m_bpButtonViewTypeSyncAction->isActive() == value) return; support polling -> what about initialization?
 
     m_bpButtonViewTypeSyncAction->setActive(value);
-    m_bpButtonViewTypeSyncAction->SetToolTip((value ? _("Action") : _("Category")) + L" (F9)");
+    m_bpButtonViewTypeSyncAction->SetToolTip((value ? _("Action") : _("Category")) + L" (F10)");
 
     //toggle display of sync preview in middle grid
     gridview::highlightSyncAction(*m_gridMainC, value);

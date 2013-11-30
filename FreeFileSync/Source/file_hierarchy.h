@@ -236,7 +236,7 @@ public:
                 bool dirExistsRight,
                 const HardFilter::FilterRef& filter,
                 CompareVariant cmpVar,
-                size_t fileTimeTolerance) :
+                int fileTimeTolerance) :
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
@@ -260,7 +260,7 @@ public:
     //get settings which were used while creating BaseDirPair
     const HardFilter&   getFilter() const { return *filter_; }
     CompareVariant getCompVariant() const { return cmpVar_; }
-    size_t   getFileTimeTolerance() const { return fileTimeTolerance_; }
+    int getFileTimeTolerance() const { return fileTimeTolerance_; }
 
     virtual void flip();
 
@@ -270,7 +270,7 @@ private:
 
     HardFilter::FilterRef filter_; //filter used while scanning directory: represents sub-view of actual files!
     CompareVariant cmpVar_;
-    size_t fileTimeTolerance_;
+    int fileTimeTolerance_;
 
     Zstring baseDirPfL; //base sync dir postfixed
     Zstring baseDirPfR; //
@@ -289,7 +289,7 @@ const Zstring& BaseDirPair::getBaseDirPf<RIGHT_SIDE>() const { return baseDirPfR
 
 //get rid of shared_ptr indirection
 template <class IterTy,     //underlying iterator type
-         class U>           //target object type
+          class U>           //target object type
 class DerefIter : public std::iterator<std::bidirectional_iterator_tag, U>
 {
 public:

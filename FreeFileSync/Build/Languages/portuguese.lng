@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Qualquer número de directórios alternativos para apenas um ficheiro de configuração.</target>
 
-<source>A folder input field is empty.</source>
-<target>Um dos campos de directório para comparar está vazio.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>A pasta correspondente será considerada como vazia.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Não é possível encontrar as seguintes pastas:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Pode ignorar este erro para considerar cada pasta como vazia. As pastas necessárias serão criadas automaticamente durante a sincronização.</target>
+
+<source>A folder input field is empty.</source>
+<target>Um dos campos de directório para comparar está vazio.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>A pasta correspondente será considerada como vazia.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>As seguintes pastas têm caminhos dependentes. Tenha atenção ao definir as regras de sincronizaçção:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Não é possível obter informação sobre o processo.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Aguardar enquanto o directório é bloqueado (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>À espera do bloqueio do directório:</target>
+
+<source>Lock owner:</source>
+<target>Dono do bloqueio:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +234,9 @@
 <pluralform>1 seg</pluralform>
 <pluralform>%x segs</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Detectado bloqueio abandonado...</target>
 
 <source>Creating file %x</source>
 <target>Criar ficheiro %x</target>
@@ -486,6 +492,12 @@ O comando é executado se:
 <source>Updating attributes of %x</source>
 <target>Actualizar atributos de %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>A criar Volume Shadow Copy para %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Erro de verificação de dados: %x e %y têm conteúdo diferente.</target>
+
 <source>Cannot find %x.</source>
 <target>Não é possível encontrar %x.</target>
 
@@ -524,12 +536,6 @@ O comando é executado se:
 
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>A criar Volume Shadow Copy para %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Erro de verificação de dados: %x e %y têm conteúdo diferente.</target>
 
 <source>job name</source>
 <target>nome da tarefa</target>
@@ -580,7 +586,7 @@ O comando é executado se:
 <target>&Ignorar erros subsequentes</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>A repetir a operação...</target>
 
 <source>Serious Error</source>
 <target>Erro Grave</target>
@@ -607,7 +613,7 @@ O comando é executado se:
 <target>Não é possível encontrar a última versão do FreeFileSync online. Deseja verificar manualmente?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Verificar</target>
 
 <source>Symlink</source>
 <target>Link Simbólico</target>
@@ -765,12 +771,6 @@ O comando é executado se:
 <source>Save as batch job</source>
 <target>Guardar como batch</target>
 
-<source>Hide excluded items</source>
-<target>Esconder itens excluídos</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Mostrar ficheiros filtrados ou temporariamente excluidos</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Número de ficheiros e pastas a ser criados</target>
 
@@ -804,8 +804,8 @@ O comando é executado se:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificar e propagar mudanças nos dois lados. Eliminações, cópias e conflitos são detectados automaticamente usando base de dados.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Criar uma cópia exacta da pasta à esquerda, que vai corresponder à pasta da direita após a sincronização.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Criar uma cópia exacta da pasta à esquerda, adaptando a da direita para coincidir.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copiar ficheiros novos e actualizados para a pasta à direita.</target>
@@ -816,8 +816,16 @@ O comando é executado se:
 <source>Detect moved files</source>
 <target>Detectar ficheiros movidos</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Requer base de dados. Não é suportado por todos os sistemas de ficheiros.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Requer o uso de base de dados (cria ficheiro)
+- Detecção activa após sincronização inicial
+- Não é suportado por todos os sistemas de ficheiros
+</target>
 
 <source>Delete files:</source>
 <target>Eliminar ficheiros:</target>
@@ -1053,6 +1061,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Find</source>
 <target>Procurar</target>
 
+<source>Select View</source>
+<target>Seleccionar Vista</target>
+
 <source>Overview</source>
 <target>Vista</target>
 
@@ -1061,12 +1072,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Main Bar</source>
 <target>Barra principal</target>
-
-<source>Filter Files</source>
-<target>Filtrar Ficheiros</target>
-
-<source>Select View</source>
-<target>Seleccionar Vista</target>
 
 <source>Open...</source>
 <target>Abrir...</target>
@@ -1120,12 +1125,12 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y de 1 linha em vista</pluralform>
-<pluralform>%y de %x linhas em vista</pluralform>
+<pluralform>A mostrar %y de 1 linha</pluralform>
+<pluralform>A mostrar %y de %x linhas</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1242,6 +1247,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Show files that won't be copied</source>
 <target>Mostrar ficheiros que não serão copiados</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Mostrar ficheiros filtrados ou temporariamente excluidos</target>
+
 <source>Set as default</source>
 <target>Definir como padrão</target>
 
@@ -1277,6 +1285,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Warning</source>
 <target>Atenção</target>
+
+<source>Select all</source>
+<target>Seleccionar tudo</target>
 
 <source>Paused</source>
 <target>Em pausa</target>

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Nov  6 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -89,6 +89,7 @@ class MainDialogGenerated : public wxFrame
 		zen::BitmapTextButton* m_buttonCompare;
 		zen::BitmapTextButton* m_buttonCancel;
 		wxBitmapButton* m_bpButtonCmpConfig;
+		wxBitmapButton* m_bpButtonFilter;
 		wxBitmapButton* m_bpButtonSyncConfig;
 		zen::BitmapTextButton* m_buttonSync;
 		wxPanel* m_panelDirectoryPairs;
@@ -140,9 +141,24 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonSave;
 		wxBitmapButton* m_bpButtonBatchJob;
 		wxListBox* m_listBoxHistory;
-		wxPanel* m_panelFilter;
-		wxBitmapButton* m_bpButtonFilter;
-		wxCheckBox* m_checkBoxHideExcluded;
+		wxPanel* m_panelViewFilter;
+		wxBoxSizer* bSizerViewFilter;
+		ToggleButton* m_bpButtonViewTypeSyncAction;
+		ToggleButton* m_bpButtonShowExcluded;
+		ToggleButton* m_bpButtonShowCreateLeft;
+		ToggleButton* m_bpButtonShowUpdateLeft;
+		ToggleButton* m_bpButtonShowDeleteLeft;
+		ToggleButton* m_bpButtonShowLeftOnly;
+		ToggleButton* m_bpButtonShowLeftNewer;
+		ToggleButton* m_bpButtonShowEqual;
+		ToggleButton* m_bpButtonShowDifferent;
+		ToggleButton* m_bpButtonShowDoNothing;
+		ToggleButton* m_bpButtonShowRightNewer;
+		ToggleButton* m_bpButtonShowRightOnly;
+		ToggleButton* m_bpButtonShowDeleteRight;
+		ToggleButton* m_bpButtonShowUpdateRight;
+		ToggleButton* m_bpButtonShowCreateRight;
+		ToggleButton* m_bpButtonShowConflict;
 		wxPanel* m_panelStatistics;
 		wxBoxSizer* bSizer1801;
 		wxStaticBitmap* m_bitmapCreateLeft;
@@ -159,23 +175,6 @@ class MainDialogGenerated : public wxFrame
 		wxStaticText* m_staticTextUpdateRight;
 		wxStaticBitmap* m_bitmapCreateRight;
 		wxStaticText* m_staticTextCreateRight;
-		wxPanel* m_panelViewFilter;
-		wxBoxSizer* bSizerViewFilter;
-		ToggleButton* m_bpButtonViewTypeSyncAction;
-		ToggleButton* m_bpButtonShowCreateLeft;
-		ToggleButton* m_bpButtonShowUpdateLeft;
-		ToggleButton* m_bpButtonShowDeleteLeft;
-		ToggleButton* m_bpButtonShowLeftOnly;
-		ToggleButton* m_bpButtonShowLeftNewer;
-		ToggleButton* m_bpButtonShowEqual;
-		ToggleButton* m_bpButtonShowDifferent;
-		ToggleButton* m_bpButtonShowDoNothing;
-		ToggleButton* m_bpButtonShowRightNewer;
-		ToggleButton* m_bpButtonShowRightOnly;
-		ToggleButton* m_bpButtonShowDeleteRight;
-		ToggleButton* m_bpButtonShowUpdateRight;
-		ToggleButton* m_bpButtonShowCreateRight;
-		ToggleButton* m_bpButtonShowConflict;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
@@ -196,6 +195,8 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompSettingsContext( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGlobalFilterContext( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSyncSettingsContext( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
@@ -207,9 +208,6 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadFromHistoryDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCfgHistoryRightClick( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnGlobalFilterContext( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnShowExcluded( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToggleViewType( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToggleViewButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewButtonRightClick( wxMouseEvent& event ) { event.Skip(); }
@@ -414,6 +412,7 @@ class SyncConfirmationDlgGenerated : public wxDialog
 		wxStaticText* m_staticTextDeleteRight;
 		wxStaticText* m_staticTextUpdateRight;
 		wxStaticText* m_staticTextCreateRight;
+		wxStaticLine* m_staticline381;
 		wxStaticLine* m_staticline12;
 		wxCheckBox* m_checkBoxDontShowAgain;
 		wxBoxSizer* bSizerStdButtons;

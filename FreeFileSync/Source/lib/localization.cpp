@@ -243,7 +243,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
 {
     switch (static_cast<int>(language)) //avoid enumeration value wxLANGUAGE_*' not handled in switch [-Wswitch-enum]
     {
-            //variants of wxLANGUAGE_ARABIC
+        //variants of wxLANGUAGE_ARABIC
         case wxLANGUAGE_ARABIC_ALGERIA:
         case wxLANGUAGE_ARABIC_BAHRAIN:
         case wxLANGUAGE_ARABIC_EGYPT:
@@ -263,22 +263,22 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_ARABIC_YEMEN:
             return wxLANGUAGE_ARABIC;
 
-            //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
+        //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
         case wxLANGUAGE_CHINESE:
         case wxLANGUAGE_CHINESE_SINGAPORE:
             return wxLANGUAGE_CHINESE_SIMPLIFIED;
 
-            //variants of wxLANGUAGE_CHINESE_TRADITIONAL
+        //variants of wxLANGUAGE_CHINESE_TRADITIONAL
         case wxLANGUAGE_CHINESE_TAIWAN:
         case wxLANGUAGE_CHINESE_HONGKONG:
         case wxLANGUAGE_CHINESE_MACAU:
             return wxLANGUAGE_CHINESE_TRADITIONAL;
 
-            //variants of wxLANGUAGE_DUTCH
+        //variants of wxLANGUAGE_DUTCH
         case wxLANGUAGE_DUTCH_BELGIAN:
             return wxLANGUAGE_DUTCH;
 
-            //variants of wxLANGUAGE_ENGLISH_UK
+        //variants of wxLANGUAGE_ENGLISH_UK
         case wxLANGUAGE_ENGLISH_AUSTRALIA:
         case wxLANGUAGE_ENGLISH_NEW_ZEALAND:
         case wxLANGUAGE_ENGLISH_TRINIDAD:
@@ -292,13 +292,13 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_ENGLISH_DENMARK:
             return wxLANGUAGE_ENGLISH_UK;
 
-            //variants of wxLANGUAGE_ENGLISH_US
+        //variants of wxLANGUAGE_ENGLISH_US
         case wxLANGUAGE_ENGLISH:
         case wxLANGUAGE_ENGLISH_CANADA:
         case wxLANGUAGE_ENGLISH_PHILIPPINES:
             return wxLANGUAGE_ENGLISH_US;
 
-            //variants of wxLANGUAGE_FRENCH
+        //variants of wxLANGUAGE_FRENCH
         case wxLANGUAGE_FRENCH_BELGIAN:
         case wxLANGUAGE_FRENCH_CANADIAN:
         case wxLANGUAGE_FRENCH_LUXEMBOURG:
@@ -306,7 +306,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_FRENCH_SWISS:
             return wxLANGUAGE_FRENCH;
 
-            //variants of wxLANGUAGE_GERMAN
+        //variants of wxLANGUAGE_GERMAN
         case wxLANGUAGE_GERMAN_AUSTRIAN:
         case wxLANGUAGE_GERMAN_BELGIUM:
         case wxLANGUAGE_GERMAN_LIECHTENSTEIN:
@@ -314,29 +314,29 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_GERMAN_SWISS:
             return wxLANGUAGE_GERMAN;
 
-            //variants of wxLANGUAGE_ITALIAN
+        //variants of wxLANGUAGE_ITALIAN
         case wxLANGUAGE_ITALIAN_SWISS:
             return wxLANGUAGE_ITALIAN;
 
-            //variants of wxLANGUAGE_NORWEGIAN_BOKMAL
+        //variants of wxLANGUAGE_NORWEGIAN_BOKMAL
         case wxLANGUAGE_NORWEGIAN_NYNORSK:
             return wxLANGUAGE_NORWEGIAN_BOKMAL;
 
-            //variants of wxLANGUAGE_ROMANIAN
+        //variants of wxLANGUAGE_ROMANIAN
         case wxLANGUAGE_MOLDAVIAN:
             return wxLANGUAGE_ROMANIAN;
 
-            //variants of wxLANGUAGE_RUSSIAN
+        //variants of wxLANGUAGE_RUSSIAN
         case wxLANGUAGE_RUSSIAN_UKRAINE:
             return wxLANGUAGE_RUSSIAN;
 
-            //variants of wxLANGUAGE_SERBIAN
+        //variants of wxLANGUAGE_SERBIAN
         case wxLANGUAGE_SERBIAN_CYRILLIC:
         case wxLANGUAGE_SERBIAN_LATIN:
         case wxLANGUAGE_SERBO_CROATIAN:
             return wxLANGUAGE_SERBIAN;
 
-            //variants of wxLANGUAGE_SPANISH
+        //variants of wxLANGUAGE_SPANISH
         case wxLANGUAGE_SPANISH_ARGENTINA:
         case wxLANGUAGE_SPANISH_BOLIVIA:
         case wxLANGUAGE_SPANISH_CHILE:
@@ -359,28 +359,28 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_SPANISH_VENEZUELA:
             return wxLANGUAGE_SPANISH;
 
-            //variants of wxLANGUAGE_SWEDISH
+        //variants of wxLANGUAGE_SWEDISH
         case wxLANGUAGE_SWEDISH_FINLAND:
             return wxLANGUAGE_SWEDISH;
 
-            //languages without variants:
-            //case wxLANGUAGE_CROATIAN:
-            //case wxLANGUAGE_CZECH:
-            //case wxLANGUAGE_DANISH:
-            //case wxLANGUAGE_FINNISH:
-            //case wxLANGUAGE_GREEK:
-            //case wxLANGUAGE_HEBREW:
-            //case wxLANGUAGE_HUNGARIAN:
-            //case wxLANGUAGE_JAPANESE:
-            //case wxLANGUAGE_KOREAN:
-            //case wxLANGUAGE_LITHUANIAN:
-            //case wxLANGUAGE_POLISH:
-            //case wxLANGUAGE_PORTUGUESE:
-            //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
-            //case wxLANGUAGE_SCOTS_GAELIC:
-            //case wxLANGUAGE_SLOVENIAN:
-            //case wxLANGUAGE_TURKISH:
-            //case wxLANGUAGE_UKRAINIAN:
+        //languages without variants:
+        //case wxLANGUAGE_CROATIAN:
+        //case wxLANGUAGE_CZECH:
+        //case wxLANGUAGE_DANISH:
+        //case wxLANGUAGE_FINNISH:
+        //case wxLANGUAGE_GREEK:
+        //case wxLANGUAGE_HEBREW:
+        //case wxLANGUAGE_HUNGARIAN:
+        //case wxLANGUAGE_JAPANESE:
+        //case wxLANGUAGE_KOREAN:
+        //case wxLANGUAGE_LITHUANIAN:
+        //case wxLANGUAGE_POLISH:
+        //case wxLANGUAGE_PORTUGUESE:
+        //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
+        //case wxLANGUAGE_SCOTS_GAELIC:
+        //case wxLANGUAGE_SLOVENIAN:
+        //case wxLANGUAGE_TURKISH:
+        //case wxLANGUAGE_UKRAINIAN:
         default:
             return language;
     }

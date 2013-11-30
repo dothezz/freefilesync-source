@@ -26,8 +26,8 @@ std::wstring getVariantName(CompareVariant var);
 enum SymLinkHandling
 {
     SYMLINK_EXCLUDE,
-    SYMLINK_USE_DIRECTLY,
-    SYMLINK_FOLLOW_LINK
+    SYMLINK_DIRECT,
+    SYMLINK_FOLLOW
 };
 
 

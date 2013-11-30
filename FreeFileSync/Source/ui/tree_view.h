@@ -26,7 +26,7 @@ public:
     void setData(FolderComparison& newData); //set data, taking (partial) ownership
 
     //apply view filter: comparison results
-    void updateCmpResult(bool hideFiltered,
+    void updateCmpResult(bool showExcluded,
                          bool leftOnlyFilesActive,
                          bool rightOnlyFilesActive,
                          bool leftNewerFilesActive,
@@ -36,7 +36,7 @@ public:
                          bool conflictFilesActive);
 
     //apply view filter: synchronization preview
-    void updateSyncPreview(bool hideFiltered,
+    void updateSyncPreview(bool showExcluded,
                            bool syncCreateLeftActive,
                            bool syncCreateRightActive,
                            bool syncDeleteLeftActive,

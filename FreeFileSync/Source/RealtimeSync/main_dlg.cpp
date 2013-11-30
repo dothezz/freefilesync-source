@@ -196,7 +196,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 #error what is going on?
 #endif
 
-	build += zen::is64BitBuild ? L" x64" : L" x86";
+    build += zen::is64BitBuild ? L" x64" : L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
     showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().

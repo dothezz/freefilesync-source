@@ -376,7 +376,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
         case SYMLINK_EXCLUDE:
             return LINK_SKIP;
 
-        case SYMLINK_USE_DIRECTLY:
+        case SYMLINK_DIRECT:
             if (cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName)) //always use file filter: Link type may not be "stable" on Linux!
             {
                 output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTime));
@@ -384,7 +384,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
             }
             return LINK_SKIP;
 
-        case SYMLINK_FOLLOW_LINK:
+        case SYMLINK_FOLLOW:
             //filter symlinks before trying to follow them: handle user-excluded broken symlinks!
             //since we don't know what the symlink will resolve to, only do this when both variants agree:
             if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName))

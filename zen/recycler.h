@@ -7,6 +7,7 @@
 #ifndef RECYCLER_H_INCLUDED
 #define RECYCLER_H_INCLUDED
 
+#include <functional>
 #include <vector>
 #include <zen/file_error.h>
 #include <zen/zstring.h>
@@ -44,16 +45,9 @@ enum StatusRecycler
 StatusRecycler recycleBinStatus(const Zstring& pathName); //test existence of Recycle Bin API for certain path
 //Win: blocks heavily if recycle bin is really full and drive is slow!!!
 
-struct CallbackRecycling
-{
-    virtual ~CallbackRecycling() {}
-
-    //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
-    virtual void updateStatus(const Zstring& currentItem) = 0; //currentItem may be empty
-};
-
 void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, return "true" if file/dir was actually deleted
-                     CallbackRecycling* callback); //optional
+    //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
+	const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus); //optional; currentItem may be empty
 #endif
 }
 

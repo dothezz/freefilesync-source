@@ -9,6 +9,7 @@
 #include <set>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
+#include <wx+/image_resources.h>
 
 #ifdef ZEN_WIN
 #include <zen/dll.h>
@@ -131,7 +132,7 @@ public:
 };
 
 
-#ifdef ZEN_WIN
+#if defined ZEN_WIN || defined ZEN_LINUX
 Zstring getFileExtension(const Zstring& filename)
 {
     const Zstring shortName = afterLast(filename, Zchar('\\')); //warning: using windows file name separator!
@@ -140,37 +141,16 @@ Zstring getFileExtension(const Zstring& filename)
            afterLast(filename, Zchar('.')) :
            Zstring();
 }
+#endif
 
 
-std::set<Zstring, LessFilename> priceyExtensions;      //thread-safe!
-boost::once_flag initExtensionsOnce = BOOST_ONCE_INIT; //
-
-//test for extension for non-thumbnail icons that physically have to be retrieved from disc
-bool isCheapExtension(const Zstring& extension)
-{
-    boost::call_once(initExtensionsOnce, []()
-    {
-        priceyExtensions.insert(L"exe");
-        priceyExtensions.insert(L"ico");
-        priceyExtensions.insert(L"ani");
-        priceyExtensions.insert(L"cur");
-        priceyExtensions.insert(L"msc");
-        priceyExtensions.insert(L"scr");
-
-        priceyExtensions.insert(L"lnk"); //
-        priceyExtensions.insert(L"url"); //make sure shortcuts are pricey to get them to be detected by SHGetFileInfo
-        priceyExtensions.insert(L"pif"); //
-        priceyExtensions.insert(L"website"); //
-
-    });
-    return priceyExtensions.find(extension) == priceyExtensions.end();
-}
-
+#ifdef ZEN_WIN
 const bool wereVistaOrLater = vistaOrLater(); //thread-safety: init at startup
 
 
 thumb::IconSizeType getThumbSizeType(IconBuffer::IconSize sz)
 {
+	//coordinate with IconBuffer::getSize()!
     using namespace thumb;
     switch (sz)
     {
@@ -225,11 +205,50 @@ IconHolder iconHolderFromGicon(GIcon* gicon, IconBuffer::IconSize sz)
     return IconHolder();
 }
 #endif
+
+#ifdef ZEN_WIN
+std::set<Zstring, LessFilename> customIconExt //function-scope statics are not (yet) thread-safe in VC12
+{
+    L"ani",
+    L"cur",
+    L"exe",
+    L"ico",
+    L"msc",
+    L"scr"
+};
+std::set<Zstring, LessFilename> linkExt
+{
+    L"lnk",
+    L"pif",
+    L"url",
+    L"website"
+};
+
+//test for extension for non-thumbnail icons that can have a stock icon which does not have to be physically read from disc
+bool isStandardIconExtension(const Zstring& extension)
+{
+    return customIconExt.find(extension) == customIconExt.end() &&
+           linkExt.find(extension) == linkExt.end();
+}
+#endif
+}
+
+bool zen::hasLinkExtension(const Zstring& filename)
+{
+#ifdef ZEN_WIN
+    const Zstring& extension = getFileExtension(filename);
+    return linkExt.find(extension) != linkExt.end();
+#elif defined ZEN_LINUX
+	const Zstring& extension = getFileExtension(filename);
+    return extension == "desktop";
+#elif defined ZEN_MAC
+    return false; //alias files already get their arrow icon via "NSWorkspace::iconForFile"
+#endif
 }
 
 //################################################################################################################################################
 
-IconHolder getThumbnailIcon(const Zstring& filename, int requestedSize) //return 0 on failure
+IconHolder getThumbnailImage(const Zstring& filename, int requestedSize) //return 0 on failure
 {
 #ifdef ZEN_WIN
     if (getThumbnail && releaseImageData)
@@ -330,22 +349,19 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
             break;
         case IconBuffer::SIZE_MEDIUM:
         case IconBuffer::SIZE_LARGE:
-            if (IconHolder ico = getThumbnailIcon(filename, IconBuffer::getSize(sz)))
+            if (IconHolder ico = getThumbnailImage(filename, IconBuffer::getSize(sz)))
                 return ico;
             //else: fallback to non-thumbnail icon
             break;
     }
 
-    warn_static("problem: für folder links ist getThumbnail erfolgreich => SFGAO_LINK nicht gecheckt!")
-
     //2. retrieve file icons
 #ifdef ZEN_WIN
     //perf: optimize fallback case for SIZE_MEDIUM and SIZE_LARGE:
     const Zstring& extension = getFileExtension(filename);
-    if (isCheapExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+    if (isStandardIconExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         return getAssociatedIconByExt(extension, sz);
-    //result will not be buffered under extension name, but full filename; this is okay, since we're in SIZE_MEDIUM or SIZE_LARGE context,
-    //which means the access to get thumbnail failed: thumbnail failure is not dependent from extension in general!
+    //SIZE_MEDIUM or SIZE_LARGE: result will buffered under full filename, not extension; this is okay: failure to load thumbnail is independent from extension in general!
 
     SHFILEINFO fileInfo = {};
     if (DWORD_PTR imgList = ::SHGetFileInfo(filename.c_str(), //_In_     LPCTSTR pszPath, -> note: ::SHGetFileInfo() can't handle \\?\-prefix!
@@ -362,12 +378,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
         //        for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
         //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
 
-#ifdef __MINGW32__ //Shobjidl.h
-#define SFGAO_LINK 0x00010000L     // Shortcut (link) or symlinks
-#endif
-
-        warn_static("support SFGAO_GHOSTED or hidden?")
-        //requires SHGFI_ATTRIBUTES
+        //Check for link icon type (= shell links and symlinks): SHGetFileInfo + SHGFI_ATTRIBUTES:
         //const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
 
         if (getIconByIndex && releaseImageData)
@@ -652,6 +663,33 @@ void WorkerThread::operator()() //thread entry
 
 //#########################  redirect to impl  #####################################################
 
+namespace
+{
+const wchar_t* getLinkResourceName(IconBuffer::IconSize sz)
+{
+	 //coordinate with IconBuffer::getSize()!
+    switch (sz)
+    {
+        case IconBuffer::SIZE_SMALL:
+#if defined ZEN_WIN || defined ZEN_MAC
+            return L"link_16";
+#elif defined ZEN_LINUX
+            return L"link_24";
+#endif
+        case IconBuffer::SIZE_MEDIUM:
+#ifdef ZEN_WIN
+            if (!wereVistaOrLater) return L"link_32";
+#endif
+            return L"link_48";
+
+        case IconBuffer::SIZE_LARGE:
+            return L"link_128";
+    }
+    assert(false);
+    return L"link_16";
+}
+}
+
 struct IconBuffer::Pimpl
 {
     Pimpl() :
@@ -668,7 +706,8 @@ struct IconBuffer::Pimpl
 IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()),
     iconSizeType(sz),
     genDirIcon (::getGenericDirectoryIcon(sz).extractWxBitmap()),
-    genFileIcon(::getGenericFileIcon     (sz).extractWxBitmap())
+    genFileIcon(::getGenericFileIcon     (sz).extractWxBitmap()),
+    linkIcon(getResourceImage(getLinkResourceName(sz)))
 {
     pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
@@ -710,7 +749,7 @@ bool IconBuffer::readyForRetrieval(const Zstring& filename)
 {
 #ifdef ZEN_WIN
     if (iconSizeType == IconBuffer::SIZE_SMALL)
-        if (isCheapExtension(getFileExtension(filename)))
+        if (isStandardIconExtension(getFileExtension(filename)))
             return true;
 #endif
     return pimpl->buffer->hasIcon(filename);
@@ -724,7 +763,7 @@ Opt<wxBitmap> IconBuffer::retrieveFileIcon(const Zstring& filename)
     if (iconSizeType == IconBuffer::SIZE_SMALL) //non-thumbnail view, we need file type icons only!
     {
         const Zstring& extension = getFileExtension(filename);
-        if (isCheapExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+        if (isStandardIconExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
             if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(extension))
                 return ico;

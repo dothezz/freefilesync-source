@@ -7,6 +7,18 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
+</source>
+<target></target>
+
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>שני הצדדים שונו מאז הסנכרון האחרון.</target>
 
@@ -88,17 +100,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>כל כמות של מחיצות אלטרנטיביות עבור לפחות קובץ קונפיגורציה אחד.</target>
 
-<source>A folder input field is empty.</source>
-<target>שדה קלט תיקייה ריק.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>המחיצה המתאימה תחשב כריקה.</target>
-
 <source>Cannot find the following folders:</source>
 <target>לא יכול למצוא את המחיצות הבאות:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>אפשר להתעלם משגיאה זו ולהחשיב כל תיקיה כריקה. התיקיות יווצרו אוטומטית בזמן הסינכרון.</target>
+
+<source>A folder input field is empty.</source>
+<target>שדה קלט תיקייה ריק.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>המחיצה המתאימה תחשב כריקה.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>מסלול המחיצות הבאות מותנה. שים לב כאשר חוקי הסינכרון מוגדרים:</target>
@@ -220,8 +232,11 @@
 <source>Cannot get process information.</source>
 <target>לא יכול לקבל את נתוני התהליך.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>ממתין כאשר  מחיצה נעולה (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>ממתין בזמן שהמחיצה נעולה:</target>
+
+<source>Lock owner:</source>
+<target>בעלים נעול:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -231,6 +246,9 @@
 <pluralform>1 שנייה</pluralform>
 <pluralform>%x שניות</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>מגלה נעילה נטושה...</target>
 
 <source>Creating file %x</source>
 <target>יוצר קובץ %x</target>
@@ -486,6 +504,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>מעדכן תכונות של %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>מייצר Volume Shadow Copy עבור %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>שגיאת אימות נתונים. ל %x ו %y יש תוכן שונה.</target>
+
 <source>Cannot find %x.</source>
 <target>לא מוצא %x.</target>
 
@@ -525,12 +549,6 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>מייצר מסד נתונים...</target>
 
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>מייצר Volume Shadow Copy עבור %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>שגיאת אימות נתונים. ל %x ו %y יש תוכן שונה.</target>
-
 <source>job name</source>
 <target>שם משימה</target>
 
@@ -567,18 +585,11 @@ The command is triggered if:
 <source>Switching to FreeFileSync's main window</source>
 <target>מעבר אל החלון הראשי של FreeFileSybc</target>
 
-<source>
-<pluralform>Automatic retry in 1 second...</pluralform>
-<pluralform>Automatic retry in %x seconds...</pluralform>
-</source>
-<target>
-</target>
-
 <source>&Ignore subsequent errors</source>
 <target>&התעלם מאזהרות נוספות</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>מנסה שוב פעולה...</target>
 
 <source>Serious Error</source>
 <target>שגיאה חמורה</target>
@@ -605,7 +616,7 @@ The command is triggered if:
 <target>לא מוצא מספר גירסה עדכנית של FreeFileSync באופן מכוון. האם אתה רוצה לבדוק באופן ידני?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&בדוק</target>
 
 <source>Symlink</source>
 <target>קשור סימבולי</target>
@@ -763,12 +774,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>שמור כעבודת אצווה</target>
 
-<source>Hide excluded items</source>
-<target>הסתר פריטים שלט נכללו</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>הראה קבצים שסוננו או לא נכללו זמנית</target>
-
 <source>Number of files and folders that will be created</source>
 <target>מספר הקבצים והתיקיות שייוצרו</target>
 
@@ -802,8 +807,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>זהה והפץ שינויים בשני הצדדים. מחיקות העברות וסתירות מתגלים באופן אוטומטי באמצעות מסד נתונים.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>צור גבוי מראה של התיקייה השמאלית אשר יהיה זהה לתיקייה הימנית לאחר הסנכרון.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>צור גיבוי מראה של התיקיה משמאל באמצעות התאמת התיקיה מימין להתאמה.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>העתק קבצים חדשים ומעודכנים לתיקייה הימנית.</target>
@@ -814,8 +819,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>גלה קבצים מועברים</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>דורש קבצי בסיס נתונים. לא נתמך ע"י כל מערכות הקבצים.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- דורש ויוצר קבצי בסיס נתונים
+- גילוי פעיל לאחר סינכרון ראשוני
+- לא נתמך ע"י כל מערכות הקבצים
+</target>
 
 <source>Delete files:</source>
 <target>מחק קבצים:</target>
@@ -1051,6 +1064,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>חפש</target>
 
+<source>Select View</source>
+<target>בחר מבט</target>
+
 <source>Overview</source>
 <target>מבט כללי</target>
 
@@ -1059,12 +1075,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>סרגל ראשי</target>
-
-<source>Filter Files</source>
-<target>סנן קבצים</target>
-
-<source>Select View</source>
-<target>בחר מבט</target>
 
 <source>Open...</source>
 <target>פתח...</target>
@@ -1115,15 +1125,6 @@ This guarantees a consistent state even in case of a serious error.
 <target>
 <pluralform>1 קובץ</pluralform>
 <pluralform>%x קבצים</pluralform>
-</target>
-
-<source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
-</source>
-<target>
-<pluralform>%y של שורה 1 במראה</pluralform>
-<pluralform>%y של %x שורות במראה</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1240,6 +1241,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>הראה קבצים שלא יועתקו</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>הראה קבצים שסוננו או לא נכללו זמנית</target>
+
 <source>Set as default</source>
 <target>הגדר כברירת מחדל</target>
 
@@ -1275,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>אזהרה</target>
+
+<source>Select all</source>
+<target>בחר הכל</target>
 
 <source>Paused</source>
 <target>עצור</target>

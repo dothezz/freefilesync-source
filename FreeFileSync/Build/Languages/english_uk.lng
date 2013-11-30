@@ -771,12 +771,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Save as batch job</target>
 
-<source>Hide excluded items</source>
-<target>Hide excluded items</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Show filtered or temporarily excluded files</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Number of files and folders that will be created</target>
 
@@ -810,8 +804,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Create a mirror backup of the left folder which exactly matches the right folder after synchronisation.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Create a mirror backup of the left folder by adapting the right folder to match.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copy new and updated files to the right folder.</target>
@@ -822,8 +816,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>Detect moved files</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Requires database files. Not supported by all file systems.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</target>
 
 <source>Delete files:</source>
 <target>Delete files:</target>
@@ -1059,6 +1061,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Find</target>
 
+<source>Select View</source>
+<target>Select View</target>
+
 <source>Overview</source>
 <target>Overview</target>
 
@@ -1067,12 +1072,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Main Bar</target>
-
-<source>Filter Files</source>
-<target>Filter Files</target>
-
-<source>Select View</source>
-<target>Select View</target>
 
 <source>Open...</source>
 <target>Open...</target>
@@ -1126,12 +1125,12 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1247,6 +1246,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Show files that won't be copied</source>
 <target>Show files that won't be copied</target>
+
+<source>Show filtered or temporarily excluded files</source>
+<target>Show filtered or temporarily excluded files</target>
 
 <source>Set as default</source>
 <target>Set as default</target>

@@ -7,6 +7,9 @@
 	<plural_definition>0</plural_definition>
 </header>
 
+<source>MyButton</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>마지막 동기화 작업 이후, 양측 모두 변경 되었습니다.</target>
 
@@ -88,17 +91,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>최대 한개 설정파일에 대한 대체 디렉토리 개수</target>
 
-<source>A folder input field is empty.</source>
-<target>폴더 입력 필드 하나가 비어 있습니다.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>해당 폴더를 비어 있는 상태로 간주합니다.</target>
-
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>각 폴더를 비어있는 상태로 간주할 경우 이 오류는 무시될 수 있습니다. 폴더들은 동기화가 진행되는 동안 자동 생성됩니다.</target>
+
+<source>A folder input field is empty.</source>
+<target>폴더 입력 필드 하나가 비어 있습니다.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>해당 폴더를 비어 있는 상태로 간주합니다.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>다음 폴더들에는 종속 경로가 있습니다. 동기화 규칙을 설정 시 주의하시기 바랍니다:</target>
@@ -220,8 +223,11 @@
 <source>Cannot get process information.</source>
 <target>프로세스 정보를 얻을 수 없습니다.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>디렉토리 잠금 대기 중 (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>디렉토리 잠금 대기 중:</target>
+
+<source>Lock owner:</source>
+<target>잠금 권한자:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -230,6 +236,9 @@
 <target>
 <pluralform>%x초</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>방치된 잠금 탐색 중...</target>
 
 <source>Creating file %x</source>
 <target>파일 %x 생성 중</target>
@@ -483,6 +492,12 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>%x 속성 업데이트 중</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>%x을(를) 위한 Volume Shadow Copy 생성 중...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>데이터 확인 오류: %x 및 %y 의 내용이 서로 다릅니다.</target>
+
 <source>Cannot find %x.</source>
 <target>%x을(를) 찾을 수 없습니다.</target>
 
@@ -521,12 +536,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>데이터베이스 생성 중...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>%x을(를) 위한 Volume Shadow Copy 생성 중...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>데이터 확인 오류: %x 및 %y 의 내용이 서로 다릅니다.</target>
 
 <source>job name</source>
 <target>작업 이름</target>
@@ -576,7 +585,7 @@ The command is triggered if:
 <target>이후 오류 무시(&I)</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>작업 재시도 중...</target>
 
 <source>Serious Error</source>
 <target>심각한 오류</target>
@@ -603,7 +612,7 @@ The command is triggered if:
 <target>현재 사용 중인 FreeFileSync 버전 번호를 온라인에서 찾을 수 없습니다. 수동으로 확인해 보시겠습니까?</target>
 
 <source>&Check</source>
-<target></target>
+<target>체크(&C)</target>
 
 <source>Symlink</source>
 <target>심링크</target>
@@ -761,12 +770,6 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>일괄 작업으로 저장</target>
 
-<source>Hide excluded items</source>
-<target>제외 항목 숨기기</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>필터링 또는 일시적으로 제외된 파일 보이기</target>
-
 <source>Number of files and folders that will be created</source>
 <target>생성될 파일 및 폴더 개수</target>
 
@@ -800,8 +803,8 @@ The command is triggered if:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>좌측 폴더 백업 미러 생성: 동기화 이후 좌측 및 우측 폴더는 완전히 똑같이 매치 됩니다.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>좌측 폴더의 미러 백업을 만듭니다. 우측 폴더는 좌측 폴더와 완전히 일치하게 됩니다.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>신규 또는 업데이트 된 파일을 우측 폴더로 복사</target>
@@ -812,8 +815,16 @@ The command is triggered if:
 <source>Detect moved files</source>
 <target>이동 파일 탐지</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>데이터베이스 파일이 필요합니다. 모든 파일 시스템에서 지원되지는 않습니다.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- 데이터베이스 파일 필요 및 생성
+- 초기 동기화 이후 탐지기능 활성화
+- 모든 파일 시스템에서 지원되지 않음
+</target>
 
 <source>Delete files:</source>
 <target>파일 삭제:</target>
@@ -825,7 +836,7 @@ The command is triggered if:
 <target>파일 영구 삭제 또는 덮어쓰기</target>
 
 <source>Recycle bin</source>
-<target></target>
+<target>휴지통</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>휴지통에 삭제되고 덮어 씌어진 파일 백업</target>
@@ -1049,6 +1060,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>검색</target>
 
+<source>Select View</source>
+<target>보기 선택</target>
+
 <source>Overview</source>
 <target>개요</target>
 
@@ -1057,12 +1071,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>메인 바</target>
-
-<source>Filter Files</source>
-<target>파일 필터</target>
-
-<source>Select View</source>
-<target>보기 선택</target>
 
 <source>Open...</source>
 <target>열기</target>
@@ -1113,11 +1121,11 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>보기에 나타난 %x 행의 %y</pluralform>
+<pluralform>%x 행의 %y 표시</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1184,10 +1192,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>%x의 변경사항을 저장하시겠습니까?</target>
 
 <source>Never save &changes</source>
-<target>변경사항을 절대 저장하기 않기(&c)</target>
+<target>변경사항 저장 안 함(&c)</target>
 
 <source>Do&n't save</source>
-<target>저장하기 않기(&n)</target>
+<target>저장 안 함(&n)</target>
 
 <source>Filter</source>
 <target>필터</target>
@@ -1234,6 +1242,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that won't be copied</source>
 <target>복사되지 않을 파일 표시</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>필터링 또는 일시적으로 제외된 파일 보이기</target>
+
 <source>Set as default</source>
 <target>기본 값으로 설정</target>
 
@@ -1269,6 +1280,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Warning</source>
 <target>경고</target>
+
+<source>Select all</source>
+<target>모두 선택</target>
 
 <source>Paused</source>
 <target>일시정지 중</target>

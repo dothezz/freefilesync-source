@@ -7,6 +7,7 @@
 #ifndef FILE_HANDLING_H_8017341345614857
 #define FILE_HANDLING_H_8017341345614857
 
+#include <functional>
 #include "zstring.h"
 #include "file_error.h"
 #include "file_id_def.h"
@@ -14,19 +15,15 @@
 
 namespace zen
 {
-struct CallbackRemoveDir;
-struct CallbackCopyFile;
-
-
 bool fileExists     (const Zstring& filename); //noexcept; check whether file      or file-symlink exists
 bool dirExists      (const Zstring& dirname ); //noexcept; check whether directory or dir-symlink exists
 bool symlinkExists  (const Zstring& linkname); //noexcept; check whether a symbolic link exists
 bool somethingExists(const Zstring& objname ); //noexcept; check whether any object with this name exists
 
-enum ProcSymlink
+enum class ProcSymlink
 {
-    SYMLINK_DIRECT,
-    SYMLINK_FOLLOW
+    DIRECT,
+    FOLLOW
 };
 
 void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSymlink procSl); //throw FileError
@@ -37,7 +34,9 @@ UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 
 //file handling
 bool removeFile(const Zstring& filename); //throw FileError; return "false" if file is not existing
-void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nullptr); //throw FileError
+void removeDirectory(const Zstring& directory, //throw FileError
+                     const std::function<void (const Zstring& filename)>& onBeforeFileDeletion = nullptr,  //optional;
+                     const std::function<void (const Zstring& dirname)>&  onBeforeDirDeletion  = nullptr); //one call for each *existing* object!
 
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
@@ -64,37 +63,21 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
               const Zstring& targetFile, //symlink handling: dereference source
               bool copyFilePermissions,
               bool transactionalCopy,
-              CallbackCopyFile* callback, //may be nullptr
+              //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
+              //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
+              const std::function<void()>& onDeleteTargetFile, //may be nullptr; throw X!
+              //Linux:   unconditionally
+              //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and the exception will propagate as expected
+              //accummulated delta != file size! consider ADS, sparse, compressed files
+              const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus, //may be nullptr; throw X!
+
               InSyncAttributes* newAttrib = nullptr);  //return current attributes at the time of copy
+
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
-
-
-
-//----------- callbacks ---------------
-struct CallbackRemoveDir
-{
-    virtual ~CallbackRemoveDir() {}
-    virtual void onBeforeFileDeletion(const Zstring& filename) = 0; //one call for each *existing* object!
-    virtual void onBeforeDirDeletion (const Zstring& dirname ) = 0; //
-};
-
-struct CallbackCopyFile
-{
-    virtual ~CallbackCopyFile() {}
-
-    //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
-    //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
-    virtual void deleteTargetFile(const Zstring& targetFile) = 0; //may throw exceptions
-
-    //may throw:
-    //Linux:   unconditionally
-    //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and the exception will propagate as expected
-    virtual void updateCopyStatus(Int64 bytesDelta) = 0; //accummulated delta != file size! consider ADS, sparse, compressed files
-};
 }
 
 #endif //FILE_HANDLING_H_8017341345614857

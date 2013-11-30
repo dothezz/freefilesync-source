@@ -721,13 +721,21 @@ private:
         if (event.ControlDown())
             switch (keyCode)
             {
-                    //case 'A': -> "select all" is already implemented by Grid!
+                //case 'A': -> "select all" is already implemented by Grid!
 
                 case 'C':
                 case WXK_INSERT: //CTRL + C || CTRL + INS
                     copySelectionToClipboard();
                     return; // -> swallow event! don't allow default grid commands!
             }
+
+        //else
+        //switch (keyCode)
+        //{
+        //	case WXK_RETURN:
+        //	case WXK_NUMPAD_ENTER:
+        //		return;
+        //}
 
         event.Skip(); //unknown keypress: propagate
     }
@@ -784,7 +792,7 @@ private:
         else
             switch (keyCode)
             {
-                    //redirect certain (unhandled) keys directly to grid!
+                //redirect certain (unhandled) keys directly to grid!
                 case WXK_UP:
                 case WXK_DOWN:
                 case WXK_LEFT:
@@ -1082,9 +1090,10 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 
     virtual wxString formatText(double timeElapsed, double optimalBlockSize) const
     {
-        if (!drawLabel_) return wxString();
+        if (!drawLabel_)
+            return wxString();
         return timeElapsed < 60 ?
-               _P("1 sec", "%x sec", numeric::round(timeElapsed)) :
+               wxString(_P("1 sec", "%x sec", numeric::round(timeElapsed))) :
                timeElapsed < 3600 ?
                wxTimeSpan::Seconds(timeElapsed).Format(   L"%M:%S") :
                wxTimeSpan::Seconds(timeElapsed).Format(L"%H:%M:%S");
@@ -1869,8 +1878,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             //set overall speed (instead of current speed)
             const int64_t timeDelta = timeElapsed.timeMs() - phaseStartMs; //we need to consider "time within current phase" not total "timeElapsed"!
 
-            const wxString overallBytesPerSecond = timeDelta == 0 ? wxString() : filesizeToShortString(dataCurrent * 1000 / timeDelta) + _("/sec");
-            const wxString overallItemsPerSecond = timeDelta == 0 ? wxString() : replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsCurrent * 1000.0 / timeDelta));
+            const wxString overallBytesPerSecond = timeDelta == 0 ? std::wstring() : filesizeToShortString(dataCurrent * 1000 / timeDelta) + _("/sec");
+            const wxString overallItemsPerSecond = timeDelta == 0 ? std::wstring() : replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsCurrent * 1000.0 / timeDelta));
 
             pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setCornerText(overallBytesPerSecond, Graph2D::CORNER_TOP_LEFT));
             pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setCornerText(overallItemsPerSecond, Graph2D::CORNER_TOP_LEFT));

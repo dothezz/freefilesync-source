@@ -246,7 +246,7 @@ public:
         Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(SubWindow::onEraseBackGround), nullptr, this);
 
         //SetDoubleBuffered(true); slow as hell!
-
+		
         SetBackgroundStyle(wxBG_STYLE_PAINT);
 
         Connect(wxEVT_SET_FOCUS,  wxFocusEventHandler(SubWindow::onFocus), nullptr, this);
@@ -263,8 +263,6 @@ public:
         Connect(wxEVT_MOUSEWHEEL,   wxMouseEventHandler(SubWindow::onMouseWheel     ), nullptr, this);
         Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(SubWindow::onMouseCaptureLost), nullptr, this);
 
-        Connect(wxEVT_CHAR,     wxKeyEventHandler(SubWindow::onChar   ), nullptr, this);
-        Connect(wxEVT_KEY_UP,   wxKeyEventHandler(SubWindow::onKeyUp  ), nullptr, this);
         Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(SubWindow::onKeyDown), nullptr, this);
 
         assert(GetClientAreaOrigin() == wxPoint()); //generally assumed when dealing with coordinates below
@@ -297,7 +295,7 @@ protected:
                     SetToolTip(new wxToolTip(L"a                                                                b\n\
                                                            a                                                                b")); //ugly, but is working (on Windows)
                 tt = GetToolTip(); //should be bound by now
-				assert(tt);
+                assert(tt);
                 if (tt)
                     tt->SetTip(text);
             }
@@ -318,9 +316,12 @@ private:
     virtual void onMouseMovement  (wxMouseEvent& event) { event.Skip(); }
     virtual void onLeaveWindow    (wxMouseEvent& event) { event.Skip(); }
     virtual void onMouseCaptureLost(wxMouseCaptureLostEvent& event) { event.Skip(); }
-    virtual void onChar   (wxKeyEvent& event) { event.Skip(); }
-    virtual void onKeyUp  (wxKeyEvent& event) { event.Skip(); }
-    virtual void onKeyDown(wxKeyEvent& event) { event.Skip(); }
+
+    void onKeyDown(wxKeyEvent& event)
+    {
+        if (!sendEventNow(event)) //let parent collect all key events
+            event.Skip();
+    }
 
     void onMouseWheel(wxMouseEvent& event)
     {
@@ -332,10 +333,8 @@ private:
 
           On OS X there is no such propagation! => we need a redirection (the same wxGrid implements)
          */
-        if (wxEvtHandler* evtHandler = parent_.GetEventHandler())
-            if (evtHandler->ProcessEvent(event))
-                return;
-        event.Skip();
+        if (!sendEventNow(event))
+            event.Skip();
     }
 
     void onPaintEvent(wxPaintEvent& event)
@@ -844,53 +843,15 @@ public:
 
     ~MainWin() { assert(!gridUpdatePending); }
 
-    void makeRowVisible(size_t row)
-    {
-        const wxRect labelRect = rowLabelWin_.getRowLabelArea(row); //returns empty rect if column not found
-        if (labelRect.height > 0)
-        {
-            int scrollPosX = 0;
-            refParent().GetViewStart(&scrollPosX, nullptr);
-
-            int pixelsPerUnitY = 0;
-            refParent().GetScrollPixelsPerUnit(nullptr, &pixelsPerUnitY);
-            if (pixelsPerUnitY <= 0) return;
-
-            const int clientPosY = refParent().CalcScrolledPosition(labelRect.GetTopLeft()).y;
-            if (clientPosY < 0)
-            {
-                const int scrollPosY = labelRect.GetTopLeft().y / pixelsPerUnitY;
-                refParent().Scroll(scrollPosX, scrollPosY);
-                refParent().updateWindowSizes(); //may show horizontal scroll bar
-            }
-            else if (clientPosY + labelRect.GetHeight() > rowLabelWin_.GetClientSize().GetHeight())
-            {
-                auto execScroll = [&](int clientHeight)
-                {
-                    const int scrollPosY = std::ceil((labelRect.GetTopLeft().y - clientHeight +
-                                                      labelRect.GetHeight()) / static_cast<double>(pixelsPerUnitY));
-                    refParent().Scroll(scrollPosX, scrollPosY);
-                    refParent().updateWindowSizes(); //may show horizontal scroll bar
-                };
-
-                const int clientHeightBefore = rowLabelWin_.GetClientSize().GetHeight();
-                execScroll(clientHeightBefore);
-
-                //client height may decrease after scroll due to a new horizontal scrollbar, resulting in a partially visible last row
-                const int clientHeightAfter = rowLabelWin_.GetClientSize().GetHeight();
-                if (clientHeightAfter < clientHeightBefore)
-                    execScroll(clientHeightAfter);
-            }
-        }
-    }
-
-    void setCursor(size_t row)
-    {
-        cursorRow = row;
-        activeSelection.reset(); //e.g. user might search with F3 while holding down left mouse button
-        selectionAnchor = row;
-    }
     size_t getCursor() const { return cursorRow; }
+    size_t getAnchor() const { return selectionAnchor; }
+
+    void setCursor(size_t newCursorRow, size_t newAnchorRow)
+    {
+        cursorRow       = newCursorRow;
+        selectionAnchor = newAnchorRow;
+        activeSelection.reset(); //e.g. user might search with F3 while holding down left mouse button
+    }
 
 private:
     virtual void render(wxDC& dc, const wxRect& rect)
@@ -923,12 +884,13 @@ private:
 
             if (auto prov = refParent().getDataProvider())
             {
+                RecursiveDcClipper dummy2(dc, rect); //do NOT draw background on cells outside of invalidated rect invalidating foreground text!
+
                 //draw background lines
                 for (int row = rowFirst; row < rowLast; ++row)
                 {
                     const wxRect rowRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(totalWidth, rowHeight));
-                    RecursiveDcClipper dummy2(dc, rowRect); //solve issues with drawBackground() painting in area outside of rect
-                    //(which is not also refreshed by renderCell()) -> keep small scope!
+                    RecursiveDcClipper dummy3(dc, rowRect);
                     prov->renderRowBackgound(dc, rowRect, row, refParent().IsThisEnabled(), drawAsSelected(row));
                 }
 
@@ -942,8 +904,7 @@ private:
                         for (int row = rowFirst; row < rowLast; ++row)
                         {
                             const wxRect cellRect(cellAreaTL.x, cellAreaTL.y + row * rowHeight, cw.width_, rowHeight);
-                            RecursiveDcClipper clip(dc, cellRect);
-
+                            RecursiveDcClipper dummy3(dc, cellRect);
                             prov->renderCell(dc, cellRect, row, cw.type_, drawAsSelected(row));
                         }
                     cellAreaTL.x += cw.width_;
@@ -1091,144 +1052,6 @@ private:
         }();
 
         setToolTip(toolTip);
-
-        event.Skip();
-    }
-
-    virtual void onKeyDown(wxKeyEvent& event)
-    {
-        int keyCode = event.GetKeyCode();
-        if (GetLayoutDirection() == wxLayout_RightToLeft)
-        {
-            if (keyCode == WXK_LEFT)
-                keyCode = WXK_RIGHT;
-            else if (keyCode == WXK_RIGHT)
-                keyCode = WXK_LEFT;
-            else if (keyCode == WXK_NUMPAD_LEFT)
-                keyCode = WXK_NUMPAD_RIGHT;
-            else if (keyCode == WXK_NUMPAD_RIGHT)
-                keyCode = WXK_NUMPAD_LEFT;
-        }
-
-        const ptrdiff_t rowCount = refParent().getRowCount();
-        if (rowCount <= 0)
-        {
-            event.Skip();
-            return;
-        }
-
-        auto setSingleSelection = [&](ptrdiff_t row)
-        {
-            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
-            refParent().setGridCursor(row); //behave like an "external" set cursor!
-        };
-
-        auto setSelectionRange = [&](ptrdiff_t row)
-        {
-            //unlike "setSingleSelection" this function doesn't seem to belong into Grid: management of selectionAnchor should be local
-
-            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
-
-            refParent().selection.clear(); //clear selection, do NOT fire event
-            refParent().selectRangeAndNotify(selectionAnchor, row); //set new selection + fire event
-
-            cursorRow = row; //don't call setCursor() since it writes to "selectionAnchor"!
-            this->makeRowVisible(row);
-            refParent().Refresh();
-        };
-
-        switch (keyCode)
-        {
-            case WXK_UP:
-            case WXK_NUMPAD_UP:
-                if (event.ShiftDown())
-                    setSelectionRange(cursorRow - 1);
-                else if (event.ControlDown())
-                    refParent().scrollDelta(0, -1);
-                else
-                    setSingleSelection(cursorRow - 1);
-                return; //swallow event: wxScrolledWindow, wxWidgets 2.9.3 on Kubuntu x64 processes arrow keys: prevent this!
-
-            case WXK_DOWN:
-            case WXK_NUMPAD_DOWN:
-                if (event.ShiftDown())
-                    setSelectionRange(cursorRow + 1);
-                else if (event.ControlDown())
-                    refParent().scrollDelta(0, 1);
-                else
-                    setSingleSelection(cursorRow + 1);
-                return; //swallow event
-
-            case WXK_LEFT:
-            case WXK_NUMPAD_LEFT:
-                if (event.ControlDown())
-                    refParent().scrollDelta(-1, 0);
-                else if (event.ShiftDown())
-                    ;
-                else
-                    setSingleSelection(cursorRow);
-                return;
-
-            case WXK_RIGHT:
-            case WXK_NUMPAD_RIGHT:
-                if (event.ControlDown())
-                    refParent().scrollDelta(1, 0);
-                else if (event.ShiftDown())
-                    ;
-                else
-                    setSingleSelection(cursorRow);
-                return;
-
-            case WXK_HOME:
-            case WXK_NUMPAD_HOME:
-                if (event.ShiftDown())
-                    setSelectionRange(0);
-                else if (event.ControlDown())
-                    setSingleSelection(0);
-                else
-                    setSingleSelection(0);
-                return;
-
-            case WXK_END:
-            case WXK_NUMPAD_END:
-                if (event.ShiftDown())
-                    setSelectionRange(rowCount - 1);
-                else if (event.ControlDown())
-                    setSingleSelection(rowCount - 1);
-                else
-                    setSingleSelection(rowCount - 1);
-                return;
-
-            case WXK_PAGEUP:
-            case WXK_NUMPAD_PAGEUP:
-                if (event.ShiftDown())
-                    setSelectionRange(cursorRow - GetClientSize().GetHeight() / rowLabelWin_.getRowHeight());
-                else if (event.ControlDown())
-                    ;
-                else
-                    setSingleSelection(cursorRow - GetClientSize().GetHeight() / rowLabelWin_.getRowHeight());
-                return;
-
-            case WXK_PAGEDOWN:
-            case WXK_NUMPAD_PAGEDOWN:
-                if (event.ShiftDown())
-                    setSelectionRange(cursorRow + GetClientSize().GetHeight() / rowLabelWin_.getRowHeight());
-                else if (event.ControlDown())
-                    ;
-                else
-                    setSingleSelection(cursorRow + GetClientSize().GetHeight() / rowLabelWin_.getRowHeight());
-                return;
-
-            case 'A':  //Ctrl + A - select all
-                if (event.ControlDown())
-                    refParent().selectRangeAndNotify(0, rowCount);
-                break;
-
-            case WXK_NUMPAD_ADD: //CTRL + '+' - auto-size all
-                if (event.ControlDown())
-                    refParent().autoSizeColumns(ALLOW_GRID_EVENT);
-                return;
-        }
 
         event.Skip();
     }
@@ -1402,16 +1225,18 @@ Grid::Grid(wxWindow* parent,
         return labelFont.GetPixelSize().GetHeight();
     }();
 
-    Connect(wxEVT_PAINT,            wxPaintEventHandler(Grid::onPaintEvent     ), nullptr, this);
-    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
-    Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
-
     SetTargetWindow(mainWin_);
 
     SetInitialSize(size); //"Most controls will use this to set their initial size" -> why not
 
     assert(GetClientSize() == GetSize()); //borders are NOT allowed for Grid
     //reason: updateWindowSizes() wants to use "GetSize()" as a "GetClientSize()" including scrollbars
+
+    Connect(wxEVT_PAINT,            wxPaintEventHandler(Grid::onPaintEvent     ), nullptr, this);
+    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
+    Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
+
+	Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Grid::onKeyDown), nullptr, this);
 }
 
 
@@ -1572,6 +1397,144 @@ wxSize Grid::GetSizeAvailableForScrollTarget(const wxSize& size)
 
 
 void Grid::onPaintEvent(wxPaintEvent& event) { wxPaintDC dc(this); }
+
+
+void Grid::onKeyDown(wxKeyEvent& event)
+{
+    int keyCode = event.GetKeyCode();
+    if (GetLayoutDirection() == wxLayout_RightToLeft)
+    {
+        if (keyCode == WXK_LEFT)
+            keyCode = WXK_RIGHT;
+        else if (keyCode == WXK_RIGHT)
+            keyCode = WXK_LEFT;
+        else if (keyCode == WXK_NUMPAD_LEFT)
+            keyCode = WXK_NUMPAD_RIGHT;
+        else if (keyCode == WXK_NUMPAD_RIGHT)
+            keyCode = WXK_NUMPAD_LEFT;
+    }
+
+	const ptrdiff_t rowCount  = getRowCount();
+    const ptrdiff_t cursorRow = mainWin_->getCursor();
+
+    auto moveCursorTo = [&](ptrdiff_t row)
+    {
+        if (rowCount > 0)
+        {
+            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
+            setGridCursor(row);
+        }
+    };
+
+    auto selectWithCursorTo = [&](ptrdiff_t row)
+    {
+        if (rowCount > 0)
+        {
+            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
+            selectWithCursor(row);
+        }
+    };
+
+    switch (keyCode)
+    {
+        //case WXK_TAB:
+        //    if (Navigate(event.ShiftDown() ? wxNavigationKeyEvent::IsBackward : wxNavigationKeyEvent::IsForward))
+        //        return;
+        //    break;
+
+        case WXK_UP:
+        case WXK_NUMPAD_UP:
+            if (event.ShiftDown())
+                selectWithCursorTo(cursorRow - 1);
+            else if (event.ControlDown())
+                scrollDelta(0, -1);
+            else
+                moveCursorTo(cursorRow - 1);
+            return; //swallow event: wxScrolledWindow, wxWidgets 2.9.3 on Kubuntu x64 processes arrow keys: prevent this!
+
+        case WXK_DOWN:
+        case WXK_NUMPAD_DOWN:
+            if (event.ShiftDown())
+                selectWithCursorTo(cursorRow + 1);
+            else if (event.ControlDown())
+                scrollDelta(0, 1);
+            else
+                moveCursorTo(cursorRow + 1);
+            return; //swallow event
+
+        case WXK_LEFT:
+        case WXK_NUMPAD_LEFT:
+            if (event.ControlDown())
+                scrollDelta(-1, 0);
+            else if (event.ShiftDown())
+                ;
+            else
+                moveCursorTo(cursorRow);
+            return;
+
+        case WXK_RIGHT:
+        case WXK_NUMPAD_RIGHT:
+            if (event.ControlDown())
+                scrollDelta(1, 0);
+            else if (event.ShiftDown())
+                ;
+            else
+                moveCursorTo(cursorRow);
+            return;
+
+        case WXK_HOME:
+        case WXK_NUMPAD_HOME:
+            if (event.ShiftDown())
+                selectWithCursorTo(0);
+            else if (event.ControlDown())
+                moveCursorTo(0);
+            else
+                moveCursorTo(0);
+            return;
+
+        case WXK_END:
+        case WXK_NUMPAD_END:
+            if (event.ShiftDown())
+                selectWithCursorTo(rowCount - 1);
+            else if (event.ControlDown())
+                moveCursorTo(rowCount - 1);
+            else
+                moveCursorTo(rowCount - 1);
+            return;
+
+        case WXK_PAGEUP:
+        case WXK_NUMPAD_PAGEUP:
+            if (event.ShiftDown())
+                selectWithCursorTo(cursorRow - GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
+            else if (event.ControlDown())
+                ;
+            else
+                moveCursorTo(cursorRow - GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
+            return;
+
+        case WXK_PAGEDOWN:
+        case WXK_NUMPAD_PAGEDOWN:
+            if (event.ShiftDown())
+                selectWithCursorTo(cursorRow + GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
+            else if (event.ControlDown())
+                ;
+            else
+                moveCursorTo(cursorRow + GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
+            return;
+
+        case 'A':  //Ctrl + A - select all
+            if (event.ControlDown())
+                selectRangeAndNotify(0, rowCount);
+            break;
+
+        case WXK_NUMPAD_ADD: //CTRL + '+' - auto-size all
+            if (event.ControlDown())
+                autoSizeColumns(ALLOW_GRID_EVENT);
+            return;
+    }
+
+    event.Skip();
+}
 
 
 void Grid::setColumnLabelHeight(int height)
@@ -1939,14 +1902,70 @@ wxRect Grid::getCellArea(size_t row, ColumnType colType) const
 
 void Grid::setGridCursor(size_t row)
 {
-    mainWin_->setCursor(row);
-    mainWin_->makeRowVisible(row);
+    mainWin_->setCursor(row, row);
+    makeRowVisible(row);
 
     selection.clear(); //clear selection, do NOT fire event
     selectRangeAndNotify(row, row); //set new selection + fire event
 
     mainWin_->Refresh();
     rowLabelWin_->Refresh(); //row labels! (Kubuntu)
+}
+
+
+void Grid::selectWithCursor(ptrdiff_t row)
+{
+    const size_t anchorRow = mainWin_->getAnchor();
+	
+    mainWin_->setCursor(row, anchorRow);
+    makeRowVisible(row);
+
+    selection.clear(); //clear selection, do NOT fire event
+    selectRangeAndNotify(anchorRow, row); //set new selection + fire event
+
+    mainWin_->Refresh();
+    rowLabelWin_->Refresh();
+}
+
+
+void Grid::makeRowVisible(size_t row)
+{
+    const wxRect labelRect = rowLabelWin_->getRowLabelArea(row); //returns empty rect if column not found
+    if (labelRect.height > 0)
+    {
+        int scrollPosX = 0;
+        GetViewStart(&scrollPosX, nullptr);
+
+        int pixelsPerUnitY = 0;
+        GetScrollPixelsPerUnit(nullptr, &pixelsPerUnitY);
+        if (pixelsPerUnitY <= 0) return;
+
+        const int clientPosY = CalcScrolledPosition(labelRect.GetTopLeft()).y;
+        if (clientPosY < 0)
+        {
+            const int scrollPosY = labelRect.GetTopLeft().y / pixelsPerUnitY;
+            Scroll(scrollPosX, scrollPosY);
+            updateWindowSizes(); //may show horizontal scroll bar
+        }
+        else if (clientPosY + labelRect.GetHeight() > rowLabelWin_->GetClientSize().GetHeight())
+        {
+            auto execScroll = [&](int clientHeight)
+            {
+                const int scrollPosY = std::ceil((labelRect.GetTopLeft().y - clientHeight +
+                                                  labelRect.GetHeight()) / static_cast<double>(pixelsPerUnitY));
+                Scroll(scrollPosX, scrollPosY);
+                updateWindowSizes(); //may show horizontal scroll bar
+            };
+
+            const int clientHeightBefore = rowLabelWin_->GetClientSize().GetHeight();
+            execScroll(clientHeightBefore);
+
+            //client height may decrease after scroll due to a new horizontal scrollbar, resulting in a partially visible last row
+            const int clientHeightAfter = rowLabelWin_->GetClientSize().GetHeight();
+            if (clientHeightAfter < clientHeightBefore)
+                execScroll(clientHeightAfter);
+        }
+    }
 }
 
 

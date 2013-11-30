@@ -7,27 +7,7 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>
-<pluralform>Do you really want to execute the command %y for one item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target>
-</target>
-
-<source>
-<pluralform>Automatic retry in 1 second...</pluralform>
-<pluralform>Automatic retry in %x seconds...</pluralform>
-</source>
-<target>
-</target>
-
-<source>Detecting abandoned lock...</source>
-<target></target>
-
-<source>Lock owner:</source>
-<target></target>
-
-<source>Waiting while directory is locked:</source>
+<source>MyButton</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -243,6 +223,12 @@
 <source>Cannot get process information.</source>
 <target>Ne mogu dobit informacije o procesu</target>
 
+<source>Waiting while directory is locked:</source>
+<target>Čekam dok se mapa zaključa:</target>
+
+<source>Lock owner:</source>
+<target>Vlasnik ključa:</target>
+
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -252,6 +238,9 @@
 <pluralform>%x sek</pluralform>
 <pluralform>%x sek</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Pronalazim napušteni ključ...</target>
 
 <source>Creating file %x</source>
 <target>Izrađujem datoteku %x</target>
@@ -534,7 +523,7 @@ Naredba će biti pokrenuta ako se:
 <target>Slijedeće stavke imaju nedefiniranih sukoba te neće biti sinkronizirane:</target>
 
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target>Navedene mape se značajno razlikuju. Prvojerite dali uspoređujete ispravne mape za sinkronizaciju.</target>
+<target>Navedene mape se značajno razlikuju. Prvojerite da li uspoređujete ispravne mape za sinkronizaciju.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nedovoljno prostora na disku:</target>
@@ -590,6 +579,16 @@ Naredba će biti pokrenuta ako se:
 <source>Switching to FreeFileSync's main window</source>
 <target>Prebacujem na glavni prozor FreeFileSync</target>
 
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>Automatski pokušaj za %x sekundi...</pluralform>
+<pluralform>Automatski pokušaj za %x sekunda...</pluralform>
+<pluralform>Automatski pokušaj za %x sekundi...</pluralform>
+</target>
+
 <source>&Ignore subsequent errors</source>
 <target>&Zanemari naknadne pogreške</target>
 
@@ -618,7 +617,7 @@ Naredba će biti pokrenuta ako se:
 <target>Ne mogu se povezati na sourceforge.net.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Ne mogu pronaći trenutnu verziju FreeFileSync-a online. Dali želite ručno potražiti?</target>
+<target>Ne mogu pronaći trenutnu verziju FreeFileSync-a online. Da li želite ručno potražiti?</target>
 
 <source>&Check</source>
 <target>&Provjeri</target>
@@ -779,12 +778,6 @@ Naredba će biti pokrenuta ako se:
 <source>Save as batch job</source>
 <target>Spremi kao Slijedni zadatak</target>
 
-<source>Hide excluded items</source>
-<target>Sakrij isključene stavke</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Prikaži filtrirane ili privremeno izdvojene datoteke</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Broj datoteka i foldera koji će se stvoriti</target>
 
@@ -818,8 +811,8 @@ Naredba će biti pokrenuta ako se:
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Pronađi i izvrši izmjene na obje strane. Izbrisano, premješteno te sukobi se otkriju automatski pomoću baze.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Izradi zrcalnu kopiju lijeve mape koja će se točno podudarati s desnom mapom nakon sinkronizacije.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Izradi zrcalnu pričuvu lijeve mape prilagođavajući desnu mapu da bude jednaka.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Kopiraj nove i ažurirane datoteke u desnu mapu.</target>
@@ -830,8 +823,16 @@ Naredba će biti pokrenuta ako se:
 <source>Detect moved files</source>
 <target>Otkrij premještene datoteke</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Potrebne datoteke baze. Nije podržano kod svih datotečnih sustava.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Zahtjeva i stvara baznu datoteku
+- Otkrivanje aktivno nakon početne sinkronizacije
+- Nije podržano od svih datotečnih sustava
+</target>
 
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
@@ -1067,6 +1068,9 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Find</source>
 <target>Pronađi</target>
 
+<source>Select View</source>
+<target>Odaberi pogled</target>
+
 <source>Overview</source>
 <target>Pregled</target>
 
@@ -1075,12 +1079,6 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 
 <source>Main Bar</source>
 <target>Glavna traka</target>
-
-<source>Filter Files</source>
-<target>Filtriraj datoteke</target>
-
-<source>Select View</source>
-<target>Odaberi pogled</target>
 
 <source>Open...</source>
 <target>Otvori...</target>
@@ -1102,6 +1100,16 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 
 <source>Confirm</source>
 <target>Potvrdi</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>Da li doista želite izvršiti naredbu %y za %x stavke?</pluralform>
+<pluralform>Da li doista želite izvršiti naredbu %y za %x stavki?</pluralform>
+<pluralform>Da li doista želite izvršiti naredbu %y za %x stavki?</pluralform>
+</target>
 
 <source>&Execute</source>
 <target>&Izvrši</target>
@@ -1127,13 +1135,13 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y od %x reda u prikazu</pluralform>
-<pluralform>%y od %x reda u prikazu</pluralform>
-<pluralform>%y od %x reda u prikazu</pluralform>
+<pluralform>Prikazano %y od %x reda</pluralform>
+<pluralform>Prikazano %y od %x redova</pluralform>
+<pluralform>Prikazano %y od %x redova</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1250,6 +1258,9 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Show files that won't be copied</source>
 <target>Prikaži datoteke koje neće biti kopirane</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Prikaži filtrirane ili privremeno izdvojene datoteke</target>
+
 <source>Set as default</source>
 <target>Postavi kao zadano</target>
 
@@ -1336,9 +1347,9 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Dali stvarno želite premjestiti sljedeću %x stavku u koš?</pluralform>
-<pluralform>Dali stvarno želite premjestiti sljedeće %x stavke u koš?</pluralform>
-<pluralform>Dali stvarno želite premjestiti sljedećih %x stavki u koš?</pluralform>
+<pluralform>Da li stvarno želite premjestiti sljedeću %x stavku u koš?</pluralform>
+<pluralform>Da li stvarno želite premjestiti sljedeće %x stavke u koš?</pluralform>
+<pluralform>Da li stvarno želite premjestiti sljedećih %x stavki u koš?</pluralform>
 </target>
 
 <source>Move</source>
@@ -1349,9 +1360,9 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Dali stvarno želite obrisati sljedeću %x stavku?</pluralform>
-<pluralform>Dali stvarno želite obristi sljedeće %x stavke?</pluralform>
-<pluralform>Dali stvarno želite obristi sljedećih %x stavki?</pluralform>
+<pluralform>Da li stvarno želite obrisati sljedeću %x stavku?</pluralform>
+<pluralform>Da li stvarno želite obristi sljedeće %x stavke?</pluralform>
+<pluralform>Da li stvarno želite obristi sljedećih %x stavki?</pluralform>
 </target>
 
 <source>Exclude</source>

@@ -88,17 +88,17 @@
 <source>Any number of alternative directories for at most one config file.</source>
 <target>Orice număr de dosare alternative pentru cel mult o filă de configurare.</target>
 
-<source>A folder input field is empty.</source>
-<target>Un cîmp de introducere a dosarului este gol.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Dosarul corespondent va fi considerat ca fiind gol.</target>
-
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Poți ignora această eroare dacă vrei ca ambele dosare să fie considerate goale. Dosarele vor fi apoi create automat în timpul sincronizării.</target>
+
+<source>A folder input field is empty.</source>
+<target>Un cîmp de introducere a dosarului este gol.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Dosarul corespondent va fi considerat ca fiind gol.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>Dosarele următoare au căi dependente. Atenție la setarea regulilor de sincronizare:</target>
@@ -220,8 +220,11 @@
 <source>Cannot get process information.</source>
 <target>Nu pot obține informații despre proces.</target>
 
-<source>Waiting while directory is locked (%x)...</source>
-<target>Aștept ca dosarul să fie zăvorît (%x)...</target>
+<source>Waiting while directory is locked:</source>
+<target>Aștept ca dosarul să fie zăvorît [locked]:</target>
+
+<source>Lock owner:</source>
+<target>Zăvorăște proprietarul:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -232,6 +235,9 @@
 <pluralform>%x sec</pluralform>
 <pluralform>%x de sec</pluralform>
 </target>
+
+<source>Detecting abandoned lock...</source>
+<target>Detectez zăvorîrea [lock] abandonată...</target>
 
 <source>Creating file %x</source>
 <target>Creez fila %x</target>
@@ -489,6 +495,12 @@ Comanda este declanșată dacă:
 <source>Updating attributes of %x</source>
 <target>Actualizez atributele lui %x</target>
 
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Creez o Conservare a Volumului [Volume Shadow Copy] pentru %x...</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Eroare la verificarea datelor: %x și %y au conținut diferit.</target>
+
 <source>Cannot find %x.</source>
 <target>Nu pot găsi %x.</target>
 
@@ -527,12 +539,6 @@ Comanda este declanșată dacă:
 
 <source>Generating database...</source>
 <target>Generez baza de date...</target>
-
-<source>Creating a Volume Shadow Copy for %x...</source>
-<target>Creez o Conservare a Volumului [Volume Shadow Copy] pentru %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Eroare la verificarea datelor: %x și %y au conținut diferit.</target>
 
 <source>job name</source>
 <target>numele sarcinii</target>
@@ -575,13 +581,16 @@ Comanda este declanșată dacă:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </source>
 <target>
+<pluralform>Reîncercare automată în 1 secundă...</pluralform>
+<pluralform>Reîncercare automată în %x secunde...</pluralform>
+<pluralform>Reîncercare automată în %x de secunde...</pluralform>
 </target>
 
 <source>&Ignore subsequent errors</source>
 <target>&Ignoră erorile ulterioare</target>
 
 <source>Retrying operation...</source>
-<target></target>
+<target>Reîncerc operația...</target>
 
 <source>Serious Error</source>
 <target>Eroare Serioasă</target>
@@ -608,7 +617,7 @@ Comanda este declanșată dacă:
 <target>Nu pot afla numărul versiunii FreeFileSync disponibile acum pe internet. Vrei să-l cauți manual?</target>
 
 <source>&Check</source>
-<target></target>
+<target>&Verifică</target>
 
 <source>Symlink</source>
 <target>Simlegătură</target>
@@ -766,12 +775,6 @@ Comanda este declanșată dacă:
 <source>Save as batch job</source>
 <target>Salvează ca Sarcină Set</target>
 
-<source>Hide excluded items</source>
-<target>Ascunde elementele excluse</target>
-
-<source>Show filtered or temporarily excluded files</source>
-<target>Arată filele filtrate sau excluse temporar</target>
-
 <source>Number of files and folders that will be created</source>
 <target>Numărul de file și dosare care vor fi create</target>
 
@@ -803,10 +806,10 @@ Comanda este declanșată dacă:
 <target>OK</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identificare și propagare a modificărilor din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>
+<target>Identifică și propagă modificările din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>
 
-<source>Create a mirror backup of the left folder which exactly matches the right folder after synchronization.</source>
-<target>Creează o conservare [backup] în oglindă a dosarului stîng care se potrivește exact cu dosarul drept după sincronizare.</target>
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Creează o conservare [backup] în oglindă a dosarului stîng prin adaptarea dosarului drept pînă la potrivirea exactă cu cel stîng.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copiază filele noi și cele actualizate în dosarul drept.</target>
@@ -817,8 +820,16 @@ Comanda este declanșată dacă:
 <source>Detect moved files</source>
 <target>Detectează filele mutate</target>
 
-<source>Requires database files. Not supported by all file systems.</source>
-<target>Necesită file cu baze de date. Nu e suportat de toate sistemele de file.</target>
+<source>
+- Requires and creates database files
+- Detection active after initial sync
+- Not supported by all file systems
+</source>
+<target>
+- Solicită și creează file cu baze de date
+- Detectare activă după sincronizarea inițială
+- Nesuportat de toate sistemele de file
+</target>
 
 <source>Delete files:</source>
 <target>Ștergerea Filelor:</target>
@@ -830,7 +841,7 @@ Comanda este declanșată dacă:
 <target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
 <source>Recycle bin</source>
-<target></target>
+<target>Reciclator</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Conservă [back up] în Reciclator filele șterse sau suprascrise</target>
@@ -1054,6 +1065,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Find</source>
 <target>Găsește</target>
 
+<source>Select View</source>
+<target>Selectează Vederea</target>
+
 <source>Overview</source>
 <target>Panoramă</target>
 
@@ -1062,12 +1076,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Main Bar</source>
 <target>Bara Principală</target>
-
-<source>Filter Files</source>
-<target>Filtrează Filele</target>
-
-<source>Select View</source>
-<target>Selectează Vederea</target>
 
 <source>Open...</source>
 <target>Deschide...</target>
@@ -1095,6 +1103,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
+<pluralform>Sigur vrei să execuți comanda %y pentru un item?</pluralform>
+<pluralform>Sigur vrei să execuți comanda %y pentru %x itemuri?</pluralform>
+<pluralform>Sigur vrei să execuți comanda %y pentru %x de itemuri?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1121,13 +1132,13 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 </target>
 
 <source>
-<pluralform>%y of 1 row in view</pluralform>
-<pluralform>%y of %x rows in view</pluralform>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>%y din 1 rînd afișat</pluralform>
-<pluralform>%y din %x rînduri afișate</pluralform>
-<pluralform>%y din %x de rînduri afișate</pluralform>
+<pluralform>Afișate: %y din 1 rînd</pluralform>
+<pluralform>Afișate: %y din %x rînduri</pluralform>
+<pluralform>Afișate: %y din %x de rînduri</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1244,6 +1255,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Show files that won't be copied</source>
 <target>Arată elementele (file/dosare) care nu vor fi copiate</target>
 
+<source>Show filtered or temporarily excluded files</source>
+<target>Arată filele filtrate sau excluse temporar</target>
+
 <source>Set as default</source>
 <target>Setează ca implicit</target>
 
@@ -1279,6 +1293,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Warning</source>
 <target>Atenție</target>
+
+<source>Select all</source>
+<target>Selectează Tot</target>
 
 <source>Paused</source>
 <target>Sincronizare Pauzată</target>

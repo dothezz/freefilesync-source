@@ -289,17 +289,17 @@ struct LockInformation //throw FileError
         computerName += &buffer[0];
 
         const uid_t userIdNo = ::getuid(); //never fails
-		userId = numberTo<std::string>(userIdNo);
+        userId = numberTo<std::string>(userIdNo);
 
-		//the id alone is not very distinctive, e.g. often 1000 on Ubuntu => add name
+        //the id alone is not very distinctive, e.g. often 1000 on Ubuntu => add name
         buffer.resize(std::max<long>(buffer.size(), ::sysconf(_SC_GETPW_R_SIZE_MAX))); //::sysconf may return long(-1)
         struct passwd buffer2 = {};
         struct passwd* pwsEntry = nullptr;
         if (::getpwuid_r(userIdNo, &buffer2, &buffer[0], buffer.size(), &pwsEntry) != 0) //getlogin() is deprecated and not working on Ubuntu at all!!!
             throw FileError(_("Cannot get process information."), formatSystemError(L"getpwuid_r", getLastError()));
         if (!pwsEntry)
-            throw FileError(_("Cannot get process information."), L"no login found"); //should not happen?        
-		userId += '(' + std::string(pwsEntry->pw_name) + ')'; //follow Linux naming convention "1000(zenju)"
+            throw FileError(_("Cannot get process information."), L"no login found"); //should not happen?
+        userId += '(' + std::string(pwsEntry->pw_name) + ')'; //follow Linux naming convention "1000(zenju)"
 #endif
 
         Opt<SessionId> sessionIdTmp = getSessionId(processId); //throw FileError
@@ -420,8 +420,8 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
         try
         {
             const LockInformation& lockInfo = retrieveLockInfo(lockfilename); //throw FileError
-			//enhance status message and show which user is holding the lock:
-			infoMsg += L" | " + _("Lock owner:") +  L' ' + utfCvrtTo<std::wstring>(lockInfo.userId);
+            //enhance status message and show which user is holding the lock:
+            infoMsg += L" | " + _("Lock owner:") +  L' ' + utfCvrtTo<std::wstring>(lockInfo.userId);
 
             originalLockId = lockInfo.lockId;
             switch (getProcessStatus(lockInfo)) //throw FileError

@@ -165,21 +165,26 @@ void moveObject(const Zstring& sourceFile, //throw FileError
 }
 
 
-void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile& callback) //throw FileError
+void moveFile(const Zstring& sourceFile, //throw FileError
+              const Zstring& targetFile,
+              const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus) //may be nullptr
 {
-    moveObject(sourceFile, //throw FileError
-               targetFile,
-               [&]
+    auto copyDelete = [&]
     {
         //create target
         if (symlinkExists(sourceFile))
             copySymlink(sourceFile, targetFile, false); //throw FileError; don't copy filesystem permissions
         else
-            copyFile(sourceFile, targetFile, false, true, &callback); //throw FileError - permissions "false", transactional copy "true"
+        {
+            auto onDeleteTargetFile = [&]() { assert(!somethingExists(targetFile)); };
+            copyFile(sourceFile, targetFile, false, true, onDeleteTargetFile, onUpdateCopyStatus); //throw FileError - permissions "false", transactional copy "true"
+        }
 
         //delete source
         removeFile(sourceFile); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
-    });
+    };
+
+    moveObject(sourceFile, targetFile, copyDelete); //throw FileError
 }
 
 
@@ -233,23 +238,16 @@ private:
 }
 
 
-bool FileVersioner::revisionFile(const Zstring& fullName, const Zstring& relativeName, CallbackMoveFile& callback) //throw FileError
+bool FileVersioner::revisionFile(const Zstring& fullName, const Zstring& relativeName, const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus) //throw FileError
 {
-    struct CallbackMoveFileImpl : public CallbackMoveDir
-    {
-        CallbackMoveFileImpl(CallbackMoveFile& callback) : callback_(callback) {}
-    private:
-        virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) {}
-        virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) {}
-        virtual void updateStatus(Int64 bytesDelta) { callback_.updateStatus(bytesDelta); }
-        CallbackMoveFile& callback_;
-    } cb(callback);
-
-    return revisionFileImpl(fullName, relativeName, cb); //throw FileError
+    return revisionFileImpl(fullName, relativeName, nullptr, onUpdateCopyStatus); //throw FileError
 }
 
 
-bool FileVersioner::revisionFileImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+bool FileVersioner::revisionFileImpl(const Zstring& fullName, //throw FileError
+                                     const Zstring& relativeName,
+                                     const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
+                                     const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus)
 {
     bool moveSuccessful = false;
 
@@ -260,35 +258,33 @@ bool FileVersioner::revisionFileImpl(const Zstring& fullName, const Zstring& rel
                          versioningStyle_,
                          [&](const Zstring& source, const Zstring& target)
     {
-        callback.onBeforeFileMove(source, target); //if we're called by revisionDirImpl() we know that "source" exists!
+        if (onBeforeFileMove)
+            onBeforeFileMove(source, target); //if we're called by revisionDirImpl() we know that "source" exists!
         //when called by revisionFile(), "source" might not exist, however onBeforeFileMove() is not propagated in this case!
 
-        struct CopyCallbackImpl : public CallbackCopyFile
-        {
-            CopyCallbackImpl(CallbackMoveDir& callback) : callback_(callback) {}
-        private:
-            virtual void deleteTargetFile(const Zstring& targetFile) { assert(!somethingExists(targetFile)); }
-            virtual void updateCopyStatus(Int64 bytesDelta) { callback_.updateStatus(bytesDelta); }
-            CallbackMoveDir& callback_;
-        } copyCallback(callback);
-
-        moveFile(source, target, copyCallback); //throw FileError
+        moveFile(source, target, onUpdateCopyStatus); //throw FileError
         moveSuccessful = true;
     });
     return moveSuccessful;
 }
 
 
-void FileVersioner::revisionDir(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+void FileVersioner::revisionDir(const Zstring& fullName, const Zstring& relativeName, //throw FileError
+                                const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
+                                const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,
+                                const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus)
 {
     //no error situation if directory is not existing! manual deletion relies on it!
     if (!somethingExists(fullName))
         return; //neither directory nor any other object (e.g. broken symlink) with that name existing
-    revisionDirImpl(fullName, relativeName, callback); //throw FileError
+    revisionDirImpl(fullName, relativeName, onBeforeFileMove, onBeforeDirMove, onUpdateCopyStatus); //throw FileError
 }
 
 
-void FileVersioner::revisionDirImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+void FileVersioner::revisionDirImpl(const Zstring& fullName, const Zstring& relativeName, //throw FileError
+                                    const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
+                                    const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,
+                                    const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus)
 {
     assert(somethingExists(fullName)); //[!]
 
@@ -302,7 +298,8 @@ void FileVersioner::revisionDirImpl(const Zstring& fullName, const Zstring& rela
                              versioningStyle_,
                              [&](const Zstring& source, const Zstring& target)
         {
-            callback.onBeforeDirMove(source, target);
+            if (onBeforeDirMove)
+                onBeforeDirMove(source, target);
             moveDirSymlink(source, target); //throw FileError
         });
     }
@@ -323,28 +320,23 @@ void FileVersioner::revisionDirImpl(const Zstring& fullName, const Zstring& rela
         }
 
         const Zstring fullNamePf = appendSeparator(fullName);
-        const Zstring relnamePf   = appendSeparator(relativeName);
+        const Zstring relnamePf  = appendSeparator(relativeName);
 
         //move files
-        std::for_each(fileList.begin(), fileList.end(),
-                      [&](const Zstring& shortname)
-        {
+        for (const Zstring& shortname : fileList)
             revisionFileImpl(fullNamePf + shortname, //throw FileError
                              relnamePf + shortname,
-                             callback);
-        });
+                             onBeforeFileMove, onUpdateCopyStatus);
 
         //move items in subdirectories
-        std::for_each(dirList.begin(), dirList.end(),
-                      [&](const Zstring& shortname)
-        {
+        for (const Zstring& shortname : dirList)
             revisionDirImpl(fullNamePf + shortname, //throw FileError
                             relnamePf + shortname,
-                            callback);
-        });
+                            onBeforeFileMove, onBeforeDirMove, onUpdateCopyStatus);
 
         //delete source
-        callback.onBeforeDirMove(fullName, targetDir);
+        if (onBeforeDirMove)
+            onBeforeDirMove(fullName, targetDir);
         removeDirectory(fullName); //throw FileError
     }
 }

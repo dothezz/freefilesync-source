@@ -685,8 +685,8 @@ std::string generateLng(const TranslationUnorderedList& in, const TransHeader& h
         out += KnownTokens::text(Token::TK_SRC_END) + '\n';
 
         out += KnownTokens::text(Token::TK_TRG_BEGIN);
-        out += '\n';
-
+        if (!forms.empty())
+            out += '\n';
         for (std::string plForm : forms)
         {
             formatMultiLineText(plForm);

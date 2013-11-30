@@ -1,6 +1,6 @@
 // **************************************************************************
-// * This file is part of the zen::Xml project. It is distributed under the *
-// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -124,8 +124,8 @@ public:
     }
 
     template < class IterTy,     //underlying iterator type
-             class T,            //target object type
-             class AccessPolicy > //access policy: see AccessPtrMap
+               class T,            //target object type
+               class AccessPolicy > //access policy: see AccessPtrMap
     class PtrIter : public std::iterator<std::input_iterator_tag, T>, private AccessPolicy //get rid of shared_ptr indirection
     {
     public:

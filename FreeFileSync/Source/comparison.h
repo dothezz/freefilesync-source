@@ -45,7 +45,7 @@ struct FolderPairCfg
 std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); //fill FolderPairCfg and resolve folder pairs
 
 //FFS core routine:
-void compare(size_t fileTimeTolerance, //max allowed file time deviation
+void compare(int fileTimeTolerance, //max allowed file time deviation
              xmlAccess::OptionalDialogs& warnings,
              bool allowUserInteraction,
              bool runWithBackgroundPriority,

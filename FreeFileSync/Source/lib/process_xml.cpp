@@ -10,6 +10,7 @@
 #include "ffs_paths.h"
 #include <zen/file_handling.h>
 #include <zen/file_io.h>
+
 //#include <zen/time.h>
 #include "xml_base.h"
 
@@ -402,10 +403,10 @@ void writeText(const SymLinkHandling& value, std::string& output)
         case SYMLINK_EXCLUDE:
             output = "Exclude";
             break;
-        case SYMLINK_USE_DIRECTLY:
+        case SYMLINK_DIRECT:
             output = "Direct";
             break;
-        case SYMLINK_FOLLOW_LINK:
+        case SYMLINK_FOLLOW:
             output = "Follow";
             break;
     }
@@ -418,9 +419,9 @@ bool readText(const std::string& input, SymLinkHandling& value)
     zen::trim(tmp);
     warn_static("remove after migration. 2013.08.20")
     if (tmp == "UseDirectly") //obsolete!
-        value = SYMLINK_USE_DIRECTLY;
+        value = SYMLINK_DIRECT;
     else if (tmp == "FollowLink") //obsolete!
-        value = SYMLINK_FOLLOW_LINK;
+        value = SYMLINK_FOLLOW;
     else if (tmp == "Ignore") //obsolete!
         value = SYMLINK_EXCLUDE;
     else
@@ -428,9 +429,9 @@ bool readText(const std::string& input, SymLinkHandling& value)
         if (tmp == "Exclude")
             value = SYMLINK_EXCLUDE;
         else if (tmp == "Direct")
-            value = SYMLINK_USE_DIRECTLY;
+            value = SYMLINK_DIRECT;
         else if (tmp == "Follow")
-            value = SYMLINK_FOLLOW_LINK;
+            value = SYMLINK_FOLLOW;
         else
             return false;
     return true;
@@ -750,14 +751,17 @@ bool readStruc(const XmlElement& input, ViewFilterDefault& value)
             success = false;
     };
 
+    XmlIn sharedView = in["Shared"];
+    readAttr(sharedView, "Equal"   , value.equal);
+    readAttr(sharedView, "Conflict", value.conflict);
+    readAttr(sharedView, "Excluded", value.excluded);
+
     XmlIn catView = in["CategoryView"];
     readAttr(catView, "LeftOnly"  , value.leftOnly);
     readAttr(catView, "RightOnly" , value.rightOnly);
     readAttr(catView, "LeftNewer" , value.leftNewer);
     readAttr(catView, "RightNewer", value.rightNewer);
     readAttr(catView, "Different" , value.different);
-    readAttr(catView, "Equal"     , value.equal);
-    readAttr(catView, "Conflict"  , value.conflict);
 
     XmlIn actView = in["ActionView"];
     readAttr(actView, "CreateLeft" , value.createLeft);
@@ -776,14 +780,17 @@ void writeStruc(const ViewFilterDefault& value, XmlElement& output)
 {
     XmlOut out(output);
 
+    XmlOut sharedView = out["Shared"];
+    sharedView.attribute("Equal"   , value.equal);
+    sharedView.attribute("Conflict", value.conflict);
+    sharedView.attribute("Excluded", value.excluded);
+
     XmlOut catView = out["CategoryView"];
     catView.attribute("LeftOnly"  , value.leftOnly);
     catView.attribute("RightOnly" , value.rightOnly);
     catView.attribute("LeftNewer" , value.leftNewer);
     catView.attribute("RightNewer", value.rightNewer);
     catView.attribute("Different" , value.different);
-    catView.attribute("Equal"     , value.equal);
-    catView.attribute("Conflict"  , value.conflict);
 
     XmlOut actView = out["ActionView"];
     actView.attribute("CreateLeft" , value.createLeft);
@@ -999,18 +1006,7 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
     //read GUI specific config data
     XmlIn inGuiCfg = in["GuiConfig"];
 
-    warn_static("remove after migration?")
-    if (inGuiCfg["HideFiltered"     ]) //obsolete name
-        inGuiCfg["HideFiltered"     ](config.hideExcludedItems);
-    else if (inGuiCfg["ShowFiltered"     ]) //obsolete name
-    {
-        inGuiCfg["ShowFiltered"](config.hideExcludedItems);
-        config.hideExcludedItems = !config.hideExcludedItems;
-    }
-    else
-        inGuiCfg["HideExcluded"](config.hideExcludedItems);
-
-    inGuiCfg["HandleError"      ](config.handleError);
+    inGuiCfg["HandleError"](config.handleError);
 
     warn_static("remove after migration?")
     if (inGuiCfg["SyncPreviewActive"]) //obsolete name
@@ -1117,8 +1113,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inColRight(config.gui.columnAttribRight);
     //###########################################################
 
-    inWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    inWnd["Perspective2"     ](config.gui.guiPerspectiveLast);
+    inWnd["DefaultView" ](config.gui.viewFilterDefault);
+    inWnd["Perspective"](config.gui.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1413,7 +1409,6 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outGuiCfg = out["GuiConfig"];
 
-    outGuiCfg["HideExcluded"  ](config.hideExcludedItems);
     outGuiCfg["HandleError"   ](config.handleError);
     outGuiCfg["MiddleGridView"](config.highlightSyncAction ? "Action" : "Category"); //refactor into enum!?
 }
@@ -1505,8 +1500,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outColRight(config.gui.columnAttribRight);
     //###########################################################
 
-    outWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    outWnd["Perspective2"     ](config.gui.guiPerspectiveLast);
+    outWnd["DefaultView" ](config.gui.viewFilterDefault);
+    outWnd["Perspective"](config.gui.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 
