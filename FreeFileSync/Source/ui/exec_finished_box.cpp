@@ -107,23 +107,21 @@ void ExecFinishedBox::addItemHistory()
         std::wstring command = getValue();
         trim(command);
 
-        bool skipCmd = command == separationLine         || //do not add sep. line
+        if (command == separationLine || //do not add sep. line
                        command == cmdTxtCloseProgressDlg || //do not add special command
-                       command.empty();
+                       command.empty())
+					   return;
 
         //do not add built-in commands to history
-        if (!skipCmd)
-        {
-            for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
-                if (command == it->first ||
-                    command == it->second)
-                {
-                    skipCmd = true;
-                    break;
-                }
-        }
+            for (const auto& item : defaultCommands)
+                if (command == item.first ||
+                    command == item.second)
+					return;
 
-        if (!skipCmd)
+            for (const std::wstring& item : *history_)
+				if (command == item)
+					return;
+
             history_->insert(history_->begin(), command);
 
         if (history_->size() > historyMax_)
@@ -176,7 +174,7 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
     if (history_ && !history_->empty())
     {
         items.push_back(separationLine);
-        items.insert(items.end(), history_->begin(), history_->end());
+        vector_append(items, *history_);
         std::sort(items.end() - history_->size(), items.end());
     }
 

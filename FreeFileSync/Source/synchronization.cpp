@@ -935,33 +935,29 @@ bool haveNameClash(const Zstring& shortname, List& m)
 }
 
 
-Zstring findUnusedTempName(const Zstring& filename)
-{
-    Zstring output = filename + zen::TEMP_FILE_ENDING;
-
-    //ensure uniqueness (+ minor file system race condition!)
-    for (int i = 1; somethingExists(output); ++i)
-        output = filename + Zchar('_') + numberTo<Zstring>(i) + zen::TEMP_FILE_ENDING;
-
-    return output;
-}
-
-
 template <SelectedSide side>
 void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
                                              FilePair& targetObj) //throw FileError
 {
     const Zstring& source = sourceObj.getFullName<side>();
-    const Zstring& tmpTarget = findUnusedTempName(sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>());
+    Zstring tmpTarget = sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>() + TEMP_FILE_ENDING;
     //this could still lead to a name-clash in obscure cases, if some file exists on the other side with
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
 
-    reportInfo(txtMovingFile, source, tmpTarget);
+    for (int i = 1;; ++i)
+        try
+        {
+            reportInfo(txtMovingFile, source, tmpTarget);
+            renameFile(source, tmpTarget); //throw FileError, ErrorTargetExisting
+            break;
+        }
+        catch (const ErrorTargetExisting&) //repeat until unique name found: no file system race condition!
+        {
+            tmpTarget = sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>() + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
+        }
 
     warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-
-    renameFile(source, tmpTarget); //throw FileError
 
     //update file hierarchy
     const FileDescriptor descrSource(sourceObj.getLastWriteTime <side>(),

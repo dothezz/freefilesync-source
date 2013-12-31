@@ -672,15 +672,15 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
 {
     if (row < flatTree.size())
     {
-        const auto level = flatTree[row].level_;
+        const auto level  = flatTree[row].level_;
         const int percent = flatTree[row].percent_;
 
         switch (flatTree[row].type_)
         {
             case TreeView::TYPE_ROOT:
             {
-                const auto* root = static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
-                return make_unique<TreeView::RootNode>(percent, root->bytesGross, root->itemCountGross, getStatus(row), *(root->baseDirObj), root->displayName);
+                const auto& root = *static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
+                return make_unique<TreeView::RootNode>(percent, root.bytesGross, root.itemCountGross, getStatus(row), *root.baseDirObj, root.displayName);
             }
             break;
 

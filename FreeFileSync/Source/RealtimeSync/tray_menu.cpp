@@ -290,7 +290,6 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
             }
             catch (const FileError& e)
             {
-                warn_static("fix dialog hiding on OSX !!")
                 showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
             }
         }

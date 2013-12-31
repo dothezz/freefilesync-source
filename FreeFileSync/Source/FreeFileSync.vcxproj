@@ -163,6 +163,8 @@
       <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30u_aui.lib;wxmsw30u_adv.lib;wxmsw30u_core.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxbase30u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib</AdditionalLibraryDirectories>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
@@ -190,6 +192,8 @@
       <AdditionalDependencies>Rpcrt4.lib;winmm.lib;comctl32.lib;Wininet.lib;wxmsw30u_aui.lib;wxmsw30u_adv.lib;wxmsw30u_core.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxbase30u_net.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib</AdditionalLibraryDirectories>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>

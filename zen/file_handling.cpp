@@ -14,7 +14,7 @@
 #include "file_io.h"
 #include "assert_static.h"
 #include "file_id_def.h"
-#include <boost/thread/tss.hpp>
+//#include <boost/thread/tss.hpp>
 
 #ifdef ZEN_WIN
 #include <Aclapi.h>
@@ -1303,36 +1303,42 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
                 ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), dirInfo.dwFileAttributes);
                 //copy "read-only and system attributes": http://blogs.msdn.com/b/oldnewthing/archive/2003/09/30/55100.aspx
 
-                const bool isCompressed = (dirInfo.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
                 const bool isEncrypted  = (dirInfo.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)  != 0;
+                const bool isCompressed = (dirInfo.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
 
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)
 
-                if (isCompressed)
+                HANDLE hDirTrg = ::CreateFile(applyLongPathPrefix(directory).c_str(),
+                                              GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
+                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                              nullptr,
+                                              OPEN_EXISTING,
+                                              FILE_FLAG_BACKUP_SEMANTICS,
+                                              nullptr);
+                if (hDirTrg != INVALID_HANDLE_VALUE)
                 {
-                    HANDLE hDirTrg = ::CreateFile(applyLongPathPrefix(directory).c_str(),
-                                                  GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                                  nullptr,
-                                                  OPEN_EXISTING,
-                                                  FILE_FLAG_BACKUP_SEMANTICS,
-                                                  nullptr);
-                    if (hDirTrg != INVALID_HANDLE_VALUE)
-                    {
-                        ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirTrg));
+                    ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirTrg));
 
+                    if (isCompressed)
+                    {
                         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
                         DWORD bytesReturned = 0;
-                        ::DeviceIoControl(hDirTrg,               //handle to file or directory
-                                          FSCTL_SET_COMPRESSION, //dwIoControlCode
-                                          &cmpState,             //input buffer
-                                          sizeof(cmpState),      //size of input buffer
-                                          nullptr,               //lpOutBuffer
-                                          0,                     //OutBufferSize
-                                          &bytesReturned,        //number of bytes returned
-                                          nullptr);              //OVERLAPPED structure
+                        /*bool rv = */::DeviceIoControl(hDirTrg,               //handle to file or directory
+                                                        FSCTL_SET_COMPRESSION, //dwIoControlCode
+                                                        &cmpState,             //input buffer
+                                                        sizeof(cmpState),      //size of input buffer
+                                                        nullptr,               //lpOutBuffer
+                                                        0,                     //OutBufferSize
+                                                        &bytesReturned,        //number of bytes returned
+                                                        nullptr);              //OVERLAPPED structure
                     }
+
+                    //(try to) set creation and modification time
+                    /*bool rv = */::SetFileTime(hDirTrg,                   //_In_       HANDLE hFile,
+                                                &dirInfo.ftCreationTime,   //_Out_opt_  LPFILETIME lpCreationTime,
+                                                nullptr,                   //_Out_opt_  LPFILETIME lpLastAccessTime,
+                                                &dirInfo.ftLastWriteTime); //_Out_opt_  LPFILETIME lpLastWriteTime
                 }
             }
         }
@@ -1783,12 +1789,12 @@ public:
             throw ErrorShouldCopyAsSparse(L"sparse dummy value");
 
         if (exceptionInUserCallback)
-				try
-				{
-					exceptionInUserCallback(0); //should throw again!!!
-					assert(false);
-				}
-				catch (...) { throw; }
+            try
+            {
+                exceptionInUserCallback(0); //should throw again!!!
+                assert(false);
+            }
+            catch (...) { throw; }
 
         if (!errorMsg.first.empty())
             throw FileError(errorMsg.first, errorMsg.second);
@@ -2171,19 +2177,6 @@ void copyFileLinuxMac(const Zstring& sourceFile,
 }
 #endif
 
-
-Zstring findUnusedTempName(const Zstring& filename)
-{
-    Zstring output = filename + zen::TEMP_FILE_ENDING;
-
-    //ensure uniqueness (+ minor file system race condition!)
-    for (int i = 1; somethingExists(output); ++i)
-        output = filename + Zchar('_') + numberTo<Zstring>(i) + zen::TEMP_FILE_ENDING;
-
-    return output;
-}
-
-
 /*
       ------------------
       |File Copy Layers|
@@ -2225,25 +2218,22 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
 {
     if (transactionalCopy)
     {
-        Zstring temporary = targetFile + zen::TEMP_FILE_ENDING; //use temporary file until a correct date has been set
+        Zstring tmpTarget = targetFile + TEMP_FILE_ENDING; //use temporary file until a correct date has been set
 
         //raw file copy
-        try
-        {
-            copyFileSelectOs(sourceFile, temporary, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
-        }
-        catch (ErrorTargetExisting&)
-        {
-            //determine non-used temp file name "first":
-            //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
-            temporary = findUnusedTempName(targetFile);
-
-            //retry
-            copyFileSelectOs(sourceFile, temporary, onUpdateCopyStatus, sourceAttr); //throw FileError
-        }
+        for (int i = 1;; ++i)
+            try
+            {
+                copyFileSelectOs(sourceFile, tmpTarget, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+                break;
+            }
+            catch (const ErrorTargetExisting&) //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
+            {
+                tmpTarget = targetFile + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
+            }
 
         //transactional behavior: ensure cleanup; not needed before copyFileSelectOs() which is already transactional
-        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(temporary); } catch (FileError&) {} });
+        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(tmpTarget); } catch (FileError&) {} });
 
         //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
         if (onDeleteTargetFile)
@@ -2251,7 +2241,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
 
         //rename temporary file:
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
-        renameFile(temporary, targetFile); //throw FileError
+        renameFile(tmpTarget, targetFile); //throw FileError
 
         /*
         CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" does

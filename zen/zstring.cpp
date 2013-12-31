@@ -17,7 +17,7 @@
 #endif
 
 #ifndef NDEBUG
-#include "thread.h" //includes <boost/thread.hpp>
+#include <mutex>
 #include <iostream>
 #endif
 
@@ -32,14 +32,14 @@ class LeakChecker //small test for memory leaks
 public:
     void insert(const void* ptr, size_t size)
     {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        std::lock_guard<std::mutex> dummy(lockActStrings);
         if (!activeStrings.insert(std::make_pair(ptr, size)).second)
             reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
     void remove(const void* ptr)
     {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        std::lock_guard<std::mutex> dummy(lockActStrings);
         if (activeStrings.erase(ptr) != 1)
             reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
@@ -89,7 +89,7 @@ private:
         throw std::logic_error("Memory leak! " + message);
     }
 
-    boost::mutex lockActStrings;
+    std::mutex lockActStrings;
     zen::hash_map<const void*, size_t> activeStrings;
 };
 

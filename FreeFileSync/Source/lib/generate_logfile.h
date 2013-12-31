@@ -106,9 +106,9 @@ void saveLogToFile(const SummaryInfo& summary, //throw FileError
     fileOut.write(&*header.begin(), header.size()); //throw FileError
 
     //write log items one after the other instead of creating one big string: memory allocation might fail; think 1 million entries!
-    for (auto iter = log.begin(); iter != log.end(); ++iter)
+	for (const LogEntry& entry : log)
     {
-        Utf8String msg = replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(*iter)), '\n', LINE_BREAK);
+        Utf8String msg = replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         msg += LINE_BREAK; //make sure string is not empty!
 
         fileOut.write(&*msg.begin(), msg.size()); //throw FileError
@@ -128,9 +128,9 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
     newStream += LINE_BREAK;
 
     //check size of "newStream": memory allocation might fail - think 1 million entries!
-    for (auto iter = log.begin(); iter != log.end(); ++iter)
+    for (const LogEntry& entry : log)
     {
-        newStream += replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(*iter)), '\n', LINE_BREAK);
+        newStream += replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         newStream += LINE_BREAK;
 
         if (newStream.size() > maxBytesToWrite)

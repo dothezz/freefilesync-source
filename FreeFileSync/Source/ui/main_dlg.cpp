@@ -444,8 +444,8 @@ void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
     frame->Show();
 #ifdef ZEN_MAC
     ProcessSerialNumber psn = { 0, kCurrentProcess };
-    ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
     ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon, even if we're not an application bundle
+    ::SetFrontProcess(&psn);
     //if the executable is not yet in a bundle or if it is called through a launcher, we need to set focus manually:
 #endif
 }
@@ -1078,16 +1078,25 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
         if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(row))
         {
             if (auto root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-            {
-                //select first level of child elements
-                for (auto& fsObj : root->baseDirObj_.refSubDirs ()) output.push_back(&fsObj);
-                for (auto& fsObj : root->baseDirObj_.refSubFiles()) output.push_back(&fsObj);
-                for (auto& fsObj : root->baseDirObj_.refSubLinks()) output.push_back(&fsObj);
-            }
+			{
+				//selecting root means "select everything", *ignoring* current view filter!
+				BaseDirPair& baseDir = root->baseDirObj_;
+
+                std::vector<FileSystemObject*> dirsFilesAndLinks;
+
+                for (FileSystemObject& fsObj : baseDir.refSubDirs()) //no need to explicitly add child elements!
+                        dirsFilesAndLinks.push_back(&fsObj);
+                for (FileSystemObject& fsObj : baseDir.refSubFiles())
+                        dirsFilesAndLinks.push_back(&fsObj);
+                for (FileSystemObject& fsObj : baseDir.refSubLinks())
+                        dirsFilesAndLinks.push_back(&fsObj);
+
+				vector_append(output, dirsFilesAndLinks);
+			}
             else if (auto dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                 output.push_back(&(dir->dirObj_));
             else if (auto file = dynamic_cast<const TreeView::FilesNode*>(node.get()))
-                output.insert(output.end(), file->filesAndLinks_.begin(), file->filesAndLinks_.end());
+                vector_append(output, file->filesAndLinks_);
             else assert(false);
         }
     return output;
@@ -1688,7 +1697,9 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
             {
                 const std::vector<FileSystemObject*>& selection = getTreeSelection();
                 if (!selection.empty())
-                    setFilterManually(selection, !selection[0]->isActive());
+                    setFilterManually(selection, m_bpButtonShowExcluded->isActive() && !selection[0]->isActive()); 
+				//always exclude items if "m_bpButtonShowExcluded is unchecked" => yes, it's possible to have already unchecked items in selection, so we need to overwrite: 
+				//e.g. select root node while the first item returned is not shown on grid!
             }
             return;
 
@@ -1779,7 +1790,7 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
             {
                 const std::vector<FileSystemObject*>& selection = getGridSelection();
                 if (!selection.empty())
-                    setFilterManually(selection, !selection[0]->isActive());
+                    setFilterManually(selection, m_bpButtonShowExcluded->isActive() && !selection[0]->isActive());
             }
             return;
 
@@ -2041,10 +2052,10 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
     //----------------------------------------------------------------------------------------------------
     if (!selection.empty())
     {
-        if (selection[0]->isActive())
-            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &getResourceImage(L"checkboxFalse"));
-        else
+        if (m_bpButtonShowExcluded->isActive() && !selection[0]->isActive())
             menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, true); }, &getResourceImage(L"checkboxTrue"));
+        else
+            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &getResourceImage(L"checkboxFalse"));
     }
     else
         menu.addItem(_("Exclude temporarily") + L"\tSpace", [] {}, nullptr, false);
@@ -2169,10 +2180,10 @@ void MainDialog::onMainGridContextRim(bool leftSide)
     //----------------------------------------------------------------------------------------------------
     if (!selection.empty())
     {
-        if (selection[0]->isActive())
-            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &getResourceImage(L"checkboxFalse"));
-        else
+        if (m_bpButtonShowExcluded->isActive() && !selection[0]->isActive())
             menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, true); }, &getResourceImage(L"checkboxTrue"));
+        else
+            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &getResourceImage(L"checkboxFalse"));
     }
     else
         menu.addItem(_("Exclude temporarily") + L"\tSpace", [] {}, nullptr, false);
@@ -2709,13 +2720,13 @@ void MainDialog::OnSaveAsBatchJob(wxCommandEvent& event)
 }
 
 
-bool MainDialog::trySaveConfig(const Zstring* fileNameGui) //return true if saved successfully
+bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if saved successfully
 {
     Zstring targetFilename;
 
-    if (fileNameGui)
+    if (guiFilename)
     {
-        targetFilename = *fileNameGui;
+        targetFilename = *guiFilename;
         assert(endsWith(targetFilename, Zstr(".ffs_gui")));
     }
     else
@@ -2755,27 +2766,50 @@ bool MainDialog::trySaveConfig(const Zstring* fileNameGui) //return true if save
 }
 
 
-bool MainDialog::trySaveBatchConfig(const Zstring* fileNameBatch)
+bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 {
-    //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "hideExcludedItems, m_bpButtonViewTypeSyncAction" is negliable
+    using namespace xmlAccess;
 
-    const xmlAccess::XmlGuiConfig guiCfg = getConfig();
+    //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "m_bpButtonViewTypeSyncAction" is negliable
+
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const XmlGuiConfig guiCfg = getConfig();
+
+    //prepare batch config: reuse existing batch-specific settings from file if available
+    XmlBatchConfig batchCfg;
+    try
+    {
+        Zstring referenceBatchFile;
+        if (batchFileToUpdate)
+            referenceBatchFile = *batchFileToUpdate;
+        else if (!activeCfgFilename.empty())
+            if (getXmlType(activeCfgFilename) == XML_TYPE_BATCH) //throw FfsXmlError
+                referenceBatchFile = activeCfgFilename;
+
+        if (referenceBatchFile.empty())
+            batchCfg = convertGuiToBatch(guiCfg, nullptr);
+        else
+        {
+            XmlBatchConfig referenceBatchCfg;
+            readConfig(referenceBatchFile, referenceBatchCfg); //throw FfsXmlError
+            batchCfg = convertGuiToBatch(guiCfg, &referenceBatchCfg);
+        }
+    }
+    catch (const FfsXmlError& e)
+    {
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+        return false;
+    }
 
     Zstring targetFilename;
-    xmlAccess::XmlBatchConfig batchCfg;
-
-    if (fileNameBatch)
-    {
-        targetFilename = *fileNameBatch;
-        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, *fileNameBatch);
-        assert(endsWith(targetFilename, Zstr(".ffs_batch")));
-    }
+    if (batchFileToUpdate)
+	{
+		targetFilename = *batchFileToUpdate;
+		assert(endsWith(targetFilename, Zstr(".ffs_batch")));
+	}
     else
     {
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
-        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, activeCfgFilename);
-
-        //let user change batch config: this should change batch-exclusive settings only, else the "setLastUsedConfig" below would be somewhat of a lie
+        //let user update batch config: this should change batch-exclusive settings only, else the "setLastUsedConfig" below would be somewhat of a lie
         if (!customizeBatchConfig(this,
                                   batchCfg, //in/out
                                   globalCfg.gui.onCompletionHistory,
@@ -2801,13 +2835,13 @@ bool MainDialog::trySaveBatchConfig(const Zstring* fileNameBatch)
 
     try
     {
-        xmlAccess::writeConfig(batchCfg, targetFilename); //throw FfsXmlError
+        writeConfig(batchCfg, targetFilename); //throw FfsXmlError
 
         setLastUsedConfig(targetFilename, guiCfg); //[!] behave as if we had saved guiCfg
         flashStatusInformation(_("Configuration saved"));
         return true;
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FfsXmlError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         return false;

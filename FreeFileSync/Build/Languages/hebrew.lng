@@ -7,18 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>
-<pluralform>Showing %y of 1 row</pluralform>
-<pluralform>Showing %y of %x rows</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>Automatic retry in 1 second...</pluralform>
-<pluralform>Automatic retry in %x seconds...</pluralform>
-</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>שני הצדדים שונו מאז הסנכרון האחרון.</target>
 
@@ -585,6 +573,15 @@ The command is triggered if:
 <source>Switching to FreeFileSync's main window</source>
 <target>מעבר אל החלון הראשי של FreeFileSybc</target>
 
+<source>
+<pluralform>Automatic retry in 1 second...</pluralform>
+<pluralform>Automatic retry in %x seconds...</pluralform>
+</source>
+<target>
+<pluralform>נסיון מחדש אוטומטי בתוך שניה 1...</pluralform>
+<pluralform>נסיון מחדש אוטומטי בתוך %x שניות...</pluralform>
+</target>
+
 <source>&Ignore subsequent errors</source>
 <target>&התעלם מאזהרות נוספות</target>
 
@@ -1125,6 +1122,15 @@ This guarantees a consistent state even in case of a serious error.
 <target>
 <pluralform>1 קובץ</pluralform>
 <pluralform>%x קבצים</pluralform>
+</target>
+
+<source>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
+</source>
+<target>
+<pluralform>מראה %y מתוך שורה 1</pluralform>
+<pluralform>מראה %y מתוך %x שורות</pluralform>
 </target>
 
 <source>Set direction:</source>

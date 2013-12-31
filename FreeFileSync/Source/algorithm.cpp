@@ -1307,15 +1307,13 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
 {
     ItemDeleter<side> deleter(useRecycleBin, handler);
 
-    for (auto it = ptrList.begin(); it != ptrList.end(); ++it) //VS 2010 bug prevents replacing this by std::for_each + lamba
+    for (FileSystemObject* fsObj : ptrList) //all pointers are required(!) to be bound
     {
-        FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
-
-        if (!fsObj.isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
+        if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
             tryReportingError([&]
         {
-            fsObj.accept(deleter); //throw FileError
-            fsObj.removeObject<side>(); //if directory: removes recursively!
+            fsObj->accept(deleter); //throw FileError
+            fsObj->removeObject<side>(); //if directory: removes recursively!
         }, handler);
     }
 }
@@ -1409,7 +1407,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
             if (!it->second)
                 msg += std::wstring(L"\n") + it->first;
 
-        statusHandler.reportWarning(msg, warningRecyclerMissing);
+        statusHandler.reportWarning(msg, warningRecyclerMissing); //throw?
     }
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteRecylerLeft,   true,  statusHandler);

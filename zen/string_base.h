@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <atomic>
 #include "string_tools.h"
-#include <boost/detail/atomic_count.hpp>
 
 //Zbase - a policy based string class optimizing performance and flexibility
 
@@ -168,15 +168,14 @@ protected:
 private:
     struct Descriptor
     {
-        Descriptor(long rc, size_t len, size_t cap) :
-            refCount(rc),
+        Descriptor(int rc, size_t len, size_t cap) :
             length  (static_cast<std::uint32_t>(len)),
-            capacity(static_cast<std::uint32_t>(cap)) {}
+            capacity(static_cast<std::uint32_t>(cap)),
+			refCount(rc) { assert_static(ATOMIC_INT_LOCK_FREE == 2); } //2: "the types are always lock-free"
 
-        boost::detail::atomic_count refCount; //practically no perf loss: ~0.2%! (FFS comparison)
-        //replace by #include <atomic> std::atomic_int when finally getting rid of VS2010
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
+        std::atomic<int> refCount; //practically no perf loss: ~0.2%! (FFS comparison)
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }

@@ -70,8 +70,10 @@ public:
 
     struct FilesNode : public Node
     {
-        FilesNode(int percent, UInt64 bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) : Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
-        std::vector<FileSystemObject*> filesAndLinks_; //files or symlinks; pointers are bound!
+        FilesNode(int percent, UInt64 bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) :
+            Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
+
+        std::vector<FileSystemObject*> filesAndLinks_; //files and symlinks matching view filter; pointers are bound!
     };
 
     struct DirNode : public Node
@@ -82,7 +84,9 @@ public:
 
     struct RootNode : public Node
     {
-        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const Zstring displayName) : Node(percent, bytes, itemCount, 0, status), baseDirObj_(baseDirObj), displayName_(displayName) {}
+        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const Zstring displayName) :
+            Node(percent, bytes, itemCount, 0, status), baseDirObj_(baseDirObj), displayName_(displayName) {}
+
         BaseDirPair& baseDirObj_;
         Zstring displayName_;
     };
@@ -113,7 +117,7 @@ private:
         std::vector<DirNodeImpl> subDirs;
         FileSystemObject::ObjectId firstFileId; //weak pointer to first FilePair or SymlinkPair
         //- "compress" algorithm may hide file nodes for directories with a single included file, i.e. itemCountGross == itemCountNet == 1
-        //- a HierarchyObject* would a better fit, but we need weak pointer semantics!
+        //- a HierarchyObject* would be a better fit, but we need weak pointer semantics!
         //- a std::vector<FileSystemObject::ObjectId> would be a better design, but we don't want a second memory structure as large as custom grid!
     };
 

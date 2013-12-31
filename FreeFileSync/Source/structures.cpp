@@ -436,7 +436,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 
             fp.localFilter = mergeFilterConfig(mainCfg.globalFilter, fp.localFilter);
         }
-        fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());
+        vector_append(fpMerged, fpTmp);
     }
 
     if (fpMerged.empty())

@@ -117,40 +117,26 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg) //noexcept
+xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const XmlBatchConfig* referenceBatchCfg) //noexcept
 {
-    XmlBatchConfig output; //use default batch-settings
-    output.mainCfg = guiCfg.mainCfg;
+    XmlBatchConfig output;
 
-    switch (guiCfg.handleError)
-    {
-        case ON_GUIERROR_POPUP:
-            output.handleError = ON_ERROR_POPUP;
-            break;
-        case ON_GUIERROR_IGNORE:
-            output.handleError = ON_ERROR_IGNORE;
-            break;
-    }
-    return output;
-}
-
-
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatchPreservingExistingBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceBatchFile) //noexcept
-{
-    //try to take over batch-specific settings from reference file if possible
-    if (!referenceBatchFile.empty())
-        try
+    //try to take over batch-specific settings from reference if available
+    if (referenceBatchCfg)
+        output = *referenceBatchCfg;
+    else
+        switch (guiCfg.handleError)
         {
-            XmlBatchConfig batchCfg;
-            readConfig(referenceBatchFile, batchCfg); //throw FfsXmlError
-
-            batchCfg.mainCfg = guiCfg.mainCfg;
-            return batchCfg;
+            case ON_GUIERROR_POPUP:
+                output.handleError = ON_ERROR_POPUP;
+                break;
+            case ON_GUIERROR_IGNORE:
+                output.handleError = ON_ERROR_IGNORE;
+                break;
         }
-        catch (xmlAccess::FfsXmlError&) {}
-    warn_static("not good enough")
 
-    return convertGuiToBatch(guiCfg);
+    output.mainCfg = guiCfg.mainCfg;
+    return output;
 }
 
 
@@ -1114,7 +1100,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //###########################################################
 
     inWnd["DefaultView" ](config.gui.viewFilterDefault);
-    inWnd["Perspective"](config.gui.guiPerspectiveLast);
+    inWnd["Perspective3"](config.gui.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1501,7 +1487,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //###########################################################
 
     outWnd["DefaultView" ](config.gui.viewFilterDefault);
-    outWnd["Perspective"](config.gui.guiPerspectiveLast);
+    outWnd["Perspective3"](config.gui.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 

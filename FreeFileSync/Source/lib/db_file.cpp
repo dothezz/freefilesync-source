@@ -544,8 +544,8 @@ private:
 
                     //create or update new "in-sync" state
                     InSyncFile& file = updateItem(dbFiles, fileObj.getObjShortName(),
-                                                  InSyncFile(InSyncDescrFile(fileObj.getLastWriteTime<LEFT_SIDE>(),
-                                                                             fileObj.getFileId       <LEFT_SIDE>()),
+                                                  InSyncFile(InSyncDescrFile(fileObj.getLastWriteTime<LEFT_SIDE >(),
+                                                                             fileObj.getFileId       <LEFT_SIDE >()),
                                                              InSyncDescrFile(fileObj.getLastWriteTime<RIGHT_SIDE>(),
                                                                              fileObj.getFileId       <RIGHT_SIDE>()),
                                                              activeCmpVar_,

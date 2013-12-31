@@ -21,12 +21,15 @@ namespace zen
 //watch directory including subdirectories
 /*
 !Note handling of directories!:
-    Linux: newly added subdirectories are reported but not automatically added for watching! -> reset Dirwatcher!
-	       removal of top watched directory is NOT notified!
-    Windows: removal of top watched directory also NOT notified (e.g. brute force usb stick removal)
+	Windows: removal of top watched directory is NOT notified (e.g. brute force usb stick removal)
 	         however manual unmount IS notified (e.g. usb stick removal, then re-insert), but watching is stopped!
 			 Renaming of top watched directory handled incorrectly: Not notified(!) + additional changes in subfolders
 			 now do report FILE_ACTION_MODIFIED for directory (check that should prevent this fails!)
+
+    Linux: newly added subdirectories are reported but not automatically added for watching! -> reset Dirwatcher!
+	       removal of top watched directory is NOT notified!
+
+	OS X: everything works as expected; renaming of top level folder is also detected
 
 	Overcome all issues portably: check existence of top watched directory externally + reinstall watch after changes in directory structure (added directories) are detected
 */
@@ -38,9 +41,9 @@ public:
 
     enum ActionType
     {
-        ACTION_CREATE,
-        ACTION_UPDATE,
-        ACTION_DELETE,
+        ACTION_CREATE, //informal only!
+        ACTION_UPDATE, //use for debugging/logging only!
+        ACTION_DELETE, //
     };
 
     struct Entry

@@ -25,6 +25,9 @@ namespace zen
 template <class V, class Predicate>
 void vector_remove_if(V& vec, Predicate p);
 
+template <class V, class W>
+void vector_append(V& vec, W& vec2);
+
 template <class S, class Predicate>
 void set_remove_if(S& set, Predicate p);
 
@@ -85,6 +88,13 @@ template <class V, class Predicate> inline
 void vector_remove_if(V& vec, Predicate p)
 {
     vec.erase(std::remove_if(vec.begin(), vec.end(), p), vec.end());
+}
+
+
+template <class V, class W> inline
+void vector_append(V& vec, W& vec2)
+{
+vec.insert(vec.end(), vec2.begin(), vec2.end());
 }
 
 
@@ -196,6 +206,7 @@ template<class T, class Arg1, class Arg2, class Arg3>								      inline std::u
 template<class T, class Arg1, class Arg2, class Arg3, class Arg4>						  inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4)							  { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4))); }
 template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>			  inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5)              { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5))); }
 template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6> inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5, Arg6&& arg6) { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5), std::forward<Arg6>(arg6))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7> inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5, Arg6&& arg6, Arg7&& arg7) { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5), std::forward<Arg6>(arg6), std::forward<Arg7>(arg7))); }
 
 //template<typename T, typename ...Args> inline
 //std::unique_ptr<T> make_unique(Args&& ...args)

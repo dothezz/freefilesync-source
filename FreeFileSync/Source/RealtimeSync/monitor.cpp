@@ -117,20 +117,17 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
                 //remove to be ignored changes
                 vector_remove_if(changedItems, [](const DirWatcher::Entry& e)
                 {
-                    return endsWith(e.filename_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
-                           endsWith(e.filename_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
+                    return
+#ifdef ZEN_MAC
+                        endsWith(e.filename_, Zstr("/.DS_Store")) ||
+#endif
+                        endsWith(e.filename_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
+                        endsWith(e.filename_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
                 });
 
                 if (!changedItems.empty())
-                {
-                    /*
-                                    std::for_each(changedItems.begin(), changedItems.end(),
-                                    [](const Zstring& fn) { wxMessageBox(toWx(fn));});
-                    */
                     return WaitResult(changedItems[0]); //directory change detected
-                }
-
             }
             catch (FileError&)
             {

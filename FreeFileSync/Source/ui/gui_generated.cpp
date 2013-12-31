@@ -1327,6 +1327,8 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
 	bSizerConfig->Add( 0, 5, 0, 0, 5 );
 	
 	m_bitmapDatabase = new wxStaticBitmap( m_panel37, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_bitmapDatabase->SetToolTip( _("Detect synchronization directions with the help of database files") );
+	
 	bSizerConfig->Add( m_bitmapDatabase, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 10 );
 	
 	wxBoxSizer* sbSizerKeepWidthStableIfSyncDirsNotShown;

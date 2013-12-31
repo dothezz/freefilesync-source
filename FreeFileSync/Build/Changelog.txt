@@ -1,3 +1,17 @@
+FreeFileSync 6.1
+----------------
+Released RealtimeSync for OS X
+Handle errors loading reference batch config
+Disable user mode exception swallowing for Windows 7 SP1
+Always exclude root nodes on manual selection when excluded items are hidden
+Fixed showing duplicate custom "on completion" commands
+Close old directory handle first before executing directory traversal fallback 
+Show negative batch synchronization result in log file name
+Avoid file system race when creating temporary files
+Transfer creation and modification times on folder creation
+Fixed empty main dialog configuration migration issue on Mac OS X
+
+
 FreeFileSync 6.0 [2013-12-01]
 -----------------------------
 Revised main dialog panel layout

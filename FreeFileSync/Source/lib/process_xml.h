@@ -287,8 +287,7 @@ void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config);
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg); //noexcept
-XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg  ); //
-XmlBatchConfig convertGuiToBatchPreservingExistingBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceBatchFile); //noexcept
+XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg, const XmlBatchConfig* referenceBatchCfg); //
 
 std::wstring extractJobName(const Zstring& configFilename);
 }

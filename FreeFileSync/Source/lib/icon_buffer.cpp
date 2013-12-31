@@ -150,7 +150,7 @@ const bool wereVistaOrLater = vistaOrLater(); //thread-safety: init at startup
 
 thumb::IconSizeType getThumbSizeType(IconBuffer::IconSize sz)
 {
-	//coordinate with IconBuffer::getSize()!
+    //coordinate with IconBuffer::getSize()!
     using namespace thumb;
     switch (sz)
     {
@@ -239,7 +239,7 @@ bool zen::hasLinkExtension(const Zstring& filename)
     const Zstring& extension = getFileExtension(filename);
     return linkExt.find(extension) != linkExt.end();
 #elif defined ZEN_LINUX
-	const Zstring& extension = getFileExtension(filename);
+    const Zstring& extension = getFileExtension(filename);
     return extension == "desktop";
 #elif defined ZEN_MAC
     return false; //alias files already get their arrow icon via "NSWorkspace::iconForFile"
@@ -667,7 +667,7 @@ namespace
 {
 const wchar_t* getLinkResourceName(IconBuffer::IconSize sz)
 {
-	 //coordinate with IconBuffer::getSize()!
+    //coordinate with IconBuffer::getSize()!
     switch (sz)
     {
         case IconBuffer::SIZE_SMALL:

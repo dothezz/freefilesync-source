@@ -22,6 +22,7 @@
 #endif
 
 #if defined ZEN_LINUX || defined ZEN_MAC
+#include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -153,8 +154,7 @@ typedef ... FindData;
 static void create(const Zstring& directory, DirHandle& hnd); //throw FileError - *no* concession to FindFirstFile(): open handle only, *no* return of data!
 static void destroy(DirHandle hnd); //throw()
 
-template <class FallbackFun>
-static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo, FallbackFun fb) //throw FileError -> fb: fallback to FindFirstFile()/FindNextFile()
+static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError, NeedFallbackToWin32Traverser -> fallback to FindFirstFile()/FindNextFile()
 
 //FindData "member" functions
 static void extractFileInfo            (const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output); //volumeSerial may be 0 if not available!
@@ -207,8 +207,7 @@ struct Win32Traverser
 
     static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
 
-    template <class FallbackFun>
-    static bool getEntry(DirHandle& hnd, const Zstring& dirname, FindData& fileInfo, FallbackFun) //throw FileError
+    static bool getEntry(DirHandle& hnd, const Zstring& dirname, FindData& fileInfo) //throw FileError
     {
         if (hnd.searchHandle == INVALID_HANDLE_VALUE) //handle special case of "truly empty directories"
             return false;
@@ -247,6 +246,9 @@ struct Win32Traverser
 };
 
 
+class NeedFallbackToWin32Traverser {}; //special exception class
+
+
 struct FilePlusTraverser
 {
     struct DirHandle
@@ -267,8 +269,7 @@ struct FilePlusTraverser
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
 
-    template <class FallbackFun>
-    static bool getEntry(DirHandle hnd, const Zstring& dirname, FindData& fileInfo, FallbackFun fb) //throw FileError
+    static bool getEntry(DirHandle hnd, const Zstring& dirname, FindData& fileInfo) //throw FileError, NeedFallbackToWin32Traverser
     {
         if (!::readDir(hnd.searchHandle, fileInfo))
         {
@@ -281,10 +282,8 @@ struct FilePlusTraverser
             this is required for NetDrive mounted Webdav, e.g. www.box.net and NT4, 2000 remote drives, et al.
             */
             if (lastError == ERROR_NOT_SUPPORTED)
-            {
-                fb(); //fallback should apply to whole directory sub-tree! => client needs to handle duplicate file notifications!
-                return false;
-            }
+                throw NeedFallbackToWin32Traverser();
+            //fallback should apply to whole directory sub-tree! => client needs to handle duplicate file notifications!
 
             //else we have a problem... report it:
             throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"readDir", lastError));
@@ -312,6 +311,12 @@ struct FilePlusTraverser
 class DirTraverser
 {
 public:
+    static void execute(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback)
+    {
+        DirTraverser(baseDirectory, sink, dstCallback);
+    }
+
+private:
     DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback) :
         needDstHack(dstCallback ? dst::isFatDrive(baseDirectory) : false)
     {
@@ -322,7 +327,13 @@ public:
         catch (FileError&) {} //don't cause issues in user mode
 
         if (::openDir && ::readDir && ::closeDir)
-            traverse<FilePlusTraverser>(baseDirectory, sink, retrieveVolumeSerial(baseDirectory)); //retrieveVolumeSerial returns 0 on error
+        {
+            try
+            {
+                traverse<FilePlusTraverser>(baseDirectory, sink, retrieveVolumeSerial(baseDirectory)); //throw NeedFallbackToWin32Traverser; retrieveVolumeSerial returns 0 on error
+            }
+            catch (NeedFallbackToWin32Traverser&) { traverse<Win32Traverser>(baseDirectory, sink, 0); }
+        }
         else //fallback
             traverse<Win32Traverser>(baseDirectory, sink, 0);
 
@@ -332,33 +343,29 @@ public:
                 applyDstHack(*dstCallback);
     }
 
-private:
     DirTraverser(const DirTraverser&);
     DirTraverser& operator=(const DirTraverser&);
 
     template <class Trav>
-    void traverse(const Zstring& dirname, zen::TraverseCallback& sink, DWORD volumeSerial /*may be 0!*/)
+    void traverse(const Zstring& dirname, zen::TraverseCallback& sink, DWORD volumeSerial /*may be 0!*/) //throw NeedFallbackToWin32Traverser
     {
         //no need to check for endless recursion: Windows seems to have an internal path limit of about 700 chars
 
         typename Trav::DirHandle searchHandle;
 
-        if (!tryReportingDirError([&]
-    {
-        typedef Trav Trav; //f u VS!
-        Trav::create(dirname, searchHandle); //throw FileError
-        }, sink))
+        if (!tryReportingDirError([&] { Trav::create(dirname, searchHandle); /*throw FileError*/ }, sink))  
         return; //ignored error
-        ZEN_ON_SCOPE_EXIT(typedef Trav Trav; Trav::destroy(searchHandle));
+        ZEN_ON_SCOPE_EXIT(Trav::destroy(searchHandle));
 
         typename Trav::FindData findData = {};
-
-        auto fallback = [&] { this->traverse<Win32Traverser>(dirname, sink, volumeSerial); }; //help VS2010 a little by avoiding too deeply nested lambdas
 
         for (;;)
         {
             bool gotEntry = false;
-            tryReportingDirError([&] { typedef Trav Trav; /*VS 2010 bug*/ gotEntry = Trav::getEntry(searchHandle, dirname, findData, fallback); }, sink); //throw FileError
+            tryReportingDirError([&]
+            {
+                gotEntry = Trav::getEntry(searchHandle, dirname, findData); //throw FileError, NeedFallbackToWin32Traverser
+            }, sink);
             if (!gotEntry) //no more items or ignored error
                 return;
 
@@ -383,7 +390,11 @@ private:
                             if (TraverseCallback* trav = sink.onDir(shortName, fullName))
                             {
                                 ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
-                                traverse<Trav>(fullName, *trav, retrieveVolumeSerial(fullName)); //symlink may link to different volume => redetermine volume serial!
+                                try
+                                {
+                                    traverse<Trav>(fullName, *trav, retrieveVolumeSerial(fullName)); //throw NeedFallbackToWin32Traverser; symlink may link to different volume => redetermine volume serial!
+                                }
+                                catch (NeedFallbackToWin32Traverser&) { traverse<Win32Traverser>(fullName, *trav, 0); }
                             }
                         }
                         else //a file
@@ -410,7 +421,11 @@ private:
                 if (TraverseCallback* trav = sink.onDir(shortName, fullName))
                 {
                     ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
-                    traverse<Trav>(fullName, *trav, volumeSerial);
+                    try
+                    {
+                        traverse<Trav>(fullName, *trav, volumeSerial); //throw NeedFallbackToWin32Traverser
+                    }
+                    catch (NeedFallbackToWin32Traverser&) { traverse<Win32Traverser>(fullName, *trav, 0); }
                 }
             }
             else //a file
@@ -493,6 +508,12 @@ private:
 class DirTraverser
 {
 public:
+    static void execute(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback)
+    {
+        DirTraverser(baseDirectory, sink, dstCallback);
+    }
+
+private:
     DirTraverser(const Zstring& baseDirectory, zen::TraverseCallback& sink, zen::DstHackCallback* dstCallback)
     {
         const Zstring directoryFormatted = //remove trailing slash
@@ -511,7 +532,6 @@ public:
         traverse(directoryFormatted, sink);
     }
 
-private:
     DirTraverser(const DirTraverser&);
     DirTraverser& operator=(const DirTraverser&);
 
@@ -658,5 +678,5 @@ private:
 
 void zen::traverseFolder(const Zstring& dirname, TraverseCallback& sink, DstHackCallback* dstCallback)
 {
-    DirTraverser(dirname, sink, dstCallback);
+    DirTraverser::execute(dirname, sink, dstCallback);
 }

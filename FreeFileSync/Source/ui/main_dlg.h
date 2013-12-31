@@ -74,8 +74,8 @@ private:
 
     bool loadConfiguration(const std::vector<Zstring>& filenames); //return true if loaded successfully
 
-    bool trySaveConfig     (const Zstring* fileNameGui); //return true if saved successfully
-    bool trySaveBatchConfig(const Zstring* fileNameBatch); //
+    bool trySaveConfig     (const Zstring* guiFilename); //return true if saved successfully
+    bool trySaveBatchConfig(const Zstring* batchFileToUpdate); //
     bool saveOldConfig(); //return false on user abort
 
     static const Zstring& lastRunConfigName();

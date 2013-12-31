@@ -184,7 +184,7 @@ template <class T>
 template <class Fun> inline
 void RunUntilFirstHit<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
 {
-    auto result2 = result; //MSVC2010: this is ridiculous!!!
+    auto result2 = result; //MSVC 2010: this is ridiculous!!!
     boost::thread t([result2, f] { result2->reportFinished(f()); });
     ++jobsTotal;
     t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!

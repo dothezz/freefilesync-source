@@ -924,7 +924,7 @@ La commande est déclenchée si :
 <target>Sauvegarder le fichier log :</target>
 
 <source>Limit:</source>
-<target>Mimite :</target>
+<target>Limite :</target>
 
 <source>Limit maximum number of log files</source>
 <target>Nombre maximal de fichiers log</target>

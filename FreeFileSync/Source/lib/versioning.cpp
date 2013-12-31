@@ -1,5 +1,6 @@
 #include "versioning.h"
 #include <map>
+#include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
 #include <zen/string_tools.h>

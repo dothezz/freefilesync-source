@@ -1335,7 +1335,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider non-silent batch mode)
-        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        ::SetFrontProcess(&psn);
 #endif
 
         pnl.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
@@ -1359,9 +1359,8 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
         parentFrame_->Show();
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
-        //why isn't this covered by wxWindows::Raise()??
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider GUI mode with "close progress dialog")
-        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
         //if (parentFrame_->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
         //    parentFrame_->Iconize(false);
@@ -2090,6 +2089,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
         //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
         ProcessSerialNumber psn = { 0, kCurrentProcess };
         ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+        wxTheApp->Yield(); //required to complete TransformProcessType: else a subsequent modal dialog will be erroneously hidden!
+        //-> Yield probably not needed here since we continue the event loop afterwards!
 #endif
     }
 }
@@ -2121,9 +2122,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
 
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
-        //why isn't this covered by wxWindows::Raise()??
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
     }
 }

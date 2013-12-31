@@ -39,9 +39,6 @@ void checkRange(U value)
     //caveat: std::numeric_limits<T>::min returns minimum positive(!) number for T = double, while behaving correctly for integer types... sigh
     assert(double(std::numeric_limits<T>::lowest()) <= double(value) && //new with C++11!
            double(std::numeric_limits<T>::max()   ) >= double(value));
-
-    //    assert(double(boost::numeric::bounds<T>::lowest ()) <= double(value) &&
-    //           double(boost::numeric::bounds<T>::highest()) >= double(value));
 }
 
 class Int64

@@ -21,10 +21,8 @@
 #include "file_traverser.h"
 
 #elif defined ZEN_MAC
-//#include <sys/types.h>
-//#include <sys/event.h>
-//#include <sys/time.h>
-#include "file_traverser.h"
+#include <CoreServices/CoreServices.h>
+#include <zen/osx_string.h>
 #endif
 
 using namespace zen;
@@ -97,7 +95,7 @@ public:
 
 
     //context of main thread
-    void getChanges(std::vector<DirWatcher::Entry>& output) //throw FileError
+    void fetchChanges(std::vector<DirWatcher::Entry>& output) //throw FileError
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
@@ -160,6 +158,14 @@ public:
             throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"CreateFile", getLastError()));
 
         //end of constructor, no need to start managing "hDir"
+    }
+
+    ReadChangesAsync(ReadChangesAsync&& other) :
+        hDir(INVALID_HANDLE_VALUE)
+    {
+        shared_   = std::move(other.shared_);
+        dirnamePf = std::move(other.dirnamePf);
+        std::swap(hDir, other.hDir);
     }
 
     ~ReadChangesAsync()
@@ -248,14 +254,6 @@ public:
         {
             throw; //this is the only exception expected!
         }
-    }
-
-    ReadChangesAsync(ReadChangesAsync&& other) :
-        hDir(INVALID_HANDLE_VALUE)
-    {
-        shared_   = std::move(other.shared_);
-        dirnamePf = std::move(other.dirnamePf);
-        std::swap(hDir, other.hDir);
     }
 
     HANDLE getDirHandle() const { return hDir; } //for reading/monitoring purposes only, don't abuse (e.g. close handle)!
@@ -364,7 +362,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         output.push_back(Entry(ACTION_DELETE, pimpl_->dirname)); //report removal as change to main directory
     }
     else //the normal case...
-        pimpl_->shared->getChanges(output); //throw FileError
+        pimpl_->shared->fetchChanges(output); //throw FileError
     return output;
 }
 
@@ -395,6 +393,8 @@ private:
 
 struct DirWatcher::Pimpl
 {
+    Pimpl() : notifDescr() {}
+
     Zstring baseDirname;
     int notifDescr;
     std::map<int, Zstring> watchDescrs; //watch descriptor and (sub-)directory name (postfixed with separator) -> owned by "notifDescr"
@@ -519,188 +519,116 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 }
 
 #elif defined ZEN_MAC
-warn_static("finish");
-struct DirWatcher::Pimpl {};
-DirWatcher::DirWatcher(const Zstring& directory) {}
-DirWatcher::~DirWatcher() {}
-std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) { return std::vector<DirWatcher::Entry>(); }
-
-#if 0
 namespace
 {
-class DirsOnlyTraverser : public zen::TraverseCallback
+void eventCallback(ConstFSEventStreamRef streamRef,
+                   void* clientCallBackInfo,
+                   size_t numEvents,
+                   void* eventPaths,
+                   const FSEventStreamEventFlags eventFlags[],
+                   const FSEventStreamEventId eventIds[])
 {
-public:
-    DirsOnlyTraverser(std::vector<Zstring>& dirs) : dirs_(dirs) {}
+    std::vector<DirWatcher::Entry>& changedFiles = *static_cast<std::vector<DirWatcher::Entry>*>(clientCallBackInfo);
 
-    virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
+    auto paths = static_cast<const char**>(eventPaths);
+    for (size_t i = 0; i < numEvents; ++i)
     {
-        dirs_.push_back(fullName);
-        return this;
+        //::printf("0x%08x\t%s\n", static_cast<unsigned int>(eventFlags[i]), paths[i]);
+
+        //events are aggregated => it's possible to see a single event with flags
+        //kFSEventStreamEventFlagItemCreated | kFSEventStreamEventFlagItemModified | kFSEventStreamEventFlagItemRemoved
+
+        if (eventFlags[i] & kFSEventStreamEventFlagItemCreated ||
+            eventFlags[i] & kFSEventStreamEventFlagMount)
+            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, paths[i]));
+        if (eventFlags[i] & kFSEventStreamEventFlagItemModified      || //
+            eventFlags[i] & kFSEventStreamEventFlagItemXattrMod      || //
+            eventFlags[i] & kFSEventStreamEventFlagItemChangeOwner   || //aggregate these into a single event
+            eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod  || //
+            eventFlags[i] & kFSEventStreamEventFlagItemFinderInfoMod || //
+            eventFlags[i] & kFSEventStreamEventFlagItemRenamed       || //OS X sends the same event flag for both old and new names!!!
+            eventFlags[i] & kFSEventStreamEventFlagMustScanSubDirs)  //something changed in one of the subdirs: NOT expected due to kFSEventStreamCreateFlagFileEvents
+            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_UPDATE, paths[i]));
+        if (eventFlags[i] & kFSEventStreamEventFlagItemRemoved ||
+            eventFlags[i] & kFSEventStreamEventFlagRootChanged || //root is (indirectly) deleted or renamed
+            eventFlags[i] & kFSEventStreamEventFlagUnmount)
+            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_DELETE, paths[i]));
+
+        //kFSEventStreamEventFlagEventIdsWrapped -> irrelevant!
+        //kFSEventStreamEventFlagHistoryDone -> not expected due to kFSEventStreamEventIdSinceNow below
     }
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
-
-private:
-    std::vector<Zstring>& dirs_;
-};
-
-
-class DirDescriptor //throw FileError
-{
-public:
-    DirDescriptor(const Zstring& dirname) : dirname_(dirname)
-    {
-        fdDir = ::open(dirname.c_str(), O_EVTONLY); //"descriptor requested for event notifications only"; O_EVTONLY does not exist on Linux
-        if (fdDir == -1)
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"open", getLastError()));
-    }
-
-    ~DirDescriptor() { if (fdDir != -1) ::close(fdDir); } //check for "-1" only needed by move-constructor
-
-    DirDescriptor(DirDescriptor&& other) : fdDir(other.fdDir), dirname_(std::move(other.dirname_)) { other.fdDir = -1; }
-
-    int getDescriptor() const { return fdDir; }
-    Zstring getDirname() const { return dirname_; }
-
-private:
-    DirDescriptor(const DirDescriptor&) = delete;
-    DirDescriptor& operator=(const DirDescriptor&) = delete;
-
-    int fdDir;
-    Zstring dirname_;
-};
+}
 }
 
-warn_static("finish")
+
 struct DirWatcher::Pimpl
 {
-    Zstring baseDirname;
-    int queueDescr;
-    std::map<int, DirDescriptor> watchDescrs; //directory descriptors and corresponding (sub-)directory name (postfixed with separator!)
-    std::vector<struct ::kevent> changelist;
+    Pimpl() : eventStream() {}
+    FSEventStreamRef eventStream;
+    std::vector<DirWatcher::Entry> changedFiles;
 };
 
 
-DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
+DirWatcher::DirWatcher(const Zstring& directory) :
     pimpl_(new Pimpl)
 {
-    //get all subdirectories
-    Zstring dirname = directory;
-    if (endsWith(dirname, FILE_NAME_SEPARATOR))
-        dirname.resize(dirname.size() - 1);
+    CFStringRef dirnameCf = osx::createCFString(directory.c_str()); //returns nullptr on error
+    if (!dirnameCf)
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: createCFString"); //no error code documented!
+    ZEN_ON_SCOPE_EXIT(::CFRelease(dirnameCf));
 
-    std::vector<Zstring> fullDirList { dirname };
-    {
-        DirsOnlyTraverser traverser(fullDirList); //throw FileError
-        zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
-    }
+    CFArrayRef dirnameCfArray = ::CFArrayCreate(nullptr,    //CFAllocatorRef allocator,
+                                                reinterpret_cast<const void**>(&dirnameCf), //const void** values,
+                                                1,          //CFIndex numValues,
+                                                nullptr);   //const CFArrayCallBacks* callBacks
+    if (!dirnameCfArray)
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: CFArrayCreate"); //no error code documented!
+    ZEN_ON_SCOPE_EXIT(::CFRelease(dirnameCfArray));
 
-    pimpl_->baseDirname = directory;
+    FSEventStreamContext context = {};
+    context.info = &pimpl_->changedFiles;
 
-    pimpl_->queueDescr = ::kqueue();
-    if (pimpl_->queueDescr == -1)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"kqueue", getLastError()));
-    zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->queueDescr); });
+    pimpl_->eventStream = ::FSEventStreamCreate(nullptr,        //CFAllocatorRef allocator,
+                                                &eventCallback, //FSEventStreamCallback callback,
+                                                &context,       //FSEventStreamContext* context,
+                                                dirnameCfArray, //CFArrayRef pathsToWatch,
+                                                kFSEventStreamEventIdSinceNow, //FSEventStreamEventId sinceWhen,
+                                                0,              //CFTimeInterval latency, in seconds
+                                                kFSEventStreamCreateFlagWatchRoot |
+                                                kFSEventStreamCreateFlagFileEvents); //FSEventStreamCreateFlags flags
+    //can this fail?? not documented!
 
-    for (const Zstring& subdir : fullDirList)
-    {
-        DirDescriptor descr(subdir);
-        const int rawDescr = descr.getDescriptor();
-        pimpl_->watchDescrs.insert(std::make_pair(rawDescr, std::move(descr)));
+    zen::ScopeGuard guardCreate = zen::makeGuard([&] { ::FSEventStreamRelease(pimpl_->eventStream); });
 
-        pimpl_->changelist.push_back({});
-        EV_SET(&pimpl_->changelist.back(),
-               rawDescr,          //identifier for this event
-               EVFILT_VNODE,      //filter for event
-               EV_ADD | EV_CLEAR, //general flags
-               NOTE_DELETE | NOTE_REVOKE | NOTE_RENAME | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB, //filter-specific flags
-               0,        //filter-specific data
-               nullptr); //opaque user data identifier
-    }
+    ::FSEventStreamScheduleWithRunLoop(pimpl_->eventStream,     //FSEventStreamRef streamRef,
+                                       ::CFRunLoopGetCurrent(), //CFRunLoopRef runLoop;  CFRunLoopGetCurrent(): failure not documented!
+                                       kCFRunLoopDefaultMode);  //CFStringRef runLoopMode
+    //no-fail
 
-    //what about EINTR?
-    struct ::timespec timeout = {}; //=> poll
-    if (::kevent(pimpl_->queueDescr, &pimpl_->changelist[0], pimpl_->changelist.size(), nullptr, 0, &timeout) < 0)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"kevent", getLastError()));
+    zen::ScopeGuard guardRunloop = zen::makeGuard([&] { ::FSEventStreamInvalidate(pimpl_->eventStream); });
 
-    guardDescr.dismiss();
+    if (!::FSEventStreamStart(pimpl_->eventStream))
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: FSEventStreamStart"); //no error code documented!
+
+    guardCreate .dismiss();
+    guardRunloop.dismiss();
 }
 
 
 DirWatcher::~DirWatcher()
 {
-    ::close(pimpl_->queueDescr);
+    ::FSEventStreamStop      (pimpl_->eventStream);
+    ::FSEventStreamInvalidate(pimpl_->eventStream);
+    ::FSEventStreamRelease   (pimpl_->eventStream);
 }
 
 
-std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
+std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&)
 {
-    std::vector<Entry> output;
+    ::FSEventStreamFlushSync(pimpl_->eventStream); //flushes pending events + execs runloop
 
-    std::vector<struct ::kevent> events(512);
-    for (;;)
-    {
-        assert(!pimpl_->changelist.empty()); //contains at least parent directory
-        struct ::timespec timeout = {}; //=> poll
-
-        int evtCount = 0;
-        do
-        {
-            evtCount = ::kevent(pimpl_->queueDescr,        //int kq,
-                                &pimpl_->changelist[0],    //const struct kevent* changelist,
-                                pimpl_->changelist.size(), //int nchanges,
-                                &events[0],    //struct kevent* eventlist,
-                                events.size(), //int nevents,
-                                &timeout);     //const struct timespec* timeout
-        }
-        while (evtCount < 0 && errno == EINTR);
-
-        if (evtCount == -1)
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), formatSystemError(L"kevent", getLastError()));
-
-        for (int i = 0; i < evtCount; ++i)
-        {
-            const auto& evt = events[i];
-
-            auto it = pimpl_->watchDescrs.find(static_cast<int>(evt.ident));
-            if (it == pimpl_->watchDescrs.end())
-                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), L"Received event from unknown source.");
-
-            //"If an error occurs [...] and there is enough room in the eventlist, then the event will
-            // be placed in the eventlist with EV_ERROR set in flags and the system error in data."
-            if (evt.flags & EV_ERROR)
-                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(it->second.getDirname())), formatSystemError(L"kevent", static_cast<ErrorCode>(evt.data)));
-
-            assert(evt.filter == EVFILT_VNODE);
-            if (evt.filter == EVFILT_VNODE)
-            {
-                if (evt.fflags & NOTE_DELETE)
-                    wxMessageBox(L"NOTE_DELETE "+ it->second.getDirname());
-                else if (evt.fflags & NOTE_REVOKE)
-                    wxMessageBox(L"NOTE_REVOKE "+ it->second.getDirname());
-                else if (evt.fflags & NOTE_RENAME)
-                    wxMessageBox(L"NOTE_RENAME "+ it->second.getDirname());
-                else if (evt.fflags & NOTE_WRITE)
-                    wxMessageBox(L"NOTE_WRITE "+ it->second.getDirname());
-                else if (evt.fflags & NOTE_EXTEND)
-                    wxMessageBox(L"NOTE_EXTEND "+ it->second.getDirname());
-                else if (evt.fflags & NOTE_ATTRIB)
-                    wxMessageBox(L"NOTE_ATTRIB "+ it->second.getDirname());
-                else
-                    assert(false);
-            }
-        }
-
-        if (evtCount < events.size())
-            break;
-    }
-
-    return output;
+    std::vector<DirWatcher::Entry> changes;
+    changes.swap(pimpl_->changedFiles);
+    return changes;
 }
-#endif
-
-
 #endif

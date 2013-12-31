@@ -8,6 +8,7 @@
 #define FILEHIERARCHY_H_INCLUDED
 
 #include <map>
+#include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
 #include <string>
 #include <memory>
 #include <functional>

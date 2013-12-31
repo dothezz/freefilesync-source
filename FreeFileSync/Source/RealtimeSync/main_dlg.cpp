@@ -23,10 +23,12 @@
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
+
 #ifdef ZEN_LINUX
 #include <gtk/gtk.h>
 #elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
+#include <wx/app.h>
 #endif
 
 using namespace zen;
@@ -130,7 +132,7 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
 #ifdef ZEN_MAC
         ProcessSerialNumber psn = { 0, kCurrentProcess };
         ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon, even if we're not an application bundle
-        ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+        ::SetFrontProcess(&psn);
         //if the executable is not yet in a bundle or if it is called through a launcher, we need to set focus manually:
 #endif
     }
@@ -219,14 +221,15 @@ void MainDialog::OnKeyPressed(wxKeyEvent& event)
 
 void MainDialog::OnStart(wxCommandEvent& event)
 {
-    xmlAccess::XmlRealConfig currentCfg = getConfiguration();
-
     Hide();
 #ifdef ZEN_MAC
     //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
     ProcessSerialNumber psn = { 0, kCurrentProcess };
     ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+    wxTheApp->Yield(); //required to complete TransformProcessType: else a subsequent modal dialog will be erroneously hidden!
 #endif
+
+    xmlAccess::XmlRealConfig currentCfg = getConfiguration();
 
     switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName))))
     {
@@ -237,11 +240,11 @@ void MainDialog::OnStart(wxCommandEvent& event)
         case rts::SHOW_GUI:
             break;
     }
+
     Show(); //don't show for EXIT_APP
 #ifdef ZEN_MAC
-    //why isn't this covered by wxWindows::Raise()??
     ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-    ::SetFrontProcess(&psn); //call before TransformProcessType() so that OSX menu is updated correctly
+    ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
 #endif
     Raise();
 }

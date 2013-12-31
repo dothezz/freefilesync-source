@@ -22,6 +22,21 @@ using namespace zen;
 
 namespace
 {
+//"Backup FreeFileSync 2013-09-15 015052.log" ->
+//"Backup FreeFileSync 2013-09-15 015052 (Error).log"
+Zstring addStatusToLogfilename(const Zstring& logfilename, const std::wstring& status)
+{
+    //attention: do not interfere with naming convention required by limitLogfileCount()!
+    size_t pos = logfilename.rfind(Zstr("."));
+    if (pos != Zstring::npos)
+        return Zstring(logfilename.begin(), logfilename.begin() + pos) +
+               utfCvrtTo<Zstring>(L" (" + status + L")") +
+               Zstring(logfilename.begin() + pos, logfilename.end());
+    assert(false);
+    return logfilename;
+}
+
+
 class FindLogfiles : public TraverseCallback
 {
 public:
@@ -49,9 +64,7 @@ void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_
 {
     std::vector<Zstring> logFiles;
     FindLogfiles traverseCallback(utfCvrtTo<Zstring>(jobname), logFiles); //throw()!
-
-    traverseFolder(logdir,
-                   traverseCallback);
+    traverseFolder(logdir, traverseCallback);
 
     if (logFiles.size() <= maxCount)
         return;
@@ -68,11 +81,11 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
                                               const std::wstring& jobName,
                                               const TimeComp& timeStamp) //return value always bound!
 {
-    //create logfile directory if required
     Zstring logfileDir = logfileDirectory.empty() ?
                          getConfigDir() + Zstr("Logs") :
                          getFormattedDirectoryName(logfileDirectory);
 
+    //create logfile directory if required
     makeDirectory(logfileDir); //throw FileError
 
     //assemble logfile name
@@ -236,6 +249,16 @@ BatchStatusHandler::~BatchStatusHandler()
         try
         {
             saveLogToFile(summary, errorLog, *logFile); //throw FileError
+
+            //additionally notify errors by showing in log file name
+            const Zstring oldLogfilename = logFile->getFilename();
+            logFile.reset();
+
+            if (abortIsRequested())
+                renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Stopped"))); //throw FileError
+            else if (totalErrors > 0)
+                renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Error"))); //throw FileError
+			//status "warning" is not important enough to show up in log file name
         }
         catch (FileError&) {}
     }
