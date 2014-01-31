@@ -9,7 +9,6 @@
 #include <wx/filedlg.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/string_conv.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/font_size.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
@@ -18,13 +17,15 @@
 #include <zen/build_info.h>
 #include "xml_proc.h"
 #include "tray_menu.h"
-#include "xml_ffs.h"
 #include "app_icon.h"
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
 
-#ifdef ZEN_LINUX
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+
+#elif defined ZEN_LINUX
 #include <gtk/gtk.h>
 #elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
@@ -102,15 +103,17 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     if (!cfgFileName.empty() || fileExists(lastConfigFileName()))
         try
         {
-            rts::readRealOrBatchConfig(currentConfigFile, newConfig); //throw FfsXmlError
-            loadCfgSuccess = true;
+            std::wstring warningMsg;
+            xmlAccess::readRealOrBatchConfig(currentConfigFile, newConfig, warningMsg); //throw FileError
+
+            if (!warningMsg.empty())
+                showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
+
+            loadCfgSuccess = warningMsg.empty();
         }
-        catch (const xmlAccess::FfsXmlError& e)
+        catch (const FileError& e)
         {
-            if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
-            else
-                showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+            showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         }
 
     const bool startWatchingImmediately = loadCfgSuccess && !cfgFileName.empty();
@@ -152,9 +155,9 @@ MainDialog::~MainDialog()
 
     try //write config to XML
     {
-        writeRealConfig(currentCfg, lastConfigFileName()); //throw FfsXmlError
+        writeConfig(currentCfg, lastConfigFileName()); //throw FileError
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
     }
@@ -163,8 +166,8 @@ MainDialog::~MainDialog()
 
 void MainDialog::onQueryEndSession()
 {
-    try { writeRealConfig(getConfiguration(), lastConfigFileName()); } //throw FfsXmlError
-    catch (const xmlAccess::FfsXmlError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
+    try { writeConfig(getConfiguration(), lastConfigFileName()); } //throw FileError
+    catch (const FileError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
 }
 
 
@@ -274,10 +277,10 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     const xmlAccess::XmlRealConfig currentCfg = getConfiguration();
     try
     {
-        writeRealConfig(currentCfg, newFileName); //throw FfsXmlError
+        writeConfig(currentCfg, newFileName); //throw FileError
         setLastUsedConfig(newFileName);
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
     }
@@ -290,17 +293,16 @@ void MainDialog::loadConfig(const Zstring& filename)
 
     try
     {
-        rts::readRealOrBatchConfig(filename, newConfig);
+        std::wstring warningMsg;
+        xmlAccess::readRealOrBatchConfig(filename, newConfig, warningMsg); //throw FileError
+
+        if (!warningMsg.empty())
+            showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
-        if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
-        else
-        {
-            showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
-            return;
-        }
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+        return;
     }
 
     setConfiguration(newConfig);

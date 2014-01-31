@@ -6,9 +6,7 @@
 
 #include "sync_cfg.h"
 #include <memory>
-//#include <zen/format_unit.h>
 #include <wx/wupdlock.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/rtl.h>
 #include <wx+/no_flicker.h>
 #include <wx+/choice_enum.h>
@@ -22,6 +20,10 @@
 #include "dir_name.h"
 #include "../file_hierarchy.h"
 #include "../lib/help_provider.h"
+
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+#endif
 
 using namespace zen;
 using namespace xmlAccess;

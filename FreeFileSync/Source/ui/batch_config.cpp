@@ -6,7 +6,6 @@
 
 #include "batch_config.h"
 #include <wx/wupdlock.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/std_button_order.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
@@ -14,6 +13,10 @@
 #include "dir_name.h"
 #include "../ui/exec_finished_box.h"
 #include "../lib/help_provider.h"
+
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+#endif
 
 using namespace zen;
 using namespace xmlAccess;

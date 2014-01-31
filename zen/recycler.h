@@ -46,8 +46,8 @@ StatusRecycler recycleBinStatus(const Zstring& pathName); //test existence of Re
 //Win: blocks heavily if recycle bin is really full and drive is slow!!!
 
 void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, return "true" if file/dir was actually deleted
-    //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
-	const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus); //optional; currentItem may be empty
+                     //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
+                     const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus); //optional; currentItem may be empty
 #endif
 }
 

@@ -588,8 +588,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     ____________________________________________________________________________________________________________
 
     Windows Login Prompt Naming Conventions:
-    	user account:	<Domain>\<user>		e.g. WIN-XP\ZenJu
-    	network share:	\\<server>\<share>	e.g. \\WIN-XP\test
+    	network share:	\\<server>\<share>	e.g. \\WIN-XP\folder or \\192.168.1.50\folder
+    	user account:	<Domain>\<user>		e.g. WIN-XP\Zenju    or 192.168.1.50\Zenju
 
     Windows Command Line:
     - list *all* active network connections, including deviceless ones which are hidden in Explorer:
@@ -614,6 +614,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
                                         nullptr, // __in  LPCTSTR lpUsername,
                                         0);      //__in  DWORD dwFlags
         //53L	ERROR_BAD_NETPATH		The network path was not found.
+        //67L   ERROR_BAD_NET_NAME
         //86L	ERROR_INVALID_PASSWORD
         //1219L	ERROR_SESSION_CREDENTIAL_CONFLICT	Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
         //1326L	ERROR_LOGON_FAILURE	Logon failure: unknown user name or bad password.
@@ -621,8 +622,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
         if (somethingExists(trgRes.lpRemoteName)) //blocks!
             return; //success: connection usable! -> don't care about "rv"
 
-        if (rv == ERROR_BAD_NETPATH || //Windows 7
-            rv == ERROR_BAD_NET_NAME|| //XP
+        if (rv == ERROR_BAD_NETPATH || //like ERROR_PATH_NOT_FOUND
+            rv == ERROR_BAD_NET_NAME|| //like ERROR_FILE_NOT_FOUND
             rv == ERROR_CONNECTION_ABORTED) //failed to connect to a network that existed not too long ago; will later return ERROR_BAD_NETPATH
             return; //no need to show a prompt for an unreachable network device
 

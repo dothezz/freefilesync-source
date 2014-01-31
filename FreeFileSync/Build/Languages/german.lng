@@ -7,6 +7,12 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target></target>
+
+<source>Binary comparison was skipped for excluded files %x.</source>
+<target>Der binäre Vergleich wurde für die ausgeschlossenen Dateien %x übersprungen.</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -44,7 +50,7 @@
 <target>Lösche Symbolischen Link %x</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Die Dateien werden stattdessen permanent gelöscht:</target>
+<target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Dateien werden stattdessen permanent gelöscht:</target>
 
 <source>An exception occurred</source>
 <target>Eine Ausnahme ist aufgetreten</target>
@@ -295,9 +301,6 @@
 <source>%x items/sec</source>
 <target>%x Elemente/sek</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Die Konfigurationsdatei %x wurde nur teilweise geladen.</target>
-
 <source>Show in Explorer</source>
 <target>Im Explorer anzeigen</target>
 
@@ -327,9 +330,6 @@
 
 <source>Unable to create timestamp for versioning:</source>
 <target>Der Zeitstempel für die Versionierung kann nicht erstellt werden:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Die folgenden XML-Elemente können nicht gelesen werden:</target>
 
 <source>&Open...</source>
 <target>Ö&ffnen...</target>
@@ -557,6 +557,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Saving log file %x...</source>
 <target>Speichere Protokolldatei %x...</target>
+
+<source>Stopped</source>
+<target>Angehalten</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Sie können auf FreeFileSyncs Hauptfenster wechseln, um das Problem zu beheben.</target>
@@ -1145,11 +1148,11 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Exclude via filter:</source>
 <target>Über Filter ausschließen:</target>
 
-<source>Exclude temporarily</source>
-<target>Temporär ausschließen</target>
-
 <source>Include temporarily</source>
 <target>Temporär einschließen</target>
+
+<source>Exclude temporarily</source>
+<target>Temporär ausschließen</target>
 
 <source>Delete</source>
 <target>Löschen</target>
@@ -1294,9 +1297,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Initializing...</source>
 <target>Initialisiere...</target>
-
-<source>Stopped</source>
-<target>Angehalten</target>
 
 <source>Completed</source>
 <target>Fertig</target>
@@ -1525,4 +1525,10 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Error Code %x:</source>
 <target>Fehlercode %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Die folgenden XML-Elemente können nicht gelesen werden:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Die Konfigurationsdatei %x wurde nur teilweise geladen.</target>
 

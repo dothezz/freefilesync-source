@@ -436,6 +436,7 @@ void DirCallback::releaseDirTraverser(TraverseCallback* trav)
 
 DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, size_t retryNumber)
 {
+    //AsyncCallback::reportError() blocks while implementing boost::this_thread::interruption_point()
     switch (cfg.acb_.reportError(msg, retryNumber))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
@@ -452,6 +453,7 @@ DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, si
 
 DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)
 {
+    //AsyncCallback::reportError() blocks while implementing boost::this_thread::interruption_point()
     switch (cfg.acb_.reportError(msg, retryNumber))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
@@ -478,6 +480,8 @@ public:
 private:
     virtual void requestUiRefresh(const Zstring& filename) //applying DST hack imposes significant one-time performance drawback => callback to inform user
     {
+        boost::this_thread::interruption_point();
+
         acb_.reportCurrentStatus(replaceCpy(textApplyingDstHack, L"%x", fmtFileName(filename)), threadID_);
     }
 

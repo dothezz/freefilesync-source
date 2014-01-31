@@ -14,7 +14,7 @@
 #include <wx+/string_conv.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
-#include "xml_ffs.h"
+#include "xml_proc.h"
 #include "../lib/localization.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/return_codes.h"
@@ -109,7 +109,8 @@ void Application::onEnterEventLoop(wxEvent& event)
 
     try
     {
-        setLanguage(rts::getProgramLanguage()); //throw FileError
+        int lid = xmlAccess::getProgramLanguage();
+        setLanguage(lid); //throw FileError
     }
     catch (const FileError& e)
     {

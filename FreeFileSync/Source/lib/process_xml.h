@@ -7,10 +7,10 @@
 #ifndef PROCESSXML_H_INCLUDED
 #define PROCESSXML_H_INCLUDED
 
+#include <zen/xml_io.h>
 #include <wx/gdicmn.h>
-#include "../structures.h"
-#include "xml_base.h"
 #include "localization.h"
+#include "../structures.h"
 #include "../ui/column_attr.h"
 #include "../ui/folder_history_types.h"
 //#include "ffs_paths.h"
@@ -25,7 +25,7 @@ enum XmlType
     XML_TYPE_OTHER
 };
 
-XmlType getXmlType(const Zstring& filename); //throw FfsXmlError
+XmlType getXmlType(const Zstring& filename); //throw FileError
 
 
 enum OnError
@@ -274,16 +274,16 @@ struct XmlGlobalSettings
 };
 
 //read/write specific config types
-void readConfig(const Zstring& filename, XmlGuiConfig&      config); //
-void readConfig(const Zstring& filename, XmlBatchConfig&    config); //throw FfsXmlError
-void readConfig(                         XmlGlobalSettings& config); //
+void readConfig(const Zstring& filename, XmlGuiConfig&      config, std::wstring& warningMsg); //
+void readConfig(const Zstring& filename, XmlBatchConfig&    config, std::wstring& warningMsg); //throw FileError
+void readConfig(const Zstring& filename, XmlGlobalSettings& config, std::wstring& warningMsg); //
 
 void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //
-void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FfsXmlError
-void writeConfig(const XmlGlobalSettings& config);                          //
+void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FileError
+void writeConfig(const XmlGlobalSettings& config, const Zstring& filename); //
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
-void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config); //throw FfsXmlError
+void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config, std::wstring& warningMsg); //throw FileError
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg); //noexcept

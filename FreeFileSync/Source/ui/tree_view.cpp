@@ -1218,7 +1218,7 @@ private:
 
         menu.popup(grid_);
 
-        event.Skip();
+        //event.Skip();
     }
 
     void onGridLabelLeftClick(GridClickEvent& event)

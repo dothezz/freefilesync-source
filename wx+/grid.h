@@ -42,7 +42,7 @@ struct GridClickEvent : public wxMouseEvent
     virtual wxEvent* Clone() const { return new GridClickEvent(*this); }
 
     const ptrdiff_t row_; //-1 for invalid position, >= rowCount if out of range
-    const ColumnType colType_;
+    const ColumnType colType_; //may be DUMMY_COLUMN_TYPE
 };
 
 struct GridColumnResizeEvent : public wxCommandEvent

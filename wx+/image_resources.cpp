@@ -62,7 +62,7 @@ private:
 
 void GlobalResources::init(const Zstring& filename)
 {
-	assert(bitmaps.empty() && anims.empty());
+    assert(bitmaps.empty() && anims.empty());
 
     wxFFileInputStream input(utfCvrtTo<wxString>(filename));
     if (input.IsOk()) //if not... we don't want to react too harsh here
@@ -70,12 +70,12 @@ void GlobalResources::init(const Zstring& filename)
         //activate support for .png files
         wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
-        wxZipInputStream resourceFile(input, wxConvUTF8);
+        wxZipInputStream streamIn(input, wxConvUTF8);
         //do NOT rely on wxConvLocal! On failure shows unhelpful popup "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
         while (true)
         {
-            std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry()); //take ownership!
+            std::unique_ptr<wxZipEntry> entry(streamIn.GetNextEntry()); //take ownership!
             if (!entry)
                 break;
 
@@ -83,9 +83,9 @@ void GlobalResources::init(const Zstring& filename)
 
             //generic image loading
             if (endsWith(name, L".png"))
-                bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
+                bitmaps.insert(std::make_pair(name, wxImage(streamIn, wxBITMAP_TYPE_PNG)));
             else if (endsWith(name, L".gif"))
-                loadAnimFromZip(resourceFile, anims[name]);
+                loadAnimFromZip(streamIn, anims[name]);
         }
     }
 }

@@ -6,11 +6,14 @@
 
 #include "popup_dlg.h"
 #include <wx/app.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/std_button_order.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
 #include "popup_dlg_generated.h"
+
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+#endif
 
 using namespace zen;
 

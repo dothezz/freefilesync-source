@@ -30,7 +30,7 @@ struct ProcessCallback
         PHASE_COMPARING_CONTENT,
         PHASE_SYNCHRONIZING
     };
-    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseId) = 0; //informs about the estimated amount of data that will be processed in this phase
+    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseId) = 0; //throw ?; informs about the estimated amount of data that will be processed in this phase
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
@@ -54,12 +54,12 @@ struct ProcessCallback
     virtual void forceUiRefresh  () = 0; //throw ? - called before starting long running tasks which don't update regularly
 
     //called periodically after data was processed: expected(!) to request GUI update
-    virtual void reportStatus(const std::wstring& text) = 0; //UI info only, should not be logged!
+    virtual void reportStatus(const std::wstring& text) = 0; //throw ?; UI info only, should not be logged!
 
     //called periodically after data was processed: expected(!) to request GUI update
-    virtual void reportInfo(const std::wstring& text) = 0;
+    virtual void reportInfo(const std::wstring& text) = 0; //throw ?
 
-    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive) = 0;
+    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive) = 0; //throw ?
 
     //error handling:
     enum Response
@@ -67,8 +67,8 @@ struct ProcessCallback
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError     (const std::wstring& errorMessage, size_t retryNumber) = 0; //recoverable error situation
-    virtual void     reportFatalError(const std::wstring& errorMessage) = 0; //non-recoverable error situation
+    virtual Response reportError     (const std::wstring& errorMessage, size_t retryNumber) = 0; //throw ?; recoverable error situation
+    virtual void     reportFatalError(const std::wstring& errorMessage) = 0; //throw ?; non-recoverable error situation
 
     virtual void abortProcessNow() = 0; //will throw an exception => don't call while in a C GUI callstack
 };

@@ -57,6 +57,8 @@ const wxColor COLOR_LABEL_GRADIENT_FROM_FOCUS = COLOR_LABEL_GRADIENT_FROM;
 const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = getColorSelectionGradientFrom();
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
+
+const bool fillGapAfterColumns = true; //draw rows/column label to fill full window width; may become an instance variable some time?
 }
 
 //----------------------------------------------------------------------------------------------------------------
@@ -246,7 +248,7 @@ public:
         Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(SubWindow::onEraseBackGround), nullptr, this);
 
         //SetDoubleBuffered(true); slow as hell!
-		
+
         SetBackgroundStyle(wxBG_STYLE_PAINT);
 
         Connect(wxEVT_SET_FOCUS,  wxFocusEventHandler(SubWindow::onFocus), nullptr, this);
@@ -333,8 +335,14 @@ private:
 
           On OS X there is no such propagation! => we need a redirection (the same wxGrid implements)
          */
-        if (!sendEventNow(event))
-            event.Skip();
+
+        //new wxWidgets 3.0 screw-up for GTK2: wxScrollHelperEvtHandler::ProcessEvent() ignores wxEVT_MOUSEWHEEL events
+        //thereby breaking the scenario of redirection to parent we need here (but also breaking their very own wxGrid sample)
+        //=> call wxScrolledWindow mouse wheel handler directly
+        parent_.HandleOnMouseWheel(event);
+
+        //if (!sendEventNow(event))
+        //   event.Skip();
     }
 
     void onPaintEvent(wxPaintEvent& event)
@@ -627,10 +635,24 @@ private:
             const int width  = it->width_; //don't use unsigned for calculations!
 
             if (labelAreaTL.x > rect.GetRight())
-                return; //done
+                return; //done, rect is fully covered
             if (labelAreaTL.x + width > rect.x)
                 drawColumnLabel(dc, wxRect(labelAreaTL, wxSize(width, colLabelHeight)), col, it->type_);
             labelAreaTL.x += width;
+        }
+        if (labelAreaTL.x > rect.GetRight())
+            return; //done, rect is fully covered
+
+        //fill gap after columns and cover full width
+        if (fillGapAfterColumns)
+        {
+            int totalWidth = 0;
+            for (const ColumnWidth& cw : absWidths)
+                totalWidth += cw.width_;
+            const int clientWidth = GetClientSize().GetWidth(); //need reliable, stable width in contrast to rect.width
+
+            if (totalWidth < clientWidth)
+                drawColumnLabel(dc, wxRect(labelAreaTL, wxSize(clientWidth - totalWidth, colLabelHeight)), absWidths.size(), DUMMY_COLUMN_TYPE);
         }
     }
 
@@ -672,10 +694,10 @@ private:
             {
                 if (!event.LeftDClick()) //double-clicks never seem to arrive here; why is this checked at all???
                     if (Opt<int> colWidth = refParent().getColWidth(action->col))
-                        activeResizing.reset(new ColumnResizing(*this, action->col, *colWidth, event.GetPosition().x));
+                        activeResizing = make_unique<ColumnResizing>(*this, action->col, *colWidth, event.GetPosition().x);
             }
             else //a move or single click
-                activeMove.reset(new ColumnMove(*this, action->col, event.GetPosition().x));
+                activeMove = make_unique<ColumnMove>(*this, action->col, event.GetPosition().x);
         }
         event.Skip();
     }
@@ -769,7 +791,7 @@ private:
         {
             if (const Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition()))
             {
-                highlightCol.reset(new size_t(action->col));
+                highlightCol = make_unique<size_t>(action->col);
 
                 if (action->wantResize)
                     SetCursor(wxCURSOR_SIZEWE); //set window-local only! :)
@@ -811,7 +833,13 @@ private:
         {
             if (const Opt<ColumnType> colType = refParent().colToType(action->col))
                 sendEventNow(GridClickEvent(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, event, -1, *colType)); //notify right click
+            else assert(false);
         }
+        else
+            //notify right click (on free space after last column)
+            if (fillGapAfterColumns)
+                sendEventNow(GridClickEvent(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, event, -1, DUMMY_COLUMN_TYPE));
+
         event.Skip();
     }
 
@@ -878,9 +906,13 @@ private:
 
         std::vector<ColumnWidth> absWidths = refParent().getColWidths(); //resolve stretched widths
         {
-            int totalWidth = 0;
+            int totalRowWidth = 0;
             for (const ColumnWidth& cw : absWidths)
-                totalWidth += cw.width_;
+                totalRowWidth += cw.width_;
+
+            //fill gap after columns and cover full width
+            if (fillGapAfterColumns)
+                totalRowWidth = std::max(totalRowWidth, GetClientSize().GetWidth());
 
             if (auto prov = refParent().getDataProvider())
             {
@@ -889,7 +921,7 @@ private:
                 //draw background lines
                 for (int row = rowFirst; row < rowLast; ++row)
                 {
-                    const wxRect rowRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(totalWidth, rowHeight));
+                    const wxRect rowRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(totalRowWidth, rowHeight));
                     RecursiveDcClipper dummy3(dc, rowRect);
                     prov->renderRowBackgound(dc, rowRect, row, refParent().IsThisEnabled(), drawAsSelected(row));
                 }
@@ -960,15 +992,15 @@ private:
             if (!event.RightDown() || !refParent().isSelected(row)) //do NOT start a new selection if user right-clicks on a selected area!
             {
                 if (event.ControlDown())
-                    activeSelection.reset(new MouseSelection(*this, row, !refParent().isSelected(row)));
+                    activeSelection = make_unique<MouseSelection>(*this, row, !refParent().isSelected(row));
                 else if (event.ShiftDown())
                 {
-                    activeSelection.reset(new MouseSelection(*this, selectionAnchor, true));
+                    activeSelection = make_unique<MouseSelection>(*this, selectionAnchor, true);
                     refParent().clearSelection(ALLOW_GRID_EVENT);
                 }
                 else
                 {
-                    activeSelection.reset(new MouseSelection(*this, row, true));
+                    activeSelection = make_unique<MouseSelection>(*this, row, true);
                     refParent().clearSelection(ALLOW_GRID_EVENT);
                 }
             }
@@ -1236,7 +1268,7 @@ Grid::Grid(wxWindow* parent,
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
     Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
 
-	Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Grid::onKeyDown), nullptr, this);
+    Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(Grid::onKeyDown), nullptr, this);
 }
 
 
@@ -1414,7 +1446,7 @@ void Grid::onKeyDown(wxKeyEvent& event)
             keyCode = WXK_NUMPAD_LEFT;
     }
 
-	const ptrdiff_t rowCount  = getRowCount();
+    const ptrdiff_t rowCount  = getRowCount();
     const ptrdiff_t cursorRow = mainWin_->getCursor();
 
     auto moveCursorTo = [&](ptrdiff_t row)
@@ -1916,7 +1948,7 @@ void Grid::setGridCursor(size_t row)
 void Grid::selectWithCursor(ptrdiff_t row)
 {
     const size_t anchorRow = mainWin_->getAnchor();
-	
+
     mainWin_->setCursor(row, anchorRow);
     makeRowVisible(row);
 

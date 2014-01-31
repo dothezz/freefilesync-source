@@ -90,6 +90,8 @@ void CompareStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase
         }
         break;
     }
+
+    forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
 
 
@@ -303,6 +305,8 @@ void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase ph
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
     if (progressDlg)
         progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
+
+    forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
 
 

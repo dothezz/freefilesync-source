@@ -7,12 +7,10 @@
 #include "process_xml.h"
 #include <utility>
 #include <zenxml/xml.h>
-#include "ffs_paths.h"
 #include <zen/file_handling.h>
 #include <zen/file_io.h>
-
-//#include <zen/time.h>
-#include "xml_base.h"
+#include <zen/xml_io.h>
+#include "ffs_paths.h"
 
 using namespace zen;
 using namespace xmlAccess; //functionally needed for correct overload resolution!!!
@@ -46,10 +44,10 @@ XmlType getXmlTypeNoThrow(const zen::XmlDoc& doc) //throw()
 }
 
 
-XmlType xmlAccess::getXmlType(const Zstring& filename) //throw FfsXmlError
+XmlType xmlAccess::getXmlType(const Zstring& filename) //throw FileError
 {
     //do NOT use zen::loadStream as it will needlessly load even huge files!
-    XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError, quick exit if file is not an FFS XML
+    XmlDoc doc = loadXmlDocument(filename); //throw FileError; quick exit if file is not an FFS XML
     return ::getXmlTypeNoThrow(doc);
 }
 
@@ -1144,102 +1142,98 @@ bool needsMigration(const XmlDoc& doc, int currentXmlFormatVer)
 
 
 template <class ConfigType>
-void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int currentXmlFormatVer, bool& needMigration) //throw FfsXmlError
+void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int currentXmlFormatVer, std::wstring& warningMsg) //throw FileError
 {
-    XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
+    XmlDoc doc = loadXmlDocument(filename); //throw FileError
 
-    if (getXmlTypeNoThrow(doc) != type) //throw()
-        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+    if (getXmlTypeNoThrow(doc) != type) //noexcept
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
     XmlIn in(doc);
     ::readConfig(in, cfg);
 
-    if (in.errorsOccured())
-        throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
-                          getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
+    try
+    {
+        checkForMappingErrors(in, filename); //throw FileError
 
-    //(try to) migrate old configuration if needed
-    needMigration = needsMigration(doc, currentXmlFormatVer);
+        //(try to) migrate old configuration if needed
+        if (needsMigration(doc, currentXmlFormatVer))
+            try { xmlAccess::writeConfig(cfg, filename); /*throw FileError*/ }
+            catch (FileError&) { assert(false); }   //don't bother user!
+    }
+    catch (const FileError& e)
+    {
+        warningMsg = e.toString();
+    }
 }
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& cfg)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& cfg, std::wstring& warningMsg)
 {
-    bool needMigration = false;
-    ::readConfig(filename, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, needMigration); //throw FfsXmlError
-
-    if (needMigration) //(try to) migrate old configuration
-        try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
-        catch (FfsXmlError&) { assert(false); }   //don't bother user!
+    ::readConfig(filename, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& cfg)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& cfg, std::wstring& warningMsg)
 {
-    bool needMigration = false;
-    ::readConfig(filename, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, needMigration); //throw FfsXmlError
-
-    if (needMigration) //(try to) migrate old configuration
-        try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
-        catch (FfsXmlError&) { assert(false); }   //don't bother user!
+    ::readConfig(filename, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& cfg)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGlobalSettings& cfg, std::wstring& warningMsg)
 {
-    bool needMigration = false;
-    ::readConfig(getGlobalConfigFile(), XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, needMigration); //throw FfsXmlError
+    ::readConfig(filename, XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, warningMsg); //throw FileError
 }
 
 
 namespace
 {
 template <class XmlCfg>
-XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFormatVer, std::unique_ptr<FfsXmlError>& warning) //nothrow
+XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFormatVer, std::wstring& warningMsg) //nothrow
 {
-    XmlCfg cfg;
     XmlIn in(doc);
+    XmlCfg cfg;
     ::readConfig(in, cfg);
 
-    if (in.errorsOccured())
+    try
     {
-        if (!warning)
-            warning = make_unique<FfsXmlError>(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
-                                               getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
-    }
-    else
-    {
+        checkForMappingErrors(in, filename); //throw FileError
+
         //(try to) migrate old configuration if needed
         if (needsMigration(doc, currentXmlFormatVer))
-            try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
-            catch (FfsXmlError&) { assert(false); }   //don't bother user!
+            try { xmlAccess::writeConfig(cfg, filename); /*throw FileError*/ }
+            catch (FileError&) { assert(false); }     //don't bother user!
     }
+    catch (const FileError& e)
+    {
+        if (warningMsg.empty())
+            warningMsg = e.toString();
+    }
+
     return cfg;
 }
 }
 
 
-void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
+void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config, std::wstring& warningMsg) //throw FileError
 {
     assert(!filenames.empty());
 
     std::vector<zen::MainConfiguration> mainCfgs;
-    std::unique_ptr<FfsXmlError> warning;
 
     for (auto it = filenames.begin(); it != filenames.end(); ++it)
     {
         const Zstring& filename = *it;
         const bool firstItem = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
 
-        XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
-        //do NOT use zen::loadStream as it will superfluously load even huge files!
+        XmlDoc doc = loadXmlDocument(filename); //throw FileError
 
         switch (getXmlTypeNoThrow(doc))
         {
             case XML_TYPE_GUI:
             {
-                XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filename, XML_FORMAT_VER_FFS_GUI, warning); //nothrow
+                XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filename, XML_FORMAT_VER_FFS_GUI, warningMsg); //nothrow
                 if (firstItem)
                     config = guiCfg;
                 mainCfgs.push_back(guiCfg.mainCfg);
@@ -1248,7 +1242,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
 
             case XML_TYPE_BATCH:
             {
-                XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filename, XML_FORMAT_VER_FFS_BATCH, warning); //nothrow
+                XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filename, XML_FORMAT_VER_FFS_BATCH, warningMsg); //nothrow
                 if (firstItem)
                     config = convertBatchToGui(batchCfg);
                 mainCfgs.push_back(batchCfg.mainCfg);
@@ -1257,14 +1251,11 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
 
             case XML_TYPE_GLOBAL:
             case XML_TYPE_OTHER:
-                throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
     }
 
     config.mainCfg = merge(mainCfgs);
-
-    if (warning)
-        throw* warning;
 }
 
 //################################################################################################
@@ -1526,25 +1517,25 @@ void writeConfig(const ConfigType& config, XmlType type, int xmlFormatVer, const
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw FfsXmlError
+    saveXmlDocument(doc, filename); //throw FileError
 }
 }
 
 void xmlAccess::writeConfig(const XmlGuiConfig& cfg, const Zstring& filename)
 {
-    ::writeConfig(cfg, XML_TYPE_GUI, XML_FORMAT_VER_FFS_GUI, filename); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_GUI, XML_FORMAT_VER_FFS_GUI, filename); //throw FileError
 }
 
 
 void xmlAccess::writeConfig(const XmlBatchConfig& cfg, const Zstring& filename)
 {
-    ::writeConfig(cfg, XML_TYPE_BATCH, XML_FORMAT_VER_FFS_BATCH, filename); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_BATCH, XML_FORMAT_VER_FFS_BATCH, filename); //throw FileError
 }
 
 
-void xmlAccess::writeConfig(const XmlGlobalSettings& cfg)
+void xmlAccess::writeConfig(const XmlGlobalSettings& cfg, const Zstring& filename)
 {
-    ::writeConfig(cfg, XML_TYPE_GLOBAL, XML_FORMAT_VER_GLOBAL, getGlobalConfigFile()); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_GLOBAL, XML_FORMAT_VER_GLOBAL, filename); //throw FileError
 }
 
 

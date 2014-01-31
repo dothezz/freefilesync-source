@@ -103,13 +103,13 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::func
         if (!moveToRecycler(&cNames[0], cNames.size(), recyclerCallback, &cbd))
         {
             if (cbd.exceptionInUserCallback)
-				try
-				{
-					assert(notifyDeletionStatus);
-					notifyDeletionStatus(Zstring()); //should throw again!!!
-					assert(false);
-				}
-				catch (...) { throw; }
+                try
+                {
+                    assert(notifyDeletionStatus);
+                    notifyDeletionStatus(Zstring()); //should throw again!!!
+                    assert(false);
+                }
+                catch (...) { throw; }
 
             std::wstring filenameFmt = fmtFileName(filenames[0]); //probably not the correct file name for file lists larger than 1!
             if (filenames.size() > 1)

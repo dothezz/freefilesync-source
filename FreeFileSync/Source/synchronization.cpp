@@ -1999,7 +1999,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     const SyncStatistics statisticsTotal(folderCmp);
 
     //keep at beginning so that all gui elements are initialized properly
-    callback.initNewPhase(getCUD(statisticsTotal),
+    callback.initNewPhase(getCUD(statisticsTotal), //may throw
                           statisticsTotal.getDataToProcess(),
                           ProcessCallback::PHASE_SYNCHRONIZING);
 

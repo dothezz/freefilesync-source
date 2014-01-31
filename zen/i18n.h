@@ -14,8 +14,10 @@
 
 
 //minimal layer enabling text translation - without platform/library dependencies!
+#ifdef __WXMSW__ //we have wxWidgets
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
+#endif
 #endif
 
 #define ZEN_TRANS_CONCAT_SUB(X, Y) X ## Y

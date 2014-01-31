@@ -353,8 +353,8 @@ private:
 
         typename Trav::DirHandle searchHandle;
 
-        if (!tryReportingDirError([&] { Trav::create(dirname, searchHandle); /*throw FileError*/ }, sink))  
-        return; //ignored error
+        if (!tryReportingDirError([&] { Trav::create(dirname, searchHandle); /*throw FileError*/ }, sink))
+            return; //ignored error
         ZEN_ON_SCOPE_EXIT(Trav::destroy(searchHandle));
 
         typename Trav::FindData findData = {};

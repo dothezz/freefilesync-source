@@ -106,8 +106,23 @@ bool zen::somethingExists(const Zstring& objname)
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
     if (attr != INVALID_FILE_ATTRIBUTES)
         return true;
-    if (::GetLastError() == ERROR_SHARING_VIOLATION) //"C:\pagefile.sys"
-        return true;
+    const ErrorCode lastError = getLastError();
+
+    //handle obscure file permission problem where ::GetFileAttributes() fails with ERROR_ACCESS_DENIED or ERROR_SHARING_VIOLATION
+    //while parent directory traversal is successful: e.g. "C:\pagefile.sys"
+    if (lastError != ERROR_PATH_NOT_FOUND && //perf: short circuit for common "not existing" error codes
+        lastError != ERROR_FILE_NOT_FOUND && //
+        lastError != ERROR_BAD_NETPATH    && //
+        lastError != ERROR_BAD_NET_NAME)     //
+    {
+        WIN32_FIND_DATA fileInfo = {};
+        const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(objname).c_str(), &fileInfo);
+        if (searchHandle != INVALID_HANDLE_VALUE)
+        {
+            ::FindClose(searchHandle);
+            return true;
+        }
+    }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
@@ -238,7 +253,7 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
         }
 #endif
         if (!somethingExists(filename)) //warning: changes global error code!!
-            return false; //neither file nor any other object (e.g. broken symlink) with that name existing
+            return false; //neither file nor any other object (e.g. broken symlink) with that name existing - caveat: what if "access is denied"!?!??!?!?
 
         //begin of "regular" error reporting
         const std::wstring errorMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filename));
@@ -2006,7 +2021,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
         if (lastError == ERROR_PATH_NOT_FOUND)
         {
             guardTarget.dismiss(); //not relevant
-            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+            throw ErrorTargetPathMissing(errorMsg, errorDescr); //could this also be source path missing!?
         }
 
         try //add more meaningful message

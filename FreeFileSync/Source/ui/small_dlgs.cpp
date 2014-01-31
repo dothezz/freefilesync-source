@@ -14,7 +14,6 @@
 #include <wx+/bitmap_button.h>
 #include <wx+/rtl.h>
 #include <wx+/no_flicker.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
 #include <wx+/std_button_order.h>
@@ -27,6 +26,10 @@
 #include "../lib/help_provider.h"
 #include "../lib/hard_filter.h"
 #include "../version/version.h"
+
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+#endif
 
 using namespace zen;
 
@@ -508,28 +511,32 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
     //update preview of item count and bytes to be transferred:
-    setText(*m_staticTextData, filesizeToShortString(st.getDataToProcess()));
-    if (st.getDataToProcess() == 0)
-        m_bitmapData->SetBitmap(greyScale(getResourceImage(L"data")));
-    else
-        m_bitmapData->SetBitmap(getResourceImage(L"data"));
-
-    auto setValue = [](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
+    auto setValue = [](wxStaticText& txtControl, bool isZeroValue, const wxString& valueAsString, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
     {
-        setText(txtControl, toGuiString(value));
+        wxFont fnt = txtControl.GetFont();
+        fnt.SetWeight(isZeroValue ? wxFONTWEIGHT_NORMAL : wxFONTWEIGHT_BOLD);
+        txtControl.SetFont(fnt);
 
-        if (value == 0)
+        setText(txtControl, valueAsString);
+
+        if (isZeroValue)
             bmpControl.SetBitmap(greyScale(mirrorIfRtl(getResourceImage(bmpName))));
         else
             bmpControl.SetBitmap(mirrorIfRtl(getResourceImage(bmpName)));
     };
 
-    setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
-    setValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
-    setValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
-    setValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
-    setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
-    setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
+    auto setIntValue = [&setValue](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
+    {
+        setValue(txtControl, value == 0, toGuiString(value), bmpControl, bmpName);
+    };
+
+    setValue(*m_staticTextData, st.getDataToProcess() == 0, filesizeToShortString(st.getDataToProcess()), *m_bitmapData,  L"data");
+    setIntValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
+    setIntValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
+    setIntValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
+    setIntValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
+    setIntValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
+    setIntValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
 
     m_panelStatistics->Layout();
 
@@ -702,9 +709,10 @@ private:
     virtual void OnToggleAutoRetryCount(wxCommandEvent& event) { updateGui(); }
 
     void setExtApp(const xmlAccess::ExternalApps& extApp);
-    xmlAccess::ExternalApps getExtApp();
+    xmlAccess::ExternalApps getExtApp() const;
 
     xmlAccess::XmlGlobalSettings& settings;
+    std::map<std::wstring, std::wstring> descriptionTransToEng; //"translated description" -> "english" mapping for external application config
 };
 
 
@@ -856,19 +864,29 @@ void GlobalSettingsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
     for (auto it = extAppTmp.begin(); it != extAppTmp.end(); ++it)
     {
         const int row = it - extAppTmp.begin();
-        m_gridCustomCommand->SetCellValue(row, 0, it->first);  //description
-        m_gridCustomCommand->SetCellValue(row, 1, it->second); //commandline
+
+        const std::wstring description = zen::implementation::translate(it->first);
+        if (description != it->first) //remember english description to save in GlobalSettings.xml later rather than hard-code translation
+            descriptionTransToEng[description] = it->first;
+
+        m_gridCustomCommand->SetCellValue(row, 0, description); //description
+        m_gridCustomCommand->SetCellValue(row, 1, it->second);  //commandline
     }
 }
 
 
-xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp()
+xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp() const
 {
     xmlAccess::ExternalApps output;
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
     {
         auto description = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 0));
         auto commandline = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 1));
+
+        //try to undo translation of description for GlobalSettings.xml
+        auto it = descriptionTransToEng.find(description);
+        if (it != descriptionTransToEng.end())
+            description = it->second;
 
         if (!description.empty() || !commandline.empty())
             output.push_back(std::make_pair(description, commandline));

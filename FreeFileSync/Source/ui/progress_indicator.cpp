@@ -18,7 +18,6 @@
 #include <zen/format_unit.h>
 #include <zen/scope_guard.h>
 #include <wx+/grid.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/toggle_button.h>
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
@@ -37,7 +36,11 @@
 #include "taskbar.h"
 #include "exec_finished_box.h"
 #include "app_icon.h"
-#ifdef ZEN_MAC
+
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+
+#elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -873,8 +876,135 @@ private:
 
 //########################################################################################
 
+warn_static("remove after test")
+#define NEW_BAR_PROGRESS_GRAPH
+
 namespace
 {
+#ifdef NEW_BAR_PROGRESS_GRAPH
+class CurveDataProgressBar : public CurveData
+{
+public:
+    CurveDataProgressBar() : x(0), xMax(0) {}
+
+    void setValue(double val, double valMax) { x = val; xMax = valMax; }
+
+private:
+    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(0, xMax); } //irrelevant; graph range is fixed
+
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
+    {
+        //- draw a filled rectangle partly outside visible graph area [0, xMax] x [0, xMax] to simulate a progress bar
+        //- make sure to start within visible area to avoid automatic trimming
+        points.push_back(CurvePoint(    x,  xMax / 2));
+        points.push_back(CurvePoint(    x, -xMax));
+        points.push_back(CurvePoint(-xMax, -xMax));
+        points.push_back(CurvePoint(-xMax, xMax * 2));
+        points.push_back(CurvePoint(    x, xMax * 2));
+        points.push_back(CurvePoint(    x, xMax / 2));
+    }
+
+    double x;
+    double xMax;
+};
+
+
+class CurveDataStretchedGraph : public SparseCurveData
+{
+public:
+    CurveDataStretchedGraph() : SparseCurveData(true), /*true: add steps*/ timeNow(0) {}
+
+    void clear() { samples.clear(); timeNow = 0; }
+
+    void addRecord(int64_t timeNowMs, double value)
+    {
+        timeNow = timeNowMs;
+
+        //allow for at most one sample per 100ms (handles duplicate inserts, too!) => this is unrelated to UI_UPDATE_INTERVAL!
+        if (!samples.empty() && timeNowMs / 100 == samples.rbegin()->first / 100)
+        {
+            samples.rbegin()->second = value;
+            return;
+        }
+
+        samples.insert(samples.end(), std::make_pair(timeNowMs, value)); //time is "expected" to be monotonously ascending
+        //documentation differs about whether "hint" should be before or after the to be inserted element!
+        //however "std::map<>::end()" is interpreted correctly by GCC and VS2010
+
+        if (samples.size() > MAX_BUFFER_SIZE) //limit buffer size
+            samples.erase(samples.begin());
+    }
+
+private:
+    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(0, samples.empty() ? 0 : samples.rbegin()->second); } //irrelevant; graph range is fixed
+
+    virtual Opt<CurvePoint> getLessEq(double x) const override //x: both input and output have unit "data processed"
+    {
+        if (samples.empty())
+            return NoValue();
+
+        const double dataCurrent = samples.rbegin()->second;
+        const int64_t curveDuration = samples.rbegin()->first - samples.begin()->first;
+        if (numeric::isNull(dataCurrent) || curveDuration == 0)
+            return NoValue();
+
+        //map x from [0, dataCurrent] to [curveTimeBegin, curveTimeEnd]
+        const double timeMs = samples.begin()->first + curveDuration * x / dataCurrent;
+        auto timePointToX = [&](int64_t tp) {  return (tp - samples.begin()->first) * dataCurrent / curveDuration; };
+
+        //--------------------------------------------------
+        const int64_t timex = std::floor(timeMs);
+        //------ add artifical last sample value -------
+        if (samples.rbegin()->first < timeNow)
+            if (timeNow <= timex)
+                return CurvePoint(timePointToX(timeNow), samples.rbegin()->second);
+        //--------------------------------------------------
+
+        //find first key > x, then go one step back: => samples must be a std::map, NOT std::multimap!!!
+        auto it = samples.upper_bound(timex);
+        if (it == samples.begin())
+            return NoValue();
+        //=> samples not empty in this context
+        --it;
+        return CurvePoint(timePointToX(it->first), it->second);
+    }
+
+    virtual Opt<CurvePoint> getGreaterEq(double x) const override
+    {
+        if (samples.empty())
+            return NoValue();
+
+        const double dataCurrent = samples.rbegin()->second;
+        const int64_t curveDuration = samples.rbegin()->first - samples.begin()->first;
+        if (numeric::isNull(dataCurrent) || curveDuration == 0)
+            return NoValue();
+
+        //map x from [0, dataCurrent] to [curveTimeBegin, curveTimeEnd]
+        const double timeMs = samples.begin()->first + curveDuration * x / dataCurrent;
+        auto timePointToX = [&](int64_t tp) {  return (tp - samples.begin()->first) * dataCurrent / curveDuration; };
+
+        //--------------------------------------------------
+        const int64_t timex = std::ceil(timeMs);
+        //------ add artifical last sample value -------
+        if (samples.rbegin()->first < timeNow)
+            if (samples.rbegin()->first < timex && timex <= timeNow)
+                return CurvePoint(timePointToX(timeNow), samples.rbegin()->second);
+        //--------------------------------------------------
+
+        auto it = samples.lower_bound(timex);
+        if (it == samples.end())
+            return NoValue();
+        return CurvePoint(timePointToX(it->first), it->second);
+    }
+
+    static const size_t MAX_BUFFER_SIZE = 2500000; //sizeof(single node) worst case ~ 3 * 8 byte ptr + 16 byte key/value = 40 byte
+
+    std::map<int64_t, double> samples; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
+    int64_t timeNow; //help create an artificial record at the end of samples to visualize current time!
+};
+
+
+#else
 class CurveDataStatistics : public SparseCurveData
 {
 public:
@@ -1102,6 +1232,7 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 private:
     bool drawLabel_;
 };
+#endif
 }
 
 
@@ -1190,13 +1321,20 @@ private:
     //help calculate total speed
     int64_t phaseStartMs; //begin of current phase in [ms]
 
-    std::shared_ptr<CurveDataStatistics>  curveDataBytes;
-    std::shared_ptr<CurveDataStatistics>  curveDataItems;
-
+#ifdef NEW_BAR_PROGRESS_GRAPH
+    std::shared_ptr<CurveDataProgressBar> curveDataBytesPerc;
+    std::shared_ptr<CurveDataProgressBar> curveDataItemsPerc;
+    std::shared_ptr<CurveDataStretchedGraph> curveDataBytes;
+    std::shared_ptr<CurveDataStretchedGraph> curveDataItems;
+#else
+    std::shared_ptr<CurveDataStatistics  > curveDataBytes;
     std::shared_ptr<CurveDataTotalValue  > curveDataBytesTotal;
     std::shared_ptr<CurveDataCurrentValue> curveDataBytesCurrent;
+
+    std::shared_ptr<CurveDataStatistics  > curveDataItems;
     std::shared_ptr<CurveDataTotalValue  > curveDataItemsTotal;
     std::shared_ptr<CurveDataCurrentValue> curveDataItemsCurrent;
+#endif
 
     wxString parentFrameTitleBackup;
     std::unique_ptr<FfsTrayIcon> trayIcon; //optional: if filled all other windows should be hidden and conversely
@@ -1285,10 +1423,36 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
 
     //init graph
+#ifdef NEW_BAR_PROGRESS_GRAPH
+    curveDataBytesPerc = std::make_shared<CurveDataProgressBar>();
+    curveDataItemsPerc = std::make_shared<CurveDataProgressBar>();
+    curveDataBytes     = std::make_shared<CurveDataStretchedGraph>();
+    curveDataItems     = std::make_shared<CurveDataStretchedGraph>();
+
+    pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().setLabelX(Graph2D::X_LABEL_NONE).setLabelY(Graph2D::Y_LABEL_NONE).setSelectionMode(Graph2D::SELECT_NONE));
+    pnl.m_panelGraphItems->setAttributes(Graph2D::MainAttributes().setLabelX(Graph2D::X_LABEL_NONE).setLabelY(Graph2D::Y_LABEL_NONE).setSelectionMode(Graph2D::SELECT_NONE));
+
+    pnl.m_panelGraphBytes->setCurve(curveDataBytesPerc, Graph2D::CurveAttributes().setLineWidth(2).
+                                    fillCurveArea(wxColor(205, 255, 202)).  //faint green
+                                    setColor     (wxColor(12, 128,    0))); //dark green
+
+    pnl.m_panelGraphItems->setCurve(curveDataItemsPerc, Graph2D::CurveAttributes().setLineWidth(2).
+                                    fillCurveArea(wxColor(198, 206, 255)).  //faint blue
+                                    setColor     (wxColor(53, 25,   255))); //dark blue
+
+    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).
+                                    fillCurveArea(wxColor(111, 255, 99)).   //light green
+                                    setColor     (wxColor( 20, 200,   0))); //medium green
+
+    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).
+                                    fillCurveArea(wxColor(127, 147, 255)).  //light blue
+                                    setColor     (wxColor( 90, 120, 255))); //medium blue
+
+#else
     curveDataBytes        = std::make_shared<CurveDataStatistics>();
-    curveDataItems        = std::make_shared<CurveDataStatistics>();
     curveDataBytesTotal   = std::make_shared<CurveDataTotalValue>();
     curveDataBytesCurrent = std::make_shared<CurveDataCurrentValue>();
+    curveDataItems        = std::make_shared<CurveDataStatistics>();
     curveDataItemsTotal   = std::make_shared<CurveDataTotalValue>();
     curveDataItemsCurrent = std::make_shared<CurveDataCurrentValue>();
 
@@ -1319,6 +1483,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 
     pnl.m_panelGraphItems->addCurve(curveDataItemsTotal,   Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(53, 25, 255))); //dark blue
     pnl.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).setColor(wxColor(53, 25, 255))); //
+#endif
 
     //allow changing on completion command
     pnl.m_comboBoxExecFinished->initHistory(execFinishedHistory, execFinishedHistory.size()); //-> we won't use addItemHistory() later
@@ -1403,10 +1568,15 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
     updateDialogStatus(); //evaluates "syncStat_->currentPhase()"
 
     //reset graphs (e.g. after binary comparison)
+#ifdef NEW_BAR_PROGRESS_GRAPH
+    curveDataBytesPerc->setValue(0, 0);
+    curveDataItemsPerc->setValue(0, 0);
+#else
     curveDataBytesTotal  ->setValue(0, 0);
     curveDataBytesCurrent->setValue(0, 0, 0);
     curveDataItemsTotal  ->setValue(0, 0);
     curveDataItemsCurrent->setValue(0, 0, 0);
+#endif
     curveDataBytes->clear();
     curveDataItems->clear();
 
@@ -1588,11 +1758,20 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             if (trayIcon.get()) trayIcon->setProgress(fraction);
             if (taskbar_.get()) taskbar_->setProgress(fraction);
 
+#ifdef NEW_BAR_PROGRESS_GRAPH
+            curveDataBytesPerc->setValue(to<double>(dataCurrent), to<double>(dataTotal));
+            curveDataItemsPerc->setValue(itemsCurrent, itemsTotal);
+
+            //(re-)set progress graph max, just in case it changed during sync
+            pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setMinX(0).setMaxX(to<double>(dataTotal)).setMinY(0).setMaxY(to<double>(dataTotal)));
+            pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setMinX(0).setMaxX(           itemsTotal).setMinY(0).setMaxY(           itemsTotal));
+#else
             //constant line graph
             curveDataBytesTotal  ->setValue(timeNow, to<double>(dataTotal));
             curveDataBytesCurrent->setValue(timeNow, to<double>(dataCurrent), to<double>(dataTotal));
             curveDataItemsTotal  ->setValue(timeNow, itemsTotal);
             curveDataItemsCurrent->setValue(timeNow, itemsCurrent, itemsTotal);
+#endif
             //even though notifyProgressChange() already set the latest data, let's add another sample to have all curves consider "timeNow"
             //no problem with adding too many records: CurveDataStatistics will remove duplicate entries!
             curveDataBytes->addRecord(timeNow, to<double>(dataCurrent));
@@ -2141,13 +2320,13 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
 {
     if (parentWindow) //sync from GUI
         return new SyncProgressDialogImpl<wxDialog>(wxDEFAULT_DIALOG_STYLE | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER,
-        [&](wxDialog& progDlg) { return parentWindow; }, abortCb,
-    notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
+        [&](wxDialog& progDlg) { return parentWindow; },
+    abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
     else //FFS batch job
     {
         auto dlg = new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE,
-        [](wxFrame& progDlg) { return &progDlg; }, abortCb,
-        notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
+        [](wxFrame& progDlg) { return &progDlg; },
+        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
 
         //only top level windows should have an icon:
         dlg->SetIcon(getFfsIcon());

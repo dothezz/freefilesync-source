@@ -37,13 +37,12 @@ using namespace xmlAccess;
 
 IMPLEMENT_APP(Application)
 
-warn_static("remove after test")
 #ifdef _MSC_VER
 //catch CRT floating point errors: http://msdn.microsoft.com/en-us/library/k3backsw.aspx
 int _matherr(struct _exception* except)
 {
-	assert(false);
-	return 0; //use default action
+    assert(false);
+    return 0; //use default action
 }
 #endif
 
@@ -65,21 +64,21 @@ std::abort();
 }
 */
 #ifdef ZEN_WIN
-    void enableCrashingOnCrashes() //should be needed for 32-bit code only: http://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work
-    {
-        typedef BOOL (WINAPI* GetProcessUserModeExceptionPolicyFun)(LPDWORD lpFlags);
-        typedef BOOL (WINAPI* SetProcessUserModeExceptionPolicyFun)(  DWORD dwFlags);
-        const DWORD EXCEPTION_SWALLOWING = 0x1;
+void enableCrashingOnCrashes() //should be needed for 32-bit code only: http://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work
+{
+    typedef BOOL (WINAPI* GetProcessUserModeExceptionPolicyFun)(LPDWORD lpFlags);
+    typedef BOOL (WINAPI* SetProcessUserModeExceptionPolicyFun)(  DWORD dwFlags);
+    const DWORD EXCEPTION_SWALLOWING = 0x1;
 
-		const SysDllFun<GetProcessUserModeExceptionPolicyFun> getProcessUserModeExceptionPolicy(L"kernel32.dll", "GetProcessUserModeExceptionPolicy");
-		const SysDllFun<SetProcessUserModeExceptionPolicyFun> setProcessUserModeExceptionPolicy(L"kernel32.dll", "SetProcessUserModeExceptionPolicy");
-        if (getProcessUserModeExceptionPolicy && setProcessUserModeExceptionPolicy) //available since Windows 7 SP1
-        {
-            DWORD dwFlags = 0;
-            if (getProcessUserModeExceptionPolicy(&dwFlags) && (dwFlags & EXCEPTION_SWALLOWING))
-                setProcessUserModeExceptionPolicy(dwFlags & ~EXCEPTION_SWALLOWING);
-        }
+    const SysDllFun<GetProcessUserModeExceptionPolicyFun> getProcessUserModeExceptionPolicy(L"kernel32.dll", "GetProcessUserModeExceptionPolicy");
+    const SysDllFun<SetProcessUserModeExceptionPolicyFun> setProcessUserModeExceptionPolicy(L"kernel32.dll", "SetProcessUserModeExceptionPolicy");
+    if (getProcessUserModeExceptionPolicy && setProcessUserModeExceptionPolicy) //available since Windows 7 SP1
+    {
+        DWORD dwFlags = 0;
+        if (getProcessUserModeExceptionPolicy(&dwFlags) && (dwFlags & EXCEPTION_SWALLOWING))
+            setProcessUserModeExceptionPolicy(dwFlags & ~EXCEPTION_SWALLOWING);
     }
+}
 
 #ifdef _MSC_VER
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
@@ -151,7 +150,7 @@ bool Application::OnInit()
     //std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
 
 #ifdef ZEN_WIN
-		enableCrashingOnCrashes();
+    enableCrashingOnCrashes();
 
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
@@ -352,7 +351,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
                 try
                 {
-                    switch (getXmlType(filename)) //throw FfsXmlError
+                    switch (getXmlType(filename)) //throw FileError
                     {
                         case XML_TYPE_GUI:
                             configFiles.push_back(std::make_pair(filename, XML_TYPE_GUI));
@@ -367,7 +366,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                             return;
                     }
                 }
-                catch (const FfsXmlError& e)
+                catch (const FileError& e)
                 {
                     notifyError(e.toString(), std::wstring());
                     return;
@@ -441,11 +440,14 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             XmlBatchConfig batchCfg;
             try
             {
-                readConfig(filename, batchCfg);
+                std::wstring warningMsg;
+                readConfig(filename, batchCfg, warningMsg); //throw FileError
+
+                if (!warningMsg.empty())
+                    throw FileError(warningMsg); //batch mode: break on errors AND even warnings!
             }
-            catch (const xmlAccess::FfsXmlError& e)
+            catch (const FileError& e)
             {
-                //batch mode: break on errors AND even warnings!
                 notifyError(e.toString(), std::wstring());
                 return;
             }
@@ -458,20 +460,20 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             XmlGuiConfig guiCfg;
             try
             {
-                readConfig(filename, guiCfg);
+                std::wstring warningMsg;
+                readConfig(filename, guiCfg, warningMsg); //throw FileError
+
+                if (!warningMsg.empty())
+                    showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
+                //what about simulating changed config on parsing errors?
             }
-            catch (const xmlAccess::FfsXmlError& e)
+            catch (const FileError& e)
             {
-                if (e.getSeverity() == FfsXmlError::WARNING)
-                    showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
-                //what about simulating changed config on parsing errors????
-                else
-                {
-                    notifyError(e.toString(), std::wstring());
-                    return;
-                }
+                notifyError(e.toString(), std::wstring());
+                return;
             }
-            if (!replaceDirectories(guiCfg.mainCfg)) return;
+            if (!replaceDirectories(guiCfg.mainCfg))
+                return;
             //what about simulating changed config due to directory replacement?
             //-> propably fine to not show as changed on GUI and not ask user to save on exit!
 
@@ -494,18 +496,17 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         XmlGuiConfig guiCfg; //structure to receive gui settings with default values
         try
         {
-            readAnyConfig(filenames, guiCfg); //throw FfsXmlError
+            std::wstring warningMsg;
+            readAnyConfig(filenames, guiCfg, warningMsg); //throw FileError
+
+            if (!warningMsg.empty())
+                showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
+            //what about simulating changed config on parsing errors?
         }
-        catch (const FfsXmlError& e)
+        catch (const FileError& e)
         {
-            if (e.getSeverity() == FfsXmlError::WARNING)
-                showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
-            //what about simulating changed config on parsing errors????
-            else
-            {
-                notifyError(e.toString(), std::wstring());
-                return;
-            }
+            notifyError(e.toString(), std::wstring());
+            return;
         }
         runGuiMode(guiCfg, filenames);
     }
@@ -550,18 +551,18 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     };
 
     XmlGlobalSettings globalCfg;
-    try
-    {
-        if (fileExists(getGlobalConfigFile()))
-            readConfig(globalCfg); //throw FfsXmlError
-        //else: globalCfg already has default values
-    }
-    catch (const xmlAccess::FfsXmlError& e)
-    {
-        assert(false);
-        if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
+    if (fileExists(getGlobalConfigFile())) //else: globalCfg already has default values
+        try
+        {
+            std::wstring warningMsg;
+            readConfig(getGlobalConfigFile(), globalCfg, warningMsg); //throw FileError
+
+            assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+        }
+        catch (const FileError& e)
+        {
             return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
-    }
+        }
 
     try
     {
@@ -649,9 +650,9 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
 
     try //save global settings to XML: e.g. ignored warnings
     {
-        xmlAccess::writeConfig(globalCfg); //FfsXmlError
+        xmlAccess::writeConfig(globalCfg, getGlobalConfigFile()); //FileError
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
         notifyError(e.toString(), FFS_RC_FINISHED_WITH_WARNINGS);
     }

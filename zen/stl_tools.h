@@ -94,7 +94,7 @@ void vector_remove_if(V& vec, Predicate p)
 template <class V, class W> inline
 void vector_append(V& vec, W& vec2)
 {
-vec.insert(vec.end(), vec2.begin(), vec2.end());
+    vec.insert(vec.end(), vec2.begin(), vec2.end());
 }
 
 

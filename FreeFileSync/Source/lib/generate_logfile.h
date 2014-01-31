@@ -106,7 +106,7 @@ void saveLogToFile(const SummaryInfo& summary, //throw FileError
     fileOut.write(&*header.begin(), header.size()); //throw FileError
 
     //write log items one after the other instead of creating one big string: memory allocation might fail; think 1 million entries!
-	for (const LogEntry& entry : log)
+    for (const LogEntry& entry : log)
     {
         Utf8String msg = replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         msg += LINE_BREAK; //make sure string is not empty!

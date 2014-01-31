@@ -258,7 +258,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Stopped"))); //throw FileError
             else if (totalErrors > 0)
                 renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Error"))); //throw FileError
-			//status "warning" is not important enough to show up in log file name
+            //status "warning" is not important enough to show up in log file name
         }
         catch (FileError&) {}
     }
@@ -305,6 +305,8 @@ void BatchStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Process
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
     if (progressDlg)
         progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
+
+    forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
 
 

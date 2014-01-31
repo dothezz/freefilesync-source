@@ -5,9 +5,11 @@
 // **************************************************************************
 
 #include "xml_proc.h"
-#include <wx/filefn.h>
 #include <zen/file_handling.h>
+#include <wx/filefn.h>
 #include <wx+/string_conv.h>
+#include "../lib/process_xml.h"
+#include "../lib/ffs_paths.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -36,19 +38,24 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 }
 
 
-void xmlAccess::readRealConfig(const Zstring& filename, XmlRealConfig& config)
+void xmlAccess::readConfig(const Zstring& filename, XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
 {
-    XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
+    XmlDoc doc = loadXmlDocument(filename); //throw FileError
 
     if (!isXmlTypeRTS(doc))
-        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
-    if (in.errorsOccured())
-        throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
-                          getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
+    try
+    {
+        checkForMappingErrors(in, filename); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        warningMsg = e.toString();
+    }
 }
 
 
@@ -63,13 +70,70 @@ void writeConfig(const XmlRealConfig& config, XmlOut& out)
 }
 
 
-void xmlAccess::writeRealConfig(const XmlRealConfig& config, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlRealConfig& config, const Zstring& filename) //throw FileError
 {
     XmlDoc doc("FreeFileSync");
     doc.root().setAttribute("XmlType", "REAL");
 
     XmlOut out(doc);
-    writeConfig(config, out);
+    ::writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw FfsXmlError
+    saveXmlDocument(doc, filename); //throw FileError
+}
+
+
+namespace
+{
+xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filename)
+{
+    std::set<Zstring, LessFilename> uniqueFolders;
+
+    //add main folders
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirnamePhraseLeft);
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirnamePhraseRight);
+
+    //additional folders
+    for (const FolderPairEnh& fp : batchCfg.mainCfg.additionalPairs)
+    {
+        uniqueFolders.insert(fp.dirnamePhraseLeft);
+        uniqueFolders.insert(fp.dirnamePhraseRight);
+    }
+
+    uniqueFolders.erase(Zstring());
+
+    xmlAccess::XmlRealConfig output;
+    output.directories.assign(uniqueFolders.begin(), uniqueFolders.end());
+    output.commandline = Zstr("\"") + zen::getFreeFileSyncLauncher() + Zstr("\" \"") + filename + Zstr("\"");
+    return output;
+}
+}
+
+
+void xmlAccess::readRealOrBatchConfig(const Zstring& filename, xmlAccess::XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
+{
+    using namespace xmlAccess;
+
+    if (getXmlType(filename) != XML_TYPE_BATCH) //throw FileError
+        return readConfig(filename, config, warningMsg); //throw FileError
+
+    //convert batch config to RealtimeSync config
+    XmlBatchConfig batchCfg;
+    readConfig(filename, batchCfg, warningMsg); //throw FileError
+    //<- redirect batch config warnings
+
+    config = convertBatchToReal(batchCfg, filename);
+}
+
+
+int xmlAccess::getProgramLanguage()
+{
+    xmlAccess::XmlGlobalSettings settings;
+    std::wstring warningMsg;
+    try
+    {
+        xmlAccess::readConfig(getGlobalConfigFile(), settings, warningMsg); //throw FileError
+    }
+    catch (const FileError&) {} //user default language if error occurred
+
+    return settings.programLanguage;
 }

@@ -229,7 +229,7 @@ const wchar_t arrowLeft [] = L"<--";
 const wchar_t arrowRight[] = L"-->";
 
 
-//check for very old dates or date2s in the future
+//check for very old dates or dates in the future
 std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
     return replaceCpy(_("File %x has an invalid date."), L"%x", fmtFileName(fileNameFull)) + L"\n" +
@@ -243,6 +243,12 @@ std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
     return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
            L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
+}
+
+
+std::wstring getConflictSkippedBinaryComparison(const FilePair& fileObj)
+{
+    return replaceCpy(_("Binary comparison was skipped for excluded files %x."), L"%x", fmtFileName(fileObj.getObjRelativeName()));
 }
 
 
@@ -424,15 +430,21 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
     //finish categorization...
     std::vector<FilePair*> filesToCompareBytewise;
 
-    //content comparison of file content happens AFTER finding corresponding files
+    //content comparison of file content happens AFTER finding corresponding files and AFTER filtering
     //in order to separate into two processes (scanning and comparing)
-
     for (FilePair* fileObj : undefinedFiles)
         //pre-check: files have different content if they have a different filesize (must not be FILE_EQUAL: see InSyncFile)
         if (fileObj->getFileSize<LEFT_SIDE>() != fileObj->getFileSize<RIGHT_SIDE>())
             fileObj->setCategory<FILE_DIFFERENT>();
         else
-            filesToCompareBytewise.push_back(fileObj);
+        {
+            //perf: skip binary comparison for excluded rows (e.g. via time span and size filter)!
+            //both soft and hard filter were already applied in ComparisonBuffer::performComparison()!
+            if (!fileObj->isActive())
+                fileObj->setCategoryConflict(getConflictSkippedBinaryComparison(*fileObj));
+            else
+                filesToCompareBytewise.push_back(fileObj);
+        }
 
     const size_t objectsTotal = filesToCompareBytewise.size();
 
@@ -440,7 +452,7 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
     for (FilePair* fileObj : filesToCompareBytewise)
         bytesTotal += fileObj->getFileSize<LEFT_SIDE>();
 
-    callback_.initNewPhase(static_cast<int>(objectsTotal),
+    callback_.initNewPhase(static_cast<int>(objectsTotal), //may throw
                            to<Int64>(bytesTotal),
                            ProcessCallback::PHASE_COMPARING_CONTENT);
 
@@ -631,13 +643,13 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
 }
 
 //mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
-void removeFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
+void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filterProc)
 {
     //process subdirs recursively
     for (DirPair& dirObj : hierObj.refSubDirs())
     {
         dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), nullptr)); //subObjMightMatch is always true in this context!
-        removeFilteredDirs(dirObj, filterProc);
+        stripExcludedDirectories(dirObj, filterProc);
     }
 
     //remove superfluous directories -> note: this does not invalidate "std::vector<FilePair*>& undefinedFiles", since we delete folders only
@@ -703,10 +715,11 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
     //PERF_STOP;
 
     //##################### in/exclude rows according to filtering #####################
+    //NOTE: we need to finish excluding rows in this method, BEFORE binary comparison is applied on the non-excluded rows only!
 
     //attention: some excluded directories are still in the comparison result! (see include filter handling!)
     if (!fpCfg.filter.nameFilter->isNull())
-        removeFilteredDirs(*output, *fpCfg.filter.nameFilter); //mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
+        stripExcludedDirectories(*output, *fpCfg.filter.nameFilter); //mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
 
     //apply soft filtering (hard filter already applied during traversal!)
     addSoftFiltering(*output, fpCfg.filter.timeSizeFilter);
@@ -759,7 +772,7 @@ void zen::compare(int fileTimeTolerance,
     callback.reportInfo(_("Starting comparison")); //indicator at the very beginning of the log to make sense of "total time"
 
     //init process: keep at beginning so that all gui elements are initialized properly
-    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //it's not known how many files will be scanned => -1 objects
+    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //may throw; it's not known how many files will be scanned => -1 objects
 
     //-------------------some basic checks:------------------------------------------
 

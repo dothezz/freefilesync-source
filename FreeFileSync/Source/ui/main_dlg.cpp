@@ -21,7 +21,6 @@
 #include <wx+/bitmap_button.h>
 #include <wx+/app_main.h>
 #include <wx+/toggle_button.h>
-#include <wx+/mouse_move_dlg.h>
 #include <wx+/no_flicker.h>
 #include <wx+/rtl.h>
 #include <wx+/font_size.h>
@@ -37,7 +36,6 @@
 #include "batch_config.h"
 #include "triple_splitter.h"
 #include "app_icon.h"
-//#include "config_history.h"
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
@@ -47,7 +45,10 @@
 #include "../lib/lock_holder.h"
 #include "../lib/localization.h"
 
-#ifdef ZEN_MAC
+#ifdef ZEN_WIN
+#include <wx+/mouse_move_dlg.h>
+
+#elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -101,7 +102,7 @@ public:
         using namespace xmlAccess;
         try
         {
-            switch (getXmlType(utfCvrtTo<Zstring>(filename))) //throw FfsXmlError
+            switch (getXmlType(utfCvrtTo<Zstring>(filename))) //throw FileError
                 {
                     case XML_TYPE_GUI:
                     case XML_TYPE_BATCH:
@@ -111,7 +112,7 @@ public:
                         break;
                 }
             }
-            catch (const FfsXmlError&) {}
+            catch (const FileError&) {}
 
             return false;
         }))
@@ -336,9 +337,8 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
     minSize.x = std::max(minSize.x, 180);
 
     btn.SetMinSize(minSize);
-    btn.SetBitmapLabel(wxBitmap(dynImage));
-    //SetLabel() calls confuse wxBitmapButton in the disabled state and it won't show the image! workaround:
-    btn.SetBitmapDisabled(wxBitmap(dynImage.ConvertToDisabled()));
+
+    setImage(btn, wxBitmap(dynImage));
 }
 
 //##################################################################################################################################
@@ -347,18 +347,19 @@ xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on erro
 {
     using namespace xmlAccess;
     XmlGlobalSettings globalCfg;
-    try
-    {
-        if (fileExists(getGlobalConfigFile()))
-            readConfig(globalCfg); //throw FfsXmlError
-        //else: globalCfg already has default values
-    }
-    catch (const FfsXmlError& e)
-    {
-        if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
+
+    if (fileExists(getGlobalConfigFile())) //else: globalCfg already has default values
+        try
+        {
+            std::wstring warningMsg;
+            readConfig(getGlobalConfigFile(), globalCfg, warningMsg); //throw FileError
+
+            assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+        }
+        catch (const FileError& e)
+        {
             showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
-        assert(false);
-    }
+        }
     return globalCfg;
 }
 }
@@ -375,10 +376,9 @@ void MainDialog::create()
     //check existence of all files in parallel:
     RunUntilFirstHit<NullType> findFirstMissing;
 
-    std::for_each(filenames.begin(), filenames.end(), [&](const Zstring& filename)
-    {
-        findFirstMissing.addJob([=] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
-    });
+    for (const Zstring& filename : filenames)
+        findFirstMissing.addJob([filename] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
+
     //potentially slow network access: give all checks 500ms to finish
     const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
                                !findFirstMissing.get(); //no missing
@@ -406,15 +406,16 @@ void MainDialog::create()
     else
         try
         {
-            readAnyConfig(filenames, guiCfg); //throw FfsXmlError
-        }
-        catch (const FfsXmlError& e)
-        {
-            if (e.getSeverity() == FfsXmlError::WARNING)
-                showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
+            std::wstring warningMsg;
+            readAnyConfig(filenames, guiCfg, warningMsg); //throw FileError
+
+            if (!warningMsg.empty())
+                showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
             //what about simulating changed config on parsing errors????
-            else
-                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+        }
+        catch (const FileError& e)
+        {
+            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         }
 
     //------------------------------------------------------------------------------------------
@@ -763,21 +764,23 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
 MainDialog::~MainDialog()
 {
+    using namespace xmlAccess;
+
     try //save "GlobalSettings.xml"
     {
-        xmlAccess::writeConfig(getGlobalCfgBeforeExit()); //throw FfsXmlError
+        writeConfig(getGlobalCfgBeforeExit(), getGlobalConfigFile()); //throw FileError
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
     }
 
     try //save "LastRun.ffs_gui"
     {
-        xmlAccess::writeConfig(getConfig(), lastRunConfigName()); //throw FfsXmlError
+        writeConfig(getConfig(), lastRunConfigName()); //throw FileError
     }
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
-    catch (const xmlAccess::FfsXmlError&) {}
+    catch (const FileError&) {}
 
     //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
     wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
@@ -800,11 +803,13 @@ MainDialog::~MainDialog()
 
 void MainDialog::onQueryEndSession()
 {
-    try { xmlAccess::writeConfig(getGlobalCfgBeforeExit()); }
-    catch (const xmlAccess::FfsXmlError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
+    using namespace xmlAccess;
 
-    try { xmlAccess::writeConfig(getConfig(), lastRunConfigName()); }
-    catch (const xmlAccess::FfsXmlError&) {}
+    try { writeConfig(getGlobalCfgBeforeExit(), getGlobalConfigFile()); }
+    catch (const FileError&) {}   //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
+
+    try { writeConfig(getConfig(), lastRunConfigName()); }
+    catch (const FileError&) {}
 }
 
 
@@ -1078,21 +1083,21 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
         if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(row))
         {
             if (auto root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-			{
-				//selecting root means "select everything", *ignoring* current view filter!
-				BaseDirPair& baseDir = root->baseDirObj_;
+            {
+                //selecting root means "select everything", *ignoring* current view filter!
+                BaseDirPair& baseDir = root->baseDirObj_;
 
                 std::vector<FileSystemObject*> dirsFilesAndLinks;
 
                 for (FileSystemObject& fsObj : baseDir.refSubDirs()) //no need to explicitly add child elements!
-                        dirsFilesAndLinks.push_back(&fsObj);
+                    dirsFilesAndLinks.push_back(&fsObj);
                 for (FileSystemObject& fsObj : baseDir.refSubFiles())
-                        dirsFilesAndLinks.push_back(&fsObj);
+                    dirsFilesAndLinks.push_back(&fsObj);
                 for (FileSystemObject& fsObj : baseDir.refSubLinks())
-                        dirsFilesAndLinks.push_back(&fsObj);
+                    dirsFilesAndLinks.push_back(&fsObj);
 
-				vector_append(output, dirsFilesAndLinks);
-			}
+                vector_append(output, dirsFilesAndLinks);
+            }
             else if (auto dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                 output.push_back(&(dir->dirObj_));
             else if (auto file = dynamic_cast<const TreeView::FilesNode*>(node.get()))
@@ -1523,6 +1528,7 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_menubar1->EnableTop(1, false);
     m_menubar1->EnableTop(2, false);
     m_bpButtonCmpConfig  ->Disable();
+    m_bpButtonFilter     ->Disable();
     m_bpButtonSyncConfig ->Disable();
     m_buttonSync         ->Disable();
     m_panelDirectoryPairs->Disable();
@@ -1557,6 +1563,7 @@ void MainDialog::enableAllElements()
     m_menubar1->EnableTop(1, true);
     m_menubar1->EnableTop(2, true);
     m_bpButtonCmpConfig  ->Enable();
+    m_bpButtonFilter     ->Enable();
     m_bpButtonSyncConfig ->Enable();
     m_buttonSync         ->Enable();
     m_panelDirectoryPairs->Enable();
@@ -1697,9 +1704,9 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
             {
                 const std::vector<FileSystemObject*>& selection = getTreeSelection();
                 if (!selection.empty())
-                    setFilterManually(selection, m_bpButtonShowExcluded->isActive() && !selection[0]->isActive()); 
-				//always exclude items if "m_bpButtonShowExcluded is unchecked" => yes, it's possible to have already unchecked items in selection, so we need to overwrite: 
-				//e.g. select root node while the first item returned is not shown on grid!
+                    setFilterManually(selection, m_bpButtonShowExcluded->isActive() && !selection[0]->isActive());
+                //always exclude items if "m_bpButtonShowExcluded is unchecked" => yes, it's possible to have already unchecked items in selection, so we need to overwrite:
+                //e.g. select root node while the first item returned is not shown on grid!
             }
             return;
 
@@ -2552,19 +2559,26 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filenames)
         }
         else //insert
         {
+            const wxString lastSessionLabel = L"<" + _("Last session") + L">";
+
             wxString label;
             unsigned int newPos = 0;
 
             if (EqualFilename()(filename, lastRunConfigName()))
-                label = L"<" + _("Last session") + L">";
+                label = lastSessionLabel;
             else
             {
                 //workaround wxWidgets 2.9 bug on GTK screwing up the client data if the list box is sorted:
                 label = getFormattedHistoryElement(filename);
+
                 //"linear-time insertion sort":
                 for (; newPos < m_listBoxHistory->GetCount(); ++newPos)
-                    if (label.CmpNoCase(m_listBoxHistory->GetString(newPos)) < 0)
-                        break;
+                {
+                    const wxString& itemLabel = m_listBoxHistory->GetString(newPos);
+                    if (itemLabel != lastSessionLabel) //last session label should always be at top position!
+                        if (label.CmpNoCase(itemLabel) < 0)
+                            break;
+                }
             }
 
             assert(!m_listBoxHistory->IsSorted());
@@ -2686,7 +2700,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     else
         try
         {
-            switch (getXmlType(activeCfgFilename)) //throw FfsXmlError
+            switch (getXmlType(activeCfgFilename)) //throw FileError
             {
                 case XML_TYPE_GUI:
                     trySaveConfig(&activeCfgFilename);
@@ -2701,7 +2715,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
                     break;
             }
         }
-        catch (const FfsXmlError& e)
+        catch (const FileError& e)
         {
             showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         }
@@ -2752,13 +2766,13 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
 
     try
     {
-        xmlAccess::writeConfig(guiCfg, targetFilename); //throw FfsXmlError
+        xmlAccess::writeConfig(guiCfg, targetFilename); //throw FileError
         setLastUsedConfig(targetFilename, guiCfg);
 
         flashStatusInformation(_("Configuration saved"));
         return true;
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         return false;
@@ -2783,7 +2797,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
         if (batchFileToUpdate)
             referenceBatchFile = *batchFileToUpdate;
         else if (!activeCfgFilename.empty())
-            if (getXmlType(activeCfgFilename) == XML_TYPE_BATCH) //throw FfsXmlError
+            if (getXmlType(activeCfgFilename) == XML_TYPE_BATCH) //throw FileError
                 referenceBatchFile = activeCfgFilename;
 
         if (referenceBatchFile.empty())
@@ -2791,11 +2805,17 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
         else
         {
             XmlBatchConfig referenceBatchCfg;
-            readConfig(referenceBatchFile, referenceBatchCfg); //throw FfsXmlError
+
+            std::wstring warningMsg;
+            readConfig(referenceBatchFile, referenceBatchCfg, warningMsg); //throw FileError
+
+            if (!warningMsg.empty())
+                throw FileError(warningMsg); //error out on warnings, too!
+
             batchCfg = convertGuiToBatch(guiCfg, &referenceBatchCfg);
         }
     }
-    catch (const FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         return false;
@@ -2803,10 +2823,10 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
     Zstring targetFilename;
     if (batchFileToUpdate)
-	{
-		targetFilename = *batchFileToUpdate;
-		assert(endsWith(targetFilename, Zstr(".ffs_batch")));
-	}
+    {
+        targetFilename = *batchFileToUpdate;
+        assert(endsWith(targetFilename, Zstr(".ffs_batch")));
+    }
     else
     {
         //let user update batch config: this should change batch-exclusive settings only, else the "setLastUsedConfig" below would be somewhat of a lie
@@ -2835,13 +2855,13 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
     try
     {
-        writeConfig(batchCfg, targetFilename); //throw FfsXmlError
+        writeConfig(batchCfg, targetFilename); //throw FileError
 
         setLastUsedConfig(targetFilename, guiCfg); //[!] behave as if we had saved guiCfg
         flashStatusInformation(_("Configuration saved"));
         return true;
     }
-    catch (const FfsXmlError& e)
+    catch (const FileError& e)
     {
         showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         return false;
@@ -2872,7 +2892,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
                         try
                         {
-                            switch (getXmlType(activeCfgFilename)) //throw FfsXmlError
+                            switch (getXmlType(activeCfgFilename)) //throw FileError
                             {
                                 case XML_TYPE_GUI:
                                     return trySaveConfig(&activeCfgFilename);
@@ -2885,7 +2905,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                                     return false;
                             }
                         }
-                        catch (const FfsXmlError& e)
+                        catch (const FileError& e)
                         {
                             showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
                             return false;
@@ -3017,24 +3037,26 @@ bool MainDialog::loadConfiguration(const std::vector<Zstring>& filenames)
     try
     {
         //allow reading batch configurations also
-        xmlAccess::readAnyConfig(filenames, newGuiCfg); //throw FfsXmlError
+        std::wstring warningMsg;
+        xmlAccess::readAnyConfig(filenames, newGuiCfg, warningMsg); //throw FileError
 
-        setConfig(newGuiCfg, filenames);
-        //flashStatusInformation(("Configuration loaded")); -> irrelevant!?
-        return true;
-    }
-    catch (const xmlAccess::FfsXmlError& e)
-    {
-        if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
+        if (!warningMsg.empty())
         {
-            showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(e.toString()));
+            showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
             setConfig(newGuiCfg, filenames);
             setLastUsedConfig(filenames, xmlAccess::XmlGuiConfig()); //simulate changed config due to parsing errors
+            return false;
         }
-        else
-            showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+    }
+    catch (const FileError& e)
+    {
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         return false;
     }
+
+    setConfig(newGuiCfg, filenames);
+    //flashStatusInformation(("Configuration loaded")); -> irrelevant!?
+    return true;
 }
 
 
@@ -3541,31 +3563,35 @@ void MainDialog::clearGrid()
 
 void MainDialog::updateStatistics()
 {
-    //update preview of item count and bytes to be transferred:
-    const SyncStatistics st(folderCmp);
-
-    setText(*m_staticTextData, filesizeToShortString(st.getDataToProcess()));
-    if (st.getDataToProcess() == 0)
-        m_bitmapData->SetBitmap(greyScale(getResourceImage(L"data")));
-    else
-        m_bitmapData->SetBitmap(getResourceImage(L"data"));
-
-    auto setValue = [](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
+    auto setValue = [](wxStaticText& txtControl, bool isZeroValue, const wxString& valueAsString, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
     {
-        setText(txtControl, toGuiString(value));
+        wxFont fnt = txtControl.GetFont();
+        fnt.SetWeight(isZeroValue ? wxFONTWEIGHT_NORMAL : wxFONTWEIGHT_BOLD);
+        txtControl.SetFont(fnt);
 
-        if (value == 0)
+        setText(txtControl, valueAsString);
+
+        if (isZeroValue)
             bmpControl.SetBitmap(greyScale(mirrorIfRtl(getResourceImage(bmpName))));
         else
             bmpControl.SetBitmap(mirrorIfRtl(getResourceImage(bmpName)));
     };
 
-    setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
-    setValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
-    setValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
-    setValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
-    setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
-    setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
+    auto setIntValue = [&setValue](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
+    {
+        setValue(txtControl, value == 0, toGuiString(value), bmpControl, bmpName);
+    };
+
+    //update preview of item count and bytes to be transferred:
+    const SyncStatistics st(folderCmp);
+
+    setValue(*m_staticTextData, st.getDataToProcess() == 0, filesizeToShortString(st.getDataToProcess()), *m_bitmapData,  L"data");
+    setIntValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
+    setIntValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
+    setIntValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
+    setIntValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
+    setIntValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
+    setIntValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
 
     m_panelStatistics->Layout();
     m_panelStatistics->Refresh(); //fix small mess up on RTL layout

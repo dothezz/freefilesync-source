@@ -74,7 +74,13 @@ inline
 void setImage(wxBitmapButton& button, const wxBitmap& bmp)
 {
     if (!isEqual(button.GetBitmapLabel(), bmp))
+    {
         button.SetBitmapLabel(bmp);
+
+        //wxWidgets excels at screwing up consistently once again:
+        //the first call to SetBitmapLabel() *implicitly* sets the disabled bitmap, too, subsequent calls, DON'T!
+        button.SetBitmapDisabled(bmp.ConvertToDisabled()); //inefficiency: wxBitmap::ConvertToDisabled() implicitly converts to wxImage!
+    }
 }
 }
 

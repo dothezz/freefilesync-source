@@ -108,21 +108,21 @@ void ExecFinishedBox::addItemHistory()
         trim(command);
 
         if (command == separationLine || //do not add sep. line
-                       command == cmdTxtCloseProgressDlg || //do not add special command
-                       command.empty())
-					   return;
+            command == cmdTxtCloseProgressDlg || //do not add special command
+            command.empty())
+            return;
 
         //do not add built-in commands to history
-            for (const auto& item : defaultCommands)
-                if (command == item.first ||
-                    command == item.second)
-					return;
+        for (const auto& item : defaultCommands)
+            if (command == item.first ||
+                command == item.second)
+                return;
 
-            for (const std::wstring& item : *history_)
-				if (command == item)
-					return;
+        for (const std::wstring& item : *history_)
+            if (command == item)
+                return;
 
-            history_->insert(history_->begin(), command);
+        history_->insert(history_->begin(), command);
 
         if (history_->size() > historyMax_)
             history_->resize(historyMax_);

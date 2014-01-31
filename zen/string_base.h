@@ -171,7 +171,7 @@ private:
         Descriptor(int rc, size_t len, size_t cap) :
             length  (static_cast<std::uint32_t>(len)),
             capacity(static_cast<std::uint32_t>(cap)),
-			refCount(rc) { assert_static(ATOMIC_INT_LOCK_FREE == 2); } //2: "the types are always lock-free"
+            refCount(rc) { assert_static(ATOMIC_INT_LOCK_FREE == 2); } //2: "the types are always lock-free"
 
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination

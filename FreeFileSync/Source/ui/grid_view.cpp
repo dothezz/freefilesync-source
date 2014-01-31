@@ -14,7 +14,7 @@ using namespace zen;
 
 
 template <class StatusResult>
-void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
+void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
 {
     struct GetValues : public FSObjectVisitor
     {
@@ -176,7 +176,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool showExcluded, //maps so
                 break;
         }
         //calculate total number of bytes for each side
-        getNumbers(fsObj, output);
+        addNumbers(fsObj, output);
         return true;
     });
 
@@ -270,7 +270,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //map
         }
 
         //calculate total number of bytes for each side
-        getNumbers(fsObj, output);
+        addNumbers(fsObj, output);
         return true;
     });
 

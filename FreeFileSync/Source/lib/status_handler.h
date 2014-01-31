@@ -60,7 +60,7 @@ public:
 
 protected:
     //implement parts of ProcessCallback
-    virtual void initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseId)
+    virtual void initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseId) //may throw
     {
         currentPhase_ = phaseId;
         refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);

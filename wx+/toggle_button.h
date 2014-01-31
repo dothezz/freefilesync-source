@@ -8,6 +8,7 @@
 #define TOGGLEBUTTON_H_INCLUDED
 
 #include <wx/bmpbuttn.h>
+#include <wx+/bitmap_button.h>
 
 class ToggleButton : public wxBitmapButton
 {
@@ -68,7 +69,7 @@ inline
 void ToggleButton::setActive(bool value)
 {
     active = value;
-    SetBitmapLabel(active ? activeBmp_ : inactiveBmp_);
+    zen::setImage(*this, active ? activeBmp_ : inactiveBmp_);
 }
 
 #endif // TOGGLEBUTTON_H_INCLUDED

@@ -4,14 +4,12 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef XMLPROCESSING_H_INCLUDED
-#define XMLPROCESSING_H_INCLUDED
+#ifndef XMLPROCESSING_H_0813748158321813490
+#define XMLPROCESSING_H_0813748158321813490
 
 #include <vector>
-//#include <wx/string.h>
+#include <zen/xml_io.h>
 #include <zen/zstring.h>
-#include "../lib/xml_base.h"
-
 
 namespace xmlAccess
 {
@@ -23,8 +21,14 @@ struct XmlRealConfig
     unsigned int delay;
 };
 
-void readRealConfig(const Zstring& filename, XmlRealConfig& config);        //throw FfsXmlError
-void writeRealConfig(const XmlRealConfig& config, const Zstring& filename); //throw FfsXmlError
+void readConfig(const Zstring& filename, XmlRealConfig& config, std::wstring& warningMsg); //throw FileError
+void writeConfig(const XmlRealConfig& config, const Zstring& filename); //throw FileError
+
+
+//reuse (some of) FreeFileSync's xml files
+void readRealOrBatchConfig(const Zstring& filename, xmlAccess::XmlRealConfig& config, std::wstring& warningMsg); //throw FileError
+
+int getProgramLanguage();
 }
 
-#endif // XMLPROCESSING_H_INCLUDED
+#endif //XMLPROCESSING_H_0813748158321813490

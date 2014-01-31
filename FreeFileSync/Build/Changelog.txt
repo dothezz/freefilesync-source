@@ -1,5 +1,21 @@
-FreeFileSync 6.1
-----------------
+FreeFileSync 6.2 [2014-02-01]
+-----------------------------
+New synchronization progress graph
+Skip binary comparison for files excluded via time span or size
+Fixed configuration panel ordering for entries starting with numbers
+Filled gap after last grid column to cover full window width
+Workaround wxWidgets image button bug showing obsolete disabled state
+Refined file existence checks to handle restricted permissions
+Disable file filter button during comparison
+Fixed mouse wheel grid scrolling for GTK2 (Linux)
+Avoid dummy texts during progress dialog init (OS X)
+Translated external application default commands in global settings
+Support cancel while encoding extended time information
+Highlight non-zero synchronization statistics
+
+
+FreeFileSync 6.1 [2014-01-01]
+-----------------------------
 Released RealtimeSync for OS X
 Handle errors loading reference batch config
 Disable user mode exception swallowing for Windows 7 SP1
