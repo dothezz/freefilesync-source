@@ -1880,21 +1880,6 @@ void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring&
 
 //###########################################################################################
 
-#ifdef ZEN_WIN
-//recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
-StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, ProcessCallback& procCallback)
-{
-    procCallback.reportStatus(replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(dirname), false));
-
-    auto ft = async([=] { return recycleBinStatus(dirname); });
-
-    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
-        procCallback.requestUiRefresh(); //may throw!
-    return ft.get();
-}
-#endif
-
-
 /*
 struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
 {
@@ -2171,7 +2156,17 @@ void zen::synchronize(const TimeComp& timeStamp,
         {
             if (!baseDirPf.empty()) //should be
                 if (baseDirHasRecycler.find(baseDirPf) == baseDirHasRecycler.end()) //perf: avoid duplicate checks!
-                    baseDirHasRecycler[baseDirPf] = recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS;
+                {
+                    callback.reportStatus(replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(baseDirPf), false));
+
+                    bool recExists = false;
+                    tryReportingError([&]
+                    {
+                        recExists = recycleBinExists(baseDirPf, [&] { callback.requestUiRefresh(); /*may throw*/ }); //throw FileError
+                    }, callback); //show error dialog if necessary
+
+                    baseDirHasRecycler[baseDirPf] = recExists;
+                }
         };
 
         if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)

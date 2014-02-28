@@ -22,20 +22,19 @@ struct ReturnSyncConfig
     };
 };
 
-struct ExecWhenFinishedCfg
+struct OnCompletionCfg
 {
-    std::wstring* command;              //*must* be bound!
-    std::vector<std::wstring>* history; //
+    Zstring* command;              //*must* be bound!
+    std::vector<Zstring>* history; //
     size_t historyMax;
 };
-
 
 ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
                                                   CompareVariant compareVar,
                                                   SyncConfig&    syncCfg,
                                                   const wxString& title,
                                                   xmlAccess::OnGuiError* handleError,     //
-                                                  ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
+                                                  OnCompletionCfg* onCompletion); //optional input parameter
 }
 
 #endif // SYNCCONFIG_H_INCLUDED

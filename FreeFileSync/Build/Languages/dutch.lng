@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Grootte:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Vergelijking voor uitgesloten bestanden %x is overgeslagen.</target>
+
 <source>Items differ in attributes only</source>
 <target>Items verschillen alleen in attributen</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x items per seconde</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Configuratiebestand %x alleen deels geladen.</target>
-
 <source>Show in Explorer</source>
 <target>Toon in Verkenner</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Stop aangegeven: Wachten tot de huidige handeling klaar is...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Niet mogelijk om een timestamp voor versiebeheer te maken:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Kan de volgende XML elementen niet lezen:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Aanmaken van timestamp voor versiebeheer mislukt:</target>
 
 <source>&Open...</source>
 <target>&Open...</target>
@@ -558,6 +555,9 @@ De opdracht word geactiveerd als:
 <source>Saving log file %x...</source>
 <target>Opslaan van logbestand %x...</target>
 
+<source>Stopped</source>
+<target>Gestopt</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>U kunt naar het hoofdvenster overschakelen om dit probleem op te lossen.</target>
 
@@ -650,21 +650,6 @@ De opdracht word geactiveerd als:
 
 <source>Drag && drop</source>
 <target>Drag en drop</target>
-
-<source>Close progress dialog</source>
-<target>Sluit voortgangsvenster</target>
-
-<source>Standby</source>
-<target>Stand-by</target>
-
-<source>Log off</source>
-<target>Afmelden</target>
-
-<source>Shut down</source>
-<target>Afsluiten</target>
-
-<source>Hibernate</source>
-<target>Slaapstand</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternatieve vergelijkings instellingen</target>
@@ -771,6 +756,15 @@ De opdracht word geactiveerd als:
 <source>Save as batch job</source>
 <target>Opslaan als batch opdracht</target>
 
+<source>View type:</source>
+<target>Laat type zien:</target>
+
+<source>Select view:</source>
+<target>Selecteer uiterlijk:</target>
+
+<source>Statistics:</source>
+<target>Statistieken:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Aantal bestanden en mappen die zullen worden aangemaakt</target>
 
@@ -872,14 +866,14 @@ De opdracht word geactiveerd als:
 <source>On completion:</source>
 <target>Bij voltooiing:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detecteer synchronisatierichtingen met behulp van databasebestanden</target>
+
 <source>Start synchronization now?</source>
 <target>Start de synchronisatie nu?</target>
 
 <source>Variant:</source>
 <target>Variant:</target>
-
-<source>Statistics</source>
-<target>Statistieken</target>
 
 <source>&Don't show this dialog again</source>
 <target>Laat deze dialoog &niet meer zien</target>
@@ -917,8 +911,8 @@ De opdracht word geactiveerd als:
 <source>Stop synchronization at first error</source>
 <target>Stop synchronisatie bij eerste foutmelding</target>
 
-<source>Show progress dialog</source>
-<target>Toon voortgangsdialoogvenster</target>
+<source>Run minimized</source>
+<target>Draai geminimaliseerd</target>
 
 <source>Save log:</source>
 <target>Bewaar logbestand:</target>
@@ -930,16 +924,10 @@ De opdracht word geactiveerd als:
 <target>Limiteer maximaal aantal log bestanden</target>
 
 <source>How can I schedule a batch job?</source>
-<target>Hoe kan ik een batch taak inroosteren?</target>
+<target>Hoe kan ik een batch opdracht inroosteren?</target>
 
 <source>&Recycle bin</source>
 <target>&Prullebak</target>
-
-<source>Delete on both sides</source>
-<target>Verwijder aan beide zijdes</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Verwijder aan beide zijdes ook al is het bestand maar aan één zijde geselecteerd</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selecteer filter regels om bepaalde bestanden uit te sluiten van synchronisatie. Geef bestandspaden in die relatief zijn aan hun corresponderende folderparen.</target>
@@ -962,8 +950,8 @@ De opdracht word geactiveerd als:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Clear</source>
-<target>&Leegmaken</target>
+<source>&Reset</source>
+<target>&Reset</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>De volgende instellingen worden gebruikt voor alle synchronisaties.</target>
@@ -1061,8 +1049,8 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Find</source>
 <target>Vind</target>
 
-<source>Select View</source>
-<target>Selecteer zichtbaarheid</target>
+<source>View Settings</source>
+<target>Instellingen</target>
 
 <source>Overview</source>
 <target>Overzicht</target>
@@ -1145,11 +1133,11 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Exclude via filter:</source>
 <target>Sluit via filter uit:</target>
 
-<source>Exclude temporarily</source>
-<target>Tijdelijk uitsluiten</target>
-
 <source>Include temporarily</source>
 <target>Tijdelijk opnemen</target>
+
+<source>Exclude temporarily</source>
+<target>Tijdelijk uitsluiten</target>
 
 <source>Delete</source>
 <target>Verwijderen</target>
@@ -1202,6 +1190,9 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Do&n't save</source>
 <target>&Niet opslaan</target>
 
+<source>Delete selected configurations</source>
+<target>Verwijder geselecteerde configuraties</target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1253,8 +1244,8 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Set as default</source>
 <target>Instellen als standaard</target>
 
-<source>All folders are in sync</source>
-<target>Alle mappen zijn gesynchroniseerd</target>
+<source>All files are in sync</source>
+<target>Alle bestanden zijn gesynchroniseerd</target>
 
 <source>Synchronization Settings</source>
 <target>Synchronisatie instellingen</target>
@@ -1273,6 +1264,21 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 
 <source>Searching for program updates...</source>
 <target>Bezig met zoeken naar programma updates...</target>
+
+<source>Close progress dialog</source>
+<target>Sluit voortgangsvenster</target>
+
+<source>Standby</source>
+<target>Stand-by</target>
+
+<source>Log off</source>
+<target>Afmelden</target>
+
+<source>Shut down</source>
+<target>Afsluiten</target>
+
+<source>Hibernate</source>
+<target>Slaapstand</target>
 
 <source>Scanning...</source>
 <target>Doorzoekt...</target>
@@ -1295,14 +1301,14 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Initializing...</source>
 <target>Initialiseren...</target>
 
-<source>Stopped</source>
-<target>Gestopt</target>
-
 <source>Completed</source>
 <target>Voltooid</target>
 
 <source>&Continue</source>
 <target>&Doorgaan</target>
+
+<source>Progress</source>
+<target>Voortgang</target>
 
 <source>Log</source>
 <target>Log</target>
@@ -1394,8 +1400,8 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Time stamp</source>
 <target>Tijdstempel</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Voeg een timestamp aan elke bestandsnaam toe</target>
+<source>Append a time stamp to each file name</source>
+<target>Voeg een timestamp toe aan elke bestandsnaam</target>
 
 <source>File</source>
 <target>Bestand</target>
@@ -1520,9 +1526,18 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Kan %x niet verplaatsen naar de prullenbak.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Controleren van prullenbak voor map %x mislukt.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Kan pad voor %x niet vaststellen.</target>
 
 <source>Error Code %x:</source>
 <target>Foutcode %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Kan de volgende XML elementen niet lezen:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Configuratiebestand %x alleen deels geladen.</target>
 

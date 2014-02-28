@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Taille :</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>La comparaison du contenu a été ignorée pour les fichiers exclus %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Seuls les attributs des éléments diffèrent</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x éléments/sec</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Le fichier de configuration %x a été chargé seulement partiellement.</target>
-
 <source>Show in Explorer</source>
 <target>Montrer dans l'explorateur</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Arrêt demandé : En attente de la fin de l'opération en cours...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Impossible de créer l'horodatage des versions :</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Impossible de lire les données XML suivantes :</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Impossible de générer l'horodatage pour la gestion des versions.</target>
 
 <source>&Open...</source>
 <target>&Ouvrir...</target>
@@ -558,6 +555,9 @@ La commande est déclenchée si :
 <source>Saving log file %x...</source>
 <target>Enregistrement du fichier log %x...</target>
 
+<source>Stopped</source>
+<target>Arrêté</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Vous pouvez basculer vers la fenêtre principale de FreeFileSync pour résoudre ce problème.</target>
 
@@ -650,21 +650,6 @@ La commande est déclenchée si :
 
 <source>Drag && drop</source>
 <target>Glisser && Déposer</target>
-
-<source>Close progress dialog</source>
-<target>Fermer la fenêtre de progression</target>
-
-<source>Standby</source>
-<target>Pause</target>
-
-<source>Log off</source>
-<target>Quitter</target>
-
-<source>Shut down</source>
-<target>Arrêter</target>
-
-<source>Hibernate</source>
-<target>Figer</target>
 
 <source>Alternate comparison settings</source>
 <target>configuration distincte de la comparaison</target>
@@ -771,6 +756,15 @@ La commande est déclenchée si :
 <source>Save as batch job</source>
 <target>Enrgistrer en temps que fichier batch</target>
 
+<source>View type:</source>
+<target>Type de vue :</target>
+
+<source>Select view:</source>
+<target>Choisir la vue :</target>
+
+<source>Statistics:</source>
+<target>Statistiques :</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Nombre de fichiers et de dossiers qui seront créés</target>
 
@@ -872,14 +866,14 @@ La commande est déclenchée si :
 <source>On completion:</source>
 <target>A la fin :</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Détection du sens de la synchronisation à l'aide de la base de données</target>
+
 <source>Start synchronization now?</source>
 <target>Démarrer la synchronisation maintenant ?</target>
 
 <source>Variant:</source>
 <target>Variante :</target>
-
-<source>Statistics</source>
-<target>Statistiques</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Ne plus afficher cette boîte de dialogue</target>
@@ -917,8 +911,8 @@ La commande est déclenchée si :
 <source>Stop synchronization at first error</source>
 <target>Arrêter la synchronisation à la première erreur</target>
 
-<source>Show progress dialog</source>
-<target>Montrer la fenêtre de progression</target>
+<source>Run minimized</source>
+<target>Exécution fenêtre réduite</target>
 
 <source>Save log:</source>
 <target>Sauvegarder le fichier log :</target>
@@ -934,12 +928,6 @@ La commande est déclenchée si :
 
 <source>&Recycle bin</source>
 <target>&Corbeille</target>
-
-<source>Delete on both sides</source>
-<target>Suppression des deux côtés</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Suppression des deux côtés même si le fichier n'est sélectionné que d'un seul côté</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Sélectionnez les règles de filtrage pour exclure certains fichiers de la synchronisation. Entrez les chemins des fichiers par rapport à leur paire de dossiers.</target>
@@ -962,8 +950,8 @@ La commande est déclenchée si :
 <source>Maximum:</source>
 <target>Maximum :</target>
 
-<source>&Clear</source>
-<target>&Effacer</target>
+<source>&Reset</source>
+<target>&Réinitialiser</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Les paramètres suivants sont utilisés lors de toutes les synchronisations.</target>
@@ -1061,8 +1049,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Find</source>
 <target>Rechercher</target>
 
-<source>Select View</source>
-<target>Sélection de l'Affichage</target>
+<source>View Settings</source>
+<target>Configuration de la vue</target>
 
 <source>Overview</source>
 <target>Présentation</target>
@@ -1145,11 +1133,11 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Exclude via filter:</source>
 <target>Exclure à l'aide du filtre :</target>
 
-<source>Exclude temporarily</source>
-<target>Exclure temporairement</target>
-
 <source>Include temporarily</source>
 <target>Inclure temporairement</target>
+
+<source>Exclude temporarily</source>
+<target>Exclure temporairement</target>
 
 <source>Delete</source>
 <target>Supprimer</target>
@@ -1202,6 +1190,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Do&n't save</source>
 <target>&Ne pas Sauvegarder</target>
 
+<source>Delete selected configurations</source>
+<target>Supprimer les configurations sélectionnées</target>
+
 <source>Filter</source>
 <target>Filtre</target>
 
@@ -1253,8 +1244,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Set as default</source>
 <target>Définir par défaut</target>
 
-<source>All folders are in sync</source>
-<target>Tous les dossiers sont synchronisés</target>
+<source>All files are in sync</source>
+<target>Tous les fichiers sont concernés</target>
 
 <source>Synchronization Settings</source>
 <target>Configuration de la Synchronisation</target>
@@ -1273,6 +1264,21 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>Searching for program updates...</source>
 <target>Recherche de mises à jour ...</target>
+
+<source>Close progress dialog</source>
+<target>Fermer la fenêtre de progression</target>
+
+<source>Standby</source>
+<target>Pause</target>
+
+<source>Log off</source>
+<target>Quitter</target>
+
+<source>Shut down</source>
+<target>Arrêter</target>
+
+<source>Hibernate</source>
+<target>Figer</target>
 
 <source>Scanning...</source>
 <target>Lecture en cours...</target>
@@ -1295,14 +1301,14 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Initializing...</source>
 <target>Initialisation...</target>
 
-<source>Stopped</source>
-<target>Arrêté</target>
-
 <source>Completed</source>
 <target>Terminé</target>
 
 <source>&Continue</source>
 <target>&Continuer</target>
+
+<source>Progress</source>
+<target>Progression</target>
 
 <source>Log</source>
 <target>Log</target>
@@ -1394,8 +1400,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Time stamp</source>
 <target>Horodatage</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Ajouter un horodatage à chaque fichier</target>
+<source>Append a time stamp to each file name</source>
+<target>Ajouter un horodatage à chaque nom de fichier</target>
 
 <source>File</source>
 <target>Fichier</target>
@@ -1520,9 +1526,18 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Impossible de déplacer %x dans la Corbeille.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Echec de la vérification de la corbeille pour le dossier %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Impossible de déterminer le chemin pour %x.</target>
 
 <source>Error Code %x:</source>
 <target>Code erreur %x :</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Impossible de lire les données XML suivantes :</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Le fichier de configuration %x a été chargé seulement partiellement.</target>
 

@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Tamanho:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Comparação por conteúdo foi ignorada para o ficheiro excluído %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Itens diferem apenas nos atributos</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x itens/seg</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Ficheiro de configuração %x carregado parcialmente.</target>
-
 <source>Show in Explorer</source>
 <target>Mostrar no Explorer</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Paragem solicitada: À espera que termine a operação actual...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Não é possível criar timestamp para controle de versões:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Não é possível ler os elementos XML:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Não é possível criar data/hora para versionamento:</target>
 
 <source>&Open...</source>
 <target>&Abrir...</target>
@@ -558,6 +555,9 @@ O comando é executado se:
 <source>Saving log file %x...</source>
 <target>A guardar ficheiro log %x...</target>
 
+<source>Stopped</source>
+<target>Parado</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Pode mudar para a janela principal do FreeFileSync para resovler este problema.</target>
 
@@ -651,21 +651,6 @@ O comando é executado se:
 <source>Drag && drop</source>
 <target>Arrastar && Largar</target>
 
-<source>Close progress dialog</source>
-<target>Fechar diálogo de progresso</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Log off</source>
-<target>Terminar sessão</target>
-
-<source>Shut down</source>
-<target>Desligar</target>
-
-<source>Hibernate</source>
-<target>Hibernar</target>
-
 <source>Alternate comparison settings</source>
 <target>Definições de comparação alternativas</target>
 
@@ -721,7 +706,7 @@ O comando é executado se:
 <target>&Opções</target>
 
 <source>&Language</source>
-<target>&Língua</target>
+<target>&Idioma</target>
 
 <source>&Find...</source>
 <target>&Procurar...</target>
@@ -770,6 +755,15 @@ O comando é executado se:
 
 <source>Save as batch job</source>
 <target>Guardar como batch</target>
+
+<source>View type:</source>
+<target>Tipo de vista:</target>
+
+<source>Select view:</source>
+<target>Seleccionar vista:</target>
+
+<source>Statistics:</source>
+<target>Estatísticas:</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Número de ficheiros e pastas a ser criados</target>
@@ -872,14 +866,14 @@ O comando é executado se:
 <source>On completion:</source>
 <target>Ao completar:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detectar a direcção de sincronização com a ajuda de base de dados</target>
+
 <source>Start synchronization now?</source>
 <target>Iniciar sincronização agora?</target>
 
 <source>Variant:</source>
 <target>Variante:</target>
-
-<source>Statistics</source>
-<target>Estatísticas</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Não mostrar este diálogo novamente</target>
@@ -917,8 +911,8 @@ O comando é executado se:
 <source>Stop synchronization at first error</source>
 <target>Para sincronização ao primeiro erro</target>
 
-<source>Show progress dialog</source>
-<target>Mostrar diálogo de progresso</target>
+<source>Run minimized</source>
+<target>Correr minimizado</target>
 
 <source>Save log:</source>
 <target>Guardar registo:</target>
@@ -934,12 +928,6 @@ O comando é executado se:
 
 <source>&Recycle bin</source>
 <target>&Reciclagem</target>
-
-<source>Delete on both sides</source>
-<target>Eliminar em ambos os lados</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Seleccionar regras de filtro para excluir certos ficheiros da sincronização. Insira os caminhos relativos ao par de directórios correspondente.</target>
@@ -962,8 +950,8 @@ O comando é executado se:
 <source>Maximum:</source>
 <target>Máximo</target>
 
-<source>&Clear</source>
-<target>&Limpar</target>
+<source>&Reset</source>
+<target>&Reiniciar</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>As seguintes definições são usadas para todas as sincronizações.</target>
@@ -1061,8 +1049,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Find</source>
 <target>Procurar</target>
 
-<source>Select View</source>
-<target>Seleccionar Vista</target>
+<source>View Settings</source>
+<target>Ver Opções</target>
 
 <source>Overview</source>
 <target>Vista</target>
@@ -1145,11 +1133,11 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Exclude via filter:</source>
 <target>Excluir por filtro:</target>
 
-<source>Exclude temporarily</source>
-<target>Excluir temporariamente</target>
-
 <source>Include temporarily</source>
 <target>Incluir temporariamente</target>
+
+<source>Exclude temporarily</source>
+<target>Excluir temporariamente</target>
 
 <source>Delete</source>
 <target>Eliminar</target>
@@ -1202,6 +1190,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Do&n't save</source>
 <target>Não g&uardar</target>
 
+<source>Delete selected configurations</source>
+<target>Eliminar configurações seleccionadas</target>
+
 <source>Filter</source>
 <target>Filtro</target>
 
@@ -1253,8 +1244,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Set as default</source>
 <target>Definir como padrão</target>
 
-<source>All folders are in sync</source>
-<target>Todas as pastas estão sincronizadas</target>
+<source>All files are in sync</source>
+<target>Todos os ficheiros estão sincronizados</target>
 
 <source>Synchronization Settings</source>
 <target>Definições de Sincronização</target>
@@ -1273,6 +1264,21 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Searching for program updates...</source>
 <target>A procurar actualizações do programa...</target>
+
+<source>Close progress dialog</source>
+<target>Fechar diálogo de progresso</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Log off</source>
+<target>Terminar sessão</target>
+
+<source>Shut down</source>
+<target>Desligar</target>
+
+<source>Hibernate</source>
+<target>Hibernar</target>
 
 <source>Scanning...</source>
 <target>A pesquisar...</target>
@@ -1295,14 +1301,14 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Initializing...</source>
 <target>A iniciar...</target>
 
-<source>Stopped</source>
-<target>Parado</target>
-
 <source>Completed</source>
 <target>Terminado</target>
 
 <source>&Continue</source>
 <target>&Continuar</target>
+
+<source>Progress</source>
+<target>Progresso</target>
 
 <source>Log</source>
 <target>Registo</target>
@@ -1394,8 +1400,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Time stamp</source>
 <target>Selo temporal</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Juntar selo temporal a cada nome de ficheiro</target>
+<source>Append a time stamp to each file name</source>
+<target>Adicione data/hora ao nome de cada ficheiro</target>
 
 <source>File</source>
 <target>Ficheiro</target>
@@ -1520,9 +1526,18 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Não é possível mover %x para a reciclagem.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Verificar a reciclagem falhou no directório %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Não é possível determinar o caminho final de %x.</target>
 
 <source>Error Code %x:</source>
 <target>Código de erro %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Não é possível ler os elementos XML:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Ficheiro de configuração %x carregado parcialmente.</target>
 

@@ -21,9 +21,9 @@ using namespace zen;
 bool zen::operator<(const HardFilter& lhs, const HardFilter& rhs)
 {
     if (typeid(lhs) != typeid(rhs))
-        return typeid(lhs).before(typeid(rhs)) != 0; //note: in worst case, order is guaranteed to be stable only during each program run
+        return typeid(lhs).before(typeid(rhs)); //in worst case, order is guaranteed to be stable only during each program run
 
-    //this and other are same type:
+    //this and other are of same type:
     return lhs.cmpLessSameType(rhs);
 }
 

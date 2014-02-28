@@ -10,7 +10,7 @@
 #include <numeric>
 #include <zen/basic_math.h>
 #include <zen/scope_guard.h>
-#include <wx/settings.h>
+//#include <wx/settings.h>
 #include "dc.h"
 
 using namespace zen;
@@ -556,7 +556,7 @@ void Graph2D::render(wxDC& dc) const
     {
         //paint graph background (excluding label area)
         wxDCPenChanger   dummy (dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
-        wxDCBrushChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+        wxDCBrushChanger dummy2(dc, attr.backgroundColor);
         //accessibility: consider system text and background colors; small drawback: color of graphs is NOT connected to the background! => responsibility of client to use correct colors
 
         dc.DrawRectangle(graphArea);

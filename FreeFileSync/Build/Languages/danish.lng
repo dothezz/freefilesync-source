@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Størrelse:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Indholdsanalyse udeladt for ekskluderede filer %x</target>
+
 <source>Items differ in attributes only</source>
 <target>Enhederne har kun attributter til forskel</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x emner/sek</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Indstillingsfilen %x er kun delvist indlæst.</target>
-
 <source>Show in Explorer</source>
 <target>Åben filplacering</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Afbrydelse: Venter på aktuel opgave afsluttes...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Kunne ikke oprette versioneringstid:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Kan ikke læse følgende XML emner:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Kan ikke oprette tidsstempel til versionering:</target>
 
 <source>&Open...</source>
 <target>&Åben...</target>
@@ -558,6 +555,9 @@ Kommandoen udføres hvis:
 <source>Saving log file %x...</source>
 <target>Gemmer rapport %x...</target>
 
+<source>Stopped</source>
+<target>Afbrudt</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Skift til FreeFileSyncs hovedvindue for at løse problemet.</target>
 
@@ -650,21 +650,6 @@ Kommandoen udføres hvis:
 
 <source>Drag && drop</source>
 <target>Træk emner hertil</target>
-
-<source>Close progress dialog</source>
-<target>Luk dialogen</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Log off</source>
-<target>Log af</target>
-
-<source>Shut down</source>
-<target>Luk ned</target>
-
-<source>Hibernate</source>
-<target>Dvale</target>
 
 <source>Alternate comparison settings</source>
 <target>Tilpas analyse</target>
@@ -771,6 +756,15 @@ Kommandoen udføres hvis:
 <source>Save as batch job</source>
 <target>Gem som batchfil</target>
 
+<source>View type:</source>
+<target>Visning:</target>
+
+<source>Select view:</source>
+<target>Vælg visning:</target>
+
+<source>Statistics:</source>
+<target>Statistik:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Antal filer og mapper der oprettes</target>
 
@@ -872,14 +866,14 @@ Kommandoen udføres hvis:
 <source>On completion:</source>
 <target>Ved gennemført:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Genkend synkretninger ved hjælp af databasefiler</target>
+
 <source>Start synchronization now?</source>
 <target>Synkroniser nu?</target>
 
 <source>Variant:</source>
 <target>Jobtype:</target>
-
-<source>Statistics</source>
-<target>Statistik</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Vis ikke igen</target>
@@ -917,8 +911,8 @@ Kommandoen udføres hvis:
 <source>Stop synchronization at first error</source>
 <target>Stop synkronisering ved første fejl</target>
 
-<source>Show progress dialog</source>
-<target>Vis fremskridt</target>
+<source>Run minimized</source>
+<target>Kør minimeret</target>
 
 <source>Save log:</source>
 <target>Gem log:</target>
@@ -934,12 +928,6 @@ Kommandoen udføres hvis:
 
 <source>&Recycle bin</source>
 <target>&Papirkurv</target>
-
-<source>Delete on both sides</source>
-<target>Slet på begge sider</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Slet på begge sider selvom selvom filen kun er valgt på en side</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
@@ -962,8 +950,8 @@ Kommandoen udføres hvis:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Clear</source>
-<target>&Ryd</target>
+<source>&Reset</source>
+<target>&Nulstil</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse indstillinger gælder alle synkroniseringer.</target>
@@ -1058,8 +1046,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Søg</target>
 
-<source>Select View</source>
-<target>Tilpas visning</target>
+<source>View Settings</source>
+<target>Visninger</target>
 
 <source>Overview</source>
 <target>Oversigt</target>
@@ -1142,11 +1130,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Ekskluder m. filter:</target>
 
-<source>Exclude temporarily</source>
-<target>Ekskluder midlertidigt</target>
-
 <source>Include temporarily</source>
 <target>Inkluder midlertidigt</target>
+
+<source>Exclude temporarily</source>
+<target>Ekskluder midlertidigt</target>
 
 <source>Delete</source>
 <target>Slet</target>
@@ -1199,6 +1187,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&Gem ikke</target>
 
+<source>Delete selected configurations</source>
+<target>Slet valgte indstillinger</target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1250,8 +1241,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Sæt som standard</target>
 
-<source>All folders are in sync</source>
-<target>Alle mapper er synkrone</target>
+<source>All files are in sync</source>
+<target>Alt er synkroniseret</target>
 
 <source>Synchronization Settings</source>
 <target>Synkroniseringsindstillinger</target>
@@ -1270,6 +1261,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Søger efter opdatering...</target>
+
+<source>Close progress dialog</source>
+<target>Luk dialogen</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Log off</source>
+<target>Log af</target>
+
+<source>Shut down</source>
+<target>Luk ned</target>
+
+<source>Hibernate</source>
+<target>Dvale</target>
 
 <source>Scanning...</source>
 <target>Skanner...</target>
@@ -1292,14 +1298,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Forbereder...</target>
 
-<source>Stopped</source>
-<target>Afbrudt</target>
-
 <source>Completed</source>
 <target>Gennemført</target>
 
 <source>&Continue</source>
 <target>&Fortsæt</target>
+
+<source>Progress</source>
+<target>Fremskridt</target>
 
 <source>Log</source>
 <target>Log</target>
@@ -1391,7 +1397,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Tidsstempel</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>Føj tidsstempel til hvert filnavn</target>
 
 <source>File</source>
@@ -1517,9 +1523,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Kunne ikke flytte %x til papirkurv.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Check papirkurv fejlede for mappen %x</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Kan ikke bestemme endelig sti for %x</target>
 
 <source>Error Code %x:</source>
 <target>Fejlkode %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Kan ikke læse følgende XML emner:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Indstillingsfilen %x er kun delvist indlæst.</target>
 

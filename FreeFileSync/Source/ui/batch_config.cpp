@@ -11,7 +11,7 @@
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "dir_name.h"
-#include "../ui/exec_finished_box.h"
+#include "../ui/on_completion_box.h"
 #include "../lib/help_provider.h"
 
 #ifdef ZEN_WIN
@@ -36,7 +36,7 @@ class BatchDialog : public BatchDlgGenerated
 public:
     BatchDialog(wxWindow* parent,
                 XmlBatchConfig& batchCfg, //in/out
-                std::vector<std::wstring>& onCompletionHistory,
+                std::vector<Zstring>& onCompletionHistory,
                 size_t onCompletionHistoryMax);
 
 private:
@@ -66,7 +66,7 @@ private:
 
 BatchDialog::BatchDialog(wxWindow* parent,
                          XmlBatchConfig& batchCfg,
-                         std::vector<std::wstring>& onCompletionHistory,
+                         std::vector<Zstring>& onCompletionHistory,
                          size_t onCompletionHistoryMax) :
     BatchDlgGenerated(parent),
     batchCfgOutRef(batchCfg)
@@ -79,7 +79,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
 
-    m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
+    m_comboBoxOnCompletion->initHistory(onCompletionHistory, onCompletionHistoryMax);
 
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
@@ -130,9 +130,9 @@ void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
     localBatchCfg = batchCfg; //contains some parameters not owned by GUI controls
 
     //transfer parameter ownership to GUI
-    m_checkBoxShowProgress->SetValue(batchCfg.showProgress);
+    m_checkBoxRunMinimized->SetValue(batchCfg.runMinimized);
     logfileDir->setName(utfCvrtTo<wxString>(batchCfg.logFileDirectory));
-    m_comboBoxExecFinished->setValue(batchCfg.mainCfg.onCompletion);
+    m_comboBoxOnCompletion->setValue(batchCfg.mainCfg.onCompletion);
 
     //map single parameter "logfiles limit" to all three checkboxs and spin ctrl:
     m_checkBoxGenerateLogfile->SetValue(batchCfg.logfilesCountLimit != 0);
@@ -151,9 +151,9 @@ XmlBatchConfig BatchDialog::getConfig() const
     //load parameters with ownership within GIU controls...
 
     //load structure with batch settings "batchCfg"
-    batchCfg.showProgress     = m_checkBoxShowProgress->GetValue();
+    batchCfg.runMinimized     = m_checkBoxRunMinimized->GetValue();
     batchCfg.logFileDirectory = utfCvrtTo<Zstring>(logfileDir->getName());
-    batchCfg.mainCfg.onCompletion = m_comboBoxExecFinished->getValue();
+    batchCfg.mainCfg.onCompletion = m_comboBoxOnCompletion->getValue();
     //get single parameter "logfiles limit" from all three checkboxes and spin ctrl:
     batchCfg.logfilesCountLimit = m_checkBoxGenerateLogfile->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;
 
@@ -164,7 +164,7 @@ XmlBatchConfig BatchDialog::getConfig() const
 void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     batchCfgOutRef = getConfig();
-    m_comboBoxExecFinished->addItemHistory(); //a good place to commit current "on completion" history item
+    m_comboBoxOnCompletion->addItemHistory(); //a good place to commit current "on completion" history item
     EndModal(BUTTON_SAVE_AS);
 }
 }
@@ -172,9 +172,9 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 
 bool zen::customizeBatchConfig(wxWindow* parent,
                                xmlAccess::XmlBatchConfig& batchCfg, //in/out
-                               std::vector<std::wstring>& execFinishedhistory,
-                               size_t execFinishedhistoryMax)
+                               std::vector<Zstring>& onCompletionHistory,
+                               size_t onCompletionHistoryMax)
 {
-    BatchDialog batchDlg(parent, batchCfg, execFinishedhistory, execFinishedhistoryMax);
+    BatchDialog batchDlg(parent, batchCfg, onCompletionHistory, onCompletionHistoryMax);
     return static_cast<ButtonPressed>(batchDlg.ShowModal()) == BUTTON_SAVE_AS;
 }

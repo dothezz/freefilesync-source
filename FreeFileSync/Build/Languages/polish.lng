@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Rozmiar:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Porównywanie zostało pominięte dla wykluczonych plików %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Elementy różnią się wyłącznie atrybutami</target>
 
@@ -298,9 +301,6 @@
 <source>%x items/sec</source>
 <target>%x elementów/sek</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Plik konfiguracyjny %x został wczytany tylko częściowo.</target>
-
 <source>Show in Explorer</source>
 <target>Wyświetl w Eksploratorze</target>
 
@@ -328,11 +328,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Przerwanie: Oczekiwanie na zakończenie aktualnej operacji...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Nie można utowrzyć znacznika czasu dla wersjonowania:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Nie można odczytać elementu XML:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Nie można utworzyć znacznika czasu:</target>
 
 <source>&Open...</source>
 <target>&Otwórz...</target>
@@ -561,6 +558,9 @@ Komenda jest wykonywana gdy:
 <source>Saving log file %x...</source>
 <target>Zapisywanie pliku logów %x...</target>
 
+<source>Stopped</source>
+<target>Zatrzymana</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Możesz przejść do głównego okna FreeFileSync abe rozwiązać ten problem.</target>
 
@@ -654,21 +654,6 @@ Komenda jest wykonywana gdy:
 
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
-
-<source>Close progress dialog</source>
-<target>Zamknij okno postępu</target>
-
-<source>Standby</source>
-<target>Przejdź w stan uśpienia</target>
-
-<source>Log off</source>
-<target>Wyloguj użytkownika</target>
-
-<source>Shut down</source>
-<target>Wyłącz komputer</target>
-
-<source>Hibernate</source>
-<target>Przejdź w stan hibernacji</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternatywne ustawienia porównywania</target>
@@ -775,6 +760,15 @@ Komenda jest wykonywana gdy:
 <source>Save as batch job</source>
 <target>Zapisz w trybie wsadowym</target>
 
+<source>View type:</source>
+<target>Typ widoku:</target>
+
+<source>Select view:</source>
+<target>Widok:</target>
+
+<source>Statistics:</source>
+<target>Statystyki:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Liczba plików i katalogów, które zostaną utworzone</target>
 
@@ -876,14 +870,14 @@ Komenda jest wykonywana gdy:
 <source>On completion:</source>
 <target>Po zakończeniu:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
+
 <source>Start synchronization now?</source>
 <target>Rozpocząć teraz synchronizację?</target>
 
 <source>Variant:</source>
 <target>Wariant:</target>
-
-<source>Statistics</source>
-<target>Statystyki</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Nie pokazuj więcej tego okna</target>
@@ -904,7 +898,7 @@ Komenda jest wykonywana gdy:
 <target>Synchronizuję...</target>
 
 <source>Minimize to notification area</source>
-<target>Minimalizuj do obszaru powiadomiń</target>
+<target>Minimalizuj do obszaru powiadomień</target>
 
 <source>Close</source>
 <target>Zamknij</target>
@@ -921,8 +915,8 @@ Komenda jest wykonywana gdy:
 <source>Stop synchronization at first error</source>
 <target>Przerwij synchronizację przy pierwszym błędzie</target>
 
-<source>Show progress dialog</source>
-<target>Pokaż okno postępu</target>
+<source>Run minimized</source>
+<target>Uruchom zminimalizowane</target>
 
 <source>Save log:</source>
 <target>Zapisz logi:</target>
@@ -938,12 +932,6 @@ Komenda jest wykonywana gdy:
 
 <source>&Recycle bin</source>
 <target>&Kosz systemowy</target>
-
-<source>Delete on both sides</source>
-<target>Usuń po obu stronach</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Określ reguły filtrowania w celu wykluczenia niektórych plików z synchronizacji. Ścieżki plików muszą być relatywne do podanych par katalogów.</target>
@@ -966,8 +954,8 @@ Komenda jest wykonywana gdy:
 <source>Maximum:</source>
 <target>Maksymalny:</target>
 
-<source>&Clear</source>
-<target>W&yczyść</target>
+<source>&Reset</source>
+<target>&Resetuj</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Następujące ustawienia stosowane są do wszystkich zadań synchronizacji.</target>
@@ -1065,8 +1053,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Find</source>
 <target>Znajdź</target>
 
-<source>Select View</source>
-<target>Widok</target>
+<source>View Settings</source>
+<target>Ustawienia widoku</target>
 
 <source>Overview</source>
 <target>Przegląd</target>
@@ -1153,11 +1141,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Exclude via filter:</source>
 <target>Dodaj filtr:</target>
 
-<source>Exclude temporarily</source>
-<target>Wyklucz tymczasowo</target>
-
 <source>Include temporarily</source>
 <target>Dołącz tymczasowo</target>
+
+<source>Exclude temporarily</source>
+<target>Wyklucz tymczasowo</target>
 
 <source>Delete</source>
 <target>Usuń</target>
@@ -1210,6 +1198,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Do&n't save</source>
 <target>&Nie zapisuj</target>
 
+<source>Delete selected configurations</source>
+<target>Usuń wybrane konfiguracje</target>
+
 <source>Filter</source>
 <target>Filtr</target>
 
@@ -1261,8 +1252,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Set as default</source>
 <target>Zapisz jako domyślne</target>
 
-<source>All folders are in sync</source>
-<target>Wszystkie katalogi są zsynchronizowane</target>
+<source>All files are in sync</source>
+<target>Pliki zsynchronizowane</target>
 
 <source>Synchronization Settings</source>
 <target>Ustawienia synchronizacji</target>
@@ -1281,6 +1272,21 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Searching for program updates...</source>
 <target>Wyszukiwanie aktualizacji...</target>
+
+<source>Close progress dialog</source>
+<target>Zamknij okno postępu</target>
+
+<source>Standby</source>
+<target>Przejdź w stan uśpienia</target>
+
+<source>Log off</source>
+<target>Wyloguj użytkownika</target>
+
+<source>Shut down</source>
+<target>Wyłącz komputer</target>
+
+<source>Hibernate</source>
+<target>Przejdź w stan hibernacji</target>
 
 <source>Scanning...</source>
 <target>Skanowanie...</target>
@@ -1303,14 +1309,14 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Initializing...</source>
 <target>Inicjalizacja...</target>
 
-<source>Stopped</source>
-<target>Zatrzymana</target>
-
 <source>Completed</source>
 <target>Zakończono</target>
 
 <source>&Continue</source>
 <target>&Kontynuuj</target>
+
+<source>Progress</source>
+<target>Postęp</target>
 
 <source>Log</source>
 <target>Log</target>
@@ -1346,7 +1352,7 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <target>
 <pluralform>Czy na pewno chcesz przenieść ten element do kosza?</pluralform>
 <pluralform>Czy na pewno chcesz przenieść te %x elementy do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz przenieść te %x elemntów do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść te %x elementów do kosza?</pluralform>
 </target>
 
 <source>Move</source>
@@ -1404,8 +1410,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Time stamp</source>
 <target>Znacznik czasu</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Dołącz znacznik czasu do nazwy każdego pliku</target>
+<source>Append a time stamp to each file name</source>
+<target>Dołącz datę do nazwy każdego pliku</target>
 
 <source>File</source>
 <target>Plik</target>
@@ -1533,9 +1539,18 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Unable to move %x to the recycle bin.</source>
 <target>Nie można przenieść %x do kosza.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Sprawdzanie kosza systemowego dla katalogu %x zakończone niepowodzeniem.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Nie można określić ostatecznej ścieżki dla %x.</target>
 
 <source>Error Code %x:</source>
 <target>Kod błędu %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Nie można odczytać elementu XML:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Plik konfiguracyjny %x został wczytany tylko częściowo.</target>
 

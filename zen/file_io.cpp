@@ -33,14 +33,11 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
         const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
 
         if (getLockingProcesses && freeString)
-        {
-            const wchar_t* procList = nullptr;
-            if (getLockingProcesses(filename.c_str(), procList))
+            if (const wchar_t* procList = getLockingProcesses(filename.c_str()))
             {
                 ZEN_ON_SCOPE_EXIT(freeString(procList));
                 return procList;
             }
-        }
     }
     return Zstring();
 }
@@ -81,12 +78,12 @@ FileInput::FileInput(const Zstring& filename) : FileInputBase(filename) //throw 
 {
 #ifdef ZEN_WIN
     const wchar_t functionName[] = L"CreateFile";
-    fileHandle = ::CreateFile(applyLongPathPrefix(filename).c_str(),
-                              GENERIC_READ,
-                              FILE_SHARE_READ | FILE_SHARE_DELETE,
-                              nullptr,
-                              OPEN_EXISTING,
-                              FILE_FLAG_SEQUENTIAL_SCAN,
+    fileHandle = ::CreateFile(applyLongPathPrefix(filename).c_str(), //_In_      LPCTSTR lpFileName,
+                              GENERIC_READ,                          //_In_      DWORD dwDesiredAccess,
+                              FILE_SHARE_READ | FILE_SHARE_DELETE,   //_In_      DWORD dwShareMode,
+                              nullptr,                               //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                              OPEN_EXISTING,                         //_In_      DWORD dwCreationDisposition,
+                              FILE_FLAG_SEQUENTIAL_SCAN,             //_In_      DWORD dwFlagsAndAttributes,
                               /* possible values: (Reference http://msdn.microsoft.com/en-us/library/aa363858(VS.85).aspx#caching_behavior)
                                 FILE_FLAG_NO_BUFFERING
                                 FILE_FLAG_RANDOM_ACCESS
@@ -111,7 +108,7 @@ FileInput::FileInput(const Zstring& filename) : FileInputBase(filename) //throw 
 
                               for FFS most comparisons are probably between different disks => let's use FILE_FLAG_SEQUENTIAL_SCAN
                                */
-                              nullptr);
+                              nullptr); //_In_opt_  HANDLE hTemplateFile
     if (fileHandle == INVALID_HANDLE_VALUE)
 #elif defined ZEN_LINUX || defined ZEN_MAC
     checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
@@ -198,18 +195,20 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
 
     auto getHandle = [&](DWORD dwFlagsAndAttributes)
     {
-        return ::CreateFile(applyLongPathPrefix(filename).c_str(),
-                            GENERIC_READ | GENERIC_WRITE,
+        return ::CreateFile(applyLongPathPrefix(filename).c_str(), //_In_      LPCTSTR lpFileName,
+                            GENERIC_READ | GENERIC_WRITE, //_In_      DWORD dwDesiredAccess,
                             /*  http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
                                    quote: When an application creates a file across a network, it is better
                                    to use GENERIC_READ | GENERIC_WRITE for dwDesiredAccess than to use GENERIC_WRITE alone.
                                    The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
                                    This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
-                            FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
-                            nullptr,
-                            dwCreationDisposition,
-                            dwFlagsAndAttributes | FILE_FLAG_SEQUENTIAL_SCAN,
-                            nullptr);
+                            FILE_SHARE_DELETE,         //_In_      DWORD dwShareMode,
+                            //FILE_SHARE_DELETE is required to rename file while handle is open!
+                            nullptr,                   //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                            dwCreationDisposition,     //_In_      DWORD dwCreationDisposition,
+                            dwFlagsAndAttributes |
+                            FILE_FLAG_SEQUENTIAL_SCAN, //_In_      DWORD dwFlagsAndAttributes,
+                            nullptr);                  //_In_opt_  HANDLE hTemplateFile
     };
 
     fileHandle = getHandle(FILE_ATTRIBUTE_NORMAL);

@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Μέγεθος:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Η σύγκριση περιεχομένου παραλήφθηκε για τα εξαιρούμενα αρχεία %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Τα στοιχεία διαφέρουν μόνο ως προς τα χαρακτηριστικά τους</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x στοιχεία</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Το αρχείο διάταξης %x έχει φορτωθεί μόνο κατά ένα μέρος.</target>
-
 <source>Show in Explorer</source>
 <target>Εμφάνιση στην Εξερεύνηση</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Αίτημα διακοπής: Αναμονή για την ολοκλήρωση της τρέχουσας εργασίας...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Αδυναμία δημιουργίας χρονικής σήμανσης για διατήρηση εκδόσεων:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Δεν ήταν δυνατή η δημιουργία χρονικής σήμανσης για τη διατήρηση παλιών εκδόσεων:</target>
 
 <source>&Open...</source>
 <target>Ά&νοιγμα...</target>
@@ -558,6 +555,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Αποθήκευση του αρχείου καταγραφής %x...</target>
 
+<source>Stopped</source>
+<target>Διεκόπη</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Μπορείτε να επιστρέψετε στο κύριο παράθυρο του FreeFileSync για να επιλύσετε αυτό το θέμα.</target>
 
@@ -650,21 +650,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>Μεταφορά && Απόθεση</target>
-
-<source>Close progress dialog</source>
-<target>Κλείσιμο του παράθυρου αναφοράς</target>
-
-<source>Standby</source>
-<target>Αναστολή λειτουργίας</target>
-
-<source>Log off</source>
-<target>Αποσύνδεση</target>
-
-<source>Shut down</source>
-<target>Τερματισμός λειτουργίας</target>
-
-<source>Hibernate</source>
-<target>Αδρανοποίηση</target>
 
 <source>Alternate comparison settings</source>
 <target>Διαφοροποιημένες ρυθμίσεις σύγκρισης</target>
@@ -771,6 +756,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Αποθήκευση ως δέσμη ενεργειών</target>
 
+<source>View type:</source>
+<target>Τύπος εμφάνισης:</target>
+
+<source>Select view:</source>
+<target>Επιλογή εμφάνισης:</target>
+
+<source>Statistics:</source>
+<target>Στατιστικά:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα δημιουργηθούν</target>
 
@@ -872,14 +866,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>Μετά την ολοκλήρωση:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Ανίχνευση της κατεύθυνσης συγχρονισμού με τη βοήθεια βάσεων δεδομένων</target>
+
 <source>Start synchronization now?</source>
 <target>Να ξεκινήσει ο συγχρονισμός τώρα;</target>
 
 <source>Variant:</source>
 <target>Μέθοδος:</target>
-
-<source>Statistics</source>
-<target>Στατιστικά</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
@@ -917,8 +911,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>Διακοπή του συγχρονισμού με το πρώτο σφάλμα</target>
 
-<source>Show progress dialog</source>
-<target>Εμφάνιση της αναφοράς προόδου</target>
+<source>Run minimized</source>
+<target>Εκκίνηση σε ελαχιστοποιημένο παράθυρο</target>
 
 <source>Save log:</source>
 <target>Αποθήκευση αρχείου καταγραφής:</target>
@@ -934,12 +928,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Κάδος ανακύκλωσης</target>
-
-<source>Delete on both sides</source>
-<target>Διαγραφή και στις δυο πλευρές</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Διαγραφή και στις δυο πλευρές, ακόμα κι αν το αρχείο έχει επιλεχθεί μόνο στη μια πλευρά</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος υποκαταλόγων.</target>
@@ -962,8 +950,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Μέγιστο</target>
 
-<source>&Clear</source>
-<target>&Καθαρισμός</target>
+<source>&Reset</source>
+<target>&Επαναφορά</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Οι ακόλουθες ρυθμίσεις χρησιμοποιούνται για όλες τις εργασίες συγχρονισμού.</target>
@@ -1061,8 +1049,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Αναζήτηση</target>
 
-<source>Select View</source>
-<target>Επιλογή Εμφάνισης</target>
+<source>View Settings</source>
+<target>Προβολή Ρυθμίσεων</target>
 
 <source>Overview</source>
 <target>Σύνοψη</target>
@@ -1145,11 +1133,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Εξαίρεση με βάση το φίλτρο:</target>
 
-<source>Exclude temporarily</source>
-<target>Προσωρινή εξαίρεση</target>
-
 <source>Include temporarily</source>
 <target>Προσωρινή συμπερίληψη</target>
+
+<source>Exclude temporarily</source>
+<target>Προσωρινή εξαίρεση</target>
 
 <source>Delete</source>
 <target>Διαγραφή</target>
@@ -1202,6 +1190,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>Να &μην αποθηκευθούν</target>
 
+<source>Delete selected configurations</source>
+<target>Διαγραφή επιλεγμένων διατάξεων</target>
+
 <source>Filter</source>
 <target>Φίλτρο</target>
 
@@ -1253,8 +1244,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Ορισμός ως προεπιλογής</target>
 
-<source>All folders are in sync</source>
-<target>Όλοι οι υποκατάλογοι είναι συγχρονισμένοι</target>
+<source>All files are in sync</source>
+<target>Όλα τα αρχεία είναι συγχρονισμένα</target>
 
 <source>Synchronization Settings</source>
 <target>Ρυθμίσεις συγχρονισμού</target>
@@ -1273,6 +1264,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Αναζήτηση καινούριας έκδοσης...</target>
+
+<source>Close progress dialog</source>
+<target>Κλείσιμο του παράθυρου αναφοράς</target>
+
+<source>Standby</source>
+<target>Αναστολή λειτουργίας</target>
+
+<source>Log off</source>
+<target>Αποσύνδεση</target>
+
+<source>Shut down</source>
+<target>Τερματισμός λειτουργίας</target>
+
+<source>Hibernate</source>
+<target>Αδρανοποίηση</target>
 
 <source>Scanning...</source>
 <target>Ανίχνευση...</target>
@@ -1295,14 +1301,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Αρχικοποίηση...</target>
 
-<source>Stopped</source>
-<target>Διεκόπη</target>
-
 <source>Completed</source>
 <target>Ολοκληρώθηκε</target>
 
 <source>&Continue</source>
 <target>&Συνέχεια</target>
+
+<source>Progress</source>
+<target>Πρόοδος</target>
 
 <source>Log</source>
 <target>Καταγραφή</target>
@@ -1394,8 +1400,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Χρονική σήμανση</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Προσάρτηση χρονικής σήμανσης σε κάθε όνομα αρχείου</target>
+<source>Append a time stamp to each file name</source>
+<target>Προσάρτηση χρονικής σήμανσης στο όνομα κάθε αρχείου</target>
 
 <source>File</source>
 <target>Αρχείο</target>
@@ -1520,9 +1526,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Δεν ήταν δυνατή η μεταφορά του %x στον κάδο ανακύκλωσης.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Ο έλεγχος του κάδου ανακύκλωσης απέτυχε για τον υποκατάλογο %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Δεν μπορεί να προσδιοριστεί η τελική διαδρομή για το %x.</target>
 
 <source>Error Code %x:</source>
 <target>Κωδικός Σφάλματος %x</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Το αρχείο διάταξης %x έχει φορτωθεί μόνο κατά ένα μέρος.</target>
 

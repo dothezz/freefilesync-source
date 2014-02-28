@@ -16,7 +16,7 @@
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
-#include "exec_finished_box.h"
+#include "on_completion_box.h"
 #include "dir_name.h"
 #include "../file_hierarchy.h"
 #include "../lib/help_provider.h"
@@ -36,8 +36,8 @@ public:
                   CompareVariant compareVar,
                   SyncConfig&    syncCfg,
                   const wxString& caption,
-                  xmlAccess::OnGuiError* handleError,     //
-                  ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
+                  xmlAccess::OnGuiError* handleError, //
+                  OnCompletionCfg* onCompletion);     //optional input parameter
 
 private:
     virtual void OnSyncTwoWay(wxCommandEvent& event) { directionCfg.var = DirectionConfig::TWOWAY; updateGui(); }
@@ -78,7 +78,7 @@ private:
     {
         SyncConfig syncCfg;
         xmlAccess::OnGuiError onGuiError;
-        std::wstring onCompletion;
+        Zstring onCompletion;
     };
     void setConfig(const Config& cfg);
     Config getConfig() const;
@@ -93,7 +93,7 @@ private:
     //output data
     SyncConfig&            outSyncCfg;
     xmlAccess::OnGuiError* outOptOnGuiError;
-    ExecWhenFinishedCfg*   outOptExecWhenFinished;
+    OnCompletionCfg*       outOptOnCompletion;
 
     CompareVariant compareVar_;
     DirectoryName<FolderHistoryBox> versioningFolder;
@@ -218,13 +218,13 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                              SyncConfig&    syncCfg,
                              const wxString& title,
                              xmlAccess::OnGuiError* handleError,
-                             ExecWhenFinishedCfg* execWhenFinished) :
+                             OnCompletionCfg* onCompletion) :
     SyncCfgDlgGenerated(parent),
     handleDeletion(DELETE_TO_RECYCLER), //
     onGuiError(ON_GUIERROR_POPUP),      //dummy init
     outSyncCfg(syncCfg),
     outOptOnGuiError(handleError),
-    outOptExecWhenFinished(execWhenFinished),
+    outOptOnCompletion(onCompletion),
     compareVar_(compareVar),
     versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder/*, m_staticTextResolvedPath*/)
 {
@@ -255,21 +255,21 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
 
     enumVersioningStyle.
     add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
-    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a timestamp to each file name"));
+    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
     //hide controls for optional parameters
-    if (!handleError && !execWhenFinished) //currently either both or neither are bound!
+    if (!handleError && !onCompletion) //currently either both or neither are bound!
     {
         bSizerExtraConfig->Show(false);
         Layout();
     }
 
-    if (execWhenFinished)
-        m_comboBoxExecFinished->initHistory(*execWhenFinished->history, execWhenFinished->historyMax);
+    if (onCompletion)
+        m_comboBoxOnCompletion->initHistory(*onCompletion->history, onCompletion->historyMax);
 
     Config newCfg = { syncCfg,
                       handleError ?* handleError : ON_GUIERROR_POPUP,
-                      execWhenFinished ?* execWhenFinished->command : std::wstring()
+                      onCompletion ?* onCompletion->command : Zstring()
                     };
     setConfig(newCfg);
 
@@ -295,7 +295,7 @@ void SyncCfgDialog::setConfig(const Config& cfg)
 
     onGuiError = cfg.onGuiError;
 
-    m_comboBoxExecFinished->setValue(cfg.onCompletion);
+    m_comboBoxOnCompletion->setValue(cfg.onCompletion);
 
     updateGui();
 }
@@ -316,7 +316,7 @@ SyncCfgDialog::Config SyncCfgDialog::getConfig() const
 
                    output.onGuiError = onGuiError;
 
-    output.onCompletion = m_comboBoxExecFinished->getValue();
+    output.onCompletion = m_comboBoxOnCompletion->getValue();
     return output;
 }
 
@@ -484,11 +484,11 @@ void SyncCfgDialog::OnOkay(wxCommandEvent& event)
     if (outOptOnGuiError)
         *outOptOnGuiError = cfg.onGuiError;
 
-    if (outOptExecWhenFinished)
+    if (outOptOnCompletion)
     {
-        *outOptExecWhenFinished->command = cfg.onCompletion;
+        *outOptOnCompletion->command = cfg.onCompletion;
         //a good place to commit current "on completion" history item
-        m_comboBoxExecFinished->addItemHistory();
+        m_comboBoxOnCompletion->addItemHistory();
     }
 
     EndModal(ReturnSyncConfig::BUTTON_OKAY);
@@ -630,13 +630,13 @@ ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
                                                        SyncConfig&    syncCfg,
                                                        const wxString& title,
                                                        xmlAccess::OnGuiError* handleError,    //
-                                                       ExecWhenFinishedCfg* execWhenFinished) //optional input parameter
+                                                       OnCompletionCfg* onCompletion) //optional input parameter
 {
     SyncCfgDialog syncDlg(parent,
                           compareVar,
                           syncCfg,
                           title,
                           handleError,
-                          execWhenFinished);
+                          onCompletion);
     return static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
 }

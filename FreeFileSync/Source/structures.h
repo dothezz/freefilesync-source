@@ -380,7 +380,7 @@ struct MainConfiguration
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
-    std::wstring onCompletion; //user-defined command line
+    Zstring onCompletion; //user-defined command line
 
     std::wstring getCompVariantName() const;
     std::wstring getSyncVariantName() const;

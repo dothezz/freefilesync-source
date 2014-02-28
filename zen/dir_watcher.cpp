@@ -147,13 +147,14 @@ public:
         dirnamePf(appendSeparator(directory)),
         hDir(INVALID_HANDLE_VALUE)
     {
-        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf).c_str(),
-                            FILE_LIST_DIRECTORY,
-                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                            nullptr,
-                            OPEN_EXISTING,
-                            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-                            nullptr);
+        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf).c_str(),                 //_In_      LPCTSTR lpFileName,
+                            FILE_LIST_DIRECTORY,                                    //_In_      DWORD dwDesiredAccess,
+                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                            nullptr,              //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                            OPEN_EXISTING,        //_In_      DWORD dwCreationDisposition,
+                            FILE_FLAG_BACKUP_SEMANTICS |
+                            FILE_FLAG_OVERLAPPED, //_In_      DWORD dwFlagsAndAttributes,
+                            nullptr);             //_In_opt_  HANDLE hTemplateFile
         if (hDir == INVALID_HANDLE_VALUE)
             throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"CreateFile", getLastError()));
 

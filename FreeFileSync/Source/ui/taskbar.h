@@ -38,8 +38,8 @@ public:
         STATUS_PAUSED
     };
 
-    void setStatus(Status status);
-    void setProgress(double fraction); //between [0, 1]
+    void setStatus(Status status); //noexcept
+    void setProgress(double fraction); //between [0, 1]; noexcept
 
 private:
     class Pimpl;

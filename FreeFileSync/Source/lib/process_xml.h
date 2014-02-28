@@ -71,13 +71,13 @@ bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 struct XmlBatchConfig
 {
     XmlBatchConfig() :
-        showProgress(true),
+        runMinimized(false),
         logfilesCountLimit(-1),
         handleError(ON_ERROR_POPUP) {}
 
     zen::MainConfiguration mainCfg;
 
-    bool showProgress;
+    bool runMinimized;
     Zstring logFileDirectory;
     int logfilesCountLimit; //max logfiles; 0 := don't save logfiles; < 0 := no limit
     OnError handleError;    //reaction on error situation during synchronization
@@ -251,7 +251,7 @@ struct XmlGlobalSettings
         std::vector<Zstring> folderHistoryRight;
         size_t folderHistMax;
 
-        std::vector<std::wstring> onCompletionHistory;
+        std::vector<Zstring> onCompletionHistory;
         size_t onCompletionHistoryMax;
 
         Zstring defaultExclusionFilter;

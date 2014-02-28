@@ -7,9 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>MyButton</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Obje su strane promjenjene od posljednje sinkronizacije.</target>
 
@@ -117,6 +114,9 @@
 
 <source>Size:</source>
 <target>Veličina:</target>
+
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Usporedba sadržaja je preskočena za izdvojene datoteke %x.</target>
 
 <source>Items differ in attributes only</source>
 <target>Stavke se razlikuju samo u atributima</target>
@@ -301,9 +301,6 @@
 <source>%x items/sec</source>
 <target>%x stavki/sek</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Datoteka postavki %x učitana samo djelomično</target>
-
 <source>Show in Explorer</source>
 <target>Prikaži u Exploreru</target>
 
@@ -331,11 +328,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Zaustavljam naredbu: Čekam trenutni zadatak da se dovrši...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Nije moguća izrada vremenske oznake za označavanje:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Ne mogu čitati slijedeće XML elemente</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Nije moguće izraditi vremensku oznaku</target>
 
 <source>&Open...</source>
 <target>&Otvori...</target>
@@ -564,6 +558,9 @@ Naredba će biti pokrenuta ako se:
 <source>Saving log file %x...</source>
 <target>Spremam izješće %x...</target>
 
+<source>Stopped</source>
+<target>Zaustavljeno</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Možete prijeći na glavni prozor FreeFileSynca da bi rješili ovaj problem.</target>
 
@@ -657,21 +654,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Drag && drop</source>
 <target>Povuci && ispusti</target>
-
-<source>Close progress dialog</source>
-<target>Zatvori prozor zadatka</target>
-
-<source>Standby</source>
-<target>Spavaj</target>
-
-<source>Log off</source>
-<target>Odlogiraj se</target>
-
-<source>Shut down</source>
-<target>Isključi računalo</target>
-
-<source>Hibernate</source>
-<target>Hibernacija</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternativne postavke usporedbe</target>
@@ -778,6 +760,15 @@ Naredba će biti pokrenuta ako se:
 <source>Save as batch job</source>
 <target>Spremi kao Slijedni zadatak</target>
 
+<source>View type:</source>
+<target>Vrsta prikaza:</target>
+
+<source>Select view:</source>
+<target>Prikaz odabira:</target>
+
+<source>Statistics:</source>
+<target>Statistika:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Broj datoteka i foldera koji će se stvoriti</target>
 
@@ -879,14 +870,14 @@ Naredba će biti pokrenuta ako se:
 <source>On completion:</source>
 <target>Pri završetku:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Otkrij putanju sinkronizacije pomoću baze</target>
+
 <source>Start synchronization now?</source>
 <target>Započeti sinkronizaciju sada?</target>
 
 <source>Variant:</source>
 <target>Opcija:</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
@@ -924,8 +915,8 @@ Naredba će biti pokrenuta ako se:
 <source>Stop synchronization at first error</source>
 <target>Zaustavi sinkronizaciju pri prvoj pogrešci</target>
 
-<source>Show progress dialog</source>
-<target>Prikaži napredak</target>
+<source>Run minimized</source>
+<target>Pokreni minimizirano</target>
 
 <source>Save log:</source>
 <target>Spremi izvještaj:</target>
@@ -941,12 +932,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>&Recycle bin</source>
 <target>&Koš za smeće</target>
-
-<source>Delete on both sides</source>
-<target>Izbriši na obje strane</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Izbriši na obje strane iako je označena datoteka samo na jednoj strani</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Odaberite filterska pravila za odvojiti određene datoteke iz sinkronizacije. Unesite putanju datoteka prema njihovim odgovarajućim parovima.</target>
@@ -969,8 +954,8 @@ Naredba će biti pokrenuta ako se:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Clear</source>
-<target>&Brisati</target>
+<source>&Reset</source>
+<target>&Resetiraj</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Ove postavke se koriste za sve sinkronizacijske zadatke</target>
@@ -1068,8 +1053,8 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Find</source>
 <target>Pronađi</target>
 
-<source>Select View</source>
-<target>Odaberi pogled</target>
+<source>View Settings</source>
+<target>Postavke prikaza</target>
 
 <source>Overview</source>
 <target>Pregled</target>
@@ -1156,11 +1141,11 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Exclude via filter:</source>
 <target>Isključi preko filtra:</target>
 
-<source>Exclude temporarily</source>
-<target>Izuzmi privremeno</target>
-
 <source>Include temporarily</source>
 <target>Trenutno uključi</target>
+
+<source>Exclude temporarily</source>
+<target>Izuzmi privremeno</target>
 
 <source>Delete</source>
 <target>Izbriši</target>
@@ -1213,6 +1198,9 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Do&n't save</source>
 <target>&Nemoj spremiti</target>
 
+<source>Delete selected configurations</source>
+<target>Izbriši odabrane postavke</target>
+
 <source>Filter</source>
 <target>Filtriranje</target>
 
@@ -1264,8 +1252,8 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Set as default</source>
 <target>Postavi kao zadano</target>
 
-<source>All folders are in sync</source>
-<target>Sve mape su u sinkronizaciji</target>
+<source>All files are in sync</source>
+<target>Sve datoteke su u sinkronizaciji</target>
 
 <source>Synchronization Settings</source>
 <target>Postavke Sinkronizacije</target>
@@ -1284,6 +1272,21 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 
 <source>Searching for program updates...</source>
 <target>Pretražujem ažuriranja programa...</target>
+
+<source>Close progress dialog</source>
+<target>Zatvori prozor zadatka</target>
+
+<source>Standby</source>
+<target>Spavaj</target>
+
+<source>Log off</source>
+<target>Odlogiraj se</target>
+
+<source>Shut down</source>
+<target>Isključi računalo</target>
+
+<source>Hibernate</source>
+<target>Hibernacija</target>
 
 <source>Scanning...</source>
 <target>Tražim...</target>
@@ -1306,14 +1309,14 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Initializing...</source>
 <target>Učitavam</target>
 
-<source>Stopped</source>
-<target>Zaustavljeno</target>
-
 <source>Completed</source>
 <target>Završeno</target>
 
 <source>&Continue</source>
 <target>&Nastavi</target>
+
+<source>Progress</source>
+<target>Napredak</target>
 
 <source>Log</source>
 <target>Dnevnik</target>
@@ -1407,8 +1410,8 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Time stamp</source>
 <target>Vremenska oznaka</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Dodaj vremensku oznaku svakom imenu datoteke</target>
+<source>Append a time stamp to each file name</source>
+<target>Dodijeli vremensku oznaku za svaki naziv datoteke</target>
 
 <source>File</source>
 <target>Datoteka</target>
@@ -1536,9 +1539,18 @@ To jamči dosljedno stanje čak i u slučaju ozbiljne pogreške
 <source>Unable to move %x to the recycle bin.</source>
 <target>Nije moguće prebaciti %x u koš za smeće.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Provjeravanje koša za smeće neuspješno za mapu %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Ne mogu odrediti završnu putanju za %x.</target>
 
 <source>Error Code %x:</source>
 <target>Pogreška broj %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Ne mogu čitati slijedeće XML elemente</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Datoteka postavki %x učitana samo djelomično</target>
 

@@ -7,12 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target></target>
-
-<source>Binary comparison was skipped for excluded files %x.</source>
-<target>Der binäre Vergleich wurde für die ausgeschlossenen Dateien %x übersprungen.</target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -120,6 +114,9 @@
 
 <source>Size:</source>
 <target>Größe:</target>
+
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Der Vergleich nach Dateiinhalt wurde für die ausgeschlossenen Dateien %x übersprungen.</target>
 
 <source>Items differ in attributes only</source>
 <target>Die Elemente unterscheiden sich nur in Attributen</target>
@@ -328,7 +325,7 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Stop wurde eingeleitet: Warte bis die aktuelle Operation beendet ist...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>Der Zeitstempel für die Versionierung kann nicht erstellt werden:</target>
 
 <source>&Open...</source>
@@ -604,7 +601,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Jetzt herunterladen?</target>
 
 <source>&Download</source>
-<target>&Download</target>
+<target>Zum &Download</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync ist auf dem neuesten Stand.</target>
@@ -653,21 +650,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
-
-<source>Close progress dialog</source>
-<target>Schließe Fortschrittsdialog</target>
-
-<source>Standby</source>
-<target>Energie sparen</target>
-
-<source>Log off</source>
-<target>Abmelden</target>
-
-<source>Shut down</source>
-<target>Herunterfahren</target>
-
-<source>Hibernate</source>
-<target>Ruhezustand</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternative Vergleichseinstellungen</target>
@@ -774,6 +756,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Save as batch job</source>
 <target>Als Batch-Auftrag speichern</target>
 
+<source>View type:</source>
+<target>Ansichtstyp:</target>
+
+<source>Select view:</source>
+<target>Ansicht wählen:</target>
+
+<source>Statistics:</source>
+<target>Statistiken:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Anzahl der zu erstellenden Dateien und Ordner</target>
 
@@ -875,14 +866,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>On completion:</source>
 <target>Nach Abschluss:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Ermittle die Synchronisationsrichtungen mit Hilfe von Datenbankdateien</target>
+
 <source>Start synchronization now?</source>
 <target>Synchronisation jetzt starten?</target>
 
 <source>Variant:</source>
 <target>Variante:</target>
-
-<source>Statistics</source>
-<target>Statistiken</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Diesen Dialog nicht mehr anzeigen</target>
@@ -920,8 +911,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Stop synchronization at first error</source>
 <target>Synchronisation beim ersten Fehler anhalten</target>
 
-<source>Show progress dialog</source>
-<target>Fortschrittsdialog zeigen</target>
+<source>Run minimized</source>
+<target>Minimiert ausführen</target>
 
 <source>Save log:</source>
 <target>Protokoll speichern:</target>
@@ -937,12 +928,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>&Recycle bin</source>
 <target>&Papierkorb</target>
-
-<source>Delete on both sides</source>
-<target>Auf beiden Seiten löschen</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Lösche auf beiden Seiten, auch wenn die Datei nur auf einer Seite markiert ist</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Wählen Sie Filterregeln aus, um einzelne Dateien von der Synchronisation auszuschließen. Geben Sie Dateipfade relativ zu ihrem zugehörigen Ordnerpaar an.</target>
@@ -965,8 +950,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Clear</source>
-<target>&Löschen</target>
+<source>&Reset</source>
+<target>&Zurücksetzen</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Die folgenden Einstellungen werden für alle Synchronisationsaufgaben verwendet.</target>
@@ -1064,8 +1049,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Find</source>
 <target>Suchen</target>
 
-<source>Select View</source>
-<target>Ansicht auswählen</target>
+<source>View Settings</source>
+<target>Ansichtseinstellungen</target>
 
 <source>Overview</source>
 <target>Übersicht</target>
@@ -1205,6 +1190,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Do&n't save</source>
 <target>&Nicht speichern</target>
 
+<source>Delete selected configurations</source>
+<target>Ausgewählte Konfigurationen löschen</target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1256,8 +1244,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Set as default</source>
 <target>Als Standard festlegen</target>
 
-<source>All folders are in sync</source>
-<target>Alle Ordner sind synchron</target>
+<source>All files are in sync</source>
+<target>Alle Dateien sind synchron</target>
 
 <source>Synchronization Settings</source>
 <target>Synchronisationseinstellungen</target>
@@ -1276,6 +1264,21 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Searching for program updates...</source>
 <target>Suche nach aktualisierten Programmversionen...</target>
+
+<source>Close progress dialog</source>
+<target>Schließe Fortschrittsdialog</target>
+
+<source>Standby</source>
+<target>Energie sparen</target>
+
+<source>Log off</source>
+<target>Abmelden</target>
+
+<source>Shut down</source>
+<target>Herunterfahren</target>
+
+<source>Hibernate</source>
+<target>Ruhezustand</target>
 
 <source>Scanning...</source>
 <target>Suche Dateien...</target>
@@ -1303,6 +1306,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>&Continue</source>
 <target>&Fortfahren</target>
+
+<source>Progress</source>
+<target>Fortschritt</target>
 
 <source>Log</source>
 <target>Protokoll</target>
@@ -1394,7 +1400,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Time stamp</source>
 <target>Zeitstempel</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>Einen Zeitstempel an jeden Dateinamen anhängen</target>
 
 <source>File</source>
@@ -1519,6 +1525,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Unable to move %x to the recycle bin.</source>
 <target>%x kann nicht in den Papierkorb verschoben werden.</target>
+
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Die Prüfung des Papierkorbs für Ordner %x ist fehlgeschlagen.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Der endgültige Pfad für %x kann nicht ermittelt werden.</target>

@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>サイズ:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>除外されたファイル %x の内容の比較をスキップ</target>
+
 <source>Items differ in attributes only</source>
 <target>属性のみ異なる項目</target>
 
@@ -292,9 +295,6 @@
 <source>%x items/sec</source>
 <target>%x 項目/秒</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>構成ファイル %x は部分的のみ読み込まれます.</target>
-
 <source>Show in Explorer</source>
 <target>エクスプローラで表示</target>
 
@@ -322,11 +322,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>停止の要求: 現在の操作が完了するのを待機しています...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>バージョン付けのタイムスタンプを作成出来ません:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>次の XML要素を読み込めません:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>バージョン管理のタイムスタンプを作成できません:</target>
 
 <source>&Open...</source>
 <target>開く(&O)...</target>
@@ -555,6 +552,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>ログファイル %x を保存中...</target>
 
+<source>Stopped</source>
+<target>停止</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>FreeFileSync のメインウィンドウを切り替えることでこの問題を解決</target>
 
@@ -646,21 +646,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>ドラッグ && ドロップ</target>
-
-<source>Close progress dialog</source>
-<target>進捗ダイアログを閉じる</target>
-
-<source>Standby</source>
-<target>スタンバイ</target>
-
-<source>Log off</source>
-<target>ログオフ</target>
-
-<source>Shut down</source>
-<target>シャットダウン</target>
-
-<source>Hibernate</source>
-<target>休止状態</target>
 
 <source>Alternate comparison settings</source>
 <target>代替比較設定</target>
@@ -767,11 +752,20 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>一括ジョブで保存</target>
 
+<source>View type:</source>
+<target>表示形式:</target>
+
+<source>Select view:</source>
+<target>選択表示</target>
+
+<source>Statistics:</source>
+<target>統計情報:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>作成されたファイル、およびフォルダの数</target>
 
 <source>Number of files that will be overwritten</source>
-<target>上書きされたファイル数</target>
+<target>上書きされたファイルの数</target>
 
 <source>Number of files and folders that will be deleted</source>
 <target>削除されたファイル、およびフォルダの数</target>
@@ -780,7 +774,7 @@ The command is triggered if:
 <target>コピーの合計バイト</target>
 
 <source>Select a variant:</source>
-<target>メソッドを選択:</target>
+<target>バリアントを選択:</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>更新時刻とサイズを比較して、同一ファイルを識別します</target>
@@ -830,13 +824,13 @@ The command is triggered if:
 <target>完全消去</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>ファイルを上書き、または完全に削除</target>
+<target>ファイルを上書き/または完全に削除します</target>
 
 <source>Recycle bin</source>
 <target>ゴミ箱</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
-<target>ファイルを削除/上書きする時、ゴミ箱にバックアップをとる</target>
+<target>ファイルを削除/上書きする時に、ゴミ箱にバックアップをとる</target>
 
 <source>Versioning</source>
 <target>バージョン管理</target>
@@ -868,14 +862,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>完了時の動作:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>データベースファイルを利用して、同期の方向を検出します。</target>
+
 <source>Start synchronization now?</source>
 <target>今すぐ同期を開始しますか?</target>
 
 <source>Variant:</source>
 <target>メソッド:</target>
-
-<source>Statistics</source>
-<target>統計</target>
 
 <source>&Don't show this dialog again</source>
 <target>次回以降から表示しない(&D)</target>
@@ -913,8 +907,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>最初のエラーで同期処理を停止</target>
 
-<source>Show progress dialog</source>
-<target>進捗ダイアログを表示</target>
+<source>Run minimized</source>
+<target>最小化で起動</target>
 
 <source>Save log:</source>
 <target>ログ保存:</target>
@@ -931,14 +925,8 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>ゴミ箱(&R)</target>
 
-<source>Delete on both sides</source>
-<target>両方を削除</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>片側のペインのみ選択されている場合でも両方を削除する</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>同期処理から特定のファイルを除外するフィルター規則を選択します。対応するそれらフォルダ ペアからの相対ファイルパスを入力.</target>
+<target>同期処理から特定のファイルを除外するためのフィルター規則を選択、対応するそれらフォルダ ペアからの相対ファイルパスを入力します.</target>
 
 <source>Include:</source>
 <target>含める:</target>
@@ -958,8 +946,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大:</target>
 
-<source>&Clear</source>
-<target>クリア(&C)</target>
+<source>&Reset</source>
+<target>リセット(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下の設定は、すべての同期ジョブで使用されます</target>
@@ -1057,8 +1045,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>検索</target>
 
-<source>Select View</source>
-<target>表示を選択</target>
+<source>View Settings</source>
+<target>表示設定</target>
 
 <source>Overview</source>
 <target>概要</target>
@@ -1137,11 +1125,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>フィルターを経由して除外</target>
 
-<source>Exclude temporarily</source>
-<target>一時的に除外</target>
-
 <source>Include temporarily</source>
 <target>一時的に含める</target>
+
+<source>Exclude temporarily</source>
+<target>一時的に除外</target>
 
 <source>Delete</source>
 <target>削除</target>
@@ -1194,6 +1182,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>保存しない(&N)</target>
 
+<source>Delete selected configurations</source>
+<target>選択された構成設定を削除</target>
+
 <source>Filter</source>
 <target>フィルター</target>
 
@@ -1245,8 +1236,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>デフォルトにセット</target>
 
-<source>All folders are in sync</source>
-<target>すべてのフォルダを同期</target>
+<source>All files are in sync</source>
+<target>すべてのファイルを同期</target>
 
 <source>Synchronization Settings</source>
 <target>同期の設定</target>
@@ -1265,6 +1256,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>アップデートを検索しています...</target>
+
+<source>Close progress dialog</source>
+<target>進捗ダイアログを閉じる</target>
+
+<source>Standby</source>
+<target>スタンバイ</target>
+
+<source>Log off</source>
+<target>ログオフ</target>
+
+<source>Shut down</source>
+<target>シャットダウン</target>
+
+<source>Hibernate</source>
+<target>休止状態</target>
 
 <source>Scanning...</source>
 <target>スキャン中...</target>
@@ -1287,14 +1293,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>初期化中...</target>
 
-<source>Stopped</source>
-<target>停止</target>
-
 <source>Completed</source>
 <target>完了しました!</target>
 
 <source>&Continue</source>
 <target>続行(&C)</target>
+
+<source>Progress</source>
+<target>進行状況</target>
 
 <source>Log</source>
 <target>ログ</target>
@@ -1384,8 +1390,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>タイムスタンプ</target>
 
-<source>Append a timestamp to each file name</source>
-<target>各ファイル名にタイムスタンプを追加</target>
+<source>Append a time stamp to each file name</source>
+<target>各ファイル名にタイムスタンプを付加</target>
 
 <source>File</source>
 <target>ファイル</target>
@@ -1507,9 +1513,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>%x をゴミ箱に移動できません.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>フォルダ %x のゴミ箱のチェックに失敗</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>%x の最終的なパスを決定できません.</target>
 
 <source>Error Code %x:</source>
 <target>エラーコード %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>次の XML要素を読み込めません:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>構成ファイル %x は部分的のみ読み込まれます.</target>
 

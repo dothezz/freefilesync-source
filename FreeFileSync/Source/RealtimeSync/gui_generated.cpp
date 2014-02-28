@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov  6 2013)
+// C++ code generated with wxFormBuilder (version Feb 26 2014)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "../wx+/bitmap_button.h"
+#include "wx+/bitmap_button.h"
 
 #include "gui_generated.h"
 

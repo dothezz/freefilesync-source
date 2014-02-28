@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov  6 2013)
+// C++ code generated with wxFormBuilder (version Feb 26 2014)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -11,8 +11,8 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-class ExecFinishedBox;
 class FolderHistoryBox;
+class OnCompletionBox;
 class ToggleButton;
 namespace zen { class BitmapTextButton; }
 namespace zen { class Graph2D; }
@@ -143,15 +143,17 @@ protected:
     wxListBox* m_listBoxHistory;
     wxPanel* m_panelViewFilter;
     wxBoxSizer* bSizerViewFilter;
+    wxStaticText* m_staticTextViewType;
     ToggleButton* m_bpButtonViewTypeSyncAction;
     ToggleButton* m_bpButtonShowExcluded;
-    ToggleButton* m_bpButtonShowDoNothing;
+    wxStaticText* m_staticTextSelectView;
     ToggleButton* m_bpButtonShowCreateLeft;
     ToggleButton* m_bpButtonShowUpdateLeft;
     ToggleButton* m_bpButtonShowDeleteLeft;
     ToggleButton* m_bpButtonShowLeftOnly;
     ToggleButton* m_bpButtonShowLeftNewer;
     ToggleButton* m_bpButtonShowEqual;
+    ToggleButton* m_bpButtonShowDoNothing;
     ToggleButton* m_bpButtonShowDifferent;
     ToggleButton* m_bpButtonShowRightNewer;
     ToggleButton* m_bpButtonShowRightOnly;
@@ -159,6 +161,7 @@ protected:
     ToggleButton* m_bpButtonShowUpdateRight;
     ToggleButton* m_bpButtonShowCreateRight;
     ToggleButton* m_bpButtonShowConflict;
+    wxStaticText* m_staticText96;
     wxPanel* m_panelStatistics;
     wxBoxSizer* bSizer1801;
     wxStaticBitmap* m_bitmapCreateLeft;
@@ -316,7 +319,7 @@ protected:
     wxStaticLine* m_staticline36;
     wxBoxSizer* bSizerOnCompletion;
     wxStaticText* m_staticText89;
-    ExecFinishedBox* m_comboBoxExecFinished;
+    OnCompletionBox* m_comboBoxOnCompletion;
     wxStaticLine* m_staticline31;
     wxBoxSizer* bSizerConfig;
     wxStaticText* m_staticTextHeaderCategory1;
@@ -528,8 +531,8 @@ public:
     wxNotebook* m_notebookResult;
     wxStaticLine* m_staticlineFooter;
     wxBoxSizer* bSizerStdButtons;
-    wxBoxSizer* bSizerExecFinished;
-    ExecFinishedBox* m_comboBoxExecFinished;
+    wxBoxSizer* bSizerOnCompletion;
+    OnCompletionBox* m_comboBoxOnCompletion;
     wxButton* m_buttonClose;
     wxButton* m_buttonPause;
     wxButton* m_buttonStop;
@@ -583,9 +586,9 @@ protected:
     wxToggleButton* m_toggleBtnErrorPopup;
     wxToggleButton* m_toggleBtnErrorStop;
     wxStaticLine* m_staticline26;
-    wxCheckBox* m_checkBoxShowProgress;
+    wxCheckBox* m_checkBoxRunMinimized;
     wxStaticText* m_staticText81;
-    ExecFinishedBox* m_comboBoxExecFinished;
+    OnCompletionBox* m_comboBoxOnCompletion;
     wxStaticLine* m_staticline25;
     wxCheckBox* m_checkBoxGenerateLogfile;
     wxPanel* m_panelLogfile;
@@ -635,14 +638,12 @@ protected:
     wxStaticLine* m_staticline9;
     wxBoxSizer* bSizerStdButtons;
     wxCheckBox* m_checkBoxUseRecycler;
-    wxCheckBox* m_checkBoxDeleteBothSides;
     wxButton* m_buttonOK;
     wxButton* m_buttonCancel;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnUseRecycler( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDelOnBothSides( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 

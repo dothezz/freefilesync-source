@@ -48,8 +48,8 @@ Zstring removeLongPathPrefix(const Zstring& path); //throw()
 //################## implementation ##################
 
 //there are two flavors of long path prefix: one for UNC paths, one for regular paths
-const Zstring LONG_PATH_PREFIX     = L"\\\\?\\";
-const Zstring LONG_PATH_PREFIX_UNC = L"\\\\?\\UNC";
+const wchar_t LONG_PATH_PREFIX    [] = L"\\\\?\\";    //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
+const wchar_t LONG_PATH_PREFIX_UNC[] = L"\\\\?\\UNC"; //
 
 template <size_t maxPath> inline
 Zstring applyLongPathPrefixImpl(const Zstring& path)

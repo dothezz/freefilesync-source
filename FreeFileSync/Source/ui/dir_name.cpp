@@ -99,7 +99,7 @@ DirectoryName<NameControl>::DirectoryName(wxWindow&     dropWindow,
     }
 
     //keep dirPicker and dirName synchronous
-    dirName_     .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel), nullptr, this);
+    dirName_     .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel      ), nullptr, this);
     dirName_     .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(DirectoryName::onWriteDirManually), nullptr, this);
     selectButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DirectoryName::onSelectDir       ), nullptr, this);
 }
@@ -112,7 +112,7 @@ DirectoryName<NameControl>::~DirectoryName()
     if (dropWindow2_)
         dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::onFilesDropped), nullptr, this);
 
-    dirName_     .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel), nullptr, this);
+    dirName_     .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel      ), nullptr, this);
     dirName_     .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(DirectoryName::onWriteDirManually), nullptr, this);
     selectButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DirectoryName::onSelectDir       ), nullptr, this);
 }

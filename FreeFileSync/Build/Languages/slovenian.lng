@@ -7,18 +7,6 @@
 	<plural_definition>n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3</plural_definition>
 </header>
 
-<source>
-<pluralform>Showing %y of 1 row</pluralform>
-<pluralform>Showing %y of %x rows</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to execute the command %y for one item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Obe strani sta se spremenili od zadnje sinhronizacije.</target>
 
@@ -126,6 +114,9 @@
 
 <source>Size:</source>
 <target>Velikost:</target>
+
+<source>Content comparison was skipped for excluded files %x.</source>
+<target></target>
 
 <source>Items differ in attributes only</source>
 <target>Elementi se razlikujejo samo v atributih</target>
@@ -313,9 +304,6 @@
 <source>%x items/sec</source>
 <target>%x elementov/s</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Nastavitvena datoteka %x naložena samo delno.</target>
-
 <source>Show in Explorer</source>
 <target>Prikaži v Raziskovalcu</target>
 
@@ -343,11 +331,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Zahteva za ustavitev: Čakam da se trenutni proces zaključi...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Ne morem ustvariti časovnega žiga za verzioniranje:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Ne morem brati naslednje XML elemente:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target></target>
 
 <source>&Open...</source>
 <target>&Odpri...</target>
@@ -576,6 +561,9 @@ Ukaz se sproži če:
 <source>Saving log file %x...</source>
 <target>Shranjujem datoteko beleženja %x...</target>
 
+<source>Stopped</source>
+<target>Ustavljen</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Preklopite na FreeFileSync glavno okno za odpravo težave.</target>
 
@@ -670,21 +658,6 @@ Ukaz se sproži če:
 
 <source>Drag && drop</source>
 <target>Povleci && spusti</target>
-
-<source>Close progress dialog</source>
-<target>Zapri pogovorno okno z napredkom</target>
-
-<source>Standby</source>
-<target>V pripravljenost</target>
-
-<source>Log off</source>
-<target>Odjavi</target>
-
-<source>Shut down</source>
-<target>Ugasni</target>
-
-<source>Hibernate</source>
-<target>Hibernacija</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternativne nastavitve primerjave</target>
@@ -791,6 +764,15 @@ Ukaz se sproži če:
 <source>Save as batch job</source>
 <target>Shrani kot serijsko opravilo</target>
 
+<source>View type:</source>
+<target></target>
+
+<source>Select view:</source>
+<target></target>
+
+<source>Statistics:</source>
+<target></target>
+
 <source>Number of files and folders that will be created</source>
 <target>Število datotek in map, ki bodo ustvarjene</target>
 
@@ -892,14 +874,14 @@ Ukaz se sproži če:
 <source>On completion:</source>
 <target>Ob zaključku:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target></target>
+
 <source>Start synchronization now?</source>
 <target>Zaženem sinhnorizacijo takoj?</target>
 
 <source>Variant:</source>
 <target>Možnost:</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Ne pokaži več tega sporočila</target>
@@ -937,8 +919,8 @@ Ukaz se sproži če:
 <source>Stop synchronization at first error</source>
 <target>Ustavi sinhnorizacojo ob prvi napaki</target>
 
-<source>Show progress dialog</source>
-<target>Prikazuj pogovorno okno z napredkom</target>
+<source>Run minimized</source>
+<target></target>
 
 <source>Save log:</source>
 <target>Shrani dnevnik:</target>
@@ -954,12 +936,6 @@ Ukaz se sproži če:
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
-
-<source>Delete on both sides</source>
-<target>Izbriši na obeh straneh</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Izberi filtrirna pravila za izključitev določenih datotek iz sinhnorizacije. Vpiši pot datotek relativno na imenik v obdelavi</target>
@@ -982,8 +958,8 @@ Ukaz se sproži če:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Clear</source>
-<target>P&očisti</target>
+<source>&Reset</source>
+<target></target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Naslednje nastavitve se uporabljajo pri vseh sinhronizacijskih opravilih.</target>
@@ -1081,8 +1057,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Find</source>
 <target>Najdi</target>
 
-<source>Select View</source>
-<target>Izberi pogled</target>
+<source>View Settings</source>
+<target></target>
 
 <source>Overview</source>
 <target>Pregled</target>
@@ -1114,6 +1090,12 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Confirm</source>
 <target>Potrdi</target>
 
+<source>
+<pluralform>Do you really want to execute the command %y for one item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target></target>
+
 <source>&Execute</source>
 <target>&Izvedi</target>
 
@@ -1139,6 +1121,12 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <pluralform>%x datotek</pluralform>
 </target>
 
+<source>
+<pluralform>Showing %y of 1 row</pluralform>
+<pluralform>Showing %y of %x rows</pluralform>
+</source>
+<target></target>
+
 <source>Set direction:</source>
 <target>Nastavi smer:</target>
 
@@ -1151,11 +1139,11 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Exclude via filter:</source>
 <target>Izključi preko filtra:</target>
 
-<source>Exclude temporarily</source>
-<target>Začasno izključi</target>
-
 <source>Include temporarily</source>
 <target>Trenutno vključi</target>
+
+<source>Exclude temporarily</source>
+<target>Začasno izključi</target>
 
 <source>Delete</source>
 <target>Izbriši</target>
@@ -1208,6 +1196,9 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Do&n't save</source>
 <target>Ne shra&ni</target>
 
+<source>Delete selected configurations</source>
+<target></target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1259,8 +1250,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Set as default</source>
 <target>Nastavi kot privzeto</target>
 
-<source>All folders are in sync</source>
-<target>Vse mape so sinhronizirane</target>
+<source>All files are in sync</source>
+<target></target>
 
 <source>Synchronization Settings</source>
 <target>Nastavitve sinhnorizacije</target>
@@ -1279,6 +1270,21 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Searching for program updates...</source>
 <target>Iščem posodobitve programa...</target>
+
+<source>Close progress dialog</source>
+<target>Zapri pogovorno okno z napredkom</target>
+
+<source>Standby</source>
+<target>V pripravljenost</target>
+
+<source>Log off</source>
+<target>Odjavi</target>
+
+<source>Shut down</source>
+<target>Ugasni</target>
+
+<source>Hibernate</source>
+<target>Hibernacija</target>
 
 <source>Scanning...</source>
 <target>Pregledujem...</target>
@@ -1301,14 +1307,14 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Initializing...</source>
 <target>Inicializiram...</target>
 
-<source>Stopped</source>
-<target>Ustavljen</target>
-
 <source>Completed</source>
 <target>Zaključeno</target>
 
 <source>&Continue</source>
 <target>&Nadaljuj</target>
+
+<source>Progress</source>
+<target></target>
 
 <source>Log</source>
 <target>Dnevnik</target>
@@ -1404,8 +1410,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Time stamp</source>
 <target>Časovna oznaka</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Dodaj časovno oznako k vsakemu imenu datoteke</target>
+<source>Append a time stamp to each file name</source>
+<target></target>
 
 <source>File</source>
 <target>Datoteka</target>
@@ -1536,9 +1542,18 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Ne morem premakniti %x v koš-</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target></target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Ne morem določiti končne poti za %x.</target>
 
 <source>Error Code %x:</source>
 <target>Koda napake %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Ne morem brati naslednje XML elemente:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Nastavitvena datoteka %x naložena samo delno.</target>
 

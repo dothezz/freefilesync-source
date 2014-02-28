@@ -36,8 +36,8 @@ public:
                        size_t automaticRetryDelay,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        zen::FfsReturnCode& returnCode,
-                       const std::wstring& execWhenFinished,
-                       std::vector<std::wstring>& execFinishedHistory);
+                       const Zstring& onCompletion,
+                       std::vector<Zstring>& onCompletionHistory);
     ~BatchStatusHandler();
 
     virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);

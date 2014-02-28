@@ -12,7 +12,7 @@
 
 namespace zen
 {
-const Zstring SYNC_DB_FILE_ENDING = Zstr(".ffs_db");
+const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
 struct InSyncDescrFile //subset of FileDescriptor
 {

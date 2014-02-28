@@ -10,7 +10,8 @@
 
 namespace zen
 {
-const Zstring LOCK_FILE_ENDING = Zstr(".ffs_lock"); //intermediate locks created by DirLock use this extension, too!
+//intermediate locks created by DirLock use this extension, too:
+const Zchar LOCK_FILE_ENDING[]  = Zstr(".ffs_lock"); //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
 //hold locks for a number of directories without blocking during lock creation
 //call after having checked directory existence!

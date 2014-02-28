@@ -118,6 +118,9 @@
 <source>Size:</source>
 <target>Розмір:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Порівняння вмісту виключених файлів %x було пропущене.</target>
+
 <source>Items differ in attributes only</source>
 <target>Елементи відрізняються тільки атрибутами</target>
 
@@ -301,9 +304,6 @@
 <source>%x items/sec</source>
 <target>%x елемента/сек</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Файл конфігурації %x завантажено лише частково.</target>
-
 <source>Show in Explorer</source>
 <target>Показати у Провіднику</target>
 
@@ -331,11 +331,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Запит зупинки: очікування завершення поточної операції...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>Не вдається створити часової мітки для версій:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Не вдається прочитати такі елементи XML:</target>
 
 <source>&Open...</source>
 <target>&Відкрити...</target>
@@ -564,6 +561,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Збереження файла журналу %x...</target>
 
+<source>Stopped</source>
+<target>Зупинено</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Ви можете перейти до головного вікна FreeFileSync щоб вирішити це питання.</target>
 
@@ -657,21 +657,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
-
-<source>Close progress dialog</source>
-<target>Закрити вікно прогресу</target>
-
-<source>Standby</source>
-<target>Сплячий режим</target>
-
-<source>Log off</source>
-<target>Вилогувати</target>
-
-<source>Shut down</source>
-<target>Вимкнути комп'ютер</target>
-
-<source>Hibernate</source>
-<target>Гібернація</target>
 
 <source>Alternate comparison settings</source>
 <target>Альтернативні налаштування порівняння</target>
@@ -778,6 +763,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Зберегти як пакетне завдання</target>
 
+<source>View type:</source>
+<target>Тип перегляду</target>
+
+<source>Select view:</source>
+<target>Вибрати перегляд:</target>
+
+<source>Statistics:</source>
+<target>Статистика:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Кількість файлів і папок, які будуть створені</target>
 
@@ -879,14 +873,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>Після завершення:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
+
 <source>Start synchronization now?</source>
 <target>Розпочати синхронізацію?</target>
 
 <source>Variant:</source>
 <target>Варіант:</target>
-
-<source>Statistics</source>
-<target>Статистика</target>
 
 <source>&Don't show this dialog again</source>
 <target>Більше &не показувати цей діалог</target>
@@ -924,8 +918,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>Зупинити синхронізацію при першій помилці</target>
 
-<source>Show progress dialog</source>
-<target>Показувати вікно прогресу</target>
+<source>Run minimized</source>
+<target>Запустити мінімізовано</target>
 
 <source>Save log:</source>
 <target>Зберегти журнал:</target>
@@ -941,12 +935,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Корзина</target>
-
-<source>Delete on both sides</source>
-<target>Вилучити з обох сторін</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Вилучити з обох сторін, навіть якщо файл виділений тільки з однієї сторони</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
@@ -969,8 +957,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>&Clear</source>
-<target>&Очистити</target>
+<source>&Reset</source>
+<target>&Відновити</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Наступні налаштування використовуються для всіх завдань синхронізації.</target>
@@ -1068,11 +1056,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Знайти</target>
 
-<source>Select View</source>
-<target>Вибрати перегляд</target>
+<source>View Settings</source>
+<target>Налаштування перегляду</target>
 
 <source>Overview</source>
-<target>Головна</target>
+<target>Огляд</target>
 
 <source>Configuration</source>
 <target>Налаштування</target>
@@ -1156,11 +1144,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Виключити через фільтр:</target>
 
-<source>Exclude temporarily</source>
-<target>Виключити тимчасово</target>
-
 <source>Include temporarily</source>
 <target>Включити</target>
+
+<source>Exclude temporarily</source>
+<target>Виключити тимчасово</target>
 
 <source>Delete</source>
 <target>Видалити</target>
@@ -1213,6 +1201,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&Не зберігати</target>
 
+<source>Delete selected configurations</source>
+<target>Вилучити вибрану конфігурацію</target>
+
 <source>Filter</source>
 <target>Фільтр</target>
 
@@ -1264,8 +1255,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Встановити за замовчуванням</target>
 
-<source>All folders are in sync</source>
-<target>Всі папки синхронізовано</target>
+<source>All files are in sync</source>
+<target>Всі файли синхронні</target>
 
 <source>Synchronization Settings</source>
 <target>Налаштування Синхронізації</target>
@@ -1284,6 +1275,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Пошук оновлень програми ...</target>
+
+<source>Close progress dialog</source>
+<target>Закрити вікно прогресу</target>
+
+<source>Standby</source>
+<target>Сплячий режим</target>
+
+<source>Log off</source>
+<target>Вилогувати</target>
+
+<source>Shut down</source>
+<target>Вимкнути комп'ютер</target>
+
+<source>Hibernate</source>
+<target>Гібернація</target>
 
 <source>Scanning...</source>
 <target>Сканування...</target>
@@ -1306,14 +1312,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Ініціалізація...</target>
 
-<source>Stopped</source>
-<target>Зупинено</target>
-
 <source>Completed</source>
 <target>Завершено</target>
 
 <source>&Continue</source>
 <target>&Продовжити</target>
+
+<source>Progress</source>
+<target>Прогрес</target>
 
 <source>Log</source>
 <target>Лог</target>
@@ -1407,8 +1413,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Часова мітка</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Додати часову мітку до кожного імені файлу</target>
+<source>Append a time stamp to each file name</source>
+<target>Приєднати часову мітку до кожної назви файлу</target>
 
 <source>File</source>
 <target>Файл</target>
@@ -1536,9 +1542,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Не вдається перемістити %x до Корзини.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Перевірка Корзини для папки %x не вдалася.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Не вдається визначити кінцевого шляху для %x.</target>
 
 <source>Error Code %x:</source>
 <target>Код помилки %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Не вдається прочитати такі елементи XML:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Файл конфігурації %x завантажено лише частково.</target>
 

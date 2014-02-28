@@ -81,13 +81,14 @@ bool tryReportingItemError(Command cmd, zen::TraverseCallback& callback, const Z
 void getInfoFromFileSymlink(const Zstring& linkName, zen::TraverseCallback::FileInfo& output) //throw FileError
 {
     //open handle to target of symbolic link
-    HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(linkName).c_str(),
-                                0,
-                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                nullptr,
-                                OPEN_EXISTING,
-                                FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory -> keep it even if we expect to open a file! See comment below
-                                nullptr);
+    HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(linkName).c_str(),              //_In_      LPCTSTR lpFileName,
+                                0,                                                       //_In_      DWORD dwDesiredAccess,
+                                FILE_SHARE_READ  | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
+                                FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
+                                //needed to open a directory -> keep it even if we expect to open a file! See comment below
+                                nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hFile == INVALID_HANDLE_VALUE)
         throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"CreateFile", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
@@ -117,14 +118,16 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error or if s
     //- root paths "C:\", "D:\"
     //- network shares: \\share\dirname
     //- indirection: subst S: %USERPROFILE%
-    //   -> GetVolumePathName()+GetVolumeInformation() OTOH incorrectly resolves "S:\Desktop\somedir" to "S:\Desktop\" - nice try...
-    const HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(pathName).c_str(),
-                                     0,
-                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                     nullptr,
-                                     OPEN_EXISTING,
-                                     FILE_FLAG_BACKUP_SEMANTICS /*needed to open a directory*/ /*| FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!*/ ,
-                                     nullptr);
+    //   -> GetVolumePathName() + GetVolumeInformation() OTOH incorrectly resolves "S:\Desktop\somedir" to "S:\Desktop\" - nice try...
+    const HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(pathName).c_str(),             //_In_      LPCTSTR lpFileName,
+                                     0,                                                      //_In_      DWORD dwDesiredAccess,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                     nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                     OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
+                                     // FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!
+                                     FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
+                                     /*needed to open a directory*/
+                                     nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hDir == INVALID_HANDLE_VALUE)
         return 0;
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));

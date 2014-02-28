@@ -101,7 +101,7 @@
 <target>Karşıdaki klasör boş olarak kabul edilecek.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Şu klasörlerin bağlı yolları var. Eşleştirme kurallarını ayarlarken dikkatli olun:</target>
+<target>Şu klasörlerin yolları birbirine bağlı. Eşleştirme kurallarını ayarlarken dikkatli olun:</target>
 
 <source>File %x has an invalid date.</source>
 <target>%x dosyasının tarihi geçersiz.</target>
@@ -114,6 +114,9 @@
 
 <source>Size:</source>
 <target>Boyut:</target>
+
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Katılmayan %x dosyaları için içerik karşılaştırması atlandı.</target>
 
 <source>Items differ in attributes only</source>
 <target>Yalnız öznitelikleri farklı ögeler</target>
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x öge/saniye</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>%x ayarlar dosyası kısmen yüklendi.</target>
-
 <source>Show in Explorer</source>
 <target>Tarayıcıda Görüntüleyin</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Durdurulması istendi: Yürürlükteki işlemin bitmesi bekleniyor...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Sürüm için zaman damgası oluşturulamadı:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Şu XML elemanları okunamadı:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Sürüm izlemesi için zaman damgası oluşturulamadı:</target>
 
 <source>&Open...</source>
 <target>&Açın...</target>
@@ -558,6 +555,9 @@ Komut şu durumlarda yürütülür:
 <source>Saving log file %x...</source>
 <target>%x günlük dosyası kaydediliyor...</target>
 
+<source>Stopped</source>
+<target>Durduruldu</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Bu sorunu çözmek için FreeFileSync ana penceresine geçebilirsiniz.</target>
 
@@ -650,21 +650,6 @@ Komut şu durumlarda yürütülür:
 
 <source>Drag && drop</source>
 <target>Dosyaları sürükleyip buraya bırakabilirsiniz</target>
-
-<source>Close progress dialog</source>
-<target>İşlem penceresi kapatılsın</target>
-
-<source>Standby</source>
-<target>Uykuya dalınsın</target>
-
-<source>Log off</source>
-<target>Oturum kapatılsın</target>
-
-<source>Shut down</source>
-<target>Bilgisayar kapatılsın</target>
-
-<source>Hibernate</source>
-<target>Hazırda bekletilsin</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternatif karşılaştırma ayarları</target>
@@ -771,6 +756,15 @@ Komut şu durumlarda yürütülür:
 <source>Save as batch job</source>
 <target>Toplu iş olarak kaydedin</target>
 
+<source>View type:</source>
+<target>Görünüm tipi:</target>
+
+<source>Select view:</source>
+<target>Görünüm seçin:</target>
+
+<source>Statistics:</source>
+<target>İstatistikler:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Eklenecek dosya ve klasör sayısı</target>
 
@@ -802,13 +796,13 @@ Komut şu durumlarda yürütülür:
 <target>Tamam</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>İki taraftaki değişiklikler belirlenir ve kopyalanır. Silinme, taşınma ve çakışmalar, veritabanı kullanılarak kendiliğinden algılanır.</target>
+<target>İki tarafta da değişikliklere bakılır ve karşılıklı kopyalanır. Silinmiş, taşınmış ve çakışan ögeler, veritabanı kullanılarak kendiliğinden algılanır.</target>
 
 <source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Sağ klasör, sola uyacak şekilde değiştirilerek, sol klasörün yansı yedeği oluşturulur.</target>
+<target>Sağ klasör, sola uyacak şekilde güncellenerek, sol klasörün yansı yedeği oluşturulur.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>Sol taraftaki yeni ya da güncellenmiş dosyalar sağ tarafa kopyalanır.</target>
+<target>Sol taraftaki yeni ya da güncellenmiş ögeler sağ tarafa kopyalanır.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Eşleştirme kuralları kullanıcının isteğine göre belirlenir.</target>
@@ -831,7 +825,7 @@ Komut şu durumlarda yürütülür:
 <target>Dosya silme işlemi:</target>
 
 <source>Permanent</source>
-<target>Kalıcı olarak</target>
+<target>Kalıcı olarak silinsin</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Dosyalar kalıcı olarak silinir ya da üzerine yazılır</target>
@@ -870,16 +864,16 @@ Komut şu durumlarda yürütülür:
 <target>Hata ya da uyarılar açılır pencerede görüntülenir</target>
 
 <source>On completion:</source>
-<target>Tamamlandığında:</target>
+<target>Eşleştirme tamamlandığında:</target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Eşleştirme yönü, veritabanı dosyaları yardımı ile belirlensin</target>
 
 <source>Start synchronization now?</source>
 <target>Eşleştirme başlatılsın mı?</target>
 
 <source>Variant:</source>
 <target>İşlem tipi:</target>
-
-<source>Statistics</source>
-<target>İstatistikler</target>
 
 <source>&Don't show this dialog again</source>
 <target>Bu pencere bir daha &görüntülenmesin</target>
@@ -917,8 +911,8 @@ Komut şu durumlarda yürütülür:
 <source>Stop synchronization at first error</source>
 <target>Oluşacak ilk hatada eşleştirme durdurulur</target>
 
-<source>Show progress dialog</source>
-<target>İşlem penceresi görüntülensin</target>
+<source>Run minimized</source>
+<target>Küçültülmüş olarak çalışsın</target>
 
 <source>Save log:</source>
 <target>Günlüğe kaydedilsin:</target>
@@ -934,12 +928,6 @@ Komut şu durumlarda yürütülür:
 
 <source>&Recycle bin</source>
 <target>Ge&ri Dönüşüm Kutusu</target>
-
-<source>Delete on both sides</source>
-<target>Her iki taraftaki de silinsin</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Dosya yalnız bir tarafta seçili olsa bile her iki taraftan da silinir</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Eşleştirmeye katılmayacak dosyaların süzülme kurallarını belirleyin. Dosya yollarını bulundukları klasör çiftine göre yazın.</target>
@@ -962,8 +950,8 @@ Komut şu durumlarda yürütülür:
 <source>Maximum:</source>
 <target>En büyük:</target>
 
-<source>&Clear</source>
-<target>&Temizleyin</target>
+<source>&Reset</source>
+<target>Sıfı&rlayın</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Aşağıdaki ayarlar tüm eşleştirme işlemleri için geçerlidir.</target>
@@ -1061,8 +1049,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Find</source>
 <target>Arayın</target>
 
-<source>Select View</source>
-<target>Görünümü Seçin</target>
+<source>View Settings</source>
+<target>Görünüm Ayarları</target>
 
 <source>Overview</source>
 <target>Genel</target>
@@ -1145,11 +1133,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Exclude via filter:</source>
 <target>Şu süzgeçle katılmasın:</target>
 
-<source>Exclude temporarily</source>
-<target>Geçici olarak katılmasın</target>
-
 <source>Include temporarily</source>
 <target>Geçici olarak katılsın</target>
+
+<source>Exclude temporarily</source>
+<target>Geçici olarak katılmasın</target>
 
 <source>Delete</source>
 <target>Silin</target>
@@ -1202,6 +1190,9 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Do&n't save</source>
 <target>Kaydedilmesi&n</target>
 
+<source>Delete selected configurations</source>
+<target>Seçili ayarları silin</target>
+
 <source>Filter</source>
 <target>Süzgeç</target>
 
@@ -1253,8 +1244,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Set as default</source>
 <target>Varsayılan olarak belirleyin</target>
 
-<source>All folders are in sync</source>
-<target>Tüm klasörler eşleştirildi</target>
+<source>All files are in sync</source>
+<target>Tüm dosyalar eşleştirildi</target>
 
 <source>Synchronization Settings</source>
 <target>Eşleştirme Ayarları</target>
@@ -1273,6 +1264,21 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>Searching for program updates...</source>
 <target>Yazılım güncellemesine bakılıyor...</target>
+
+<source>Close progress dialog</source>
+<target>İşlem penceresi kapatılsın</target>
+
+<source>Standby</source>
+<target>Uykuya dalınsın</target>
+
+<source>Log off</source>
+<target>Oturum kapatılsın</target>
+
+<source>Shut down</source>
+<target>Bilgisayar kapatılsın</target>
+
+<source>Hibernate</source>
+<target>Hazırda bekletilsin</target>
 
 <source>Scanning...</source>
 <target>Taranıyor...</target>
@@ -1295,14 +1301,14 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Initializing...</source>
 <target>Başlatılıyor...</target>
 
-<source>Stopped</source>
-<target>Durduruldu</target>
-
 <source>Completed</source>
 <target>Tamamlandı</target>
 
 <source>&Continue</source>
 <target>&Devam</target>
+
+<source>Progress</source>
+<target>İlerleme</target>
 
 <source>Log</source>
 <target>Günlük</target>
@@ -1394,8 +1400,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Time stamp</source>
 <target>Zaman damgası</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Dosya adlarına zaman damgası eklensin</target>
+<source>Append a time stamp to each file name</source>
+<target>Her bir dosya adına bir zaman damgası eklensin</target>
 
 <source>File</source>
 <target>Dosya</target>
@@ -1520,9 +1526,18 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Unable to move %x to the recycle bin.</source>
 <target>%x Geri Dönüşüm Kutusuna atılamıyor.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>%x klasörü için geri dönüşüm kutusu denetlenemedi.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Son %x yolu belirlenemedi.</target>
 
 <source>Error Code %x:</source>
 <target>Hata Kodu %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Şu XML elemanları okunamadı:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>%x ayarlar dosyası kısmen yüklendi.</target>
 

@@ -11,13 +11,13 @@
 #include <zen/recycler.h>
 #include <zen/stl_tools.h>
 #include <zen/scope_guard.h>
-#include <zen/thread.h>
+//#include <zen/thread.h>
 #include <wx+/image_resources.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
 #include "lib/norm_filter.h"
-#include "process_callback.h" //for UI_UPDATE_INTERVAL
+//#include "process_callback.h" //for UI_UPDATE_INTERVAL
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -1083,66 +1083,28 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirPair& baseDirObj) { FilterByTimeSpan::execute(baseDirObj, timeFrom, timeTo); });
 }
 
-
 //############################################################################################################
+
 std::pair<Zstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
-                                                        const std::vector<FileSystemObject*>& selectionRight,
-                                                        bool deleteOnBothSides)
+                                                        const std::vector<FileSystemObject*>& selectionRight)
 {
     //don't use wxString here, it's linear allocation strategy would bring perf down to a crawl; Zstring: exponential growth!
     Zstring fileList;
     int totalDelCount = 0;
 
-    if (deleteOnBothSides)
-    {
-        //mix selected rows from left and right (without changing order)
-        std::vector<FileSystemObject*> selection;
+    for (const FileSystemObject* fsObj : selectionLeft)
+        if (!fsObj->isEmpty<LEFT_SIDE>())
         {
-            hash_set<FileSystemObject*> objectsUsed;
-            std::copy_if(selectionLeft .begin(), selectionLeft .end(), std::back_inserter(selection), [&](FileSystemObject* fsObj) { return objectsUsed.insert(fsObj).second; });
-            std::copy_if(selectionRight.begin(), selectionRight.end(), std::back_inserter(selection), [&](FileSystemObject* fsObj) { return objectsUsed.insert(fsObj).second; });
+            fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
+            ++totalDelCount;
         }
 
-        std::for_each(selection.begin(), selection.end(),
-                      [&](const FileSystemObject* fsObj)
+    for (const FileSystemObject* fsObj : selectionRight)
+        if (!fsObj->isEmpty<RIGHT_SIDE>())
         {
-            if (!fsObj->isEmpty<LEFT_SIDE>())
-            {
-                fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
-                ++totalDelCount;
-            }
-
-            if (!fsObj->isEmpty<RIGHT_SIDE>())
-            {
-                fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
-                ++totalDelCount;
-            }
-
-            fileList += Zstr('\n');
-        });
-    }
-    else //delete selected files only
-    {
-        std::for_each(selectionLeft.begin(), selectionLeft.end(),
-                      [&](const FileSystemObject* fsObj)
-        {
-            if (!fsObj->isEmpty<LEFT_SIDE>())
-            {
-                fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
-                ++totalDelCount;
-            }
-        });
-
-        std::for_each(selectionRight.begin(), selectionRight.end(),
-                      [&](const FileSystemObject* fsObj)
-        {
-            if (!fsObj->isEmpty<RIGHT_SIDE>())
-            {
-                fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
-                ++totalDelCount;
-            }
-        });
-    }
+            fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
+            ++totalDelCount;
+        }
 
     return std::make_pair(fileList, totalDelCount);
 }
@@ -1174,19 +1136,6 @@ bool tryReportingError(Function cmd, DeleteFilesHandler& handler) //return "true
         }
 }
 
-#ifdef ZEN_WIN
-//recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
-StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, DeleteFilesHandler& callback)
-{
-    const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(dirname), false);
-
-    auto ft = async([=] { return recycleBinStatus(dirname); });
-    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
-        callback.reportStatus(msg); //may throw!
-    return ft.get();
-}
-#endif
-
 
 template <SelectedSide side>
 void categorize(const std::set<FileSystemObject*>& rowsIn,
@@ -1196,27 +1145,37 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
                 std::map<Zstring, bool, LessFilename>& hasRecyclerBuffer,
                 DeleteFilesHandler& callback)
 {
-    auto hasRecycler = [&](const FileSystemObject& fsObj) -> bool
+    auto hasRecycler = [&](const Zstring& baseDirPf) -> bool
     {
 #ifdef ZEN_WIN
-        const Zstring& baseDirPf = fsObj.root().getBaseDirPf<side>();
-
         auto it = hasRecyclerBuffer.find(baseDirPf);
         if (it != hasRecyclerBuffer.end())
             return it->second;
-        return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS)).first->second;
+
+        const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(baseDirPf), false);
+
+        bool recExists = false;
+        try
+        {
+            recExists = recycleBinExists(baseDirPf, [&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
+        }
+        catch (const FileError& e) { callback.reportError(e.toString()); /*throw?*/ }
+
+        hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recExists));
+        return recExists;
+
 #elif defined ZEN_LINUX || defined ZEN_MAC
         return true;
 #endif
     };
 
-    for (auto it = rowsIn.begin(); it != rowsIn.end(); ++it)
-        if (!(*it)->isEmpty<side>())
+    for (FileSystemObject* row : rowsIn)
+        if (!row->isEmpty<side>())
         {
-            if (useRecycleBin && hasRecycler(**it)) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
-                deleteRecyler.push_back(*it);
+            if (useRecycleBin && hasRecycler(row->root().getBaseDirPf<side>())) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
+                deleteRecyler.push_back(row);
             else
-                deletePermanent.push_back(*it);
+                deletePermanent.push_back(row);
         }
 }
 
@@ -1308,14 +1267,12 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
     ItemDeleter<side> deleter(useRecycleBin, handler);
 
     for (FileSystemObject* fsObj : ptrList) //all pointers are required(!) to be bound
-    {
         if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
             tryReportingError([&]
         {
             fsObj->accept(deleter); //throw FileError
             fsObj->removeObject<side>(); //if directory: removes recursively!
         }, handler);
-    }
 }
 }
 
@@ -1323,7 +1280,6 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                               const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                               FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                               const std::vector<DirectionConfig>& directCfgs,
-                              bool deleteOnBothSides,
                               bool useRecycleBin,
                               DeleteFilesHandler& statusHandler,
                               bool& warningRecyclerMissing)
@@ -1340,11 +1296,6 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
     std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
     std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
-    if (deleteOnBothSides)
-    {
-        deleteLeft.insert(deleteRight.begin(), deleteRight.end());
-        deleteRight = deleteLeft;
-    }
 
     set_remove_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //still needed?
     set_remove_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //
@@ -1403,9 +1354,9 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     {
         std::wstring msg = _("The recycle bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n";
 
-        for (auto it = hasRecyclerBuffer.begin(); it != hasRecyclerBuffer.end(); ++it)
-            if (!it->second)
-                msg += std::wstring(L"\n") + it->first;
+        for (const auto& item : hasRecyclerBuffer)
+            if (!item.second)
+                msg += std::wstring(L"\n") + item.first;
 
         statusHandler.reportWarning(msg, warningRecyclerMissing); //throw?
     }

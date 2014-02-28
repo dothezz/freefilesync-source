@@ -53,8 +53,8 @@ size_t findUnicodePos(const UtfString& str, size_t unicodePos); //return positio
 //----------------------- implementation ----------------------------------
 namespace implementation
 {
-typedef std::uint_fast32_t CodePoint; //must be at least four bytes
-typedef std::uint_fast16_t Char16;    //we need an unsigned type
+typedef std::uint32_t CodePoint;
+typedef std::uint16_t Char16;
 typedef unsigned char Char8;
 
 const CodePoint LEAD_SURROGATE      = 0xd800;

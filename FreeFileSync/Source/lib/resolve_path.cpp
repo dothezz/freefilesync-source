@@ -4,6 +4,7 @@
 #include <zen/time.h>
 #include <zen/thread.h>
 #include <zen/utf.h>
+#include <zen/optional.h>
 #include <zen/scope_guard.h>
 #include <wx/utils.h> //wxGetEnv
 
@@ -82,7 +83,6 @@ Zstring resolveRelativePath(const Zstring& relativeName)
 }
 #endif
 
-
 #ifdef ZEN_WIN
 class CsidlConstants
 {
@@ -91,13 +91,16 @@ public:
 
     static const CsidlToDirMap& get()
     {
-        static CsidlConstants inst; //potential MT solved by intializing at startup, see below
-        return inst.csidlToDir;
+        //function scope static initialization: avoid static initialization order problem in global namespace!
+        static const CsidlToDirMap inst = createCsidlMapping();
+        return inst;
     }
 
 private:
-    CsidlConstants()
+    static CsidlToDirMap createCsidlMapping()
     {
+        CsidlToDirMap output;
+
         auto addCsidl = [&](int csidl, const Zstring& paramName)
         {
             wchar_t buffer[MAX_PATH] = {};
@@ -109,7 +112,7 @@ private:
             {
                 Zstring dirname = buffer;
                 if (!dirname.empty())
-                    csidlToDir.insert(std::make_pair(paramName, dirname));
+                    output.insert(std::make_pair(paramName, dirname));
             }
         };
 
@@ -135,7 +138,7 @@ private:
 
                     Zstring dirname = path;
                     if (!dirname.empty())
-                        csidlToDir.insert(std::make_pair(paramName, dirname));
+                        output.insert(std::make_pair(paramName, dirname));
                 }
             }
         };
@@ -197,16 +200,12 @@ private:
 
         FOLDERID_Public				covered by %Public%
         */
+        return output;
     }
-
-    CsidlConstants(const CsidlConstants&);
-    CsidlConstants& operator=(const CsidlConstants&);
-
-    CsidlToDirMap csidlToDir;
 };
 
-//caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
-struct Dummy { Dummy() { CsidlConstants::get(); }} blah;
+//caveat: function scope static initialization is not thread-safe in VS 2010!
+auto& dummy = CsidlConstants::get();
 #endif
 
 
@@ -319,7 +318,7 @@ namespace
 {
 #ifdef ZEN_WIN
 //networks and cdrom excluded - may still block for slow USB sticks!
-Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on error
+Opt<Zstring> getPathByVolumenName(const Zstring& volumeName) //return no value on error
 {
     //FindFirstVolume(): traverses volumes on local hard disks only!
     //GetLogicalDriveStrings(): traverses all *logical* volumes, including CD-ROM, FreeOTFE virtual volumes
@@ -332,13 +331,13 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
     if (0 < rv && rv < bufferSize)
     {
         //search for matching path in parallel until first hit
-        RunUntilFirstHit<Zstring> findFirstMatch;
+        GetFirstResult<Zstring> firstMatch;
 
         for (const wchar_t* it = &buffer[0]; *it != 0; it += strLength(it) + 1) //list terminated by empty c-string
         {
             const Zstring path = it;
 
-            findFirstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
+            firstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
             {
                 UINT type = ::GetDriveType(appendSeparator(path).c_str()); //non-blocking call!
                 if (type == DRIVE_REMOTE || type == DRIVE_CDROM)
@@ -353,18 +352,18 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
                 nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
                 nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
                 nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
-                nullptr,     //__out      LPTSTR lpFileSystemNameBuffer,
+                nullptr,     //__out      LPTSTR  lpFileSystemNameBuffer,
                 0))          //__in       DWORD nFileSystemNameSize
                     if (EqualFilename()(volumeName, Zstring(&volName[0])))
                         return zen::make_unique<Zstring>(path);
                 return nullptr;
             });
         }
-        if (auto result = findFirstMatch.get()) //blocks until ready
+        if (auto result = firstMatch.get()) //blocks until ready
             return *result;
     }
 
-    return Zstring();
+    return NoValue();
 }
 
 
@@ -417,9 +416,8 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
             //[.*] pattern was found...
             if (!volname.empty())
             {
-                Zstring volPath = getPathByVolumenName(volname); //may block for slow USB sticks!
-                if (!volPath.empty())
-                    return appendSeparator(volPath) + rest; //successfully replaced pattern
+                if (Opt<Zstring> volPath = getPathByVolumenName(volname)) //may block for slow USB sticks!
+                    return appendSeparator(*volPath) + rest; //successfully replaced pattern
             }
             //error: did not find corresponding volume name:
 
@@ -450,9 +448,8 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         dirname[1] == L':' &&
         dirname[2] == L'\\')
     {
-        Zstring volname = getVolumeName(Zstring(dirname.c_str(), 3)); //should not block
-        if (!volname.empty())
-            output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
+        if (Opt<Zstring> volname = getVolumeName(Zstring(dirname.c_str(), 3))) //should not block
+            output.insert(L"[" + *volname + L"]" + Zstring(dirname.c_str() + 2));
     }
 
     //2. replace volume name by volume path: [SYSTEM]\dirname -> c:\dirname
@@ -609,9 +606,9 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     auto connect = [&](NETRESOURCE& trgRes) //blocks heavily if network is not reachable!!!
     {
         //1. first try to connect without user interaction - blocks!
-        DWORD rv = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                        nullptr, // __in  LPCTSTR lpPassword,
-                                        nullptr, // __in  LPCTSTR lpUsername,
+        DWORD rv = ::WNetAddConnection2(&trgRes, //__in  LPNETRESOURCE lpNetResource,
+                                        nullptr, //__in  LPCTSTR lpPassword,
+                                        nullptr, //__in  LPCTSTR lpUsername,
                                         0);      //__in  DWORD dwFlags
         //53L	ERROR_BAD_NETPATH		The network path was not found.
         //67L   ERROR_BAD_NET_NAME

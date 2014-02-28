@@ -41,6 +41,7 @@ class GlobalResources
 public:
     static GlobalResources& instance()
     {
+        //caveat: function scope static initialization is not thread-safe in VS 2010! => but we wouldn't use wxWidgets in combination with multithreading anyway!
         static GlobalResources inst;
         return inst;
     }

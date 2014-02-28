@@ -374,14 +374,14 @@ void MainDialog::create()
 
     //------------------------------------------------------------------------------------------
     //check existence of all files in parallel:
-    RunUntilFirstHit<NullType> findFirstMissing;
+    GetFirstResult<FalseType> firstMissingDir;
 
     for (const Zstring& filename : filenames)
-        findFirstMissing.addJob([filename] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
+        firstMissingDir.addJob([filename] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? make_unique<FalseType>() : nullptr; });
 
     //potentially slow network access: give all checks 500ms to finish
-    const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
-                               !findFirstMissing.get(); //no missing
+    const bool allFilesExist = firstMissingDir.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
+                               !firstMissingDir.get(); //no missing
     if (!allFilesExist)
         filenames.clear(); //we do NOT want to show an error due to last config file missing on application start!
     //------------------------------------------------------------------------------------------
@@ -500,7 +500,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
                    wxAuiPaneInfo().Name(L"PanelFind").Layer(2).Bottom().Row(2).Caption(_("Find")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(200, m_bpButtonHideSearch->GetSize().GetHeight()).Hide());
 
     auiMgr.AddPane(m_panelViewFilter,
-                   wxAuiPaneInfo().Name(L"PanelView").Layer(2).Bottom().Row(1).Caption(_("Select View")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelView").Layer(2).Bottom().Row(1).Caption(_("View Settings")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_gridNavi,
                    wxAuiPaneInfo().Name(L"PanelOverview").Layer(3).Left().Position(1).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
@@ -719,7 +719,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
         //------------------------------------------------------------------------------------------
         //check existence of all directories in parallel!
-        RunUntilFirstHit<NullType> findFirstMissing;
+        GetFirstResult<FalseType> firstMissingDir;
 
         //harmonize checks with comparison.cpp:: checkForIncompleteInput()
         //we're really doing two checks: 1. check directory existence 2. check config validity -> don't mix them!
@@ -737,9 +737,9 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
                 haveFullPair = true;
 
             if (!dirLeft.empty())
-                findFirstMissing.addJob([=] { return !dirExists(dirLeft ) ? zen::make_unique<NullType>() : nullptr; });
+                firstMissingDir.addJob([=] { return !dirExists(dirLeft ) ? make_unique<FalseType>() : nullptr; });
             if (!dirRight.empty())
-                findFirstMissing.addJob([=] { return !dirExists(dirRight) ? zen::make_unique<NullType>() : nullptr; });
+                firstMissingDir.addJob([=] { return !dirExists(dirRight) ? make_unique<FalseType>() : nullptr; });
         };
 
         addDirCheck(currMainCfg.firstPair);
@@ -749,8 +749,8 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
         if (havePartialPair != haveFullPair) //either all pairs full or all half-filled -> validity check!
         {
             //potentially slow network access: give all checks 500ms to finish
-            const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //true: have result
-                                       !findFirstMissing.get(); //no missing
+            const bool allFilesExist = firstMissingDir.timedWait(boost::posix_time::milliseconds(500)) && //true: have result
+                                       !firstMissingDir.get(); //no missing
             if (allFilesExist)
                 if (wxEvtHandler* evtHandler = m_buttonCompare->GetEventHandler())
                 {
@@ -1234,8 +1234,7 @@ private:
 void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selectionLeft,
                                      const std::vector<FileSystemObject*>& selectionRight)
 {
-    bool deleteOnBothSides = false; //let's keep this disabled by default -> don't save
-    //=> clenup empty selection on either side:
+    //=> cleanup empty selection on either side:
     std::vector<FileSystemObject*> selectionLeftTmp;
     std::vector<FileSystemObject*> selectionRightTmp;
     std::copy_if(selectionLeft .begin(), selectionLeft .end(), std::back_inserter(selectionLeftTmp ), [](const FileSystemObject* fsObj) { return !fsObj->isEmpty<LEFT_SIDE >(); });
@@ -1249,7 +1248,6 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
             if (zen::showDeleteDialog(this,
                                       selectionLeftTmp,
                                       selectionRightTmp,
-                                      deleteOnBothSides,
                                       globalCfg.gui.useRecyclerForManualDeletion) == ReturnSmallDlg::BUTTON_OKAY)
             {
                 //wxBusyCursor dummy; -> redundant: progress already shown in status bar!
@@ -1262,7 +1260,6 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
                                              selectionRightTmp,
                                              folderCmp,
                                              extractDirectionCfg(getConfig().mainCfg),
-                                             deleteOnBothSides,
                                              globalCfg.gui.useRecyclerForManualDeletion,
                                              statusHandler,
                                              globalCfg.optDialogs.warningRecyclerMissing);
@@ -1833,7 +1830,7 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
         !isComponentOf(focus, this) ||
         !IsEnabled() || //only handle if main window is in use and no modal dialog is shown:
         !IsActive())    //thanks to wxWidgets non-portability we need both checks:
-        //first is sufficient for Windows, second is needed on OS X since it does NOT disable the parent when showing a modal dialog
+        //IsEnabled() is sufficient for Windows, IsActive() is needed on OS X since it does NOT disable the parent when showing a modal dialog
     {
         event.Skip();
         return;
@@ -1893,15 +1890,15 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
         case WXK_DOWN:
         case WXK_LEFT:
         case WXK_RIGHT:
-        case WXK_NUMPAD_UP:
-        case WXK_NUMPAD_DOWN:
-        case WXK_NUMPAD_LEFT:
-        case WXK_NUMPAD_RIGHT:
-
         case WXK_PAGEUP:
         case WXK_PAGEDOWN:
         case WXK_HOME:
         case WXK_END:
+
+        case WXK_NUMPAD_UP:
+        case WXK_NUMPAD_DOWN:
+        case WXK_NUMPAD_LEFT:
+        case WXK_NUMPAD_RIGHT:
         case WXK_NUMPAD_PAGEUP:
         case WXK_NUMPAD_PAGEDOWN:
         case WXK_NUMPAD_HOME:
@@ -3083,7 +3080,7 @@ void MainDialog::deleteSelectedCfgHistoryItems()
 void MainDialog::OnCfgHistoryRightClick(wxMouseEvent& event)
 {
     ContextMenu menu;
-    menu.addItem(_("Delete") + L"\tDel", [this] { deleteSelectedCfgHistoryItems(); });
+    menu.addItem(_("Delete selected configurations") + L"\tDel", [this] { deleteSelectedCfgHistoryItems(); });
     menu.popup(*this);
 }
 
@@ -3524,7 +3521,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 
     //prepare status information
     if (allElementsEqual(folderCmp))
-        flashStatusInformation(_("All folders are in sync"));
+        flashStatusInformation(_("All files are in sync"));
 }
 
 
@@ -3600,10 +3597,10 @@ void MainDialog::updateStatistics()
 
 void MainDialog::OnSyncSettings(wxCommandEvent& event)
 {
-    ExecWhenFinishedCfg ewfCfg = { &currentCfg.mainCfg.onCompletion,
-                                   &globalCfg.gui.onCompletionHistory,
-                                   globalCfg.gui.onCompletionHistoryMax
-                                 };
+    OnCompletionCfg ewfCfg = { &currentCfg.mainCfg.onCompletion,
+                               &globalCfg.gui.onCompletionHistory,
+                               globalCfg.gui.onCompletionHistoryMax
+                             };
 
     if (showSyncConfigDlg(this,
                           currentCfg.mainCfg.cmpConfig.compareVar,
@@ -3945,8 +3942,7 @@ void MainDialog::updateGridViewData()
         updateVisibility(m_bpButtonShowDifferent , result.existsDifferent);
     }
 
-    const bool anyViewFilterButtonShown = m_bpButtonShowExcluded   ->IsShown() ||
-                                          m_bpButtonShowEqual      ->IsShown() ||
+    const bool anySelectViewButtonShown = m_bpButtonShowEqual      ->IsShown() ||
                                           m_bpButtonShowConflict   ->IsShown() ||
 
                                           m_bpButtonShowCreateLeft ->IsShown() ||
@@ -3962,16 +3958,14 @@ void MainDialog::updateGridViewData()
                                           m_bpButtonShowLeftNewer ->IsShown() ||
                                           m_bpButtonShowRightNewer->IsShown() ||
                                           m_bpButtonShowDifferent ->IsShown();
-    m_bpButtonViewTypeSyncAction->Show(anyViewFilterButtonShown);
 
-    if (anyViewFilterButtonShown)
-    {
-        m_panelViewFilter->Show();
-        m_panelViewFilter->Layout();
-    }
-    else
-        m_panelViewFilter->Hide();
+    const bool anyViewButtonShown = anySelectViewButtonShown || m_bpButtonShowExcluded->IsShown();
 
+    m_staticTextViewType        ->Show(anyViewButtonShown);
+    m_bpButtonViewTypeSyncAction->Show(anyViewButtonShown);
+    m_staticTextSelectView      ->Show(anySelectViewButtonShown);
+
+    m_panelViewFilter->Layout();
 
     //all three grids retrieve their data directly via gridDataView
     gridview::refresh(*m_gridMainL, *m_gridMainC, *m_gridMainR);

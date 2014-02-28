@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>الحجم:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>تم تجاهل مقارنة المحتوى للملفات المستثناة %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>العناصر مختلفة في السمات فقط</target>
 
@@ -307,9 +310,6 @@
 <source>%x items/sec</source>
 <target>%x عنصر\الثانية</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>تم تحميل ملف التكوين %x بشكلٍ جزئي فقط.</target>
-
 <source>Show in Explorer</source>
 <target>إظهار في المستكشف</target>
 
@@ -337,11 +337,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>طلب إحباط المهمة: في انتظار انتهاء المهمة الحالية...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>فشل إنشاء طبعة زمنية من أجل عملية الوسم حسب الإصدار:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>لا يمكن قراءة عناصر XML التالية:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>تعذر إنشاء بصمة زمنية من أجل مفاضلة الزمنية:</target>
 
 <source>&Open...</source>
 <target>&فتح...</target>
@@ -570,6 +567,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>حفظ ملف السجل  %x...</target>
 
+<source>Stopped</source>
+<target>توقف</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>بإمكانك العودة إلى نافذة FreeFileSync الرئيسية لحل هذه المشكلة.</target>
 
@@ -666,21 +666,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>سحب و إفلات</target>
-
-<source>Close progress dialog</source>
-<target>إنهاء نافذة حوار تقدم العملية</target>
-
-<source>Standby</source>
-<target>وضع الاستعداد</target>
-
-<source>Log off</source>
-<target>تسجيل الخروج</target>
-
-<source>Shut down</source>
-<target>إيقاف التشغيل</target>
-
-<source>Hibernate</source>
-<target>السبات</target>
 
 <source>Alternate comparison settings</source>
 <target>خيارات المفارنة البديلة</target>
@@ -787,6 +772,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
 
+<source>View type:</source>
+<target>عرض النوع:</target>
+
+<source>Select view:</source>
+<target>اختيار نمط العرض:</target>
+
+<source>Statistics:</source>
+<target>إحصائيات:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
 
@@ -888,14 +882,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>عند الانتهاء:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
+
 <source>Start synchronization now?</source>
 <target>بدأ المزامنة الآن؟</target>
 
 <source>Variant:</source>
 <target>بديل</target>
-
-<source>Statistics</source>
-<target>إحصائيات</target>
 
 <source>&Don't show this dialog again</source>
 <target>&لا تظهر نافذة الحوار هذه مرة ثانية</target>
@@ -933,8 +927,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>إحباط المزامنة عند أول خطأ</target>
 
-<source>Show progress dialog</source>
-<target>إظهار نافذة حوار تقدم العملية</target>
+<source>Run minimized</source>
+<target>تشغيل بوضع التصغير</target>
 
 <source>Save log:</source>
 <target>حفظ السجل</target>
@@ -950,12 +944,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&سلة المهملات</target>
-
-<source>Delete on both sides</source>
-<target>حذف على كلا الجانبين</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>حذف الملف في كلا الجانبين حتى إذا كان الملف محدداً على جانب واحد فقط</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
@@ -978,8 +966,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>الحد الأقصى:</target>
 
-<source>&Clear</source>
-<target>&إزالة</target>
+<source>&Reset</source>
+<target>إعادة&</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة</target>
@@ -1077,8 +1065,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>بحث</target>
 
-<source>Select View</source>
-<target>اخيار طريقة العرض</target>
+<source>View Settings</source>
+<target>عرض الإعدادات</target>
 
 <source>Overview</source>
 <target>نظرة عامة</target>
@@ -1177,11 +1165,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>استبعاد باستخدام عامل الفلترة:</target>
 
-<source>Exclude temporarily</source>
-<target>استبعاد مؤقتاً</target>
-
 <source>Include temporarily</source>
 <target>شمول مؤقتاً</target>
+
+<source>Exclude temporarily</source>
+<target>استبعاد مؤقتاً</target>
 
 <source>Delete</source>
 <target>حذف</target>
@@ -1234,6 +1222,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&لا تحفظ</target>
 
+<source>Delete selected configurations</source>
+<target>حذف الخيارات المنتقاة</target>
+
 <source>Filter</source>
 <target>عامل الفلترة</target>
 
@@ -1285,8 +1276,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>تحديد كوضع افتراضي</target>
 
-<source>All folders are in sync</source>
-<target>جميع المجلدات متزامنة</target>
+<source>All files are in sync</source>
+<target>جميع الملفات في تزامن كامل</target>
 
 <source>Synchronization Settings</source>
 <target>إعدادات المزامنة</target>
@@ -1305,6 +1296,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>جاري البحث عن تحديثات للبرنامج...</target>
+
+<source>Close progress dialog</source>
+<target>إنهاء نافذة حوار تقدم العملية</target>
+
+<source>Standby</source>
+<target>وضع الاستعداد</target>
+
+<source>Log off</source>
+<target>تسجيل الخروج</target>
+
+<source>Shut down</source>
+<target>إيقاف التشغيل</target>
+
+<source>Hibernate</source>
+<target>السبات</target>
 
 <source>Scanning...</source>
 <target>جاري الفحص...</target>
@@ -1327,14 +1333,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>التجهيز للبدأ...</target>
 
-<source>Stopped</source>
-<target>توقف</target>
-
 <source>Completed</source>
 <target>انتهت العملية</target>
 
 <source>&Continue</source>
 <target>&مواصلة</target>
+
+<source>Progress</source>
+<target>التقدم</target>
 
 <source>Log</source>
 <target>السجل</target>
@@ -1434,8 +1440,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>البصمة الزمنية</target>
 
-<source>Append a timestamp to each file name</source>
-<target>إلحاق طابع زمني اسم كل ملف</target>
+<source>Append a time stamp to each file name</source>
+<target>إلحاق ختم زمني بكل اسم ملف</target>
 
 <source>File</source>
 <target>ملف</target>
@@ -1572,9 +1578,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>تعذر نقل %x إلى سلة المحذوفات.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>فشل تصفح سلة المهملات من أجل الملف %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>تعذر تحديد المسار النهائي لـ %x.</target>
 
 <source>Error Code %x:</source>
 <target>خطأ رقم %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>لا يمكن قراءة عناصر XML التالية:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>تم تحميل ملف التكوين %x بشكلٍ جزئي فقط.</target>
 

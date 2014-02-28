@@ -4,11 +4,11 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef RECYCLER_H_INCLUDED
-#define RECYCLER_H_INCLUDED
+#ifndef RECYCLER_H_INCLUDED_18345067341545
+#define RECYCLER_H_INCLUDED_18345067341545
 
-#include <functional>
 #include <vector>
+#include <functional>
 #include <zen/file_error.h>
 #include <zen/zstring.h>
 
@@ -36,14 +36,8 @@ bool recycleOrDelete(const Zstring& filename); //throw FileError, return "true" 
 
 
 #ifdef ZEN_WIN
-enum StatusRecycler
-{
-    STATUS_REC_EXISTS,
-    STATUS_REC_MISSING,
-    STATUS_REC_UNKNOWN
-};
-StatusRecycler recycleBinStatus(const Zstring& pathName); //test existence of Recycle Bin API for certain path
-//Win: blocks heavily if recycle bin is really full and drive is slow!!!
+//can take a long time if recycle bin is full and drive is slow!!! => buffer volume ids!
+bool recycleBinExists(const Zstring& pathName, const std::function<void ()>& onUpdateGui); //throw FileError
 
 void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, return "true" if file/dir was actually deleted
                      //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
@@ -51,4 +45,4 @@ void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, r
 #endif
 }
 
-#endif // RECYCLER_H_INCLUDED
+#endif //RECYCLER_H_INCLUDED_18345067341545

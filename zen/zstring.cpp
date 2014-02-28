@@ -30,6 +30,13 @@ namespace
 class LeakChecker //small test for memory leaks
 {
 public:
+    static LeakChecker& get()
+    {
+        //meyers singleton: avoid static initialization order problem in global namespace!
+        static LeakChecker inst;
+        return inst;
+    }
+
     void insert(const void* ptr, size_t size)
     {
         std::lock_guard<std::mutex> dummy(lockActStrings);
@@ -44,10 +51,9 @@ public:
             reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
 
-    static LeakChecker& instance() { static LeakChecker inst; return inst; }
-
 private:
     LeakChecker() {}
+
     ~LeakChecker()
     {
         if (!activeStrings.empty())
@@ -61,7 +67,7 @@ private:
             const std::string message = std::string("Memory leak detected!") + "\n\n"
                                         + "Candidates:\n" + leakingStrings;
 #ifdef ZEN_WIN
-            MessageBoxA(nullptr, message.c_str(), "Error", 0);
+            MessageBoxA(nullptr, message.c_str(), "Error", MB_SERVICE_NOTIFICATION | MB_ICONERROR);
 #else
             std::cerr << message;
             std::abort();
@@ -75,14 +81,14 @@ private:
     static std::string rawMemToString(const void* ptr, size_t size)
     {
         std::string output(reinterpret_cast<const char*>(ptr), std::min<size_t>(size, 100));
-        std::replace(output.begin(), output.end(), '\0', ' '); //don't stop at 0-termination
+        replace(output, '\0', ' '); //don't stop at 0-termination
         return output;
     }
 
     void reportProblem(const std::string& message) //throw std::logic_error
     {
 #ifdef ZEN_WIN
-        ::MessageBoxA(nullptr, message.c_str(), "Error", 0);
+        ::MessageBoxA(nullptr, message.c_str(), "Error", MB_SERVICE_NOTIFICATION | MB_ICONERROR);
 #else
         std::cerr << message;
 #endif
@@ -93,12 +99,12 @@ private:
     zen::hash_map<const void*, size_t> activeStrings;
 };
 
-//caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
-const LeakChecker& dummy = LeakChecker::instance();
+//caveat: function scope static initialization is not thread-safe in VS 2010!
+auto& dummy = LeakChecker::get();
 }
 
-void z_impl::leakCheckerInsert(const void* ptr, size_t size) { LeakChecker::instance().insert(ptr, size); }
-void z_impl::leakCheckerRemove(const void* ptr             ) { LeakChecker::instance().remove(ptr); }
+void z_impl::leakCheckerInsert(const void* ptr, size_t size) { LeakChecker::get().insert(ptr, size); }
+void z_impl::leakCheckerRemove(const void* ptr             ) { LeakChecker::get().remove(ptr); }
 #endif //NDEBUG
 
 
@@ -134,18 +140,16 @@ const LCID ZSTRING_INVARIANT_LOCALE = zen::winXpOrLater() ?
 
 //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
 //by a factor ~3 faster than old string comparison using "LCMapString"
-typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1,
-                                               int     cchCount1,
-                                               LPCWSTR lpString2,
-                                               int     cchCount2,
-                                               BOOL    bIgnoreCase);
+typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1, int cchCount1,
+                                               LPCWSTR lpString2, int cchCount2, BOOL bIgnoreCase);
 const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+//caveat: function scope static initialization is not thread-safe in VS 2010!
+//No global dependencies => no static initialization order problem in global namespace!
 }
 
 
 int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs)
 {
-    //caveat: function scope static initialization is not thread-safe in VS 2010!
     if (compareStringOrdinal) //this additional test has no noticeable performance impact
     {
         const int rv = compareStringOrdinal(lhs,                       //__in  LPCWSTR lpString1,
@@ -163,48 +167,46 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
         //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
-        const auto minSize = static_cast<unsigned int>(std::min(sizeLhs, sizeRhs));
-
-        if (minSize > 0) //LCMapString does not allow input sizes of 0!
+        auto copyToUpperCase = [](const wchar_t* strIn, wchar_t* strOut, size_t len)
         {
-            if (minSize <= MAX_PATH) //performance optimization: stack
+            //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
+                              LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
+                              strIn,                    //__in   LPCTSTR lpSrcStr,
+                              static_cast<int>(len),                      //__in   int cchSrc,
+                              strOut,                   //__out  LPTSTR lpDestStr,
+                              static_cast<int>(len)) == 0)                //__in   int cchDest
+                throw std::runtime_error("Error comparing strings (LCMapString).");
+        };
+
+        const auto minSize = std::min(sizeLhs, sizeRhs);
+
+        auto eval = [&](wchar_t* bufL, wchar_t* bufR)
+        {
+            if (minSize > 0) //LCMapString does not allow input sizes of 0!
             {
-                wchar_t bufferA[MAX_PATH];
-                wchar_t bufferB[MAX_PATH];
+                copyToUpperCase(lhs, bufL, minSize);
+                copyToUpperCase(rhs, bufR, minSize);
 
-                //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
-                                  LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
-                                  lhs,                      //__in   LPCTSTR lpSrcStr,
-                                  minSize,                  //__in   int cchSrc,
-                                  bufferA,                  //__out  LPTSTR lpDestStr,
-                                  MAX_PATH) == 0)           //__in   int cchDest
-                    throw std::runtime_error("Error comparing strings (LCMapString).");
-
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, bufferB, MAX_PATH) == 0)
-                    throw std::runtime_error("Error comparing strings (LCMapString).");
-
-                const int rv = ::wmemcmp(bufferA, bufferB, minSize);
+                const int rv = ::wmemcmp(bufL, bufR, minSize);
                 if (rv != 0)
                     return rv;
             }
-            else //use freestore
-            {
-                std::vector<wchar_t> bufferA(minSize);
-                std::vector<wchar_t> bufferB(minSize);
+            return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
+        };
 
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, lhs, minSize, &bufferA[0], minSize) == 0)
-                    throw std::runtime_error("Error comparing strings (LCMapString: FS).");
-
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, &bufferB[0], minSize) == 0)
-                    throw std::runtime_error("Error comparing strings (LCMapString: FS).");
-
-                const int rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
-                if (rv != 0)
-                    return rv;
-            }
+        if (minSize <= MAX_PATH) //performance optimization: stack
+        {
+            wchar_t bufferL[MAX_PATH] = {};
+            wchar_t bufferR[MAX_PATH] = {};
+            return eval(bufferL, bufferR);
         }
-        return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
+        else //use freestore
+        {
+            std::vector<wchar_t> bufferL(minSize);
+            std::vector<wchar_t> bufferR(minSize);
+            return eval(&bufferL[0], &bufferR[0]);
+        }
     }
 }
 

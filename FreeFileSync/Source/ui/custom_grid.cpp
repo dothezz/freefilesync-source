@@ -37,7 +37,7 @@ const wxColour COLOR_SYNC_BLUE   (185, 188, 255);
 const wxColour COLOR_SYNC_GREEN  (196, 255, 185);
 const wxColour COLOR_NOT_ACTIVE  (228, 228, 228); //light grey
 
-const size_t ROW_COUNT_NO_DATA = 10;
+const size_t ROW_COUNT_IF_NO_DATA = 0;
 
 /*
 class hierarchy:
@@ -185,11 +185,11 @@ private:
         if (gridDataView_)
         {
             if (gridDataView_->rowsTotal() == 0)
-                return ROW_COUNT_NO_DATA;
+                return ROW_COUNT_IF_NO_DATA;
             return gridDataView_->rowsOnView();
         }
         else
-            return ROW_COUNT_NO_DATA;
+            return ROW_COUNT_IF_NO_DATA;
 
         //return std::max(MIN_ROW_COUNT, gridDataView_ ? gridDataView_->rowsOnView() : 0);
     }
@@ -1786,7 +1786,9 @@ void gridview::highlightSyncAction(Grid& gridCenter, bool value)
         provMiddle->highlightSyncAction(value);
     else
         assert(false);
+    gridCenter.Refresh();
 }
+
 
 wxBitmap zen::getSyncOpImage(SyncOperation syncOp)
 {

@@ -142,7 +142,7 @@ struct IsArithmetic : StaticBool<IsInteger<T>::value || IsFloat<T>::value> {};
         template <class U> static  No& hasMember(Helper<int Fallback::*, &Helper2<U>::NAME>*);	\
         template <class U> static Yes& hasMember(...);											\
     public:																						\
-        enum { value = sizeof(hasMember<T>(nullptr)) == sizeof(Yes) };							    \
+        enum { value = sizeof(hasMember<T>(nullptr)) == sizeof(Yes) };							\
     };                                                                                          \
     \
     template<class T>					                          \
@@ -166,7 +166,7 @@ struct IsArithmetic : StaticBool<IsInteger<T>::value || IsFloat<T>::value> {};
         template <class T> static Yes& hasMember(Helper<TYPE, &T::NAME>*); 	\
         template <class T> static  No& hasMember(...); 					  	\
     public:																	\
-        enum { value = sizeof(hasMember<U>(nullptr)) == sizeof(Yes) };         \
+        enum { value = sizeof(hasMember<U>(nullptr)) == sizeof(Yes) };      \
     };
 //####################################################################
 
@@ -183,7 +183,7 @@ struct IsArithmetic : StaticBool<IsInteger<T>::value || IsFloat<T>::value> {};
         template <class U> static Yes& hasMemberType(Helper<typename U::TYPENAME>*); \
         template <class U> static  No& hasMemberType(...); 							 \
     public:          																 \
-        enum { value = sizeof(hasMemberType<T>(nullptr)) == sizeof(Yes) };			     \
+        enum { value = sizeof(hasMemberType<T>(nullptr)) == sizeof(Yes) };			 \
     };
 }
 

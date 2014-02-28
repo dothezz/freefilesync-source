@@ -5,17 +5,14 @@
 // **************************************************************************
 
 #include "recycler.h"
-//#include <stdexcept>
-//#include <iterator>
 #include <zen/file_handling.h>
 
 #ifdef ZEN_WIN
-//#include <algorithm>
-//#include <functional>
-#include <zen/dll.h>
-#include <zen/assert_static.h>
-#include <zen/win_ver.h>
-#include <zen/long_path_prefix.h>
+#include "thread.h"
+#include "dll.h"
+#include "assert_static.h"
+#include "win_ver.h"
+#include "long_path_prefix.h"
 #include "IFileOperation/file_op.h"
 
 #elif defined ZEN_LINUX
@@ -45,7 +42,6 @@ IFileOperation  - multiple files  2,1s
 
 Nevertheless, let's use IFileOperation for better error reporting (including details on locked files)!
 */
-const bool useIFileOperation = vistaOrLater(); //caveat: function scope static initialization is not thread-safe in VS 2010!
 
 struct CallbackData
 {
@@ -58,7 +54,7 @@ struct CallbackData
 };
 
 
-bool recyclerCallback(const wchar_t* filename, void* sink)
+bool onRecyclerCallback(const wchar_t* filename, void* sink)
 {
     CallbackData& cbd = *static_cast<CallbackData*>(sink); //sink is NOT optional here
 
@@ -76,6 +72,7 @@ bool recyclerCallback(const wchar_t* filename, void* sink)
 }
 }
 
+
 void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus)
 {
     if (filenames.empty())
@@ -85,7 +82,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::func
     //both ::SHFileOperation() and ::IFileOperation() cannot delete a folder named "System Volume Information" with normal attributes but shamelessly report success
     //both ::SHFileOperation() and ::IFileOperation() can't handle \\?\-prefix!
 
-    if (useIFileOperation) //new recycle bin usage: available since Vista
+    if (vistaOrLater()) //new recycle bin usage: available since Vista
     {
         using namespace fileop;
         const DllFun<FunType_moveToRecycleBin> moveToRecycler(getDllName(), funName_moveToRecycleBin);
@@ -100,16 +97,14 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::func
             cNames.push_back(it->c_str());
 
         CallbackData cbd(notifyDeletionStatus);
-        if (!moveToRecycler(&cNames[0], cNames.size(), recyclerCallback, &cbd))
+        if (!moveToRecycler(&cNames[0], cNames.size(), onRecyclerCallback, &cbd))
         {
             if (cbd.exceptionInUserCallback)
-                try
-                {
-                    assert(notifyDeletionStatus);
-                    notifyDeletionStatus(Zstring()); //should throw again!!!
-                    assert(false);
-                }
-                catch (...) { throw; }
+            {
+                assert(notifyDeletionStatus);
+                notifyDeletionStatus(Zstring()); //should throw again!!!
+                assert(false);
+            }
 
             std::wstring filenameFmt = fmtFileName(filenames[0]); //probably not the correct file name for file lists larger than 1!
             if (filenames.size() > 1)
@@ -174,7 +169,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
         if (error->code == G_IO_ERROR_NOT_SUPPORTED)
         {
-            struct stat fileInfo = {};
+            struct ::stat fileInfo = {};
             if (::lstat(filename.c_str(), &fileInfo) != 0)
                 return false;
 
@@ -205,7 +200,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
         throw FileError(errorMsg, errorDescr);
     };
 
-    FSRef objectRef;
+    FSRef objectRef = {}; //= POD structure not a pointer type!
     OSStatus rv = ::FSPathMakeRefWithOptions(filenameUtf8, //const UInt8 *path,
                                              kFSPathMakeRefDoNotFollowLeafSymlink, //OptionBits options,
                                              &objectRef,  //FSRef *ref,
@@ -222,7 +217,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
         if (rv2 == -120) //=="Directory not found or incomplete pathname." but should really be "recycle bin directory not found"!
         {
-            struct stat fileInfo = {};
+            struct ::stat fileInfo = {};
             if (::lstat(filename.c_str(), &fileInfo) != 0)
                 return false;
 
@@ -241,31 +236,53 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
 
 #ifdef ZEN_WIN
-StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
+bool zen::recycleBinExists(const Zstring& pathName, const std::function<void ()>& onUpdateGui) //throw FileError
 {
-    const DWORD bufferSize = MAX_PATH + 1;
-    std::vector<wchar_t> buffer(bufferSize);
-    if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
-                             &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                             bufferSize))      //__in   DWORD cchBufferLength
-        return STATUS_REC_UNKNOWN;
+    if (vistaOrLater())
+    {
+        using namespace fileop;
+        const DllFun<FunType_getRecycleBinStatus> getRecycleBinStatus(getDllName(), funName_getRecycleBinStatus);
+        const DllFun<FunType_getLastError>        getLastError       (getDllName(), funName_getLastError);
 
-    const Zstring rootPathPf = appendSeparator(&buffer[0]);
+        if (!getRecycleBinStatus || !getLastError)
+            throw FileError(replaceCpy(_("Checking recycle bin failed for folder %x."), L"%x", fmtFileName(pathName)),
+                            replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
-    SHQUERYRBINFO recInfo = {};
-    recInfo.cbSize = sizeof(recInfo);
-    HRESULT rv = ::SHQueryRecycleBin(rootPathPf.c_str(), //__in_opt  LPCTSTR pszRootPath,
-                                     &recInfo);          //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
+        bool hasRecycler = false;
+        if (!getRecycleBinStatus(pathName.c_str(), hasRecycler))
+            throw FileError(replaceCpy(_("Checking recycle bin failed for folder %x."), L"%x", fmtFileName(pathName)), getLastError());
 
-    return rv == S_OK ? STATUS_REC_EXISTS : STATUS_REC_MISSING;
-    //1. excessive: traverses whole C:\$Recycle.Bin directory tree each time!!!! But it's safe and correct.
+        return hasRecycler;
+    }
+    else
+    {
+        //excessive runtime if recycle bin exists, is full and drive is slow:
+        auto ft = async([pathName]()
+        {
+            SHQUERYRBINFO recInfo = {};
+            recInfo.cbSize = sizeof(recInfo);
+            return ::SHQueryRecycleBin(pathName.c_str(), //__in_opt  LPCTSTR pszRootPath,
+                                       &recInfo);        //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
+        });
 
-    //2. we would prefer to use CLSID_RecycleBinManager beginning with Vista... if only this interface were documented!!!
+        while (!ft.timed_wait(boost::posix_time::milliseconds(50)))
+            if (onUpdateGui)
+                onUpdateGui(); //may throw!
 
-    //3. check directory existence of "C:\$Recycle.Bin, C:\RECYCLER, C:\RECYCLED"
+        return ft.get() == S_OK;
+    }
+
+    //1. ::SHQueryRecycleBin() is excessive: traverses whole $Recycle.Bin directory tree each time!!!! But it's safe and correct.
+
+    //2. we can't simply buffer the ::SHQueryRecycleBin() based on volume serial number:
+    //	"subst S:\ C:\" => GetVolumeInformation() returns same serial for C:\ and S:\, but S:\ does not support recycle bin!
+
+    //3. we would prefer to use CLSID_RecycleBinManager beginning with Vista... if only this interface were documented!!!
+
+    //4. check directory existence of "C:\$Recycle.Bin, C:\RECYCLER, C:\RECYCLED"
     // -> not upward-compatible, wrong result for subst-alias: recycler assumed existing, although it is not!
 
-    //4. alternative approach a'la Raymond Chen: http://blogs.msdn.com/b/oldnewthing/archive/2008/09/18/8956382.aspx
+    //5. alternative approach a'la Raymond Chen: http://blogs.msdn.com/b/oldnewthing/archive/2008/09/18/8956382.aspx
     //caveat: might not be reliable, e.g. "subst"-alias of volume contains "$Recycle.Bin" although it is not available!
 
     /*

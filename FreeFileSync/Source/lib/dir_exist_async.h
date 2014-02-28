@@ -21,14 +21,20 @@ namespace
 //- check existence of all directories in parallel! (avoid adding up search times if multiple network drives are not reachable)
 //- add reasonable time-out time!
 //- avoid checking duplicate entries by design: set<Zstring, LessFilename>
-std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, LessFilename>& dirnames,
-                                                        std::set<Zstring, LessFilename>& missing,
-                                                        bool allowUserInteraction,
-                                                        ProcessCallback& procCallback)
+struct DirectoryStatus
+{
+    std::set<Zstring, LessFilename> existing;
+    std::set<Zstring, LessFilename> missing;
+
+};
+
+DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& dirnames,
+                                        bool allowUserInteraction,
+                                        ProcessCallback& procCallback)
 {
     using namespace zen;
 
-    missing.clear();
+    DirectoryStatus output;
 
     std::list<std::pair<Zstring, boost::unique_future<bool>>> futureInfo;
     for (const Zstring& dirname : dirnames)
@@ -43,7 +49,6 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, 
             return dirExists(dirname);
         })));
 
-    std::set<Zstring, LessFilename> output;
     //don't wait (almost) endlessly like win32 would on not existing network shares:
     const boost::system_time endTime = boost::get_system_time() + boost::posix_time::seconds(20); //consider CD-rom insert or hard disk spin up time from sleep
 
@@ -56,9 +61,9 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, 
             procCallback.requestUiRefresh(); //may throw!
 
         if (fi.second.is_ready() && fi.second.get())
-            output.insert(fi.first);
+            output.existing.insert(fi.first);
         else
-            missing.insert(fi.first);
+            output.missing.insert(fi.first);
     }
     return output;
 }
@@ -68,10 +73,9 @@ inline //also silences Clang "unused function" for compilation units depending f
 bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     if (dirname.empty()) return false;
-    std::set<Zstring, LessFilename> missing;
-    std::set<Zstring, LessFilename> dirsEx = getExistingDirsUpdating({ dirname }, missing, allowUserInteraction, procCallback);
-    assert(dirsEx.empty() != missing.empty());
-    return dirsEx.find(dirname) != dirsEx.end();
+    const DirectoryStatus dirStatus = getExistingDirsUpdating({ dirname }, allowUserInteraction, procCallback);
+    assert(dirStatus.existing.empty() != dirStatus.missing.empty());
+    return dirStatus.existing.find(dirname) != dirStatus.existing.end();
 }
 }
 

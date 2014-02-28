@@ -26,6 +26,7 @@
 
 #ifdef ZEN_WIN
 #include <zen/win_ver.h>
+#include "../../validate.h"
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
@@ -125,12 +126,9 @@ std::vector<Zstring> getCommandlineArgs(const wxApp& app)
     if (!args.empty())
         args.erase(args.begin()); //remove first argument which is exe path by convention: http://blogs.msdn.com/b/oldnewthing/archive/2006/05/15/597984.aspx
 
-    std::for_each(args.begin(), args.end(),
-                  [](Zstring& str)
-    {
+    for (Zstring& str : args)
         if (str.size() >= 2 && startsWith(str, L'\"') && endsWith(str, L'\"'))
             str = Zstring(str.c_str() + 1, str.size() - 2);
-    });
 
 #else
     for (int i = 1; i < app.argc; ++i) //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
@@ -151,7 +149,7 @@ bool Application::OnInit()
 
 #ifdef ZEN_WIN
     enableCrashingOnCrashes();
-
+    validateHandlers();
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif
@@ -588,7 +586,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
         const SwitchToGui switchBatchToGui(referenceFile, batchCfg, globalCfg); //prepare potential operational switch
 
         //class handling status updates and error messages
-        BatchStatusHandler statusHandler(batchCfg.showProgress, //throw BatchAbortProcess
+        BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
                                          extractJobName(referenceFile),
                                          timeStamp,
                                          batchCfg.logFileDirectory,

@@ -12,17 +12,18 @@
 #include <map>
 #include <wx/combobox.h>
 #include <zen/string_tools.h>
+#include <zen/zstring.h>
 
 //combobox with history function + functionality to delete items (DEL)
 
 //special command
-bool isCloseProgressDlgCommand(const std::wstring& value);
+bool isCloseProgressDlgCommand(const Zstring& value);
 
 
-class ExecFinishedBox : public wxComboBox
+class OnCompletionBox : public wxComboBox
 {
 public:
-    ExecFinishedBox(wxWindow* parent,
+    OnCompletionBox(wxWindow* parent,
                     wxWindowID id,
                     const wxString& value = wxEmptyString,
                     const wxPoint& pos = wxDefaultPosition,
@@ -33,12 +34,12 @@ public:
                     const wxValidator& validator = wxDefaultValidator,
                     const wxString& name = wxComboBoxNameStr);
 
-    void initHistory(std::vector<std::wstring>& history, size_t historyMax) { history_ = &history; historyMax_ = historyMax; }
+    void initHistory(std::vector<Zstring>& history, size_t historyMax) { history_ = &history; historyMax_ = historyMax; }
     void addItemHistory(); //adds current item to history
 
     // use these two accessors instead of GetValue()/SetValue():
-    std::wstring getValue() const;
-    void setValue(const std::wstring& value);
+    Zstring getValue() const;
+    void setValue(const Zstring& value);
     //required for setting value correctly + Linux to ensure the dropdown is shown as being populated
 
 private:
@@ -50,10 +51,10 @@ private:
 
     void setValueAndUpdateList(const std::wstring& value);
 
-    std::vector<std::wstring>* history_;
+    std::vector<Zstring>* history_;
     size_t historyMax_;
 
-    const std::vector<std::pair<std::wstring, std::wstring>> defaultCommands;
+    const std::vector<std::pair<std::wstring, Zstring>> defaultCommands;
 };
 
 

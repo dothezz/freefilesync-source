@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Størrelse:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target></target>
+
 <source>Items differ in attributes only</source>
 <target>Elementer har kun forskjellige attributter</target>
 
@@ -289,9 +292,6 @@
 <source>%x items/sec</source>
 <target></target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Innstillingsfilen %x bare delvis lastet.</target>
-
 <source>Show in Explorer</source>
 <target>Vis i utforsker</target>
 
@@ -319,11 +319,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target></target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target></target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Kan ikke lese følgende XML-elementer:</target>
 
 <source>&Open...</source>
 <target>&Åpne...</target>
@@ -552,6 +549,9 @@ Kommandoen utløses hvis:
 <source>Saving log file %x...</source>
 <target>Lagrer loggfil %x...</target>
 
+<source>Stopped</source>
+<target></target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target></target>
 
@@ -641,21 +641,6 @@ Kommandoen utløses hvis:
 
 <source>Drag && drop</source>
 <target>Dra && slipp</target>
-
-<source>Close progress dialog</source>
-<target>Lukk status vindu</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Log off</source>
-<target>Logg av</target>
-
-<source>Shut down</source>
-<target>Slå av maskinen</target>
-
-<source>Hibernate</source>
-<target>Sett i dvalemodus</target>
 
 <source>Alternate comparison settings</source>
 <target></target>
@@ -762,6 +747,15 @@ Kommandoen utløses hvis:
 <source>Save as batch job</source>
 <target>Lagre som sammensatt oppgave</target>
 
+<source>View type:</source>
+<target></target>
+
+<source>Select view:</source>
+<target></target>
+
+<source>Statistics:</source>
+<target></target>
+
 <source>Number of files and folders that will be created</source>
 <target>Antall filer og mapper som vil opprettes</target>
 
@@ -859,14 +853,14 @@ Kommandoen utløses hvis:
 <source>On completion:</source>
 <target></target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target></target>
+
 <source>Start synchronization now?</source>
 <target></target>
 
 <source>Variant:</source>
 <target></target>
-
-<source>Statistics</source>
-<target>Statistikk</target>
 
 <source>&Don't show this dialog again</source>
 <target></target>
@@ -904,8 +898,8 @@ Kommandoen utløses hvis:
 <source>Stop synchronization at first error</source>
 <target></target>
 
-<source>Show progress dialog</source>
-<target>Vis statuslinje</target>
+<source>Run minimized</source>
+<target></target>
 
 <source>Save log:</source>
 <target></target>
@@ -921,12 +915,6 @@ Kommandoen utløses hvis:
 
 <source>&Recycle bin</source>
 <target></target>
-
-<source>Delete on both sides</source>
-<target>Slett på begge sider</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Slett på begge sider selv om filen bare er valgt på en side</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target></target>
@@ -949,7 +937,7 @@ Kommandoen utløses hvis:
 <source>Maximum:</source>
 <target></target>
 
-<source>&Clear</source>
+<source>&Reset</source>
 <target></target>
 
 <source>The following settings are used for all synchronization jobs.</source>
@@ -1045,7 +1033,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Søk</target>
 
-<source>Select View</source>
+<source>View Settings</source>
 <target></target>
 
 <source>Overview</source>
@@ -1123,11 +1111,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Ekskluder via filter:</target>
 
-<source>Exclude temporarily</source>
-<target>Ekskluder midlertidig</target>
-
 <source>Include temporarily</source>
 <target>Inkluder midlertidig</target>
+
+<source>Exclude temporarily</source>
+<target>Ekskluder midlertidig</target>
 
 <source>Delete</source>
 <target>Slett</target>
@@ -1180,6 +1168,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&Ikke lagre</target>
 
+<source>Delete selected configurations</source>
+<target></target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1231,8 +1222,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Set som standard</target>
 
-<source>All folders are in sync</source>
-<target>Alle mapper er synkroniserte</target>
+<source>All files are in sync</source>
+<target></target>
 
 <source>Synchronization Settings</source>
 <target></target>
@@ -1251,6 +1242,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target></target>
+
+<source>Close progress dialog</source>
+<target>Lukk status vindu</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Log off</source>
+<target>Logg av</target>
+
+<source>Shut down</source>
+<target>Slå av maskinen</target>
+
+<source>Hibernate</source>
+<target>Sett i dvalemodus</target>
 
 <source>Scanning...</source>
 <target>Skanner...</target>
@@ -1273,13 +1279,13 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Initialiserer...</target>
 
-<source>Stopped</source>
-<target></target>
-
 <source>Completed</source>
 <target>Fullført</target>
 
 <source>&Continue</source>
+<target></target>
+
+<source>Progress</source>
 <target></target>
 
 <source>Log</source>
@@ -1366,8 +1372,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target></target>
 
-<source>Append a timestamp to each file name</source>
-<target>Legg til et tidsstempel til hvert filnavn</target>
+<source>Append a time stamp to each file name</source>
+<target></target>
 
 <source>File</source>
 <target>Fil</target>
@@ -1492,9 +1498,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target></target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target></target>
+
 <source>Cannot determine final path for %x.</source>
 <target></target>
 
 <source>Error Code %x:</source>
 <target>Feil kode %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Kan ikke lese følgende XML-elementer:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Innstillingsfilen %x bare delvis lastet.</target>
 

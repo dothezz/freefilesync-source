@@ -75,7 +75,8 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
 
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
-const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");
+
+const Zchar TEMP_FILE_ENDING[] = Zstr(".ffs_tmp"); //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
 }

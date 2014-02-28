@@ -36,10 +36,9 @@ void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or
 
 
 //manual deletion of files on main grid
-std::pair<Zstring, int> deleteFromGridAndHDPreview(       //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
-    const std::vector<FileSystemObject*>& selectionLeft,  //all pointers need to be bound!
-    const std::vector<FileSystemObject*>& selectionRight, //
-    bool deleteOnBothSides);
+std::pair<Zstring, int> deleteFromGridAndHDPreview(        //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
+    const std::vector<FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
+    const std::vector<FileSystemObject*>& selectionRight); //
 
 struct DeleteFilesHandler
 {
@@ -58,7 +57,6 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                          FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                          const std::vector<DirectionConfig>& directCfgs,
-                         bool deleteOnBothSides,
                          bool useRecycleBin,
                          DeleteFilesHandler& statusHandler,
                          //global warnings:

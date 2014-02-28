@@ -7,9 +7,6 @@
 	<plural_definition>0</plural_definition>
 </header>
 
-<source>MyButton</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>마지막 동기화 작업 이후, 양측 모두 변경 되었습니다.</target>
 
@@ -117,6 +114,9 @@
 
 <source>Size:</source>
 <target>크기:</target>
+
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>제외 파일 %x에 대한 내용 비교는 건너 뛰었습니다.</target>
 
 <source>Items differ in attributes only</source>
 <target>항목들이 속성에서만 차이가 있습니다.</target>
@@ -295,9 +295,6 @@
 <source>%x items/sec</source>
 <target>%x 항목</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>구성 파일 %x이(가) 부분적으로만 로드 되었음.</target>
-
 <source>Show in Explorer</source>
 <target>탐색기에 표시</target>
 
@@ -325,11 +322,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>사용자에 의한 작업 중단: 현재 작업 종료 대기 중...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>버저닝을 위한 타임 스탬프 생성 불가:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>다음 XML 요소를 읽을 수 없습니다:</target>
 
 <source>&Open...</source>
 <target>열기(&O)</target>
@@ -558,6 +552,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>로그 파일 %x 저장 중...</target>
 
+<source>Stopped</source>
+<target>중단</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>이 문제는 FreeFileSync 기본 창으로 전환해서 해결 가능합니다.</target>
 
@@ -649,21 +646,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>드래그 앤 드랍(&&) [마우스로 파일 끌어다 놓기]</target>
-
-<source>Close progress dialog</source>
-<target>진행 표시 창 닫기</target>
-
-<source>Standby</source>
-<target>대기</target>
-
-<source>Log off</source>
-<target>로그오프</target>
-
-<source>Shut down</source>
-<target>종료</target>
-
-<source>Hibernate</source>
-<target>최대절전모드</target>
 
 <source>Alternate comparison settings</source>
 <target>비교 설정 변경</target>
@@ -770,6 +752,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>일괄 작업으로 저장</target>
 
+<source>View type:</source>
+<target>유형 보기:</target>
+
+<source>Select view:</source>
+<target>보기 선택:</target>
+
+<source>Statistics:</source>
+<target>통계:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>생성될 파일 및 폴더 개수</target>
 
@@ -871,14 +862,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>완료 시:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>데이터베이스 파일로 동기화 방향 감지</target>
+
 <source>Start synchronization now?</source>
 <target>지금 동기화를 시작하시겠습니까?</target>
 
 <source>Variant:</source>
 <target>베어리언트:</target>
-
-<source>Statistics</source>
-<target>통  계</target>
 
 <source>&Don't show this dialog again</source>
 <target>이 대화 창을 다시 표시 안 함(&D)</target>
@@ -916,8 +907,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>첫 오류 발생 시 동기화 중지</target>
 
-<source>Show progress dialog</source>
-<target>진행 표시 창 보기</target>
+<source>Run minimized</source>
+<target>최소화 실행</target>
 
 <source>Save log:</source>
 <target>로그 저장:</target>
@@ -933,12 +924,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>휴지통(&R)</target>
-
-<source>Delete on both sides</source>
-<target>양측 모두 삭제</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>어느 한쪽의 파일만 선택하더라도 양측 모두 삭제</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>동기화에서 특정 파일을 제외시키는 필터 규칙을 선택합니다. 해당 폴더 페어(짝)에 대한 상대 파일 경로를 입력하세요.</target>
@@ -961,8 +946,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>최대:</target>
 
-<source>&Clear</source>
-<target>지우기(&C)</target>
+<source>&Reset</source>
+<target>리셋(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>다음 설정은 모든 동기화 작업에 사용됩니다.</target>
@@ -1060,8 +1045,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>검색</target>
 
-<source>Select View</source>
-<target>보기 선택</target>
+<source>View Settings</source>
+<target>설정 보기</target>
 
 <source>Overview</source>
 <target>개요</target>
@@ -1140,11 +1125,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>필터를 통해 다음을 제외:</target>
 
-<source>Exclude temporarily</source>
-<target>임시 제외</target>
-
 <source>Include temporarily</source>
 <target>임시 포함</target>
+
+<source>Exclude temporarily</source>
+<target>임시 제외</target>
 
 <source>Delete</source>
 <target>삭제</target>
@@ -1197,6 +1182,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>저장 안 함(&n)</target>
 
+<source>Delete selected configurations</source>
+<target>선택한 구성 삭제</target>
+
 <source>Filter</source>
 <target>필터</target>
 
@@ -1248,8 +1236,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>기본 값으로 설정</target>
 
-<source>All folders are in sync</source>
-<target>모든 폴더가 동기화 되었음</target>
+<source>All files are in sync</source>
+<target>모든 파일이 동기화 되었음.</target>
 
 <source>Synchronization Settings</source>
 <target>동기화 설정</target>
@@ -1268,6 +1256,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>프로그램 업데이트 검색 중...</target>
+
+<source>Close progress dialog</source>
+<target>진행 표시 창 닫기</target>
+
+<source>Standby</source>
+<target>대기</target>
+
+<source>Log off</source>
+<target>로그오프</target>
+
+<source>Shut down</source>
+<target>종료</target>
+
+<source>Hibernate</source>
+<target>최대절전모드</target>
 
 <source>Scanning...</source>
 <target>스캔 중...</target>
@@ -1290,14 +1293,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>초기화 작업 중...</target>
 
-<source>Stopped</source>
-<target>중단</target>
-
 <source>Completed</source>
 <target>완료</target>
 
 <source>&Continue</source>
 <target>계속(&C)</target>
+
+<source>Progress</source>
+<target>진행</target>
 
 <source>Log</source>
 <target>로그</target>
@@ -1387,8 +1390,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>타임 스탬프</target>
 
-<source>Append a timestamp to each file name</source>
-<target>각 파일 이름마다 타임스탬프 추가</target>
+<source>Append a time stamp to each file name</source>
+<target>각 파일 이름마다 타임 스탬프 추가</target>
 
 <source>File</source>
 <target>파일</target>
@@ -1510,9 +1513,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>휴지통으로 %x을(를) 이동할 수 없습니다.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>폴더 %x 실패에 관한 휴지통 확인</target>
+
 <source>Cannot determine final path for %x.</source>
-<target>%x 에 대한 최종 경로를 결정할 수 없습니다.</target>
+<target>%x에 대한 최종 경로를 결정할 수 없습니다.</target>
 
 <source>Error Code %x:</source>
 <target>오류 코드 %x</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>다음 XML 요소를 읽을 수 없습니다:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>구성 파일 %x이(가) 부분적으로만 로드 되었음.</target>
 

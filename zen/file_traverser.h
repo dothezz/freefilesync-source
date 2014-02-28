@@ -7,7 +7,6 @@
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
-//#include <memory>
 #include "zstring.h"
 #include "int64.h"
 #include "file_id_def.h"

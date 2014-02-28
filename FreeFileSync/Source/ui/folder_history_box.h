@@ -42,11 +42,8 @@ public:
         zen::trim(nameTmp);
 
         //insert new folder or put it to the front if already existing
-        auto it = std::find_if(dirnames_.begin(), dirnames_.end(),
-        [&](const Zstring& entry) { return ::EqualFilename()(entry, nameTmp); });
+        vector_remove_if(dirnames_, [&](const Zstring& item) { return ::EqualFilename()(item, nameTmp); });
 
-        if (it != dirnames_.end())
-            dirnames_.erase(it);
         dirnames_.insert(dirnames_.begin(), nameTmp);
 
         if (dirnames_.size() > maxSize_) //keep maximal size of history list
@@ -56,7 +53,6 @@ public:
     void delItem(const Zstring& dirname) { zen::vector_remove_if(dirnames_, [&](const Zstring& entry) { return ::EqualFilename()(entry, dirname); }); }
 
 private:
-
     size_t maxSize_;
     std::vector<Zstring> dirnames_;
 };

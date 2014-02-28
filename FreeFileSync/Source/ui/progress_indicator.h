@@ -4,15 +4,14 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef PROGRESSINDICATOR_H_INCLUDED
-#define PROGRESSINDICATOR_H_INCLUDED
+#ifndef PROGRESS_INDICATOR_H_INCLUDED_8037493452348
+#define PROGRESS_INDICATOR_H_INCLUDED_8037493452348
 
 #include <functional>
 #include <zen/error_log.h>
-//#include <zen/zstring.h>
+#include <zen/zstring.h>
 #include <wx/frame.h>
 #include "../lib/status_handler.h"
-//#include "main_dlg.h"
 
 
 class CompareProgressDialog
@@ -54,13 +53,13 @@ struct SyncProgressDialog
 
     virtual wxWindow* getWindowIfVisible() = 0; //may be nullptr; don't abuse, use as parent for modal dialogs only!
 
-    virtual void initNewPhase() = 0; //call after "StatusHandler::initNewPhase"
-    virtual void notifyProgressChange() = 0; //throw (), required by graph!
-    virtual void updateGui() = 0; //update GUI and process Window messages
+    virtual void initNewPhase        () = 0; //call after "StatusHandler::initNewPhase"
+    virtual void notifyProgressChange() = 0; //noexcept, required by graph!
+    virtual void updateGui           () = 0; //update GUI and process Window messages
 
-    virtual std::wstring getExecWhenFinishedCommand() const = 0; //final value (after possible user modification)
+    virtual Zstring getExecWhenFinishedCommand() const = 0; //final value (after possible user modification)
 
-    virtual void stopTimer() = 0;   //halt all internal timers!
+    virtual void stopTimer  () = 0; //halt all internal timers!
     virtual void resumeTimer() = 0; //
 
 protected:
@@ -74,8 +73,8 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          wxFrame* parentWindow, //may be nullptr
                                          bool showProgress,
                                          const wxString& jobName,
-                                         const std::wstring& execWhenFinished,
-                                         std::vector<std::wstring>& execFinishedHistory); //changing parameter!
+                                         const Zstring& onCompletion,
+                                         std::vector<Zstring>& onCompletionHistory); //changing parameter!
 //DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after processHasFinished() or closeWindowDirectly()
 
 
@@ -89,4 +88,4 @@ private:
 };
 
 
-#endif // PROGRESSINDICATOR_H_INCLUDED
+#endif //PROGRESS_INDICATOR_H_INCLUDED_8037493452348

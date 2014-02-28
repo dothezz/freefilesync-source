@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>大小：</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>內容比對已跳過排除檔案 %x。</target>
+
 <source>Items differ in attributes only</source>
 <target>只有項目的屬性不同</target>
 
@@ -292,9 +295,6 @@
 <source>%x items/sec</source>
 <target>%x 個項目/秒</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>只載入設定檔 %x 的一部份。</target>
-
 <source>Show in Explorer</source>
 <target>在資源管理器中顯示</target>
 
@@ -322,11 +322,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>停止要求：等待目前的操作結束...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>無法新建版本控制的時間戳記：</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>無法讀取下列XML元素：</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>無法新建時間戳記的版本控制：</target>
 
 <source>&Open...</source>
 <target>開啟(&O)...</target>
@@ -362,7 +359,7 @@
 <target>3. 按下 '開始'。</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>開始只是導入一個.ffs_batch檔。</target>
+<target>若要開始只要導入一個.ffs_batch檔。</target>
 
 <source>Folders to watch:</source>
 <target>要監看的資料夾：</target>
@@ -555,6 +552,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>正在儲存日誌檔 %x...</target>
 
+<source>Stopped</source>
+<target>已停止</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>您可以切換到FreeFileSync的主視窗中來解決此問題。</target>
 
@@ -646,21 +646,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>拖放</target>
-
-<source>Close progress dialog</source>
-<target>關閉進度對話框</target>
-
-<source>Standby</source>
-<target>待機</target>
-
-<source>Log off</source>
-<target>登出</target>
-
-<source>Shut down</source>
-<target>關機</target>
-
-<source>Hibernate</source>
-<target>休眠</target>
 
 <source>Alternate comparison settings</source>
 <target>備用比對設定</target>
@@ -767,6 +752,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>另存為批次處理作業</target>
 
+<source>View type:</source>
+<target>檢視類型：</target>
+
+<source>Select view:</source>
+<target>選擇視圖：</target>
+
+<source>Statistics:</source>
+<target>統計資料：</target>
+
 <source>Number of files and folders that will be created</source>
 <target>將被新建的檔案和資料夾數量</target>
 
@@ -868,14 +862,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>完成後：</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>檢測同步方向和資料庫檔案的說明</target>
+
 <source>Start synchronization now?</source>
 <target>現在開始同步？</target>
 
 <source>Variant:</source>
 <target>變數：</target>
-
-<source>Statistics</source>
-<target>統計</target>
 
 <source>&Don't show this dialog again</source>
 <target>不要再顯示此對話框(&D)</target>
@@ -913,8 +907,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>在第一個錯誤出現停止同步</target>
 
-<source>Show progress dialog</source>
-<target>顯示進度對話框</target>
+<source>Run minimized</source>
+<target>最小化執行</target>
 
 <source>Save log:</source>
 <target>儲存日誌</target>
@@ -930,12 +924,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>資源回收筒(&R)</target>
-
-<source>Delete on both sides</source>
-<target>兩邊都刪除</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>即使只在一邊中選好檔案，還是會刪除兩邊檔案。</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>選擇從同步中排除某些檔案的篩選器規則。輸入相對於其對應的配對資料夾路徑。</target>
@@ -958,8 +946,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大：</target>
 
-<source>&Clear</source>
-<target>清除(&C)</target>
+<source>&Reset</source>
+<target>重置(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下設定用於所有同步作業。</target>
@@ -1057,8 +1045,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>尋找</target>
 
-<source>Select View</source>
-<target>選擇檢視</target>
+<source>View Settings</source>
+<target>檢視設定</target>
 
 <source>Overview</source>
 <target>摘要</target>
@@ -1137,11 +1125,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>透過篩選器排除：</target>
 
-<source>Exclude temporarily</source>
-<target>暫時排除</target>
-
 <source>Include temporarily</source>
 <target>暫時包括</target>
+
+<source>Exclude temporarily</source>
+<target>暫時排除</target>
 
 <source>Delete</source>
 <target>刪除</target>
@@ -1194,6 +1182,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>不儲存(&N)</target>
 
+<source>Delete selected configurations</source>
+<target>刪除選定的配置</target>
+
 <source>Filter</source>
 <target>篩選器</target>
 
@@ -1245,8 +1236,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>設為預設值</target>
 
-<source>All folders are in sync</source>
-<target>所有資料夾都是同步的</target>
+<source>All files are in sync</source>
+<target>所有檔案都在同步</target>
 
 <source>Synchronization Settings</source>
 <target>同步設定</target>
@@ -1265,6 +1256,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>正在搜尋程式更新...</target>
+
+<source>Close progress dialog</source>
+<target>關閉進度對話框</target>
+
+<source>Standby</source>
+<target>待機</target>
+
+<source>Log off</source>
+<target>登出</target>
+
+<source>Shut down</source>
+<target>關機</target>
+
+<source>Hibernate</source>
+<target>休眠</target>
 
 <source>Scanning...</source>
 <target>正在掃瞄...</target>
@@ -1287,14 +1293,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>正在初始化...</target>
 
-<source>Stopped</source>
-<target>已停止</target>
-
 <source>Completed</source>
 <target>已完成</target>
 
 <source>&Continue</source>
 <target>繼續(&C)</target>
+
+<source>Progress</source>
+<target>進展</target>
 
 <source>Log</source>
 <target>日誌</target>
@@ -1384,7 +1390,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>時間戳記</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>將時間戳記附加到每個檔案名稱上</target>
 
 <source>File</source>
@@ -1507,9 +1513,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>無法將 %x 移動到資源回收筒。</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>正在檢查資源回收筒的資料夾 %x 失敗。</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>無法確定最後路徑為 %x。</target>
 
 <source>Error Code %x:</source>
 <target>錯誤代碼 %x：</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>無法讀取下列XML元素：</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>只載入設定檔 %x 的一部份。</target>
 

@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef BOOST_THREAD_WRAP_H
-#define BOOST_THREAD_WRAP_H
+#ifndef BOOST_THREAD_WRAP_H_78963234
+#define BOOST_THREAD_WRAP_H_78963234
 
 //temporary solution until C++11 thread becomes fully available (considering std::thread's non-interruptibility and std::async craziness, this may be NEVER)
 #include <memory>
@@ -57,10 +57,10 @@ bool wait_for_all_timed(InputIterator first, InputIterator last, const Duration&
 
 //wait until first job is successful or all failed
 template <class T>
-class RunUntilFirstHit
+class GetFirstResult
 {
 public:
-    RunUntilFirstHit();
+    GetFirstResult();
 
     template <class Fun>
     void addJob(Fun f); //f must return a std::unique_ptr<T> containing a value if successful
@@ -118,7 +118,7 @@ bool wait_for_all_timed(InputIterator first, InputIterator last, const Duration&
 
 
 template <class T>
-class RunUntilFirstHit<T>::AsyncResult
+class GetFirstResult<T>::AsyncResult
 {
 public:
     AsyncResult() :
@@ -164,6 +164,7 @@ public:
 
 private:
     bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished >= jobsTotal); } //call while locked!
+	
 #ifndef NDEBUG
     bool returnedResult;
 #endif
@@ -177,14 +178,14 @@ private:
 
 
 template <class T> inline
-RunUntilFirstHit<T>::RunUntilFirstHit() : result(std::make_shared<AsyncResult>()), jobsTotal(0) {}
+GetFirstResult<T>::GetFirstResult() : result(std::make_shared<AsyncResult>()), jobsTotal(0) {}
 
 
 template <class T>
 template <class Fun> inline
-void RunUntilFirstHit<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
+void GetFirstResult<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
 {
-    auto result2 = result; //MSVC 2010: this is ridiculous!!!
+    auto result2 = result; //capture member variable, not "this"!
     boost::thread t([result2, f] { result2->reportFinished(f()); });
     ++jobsTotal;
     t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
@@ -193,11 +194,11 @@ void RunUntilFirstHit<T>::addJob(Fun f) //f must return a std::unique_ptr<T> con
 
 template <class T>
 template <class Duration> inline
-bool RunUntilFirstHit<T>::timedWait(const Duration& duration) const { return result->waitForResult(jobsTotal, duration); }
+bool GetFirstResult<T>::timedWait(const Duration& duration) const { return result->waitForResult(jobsTotal, duration); }
 
 
 template <class T> inline
-std::unique_ptr<T> RunUntilFirstHit<T>::get() const { return result->getResult(jobsTotal); }
+std::unique_ptr<T> GetFirstResult<T>::get() const { return result->getResult(jobsTotal); }
 }
 
-#endif //BOOST_THREAD_WRAP_H
+#endif //BOOST_THREAD_WRAP_H_78963234

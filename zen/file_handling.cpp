@@ -146,14 +146,11 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
         const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
 
         if (getLockingProcesses && freeString)
-        {
-            const wchar_t* procList = nullptr;
-            if (getLockingProcesses(filename.c_str(), procList))
+            if (const wchar_t* procList = getLockingProcesses(filename.c_str()))
             {
                 ZEN_ON_SCOPE_EXIT(freeString(procList));
                 return procList;
             }
-        }
     }
     return Zstring();
 }
@@ -180,13 +177,14 @@ UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
         return UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     else
     {
-        const HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(), //open handle to target of symbolic link
-                                          0,
-                                          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                          nullptr,
-                                          OPEN_EXISTING,
-                                          FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
-                                          nullptr);
+        //open handle to target of symbolic link
+        const HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),                  //_In_      LPCTSTR lpFileName,
+                                          0,                                                      //_In_      DWORD dwDesiredAccess,
+                                          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                          nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                          OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
+                                          FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
+                                          nullptr);                                               //_In_opt_  HANDLE hTemplateFile
         if (hFile == INVALID_HANDLE_VALUE)
             throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"CreateFile", getLastError()));
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
@@ -346,7 +344,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
     {
         const int lastError = errno; //copy before making other system calls!
-        std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
+        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
         const std::wstring errorDescr = formatSystemError(L"rename", lastError);
 
         if (lastError == EXDEV)
@@ -415,10 +413,10 @@ bool have8dot3NameClash(const Zstring& filename)
     {
         const Zstring origName  = afterLast(filename, FILE_NAME_SEPARATOR); //returns the whole string if ch not found
         const Zstring shortName = afterLast(getFilenameFmt(filename, ::GetShortPathName), FILE_NAME_SEPARATOR); //throw() returns empty string on error
-        const Zstring longName  = afterLast(getFilenameFmt(filename, ::GetLongPathName) , FILE_NAME_SEPARATOR); //
+        const Zstring longName  = afterLast(getFilenameFmt(filename, ::GetLongPathName ), FILE_NAME_SEPARATOR); //
 
         if (!shortName.empty() &&
-            !longName.empty()  &&
+            !longName .empty() &&
             EqualFilename()(origName,  shortName) &&
             !EqualFilename()(shortName, longName))
         {
@@ -649,7 +647,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
 
         auto openFile = [&](bool conservativeApproach)
         {
-            return ::CreateFile(applyLongPathPrefix(filename).c_str(),
+            return ::CreateFile(applyLongPathPrefix(filename).c_str(), //_In_      LPCTSTR lpFileName,
                                 (conservativeApproach ?
                                  //some NAS seem to have issues with FILE_WRITE_ATTRIBUTES, even worse, they may fail silently!
                                  //http://sourceforge.net/tracker/?func=detail&atid=1093081&aid=3536680&group_id=234430
@@ -658,13 +656,13 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                                  //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even *after* read-only was removed directly before the call!
                                  //http://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
                                  //since former gives an error notification we may very well try FILE_WRITE_ATTRIBUTES second.
-                                 FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES),
-                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                nullptr,
-                                OPEN_EXISTING,
-                                FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
-                                nullptr);
+                                 FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES),         //_In_      DWORD dwDesiredAccess,
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
+                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0) |
+                                FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
+                                nullptr);                                               //_In_opt_  HANDLE hTemplateFile
         };
 
         HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -815,14 +813,14 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
     FILETIME creationTimeDbg  = {};
     FILETIME lastWriteTimeDbg = {};
 
-    HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),
-                                FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
-                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                nullptr,
-                                OPEN_EXISTING,
-                                FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0),
-                                nullptr);
+    HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),                  //_In_      LPCTSTR lpFileName,
+                                FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,           //_In_      DWORD dwDesiredAccess,
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
+                                (procSl == ProcSymlink::DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0) |
+                                FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
+                                nullptr);                                               //_In_opt_  HANDLE hTemplateFile
     assert(hFile != INVALID_HANDLE_VALUE);
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
@@ -1301,13 +1299,14 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
     {
 #ifdef ZEN_WIN
         //try to copy file attributes (dereference symlinks and junctions)
-        const HANDLE hDirSrc = ::CreateFile(zen::applyLongPathPrefix(templateDir).c_str(),
-                                            0,
-                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                            nullptr,
-                                            OPEN_EXISTING,
-                                            FILE_FLAG_BACKUP_SEMANTICS /*needed to open a directory*/ /*| FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!*/ ,
-                                            nullptr);
+        const HANDLE hDirSrc = ::CreateFile(zen::applyLongPathPrefix(templateDir).c_str(),          //_In_      LPCTSTR lpFileName,
+                                            0,                                                      //_In_      DWORD dwDesiredAccess,
+                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                            nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                            OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
+                                            // FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!
+                                            FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
+                                            nullptr);                                               //_In_opt_  HANDLE hTemplateFile
         if (hDirSrc != INVALID_HANDLE_VALUE) //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
         {
             ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirSrc));
@@ -1324,13 +1323,16 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)
 
-                HANDLE hDirTrg = ::CreateFile(applyLongPathPrefix(directory).c_str(),
-                                              GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                              nullptr,
-                                              OPEN_EXISTING,
-                                              FILE_FLAG_BACKUP_SEMANTICS,
-                                              nullptr);
+                HANDLE hDirTrg = ::CreateFile(applyLongPathPrefix(directory).c_str(), //_In_      LPCTSTR lpFileName,
+                                              GENERIC_READ | GENERIC_WRITE,           //_In_      DWORD dwDesiredAccess,
+                                              /*read access required for FSCTL_SET_COMPRESSION*/
+                                              FILE_SHARE_READ  |
+                                              FILE_SHARE_WRITE |
+                                              FILE_SHARE_DELETE,          //_In_      DWORD dwShareMode,
+                                              nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                              OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
+                                              FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
+                                              nullptr);                   //_In_opt_  HANDLE hTemplateFile
                 if (hDirTrg != INVALID_HANDLE_VALUE)
                 {
                     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirTrg));
@@ -1518,13 +1520,15 @@ bool canCopyAsSparse(DWORD fileAttrSource, const Zstring& targetFile) //throw ()
 bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //throw ()
 {
     //follow symlinks!
-    HANDLE hSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(),
-                                  0,
-                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
-                                  nullptr,
-                                  OPEN_EXISTING,
-                                  0,
-                                  nullptr);
+    HANDLE hSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(), //_In_      LPCTSTR lpFileName,
+                                  0,                                       //_In_      DWORD dwDesiredAccess,
+                                  FILE_SHARE_READ  |  //all shared modes are required to read files that are open in other applications
+                                  FILE_SHARE_WRITE |
+                                  FILE_SHARE_DELETE,  //_In_      DWORD dwShareMode,
+                                  nullptr,            //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                  OPEN_EXISTING,      //_In_      DWORD dwCreationDisposition,
+                                  0,                  //_In_      DWORD dwFlagsAndAttributes,
+                                  nullptr);           //_In_opt_  HANDLE hTemplateFile
     if (hSource == INVALID_HANDLE_VALUE)
         return false;
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hSource));
@@ -1552,13 +1556,16 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     catch (const FileError&) {}
 
     //open sourceFile for reading
-    HANDLE hFileSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(),
-                                      GENERIC_READ,
-                                      FILE_SHARE_READ | FILE_SHARE_DELETE,
-                                      nullptr,
-                                      OPEN_EXISTING, //FILE_FLAG_OVERLAPPED must not be used!
-                                      FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_NO_BUFFERING should not be used!
-                                      nullptr);
+    HANDLE hFileSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(), //_In_      LPCTSTR lpFileName,
+                                      GENERIC_READ,                            //_In_      DWORD dwDesiredAccess,
+                                      FILE_SHARE_READ | FILE_SHARE_DELETE,     //_In_      DWORD dwShareMode,
+                                      nullptr,                                 //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                      OPEN_EXISTING,                           //_In_      DWORD dwCreationDisposition,
+                                      //FILE_FLAG_OVERLAPPED must not be used!
+                                      //FILE_FLAG_NO_BUFFERING should not be used!
+                                      FILE_FLAG_SEQUENTIAL_SCAN |
+                                      FILE_FLAG_BACKUP_SEMANTICS,              //_In_      DWORD dwFlagsAndAttributes,
+                                      nullptr);                                //_In_opt_  HANDLE hTemplateFile
     if (hFileSource == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
@@ -1595,14 +1602,18 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //FILE_ATTRIBUTE_ENCRYPTED -> no!
 
     //create targetFile and open it for writing
-    HANDLE hFileTarget = ::CreateFile(applyLongPathPrefix(targetFile).c_str(),
-                                      GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                      FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
-                                      nullptr,
-                                      CREATE_NEW,
-                                      FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_BACKUP_SEMANTICS | (fileInfoSource.dwFileAttributes & validAttribs),
+    HANDLE hFileTarget = ::CreateFile(applyLongPathPrefix(targetFile).c_str(), //_In_      LPCTSTR lpFileName,
+                                      GENERIC_READ | GENERIC_WRITE,            //_In_      DWORD dwDesiredAccess,
+                                      //read access required for FSCTL_SET_COMPRESSION
+                                      FILE_SHARE_DELETE,                       //_In_      DWORD dwShareMode,
+                                      //FILE_SHARE_DELETE is required to rename file while handle is open!
+                                      nullptr,                                 //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                      CREATE_NEW,                              //_In_      DWORD dwCreationDisposition,
                                       //FILE_FLAG_OVERLAPPED must not be used! FILE_FLAG_NO_BUFFERING should not be used!
-                                      nullptr);
+                                      (fileInfoSource.dwFileAttributes & validAttribs) |
+                                      FILE_FLAG_SEQUENTIAL_SCAN |
+                                      FILE_FLAG_BACKUP_SEMANTICS,              //_In_      DWORD dwFlagsAndAttributes,
+                                      nullptr);                                //_In_opt_  HANDLE hTemplateFile
     if (hFileTarget == INVALID_HANDLE_VALUE)
     {
         const ErrorCode lastError = getLastError(); //copy before making other system calls!
@@ -1804,12 +1815,10 @@ public:
             throw ErrorShouldCopyAsSparse(L"sparse dummy value");
 
         if (exceptionInUserCallback)
-            try
-            {
-                exceptionInUserCallback(0); //should throw again!!!
-                assert(false);
-            }
-            catch (...) { throw; }
+        {
+            exceptionInUserCallback(0); //should throw again!!!
+            assert(false);              //
+        }
 
         if (!errorMsg.first.empty())
             throw FileError(errorMsg.first, errorMsg.second);
@@ -1818,7 +1827,7 @@ public:
 private:
     bool shouldCopyAsSparse;                        //
     std::pair<std::wstring, std::wstring> errorMsg; //these are exclusive!
-    std::function<void(Int64 bytesDelta)> exceptionInUserCallback;      // -> optional
+    std::function<void(Int64 bytesDelta)> exceptionInUserCallback; // -> optional
 };
 
 
@@ -1946,7 +1955,6 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
 
 
 const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destination is not supported with Windows 2000
-//const bool supportUnbufferedCopy        = vistaOrLater();
 //caveat: function scope static initialization is not thread-safe in VS 2010!
 
 
@@ -1969,7 +1977,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     if (supportNonEncryptedDestination)
         copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrytped location
 
-    //if (supportUnbufferedCopy) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
+    //if (vistaOrLater()) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
     //  copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, huge improvement for large files (20% in test NTFS -> NTFS)
     //It's a shame this flag causes file corruption! https://sourceforge.net/projects/freefilesync/forums/forum/847542/topic/5177950
     //documentation on CopyFile2() even states: "It is not recommended to pause copies that are using this flag." How dangerous is this thing, why offer it at all???

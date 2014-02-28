@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <wx/panel.h>
+#include <wx/settings.h>
 #include <zen/string_tools.h>
 #include <zen/optional.h>
 
@@ -240,6 +241,7 @@ public:
             labelposY(Y_LABEL_LEFT),
             yLabelWidth(60),
             labelFmtY(std::make_shared<DecimalNumberFormatter>()),
+            backgroundColor(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW)),
             mouseSelMode(SELECT_RECTANGLE) {}
 
         MainAttributes& setMinX(double newMinX) { minX = newMinX; minXauto = false; return *this; }
@@ -269,6 +271,8 @@ public:
 
         MainAttributes& setCornerText(const wxString& txt, PosCorner pos) { cornerTexts[pos] = txt; return *this; }
 
+        MainAttributes& setBackgroundColor(const wxColour& col) { backgroundColor = col; return *this; }
+
         MainAttributes& setSelectionMode(SelMode mode) { mouseSelMode = mode; return *this; }
 
     private:
@@ -294,6 +298,7 @@ public:
 
         std::map<PosCorner, wxString> cornerTexts;
 
+        wxColour backgroundColor;
         SelMode mouseSelMode;
     };
     void setAttributes(const MainAttributes& newAttr) { attr = newAttr; Refresh(); }

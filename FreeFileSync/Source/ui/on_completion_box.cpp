@@ -4,11 +4,12 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#include "exec_finished_box.h"
+#include "on_completion_box.h"
 #include <deque>
 #include <zen/i18n.h>
 #include <algorithm>
 #include <zen/stl_tools.h>
+#include <zen/utf.h>
 #ifdef ZEN_WIN
 #include <zen/win_ver.h>
 #endif
@@ -22,40 +23,41 @@ const std::wstring cmdTxtCloseProgressDlg = L"Close progress dialog"; //special 
 
 const std::wstring separationLine(L"---------------------------------------------------------------------------------------------------------------");
 
-std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui name/command) pairs
-{
-    std::vector<std::pair<std::wstring, std::wstring>> output;
 
-    auto addEntry = [&](const std::wstring& name, const std::wstring& value) { output.push_back(std::make_pair(name, value)); };
+std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/command) pairs
+{
+    std::vector<std::pair<std::wstring, Zstring>> output;
+
+    auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.push_back(std::make_pair(name, value)); };
 
 #ifdef ZEN_WIN
     if (zen::vistaOrLater())
     {
-        addEntry(_("Standby"  ), L"rundll32.exe powrprof.dll,SetSuspendState Sleep"); //suspend/Suspend to RAM/sleep
-        addEntry(_("Log off"  ), L"shutdown /l");
-        addEntry(_("Shut down"), L"shutdown /s /t 60");
+        addEntry(_("Standby"  ), Zstr("rundll32.exe powrprof.dll,SetSuspendState Sleep")); //suspend/Suspend to RAM/sleep
+        addEntry(_("Log off"  ), Zstr("shutdown /l"));
+        addEntry(_("Shut down"), Zstr("shutdown /s /t 60"));
         //addEntry(_("Hibernate"), L"shutdown /h"); //Suspend to disk -> Standby is better anyway
     }
     else //XP
     {
-        addEntry(_("Standby"), L"rundll32.exe powrprof.dll,SetSuspendState"); //this triggers standby OR hibernate, depending on whether hibernate setting is active!
-        addEntry(_("Log off"  ), L"shutdown -l");
-        addEntry(_("Shut down"), L"shutdown -s -t 60");
+        addEntry(_("Standby"  ), Zstr("rundll32.exe powrprof.dll,SetSuspendState")); //this triggers standby OR hibernate, depending on whether hibernate setting is active!
+        addEntry(_("Log off"  ), Zstr("shutdown -l"));
+        addEntry(_("Shut down"), Zstr("shutdown -s -t 60"));
         //no suspend on XP?
     }
 
 #elif defined ZEN_LINUX
-    addEntry(_("Standby"  ), L"sudo pm-suspend");
-    addEntry(_("Log off"  ), L"gnome-session-quit"); //alternative requiring admin: sudo killall Xorg
-    addEntry(_("Shut down"), L"dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown");
+    addEntry(_("Standby"  ), Zstr("sudo pm-suspend"));
+    addEntry(_("Log off"  ), Zstr("gnome-session-quit")); //alternative requiring admin: sudo killall Xorg
+    addEntry(_("Shut down"), Zstr("dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown"));
     //alternative requiring admin: sudo shutdown -h 1
     //addEntry(_("Hibernate"), L"sudo pm-hibernate");
     //alternative: "pmi action suspend" and "pmi action hibernate", require "sudo apt-get install powermanagement-interaface"
 
 #elif defined ZEN_MAC
-    addEntry(_("Standby"  ), L"osascript -e \'tell application \"System Events\" to sleep\'");
-    addEntry(_("Log off"  ), L"osascript -e \'tell application \"System Events\" to log out\'");
-    addEntry(_("Shut down"), L"osascript -e \'tell application \"System Events\" to shut down\'");
+    addEntry(_("Standby"  ), Zstr("osascript -e \'tell application \"System Events\" to sleep\'"));
+    addEntry(_("Log off"  ), Zstr("osascript -e \'tell application \"System Events\" to log out\'"));
+    addEntry(_("Shut down"), Zstr("osascript -e \'tell application \"System Events\" to shut down\'"));
 #endif
     return output;
 }
@@ -64,15 +66,15 @@ const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 }
 
 
-bool isCloseProgressDlgCommand(const std::wstring& value)
+bool isCloseProgressDlgCommand(const Zstring& value)
 {
-    std::wstring tmp = value;
+    auto tmp = utfCvrtTo<std::wstring>(value);
     trim(tmp);
     return tmp == cmdTxtCloseProgressDlg;
 }
 
 
-ExecFinishedBox::ExecFinishedBox(wxWindow* parent,
+OnCompletionBox::OnCompletionBox(wxWindow* parent,
                                  wxWindowID id,
                                  const wxString& value,
                                  const wxPoint& pos,
@@ -91,36 +93,34 @@ ExecFinishedBox::ExecFinishedBox(wxWindow* parent,
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (ExecFinishedBox::OnKeyEvent  ), nullptr, this);
-    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (ExecFinishedBox::OnUpdateList), nullptr, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ExecFinishedBox::OnSelection ), nullptr, this);
-    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (ExecFinishedBox::OnMouseWheel), nullptr, this);
+    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (OnCompletionBox::OnKeyEvent  ), nullptr, this);
+    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (OnCompletionBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(OnCompletionBox::OnSelection ), nullptr, this);
+    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (OnCompletionBox::OnMouseWheel), nullptr, this);
 
-    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(ExecFinishedBox::OnValidateSelection), nullptr, this);
+    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(OnCompletionBox::OnValidateSelection), nullptr, this);
 }
 
 
-void ExecFinishedBox::addItemHistory()
+void OnCompletionBox::addItemHistory()
 {
     if (history_)
     {
-        std::wstring command = getValue();
+        Zstring command = getValue();
         trim(command);
 
-        if (command == separationLine || //do not add sep. line
-            command == cmdTxtCloseProgressDlg || //do not add special command
+        if (command == utfCvrtTo<Zstring>(separationLine) || //do not add sep. line
+            command == utfCvrtTo<Zstring>(cmdTxtCloseProgressDlg) || //do not add special command
             command.empty())
             return;
 
         //do not add built-in commands to history
         for (const auto& item : defaultCommands)
-            if (command == item.first ||
-                command == item.second)
+            if (command == utfCvrtTo<Zstring>(item.first) ||
+                ::EqualFilename()(command, item.second))
                 return;
 
-        for (const std::wstring& item : *history_)
-            if (command == item)
-                return;
+        vector_remove_if(*history_, [&](const Zstring& item) { return ::EqualFilename()(command, item); });
 
         history_->insert(history_->begin(), command);
 
@@ -130,34 +130,32 @@ void ExecFinishedBox::addItemHistory()
 }
 
 
-std::wstring ExecFinishedBox::getValue() const
+Zstring OnCompletionBox::getValue() const
 {
-    const std::wstring value = zen::copyStringTo<std::wstring>(GetValue());
+    auto value = copyStringTo<std::wstring>(GetValue());
+    trim(value);
 
-    {
-        std::wstring tmp = value;
-        trim(tmp);
-        if (tmp == implementation::translate(cmdTxtCloseProgressDlg)) //have this symbolic constant translated properly
-            return cmdTxtCloseProgressDlg;
-    }
+    if (value == implementation::translate(cmdTxtCloseProgressDlg)) //undo translation for config file storage
+        value = cmdTxtCloseProgressDlg;
 
-    return value;
+    return utfCvrtTo<Zstring>(value);
 }
 
 
-void ExecFinishedBox::setValue(const std::wstring& value)
+void OnCompletionBox::setValue(const Zstring& value)
 {
-    std::wstring tmp = value;
+    auto tmp = utfCvrtTo<std::wstring>(value);
     trim(tmp);
 
     if (tmp == cmdTxtCloseProgressDlg)
-        setValueAndUpdateList(implementation::translate(cmdTxtCloseProgressDlg)); //have this symbolic constant translated properly
-    else
-        setValueAndUpdateList(value);
+        tmp = implementation::translate(cmdTxtCloseProgressDlg); //have this symbolic constant translated properly
+
+    setValueAndUpdateList(tmp);
 }
 
+
 //set value and update list are technically entangled: see potential bug description below
-void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
+void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
 {
     //it may be a little lame to update the list on each mouse-button click, but it should be working and we dont't have to manipulate wxComboBox internals
 
@@ -167,14 +165,15 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
     items.push_back(implementation::translate(cmdTxtCloseProgressDlg));
 
     //2. built in commands
-    for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
-        items.push_back(it->first);
+    for (const auto& item : defaultCommands)
+        items.push_back(item.first);
 
     //3. history elements
     if (history_ && !history_->empty())
     {
         items.push_back(separationLine);
-        vector_append(items, *history_);
+        for (const Zstring& hist : *history_)
+            items.push_back(utfCvrtTo<std::wstring>(hist));
         std::sort(items.end() - history_->size(), items.end());
     }
 
@@ -188,14 +187,17 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
         items.push_front(value);
     }
 
-    Clear();
-    std::for_each(items.begin(), items.end(), [&](const std::wstring& item) { this->Append(item); });
+    //this->Clear(); -> NO! emits yet another wxEVT_COMMAND_TEXT_UPDATED!!!
+	wxItemContainer::Clear(); //suffices to clear the selection items only!
+
+    for (const std::wstring& item : items)
+        this->Append(item);
     //this->SetSelection(wxNOT_FOUND); //don't select anything
-    SetValue(value);          //preserve main text!
+    ChangeValue(value); //preserve main text!
 }
 
 
-void ExecFinishedBox::OnSelection(wxCommandEvent& event)
+void OnCompletionBox::OnSelection(wxCommandEvent& event)
 {
     wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
     if (auto handler = GetEventHandler())
@@ -205,27 +207,27 @@ void ExecFinishedBox::OnSelection(wxCommandEvent& event)
 }
 
 
-void ExecFinishedBox::OnValidateSelection(wxCommandEvent& event)
+void OnCompletionBox::OnValidateSelection(wxCommandEvent& event)
 {
-    const auto& value = getValue();
+    const auto value = copyStringTo<std::wstring>(GetValue());
 
     if (value == separationLine)
-        setValueAndUpdateList(std::wstring());
-    else
-        for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
-            if (it->first == value)
-                return setValueAndUpdateList(it->second); //replace GUI name by actual command string
+        return setValueAndUpdateList(std::wstring());
+
+    for (const auto& item : defaultCommands)
+        if (item.first == value)
+            return setValueAndUpdateList(utfCvrtTo<std::wstring>(item.second)); //replace GUI name by actual command string
 }
 
 
-void ExecFinishedBox::OnUpdateList(wxEvent& event)
+void OnCompletionBox::OnUpdateList(wxEvent& event)
 {
     setValue(getValue());
     event.Skip();
 }
 
 
-void ExecFinishedBox::OnKeyEvent(wxKeyEvent& event)
+void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
 {
     switch (event.GetKeyCode())
     {
@@ -239,7 +241,7 @@ void ExecFinishedBox::OnKeyEvent(wxKeyEvent& event)
                 (GetValue() != GetString(pos) || //avoid problems when a character shall be deleted instead of list item
                  GetValue() == wxEmptyString)) //exception: always allow removing empty entry
             {
-                const std::wstring selValue = copyStringTo<std::wstring>(GetString(pos));
+                const auto selValue = utfCvrtTo<Zstring>(GetString(pos));
 
                 if (history_ && std::find(history_->begin(), history_->end(), selValue) != history_->end()) //only history elements may be deleted
                 {
@@ -248,7 +250,7 @@ void ExecFinishedBox::OnKeyEvent(wxKeyEvent& event)
                     //this->SetSelection(wxNOT_FOUND);
 
                     //delete selected row
-                    vector_remove_if(*history_, [&](const std::wstring& item) { return item == selValue; });
+                    vector_remove_if(*history_, [&](const Zstring& item) { return item == selValue; });
 
                     SetString(pos, wxString()); //in contrast to Delete(), this one does not kill the drop-down list and gives a nice visual feedback!
                     //Delete(pos);
@@ -256,9 +258,7 @@ void ExecFinishedBox::OnKeyEvent(wxKeyEvent& event)
                     //(re-)set value
                     SetValue(currentVal);
                 }
-
-                //eat up key event
-                return;
+                return; //eat up key event
             }
         }
         break;

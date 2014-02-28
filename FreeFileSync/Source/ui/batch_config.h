@@ -15,8 +15,8 @@ namespace zen
 //show and let user customize batch settings (without saving)
 bool customizeBatchConfig(wxWindow* parent, //return "false" if aborted, "true" on "do save"
                           xmlAccess::XmlBatchConfig& batchCfg, //in/out
-                          std::vector<std::wstring>& execFinishedhistory,
-                          size_t execFinishedhistoryMax);
+                          std::vector<Zstring>& onCompletionHistory,
+                          size_t onCompletionHistoryMax);
 }
 
 #endif // BATCHCONFIG_H_INCLUDED

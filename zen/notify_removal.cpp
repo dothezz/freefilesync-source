@@ -13,25 +13,17 @@
 using namespace zen;
 
 
-namespace
-{
-bool messageProviderConstructed = false;
-}
-
-
 class MessageProvider //administrates a single dummy window to receive messages
 {
 public:
-    static MessageProvider& instance() //throw (FileError)
+    static MessageProvider& instance() //throw FileError
     {
         static MessageProvider inst;
-        messageProviderConstructed = true;
         return inst;
     }
 
-    class Listener
+    struct Listener
     {
-    public:
         virtual ~Listener() {}
         virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) = 0; //throw()!
     };
@@ -48,7 +40,8 @@ private:
 
     static const wchar_t dummyWindowName[];
 
-    friend LRESULT CALLBACK topWndProc(HWND, UINT, WPARAM, LPARAM);
+    static LRESULT CALLBACK topWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     void processMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
     const HINSTANCE hMainModule;
@@ -61,15 +54,15 @@ private:
 const wchar_t MessageProvider::dummyWindowName[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
 
 
-LRESULT CALLBACK topWndProc(HWND hwnd,     //handle to window
-                            UINT uMsg,     //message identifier
-                            WPARAM wParam, //first message parameter
-                            LPARAM lParam) //second message parameter
+LRESULT CALLBACK MessageProvider::topWndProc(HWND hwnd,     //handle to window
+                                             UINT uMsg,     //message identifier
+                                             WPARAM wParam, //first message parameter
+                                             LPARAM lParam) //second message parameter
 {
-    if (messageProviderConstructed) //attention: this callback is triggered in the middle of singleton construction! It is a bad idea to to call back at this time!
+    if (auto pThis = reinterpret_cast<MessageProvider*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA)))
         try
         {
-            MessageProvider::instance().processMessage(uMsg, wParam, lParam); //not supposed to throw
+            pThis->processMessage(uMsg, wParam, lParam); //not supposed to throw!
         }
         catch (...) { assert(false); }
 
@@ -110,6 +103,13 @@ MessageProvider::MessageProvider() :
     if (!windowHandle)
         throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"CreateWindow", getLastError()));
 
+    //store this-pointer for topWndProc() to use: do this AFTER CreateWindow() to avoid processing messages while this constructor is running!!!
+    //unlike: http://blogs.msdn.com/b/oldnewthing/archive/2014/02/03/10496248.aspx
+    ::SetLastError(ERROR_SUCCESS); //[!] required for proper error handling, see MSDN, SetWindowLongPtr
+    if (::SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this)) == 0)
+        if (::GetLastError() != ERROR_SUCCESS)
+            throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"SetWindowLongPtr", getLastError()));
+
     guardClass.dismiss();
 }
 
@@ -125,8 +125,8 @@ MessageProvider::~MessageProvider()
 
 void MessageProvider::processMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    std::for_each(listener.begin(), listener.end(),
-    [&](Listener* ls) { ls->onMessage(message, wParam, lParam); });
+    for (Listener* ls : listener)
+        ls->onMessage(message, wParam, lParam);
 }
 
 //####################################################################################################

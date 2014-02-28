@@ -21,7 +21,7 @@ public:
 
     void addSample(int itemsCurrent, double dataCurrent, int64_t timeMs); //timeMs must be ascending!
 
-    zen::Opt<std::wstring> getRemainingTime(double dataRemaining) const;
+    zen::Opt<double> getRemainingTimeSec(double dataRemaining) const;
     zen::Opt<std::wstring> getBytesPerSecond() const; //for window
     zen::Opt<std::wstring> getItemsPerSecond() const; //for window
 

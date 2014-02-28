@@ -1,3 +1,16 @@
+FreeFileSync 6.3
+----------------
+No wait time anymore while searching for recycle bin (Windows Vista and later)
+Revised synchronization progress graph
+Clean up "On completion" considering last usage
+Fixed CTRL + C keyboard short cut in filter dialog (OS X)
+Resolved static initialization order issues
+Reduced disk accesses when resolving directory name
+Added view filter labels
+Updated translation files
+Updated help file
+
+
 FreeFileSync 6.2 [2014-02-01]
 -----------------------------
 New synchronization progress graph

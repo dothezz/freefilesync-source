@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Storlek:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Innehållsjämförelse skippades för undantagna filer %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Endast attribut skiljer objekten åt</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x objekt/sek.</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Konfigurationsfilen %x lästes bara delvis in.</target>
-
 <source>Show in Explorer</source>
 <target>Visa i Utforskaren</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Stopp begärt: Väntar på att aktuell åtgärd skall slutföras...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>Kunde inte skapa tidsstämpel för versionshantering:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Kan inte läsa följande XML-element:</target>
 
 <source>&Open...</source>
 <target>&Öppna...</target>
@@ -558,6 +555,9 @@ Kommandot triggas om:
 <source>Saving log file %x...</source>
 <target>Sparar loggfil %x...</target>
 
+<source>Stopped</source>
+<target>Stoppad</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Du kan växla till FreeFileSyncs programfönster för att lösa problemet.</target>
 
@@ -650,21 +650,6 @@ Kommandot triggas om:
 
 <source>Drag && drop</source>
 <target>Dra && släpp</target>
-
-<source>Close progress dialog</source>
-<target>Stäng förloppsindikator</target>
-
-<source>Standby</source>
-<target>Strömsparläge</target>
-
-<source>Log off</source>
-<target>Logga ut</target>
-
-<source>Shut down</source>
-<target>Stäng av datorn</target>
-
-<source>Hibernate</source>
-<target>Viloläge</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternativa jämförelseinställningar</target>
@@ -771,6 +756,15 @@ Kommandot triggas om:
 <source>Save as batch job</source>
 <target>Spara som batch-fil</target>
 
+<source>View type:</source>
+<target>Visningstyp:</target>
+
+<source>Select view:</source>
+<target>Välj vy:</target>
+
+<source>Statistics:</source>
+<target>Statistik:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Antal filer och mappar som kommer att skapas</target>
 
@@ -872,14 +866,14 @@ Kommandot triggas om:
 <source>On completion:</source>
 <target>Vid slutförd åtgärd:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
+
 <source>Start synchronization now?</source>
 <target>Vill du starta synkroniseringen nu?</target>
 
 <source>Variant:</source>
 <target>Alternativ:</target>
-
-<source>Statistics</source>
-<target>Statistik</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Visa inte den här dialogen igen</target>
@@ -917,8 +911,8 @@ Kommandot triggas om:
 <source>Stop synchronization at first error</source>
 <target>Stoppa synkroniseringen vid första fel som uppstår</target>
 
-<source>Show progress dialog</source>
-<target>Visa förloppsindikator</target>
+<source>Run minimized</source>
+<target>Kör minimerad</target>
 
 <source>Save log:</source>
 <target>Spara logg:</target>
@@ -934,12 +928,6 @@ Kommandot triggas om:
 
 <source>&Recycle bin</source>
 <target>&Papperskorgen</target>
-
-<source>Delete on both sides</source>
-<target>Ta bort på båda sidor</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Ta bort på båda sidor, även om filen är markerad på endast en sida</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande mapp-par</target>
@@ -962,8 +950,8 @@ Kommandot triggas om:
 <source>Maximum:</source>
 <target>Max:</target>
 
-<source>&Clear</source>
-<target>&Rensa</target>
+<source>&Reset</source>
+<target>&Återställ</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Följande inställningar används för all synkronisering</target>
@@ -1061,8 +1049,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Find</source>
 <target>Sök</target>
 
-<source>Select View</source>
-<target>Välj vy</target>
+<source>View Settings</source>
+<target>Visningsinställningar</target>
 
 <source>Overview</source>
 <target>Översikt</target>
@@ -1145,11 +1133,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Exclude via filter:</source>
 <target>Lägg till i undantag:</target>
 
-<source>Exclude temporarily</source>
-<target>Undanta tillfälligt</target>
-
 <source>Include temporarily</source>
 <target>Inkludera tillfälligt</target>
+
+<source>Exclude temporarily</source>
+<target>Undanta tillfälligt</target>
 
 <source>Delete</source>
 <target>Ta bort</target>
@@ -1202,6 +1190,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Do&n't save</source>
 <target>Spara &inte</target>
 
+<source>Delete selected configurations</source>
+<target>Ta bort markerade konfigurationer</target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1253,8 +1244,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Set as default</source>
 <target>Ange som standard</target>
 
-<source>All folders are in sync</source>
-<target>Alla mappar är synkroniserade</target>
+<source>All files are in sync</source>
+<target>Alla filer är synkroniserade</target>
 
 <source>Synchronization Settings</source>
 <target>Synkroniseringsinställningar</target>
@@ -1273,6 +1264,21 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Searching for program updates...</source>
 <target>Söker efter programuppdateringar...</target>
+
+<source>Close progress dialog</source>
+<target>Stäng förloppsindikator</target>
+
+<source>Standby</source>
+<target>Strömsparläge</target>
+
+<source>Log off</source>
+<target>Logga ut</target>
+
+<source>Shut down</source>
+<target>Stäng av datorn</target>
+
+<source>Hibernate</source>
+<target>Viloläge</target>
 
 <source>Scanning...</source>
 <target>Skannar...</target>
@@ -1295,14 +1301,14 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Initializing...</source>
 <target>Initierar...</target>
 
-<source>Stopped</source>
-<target>Stoppad</target>
-
 <source>Completed</source>
 <target>Slutförd</target>
 
 <source>&Continue</source>
 <target>&Fortsätt</target>
+
+<source>Progress</source>
+<target>Förlopp</target>
 
 <source>Log</source>
 <target>Logg</target>
@@ -1394,7 +1400,7 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Time stamp</source>
 <target>Tidsstämpel</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>Lägg till en tidsstämpel till varje filnamn</target>
 
 <source>File</source>
@@ -1520,9 +1526,18 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Kan inte att flytta %x till papperskorgen</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Kontroll av papperskorgen misslyckades för %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Kan inte utläsa slutlig sökväg för %x.</target>
 
 <source>Error Code %x:</source>
 <target>Felkod %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Kan inte läsa följande XML-element:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Konfigurationsfilen %x lästes bara delvis in.</target>
 

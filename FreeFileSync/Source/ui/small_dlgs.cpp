@@ -326,7 +326,6 @@ public:
     DeleteDialog(wxWindow* parent,
                  const std::vector<zen::FileSystemObject*>& rowsOnLeft,
                  const std::vector<zen::FileSystemObject*>& rowsOnRight,
-                 bool& deleteOnBothSides,
                  bool& useRecycleBin);
 
 private:
@@ -340,7 +339,6 @@ private:
 
     const std::vector<zen::FileSystemObject*>& rowsToDeleteOnLeft;
     const std::vector<zen::FileSystemObject*>& rowsToDeleteOnRight;
-    bool& outRefdeleteOnBothSides;
     bool& outRefuseRecycleBin;
     const TickVal tickCountStartup;
 };
@@ -349,12 +347,10 @@ private:
 DeleteDialog::DeleteDialog(wxWindow* parent,
                            const std::vector<FileSystemObject*>& rowsOnLeft,
                            const std::vector<FileSystemObject*>& rowsOnRight,
-                           bool& deleteOnBothSides,
                            bool& useRecycleBin) :
     DeleteDlgGenerated(parent),
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
-    outRefdeleteOnBothSides(deleteOnBothSides),
     outRefuseRecycleBin(useRecycleBin),
     tickCountStartup(getTicks())
 {
@@ -365,15 +361,7 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
     setMainInstructionFont(*m_staticTextHeader);
 
-    m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
-
-    //if both sides contain same rows this checkbox is superfluous
-    if (rowsToDeleteOnLeft == rowsToDeleteOnRight)
-    {
-        m_checkBoxDeleteBothSides->Show(false);
-        m_checkBoxDeleteBothSides->SetValue(true);
-    }
 
 #ifndef __WXGTK__  //wxWidgets holds portability promise by not supporting for multi-line controls...not
     m_textCtrlFileList->SetMaxLength(0); //allow large entries!
@@ -397,8 +385,7 @@ void DeleteDialog::updateGui()
 #endif
 
     const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(rowsToDeleteOnLeft,
-                                                                            rowsToDeleteOnRight,
-                                                                            m_checkBoxDeleteBothSides->GetValue());
+                                                                            rowsToDeleteOnRight);
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
@@ -443,8 +430,6 @@ void DeleteDialog::OnOK(wxCommandEvent& event)
             return;
 
     outRefuseRecycleBin = m_checkBoxUseRecycler->GetValue();
-    if (rowsToDeleteOnLeft != rowsToDeleteOnRight)
-        outRefdeleteOnBothSides = m_checkBoxDeleteBothSides->GetValue();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -463,13 +448,11 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(wxWindow* parent,
                                                     const std::vector<zen::FileSystemObject*>& rowsOnLeft,
                                                     const std::vector<zen::FileSystemObject*>& rowsOnRight,
-                                                    bool& deleteOnBothSides,
                                                     bool& useRecycleBin)
 {
     DeleteDialog confirmDeletion(parent,
                                  rowsOnLeft,
                                  rowsOnRight,
-                                 deleteOnBothSides,
                                  useRecycleBin);
     return static_cast<ReturnSmallDlg::ButtonPressed>(confirmDeletion.ShowModal());
 }

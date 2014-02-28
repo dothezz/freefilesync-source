@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Velikost:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Porovnání obsahu bylo vynecháno pro soubory %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Položky se liší pouze ve vlastnostech</target>
 
@@ -298,9 +301,6 @@
 <source>%x items/sec</source>
 <target>%x položek/s</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Konfigurace ze souboru %x byla načtena jen částečně.</target>
-
 <source>Show in Explorer</source>
 <target>Zobrazit v Průzkumníkovi</target>
 
@@ -328,11 +328,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Zastavování: Čekání na dokončení právě probíhající operace...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>Nelze vytvořit časové značky verzování:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Nelze načíst následující XML elementy:</target>
 
 <source>&Open...</source>
 <target>&Otevřít...</target>
@@ -561,6 +558,9 @@ Příkaz je spuštěn když:
 <source>Saving log file %x...</source>
 <target>Ukládání žurnálu %x...</target>
 
+<source>Stopped</source>
+<target>Zastaveno</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>K odstranění tohoto problému se přepněte do hlavního okna FreeFileSync.</target>
 
@@ -654,21 +654,6 @@ Příkaz je spuštěn když:
 
 <source>Drag && drop</source>
 <target>Přetáhni sem && pusť</target>
-
-<source>Close progress dialog</source>
-<target>Zavřít průběh zpracování</target>
-
-<source>Standby</source>
-<target>Přepnout do úsporného režimu</target>
-
-<source>Log off</source>
-<target>Odhlásit uživatele</target>
-
-<source>Shut down</source>
-<target>Vypnout počítač</target>
-
-<source>Hibernate</source>
-<target>Přepnout do režimu spánku</target>
 
 <source>Alternate comparison settings</source>
 <target>Jiné nastavení porovnání</target>
@@ -775,6 +760,15 @@ Příkaz je spuštěn když:
 <source>Save as batch job</source>
 <target>Uložit jako dávku</target>
 
+<source>View type:</source>
+<target>Typ zobrazení:</target>
+
+<source>Select view:</source>
+<target>Výběr zobrazení:</target>
+
+<source>Statistics:</source>
+<target>Statistika</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Počet souborů a složek k vytvoření</target>
 
@@ -876,14 +870,14 @@ Příkaz je spuštěn když:
 <source>On completion:</source>
 <target>Po dokončení:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Určit směr synchronizace pomocí databáze</target>
+
 <source>Start synchronization now?</source>
 <target>Začít synchronizovat nyní?</target>
 
 <source>Variant:</source>
 <target>Varianta:</target>
-
-<source>Statistics</source>
-<target>Statistika</target>
 
 <source>&Don't show this dialog again</source>
 <target>Tento dialog již &nezobrazovat</target>
@@ -921,8 +915,8 @@ Příkaz je spuštěn když:
 <source>Stop synchronization at first error</source>
 <target>Ukončit synchronizaci při první chybě</target>
 
-<source>Show progress dialog</source>
-<target>Zobrazit průběh zpracování</target>
+<source>Run minimized</source>
+<target>Minimalizovat</target>
 
 <source>Save log:</source>
 <target>Uložit žurnál:</target>
@@ -938,12 +932,6 @@ Příkaz je spuštěn když:
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
-
-<source>Delete on both sides</source>
-<target>Smazat z obou stran</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávajte cesty relativně k odpovídající složce.</target>
@@ -966,7 +954,7 @@ Příkaz je spuštěn když:
 <source>Maximum:</source>
 <target>Do:</target>
 
-<source>&Clear</source>
+<source>&Reset</source>
 <target>&Smazat</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
@@ -1062,8 +1050,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Najít</target>
 
-<source>Select View</source>
-<target>Zobrazení</target>
+<source>View Settings</source>
+<target>Nastavení zobrazení</target>
 
 <source>Overview</source>
 <target>Přehled</target>
@@ -1150,11 +1138,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Vynechat pomocí filtru:</target>
 
-<source>Exclude temporarily</source>
-<target>Vynechat dočasně</target>
-
 <source>Include temporarily</source>
 <target>Přidat dočasně</target>
+
+<source>Exclude temporarily</source>
+<target>Vynechat dočasně</target>
 
 <source>Delete</source>
 <target>Smazat</target>
@@ -1207,6 +1195,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&Neukládat</target>
 
+<source>Delete selected configurations</source>
+<target>Smazat vybrané konfigurace</target>
+
 <source>Filter</source>
 <target>Filtr</target>
 
@@ -1258,8 +1249,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Nastavit jako výchozí</target>
 
-<source>All folders are in sync</source>
-<target>Všechny složky jsou synchronizovány</target>
+<source>All files are in sync</source>
+<target>Všechny soubory jsou synchronizovány</target>
 
 <source>Synchronization Settings</source>
 <target>Nastavení synchronizace</target>
@@ -1278,6 +1269,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Hledání aktualizací programu ...</target>
+
+<source>Close progress dialog</source>
+<target>Zavřít průběh zpracování</target>
+
+<source>Standby</source>
+<target>Přepnout do úsporného režimu</target>
+
+<source>Log off</source>
+<target>Odhlásit uživatele</target>
+
+<source>Shut down</source>
+<target>Vypnout počítač</target>
+
+<source>Hibernate</source>
+<target>Přepnout do režimu spánku</target>
 
 <source>Scanning...</source>
 <target>Zpracovávání...</target>
@@ -1300,14 +1306,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Inicializace...</target>
 
-<source>Stopped</source>
-<target>Zastaveno</target>
-
 <source>Completed</source>
 <target>Hotovo</target>
 
 <source>&Continue</source>
 <target>&Pokračovat</target>
+
+<source>Progress</source>
+<target>Průběh</target>
 
 <source>Log</source>
 <target>Záznam zpracování</target>
@@ -1401,7 +1407,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Časová značka</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>Přidat časovou značku ke jménu souboru</target>
 
 <source>File</source>
@@ -1530,9 +1536,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Není možné přesunout %x do Koše.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Selhala kontrola Koše pro složku %x</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Nelze určit výslednou cestu pro %x.</target>
 
 <source>Error Code %x:</source>
 <target>Chybový kód %x</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Nelze načíst následující XML elementy:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Konfigurace ze souboru %x byla načtena jen částečně.</target>
 

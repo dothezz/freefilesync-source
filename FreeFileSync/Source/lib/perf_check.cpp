@@ -70,7 +70,7 @@ std::pair<const std::multimap<int64_t, PerfCheck::Record>::value_type*, const st
 }
 
 
-zen::Opt<std::wstring> PerfCheck::getRemainingTime(double dataRemaining) const
+zen::Opt<double> PerfCheck::getRemainingTimeSec(double dataRemaining) const
 {
     auto blk = getBlockFromEnd(windowSizeRemTime);
     if (blk.first && blk.second)
@@ -78,14 +78,14 @@ zen::Opt<std::wstring> PerfCheck::getRemainingTime(double dataRemaining) const
         const auto& itemFront = *blk.first;
         const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const int64_t timeDelta = itemBack.first        - itemFront.first;
-        const double  dataDelta = itemBack.second.data_ - itemFront.second.data_;
+        const std::int64_t timeDeltaMs = itemBack.first   - itemFront.first;
+        const double       dataDelta   = itemBack.second.data_ - itemFront.second.data_;
 
         //objects model logical operations *NOT* disk accesses, so we better play safe and use "bytes" only!
         //http://sourceforge.net/p/freefilesync/feature-requests/197/
 
         if (!numeric::isNull(dataDelta)) //sign(dataRemaining) != sign(dataDelta) usually an error, so show it!
-            return remainingTimeToString(dataRemaining * timeDelta / (1000.0 * dataDelta));
+            return dataRemaining * timeDeltaMs / 1000.0 / dataDelta;
     }
     return NoValue();
 }
@@ -99,11 +99,11 @@ zen::Opt<std::wstring> PerfCheck::getBytesPerSecond() const
         const auto& itemFront = *blk.first;
         const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const int64_t timeDelta = itemBack.first        - itemFront.first;
-        const double  dataDelta = itemBack.second.data_ - itemFront.second.data_;
+        const std::int64_t timeDeltaMs = itemBack.first   - itemFront.first;
+        const double       dataDelta   = itemBack.second.data_ - itemFront.second.data_;
 
-        if (timeDelta != 0/* && dataDelta > 0*/)
-            return filesizeToShortString(Int64(dataDelta * 1000.0 / timeDelta)) + _("/sec");
+        if (timeDeltaMs != 0)
+            return filesizeToShortString(Int64(dataDelta * 1000.0 / timeDeltaMs)) + _("/sec");
     }
     return NoValue();
 }
@@ -117,11 +117,11 @@ zen::Opt<std::wstring> PerfCheck::getItemsPerSecond() const
         const auto& itemFront = *blk.first;
         const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const int64_t timeDelta  = itemBack.first             - itemFront.first;
-        const int     itemsDelta = itemBack.second.itemCount_ - itemFront.second.itemCount_;
+        const int64_t timeDeltaMs = itemBack.first             - itemFront.first;
+        const int     itemsDelta  = itemBack.second.itemCount_ - itemFront.second.itemCount_;
 
-        if (timeDelta != 0)
-            return replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsDelta * 1000.0 / timeDelta));
+        if (timeDeltaMs != 0)
+            return replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsDelta * 1000.0 / timeDeltaMs));
     }
     return NoValue();
 }

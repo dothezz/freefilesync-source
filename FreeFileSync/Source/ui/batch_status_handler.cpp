@@ -7,11 +7,10 @@
 #include "batch_status_handler.h"
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
-//#include <zen/format_unit.h>
 #include <zen/shell_execute.h>
 #include <wx+/popup_dlg.h>
 #include <wx/app.h>
-#include "exec_finished_box.h"
+#include "on_completion_box.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/resolve_path.h"
 #include "../lib/status_handler_impl.h"
@@ -27,7 +26,7 @@ namespace
 Zstring addStatusToLogfilename(const Zstring& logfilename, const std::wstring& status)
 {
     //attention: do not interfere with naming convention required by limitLogfileCount()!
-    size_t pos = logfilename.rfind(Zstr("."));
+    size_t pos = logfilename.rfind(Zstr('.'));
     if (pos != Zstring::npos)
         return Zstring(logfilename.begin(), logfilename.begin() + pos) +
                utfCvrtTo<Zstring>(L" (" + status + L")") +
@@ -119,8 +118,8 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        size_t automaticRetryDelay,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        FfsReturnCode& returnCode,
-                                       const std::wstring& execWhenFinished,
-                                       std::vector<std::wstring>& execFinishedHistory) :
+                                       const Zstring& onCompletion,
+                                       std::vector<Zstring>& onCompletionHistory) :
     switchBatchToGui_(switchBatchToGui),
     showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
@@ -130,7 +129,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     returnCode_(returnCode),
     automaticRetryCount_(automaticRetryCount),
     automaticRetryDelay_(automaticRetryDelay),
-    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory)),
+    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, onCompletion, onCompletionHistory)),
             jobName_(jobName),
             startTime_(wxGetUTCTimeMillis().GetValue())
 {
@@ -172,7 +171,7 @@ BatchStatusHandler::~BatchStatusHandler()
         //execute "on completion" command (even in case of ignored errors)
         if (!abortIsRequested()) //if aborted (manually), we don't execute the command
         {
-            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            const Zstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
             if (!finalCommand.empty())
             {
                 if (isCloseProgressDlgCommand(finalCommand))
@@ -181,7 +180,7 @@ BatchStatusHandler::~BatchStatusHandler()
                     try
                     {
                         //use EXEC_TYPE_ASYNC until there is reason no to: https://sourceforge.net/p/freefilesync/discussion/help/thread/828dca52
-                        tryReportingError([&] { shellExecute2(expandMacros(utfCvrtTo<Zstring>(finalCommand)), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
+                        tryReportingError([&] { shellExecute2(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
                                           *this);
                     }
                     catch (...) {}

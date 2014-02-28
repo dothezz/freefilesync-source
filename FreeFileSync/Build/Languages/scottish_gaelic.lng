@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Meud:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Leumadh thairis air coimeas na susbaint mu choinneamh nam faidhlichean a chaidh an dùnadh às (%x).</target>
+
 <source>Items differ in attributes only</source>
 <target>Chan eil diofar eatarra ach a thaobh an cuid bhuadhan</target>
 
@@ -301,9 +304,6 @@
 <source>%x items/sec</source>
 <target>%x nithean/diog</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Cha deach faidhle an rèiteachaidh %x a luchdadh gu tur.</target>
-
 <source>Show in Explorer</source>
 <target>Seall san taisgealaiche</target>
 
@@ -331,11 +331,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Dh'iarr thu oirnn sgur: A' feitheamh ri crìoch na h-obrach làithreach...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Chan urrainn dhuinn stampa-ama a chruthachadh airson versioning:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Chan urrainn dhuinn na h-eileamaidean XML a leanas a leughadh:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Cha ghabh stampa ama a chruthachadh airson versioning:</target>
 
 <source>&Open...</source>
 <target>F&osgail...</target>
@@ -564,6 +561,9 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Saving log file %x...</source>
 <target>A' sàbhaladh faidhle an loga %x...</target>
 
+<source>Stopped</source>
+<target>Chaidh stad a chur air</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>'S urrainn dhut leum a ghearradh gu prìomh-uinneag FreeFileSync gus an duilgheadas seo fhuasgladh.</target>
 
@@ -658,21 +658,6 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Drag && drop</source>
 <target>Slaod ⁊ leig às</target>
-
-<source>Close progress dialog</source>
-<target>Dùin còmhradh an adhartais</target>
-
-<source>Standby</source>
-<target>Cuir 'na fhuireachas</target>
-
-<source>Log off</source>
-<target>Clàraich a-mach</target>
-
-<source>Shut down</source>
-<target>Dùin sìos an siostam</target>
-
-<source>Hibernate</source>
-<target>Geamhraich</target>
 
 <source>Alternate comparison settings</source>
 <target>Roghainnean eile airson coimeasadh</target>
@@ -779,6 +764,15 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Save as batch job</source>
 <target>Sàbhail mar obair baidse</target>
 
+<source>View type:</source>
+<target>Seall an seòrsa:</target>
+
+<source>Select view:</source>
+<target>Tagh an seòrsa:</target>
+
+<source>Statistics:</source>
+<target>Stats:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Àireamh nam faidhle 's nam pasgan a thèid a chruthachadh</target>
 
@@ -880,14 +874,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>On completion:</source>
 <target>An dèidh coileanaidh:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Mothaich do chomhair an t-sioncronachaidh le taic o fhaidhlichean stòir-dhàta</target>
+
 <source>Start synchronization now?</source>
 <target>A bheil thu airson tòiseachadh air an t-sioncronachadh an-dràsta?</target>
 
 <source>Variant:</source>
 <target>Eug-samhail:</target>
-
-<source>Statistics</source>
-<target>Stats</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Na seall an còmhradh seo a-rithist</target>
@@ -925,8 +919,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Stop synchronization at first error</source>
 <target>Sguir dhen t-sioncronachadh aig a' chiad mhearachd</target>
 
-<source>Show progress dialog</source>
-<target>Seall còmhradh an adhartais</target>
+<source>Run minimized</source>
+<target>Ruith e sa mhodh lùghdaichte</target>
 
 <source>Save log:</source>
 <target>Sàbhail an loga:</target>
@@ -942,12 +936,6 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>&Recycle bin</source>
 <target>A&m biona</target>
-
-<source>Delete on both sides</source>
-<target>Sguab às air an dà thaobh</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Sguab às air an dà thaobh fiù mur an deach am faidhle a thaghadh ach air aon taobh</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Tagh riaghailteach criathraidh gus seòrsachan àraidh de dh'fhaidhlichean fhàgail às an t-sioncronachadh. Cuir a-steach slighean fhaidhlichean a-rèir paidhir an dà phasgan aca.</target>
@@ -970,8 +958,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Maximum:</source>
 <target>Air a' char as motha:</target>
 
-<source>&Clear</source>
-<target>Fala&mhaich</target>
+<source>&Reset</source>
+<target>&Ath-shuidhich</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Thèid na roghainnean a leanas a chleachdadh airson a h-uile obair sioncronachaidh.</target>
@@ -1069,8 +1057,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Find</source>
 <target>Lorg</target>
 
-<source>Select View</source>
-<target>Tagh sealladh</target>
+<source>View Settings</source>
+<target>Seall na roghainnean</target>
 
 <source>Overview</source>
 <target>Foir-shealladh</target>
@@ -1161,11 +1149,11 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Exclude via filter:</source>
 <target>Dùin a-mach le criathrag:</target>
 
-<source>Exclude temporarily</source>
-<target>Dùin a-mach gu sealach</target>
-
 <source>Include temporarily</source>
 <target>Gabh a-steach gu sealach</target>
+
+<source>Exclude temporarily</source>
+<target>Dùin a-mach gu sealach</target>
 
 <source>Delete</source>
 <target>Sguab às</target>
@@ -1218,6 +1206,9 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Do&n't save</source>
 <target>&Na sàbhail</target>
 
+<source>Delete selected configurations</source>
+<target>Sguab às na rèiteachaidhean a thagh thu</target>
+
 <source>Filter</source>
 <target>Criathrag</target>
 
@@ -1269,8 +1260,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Set as default</source>
 <target>Suidhich mar a' bhun-roghainn</target>
 
-<source>All folders are in sync</source>
-<target>Tha gach pasgan air a shioncronachadh</target>
+<source>All files are in sync</source>
+<target>Tha gach faidhle sioncronaichte</target>
 
 <source>Synchronization Settings</source>
 <target>Roghainnean an t-sioncronachaidh</target>
@@ -1289,6 +1280,21 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 
 <source>Searching for program updates...</source>
 <target>A' lorg ùrachaidhean a' phrògraim...</target>
+
+<source>Close progress dialog</source>
+<target>Dùin còmhradh an adhartais</target>
+
+<source>Standby</source>
+<target>Cuir 'na fhuireachas</target>
+
+<source>Log off</source>
+<target>Clàraich a-mach</target>
+
+<source>Shut down</source>
+<target>Dùin sìos an siostam</target>
+
+<source>Hibernate</source>
+<target>Geamhraich</target>
 
 <source>Scanning...</source>
 <target>'Ga sganadh...</target>
@@ -1311,14 +1317,14 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Initializing...</source>
 <target>A' tòiseachadh...</target>
 
-<source>Stopped</source>
-<target>Chaidh stad a chur air</target>
-
 <source>Completed</source>
 <target>Deiseil</target>
 
 <source>&Continue</source>
 <target>Lean air adhar&t</target>
+
+<source>Progress</source>
+<target>Adhartas</target>
 
 <source>Log</source>
 <target>Logaich</target>
@@ -1414,8 +1420,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Time stamp</source>
 <target>Stampa ama</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Cuir stampa-ama ris ainm gach faidhle</target>
+<source>Append a time stamp to each file name</source>
+<target>Cuir stampa ama ri gach ainm faidhle</target>
 
 <source>File</source>
 <target>Faidhle</target>
@@ -1546,9 +1552,18 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Cha ghabh %x a ghluasad dhan bhiona.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Dh'fhàillig sgrùdadh a' bhiona airson a' phasgain %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Chan urrainn dhuinn an t-slighe dheireannach airson %x a dhearbhadh.</target>
 
 <source>Error Code %x:</source>
 <target>Còd na mearachd %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Chan urrainn dhuinn na h-eileamaidean XML a leanas a leughadh:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Cha deach faidhle an rèiteachaidh %x a luchdadh gu tur.</target>
 

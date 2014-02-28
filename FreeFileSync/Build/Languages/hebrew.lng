@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>גודל:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>השוואת תוכן דולגה עבור קבצים שלא נכללו %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>פריטים שונים בתכונות בלבד</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x פריטים לשניה</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>קובץ תצורה %x נטען חלקית בלבד.</target>
-
 <source>Show in Explorer</source>
 <target>הראה בסייר הקבצים</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>עצירה התבקשה: מחכה שפעולה נוכחית תסתיים...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>לא ניתן ליצור תג זמן לגרסאות:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>לא יכול לקרוא את שמות צמתי XML:</target>
 
 <source>&Open...</source>
 <target>&פתח...</target>
@@ -558,6 +555,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>שומר קובץ יומן %x...</target>
 
+<source>Stopped</source>
+<target>נעצר</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>ניתן לעבור לחלון הראשי של FreeFileSybc כדי לפתור את הסוגיה הזו.</target>
 
@@ -650,21 +650,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>גרור &והשלך</target>
-
-<source>Close progress dialog</source>
-<target>סגור שיח התקדמות</target>
-
-<source>Standby</source>
-<target>עבור למצב המתנה</target>
-
-<source>Log off</source>
-<target>התנתק כמשתמש</target>
-
-<source>Shut down</source>
-<target>כבה מחשב</target>
-
-<source>Hibernate</source>
-<target>עבור למצב שינה</target>
 
 <source>Alternate comparison settings</source>
 <target>הגדרות השוואה חלופיות</target>
@@ -771,6 +756,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>שמור כעבודת אצווה</target>
 
+<source>View type:</source>
+<target>הצג סוג:</target>
+
+<source>Select view:</source>
+<target>בחר תצוגה:</target>
+
+<source>Statistics:</source>
+<target>סטטיסטיקה:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>מספר הקבצים והתיקיות שייוצרו</target>
 
@@ -872,14 +866,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>עם הסיום:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>גלה כיווני סינכרון באמצעות קבצי בסיס נתונים</target>
+
 <source>Start synchronization now?</source>
 <target>האם להתחיל סנכרון עכשיו?</target>
 
 <source>Variant:</source>
 <target>גרסה אחרת:</target>
-
-<source>Statistics</source>
-<target>סטטיסטיקה</target>
 
 <source>&Don't show this dialog again</source>
 <target>&אל תראה דושיח זה שנית</target>
@@ -917,8 +911,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>עצור סנכרון עם הופעת שגיאה ראשונה</target>
 
-<source>Show progress dialog</source>
-<target>הראה שיח התקדמות</target>
+<source>Run minimized</source>
+<target>הרץ ממוזער</target>
 
 <source>Save log:</source>
 <target>שמור יומן:</target>
@@ -934,12 +928,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&סל מחזור</target>
-
-<source>Delete on both sides</source>
-<target>מחק בשני הצדדים</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>מחק בשני הצדדים אף אם הקובץ נבחר בצד אחד בלבד</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>בחר כללי סינון כדי לא לכלול קבצים מסוימים בסנכרון. הזן את נתיבי הקבצים ביחס לזוג התיקיות בהתאמה.</target>
@@ -962,8 +950,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>מקסימום:</target>
 
-<source>&Clear</source>
-<target>&נקה</target>
+<source>&Reset</source>
+<target>&אפס</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>ההגדרות הבאות משמשות לכל משימות הסנכרון.</target>
@@ -1061,8 +1049,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>חפש</target>
 
-<source>Select View</source>
-<target>בחר מבט</target>
+<source>View Settings</source>
+<target>הגדרות תצוגה</target>
 
 <source>Overview</source>
 <target>מבט כללי</target>
@@ -1145,11 +1133,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>אל תכלול בעזרת סנן:</target>
 
-<source>Exclude temporarily</source>
-<target>אל תכלול זמנית</target>
-
 <source>Include temporarily</source>
 <target>כלול זמנית</target>
+
+<source>Exclude temporarily</source>
+<target>אל תכלול זמנית</target>
 
 <source>Delete</source>
 <target>מחק</target>
@@ -1202,6 +1190,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>אל &תשמור</target>
 
+<source>Delete selected configurations</source>
+<target>מחק קופיגורציות שנבחרו</target>
+
 <source>Filter</source>
 <target>מסנן</target>
 
@@ -1253,8 +1244,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>הגדר כברירת מחדל</target>
 
-<source>All folders are in sync</source>
-<target>כל התיקיות מסונכרנות</target>
+<source>All files are in sync</source>
+<target>כל הקבצים מסונכרנים</target>
 
 <source>Synchronization Settings</source>
 <target>הגדרות סנכרון</target>
@@ -1273,6 +1264,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>מחפש עידכוני תוכנה...</target>
+
+<source>Close progress dialog</source>
+<target>סגור שיח התקדמות</target>
+
+<source>Standby</source>
+<target>עבור למצב המתנה</target>
+
+<source>Log off</source>
+<target>התנתק כמשתמש</target>
+
+<source>Shut down</source>
+<target>כבה מחשב</target>
+
+<source>Hibernate</source>
+<target>עבור למצב שינה</target>
 
 <source>Scanning...</source>
 <target>סורק...</target>
@@ -1295,14 +1301,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>מאתחל ...</target>
 
-<source>Stopped</source>
-<target>נעצר</target>
-
 <source>Completed</source>
 <target>הושלם</target>
 
 <source>&Continue</source>
 <target>&המשך</target>
+
+<source>Progress</source>
+<target>התקדמות</target>
 
 <source>Log</source>
 <target>יומן</target>
@@ -1394,8 +1400,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>תג זמן</target>
 
-<source>Append a timestamp to each file name</source>
-<target>הצמד תג זמן לכל שם קובץ</target>
+<source>Append a time stamp to each file name</source>
+<target>הוסף חתימת זמן לכל שם קובץ</target>
 
 <source>File</source>
 <target>קובץ</target>
@@ -1520,9 +1526,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>לא יכול להעביר את %x לסל המחזור</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>בודק כשלון בתא מחזור עבור תיקייה %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>לא יכול לקבוע את המסלול הסופי ל %x.</target>
 
 <source>Error Code %x:</source>
 <target>קוד שגיאה %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>לא יכול לקרוא את שמות צמתי XML:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>קובץ תצורה %x נטען חלקית בלבד.</target>
 

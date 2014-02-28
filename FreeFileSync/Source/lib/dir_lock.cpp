@@ -79,13 +79,14 @@ public:
         //ATTENTION: setting file pointer IS required! => use CreateFile/GENERIC_WRITE + SetFilePointerEx!
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
 
-        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_).c_str(),
-                                               GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
-                                               FILE_SHARE_READ,
-                                               nullptr,
-                                               OPEN_EXISTING,
-                                               FILE_ATTRIBUTE_NORMAL,
-                                               nullptr);
+        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_).c_str(), //_In_      LPCTSTR lpFileName,
+                                               //use both when writing over network, see comment in file_io.cpp
+                                               GENERIC_READ | GENERIC_WRITE,  //_In_      DWORD dwDesiredAccess,
+                                               FILE_SHARE_READ,               //_In_      DWORD dwShareMode,
+                                               nullptr,                       //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                               OPEN_EXISTING,                 //_In_      DWORD dwCreationDisposition,
+                                               FILE_ATTRIBUTE_NORMAL,         //_In_      DWORD dwFlagsAndAttributes,
+                                               nullptr);                      //_In_opt_  HANDLE hTemplateFile
         if (fileHandle == INVALID_HANDLE_VALUE)
             return;
         ZEN_ON_SCOPE_EXIT(::CloseHandle(fileHandle));
@@ -141,10 +142,8 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError
     const wchar_t functionName[] = L"stat";
 #endif
 
-    const ErrorCode lastError = getLastError();
-    const std::wstring errorMsg = replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename));
-    const std::wstring errorDescr = formatSystemError(functionName, lastError);
-    throw FileError(errorMsg, errorDescr);
+    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)),
+                    formatSystemError(functionName, getLastError()));
 }
 
 
@@ -516,13 +515,14 @@ void releaseLock(const Zstring& lockfilename) //throw ()
 bool tryLock(const Zstring& lockfilename) //throw FileError
 {
 #ifdef ZEN_WIN
-    const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),
-                                           GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
-                                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                           nullptr,
-                                           CREATE_NEW,
-                                           FILE_ATTRIBUTE_NORMAL,
-                                           nullptr);
+    const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),              //_In_      LPCTSTR lpFileName,
+                                           //use both when writing over network, see comment in file_io.cpp
+                                           GENERIC_READ | GENERIC_WRITE,                           //_In_      DWORD dwDesiredAccess,
+                                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                           nullptr,               //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                           CREATE_NEW,            //_In_      DWORD dwCreationDisposition,
+                                           FILE_ATTRIBUTE_NORMAL, //_In_      DWORD dwFlagsAndAttributes,
+                                           nullptr);              //_In_opt_  HANDLE hTemplateFile
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();

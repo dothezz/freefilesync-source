@@ -56,8 +56,8 @@ public:
                       size_t automaticRetryCount,
                       size_t automaticRetryDelay,
                       const std::wstring& jobName,
-                      const std::wstring& execWhenFinished,
-                      std::vector<std::wstring>& execFinishedHistory);
+                      const Zstring& onCompletion,
+                      std::vector<Zstring>& onCompletionHistory);
     ~SyncStatusHandler();
 
     virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);

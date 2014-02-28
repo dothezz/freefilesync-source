@@ -118,6 +118,9 @@
 <source>Size:</source>
 <target>Размер:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Сравнение содержания было пропущено для исключенного файла %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Элементы различаются только атрибутами</target>
 
@@ -301,9 +304,6 @@
 <source>%x items/sec</source>
 <target>%x элементов/с</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Файл конфигурации %x загрузился частично.</target>
-
 <source>Show in Explorer</source>
 <target>Показать в Проводнике</target>
 
@@ -331,11 +331,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Запрошена остановка: Ожидайте, пока текущая операция завершится...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Неспособность создать отметку времени для архивации файлов:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Невозможно прочитать следующие XML элементы:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Невозможно создать отметку времени для архивирования файлов:</target>
 
 <source>&Open...</source>
 <target>&Открыть...</target>
@@ -514,7 +511,7 @@ The command is triggered if:
 <target>Поле ввода целевой папки не должно быть пустым.</target>
 
 <source>Please enter a target folder for versioning.</source>
-<target>Пожалуйста, введите целевую папку для архивации файлов.</target>
+<target>Пожалуйста, введите целевую папку для архивирования файлов.</target>
 
 <source>Source folder %x not found.</source>
 <target>Исходная папка %x не найдена.</target>
@@ -566,6 +563,9 @@ The command is triggered if:
 
 <source>Saving log file %x...</source>
 <target>Сохранение лог-файла %x...</target>
+
+<source>Stopped</source>
+<target>Остановлено</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Вы можете переключиться на главное окно FreeFileSync для решения этой проблемы.</target>
@@ -660,21 +660,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
-
-<source>Close progress dialog</source>
-<target>Закрыть окно процесса</target>
-
-<source>Standby</source>
-<target>Перейти в ожидании</target>
-
-<source>Log off</source>
-<target>Выйти из системы (разлогиниться)</target>
-
-<source>Shut down</source>
-<target>Выключить компьютер</target>
-
-<source>Hibernate</source>
-<target>Гибернация</target>
 
 <source>Alternate comparison settings</source>
 <target>Альтернативные настройки сравнения</target>
@@ -781,6 +766,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Сохранить как пакетное задание</target>
 
+<source>View type:</source>
+<target>Тип просмотра:</target>
+
+<source>Select view:</source>
+<target>Выберете отображение:</target>
+
+<source>Statistics:</source>
+<target>Статистика:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Количество файлов и папок, которые будут созданы</target>
 
@@ -882,14 +876,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>По завершению:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Обнаружение направления синхронизации с помощью файлов баз данных</target>
+
 <source>Start synchronization now?</source>
 <target>Начать синхронизацию сейчас?</target>
 
 <source>Variant:</source>
 <target>Вариант:</target>
-
-<source>Statistics</source>
-<target>Статистика</target>
 
 <source>&Don't show this dialog again</source>
 <target>Больше &не показывать это окно</target>
@@ -931,8 +925,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>Остановить синхронизацию при первой ошибке</target>
 
-<source>Show progress dialog</source>
-<target>Показать окно прогресса</target>
+<source>Run minimized</source>
+<target>Запустить свернутым</target>
 
 <source>Save log:</source>
 <target>Сохранить лог-файл:</target>
@@ -948,12 +942,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>В "&Корзину"</target>
-
-<source>Delete on both sides</source>
-<target>Удалить с обеих сторон</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Удалить с обеих сторон, даже если файл выделен только на одной стороне</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Выберите правила фильтрации для исключения определенных файлов из синхронизации. Введите пути файлов относящиеся к соответствующим парам папок.</target>
@@ -976,8 +964,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>максимум:</target>
 
-<source>&Clear</source>
-<target>&Очистить</target>
+<source>&Reset</source>
+<target>&Сбросить</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следующие настройки используются для всех заданий синхронизации.</target>
@@ -1075,8 +1063,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Поиск</target>
 
-<source>Select View</source>
-<target>Вид списка файлов</target>
+<source>View Settings</source>
+<target>Настройки просмотра</target>
 
 <source>Overview</source>
 <target>Главная</target>
@@ -1163,11 +1151,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Исключить с помощью фильтра:</target>
 
-<source>Exclude temporarily</source>
-<target>Временно исключить</target>
-
 <source>Include temporarily</source>
 <target>Временно включить</target>
+
+<source>Exclude temporarily</source>
+<target>Временно исключить</target>
 
 <source>Delete</source>
 <target>Удалить</target>
@@ -1220,6 +1208,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&Не сохранять</target>
 
+<source>Delete selected configurations</source>
+<target>Удалить выделенные настройки</target>
+
 <source>Filter</source>
 <target>Фильтр</target>
 
@@ -1271,8 +1262,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Установить по умолчанию</target>
 
-<source>All folders are in sync</source>
-<target>Все папки синхронизированы</target>
+<source>All files are in sync</source>
+<target>Все файлы синхронизированы</target>
 
 <source>Synchronization Settings</source>
 <target>Настройки синхронизации</target>
@@ -1291,6 +1282,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Проверка обновлений программы...</target>
+
+<source>Close progress dialog</source>
+<target>Закрыть окно процесса</target>
+
+<source>Standby</source>
+<target>Перейти в ожидании</target>
+
+<source>Log off</source>
+<target>Выйти из системы (разлогиниться)</target>
+
+<source>Shut down</source>
+<target>Выключить компьютер</target>
+
+<source>Hibernate</source>
+<target>Гибернация</target>
 
 <source>Scanning...</source>
 <target>Сканирование...</target>
@@ -1313,14 +1319,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Инициализация...</target>
 
-<source>Stopped</source>
-<target>Остановлено</target>
-
 <source>Completed</source>
 <target>Завершено</target>
 
 <source>&Continue</source>
 <target>&Продолжить</target>
+
+<source>Progress</source>
+<target>Прогресс</target>
 
 <source>Log</source>
 <target>Лог (журнал)</target>
@@ -1417,7 +1423,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Добавить отметку времени</target>
 
-<source>Append a timestamp to each file name</source>
+<source>Append a time stamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
 
 <source>File</source>
@@ -1546,9 +1552,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Невозможно переместить %x в "Корзину".</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Проверка "Корзины" не удалась для папки %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Невозможно определить конечный путь для %x.</target>
 
 <source>Error Code %x:</source>
 <target>Код ошибки %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Невозможно прочитать следующие XML элементы:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Файл конфигурации %x загрузился частично.</target>
 

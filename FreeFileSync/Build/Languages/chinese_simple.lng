@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>大小:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>对于被排除的文件 %x 内容比较已跳过.</target>
+
 <source>Items differ in attributes only</source>
 <target>项目仅是文件属性不同</target>
 
@@ -292,9 +295,6 @@
 <source>%x items/sec</source>
 <target>%x 个项目/秒</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>配置文件 %x 只是部分载入.</target>
-
 <source>Show in Explorer</source>
 <target>在Explorer中显示</target>
 
@@ -322,11 +322,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>停止要求: 等待当前操作完成...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>无法为历史版本创建时间戳:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>无法读取如下XML元素:</target>
 
 <source>&Open...</source>
 <target>打开(&O)...</target>
@@ -555,6 +552,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>正在保存日志文件 %x...</target>
 
+<source>Stopped</source>
+<target>已停止</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>你可以切换至 FreeFileSync 的主窗口来解决这个问题.</target>
 
@@ -646,21 +646,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>拖放</target>
-
-<source>Close progress dialog</source>
-<target>关闭进度对话框</target>
-
-<source>Standby</source>
-<target>待机</target>
-
-<source>Log off</source>
-<target>注销</target>
-
-<source>Shut down</source>
-<target>关机</target>
-
-<source>Hibernate</source>
-<target>休眠</target>
 
 <source>Alternate comparison settings</source>
 <target>备用比较设置</target>
@@ -767,6 +752,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>另存为批处理作业</target>
 
+<source>View type:</source>
+<target>视图类型:</target>
+
+<source>Select view:</source>
+<target>选择视图:</target>
+
+<source>Statistics:</source>
+<target>统计:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>将被创建的文件和文件夹数</target>
 
@@ -868,14 +862,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>在完成时:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>借助数据库文件来检测同步的方向</target>
+
 <source>Start synchronization now?</source>
 <target>现在开始同步吗?</target>
 
 <source>Variant:</source>
 <target>变化:</target>
-
-<source>Statistics</source>
-<target>统计</target>
 
 <source>&Don't show this dialog again</source>
 <target>不要再显示这个对话框(&D)</target>
@@ -913,8 +907,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>在遇到第一个错误时停止同步</target>
 
-<source>Show progress dialog</source>
-<target>显示进度对话框</target>
+<source>Run minimized</source>
+<target>以最小化运行</target>
 
 <source>Save log:</source>
 <target>保存日志:</target>
@@ -930,12 +924,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>回收站(&R)</target>
-
-<source>Delete on both sides</source>
-<target>从两侧删除</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>从两侧删除(即使仅在一侧选择文件)</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>选择过滤器规则以将某些文件从同步中排除. 输入与相关的文件夹对相对的与文件路径.</target>
@@ -958,8 +946,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大:</target>
 
-<source>&Clear</source>
-<target>清除(&C)</target>
+<source>&Reset</source>
+<target>重置(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>如下的设置使用于所有同步作业.</target>
@@ -1054,8 +1042,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>查找</target>
 
-<source>Select View</source>
-<target>选择视图</target>
+<source>View Settings</source>
+<target>视图设置</target>
 
 <source>Overview</source>
 <target>摘要</target>
@@ -1134,11 +1122,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>通过过滤器排除:</target>
 
-<source>Exclude temporarily</source>
-<target>暂时排除</target>
-
 <source>Include temporarily</source>
 <target>暂时包括</target>
+
+<source>Exclude temporarily</source>
+<target>暂时排除</target>
 
 <source>Delete</source>
 <target>删除</target>
@@ -1191,6 +1179,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>不保存(&N)</target>
 
+<source>Delete selected configurations</source>
+<target>删除已选定的配置文件</target>
+
 <source>Filter</source>
 <target>过滤器</target>
 
@@ -1242,8 +1233,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>设置为默认值</target>
 
-<source>All folders are in sync</source>
-<target>所有文件夹都是同步的</target>
+<source>All files are in sync</source>
+<target>所有文件均是同步的</target>
 
 <source>Synchronization Settings</source>
 <target>同步设置</target>
@@ -1262,6 +1253,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>正在搜索程序的更新...</target>
+
+<source>Close progress dialog</source>
+<target>关闭进度对话框</target>
+
+<source>Standby</source>
+<target>待机</target>
+
+<source>Log off</source>
+<target>注销</target>
+
+<source>Shut down</source>
+<target>关机</target>
+
+<source>Hibernate</source>
+<target>休眠</target>
 
 <source>Scanning...</source>
 <target>正扫描...</target>
@@ -1284,14 +1290,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>正在初始化...</target>
 
-<source>Stopped</source>
-<target>已停止</target>
-
 <source>Completed</source>
 <target>完成</target>
 
 <source>&Continue</source>
 <target>继续(&C)</target>
+
+<source>Progress</source>
+<target>进度</target>
 
 <source>Log</source>
 <target>日志</target>
@@ -1381,8 +1387,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>时间戳</target>
 
-<source>Append a timestamp to each file name</source>
-<target>附加时间戳到每一个文件名</target>
+<source>Append a time stamp to each file name</source>
+<target>添加一个时间戳到每个文件名</target>
 
 <source>File</source>
 <target>文件</target>
@@ -1504,9 +1510,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>无法将 %x 移动到回收站.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>为文件夹 %x 检查回收站失败.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>无法确定 %x 的最终路径.</target>
 
 <source>Error Code %x:</source>
 <target>错误代码 %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>无法读取如下XML元素:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>配置文件 %x 只是部分载入.</target>
 

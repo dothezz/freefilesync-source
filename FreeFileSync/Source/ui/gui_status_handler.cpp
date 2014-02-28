@@ -11,7 +11,7 @@
 #include <wx+/bitmap_button.h>
 #include <wx+/popup_dlg.h>
 #include "main_dlg.h"
-#include "exec_finished_box.h"
+#include "on_completion_box.h"
 #include "../lib/generate_logfile.h"
 #include "../lib/resolve_path.h"
 #include "../lib/status_handler_impl.h"
@@ -185,9 +185,9 @@ SyncStatusHandler::SyncStatusHandler(wxFrame* parentDlg,
                                      size_t automaticRetryCount,
                                      size_t automaticRetryDelay,
                                      const std::wstring& jobName,
-                                     const std::wstring& execWhenFinished,
-                                     std::vector<std::wstring>& execFinishedHistory) :
-    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory)),
+                                     const Zstring& onCompletion,
+                                     std::vector<Zstring>& onCompletionHistory) :
+    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, onCompletion, onCompletionHistory)),
             lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
             handleError_(handleError),
             automaticRetryCount_(automaticRetryCount),
@@ -208,7 +208,7 @@ SyncStatusHandler::~SyncStatusHandler()
         //execute "on completion" command (even in case of ignored errors)
         if (!abortIsRequested()) //if aborted (manually), we don't execute the command
         {
-            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            const Zstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
             if (!finalCommand.empty())
             {
                 if (isCloseProgressDlgCommand(finalCommand))
@@ -217,7 +217,7 @@ SyncStatusHandler::~SyncStatusHandler()
                     try
                     {
                         //use EXEC_TYPE_ASYNC until there is reason no to: https://sourceforge.net/p/freefilesync/discussion/help/thread/828dca52
-                        tryReportingError([&] { shellExecute2(expandMacros(utfCvrtTo<Zstring>(finalCommand)), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
+                        tryReportingError([&] { shellExecute2(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
                                           *this);
                     }
                     catch (...) {}

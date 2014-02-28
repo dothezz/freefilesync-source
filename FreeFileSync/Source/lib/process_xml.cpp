@@ -1012,7 +1012,15 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     XmlIn inBatchCfg = in["BatchConfig"];
 
     inBatchCfg["HandleError"     ](config.handleError);
-    inBatchCfg["ShowProgress"    ](config.showProgress);
+
+    warn_static("remove after migration?")
+    if (inBatchCfg["ShowProgress"]) //2014-2-17
+    {
+        inBatchCfg["ShowProgress"](config.runMinimized);
+        config.runMinimized = !config.runMinimized;
+    }
+    else
+        inBatchCfg["RunMinimized"](config.runMinimized);
 
     warn_static("remove after migration?")
     if (inBatchCfg["LogfileDirectory"]) inBatchCfg["LogfileDirectory"](config.logFileDirectory); //obsolete name
@@ -1398,9 +1406,9 @@ void writeConfig(const XmlBatchConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outBatchCfg = out["BatchConfig"];
 
-    outBatchCfg["HandleError"    ](config.handleError);
-    outBatchCfg["ShowProgress"   ](config.showProgress);
-    outBatchCfg["LogfileFolder"  ](config.logFileDirectory);
+    outBatchCfg["HandleError"  ](config.handleError);
+    outBatchCfg["RunMinimized" ](config.runMinimized);
+    outBatchCfg["LogfileFolder"](config.logFileDirectory);
     outBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 

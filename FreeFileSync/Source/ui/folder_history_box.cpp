@@ -97,10 +97,13 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
     if (std::find(dirList.begin(), dirList.end(), dirname) == dirList.end())
         dirList.insert(dirList.begin(), dirname);
 
-    Clear(); //emits yet another wxEVT_COMMAND_TEXT_UPDATED on Suse/X11/wxWidgets 2.9.4!!!
-    std::for_each(dirList.begin(), dirList.end(), [&](const wxString& dir) { this->Append(dir); });
+    //this->Clear(); -> NO! emits yet another wxEVT_COMMAND_TEXT_UPDATED!!!
+	wxItemContainer::Clear(); //suffices to clear the selection items only!
+
+    for (const wxString& dir : dirList)
+        this->Append(dir);
     //this->SetSelection(wxNOT_FOUND); //don't select anything
-    this->SetValue(dirname);          //preserve main text!
+    ChangeValue(dirname);          //preserve main text!
 }
 
 

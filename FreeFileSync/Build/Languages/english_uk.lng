@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Size:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Content comparison was skipped for excluded files %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Items differ in attributes only</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x items/sec</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Configuration file %x loaded partially only.</target>
-
 <source>Show in Explorer</source>
 <target>Show in Explorer</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Stop requested: Waiting for current operation to finish...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Unable to create timestamp for versioning:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Cannot read the following XML elements:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Unable to create time stamp for versioning:</target>
 
 <source>&Open...</source>
 <target>&Open...</target>
@@ -547,7 +544,7 @@ The command is triggered if:
 <target>Synchronisation completed with errors</target>
 
 <source>Synchronization completed with warnings</source>
-<target>Synchronization completed with warnings</target>
+<target>Synchronisation completed with warnings</target>
 
 <source>Nothing to synchronize</source>
 <target>Nothing to synchronise</target>
@@ -557,6 +554,9 @@ The command is triggered if:
 
 <source>Saving log file %x...</source>
 <target>Saving log file %x...</target>
+
+<source>Stopped</source>
+<target>Stopped</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>You can switch to FreeFileSync's main window to resolve this issue.</target>
@@ -650,21 +650,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
-
-<source>Close progress dialog</source>
-<target>Close progress dialogue</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Log off</source>
-<target>Log off</target>
-
-<source>Shut down</source>
-<target>Shut down</target>
-
-<source>Hibernate</source>
-<target>Hibernate</target>
 
 <source>Alternate comparison settings</source>
 <target>Alternate comparison settings</target>
@@ -771,6 +756,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Save as batch job</target>
 
+<source>View type:</source>
+<target>View type:</target>
+
+<source>Select view:</source>
+<target>Select view:</target>
+
+<source>Statistics:</source>
+<target>Statistics:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Number of files and folders that will be created</target>
 
@@ -872,14 +866,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>On completion:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detect synchronisation directions with the help of database files</target>
+
 <source>Start synchronization now?</source>
 <target>Start synchronisation now?</target>
 
 <source>Variant:</source>
 <target>Variant:</target>
-
-<source>Statistics</source>
-<target>Statistics</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Don't show this dialogue again</target>
@@ -900,7 +894,7 @@ The command is triggered if:
 <target>Synchronising...</target>
 
 <source>Minimize to notification area</source>
-<target>Minimize to notification area</target>
+<target>Minimise to notification area</target>
 
 <source>Close</source>
 <target>Close</target>
@@ -917,8 +911,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>Stop synchronisation at first error</target>
 
-<source>Show progress dialog</source>
-<target>Show progress dialogue</target>
+<source>Run minimized</source>
+<target>Run minimised</target>
 
 <source>Save log:</source>
 <target>Save log:</target>
@@ -934,12 +928,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Recycle bin</target>
-
-<source>Delete on both sides</source>
-<target>Delete on both sides</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Delete on both sides even if the file is selected on one side only</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Select filter rules to exclude certain files from synchronisation. Enter file paths relative to their corresponding folder pair.</target>
@@ -962,8 +950,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Clear</source>
-<target>&Clear</target>
+<source>&Reset</source>
+<target>&Reset</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>The following settings are used for all synchronisation jobs.</target>
@@ -1061,8 +1049,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Find</target>
 
-<source>Select View</source>
-<target>Select View</target>
+<source>View Settings</source>
+<target>View Settings</target>
 
 <source>Overview</source>
 <target>Overview</target>
@@ -1145,11 +1133,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Exclude via filter:</target>
 
-<source>Exclude temporarily</source>
-<target>Exclude temporarily</target>
-
 <source>Include temporarily</source>
 <target>Include temporarily</target>
+
+<source>Exclude temporarily</source>
+<target>Exclude temporarily</target>
 
 <source>Delete</source>
 <target>Delete</target>
@@ -1202,6 +1190,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>Do&n't save</target>
 
+<source>Delete selected configurations</source>
+<target>Delete selected configurations</target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1253,8 +1244,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Set as default</target>
 
-<source>All folders are in sync</source>
-<target>All folders are in sync</target>
+<source>All files are in sync</source>
+<target>All files are in sync</target>
 
 <source>Synchronization Settings</source>
 <target>Synchronisation Settings</target>
@@ -1273,6 +1264,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Searching for program updates...</target>
+
+<source>Close progress dialog</source>
+<target>Close progress dialogue</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Log off</source>
+<target>Log off</target>
+
+<source>Shut down</source>
+<target>Shut down</target>
+
+<source>Hibernate</source>
+<target>Hibernate</target>
 
 <source>Scanning...</source>
 <target>Scanning...</target>
@@ -1295,14 +1301,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Initialising...</target>
 
-<source>Stopped</source>
-<target>Stopped</target>
-
 <source>Completed</source>
 <target>Completed</target>
 
 <source>&Continue</source>
 <target>&Continue</target>
+
+<source>Progress</source>
+<target>Progress</target>
 
 <source>Log</source>
 <target>Log</target>
@@ -1394,8 +1400,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Time stamp</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Append a timestamp to each file name</target>
+<source>Append a time stamp to each file name</source>
+<target>Append a time stamp to each file name</target>
 
 <source>File</source>
 <target>File</target>
@@ -1520,9 +1526,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Unable to move %x to the recycle bin.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Checking recycle bin failed for folder %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Cannot determine final path for %x.</target>
 
 <source>Error Code %x:</source>
 <target>Error Code %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Cannot read the following XML elements:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Configuration file %x loaded partially only.</target>
 

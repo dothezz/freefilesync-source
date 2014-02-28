@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Величина:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>Упоређење по садржају је изостављено за искључене датотеке %x.</target>
+
 <source>Items differ in attributes only</source>
 <target>Ставке се разликују само у атрибутима</target>
 
@@ -298,9 +301,6 @@
 <source>%x items/sec</source>
 <target>%x ставки/секунди</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>Датотека подешавања %x учитана само делимично.</target>
-
 <source>Show in Explorer</source>
 <target>Прикажи у Експлореру</target>
 
@@ -328,11 +328,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Заустављање захтевано: Чека се да се тренутна акција заврши...</target>
 
-<source>Unable to create timestamp for versioning:</source>
+<source>Unable to create time stamp for versioning:</source>
 <target>Није могуће стварање временске ознаке за верзију:</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Не могу прочитати следеће XML елементе:</target>
 
 <source>&Open...</source>
 <target>&Отвори...</target>
@@ -561,6 +558,9 @@ The command is triggered if:
 <source>Saving log file %x...</source>
 <target>Уписујем лог датотеку %x...</target>
 
+<source>Stopped</source>
+<target>Заустављено</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Можете се пребацити на главни прозор FreeFileSync-а да би разрешили ову ствар.</target>
 
@@ -654,21 +654,6 @@ The command is triggered if:
 
 <source>Drag && drop</source>
 <target>Вуци && пусти</target>
-
-<source>Close progress dialog</source>
-<target>Затвори дијалог прогреса</target>
-
-<source>Standby</source>
-<target>Пређи у стање приправности</target>
-
-<source>Log off</source>
-<target>Одјави се</target>
-
-<source>Shut down</source>
-<target>Искључи рачунар</target>
-
-<source>Hibernate</source>
-<target>Хибернација</target>
 
 <source>Alternate comparison settings</source>
 <target>Алтернативна подешавања упоређивања</target>
@@ -775,6 +760,15 @@ The command is triggered if:
 <source>Save as batch job</source>
 <target>Сачувај као беч задатак</target>
 
+<source>View type:</source>
+<target>Тип приказа:</target>
+
+<source>Select view:</source>
+<target>Изаберите приказ:</target>
+
+<source>Statistics:</source>
+<target>Статистика:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>Број датотека и фолдера који ће бити креирани</target>
 
@@ -876,14 +870,14 @@ The command is triggered if:
 <source>On completion:</source>
 <target>При завршетку:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Уочи синхронизацијске смерове уз помоћ датотека базе</target>
+
 <source>Start synchronization now?</source>
 <target>Почни синхронизацију сада?</target>
 
 <source>Variant:</source>
 <target>Варијанта:</target>
-
-<source>Statistics</source>
-<target>Статистика</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Не приказуј овај диалог поновно</target>
@@ -921,8 +915,8 @@ The command is triggered if:
 <source>Stop synchronization at first error</source>
 <target>Заустави синхронизацију при првој грешци</target>
 
-<source>Show progress dialog</source>
-<target>Прикажи дијалог прогреса</target>
+<source>Run minimized</source>
+<target>Минимизирај при раду</target>
 
 <source>Save log:</source>
 <target>Сачувај лог:</target>
@@ -938,12 +932,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Корпа за смеће</target>
-
-<source>Delete on both sides</source>
-<target>Избриши на обе стране</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Избриши на обе стране чак иако је датотека селектована само на једној страни</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
@@ -966,8 +954,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>&Clear</source>
-<target>&Уклони</target>
+<source>&Reset</source>
+<target>&Ресетуј</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
@@ -1065,8 +1053,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Find</source>
 <target>Пронађи</target>
 
-<source>Select View</source>
-<target>Изаберите приказ</target>
+<source>View Settings</source>
+<target>Подешавања приказа</target>
 
 <source>Overview</source>
 <target>Преглед</target>
@@ -1153,11 +1141,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude via filter:</source>
 <target>Искључи преко филтера:</target>
 
-<source>Exclude temporarily</source>
-<target>Тренутно искључи</target>
-
 <source>Include temporarily</source>
 <target>Тренутно укључи</target>
+
+<source>Exclude temporarily</source>
+<target>Тренутно искључи</target>
 
 <source>Delete</source>
 <target>Избриши</target>
@@ -1210,6 +1198,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>Не&мој сачувати</target>
 
+<source>Delete selected configurations</source>
+<target>Обриши селектоване конфигурације</target>
+
 <source>Filter</source>
 <target>Филтрирање</target>
 
@@ -1261,8 +1252,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Постави као подразумевано</target>
 
-<source>All folders are in sync</source>
-<target>Сви фолдери су синхронизовани</target>
+<source>All files are in sync</source>
+<target>Све датотеке су синхронизоване</target>
 
 <source>Synchronization Settings</source>
 <target>Подешавања синхронизације</target>
@@ -1281,6 +1272,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Searching for program updates...</source>
 <target>Претражујем ажурирање за програм...</target>
+
+<source>Close progress dialog</source>
+<target>Затвори дијалог прогреса</target>
+
+<source>Standby</source>
+<target>Пређи у стање приправности</target>
+
+<source>Log off</source>
+<target>Одјави се</target>
+
+<source>Shut down</source>
+<target>Искључи рачунар</target>
+
+<source>Hibernate</source>
+<target>Хибернација</target>
 
 <source>Scanning...</source>
 <target>Прегледавање...</target>
@@ -1303,14 +1309,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Initializing...</source>
 <target>Покретање...</target>
 
-<source>Stopped</source>
-<target>Заустављено</target>
-
 <source>Completed</source>
 <target>Завршено</target>
 
 <source>&Continue</source>
 <target>&Настави</target>
+
+<source>Progress</source>
+<target>Напредовање</target>
 
 <source>Log</source>
 <target>Лог</target>
@@ -1404,8 +1410,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Time stamp</source>
 <target>Временска ознака</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Додај временску ознаку сваком имену датотеке</target>
+<source>Append a time stamp to each file name</source>
+<target>Додај временску ознаку за свако име датотеке</target>
 
 <source>File</source>
 <target>Датотека</target>
@@ -1533,9 +1539,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to move %x to the recycle bin.</source>
 <target>Није могуће преместити %x у Корпи за смеће.</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>Провера доступности Корпе за смеће није успела за фолдер %x.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Не могу утврдити коначну путању за %x.</target>
 
 <source>Error Code %x:</source>
 <target>Грешка број %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Не могу прочитати следеће XML елементе:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>Датотека подешавања %x учитана само делимично.</target>
 

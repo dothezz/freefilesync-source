@@ -32,7 +32,6 @@ ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, FilterConfig& f
 ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
                                                const std::vector<FileSystemObject*>& rowsOnLeft,
                                                const std::vector<FileSystemObject*>& rowsOnRight,
-                                               bool& deleteOnBothSides,
                                                bool& useRecycleBin);
 
 ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,

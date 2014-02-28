@@ -92,13 +92,14 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
     { activatePrivilege(SE_BACKUP_NAME); } //throw FileError
     catch (FileError&) {} //This shall not cause an error in user mode!
 
-    const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
-                                      0, //it seems we do not even need GENERIC_READ!
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      nullptr,
-                                      OPEN_EXISTING,
-                                      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                                      nullptr);
+    const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(), //_In_      LPCTSTR lpFileName,
+                                      //it seems we do not even need GENERIC_READ!
+                                      0,                 //_In_      DWORD dwDesiredAccess,
+                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,    //_In_      DWORD dwShareMode,
+                                      nullptr,           //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                      OPEN_EXISTING,     //_In_      DWORD dwCreationDisposition,
+                                      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, //_In_      DWORD dwFlagsAndAttributes,
+                                      nullptr);          //_In_opt_  HANDLE hTemplateFile
     if (hLink == INVALID_HANDLE_VALUE)
         throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"CreateFile", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hLink));
@@ -162,13 +163,14 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
 {
     using namespace zen;
 #ifdef ZEN_WIN
-    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
-                                     0,
-                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                     nullptr,
-                                     OPEN_EXISTING,
-                                     FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
-                                     nullptr);
+    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),                  //_In_      LPCTSTR lpFileName,
+                                     0,                                                      //_In_      DWORD dwDesiredAccess,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                     nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                     OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
+                                     //needed to open a directory:
+                                     FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
+                                     nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hDir == INVALID_HANDLE_VALUE)
         throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"CreateFile", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));

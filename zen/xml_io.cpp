@@ -5,16 +5,16 @@
 // **************************************************************************
 
 #include "xml_io.h"
-#include <zen/file_handling.h>
-#include <zen/file_io.h>
-#include <zen/serialize.h>
+#include "file_handling.h"
+#include "file_io.h"
+#include "serialize.h"
 
 using namespace zen;
 
 
 XmlDoc zen::loadXmlDocument(const Zstring& filename) //throw FileError
 {
-	//can't simply use zen::loadBinStream() due to the short-circuit xml-validation below!
+    //can't simply use zen::loadBinStream() due to the short-circuit xml-validation below!
 
     std::string stream;
 
@@ -28,7 +28,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filename) //throw FileError
         stream.resize(bytesRead);
 
         if (!startsWith(stream, xmlBegin) &&
-            !startsWith(stream, BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
+            !startsWith(stream, BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
             throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
     }
 
@@ -62,10 +62,11 @@ void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filename) //throw Fi
 {
     std::string stream = serialize(doc); //noexcept
 
+    //only update xml file if there are real changes
     try
     {
         if (getFilesize(filename) == stream.size()) //throw FileError
-			if (loadBinStream<std::string>(filename) == stream) //throw FileError
+            if (loadBinStream<std::string>(filename) == stream) //throw FileError
                 return;
     }
     catch (FileError&) {}

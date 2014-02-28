@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef Z_BASE_H_INCLUDED
-#define Z_BASE_H_INCLUDED
+#ifndef Z_BASE_H_INCLUDED_08321745456
+#define Z_BASE_H_INCLUDED_08321745456
 
 #include <algorithm>
 #include <cassert>
@@ -186,9 +186,9 @@ private:
 
 //perf note: interestingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
-template <class Char,  							                       //Character Type
+template <class Char,  							                        //Character Type
           template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
-          class AP = AllocatorOptimalSpeed>				               //Allocator Policy
+          class AP = AllocatorOptimalSpeed>				                //Allocator Policy
 class Zbase : public SP<Char, AP>
 {
 public:
@@ -381,8 +381,9 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
 {
     assert(pos <= length());
-    const Char* thisEnd = end(); //respect embedded 0
-    const Char* it = std::search(begin() + pos, thisEnd,
+	const size_t len = length();
+    const Char* thisEnd = begin() + len; //respect embedded 0
+    const Char* it = std::search(begin() + std::min(pos, len), thisEnd,
                                  str.begin(), str.end());
     return it == thisEnd ? npos : it - begin();
 }
@@ -392,8 +393,9 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
 {
     assert(pos <= length());
-    const Char* thisEnd = end(); //respect embedded 0
-    const Char* it = std::search(begin() + pos, thisEnd,
+	const size_t len = length();
+    const Char* thisEnd = begin() + len; //respect embedded 0
+    const Char* it = std::search(begin() + std::min(pos, len), thisEnd,
                                  str, str + strLength(str));
     return it == thisEnd ? npos : it - begin();
 }
@@ -403,8 +405,9 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(Char ch, size_t pos) const
 {
     assert(pos <= length());
-    const Char* thisEnd = end();
-    const Char* it = std::find(begin() + pos, thisEnd, ch); //respect embedded 0
+	const size_t len = length();
+    const Char* thisEnd = begin() + len; //respect embedded 0
+	const Char* it = std::find(begin() + std::min(pos, len), thisEnd, ch);
     return it == thisEnd ? npos : it - begin();
 }
 
@@ -413,9 +416,8 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::rfind(Char ch, size_t pos) const
 {
     assert(pos == npos || pos <= length());
-
-    const Char* currEnd = pos == npos ? end() : begin() + std::min(pos + 1, length());
-
+	const size_t len = length();
+    const Char* currEnd = begin() + (pos == npos ? len : std::min(pos + 1, len));
     const Char* it = find_last(begin(), currEnd, ch);
     return it == currEnd ? npos : it - begin();
 }
@@ -425,61 +427,14 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
 {
     assert(pos == npos || pos <= length());
-
     const size_t strLen = strLength(str);
-    const Char* currEnd = pos == npos ? end() : begin() + std::min(pos + strLen, length());
-
+	const size_t len = length();
+	const Char* currEnd = begin() + (pos == npos ? len : std::min(pos + strLen, len));
     const Char* it = search_last(begin(), currEnd,
                                  str, str + strLen);
     return it == currEnd ? npos : it - begin();
 }
 
-
-/* -> dead code ahead: better use zen::replace template instead!
-template <class Char, template <class, class> class SP, class AP>
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const Zbase& str)
-{
-    assert(str.data() < rawStr || rawStr + length() < str.data()); //str mustn't point to data in this string
-    assert(pos1 + n1 <= length());
-
-    const size_t n2 = str.length();
-
-    const size_t oldLen = length();
-    if (oldLen == 0)
-        return *this = str;
-
-    const size_t newLen = oldLen - n1 + n2;
-
-    if (this->canWrite(rawStr, newLen))
-    {
-        if (n1 < n2) //move remainder right -> std::copy_backward
-        {
-            std::copy_backward(rawStr + pos1 + n1, rawStr + oldLen + 1, rawStr + newLen + 1); //include null-termination
-            this->setLength(rawStr, newLen);
-        }
-        else if (n1 > n2) //shift left -> std::copy
-        {
-            std::copy(rawStr + pos1 + n1, rawStr + oldLen + 1, rawStr + pos1 + n2); //include null-termination
-            this->setLength(rawStr, newLen);
-        }
-
-        std::copy(str.data(), str.data() + n2, rawStr + pos1);
-    }
-    else
-    {
-        //copy directly into new string
-        Char* const newStr = this->create(newLen);
-
-        std::copy(rawStr, rawStr + pos1, newStr);
-        std::copy(str.data(), str.data() + n2, newStr + pos1);
-        std::copy(rawStr + pos1 + n1, rawStr + oldLen + 1, newStr + pos1 + n2); //include null-termination
-
-        this->destroy(rawStr);
-        rawStr = newStr;
-    }
-    return *this;
-}
-*/
 
 template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)
@@ -558,7 +513,7 @@ size_t Zbase<Char, SP, AP>::length() const
 template <class Char, template <class, class> class SP, class AP> inline
 const Char Zbase<Char, SP, AP>::operator[](size_t pos) const
 {
-    assert(pos < length());
+    assert(pos < length()); //design by contract! no runtime check!
     return rawStr[pos];
 }
 
@@ -712,4 +667,4 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator+=(Char ch)
 }
 }
 
-#endif //Z_BASE_H_INCLUDED
+#endif //Z_BASE_H_INCLUDED_08321745456

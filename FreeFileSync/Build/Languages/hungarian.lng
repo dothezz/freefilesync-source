@@ -115,6 +115,9 @@
 <source>Size:</source>
 <target>Méret:</target>
 
+<source>Content comparison was skipped for excluded files %x.</source>
+<target>A tartalom összehasonlítását átugrotta a(z) %x kizárt fájlok esetében</target>
+
 <source>Items differ in attributes only</source>
 <target>Az elemek csak attribútumaikban különböznek</target>
 
@@ -295,9 +298,6 @@
 <source>%x items/sec</source>
 <target>%x elem/másodperc</target>
 
-<source>Configuration file %x loaded partially only.</source>
-<target>%x konfigurációs fájl csak részlegesen töltődött be: .</target>
-
 <source>Show in Explorer</source>
 <target>Mutassa az Intézőben</target>
 
@@ -325,11 +325,8 @@
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Megállás szükséges: várakozás a jelenlegi művelet befejezésére...</target>
 
-<source>Unable to create timestamp for versioning:</source>
-<target>Nem sikerült időbélyeget generálni a verziókövetéshez</target>
-
-<source>Cannot read the following XML elements:</source>
-<target>Nem sikerült a következő XML elemek olvasása:</target>
+<source>Unable to create time stamp for versioning:</source>
+<target>Nem képes időbélyegzés létrehozására a verzióképzéshez:</target>
 
 <source>&Open...</source>
 <target>&Megnyitás...</target>
@@ -558,6 +555,9 @@ A parancs végrehajtódik, ha:
 <source>Saving log file %x...</source>
 <target>Naplófájl mentése a következő fájlba: %x.</target>
 
+<source>Stopped</source>
+<target>Leállítva</target>
+
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>E jelenség megoldásához kapcsoljon át a FreeFileSync fő  ablakába.</target>
 
@@ -650,21 +650,6 @@ A parancs végrehajtódik, ha:
 
 <source>Drag && drop</source>
 <target>Húzd && Ejtsd</target>
-
-<source>Close progress dialog</source>
-<target>Zárja be a folyamatjelző párbeszédablakot</target>
-
-<source>Standby</source>
-<target>Készenléti állapot</target>
-
-<source>Log off</source>
-<target>Kijelentkezik</target>
-
-<source>Shut down</source>
-<target>Leállítja a gépet</target>
-
-<source>Hibernate</source>
-<target>Hibernál</target>
 
 <source>Alternate comparison settings</source>
 <target>Megváltoztatja az összehasonlítási beállításokat</target>
@@ -771,6 +756,15 @@ A parancs végrehajtódik, ha:
 <source>Save as batch job</source>
 <target>Mentse kötegelt feladatként</target>
 
+<source>View type:</source>
+<target>Nézet típusa:</target>
+
+<source>Select view:</source>
+<target>Válasszon nézetet:</target>
+
+<source>Statistics:</source>
+<target>Statisztika:</target>
+
 <source>Number of files and folders that will be created</source>
 <target>A létrehozandó fájlok és könyvtárak száma</target>
 
@@ -872,14 +866,14 @@ A parancs végrehajtódik, ha:
 <source>On completion:</source>
 <target>Végrehajtás alatt:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Érzékelje a szinkronizálási irányokat az adatbázis-fájlok segítségével</target>
+
 <source>Start synchronization now?</source>
 <target>Megkezdje a szinkronizálást?</target>
 
 <source>Variant:</source>
 <target>Variáns:</target>
-
-<source>Statistics</source>
-<target>Statisztika</target>
 
 <source>&Don't show this dialog again</source>
 <target>&Ne mutassa ismételten ezt a párbeszédablakot</target>
@@ -917,8 +911,8 @@ A parancs végrehajtódik, ha:
 <source>Stop synchronization at first error</source>
 <target>Állítsa le a szinkronizálást az első hibánál</target>
 
-<source>Show progress dialog</source>
-<target>Mutassa a folyamatjelző párbeszédablakot</target>
+<source>Run minimized</source>
+<target>Minimalizálva fusson</target>
 
 <source>Save log:</source>
 <target>Mentse a következő napló-fájlt:</target>
@@ -934,12 +928,6 @@ A parancs végrehajtódik, ha:
 
 <source>&Recycle bin</source>
 <target>Lomtá&r</target>
-
-<source>Delete on both sides</source>
-<target>Törlés mindkét oldalon</target>
-
-<source>Delete on both sides even if the file is selected on one side only</source>
-<target>Törlés mindkét oldalon, még akkor is, ha a fájl csak az egyik oldalon lett kijelölve</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Meghatározott fájlok szinkronizálásból történő kizárásához válasszon szűrőt. Az útvonalakat a megfelelő könyvtár-párjaikhoz viszonyítva adja meg.</target>
@@ -962,8 +950,8 @@ A parancs végrehajtódik, ha:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Clear</source>
-<target>&Töröl</target>
+<source>&Reset</source>
+<target>&Visszaállít</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>A következő beállítások minden szinkronizálási feladatnál használja.</target>
@@ -1061,8 +1049,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Find</source>
 <target>Keres</target>
 
-<source>Select View</source>
-<target>Válasszon nézetet</target>
+<source>View Settings</source>
+<target>Mutassa a beállításokat</target>
 
 <source>Overview</source>
 <target>Áttekintés</target>
@@ -1145,11 +1133,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Exclude via filter:</source>
 <target>Zárja ki szűrő segítségével:</target>
 
-<source>Exclude temporarily</source>
-<target>Zárja ki ideiglenesen</target>
-
 <source>Include temporarily</source>
 <target>Csatolja ideiglenesen</target>
+
+<source>Exclude temporarily</source>
+<target>Zárja ki ideiglenesen</target>
 
 <source>Delete</source>
 <target>Töröl</target>
@@ -1202,6 +1190,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Do&n't save</source>
 <target>&ne mentse</target>
 
+<source>Delete selected configurations</source>
+<target>Törölje a kiválasztott beállításokat</target>
+
 <source>Filter</source>
 <target>Szűrő</target>
 
@@ -1253,8 +1244,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Set as default</source>
 <target>Beállítás alapértelmezettként</target>
 
-<source>All folders are in sync</source>
-<target>Minden könyvtár szinkronban</target>
+<source>All files are in sync</source>
+<target>Az összes fájl szinkronizált</target>
 
 <source>Synchronization Settings</source>
 <target>Szinkronizálási beállítások</target>
@@ -1273,6 +1264,21 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Searching for program updates...</source>
 <target>Programfrissítés keresése...</target>
+
+<source>Close progress dialog</source>
+<target>Zárja be a folyamatjelző párbeszédablakot</target>
+
+<source>Standby</source>
+<target>Készenléti állapot</target>
+
+<source>Log off</source>
+<target>Kijelentkezik</target>
+
+<source>Shut down</source>
+<target>Leállítja a gépet</target>
+
+<source>Hibernate</source>
+<target>Hibernál</target>
 
 <source>Scanning...</source>
 <target>Vizsgálat folyamatban...</target>
@@ -1295,14 +1301,14 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Initializing...</source>
 <target>Inicializálás...</target>
 
-<source>Stopped</source>
-<target>Leállítva</target>
-
 <source>Completed</source>
 <target>Befejeződött</target>
 
 <source>&Continue</source>
 <target>&Folytat</target>
+
+<source>Progress</source>
+<target>Haladás</target>
 
 <source>Log</source>
 <target>Napló</target>
@@ -1394,8 +1400,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Time stamp</source>
 <target>Időbélyeg</target>
 
-<source>Append a timestamp to each file name</source>
-<target>Adjon időbélyeget minden fájlnévhez</target>
+<source>Append a time stamp to each file name</source>
+<target>Minden fájlnévhez adjon egy-egy időbélyeget</target>
 
 <source>File</source>
 <target>Fájl</target>
@@ -1452,7 +1458,7 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>Nem sikerült a következő könyvtár létrehozása: %x.</target>
 
 <source>Cannot create symbolic link %x.</source>
-<target>Nem lehet létrehozni a(z) %x szimbolikus hivatkozást</target>
+<target>Nem lehet létrehozni a(z) %x szimbolikus hivatkozást.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nem található a következő rendszerfunkció: %x.</target>
@@ -1470,7 +1476,7 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>A %x könyvtár megnyitása nem sikerült.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>Nem sikerült besorolni a(z) %x könyvtárat. .</target>
+<target>Nem sikerült besorolni a(z) %x könyvtárat.</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1520,9 +1526,18 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Unable to move %x to the recycle bin.</source>
 <target>%x nem helyezhető a Lomtárba</target>
 
+<source>Checking recycle bin failed for folder %x.</source>
+<target>A lomtár ellenőrzése meghiúsult a(z) %x könyvtár esetében.</target>
+
 <source>Cannot determine final path for %x.</source>
 <target>Nem lehet meghatározni a végső útvonalat a(z) %x számára.</target>
 
 <source>Error Code %x:</source>
 <target>Hibakód %x:</target>
+
+<source>Cannot read the following XML elements:</source>
+<target>Nem sikerült a következő XML elemek olvasása:</target>
+
+<source>Configuration file %x loaded partially only.</source>
+<target>%x konfigurációs fájl csak részlegesen töltődött be.</target>
 
