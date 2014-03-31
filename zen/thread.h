@@ -164,7 +164,7 @@ public:
 
 private:
     bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished >= jobsTotal); } //call while locked!
-	
+
 #ifndef NDEBUG
     bool returnedResult;
 #endif

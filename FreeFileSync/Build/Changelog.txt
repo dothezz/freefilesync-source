@@ -1,5 +1,19 @@
-FreeFileSync 6.3
-----------------
+FreeFileSync 6.4 [2014-04-01]
+-----------------------------
+Combined comparison, filter and sync config dialogs
+Support alternate GlobalSettings.xml file via command line
+Toggle between config panels with F6, F7, F8
+Show config status icons in notebook panel caption
+Redesigned configuration dialog layouts
+Fixed startup error after moving installation directory
+Fixed retry on failure to resolve path by volume name
+Resolved ERROR_ALREADY_EXISTS when creating temporary recycle bin subdirectory
+Added "save as gui job" button on main dialog
+Added Bulgarian language
+
+
+FreeFileSync 6.3 [2014-03-01]
+-----------------------------
 No wait time anymore while searching for recycle bin (Windows Vista and later)
 Revised synchronization progress graph
 Clean up "On completion" considering last usage

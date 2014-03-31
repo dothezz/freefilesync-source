@@ -25,6 +25,7 @@
 #include <wx+/std_button_order.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
+#include <wx+/key_event.h>
 #include <zen/file_handling.h>
 #include <zen/thread.h>
 #include "gui_generated.h"
@@ -455,9 +456,9 @@ class GridDataMessages : public GridData
 public:
     GridDataMessages(const std::shared_ptr<MessageView>& msgView) : msgView_(msgView) {}
 
-    virtual size_t getRowCount() const { return msgView_ ? msgView_->rowsOnView() : 0; }
+    virtual size_t getRowCount() const override { return msgView_ ? msgView_->rowsOnView() : 0; }
 
-    virtual wxString getValue(size_t row, ColumnType colType) const
+    virtual wxString getValue(size_t row, ColumnType colType) const override
     {
         if (msgView_)
             if (Opt<MessageView::LogEntryView> entry = msgView_->getEntry(row))
@@ -597,27 +598,11 @@ public:
         return wxEmptyString;
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const { return wxEmptyString; }
+    virtual wxString getColumnLabel(ColumnType colType) const override { return wxEmptyString; }
 
 private:
     const std::shared_ptr<MessageView> msgView_;
 };
-
-bool isComponentOf(const wxWindow* child, const wxWindow* top)
-{
-    for (const wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
-        if (wnd == top)
-            return true;
-    return false;
-}
-
-const wxTopLevelWindow* getTopLevelWindow(const wxWindow* child)
-{
-    for (const wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
-        if (auto tlw = dynamic_cast<const wxTopLevelWindow*>(wnd))
-            return tlw;
-    return nullptr;
-}
 }
 
 
@@ -625,8 +610,7 @@ class LogPanel : public LogPanelGenerated
 {
 public:
     LogPanel(wxWindow* parent, const ErrorLog& log) : LogPanelGenerated(parent),
-        msgView(std::make_shared<MessageView>(log)),
-        processingGlobalKeyEvent(false)
+        msgView(std::make_shared<MessageView>(log))
     {
         const int errorCount   = log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
         const int warningCount = log.getItemCount(TYPE_WARNING);
@@ -666,33 +650,26 @@ public:
 
         m_gridMessages->Connect(EVENT_GRID_MOUSE_RIGHT_UP, GridClickEventHandler(LogPanel::onMsgGridContext), nullptr, this);
 
-        wxTheApp->Connect(wxEVT_KEY_DOWN,  wxKeyEventHandler(LogPanel::onGlobalKeyEvent), nullptr, this);
-        wxTheApp->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(LogPanel::onGlobalKeyEvent), nullptr, this); //capture direction keys
+        //enable dialog-specific key local events
+        setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
 
         updateGrid();
     }
 
-    ~LogPanel()
-    {
-        //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
-        wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(LogPanel::onGlobalKeyEvent), nullptr, this);
-        wxTheApp->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(LogPanel::onGlobalKeyEvent), nullptr, this);
-    }
-
 private:
-    virtual void OnErrors(wxCommandEvent& event)
+    virtual void OnErrors(wxCommandEvent& event) override
     {
         m_bpButtonErrors->toggle();
         updateGrid();
     }
 
-    virtual void OnWarnings(wxCommandEvent& event)
+    virtual void OnWarnings(wxCommandEvent& event) override
     {
         m_bpButtonWarnings->toggle();
         updateGrid();
     }
 
-    virtual void OnInfo(wxCommandEvent& event)
+    virtual void OnInfo(wxCommandEvent& event) override
     {
         m_bpButtonInfo->toggle();
         updateGrid();
@@ -759,26 +736,8 @@ private:
         menu.popup(*this);
     }
 
-    void onGlobalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
+    void onLocalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
     {
-        const wxWindow* focus = wxWindow::FindFocus();
-        const wxTopLevelWindow* tlw = getTopLevelWindow(this);
-
-        //avoid recursion!!! -> this ugly construct seems to be the only (portable) way to avoid re-entrancy
-        //recursion may happen in multiple situations: e.g. modal dialogs, Grid::ProcessEvent()!
-        if (processingGlobalKeyEvent  ||
-            !isComponentOf(focus, this) ||
-            !IsEnabled() || //only handle if main window is in use and no modal dialog is shown:
-            !tlw || !const_cast<wxTopLevelWindow*>(tlw)->IsActive())    //thanks to wxWidgets non-portability we need both checks:
-            //IsEnabled() is sufficient for Windows, IsActive() is needed on OS X since it does NOT disable the parent when showing a modal dialog
-        {
-            event.Skip();
-            return;
-        }
-        processingGlobalKeyEvent = true;
-        ZEN_ON_SCOPE_EXIT(processingGlobalKeyEvent = false;)
-        //----------------------------------------------------
-
         const int keyCode = event.GetKeyCode();
 
         if (event.ControlDown())
@@ -812,7 +771,7 @@ private:
                 case WXK_NUMPAD_PAGEDOWN:
                 case WXK_NUMPAD_HOME:
                 case WXK_NUMPAD_END:
-                    if (!isComponentOf(focus, m_gridMessages) && //don't propagate keyboard commands if grid is already in focus
+                    if (!isComponentOf(wxWindow::FindFocus(), m_gridMessages) && //don't propagate keyboard commands if grid is already in focus
                         m_gridMessages->IsEnabled())
                         if (wxEvtHandler* evtHandler = m_gridMessages->getMainWin().GetEventHandler())
                         {
@@ -869,8 +828,6 @@ private:
     }
 
     std::shared_ptr<MessageView> msgView; //bound!
-
-    bool processingGlobalKeyEvent;
 };
 
 //########################################################################################

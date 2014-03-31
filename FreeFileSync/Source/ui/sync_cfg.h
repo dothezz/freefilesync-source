@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SYNCCONFIG_H_INCLUDED
-#define SYNCCONFIG_H_INCLUDED
+#ifndef SYNCCONFIG_H_INCLUDED_31289470134253425
+#define SYNCCONFIG_H_INCLUDED_31289470134253425
 
 #include <wx/window.h>
 #include "../lib/process_xml.h"
@@ -22,19 +22,33 @@ struct ReturnSyncConfig
     };
 };
 
-struct OnCompletionCfg
+enum class SyncConfigPanel
 {
-    Zstring* command;              //*must* be bound!
-    std::vector<Zstring>* history; //
-    size_t historyMax;
+    COMPARISON = 0, //
+    FILTER     = 1, //used as zero-based notebook page index!
+    SYNC       = 2, //
 };
 
+struct MiscGlobalCfg
+{
+    xmlAccess::OnGuiError& handleError; //in/out param
+
+    Zstring& onCompletionCommand;       //
+    std::vector<Zstring>& onCompletionHistory;
+    size_t onCompletionHistoryMax;
+};
+
+
 ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
-                                                  CompareVariant compareVar,
-                                                  SyncConfig&    syncCfg,
-                                                  const wxString& title,
-                                                  xmlAccess::OnGuiError* handleError,     //
-                                                  OnCompletionCfg* onCompletion); //optional input parameter
+                                                  SyncConfigPanel panelToShow,
+                                                  bool* useAlternateCmpCfg,  //optional parameter
+                                                  CompConfig&   cmpCfg,
+                                                  FilterConfig& filterCfg,
+                                                  bool* useAlternateSyncCfg,  //
+                                                  SyncConfig&   syncCfg,
+                                                  CompareVariant globalCmpVar,
+                                                  MiscGlobalCfg* miscCfg, //
+                                                  const wxString& title);
 }
 
-#endif // SYNCCONFIG_H_INCLUDED
+#endif //SYNCCONFIG_H_INCLUDED_31289470134253425

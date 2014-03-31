@@ -66,35 +66,43 @@ std::vector<ResolvedFolderPair> resolveDirectoryNames(const std::vector<FolderPa
 {
     std::vector<ResolvedFolderPair> output;
 
-    //support retry for environment variable and and variable driver letter resolution!
     for (const FolderPairCfg& fpCfg : cfgList)
         output.push_back(ResolvedFolderPair(
                              getFormattedDirectoryName(fpCfg.dirnamePhraseLeft),
                              getFormattedDirectoryName(fpCfg.dirnamePhraseRight)));
     warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryName, but currently not thread-safe")
-
-    assert(output.size() == cfgList.size()); //postcondition!
     return output;
 }
 
 
-std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<ResolvedFolderPair>& resolvedPairs,
-                                                      bool allowUserInteraction,
-                                                      ProcessCallback& callback)
+struct ResolutionInfo
 {
-    std::set<Zstring, LessFilename> dirnames;
-    for (const ResolvedFolderPair& fp : resolvedPairs)
-    {
-        dirnames.insert(fp.dirnameLeft);
-        dirnames.insert(fp.dirnameRight);
-    }
+    std::vector<ResolvedFolderPair> resolvedPairs;
+    std::set<Zstring, LessFilename> existingDirs;
+};
 
-    std::set<Zstring, LessFilename> output;
+
+ResolutionInfo resolveFolderPairs(const std::vector<FolderPairCfg>& cfgList,
+                                  bool allowUserInteraction,
+                                  ProcessCallback& callback)
+{
+    ResolutionInfo output;
 
     tryReportingError([&]
     {
+        //support "retry" for environment variable and and variable driver letter resolution!
+        output.resolvedPairs = resolveDirectoryNames(cfgList);
+        assert(output.resolvedPairs.size() == cfgList.size()); //postcondition!
+
+        std::set<Zstring, LessFilename> dirnames;
+        for (const ResolvedFolderPair& fp : output.resolvedPairs)
+        {
+            dirnames.insert(fp.dirnameLeft);
+            dirnames.insert(fp.dirnameRight);
+        }
+
         const DirectoryStatus dirStatus = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
-        output = dirStatus.existing;
+        output.existingDirs = dirStatus.existing;
 
         if (!dirStatus.missing.empty())
         {
@@ -104,6 +112,7 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<Resolved
             throw FileError(msg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
         }
     }, callback);
+
     return output;
 }
 
@@ -786,29 +795,28 @@ void zen::compare(int fileTimeTolerance,
 
     //-------------------some basic checks:------------------------------------------
 
-    const std::vector<ResolvedFolderPair> resolvedPairs = resolveDirectoryNames(cfgList);
-    const std::set<Zstring, LessFilename> existingDirs  = determineExistentDirs(resolvedPairs, allowUserInteraction, callback);
+    const ResolutionInfo& resInfo = resolveFolderPairs(cfgList, allowUserInteraction, callback);
 
     //directory existence only checked *once* to avoid race conditions!
-    if (resolvedPairs.size() != cfgList.size())
+    if (resInfo.resolvedPairs.size() != cfgList.size())
         throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
-    checkForIncompleteInput(resolvedPairs, warnings.warningInputFieldEmpty,  callback);
-    checkFolderDependency  (resolvedPairs, warnings.warningDependentFolders, callback);
+    checkForIncompleteInput(resInfo.resolvedPairs, warnings.warningInputFieldEmpty,  callback);
+    checkFolderDependency  (resInfo.resolvedPairs, warnings.warningDependentFolders, callback);
 
     //list of directories that are *expected* to be existent (and need to be scanned)!
 
     //-------------------end of basic checks------------------------------------------
 
-    auto dirAvailable = [&](const Zstring& dirnameFmt) { return existingDirs.find(dirnameFmt) != existingDirs.end(); };
+    auto dirAvailable = [&](const Zstring& dirnameFmt) { return resInfo.existingDirs.find(dirnameFmt) != resInfo.existingDirs.end(); };
 
     std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> totalWorkLoad;
     for (size_t i = 0; i < cfgList.size(); ++i)
-        totalWorkLoad.push_back(std::make_pair(resolvedPairs[i], cfgList[i]));
+        totalWorkLoad.push_back(std::make_pair(resInfo.resolvedPairs[i], cfgList[i]));
 
     //lock (existing) directories before comparison
     if (createDirLocks)
-        dirLocks = make_unique<LockHolder>(existingDirs, warnings.warningDirectoryLockFailed, callback);
+        dirLocks = make_unique<LockHolder>(resInfo.existingDirs, warnings.warningDirectoryLockFailed, callback);
 
     try
     {

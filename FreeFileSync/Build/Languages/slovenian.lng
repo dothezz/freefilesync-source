@@ -116,7 +116,7 @@
 <target>Velikost:</target>
 
 <source>Content comparison was skipped for excluded files %x.</source>
-<target></target>
+<target>Za izločene datoteke %x je bila primerjava vsebine izpuščena</target>
 
 <source>Items differ in attributes only</source>
 <target>Elementi se razlikujejo samo v atributih</target>
@@ -332,7 +332,7 @@
 <target>Zahteva za ustavitev: Čakam da se trenutni proces zaključi...</target>
 
 <source>Unable to create time stamp for versioning:</source>
-<target></target>
+<target>Časovnega žiga za verzioniranje ni bilo mogoče ustvariti:</target>
 
 <source>&Open...</source>
 <target>&Odpri...</target>
@@ -765,13 +765,13 @@ Ukaz se sproži če:
 <target>Shrani kot serijsko opravilo</target>
 
 <source>View type:</source>
-<target></target>
+<target>Tip pogleda:</target>
 
 <source>Select view:</source>
-<target></target>
+<target>Izberi pogled:</target>
 
 <source>Statistics:</source>
-<target></target>
+<target>Statistika:</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Število datotek in map, ki bodo ustvarjene</target>
@@ -875,7 +875,7 @@ Ukaz se sproži če:
 <target>Ob zaključku:</target>
 
 <source>Detect synchronization directions with the help of database files</source>
-<target></target>
+<target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
 
 <source>Start synchronization now?</source>
 <target>Zaženem sinhnorizacijo takoj?</target>
@@ -920,7 +920,7 @@ Ukaz se sproži če:
 <target>Ustavi sinhnorizacojo ob prvi napaki</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Zaženi minimizirano</target>
 
 <source>Save log:</source>
 <target>Shrani dnevnik:</target>
@@ -959,7 +959,7 @@ Ukaz se sproži če:
 <target>Maksimum:</target>
 
 <source>&Reset</source>
-<target></target>
+<target>&Ponovni zagon</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Naslednje nastavitve se uporabljajo pri vseh sinhronizacijskih opravilih.</target>
@@ -1058,7 +1058,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Najdi</target>
 
 <source>View Settings</source>
-<target></target>
+<target>Nastavitve pogleda</target>
 
 <source>Overview</source>
 <target>Pregled</target>
@@ -1094,7 +1094,12 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <pluralform>Do you really want to execute the command %y for one item?</pluralform>
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>Ali res želite izvesti ukaz %y za %x element?</pluralform>
+<pluralform>Ali res želite izvesti ukaz %y za %x elementa?</pluralform>
+<pluralform>Ali res želite izvesti ukaz %y za %x elemente?</pluralform>
+<pluralform>Ali res želite izvesti ukaz %y za %x elementov?</pluralform>
+</target>
 
 <source>&Execute</source>
 <target>&Izvedi</target>
@@ -1125,7 +1130,12 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <pluralform>Showing %y of 1 row</pluralform>
 <pluralform>Showing %y of %x rows</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>Prikazano %y od %x vrstice</pluralform>
+<pluralform>Prikazano %y od %x vrstic</pluralform>
+<pluralform>Prikazano %y od %x vrstic</pluralform>
+<pluralform>Prikazano %y od %x vrstic</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Nastavi smer:</target>
@@ -1197,7 +1207,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Ne shra&ni</target>
 
 <source>Delete selected configurations</source>
-<target></target>
+<target>Izbriši izbrane konfiguracije</target>
 
 <source>Filter</source>
 <target>Filter</target>
@@ -1251,7 +1261,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Nastavi kot privzeto</target>
 
 <source>All files are in sync</source>
-<target></target>
+<target>Vse datoteke so sinhronizirane</target>
 
 <source>Synchronization Settings</source>
 <target>Nastavitve sinhnorizacije</target>
@@ -1314,7 +1324,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>&Nadaljuj</target>
 
 <source>Progress</source>
-<target></target>
+<target>Napredek</target>
 
 <source>Log</source>
 <target>Dnevnik</target>
@@ -1411,7 +1421,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Časovna oznaka</target>
 
 <source>Append a time stamp to each file name</source>
-<target></target>
+<target>Imenu vsake datoteke pripni časovni žig</target>
 
 <source>File</source>
 <target>Datoteka</target>
@@ -1522,8 +1532,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 </source>
 <target>
 <pluralform>%x dan</pluralform>
-<pluralform>%x dni</pluralform>
-<pluralform>%x dni</pluralform>
+<pluralform>%x dneva</pluralform>
+<pluralform>%x dnevi</pluralform>
 <pluralform>%x dni</pluralform>
 </target>
 
@@ -1543,7 +1553,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Ne morem premakniti %x v koš-</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
-<target></target>
+<target>Preverjanje koša za mapo %x ni uspelo.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Ne morem določiti končne poti za %x.</target>

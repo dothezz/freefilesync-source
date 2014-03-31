@@ -14,12 +14,14 @@
 #include <wx+/font_size.h>
 #include <wx+/std_button_order.h>
 #include <wx+/popup_dlg.h>
+#include <wx+/key_event.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "on_completion_box.h"
 #include "dir_name.h"
 #include "../file_hierarchy.h"
 #include "../lib/help_provider.h"
+#include "../lib/norm_filter.h"
 
 #ifdef ZEN_WIN
 #include <wx+/mouse_move_dlg.h>
@@ -29,224 +31,282 @@ using namespace zen;
 using namespace xmlAccess;
 
 
-class SyncCfgDialog : public SyncCfgDlgGenerated
+namespace
+{
+class ConfigDialog : public ConfigDlgGenerated
 {
 public:
-    SyncCfgDialog(wxWindow* parent,
-                  CompareVariant compareVar,
-                  SyncConfig&    syncCfg,
-                  const wxString& caption,
-                  xmlAccess::OnGuiError* handleError, //
-                  OnCompletionCfg* onCompletion);     //optional input parameter
+    ConfigDialog(wxWindow* parent,
+                 SyncConfigPanel panelToShow,
+                 bool* useAlternateCmpCfg,  //optional parameter
+                 CompConfig&   cmpCfg,
+                 FilterConfig& filterCfg,
+                 bool* useAlternateSyncCfg,  //
+                 SyncConfig&   syncCfg,
+                 CompareVariant globalCmpVar,
+                 MiscGlobalCfg* miscCfg, //
+                 const wxString& title);
 
 private:
-    virtual void OnSyncTwoWay(wxCommandEvent& event) { directionCfg.var = DirectionConfig::TWOWAY; updateGui(); }
-    virtual void OnSyncMirror(wxCommandEvent& event) { directionCfg.var = DirectionConfig::MIRROR; updateGui(); }
-    virtual void OnSyncUpdate(wxCommandEvent& event) { directionCfg.var = DirectionConfig::UPDATE; updateGui(); }
-    virtual void OnSyncCustom(wxCommandEvent& event) { directionCfg.var = DirectionConfig::CUSTOM; updateGui(); }
+    virtual void OnOkay  (wxCommandEvent& event) override;
+    virtual void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
+    virtual void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
 
-    virtual void OnToggleDetectMovedFiles(wxCommandEvent& event) { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateGui(); }
+    void onLocalKeyEvent(wxKeyEvent& event);
 
-    virtual void OnSyncTwoWayDouble(wxMouseEvent& event);
-    virtual void OnSyncMirrorDouble(wxMouseEvent& event);
-    virtual void OnSyncUpdateDouble(wxMouseEvent& event);
-    virtual void OnSyncCustomDouble(wxMouseEvent& event);
+    enum class ConfigTypeImage
+    {
+        COMPARISON = 0, //used as zero-based wxImageList index!
+        COMPARISON_GREY,
+        FILTER,
+        FILTER_GREY,
+        SYNC,
+        SYNC_GREY,
+    };
 
-    virtual void OnExLeftSideOnly (wxCommandEvent& event);
-    virtual void OnExRightSideOnly(wxCommandEvent& event);
-    virtual void OnLeftNewer      (wxCommandEvent& event);
-    virtual void OnRightNewer     (wxCommandEvent& event);
-    virtual void OnDifferent      (wxCommandEvent& event);
-    virtual void OnConflict       (wxCommandEvent& event);
+    //------------- comparison panel ----------------------
+    virtual void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Comparison Settings.html", this); }
 
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
-    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
-    virtual void OnOkay  (wxCommandEvent& event);
+    virtual void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    virtual void OnTimeSize(wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    virtual void OnContent (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    virtual void OnTimeSizeDouble(wxMouseEvent& event) override;
+    virtual void OnContentDouble (wxMouseEvent& event) override;
 
-    virtual void OnParameterChange(wxCommandEvent& event) { updateGui(); }
+    void updateCompGui();
 
-    virtual void OnDeletionPermanent  (wxCommandEvent& event) { handleDeletion = DELETE_PERMANENTLY;   updateGui(); }
-    virtual void OnDeletionRecycler   (wxCommandEvent& event) { handleDeletion = DELETE_TO_RECYCLER;   updateGui(); }
-    virtual void OnDeletionVersioning (wxCommandEvent& event) { handleDeletion = DELETE_TO_VERSIONING; updateGui(); }
+    CompConfig& cmpCfgOut; //for output only
+    bool* useAlternateCmpCfgOptOut;
+    CompareVariant localCmpVar;
+    EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 
-    virtual void OnErrorPopup (wxCommandEvent& event) { onGuiError = ON_GUIERROR_POPUP;  updateGui(); }
-    virtual void OnErrorIgnore(wxCommandEvent& event) { onGuiError = ON_GUIERROR_IGNORE; updateGui(); }
+    //------------- filter panel --------------------------
+    virtual void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Exclude Items.html", this); }
+    virtual void OnChangeFilterOption(wxCommandEvent& event) override { updateFilterGui(); }
+    virtual void OnFilterReset       (wxCommandEvent& event) override { setFilter(FilterConfig()); }
 
-    virtual void OnHelpVersioning(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Versioning.html", this); }
+    void onFilterKeyEvent(wxKeyEvent& event);
+    void setFilter(const FilterConfig& filter);
+    FilterConfig getFilter() const;
 
-    struct Config
+    void updateFilterGui();
+
+    FilterConfig& filterCfgOut;
+    EnumDescrList<UnitTime> enumTimeDescr;
+    EnumDescrList<UnitSize> enumSizeDescr;
+
+    //------------- synchronization panel -----------------
+    virtual void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWOWAY; updateSyncGui(); }
+    virtual void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR; updateSyncGui(); }
+    virtual void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE; updateSyncGui(); }
+    virtual void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM; updateSyncGui(); }
+
+    virtual void OnToggleLocalSyncSettings(wxCommandEvent& event) override { updateSyncGui(); }
+    virtual void OnToggleDetectMovedFiles(wxCommandEvent& event) override { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateSyncGui(); }
+    virtual void OnChangeSyncOption      (wxCommandEvent& event) override { updateSyncGui(); }
+
+    virtual void OnSyncTwoWayDouble(wxMouseEvent& event) override;
+    virtual void OnSyncMirrorDouble(wxMouseEvent& event) override;
+    virtual void OnSyncUpdateDouble(wxMouseEvent& event) override;
+    virtual void OnSyncCustomDouble(wxMouseEvent& event) override;
+
+    virtual void OnExLeftSideOnly (wxCommandEvent& event) override;
+    virtual void OnExRightSideOnly(wxCommandEvent& event) override;
+    virtual void OnLeftNewer      (wxCommandEvent& event) override;
+    virtual void OnRightNewer     (wxCommandEvent& event) override;
+    virtual void OnDifferent      (wxCommandEvent& event) override;
+    virtual void OnConflict       (wxCommandEvent& event) override;
+
+    virtual void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DELETE_PERMANENTLY;   updateSyncGui(); }
+    virtual void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
+    virtual void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
+
+    virtual void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateSyncGui(); }
+    virtual void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateSyncGui(); }
+
+    virtual void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Versioning.html", this); }
+
+    struct SyncOptions
     {
         SyncConfig syncCfg;
         xmlAccess::OnGuiError onGuiError;
         Zstring onCompletion;
     };
-    void setConfig(const Config& cfg);
-    Config getConfig() const;
 
-    void updateGui();
+    void setSyncOptions(const SyncOptions& so);
+    SyncOptions getSyncOptions() const;
+
+    void updateSyncGui();
+
+    const CompareVariant globalCmpVar_;
+    SyncConfig& syncCfgOut;
+    bool* useAlternateSyncCfgOptOut;
+    MiscGlobalCfg* miscCfgOut;
 
     //parameters with ownership NOT within GUI controls!
     DirectionConfig directionCfg;
     DeletionPolicy handleDeletion; //use Recycler, delete permanently or move to user-defined location
     OnGuiError onGuiError;
 
-    //output data
-    SyncConfig&            outSyncCfg;
-    xmlAccess::OnGuiError* outOptOnGuiError;
-    OnCompletionCfg*       outOptOnCompletion;
-
-    CompareVariant compareVar_;
-    DirectoryName<FolderHistoryBox> versioningFolder;
-
     EnumDescrList<VersioningStyle> enumVersioningStyle;
+    DirectoryName<FolderHistoryBox> versioningFolder;
 };
 
+//#################################################################################################################
 
-void updateConfigIcons(const DirectionConfig& directionCfg,
-                       wxBitmapButton* buttonLeftOnly,
-                       wxBitmapButton* buttonRightOnly,
-                       wxBitmapButton* buttonLeftNewer,
-                       wxBitmapButton* buttonRightNewer,
-                       wxBitmapButton* buttonDifferent,
-                       wxBitmapButton* buttonConflict)
+std::wstring getCompVariantDescription(CompareVariant var)
 {
-    if (directionCfg.var != DirectionConfig::TWOWAY) //automatic mode needs no sync-directions
+    switch (var)
     {
-        const DirectionSet dirCfg = extractDirections(directionCfg);
-
-        switch (dirCfg.exLeftSideOnly)
-        {
-            case SyncDirection::RIGHT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_right")));
-                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_left")));
-                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DELETE_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
-                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
-                break;
-        }
-
-        switch (dirCfg.exRightSideOnly)
-        {
-            case SyncDirection::RIGHT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_right")));
-                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DELETE_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_left")));
-                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
-                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
-                break;
-        }
-
-        switch (dirCfg.leftNewer)
-        {
-            case SyncDirection::RIGHT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
-                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
-                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
-                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
-                break;
-        }
-
-        switch (dirCfg.rightNewer)
-        {
-            case SyncDirection::RIGHT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
-                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
-                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
-                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
-                break;
-        }
-
-        switch (dirCfg.different)
-        {
-            case SyncDirection::RIGHT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
-                buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
-                buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
-                buttonDifferent->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
-                break;
-        }
-
-        switch (dirCfg.conflict)
-        {
-            case SyncDirection::RIGHT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
-                buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
-                break;
-            case SyncDirection::LEFT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
-                buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
-                break;
-            case SyncDirection::NONE:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"cat_conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
-                buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
-                break;
-        }
+        case CMP_BY_TIME_SIZE:
+            return _("Identify equal files by comparing modification time and size.");
+        case CMP_BY_CONTENT:
+            return _("Identify equal files by comparing the file content.");
     }
+    assert(false);
+    return _("Error");
 }
 
 
-SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
-                             CompareVariant compareVar,
-                             SyncConfig&    syncCfg,
-                             const wxString& title,
-                             xmlAccess::OnGuiError* handleError,
-                             OnCompletionCfg* onCompletion) :
-    SyncCfgDlgGenerated(parent),
+std::wstring getSyncVariantDescription(DirectionConfig::Variant var)
+{
+    switch (var)
+    {
+        case DirectionConfig::TWOWAY:
+            return _("Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.");
+        case DirectionConfig::MIRROR:
+            return _("Create a mirror backup of the left folder by adapting the right folder to match.");
+        case DirectionConfig::UPDATE:
+            return _("Copy new and updated files to the right folder.");
+        case DirectionConfig::CUSTOM:
+            return _("Configure your own synchronization rules.");
+    }
+    assert(false);
+    return _("Error");
+}
+
+
+ConfigDialog::ConfigDialog(wxWindow* parent,
+                           SyncConfigPanel panelToShow,
+                           bool* useAlternateCmpCfg,  //optional parameter
+                           CompConfig&   cmpCfg,
+                           FilterConfig& filterCfg,
+                           bool* useAlternateSyncCfg,  //
+                           SyncConfig&   syncCfg,
+                           CompareVariant globalCmpVar,
+                           MiscGlobalCfg* miscCfg, //
+                           const wxString& title) :
+    ConfigDlgGenerated(parent),
+    cmpCfgOut(cmpCfg),
+    useAlternateCmpCfgOptOut(useAlternateCmpCfg),
+    localCmpVar(cmpCfg.compareVar),
+    filterCfgOut(filterCfg),
+    globalCmpVar_(globalCmpVar),
+    syncCfgOut(syncCfg),
+    useAlternateSyncCfgOptOut(useAlternateSyncCfg),
+    miscCfgOut(miscCfg),
     handleDeletion(DELETE_TO_RECYCLER), //
     onGuiError(ON_GUIERROR_POPUP),      //dummy init
-    outSyncCfg(syncCfg),
-    outOptOnGuiError(handleError),
-    outOptOnCompletion(onCompletion),
-    compareVar_(compareVar),
     versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder/*, m_staticTextResolvedPath*/)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     SetTitle(title);
 
-    //set icons for this dialog
+    //fill image list to cope with wxNotebook image setting design desaster...
+    const int imageListSize = getResourceImage(L"cfg_compare_small").GetHeight();
+    assert(imageListSize == 16); //Windows default size for panel caption
+    auto imgList = make_unique<wxImageList>(imageListSize, imageListSize);
+
+    auto addToImageList = [&](const wxBitmap& bmp)
+    {
+        assert(bmp.GetWidth () <= imageListSize);
+        assert(bmp.GetHeight() <= imageListSize);
+        imgList->Add(bmp);
+        imgList->Add(greyScale(bmp));
+    };
+    //make sure to add images in same sequence as ConfigTypeImage enum!!!
+    addToImageList(getResourceImage(L"cfg_compare_small"));
+    addToImageList(getResourceImage(L"filter_small"     ));
+    addToImageList(getResourceImage(L"cfg_sync_small"   ));
+    assert(imgList->GetImageCount() == static_cast<int>(ConfigTypeImage::SYNC_GREY) + 1);
+
+    m_notebook->AssignImageList(imgList.release()); //notebook takes ownership
+
+    //------------- comparison panel ----------------------
+    setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
+    setRelativeFontSize(*m_toggleBtnContent,  1.25);
+
+    m_toggleBtnTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
+    m_toggleBtnContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
+
+    enumDescrHandleSyml.
+    add(SYMLINK_EXCLUDE, _("Exclude")).
+    add(SYMLINK_DIRECT,  _("Direct")).
+    add(SYMLINK_FOLLOW,  _("Follow"));
+
+    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpCfg.handleSymlinks);
+
+    if (useAlternateCmpCfg)
+        m_checkBoxUseLocalCmpOptions->SetValue(*useAlternateCmpCfg);
+    else
+    {
+        m_checkBoxUseLocalCmpOptions->SetValue(true);
+        bSizerLocalCompSettings->Show(false);
+    }
+
+    updateCompGui();
+
+    //------------- filter panel --------------------------
+
+#ifndef __WXGTK__  //wxWidgets breaks portability promise once again
+    m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
+    m_textCtrlExclude->SetMaxLength(0); //
+#endif
+
+    m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
+    m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
+
+    enumTimeDescr.
+    add(UTIME_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
+    add(UTIME_TODAY,       _("Today")).
+    //    add(UTIME_THIS_WEEK,   _("This week")).
+    add(UTIME_THIS_MONTH,  _("This month")).
+    add(UTIME_THIS_YEAR,   _("This year")).
+    add(UTIME_LAST_X_DAYS, _("Last x days"));
+
+    enumSizeDescr.
+    add(USIZE_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
+    add(USIZE_BYTE, _("Byte")).
+    add(USIZE_KB,   _("KB")).
+    add(USIZE_MB,   _("MB"));
+
+    assert((useAlternateCmpCfg != nullptr) == (useAlternateSyncCfg != nullptr));
+    if (!useAlternateCmpCfg)
+        bSizerLocalFilterSettings->Show(false);
+
+    setFilter(filterCfg);
+
+    //------------- synchronization panel -----------------
+    m_toggleBtnTwoWay->SetLabel(getVariantName(DirectionConfig::TWOWAY));
+    m_toggleBtnMirror->SetLabel(getVariantName(DirectionConfig::MIRROR));
+    m_toggleBtnUpdate->SetLabel(getVariantName(DirectionConfig::UPDATE));
+    m_toggleBtnCustom->SetLabel(getVariantName(DirectionConfig::CUSTOM));
+
+    m_toggleBtnTwoWay->SetToolTip(getSyncVariantDescription(DirectionConfig::TWOWAY));
+    m_toggleBtnMirror->SetToolTip(getSyncVariantDescription(DirectionConfig::MIRROR));
+    m_toggleBtnUpdate->SetToolTip(getSyncVariantDescription(DirectionConfig::UPDATE));
+    m_toggleBtnCustom->SetToolTip(getSyncVariantDescription(DirectionConfig::CUSTOM));
+
     m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_left_only"  ))));
     m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_right_only" ))));
     m_bitmapLeftNewer ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_left_newer" ))));
     m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_right_newer"))));
     m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_different"  ))));
     m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_conflict"   ))));
-    m_bitmapDatabase  ->SetBitmap(getResourceImage(L"database"));
-
-    m_toggleBtnTwoWay->SetLabel(L"<- " + _("Two way") + L" ->");
-    m_toggleBtnMirror->SetLabel(         _("Mirror")  + L" ->>");
-    m_toggleBtnUpdate->SetLabel(         _("Update")  + L" ->");
 
     setRelativeFontSize(*m_toggleBtnTwoWay, 1.25);
     setRelativeFontSize(*m_toggleBtnMirror, 1.25);
@@ -257,274 +317,227 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
     add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
-    //hide controls for optional parameters
-    if (!handleError && !onCompletion) //currently either both or neither are bound!
+    //use spacer to keep dialog height stable, no matter if versioning options are visible
+    bSizerVersioning->Add(0, m_panelVersioning->GetSize().GetHeight());
+
+    if (useAlternateSyncCfg)
+        m_checkBoxUseLocalSyncOptions->SetValue(*useAlternateSyncCfg);
+    else
     {
-        bSizerExtraConfig->Show(false);
+        m_checkBoxUseLocalSyncOptions->SetValue(true);
+        bSizerLocalSyncSettings->Show(false);
+    }
+
+    if (miscCfg)
+        m_comboBoxOnCompletion->initHistory(miscCfg->onCompletionHistory, miscCfg->onCompletionHistoryMax);
+    else //hide controls for optional parameters
+    {
+        bSizerMiscConfig->Show(false);
         Layout();
     }
 
-    if (onCompletion)
-        m_comboBoxOnCompletion->initHistory(*onCompletion->history, onCompletion->historyMax);
+    const SyncOptions so = { syncCfg,
+                             miscCfg ? miscCfg->handleError : ON_GUIERROR_POPUP,
+                             miscCfg ? miscCfg->onCompletionCommand : Zstring()
+                           };
+    setSyncOptions(so);
+    //-----------------------------------------------------
 
-    Config newCfg = { syncCfg,
-                      handleError ?* handleError : ON_GUIERROR_POPUP,
-                      onCompletion ?* onCompletion->command : Zstring()
-                    };
-    setConfig(newCfg);
+    //enable dialog-specific key local events
+    setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
+
+    m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::COMPARISON), _("Comparison")      + L" (F6)");
+    m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::FILTER    ), _("Filter")          + L" (F7)");
+    m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::SYNC      ), _("Synchronization") + L" (F8)");
+
+    m_notebook->ChangeSelection(static_cast<size_t>(panelToShow));
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
-
-    m_buttonOK->SetFocus();
-}
-
-//#################################################################################################################
-
-void SyncCfgDialog::setConfig(const Config& cfg)
-{
-    directionCfg   = cfg.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
-    handleDeletion = cfg.syncCfg.handleDeletion;
-
-    versioningFolder.setName(utfCvrtTo<wxString>(cfg.syncCfg.versioningDirectory));
-    setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle,  cfg.syncCfg.versioningStyle);
-
-    ////map single parameter "version limit" to both checkbox and spin ctrl:
-    //m_checkBoxVersionsLimit->SetValue(cfg.syncCfg.versionCountLimit >= 0);
-    //m_spinCtrlVersionsLimit->SetValue(cfg.syncCfg.versionCountLimit >= 0 ? cfg.syncCfg.versionCountLimit : 10 /*SyncConfig().versionCountLimit*/);
-
-    onGuiError = cfg.onGuiError;
-
-    m_comboBoxOnCompletion->setValue(cfg.onCompletion);
-
-    updateGui();
+    m_buttonOkay->SetFocus();
 }
 
 
-SyncCfgDialog::Config SyncCfgDialog::getConfig() const
+void ConfigDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
 {
-    Config output;
+    const int keyCode = event.GetKeyCode();
 
-    //write configuration to main dialog
-    output.syncCfg.directionCfg        = directionCfg;
-    output.syncCfg.handleDeletion      = handleDeletion;
-    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
-    output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle),
-
-                   //get single parameter "version limit" from both checkbox and spin ctrl:
-                   //   output.syncCfg.versionCountLimit   = m_checkBoxVersionsLimit->GetValue() ? m_spinCtrlVersionsLimit->GetValue() : -1;
-
-                   output.onGuiError = onGuiError;
-
-    output.onCompletion = m_comboBoxOnCompletion->getValue();
-    return output;
-}
-
-
-void SyncCfgDialog::updateGui()
-{
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-    wxWindowUpdateLocker dummy2(m_panelVersioning);
-    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
-    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
-    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
-    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
-    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
-    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
-#endif
-
-    const Config cfg = getConfig(); //resolve parameter ownership: some on GUI controls, others member variables
-
-    updateConfigIcons(cfg.syncCfg.directionCfg,
-                      m_bpButtonLeftOnly,
-                      m_bpButtonRightOnly,
-                      m_bpButtonLeftNewer,
-                      m_bpButtonRightNewer,
-                      m_bpButtonDifferent,
-                      m_bpButtonConflict);
-
-    //selecting "detect move files" does not always make sense:
-    m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg));
-    m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg)); //parameter NOT owned by checkbox!
-
-    //display only relevant sync options
-    m_bitmapDatabase     ->Show(cfg.syncCfg.directionCfg.var == DirectionConfig::TWOWAY);
-    sbSizerSyncDirections->Show(cfg.syncCfg.directionCfg.var != DirectionConfig::TWOWAY);
-
-    switch (compareVar_) //sbSizerSyncDirections->Show resets child sizers!
+    switch (keyCode)
     {
-        case CMP_BY_TIME_SIZE:
-            bSizerDifferent ->Show(false);
-            break;
-
-        case CMP_BY_CONTENT:
-            bSizerLeftNewer ->Show(false);
-            bSizerRightNewer->Show(false);
-            break;
+        case WXK_F6:
+            m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::COMPARISON));
+            return; //handled!
+        case WXK_F7:
+            m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::FILTER));
+            return;
+        case WXK_F8:
+            m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
+            return;
     }
-    bSizerConfig->Layout(); //[!]
+
+    event.Skip();
+}
+
+
+void ConfigDialog::OnTimeSizeDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnTimeSize(dummy);
+    OnOkay(dummy);
+}
+
+
+void ConfigDialog::OnContentDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnContent(dummy);
+    OnOkay(dummy);
+}
+
+
+void ConfigDialog::updateCompGui()
+{
+    m_panelComparisonSettings->Enable(m_checkBoxUseLocalCmpOptions->GetValue());
+
+    m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::COMPARISON),
+                             static_cast<int>(m_checkBoxUseLocalCmpOptions->GetValue() ? ConfigTypeImage::COMPARISON : ConfigTypeImage::COMPARISON_GREY));
 
     //update toggle buttons -> they have no parameter-ownership at all!
-    m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
-    m_staticTextMirror   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
-    m_staticTextUpdate   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
-    m_staticTextCustom   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    m_toggleBtnTimeSize->SetValue(false);
+    m_toggleBtnContent ->SetValue(false);
 
-    m_toggleBtnTwoWay->SetValue(false);
-    m_toggleBtnMirror->SetValue(false);
-    m_toggleBtnUpdate->SetValue(false);
-    m_toggleBtnCustom->SetValue(false);
-
-    switch (cfg.syncCfg.directionCfg.var)
-    {
-        case DirectionConfig::TWOWAY:
-            m_toggleBtnTwoWay->SetValue(true);
-            m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-            break;
-        case DirectionConfig::MIRROR:
-            m_toggleBtnMirror->SetValue(true);
-            m_staticTextMirror->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-            break;
-        case DirectionConfig::UPDATE:
-            m_toggleBtnUpdate->SetValue(true);
-            m_staticTextUpdate->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-            break;
-        case DirectionConfig::CUSTOM:
-            m_toggleBtnCustom->SetValue(true);
-            m_staticTextCustom->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-            break;
-    }
-
-    m_toggleBtnPermanent ->SetValue(false);
-    m_toggleBtnRecycler  ->SetValue(false);
-    m_toggleBtnVersioning->SetValue(false);
-    switch (cfg.syncCfg.handleDeletion)
-    {
-        case DELETE_PERMANENTLY:
-            m_toggleBtnPermanent->SetValue(true);
-            break;
-        case DELETE_TO_RECYCLER:
-            m_toggleBtnRecycler->SetValue(true);
-            break;
-        case DELETE_TO_VERSIONING:
-            m_toggleBtnVersioning->SetValue(true);
-            break;
-    }
-
-    const bool versioningSelected = cfg.syncCfg.handleDeletion == DELETE_TO_VERSIONING;
-    m_panelVersioning->Show(versioningSelected);
-
-    if (versioningSelected)
-    {
-        updateTooltipEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
-
-        const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
-        switch (cfg.syncCfg.versioningStyle)
+    if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        switch (localCmpVar)
         {
-            case VER_STYLE_REPLACE:
-                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc");
-                setText(*m_staticTextNamingCvtPart2Bold, L"");
-                setText(*m_staticTextNamingCvtPart3, L"");
+            case CMP_BY_TIME_SIZE:
+                m_toggleBtnTimeSize->SetValue(true);
                 break;
-
-            case VER_STYLE_ADD_TIMESTAMP:
-                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc ");
-                setText(*m_staticTextNamingCvtPart2Bold, _("YYYY-MM-DD hhmmss"));
-                setText(*m_staticTextNamingCvtPart3, L".doc");
+            case CMP_BY_CONTENT:
+                m_toggleBtnContent->SetValue(true);
                 break;
         }
-    }
 
-    //m_spinCtrlVersionsLimit->Enable(m_checkBoxVersionsLimit->GetValue()); //enabled status is *not* directly dependent from resolved config! (but transitively)
-
-    m_toggleBtnErrorIgnore->SetValue(false);
-    m_toggleBtnErrorPopup ->SetValue(false);
-    switch (cfg.onGuiError)
+    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
     {
-        case ON_GUIERROR_IGNORE:
-            m_toggleBtnErrorIgnore->SetValue(true);
-            break;
-        case ON_GUIERROR_POPUP:
-            m_toggleBtnErrorPopup->SetValue(true);
-            break;
-    }
+        if (active &&
+            m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+            bmpCtrl.SetBitmap(bmp);
+        else
+            bmpCtrl.SetBitmap(greyScale(bmp));
+    };
+    setBitmap(*m_bitmapByTime,    localCmpVar == CMP_BY_TIME_SIZE, getResourceImage(L"clock"));
+    setBitmap(*m_bitmapByContent, localCmpVar == CMP_BY_CONTENT,   getResourceImage(L"cmpByContent"));
 
-    Layout();
-    Refresh(); //removes a few artifacts when toggling display of versioning folder
-
-    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    //active variant description:
+    setText(*m_textCtrlCompVarDescription, getCompVariantDescription(localCmpVar));
 }
 
 
-void SyncCfgDialog::OnOkay(wxCommandEvent& event)
+void ConfigDialog::onFilterKeyEvent(wxKeyEvent& event)
 {
-    const Config cfg = getConfig();
+    const int keyCode = event.GetKeyCode();
 
-    //parameter validation:
-
-    //check if user-defined directory for deletion was specified
-    if (cfg.syncCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
-    {
-        Zstring versioningDir = cfg.syncCfg.versioningDirectory;
-        trim(versioningDir);
-        if (versioningDir.empty())
+    if (event.ControlDown())
+        switch (keyCode)
         {
-            showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().setMainInstructions(_("Please enter a target folder for versioning.")));
-            //don't show error icon to follow "Windows' encouraging tone"
-            m_panelVersioning->SetFocus();
-            return;
+            case 'A': //CTRL + A
+                if (auto textCtrl = dynamic_cast<wxTextCtrl*>(event.GetEventObject()))
+                    textCtrl->SetSelection(-1, -1); //select all
+                return;
         }
-    }
-
-    //apply config:
-    outSyncCfg = cfg.syncCfg;
-
-    if (outOptOnGuiError)
-        *outOptOnGuiError = cfg.onGuiError;
-
-    if (outOptOnCompletion)
-    {
-        *outOptOnCompletion->command = cfg.onCompletion;
-        //a good place to commit current "on completion" history item
-        m_comboBoxOnCompletion->addItemHistory();
-    }
-
-    EndModal(ReturnSyncConfig::BUTTON_OKAY);
+    event.Skip();
 }
 
 
-void SyncCfgDialog::OnSyncTwoWayDouble(wxMouseEvent& event)
+void ConfigDialog::setFilter(const FilterConfig& filter)
+{
+    m_textCtrlInclude->ChangeValue(utfCvrtTo<wxString>(filter.includeFilter));
+    m_textCtrlExclude->ChangeValue(utfCvrtTo<wxString>(filter.excludeFilter));
+
+    setEnumVal(enumTimeDescr, *m_choiceUnitTimespan, filter.unitTimeSpan);
+    setEnumVal(enumSizeDescr, *m_choiceUnitMinSize,  filter.unitSizeMin);
+    setEnumVal(enumSizeDescr, *m_choiceUnitMaxSize,  filter.unitSizeMax);
+
+    m_spinCtrlTimespan->SetValue(static_cast<int>(filter.timeSpan));
+    m_spinCtrlMinSize ->SetValue(static_cast<int>(filter.sizeMin));
+    m_spinCtrlMaxSize ->SetValue(static_cast<int>(filter.sizeMax));
+
+    updateFilterGui();
+}
+
+
+FilterConfig ConfigDialog::getFilter() const
+{
+    return FilterConfig(utfCvrtTo<Zstring>(m_textCtrlInclude->GetValue()),
+                        utfCvrtTo<Zstring>(m_textCtrlExclude->GetValue()),
+                        m_spinCtrlTimespan->GetValue(),
+                        getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
+                        m_spinCtrlMinSize->GetValue(),
+                        getEnumVal(enumSizeDescr, *m_choiceUnitMinSize),
+                        m_spinCtrlMaxSize->GetValue(),
+                        getEnumVal(enumSizeDescr, *m_choiceUnitMaxSize));
+}
+
+
+void ConfigDialog::updateFilterGui()
+{
+    const FilterConfig activeCfg = getFilter();
+
+    m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::FILTER),
+                             static_cast<int>(!isNullFilter(activeCfg) ? ConfigTypeImage::FILTER: ConfigTypeImage::FILTER_GREY));
+
+    auto setStatusBitmap = [&](wxStaticBitmap& staticBmp, const wxString& bmpName, bool active)
+    {
+        if (active)
+            staticBmp.SetBitmap(getResourceImage(bmpName));
+        else
+            staticBmp.SetBitmap(greyScale(getResourceImage(bmpName)));
+    };
+    setStatusBitmap(*m_bitmapInclude,    L"filter_include", !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter));
+    setStatusBitmap(*m_bitmapExclude,    L"filter_exclude", !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter));
+    setStatusBitmap(*m_bitmapFilterDate, L"clock", activeCfg.unitTimeSpan != UTIME_NONE);
+    setStatusBitmap(*m_bitmapFilterSize, L"size",  activeCfg.unitSizeMin  != USIZE_NONE || activeCfg.unitSizeMax != USIZE_NONE);
+
+    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
+    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
+    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
+
+    m_buttonReset->Enable(!(activeCfg == FilterConfig()));
+}
+
+
+void ConfigDialog::OnSyncTwoWayDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncTwoWay(dummy);
     OnOkay(dummy);
 }
 
-void SyncCfgDialog::OnSyncMirrorDouble(wxMouseEvent& event)
+
+void ConfigDialog::OnSyncMirrorDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncMirror(dummy);
     OnOkay(dummy);
 }
 
-void SyncCfgDialog::OnSyncUpdateDouble(wxMouseEvent& event)
+
+void ConfigDialog::OnSyncUpdateDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncUpdate(dummy);
     OnOkay(dummy);
 }
 
-void SyncCfgDialog::OnSyncCustomDouble(wxMouseEvent& event)
+
+void ConfigDialog::OnSyncCustomDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
     OnSyncCustom(dummy);
     OnOkay(dummy);
 }
 
-namespace
-{
+
 void toggleSyncDirection(SyncDirection& current)
 {
     switch (current)
@@ -542,7 +555,7 @@ void toggleSyncDirection(SyncDirection& current)
 }
 
 
-void pressCustomDir(DirectionConfig& directionCfg, SyncDirection& syncdir)
+void toggleSyncConfig(DirectionConfig& directionCfg, SyncDirection& custSyncdir)
 {
     switch (directionCfg.var)
     {
@@ -553,90 +566,389 @@ void pressCustomDir(DirectionConfig& directionCfg, SyncDirection& syncdir)
         case DirectionConfig::UPDATE:
             directionCfg.custom = extractDirections(directionCfg);
             directionCfg.var = DirectionConfig::CUSTOM;
-            toggleSyncDirection(syncdir);
+            toggleSyncDirection(custSyncdir);
             break;
         case DirectionConfig::CUSTOM:
-            toggleSyncDirection(syncdir);
+            toggleSyncDirection(custSyncdir);
 
             //some config optimization: if custom settings happen to match "mirror" or "update", just switch variant
-            const DirectionSet setMirror = []
+            const DirectionSet mirrorSet = []
             {
                 DirectionConfig mirrorCfg;
                 mirrorCfg.var = DirectionConfig::MIRROR;
                 return extractDirections(mirrorCfg);
             }();
 
-            const DirectionSet setUpdate = []
+            const DirectionSet updateSet = []
             {
                 DirectionConfig updateCfg;
                 updateCfg.var = DirectionConfig::UPDATE;
                 return extractDirections(updateCfg);
             }();
 
-            const DirectionSet currentSet = extractDirections(directionCfg);
-            if (currentSet == setMirror)
+            if (directionCfg.custom == mirrorSet)
                 directionCfg.var = DirectionConfig::MIRROR;
-            else if (currentSet == setUpdate)
+            else if (directionCfg.custom == updateSet)
                 directionCfg.var = DirectionConfig::UPDATE;
             break;
     }
 }
-}
 
-void SyncCfgDialog::OnExLeftSideOnly(wxCommandEvent& event )
+
+void ConfigDialog::OnExLeftSideOnly(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.exLeftSideOnly);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.exLeftSideOnly);
+    updateSyncGui();
 }
 
 
-void SyncCfgDialog::OnExRightSideOnly(wxCommandEvent& event )
+void ConfigDialog::OnExRightSideOnly(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.exRightSideOnly);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.exRightSideOnly);
+    updateSyncGui();
 }
 
 
-void SyncCfgDialog::OnLeftNewer(wxCommandEvent& event )
+void ConfigDialog::OnLeftNewer(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.leftNewer);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.leftNewer);
+    updateSyncGui();
 }
 
 
-void SyncCfgDialog::OnRightNewer(wxCommandEvent& event )
+void ConfigDialog::OnRightNewer(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.rightNewer);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.rightNewer);
+    updateSyncGui();
 }
 
 
-void SyncCfgDialog::OnDifferent(wxCommandEvent& event )
+void ConfigDialog::OnDifferent(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.different);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.different);
+    updateSyncGui();
 }
 
 
-void SyncCfgDialog::OnConflict(wxCommandEvent& event)
+void ConfigDialog::OnConflict(wxCommandEvent& event)
 {
-    pressCustomDir(directionCfg, directionCfg.custom.conflict);
-    updateGui();
+    toggleSyncConfig(directionCfg, directionCfg.custom.conflict);
+    updateSyncGui();
 }
 
+
+void updateSyncDirectionIcons(const DirectionConfig& directionCfg,
+                              wxBitmapButton& buttonLeftOnly,
+                              wxBitmapButton& buttonRightOnly,
+                              wxBitmapButton& buttonLeftNewer,
+                              wxBitmapButton& buttonRightNewer,
+                              wxBitmapButton& buttonDifferent,
+                              wxBitmapButton& buttonConflict)
+{
+    if (directionCfg.var != DirectionConfig::TWOWAY) //automatic mode needs no sync-directions
+    {
+        auto updateButton = [](wxBitmapButton& button, SyncDirection dir,
+                               const wchar_t* imgNameLeft, const wchar_t* imgNameNone, const wchar_t* imgNameRight,
+                               SyncOperation opLeft, SyncOperation opNone, SyncOperation opRight)
+        {
+            switch (dir)
+            {
+                case SyncDirection::LEFT:
+                    button.SetBitmapLabel(mirrorIfRtl(getResourceImage(imgNameLeft)));
+                    button.SetToolTip(getSyncOpDescription(opLeft));
+                    break;
+                case SyncDirection::NONE:
+                    button.SetBitmapLabel(mirrorIfRtl(getResourceImage(imgNameNone)));
+                    button.SetToolTip(getSyncOpDescription(opNone));
+                    break;
+                case SyncDirection::RIGHT:
+                    button.SetBitmapLabel(mirrorIfRtl(getResourceImage(imgNameRight)));
+                    button.SetToolTip(getSyncOpDescription(opRight));
+                    break;
+            }
+        };
+
+        const DirectionSet dirCfg = extractDirections(directionCfg);
+
+        updateButton(buttonLeftOnly  , dirCfg.exLeftSideOnly , L"so_delete_left", L"so_none", L"so_create_right", SO_DELETE_LEFT    , SO_DO_NOTHING, SO_CREATE_NEW_RIGHT);
+        updateButton(buttonRightOnly , dirCfg.exRightSideOnly, L"so_create_left", L"so_none", L"so_delete_right", SO_CREATE_NEW_LEFT, SO_DO_NOTHING, SO_DELETE_RIGHT    );
+        updateButton(buttonLeftNewer , dirCfg.leftNewer      , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+        updateButton(buttonRightNewer, dirCfg.rightNewer     , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+        updateButton(buttonDifferent , dirCfg.different      , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+
+        switch (dirCfg.conflict)
+        {
+            case SyncDirection::LEFT:
+                buttonConflict.SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
+                buttonConflict.SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
+                break;
+            case SyncDirection::NONE:
+                buttonConflict.SetBitmapLabel(mirrorIfRtl(getResourceImage(L"cat_conflict"))); //silent dependency from algorithm.cpp::Redetermine!!!
+                buttonConflict.SetToolTip(_("Leave as unresolved conflict"));
+                break;
+            case SyncDirection::RIGHT:
+                buttonConflict.SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
+                buttonConflict.SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
+                break;
+        }
+    }
+}
+
+
+void ConfigDialog::setSyncOptions(const SyncOptions& so)
+{
+    directionCfg   = so.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
+    handleDeletion = so.syncCfg.handleDeletion;
+
+    versioningFolder.setName(utfCvrtTo<wxString>(so.syncCfg.versioningDirectory));
+    setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle, so.syncCfg.versioningStyle);
+
+    //misc config
+    onGuiError = so.onGuiError;
+    m_comboBoxOnCompletion->setValue(so.onCompletion);
+
+    updateSyncGui();
+}
+
+
+ConfigDialog::SyncOptions ConfigDialog::getSyncOptions() const
+{
+    SyncOptions output;
+
+    output.syncCfg.directionCfg        = directionCfg;
+    output.syncCfg.handleDeletion      = handleDeletion;
+    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
+    output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+
+    output.onGuiError = onGuiError;
+    output.onCompletion = m_comboBoxOnCompletion->getValue();
+
+    return output;
+}
+
+
+void ConfigDialog::updateSyncGui()
+{
+#ifdef ZEN_WIN
+    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
+    wxWindowUpdateLocker dummy2(m_panelVersioning);
+    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
+    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
+    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
+    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
+    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
+    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
+#endif
+
+    m_panelSyncSettings->Enable(m_checkBoxUseLocalSyncOptions->GetValue());
+
+    m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::SYNC),
+                             static_cast<int>(m_checkBoxUseLocalSyncOptions->GetValue() ? ConfigTypeImage::SYNC: ConfigTypeImage::SYNC_GREY));
+
+    const SyncOptions so = getSyncOptions(); //resolve parameter ownership: some on GUI controls, others member variables
+
+    updateSyncDirectionIcons(so.syncCfg.directionCfg,
+                             *m_bpButtonLeftOnly,
+                             *m_bpButtonRightOnly,
+                             *m_bpButtonLeftNewer,
+                             *m_bpButtonRightNewer,
+                             *m_bpButtonDifferent,
+                             *m_bpButtonConflict);
+
+    //selecting "detect move files" does not always make sense:
+    m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg));
+    m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg)); //parameter NOT owned by checkbox!
+
+    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
+    {
+        if (active &&
+            m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+            bmpCtrl.SetBitmap(bmp);
+        else
+            bmpCtrl.SetBitmap(greyScale(bmp));
+    };
+
+    //display only relevant sync options
+    m_bitmapDatabase     ->Show(so.syncCfg.directionCfg.var == DirectionConfig::TWOWAY);
+    fgSizerSyncDirections->Show(so.syncCfg.directionCfg.var != DirectionConfig::TWOWAY);
+
+    if (so.syncCfg.directionCfg.var == DirectionConfig::TWOWAY)
+		setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
+	else
+    {
+        const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ?  localCmpVar : globalCmpVar_;
+
+        m_bitmapDifferent  ->Show(activeCmpVar != CMP_BY_TIME_SIZE);
+        m_bpButtonDifferent->Show(activeCmpVar != CMP_BY_TIME_SIZE);
+
+        m_bitmapLeftNewer   ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+        m_bpButtonLeftNewer ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+        m_bitmapRightNewer  ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+        m_bpButtonRightNewer->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+    }
+
+    //active variant description:
+    setText(*m_textCtrlSyncVarDescription, getSyncVariantDescription(so.syncCfg.directionCfg.var));
+
+    //update toggle buttons -> they have no parameter-ownership at all!
+    m_toggleBtnTwoWay->SetValue(false);
+    m_toggleBtnMirror->SetValue(false);
+    m_toggleBtnUpdate->SetValue(false);
+    m_toggleBtnCustom->SetValue(false);
+
+    if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        switch (so.syncCfg.directionCfg.var)
+        {
+            case DirectionConfig::TWOWAY:
+                m_toggleBtnTwoWay->SetValue(true);
+                break;
+            case DirectionConfig::MIRROR:
+                m_toggleBtnMirror->SetValue(true);
+                break;
+            case DirectionConfig::UPDATE:
+                m_toggleBtnUpdate->SetValue(true);
+                break;
+            case DirectionConfig::CUSTOM:
+                m_toggleBtnCustom->SetValue(true);
+                break;
+        }
+
+    m_toggleBtnPermanent ->SetValue(false);
+    m_toggleBtnRecycler  ->SetValue(false);
+    m_toggleBtnVersioning->SetValue(false);
+
+    if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        switch (so.syncCfg.handleDeletion)
+        {
+            case DELETE_PERMANENTLY:
+                m_toggleBtnPermanent->SetValue(true);
+                break;
+            case DELETE_TO_RECYCLER:
+                m_toggleBtnRecycler->SetValue(true);
+                break;
+            case DELETE_TO_VERSIONING:
+                m_toggleBtnVersioning->SetValue(true);
+                break;
+        }
+
+    const bool versioningSelected = so.syncCfg.handleDeletion == DELETE_TO_VERSIONING;
+    m_panelVersioning->Show(versioningSelected);
+
+    if (versioningSelected)
+    {
+        updateTooltipEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+
+        const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
+        switch (so.syncCfg.versioningStyle)
+        {
+            case VER_STYLE_REPLACE:
+                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc");
+                setText(*m_staticTextNamingCvtPart2Bold, L"");
+                setText(*m_staticTextNamingCvtPart3, L"");
+                break;
+
+            case VER_STYLE_ADD_TIMESTAMP:
+                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc ");
+                setText(*m_staticTextNamingCvtPart2Bold, _("YYYY-MM-DD hhmmss"));
+                setText(*m_staticTextNamingCvtPart3, L".doc");
+                break;
+        }
+    }
+
+    m_toggleBtnErrorIgnore->SetValue(false);
+    m_toggleBtnErrorPopup ->SetValue(false);
+
+    switch (so.onGuiError)
+    {
+        case ON_GUIERROR_IGNORE:
+            m_toggleBtnErrorIgnore->SetValue(true);
+            break;
+        case ON_GUIERROR_POPUP:
+            m_toggleBtnErrorPopup->SetValue(true);
+            break;
+    }
+
+    m_panelSyncSettings->Layout();
+    //Layout();
+    //Refresh(); //removes a few artifacts when toggling display of versioning folder
+
+    //GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+}
+
+
+void ConfigDialog::OnOkay(wxCommandEvent& event)
+{
+    const SyncOptions so = getSyncOptions();
+
+    //------- parameter validation (BEFORE writing output!) -------
+
+    //check if user-defined directory for deletion was specified:
+    if (m_checkBoxUseLocalSyncOptions->GetValue() &&
+        so.syncCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
+    {
+        Zstring versioningDir = so.syncCfg.versioningDirectory;
+        trim(versioningDir);
+        if (versioningDir.empty())
+        {
+            m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
+            showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().setMainInstructions(_("Please enter a target folder for versioning.")));
+            //don't show error icon to follow "Windows' encouraging tone"
+            m_panelVersioning->SetFocus();
+            return;
+        }
+    }
+
+    //------------- comparison panel ----------------------
+    if (useAlternateCmpCfgOptOut)
+        *useAlternateCmpCfgOptOut = m_checkBoxUseLocalCmpOptions->GetValue();
+
+    cmpCfgOut.compareVar = localCmpVar;
+    cmpCfgOut.handleSymlinks = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
+
+    //------------- filter panel --------------------------
+    FilterConfig filterCfg = getFilter();
+
+    //parameter correction: include filter must not be empty!
+    {
+        Zstring tmp = filterCfg.includeFilter;
+        trim(tmp);
+        if (tmp.empty())
+            filterCfg.includeFilter = FilterConfig().includeFilter; //no need to show error message, just correct user input
+    }
+    filterCfgOut = filterCfg;
+
+    //------------- synchronization panel -----------------
+    if (useAlternateSyncCfgOptOut)
+        *useAlternateSyncCfgOptOut = m_checkBoxUseLocalSyncOptions->GetValue();
+
+    syncCfgOut = so.syncCfg;
+
+    if (miscCfgOut)
+    {
+        miscCfgOut->handleError         = so.onGuiError;
+        miscCfgOut->onCompletionCommand = so.onCompletion;
+        //a good place to commit current "on completion" history item
+        m_comboBoxOnCompletion->addItemHistory();
+    }
+
+    EndModal(ReturnSyncConfig::BUTTON_OKAY);
+}
+}
+
+//########################################################################################
 
 ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
-                                                       CompareVariant compareVar,
-                                                       SyncConfig&    syncCfg,
-                                                       const wxString& title,
-                                                       xmlAccess::OnGuiError* handleError,    //
-                                                       OnCompletionCfg* onCompletion) //optional input parameter
+                                                       SyncConfigPanel panelToShow,
+                                                       bool* useAlternateCmpCfg,  //optional parameter
+                                                       CompConfig&   cmpCfg,
+                                                       FilterConfig& filterCfg,
+                                                       bool* useAlternateSyncCfg,  //
+                                                       SyncConfig&   syncCfg,
+                                                       CompareVariant globalCmpVar,
+                                                       MiscGlobalCfg* miscCfg, //
+                                                       const wxString& title)
 {
-    SyncCfgDialog syncDlg(parent,
-                          compareVar,
-                          syncCfg,
-                          title,
-                          handleError,
-                          onCompletion);
+    ConfigDialog syncDlg(parent, panelToShow, useAlternateCmpCfg, cmpCfg, filterCfg, useAlternateSyncCfg, syncCfg, globalCmpVar, miscCfg, title);
     return static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
 }

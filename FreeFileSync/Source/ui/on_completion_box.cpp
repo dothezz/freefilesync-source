@@ -188,7 +188,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     }
 
     //this->Clear(); -> NO! emits yet another wxEVT_COMMAND_TEXT_UPDATED!!!
-	wxItemContainer::Clear(); //suffices to clear the selection items only!
+    wxItemContainer::Clear(); //suffices to clear the selection items only!
 
     for (const std::wstring& item : items)
         this->Append(item);

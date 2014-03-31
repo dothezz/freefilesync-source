@@ -38,9 +38,9 @@ public:
         refreshButtons();
     }
 
-    AltCompCfgPtr getAltCompConfig() const { return altCompConfig; }
-    AltSyncCfgPtr getAltSyncConfig() const { return altSyncConfig; }
-    FilterConfig getAltFilterConfig() const { return localFilter; }
+    AltCompCfgPtr getAltCompConfig  () const { return altCompConfig; }
+    AltSyncCfgPtr getAltSyncConfig  () const { return altSyncConfig; }
+    FilterConfig  getAltFilterConfig() const { return localFilter;   }
 
 
     FolderPairPanelBasic(GuiPanel& basicPanel) : //takes reference on basic panel to be enhanced
@@ -162,49 +162,52 @@ private:
     virtual void onAltSyncCfgChange() = 0;
     virtual void onLocalFilterCfgChange() = 0;
 
-    void OnAltCompCfg(wxCommandEvent& event)
+    void OnAltCompCfg    (wxCommandEvent& event) { showConfigDialog(SyncConfigPanel::COMPARISON); }
+    void OnLocalFilterCfg(wxCommandEvent& event) { showConfigDialog(SyncConfigPanel::FILTER    ); }
+    void OnAltSyncCfg    (wxCommandEvent& event) { showConfigDialog(SyncConfigPanel::SYNC      ); }
+
+    void showConfigDialog(SyncConfigPanel panelToShow)
     {
         const MainConfiguration mainCfg = getMainConfig();
 
-        CompConfig cmpCfg = altCompConfig.get() ? *altCompConfig : mainCfg.cmpConfig;
-
-        if (showCompareCfgDialog(getParentWindow(), cmpCfg, _("Alternate Comparison Settings")) == ReturnSmallDlg::BUTTON_OKAY)
-        {
-            altCompConfig = std::make_shared<CompConfig>(cmpCfg);
-            refreshButtons();
-            onAltCompCfgChange();
-        }
-    }
-
-    void OnAltSyncCfg(wxCommandEvent& event)
-    {
-        const MainConfiguration mainCfg = getMainConfig();
-
+        bool useAlternateCmpCfg  = altCompConfig.get() != nullptr;
+        bool useAlternateSyncCfg = altSyncConfig.get() != nullptr;
         CompConfig cmpCfg  = altCompConfig.get() ? *altCompConfig : mainCfg.cmpConfig;
         SyncConfig syncCfg = altSyncConfig.get() ? *altSyncConfig : mainCfg.syncCfg;
 
+        const bool useAlternateCmpCfgOld  = useAlternateCmpCfg;
+        const bool useAlternateSyncCfgOld = useAlternateSyncCfg;
+        const CompConfig   cmpCfgOld    = cmpCfg;
+        const FilterConfig filterCfgOld = localFilter;
+        const SyncConfig   syncCfgOld   = syncCfg;
+
         if (showSyncConfigDlg(getParentWindow(),
-                              cmpCfg.compareVar,
+                              panelToShow,
+                              &useAlternateCmpCfg,
+                              cmpCfg,
+                              localFilter,
+                              &useAlternateSyncCfg,
                               syncCfg,
-                              _("Alternate Synchronization Settings"),
+                              mainCfg.cmpConfig.compareVar,
                               nullptr,
-                              nullptr) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
+                              _("Local Synchronization Settings")) == ReturnSyncConfig::BUTTON_OKAY)
         {
-            altSyncConfig = std::make_shared<SyncConfig>(syncCfg);
-            refreshButtons();
-            onAltSyncCfgChange();
-        }
-    }
+            if (!(cmpCfg == cmpCfgOld) || useAlternateCmpCfg != useAlternateCmpCfgOld)
+            {
+                altCompConfig = useAlternateCmpCfg ? std::make_shared<CompConfig>(cmpCfg) : nullptr;
+                onAltCompCfgChange();
+            }
 
-    void OnLocalFilterCfg(wxCommandEvent& event)
-    {
-        FilterConfig localFiltTmp = localFilter;
+            if (!(localFilter == filterCfgOld))
+                onLocalFilterCfgChange();
 
-        if (showFilterDialog(getParentWindow(), localFiltTmp, _("Local Filter")) == ReturnSmallDlg::BUTTON_OKAY)
-        {
-            localFilter = localFiltTmp;
+            if (!(syncCfg == syncCfgOld) || useAlternateSyncCfg != useAlternateSyncCfgOld)
+            {
+                altSyncConfig = useAlternateSyncCfg ? std::make_shared<SyncConfig>(syncCfg) : nullptr;
+                onAltSyncCfgChange();
+            }
+
             refreshButtons();
-            onLocalFilterCfgChange();
         }
     }
 

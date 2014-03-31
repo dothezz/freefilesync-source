@@ -434,7 +434,7 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
             -> this naming convention is too cute and confusing for end users:
 
             //1. generate random directory name
-            static std::mt19937 rng(std::time(nullptr)); //don't use std::default_random_engine and leave the choice to the STL implementer!
+            static std::mt19937 rng(std::time(nullptr)); //don't use std::default_random_engine which leaves the choice to the STL implementer!
             //- the alternative std::random_device may not always be available and can even throw an exception!
             //- seed with second precision is sufficient: collisions are handled below
 
@@ -1346,10 +1346,18 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation 
             }
             catch (FileError&)
             {
-                if (somethingExists(fileObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
+                warn_static("still an error if base dir is missing!")
+                //	const Zstring basedir = beforeLast(fileObj.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
+                //if (!dirExists(basedir) ||
+
+
+                if (!somethingExists(fileObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
+                {
+                    //source deleted meanwhile...nothing was done (logical point of view!)
+                    fileObj.removeObject<sideSrc>(); //remove only *after* evaluating "fileObj, sideSrc"!
+                }
+                else
                     throw;
-                //source deleted meanwhile...nothing was done (logical point of view!)
-                fileObj.removeObject<sideSrc>(); //remove only *after* evaluating "fileObj, sideSrc"!
             }
             statReporter.reportFinished();
         }
@@ -1542,6 +1550,8 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& linkObj, SyncOperati
             }
             catch (FileError&)
             {
+                warn_static("still an error if base dir is missing!")
+
                 if (somethingExists(linkObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
                     throw;
                 //source deleted meanwhile...nothing was done (logical point of view!)
@@ -1679,6 +1689,8 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirPair& dirObj, SyncOperation 
             }
             else //source deleted meanwhile...nothing was done (logical point of view!) -> uh....what about a temporary network drop???
             {
+                warn_static("still an error if base dir is missing!")
+
                 const SyncStatistics subStats(dirObj);
                 procCallback_.updateTotalData(-getCUD(subStats) - 1, -subStats.getDataToProcess());
 

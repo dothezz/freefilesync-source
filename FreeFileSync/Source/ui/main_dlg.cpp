@@ -24,11 +24,11 @@
 #include <wx+/no_flicker.h>
 #include <wx+/rtl.h>
 #include <wx+/font_size.h>
+#include <wx+/key_event.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "check_version.h"
 #include "gui_status_handler.h"
-#include "sync_cfg.h"
 #include "small_dlgs.h"
 #include "progress_indicator.h"
 #include "folder_pair.h"
@@ -95,7 +95,7 @@ public:
         DirectoryName(dropWindow1, dirSelectButton, dirName, &staticText, &dropGrid.getMainWin()),
         mainDlg_(mainDlg) {}
 
-    virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd)
+    virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) override
     {
         if (std::any_of(droppedFiles.begin(), droppedFiles.end(), [](const wxString& filename)
     {
@@ -156,13 +156,13 @@ public:
         mainDlg(mainDialog) {}
 
 private:
-    virtual MainConfiguration getMainConfig() const { return mainDlg.getConfig().mainCfg; }
-    virtual wxWindow* getParentWindow() { return &mainDlg; }
-    virtual std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() { return mainDlg.filterCfgOnClipboard; }
+    virtual MainConfiguration getMainConfig() const override { return mainDlg.getConfig().mainCfg; }
+    virtual wxWindow* getParentWindow() override { return &mainDlg; }
+    virtual std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() override { return mainDlg.filterCfgOnClipboard; }
 
-    virtual void onAltCompCfgChange    () { mainDlg.applyCompareConfig(); }
-    virtual void onAltSyncCfgChange    () { mainDlg.applySyncConfig(); }
-    virtual void onLocalFilterCfgChange() { mainDlg.applyFilterConfig(); } //re-apply filter
+    virtual void onAltCompCfgChange    () override { mainDlg.applyCompareConfig(); }
+    virtual void onAltSyncCfgChange    () override { mainDlg.applySyncConfig(); }
+    virtual void onLocalFilterCfgChange() override { mainDlg.applyFilterConfig(); } //re-apply filter
 
     MainDialog& mainDlg;
 };
@@ -261,7 +261,7 @@ public:
         MouseMoveWindow(mainDlg, false), //don't include main dialog itself, thereby prevent various mouse capture lost issues
         mainDlg_(mainDlg) {}
 
-    virtual bool allowMove(const wxMouseEvent& event)
+    virtual bool allowMove(const wxMouseEvent& event) override
     {
         if (wxPanel* panel = dynamic_cast<wxPanel*>(event.GetEventObject()))
         {
@@ -343,32 +343,34 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
 
 //##################################################################################################################################
 
-xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on errors!
+xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFile) //blocks on GUI on errors!
 {
     using namespace xmlAccess;
     XmlGlobalSettings globalCfg;
 
-    if (fileExists(getGlobalConfigFile())) //else: globalCfg already has default values
-        try
-        {
-            std::wstring warningMsg;
-            readConfig(getGlobalConfigFile(), globalCfg, warningMsg); //throw FileError
+    try
+    {
+        std::wstring warningMsg;
+        readConfig(globalConfigFile, globalCfg, warningMsg); //throw FileError
 
-            assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
-        }
-        catch (const FileError& e)
-        {
-            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
-        }
+        assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+    }
+    catch (const FileError& e)
+    {
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
+    }
     return globalCfg;
 }
 }
 
 
-void MainDialog::create()
+void MainDialog::create(const Zstring& globalConfigFile)
 {
     using namespace xmlAccess;
-    const XmlGlobalSettings globalSettings = retrieveGlobalCfgFromDisk();
+
+    XmlGlobalSettings globalSettings;
+    if (fileExists(globalConfigFile)) //else: globalCfg already has default values
+        globalSettings = loadGlobalConfig(globalConfigFile);
 
     std::vector<Zstring> filenames = globalSettings.gui.lastUsedConfigFiles; //2. now try last used files
 
@@ -420,16 +422,23 @@ void MainDialog::create()
 
     //------------------------------------------------------------------------------------------
 
-    create(guiCfg, filenames, &globalSettings, false);
+    create(globalConfigFile, &globalSettings, guiCfg, filenames, false);
 }
 
 
-void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
-                        const std::vector<Zstring>& referenceFiles,
+void MainDialog::create(const Zstring& globalConfigFile,
                         const xmlAccess::XmlGlobalSettings* globalSettings,
+                        const xmlAccess::XmlGuiConfig& guiCfg,
+                        const std::vector<Zstring>& referenceFiles,
                         bool startComparison)
 {
-    const xmlAccess::XmlGlobalSettings& globSett = globalSettings ? *globalSettings : retrieveGlobalCfgFromDisk();
+    xmlAccess::XmlGlobalSettings globSett;
+    if (globalSettings)
+        globSett = *globalSettings;
+    else if (fileExists(globalConfigFile))
+        globSett = loadGlobalConfig(globalConfigFile);
+    //else: globalCfg already has default values
+
     try
     {
         //we need to set language *before* creating MainDialog!
@@ -441,7 +450,7 @@ void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
         //continue!
     }
 
-    MainDialog* frame = new MainDialog(guiCfg, referenceFiles, globSett, startComparison);
+    MainDialog* frame = new MainDialog(globalConfigFile, guiCfg, referenceFiles, globSett, startComparison);
     frame->Show();
 #ifdef ZEN_MAC
     ProcessSerialNumber psn = { 0, kCurrentProcess };
@@ -452,11 +461,13 @@ void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
 }
 
 
-MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+MainDialog::MainDialog(const Zstring& globalConfigFile,
+                       const xmlAccess::XmlGuiConfig& guiCfg,
                        const std::vector<Zstring>& referenceFiles,
                        const xmlAccess::XmlGlobalSettings& globalSettings,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
+    globalConfigFile_(globalConfigFile),
     folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
     folderHistoryRight(std::make_shared<FolderHistory>()), //
     focusWindowAfterSearch(nullptr)
@@ -580,7 +591,6 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     treeDataView = std::make_shared<TreeView>();
 
     cleanedUp = false;
-    processingGlobalKeyEvent = false;
 
 #ifdef ZEN_WIN
     new PanelMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere... //ownership passed to "this"
@@ -592,6 +602,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
     m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
     m_bpButtonOpen      ->SetBitmapLabel(getResourceImage(L"load"));
+    m_bpButtonSaveAs    ->SetBitmapLabel(getResourceImage(L"sync"));
     m_bpButtonBatchJob  ->SetBitmapLabel(getResourceImage(L"batch"));
     m_bpButtonAddPair   ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonHideSearch->SetBitmapLabel(getResourceImage(L"close_panel"));
@@ -673,9 +684,8 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
     m_gridNavi->getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onTreeButtonEvent), nullptr, this);
 
-    //register global hotkeys (without explicit menu entry)
-    wxTheApp->Connect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
-    wxTheApp->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this); //capture direction keys
+    //enable dialog-specific key local events
+    setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
 
     //drag & drop on navi panel
     setupFileDrop(*m_gridNavi);
@@ -768,7 +778,7 @@ MainDialog::~MainDialog()
 
     try //save "GlobalSettings.xml"
     {
-        writeConfig(getGlobalCfgBeforeExit(), getGlobalConfigFile()); //throw FileError
+        writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -781,10 +791,6 @@ MainDialog::~MainDialog()
     }
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
     catch (const FileError&) {}
-
-    //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
-    wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
-    wxTheApp->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
 
 #ifdef ZEN_MAC
     //more (non-portable) wxWidgets crap: wxListBox leaks wxClientData, both of the following functions fail to clean up:
@@ -805,7 +811,7 @@ void MainDialog::onQueryEndSession()
 {
     using namespace xmlAccess;
 
-    try { writeConfig(getGlobalCfgBeforeExit(), getGlobalConfigFile()); }
+    try { writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); }
     catch (const FileError&) {}   //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
 
     try { writeConfig(getConfig(), lastRunConfigName()); }
@@ -1135,7 +1141,7 @@ public:
         mainDlg.enableAllElements();
     }
 
-    virtual Response reportError(const std::wstring& msg)
+    virtual Response reportError(const std::wstring& msg) override
     {
         if (ignoreErrors)
             return DeleteFilesHandler::IGNORE_ERROR;
@@ -1162,7 +1168,7 @@ public:
         return DeleteFilesHandler::IGNORE_ERROR; //dummy return value
     }
 
-    virtual void reportWarning(const std::wstring& msg, bool& warningActive)
+    virtual void reportWarning(const std::wstring& msg, bool& warningActive) override
     {
         if (!warningActive || ignoreErrors)
             return;
@@ -1181,14 +1187,14 @@ public:
         }
     }
 
-    virtual void reportStatus (const std::wstring& msg)
+    virtual void reportStatus (const std::wstring& msg) override
     {
         statusMsg = msg;
         requestUiRefresh();
     }
 
 private:
-    virtual void requestUiRefresh()
+    void requestUiRefresh()
     {
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
             forceUiRefresh();
@@ -1810,35 +1816,8 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
 }
 
 
-//pretty much the same like "bool wxWindowBase::IsDescendant(wxWindowBase* child) const" but without the obvious misnaming
-bool isComponentOf(const wxWindow* child, const wxWindow* top)
+void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
 {
-    for (const wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
-        if (wnd == top)
-            return true;
-    return false;
-}
-
-
-void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
-{
-    const wxWindow* focus = wxWindow::FindFocus();
-
-    //avoid recursion!!! -> this ugly construct seems to be the only (portable) way to avoid re-entrancy
-    //recursion may happen in multiple situations: e.g. modal dialogs, Grid::ProcessEvent()!
-    if (processingGlobalKeyEvent  ||
-        !isComponentOf(focus, this) ||
-        !IsEnabled() || //only handle if main window is in use and no modal dialog is shown:
-        !IsActive())    //thanks to wxWidgets non-portability we need both checks:
-        //IsEnabled() is sufficient for Windows, IsActive() is needed on OS X since it does NOT disable the parent when showing a modal dialog
-    {
-        event.Skip();
-        return;
-    }
-    processingGlobalKeyEvent = true;
-    ZEN_ON_SCOPE_EXIT(processingGlobalKeyEvent = false;)
-    //----------------------------------------------------
-
     const int keyCode = event.GetKeyCode();
 
     //CTRL + X
@@ -1903,6 +1882,8 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
         case WXK_NUMPAD_PAGEDOWN:
         case WXK_NUMPAD_HOME:
         case WXK_NUMPAD_END:
+        {
+            const wxWindow* focus = wxWindow::FindFocus();
             if (!isComponentOf(focus, m_gridMainL     ) && //
                 !isComponentOf(focus, m_gridMainC     ) && //don't propagate keyboard commands if grid is already in focus
                 !isComponentOf(focus, m_gridMainR     ) && //
@@ -1922,7 +1903,8 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
                     event.Skip(false); //definitively handled now!
                     return;
                 }
-            break;
+        }
+        break;
     }
 
     event.Skip();
@@ -2456,7 +2438,7 @@ void MainDialog::OnCompSettingsContext(wxMouseEvent& event)
     auto setVariant = [&](CompareVariant var)
     {
         currentCfg.mainCfg.cmpConfig.compareVar = var;
-        applyCompareConfig(true); //true: switchMiddleGrid
+        applyCompareConfig(true); //true: setDefaultViewType
     };
 
     auto currentVar = getConfig().mainCfg.cmpConfig.compareVar;
@@ -3263,15 +3245,44 @@ void MainDialog::updateGuiDelayedIf(bool condition)
 }
 
 
-void MainDialog::OnConfigureFilter(wxCommandEvent& event)
+void MainDialog::showConfigDialog(SyncConfigPanel panelToShow)
 {
-    if (showFilterDialog(this, currentCfg.mainCfg.globalFilter, _("Filter")) == ReturnSmallDlg::BUTTON_OKAY)
-    {
-        updateGlobalFilterButton(); //refresh global filter icon
-        applyFilterConfig();  //re-apply filter
-    }
+    const CompConfig   cmpCfgOld    = currentCfg.mainCfg.cmpConfig;
+    const FilterConfig filterCfgOld = currentCfg.mainCfg.globalFilter;
+    const SyncConfig   syncCfgOld   = currentCfg.mainCfg.syncCfg;
 
-    //event.Skip()
+    MiscGlobalCfg miscCfg =
+    {
+        currentCfg.handleError,
+
+        currentCfg.mainCfg.onCompletion,
+        globalCfg.gui.onCompletionHistory,
+        globalCfg.gui.onCompletionHistoryMax
+    };
+
+    if (showSyncConfigDlg(this,
+                          panelToShow,
+                          nullptr,
+                          currentCfg.mainCfg.cmpConfig,
+                          currentCfg.mainCfg.globalFilter,
+                          nullptr,
+                          currentCfg.mainCfg.syncCfg,
+                          currentCfg.mainCfg.cmpConfig.compareVar,
+                          &miscCfg,
+                          _("Synchronization Settings")) == ReturnSyncConfig::BUTTON_OKAY)
+    {
+        if (currentCfg.mainCfg.cmpConfig != cmpCfgOld)
+            applyCompareConfig(true); //true: setDefaultViewType
+
+        if (currentCfg.mainCfg.globalFilter != filterCfgOld)
+        {
+            updateGlobalFilterButton(); //refresh global filter icon
+            applyFilterConfig();  //re-apply filter
+        }
+
+        if (currentCfg.mainCfg.syncCfg != syncCfgOld)
+            applySyncConfig();
+    }
 }
 
 
@@ -3595,31 +3606,12 @@ void MainDialog::updateStatistics()
 }
 
 
-void MainDialog::OnSyncSettings(wxCommandEvent& event)
-{
-    OnCompletionCfg ewfCfg = { &currentCfg.mainCfg.onCompletion,
-                               &globalCfg.gui.onCompletionHistory,
-                               globalCfg.gui.onCompletionHistoryMax
-                             };
-
-    if (showSyncConfigDlg(this,
-                          currentCfg.mainCfg.cmpConfig.compareVar,
-                          currentCfg.mainCfg.syncCfg,
-                          _("Synchronization Settings"),
-                          &currentCfg.handleError,
-                          &ewfCfg) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
-    {
-        applySyncConfig();
-    }
-}
-
-
-void MainDialog::applyCompareConfig(bool switchMiddleGrid)
+void MainDialog::applyCompareConfig(bool setDefaultViewType)
 {
     clearGrid(); //+ GUI update
 
     //convenience: change sync view
-    if (switchMiddleGrid)
+    if (setDefaultViewType)
         switch (currentCfg.mainCfg.cmpConfig.compareVar)
         {
             case CMP_BY_TIME_SIZE:
@@ -3629,25 +3621,6 @@ void MainDialog::applyCompareConfig(bool switchMiddleGrid)
                 setViewTypeSyncAction(false);
                 break;
         }
-}
-
-
-void MainDialog::OnCmpSettings(wxCommandEvent& event)
-{
-    //show window right next to the compare-config button
-    //wxPoint windowPos = m_bpButtonCmpConfig->GetScreenPosition();
-    //windowPos.x += m_bpButtonCmpConfig->GetSize().GetWidth() + 5;
-
-    CompConfig cmpConfigNew = currentCfg.mainCfg.cmpConfig;
-
-    if (zen::showCompareCfgDialog(this, cmpConfigNew, _("Comparison Settings")) == ReturnSmallDlg::BUTTON_OKAY &&
-        //check if settings were changed at all
-        cmpConfigNew != currentCfg.mainCfg.cmpConfig)
-    {
-        currentCfg.mainCfg.cmpConfig = cmpConfigNew;
-
-        applyCompareConfig(true); //true: switchMiddleGrid
-    }
 }
 
 
@@ -4558,7 +4531,7 @@ void MainDialog::switchProgramLanguage(int langID)
     newGlobalCfg.programLanguage = langID;
 
     //show new dialog, then delete old one
-    MainDialog::create(getConfig(), activeConfigFiles, &newGlobalCfg, false);
+    MainDialog::create(globalConfigFile_, &newGlobalCfg, getConfig(), activeConfigFiles, false);
 
     //we don't use Close():
     //1. we don't want to show the prompt to save current config in OnClose()

@@ -7,9 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>All files are in sync</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Molemmat puolet muuttuneet edellisestä täsmäyksestä.</target>
 
@@ -1246,6 +1243,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Set as default</source>
 <target>Aseta oletukseksi</target>
+
+<source>All files are in sync</source>
+<target>Kaikki tiedostot ovat ajan tasalla</target>
 
 <source>Synchronization Settings</source>
 <target>Täsmäyksen asetukset</target>

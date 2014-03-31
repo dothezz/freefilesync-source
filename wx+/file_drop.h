@@ -35,14 +35,6 @@ void setupFileDrop(wxWindow& wnd);
 
 
 
-
-
-
-
-
-
-
-
 namespace impl
 {
 inline

@@ -419,14 +419,16 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
                 if (Opt<Zstring> volPath = getPathByVolumenName(volname)) //may block for slow USB sticks!
                     return appendSeparator(*volPath) + rest; //successfully replaced pattern
             }
-            //error: did not find corresponding volume name:
+            /*
+            error: did not find corresponding volume name:
 
-            /*make sure directory creation will fail later if attempted, instead of inconveniently interpreting this string as a relative name!
+            make sure directory creation will fail later if attempted, instead of inconveniently interpreting this string as a relative name!
                     [FFS USB]\FreeFileSync   will be resolved as
                  ?:\[FFS USB]\FreeFileSync\  - Windows
                /.../[FFS USB]/FreeFileSync/  - Linux
                             instead of:
-               C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\                                                                                        */
+               C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\
+            */
             return L"?:\\[" + volname + L"]\\" + rest;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC //neither supported nor needed

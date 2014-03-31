@@ -98,7 +98,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
         dirList.insert(dirList.begin(), dirname);
 
     //this->Clear(); -> NO! emits yet another wxEVT_COMMAND_TEXT_UPDATED!!!
-	wxItemContainer::Clear(); //suffices to clear the selection items only!
+    wxItemContainer::Clear(); //suffices to clear the selection items only!
 
     for (const wxString& dir : dirList)
         this->Append(dir);

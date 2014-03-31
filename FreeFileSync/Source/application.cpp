@@ -268,9 +268,9 @@ void Application::onQueryEndSession(wxEvent& event)
 }
 
 
-void runGuiMode();
-void runGuiMode(const XmlGuiConfig& guiCfg, const std::vector<Zstring>& referenceFiles);
-void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode);
+void runGuiMode  (const Zstring& globalConfigFile);
+void runGuiMode  (const Zstring& globalConfigFile, const XmlGuiConfig& guiCfg, const std::vector<Zstring>& referenceFiles);
+void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode);
 void showSyntaxHelp();
 
 
@@ -297,6 +297,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     std::vector<Zstring> leftDirs;
     std::vector<Zstring> rightDirs;
     std::vector<std::pair<Zstring, XmlType>> configFiles; //XmlType: batch or GUI files only
+    Opt<Zstring> globalConfigFile;
     {
         const Zchar optionLeftDir [] = Zstr("-leftdir");
         const Zchar optionRightDir[] = Zstr("-rightdir");
@@ -340,6 +341,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         filename += Zstr(".ffs_batch");
                     else if (fileExists(filename + Zstr(".ffs_gui")))
                         filename += Zstr(".ffs_gui");
+                    else if (fileExists(filename + Zstr(".xml")))
+                        filename += Zstr(".xml");
                     else
                     {
                         notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), std::wstring());
@@ -357,8 +360,9 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         case XML_TYPE_BATCH:
                             configFiles.push_back(std::make_pair(filename, XML_TYPE_BATCH));
                             break;
-
                         case XML_TYPE_GLOBAL:
+                            globalConfigFile = filename;
+                            break;
                         case XML_TYPE_OTHER:
                             notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), std::wstring());
                             return;
@@ -413,11 +417,13 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     //distinguish sync scenarios:
     //---------------------------
+    const Zstring globalConfigFilePath = globalConfigFile? *globalConfigFile : xmlAccess::getGlobalConfigFile();
+
     if (configFiles.empty())
     {
         //gui mode: default startup
         if (leftDirs.empty())
-            runGuiMode();
+            runGuiMode(globalConfigFilePath);
         //gui mode: default config with given directories
         else
         {
@@ -425,7 +431,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
             if (!replaceDirectories(guiCfg.mainCfg)) return;
-            runGuiMode(guiCfg, std::vector<Zstring>());
+            runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>());
         }
     }
     else if (configFiles.size() == 1)
@@ -450,7 +456,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 return;
             }
             if (!replaceDirectories(batchCfg.mainCfg)) return;
-            runBatchMode(batchCfg, filename, returnCode);
+            runBatchMode(globalConfigFilePath, batchCfg, filename, returnCode);
         }
         //GUI mode: single config
         else
@@ -475,7 +481,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //what about simulating changed config due to directory replacement?
             //-> propably fine to not show as changed on GUI and not ask user to save on exit!
 
-            runGuiMode(guiCfg, { filename }); //caveat: guiCfg and filename do not match if directories were set/replaced via command line!
+            runGuiMode(globalConfigFilePath, guiCfg, { filename }); //caveat: guiCfg and filename do not match if directories were set/replaced via command line!
         }
     }
     //gui mode: merged configs
@@ -506,18 +512,19 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             notifyError(e.toString(), std::wstring());
             return;
         }
-        runGuiMode(guiCfg, filenames);
+        runGuiMode(globalConfigFilePath, guiCfg, filenames);
     }
 }
 
 
-void runGuiMode() { MainDialog::create(); }
+void runGuiMode(const Zstring& globalConfigFile) { MainDialog::create(globalConfigFile); }
 
 
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg,
+void runGuiMode(const Zstring& globalConfigFile,
+                const xmlAccess::XmlGuiConfig& guiCfg,
                 const std::vector<Zstring>& referenceFiles)
 {
-    MainDialog::create(guiCfg, referenceFiles, nullptr, true); //startComparison == true!
+    MainDialog::create(globalConfigFile, nullptr, guiCfg, referenceFiles, /*bool startComparison = */true);
 }
 
 
@@ -525,18 +532,25 @@ void showSyntaxHelp()
 {
     showNotificationDialog(nullptr, DialogInfoType::INFO, PopupDialogCfg().
                            setTitle(_("Command line")).
-                           setDetailInstructions(_("Syntax:") + L"\n" +
-                                                 L"FreeFileSync [" + _("config files") + L"]\n[-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n" +
-                                                 L"\n" +
-                                                 _("config files") + L"\n" +
+                           setDetailInstructions(_("Syntax:") + L"\n\n" +
+
+                                                 L"FreeFileSync.exe " + L"\n" +
+                                                 L"    [" + _("global config file:") + L" GlobalSettings.xml]\n" +
+                                                 L"    [" + _("config files:") + L" *.ffs_gui/*.ffs_batch]\n" +
+                                                 L"    [-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n\n" +
+
+                                                 _("global config file:") + L"\n" +
+                                                 _("Path to an alternate GlobalSettings.xml file.") + L"\n\n" +
+
+                                                 _("config files:") + L"\n" +
                                                  _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n"
 
                                                  L"-leftdir " + _("directory") + L" -rightdir " + _("directory") + L"\n" +
-                                                 _("Any number of alternative directories for at most one config file.")));
+                                                 _("Any number of alternative directory pairs for at most one config file.")));
 }
 
 
-void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
+void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
 {
     auto notifyError = [&](const std::wstring& msg, FfsReturnCode rc)
     {
@@ -549,11 +563,11 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     };
 
     XmlGlobalSettings globalCfg;
-    if (fileExists(getGlobalConfigFile())) //else: globalCfg already has default values
+    if (fileExists(globalConfigFile)) //else: globalCfg already has default values
         try
         {
             std::wstring warningMsg;
-            readConfig(getGlobalConfigFile(), globalCfg, warningMsg); //throw FileError
+            readConfig(globalConfigFile, globalCfg, warningMsg); //throw FileError
 
             assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
         }
@@ -583,7 +597,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
 
         const TimeComp timeStamp = localTime();
 
-        const SwitchToGui switchBatchToGui(referenceFile, batchCfg, globalCfg); //prepare potential operational switch
+        const SwitchToGui switchBatchToGui(globalConfigFile, globalCfg, referenceFile, batchCfg); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
@@ -648,7 +662,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
 
     try //save global settings to XML: e.g. ignored warnings
     {
-        xmlAccess::writeConfig(globalCfg, getGlobalConfigFile()); //FileError
+        xmlAccess::writeConfig(globalCfg, globalConfigFile); //FileError
     }
     catch (const FileError& e)
     {

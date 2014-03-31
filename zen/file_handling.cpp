@@ -1172,11 +1172,10 @@ void makeDirectoryRecursively(const Zstring& directory) //FileError, ErrorTarget
             {
                 makeDirectoryRecursively(dirParent); //throw FileError, (ErrorTargetExisting)
             }
-            catch (const ErrorTargetExisting& e) { throw FileError(e.toString()); }
-            //yes it's pathological, but we do not want to emit ErrorTargetExisting when creating parent directories!
+            catch (const ErrorTargetExisting&) { /*parent directory created externally in the meantime? => NOT AN ERROR*/ }
 
             //now try again...
-            makeDirectoryPlain(directory, Zstring(), false); //throw FileError, ErrorTargetExisting, (ErrorTargetPathMissing)
+            makeDirectoryPlain(directory, Zstring(), false); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
             return;
         }
         throw;

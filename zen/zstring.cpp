@@ -173,9 +173,9 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
             if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
                               LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
                               strIn,                    //__in   LPCTSTR lpSrcStr,
-                              static_cast<int>(len),                      //__in   int cchSrc,
+                              static_cast<int>(len),    //__in   int cchSrc,
                               strOut,                   //__out  LPTSTR lpDestStr,
-                              static_cast<int>(len)) == 0)                //__in   int cchDest
+                              static_cast<int>(len)) == 0) //__in   int cchDest
                 throw std::runtime_error("Error comparing strings (LCMapString).");
         };
 

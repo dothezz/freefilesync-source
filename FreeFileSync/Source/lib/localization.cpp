@@ -364,6 +364,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
             return wxLANGUAGE_SWEDISH;
 
         //languages without variants:
+        //case wxLANGUAGE_BULGARIAN:
         //case wxLANGUAGE_CROATIAN:
         //case wxLANGUAGE_CZECH:
         //case wxLANGUAGE_DANISH:

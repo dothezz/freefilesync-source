@@ -381,7 +381,7 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
 {
     assert(pos <= length());
-	const size_t len = length();
+    const size_t len = length();
     const Char* thisEnd = begin() + len; //respect embedded 0
     const Char* it = std::search(begin() + std::min(pos, len), thisEnd,
                                  str.begin(), str.end());
@@ -393,7 +393,7 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
 {
     assert(pos <= length());
-	const size_t len = length();
+    const size_t len = length();
     const Char* thisEnd = begin() + len; //respect embedded 0
     const Char* it = std::search(begin() + std::min(pos, len), thisEnd,
                                  str, str + strLength(str));
@@ -405,9 +405,9 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::find(Char ch, size_t pos) const
 {
     assert(pos <= length());
-	const size_t len = length();
+    const size_t len = length();
     const Char* thisEnd = begin() + len; //respect embedded 0
-	const Char* it = std::find(begin() + std::min(pos, len), thisEnd, ch);
+    const Char* it = std::find(begin() + std::min(pos, len), thisEnd, ch);
     return it == thisEnd ? npos : it - begin();
 }
 
@@ -416,7 +416,7 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::rfind(Char ch, size_t pos) const
 {
     assert(pos == npos || pos <= length());
-	const size_t len = length();
+    const size_t len = length();
     const Char* currEnd = begin() + (pos == npos ? len : std::min(pos + 1, len));
     const Char* it = find_last(begin(), currEnd, ch);
     return it == currEnd ? npos : it - begin();
@@ -428,8 +428,8 @@ size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
 {
     assert(pos == npos || pos <= length());
     const size_t strLen = strLength(str);
-	const size_t len = length();
-	const Char* currEnd = begin() + (pos == npos ? len : std::min(pos + strLen, len));
+    const size_t len = length();
+    const Char* currEnd = begin() + (pos == npos ? len : std::min(pos + strLen, len));
     const Char* it = search_last(begin(), currEnd,
                                  str, str + strLen);
     return it == currEnd ? npos : it - begin();

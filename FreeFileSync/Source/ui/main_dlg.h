@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef MAINDIALOG_H
-#define MAINDIALOG_H
+#ifndef MAINDIALOG_H_891048132454564
+#define MAINDIALOG_H_891048132454564
 
 #include <map>
 #include <set>
@@ -17,6 +17,7 @@
 #include <wx/aui/aui.h>
 #include "gui_generated.h"
 #include "custom_grid.h"
+#include "sync_cfg.h"
 #include "tree_view.h"
 #include "folder_history_box.h"
 #include "../lib/process_xml.h"
@@ -30,14 +31,15 @@ class MainDialog : public MainDialogGenerated
 {
 public:
     //default behavior, application start, restores last used config
-    static void create();
+    static void create(const Zstring& globalConfigFile);
 
     //when loading dynamically assembled config,
     //when switching language,
     //or switching from batch run to GUI on warnings
-    static void create(const xmlAccess::XmlGuiConfig& guiCfg,
-                       const std::vector<Zstring>& referenceFiles,
+    static void create(const Zstring& globalConfigFile,
                        const xmlAccess::XmlGlobalSettings* globalSettings, //optional: take over ownership => save on exit
+                       const xmlAccess::XmlGuiConfig& guiCfg,
+                       const std::vector<Zstring>& referenceFiles,
                        bool startComparison);
 
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
@@ -46,7 +48,8 @@ public:
     void onQueryEndSession(); //last chance to do something useful before killing the application!
 
 private:
-    MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+    MainDialog(const Zstring& globalConfigFile,
+               const xmlAccess::XmlGuiConfig& guiCfg,
                const std::vector<Zstring>& referenceFiles,
                const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
                bool startComparison);
@@ -79,10 +82,6 @@ private:
     bool saveOldConfig(); //return false on user abort
 
     static const Zstring& lastRunConfigName();
-
-    xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
-    //used when saving configuration
-    std::vector<Zstring> activeConfigFiles; //name of currently loaded config file (may be more than 1)
 
     void updateGlobalFilterButton();
 
@@ -143,14 +142,14 @@ private:
 
     void onTreeButtonEvent (wxKeyEvent& event);
     void OnContextSetLayout(wxMouseEvent& event);
-    void OnGlobalKeyEvent  (wxKeyEvent& event);
+    void onLocalKeyEvent   (wxKeyEvent& event);
 
     virtual void OnCompSettingsContext(wxMouseEvent& event) override;
     virtual void OnSyncSettingsContext(wxMouseEvent& event) override;
     virtual void OnGlobalFilterContext(wxMouseEvent& event) override;
     virtual void OnViewButtonRightClick(wxMouseEvent& event) override;
 
-    void applyCompareConfig(bool switchMiddleGrid = false);
+    void applyCompareConfig(bool setDefaultViewType = false);
 
     //context menu handler methods
     void onMainGridContextL(zen::GridClickEvent& event);
@@ -205,13 +204,16 @@ private:
     void OnResizeLeftFolderWidth(wxEvent& event);
     void OnResizeConfigPanel    (wxEvent& event);
     void OnResizeViewPanel      (wxEvent& event);
-    virtual void OnConfigureFilter      (wxCommandEvent& event) override;
-    virtual void OnSwapSides            (wxCommandEvent& event) override;
     virtual void OnCompare              (wxCommandEvent& event) override;
-    virtual void OnSyncSettings         (wxCommandEvent& event) override;
-    virtual void OnCmpSettings          (wxCommandEvent& event) override;
     virtual void OnStartSync            (wxCommandEvent& event) override;
+    virtual void OnSwapSides            (wxCommandEvent& event) override;
     virtual void OnClose                (wxCloseEvent&   event) override;
+
+    void OnCmpSettings    (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON); }
+    void OnConfigureFilter(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER    ); }
+    void OnSyncSettings   (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC      ); }
+
+    void showConfigDialog(zen::SyncConfigPanel panelToShow);
 
     void filterExtension(const Zstring& extension, bool include);
     void filterShortname(const zen::FileSystemObject& fsObj, bool include);
@@ -247,6 +249,8 @@ private:
 
     void switchProgramLanguage(int langID);
 
+    void clearGrid();
+
     typedef int MenuItemID;
     typedef int LanguageID;
     std::map<MenuItemID, LanguageID> languageMenuItemMap; //needed to attach menu item events
@@ -257,18 +261,24 @@ private:
     //global settings shared by GUI and batch mode
     xmlAccess::XmlGlobalSettings globalCfg;
 
+    const Zstring globalConfigFile_;
+
+    //-------------------------------------
+    //program configuration
+    xmlAccess::XmlGuiConfig currentCfg;
+
+    //used when saving configuration
+    std::vector<Zstring> activeConfigFiles; //name of currently loaded config file (may be more than 1)
+
+    xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
+    //-------------------------------------
+
     //UI view of FolderComparison structure (partially owns folderCmp)
     std::shared_ptr<zen::GridView> gridDataView; //always bound!
     std::shared_ptr<zen::TreeView> treeDataView; //
 
     //the prime data structure of this tool *bling*:
     zen::FolderComparison folderCmp; //optional!: sync button not available if empty
-
-    void clearGrid();
-
-    //-------------------------------------
-    //program configuration
-    xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
     std::unique_ptr<FolderPairFirst> firstFolderPair; //always bound!!!
@@ -283,8 +293,6 @@ private:
     std::unique_ptr<CompareProgressDialog> compareStatus; //always bound
 
     bool cleanedUp;
-
-    bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
     //toggle to display configuration preview instead of comparison result:
     //for read access use: m_bpButtonViewTypeSyncAction->isActive()
@@ -309,4 +317,4 @@ private:
     wxWindow* focusWindowAfterSearch; //used to restore focus after search panel is closed
 };
 
-#endif // MAINDIALOG_H
+#endif //MAINDIALOG_H_891048132454564
