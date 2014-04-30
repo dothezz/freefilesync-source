@@ -101,7 +101,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, //_In_      DWORD dwFlagsAndAttributes,
                                       nullptr);          //_In_opt_  HANDLE hTemplateFile
     if (hLink == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"CreateFile", getLastError()));
+        throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"CreateFile", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hLink));
 
     //respect alignment issues...
@@ -117,7 +117,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
                            bufferSize,              //__in         DWORD nOutBufferSize,
                            &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
                            nullptr))                //__inout_opt  LPOVERLAPPED lpOverlapped
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"DeviceIoControl, FSCTL_GET_REPARSE_POINT", getLastError()));
+        throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"DeviceIoControl, FSCTL_GET_REPARSE_POINT", getLastError());
 
     REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(&buffer[0]); //REPARSE_DATA_BUFFER needs to be artificially enlarged!
 
@@ -135,25 +135,20 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
     else
         throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"Not a symbolic link or junction.");
 
-    //absolute symlinks and junctions technically start with \??\ while relative ones do not
-    if (startsWith(output, Zstr("\\??\\")))
-        output = Zstring(output.c_str() + 4, output.length() - 4);
-
-    return output;
+    //absolute symlinks and junctions use NT namespace naming convention while relative ones do not:
+    //http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#NT_Namespaces
+    return ntPathToWin32Path(output);
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     const size_t BUFFER_SIZE = 10000;
     std::vector<char> buffer(BUFFER_SIZE);
 
     const ssize_t bytesWritten = ::readlink(linkPath.c_str(), &buffer[0], BUFFER_SIZE);
-    if (bytesWritten < 0 || bytesWritten >= static_cast<ssize_t>(BUFFER_SIZE)) //detect truncation!
-    {
-        ErrorCode lastError = getLastError();
-        const std::wstring errorMsg = replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath));
-        if (bytesWritten < 0)
-            throw FileError(errorMsg, formatSystemError(L"readlink", lastError));
-        throw FileError(errorMsg);
-    }
+    if (bytesWritten < 0)
+        throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)), L"readlink", getLastError());
+    if (bytesWritten >= static_cast<ssize_t>(BUFFER_SIZE)) //detect truncation!
+        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath)));
+
     return Zstring(&buffer[0], bytesWritten); //readlink does not append 0-termination!
 #endif
 }
@@ -172,7 +167,7 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
                                      FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
                                      nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hDir == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"CreateFile", getLastError()));
+        throwFileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), L"CreateFile", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
 
     //GetFinalPathNameByHandle() is not available before Vista!
@@ -184,7 +179,7 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
 
     const DWORD bufferSize = getFinalPathNameByHandle(hDir, nullptr, 0, 0);
     if (bufferSize == 0)
-        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"GetFinalPathNameByHandle", getLastError()));
+        throwFileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), L"GetFinalPathNameByHandle", getLastError());
 
     std::vector<wchar_t> targetPath(bufferSize);
     const DWORD charsWritten = getFinalPathNameByHandle(hDir,           //__in   HANDLE hFile,
@@ -195,7 +190,7 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
     {
         const std::wstring errorMsg = replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath));
         if (charsWritten == 0)
-            throw FileError(errorMsg, formatSystemError(L"GetFinalPathNameByHandle", getLastError()));
+            throwFileError(errorMsg, L"GetFinalPathNameByHandle", getLastError());
         throw FileError(errorMsg);
     }
 
@@ -204,7 +199,7 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
 #elif defined ZEN_LINUX || defined ZEN_MAC
     char* targetPath = ::realpath(linkPath.c_str(), nullptr);
     if (!targetPath)
-        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), formatSystemError(L"realpath", getLastError()));
+        throwFileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), L"realpath", getLastError());
     ZEN_ON_SCOPE_EXIT(::free(targetPath));
     return targetPath;
 #endif

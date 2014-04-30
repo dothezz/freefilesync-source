@@ -162,7 +162,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fread()!
 #endif
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), formatSystemError(functionName, getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), functionName, getLastError());
 
 #ifdef ZEN_WIN
     if (bytesRead < bytesToRead) //verify only!
@@ -214,7 +214,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     fileHandle = getHandle(FILE_ATTRIBUTE_NORMAL);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
-        DWORD lastError = ::GetLastError(); //copy before making other system calls!
+        DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         //CREATE_ALWAYS fails with ERROR_ACCESS_DENIED if the existing file is hidden or "system" http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
         if (lastError == ERROR_ACCESS_DENIED &&
@@ -260,7 +260,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
                          access == ACC_OVERWRITE ? "w,type=record,noseek" : "wx,type=record,noseek");
     if (!fileHandle)
     {
-        const ErrorCode lastError = getLastError(); //copy before making other system calls!
+        const int lastError = errno; //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename()));
         const std::wstring errorDescr = formatSystemError(L"fopen", lastError);
 
@@ -301,7 +301,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fwrite()!
 #endif
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), formatSystemError(functionName, getLastError()));
+        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), functionName, getLastError());
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete write."); //user should never see this
@@ -317,7 +317,7 @@ FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBas
 
     fdFile = ::open(filename.c_str(), O_RDONLY);
     if (fdFile == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
-        throw FileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), formatSystemError(L"open", getLastError()));
+        throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), L"open", getLastError());
 }
 
 
@@ -337,7 +337,7 @@ size_t FileInputUnbuffered::read(void* buffer, size_t bytesToRead) //throw FileE
     while (bytesRead < 0 && errno == EINTR);
 
     if (bytesRead < 0)
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), formatSystemError(L"read", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"read", getLastError());
     else if (bytesRead == 0) //"zero indicates end of file"
         setEof();
     else if (bytesRead > static_cast<ssize_t>(bytesToRead)) //better safe than sorry
@@ -391,7 +391,7 @@ void FileOutputUnbuffered::write(const void* buffer, size_t bytesToWrite) //thro
             if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
                 errno = ENOSPC;
 
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), formatSystemError(L"write", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"write", getLastError());
         }
         if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"buffer overflow"); //user should never see this

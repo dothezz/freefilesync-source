@@ -75,7 +75,7 @@ MessageProvider::MessageProvider() :
     windowHandle(nullptr)
 {
     if (!hMainModule)
-        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"GetModuleHandle", getLastError()));
+        throwFileError(_("Unable to register to receive system messages."), L"GetModuleHandle", getLastError());
 
     //register the main window class
     WNDCLASS wc = {};
@@ -84,7 +84,7 @@ MessageProvider::MessageProvider() :
     wc.lpszClassName = dummyWindowName;
 
     if (::RegisterClass(&wc) == 0)
-        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"RegisterClass", getLastError()));
+        throwFileError(_("Unable to register to receive system messages."), L"RegisterClass", getLastError());
 
     ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(dummyWindowName, hMainModule); });
 
@@ -101,14 +101,17 @@ MessageProvider::MessageProvider() :
                                   hMainModule, //HINSTANCE hInstance,
                                   nullptr);    //LPVOID lpParam
     if (!windowHandle)
-        throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"CreateWindow", getLastError()));
+        throwFileError(_("Unable to register to receive system messages."), L"CreateWindow", getLastError());
 
     //store this-pointer for topWndProc() to use: do this AFTER CreateWindow() to avoid processing messages while this constructor is running!!!
     //unlike: http://blogs.msdn.com/b/oldnewthing/archive/2014/02/03/10496248.aspx
     ::SetLastError(ERROR_SUCCESS); //[!] required for proper error handling, see MSDN, SetWindowLongPtr
     if (::SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this)) == 0)
-        if (::GetLastError() != ERROR_SUCCESS)
-            throw FileError(_("Unable to register to receive system messages."), formatSystemError(L"SetWindowLongPtr", getLastError()));
+    {
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
+        if (lastError != ERROR_SUCCESS)
+            throwFileError(_("Unable to register to receive system messages."), L"SetWindowLongPtr", lastError);
+    }
 
     guardClass.dismiss();
 }
@@ -152,11 +155,11 @@ public:
                                                      DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
         if (!hNotification)
         {
-            const DWORD lastError = ::GetLastError();
+            const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                 lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                 lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                throw zen::FileError(_("Unable to register to receive system messages."), formatSystemError(L"RegisterDeviceNotification", lastError));
+                throwFileError(_("Unable to register to receive system messages."), L"RegisterDeviceNotification", lastError);
         }
 
         guardProvider.dismiss();

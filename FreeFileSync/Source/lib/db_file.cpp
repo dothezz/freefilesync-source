@@ -285,35 +285,19 @@ public:
             BinStreamIn inL(streamL);
             BinStreamIn inR(streamR);
 
-            const int streamVersion = readNumber<std::int32_t>(inL); //throw UnexpectedEndOfStreamError
-            warn_static("remove this case after migration:")
-            bool migrateStreamFromOldFormat = streamVersion != DB_FORMAT_STREAM;
-            if (migrateStreamFromOldFormat)
-                inL = BinStreamIn(streamL);
-            else
-            {
-                const int streamVersionRef = readNumber<std::int32_t>(inR); //throw UnexpectedEndOfStreamError
-                if (streamVersionRef != streamVersion) //throw UnexpectedEndOfStreamError
-                    throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameR), L"stream format mismatch"));
-                if (streamVersion != DB_FORMAT_STREAM)
-                    throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameL), L"stream format"));
-            }
+            const int streamVersionL = readNumber<std::int32_t>(inL); //throw UnexpectedEndOfStreamError
+            const int streamVersionR = readNumber<std::int32_t>(inR); //
 
-            bool has1stPartL = false;
-            bool has1stPartR = false;
-            if (migrateStreamFromOldFormat)
-            {
-                has1stPartL = readNumber<bool>(inL) != 0; //throw UnexpectedEndOfStreamError
-                has1stPartR = readNumber<bool>(inR) != 0; //
-            }
-            else
-            {
-                has1stPartL = readNumber<std::int8_t>(inL) != 0; //throw UnexpectedEndOfStreamError
-                has1stPartR = readNumber<std::int8_t>(inR) != 0; //
-            }
+            if (streamVersionL != DB_FORMAT_STREAM)
+                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameL)), L"unknown stream format");
+            if (streamVersionR != DB_FORMAT_STREAM)
+                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameR)), L"unknown stream format");
+
+            const bool has1stPartL = readNumber<std::int8_t>(inL) != 0; //throw UnexpectedEndOfStreamError
+            const bool has1stPartR = readNumber<std::int8_t>(inR) != 0; //
 
             if (has1stPartL == has1stPartR)
-                throw UnexpectedEndOfStreamError();
+                throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR), L"second part missing");
 
             BinStreamIn& in1stPart = has1stPartL ? inL : inR;
             BinStreamIn& in2ndPart = has1stPartL ? inR : inL;
@@ -323,8 +307,8 @@ public:
 
             BinaryStream tmpB;
             tmpB.resize(size1stPart + size2ndPart); //throw bad_alloc
-            readArray(in1stPart, &*tmpB.begin(), size1stPart);
-            readArray(in2ndPart, &*tmpB.begin() + size1stPart, size2ndPart);
+            readArray(in1stPart, &*tmpB.begin(),               size1stPart); //stream always non-empty
+            readArray(in2ndPart, &*tmpB.begin() + size1stPart, size2ndPart); //
 
             const BinaryStream tmpL = readContainer<BinaryStream>(inL);
             const BinaryStream tmpR = readContainer<BinaryStream>(inR);
@@ -332,7 +316,7 @@ public:
             auto output = std::make_shared<InSyncDir>(InSyncDir::DIR_STATUS_IN_SYNC);
             StreamParser parser(decompStream(tmpL, filenameL),
                                 decompStream(tmpR, filenameR),
-                                decompStream(tmpB, filenameL + Zstr("/") + filenameR), migrateStreamFromOldFormat);
+                                decompStream(tmpB, filenameL + Zstr("/") + filenameR));
             parser.recurse(*output); //throw UnexpectedEndOfStreamError
             return output;
         }
@@ -350,9 +334,7 @@ public:
 private:
     StreamParser(const BinaryStream& bufferL,
                  const BinaryStream& bufferR,
-                 const BinaryStream& bufferB,
-                 bool migrateStreamFromOldFormat) :
-        migrateStreamFromOldFormat_(migrateStreamFromOldFormat),
+                 const BinaryStream& bufferB) :
         inputLeft (bufferL),
         inputRight(bufferR),
         inputBoth (bufferB) {}
@@ -363,63 +345,21 @@ private:
         while (fileCount-- != 0)
         {
             const Zstring shortName = readUtf8(inputBoth);
-
-            if (migrateStreamFromOldFormat_)
-            {
-                const auto inSyncType  = readNumber<std::int32_t>(inputBoth);
-                const CompareVariant cmpVar =  inSyncType == 0 ? CMP_BY_CONTENT : CMP_BY_TIME_SIZE;
-
-                auto lastWriteTimeRawL = readNumber<std::int64_t>(inputLeft); //throw UnexpectedEndOfStreamError
-                const UInt64 fileSize         = readNumber<std::uint64_t>(inputLeft);
-                auto devIdL            = static_cast<DeviceId >(readNumber<std::uint64_t>(inputLeft)); //
-                auto fileIdxL          = static_cast<FileIndex>(readNumber<std::uint64_t>(inputLeft)); //silence "loss of precision" compiler warnings
-                const InSyncDescrFile dataL = InSyncDescrFile(lastWriteTimeRawL, FileId(devIdL, fileIdxL));
-
-                auto lastWriteTimeRaw = readNumber<std::int64_t>(inputRight); //throw UnexpectedEndOfStreamError
-                readNumber<std::uint64_t>(inputRight);
-                auto devId            = static_cast<DeviceId >(readNumber<std::uint64_t>(inputRight)); //
-                auto fileIdx          = static_cast<FileIndex>(readNumber<std::uint64_t>(inputRight)); //silence "loss of precision" compiler warnings
-                const InSyncDescrFile dataR = InSyncDescrFile(lastWriteTimeRaw, FileId(devId, fileIdx));
-
-                container.addFile(shortName, dataL, dataR, cmpVar, fileSize);
-            }
-            else
-            {
-                const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
-                const UInt64 fileSize = readNumber<std::uint64_t>(inputBoth);
-                const InSyncDescrFile dataL = readFile(inputLeft);
-                const InSyncDescrFile dataR = readFile(inputRight);
-                container.addFile(shortName, dataL, dataR, cmpVar, fileSize);
-            }
+            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
+            const UInt64 fileSize = readNumber<std::uint64_t>(inputBoth);
+            const InSyncDescrFile dataL = readFile(inputLeft);
+            const InSyncDescrFile dataR = readFile(inputRight);
+            container.addFile(shortName, dataL, dataR, cmpVar, fileSize);
         }
 
         size_t linkCount = readNumber<std::uint32_t>(inputBoth);
         while (linkCount-- != 0)
         {
             const Zstring shortName = readUtf8(inputBoth);
-
-            if (migrateStreamFromOldFormat_)
-            {
-                const CompareVariant cmpVar = CMP_BY_CONTENT;
-                auto lastWriteTimeRaw = readNumber<std::int64_t>(inputLeft);
-                readUtf8(inputLeft);//descr.targetPath       = readUtf8(input);
-                readNumber<std::int32_t>(inputLeft);//descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
-                InSyncDescrLink dataL = InSyncDescrLink(lastWriteTimeRaw);
-
-                auto lastWriteTimeRawR = readNumber<std::int64_t>(inputRight);
-                readUtf8(inputRight);//descr.targetPath       = readUtf8(input);
-                readNumber<std::int32_t>(inputRight);//descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
-                InSyncDescrLink dataR = InSyncDescrLink(lastWriteTimeRawR);
-
-                container.addSymlink(shortName, dataL, dataR, cmpVar);
-            }
-            else
-            {
-                const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
-                InSyncDescrLink dataL = readLink(inputLeft);
-                InSyncDescrLink dataR = readLink(inputRight);
-                container.addSymlink(shortName, dataL, dataR, cmpVar);
-            }
+            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
+            InSyncDescrLink dataL = readLink(inputLeft);
+            InSyncDescrLink dataR = readLink(inputRight);
+            container.addSymlink(shortName, dataL, dataR, cmpVar);
         }
 
         size_t dirCount = readNumber<std::uint32_t>(inputBoth);
@@ -449,9 +389,6 @@ private:
         auto lastWriteTimeRaw = readNumber<std::int64_t>(input);
         return InSyncDescrLink(lastWriteTimeRaw);
     }
-
-    warn_static("remove after migration")
-    bool migrateStreamFromOldFormat_;
 
     BinStreamIn inputLeft;  //data related to one side only
     BinStreamIn inputRight; //

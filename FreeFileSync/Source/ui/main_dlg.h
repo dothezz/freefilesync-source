@@ -202,6 +202,7 @@ private:
     void OnLayoutWindowAsync   (wxIdleEvent&  event);
 
     void OnResizeLeftFolderWidth(wxEvent& event);
+    void OnResizeTopButtonPanel (wxEvent& event);
     void OnResizeConfigPanel    (wxEvent& event);
     void OnResizeViewPanel      (wxEvent& event);
     virtual void OnCompare              (wxCommandEvent& event) override;

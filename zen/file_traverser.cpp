@@ -90,12 +90,12 @@ void getInfoFromFileSymlink(const Zstring& linkName, zen::TraverseCallback::File
                                 //needed to open a directory -> keep it even if we expect to open a file! See comment below
                                 nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hFile == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"CreateFile", getLastError()));
+        throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), L"CreateFile", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
     BY_HANDLE_FILE_INFORMATION fileInfo = {};
     if (!::GetFileInformationByHandle(hFile, &fileInfo))
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+        throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), L"GetFileInformationByHandle", getLastError());
 
     //a file symlink may incorrectly point to a directory, but both CreateFile() and GetFileInformationByHandle() will succeed and return garbage!
     //- if we did not use FILE_FLAG_BACKUP_SEMANTICS above, CreateFile() would error out with an even less helpful ERROR_ACCESS_DENIED!
@@ -195,7 +195,7 @@ struct Win32Traverser
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
         {
-            const ErrorCode lastError = getLastError(); //copy before making other system calls!
+            const DWORD lastError = ::GetLastError(); //copy before making other system calls!
             hnd.haveData = false;
             if (lastError == ERROR_FILE_NOT_FOUND)
             {
@@ -204,7 +204,7 @@ struct Win32Traverser
                 if (dirExists(dirname)) //yes, a race-condition, still the best we can do
                     return;
             }
-            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"FindFirstFile", lastError));
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), L"FindFirstFile", lastError);
         }
     }
 
@@ -224,11 +224,11 @@ struct Win32Traverser
 
         if (!::FindNextFile(hnd.searchHandle, &fileInfo))
         {
-            const ErrorCode lastError = getLastError(); //copy before making other system calls!
+            const DWORD lastError = ::GetLastError(); //copy before making other system calls!
             if (lastError == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"FindNextFile", lastError));
+            throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), L"FindNextFile", lastError);
         }
         return true;
     }
@@ -267,7 +267,7 @@ struct FilePlusTraverser
     {
         hnd.searchHandle = ::openDir(applyLongPathPrefix(dirname).c_str());
         if (hnd.searchHandle == nullptr)
-            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"openDir", getLastError()));
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), L"openDir", getLastError());
     }
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
@@ -276,7 +276,7 @@ struct FilePlusTraverser
     {
         if (!::readDir(hnd.searchHandle, fileInfo))
         {
-            const DWORD lastError = ::GetLastError();
+            const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
             if (lastError == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
 
@@ -289,7 +289,7 @@ struct FilePlusTraverser
             //fallback should apply to whole directory sub-tree! => client needs to handle duplicate file notifications!
 
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"readDir", lastError));
+            throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), L"readDir", lastError);
         }
 
         return true;
@@ -547,7 +547,7 @@ private:
     {
         dirObj = ::opendir(dirname.c_str()); //directory must NOT end with path separator, except "/"
             if (!dirObj)
-                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"opendir", getLastError()));
+                throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), L"opendir", getLastError());
         }, sink))
         return; //ignored error
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
@@ -558,7 +558,7 @@ private:
             tryReportingDirError([&]
             {
                 if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                    throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"readdir_r", getLastError()));
+                    throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), L"readdir_r", getLastError());
             }, sink);
             if (!dirEntry) //no more items or ignored error
                 return;
@@ -594,7 +594,7 @@ private:
             if (!tryReportingItemError([&]
         {
             if (::lstat(fullName.c_str(), &statData) != 0) //lstat() does not resolve symlinks
-                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(fullName)), formatSystemError(L"lstat", getLastError()));
+                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(fullName)), L"lstat", getLastError());
             }, sink, shortName))
             continue; //ignore error: skip file
 
@@ -612,7 +612,7 @@ private:
                         bool validLink = tryReportingItemError([&]
                         {
                             if (::stat(fullName.c_str(), &statDataTrg) != 0)
-                                throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)), formatSystemError(L"stat", getLastError()));
+                                throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)), L"stat", getLastError());
                         }, sink, shortName);
 
                         if (validLink)

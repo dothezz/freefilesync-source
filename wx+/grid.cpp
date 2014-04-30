@@ -43,7 +43,7 @@ namespace
 //------------ Grid Constants --------------------------------
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value as Explorer!
 const int DEFAULT_COL_LABEL_BORDER = 6; //top + bottom border in addition to label height
-const int COLUMN_LABEL_BORDER      = GridData::COLUMN_GAP_LEFT;
+//const int COLUMN_LABEL_BORDER      = GridData::COLUMN_GAP_LEFT;
 const int COLUMN_MOVE_DELAY        = 5;  //unit: [pixel] (from Explorer)
 const int COLUMN_MIN_WIDTH         = 40; //only honored when resizing manually!
 const int ROW_LABEL_BORDER         = 3;

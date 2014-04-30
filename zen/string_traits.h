@@ -162,7 +162,7 @@ struct GetCharType : ResultType<typename implementation::StringTraits<T>::CharTy
 namespace implementation
 {
 template <class C> inline
-size_t cStringLength(const C* str) //strlen()
+size_t cStringLength(const C* str) //naive implementation seems somewhat faster than "optimized" strlen/wcslen!
 {
     assert_static((IsSameType<C, char>::value || IsSameType<C, wchar_t>::value));
     size_t len = 0;
@@ -195,8 +195,8 @@ size_t strLength(const S& str, typename EnableIf<implementation::StringTraits<S>
 
 inline size_t strLength(const char*    str) { return implementation::cStringLength(str); }
 inline size_t strLength(const wchar_t* str) { return implementation::cStringLength(str); }
-inline size_t strLength(char)            { return 1; }
-inline size_t strLength(wchar_t)         { return 1; }
+inline size_t strLength(char)               { return 1; }
+inline size_t strLength(wchar_t)            { return 1; }
 inline size_t strLength(const StringRef<char   >& ref) { return ref.length(); }
 inline size_t strLength(const StringRef<wchar_t>& ref) { return ref.length(); }
 }

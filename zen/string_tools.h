@@ -65,20 +65,6 @@ template <class T, class S> T copyStringTo(const S& str);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //---------------------- implementation ----------------------
 template <> inline
 bool isWhiteSpace(char ch)
@@ -584,7 +570,7 @@ Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to i
         }
         else
         {
-            //rest of string should contain whitespace only, it's NOT a bug if there is some!
+            //rest of string should contain whitespace only, it's NOT a bug if there is something else!
             //assert(std::all_of(iter, last, &isWhiteSpace<CharType>)); -> this is NO assert situation
             break;
         }

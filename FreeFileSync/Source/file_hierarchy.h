@@ -610,7 +610,8 @@ std::wstring getSyncOpDescription  (const FileSystemObject& fsObj);
 
 
 
-//---------------Inline Implementation---------------------------------------------------
+//--------------------- implementation ------------------------------------------
+
 //inline virtual... admittedly its use may be limited
 inline void FilePair   ::accept(FSObjectVisitor& visitor) const { visitor.visit(*this); }
 inline void DirPair    ::accept(FSObjectVisitor& visitor) const { visitor.visit(*this); }

@@ -156,7 +156,7 @@ public:
                             FILE_FLAG_OVERLAPPED, //_In_      DWORD dwFlagsAndAttributes,
                             nullptr);             //_In_opt_  HANDLE hTemplateFile
         if (hDir == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"CreateFile", getLastError()));
+            throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"CreateFile", getLastError());
 
         //end of constructor, no need to start managing "hDir"
     }
@@ -193,7 +193,7 @@ public:
                                                   nullptr); //__in_opt  LPCTSTR lpName
                 if (overlapped.hEvent == nullptr)
                 {
-                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
                     return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"CreateEvent", lastError), lastError);
                 }
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
@@ -213,7 +213,7 @@ public:
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
                 {
-                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
                     return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"ReadDirectoryChangesW", lastError), lastError);
                 }
 
@@ -236,7 +236,7 @@ public:
                                               &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
                                               false))        //__in   BOOL bWait
                 {
-                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
                     if (lastError != ERROR_IO_INCOMPLETE)
                         return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"GetOverlappedResult", lastError), lastError);
 
@@ -420,7 +420,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     pimpl_->baseDirname = directory;
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"inotify_init", getLastError()));
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"inotify_init", getLastError());
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -432,7 +432,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), formatSystemError(L"fcntl", getLastError()));
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"fcntl", getLastError());
 
     //add watches
     for (const Zstring& subdir : fullDirList)
@@ -449,7 +449,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
                                      IN_MOVED_TO    |
                                      IN_MOVE_SELF);
         if (wd == -1)
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)), formatSystemError(L"inotify_add_watch", getLastError()));
+            throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)), L"inotify_add_watch", getLastError());
 
         pimpl_->watchDescrs.insert(std::make_pair(wd, appendSeparator(subdir)));
     }
@@ -481,7 +481,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), formatSystemError(L"read", getLastError()));
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), L"read", getLastError());
     }
 
     std::vector<Entry> output;

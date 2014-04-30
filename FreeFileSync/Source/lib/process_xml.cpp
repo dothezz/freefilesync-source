@@ -179,19 +179,12 @@ bool readText(const std::string& input, CompareVariant& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "ByTimeAndSize") //obsolete
+    if (tmp == "TimeAndSize")
         value = zen::CMP_BY_TIME_SIZE;
-    else if (tmp == "ByContent") //obsolete
+    else if (tmp == "Content")
         value = zen::CMP_BY_CONTENT;
     else
-
-        if (tmp == "TimeAndSize")
-            value = zen::CMP_BY_TIME_SIZE;
-        else if (tmp == "Content")
-            value = zen::CMP_BY_CONTENT;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -252,21 +245,14 @@ bool readText(const std::string& input, OnError& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "Exit") //obsolete
-        value = ON_ERROR_STOP;
-    else if (tmp == "Abort") //obsolete: 2013.09.04
+    if (tmp == "Ignore")
+        value = ON_ERROR_IGNORE;
+    else if (tmp == "Popup")
+        value = ON_ERROR_POPUP;
+    else if (tmp == "Stop")
         value = ON_ERROR_STOP;
     else
-
-        if (tmp == "Ignore")
-            value = ON_ERROR_IGNORE;
-        else if (tmp == "Popup")
-            value = ON_ERROR_POPUP;
-        else if (tmp == "Stop")
-            value = ON_ERROR_STOP;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -357,24 +343,14 @@ bool readText(const std::string& input, DeletionPolicy& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    //------------------
-    warn_static("remove after migration?")
-    if (tmp == "DeletePermanently")//obsolete name
+    if (tmp == "Permanent")
         value = DELETE_PERMANENTLY;
-    else if (tmp == "MoveToRecycleBin")//obsolete name
+    else if (tmp == "RecycleBin")
         value = DELETE_TO_RECYCLER;
-    else if (tmp == "MoveToCustomDirectory")//obsolete name
+    else if (tmp == "Versioning")
         value = DELETE_TO_VERSIONING;
     else
-
-        if (tmp == "Permanent")
-            value = DELETE_PERMANENTLY;
-        else if (tmp == "RecycleBin")
-            value = DELETE_TO_RECYCLER;
-        else if (tmp == "Versioning")
-            value = DELETE_TO_VERSIONING;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -401,23 +377,14 @@ bool readText(const std::string& input, SymLinkHandling& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "UseDirectly") //obsolete!
-        value = SYMLINK_DIRECT;
-    else if (tmp == "FollowLink") //obsolete!
-        value = SYMLINK_FOLLOW;
-    else if (tmp == "Ignore") //obsolete!
+    if (tmp == "Exclude")
         value = SYMLINK_EXCLUDE;
+    else if (tmp == "Direct")
+        value = SYMLINK_DIRECT;
+    else if (tmp == "Follow")
+        value = SYMLINK_FOLLOW;
     else
-
-        if (tmp == "Exclude")
-            value = SYMLINK_EXCLUDE;
-        else if (tmp == "Direct")
-            value = SYMLINK_DIRECT;
-        else if (tmp == "Follow")
-            value = SYMLINK_FOLLOW;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -535,21 +502,16 @@ bool readText(const std::string& input, UnitSize& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "Inactive") //obsolete!
+    if (tmp == "None")
         value = USIZE_NONE;
+    else if (tmp == "Byte")
+        value = USIZE_BYTE;
+    else if (tmp == "KB")
+        value = USIZE_KB;
+    else if (tmp == "MB")
+        value = USIZE_MB;
     else
-
-        if (tmp == "None")
-            value = USIZE_NONE;
-        else if (tmp == "Byte")
-            value = USIZE_BYTE;
-        else if (tmp == "KB")
-            value = USIZE_KB;
-        else if (tmp == "MB")
-            value = USIZE_MB;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -581,23 +543,18 @@ bool readText(const std::string& input, UnitTime& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "Inactive") //obsolete!
+    if (tmp == "None")
         value = UTIME_NONE;
+    else if (tmp == "Today")
+        value = UTIME_TODAY;
+    else if (tmp == "Month")
+        value = UTIME_THIS_MONTH;
+    else if (tmp == "Year")
+        value = UTIME_THIS_YEAR;
+    else if (tmp == "x-days")
+        value = UTIME_LAST_X_DAYS;
     else
-
-        if (tmp == "None")
-            value = UTIME_NONE;
-        else if (tmp == "Today")
-            value = UTIME_TODAY;
-        else if (tmp == "Month")
-            value = UTIME_THIS_MONTH;
-        else if (tmp == "Year")
-            value = UTIME_THIS_YEAR;
-        else if (tmp == "x-days")
-            value = UTIME_LAST_X_DAYS;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -620,17 +577,12 @@ bool readText(const std::string& input, VersioningStyle& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "AddTimeStamp") //obsolete
+    if (tmp == "Replace")
+        value = VER_STYLE_REPLACE;
+    else if (tmp == "TimeStamp")
         value = VER_STYLE_ADD_TIMESTAMP;
     else
-
-        if (tmp == "Replace")
-            value = VER_STYLE_REPLACE;
-        else if (tmp == "TimeStamp")
-            value = VER_STYLE_ADD_TIMESTAMP;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -660,21 +612,16 @@ bool readText(const std::string& input, DirectionConfig::Variant& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    warn_static("remove after migration. 2013.08.20")
-    if (tmp == "Automatic") //obsolete!
+    if (tmp == "TwoWay")
         value = DirectionConfig::TWOWAY;
+    else if (tmp == "Mirror")
+        value = DirectionConfig::MIRROR;
+    else if (tmp == "Update")
+        value = DirectionConfig::UPDATE;
+    else if (tmp == "Custom")
+        value = DirectionConfig::CUSTOM;
     else
-
-        if (tmp == "TwoWay")
-            value = DirectionConfig::TWOWAY;
-        else if (tmp == "Mirror")
-            value = DirectionConfig::MIRROR;
-        else if (tmp == "Update")
-            value = DirectionConfig::UPDATE;
-        else if (tmp == "Custom")
-            value = DirectionConfig::CUSTOM;
-        else
-            return false;
+        return false;
     return true;
 }
 
@@ -811,13 +758,8 @@ namespace
 {
 void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
-    in["Variant"       ](cmpConfig.compareVar);
-
-    warn_static("remove check after migration. 2013.09.7")
-    if (in["HandleSymlinks"])//obsolete name
-        in["HandleSymlinks"](cmpConfig.handleSymlinks);
-    else
-        in["Symlinks"](cmpConfig.handleSymlinks);
+    in["Variant" ](cmpConfig.compareVar);
+    in["Symlinks"](cmpConfig.handleSymlinks);
 }
 
 
@@ -833,9 +775,7 @@ void readConfig(const XmlIn& in, DirectionConfig& directCfg)
     inCustDir["Different" ](directCfg.custom.different);
     inCustDir["Conflict"  ](directCfg.custom.conflict);
 
-    warn_static("remove check after migration. 2013.08.17")
-    if (in["DetectMovedFiles"]) //new value: remove check
-        in["DetectMovedFiles"](directCfg.detectMovedFiles);
+    in["DetectMovedFiles"](directCfg.detectMovedFiles);
 }
 
 
@@ -843,70 +783,30 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 {
     readConfig(in, syncCfg.directionCfg);
 
-    in["DeletionPolicy"](syncCfg.handleDeletion);
-
-    warn_static("remove after migration?")
-    if (in["CustomDeletionFolder"])
-        in["CustomDeletionFolder"](syncCfg.versioningDirectory);//obsolete name
-    else
-        in["VersioningFolder"](syncCfg.versioningDirectory);
-
-    warn_static("remove after migration?")
-    if (in["VersioningFolder"] &&
-        in["VersioningFolder"].get()->getAttribute("Style", syncCfg.versioningStyle)) //new parameter, do not complain when missing
-        ;
-    else if (in["VersioningStyle"]) //obsolete name
-        in["VersioningStyle"](syncCfg.versioningStyle);
-    else
-        syncCfg.versioningStyle = VER_STYLE_ADD_TIMESTAMP; //obsolete fallback
+    in["DeletionPolicy"  ](syncCfg.handleDeletion);
+    in["VersioningFolder"](syncCfg.versioningDirectory);
+    in["VersioningFolder"].get()->getAttribute("Style", syncCfg.versioningStyle);
 }
 
 
 void readConfig(const XmlIn& in, FilterConfig& filter)
 {
-    warn_static("remove after migration?")
-    auto haveFilterAsSingleString = [&]() -> bool
-    {
-        if (in["Include"])
-            if (auto elem = in["Include"].get())
-            {
-                std::string tmp;
-                if (elem->getValue(tmp))
-                    return !tmp.empty();
-            }
-        return false;
-    };
-    if (haveFilterAsSingleString()) //obsolete style
-    {
-        in["Include"](filter.includeFilter);
-        in["Exclude"](filter.excludeFilter);
-    }
-    else
-    {
-        std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //default value
-        in["Include"](tmp);
-        filter.includeFilter = mergeFilterLines(tmp);
+    std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //default value
+    in["Include"](tmp);
+    filter.includeFilter = mergeFilterLines(tmp);
 
-        std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //default value
-        in["Exclude"](tmp2);
-        filter.excludeFilter = mergeFilterLines(tmp2);
-    }
+    std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //default value
+    in["Exclude"](tmp2);
+    filter.excludeFilter = mergeFilterLines(tmp2);
 
     in["TimeSpan"](filter.timeSpan);
-    warn_static("remove after migration?")
-    if (in["UnitTimeSpan"]) in["UnitTimeSpan"](filter.unitTimeSpan);//obsolete name
-    else
-        in["TimeSpan"].attribute("Type", filter.unitTimeSpan);
+    in["TimeSpan"].attribute("Type", filter.unitTimeSpan);
 
     in["SizeMin"](filter.sizeMin);
-    if (in["UnitSizeMin"]) in["UnitSizeMin"](filter.unitSizeMin);//obsolete name
-    else
-        in["SizeMin"].attribute("Unit", filter.unitSizeMin);
+    in["SizeMin"].attribute("Unit", filter.unitSizeMin);
 
     in["SizeMax"](filter.sizeMax);
-    if (in["UnitSizeMax"]) in["UnitSizeMax"](filter.unitSizeMax);//obsolete name
-    else
-        in["SizeMax"].attribute("Unit", filter.unitSizeMax);
+    in["SizeMax"].attribute("Unit", filter.unitSizeMax);
 }
 
 
@@ -976,10 +876,7 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
             mainCfg.additionalPairs.push_back(newPair); //set additional folder pairs
     }
 
-    warn_static("remove after migration?")
-    if (inMain["ExecuteWhenFinished"]) inMain["ExecuteWhenFinished"](mainCfg.onCompletion); //obsolete name
-    else
-        inMain["OnCompletion"](mainCfg.onCompletion);
+    inMain["OnCompletion"](mainCfg.onCompletion);
 }
 
 
@@ -992,15 +889,9 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 
     inGuiCfg["HandleError"](config.handleError);
 
-    warn_static("remove after migration?")
-    if (inGuiCfg["SyncPreviewActive"]) //obsolete name
-        inGuiCfg["SyncPreviewActive"](config.highlightSyncAction);
-    else
-    {
-        std::string val;
-        if (inGuiCfg["MiddleGridView"](val)) //refactor into enum!?
-            config.highlightSyncAction = val == "Action";
-    }
+    std::string val;
+    if (inGuiCfg["MiddleGridView"](val)) //refactor into enum!?
+        config.highlightSyncAction = val == "Action";
 }
 
 
@@ -1014,22 +905,16 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     inBatchCfg["HandleError"     ](config.handleError);
 
     warn_static("remove after migration?")
-    if (inBatchCfg["ShowProgress"]) //2014-2-17
+    if (inBatchCfg["ShowProgress"]) //2014-2-17 -> obsolete name
     {
         inBatchCfg["ShowProgress"](config.runMinimized);
         config.runMinimized = !config.runMinimized;
     }
     else
-        inBatchCfg["RunMinimized"](config.runMinimized);
+        inBatchCfg["RunMinimized" ](config.runMinimized);
 
-    warn_static("remove after migration?")
-    if (inBatchCfg["LogfileDirectory"]) inBatchCfg["LogfileDirectory"](config.logFileDirectory); //obsolete name
-    else
-        inBatchCfg["LogfileFolder"](config.logFileDirectory);
-
-    if (inBatchCfg["LogfileCountMax" ]) inBatchCfg["LogfileCountMax"](config.logfilesCountLimit); //obsolete name
-    else
-        inBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
+    inBatchCfg["LogfileFolder"](config.logFileDirectory);
+    inBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 
 
@@ -1129,7 +1014,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inGui["ExternalApplications"](config.gui.externelApplications);
 
     warn_static("remove after migration: cleanup the old placeholder syntax") //26.10.2013
-    if (std::any_of(config.gui.externelApplications.begin(), config.gui.externelApplications.end(), [](const std::pair<Description, Commandline>& ea) { return contains(ea.second, L"%name") || contains(ea.second, L"%nameCo") || contains(ea.second, L"%dir") || contains(ea.second, L"%dirCo"); }))
+    if (std::any_of(config.gui.externelApplications.begin(), config.gui.externelApplications.end(),
+    [](const std::pair<Description, Commandline>& ea) { return contains(ea.second, L"%name") || contains(ea.second, L"%nameCo") || contains(ea.second, L"%dir") || contains(ea.second, L"%dirCo"); }))
     config.gui.externelApplications = XmlGlobalSettings().gui.externelApplications;
 
     //last update check

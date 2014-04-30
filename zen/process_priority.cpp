@@ -49,7 +49,7 @@ struct ScheduleForBackgroundProcessing::Pimpl {};
 ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing()
 {
     if (!::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_BEGIN)) //this call lowers CPU priority, too!!
-        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"SetPriorityClass", getLastError()));
+        throwFileError(_("Cannot change process I/O priorities."), L"SetPriorityClass", getLastError());
 }
 
 
@@ -136,10 +136,10 @@ ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing() : pimpl(make_
 {
     pimpl->oldIoPrio = ::getiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS);
     if (pimpl->oldIoPrio == -1)
-        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"getiopolicy_np", getLastError()));
+        throwFileError(_("Cannot change process I/O priorities."), L"getiopolicy_np", getLastError());
 
     if (::setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_THROTTLE) != 0)
-        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"setiopolicy_np", getLastError()));
+        throwFileError(_("Cannot change process I/O priorities."), L"setiopolicy_np", getLastError());
 }
 
 

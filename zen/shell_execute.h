@@ -68,8 +68,7 @@ void shellExecute2(const Zstring& command, ExecutionType type) //throw FileError
     execInfo.nShow        = SW_SHOWNORMAL;
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
-        throw FileError(_("Incorrect command line:") + L"\nFile: " + filename + L"\nArg: " + arguments,
-                        formatSystemError(L"ShellExecuteEx", getLastError()));
+        throwFileError(_("Incorrect command line:") + L"\nFile: " + filename + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
 
     if (execInfo.hProcess)
     {

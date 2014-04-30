@@ -7,6 +7,39 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural_definition>
 </header>
 
+<source>Synchronization</source>
+<target></target>
+
+<source>Comparison</source>
+<target></target>
+
+<source>Local settings:</source>
+<target></target>
+
+<source>Use local settings:</source>
+<target></target>
+
+<source>Save as...</source>
+<target></target>
+
+<source>Save as GUI job</source>
+<target></target>
+
+<source>Local Synchronization Settings</source>
+<target></target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target></target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target></target>
+
+<source>config files:</source>
+<target></target>
+
+<source>global config file:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения.</target>
 
@@ -79,17 +112,11 @@
 <source>Syntax:</source>
 <target>Синтаксис:</target>
 
-<source>config files</source>
-<target>конфигурационные файлы</target>
-
 <source>directory</source>
 <target>папка</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Любое количество FreeFileSync .ffs_gui и/или .ffs_batch конфигурационных файлов.</target>
-
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Любое количество альтернативных папок для одного конфигурационного файла.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
@@ -688,15 +715,6 @@ The command is triggered if:
 <source>Paste</source>
 <target>Вставить</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Альтернативные настройки сравнения</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Альтернативные настройки синхронизации</target>
-
-<source>Local Filter</source>
-<target>Локальный фильтр</target>
-
 <source>&New</source>
 <target>&Новая</target>
 
@@ -763,6 +781,12 @@ The command is triggered if:
 <source>Match case</source>
 <target>Учитывать регистр</target>
 
+<source>Open...</source>
+<target>Открыть...</target>
+
+<source>Save</source>
+<target>Сохранить</target>
+
 <source>Save as batch job</source>
 <target>Сохранить как пакетное задание</target>
 
@@ -802,20 +826,32 @@ The command is triggered if:
 <source>More information</source>
 <target>Подробнее</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Include:</source>
+<target>Включить:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Выявять и распространять изменения на обе стороны. Удаленные, перемещенные и конфликтующие файлы определяются автоматически с использованием базы данных.</target>
+<source>Exclude:</source>
+<target>Исключить:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Создавать зеркальную копию левой части, приводя правую часть в полное соответствие.</target>
+<source>Show examples</source>
+<target>Подробнее</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Копировать новые или обновленные файлы на правую сторону.</target>
+<source>Time span:</source>
+<target>Промежуток времени:</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Настроить свои собственные правила синхронизации.</target>
+<source>File size:</source>
+<target>Размер файла:</target>
+
+<source>Minimum:</source>
+<target>минимум:</target>
+
+<source>Maximum:</source>
+<target>максимум:</target>
+
+<source>&Reset</source>
+<target>&Сбросить</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Выберите правила фильтрации для исключения определенных файлов из синхронизации. Введите пути файлов относящиеся к соответствующим парам папок.</target>
 
 <source>Detect moved files</source>
 <target>Обнаруживать перемещенные файлы</target>
@@ -830,6 +866,9 @@ The command is triggered if:
 - Обнаруживает активность после начальной синхронизации
 - Поддерживается не всеми файловыми системами
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Обнаружение направления синхронизации с помощью файлов баз данных</target>
 
 <source>Delete files:</source>
 <target>Удаление файлов:</target>
@@ -855,9 +894,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Условие переименования:</target>
 
-<source>Show examples</source>
-<target>Подробнее</target>
-
 <source>Handle errors:</source>
 <target>Обработка ошибкок:</target>
 
@@ -876,8 +912,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>По завершению:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Обнаружение направления синхронизации с помощью файлов баз данных</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Начать синхронизацию сейчас?</target>
@@ -942,30 +978,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>В "&Корзину"</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Выберите правила фильтрации для исключения определенных файлов из синхронизации. Введите пути файлов относящиеся к соответствующим парам папок.</target>
-
-<source>Include:</source>
-<target>Включить:</target>
-
-<source>Exclude:</source>
-<target>Исключить:</target>
-
-<source>Time span:</source>
-<target>Промежуток времени:</target>
-
-<source>File size:</source>
-<target>Размер файла:</target>
-
-<source>Minimum:</source>
-<target>минимум:</target>
-
-<source>Maximum:</source>
-<target>максимум:</target>
-
-<source>&Reset</source>
-<target>&Сбросить</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следующие настройки используются для всех заданий синхронизации.</target>
@@ -1074,12 +1086,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Главная панель</target>
-
-<source>Open...</source>
-<target>Открыть...</target>
-
-<source>Save</source>
-<target>Сохранить</target>
 
 <source>Compare both sides</source>
 <target>Сравнить обе стороны</target>
@@ -1211,8 +1217,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Удалить выделенные настройки</target>
 
-<source>Filter</source>
-<target>Фильтр</target>
+<source>Synchronization Settings</source>
+<target>Настройки синхронизации</target>
 
 <source>Show files that exist on left side only</source>
 <target>Показать файлы, существующие только слева</target>
@@ -1262,14 +1268,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Установить по умолчанию</target>
 
+<source>Filter</source>
+<target>Фильтр</target>
+
 <source>All files are in sync</source>
 <target>Все файлы синхронизированы</target>
-
-<source>Synchronization Settings</source>
-<target>Настройки синхронизации</target>
-
-<source>Comparison Settings</source>
-<target>Настройки сравнения</target>
 
 <source>Cannot find %x</source>
 <target>Невозможно найти %x</target>
@@ -1331,30 +1334,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог (журнал)</target>
 
-<source>Today</source>
-<target>сегодня</target>
-
-<source>This week</source>
-<target>на этой неделе</target>
-
-<source>This month</source>
-<target>последний месяц</target>
-
-<source>This year</source>
-<target>последний год</target>
-
-<source>Last x days</source>
-<target>последние X дня(ей)</target>
-
-<source>Byte</source>
-<target>Байт</target>
-
-<source>KB</source>
-<target>КБ</target>
-
-<source>MB</source>
-<target>МБ</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1377,15 +1356,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Вы точно хотите удалить следующие %x элемента?</pluralform>
 <pluralform>Вы точно хотите удалить следующие %x элементов?</pluralform>
 </target>
-
-<source>Exclude</source>
-<target>Исключить</target>
-
-<source>Direct</source>
-<target>Прямое</target>
-
-<source>Follow</source>
-<target>Последовательное</target>
 
 <source>Copy NTFS permissions</source>
 <target>Копирование NTFS прав доступа</target>
@@ -1411,8 +1381,50 @@ This guarantees a consistent state even in case of a serious error.
 <source>Restore all hidden windows and warnings?</source>
 <target>Восстановить все скрытые окна и предупреждения?</target>
 
-<source>Leave as unresolved conflict</source>
-<target>Оставить как нерешенный конфликт</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Выявять и распространять изменения на обе стороны. Удаленные, перемещенные и конфликтующие файлы определяются автоматически с использованием базы данных.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Создавать зеркальную копию левой части, приводя правую часть в полное соответствие.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Копировать новые или обновленные файлы на правую сторону.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Настроить свои собственные правила синхронизации.</target>
+
+<source>Exclude</source>
+<target>Исключить</target>
+
+<source>Direct</source>
+<target>Прямое</target>
+
+<source>Follow</source>
+<target>Последовательное</target>
+
+<source>Today</source>
+<target>сегодня</target>
+
+<source>This week</source>
+<target>на этой неделе</target>
+
+<source>This month</source>
+<target>последний месяц</target>
+
+<source>This year</source>
+<target>последний год</target>
+
+<source>Last x days</source>
+<target>последние X дня(ей)</target>
+
+<source>Byte</source>
+<target>Байт</target>
+
+<source>KB</source>
+<target>КБ</target>
+
+<source>MB</source>
+<target>МБ</target>
 
 <source>Replace</source>
 <target>Без переименования</target>
@@ -1425,6 +1437,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Оставить как нерешенный конфликт</target>
 
 <source>File</source>
 <target>Файл</target>

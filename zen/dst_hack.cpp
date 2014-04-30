@@ -166,10 +166,10 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw std::runtime_error
             &utcTime,    //__in   const FILETIME *lpFileTime,
             &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
-        const std::wstring errorMsg = _("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
-                                      L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
-                                      L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"FileTimeToLocalFileTime", getLastError());
-        throw std::runtime_error(utfCvrtTo<std::string>(errorMsg));
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
+        throw std::runtime_error(utfCvrtTo<std::string>(_("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
+                                                        L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
+                                                        L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"FileTimeToLocalFileTime", lastError)));
     }
     return localTime;
 }
@@ -184,10 +184,10 @@ FILETIME localToUtc(const FILETIME& localTime) //throw std::runtime_error
             &localTime, //__in   const FILETIME *lpLocalFileTime,
             &utcTime))  //__out  LPFILETIME lpFileTime
     {
-        const std::wstring errorMsg = _("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
-                                      L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
-                                      L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"LocalFileTimeToFileTime", getLastError());
-        throw std::runtime_error(utfCvrtTo<std::string>(errorMsg));
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
+        throw std::runtime_error(utfCvrtTo<std::string>(_("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
+                                                        L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
+                                                        L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"LocalFileTimeToFileTime", lastError)));
     }
     return utcTime;
 }

@@ -95,13 +95,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;WXUSINGDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Data\Projects;C:\Data\Projects\zenXml;C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x86_debug_dll\mswud</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>wx+/pch.h</ForcedIncludeFiles>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <SmallerTypeCheck>true</SmallerTypeCheck>
       <MinimalRebuild>false</MinimalRebuild>
@@ -110,11 +109,11 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;wxbase30ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_debug_dll</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories></AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X86</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -123,13 +122,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;WXUSINGDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Data\Projects;C:\Data\Projects\zenXml;C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x64_debug_dll\mswud</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>wx+/pch.h</ForcedIncludeFiles>
       <ShowIncludes>false</ShowIncludes>
       <SmallerTypeCheck>true</SmallerTypeCheck>
       <MinimalRebuild>false</MinimalRebuild>
@@ -138,11 +136,11 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;wxbase30ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_debug_dll</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories></AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X64</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -152,29 +150,27 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Data\Projects;C:\Data\Projects\zenXml;C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib\mswu</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DisableSpecificWarnings>4100;4512;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <ForcedIncludeFiles>zen/warn_static.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles></ForcedIncludeFiles>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;wxmsw30u_adv.lib;wxbase30u_net.lib;wxbase30u.lib;wxmsw30u_core.lib;wxpng.lib;wxzlib.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw30u_adv.lib;wxbase30u_net.lib;wxbase30u.lib;wxmsw30u_core.lib;wxpng.lib;wxzlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage\lib;C:\Data\C++\wxWidgets\lib\vc12_x86_release_lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories></AdditionalLibraryDirectories>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X86</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"C:\Data\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,35 +179,29 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Data\Projects;C:\Data\Projects\zenXml;C:\Data\C++\Boost;C:\Data\C++\wxWidgets\include;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib\mswu</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WXMSW__;ZEN_WIN;WXINTL_NO_GETTEXT_MACRO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DisableSpecificWarnings>4100;4512;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <ForcedIncludeFiles>zen/warn_static.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles></ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;wxmsw30u_adv.lib;wxbase30u_net.lib;wxbase30u.lib;wxmsw30u_core.lib;wxpng.lib;wxzlib.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw30u_adv.lib;wxbase30u_net.lib;wxbase30u.lib;wxmsw30u_core.lib;wxpng.lib;wxzlib.lib%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Data\C++\Boost\stage_x64\lib;C:\Data\C++\wxWidgets\lib\vc12_x64_release_lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories></AdditionalLibraryDirectories>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Data\C++\wxWidgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories></AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);ZEN_ARCHITECTURE_X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"C:\Data\C++\CodeSigning\SignCode.cmd" "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\wx+\create_pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\..\..\wx+\image_resources.cpp" />
     <ClCompile Include="..\..\..\wx+\image_tools.cpp" />
     <ClCompile Include="..\..\..\wx+\mouse_move_dlg.cpp" />

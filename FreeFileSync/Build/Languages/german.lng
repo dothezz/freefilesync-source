@@ -7,18 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Local settings:</source>
-<target></target>
-
-<source>Use local settings:</source>
-<target></target>
-
-<source>Save as GUI job</source>
-<target></target>
-
-<source>Local Synchronization Settings</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -696,6 +684,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Paste</source>
 <target>Einfügen</target>
 
+<source>Local Synchronization Settings</source>
+<target>Lokale Synchronisationseinstellungen</target>
+
 <source>&New</source>
 <target>&Neu</target>
 
@@ -735,11 +726,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Check for new version</source>
 <target>&Auf neue Version prüfen</target>
 
-<source>Compare</source>
-<target>Vergleichen</target>
-
 <source>Cancel</source>
 <target>Abbrechen</target>
+
+<source>Compare</source>
+<target>Vergleichen</target>
 
 <source>Synchronize</source>
 <target>Synchronisieren</target>
@@ -768,6 +759,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Save</source>
 <target>Speichern</target>
 
+<source>Save as GUI job</source>
+<target>Als GUI-Auftrag speichern</target>
+
 <source>Save as batch job</source>
 <target>Als Batch-Auftrag speichern</target>
 
@@ -795,6 +789,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Total bytes to copy</source>
 <target>Gesamtmenge der zu kopierenden Daten</target>
 
+<source>Use local settings:</source>
+<target>Verwende lokale Einstellungen:</target>
+
 <source>Select a variant:</source>
 <target>Variante wählen:</target>
 
@@ -809,6 +806,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>More information</source>
 <target>Mehr Information</target>
+
+<source>Local settings:</source>
+<target>Lokale Einstellungen:</target>
 
 <source>Include:</source>
 <target>Einschließen:</target>

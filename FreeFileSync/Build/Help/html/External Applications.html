@@ -35,23 +35,23 @@ context menu shown after a right mouse click. The following macros can be used:
 <h3>Examples:</h3>
 
 <UL>
-	<LI>Start visual difference tool:<BR>
-	<FONT FACE="Courier New, monospace">&quot;C:\Program Files (x86)\WinMerge\WinMergeU.exe&quot; &quot;%item_path%&quot; &quot;%item2_path%&quot;<BR>&nbsp;</FONT>
+	<LI>Start visual content comparison tool:<BR>
+	<FONT FACE="Courier New, monospace">&quot;C:\Program Files (x86)\WinMerge\WinMergeU.exe&quot; &quot;%item_path%&quot; &quot;%item2_path%&quot;</FONT><BR>&nbsp;
 	
 	<LI>Show file in Windows Explorer:<BR>
-	<FONT FACE="Courier New, monospace">explorer /select, &quot;%item_path%&quot;<BR>&nbsp;</FONT>
+	<FONT FACE="Courier New, monospace">explorer /select, &quot;%item_path%&quot;</FONT><BR>&nbsp;
 	
-	<LI>Open file in associated application:<BR>
-	<FONT FACE="Courier New, monospace">cmd /c start &quot;&quot; &quot;%item_path%&quot; </FONT>or simply <FONT FACE="Courier New, monospace">&quot;%item_path%&quot;</FONT><BR>&nbsp;
+	<LI>Open file with associated application:<BR>
+	<FONT FACE="Courier New, monospace">&quot;%item_path%&quot;</FONT><BR>&nbsp;
 	
-	<LI>Open console dialog:<BR>
+	<LI>Open console for directory:<BR>
 	<FONT FACE="Courier New, monospace">cmd /k cd /D &quot;%item_folder%&quot;</FONT>
 </UL>
 
 <div class="bluebox">
 	<div class="bluebox_inner">
 			<B>Note</B><BR>
-			You need to protect macros with quotation marks if they can resolve to a file path with space characters.		
+			You need to protect macros with quotation marks if they can resolve to a file path containing space characters.		
 	</div>
 </div>
 <BR CLEAR=LEFT>

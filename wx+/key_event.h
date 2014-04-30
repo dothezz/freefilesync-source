@@ -62,8 +62,8 @@ public:
         callback_(callback),
         processingCallback(false)
     {
-		    Hide();    //this is just a dummy window so that its parent can have ownership
-            Disable(); //
+        Hide();    //this is just a dummy window so that its parent can have ownership
+        Disable(); //
 
         //register global hotkeys (without needing explicit menu entry)
         wxTheApp->Connect(wxEVT_KEY_DOWN,  wxKeyEventHandler(LokalKeyEventHandler::onGlobalKeyEvent), nullptr, this);

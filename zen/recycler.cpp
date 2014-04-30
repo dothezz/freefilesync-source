@@ -85,10 +85,10 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::func
     if (vistaOrLater()) //new recycle bin usage: available since Vista
     {
         using namespace fileop;
-        const DllFun<FunType_moveToRecycleBin> moveToRecycler(getDllName(), funName_moveToRecycleBin);
-        const DllFun<FunType_getLastError>     getLastError  (getDllName(), funName_getLastError);
+        const DllFun<FunType_moveToRecycleBin   > moveToRecycler     (getDllName(), funName_moveToRecycleBin);
+        const DllFun<FunType_getLastErrorMessage> getLastErrorMessage(getDllName(), funName_getLastErrorMessage);
 
-        if (!moveToRecycler || !getLastError)
+        if (!moveToRecycler || !getLastErrorMessage)
             throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(filenames[0])),
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
@@ -110,7 +110,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, const std::func
             if (filenames.size() > 1)
                 filenameFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
 
-            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", filenameFmt), getLastError()); //already includes details about locking errors!
+            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", filenameFmt), getLastErrorMessage()); //already includes details about locking errors!
         }
     }
     else //regular recycle bin usage: available since XP
@@ -242,15 +242,15 @@ bool zen::recycleBinExists(const Zstring& pathName, const std::function<void ()>
     {
         using namespace fileop;
         const DllFun<FunType_getRecycleBinStatus> getRecycleBinStatus(getDllName(), funName_getRecycleBinStatus);
-        const DllFun<FunType_getLastError>        getLastError       (getDllName(), funName_getLastError);
+        const DllFun<FunType_getLastErrorMessage> getLastErrorMessage(getDllName(), funName_getLastErrorMessage);
 
-        if (!getRecycleBinStatus || !getLastError)
+        if (!getRecycleBinStatus || !getLastErrorMessage)
             throw FileError(replaceCpy(_("Checking recycle bin failed for folder %x."), L"%x", fmtFileName(pathName)),
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
         bool hasRecycler = false;
         if (!getRecycleBinStatus(pathName.c_str(), hasRecycler))
-            throw FileError(replaceCpy(_("Checking recycle bin failed for folder %x."), L"%x", fmtFileName(pathName)), getLastError());
+            throw FileError(replaceCpy(_("Checking recycle bin failed for folder %x."), L"%x", fmtFileName(pathName)), getLastErrorMessage());
 
         return hasRecycler;
     }

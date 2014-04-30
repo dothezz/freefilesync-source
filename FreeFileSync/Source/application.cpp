@@ -26,7 +26,6 @@
 
 #ifdef ZEN_WIN
 #include <zen/win_ver.h>
-#include "../../validate.h"
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
@@ -149,7 +148,6 @@ bool Application::OnInit()
 
 #ifdef ZEN_WIN
     enableCrashingOnCrashes();
-    validateHandlers();
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif

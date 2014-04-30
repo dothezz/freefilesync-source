@@ -1166,9 +1166,6 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     wxBoxSizer* bSizer170 = new wxBoxSizer(wxVERTICAL);
     bSizer170->Add(&pnl, 1, wxEXPAND);
     this->SetSizer(bSizer170); //pass ownership
-    //this->Layout();
-    //bSizer170->Fit(this);
-    this->Centre(wxBOTH);
 
     //lifetime of event sources is subset of this instance's lifetime => no wxEvtHandler::Disconnect() needed
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler  (SyncProgressDialogImpl<TopLevelDialog>::OnClose));
@@ -1268,6 +1265,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     }
     else
         minimizeToTray();
+
+    this->Centre(wxBOTH); //call *after* dialog layout update!
 }
 
 

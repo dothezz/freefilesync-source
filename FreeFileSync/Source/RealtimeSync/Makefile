@@ -4,7 +4,9 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-CXXFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DWXINTL_NO_GETTEXT_MACRO -I../../.. -I../../../zenXml -include "zen/i18n.h" -include "zen/warn_static.h"
+CXXFLAGS  = -std=c++11 -pipe -O3 -DNDEBUG -DWXINTL_NO_GETTEXT_MACRO -I../../.. -I../../../zenXml -include "zen/i18n.h" -include "zen/warn_static.h" \
+-Wall -Winit-self -Wredundant-decls -Wmissing-include-dirs -Wswitch-enum -Wmain
+
 LINKFLAGS =
 
 #distinguish Linux/Mac builds
@@ -13,7 +15,7 @@ OPERATING_SYSTEM_NAME := $(shell uname)
 #################### Linux ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Linux)
 COMPILER_BIN=g++ -pthread
-CXXFLAGS += -DZEN_LINUX
+CXXFLAGS += -DZEN_LINUX -Wcast-align -Wshadow
 
 #Gtk - support "no button border"
 CXXFLAGS  += `pkg-config --cflags gtk+-2.0`
@@ -37,7 +39,7 @@ endif
 #################### OS X ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
-CXXFLAGS += -DZEN_MAC
+CXXFLAGS += -DZEN_MAC -Wbind-to-temporary-copy -Wambiguous-member-template -Wextra-tokens
 
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets/lib/release/bin/wx-config
 CXXFLAGS  += -I$(HOME)/Desktop/boost

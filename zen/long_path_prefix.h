@@ -18,10 +18,21 @@ namespace zen
 2. if path is smaller than MAX_PATH nothing is changed! caveat: FindFirstFile() "Prepending the string "\\?\" does not allow access to the root directory."
 3. path may already contain \\?\-prefix
 */
-Zstring applyLongPathPrefix(const Zstring& path); //throw()
-Zstring applyLongPathPrefixCreateDir(const Zstring& path); //throw() -> special rule for ::CreateDirectory()/::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
+Zstring applyLongPathPrefix(const Zstring& path); //noexcept
+Zstring applyLongPathPrefixCreateDir(const Zstring& path); //noexcept -> special rule for ::CreateDirectory()/::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
 
-Zstring removeLongPathPrefix(const Zstring& path); //throw()
+Zstring removeLongPathPrefix(const Zstring& path); //noexcept
+
+
+Zstring ntPathToWin32Path(const Zstring& path); //noexcept
+/*
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#NT_Namespaces
+
+As used by GetModuleFileNameEx() and symlinks (FSCTL_GET_REPARSE_POINT):
+	E.g.:
+	\??\C:\folder -> C:\folder
+	\SystemRoot   -> C:\Windows
+*/
 }
 
 
@@ -84,7 +95,7 @@ Zstring zen::applyLongPathPrefix(const Zstring& path)
 
 
 inline
-Zstring zen::applyLongPathPrefixCreateDir(const Zstring& path) //throw()
+Zstring zen::applyLongPathPrefixCreateDir(const Zstring& path) //noexcept
 {
     //special rule for ::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
     return applyLongPathPrefixImpl<MAX_PATH - 12> (path);
@@ -92,7 +103,7 @@ Zstring zen::applyLongPathPrefixCreateDir(const Zstring& path) //throw()
 
 
 inline
-Zstring zen::removeLongPathPrefix(const Zstring& path) //throw()
+Zstring zen::removeLongPathPrefix(const Zstring& path) //noexcept
 {
     if (zen::startsWith(path, LONG_PATH_PREFIX))
     {
@@ -102,6 +113,31 @@ Zstring zen::removeLongPathPrefix(const Zstring& path) //throw()
             return replaceCpy(path, LONG_PATH_PREFIX, Zstr(""), false);
     }
     return path; //fallback
+}
+
+
+inline
+Zstring zen::ntPathToWin32Path(const Zstring& path) //noexcept
+{
+    if (startsWith(path, L"\\??\\"))
+        return Zstring(path.c_str() + 4, path.length() - 4);
+
+    if (startsWith(path, L"\\SystemRoot\\"))
+    {
+        DWORD bufSize = ::GetEnvironmentVariable(L"SystemRoot", nullptr, 0);
+        if (bufSize > 0)
+        {
+            std::vector<wchar_t> buf(bufSize);
+            DWORD charsWritten = ::GetEnvironmentVariable(L"SystemRoot", //_In_opt_   LPCTSTR lpName,
+                                                          &buf[0],       //_Out_opt_  LPTSTR lpBuffer,
+                                                          bufSize);      //_In_       DWORD nSize
+
+            if (charsWritten != 0 && charsWritten < bufSize)
+                return replaceCpy(path, L"\\SystemRoot\\", appendSeparator(Zstring(&buf[0], charsWritten)), false);
+        }
+    }
+
+    return path;
 }
 
 #endif //LONGPATHPREFIX_H_INCLUDED

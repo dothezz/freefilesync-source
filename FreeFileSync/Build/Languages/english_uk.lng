@@ -7,6 +7,39 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Synchronization</source>
+<target></target>
+
+<source>Comparison</source>
+<target></target>
+
+<source>Local settings:</source>
+<target></target>
+
+<source>Use local settings:</source>
+<target></target>
+
+<source>Save as...</source>
+<target></target>
+
+<source>Save as GUI job</source>
+<target></target>
+
+<source>Local Synchronization Settings</source>
+<target></target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target></target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target></target>
+
+<source>config files:</source>
+<target></target>
+
+<source>global config file:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -76,17 +109,11 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>config files</source>
-<target>config files</target>
-
 <source>directory</source>
 <target>directory</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</target>
-
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Any number of alternative directories for at most one config file.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
@@ -678,15 +705,6 @@ The command is triggered if:
 <source>Paste</source>
 <target>Paste</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternate Comparison Settings</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternate Synchronisation Settings</target>
-
-<source>Local Filter</source>
-<target>Local Filter</target>
-
 <source>&New</source>
 <target>&New</target>
 
@@ -753,6 +771,12 @@ The command is triggered if:
 <source>Match case</source>
 <target>Match case</target>
 
+<source>Open...</source>
+<target>Open...</target>
+
+<source>Save</source>
+<target>Save</target>
+
 <source>Save as batch job</source>
 <target>Save as batch job</target>
 
@@ -792,20 +816,32 @@ The command is triggered if:
 <source>More information</source>
 <target>More information</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Include:</source>
+<target>Include:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
+<source>Exclude:</source>
+<target>Exclude:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Create a mirror backup of the left folder by adapting the right folder to match.</target>
+<source>Show examples</source>
+<target>Show examples</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Copy new and updated files to the right folder.</target>
+<source>Time span:</source>
+<target>Time span:</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Configure your own synchronisation rules.</target>
+<source>File size:</source>
+<target>File size:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maximum:</target>
+
+<source>&Reset</source>
+<target>&Reset</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Select filter rules to exclude certain files from synchronisation. Enter file paths relative to their corresponding folder pair.</target>
 
 <source>Detect moved files</source>
 <target>Detect moved files</target>
@@ -820,6 +856,9 @@ The command is triggered if:
 - Detection active after initial sync
 - Not supported by all file systems
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detect synchronisation directions with the help of database files</target>
 
 <source>Delete files:</source>
 <target>Delete files:</target>
@@ -845,9 +884,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Naming convention:</target>
 
-<source>Show examples</source>
-<target>Show examples</target>
-
 <source>Handle errors:</source>
 <target>Handle errors:</target>
 
@@ -866,8 +902,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>On completion:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detect synchronisation directions with the help of database files</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Start synchronisation now?</target>
@@ -928,30 +964,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Recycle bin</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Select filter rules to exclude certain files from synchronisation. Enter file paths relative to their corresponding folder pair.</target>
-
-<source>Include:</source>
-<target>Include:</target>
-
-<source>Exclude:</source>
-<target>Exclude:</target>
-
-<source>Time span:</source>
-<target>Time span:</target>
-
-<source>File size:</source>
-<target>File size:</target>
-
-<source>Minimum:</source>
-<target>Minimum:</target>
-
-<source>Maximum:</source>
-<target>Maximum:</target>
-
-<source>&Reset</source>
-<target>&Reset</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>The following settings are used for all synchronisation jobs.</target>
@@ -1060,12 +1072,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Main Bar</target>
-
-<source>Open...</source>
-<target>Open...</target>
-
-<source>Save</source>
-<target>Save</target>
 
 <source>Compare both sides</source>
 <target>Compare both sides</target>
@@ -1193,8 +1199,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Delete selected configurations</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Synchronization Settings</source>
+<target>Synchronisation Settings</target>
 
 <source>Show files that exist on left side only</source>
 <target>Show files that exist on left side only</target>
@@ -1244,14 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Set as default</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>All files are in sync</source>
 <target>All files are in sync</target>
-
-<source>Synchronization Settings</source>
-<target>Synchronisation Settings</target>
-
-<source>Comparison Settings</source>
-<target>Comparison Settings</target>
 
 <source>Cannot find %x</source>
 <target>Cannot find %x</target>
@@ -1313,6 +1316,69 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Log</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Move</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</target>
+
+<source>Copy NTFS permissions</source>
+<target>Copy NTFS permissions</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integrate external applications into context menu. The following macros are available:</target>
+
+<source>- full file or folder name</source>
+<target>- full file or folder name</target>
+
+<source>- folder part only</source>
+<target>- folder part only</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Other side's counterpart to %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Other side's counterpart to %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Restore all hidden windows and warnings?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Create a mirror backup of the left folder by adapting the right folder to match.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Copy new and updated files to the right folder.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configure your own synchronisation rules.</target>
+
+<source>Exclude</source>
+<target>Exclude</target>
+
+<source>Direct</source>
+<target>Direct</target>
+
+<source>Follow</source>
+<target>Follow</target>
+
 <source>Today</source>
 <target>Today</target>
 
@@ -1337,60 +1403,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Move</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Exclude</target>
-
-<source>Direct</source>
-<target>Direct</target>
-
-<source>Follow</source>
-<target>Follow</target>
-
-<source>Copy NTFS permissions</source>
-<target>Copy NTFS permissions</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrate external applications into context menu. The following macros are available:</target>
-
-<source>- full file or folder name</source>
-<target>- full file or folder name</target>
-
-<source>- folder part only</source>
-<target>- folder part only</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Other side's counterpart to %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Other side's counterpart to %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Restore all hidden windows and warnings?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Leave as unresolved conflict</target>
-
 <source>Replace</source>
 <target>Replace</target>
 
@@ -1402,6 +1414,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Append a time stamp to each file name</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Leave as unresolved conflict</target>
 
 <source>File</source>
 <target>File</target>

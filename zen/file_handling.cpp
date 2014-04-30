@@ -106,7 +106,7 @@ bool zen::somethingExists(const Zstring& objname)
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
     if (attr != INVALID_FILE_ATTRIBUTES)
         return true;
-    const ErrorCode lastError = getLastError();
+    const DWORD lastError = ::GetLastError();
 
     //handle obscure file permission problem where ::GetFileAttributes() fails with ERROR_ACCESS_DENIED or ERROR_SHARING_VIOLATION
     //while parent directory traversal is successful: e.g. "C:\pagefile.sys"
@@ -165,7 +165,7 @@ UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
     {
         const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
         if (searchHandle == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"FindFirstFile", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), L"FindFirstFile", getLastError());
         ::FindClose(searchHandle);
     }
     //        WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
@@ -186,12 +186,12 @@ UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
                                           FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
                                           nullptr);                                               //_In_opt_  HANDLE hTemplateFile
         if (hFile == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"CreateFile", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), L"CreateFile", getLastError());
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
         if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), L"GetFileInformationByHandle", getLastError());
 
         return UInt64(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
     }
@@ -199,7 +199,7 @@ UInt64 zen::getFilesize(const Zstring& filename) //throw FileError
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     if (::stat(filename.c_str(), &fileInfo) != 0)
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"stat", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), L"stat", getLastError());
 
     return UInt64(fileInfo.st_size);
 #endif
@@ -214,14 +214,14 @@ UInt64 zen::getFreeDiskSpace(const Zstring& path) //throw FileError
                               &bytesFree,                    //__out_opt  PULARGE_INTEGER lpFreeBytesAvailable,
                               nullptr,                       //__out_opt  PULARGE_INTEGER lpTotalNumberOfBytes,
                               nullptr))                      //__out_opt  PULARGE_INTEGER lpTotalNumberOfFreeBytes
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), formatSystemError(L"GetDiskFreeSpaceEx", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), L"GetDiskFreeSpaceEx", getLastError());
 
     return UInt64(bytesFree.LowPart, bytesFree.HighPart);
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct statfs info = {};
     if (::statfs(path.c_str(), &info) != 0)
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), formatSystemError(L"statfs", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), L"statfs", getLastError());
 
     return UInt64(info.f_bsize) * info.f_bavail;
 #endif
@@ -292,7 +292,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
                       newNameFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
                       0))                 //__in      DWORD dwFlags
     {
-        DWORD lastError = ::GetLastError();
+        DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         if (lastError == ERROR_ACCESS_DENIED) //MoveFileEx may fail to rename a read-only file on a SAMBA-share -> (try to) handle this
         {
@@ -323,7 +323,8 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
         const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
         std::wstring errorDescr = formatSystemError(L"MoveFileEx", lastError);
 
-        if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
+        //try to enhance error message:
+        if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
             const Zstring procList = getLockingProcessNames(oldName); //throw()
@@ -343,7 +344,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
 #elif defined ZEN_LINUX || defined ZEN_MAC
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
     {
-        const int lastError = errno; //copy before making other system calls!
+        const int lastError = errno; //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
         const std::wstring errorDescr = formatSystemError(L"rename", lastError);
 
@@ -549,7 +550,7 @@ void removeDirectoryImpl(const Zstring& directory, //throw FileError
         const wchar_t functionName[] = L"unlink";
         if (::unlink(directory.c_str()) != 0)
 #endif
-            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), formatSystemError(functionName, getLastError()));
+            throwFileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), functionName, getLastError());
     }
     else
     {
@@ -583,7 +584,7 @@ void removeDirectoryImpl(const Zstring& directory, //throw FileError
         const wchar_t functionName[] = L"rmdir";
         if (::rmdir(directory.c_str()) != 0)
 #endif
-            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), formatSystemError(functionName, getLastError()));
+            throwFileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), functionName, getLastError());
         //may spuriously fail with ERROR_DIR_NOT_EMPTY(145) even though all child items have
         //successfully been *marked* for deletion, but some application still has a handle open!
         //e.g. Open "C:\Test\Dir1\Dir2" (filled with lots of files) in Explorer, then delete "C:\Test\Dir1" via ::RemoveDirectory() => Error 145
@@ -631,12 +632,12 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
             {
                 const DWORD tmpAttr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
                 if (tmpAttr == INVALID_FILE_ATTRIBUTES)
-                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"GetFileAttributes", getLastError()));
+                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), L"GetFileAttributes", getLastError());
 
                 if (tmpAttr & FILE_ATTRIBUTE_READONLY)
                 {
                     if (!::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL))
-                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"SetFileAttributes", getLastError()));
+                        throwFileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), L"SetFileAttributes", getLastError());
 
                     attribs = tmpAttr; //reapplied on scope exit
                     return true;
@@ -680,13 +681,13 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                 hFile = openFile(false);
                 if (hFile == INVALID_HANDLE_VALUE)
                 {
-                    const ErrorCode lastError = getLastError(); //copy before making other system calls!
+                    const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
                     if (lastError == ERROR_ACCESS_DENIED)
                         if (removeReadonly()) //throw FileError
                             continue;
 
                     //3. after these herculean stunts we give up...
-                    throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"CreateFile", lastError));
+                    throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), L"CreateFile", lastError);
                 }
             }
             break;
@@ -701,7 +702,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                            nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
                            &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
         {
-            ErrorCode lastError = getLastError(); //copy before making other system calls!
+            ErrorCode lastError = getLastError(); //copy before directly or indirectly making other system calls!
 
             //function may fail if file is read-only: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
             if (lastError == ERROR_ACCESS_DENIED)
@@ -718,7 +719,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
                                                         FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
                                                         &basicInfo,         //__in  LPVOID lpFileInformation,
                                                         sizeof(basicInfo))) //__in  DWORD dwBufferSize
-                            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"SetFileInformationByHandle", getLastError()));
+                            throwFileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), L"SetFileInformationByHandle", getLastError());
                     };
 
                     auto toLargeInteger = [](const FILETIME& ft) -> LARGE_INTEGER
@@ -757,7 +758,6 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
             }
 
             std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename));
-            const std::wstring errorDescr = formatSystemError(L"SetFileTime", lastError);
 
             //add more meaningful message: FAT accepts only a subset of the NTFS date range
             if (lastError == ERROR_INVALID_PARAMETER &&
@@ -806,7 +806,7 @@ void setFileTimeRaw(const Zstring& filename, const FILETIME& creationTime, const
             }
 
             if (lastError != ERROR_SUCCESS)
-                throw FileError(errorMsg, errorDescr);
+                throwFileError(errorMsg, L"SetFileTime", lastError);
         }
     }
 #ifndef NDEBUG //verify written data: mainly required to check consistency of DST hack
@@ -873,19 +873,21 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
     //    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
     //
     //    if (::utimensat(AT_FDCWD, filename.c_str(), newTimes, procSl == SYMLINK_DIRECT ? AT_SYMLINK_NOFOLLOW : 0) != 0)
-    //        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"utimensat", getLastError()));
+    //        throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), L"utimensat", getLastError());
 
     //=> fallback to "retarded-idiot version"! -- DarkByte
 
+	//OS X: utime() is obsoleted by utimes()! utimensat() not yet implemented
+
     struct ::timeval newTimes[2] = {};
-    newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
+    newTimes[0].tv_sec = ::time(nullptr);     //access time (seconds)
     newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
 
     const int rv = procSl == ProcSymlink::FOLLOW ?
-                   :: utimes(filename.c_str(), newTimes) : //utimensat() not yet implemented on OS X
+                   :: utimes(filename.c_str(), newTimes) :
                    ::lutimes(filename.c_str(), newTimes);
     if (rv != 0)
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"utimes", getLastError()));
+        throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), L"utimes", getLastError());
 #endif
 }
 
@@ -898,7 +900,7 @@ bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
     if (!::GetVolumePathName(dirname.c_str(), //__in   LPCTSTR lpszFileName,
                              &buffer[0],      //__out  LPTSTR lpszVolumePathName,
                              bufferSize))     //__in   DWORD cchBufferLength
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"GetVolumePathName", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), L"GetVolumePathName", getLastError());
 
     DWORD fsFlags = 0;
     if (!::GetVolumeInformation(&buffer[0], //__in_opt   LPCTSTR lpRootPathName,
@@ -909,7 +911,7 @@ bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
                                 &fsFlags,   //__out_opt  LPDWORD lpFileSystemFlags,
                                 nullptr,    //__out      LPTSTR  lpFileSystemNameBuffer,
                                 0))         //__in       DWORD   nFileSystemNameSize
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"GetVolumeInformation", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), L"GetVolumeInformation", getLastError());
 
     return (fsFlags & FILE_PERSISTENT_ACLS) != 0;
 
@@ -935,7 +937,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
             errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
             return;
 
-        throw FileError(replaceCpy(_("Cannot read security context of %x."), L"%x", fmtFileName(source)), formatSystemError(L"getfilecon", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read security context of %x."), L"%x", fmtFileName(source)), L"getfilecon", getLastError());
     }
     ZEN_ON_SCOPE_EXIT(::freecon(contextSource));
 
@@ -963,7 +965,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
                     ::setfilecon(target.c_str(), contextSource) :
                     ::lsetfilecon(target.c_str(), contextSource);
     if (rv3 < 0)
-        throw FileError(replaceCpy(_("Cannot write security context of %x."), L"%x", fmtFileName(target)), formatSystemError(L"setfilecon", getLastError()));
+        throwFileError(replaceCpy(_("Cannot write security context of %x."), L"%x", fmtFileName(target)), L"setfilecon", getLastError());
 }
 #endif //HAVE_SELINUX
 
@@ -1014,7 +1016,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         if (bytesNeeded > buffer.size())
             buffer.resize(bytesNeeded);
         else
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)), formatSystemError(L"GetFileSecurity", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)), L"GetFileSecurity", getLastError());
     }
     SECURITY_DESCRIPTOR& secDescr = reinterpret_cast<SECURITY_DESCRIPTOR&>(buffer[0]);
 
@@ -1038,7 +1040,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
                            OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
                            DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION, //__in  SECURITY_INFORMATION SecurityInformation,
                            &secDescr)) //__in  PSECURITY_DESCRIPTOR pSecurityDescriptor
-        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(targetResolved)), formatSystemError(L"SetFileSecurity", getLastError()));
+        throwFileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(targetResolved)), L"SetFileSecurity", getLastError());
 
     /*
     PSECURITY_DESCRIPTOR buffer = nullptr;
@@ -1130,24 +1132,24 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     if (procSl == ProcSymlink::FOLLOW)
     {
         if (::stat(source.c_str(), &fileInfo) != 0)
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), formatSystemError(L"stat", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), L"stat", getLastError());
 
         if (::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0) // may require admin rights!
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chown", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), L"chown", getLastError());
 
         if (::chmod(target.c_str(), fileInfo.st_mode) != 0)
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chmod", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), L"chmod", getLastError());
     }
     else
     {
         if (::lstat(source.c_str(), &fileInfo) != 0)
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), formatSystemError(L"lstat", getLastError()));
+            throwFileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), L"lstat", getLastError());
 
         if (::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0) // may require admin rights!
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"lchown", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), L"lchown", getLastError());
 
         if (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chmod", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), L"chmod", getLastError());
     }
 #endif
 }
@@ -1251,7 +1253,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
     if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), //__in      LPCTSTR lpPathName,
                            nullptr))                                        //__in_opt  LPSECURITY_ATTRIBUTES lpSecurityAttributes
     {
-        ErrorCode lastError = getLastError();
+        DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         //handle issues with already existing short 8.3 file names on Windows
         if (lastError == ERROR_ALREADY_EXISTS)
@@ -1263,7 +1265,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
                 if (::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), nullptr))
                     lastError = ERROR_SUCCESS;
                 else
-                    lastError = getLastError();
+                    lastError = ::GetLastError();
             }
 
         if (lastError != ERROR_SUCCESS)
@@ -1282,7 +1284,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
 #elif defined ZEN_LINUX || defined ZEN_MAC
     if (::mkdir(directory.c_str(), 0755) != 0) //mode: drwxr-xr-x
     {
-        const ErrorCode lastError = getLastError();
+        const int lastError = errno; //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory));
         const std::wstring errorDescr = formatSystemError(L"mkdir", lastError);
 
@@ -1397,7 +1399,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     const wchar_t functionName[] = L"symlink";
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), formatSystemError(functionName, getLastError()));
+        throwFileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), functionName, getLastError());
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
     zen::ScopeGuard guardNewLink = zen::makeGuard([&]
@@ -1420,14 +1422,14 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     if (!::GetFileAttributesEx(applyLongPathPrefix(sourceLink).c_str(), //__in   LPCTSTR lpFileName,
                                GetFileExInfoStandard,                   //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
                                &sourceAttr))                            //__out  LPVOID lpFileInformation
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"GetFileAttributesEx", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), L"GetFileAttributesEx", getLastError());
 
     setFileTimeRaw(targetLink, sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, ProcSymlink::DIRECT); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat srcInfo = {};
     if (::lstat(sourceLink.c_str(), &srcInfo) != 0)
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), formatSystemError(L"lstat", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), L"lstat", getLastError());
 
     setFileTime(targetLink, Int64(srcInfo.st_mtime), ProcSymlink::DIRECT); //throw FileError
 #endif
@@ -1567,7 +1569,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                       nullptr);                                //_In_opt_  HANDLE hTemplateFile
     if (hFileSource == INVALID_HANDLE_VALUE)
     {
-        const DWORD lastError = ::GetLastError();
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         const std::wstring errorMsg = replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile));
         std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
@@ -1589,7 +1591,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //----------------------------------------------------------------------
     BY_HANDLE_FILE_INFORMATION fileInfoSource = {};
     if (!::GetFileInformationByHandle(hFileSource, &fileInfoSource))
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), L"GetFileInformationByHandle", getLastError());
 
     //----------------------------------------------------------------------
     const DWORD validAttribs = FILE_ATTRIBUTE_NORMAL   | //"This attribute is valid only if used alone."
@@ -1615,7 +1617,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                       nullptr);                                //_In_opt_  HANDLE hTemplateFile
     if (hFileTarget == INVALID_HANDLE_VALUE)
     {
-        const ErrorCode lastError = getLastError(); //copy before making other system calls!
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile));
         const std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
 
@@ -1634,7 +1636,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //----------------------------------------------------------------------
     BY_HANDLE_FILE_INFORMATION fileInfoTarget = {};
     if (!::GetFileInformationByHandle(hFileTarget, &fileInfoTarget))
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), L"GetFileInformationByHandle", getLastError());
 
     //return up-to-date file attributes
     if (newAttrib)
@@ -1683,8 +1685,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                0,                //OutBufferSize
                                &bytesReturned,   //number of bytes returned
                                nullptr))         //OVERLAPPED structure
-            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)),
-                            formatSystemError(L"DeviceIoControl, FSCTL_SET_SPARSE", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)), L"DeviceIoControl, FSCTL_SET_SPARSE", getLastError());
     }
 
     //----------------------------------------------------------------------
@@ -1711,7 +1712,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                           false,         //__in   BOOL bAbort,
                           false,         //__in   BOOL bProcessSecurity,
                           &contextRead)) //__out  LPVOID *lpContext
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"BackupRead", getLastError())); //better use fine-granular error messages "reading/writing"!
+            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"BackupRead", getLastError()); //better use fine-granular error messages "reading/writing"!
 
         if (bytesRead > BUFFER_SIZE)
             throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"buffer overflow"); //user should never see this
@@ -1727,7 +1728,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                            false,          //__in   BOOL bAbort,
                            false,          //__in   BOOL bProcessSecurity,
                            &contextWrite)) //__out  LPVOID *lpContext
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"BackupWrite", getLastError()));
+            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), L"BackupWrite", getLastError());
 
         if (bytesWritten != bytesRead)
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), L"incomplete write"); //user should never see this
@@ -1755,7 +1756,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                        &fileInfoSource.ftCreationTime,
                        nullptr,
                        &fileInfoSource.ftLastWriteTime))
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"SetFileTime", getLastError()));
+        throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)), L"SetFileTime", getLastError());
 
     guardTarget.dismiss();
 
@@ -1891,13 +1892,15 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         //#################### return source file attributes ################################
         if (!::GetFileInformationByHandle(hSourceFile, &cbd.fileInfoSrc))
         {
-            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.sourceFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+            const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
+            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.sourceFile_)), formatSystemError(L"GetFileInformationByHandle", lastError));
             return PROGRESS_CANCEL;
         }
 
         if (!::GetFileInformationByHandle(hDestinationFile, &cbd.fileInfoTrg))
         {
-            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
+            const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
+            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)), formatSystemError(L"GetFileInformationByHandle", lastError));
             return PROGRESS_CANCEL;
         }
 
@@ -1995,7 +1998,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     cbd.errorHandler.evaluateErrors(); //throw ?, process errors in callback first!
     if (!success)
     {
-        const DWORD lastError = ::GetLastError();
+        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         //don't suppress "lastError == ERROR_REQUEST_ABORTED": a user aborted operation IS an error condition!
 
@@ -2144,7 +2147,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
 
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"fstat", getLastError()));
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), L"fstat", getLastError());
 
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: place guard before lifetime of FileOutput
     try
@@ -2171,7 +2174,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
             //read and return file statistics
             struct ::stat targetInfo = {};
             if (::fstat(fileOut.getDescriptor(), &targetInfo) != 0)
-                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"fstat", getLastError()));
+                throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), L"fstat", getLastError());
 
             if (newAttrib)
             {

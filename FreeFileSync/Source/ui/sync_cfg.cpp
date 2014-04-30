@@ -429,7 +429,7 @@ void ConfigDialog::updateCompGui()
     setBitmap(*m_bitmapByContent, localCmpVar == CMP_BY_CONTENT,   getResourceImage(L"cmpByContent"));
 
     //active variant description:
-    setText(*m_textCtrlCompVarDescription, getCompVariantDescription(localCmpVar));
+    setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
 }
 
 
@@ -773,8 +773,8 @@ void ConfigDialog::updateSyncGui()
     fgSizerSyncDirections->Show(so.syncCfg.directionCfg.var != DirectionConfig::TWOWAY);
 
     if (so.syncCfg.directionCfg.var == DirectionConfig::TWOWAY)
-		setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
-	else
+        setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
+    else
     {
         const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ?  localCmpVar : globalCmpVar_;
 
@@ -788,7 +788,7 @@ void ConfigDialog::updateSyncGui()
     }
 
     //active variant description:
-    setText(*m_textCtrlSyncVarDescription, getSyncVariantDescription(so.syncCfg.directionCfg.var));
+    setText(*m_textCtrlSyncVarDescription, L"\n" + getSyncVariantDescription(so.syncCfg.directionCfg.var));
 
     //update toggle buttons -> they have no parameter-ownership at all!
     m_toggleBtnTwoWay->SetValue(false);

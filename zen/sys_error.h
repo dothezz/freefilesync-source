@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef LAST_ERROR_H_3284791347018951324534
-#define LAST_ERROR_H_3284791347018951324534
+#ifndef SYS_ERROR_H_3284791347018951324534
+#define SYS_ERROR_H_3284791347018951324534
 
 #include <string>
 #include "utf.h"
@@ -67,7 +67,7 @@ ErrorCode getLastError()
 }
 
 
-std::wstring formatSystemError(const std::wstring& functionName, long long lastError); //not implemented! intentional overload ambiguity to catch usage errors with HRESULT!
+std::wstring formatSystemError(const std::wstring& functionName, long long lastError) = delete; //not implemented! intentional overload ambiguity to catch usage errors with HRESULT!
 
 
 inline
@@ -110,4 +110,4 @@ std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastE
 }
 }
 
-#endif //LAST_ERROR_H_3284791347018951324534
+#endif //SYS_ERROR_H_3284791347018951324534

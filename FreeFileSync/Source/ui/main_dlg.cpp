@@ -321,6 +321,9 @@ void setMenuItemImage(wxMenuItem*& menuItem, const wxBitmap& bmp)
 }
 
 
+const int TOP_BUTTON_OPTIMAL_WIDTH = 180;
+
+
 void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& variantName, bool makeGrey)
 {
     wxImage labelImage   = createImageFromText(btn.GetLabel(), btn.GetFont(), wxSystemSettings::GetColour(makeGrey ? wxSYS_COLOUR_GRAYTEXT : wxSYS_COLOUR_BTNTEXT));
@@ -332,9 +335,9 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
                        stackImages(iconImage, descrImage, ImageStackLayout::HORIZONTAL, ImageStackAlignment::CENTER, 5) :
                        stackImages(descrImage, iconImage, ImageStackLayout::HORIZONTAL, ImageStackAlignment::CENTER, 5);
 
-    //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work corretly
+    //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work correctly
     wxSize minSize = dynImage.GetSize() + wxSize(10, 10); //add border space
-    minSize.x = std::max(minSize.x, 180);
+    minSize.x = std::max(minSize.x, TOP_BUTTON_OPTIMAL_WIDTH);
 
     btn.SetMinSize(minSize);
 
@@ -487,6 +490,17 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     setRelativeFontSize(*m_buttonSync,    1.4);
     setRelativeFontSize(*m_buttonCancel,  1.4);
 
+    //set icons for this dialog
+    SetIcon(getFfsIcon()); //set application icon
+
+    m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
+    m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
+    m_bpButtonOpen      ->SetBitmapLabel(getResourceImage(L"load"));
+    m_bpButtonSaveAs    ->SetBitmapLabel(getResourceImage(L"sync"));
+    m_bpButtonBatchJob  ->SetBitmapLabel(getResourceImage(L"batch"));
+    m_bpButtonAddPair   ->SetBitmapLabel(getResourceImage(L"item_add"));
+    m_bpButtonHideSearch->SetBitmapLabel(getResourceImage(L"close_panel"));
+
     //---------------- support for dockable gui style --------------------------------
     bSizerPanelHolder->Detach(m_panelTopButtons);
     bSizerPanelHolder->Detach(m_panelDirectoryPairs);
@@ -523,8 +537,11 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
     m_panelTopButtons->GetSizer()->SetSizeHints(m_panelTopButtons); //~=Fit() + SetMinSize()
 
+    m_buttonCancel->SetMinSize(wxSize(std::max(m_buttonCancel->GetSize().x, TOP_BUTTON_OPTIMAL_WIDTH),
+                                      std::max(m_buttonCancel->GetSize().y, m_buttonCompare->GetSize().y)));
+
     auiMgr.AddPane(m_panelTopButtons,
-                   wxAuiPaneInfo().Name(L"PanelTop").Layer(4).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelTop").Layer(4).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(TOP_BUTTON_OPTIMAL_WIDTH, m_panelTopButtons->GetSize().GetHeight()));
     //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
     auiMgr.AddPane(compareStatus->getAsWindow(),
@@ -595,17 +612,6 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 #ifdef ZEN_WIN
     new PanelMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere... //ownership passed to "this"
 #endif
-
-    //set icons for this dialog
-    SetIcon(getFfsIcon()); //set application icon
-
-    m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
-    m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
-    m_bpButtonOpen      ->SetBitmapLabel(getResourceImage(L"load"));
-    m_bpButtonSaveAs    ->SetBitmapLabel(getResourceImage(L"sync"));
-    m_bpButtonBatchJob  ->SetBitmapLabel(getResourceImage(L"batch"));
-    m_bpButtonAddPair   ->SetBitmapLabel(getResourceImage(L"item_add"));
-    m_bpButtonHideSearch->SetBitmapLabel(getResourceImage(L"close_panel"));
 
     //we can't use a wxButton for cancel: it's rendered smaller on OS X than a wxBitmapButton!
     setBitmapTextLabel(*m_buttonCancel, wxImage(), m_buttonCancel->GetLabel());
@@ -700,11 +706,13 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_panelTopLeft->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeLeftFolderWidth), nullptr, this);
 
     //dynamically change sizer direction depending on size
-    m_panelConfig    ->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeConfigPanel),     nullptr, this);
-    m_panelViewFilter->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeViewPanel),       nullptr, this);
+    m_panelTopButtons->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeTopButtonPanel), nullptr, this);
+    m_panelConfig    ->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeConfigPanel),    nullptr, this);
+    m_panelViewFilter->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeViewPanel),      nullptr, this);
     wxSizeEvent dummy3;
-    OnResizeConfigPanel    (dummy3); //call once on window creation
-    OnResizeViewPanel      (dummy3); //
+    OnResizeTopButtonPanel(dummy3); //
+    OnResizeConfigPanel   (dummy3); //call once on window creation
+    OnResizeViewPanel     (dummy3); //
 
     //event handler for manual (un-)checking of rows and setting of sync direction
     m_gridMainC->Connect(EVENT_GRID_CHECK_ROWS,     CheckRowsEventHandler    (MainDialog::onCheckRows), nullptr, this);
@@ -1600,6 +1608,13 @@ void updateSizerOrientation(wxBoxSizer& sizer, wxWindow& window, double horizont
         window.Layout();
     }
 }
+}
+
+
+void MainDialog::OnResizeTopButtonPanel(wxEvent& event)
+{
+    updateSizerOrientation(*bSizerTopButtons, *m_panelTopButtons, 0.5);
+    event.Skip();
 }
 
 

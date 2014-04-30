@@ -73,8 +73,8 @@ public:
 
 private:
     class AsyncResult;
-    std::shared_ptr<AsyncResult> result;
-    size_t jobsTotal;
+    std::shared_ptr<AsyncResult> asyncResult;
+    size_t jobsTotal_;
 };
 
 
@@ -178,27 +178,27 @@ private:
 
 
 template <class T> inline
-GetFirstResult<T>::GetFirstResult() : result(std::make_shared<AsyncResult>()), jobsTotal(0) {}
+GetFirstResult<T>::GetFirstResult() : asyncResult(std::make_shared<AsyncResult>()), jobsTotal_(0) {}
 
 
 template <class T>
 template <class Fun> inline
 void GetFirstResult<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
 {
-    auto result2 = result; //capture member variable, not "this"!
-    boost::thread t([result2, f] { result2->reportFinished(f()); });
-    ++jobsTotal;
+    auto asyncResult2 = asyncResult; //capture member variable, not "this"!
+    boost::thread t([asyncResult2, f] { asyncResult2->reportFinished(f()); });
+    ++jobsTotal_;
     t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
 }
 
 
 template <class T>
 template <class Duration> inline
-bool GetFirstResult<T>::timedWait(const Duration& duration) const { return result->waitForResult(jobsTotal, duration); }
+bool GetFirstResult<T>::timedWait(const Duration& duration) const { return asyncResult->waitForResult(jobsTotal_, duration); }
 
 
 template <class T> inline
-std::unique_ptr<T> GetFirstResult<T>::get() const { return result->getResult(jobsTotal); }
+std::unique_ptr<T> GetFirstResult<T>::get() const { return asyncResult->getResult(jobsTotal_); }
 }
 
 #endif //BOOST_THREAD_WRAP_H_78963234
