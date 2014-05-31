@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Składnia:</target>
 
-<source>config files</source>
-<target>pliki konfiguracyjne</target>
+<source>global config file:</source>
+<target>globalny plik konfiguracyjny:</target>
+
+<source>config files:</source>
+<target>pliki konfiguracyjne:</target>
 
 <source>directory</source>
 <target>katalog</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Alternatywna ścieżka do pliku GlobalSettings.xml.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Dowolna ilość plików konfiguracyjnych FreeFileSync .ffs_gui/.ffs_batch.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Dowolna liczba katalogów w przypadku użycia jednego pliku konfiguracyjnego.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Dowolna liczba alternatywnych par katalogów dla najwyżej jednego pliku konfiguracyjnego.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
@@ -655,11 +661,11 @@ Komenda jest wykonywana gdy:
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternatywne ustawienia porównywania</target>
+<source>Local comparison settings</source>
+<target>Lokalne ustawienia porównywania</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternatywne ustawienia synchronizacji</target>
+<source>Local synchronization settings</source>
+<target>Lokalne ustawienia synchronizacji</target>
 
 <source>Local filter</source>
 <target>Filtr lokalny</target>
@@ -670,11 +676,11 @@ Komenda jest wykonywana gdy:
 <source>None</source>
 <target>Żaden</target>
 
-<source>Remove alternate settings</source>
-<target>Usuń alternatywne ustawienia</target>
+<source>Remove local settings</source>
+<target>Usuń lokalne ustawienia</target>
 
-<source>Clear filter settings</source>
-<target>Wyczyść ustawienia filtra</target>
+<source>Reset local filter</source>
+<target>Resetuj lokalny filtr</target>
 
 <source>Copy</source>
 <target>Kopiuj</target>
@@ -682,14 +688,8 @@ Komenda jest wykonywana gdy:
 <source>Paste</source>
 <target>Wklej</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternatywne ustawienia porównywania</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternatywne ustawienia synchronizacji</target>
-
-<source>Local Filter</source>
-<target>Filtr lokalny</target>
+<source>Local Synchronization Settings</source>
+<target>Lokalne Ustawienia Synchronizacji</target>
 
 <source>&New</source>
 <target>&Nowy</target>
@@ -706,8 +706,8 @@ Komenda jest wykonywana gdy:
 <source>2. &Synchronize</source>
 <target>2. &Synchronizuj</target>
 
-<source>&Global settings</source>
-<target>&Ustawienia programu</target>
+<source>&Options</source>
+<target>&Opcje</target>
 
 <source>&Language</source>
 <target>&Język</target>
@@ -730,11 +730,11 @@ Komenda jest wykonywana gdy:
 <source>&Check for new version</source>
 <target>Sprawdź &nową wersję</target>
 
-<source>Compare</source>
-<target>Porównaj</target>
-
 <source>Cancel</source>
 <target>Anuluj</target>
+
+<source>Compare</source>
+<target>Porównaj</target>
 
 <source>Synchronize</source>
 <target>Synchronizuj</target>
@@ -757,8 +757,20 @@ Komenda jest wykonywana gdy:
 <source>Match case</source>
 <target>Uwzględnij wielkość liter</target>
 
+<source>Open...</source>
+<target>Otwórz...</target>
+
+<source>Save</source>
+<target>Zapisz</target>
+
+<source>Save as GUI job</source>
+<target>Zapisz zadanie</target>
+
 <source>Save as batch job</source>
 <target>Zapisz w trybie wsadowym</target>
+
+<source>Save as...</source>
+<target>Zapisz jako...</target>
 
 <source>View type:</source>
 <target>Typ widoku:</target>
@@ -781,6 +793,9 @@ Komenda jest wykonywana gdy:
 <source>Total bytes to copy</source>
 <target>Całkowity rozmiar do skopiowania</target>
 
+<source>Use local settings:</source>
+<target>Korzystaj z ustawień lokalnych:</target>
+
 <source>Select a variant:</source>
 <target>Określ wariant:</target>
 
@@ -796,20 +811,35 @@ Komenda jest wykonywana gdy:
 <source>More information</source>
 <target>Więcej informacji</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Ustawienia lokalne:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Wyszukaj oraz zastosuj zmiany po obu stronach. Wszystkie operacje na plikach takie jak usunięcia, zmiany oraz konflikty wykrywane są automatycznie przy użyciu bazy danych.</target>
+<source>Include:</source>
+<target>Dołącz:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Utwórz lustrzaną kopię lewego katalogu. Cała zawartość prawego katalogu będzie usunięta bądź nadpisana zawartością lewego katalogu.</target>
+<source>Exclude:</source>
+<target>Wyklucz:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopiuj nowe i zmodyfikowane pliki do prawego katalogu.</target>
+<source>Show examples</source>
+<target>Przykład</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Skonfiguruj swoje własne reguły synchronizacji.</target>
+<source>Time span:</source>
+<target>Przedział czasu:</target>
+
+<source>File size:</source>
+<target>Rozmiar pliku:</target>
+
+<source>Minimum:</source>
+<target>Minimalny:</target>
+
+<source>Maximum:</source>
+<target>Maksymalny:</target>
+
+<source>&Reset</source>
+<target>&Resetuj</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Określ reguły filtrowania w celu wykluczenia niektórych plików z synchronizacji. Ścieżki plików muszą być relatywne do podanych par katalogów.</target>
 
 <source>Detect moved files</source>
 <target>Wykryj przeniesione pliki.</target>
@@ -824,6 +854,9 @@ Komenda jest wykonywana gdy:
 - Funkcja aktywna po pierwszej synchronizacji
 - Niewspierany przez wszystkie systemy plików
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
 
 <source>Delete files:</source>
 <target>Usuwanie plików:</target>
@@ -849,9 +882,6 @@ Komenda jest wykonywana gdy:
 <source>Naming convention:</source>
 <target>Konwencja nazewnictwa:</target>
 
-<source>Show examples</source>
-<target>Przykład</target>
-
 <source>Handle errors:</source>
 <target>Obsługa błędów:</target>
 
@@ -870,8 +900,8 @@ Komenda jest wykonywana gdy:
 <source>On completion:</source>
 <target>Po zakończeniu:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Rozpocząć teraz synchronizację?</target>
@@ -932,30 +962,6 @@ Komenda jest wykonywana gdy:
 
 <source>&Recycle bin</source>
 <target>&Kosz systemowy</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Określ reguły filtrowania w celu wykluczenia niektórych plików z synchronizacji. Ścieżki plików muszą być relatywne do podanych par katalogów.</target>
-
-<source>Include:</source>
-<target>Dołącz:</target>
-
-<source>Exclude:</source>
-<target>Wyklucz:</target>
-
-<source>Time span:</source>
-<target>Przedział czasu:</target>
-
-<source>File size:</source>
-<target>Rozmiar pliku:</target>
-
-<source>Minimum:</source>
-<target>Minimalny:</target>
-
-<source>Maximum:</source>
-<target>Maksymalny:</target>
-
-<source>&Reset</source>
-<target>&Resetuj</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Następujące ustawienia stosowane są do wszystkich zadań synchronizacji.</target>
@@ -1041,11 +1047,14 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Delete Items</source>
 <target>Usuń elementy</target>
 
-<source>Global Settings</source>
-<target>Ustawienia ogólne</target>
+<source>Options</source>
+<target>Opcje</target>
 
 <source>Select Time Span</source>
 <target>Określ</target>
+
+<source>&Preferences...</source>
+<target>&Preferencje...</target>
 
 <source>Folder Pairs</source>
 <target>Pary katalogów</target>
@@ -1064,12 +1073,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Main Bar</source>
 <target>Główny pasek</target>
-
-<source>Open...</source>
-<target>Otwórz...</target>
-
-<source>Save</source>
-<target>Zapisz</target>
 
 <source>Compare both sides</source>
 <target>Porównaj foldery</target>
@@ -1201,8 +1204,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Delete selected configurations</source>
 <target>Usuń wybrane konfiguracje</target>
 
-<source>Filter</source>
-<target>Filtr</target>
+<source>Synchronization Settings</source>
+<target>Ustawienia synchronizacji</target>
+
+<source>Reset filter</source>
+<target>Resetuj filtr</target>
 
 <source>Show files that exist on left side only</source>
 <target>Pokaż pliki istniejące tylko po lewej stronie</target>
@@ -1252,14 +1258,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Set as default</source>
 <target>Zapisz jako domyślne</target>
 
+<source>Filter</source>
+<target>Filtr</target>
+
 <source>All files are in sync</source>
 <target>Pliki zsynchronizowane</target>
-
-<source>Synchronization Settings</source>
-<target>Ustawienia synchronizacji</target>
-
-<source>Comparison Settings</source>
-<target>Ustawienia porównywania</target>
 
 <source>Cannot find %x</source>
 <target>Nie można znaleźć %x</target>
@@ -1321,6 +1324,74 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Log</source>
 <target>Log</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz przenieść ten element do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść te %x elementy do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść te %x elementów do kosza?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Przenieś</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz usunąć następujący element?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujące elementy?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujących elementów?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Preferencje</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopiuj uprawnienia NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne makra:</target>
+
+<source>- full file or folder name</source>
+<target>- pełna nazwa pliku lub katalogu</target>
+
+<source>- folder part only</source>
+<target>- tylko część katalogu</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Odpowiednik %item_path% po drugiej stronie</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Odpowiednik %item_folder% po drugiej stronie</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Przywrócić wszystkie ukryte dialogi?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Wyszukaj oraz zastosuj zmiany po obu stronach. Wszystkie operacje na plikach takie jak usunięcia, zmiany oraz konflikty wykrywane są automatycznie przy użyciu bazy danych.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Utwórz lustrzaną kopię lewego katalogu. Cała zawartość prawego katalogu będzie usunięta bądź nadpisana zawartością lewego katalogu.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopiuj nowe i zmodyfikowane pliki do prawego katalogu.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Skonfiguruj swoje własne reguły synchronizacji.</target>
+
+<source>Exclude</source>
+<target>Wyklucz</target>
+
+<source>Direct</source>
+<target>Bezpośrednio</target>
+
+<source>Follow</source>
+<target>Podążaj</target>
+
 <source>Today</source>
 <target>Dzisiaj</target>
 
@@ -1345,62 +1416,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Czy na pewno chcesz przenieść ten element do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz przenieść te %x elementy do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz przenieść te %x elementów do kosza?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Przenieś</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Czy na pewno chcesz usunąć następujący element?</pluralform>
-<pluralform>Czy na pewno chcesz usunąć %x następujące elementy?</pluralform>
-<pluralform>Czy na pewno chcesz usunąć %x następujących elementów?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Wyklucz</target>
-
-<source>Direct</source>
-<target>Bezpośrednio</target>
-
-<source>Follow</source>
-<target>Podążaj</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopiuj uprawnienia NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne makra:</target>
-
-<source>- full file or folder name</source>
-<target>- pełna nazwa pliku lub katalogu</target>
-
-<source>- folder part only</source>
-<target>- tylko część katalogu</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Odpowiednik %item_path% po drugiej stronie</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Odpowiednik %item_folder% po drugiej stronie</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Przywrócić wszystkie ukryte dialogi?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Zostaw jako nierozwiązany konflikt</target>
-
 <source>Replace</source>
 <target>Zamień</target>
 
@@ -1412,6 +1427,15 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Append a time stamp to each file name</source>
 <target>Dołącz datę do nazwy każdego pliku</target>
+
+<source>Comparison</source>
+<target>Porównanie</target>
+
+<source>Synchronization</source>
+<target>Synchronizacja</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Zostaw jako nierozwiązany konflikt</target>
 
 <source>File</source>
 <target>Plik</target>

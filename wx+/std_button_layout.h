@@ -7,6 +7,7 @@
 #ifndef STD_BUTTON_ORDER_H_18347032147831732143214
 #define STD_BUTTON_ORDER_H_18347032147831732143214
 
+#include <algorithm>
 #include <wx/sizer.h>
 #include <wx/button.h>
 
@@ -24,7 +25,7 @@ struct StdButtons
     wxButton* btnCancel;
 };
 
-void setStandardButtonOrder(wxBoxSizer& sizer, const StdButtons& buttons = StdButtons());
+void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons = StdButtons());
 //sizer width will change! => call wxWindow::Fit and wxWindow::Layout
 
 
@@ -39,7 +40,7 @@ void setStandardButtonOrder(wxBoxSizer& sizer, const StdButtons& buttons = StdBu
 
 //--------------- impelementation -------------------------------------------
 inline
-void setStandardButtonOrder(wxBoxSizer& sizer, const StdButtons& buttons)
+void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
 {
     assert(sizer.GetOrientation() == wxHORIZONTAL);
 
@@ -79,21 +80,26 @@ void setStandardButtonOrder(wxBoxSizer& sizer, const StdButtons& buttons)
 #elif defined ZEN_MAC
     //OS X Human Interface Guidelines: http://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/AppleHIGuidelines/Windows/Windows.html
     const int spaceH    = 14; //OK
-    const int spaceRimH = 20; //OK
-    const int spaceRimV = 11; //compromise; custom button height (of 30 pix) is considered, although the button is drawn smaller; otherwise 15 seems to have been optimal
+    const int spaceRimH = 24; //OK
+    const int spaceRimV = 14; //OK
 #endif
 
-    bool firstButtonSet = false;
+    bool settingFirstButton = true;
     auto attach = [&](wxButton* btn)
     {
         if (btn)
         {
-            if (firstButtonSet)
-                sizer.Add(spaceH, 0);
+            assert(btn->GetMinSize().GetHeight() == -1); //let OS or this routine do the sizing! note: OS X does not allow changing the (visible!) button height!
+#if defined ZEN_WIN || defined ZEN_LINUX
+    const int defaultHeight = wxButton::GetDefaultSize().GetHeight(); //buffered by wxWidgets
+            btn->SetMinSize(wxSize(-1, std::max(defaultHeight, 30))); //default button height is much too small => increase!
+#endif
+
+            if (settingFirstButton)
+                settingFirstButton = false;
             else
-                firstButtonSet = true;
+                sizer.Add(spaceH, 0);
             sizer.Add(btn, 0, wxTOP | wxBOTTOM | wxALIGN_CENTER_VERTICAL, spaceRimV);
-            assert(btn->GetSize().GetHeight() == 30); //see comment for OS X above
         }
     };
 
@@ -126,7 +132,7 @@ void setStandardButtonOrder(wxBoxSizer& sizer, const StdButtons& buttons)
     if (buttonsTmp.btnNo)
     {
         attach(buttonsTmp.btnNo);
-        sizer.Add(42 - spaceH, 0); //OS X Human Interface Guidelines: "position it at least 24 pixels away from the “safe” buttons" -> however 42 is used in practice!
+        sizer.Add(83 - spaceH, 0); //OS X Human Interface Guidelines: "position it at least 24 pixels away from the “safe” buttons" -> however 83 is used in practice!
     }
     attach(buttonsTmp.btnCancel);
     attach(buttonsTmp.btnYes);

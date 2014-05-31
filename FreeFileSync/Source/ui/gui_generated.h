@@ -75,7 +75,7 @@ protected:
     wxMenuItem* m_menuItem10;
     wxMenuItem* m_menuItem11;
     wxMenu* m_menuTools;
-    wxMenuItem* m_menuItemGlobSett;
+    wxMenuItem* m_menuItemOptions;
     wxMenu* m_menuLanguages;
     wxMenu* m_menuHelp;
     wxMenuItem* m_menuItemManual;
@@ -193,7 +193,7 @@ protected:
     virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuGlobalSettings( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnMenuOptions( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuFindItem( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuExportFileList( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
@@ -247,7 +247,7 @@ private:
 
 protected:
     wxNotebook* m_notebook;
-    wxPanel* m_panel39;
+    wxPanel* m_panelCompSettingsHolder;
     wxBoxSizer* bSizerLocalCompSettings;
     wxCheckBox* m_checkBoxUseLocalCmpOptions;
     wxStaticLine* m_staticline59;
@@ -264,7 +264,7 @@ protected:
     wxChoice* m_choiceHandleSymlinks;
     wxHyperlinkCtrl* m_hyperlink24;
     wxStaticLine* m_staticline331;
-    wxPanel* m_panel40;
+    wxPanel* m_panelFilterSettingsHolder;
     wxBoxSizer* bSizerLocalFilterSettings;
     wxStaticText* m_staticText144;
     wxStaticLine* m_staticline61;
@@ -294,7 +294,7 @@ protected:
     wxStaticLine* m_staticline62;
     wxButton* m_buttonReset;
     wxStaticText* m_staticText44;
-    wxPanel* m_panel41;
+    wxPanel* m_panelSyncSettingsHolder;
     wxBoxSizer* bSizerLocalSyncSettings;
     wxCheckBox* m_checkBoxUseLocalSyncOptions;
     wxStaticLine* m_staticline60;
@@ -672,9 +672,9 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GlobalSettingsDlgGenerated
+/// Class OptionsDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class GlobalSettingsDlgGenerated : public wxDialog
+class OptionsDlgGenerated : public wxDialog
 {
 private:
 
@@ -725,8 +725,8 @@ protected:
 
 public:
 
-    GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-    ~GlobalSettingsDlgGenerated();
+    OptionsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Options"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+    ~OptionsDlgGenerated();
 
 };
 

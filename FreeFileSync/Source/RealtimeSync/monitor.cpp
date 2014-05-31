@@ -121,6 +121,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
 #ifdef ZEN_MAC
                         endsWith(e.filename_, Zstr("/.DS_Store")) ||
 #endif
+                        endsWith(e.filename_, TEMP_FILE_ENDING)  ||
                         endsWith(e.filename_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
                         endsWith(e.filename_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway

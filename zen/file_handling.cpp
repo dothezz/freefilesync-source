@@ -928,7 +928,7 @@ namespace
 void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError
 {
     security_context_t contextSource = nullptr;
-    const int rv = procSl == SYMLINK_FOLLOW ?
+    const int rv = procSl == ProcSymlink::FOLLOW ?
                    ::getfilecon(source.c_str(), &contextSource) :
                    ::lgetfilecon(source.c_str(), &contextSource);
     if (rv < 0)
@@ -943,7 +943,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
 
     {
         security_context_t contextTarget = nullptr;
-        const int rv2 = procSl == SYMLINK_FOLLOW ?
+        const int rv2 = procSl == ProcSymlink::FOLLOW ?
                         ::getfilecon(target.c_str(), &contextTarget) :
                         ::lgetfilecon(target.c_str(), &contextTarget);
         if (rv2 < 0)
@@ -961,7 +961,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
         }
     }
 
-    const int rv3 = procSl == SYMLINK_FOLLOW ?
+    const int rv3 = procSl == ProcSymlink::FOLLOW ?
                     ::setfilecon(target.c_str(), contextSource) :
                     ::lsetfilecon(target.c_str(), contextSource);
     if (rv3 < 0)

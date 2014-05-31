@@ -7,6 +7,66 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
+<source>Synchronization</source>
+<target></target>
+
+<source>Comparison</source>
+<target></target>
+
+<source>Preferences</source>
+<target></target>
+
+<source>Reset filter</source>
+<target></target>
+
+<source>&Preferences...</source>
+<target></target>
+
+<source>Options</source>
+<target></target>
+
+<source>Local settings:</source>
+<target></target>
+
+<source>Use local settings:</source>
+<target></target>
+
+<source>Save as...</source>
+<target></target>
+
+<source>Save as GUI job</source>
+<target></target>
+
+<source>&Options</source>
+<target></target>
+
+<source>Local Synchronization Settings</source>
+<target></target>
+
+<source>Reset local filter</source>
+<target></target>
+
+<source>Remove local settings</source>
+<target></target>
+
+<source>Local synchronization settings</source>
+<target></target>
+
+<source>Local comparison settings</source>
+<target></target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target></target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target></target>
+
+<source>config files:</source>
+<target></target>
+
+<source>global config file:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>З моменту останньої синхронізації з обох сторін відбулися зміни.</target>
 
@@ -79,17 +139,11 @@
 <source>Syntax:</source>
 <target>Синтаксис:</target>
 
-<source>config files</source>
-<target>файли конфігурації</target>
-
 <source>directory</source>
 <target>каталог</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Будь-яка кількість FreeFileSync .ffs_gui та/або .ffs_batch файлів конфігурації.</target>
-
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Будь-яка кількість альтернативних каталогів для щонайбільше одного конфігураційного файлу.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не вдається знайти такі папки:</target>
@@ -658,12 +712,6 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>Drag && drop</target>
 
-<source>Alternate comparison settings</source>
-<target>Альтернативні налаштування порівняння</target>
-
-<source>Alternate synchronization settings</source>
-<target>Альтернативні налаштування синхронізації</target>
-
 <source>Local filter</source>
 <target>Локальний фільтр</target>
 
@@ -673,26 +721,11 @@ The command is triggered if:
 <source>None</source>
 <target>Відсутні</target>
 
-<source>Remove alternate settings</source>
-<target>Вилучити альтернативні налаштування</target>
-
-<source>Clear filter settings</source>
-<target>Очистити налаштування фільтра</target>
-
 <source>Copy</source>
 <target>Копіювати</target>
 
 <source>Paste</source>
 <target>Вклеїти</target>
-
-<source>Alternate Comparison Settings</source>
-<target>Альтернативні Налаштування Порівняння</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Альтернативні Налаштування Синхронізації</target>
-
-<source>Local Filter</source>
-<target>Локальний Фільтр</target>
 
 <source>&New</source>
 <target>&Нова</target>
@@ -708,9 +741,6 @@ The command is triggered if:
 
 <source>2. &Synchronize</source>
 <target>2. &Синхронізувати</target>
-
-<source>&Global settings</source>
-<target>&Глобальні налаштування</target>
 
 <source>&Language</source>
 <target>&Мова</target>
@@ -733,11 +763,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>&Перевірка наявності нової версії</target>
 
-<source>Compare</source>
-<target>Порівняти</target>
-
 <source>Cancel</source>
 <target>Відмінити</target>
+
+<source>Compare</source>
+<target>Порівняти</target>
 
 <source>Synchronize</source>
 <target>Синхронізувати</target>
@@ -759,6 +789,12 @@ The command is triggered if:
 
 <source>Match case</source>
 <target>Враховувати регістр</target>
+
+<source>Open...</source>
+<target>Відкрити...</target>
+
+<source>Save</source>
+<target>Зберегти</target>
 
 <source>Save as batch job</source>
 <target>Зберегти як пакетне завдання</target>
@@ -799,20 +835,32 @@ The command is triggered if:
 <source>More information</source>
 <target>Додаткова інформація</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Include:</source>
+<target>Включити</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>
+<source>Exclude:</source>
+<target>Виключити</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Створення дзеркальної резервної копії лівої папки шляхом адаптації правої папки.</target>
+<source>Show examples</source>
+<target>Показати приклади</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Скопіювати нові та оновлені файли в праву папку.</target>
+<source>Time span:</source>
+<target>Часовий інтервал</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Налаштувати власні правила синхронізації.</target>
+<source>File size:</source>
+<target>Розмір Файла</target>
+
+<source>Minimum:</source>
+<target>Мінімум:</target>
+
+<source>Maximum:</source>
+<target>Максимум:</target>
+
+<source>&Reset</source>
+<target>&Відновити</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
 
 <source>Detect moved files</source>
 <target>Виявляти переміщені файли</target>
@@ -827,6 +875,9 @@ The command is triggered if:
 - Активне спостереження після первинної синхронізації
 - Підтримується не всіма файловими системами
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
 
 <source>Delete files:</source>
 <target>Вилучити файли:</target>
@@ -852,9 +903,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Метод іменування:</target>
 
-<source>Show examples</source>
-<target>Показати приклади</target>
-
 <source>Handle errors:</source>
 <target>Обробка помилок:</target>
 
@@ -873,8 +921,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>Після завершення:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Розпочати синхронізацію?</target>
@@ -935,30 +983,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Корзина</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
-
-<source>Include:</source>
-<target>Включити</target>
-
-<source>Exclude:</source>
-<target>Виключити</target>
-
-<source>Time span:</source>
-<target>Часовий інтервал</target>
-
-<source>File size:</source>
-<target>Розмір Файла</target>
-
-<source>Minimum:</source>
-<target>Мінімум:</target>
-
-<source>Maximum:</source>
-<target>Максимум:</target>
-
-<source>&Reset</source>
-<target>&Відновити</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Наступні налаштування використовуються для всіх завдань синхронізації.</target>
@@ -1044,9 +1068,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Вилучити Елементи</target>
 
-<source>Global Settings</source>
-<target>Глобальні Налаштування</target>
-
 <source>Select Time Span</source>
 <target>Виберіть Інтервал Часу</target>
 
@@ -1067,12 +1088,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Головна панель</target>
-
-<source>Open...</source>
-<target>Відкрити...</target>
-
-<source>Save</source>
-<target>Зберегти</target>
 
 <source>Compare both sides</source>
 <target>Порівняти обидві сторони</target>
@@ -1204,8 +1219,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Вилучити вибрану конфігурацію</target>
 
-<source>Filter</source>
-<target>Фільтр</target>
+<source>Synchronization Settings</source>
+<target>Налаштування Синхронізації</target>
 
 <source>Show files that exist on left side only</source>
 <target>Показати файли, які є тільки ліворуч</target>
@@ -1255,14 +1270,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Встановити за замовчуванням</target>
 
+<source>Filter</source>
+<target>Фільтр</target>
+
 <source>All files are in sync</source>
 <target>Всі файли синхронні</target>
-
-<source>Synchronization Settings</source>
-<target>Налаштування Синхронізації</target>
-
-<source>Comparison Settings</source>
-<target>Параметри Порівняння</target>
 
 <source>Cannot find %x</source>
 <target>Не можна знайти %x</target>
@@ -1324,6 +1336,71 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Ви дійсно хочете перемістити цей %x елемент у Корзину?</pluralform>
+<pluralform>Ви дійсно хочете перемістити ці %x елементи у Корзину?</pluralform>
+<pluralform>Ви дійсно хочете перемістити ці %x елементів у Корзину?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Перемістити</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Ви дійсно хочете вилучити цей %x елемент?</pluralform>
+<pluralform>Ви дійсно хочете вилучити ці %x елементи?</pluralform>
+<pluralform>Ви дійсно хочете вилучити ці %x елементів?</pluralform>
+</target>
+
+<source>Copy NTFS permissions</source>
+<target>Копіювати права доступу NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Інтеграція зовнішніх додатків в контекстному меню. Доступні макроси:</target>
+
+<source>- full file or folder name</source>
+<target>- повна назва файлу або папки</target>
+
+<source>- folder part only</source>
+<target>- тільки папка</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Елемент з протилежної сторони до %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Елемент з протилежної сторони до %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Відновити всі приховані вікна та попередження?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Створення дзеркальної резервної копії лівої папки шляхом адаптації правої папки.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Скопіювати нові та оновлені файли в праву папку.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Налаштувати власні правила синхронізації.</target>
+
+<source>Exclude</source>
+<target>Виключити</target>
+
+<source>Direct</source>
+<target>Прямо</target>
+
+<source>Follow</source>
+<target>Послідовно</target>
+
 <source>Today</source>
 <target>Сьогодні</target>
 
@@ -1348,62 +1425,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>МБ</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Ви дійсно хочете перемістити цей %x елемент у Корзину?</pluralform>
-<pluralform>Ви дійсно хочете перемістити ці %x елементи у Корзину?</pluralform>
-<pluralform>Ви дійсно хочете перемістити ці %x елементів у Корзину?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Перемістити</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Ви дійсно хочете вилучити цей %x елемент?</pluralform>
-<pluralform>Ви дійсно хочете вилучити ці %x елементи?</pluralform>
-<pluralform>Ви дійсно хочете вилучити ці %x елементів?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Виключити</target>
-
-<source>Direct</source>
-<target>Прямо</target>
-
-<source>Follow</source>
-<target>Послідовно</target>
-
-<source>Copy NTFS permissions</source>
-<target>Копіювати права доступу NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Інтеграція зовнішніх додатків в контекстному меню. Доступні макроси:</target>
-
-<source>- full file or folder name</source>
-<target>- повна назва файлу або папки</target>
-
-<source>- folder part only</source>
-<target>- тільки папка</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Елемент з протилежної сторони до %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Елемент з протилежної сторони до %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Відновити всі приховані вікна та попередження?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Залишити як невирішений конфлікт</target>
-
 <source>Replace</source>
 <target>Замінити</target>
 
@@ -1415,6 +1436,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Приєднати часову мітку до кожної назви файлу</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Залишити як невирішений конфлікт</target>
 
 <source>File</source>
 <target>Файл</target>

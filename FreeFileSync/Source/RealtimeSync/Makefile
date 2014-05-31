@@ -4,8 +4,11 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-CXXFLAGS  = -std=c++11 -pipe -O3 -DNDEBUG -DWXINTL_NO_GETTEXT_MACRO -I../../.. -I../../../zenXml -include "zen/i18n.h" -include "zen/warn_static.h" \
+CXXFLAGS  = -std=c++11 -pipe -DWXINTL_NO_GETTEXT_MACRO -I../../.. -I../../../zenXml -include "zen/i18n.h" -include "zen/warn_static.h" \
 -Wall -Winit-self -Wredundant-decls -Wmissing-include-dirs -Wswitch-enum -Wmain
+
+release launchpad: CXXFLAGS  += -O3 -DNDEBUG
+debug:             CXXFLAGS  += -g -D__WXDEBUG__
 
 LINKFLAGS =
 
@@ -14,45 +17,40 @@ OPERATING_SYSTEM_NAME := $(shell uname)
 
 #################### Linux ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Linux)
-COMPILER_BIN=g++ -pthread
+COMPILER_BIN = g++ -pthread
 CXXFLAGS += -DZEN_LINUX -Wcast-align -Wshadow
 
 #Gtk - support "no button border"
 CXXFLAGS  += `pkg-config --cflags gtk+-2.0`
 LINKFLAGS += `pkg-config --libs   gtk+-2.0`
 
-ifeq ($(BUILD),Launchpad)
-#default build/Launchpad
-CXXFLAGS  += `wx-config --cxxflags --debug=no`
-LINKFLAGS += `wx-config --libs     --debug=no` -lboost_thread -lboost_system -lz
-else
-#static wxWidgets and boost library linkage for precompiled release
-WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost
-BOOST_LIB_DIR =$(HOME)/Desktop/boost/stage/lib
-
-CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
-LINKFLAGS += `$(WX_CONFIG_BIN) --libs     --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a -lX11
-endif
-
+release launchpad: LINKFLAGS += -s
+#release debug: LINKFLAGS += -lX11
 endif
 #################### OS X ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
-COMPILER_BIN=clang++ -stdlib=libc++
+COMPILER_BIN = clang++ -stdlib=libc++ -mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 CXXFLAGS += -DZEN_MAC -Wbind-to-temporary-copy -Wambiguous-member-template -Wextra-tokens
 
-WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost
-BOOST_LIB_DIR =$(HOME)/Desktop/boost/stage/lib
-MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 #-Wl,-Bstatic not supported on OSX!
-
-# link wxWidgets and boost statically -> check dependencies with: otool -L RealtimeSync
-CXXFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
-LINKFLAGS += $(MACOS_SDK) `$(WX_CONFIG_BIN) --libs     --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
-
+# check dependencies with: otool -L FreeFileSync
 endif
 ######################################################
+
+WX_CONFIG_LIB =$(HOME)/Desktop/wxWidgets/lib
+BOOST_LIB_DIR =$(HOME)/Desktop/boost/stage/lib
+CXXFLAGS  += -I$(HOME)/Desktop/boost
+
+release:   CXXFLAGS  += `$(WX_CONFIG_LIB)/release/bin/wx-config --cxxflags --debug=no  --static=yes`
+debug:     CXXFLAGS  += `$(WX_CONFIG_LIB)/debug/bin/wx-config   --cxxflags --debug=yes --static=yes`
+launchpad: CXXFLAGS  += `wx-config                              --cxxflags --debug=no`
+
+release:   LINKFLAGS += `$(WX_CONFIG_LIB)/release/bin/wx-config --libs std, aui --debug=no  --static=yes`
+debug:     LINKFLAGS += `$(WX_CONFIG_LIB)/debug/bin/wx-config   --libs std, aui --debug=yes --static=yes`
+launchpad: LINKFLAGS += `wx-config                              --libs std, aui --debug=no`
+
+release debug: LINKFLAGS += $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
+launchpad:     LINKFLAGS += -lboost_thread -lboost_system -lz
 
 CPP_LIST= #internal list of all *.cpp files needed for compilation
 CPP_LIST+=application.cpp
@@ -83,7 +81,11 @@ CPP_LIST+=../../../wx+/popup_dlg_generated.cpp
 #list of all *.o files (we need the "RTS" subdirectory to handle "../*.cpp" files
 OBJECT_LIST=$(CPP_LIST:%.cpp=../../Obj/RTS_GCC_Make_Release/ffs/src/rts/%.o)
 
-all: RealtimeSync
+all: release
+
+release:   RealtimeSync
+debug:     RealtimeSync
+launchpad: RealtimeSync
 
 ../../Obj/RTS_GCC_Make_Release/ffs/src/rts/%.o : %.cpp
 	mkdir -p $(dir $@)

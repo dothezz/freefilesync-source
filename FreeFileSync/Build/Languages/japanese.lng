@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>構文:</target>
 
-<source>config files</source>
-<target>構成設定ファイル</target>
+<source>global config file:</source>
+<target>グローバル構成ファイル</target>
+
+<source>config files:</source>
+<target>構成ファイル</target>
 
 <source>directory</source>
 <target>ディレクトリ</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>代替グローバル設定.xml ファイルのパス</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>任意の数の FreeFileSync 構成設定ファイル(.ffs_gui および/または .ffs_batch).</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>ひとつの構成設定ファイルに対して任意の数の代替ディレクトリ.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>任意の数の代替ディレクトリペア(ひとつの構成ファイル)</target>
 
 <source>Cannot find the following folders:</source>
 <target>以下のフォルダがみつかりません:</target>
@@ -647,11 +653,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>ドラッグ && ドロップ</target>
 
-<source>Alternate comparison settings</source>
-<target>代替比較設定</target>
+<source>Local comparison settings</source>
+<target>ローカルの比較設定</target>
 
-<source>Alternate synchronization settings</source>
-<target>代替同期設定</target>
+<source>Local synchronization settings</source>
+<target>ローカルの同期設定</target>
 
 <source>Local filter</source>
 <target>ローカル フィルター</target>
@@ -662,11 +668,11 @@ The command is triggered if:
 <source>None</source>
 <target>なし</target>
 
-<source>Remove alternate settings</source>
-<target>代替設定を除去</target>
+<source>Remove local settings</source>
+<target>ローカルの設定を除去</target>
 
-<source>Clear filter settings</source>
-<target>フィルター設定をクリア</target>
+<source>Reset local filter</source>
+<target>ローカルフィルターをリセット</target>
 
 <source>Copy</source>
 <target>コピー</target>
@@ -674,14 +680,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>貼り付け</target>
 
-<source>Alternate Comparison Settings</source>
-<target>代替比較設定</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>代替同期設定</target>
-
-<source>Local Filter</source>
-<target>ローカル フィルター</target>
+<source>Local Synchronization Settings</source>
+<target>ローカルの同期設定</target>
 
 <source>&New</source>
 <target>新規(&N)</target>
@@ -698,8 +698,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. 同期処理(&S)</target>
 
-<source>&Global settings</source>
-<target>全般的な設定(&G)</target>
+<source>&Options</source>
+<target>設定(&O)</target>
 
 <source>&Language</source>
 <target>使用言語(&L)</target>
@@ -722,11 +722,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>新バージョンの確認(&C)</target>
 
-<source>Compare</source>
-<target>比較</target>
-
 <source>Cancel</source>
 <target>キャンセル</target>
+
+<source>Compare</source>
+<target>比較</target>
 
 <source>Synchronize</source>
 <target>同期処理</target>
@@ -749,8 +749,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>文字種を区別</target>
 
+<source>Open...</source>
+<target>開く...</target>
+
+<source>Save</source>
+<target>保存</target>
+
+<source>Save as GUI job</source>
+<target>GUI ジョブで保存</target>
+
 <source>Save as batch job</source>
 <target>一括ジョブで保存</target>
+
+<source>Save as...</source>
+<target>別名保存...</target>
 
 <source>View type:</source>
 <target>表示形式:</target>
@@ -773,6 +785,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>コピーの合計バイト</target>
 
+<source>Use local settings:</source>
+<target>ローカル設定を使用</target>
+
 <source>Select a variant:</source>
 <target>バリアントを選択:</target>
 
@@ -788,20 +803,35 @@ The command is triggered if:
 <source>More information</source>
 <target>更に詳細な情報</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>ローカル設定:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>変更箇所を識別して両側に変更を反映します。データベースを使用することで、削除/移動/競合などは自動的に検出されます。</target>
+<source>Include:</source>
+<target>含める:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>右側フォルダにマッチングを適合することで、左側フォルダのミラーリングバックアップを作成します。</target>
+<source>Exclude:</source>
+<target>除外:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>新しい、または更新されたファイルを右側フォルダにコピーします。</target>
+<source>Show examples</source>
+<target>入力例を表示</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>あなたの設定した同期規則を使用します。</target>
+<source>Time span:</source>
+<target>タイムスパン:</target>
+
+<source>File size:</source>
+<target>ファイルサイズ:</target>
+
+<source>Minimum:</source>
+<target>最小:</target>
+
+<source>Maximum:</source>
+<target>最大:</target>
+
+<source>&Reset</source>
+<target>リセット(&R)</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>同期処理から特定のファイルを除外するためのフィルター規則を選択、対応するそれらフォルダ ペアからの相対ファイルパスを入力します.</target>
 
 <source>Detect moved files</source>
 <target>移動済みのファイルを検出する</target>
@@ -816,6 +846,9 @@ The command is triggered if:
 - 初期同期後にアクティブを検出
 - すべてのファイルシステムには非対応
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>データベースファイルを利用して、同期の方向を検出します。</target>
 
 <source>Delete files:</source>
 <target>ファイルの削除:</target>
@@ -841,9 +874,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>命名規則:</target>
 
-<source>Show examples</source>
-<target>入力例を表示</target>
-
 <source>Handle errors:</source>
 <target>エラーの取り扱い:</target>
 
@@ -862,8 +892,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>完了時の動作:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>データベースファイルを利用して、同期の方向を検出します。</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>今すぐ同期を開始しますか?</target>
@@ -924,30 +954,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>ゴミ箱(&R)</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>同期処理から特定のファイルを除外するためのフィルター規則を選択、対応するそれらフォルダ ペアからの相対ファイルパスを入力します.</target>
-
-<source>Include:</source>
-<target>含める:</target>
-
-<source>Exclude:</source>
-<target>除外:</target>
-
-<source>Time span:</source>
-<target>タイムスパン:</target>
-
-<source>File size:</source>
-<target>ファイルサイズ:</target>
-
-<source>Minimum:</source>
-<target>最小:</target>
-
-<source>Maximum:</source>
-<target>最大:</target>
-
-<source>&Reset</source>
-<target>リセット(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下の設定は、すべての同期ジョブで使用されます</target>
@@ -1033,11 +1039,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>項目の削除</target>
 
-<source>Global Settings</source>
-<target>全般的な設定</target>
+<source>Options</source>
+<target>設定</target>
 
 <source>Select Time Span</source>
 <target>タイムスパンを選択</target>
+
+<source>&Preferences...</source>
+<target>プリファレンス(&P)...</target>
 
 <source>Folder Pairs</source>
 <target>フォルダ ペア</target>
@@ -1056,12 +1065,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>メインバー</target>
-
-<source>Open...</source>
-<target>開く...</target>
-
-<source>Save</source>
-<target>保存</target>
 
 <source>Compare both sides</source>
 <target>両方を比較</target>
@@ -1185,8 +1188,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>選択された構成設定を削除</target>
 
-<source>Filter</source>
-<target>フィルター</target>
+<source>Synchronization Settings</source>
+<target>同期の設定</target>
+
+<source>Reset filter</source>
+<target>フィルターをリセット</target>
 
 <source>Show files that exist on left side only</source>
 <target>左側のみに存在するファイルを表示</target>
@@ -1236,14 +1242,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>デフォルトにセット</target>
 
+<source>Filter</source>
+<target>フィルター</target>
+
 <source>All files are in sync</source>
 <target>すべてのファイルを同期</target>
-
-<source>Synchronization Settings</source>
-<target>同期の設定</target>
-
-<source>Comparison Settings</source>
-<target>比較の設定</target>
 
 <source>Cannot find %x</source>
 <target>%x は見つかりません</target>
@@ -1305,6 +1308,70 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>ログ</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>本当に以下 %x 個の項目をゴミ箱に移動しますか?</pluralform>
+</target>
+
+<source>Move</source>
+<target>移動</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>本当に以下の %x 個の項目を削除しますか</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>プリファレンス</target>
+
+<source>Copy NTFS permissions</source>
+<target>NTFS パーミッションをコピーする</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:</target>
+
+<source>- full file or folder name</source>
+<target>- ファイル、フォルダの完全な名前</target>
+
+<source>- folder part only</source>
+<target>- フォルダ部分のみ</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- %item_path% の反対側の対象</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- %item_folder% の反対側の対象</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>すべての非表示ウィンドウと警告を元に戻しますか?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>変更箇所を識別して両側に変更を反映します。データベースを使用することで、削除/移動/競合などは自動的に検出されます。</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>右側フォルダにマッチングを適合することで、左側フォルダのミラーリングバックアップを作成します。</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>新しい、または更新されたファイルを右側フォルダにコピーします。</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>あなたの設定した同期規則を使用します。</target>
+
+<source>Exclude</source>
+<target>除外</target>
+
+<source>Direct</source>
+<target>ダイレクト</target>
+
+<source>Follow</source>
+<target>考慮する</target>
+
 <source>Today</source>
 <target>今日</target>
 
@@ -1329,58 +1396,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>本当に以下 %x 個の項目をゴミ箱に移動しますか?</pluralform>
-</target>
-
-<source>Move</source>
-<target>移動</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>本当に以下の %x 個の項目を削除しますか</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>除外</target>
-
-<source>Direct</source>
-<target>ダイレクト</target>
-
-<source>Follow</source>
-<target>考慮する</target>
-
-<source>Copy NTFS permissions</source>
-<target>NTFS パーミッションをコピーする</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:</target>
-
-<source>- full file or folder name</source>
-<target>- ファイル、フォルダの完全な名前</target>
-
-<source>- folder part only</source>
-<target>- フォルダ部分のみ</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- %item_path% の反対側の対象</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- %item_folder% の反対側の対象</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>すべての非表示ウィンドウと警告を元に戻しますか?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>未解決の競合はそのまま残す</target>
-
 <source>Replace</source>
 <target>置換</target>
 
@@ -1392,6 +1407,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>各ファイル名にタイムスタンプを付加</target>
+
+<source>Comparison</source>
+<target>比較</target>
+
+<source>Synchronization</source>
+<target>同期</target>
+
+<source>Leave as unresolved conflict</source>
+<target>未解決の競合はそのまま残す</target>
 
 <source>File</source>
 <target>ファイル</target>

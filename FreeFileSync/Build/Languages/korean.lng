@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>구문(Syntax):</target>
 
-<source>config files</source>
-<target>설정 파일</target>
+<source>global config file:</source>
+<target>전체 설정 파일:</target>
+
+<source>config files:</source>
+<target>설정 파일:</target>
 
 <source>directory</source>
 <target>디렉토리</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>GlobalSettings.xml 대체 파일에 대한 경로</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>FreeFileSync .ffs_gui 또는 .ffs_batch 설정파일 개수</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>최대 한개 설정파일에 대한 대체 디렉토리 개수</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>최대 1개 설정파일에 대한 대체 디렉토리 페어 개수</target>
 
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다:</target>
@@ -137,7 +143,7 @@
 <target>동기화 방향을 계산 중...</target>
 
 <source>Out of memory.</source>
-<target>메모리 부족.</target>
+<target>메모리 부족</target>
 
 <source>Item exists on left side only</source>
 <target>항목이 좌측에만 존재합니다.</target>
@@ -526,7 +532,7 @@ The command is triggered if:
 <target>다중 폴더 페어의 일부인 폴더가 변경됩니다. 동기화 설정을 재검토하세요.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>폴더 페어(짝) 동기화 진행 중</target>
+<target>폴더 페어 동기화 진행 중</target>
 
 <source>Generating database...</source>
 <target>데이터베이스 생성 중...</target>
@@ -647,11 +653,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>드래그 앤 드랍(&&) [마우스로 파일 끌어다 놓기]</target>
 
-<source>Alternate comparison settings</source>
-<target>비교 설정 변경</target>
+<source>Local comparison settings</source>
+<target>로컬 비교 설정</target>
 
-<source>Alternate synchronization settings</source>
-<target>동기화 설정 변경</target>
+<source>Local synchronization settings</source>
+<target>로컬 동기화 설정</target>
 
 <source>Local filter</source>
 <target>로컬 필터</target>
@@ -662,11 +668,11 @@ The command is triggered if:
 <source>None</source>
 <target>아무것도 안 함</target>
 
-<source>Remove alternate settings</source>
-<target>대체설정 제거</target>
+<source>Remove local settings</source>
+<target>로컬 설정 제거</target>
 
-<source>Clear filter settings</source>
-<target>필터 설정 지우기</target>
+<source>Reset local filter</source>
+<target>로컬 필터 재설정(리셋)</target>
 
 <source>Copy</source>
 <target>복사</target>
@@ -674,14 +680,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>붙여넣기</target>
 
-<source>Alternate Comparison Settings</source>
-<target>비교 설정 변경</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>동기화 설정 변경</target>
-
-<source>Local Filter</source>
-<target>로컬 필터</target>
+<source>Local Synchronization Settings</source>
+<target>로컬 동기화 설정</target>
 
 <source>&New</source>
 <target>신규 작업(&N)</target>
@@ -698,8 +698,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. 동기화(&S)</target>
 
-<source>&Global settings</source>
-<target>전체 설정(&G)</target>
+<source>&Options</source>
+<target>옵션(&O)</target>
 
 <source>&Language</source>
 <target>언어 선택(&L)</target>
@@ -722,20 +722,20 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>신규 버전 확인(&C)</target>
 
-<source>Compare</source>
-<target>비  교</target>
-
 <source>Cancel</source>
 <target>취소</target>
+
+<source>Compare</source>
+<target>비  교</target>
 
 <source>Synchronize</source>
 <target>동  기  화</target>
 
 <source>Add folder pair</source>
-<target>폴더 페어(짝) 추가</target>
+<target>폴더 페어 추가</target>
 
 <source>Remove folder pair</source>
-<target>폴더 페어(짝) 제거</target>
+<target>폴더 페어 제거</target>
 
 <source>Swap sides</source>
 <target>양측 위치 바꾸기</target>
@@ -749,8 +749,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>대문자/소문자 구분</target>
 
+<source>Open...</source>
+<target>열기</target>
+
+<source>Save</source>
+<target>저장</target>
+
+<source>Save as GUI job</source>
+<target>GUI 작업으로 저장</target>
+
 <source>Save as batch job</source>
 <target>일괄 작업으로 저장</target>
+
+<source>Save as...</source>
+<target>다른 이름으로 저장</target>
 
 <source>View type:</source>
 <target>유형 보기:</target>
@@ -773,6 +785,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>복사할 전체 바이트 크기</target>
 
+<source>Use local settings:</source>
+<target>로컬 설정 사용:</target>
+
 <source>Select a variant:</source>
 <target>베어리언트 선택:</target>
 
@@ -788,20 +803,35 @@ The command is triggered if:
 <source>More information</source>
 <target>상세 정보</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>로컬 설정:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
+<source>Include:</source>
+<target>포함:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>좌측 폴더의 미러 백업을 만듭니다. 우측 폴더는 좌측 폴더와 완전히 일치하게 됩니다.</target>
+<source>Exclude:</source>
+<target>제외:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사</target>
+<source>Show examples</source>
+<target>예시 보이기</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>개인 동기화 규칙 설정</target>
+<source>Time span:</source>
+<target>시간 간격:</target>
+
+<source>File size:</source>
+<target>파일 크기:</target>
+
+<source>Minimum:</source>
+<target>최소:</target>
+
+<source>Maximum:</source>
+<target>최대:</target>
+
+<source>&Reset</source>
+<target>리셋(&R)</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>동기화에서 특정 파일을 제외시키는 필터 규칙을 선택합니다. 해당 폴더 페어에 대한 상대 파일 경로를 입력하세요.</target>
 
 <source>Detect moved files</source>
 <target>이동 파일 탐지</target>
@@ -816,6 +846,9 @@ The command is triggered if:
 - 초기 동기화 이후 탐지기능 활성화
 - 모든 파일 시스템에서 지원되지 않음
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>데이터베이스 파일로 동기화 방향 감지</target>
 
 <source>Delete files:</source>
 <target>파일 삭제:</target>
@@ -841,9 +874,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>이름 지정:</target>
 
-<source>Show examples</source>
-<target>예 보이기</target>
-
 <source>Handle errors:</source>
 <target>오류 발생시:</target>
 
@@ -862,8 +892,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>완료 시:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>데이터베이스 파일로 동기화 방향 감지</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>지금 동기화를 시작하시겠습니까?</target>
@@ -924,30 +954,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>휴지통(&R)</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>동기화에서 특정 파일을 제외시키는 필터 규칙을 선택합니다. 해당 폴더 페어(짝)에 대한 상대 파일 경로를 입력하세요.</target>
-
-<source>Include:</source>
-<target>포함:</target>
-
-<source>Exclude:</source>
-<target>제외:</target>
-
-<source>Time span:</source>
-<target>시간 간격:</target>
-
-<source>File size:</source>
-<target>파일 크기:</target>
-
-<source>Minimum:</source>
-<target>최소:</target>
-
-<source>Maximum:</source>
-<target>최대:</target>
-
-<source>&Reset</source>
-<target>리셋(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>다음 설정은 모든 동기화 작업에 사용됩니다.</target>
@@ -1033,14 +1039,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>항목 삭제</target>
 
-<source>Global Settings</source>
-<target>전체 설정</target>
+<source>Options</source>
+<target>옵션</target>
 
 <source>Select Time Span</source>
 <target>시간간격(타임스팬) 선택</target>
 
+<source>&Preferences...</source>
+<target>환경설정(&P)</target>
+
 <source>Folder Pairs</source>
-<target>폴더 페어(짝)</target>
+<target>폴더 페어</target>
 
 <source>Find</source>
 <target>검색</target>
@@ -1056,12 +1065,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>메인 바</target>
-
-<source>Open...</source>
-<target>열기</target>
-
-<source>Save</source>
-<target>저장</target>
 
 <source>Compare both sides</source>
 <target>양측 비교</target>
@@ -1185,8 +1188,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>선택한 구성 삭제</target>
 
-<source>Filter</source>
-<target>필터</target>
+<source>Synchronization Settings</source>
+<target>동기화 설정</target>
+
+<source>Reset filter</source>
+<target>필터 재설정(리셋)</target>
 
 <source>Show files that exist on left side only</source>
 <target>좌측에만 존재하는 파일 표시</target>
@@ -1236,14 +1242,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>기본 값으로 설정</target>
 
+<source>Filter</source>
+<target>필터</target>
+
 <source>All files are in sync</source>
 <target>모든 파일이 동기화 되었음.</target>
-
-<source>Synchronization Settings</source>
-<target>동기화 설정</target>
-
-<source>Comparison Settings</source>
-<target>비교 설정</target>
 
 <source>Cannot find %x</source>
 <target>%x을(를) 찾을 수 없습니다.</target>
@@ -1305,6 +1308,70 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>로그</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>다음 %x 항목을 정말로 휴지통으로 이동하기를 원하십니까?</pluralform>
+</target>
+
+<source>Move</source>
+<target>이동</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>환경설정</target>
+
+<source>Copy NTFS permissions</source>
+<target>NTFS 권한 복사</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>외부 응용 프로그램을 Context Menu에 통합. 다음 매크로가 사용 가능합니다:</target>
+
+<source>- full file or folder name</source>
+<target>- 전체 파일 또는 폴더 이름</target>
+
+<source>- folder part only</source>
+<target>- 폴더 부분만</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>% 항목_경로 %의 반대편 대응부(카운터파트)</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>% 항목_폴더 %의 반대편 대응부(카운터파트)</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>모든 숨겨진 창 및 경고를 복원하시겠습니까?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>좌측 폴더의 미러 백업을 만듭니다. 우측 폴더는 좌측 폴더와 완전히 일치하게 됩니다.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>개인 동기화 규칙 설정</target>
+
+<source>Exclude</source>
+<target>제외</target>
+
+<source>Direct</source>
+<target>다이렉트</target>
+
+<source>Follow</source>
+<target>팔로우</target>
+
 <source>Today</source>
 <target>오늘</target>
 
@@ -1329,58 +1396,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>다음 %x 항목을 정말로 휴지통으로 이동하기를 원하십니까?</pluralform>
-</target>
-
-<source>Move</source>
-<target>이동</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>제외</target>
-
-<source>Direct</source>
-<target>다이렉트</target>
-
-<source>Follow</source>
-<target>팔로우</target>
-
-<source>Copy NTFS permissions</source>
-<target>NTFS 권한 복사</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>외부 응용 프로그램을 Context Menu에 통합. 다음 매크로가 사용 가능합니다:</target>
-
-<source>- full file or folder name</source>
-<target>- 전체 파일 또는 폴더 이름</target>
-
-<source>- folder part only</source>
-<target>- 폴더 부분만</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>% 항목_경로 %의 반대편 대응부(카운터파트)</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>% 항목_폴더 %의 반대편 대응부(카운터파트)</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>모든 숨겨진 창 및 경고를 복원하시겠습니까?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>미해결 충돌로 놔두기</target>
-
 <source>Replace</source>
 <target>대체</target>
 
@@ -1392,6 +1407,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>각 파일 이름마다 타임 스탬프 추가</target>
+
+<source>Comparison</source>
+<target>비  교</target>
+
+<source>Synchronization</source>
+<target>동 기 화</target>
+
+<source>Leave as unresolved conflict</source>
+<target>미해결 충돌로 놔두기</target>
 
 <source>File</source>
 <target>파일</target>
@@ -1406,7 +1430,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>항목</target>
 
 <source>Percentage</source>
-<target>백분율(%)</target>
+<target>퍼센티지(%)</target>
 
 <source>Cannot monitor directory %x.</source>
 <target>디렉토리 %x을(를) 모니터링 할 수 없습니다.</target>

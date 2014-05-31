@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>语法:</target>
 
-<source>config files</source>
-<target>配置文件</target>
+<source>global config file:</source>
+<target>全局配置文件:</target>
+
+<source>config files:</source>
+<target>配置文件:</target>
 
 <source>directory</source>
 <target>目录</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>指向一个替代的GlobalSettings.xml文件的路径.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>任意数量的 FreeFileSync .ffs_gui 和/或 .ffs_batch 配置文件.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>任意数量的替代目录中至多有一个配置文件.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>任意数量的替代目录对的最多一个配置文件.</target>
 
 <source>Cannot find the following folders:</source>
 <target>无法找到如下文件夹:</target>
@@ -647,11 +653,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>拖放</target>
 
-<source>Alternate comparison settings</source>
-<target>备用比较设置</target>
+<source>Local comparison settings</source>
+<target>本地比较设置</target>
 
-<source>Alternate synchronization settings</source>
-<target>备用同步设置</target>
+<source>Local synchronization settings</source>
+<target>本地同步设置</target>
 
 <source>Local filter</source>
 <target>本地过滤器</target>
@@ -662,11 +668,11 @@ The command is triggered if:
 <source>None</source>
 <target>无</target>
 
-<source>Remove alternate settings</source>
-<target>移除替换设置</target>
+<source>Remove local settings</source>
+<target>移除本地设置</target>
 
-<source>Clear filter settings</source>
-<target>清除过滤器设置</target>
+<source>Reset local filter</source>
+<target>重置本地过滤器</target>
 
 <source>Copy</source>
 <target>复制</target>
@@ -674,14 +680,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>粘贴</target>
 
-<source>Alternate Comparison Settings</source>
-<target>备用比较设置</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>备用同步设置</target>
-
-<source>Local Filter</source>
-<target>本地过滤器</target>
+<source>Local Synchronization Settings</source>
+<target>本地同步设置</target>
 
 <source>&New</source>
 <target>新建(&N)</target>
@@ -698,8 +698,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. 同步(&S)</target>
 
-<source>&Global settings</source>
-<target>全局设置(&G)</target>
+<source>&Options</source>
+<target>选项(&O)</target>
 
 <source>&Language</source>
 <target>切换语言(&L)</target>
@@ -722,11 +722,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>检查新版本(&C)</target>
 
-<source>Compare</source>
-<target>比较</target>
-
 <source>Cancel</source>
 <target>取消</target>
+
+<source>Compare</source>
+<target>比较</target>
 
 <source>Synchronize</source>
 <target>同步</target>
@@ -749,8 +749,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>匹配大小写</target>
 
+<source>Open...</source>
+<target>打开...</target>
+
+<source>Save</source>
+<target>保存</target>
+
+<source>Save as GUI job</source>
+<target>保存为GUI作业</target>
+
 <source>Save as batch job</source>
 <target>另存为批处理作业</target>
+
+<source>Save as...</source>
+<target>另存为...</target>
 
 <source>View type:</source>
 <target>视图类型:</target>
@@ -773,6 +785,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>要复制的总字节数</target>
 
+<source>Use local settings:</source>
+<target>使用本地设置:</target>
+
 <source>Select a variant:</source>
 <target>选择一个变化:</target>
 
@@ -788,20 +803,35 @@ The command is triggered if:
 <source>More information</source>
 <target>更多信息</target>
 
-<source>OK</source>
-<target>确定</target>
+<source>Local settings:</source>
+<target>本地设置:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>
+<source>Include:</source>
+<target>包括:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>以适配右侧文件夹来匹配从而创建左侧文件夹的镜像备份.</target>
+<source>Exclude:</source>
+<target>排除:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>复制新的和已更新的文件到右侧文件夹.</target>
+<source>Show examples</source>
+<target>显示范例</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>配置你自己的同步规则.</target>
+<source>Time span:</source>
+<target>时间跨度:</target>
+
+<source>File size:</source>
+<target>文件大小:</target>
+
+<source>Minimum:</source>
+<target>最小:</target>
+
+<source>Maximum:</source>
+<target>最大:</target>
+
+<source>&Reset</source>
+<target>重置(&R)</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>选择过滤器规则以将某些文件从同步中排除. 输入与相关的文件夹对相对的与文件路径.</target>
 
 <source>Detect moved files</source>
 <target>检测被移动的文件</target>
@@ -816,6 +846,9 @@ The command is triggered if:
 - 在初始同步后检测活动
 - 不是所有文件系统都支持
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>借助数据库文件来检测同步的方向</target>
 
 <source>Delete files:</source>
 <target>删除文件:</target>
@@ -841,9 +874,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>命名规则:</target>
 
-<source>Show examples</source>
-<target>显示范例</target>
-
 <source>Handle errors:</source>
 <target>处理错误:</target>
 
@@ -862,8 +892,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>在完成时:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>借助数据库文件来检测同步的方向</target>
+<source>OK</source>
+<target>确定</target>
 
 <source>Start synchronization now?</source>
 <target>现在开始同步吗?</target>
@@ -924,30 +954,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>回收站(&R)</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>选择过滤器规则以将某些文件从同步中排除. 输入与相关的文件夹对相对的与文件路径.</target>
-
-<source>Include:</source>
-<target>包括:</target>
-
-<source>Exclude:</source>
-<target>排除:</target>
-
-<source>Time span:</source>
-<target>时间跨度:</target>
-
-<source>File size:</source>
-<target>文件大小:</target>
-
-<source>Minimum:</source>
-<target>最小:</target>
-
-<source>Maximum:</source>
-<target>最大:</target>
-
-<source>&Reset</source>
-<target>重置(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>如下的设置使用于所有同步作业.</target>
@@ -1030,11 +1036,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>删除项目</target>
 
-<source>Global Settings</source>
-<target>全局设置</target>
+<source>Options</source>
+<target>选项</target>
 
 <source>Select Time Span</source>
 <target>选择时间跨度</target>
+
+<source>&Preferences...</source>
+<target>首选项(&P)</target>
 
 <source>Folder Pairs</source>
 <target>文件夹对</target>
@@ -1053,12 +1062,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>主工具栏</target>
-
-<source>Open...</source>
-<target>打开...</target>
-
-<source>Save</source>
-<target>保存</target>
 
 <source>Compare both sides</source>
 <target>比较两侧</target>
@@ -1182,8 +1185,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>删除已选定的配置文件</target>
 
-<source>Filter</source>
-<target>过滤器</target>
+<source>Synchronization Settings</source>
+<target>同步设置</target>
+
+<source>Reset filter</source>
+<target>重置过滤器</target>
 
 <source>Show files that exist on left side only</source>
 <target>显示仅存在左侧的文件</target>
@@ -1233,14 +1239,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>设置为默认值</target>
 
+<source>Filter</source>
+<target>过滤器</target>
+
 <source>All files are in sync</source>
 <target>所有文件均是同步的</target>
-
-<source>Synchronization Settings</source>
-<target>同步设置</target>
-
-<source>Comparison Settings</source>
-<target>比较设置</target>
 
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
@@ -1302,6 +1305,70 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>日志</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>你是否要将如下 %x 个项目移动到回收站?</pluralform>
+</target>
+
+<source>Move</source>
+<target>移动</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>是否真的要删除如下 %x 个项目?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>首选项</target>
+
+<source>Copy NTFS permissions</source>
+<target>复制NTFS权限</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>集成外部应用程序到右键菜单. 如下宏可用:</target>
+
+<source>- full file or folder name</source>
+<target>- 完整的文件或文件夹名</target>
+
+<source>- folder part only</source>
+<target>- 只对文件夹部分</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- 另一边的对应项到 %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- 另一边的对应项到 %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>要恢复所有隐藏的窗口和警告吗?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>以适配右侧文件夹来匹配从而创建左侧文件夹的镜像备份.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>复制新的和已更新的文件到右侧文件夹.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>配置你自己的同步规则.</target>
+
+<source>Exclude</source>
+<target>排除</target>
+
+<source>Direct</source>
+<target>直接</target>
+
+<source>Follow</source>
+<target>跟随</target>
+
 <source>Today</source>
 <target>今天</target>
 
@@ -1326,58 +1393,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>你是否要将如下 %x 个项目移动到回收站?</pluralform>
-</target>
-
-<source>Move</source>
-<target>移动</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>是否真的要删除如下 %x 个项目?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>排除</target>
-
-<source>Direct</source>
-<target>直接</target>
-
-<source>Follow</source>
-<target>跟随</target>
-
-<source>Copy NTFS permissions</source>
-<target>复制NTFS权限</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>集成外部应用程序到右键菜单. 如下宏可用:</target>
-
-<source>- full file or folder name</source>
-<target>- 完整的文件或文件夹名</target>
-
-<source>- folder part only</source>
-<target>- 只对文件夹部分</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- 另一边的对应项到 %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- 另一边的对应项到 %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>要恢复所有隐藏的窗口和警告吗?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>遗留为未解决的冲突</target>
-
 <source>Replace</source>
 <target>替换</target>
 
@@ -1389,6 +1404,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>添加一个时间戳到每个文件名</target>
+
+<source>Comparison</source>
+<target>比较</target>
+
+<source>Synchronization</source>
+<target>同步</target>
+
+<source>Leave as unresolved conflict</source>
+<target>遗留为未解决的冲突</target>
 
 <source>File</source>
 <target>文件</target>

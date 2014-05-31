@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Σύνταξη:</target>
 
-<source>config files</source>
-<target>αρχεία διάταξης</target>
+<source>global config file:</source>
+<target>αρχείο γενικών ρυθμίσεων:</target>
+
+<source>config files:</source>
+<target>αρχεία ρυθμίσεων:</target>
 
 <source>directory</source>
 <target>υποκατάλογος</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Διαδρομή σε ένα εναλλακτικό αρχείο GlobalSettings.xml</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Οποιοσδήποτε αριθμός αρχείων διάταξης .ffs_gui ή/και .ffs_batch του FreeFileSync</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Οποιοσδήποτε αριθμός εναλλακτικών υποκαταλόγων για το πολύ ένα αρχείο διάταξης.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Οποιοσδήποτε αριθμός από εναλλακτικά ζεύγη υποκαταλόγων για το πολύ ένα αρχείο ρυθμίσεων.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
@@ -651,11 +657,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>Μεταφορά && Απόθεση</target>
 
-<source>Alternate comparison settings</source>
-<target>Διαφοροποιημένες ρυθμίσεις σύγκρισης</target>
+<source>Local comparison settings</source>
+<target>Τοπικές ρυθμίσεις σύγκρισης</target>
 
-<source>Alternate synchronization settings</source>
-<target>Διαφοροποιημένες ρυθμίσεις συγχρονισμού</target>
+<source>Local synchronization settings</source>
+<target>Τοπικές ρυθμίσεις συγχρονισμού</target>
 
 <source>Local filter</source>
 <target>Τοπικό φίλτρο</target>
@@ -666,11 +672,11 @@ The command is triggered if:
 <source>None</source>
 <target>Καθόλου</target>
 
-<source>Remove alternate settings</source>
-<target>Διαγραφή των διαφοροποιημένων ρυθμίσεων</target>
+<source>Remove local settings</source>
+<target>Αφαίρεση τοπικών ρυθμίσεων</target>
 
-<source>Clear filter settings</source>
-<target>Διαγραφή όλων των ρυθμίσεων φίλτρου</target>
+<source>Reset local filter</source>
+<target>Αφαίρεση τοπικού φίλτρου</target>
 
 <source>Copy</source>
 <target>Αντιγραφή</target>
@@ -678,14 +684,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>Επικόλληση</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Διαφοροποιημένες Ρυθμίσεις Σύγκρισης</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Διαφοροποιημένες Ρυθμίσεις Συγχρονισμού</target>
-
-<source>Local Filter</source>
-<target>Τοπικό Φίλτρο</target>
+<source>Local Synchronization Settings</source>
+<target>Τοπικές Ρυθμίσεις Συγχρονισμού</target>
 
 <source>&New</source>
 <target>&Δημιουργία</target>
@@ -702,14 +702,14 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. Συ&γχρονισμός</target>
 
-<source>&Global settings</source>
-<target>Γενικές &ρυθμίσεις</target>
+<source>&Options</source>
+<target>&Επιλογές</target>
 
 <source>&Language</source>
 <target>&Γλώσσα</target>
 
 <source>&Find...</source>
-<target>&Εύρεση</target>
+<target>Εύ&ρεση</target>
 
 <source>&Export file list...</source>
 <target>Ε&ξαγωγή καταλόγου αρχείων...</target>
@@ -726,11 +726,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>Έλεγχος για &νέα έκδοση</target>
 
-<source>Compare</source>
-<target>Σύγκριση</target>
-
 <source>Cancel</source>
 <target>Άκυρο</target>
+
+<source>Compare</source>
+<target>Σύγκριση</target>
 
 <source>Synchronize</source>
 <target>Συγχρονισμός</target>
@@ -753,8 +753,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>Αντιστοίχιση πεζών-κεφαλαίων</target>
 
+<source>Open...</source>
+<target>Άνοιγμα...</target>
+
+<source>Save</source>
+<target>Αποθήκευση</target>
+
+<source>Save as GUI job</source>
+<target>Αποθήκευση ως εργασία του GUI</target>
+
 <source>Save as batch job</source>
 <target>Αποθήκευση ως δέσμη ενεργειών</target>
+
+<source>Save as...</source>
+<target>Αποθήκευση ως...</target>
 
 <source>View type:</source>
 <target>Τύπος εμφάνισης:</target>
@@ -777,6 +789,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Συνολικός αριθμός bytes προς αντιγραφή</target>
 
+<source>Use local settings:</source>
+<target>Χρήση τοπικών ρυθμίσεων:</target>
+
 <source>Select a variant:</source>
 <target>Επιλογή μεθόδου:</target>
 
@@ -792,20 +807,35 @@ The command is triggered if:
 <source>More information</source>
 <target>Περισσότερες πληροφορίες</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Τοπικές ρυθμίσεις:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
+<source>Include:</source>
+<target>Συμπερίληψη:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Τροποποίηση του υποκαταλόγου δεξιά, ώστε να γίνει ακριβές αντίγραφο του υποκαταλόγου αριστερά.</target>
+<source>Exclude:</source>
+<target>Αποκλεισμός:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Αντιγραφή των νέων και των τροποποιημένων αρχείων στον υποκατάλογο δεξιά.</target>
+<source>Show examples</source>
+<target>Εμφάνιση παραδειγμάτων</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
+<source>Time span:</source>
+<target>Χρονικό εύρος:</target>
+
+<source>File size:</source>
+<target>Μέγεθος αρχείου:</target>
+
+<source>Minimum:</source>
+<target>Ελάχιστο:</target>
+
+<source>Maximum:</source>
+<target>Μέγιστο</target>
+
+<source>&Reset</source>
+<target>&Επαναφορά</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος υποκαταλόγων.</target>
 
 <source>Detect moved files</source>
 <target>Ανίχνευση των αρχείων που μεταφέρθηκαν</target>
@@ -820,6 +850,9 @@ The command is triggered if:
 - Η ανίχνευση είναι ενεργή μετά τον αρχικό συγχρονισμό
 - Δεν υποστηρίζεται από όλα τα συστήματα αρχείων
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Ανίχνευση της κατεύθυνσης συγχρονισμού με τη βοήθεια βάσεων δεδομένων</target>
 
 <source>Delete files:</source>
 <target>Διαγραφή αρχείων:</target>
@@ -845,9 +878,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Τρόπος ονομασίας:</target>
 
-<source>Show examples</source>
-<target>Εμφάνιση παραδειγμάτων</target>
-
 <source>Handle errors:</source>
 <target>Χειρισμός σφαλμάτων:</target>
 
@@ -866,8 +896,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>Μετά την ολοκλήρωση:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Ανίχνευση της κατεύθυνσης συγχρονισμού με τη βοήθεια βάσεων δεδομένων</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Να ξεκινήσει ο συγχρονισμός τώρα;</target>
@@ -928,30 +958,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Κάδος ανακύκλωσης</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος υποκαταλόγων.</target>
-
-<source>Include:</source>
-<target>Συμπερίληψη:</target>
-
-<source>Exclude:</source>
-<target>Αποκλεισμός:</target>
-
-<source>Time span:</source>
-<target>Χρονικό εύρος:</target>
-
-<source>File size:</source>
-<target>Μέγεθος αρχείου:</target>
-
-<source>Minimum:</source>
-<target>Ελάχιστο:</target>
-
-<source>Maximum:</source>
-<target>Μέγιστο</target>
-
-<source>&Reset</source>
-<target>&Επαναφορά</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Οι ακόλουθες ρυθμίσεις χρησιμοποιούνται για όλες τις εργασίες συγχρονισμού.</target>
@@ -1037,11 +1043,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Διαγραφή Στοιχείων</target>
 
-<source>Global Settings</source>
-<target>Γενικές Ρυθμίσεις</target>
+<source>Options</source>
+<target>Επιλογές</target>
 
 <source>Select Time Span</source>
 <target>Επιλογή Χρονικού Εύρους</target>
+
+<source>&Preferences...</source>
+<target>&Προτιμήσεις...</target>
 
 <source>Folder Pairs</source>
 <target>Ζεύγη Υποκαταλόγων</target>
@@ -1060,12 +1069,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Κύρια Γραμμή</target>
-
-<source>Open...</source>
-<target>Άνοιγμα...</target>
-
-<source>Save</source>
-<target>Αποθήκευση</target>
 
 <source>Compare both sides</source>
 <target>Σύγκριση των δύο πλευρών</target>
@@ -1193,8 +1196,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Διαγραφή επιλεγμένων διατάξεων</target>
 
-<source>Filter</source>
-<target>Φίλτρο</target>
+<source>Synchronization Settings</source>
+<target>Ρυθμίσεις συγχρονισμού</target>
+
+<source>Reset filter</source>
+<target>Επαναφορά φίλτρου</target>
 
 <source>Show files that exist on left side only</source>
 <target>Εμφάνιση των αρχείων που υπάρχουν μόνο στα αριστερά</target>
@@ -1244,14 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Ορισμός ως προεπιλογής</target>
 
+<source>Filter</source>
+<target>Φίλτρο</target>
+
 <source>All files are in sync</source>
 <target>Όλα τα αρχεία είναι συγχρονισμένα</target>
-
-<source>Synchronization Settings</source>
-<target>Ρυθμίσεις συγχρονισμού</target>
-
-<source>Comparison Settings</source>
-<target>Ρυθμίσεις Σύγκρισης</target>
 
 <source>Cannot find %x</source>
 <target>Δεν μπορεί να βρεθεί το %x</target>
@@ -1313,6 +1316,72 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Καταγραφή</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε το ακόλουθο αντικείμενο στον κάδο ανακύκλωσης;</pluralform>
+<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε τα ακόλουθα %x αντικείμενα στον κάδο ανακύκλωσης;</pluralform>
+</target>
+
+<source>Move</source>
+<target>Μεταφορά</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Προτιμήσεις</target>
+
+<source>Copy NTFS permissions</source>
+<target>Αντιγραφή αδειών προσπέλασης NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Ένταξη εξωτερικών εφαρμογών στο μενού περιβάλλοντος. Οι ακόλουθες μακροεντολές είναι διαθέσιμες:</target>
+
+<source>- full file or folder name</source>
+<target>- πλήρες όνομα αρχείου ή υποκαταλόγου</target>
+
+<source>- folder part only</source>
+<target>- μέρος μόνο του υποκαταλόγου</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Το αντίστοιχο του %item_path% της άλλης πλευράς</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Το αντίστοιχο του %item_folder% της άλλης πλευράς</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Να γίνει επαναφορά όλων των κρυμμένων μηνυμάτων και προειδοποιήσεων;</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Τροποποίηση του υποκαταλόγου δεξιά, ώστε να γίνει ακριβές αντίγραφο του υποκαταλόγου αριστερά.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Αντιγραφή των νέων και των τροποποιημένων αρχείων στον υποκατάλογο δεξιά.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
+
+<source>Exclude</source>
+<target>Εξαίρεση</target>
+
+<source>Direct</source>
+<target>Ως δεσμοί</target>
+
+<source>Follow</source>
+<target>Ως περιεχόμενο</target>
+
 <source>Today</source>
 <target>Σήμερα</target>
 
@@ -1337,60 +1406,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε το ακόλουθο αντικείμενο στον κάδο ανακύκλωσης;</pluralform>
-<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε τα ακόλουθα %x αντικείμενα στον κάδο ανακύκλωσης;</pluralform>
-</target>
-
-<source>Move</source>
-<target>Μεταφορά</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
-<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Εξαίρεση</target>
-
-<source>Direct</source>
-<target>Ως δεσμοί</target>
-
-<source>Follow</source>
-<target>Ως περιεχόμενο</target>
-
-<source>Copy NTFS permissions</source>
-<target>Αντιγραφή αδειών προσπέλασης NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Ένταξη εξωτερικών εφαρμογών στο μενού περιβάλλοντος. Οι ακόλουθες μακροεντολές είναι διαθέσιμες:</target>
-
-<source>- full file or folder name</source>
-<target>- πλήρες όνομα αρχείου ή υποκαταλόγου</target>
-
-<source>- folder part only</source>
-<target>- μέρος μόνο του υποκαταλόγου</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Το αντίστοιχο του %item_path% της άλλης πλευράς</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Το αντίστοιχο του %item_folder% της άλλης πλευράς</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Να γίνει επαναφορά όλων των κρυμμένων μηνυμάτων και προειδοποιήσεων;</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
-
 <source>Replace</source>
 <target>Αντικατάσταση προηγούμενης</target>
 
@@ -1402,6 +1417,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Προσάρτηση χρονικής σήμανσης στο όνομα κάθε αρχείου</target>
+
+<source>Comparison</source>
+<target>Σύγκριση</target>
+
+<source>Synchronization</source>
+<target>Συγχρονισμός</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
 
 <source>File</source>
 <target>Αρχείο</target>

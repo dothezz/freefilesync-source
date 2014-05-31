@@ -7,45 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>Synchronization</source>
-<target></target>
-
-<source>Comparison</source>
-<target></target>
-
-<source>Local settings:</source>
-<target></target>
-
-<source>Select a variant:</source>
-<target></target>
-
-<source>Use local settings:</source>
-<target></target>
-
-<source>Save as...</source>
-<target></target>
-
-<source>Save as GUI job</source>
-<target></target>
-
-<source>Local Synchronization Settings</source>
-<target></target>
-
-<source>Synchronization stopped</source>
-<target></target>
-
-<source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
-
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
-
-<source>config files:</source>
-<target></target>
-
-<source>global config file:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Abi pusės buvo pakeistos nuo paskutinio sinchronizavimo.</target>
 
@@ -115,11 +76,23 @@
 <source>Syntax:</source>
 <target>Sintaksė:</target>
 
+<source>global config file:</source>
+<target>bendrinis konfigūracinis failas</target>
+
+<source>config files:</source>
+<target>konfigūracinis failas</target>
+
 <source>directory</source>
 <target>katalogas</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Kelias iki alternatyvaus GlobalSettings.xml failo</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Neribotas kiekis FreeFileSync .ffs_gui ir/arba .ffs_batch konfigūracinių failų</target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Bet koks skaičius alternatyvių katalogų grupuojams tik su vienu konfigūraciniu failu</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nepavyksta rasti šių aplankų:</target>
@@ -338,7 +311,7 @@
 <target>Rodyti naršyklėje</target>
 
 <source>Open with default application</source>
-<target>Atverti su numatyta programa</target>
+<target>Atversti su numatyta programa</target>
 
 <source>Browse directory</source>
 <target>Naršyti katalogą</target>
@@ -365,7 +338,7 @@
 <target>Nepavyko sukurti versijos laiko žymą</target>
 
 <source>&Open...</source>
-<target>&Atverti...</target>
+<target>&Atversti...</target>
 
 <source>Save &as...</source>
 <target>Išsaugoti &kaip...</target>
@@ -377,7 +350,7 @@
 <target>&Programa</target>
 
 <source>&View help</source>
-<target>&Rodymo pagalba</target>
+<target>&Rodyti pagalbą</target>
 
 <source>&About</source>
 <target>&Apie</target>
@@ -573,6 +546,9 @@ Komanda inicijuojama jei:
 <source>job name</source>
 <target>Užduoties pavadinimas</target>
 
+<source>Synchronization stopped</source>
+<target>Suvienodinimas sustabdytas</target>
+
 <source>Synchronization completed with errors</source>
 <target>Suvienodinimas baigtas su klaidomis</target>
 
@@ -685,11 +661,11 @@ Komanda inicijuojama jei:
 <source>Drag && drop</source>
 <target>Vilkti ir numesti</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternatyvaus Palyginimo Parametrai</target>
+<source>Local comparison settings</source>
+<target>Vietiniai palyginimo parametrai</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternatyvaus Palyginimo Parametrai</target>
+<source>Local synchronization settings</source>
+<target>Vietiniai suvienodinimo parametrai</target>
 
 <source>Local filter</source>
 <target>Vietinis filtras</target>
@@ -700,17 +676,20 @@ Komanda inicijuojama jei:
 <source>None</source>
 <target>Tusčia</target>
 
-<source>Remove alternate settings</source>
-<target>Pašalinti alternatyvius nustatymus</target>
+<source>Remove local settings</source>
+<target>Pašalinti vietinius parametrus</target>
 
-<source>Clear filter settings</source>
-<target>Išvalyti filtro nustatymus</target>
+<source>Reset local filter</source>
+<target>Iš naujo nustatyti vietinį filtrą</target>
 
 <source>Copy</source>
 <target>Kopijuoti</target>
 
 <source>Paste</source>
 <target>Įklijuoti</target>
+
+<source>Local Synchronization Settings</source>
+<target>Vietiniai Suvienodinimo Parametrai</target>
 
 <source>&New</source>
 <target>&Naujas</target>
@@ -722,13 +701,13 @@ Komanda inicijuojama jei:
 <target>Išsaugoti kaip &užduočių paketą...</target>
 
 <source>1. &Compare</source>
-<target>1. &Sulyginti</target>
+<target>1. &Palyginti</target>
 
 <source>2. &Synchronize</source>
 <target>2. &Suvienodinti</target>
 
-<source>&Global settings</source>
-<target>&Bendri nustatymai</target>
+<source>&Options</source>
+<target>&Parinktys</target>
 
 <source>&Language</source>
 <target>&Kalba</target>
@@ -751,11 +730,11 @@ Komanda inicijuojama jei:
 <source>&Check for new version</source>
 <target>&Naujasnės versijos tikrinimas</target>
 
-<source>Compare</source>
-<target>Sulyginti</target>
-
 <source>Cancel</source>
 <target>Atšaukti</target>
+
+<source>Compare</source>
+<target>Sulyginti</target>
 
 <source>Synchronize</source>
 <target>Suvienodinti</target>
@@ -779,13 +758,19 @@ Komanda inicijuojama jei:
 <target>Atitikti atveją</target>
 
 <source>Open...</source>
-<target>Atverti...</target>
+<target>Atversti...</target>
 
 <source>Save</source>
 <target>Išsaugoti</target>
 
+<source>Save as GUI job</source>
+<target>Išsaugotu kaip GUI paketą</target>
+
 <source>Save as batch job</source>
 <target>Išsaugoti kaip užduočių paketą</target>
+
+<source>Save as...</source>
+<target>Išsaugoti kaip...</target>
 
 <source>View type:</source>
 <target>Rodymo būdai</target>
@@ -808,6 +793,12 @@ Komanda inicijuojama jei:
 <source>Total bytes to copy</source>
 <target>Viso baitų kopijuoti</target>
 
+<source>Use local settings:</source>
+<target>Naudoti vietinius nustatymus</target>
+
+<source>Select a variant:</source>
+<target>Pasirinkti variantą</target>
+
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Sutapatinti vienodus failus lyginant failų modifikavimo laiką ir dydį.</target>
 
@@ -819,6 +810,9 @@ Komanda inicijuojama jei:
 
 <source>More information</source>
 <target>Daugiau informacijos</target>
+
+<source>Local settings:</source>
+<target>Vietiniai nustatymai</target>
 
 <source>Include:</source>
 <target>Įtraukti:</target>
@@ -1053,11 +1047,14 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Delete Items</source>
 <target>Pašalinti elementai</target>
 
-<source>Global Settings</source>
-<target>Bendri parametrai</target>
+<source>Options</source>
+<target>Parinktys</target>
 
 <source>Select Time Span</source>
 <target>Pasirinkti laiko atkarpą</target>
+
+<source>&Preferences...</source>
+<target>&Pirmenybė...</target>
 
 <source>Folder Pairs</source>
 <target>Sugretinti aplankai</target>
@@ -1210,6 +1207,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Synchronization Settings</source>
 <target>Suvienodinimo parametrai</target>
 
+<source>Reset filter</source>
+<target>Iš naujo nustatyti filtrą</target>
+
 <source>Show files that exist on left side only</source>
 <target>Rodyti failus, kurie egzistuoja tik kairėje pusėje</target>
 
@@ -1347,6 +1347,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
 </target>
 
+<source>Preferences</source>
+<target>Pirmenybės</target>
+
 <source>Copy NTFS permissions</source>
 <target>Kopijuoti NTFS leidimus</target>
 
@@ -1425,6 +1428,12 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Append a time stamp to each file name</source>
 <target>Pridėti laiko žymę prie kiekvieno failo pavadinimo</target>
 
+<source>Comparison</source>
+<target>Palyginimas</target>
+
+<source>Synchronization</source>
+<target>Suvienodinimas</target>
+
 <source>Leave as unresolved conflict</source>
 <target>Palikti kaip neišpręstą konfliktą</target>
 
@@ -1498,7 +1507,7 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Nepavyko rasti simbolinės nuorodos %x reikšmės</target>
 
 <source>Cannot open directory %x.</source>
-<target>Nepavyksta atverti direktorijos %x.</target>
+<target>Nepavyksta atversti direktorijos %x.</target>
 
 <source>Cannot enumerate directory %x.</source>
 <target>Nepavyksta sunumeruoti direktorijos %x.</target>

@@ -41,7 +41,7 @@ ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,
 
 ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig, const wxString& title);
 
-ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
+ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
 }

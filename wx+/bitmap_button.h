@@ -60,9 +60,9 @@ void setBitmapTextLabel(wxBitmapButton& btn, const wxImage& img, const wxString&
     }
 
     //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work corretly
-    wxSize minSize = btn.GetMinSize();
-    btn.SetMinSize(wxSize(std::max(dynImage.GetWidth () + 2 * border, minSize.GetWidth()),
-                          std::max(dynImage.GetHeight() + 2 * border, minSize.GetHeight())));
+	const int defaultHeight = wxButton::GetDefaultSize().GetHeight();
+    btn.SetMinSize(wxSize(dynImage.GetWidth () + 2 * border,
+                          std::max(dynImage.GetHeight() + 2 * border, defaultHeight)));
 
     btn.SetBitmapLabel(wxBitmap(dynImage));
     //SetLabel() calls confuse wxBitmapButton in the disabled state and it won't show the image! workaround:

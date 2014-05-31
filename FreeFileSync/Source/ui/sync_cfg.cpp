@@ -12,7 +12,7 @@
 #include <wx+/choice_enum.h>
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
-#include <wx+/std_button_order.h>
+#include <wx+/std_button_layout.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/key_event.h>
 #include <wx+/image_resources.h>
@@ -212,7 +212,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     SetTitle(title);
 
@@ -256,8 +256,8 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     {
         m_checkBoxUseLocalCmpOptions->SetValue(true);
         bSizerLocalCompSettings->Show(false);
+        m_panelCompSettingsHolder->Layout(); //fix comp panel glitch on Win 7 125% font size
     }
-
     updateCompGui();
 
     //------------- filter panel --------------------------
@@ -286,7 +286,10 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
 
     assert((useAlternateCmpCfg != nullptr) == (useAlternateSyncCfg != nullptr));
     if (!useAlternateCmpCfg)
+    {
         bSizerLocalFilterSettings->Show(false);
+        m_panelFilterSettingsHolder->Layout();
+    }
 
     setFilter(filterCfg);
 
@@ -326,6 +329,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     {
         m_checkBoxUseLocalSyncOptions->SetValue(true);
         bSizerLocalSyncSettings->Show(false);
+        m_panelSyncSettingsHolder->Layout();
     }
 
     if (miscCfg)

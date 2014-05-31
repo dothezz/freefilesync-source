@@ -7,39 +7,6 @@
 	<plural_definition>n <= 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Synchronization</source>
-<target></target>
-
-<source>Comparison</source>
-<target></target>
-
-<source>Local settings:</source>
-<target></target>
-
-<source>Use local settings:</source>
-<target></target>
-
-<source>Save as...</source>
-<target></target>
-
-<source>Save as GUI job</source>
-<target></target>
-
-<source>Local Synchronization Settings</source>
-<target></target>
-
-<source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
-
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
-
-<source>config files:</source>
-<target></target>
-
-<source>global config file:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Les deux côtés ont changé depuis la dernière synchronisation.</target>
 
@@ -109,11 +76,23 @@
 <source>Syntax:</source>
 <target>Syntaxe :</target>
 
+<source>global config file:</source>
+<target>fichier de configuration globale</target>
+
+<source>config files:</source>
+<target>fichier de configuration</target>
+
 <source>directory</source>
 <target>répertoire</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Chemin d'un fichier GlobalSettings.xml distinct</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>N'importe quel nombre de fichiers FreeFileSync .ffs_gui et/ou .ffs_batch.</target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>N'importe quel nombre de paires de répertoires distincts pour au plus un fichier de configuration</target>
 
 <source>Cannot find the following folders:</source>
 <target>Impossible de trouver les dossiers suivants :</target>
@@ -678,11 +657,11 @@ La commande est déclenchée si :
 <source>Drag && drop</source>
 <target>Glisser && Déposer</target>
 
-<source>Alternate comparison settings</source>
-<target>configuration distincte de la comparaison</target>
+<source>Local comparison settings</source>
+<target>Paramètres de comparaison locaux</target>
 
-<source>Alternate synchronization settings</source>
-<target>configuration distincte de la synchronisation</target>
+<source>Local synchronization settings</source>
+<target>Paramètres de synchronisation locaux</target>
 
 <source>Local filter</source>
 <target>Filtre local</target>
@@ -693,17 +672,20 @@ La commande est déclenchée si :
 <source>None</source>
 <target>Aucun</target>
 
-<source>Remove alternate settings</source>
-<target>Supprimer les paramètres de rechange</target>
+<source>Remove local settings</source>
+<target>supprimer les paramètres locaux</target>
 
-<source>Clear filter settings</source>
-<target>Effacer la configuration du filtrage</target>
+<source>Reset local filter</source>
+<target>Réinitialiser le filtre local</target>
 
 <source>Copy</source>
 <target>Copier</target>
 
 <source>Paste</source>
 <target>Coller</target>
+
+<source>Local Synchronization Settings</source>
+<target>Paramètres de synchronisation locaux</target>
 
 <source>&New</source>
 <target>&Nouveau</target>
@@ -720,8 +702,8 @@ La commande est déclenchée si :
 <source>2. &Synchronize</source>
 <target>2. &Synchroniser</target>
 
-<source>&Global settings</source>
-<target>&Paramètres généraux</target>
+<source>&Options</source>
+<target>&Options</target>
 
 <source>&Language</source>
 <target>&Langue</target>
@@ -744,11 +726,11 @@ La commande est déclenchée si :
 <source>&Check for new version</source>
 <target>&Vérifier les nouvelles versions</target>
 
-<source>Compare</source>
-<target>Comparer</target>
-
 <source>Cancel</source>
 <target>Annuler</target>
+
+<source>Compare</source>
+<target>Comparer</target>
 
 <source>Synchronize</source>
 <target>Synchroniser</target>
@@ -777,8 +759,14 @@ La commande est déclenchée si :
 <source>Save</source>
 <target>Sauvegarder</target>
 
+<source>Save as GUI job</source>
+<target>Enregistrer en tant que job GUI</target>
+
 <source>Save as batch job</source>
-<target>Enrgistrer en temps que fichier batch</target>
+<target>Enregistrer en tant que fichier batch</target>
+
+<source>Save as...</source>
+<target>Enregistrer en tant que...</target>
 
 <source>View type:</source>
 <target>Type de vue :</target>
@@ -801,6 +789,9 @@ La commande est déclenchée si :
 <source>Total bytes to copy</source>
 <target>Nombre total d'octets à copier</target>
 
+<source>Use local settings:</source>
+<target>Utiliser les paramètres locaux</target>
+
 <source>Select a variant:</source>
 <target>Choisir une variante :</target>
 
@@ -815,6 +806,9 @@ La commande est déclenchée si :
 
 <source>More information</source>
 <target>Plus d'informations</target>
+
+<source>Local settings:</source>
+<target>Paramètres locaux</target>
 
 <source>Include:</source>
 <target>Inclure :</target>
@@ -1049,11 +1043,14 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Delete Items</source>
 <target>Supprimer les Éléments</target>
 
-<source>Global Settings</source>
-<target>Configuration Générale</target>
+<source>Options</source>
+<target>Options</target>
 
 <source>Select Time Span</source>
 <target>Sélection de l'Intervalle de Temps</target>
+
+<source>&Preferences...</source>
+<target>&Préférences...</target>
 
 <source>Folder Pairs</source>
 <target>Paires de Dossiers</target>
@@ -1202,6 +1199,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Synchronization Settings</source>
 <target>Configuration de la Synchronisation</target>
 
+<source>Reset filter</source>
+<target>Réinitialiser le filtre</target>
+
 <source>Show files that exist on left side only</source>
 <target>Afficher les fichiers existant seulement à gauche</target>
 
@@ -1337,6 +1337,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <pluralform>Voulez-vous vraiment supprimer ces %x éléments ?</pluralform>
 </target>
 
+<source>Preferences</source>
+<target>Préférences</target>
+
 <source>Copy NTFS permissions</source>
 <target>Copie des droits NTFS</target>
 
@@ -1414,6 +1417,12 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>Append a time stamp to each file name</source>
 <target>Ajouter un horodatage à chaque nom de fichier</target>
+
+<source>Comparison</source>
+<target>Comparaison</target>
+
+<source>Synchronization</source>
+<target>Synchronisation</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Abandonner en tant que conflit non résolu</target>

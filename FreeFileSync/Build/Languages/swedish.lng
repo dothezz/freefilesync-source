@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>config files</source>
-<target>konfigurationsfiler</target>
+<source>global config file:</source>
+<target>övergripande konfigurationsfil:</target>
+
+<source>config files:</source>
+<target>configurationsfiler:</target>
 
 <source>directory</source>
 <target>mapp</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Sökväg till en alternativ GlobalSettings.xml-fil</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Valfritt antal FreeFileSync .ffs_gui och/eller .ffs_batch konfigurationsfiler.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Valfritt antal alternativa mappar för max en konfigurationsfil.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Valfritt antal alternativa mapp-par för som mest, en konfigurationsfil</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan inte hitta följande mappar:</target>
@@ -651,11 +657,11 @@ Kommandot triggas om:
 <source>Drag && drop</source>
 <target>Dra && släpp</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternativa jämförelseinställningar</target>
+<source>Local comparison settings</source>
+<target>Lokala jämförelseinställningar</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternativa synkroniseringsinställningar</target>
+<source>Local synchronization settings</source>
+<target>Lokala synkroniseringsinställningar</target>
 
 <source>Local filter</source>
 <target>Lokalt filter</target>
@@ -666,11 +672,11 @@ Kommandot triggas om:
 <source>None</source>
 <target>Inget</target>
 
-<source>Remove alternate settings</source>
-<target>Ta bort alternativa inställningar</target>
+<source>Remove local settings</source>
+<target>Ta bort lokala inställningar</target>
 
-<source>Clear filter settings</source>
-<target>Rensa filterinställningar</target>
+<source>Reset local filter</source>
+<target>Återställ lokalt filter</target>
 
 <source>Copy</source>
 <target>Kopiera</target>
@@ -678,14 +684,8 @@ Kommandot triggas om:
 <source>Paste</source>
 <target>Klistra in</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternativa jämförelseinställningar</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternativa synkroniseringsinställningar</target>
-
-<source>Local Filter</source>
-<target>Lokalt filter</target>
+<source>Local Synchronization Settings</source>
+<target>Lokala synkroniseringsinställningar</target>
 
 <source>&New</source>
 <target>&Nytt</target>
@@ -702,8 +702,8 @@ Kommandot triggas om:
 <source>2. &Synchronize</source>
 <target>2. &Synkronisera</target>
 
-<source>&Global settings</source>
-<target>&Allmäna inställningar</target>
+<source>&Options</source>
+<target>&Alternativ</target>
 
 <source>&Language</source>
 <target>&Språk</target>
@@ -726,11 +726,11 @@ Kommandot triggas om:
 <source>&Check for new version</source>
 <target>&Sök efter uppdateringar</target>
 
-<source>Compare</source>
-<target>Jämför</target>
-
 <source>Cancel</source>
 <target>Avbryt</target>
+
+<source>Compare</source>
+<target>Jämför</target>
 
 <source>Synchronize</source>
 <target>Synkronisera</target>
@@ -753,8 +753,20 @@ Kommandot triggas om:
 <source>Match case</source>
 <target>Matcha gemener/VERSALER</target>
 
+<source>Open...</source>
+<target>Öppna...</target>
+
+<source>Save</source>
+<target>Spara</target>
+
+<source>Save as GUI job</source>
+<target>Spara som grafisk åtgärd</target>
+
 <source>Save as batch job</source>
 <target>Spara som batch-fil</target>
+
+<source>Save as...</source>
+<target>Spara som...</target>
 
 <source>View type:</source>
 <target>Visningstyp:</target>
@@ -777,6 +789,9 @@ Kommandot triggas om:
 <source>Total bytes to copy</source>
 <target>Byte att kopiera</target>
 
+<source>Use local settings:</source>
+<target>Använd lokala inställningar:</target>
+
 <source>Select a variant:</source>
 <target>Välj ett alternativ:</target>
 
@@ -792,20 +807,35 @@ Kommandot triggas om:
 <source>More information</source>
 <target>Mer information</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Lokala inställningar:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
+<source>Include:</source>
+<target>Inkludera:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Skapar en speglad säkerhetskopia av vänstra mappen genom att anpassa den högra</target>
+<source>Exclude:</source>
+<target>Undanta:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopierar nya och uppdaterade filer till höger mapp.</target>
+<source>Show examples</source>
+<target>Visa exempel</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Konfigurera dina egna synkroniseringsregler.</target>
+<source>Time span:</source>
+<target>Tidsrymd:</target>
+
+<source>File size:</source>
+<target>Filstorlek:</target>
+
+<source>Minimum:</source>
+<target>Min:</target>
+
+<source>Maximum:</source>
+<target>Max:</target>
+
+<source>&Reset</source>
+<target>&Återställ</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande mapp-par</target>
 
 <source>Detect moved files</source>
 <target>Hitta flyttade filer</target>
@@ -820,6 +850,9 @@ Kommandot triggas om:
 - Övervakning aktiv efter initial synkronisering
 - Stöds ej av alla filsystem
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
 
 <source>Delete files:</source>
 <target>Ta bort filer:</target>
@@ -845,9 +878,6 @@ Kommandot triggas om:
 <source>Naming convention:</source>
 <target>Regler för namngivning</target>
 
-<source>Show examples</source>
-<target>Visa exempel</target>
-
 <source>Handle errors:</source>
 <target>Felhantering:</target>
 
@@ -866,8 +896,8 @@ Kommandot triggas om:
 <source>On completion:</source>
 <target>Vid slutförd åtgärd:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Vill du starta synkroniseringen nu?</target>
@@ -928,30 +958,6 @@ Kommandot triggas om:
 
 <source>&Recycle bin</source>
 <target>&Papperskorgen</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande mapp-par</target>
-
-<source>Include:</source>
-<target>Inkludera:</target>
-
-<source>Exclude:</source>
-<target>Undanta:</target>
-
-<source>Time span:</source>
-<target>Tidsrymd:</target>
-
-<source>File size:</source>
-<target>Filstorlek:</target>
-
-<source>Minimum:</source>
-<target>Min:</target>
-
-<source>Maximum:</source>
-<target>Max:</target>
-
-<source>&Reset</source>
-<target>&Återställ</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Följande inställningar används för all synkronisering</target>
@@ -1037,11 +1043,14 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Delete Items</source>
 <target>Ta bort objekt</target>
 
-<source>Global Settings</source>
-<target>Globala inställningar</target>
+<source>Options</source>
+<target>Alternativ</target>
 
 <source>Select Time Span</source>
 <target>Välj tidsrymd</target>
+
+<source>&Preferences...</source>
+<target>&Inställningar...</target>
 
 <source>Folder Pairs</source>
 <target>Mapp-par</target>
@@ -1060,12 +1069,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Main Bar</source>
 <target>Primärt verktygsfält</target>
-
-<source>Open...</source>
-<target>Öppna...</target>
-
-<source>Save</source>
-<target>Spara</target>
 
 <source>Compare both sides</source>
 <target>Jämför båda sidor</target>
@@ -1193,8 +1196,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Delete selected configurations</source>
 <target>Ta bort markerade konfigurationer</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Synchronization Settings</source>
+<target>Synkroniseringsinställningar</target>
+
+<source>Reset filter</source>
+<target>Återställ filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Visa filer som endast finns till vänster</target>
@@ -1244,14 +1250,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Set as default</source>
 <target>Ange som standard</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>All files are in sync</source>
 <target>Alla filer är synkroniserade</target>
-
-<source>Synchronization Settings</source>
-<target>Synkroniseringsinställningar</target>
-
-<source>Comparison Settings</source>
-<target>Jämförelseinställningar</target>
 
 <source>Cannot find %x</source>
 <target>Kan inte hitta %x</target>
@@ -1313,6 +1316,72 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Log</source>
 <target>Logg</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Vill du verkligen flytta följande objekt till papperskorgen?</pluralform>
+<pluralform>Vill du verkligen flytta följande %x objekt till papperskorgen?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Flytta</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Vill du verkligen ta bort följande objekt?</pluralform>
+<pluralform>Vill du verkligen ta bort följande %x objekt?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Inställningar</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopiera NTFS-behörigheter</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:</target>
+
+<source>- full file or folder name</source>
+<target>- fullständigt fil- eller mappnamn</target>
+
+<source>- folder part only</source>
+<target>- endast mappdelen</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Andra sidans motsvarighet till %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Andra sidans motsvarighet till %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Vill du återställa alla dolda vyer och varningar</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Skapar en speglad säkerhetskopia av vänstra mappen genom att anpassa den högra</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopierar nya och uppdaterade filer till höger mapp.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurera dina egna synkroniseringsregler.</target>
+
+<source>Exclude</source>
+<target>Undanta</target>
+
+<source>Direct</source>
+<target>Direkt</target>
+
+<source>Follow</source>
+<target>Följ</target>
+
 <source>Today</source>
 <target>Idag</target>
 
@@ -1337,60 +1406,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Vill du verkligen flytta följande objekt till papperskorgen?</pluralform>
-<pluralform>Vill du verkligen flytta följande %x objekt till papperskorgen?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Flytta</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vill du verkligen ta bort följande objekt?</pluralform>
-<pluralform>Vill du verkligen ta bort följande %x objekt?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Undanta</target>
-
-<source>Direct</source>
-<target>Direkt</target>
-
-<source>Follow</source>
-<target>Följ</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopiera NTFS-behörigheter</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:</target>
-
-<source>- full file or folder name</source>
-<target>- fullständigt fil- eller mappnamn</target>
-
-<source>- folder part only</source>
-<target>- endast mappdelen</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Andra sidans motsvarighet till %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Andra sidans motsvarighet till %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Vill du återställa alla dolda vyer och varningar</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Ignorera konflikt</target>
-
 <source>Replace</source>
 <target>Byt ut</target>
 
@@ -1402,6 +1417,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Append a time stamp to each file name</source>
 <target>Lägg till en tidsstämpel till varje filnamn</target>
+
+<source>Comparison</source>
+<target>Jämförelse</target>
+
+<source>Synchronization</source>
+<target>Synkronisering</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Ignorera konflikt</target>
 
 <source>File</source>
 <target>Fil</target>

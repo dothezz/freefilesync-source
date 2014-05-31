@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>תחביר:</target>
 
-<source>config files</source>
-<target>קבצי קונפיגורציה</target>
+<source>global config file:</source>
+<target>קבצי תצורה גלובליים</target>
+
+<source>config files:</source>
+<target>קבצי תצורה</target>
 
 <source>directory</source>
 <target>מחיצה</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>נתיב אל קובץ GlobalSettingd.xml אלטרנטיבי</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>כל כמות של קבצי FreeFileSync .ffs_gui ו\או קבצי קונפיגורציה .ffs_batch.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>כל כמות של מחיצות אלטרנטיביות עבור לפחות קובץ קונפיגורציה אחד.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>כל כמות של זוגות מחיצות אלטרנטיביות עבור קובץ תצורה אחד לפחות.</target>
 
 <source>Cannot find the following folders:</source>
 <target>לא יכול למצוא את המחיצות הבאות:</target>
@@ -651,11 +657,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>גרור &והשלך</target>
 
-<source>Alternate comparison settings</source>
-<target>הגדרות השוואה חלופיות</target>
+<source>Local comparison settings</source>
+<target>הגדרות השוואה מקומיות</target>
 
-<source>Alternate synchronization settings</source>
-<target>הגדרות סנכרון חלופיות</target>
+<source>Local synchronization settings</source>
+<target>הגדרות סינכרון מקומיות</target>
 
 <source>Local filter</source>
 <target>מסנן מקומי</target>
@@ -666,11 +672,11 @@ The command is triggered if:
 <source>None</source>
 <target>אין</target>
 
-<source>Remove alternate settings</source>
-<target>הסר הגדרות תצורה חליפיות</target>
+<source>Remove local settings</source>
+<target>הסר הגדרות מקומיות</target>
 
-<source>Clear filter settings</source>
-<target>נקה בחירת מסנן</target>
+<source>Reset local filter</source>
+<target>אפס מסנן מקומי</target>
 
 <source>Copy</source>
 <target>העתק</target>
@@ -678,14 +684,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>הדבק</target>
 
-<source>Alternate Comparison Settings</source>
-<target>הגדרות השוואה חלופיות</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>הגדרות סנכרון חלופיות</target>
-
-<source>Local Filter</source>
-<target>מסנן מקומי</target>
+<source>Local Synchronization Settings</source>
+<target>הגדרות סינכרון מקומיות</target>
 
 <source>&New</source>
 <target>&חדש</target>
@@ -702,8 +702,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &סנכרן</target>
 
-<source>&Global settings</source>
-<target>&משתנים גלובליים</target>
+<source>&Options</source>
+<target>&אפשרויות</target>
 
 <source>&Language</source>
 <target>&שפה</target>
@@ -726,11 +726,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>&בדוק קיום גירסה חדשה</target>
 
-<source>Compare</source>
-<target>השוואה</target>
-
 <source>Cancel</source>
 <target>בטל</target>
+
+<source>Compare</source>
+<target>השוואה</target>
 
 <source>Synchronize</source>
 <target>סנכרן</target>
@@ -753,8 +753,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>התאם רישיות</target>
 
+<source>Open...</source>
+<target>פתח...</target>
+
+<source>Save</source>
+<target>שמור</target>
+
+<source>Save as GUI job</source>
+<target>שמור כמשימת GUI</target>
+
 <source>Save as batch job</source>
 <target>שמור כעבודת אצווה</target>
+
+<source>Save as...</source>
+<target>שמור כ...</target>
 
 <source>View type:</source>
 <target>הצג סוג:</target>
@@ -777,6 +789,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>סה"כ בתים להעתיק</target>
 
+<source>Use local settings:</source>
+<target>השתמש בהגדרות מקומיות:</target>
+
 <source>Select a variant:</source>
 <target>בחר גירסה:</target>
 
@@ -792,20 +807,35 @@ The command is triggered if:
 <source>More information</source>
 <target>מידע נוסף</target>
 
-<source>OK</source>
-<target>אשר</target>
+<source>Local settings:</source>
+<target>הגדרות מקומיות:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>זהה והפץ שינויים בשני הצדדים. מחיקות העברות וסתירות מתגלים באופן אוטומטי באמצעות מסד נתונים.</target>
+<source>Include:</source>
+<target>כלול:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>צור גיבוי מראה של התיקיה משמאל באמצעות התאמת התיקיה מימין להתאמה.</target>
+<source>Exclude:</source>
+<target>לא לכלול:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>העתק קבצים חדשים ומעודכנים לתיקייה הימנית.</target>
+<source>Show examples</source>
+<target>הראה דוגמאות</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>סדר את כללי הסנכרון שלך.</target>
+<source>Time span:</source>
+<target>טווח זמן:</target>
+
+<source>File size:</source>
+<target>גודל קובץ:</target>
+
+<source>Minimum:</source>
+<target>מינימום:</target>
+
+<source>Maximum:</source>
+<target>מקסימום:</target>
+
+<source>&Reset</source>
+<target>&אפס</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>בחר כללי סינון כדי לא לכלול קבצים מסוימים בסנכרון. הזן את נתיבי הקבצים ביחס לזוג התיקיות בהתאמה.</target>
 
 <source>Detect moved files</source>
 <target>גלה קבצים מועברים</target>
@@ -820,6 +850,9 @@ The command is triggered if:
 - גילוי פעיל לאחר סינכרון ראשוני
 - לא נתמך ע"י כל מערכות הקבצים
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>גלה כיווני סינכרון באמצעות קבצי בסיס נתונים</target>
 
 <source>Delete files:</source>
 <target>מחק קבצים:</target>
@@ -845,9 +878,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>מוסכמות לקביעת שמות:</target>
 
-<source>Show examples</source>
-<target>הראה דוגמאות</target>
-
 <source>Handle errors:</source>
 <target>טפל בשגיאות:</target>
 
@@ -866,8 +896,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>עם הסיום:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>גלה כיווני סינכרון באמצעות קבצי בסיס נתונים</target>
+<source>OK</source>
+<target>אשר</target>
 
 <source>Start synchronization now?</source>
 <target>האם להתחיל סנכרון עכשיו?</target>
@@ -928,30 +958,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&סל מחזור</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>בחר כללי סינון כדי לא לכלול קבצים מסוימים בסנכרון. הזן את נתיבי הקבצים ביחס לזוג התיקיות בהתאמה.</target>
-
-<source>Include:</source>
-<target>כלול:</target>
-
-<source>Exclude:</source>
-<target>לא לכלול:</target>
-
-<source>Time span:</source>
-<target>טווח זמן:</target>
-
-<source>File size:</source>
-<target>גודל קובץ:</target>
-
-<source>Minimum:</source>
-<target>מינימום:</target>
-
-<source>Maximum:</source>
-<target>מקסימום:</target>
-
-<source>&Reset</source>
-<target>&אפס</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>ההגדרות הבאות משמשות לכל משימות הסנכרון.</target>
@@ -1037,11 +1043,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>מחק פריטים</target>
 
-<source>Global Settings</source>
-<target>הגדרות גלובליות</target>
+<source>Options</source>
+<target>אפשרויות</target>
 
 <source>Select Time Span</source>
 <target>בחר טווח זמן</target>
+
+<source>&Preferences...</source>
+<target>&העדפות...</target>
 
 <source>Folder Pairs</source>
 <target>זוגות תיקיות</target>
@@ -1060,12 +1069,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>סרגל ראשי</target>
-
-<source>Open...</source>
-<target>פתח...</target>
-
-<source>Save</source>
-<target>שמור</target>
 
 <source>Compare both sides</source>
 <target>השווה בין שני הצדדים</target>
@@ -1193,8 +1196,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>מחק קופיגורציות שנבחרו</target>
 
-<source>Filter</source>
-<target>מסנן</target>
+<source>Synchronization Settings</source>
+<target>הגדרות סנכרון</target>
+
+<source>Reset filter</source>
+<target>אפס מסנן</target>
 
 <source>Show files that exist on left side only</source>
 <target>הראה קבצים הנמצאים אך ורק בצד ימין</target>
@@ -1244,14 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>הגדר כברירת מחדל</target>
 
+<source>Filter</source>
+<target>מסנן</target>
+
 <source>All files are in sync</source>
 <target>כל הקבצים מסונכרנים</target>
-
-<source>Synchronization Settings</source>
-<target>הגדרות סנכרון</target>
-
-<source>Comparison Settings</source>
-<target>הגדרות השוואה</target>
 
 <source>Cannot find %x</source>
 <target>לא מוצא %x</target>
@@ -1313,6 +1316,72 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>יומן</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>האם  באמת ברצונך להעביר את הפריט הבא לסל המחזור?</pluralform>
+<pluralform>האם באמת ברצונך להעביר את הפריטים הבאים %x לסל המחזור?</pluralform>
+</target>
+
+<source>Move</source>
+<target>העבר</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>האם ברצונך למחוק את הפריט הבא?</pluralform>
+<pluralform>האם ברצונך למחוק את הפריטים %x הבאים?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>העדפות</target>
+
+<source>Copy NTFS permissions</source>
+<target>העתק הרשאות NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>הטמע תוכנות חיצוניות. תפריטי המקרו הבאים זמינים:</target>
+
+<source>- full file or folder name</source>
+<target>- שם מלא של קובץ או תיקייה</target>
+
+<source>- folder part only</source>
+<target>- תיקייה בלבד</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- הצד השני מקביל ל %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>הצד השני המקביל ל %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>האם לשחזר את כל החלונות וההודעות הנסתרות?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>זהה והפץ שינויים בשני הצדדים. מחיקות העברות וסתירות מתגלים באופן אוטומטי באמצעות מסד נתונים.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>צור גיבוי מראה של התיקיה משמאל באמצעות התאמת התיקיה מימין להתאמה.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>העתק קבצים חדשים ומעודכנים לתיקייה הימנית.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>סדר את כללי הסנכרון שלך.</target>
+
+<source>Exclude</source>
+<target>אל תכלול</target>
+
+<source>Direct</source>
+<target>כוון</target>
+
+<source>Follow</source>
+<target>עקוב</target>
+
 <source>Today</source>
 <target>היום</target>
 
@@ -1337,60 +1406,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>מגה-בייט</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>האם  באמת ברצונך להעביר את הפריט הבא לסל המחזור?</pluralform>
-<pluralform>האם באמת ברצונך להעביר את הפריטים הבאים %x לסל המחזור?</pluralform>
-</target>
-
-<source>Move</source>
-<target>העבר</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>האם ברצונך למחוק את הפריט הבא?</pluralform>
-<pluralform>האם ברצונך למחוק את הפריטים %x הבאים?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>אל תכלול</target>
-
-<source>Direct</source>
-<target>כוון</target>
-
-<source>Follow</source>
-<target>עקוב</target>
-
-<source>Copy NTFS permissions</source>
-<target>העתק הרשאות NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>הטמע תוכנות חיצוניות. תפריטי המקרו הבאים זמינים:</target>
-
-<source>- full file or folder name</source>
-<target>- שם מלא של קובץ או תיקייה</target>
-
-<source>- folder part only</source>
-<target>- תיקייה בלבד</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- הצד השני מקביל ל %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>הצד השני המקביל ל %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>האם לשחזר את כל החלונות וההודעות הנסתרות?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>השאר כקונפליקט לא מטופל</target>
-
 <source>Replace</source>
 <target>החלף</target>
 
@@ -1402,6 +1417,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>הוסף חתימת זמן לכל שם קובץ</target>
+
+<source>Comparison</source>
+<target>השוואה</target>
+
+<source>Synchronization</source>
+<target>סינכרון</target>
+
+<source>Leave as unresolved conflict</source>
+<target>השאר כקונפליקט לא מטופל</target>
 
 <source>File</source>
 <target>קובץ</target>

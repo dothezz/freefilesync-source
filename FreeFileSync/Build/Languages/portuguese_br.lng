@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Sintaxe:</target>
 
-<source>config files</source>
-<target>arquivos de configuração</target>
+<source>global config file:</source>
+<target>arquivo de configuração global:</target>
+
+<source>config files:</source>
+<target>arquivos de configuração:</target>
 
 <source>directory</source>
 <target>diretório</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Caminho para um arquivo GlobalSettings.xml alternativo.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Qualquer número de arquivos FreeFileSync .ffs e/ou de tarefa em lote .ffs_batch.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Qualquer número de alternativas de diretórios para pelo menos um arquivo de configuração.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Qualquer número de pares alternativos de diretórios para no máximo um arquivo de configuração.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Não foi possível localizar as seguintes pastas:</target>
@@ -651,11 +657,11 @@ O comando é disparado se:
 <source>Drag && drop</source>
 <target>Arrastar && Soltar</target>
 
-<source>Alternate comparison settings</source>
-<target>Configurações alternativas de comparação</target>
+<source>Local comparison settings</source>
+<target>Configurações de comparação local</target>
 
-<source>Alternate synchronization settings</source>
-<target>Configurações alternativas de sincronização</target>
+<source>Local synchronization settings</source>
+<target>Configurações de sincronização local</target>
 
 <source>Local filter</source>
 <target>Filtro local</target>
@@ -666,11 +672,11 @@ O comando é disparado se:
 <source>None</source>
 <target>Nenhum</target>
 
-<source>Remove alternate settings</source>
-<target>Remover configurações alternativas</target>
+<source>Remove local settings</source>
+<target>Remover configurações locais</target>
 
-<source>Clear filter settings</source>
-<target>Limpar configurações do filtro</target>
+<source>Reset local filter</source>
+<target>Limpar filtro local</target>
 
 <source>Copy</source>
 <target>Copiar</target>
@@ -678,14 +684,8 @@ O comando é disparado se:
 <source>Paste</source>
 <target>Colar</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Configurações Alternativas de Comparação</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Configurações Alternativas de Sincronização</target>
-
-<source>Local Filter</source>
-<target>Filtro Local</target>
+<source>Local Synchronization Settings</source>
+<target>Configurações de Sincronização Local</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -702,8 +702,8 @@ O comando é disparado se:
 <source>2. &Synchronize</source>
 <target>2. S&incronizar</target>
 
-<source>&Global settings</source>
-<target>&Configurações</target>
+<source>&Options</source>
+<target>&Opções</target>
 
 <source>&Language</source>
 <target>&Idioma</target>
@@ -726,11 +726,11 @@ O comando é disparado se:
 <source>&Check for new version</source>
 <target>&Verificar se existe nova versão</target>
 
-<source>Compare</source>
-<target>Comparar</target>
-
 <source>Cancel</source>
 <target>Cancelar</target>
+
+<source>Compare</source>
+<target>Comparar</target>
 
 <source>Synchronize</source>
 <target>Sincronizar</target>
@@ -753,8 +753,20 @@ O comando é disparado se:
 <source>Match case</source>
 <target>Diferenciar maiúsculas e minúsculas</target>
 
+<source>Open...</source>
+<target>Abrir...</target>
+
+<source>Save</source>
+<target>Salvar</target>
+
+<source>Save as GUI job</source>
+<target>Salvar como tarefa GUI</target>
+
 <source>Save as batch job</source>
 <target>Salvar como tarefa em lote</target>
+
+<source>Save as...</source>
+<target>Salvar como...</target>
 
 <source>View type:</source>
 <target>Tipo de visualização:</target>
@@ -777,6 +789,9 @@ O comando é disparado se:
 <source>Total bytes to copy</source>
 <target>Bytes totais a serem copiados</target>
 
+<source>Use local settings:</source>
+<target>Usar configurações locais:</target>
+
 <source>Select a variant:</source>
 <target>Selecione uma variante:</target>
 
@@ -792,20 +807,35 @@ O comando é disparado se:
 <source>More information</source>
 <target>Mais informação</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Configurações locais:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identifica e propaga as mudanças em ambos os lados. Arquivos e pastas apagados e/ou movidos e conflitos são detectados automaticamente usando um banco de dados.</target>
+<source>Include:</source>
+<target>Incluir:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Cria uma cópia espelho da pasta da esquerda adaptando a pasta da direita para igualar.</target>
+<source>Exclude:</source>
+<target>Excluir:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Copia arquivos novos ou atualizados para a pasta da direita.</target>
+<source>Show examples</source>
+<target>Mostrar exemplos</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Configure as suas próprias regras de sincronização.</target>
+<source>Time span:</source>
+<target>Intervalo de tempo:</target>
+
+<source>File size:</source>
+<target>Tamanho do arquivo:</target>
+
+<source>Minimum:</source>
+<target>Mínimo:</target>
+
+<source>Maximum:</source>
+<target>Máximo:</target>
+
+<source>&Reset</source>
+<target>&Limpar tudo</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Selecione regras de filtro para exlcuir certos arquivos da sincronização. Entre com os caminhos relativos dos pares de pastas correspondentes.</target>
 
 <source>Detect moved files</source>
 <target>Detectar arquivos movidos</target>
@@ -820,6 +850,9 @@ O comando é disparado se:
 - Detecção ativa após sincronismo incial
 - Não suportado por todos os sistemas de arquivo
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detecta a direção de sincronização com a ajuda do arquivo de banco de dados</target>
 
 <source>Delete files:</source>
 <target>Apagar arquivos:</target>
@@ -845,9 +878,6 @@ O comando é disparado se:
 <source>Naming convention:</source>
 <target>Convenção de nomenclatura:</target>
 
-<source>Show examples</source>
-<target>Mostrar exemplos</target>
-
 <source>Handle errors:</source>
 <target>Tratamento de erros:</target>
 
@@ -866,8 +896,8 @@ O comando é disparado se:
 <source>On completion:</source>
 <target>Ao finalizar:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detecta a direção de sincronização com a ajuda do arquivo de banco de dados</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Iniciar sincronização agora?</target>
@@ -928,30 +958,6 @@ O comando é disparado se:
 
 <source>&Recycle bin</source>
 <target>&Lixeira</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Selecione regras de filtro para exlcuir certos arquivos da sincrinização. Entre com os caminhos relativos dos pares de pastas correspondentes.</target>
-
-<source>Include:</source>
-<target>Incluir:</target>
-
-<source>Exclude:</source>
-<target>Excluir:</target>
-
-<source>Time span:</source>
-<target>Intervalo de tempo:</target>
-
-<source>File size:</source>
-<target>Tamanho do arquivo:</target>
-
-<source>Minimum:</source>
-<target>Mínimo:</target>
-
-<source>Maximum:</source>
-<target>Máximo:</target>
-
-<source>&Reset</source>
-<target>&Limpar tudo</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>As seguintes configurações são utilizadas para todas as tarefas de sincronização.</target>
@@ -1037,11 +1043,14 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Delete Items</source>
 <target>Apagar Itens</target>
 
-<source>Global Settings</source>
-<target>Configurações</target>
+<source>Options</source>
+<target>Opções</target>
 
 <source>Select Time Span</source>
 <target>Selecionar Intervalo de Tempo</target>
+
+<source>&Preferences...</source>
+<target>&Preferências...</target>
 
 <source>Folder Pairs</source>
 <target>Pares de Pastas</target>
@@ -1060,12 +1069,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Main Bar</source>
 <target>Barra Principal</target>
-
-<source>Open...</source>
-<target>Abrir...</target>
-
-<source>Save</source>
-<target>Salvar</target>
 
 <source>Compare both sides</source>
 <target>Comparar os dois lados</target>
@@ -1193,8 +1196,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Delete selected configurations</source>
 <target>Apagar configurações selecionadas</target>
 
-<source>Filter</source>
-<target>Filtro</target>
+<source>Synchronization Settings</source>
+<target>Configurações de Sincronização</target>
+
+<source>Reset filter</source>
+<target>Limpar filtro</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar arquivos que existem somente à esquerda</target>
@@ -1244,14 +1250,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Set as default</source>
 <target>Definir como padrão</target>
 
+<source>Filter</source>
+<target>Filtro</target>
+
 <source>All files are in sync</source>
 <target>Todos os arquivos estão em sincronia</target>
-
-<source>Synchronization Settings</source>
-<target>Configurações de Sincronização</target>
-
-<source>Comparison Settings</source>
-<target>Configurações de Comparação</target>
 
 <source>Cannot find %x</source>
 <target>Não foi possível localizar %x</target>
@@ -1313,6 +1316,72 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Log</source>
 <target>Log</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Você realmente deseja mover o seguinte item para a Lixeira?</pluralform>
+<pluralform>Você realmente deseja mover os seguintes %x itens para a Lixeira?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Mover</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Você realmente deseja apagar o seguinte item?</pluralform>
+<pluralform>Você realmente deseja apagar os seguintes %x itens?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Preferências</target>
+
+<source>Copy NTFS permissions</source>
+<target>Copiar permissões NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:</target>
+
+<source>- full file or folder name</source>
+<target>- nome completo do arquivo ou pasta</target>
+
+<source>- folder part only</source>
+<target>- apenas parte da pasta</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Contrapartida do outro lado para %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Contrapartida do outro lado para %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Restaurar todos as janelas e avisos ocultados?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identifica e propaga as mudanças em ambos os lados. Arquivos e pastas apagados e/ou movidos e conflitos são detectados automaticamente usando um banco de dados.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Cria uma cópia espelho da pasta da esquerda adaptando a pasta da direita para igualar.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Copia arquivos novos ou atualizados para a pasta da direita.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configure as suas próprias regras de sincronização.</target>
+
+<source>Exclude</source>
+<target>Excluir</target>
+
+<source>Direct</source>
+<target>Direto</target>
+
+<source>Follow</source>
+<target>Seguir</target>
+
 <source>Today</source>
 <target>Hoje</target>
 
@@ -1337,60 +1406,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Você realmente deseja mover o seguinte item para a Lixeira?</pluralform>
-<pluralform>Você realmente deseja mover os seguintes %x itens para a Lixeira?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Mover</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Você realmente deseja apagar o seguinte item?</pluralform>
-<pluralform>Você realmente deseja apagar os seguintes %x itens?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Excluir</target>
-
-<source>Direct</source>
-<target>Direto</target>
-
-<source>Follow</source>
-<target>Seguir</target>
-
-<source>Copy NTFS permissions</source>
-<target>Copiar permissões NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:</target>
-
-<source>- full file or folder name</source>
-<target>- nome completo do arquivo ou pasta</target>
-
-<source>- folder part only</source>
-<target>- apenas parte da pasta</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Contrapartida do outro lado para %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Contrapartida do outro lado para %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurar todos as janelas e avisos ocultados?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Deixar como conflito não resolvido</target>
-
 <source>Replace</source>
 <target>Substituir</target>
 
@@ -1402,6 +1417,15 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Append a time stamp to each file name</source>
 <target>Coloca uma estampa de tempo para cada nome de arquivo</target>
+
+<source>Comparison</source>
+<target>Comparação</target>
+
+<source>Synchronization</source>
+<target>Sincronização</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Deixar como conflito não resolvido</target>
 
 <source>File</source>
 <target>Arquivo</target>

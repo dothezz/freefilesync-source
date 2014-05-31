@@ -64,23 +64,23 @@ private:
         if (altCompConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, getResourceImage(L"cfg_compare_small"));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Alternate comparison settings") +  L" (" + getVariantName(altCompConfig->compareVar) + L")");
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Local comparison settings") +  L" (" + getVariantName(altCompConfig->compareVar) + L")");
         }
         else
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(getResourceImage(L"cfg_compare_small")));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Alternate comparison settings"));
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Local comparison settings"));
         }
 
         if (altSyncConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, getResourceImage(L"cfg_sync_small"));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Alternate synchronization settings") +  L" (" + getVariantName(altSyncConfig->directionCfg.var) + L")");
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Local synchronization settings") +  L" (" + getVariantName(altSyncConfig->directionCfg.var) + L")");
         }
         else
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(getResourceImage(L"cfg_sync_small")));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Alternate synchronization settings"));
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Local synchronization settings"));
         }
 
         if (!isNullFilter(localFilter))
@@ -105,7 +105,7 @@ private:
         };
 
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), removeAltCompCfg, nullptr, altCompConfig.get() != nullptr);
+        menu.addItem(_("Remove local settings"), removeAltCompCfg, nullptr, altCompConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
@@ -119,7 +119,7 @@ private:
         };
 
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), removeAltSyncCfg, nullptr, altSyncConfig.get() != nullptr);
+        menu.addItem(_("Remove local settings"), removeAltSyncCfg, nullptr, altSyncConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
@@ -146,7 +146,7 @@ private:
         };
 
         ContextMenu menu;
-        menu.addItem(_("Clear filter settings"), removeLocalFilterCfg, nullptr, !isNullFilter(localFilter));
+        menu.addItem(_("Reset local filter"), removeLocalFilterCfg, nullptr, !isNullFilter(localFilter));
         menu.addSeparator();
         menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(localFilter));
         menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);

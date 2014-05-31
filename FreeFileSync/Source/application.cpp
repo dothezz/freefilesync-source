@@ -18,7 +18,7 @@
 #include "algorithm.h"
 #include "synchronization.h"
 #include "ui/batch_status_handler.h"
-#include "ui/check_version.h"
+//#include "ui/check_version.h"
 #include "ui/main_dlg.h"
 #include "ui/switch_to_gui.h"
 #include "lib/process_xml.h"
@@ -428,7 +428,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             XmlGuiConfig guiCfg;
             guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
-            if (!replaceDirectories(guiCfg.mainCfg)) return;
+            if (!replaceDirectories(guiCfg.mainCfg))
+                return;
             runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>());
         }
     }
@@ -453,7 +454,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 notifyError(e.toString(), std::wstring());
                 return;
             }
-            if (!replaceDirectories(batchCfg.mainCfg)) return;
+            if (!replaceDirectories(batchCfg.mainCfg))
+                return;
             runBatchMode(globalConfigFilePath, batchCfg, filename, returnCode);
         }
         //GUI mode: single config

@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>config files</source>
-<target>configuratiebestanden</target>
+<source>global config file:</source>
+<target>Globaal configuratiebestand:</target>
+
+<source>config files:</source>
+<target>configuratiebestanden:</target>
 
 <source>directory</source>
 <target>bestandslocatie</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Pad naar alternatief GlobalSettings.xml bestand.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Elk aantal FreeFileSync .ffs_gui en/of .ffs_batch configuratiebestanden.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Elk aantal alternatieve bestandslocaties voor een configuratiebestand.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Willekeurig aantal gekoppelde mappen voor één configuratie bestand.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan de volgende mappen niet vinden:</target>
@@ -526,7 +532,7 @@ De opdracht word geactiveerd als:
 <target>Beschikbaar:</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Een map die onderdeel is van meerdere map paren word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
+<target>Een map die onderdeel is van meerdere gekoppelde mappen word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Bezig met synchroniseren van folder paar:</target>
@@ -651,11 +657,11 @@ De opdracht word geactiveerd als:
 <source>Drag && drop</source>
 <target>Drag en drop</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternatieve vergelijkings instellingen</target>
+<source>Local comparison settings</source>
+<target>Lokale vergelijkings instellingen</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternatieve synchronisatie instellingen</target>
+<source>Local synchronization settings</source>
+<target>Lokale synchronisatie instellingen</target>
 
 <source>Local filter</source>
 <target>Lokale filter</target>
@@ -666,11 +672,11 @@ De opdracht word geactiveerd als:
 <source>None</source>
 <target>Geen</target>
 
-<source>Remove alternate settings</source>
-<target>Verwijder alternatieve instellingen</target>
+<source>Remove local settings</source>
+<target>Verwijder lokale instellingen</target>
 
-<source>Clear filter settings</source>
-<target>Verwijder filterinstellingen</target>
+<source>Reset local filter</source>
+<target>Reset lokale filter</target>
 
 <source>Copy</source>
 <target>Kopiëren</target>
@@ -678,14 +684,8 @@ De opdracht word geactiveerd als:
 <source>Paste</source>
 <target>Plakken</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternatieve vergelijkings instellingen</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternatieve synchronisatie instellingen</target>
-
-<source>Local Filter</source>
-<target>Lokale filter</target>
+<source>Local Synchronization Settings</source>
+<target>Lokale synchronisatie instellingen</target>
 
 <source>&New</source>
 <target>&Nieuw</target>
@@ -702,8 +702,8 @@ De opdracht word geactiveerd als:
 <source>2. &Synchronize</source>
 <target>2. &Synchroniseer</target>
 
-<source>&Global settings</source>
-<target>&Algemene instellingen</target>
+<source>&Options</source>
+<target>&Opties</target>
 
 <source>&Language</source>
 <target>&Taal</target>
@@ -726,11 +726,11 @@ De opdracht word geactiveerd als:
 <source>&Check for new version</source>
 <target>&Controleer voor nieuwe versie</target>
 
-<source>Compare</source>
-<target>Vergelijk</target>
-
 <source>Cancel</source>
 <target>Annuleren</target>
+
+<source>Compare</source>
+<target>Vergelijk</target>
 
 <source>Synchronize</source>
 <target>Synchroniseer</target>
@@ -753,8 +753,20 @@ De opdracht word geactiveerd als:
 <source>Match case</source>
 <target>Hoofdlettergevoelig</target>
 
+<source>Open...</source>
+<target>Open...</target>
+
+<source>Save</source>
+<target>Opslaan</target>
+
+<source>Save as GUI job</source>
+<target>Opslaan als GUI taak</target>
+
 <source>Save as batch job</source>
 <target>Opslaan als batch opdracht</target>
+
+<source>Save as...</source>
+<target>Opslaan als...</target>
 
 <source>View type:</source>
 <target>Laat type zien:</target>
@@ -777,6 +789,9 @@ De opdracht word geactiveerd als:
 <source>Total bytes to copy</source>
 <target>Aantal bytes om te kopiëren</target>
 
+<source>Use local settings:</source>
+<target>Gebruik lokale instellingen:</target>
+
 <source>Select a variant:</source>
 <target>Selecteer een variant:</target>
 
@@ -792,20 +807,35 @@ De opdracht word geactiveerd als:
 <source>More information</source>
 <target>Meer informatie</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Lokale instellingen:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identificeer en pas veranderingen toe aan beide kanten. Verwijderingen, verplaatsingen en conflicten worden automatisch gevonden met behulp van een database.</target>
+<source>Include:</source>
+<target>Meerekenen:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Maak een spiegelbackup van de linkermap door te zorgen dat de rechtermap gelijk is.</target>
+<source>Exclude:</source>
+<target>Uitsluiten:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopiëer nieuwe en geupdate bestanden naar de rechtermap.</target>
+<source>Show examples</source>
+<target>Laat voorbeelden zien</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Configureer uw eigen synchronisatieregels.</target>
+<source>Time span:</source>
+<target>Tijdspanne:</target>
+
+<source>File size:</source>
+<target>Bestandsgrootte:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maximum:</target>
+
+<source>&Reset</source>
+<target>&Reset</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Selecteer filter regels om bepaalde bestanden uit te sluiten van synchronisatie. Geef bestandspaden in die relatief zijn aan hun corresponderende folderparen.</target>
 
 <source>Detect moved files</source>
 <target>Detecteer verplaatste bestanden</target>
@@ -820,6 +850,9 @@ De opdracht word geactiveerd als:
 - Detectie actief na eerste synchronisatie
 - Niet ondersteund door alle bestandssystemen
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detecteer synchronisatierichtingen met behulp van databasebestanden</target>
 
 <source>Delete files:</source>
 <target>Verwijder bestanden:</target>
@@ -845,9 +878,6 @@ De opdracht word geactiveerd als:
 <source>Naming convention:</source>
 <target>Naamgevingsconventie</target>
 
-<source>Show examples</source>
-<target>Laat voorbeelden zien</target>
-
 <source>Handle errors:</source>
 <target>Fouten afhandelen:</target>
 
@@ -866,8 +896,8 @@ De opdracht word geactiveerd als:
 <source>On completion:</source>
 <target>Bij voltooiing:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detecteer synchronisatierichtingen met behulp van databasebestanden</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Start de synchronisatie nu?</target>
@@ -928,30 +958,6 @@ De opdracht word geactiveerd als:
 
 <source>&Recycle bin</source>
 <target>&Prullebak</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Selecteer filter regels om bepaalde bestanden uit te sluiten van synchronisatie. Geef bestandspaden in die relatief zijn aan hun corresponderende folderparen.</target>
-
-<source>Include:</source>
-<target>Meerekenen:</target>
-
-<source>Exclude:</source>
-<target>Uitsluiten:</target>
-
-<source>Time span:</source>
-<target>Tijdspanne:</target>
-
-<source>File size:</source>
-<target>Bestandsgrootte:</target>
-
-<source>Minimum:</source>
-<target>Minimum:</target>
-
-<source>Maximum:</source>
-<target>Maximum:</target>
-
-<source>&Reset</source>
-<target>&Reset</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>De volgende instellingen worden gebruikt voor alle synchronisaties.</target>
@@ -1037,11 +1043,14 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Delete Items</source>
 <target>Verwijder items</target>
 
-<source>Global Settings</source>
-<target>Globale instellingen</target>
+<source>Options</source>
+<target>Opties</target>
 
 <source>Select Time Span</source>
 <target>Selecteer tijdspanne</target>
+
+<source>&Preferences...</source>
+<target>&Voorkeuren...</target>
 
 <source>Folder Pairs</source>
 <target>Map koppelingen</target>
@@ -1060,12 +1069,6 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 
 <source>Main Bar</source>
 <target>Hoofdbalk</target>
-
-<source>Open...</source>
-<target>Open...</target>
-
-<source>Save</source>
-<target>Opslaan</target>
 
 <source>Compare both sides</source>
 <target>Vergelijk beide zijdes</target>
@@ -1193,8 +1196,11 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Delete selected configurations</source>
 <target>Verwijder geselecteerde configuraties</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Synchronization Settings</source>
+<target>Synchronisatie instellingen</target>
+
+<source>Reset filter</source>
+<target>Reset filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Toon bestanden die alleen aan de linkerzijde bestaan</target>
@@ -1244,14 +1250,11 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Set as default</source>
 <target>Instellen als standaard</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>All files are in sync</source>
 <target>Alle bestanden zijn gesynchroniseerd</target>
-
-<source>Synchronization Settings</source>
-<target>Synchronisatie instellingen</target>
-
-<source>Comparison Settings</source>
-<target>Vergelijkings instellingen</target>
 
 <source>Cannot find %x</source>
 <target>Kan %x niet vinden</target>
@@ -1313,6 +1316,72 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Log</source>
 <target>Log</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Wilt u dit item echt naar de prullenbak verplaatsen?</pluralform>
+<pluralform>Wilt u echt de volgende %x items naar de prullenbak verplaatsen?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Verplaats</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Wilt u het volgende item echt verwijderen?</pluralform>
+<pluralform>Wilt u echt de volgende %x items verwijderen?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Voorkeuren</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopiëer NTFS permissies</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:</target>
+
+<source>- full file or folder name</source>
+<target>- volledige bestands- of mapnaam</target>
+
+<source>- folder part only</source>
+<target>- alleen het map gedeelte</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Tegenhanger van de andere kant naar %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Tegenhanger van de andere kant naar %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Herstel alle verborgen vensters en waarschuwingen?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identificeer en pas veranderingen toe aan beide kanten. Verwijderingen, verplaatsingen en conflicten worden automatisch gevonden met behulp van een database.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Maak een spiegelbackup van de linkermap door te zorgen dat de rechtermap gelijk is.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopiëer nieuwe en geupdate bestanden naar de rechtermap.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configureer uw eigen synchronisatieregels.</target>
+
+<source>Exclude</source>
+<target>Uitsluiten</target>
+
+<source>Direct</source>
+<target>Direct</target>
+
+<source>Follow</source>
+<target>Volgen</target>
+
 <source>Today</source>
 <target>Vandaag</target>
 
@@ -1337,60 +1406,6 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Wilt u dit item echt naar de prullenbak verplaatsen?</pluralform>
-<pluralform>Wilt u echt de volgende %x items naar de prullenbak verplaatsen?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Verplaats</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Wilt u het volgende item echt verwijderen?</pluralform>
-<pluralform>Wilt u echt de volgende %x items verwijderen?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Uitsluiten</target>
-
-<source>Direct</source>
-<target>Direct</target>
-
-<source>Follow</source>
-<target>Volgen</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopiëer NTFS permissies</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:</target>
-
-<source>- full file or folder name</source>
-<target>- volledige bestands- of mapnaam</target>
-
-<source>- folder part only</source>
-<target>- alleen het map gedeelte</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Tegenhanger van de andere kant naar %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Tegenhanger van de andere kant naar %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Herstel alle verborgen vensters en waarschuwingen?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Beschouw als onopgelost conflict</target>
-
 <source>Replace</source>
 <target>Vervangen</target>
 
@@ -1402,6 +1417,15 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 
 <source>Append a time stamp to each file name</source>
 <target>Voeg een timestamp toe aan elke bestandsnaam</target>
+
+<source>Comparison</source>
+<target>Vergelijkingen</target>
+
+<source>Synchronization</source>
+<target>Synchronisatie</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Beschouw als onopgelost conflict</target>
 
 <source>File</source>
 <target>Bestand</target>

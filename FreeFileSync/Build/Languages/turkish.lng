@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Yazım:</target>
 
-<source>config files</source>
-<target>ayar dosyaları</target>
+<source>global config file:</source>
+<target>genel ayar dosyası:</target>
+
+<source>config files:</source>
+<target>ayar dosyaları:</target>
 
 <source>directory</source>
 <target>klasör</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Alternatif GlobalSettings.xml dosyasının yolu.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>FreeFileSync .ffs_gui ya da .ffs_batch ayar dosyalarının sayısı.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>En çok bir ayar dosyası için alternatif klasörlerin sayısı.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Bir ayar dosyasındaki en fazla alternatif klasör çifti sayısı.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Aşağıdaki klasörler bulunamadı:</target>
@@ -651,11 +657,11 @@ Komut şu durumlarda yürütülür:
 <source>Drag && drop</source>
 <target>Dosyaları sürükleyip buraya bırakabilirsiniz</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternatif karşılaştırma ayarları</target>
+<source>Local comparison settings</source>
+<target>Yerel karşılaştırma ayarları</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternatif eşleştirme ayarları</target>
+<source>Local synchronization settings</source>
+<target>Yerel eşleştirme ayarları</target>
 
 <source>Local filter</source>
 <target>Yerel süzgeç</target>
@@ -666,11 +672,11 @@ Komut şu durumlarda yürütülür:
 <source>None</source>
 <target>Yok</target>
 
-<source>Remove alternate settings</source>
-<target>Alternatif ayarları silin</target>
+<source>Remove local settings</source>
+<target>Yerel ayarları silin</target>
 
-<source>Clear filter settings</source>
-<target>Süzgeç ayarlarını temizleyin</target>
+<source>Reset local filter</source>
+<target>Yerel süzgeci sıfırlayın</target>
 
 <source>Copy</source>
 <target>Kopyalayın</target>
@@ -678,14 +684,8 @@ Komut şu durumlarda yürütülür:
 <source>Paste</source>
 <target>Yapıştırın</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternatif Karşılaştırma Ayarları</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternatif Eşleştirme Ayarları</target>
-
-<source>Local Filter</source>
-<target>Yerel Süzgeç</target>
+<source>Local Synchronization Settings</source>
+<target>Yerel Eşleştirme Ayarları</target>
 
 <source>&New</source>
 <target>Ye&ni</target>
@@ -702,8 +702,8 @@ Komut şu durumlarda yürütülür:
 <source>2. &Synchronize</source>
 <target>2. &Eşleştirin</target>
 
-<source>&Global settings</source>
-<target>&Genel ayarlar</target>
+<source>&Options</source>
+<target>A&yarlar</target>
 
 <source>&Language</source>
 <target>Di&l</target>
@@ -726,11 +726,11 @@ Komut şu durumlarda yürütülür:
 <source>&Check for new version</source>
 <target>Yeni &sürümü denetleyin</target>
 
-<source>Compare</source>
-<target>Karşılaştırın</target>
-
 <source>Cancel</source>
 <target>İptal</target>
+
+<source>Compare</source>
+<target>Karşılaştırın</target>
 
 <source>Synchronize</source>
 <target>Eşleştirin</target>
@@ -753,8 +753,20 @@ Komut şu durumlarda yürütülür:
 <source>Match case</source>
 <target>Büyük-küçük harf uysun</target>
 
+<source>Open...</source>
+<target>Açın...</target>
+
+<source>Save</source>
+<target>Kaydedin</target>
+
+<source>Save as GUI job</source>
+<target>Grafik arayüz işi olarak kaydedin</target>
+
 <source>Save as batch job</source>
 <target>Toplu iş olarak kaydedin</target>
+
+<source>Save as...</source>
+<target>Farklı kaydedin...</target>
 
 <source>View type:</source>
 <target>Görünüm tipi:</target>
@@ -777,6 +789,9 @@ Komut şu durumlarda yürütülür:
 <source>Total bytes to copy</source>
 <target>Toplam kopyalanacak bayt</target>
 
+<source>Use local settings:</source>
+<target>Yerel ayarlar kullanılsın:</target>
+
 <source>Select a variant:</source>
 <target>İşlem tipini seçin:</target>
 
@@ -792,20 +807,35 @@ Komut şu durumlarda yürütülür:
 <source>More information</source>
 <target>Ek bilgilere bakın</target>
 
-<source>OK</source>
-<target>Tamam</target>
+<source>Local settings:</source>
+<target>Yerel ayarlar:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>İki tarafta da değişikliklere bakılır ve karşılıklı kopyalanır. Silinmiş, taşınmış ve çakışan ögeler, veritabanı kullanılarak kendiliğinden algılanır.</target>
+<source>Include:</source>
+<target>Katılacak ögeler:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Sağ klasör, sola uyacak şekilde güncellenerek, sol klasörün yansı yedeği oluşturulur.</target>
+<source>Exclude:</source>
+<target>Katılmayacak ögeler</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Sol taraftaki yeni ya da güncellenmiş ögeler sağ tarafa kopyalanır.</target>
+<source>Show examples</source>
+<target>Örneklere bakın</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Eşleştirme kuralları kullanıcının isteğine göre belirlenir.</target>
+<source>Time span:</source>
+<target>Zaman aralığı:</target>
+
+<source>File size:</source>
+<target>Dosya boyutu:</target>
+
+<source>Minimum:</source>
+<target>En küçük:</target>
+
+<source>Maximum:</source>
+<target>En büyük:</target>
+
+<source>&Reset</source>
+<target>Sıfı&rlayın</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Eşleştirmeye katılmayacak dosyaların süzülme kurallarını belirleyin. Dosya yollarını bulundukları klasör çiftine göre yazın.</target>
 
 <source>Detect moved files</source>
 <target>Taşınmış dosyalar algılansın</target>
@@ -820,6 +850,9 @@ Komut şu durumlarda yürütülür:
 - Algılama, ilk eşleştirmeden sonra kullanılabilir
 - Tüm dosya sistemleri tarafından desteklenmez
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Eşleştirme yönü, veritabanı dosyaları yardımı ile belirlensin</target>
 
 <source>Delete files:</source>
 <target>Dosya silme işlemi:</target>
@@ -845,9 +878,6 @@ Komut şu durumlarda yürütülür:
 <source>Naming convention:</source>
 <target>Adlandırma kuralı:</target>
 
-<source>Show examples</source>
-<target>Örneklere bakın</target>
-
 <source>Handle errors:</source>
 <target>Hata olursa:</target>
 
@@ -866,8 +896,8 @@ Komut şu durumlarda yürütülür:
 <source>On completion:</source>
 <target>Eşleştirme tamamlandığında:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Eşleştirme yönü, veritabanı dosyaları yardımı ile belirlensin</target>
+<source>OK</source>
+<target>Tamam</target>
 
 <source>Start synchronization now?</source>
 <target>Eşleştirme başlatılsın mı?</target>
@@ -928,30 +958,6 @@ Komut şu durumlarda yürütülür:
 
 <source>&Recycle bin</source>
 <target>Ge&ri Dönüşüm Kutusu</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Eşleştirmeye katılmayacak dosyaların süzülme kurallarını belirleyin. Dosya yollarını bulundukları klasör çiftine göre yazın.</target>
-
-<source>Include:</source>
-<target>Katılacak ögeler:</target>
-
-<source>Exclude:</source>
-<target>Katılmayacak ögeler</target>
-
-<source>Time span:</source>
-<target>Zaman aralığı:</target>
-
-<source>File size:</source>
-<target>Dosya boyutu:</target>
-
-<source>Minimum:</source>
-<target>En küçük:</target>
-
-<source>Maximum:</source>
-<target>En büyük:</target>
-
-<source>&Reset</source>
-<target>Sıfı&rlayın</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Aşağıdaki ayarlar tüm eşleştirme işlemleri için geçerlidir.</target>
@@ -1037,11 +1043,14 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Delete Items</source>
 <target>Ögeleri Silin</target>
 
-<source>Global Settings</source>
-<target>Genel Ayarlar</target>
+<source>Options</source>
+<target>Ayarlar</target>
 
 <source>Select Time Span</source>
 <target>Zaman Aralığı</target>
+
+<source>&Preferences...</source>
+<target>&Tercihler...</target>
 
 <source>Folder Pairs</source>
 <target>Klasör Çiftleri</target>
@@ -1060,12 +1069,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>Main Bar</source>
 <target>Ana Çubuk</target>
-
-<source>Open...</source>
-<target>Açın...</target>
-
-<source>Save</source>
-<target>Kaydedin</target>
 
 <source>Compare both sides</source>
 <target>İki tarafı karşılaştırın</target>
@@ -1193,8 +1196,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Delete selected configurations</source>
 <target>Seçili ayarları silin</target>
 
-<source>Filter</source>
-<target>Süzgeç</target>
+<source>Synchronization Settings</source>
+<target>Eşleştirme Ayarları</target>
+
+<source>Reset filter</source>
+<target>Süzgeci sıfırlayın</target>
 
 <source>Show files that exist on left side only</source>
 <target>Yalnız sol tarafta bulunan dosyaları görüntüler ya da gizler</target>
@@ -1244,14 +1250,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Set as default</source>
 <target>Varsayılan olarak belirleyin</target>
 
+<source>Filter</source>
+<target>Süzgeç</target>
+
 <source>All files are in sync</source>
 <target>Tüm dosyalar eşleştirildi</target>
-
-<source>Synchronization Settings</source>
-<target>Eşleştirme Ayarları</target>
-
-<source>Comparison Settings</source>
-<target>Karşılaştırma Ayarları</target>
 
 <source>Cannot find %x</source>
 <target>%x bulunamadı</target>
@@ -1313,6 +1316,72 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Log</source>
 <target>Günlük</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Aşağıdaki ögeyi Geri Dönüşüm Kutusuna atmak istediğinize emin misiniz?</pluralform>
+<pluralform>Aşağıdaki %x ögeyi Geri Dönüşüm Kutusuna atmak istediğinize emin misiniz?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Atılsın</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Aşağıdaki ögeyi silmek istediğinize emin misiniz?</pluralform>
+<pluralform>Aşağıdaki %x ögeyi silmek istediğinize emin misiniz?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Tercihler</target>
+
+<source>Copy NTFS permissions</source>
+<target>NTFS izinleri de kopyalansın</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Sağ tık menüsüne dış uygulamalar eklenebilir. Şu etiketler kullanılabilir:</target>
+
+<source>- full file or folder name</source>
+<target>- tam dosya ya da klasör adı</target>
+
+<source>- folder part only</source>
+<target>- yalnız klasör bölümü</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>%item_path% ögesinin diğer taraftaki karşılığı</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>%item_folder% ögesinin diğer taraftaki karşılığı</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Gizlenmiş tüm pencere ve uyarılar yeniden görüntülensin mi?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>İki tarafta da değişikliklere bakılır ve karşılıklı kopyalanır. Silinmiş, taşınmış ve çakışan ögeler, veritabanı kullanılarak kendiliğinden algılanır.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Sağ klasör, sola uyacak şekilde güncellenerek, sol klasörün yansı yedeği oluşturulur.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Sol taraftaki yeni ya da güncellenmiş ögeler sağ tarafa kopyalanır.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Eşleştirme kuralları kullanıcının isteğine göre belirlenir.</target>
+
+<source>Exclude</source>
+<target>Katılmasın</target>
+
+<source>Direct</source>
+<target>Doğrudan</target>
+
+<source>Follow</source>
+<target>Hedefler</target>
+
 <source>Today</source>
 <target>Bugün</target>
 
@@ -1337,60 +1406,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Aşağıdaki ögeyi Geri Dönüşüm Kutusuna atmak istediğinize emin misiniz?</pluralform>
-<pluralform>Aşağıdaki %x ögeyi Geri Dönüşüm Kutusuna atmak istediğinize emin misiniz?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Atılsın</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Aşağıdaki ögeyi silmek istediğinize emin misiniz?</pluralform>
-<pluralform>Aşağıdaki %x ögeyi silmek istediğinize emin misiniz?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Katılmasın</target>
-
-<source>Direct</source>
-<target>Doğrudan</target>
-
-<source>Follow</source>
-<target>Hedefler</target>
-
-<source>Copy NTFS permissions</source>
-<target>NTFS izinleri de kopyalansın</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Sağ tık menüsüne dış uygulamalar eklenebilir. Şu etiketler kullanılabilir:</target>
-
-<source>- full file or folder name</source>
-<target>- tam dosya ya da klasör adı</target>
-
-<source>- folder part only</source>
-<target>- yalnız klasör bölümü</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>%item_path% ögesinin diğer taraftaki karşılığı</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>%item_folder% ögesinin diğer taraftaki karşılığı</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Gizlenmiş tüm pencere ve uyarılar yeniden görüntülensin mi?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Uyuşmazlık çözülmeden bırakılsın</target>
-
 <source>Replace</source>
 <target>Değiştirin</target>
 
@@ -1402,6 +1417,15 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>Append a time stamp to each file name</source>
 <target>Her bir dosya adına bir zaman damgası eklensin</target>
+
+<source>Comparison</source>
+<target>Karşılaştırma</target>
+
+<source>Synchronization</source>
+<target>Eşleştirme</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Uyuşmazlık çözülmeden bırakılsın</target>
 
 <source>File</source>
 <target>Dosya</target>

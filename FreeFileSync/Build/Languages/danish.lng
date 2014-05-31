@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Syntaks:</target>
 
-<source>config files</source>
-<target>indstillingsfiler</target>
+<source>global config file:</source>
+<target>global indstillingsfil</target>
+
+<source>config files:</source>
+<target>indstillingsfiler:</target>
 
 <source>directory</source>
 <target>mappe</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Sti til alternativ GlobalSettings.xml fil.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Vilkårligt antal FreeFileSync .ffs_gui og/eller .ffs_batch indstillingsfiler.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Vilkårligt antal alternative mappe til højst en indstillingsfil</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Vilkårligt antal alternative mappepar til højst en indstillingsfil</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finde følgende mapper:</target>
@@ -651,11 +657,11 @@ Kommandoen udføres hvis:
 <source>Drag && drop</source>
 <target>Træk emner hertil</target>
 
-<source>Alternate comparison settings</source>
-<target>Tilpas analyse</target>
+<source>Local comparison settings</source>
+<target>Lokale analyseindstillinger</target>
 
-<source>Alternate synchronization settings</source>
-<target>Tilpas synkronisering</target>
+<source>Local synchronization settings</source>
+<target>Lokale synkindstillinger</target>
 
 <source>Local filter</source>
 <target>Lokalt filter</target>
@@ -666,11 +672,11 @@ Kommandoen udføres hvis:
 <source>None</source>
 <target>Ingen</target>
 
-<source>Remove alternate settings</source>
-<target>Fjern tilpassede indstillinger</target>
+<source>Remove local settings</source>
+<target>Fjern lokale indstillinger</target>
 
-<source>Clear filter settings</source>
-<target>Nulstil filter</target>
+<source>Reset local filter</source>
+<target>Nulstil lokalt filter</target>
 
 <source>Copy</source>
 <target>Kopiér</target>
@@ -678,14 +684,8 @@ Kommandoen udføres hvis:
 <source>Paste</source>
 <target>Indsæt</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Tilpas analyse</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Tilpas synkronisering</target>
-
-<source>Local Filter</source>
-<target>Lokalt filter</target>
+<source>Local Synchronization Settings</source>
+<target>Lokale synkindstillinger</target>
 
 <source>&New</source>
 <target>&Ny</target>
@@ -702,8 +702,8 @@ Kommandoen udføres hvis:
 <source>2. &Synchronize</source>
 <target>2. &Synkroniser</target>
 
-<source>&Global settings</source>
-<target>&Programindstillinger</target>
+<source>&Options</source>
+<target>&Indstillinger</target>
 
 <source>&Language</source>
 <target>&Sprog</target>
@@ -726,11 +726,11 @@ Kommandoen udføres hvis:
 <source>&Check for new version</source>
 <target>Søg &efter opdatering</target>
 
-<source>Compare</source>
-<target>Analysér</target>
-
 <source>Cancel</source>
 <target>Annuller</target>
+
+<source>Compare</source>
+<target>Analysér</target>
 
 <source>Synchronize</source>
 <target>Synkronisér</target>
@@ -753,8 +753,20 @@ Kommandoen udføres hvis:
 <source>Match case</source>
 <target>Versalfølsom (a/A)</target>
 
+<source>Open...</source>
+<target>Åben...</target>
+
+<source>Save</source>
+<target>Gem</target>
+
+<source>Save as GUI job</source>
+<target>Gem som brugerfladejob</target>
+
 <source>Save as batch job</source>
 <target>Gem som batchfil</target>
+
+<source>Save as...</source>
+<target>Gem som...</target>
 
 <source>View type:</source>
 <target>Visning:</target>
@@ -777,6 +789,9 @@ Kommandoen udføres hvis:
 <source>Total bytes to copy</source>
 <target>Antal bytes der kopieres</target>
 
+<source>Use local settings:</source>
+<target>Brug lokale indstillinger</target>
+
 <source>Select a variant:</source>
 <target>Vælg metode:</target>
 
@@ -792,20 +807,35 @@ Kommandoen udføres hvis:
 <source>More information</source>
 <target>Mere information</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Lokale indstillinger:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Find og udbred ændringer på begge sider. Sletninger, omdøbninger og konflikter findes automatisk i en database.</target>
+<source>Include:</source>
+<target>Inkludér:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Opret spejling af venstre mappe ved at tilpasse den højre mappe</target>
+<source>Exclude:</source>
+<target>Ekskludér:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopier nye og opdaterede filer til højre mappe.</target>
+<source>Show examples</source>
+<target>Vis eksempler</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Opret dine egne synkroniseringsregler.</target>
+<source>Time span:</source>
+<target>Interval:</target>
+
+<source>File size:</source>
+<target>Filstørrelse:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maksimum:</target>
+
+<source>&Reset</source>
+<target>&Nulstil</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
 
 <source>Detect moved files</source>
 <target>Genkend flyttede filer</target>
@@ -820,6 +850,9 @@ Kommandoen udføres hvis:
 - Genkendelse aktiv efter første synk
 - Understøtter ikke alle filsystemer
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Genkend synkretninger ved hjælp af databasefiler</target>
 
 <source>Delete files:</source>
 <target>Filsletning:</target>
@@ -845,9 +878,6 @@ Kommandoen udføres hvis:
 <source>Naming convention:</source>
 <target>Navneregler:</target>
 
-<source>Show examples</source>
-<target>Vis eksempler</target>
-
 <source>Handle errors:</source>
 <target>Fejlhåndtering:</target>
 
@@ -866,8 +896,8 @@ Kommandoen udføres hvis:
 <source>On completion:</source>
 <target>Ved gennemført:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Genkend synkretninger ved hjælp af databasefiler</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Synkroniser nu?</target>
@@ -928,30 +958,6 @@ Kommandoen udføres hvis:
 
 <source>&Recycle bin</source>
 <target>&Papirkurv</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
-
-<source>Include:</source>
-<target>Inkludér:</target>
-
-<source>Exclude:</source>
-<target>Ekskludér:</target>
-
-<source>Time span:</source>
-<target>Interval:</target>
-
-<source>File size:</source>
-<target>Filstørrelse:</target>
-
-<source>Minimum:</source>
-<target>Minimum:</target>
-
-<source>Maximum:</source>
-<target>Maksimum:</target>
-
-<source>&Reset</source>
-<target>&Nulstil</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse indstillinger gælder alle synkroniseringer.</target>
@@ -1034,11 +1040,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Slet emner</target>
 
-<source>Global Settings</source>
-<target>Programindstillinger</target>
+<source>Options</source>
+<target>Indstillinger</target>
 
 <source>Select Time Span</source>
 <target>Vælg tidsinterval</target>
+
+<source>&Preferences...</source>
+<target>I&ndstillinger</target>
 
 <source>Folder Pairs</source>
 <target>Mappepar</target>
@@ -1057,12 +1066,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Hovedlinie</target>
-
-<source>Open...</source>
-<target>Åben...</target>
-
-<source>Save</source>
-<target>Gem</target>
 
 <source>Compare both sides</source>
 <target>Analyser begge sider</target>
@@ -1190,8 +1193,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Slet valgte indstillinger</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Synchronization Settings</source>
+<target>Synkroniseringsindstillinger</target>
+
+<source>Reset filter</source>
+<target>Nulstil filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Vis filer der kun findes på venstre side</target>
@@ -1241,14 +1247,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Sæt som standard</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>All files are in sync</source>
 <target>Alt er synkroniseret</target>
-
-<source>Synchronization Settings</source>
-<target>Synkroniseringsindstillinger</target>
-
-<source>Comparison Settings</source>
-<target>Analyseindstillinger</target>
 
 <source>Cannot find %x</source>
 <target>Kan ikke finde %x</target>
@@ -1310,6 +1313,72 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Log</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Vil du flytte følgende emne til papirkurven?</pluralform>
+<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Flyt</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Vil du slette følgende emne?</pluralform>
+<pluralform>Vil du slette følgende %x emner?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Indstillinger</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopier NTFS tilladelser</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integrer eksterne programmer i kontekstmenu. Brug følgende macroer:</target>
+
+<source>- full file or folder name</source>
+<target>Komplet fil- eller mappenavn</target>
+
+<source>- folder part only</source>
+<target>Kun mappedelen</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>Modsat sides pendant til %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>Modsat sides pendant til %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Gendan skjulte vinduer og advarsler?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Find og udbred ændringer på begge sider. Sletninger, omdøbninger og konflikter findes automatisk i en database.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Opret spejling af venstre mappe ved at tilpasse den højre mappe</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopier nye og opdaterede filer til højre mappe.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Opret dine egne synkroniseringsregler.</target>
+
+<source>Exclude</source>
+<target>Ekskludér</target>
+
+<source>Direct</source>
+<target>Direkte</target>
+
+<source>Follow</source>
+<target>Følg</target>
+
 <source>Today</source>
 <target>Idag</target>
 
@@ -1334,60 +1403,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Vil du flytte følgende emne til papirkurven?</pluralform>
-<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Flyt</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vil du slette følgende emne?</pluralform>
-<pluralform>Vil du slette følgende %x emner?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Ekskludér</target>
-
-<source>Direct</source>
-<target>Direkte</target>
-
-<source>Follow</source>
-<target>Følg</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopier NTFS tilladelser</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrer eksterne programmer i kontekstmenu. Brug følgende macroer:</target>
-
-<source>- full file or folder name</source>
-<target>Komplet fil- eller mappenavn</target>
-
-<source>- folder part only</source>
-<target>Kun mappedelen</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>Modsat sides pendant til %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>Modsat sides pendant til %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Gendan skjulte vinduer og advarsler?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Efterlad som uløst konflikt</target>
-
 <source>Replace</source>
 <target>Erstat</target>
 
@@ -1399,6 +1414,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Føj tidsstempel til hvert filnavn</target>
+
+<source>Comparison</source>
+<target>Analyse</target>
+
+<source>Synchronization</source>
+<target>Synkronisering</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Efterlad som uløst konflikt</target>
 
 <source>File</source>
 <target>Fil</target>

@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Sintaxă:</target>
 
-<source>config files</source>
-<target>file de configurare</target>
+<source>global config file:</source>
+<target>filă de configurare globală:</target>
+
+<source>config files:</source>
+<target>file de configurare:</target>
 
 <source>directory</source>
 <target>dosar</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Calea către o filă GlobalSettings.xml alternativă.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Orice număr de file de configurare pentru FreeFileSync, de tipul .ffs_gui sau/și .ffs_batch.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Orice număr de dosare alternative pentru cel mult o filă de configurare.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Orice număr de perechi alternative de dosare pentru cel mult o filă de configurare.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
@@ -655,11 +661,11 @@ Comanda este declanșată dacă:
 <source>Drag && drop</source>
 <target>Trage și pune un dosar mai jos sau explorează către el</target>
 
-<source>Alternate comparison settings</source>
-<target>Setări alternative de comparare</target>
+<source>Local comparison settings</source>
+<target>Setările locale de comparare</target>
 
-<source>Alternate synchronization settings</source>
-<target>Setări alternative de sincronizare</target>
+<source>Local synchronization settings</source>
+<target>Setările locale de sincronizare</target>
 
 <source>Local filter</source>
 <target>Filtru local</target>
@@ -670,11 +676,11 @@ Comanda este declanșată dacă:
 <source>None</source>
 <target>Nimic</target>
 
-<source>Remove alternate settings</source>
-<target>Înlătură setările alternative</target>
+<source>Remove local settings</source>
+<target>Înlătură setările locale</target>
 
-<source>Clear filter settings</source>
-<target>Curăță Setările Filtrului</target>
+<source>Reset local filter</source>
+<target>Resetează filtrul local</target>
 
 <source>Copy</source>
 <target>Copiază</target>
@@ -682,14 +688,8 @@ Comanda este declanșată dacă:
 <source>Paste</source>
 <target>Lipește</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Setări Alternative de Comparare</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Setări Alternative de Sincronizare</target>
-
-<source>Local Filter</source>
-<target>Filtru Local</target>
+<source>Local Synchronization Settings</source>
+<target>Setările Locale de Sincronizare</target>
 
 <source>&New</source>
 <target>Configurație &Nouă</target>
@@ -706,8 +706,8 @@ Comanda este declanșată dacă:
 <source>2. &Synchronize</source>
 <target>2. &Sincronizează</target>
 
-<source>&Global settings</source>
-<target>&Setări Globale</target>
+<source>&Options</source>
+<target>&Opțiuni</target>
 
 <source>&Language</source>
 <target>&Limbă</target>
@@ -730,11 +730,11 @@ Comanda este declanșată dacă:
 <source>&Check for new version</source>
 <target>Caută &Versiune Nouă</target>
 
-<source>Compare</source>
-<target>Compară</target>
-
 <source>Cancel</source>
 <target>Anulează</target>
+
+<source>Compare</source>
+<target>Compară</target>
 
 <source>Synchronize</source>
 <target>Sincronizează</target>
@@ -757,8 +757,20 @@ Comanda este declanșată dacă:
 <source>Match case</source>
 <target>Potrivește cu caseta literelor (MAJ/min)</target>
 
+<source>Open...</source>
+<target>Deschide...</target>
+
+<source>Save</source>
+<target>Salvează</target>
+
+<source>Save as GUI job</source>
+<target>Salvează ca Sarcină GUI [*.ffs_gui]</target>
+
 <source>Save as batch job</source>
-<target>Salvează ca Sarcină Set</target>
+<target>Salvează ca Sarcină Set [*.ffs_batch]</target>
+
+<source>Save as...</source>
+<target>Salvează ca...</target>
 
 <source>View type:</source>
 <target>Tipul de Vedere:</target>
@@ -781,6 +793,9 @@ Comanda este declanșată dacă:
 <source>Total bytes to copy</source>
 <target>Numărul total de baiți copiați</target>
 
+<source>Use local settings:</source>
+<target>Folosește setările locale</target>
+
 <source>Select a variant:</source>
 <target>Selectează o variantă:</target>
 
@@ -796,20 +811,35 @@ Comanda este declanșată dacă:
 <source>More information</source>
 <target>Mai multe informații</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Setări Locale:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identifică și propagă modificările din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>
+<source>Include:</source>
+<target>Incluse:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Creează o conservare [backup] în oglindă a dosarului stîng prin adaptarea dosarului drept pînă la potrivirea exactă cu cel stîng.</target>
+<source>Exclude:</source>
+<target>Excluse:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Copiază filele noi și cele actualizate în dosarul drept.</target>
+<source>Show examples</source>
+<target>Arată exemple</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
+<source>Time span:</source>
+<target>Intervalul de Timp:</target>
+
+<source>File size:</source>
+<target>Mărimea Filei:</target>
+
+<source>Minimum:</source>
+<target>Minim:</target>
+
+<source>Maximum:</source>
+<target>Maxim:</target>
+
+<source>&Reset</source>
+<target>&Resetează</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Selectează regulile filtrului pentru a exclude anumite file de la sincronizare. Introdu căile filelor relative la perechea lor de dosare corespondentă.</target>
 
 <source>Detect moved files</source>
 <target>Detectează filele mutate</target>
@@ -824,6 +854,9 @@ Comanda este declanșată dacă:
 - Detectare activă după sincronizarea inițială
 - Nesuportat de toate sistemele de file
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detectează direcțiile de sincronizare cu ajutorul filelor bază de date</target>
 
 <source>Delete files:</source>
 <target>Ștergerea Filelor:</target>
@@ -849,9 +882,6 @@ Comanda este declanșată dacă:
 <source>Naming convention:</source>
 <target>Convenție de numire:</target>
 
-<source>Show examples</source>
-<target>Arată exemple</target>
-
 <source>Handle errors:</source>
 <target>Gestionarea Erorilor:</target>
 
@@ -870,8 +900,8 @@ Comanda este declanșată dacă:
 <source>On completion:</source>
 <target>La terminare:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detectează direcțiile de sincronizare cu ajutorul filelor bază de date</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Pornesc sincronizarea acum?</target>
@@ -922,7 +952,7 @@ Comanda este declanșată dacă:
 <target>Salvează jurnalul:</target>
 
 <source>Limit:</source>
-<target>Limitare:</target>
+<target>Limită:</target>
 
 <source>Limit maximum number of log files</source>
 <target>Limitează numărul maxim de file jurnal</target>
@@ -932,30 +962,6 @@ Comanda este declanșată dacă:
 
 <source>&Recycle bin</source>
 <target>&Reciclator</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Selectează regulile filtrului pentru a exclude anumite file de la sincronizare. Introdu căile filelor relative la perechea lor de dosare corespondentă.</target>
-
-<source>Include:</source>
-<target>Incluse:</target>
-
-<source>Exclude:</source>
-<target>Excluse:</target>
-
-<source>Time span:</source>
-<target>Intervalul de Timp:</target>
-
-<source>File size:</source>
-<target>Mărimea Filei:</target>
-
-<source>Minimum:</source>
-<target>Minim:</target>
-
-<source>Maximum:</source>
-<target>Maxim:</target>
-
-<source>&Reset</source>
-<target>&Resetează</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Setările următoare sînt folosite pentru toate sarcinile de sincronizare.</target>
@@ -1041,11 +1047,14 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Delete Items</source>
 <target>Șterge Elementele</target>
 
-<source>Global Settings</source>
-<target>Setări Globale</target>
+<source>Options</source>
+<target>Opțiuni</target>
 
 <source>Select Time Span</source>
 <target>Selectează Intervalul de Timp</target>
+
+<source>&Preferences...</source>
+<target>&Preferințe...</target>
 
 <source>Folder Pairs</source>
 <target>Perechi de Dosare</target>
@@ -1064,12 +1073,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Main Bar</source>
 <target>Bara Principală</target>
-
-<source>Open...</source>
-<target>Deschide...</target>
-
-<source>Save</source>
-<target>Salvează</target>
 
 <source>Compare both sides</source>
 <target>Compară Părțile Stîngă și Dreaptă</target>
@@ -1201,8 +1204,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Delete selected configurations</source>
 <target>Șterge Configurațiile Selectate</target>
 
-<source>Filter</source>
-<target>Filtru</target>
+<source>Synchronization Settings</source>
+<target>Setările Sincronizării</target>
+
+<source>Reset filter</source>
+<target>Resetează Filtrul</target>
 
 <source>Show files that exist on left side only</source>
 <target>Arată filele care există doar în stînga</target>
@@ -1252,14 +1258,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Set as default</source>
 <target>Setează ca implicit</target>
 
+<source>Filter</source>
+<target>Filtru</target>
+
 <source>All files are in sync</source>
 <target>Toate filele sînt sincronizate</target>
-
-<source>Synchronization Settings</source>
-<target>Setările Sincronizării</target>
-
-<source>Comparison Settings</source>
-<target>Setările Comparării</target>
 
 <source>Cannot find %x</source>
 <target>Nu pot găsi %x</target>
@@ -1321,6 +1324,74 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Log</source>
 <target>Jurnal</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să muți în Reciclator elementul următor?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x elemente?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x de elemente?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Mută</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să ștergi definitiv elementul următor?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x elemente?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x de elemente?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Preferințe</target>
+
+<source>Copy NTFS permissions</source>
+<target>Copiază permisiunile NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Comenzi pentru aplicații externe incluse în meniul contextual al softului. Sînt disponibile următoarele macrocomenzi:</target>
+
+<source>- full file or folder name</source>
+<target>- numele complet al filei sau dosarului</target>
+
+<source>- folder part only</source>
+<target>- doar pentru partea dosarului</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- corespondentul din partea opusă al lui %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- corespondentul din partea opusă al lui %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Restaurezi toate ferestrele și avertismentele ascunse?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identifică și propagă modificările din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Creează o conservare [backup] în oglindă a dosarului stîng prin adaptarea dosarului drept pînă la potrivirea exactă cu cel stîng.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Copiază filele noi și cele actualizate în dosarul drept.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
+
+<source>Exclude</source>
+<target>Exclude</target>
+
+<source>Direct</source>
+<target>Direcționează</target>
+
+<source>Follow</source>
+<target>Urmărește</target>
+
 <source>Today</source>
 <target>Azi</target>
 
@@ -1345,62 +1416,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Sigur vrei să muți în Reciclator elementul următor?</pluralform>
-<pluralform>Sigur vrei să muți în Reciclator următoarele %x elemente?</pluralform>
-<pluralform>Sigur vrei să muți în Reciclator următoarele %x de elemente?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Mută</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Sigur vrei să ștergi definitiv elementul următor?</pluralform>
-<pluralform>Sigur vrei să ștergi definitiv următoarele %x elemente?</pluralform>
-<pluralform>Sigur vrei să ștergi definitiv următoarele %x de elemente?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Exclude</target>
-
-<source>Direct</source>
-<target>Direcționează</target>
-
-<source>Follow</source>
-<target>Urmărește</target>
-
-<source>Copy NTFS permissions</source>
-<target>Copiază permisiunile NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Comenzi pentru aplicații externe incluse în meniul contextual al softului. Sînt disponibile următoarele macrocomenzi:</target>
-
-<source>- full file or folder name</source>
-<target>- numele complet al filei sau dosarului</target>
-
-<source>- folder part only</source>
-<target>- doar pentru partea dosarului</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- corespondentul din partea opusă al lui %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- corespondentul din partea opusă al lui %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurezi toate ferestrele și avertismentele ascunse?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Lasă ca conflict nerezolvat</target>
-
 <source>Replace</source>
 <target>Înlocuiește</target>
 
@@ -1412,6 +1427,15 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Append a time stamp to each file name</source>
 <target>Adaugă un marcaj temporal la numele fiecărei file</target>
+
+<source>Comparison</source>
+<target>Comparare</target>
+
+<source>Synchronization</source>
+<target>Sincronizare</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Lasă ca conflict nerezolvat</target>
 
 <source>File</source>
 <target>Filă</target>

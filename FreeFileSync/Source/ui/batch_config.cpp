@@ -6,7 +6,7 @@
 
 #include "batch_config.h"
 #include <wx/wupdlock.h>
-#include <wx+/std_button_order.h>
+#include <wx+/std_button_layout.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
@@ -75,7 +75,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
     wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
 

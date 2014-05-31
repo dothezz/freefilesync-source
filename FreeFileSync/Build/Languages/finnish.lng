@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Syntaksi:</target>
 
-<source>config files</source>
-<target>määrittelytiedostot</target>
+<source>global config file:</source>
+<target>yleinen määrittely:</target>
+
+<source>config files:</source>
+<target>määrittelyt:</target>
 
 <source>directory</source>
 <target>hakemisto</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Polku toiseen GlobalSettings.xml tiedostolle.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Vapaa määrä FreeFileSync .ffs_gui ja/tai .ffs_batch määrittelytiedostoja.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Vapaa määrä eri hakemistoja yhdessä tietyssä määrittelyssä.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Vapaa määrä eri hakemistopareja yhdessä tietyssä määrittelyssä.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Seuraavia hakemistoja ei löydy:</target>
@@ -651,11 +657,11 @@ Käsky suoritetaan jos:
 <source>Drag && drop</source>
 <target>Vedä ja pudota</target>
 
-<source>Alternate comparison settings</source>
-<target>Vaihtoehtoiset asetukset vertailuille</target>
+<source>Local comparison settings</source>
+<target>Vertaillun paikalliset asetukset</target>
 
-<source>Alternate synchronization settings</source>
-<target>Vaihtoehtoiset asetukset täsmäykselle</target>
+<source>Local synchronization settings</source>
+<target>Täsmäytyksen paikalliset asetukset</target>
 
 <source>Local filter</source>
 <target>Paikallinen suodin</target>
@@ -666,11 +672,11 @@ Käsky suoritetaan jos:
 <source>None</source>
 <target>Ei ole</target>
 
-<source>Remove alternate settings</source>
-<target>Poista vaihtoehtoiset asetukset</target>
+<source>Remove local settings</source>
+<target>Poista paikalliset asetukset</target>
 
-<source>Clear filter settings</source>
-<target>Nollaa suodinasetukset</target>
+<source>Reset local filter</source>
+<target>Nollaa paikalliset suotimet</target>
 
 <source>Copy</source>
 <target>Monista</target>
@@ -678,14 +684,8 @@ Käsky suoritetaan jos:
 <source>Paste</source>
 <target>Liitä</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Vaihtoehtoiset asetukset vertailuille</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Vaihtoehtoiset asetukset täsmäykselle</target>
-
-<source>Local Filter</source>
-<target>Paikallinen suodin</target>
+<source>Local Synchronization Settings</source>
+<target>Täsmäytyksen paikalliset asetukset</target>
 
 <source>&New</source>
 <target>&Uusi</target>
@@ -702,8 +702,8 @@ Käsky suoritetaan jos:
 <source>2. &Synchronize</source>
 <target>2. &Täsmäytä</target>
 
-<source>&Global settings</source>
-<target>&Yleiset asetukset</target>
+<source>&Options</source>
+<target>&Asetukset</target>
 
 <source>&Language</source>
 <target>&Kieli</target>
@@ -726,11 +726,11 @@ Käsky suoritetaan jos:
 <source>&Check for new version</source>
 <target>&Hae uusi versio</target>
 
-<source>Compare</source>
-<target>Vertaile</target>
-
 <source>Cancel</source>
 <target>Lopeta</target>
+
+<source>Compare</source>
+<target>Vertaile</target>
 
 <source>Synchronize</source>
 <target>Täsmäytä</target>
@@ -753,8 +753,20 @@ Käsky suoritetaan jos:
 <source>Match case</source>
 <target>Täsmäytä kirjainkoko</target>
 
+<source>Open...</source>
+<target>Avaa...</target>
+
+<source>Save</source>
+<target>Tallenna</target>
+
+<source>Save as GUI job</source>
+<target>Tallenna GUI-työnä</target>
+
 <source>Save as batch job</source>
 <target>Tallenna eräajona</target>
+
+<source>Save as...</source>
+<target>Tallenna nimellä...</target>
 
 <source>View type:</source>
 <target>Näytä tyyppi:</target>
@@ -777,6 +789,9 @@ Käsky suoritetaan jos:
 <source>Total bytes to copy</source>
 <target>Kopioitava määrä tavuja</target>
 
+<source>Use local settings:</source>
+<target>Käytä paikallisia asetuksia:</target>
+
 <source>Select a variant:</source>
 <target>Valitse vaihtoehto:</target>
 
@@ -792,20 +807,35 @@ Käsky suoritetaan jos:
 <source>More information</source>
 <target>Lisää tietoa</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Paikalliset aseukset:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Löydä ja monista muutokset molemmille puolille. Poistot, siirrot ja eroavuudet tunnistetaan tietokannan avulla.</target>
+<source>Include:</source>
+<target>Sisällytä:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Luo peilikuva vasemmasta kansiosta muokkaamalla oikeata kansiota samanlaiseksi.</target>
+<source>Exclude:</source>
+<target>Sulje pois:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Monista uudet ja päivitetyt tiedostot oikealle.</target>
+<source>Show examples</source>
+<target>Näytä esimerkkejä</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Määritä omat täsmäyssäännöt.</target>
+<source>Time span:</source>
+<target>Aikajakso:</target>
+
+<source>File size:</source>
+<target>Tiedoston koko:</target>
+
+<source>Minimum:</source>
+<target>Vähintään:</target>
+
+<source>Maximum:</source>
+<target>Enintään:</target>
+
+<source>&Reset</source>
+<target>&Palauta</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Määrittele suodatussäännöt täsmäyksestä pois jätettäville tiedostoille. Anna hakemistopariin nähden suhteellinen osoite.</target>
 
 <source>Detect moved files</source>
 <target>Tunnista siirretyt tiedostot</target>
@@ -820,6 +850,9 @@ Käsky suoritetaan jos:
 - Tunnistus alkaa ensimmäisestä täsmäyksestä
 - Ei toimi kaikissa tiedostojärjestelmissä
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Tunnista tietokannan avulla täysmäyksen suuntaa</target>
 
 <source>Delete files:</source>
 <target>Poista tiedosto:</target>
@@ -845,9 +878,6 @@ Käsky suoritetaan jos:
 <source>Naming convention:</source>
 <target>Nimeämiskäytäntö:</target>
 
-<source>Show examples</source>
-<target>Näytä esimerkkejä</target>
-
 <source>Handle errors:</source>
 <target>Hoida virheet:</target>
 
@@ -866,8 +896,8 @@ Käsky suoritetaan jos:
 <source>On completion:</source>
 <target>Toimet kun valmis:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Tunnista tietokannan avulla täysmäyksen suuntaa</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Käynnistetäänkö täsmäytys?</target>
@@ -929,30 +959,6 @@ Käsky suoritetaan jos:
 <source>&Recycle bin</source>
 <target>&Roskakori</target>
 
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Määrittele suodatussäännöt täsmäyksestä pois jätettäville tiedostoille. Anna hakemistopariin nähden suhteellinen osoite.</target>
-
-<source>Include:</source>
-<target>Sisällytä:</target>
-
-<source>Exclude:</source>
-<target>Sulje pois:</target>
-
-<source>Time span:</source>
-<target>Aikajakso:</target>
-
-<source>File size:</source>
-<target>Tiedoston koko:</target>
-
-<source>Minimum:</source>
-<target>Vähintään:</target>
-
-<source>Maximum:</source>
-<target>Enintään:</target>
-
-<source>&Reset</source>
-<target>&Palauta</target>
-
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Näitä asetuksia käytetään kaikkiin täsmäyksiin.</target>
 
@@ -996,7 +1002,7 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <target>Viive (sekunneissa):</target>
 
 <source>Customize context menu:</source>
-<target>Muokkaa kontekstivalikko:</target>
+<target>Muokkaa kontekstivalikkoa:</target>
 
 <source>Description</source>
 <target>Kuvaus</target>
@@ -1037,11 +1043,14 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Delete Items</source>
 <target>Poista kohteet</target>
 
-<source>Global Settings</source>
-<target>Yleiset asetukset</target>
+<source>Options</source>
+<target>Asetukset</target>
 
 <source>Select Time Span</source>
 <target>Valitse aikajakso</target>
+
+<source>&Preferences...</source>
+<target>&Ominaisuudet</target>
 
 <source>Folder Pairs</source>
 <target>Hakemistoparit</target>
@@ -1060,12 +1069,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Main Bar</source>
 <target>Pääpalkki</target>
-
-<source>Open...</source>
-<target>Avaa...</target>
-
-<source>Save</source>
-<target>Tallenna</target>
 
 <source>Compare both sides</source>
 <target>Vertaile molempia puolia</target>
@@ -1193,8 +1196,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Delete selected configurations</source>
 <target>Poista valitus määrittelyt</target>
 
-<source>Filter</source>
-<target>Suodin</target>
+<source>Synchronization Settings</source>
+<target>Täsmäyksen asetukset</target>
+
+<source>Reset filter</source>
+<target>Nollaa suodin</target>
 
 <source>Show files that exist on left side only</source>
 <target>Näytä vain vasemmalla esiintyvät tiedostot</target>
@@ -1244,14 +1250,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Set as default</source>
 <target>Aseta oletukseksi</target>
 
+<source>Filter</source>
+<target>Suodin</target>
+
 <source>All files are in sync</source>
-<target>Kaikki tiedostot ovat ajan tasalla</target>
-
-<source>Synchronization Settings</source>
-<target>Täsmäyksen asetukset</target>
-
-<source>Comparison Settings</source>
-<target>Vertailun asetukset</target>
+<target>Kaikki tiedostot ovat ajantasalla</target>
 
 <source>Cannot find %x</source>
 <target>En löydä %x</target>
@@ -1313,6 +1316,72 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Log</source>
 <target>Loki</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Haluatko varmasti siirtää kohteen Roskakoriin?</pluralform>
+<pluralform>Haluatko varmasti siirtää nämä %x kohteet Roskakoriin?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Siirrä</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Haluatko todella poistaa tämän kohteen?</pluralform>
+<pluralform>Haluatko todella poistaa nämä %x kohdetta?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Ominaisuudet</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopioi NTFS-oikeudet</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Liitä ulkoinen sovellus kontekstivalikkoon. Seuraavat makrot ovat valittavissa:</target>
+
+<source>- full file or folder name</source>
+<target>- tiedoston tai hakemiston koko nimi</target>
+
+<source>- folder part only</source>
+<target>- vain hakemisto-osa</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Toisen puolen osa liittyy %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Toisen puolen osa liittyy %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Palauta kaikki piiloitetut ikkunat ja varoitukset?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Löydä ja monista muutokset molemmille puolille. Poistot, siirrot ja eroavuudet tunnistetaan tietokannan avulla.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Luo peilikuva vasemmasta kansiosta muokkaamalla oikeata kansiota samanlaiseksi.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Monista uudet ja päivitetyt tiedostot oikealle.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Määritä omat täsmäyssäännöt.</target>
+
+<source>Exclude</source>
+<target>Sulje pois</target>
+
+<source>Direct</source>
+<target>Suoraan</target>
+
+<source>Follow</source>
+<target>Seuraa</target>
+
 <source>Today</source>
 <target>Tänään</target>
 
@@ -1337,60 +1406,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>MB</source>
 <target>Mt</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Haluatko varmasti siirtää kohteen Roskakoriin?</pluralform>
-<pluralform>Haluatko varmasti siirtää nämä %x kohteet Roskakoriin?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Siirrä</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Haluatko todella poistaa tämän kohteen?</pluralform>
-<pluralform>Haluatko todella poistaa nämä %x kohdetta?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Sulje pois</target>
-
-<source>Direct</source>
-<target>Suoraan</target>
-
-<source>Follow</source>
-<target>Seuraa</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopioi NTFS-oikeudet</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Liitä ulkoinen sovellus kontekstivalikkoon. Seuraavat makrot ovat valittavissa:</target>
-
-<source>- full file or folder name</source>
-<target>- tiedoston tai hakemiston koko nimi</target>
-
-<source>- folder part only</source>
-<target>- vain hakemisto-osa</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Toisen puolen osa liittyy %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Toisen puolen osa liittyy %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Palauta kaikki piiloitetut ikkunat ja varoitukset?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Jätä ratkaisemattomana ristiriitana</target>
-
 <source>Replace</source>
 <target>Korvaa</target>
 
@@ -1401,7 +1416,16 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <target>Aikaleima</target>
 
 <source>Append a time stamp to each file name</source>
-<target>Lisää aikaleima tiedostoihin</target>
+<target>Lisää tiedostoihin aikaleimat</target>
+
+<source>Comparison</source>
+<target>Vertailu</target>
+
+<source>Synchronization</source>
+<target>Täsmäytys</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Jätä ratkaisemattomana ristiriitana</target>
 
 <source>File</source>
 <target>Tiedosto</target>

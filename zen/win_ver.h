@@ -54,7 +54,7 @@ inline
 std::uint64_t getOsVersion()
 {
     OSVERSIONINFO osvi = {};
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
     if (!::GetVersionEx(&osvi)) //38 ns per call! (yes, that's nano!) -> we do NOT miss C++11 thread safe statics right now...
         return 0;
     return toBigOsNumber(osvi.dwMajorVersion, osvi.dwMinorVersion);

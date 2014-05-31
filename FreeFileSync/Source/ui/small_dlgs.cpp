@@ -16,7 +16,7 @@
 #include <wx+/no_flicker.h>
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
-#include <wx+/std_button_order.h>
+#include <wx+/std_button_layout.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
@@ -48,7 +48,7 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonClose));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonClose));
 
     setRelativeFontSize(*m_buttonDonate, 1.25);
 
@@ -98,6 +98,14 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //generate logo: put *after* first Fit()
     Layout(); //make sure m_panelLogo has final width (required by wxGTK)
 
+    wxImage titelImage = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
+                                             wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"),
+                                             *wxBLACK); //accessibility: align foreground/background colors!
+    wxImage buildImage = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
+                                             *wxNORMAL_FONT,
+                                             *wxBLACK);
+    wxImage headerImage = stackImages(titelImage, buildImage, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
+
     wxBitmap bmpLogo;
     {
         wxImage tmp = getResourceImage(L"logo").ConvertToImage();
@@ -106,17 +114,8 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     }
     {
         wxMemoryDC dc(bmpLogo);
-
-        wxImage labelImage = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
-                                                 wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"),
-                                                 *wxBLACK); //accessibility: align foreground/background colors!
-        wxImage buildImage = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
-                                                 *wxNORMAL_FONT,
-                                                 *wxBLACK);
-        wxImage dynImage = stackImages(labelImage, buildImage, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
-
-        dc.DrawBitmap(dynImage, wxPoint((bmpLogo.GetWidth () - dynImage.GetWidth ()) / 2,
-                                        (bmpLogo.GetHeight() - dynImage.GetHeight()) / 2));
+        dc.DrawBitmap(headerImage, wxPoint((bmpLogo.GetWidth () - headerImage.GetWidth ()) / 2,
+                                           (bmpLogo.GetHeight() - headerImage.GetHeight()) / 2));
     }
     m_bitmapLogo->SetBitmap(bmpLogo);
 
@@ -172,7 +171,7 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
 
     setMainInstructionFont(*m_staticTextHeader);
 
@@ -300,7 +299,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
 
     setMainInstructionFont(*m_staticTextHeader);
     m_bitmapSync->SetBitmap(getResourceImage(L"sync"));
@@ -366,10 +365,10 @@ ReturnSmallDlg::ButtonPressed zen::showSyncConfirmationDlg(wxWindow* parent,
 
 //########################################################################################
 
-class GlobalSettingsDlg : public GlobalSettingsDlgGenerated
+class OptionsDlg : public OptionsDlgGenerated
 {
 public:
-    GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
+    OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 private:
     virtual void OnOkay(wxCommandEvent& event);
@@ -393,14 +392,19 @@ private:
 };
 
 
-GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings) :
-    GlobalSettingsDlgGenerated(parent),
+OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings) :
+    OptionsDlgGenerated(parent),
     settings(globalSettings)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+
+    warn_static("remove after test")
+    //#ifdef ZEN_MAC
+    //	SetTitle(_("Preferences")); //follow OS conventions
+    //#endif
 
     //setMainInstructionFont(*m_staticTextHeader);
 
@@ -444,7 +448,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     Layout();
 
     //automatically fit column width to match total grid width
-    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::onResize), nullptr, this);
+    Connect(wxEVT_SIZE, wxSizeEventHandler(OptionsDlg::onResize), nullptr, this);
     wxSizeEvent dummy;
     onResize(dummy);
 
@@ -452,7 +456,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 }
 
 
-void GlobalSettingsDlg::onResize(wxSizeEvent& event)
+void OptionsDlg::onResize(wxSizeEvent& event)
 {
     const int widthTotal = m_gridCustomCommand->GetGridWindow()->GetClientSize().GetWidth();
 
@@ -470,7 +474,7 @@ void GlobalSettingsDlg::onResize(wxSizeEvent& event)
 }
 
 
-void GlobalSettingsDlg::updateGui()
+void OptionsDlg::updateGui()
 {
     const bool autoRetryActive = m_spinCtrlAutoRetryCount->GetValue() > 0;
     m_staticTextAutoRetryDelay->Enable(autoRetryActive);
@@ -478,9 +482,9 @@ void GlobalSettingsDlg::updateGui()
 }
 
 
-void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
+void OptionsDlg::OnOkay(wxCommandEvent& event)
 {
-    //write global settings only when okay-button is pressed!
+    //write settings only when okay-button is pressed!
     settings.failsafeFileCopy    = m_checkBoxFailSafe->GetValue();
     settings.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
     settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
@@ -494,7 +498,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 }
 
 
-void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
+void OptionsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     switch (showConfirmationDialog(this, DialogInfoType::INFO,
                                    PopupDialogCfg().setMainInstructions(_("Restore all hidden windows and warnings?")),
@@ -509,7 +513,7 @@ void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 }
 
 
-void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
+void OptionsDlg::OnDefault(wxCommandEvent& event)
 {
     const xmlAccess::XmlGlobalSettings defaultCfg;
 
@@ -526,7 +530,7 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 }
 
 
-void GlobalSettingsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
+void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
 {
     auto extAppTmp = extApp;
     vector_remove_if(extAppTmp, [](decltype(extAppTmp[0])& entry) { return entry.first.empty() && entry.second.empty(); });
@@ -552,7 +556,7 @@ void GlobalSettingsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
 }
 
 
-xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp() const
+xmlAccess::ExternalApps OptionsDlg::getExtApp() const
 {
     xmlAccess::ExternalApps output;
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
@@ -572,7 +576,7 @@ xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp() const
 }
 
 
-void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
+void OptionsDlg::OnAddRow(wxCommandEvent& event)
 {
 #ifdef ZEN_WIN
     wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
@@ -586,7 +590,7 @@ void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
 }
 
 
-void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
+void OptionsDlg::OnRemoveRow(wxCommandEvent& event)
 {
     if (m_gridCustomCommand->GetNumberRows() > 0)
     {
@@ -603,10 +607,10 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings)
+ReturnSmallDlg::ButtonPressed zen::showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings)
 {
-    GlobalSettingsDlg settingsDlg(parent, globalSettings);
-    return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
+    OptionsDlg dlg(parent, globalSettings);
+    return static_cast<ReturnSmallDlg::ButtonPressed>(dlg.ShowModal());
 }
 
 //########################################################################################
@@ -657,7 +661,7 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     long style = wxCAL_SHOW_HOLIDAYS | wxCAL_SHOW_SURROUNDING_WEEKS;
 

@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>بنية:</target>
 
-<source>config files</source>
-<target>ملفات الخيارات</target>
+<source>global config file:</source>
+<target></target>
+
+<source>config files:</source>
+<target></target>
 
 <source>directory</source>
 <target>مسار</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target></target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>أي عدد من ملفات خيارات FreeFileSyn أو\و _gui and/or .ffs_batch</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>أي عدد من المسارات البديلة لملف خيارات وحيد على الأكثر.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target></target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
@@ -667,11 +673,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>سحب و إفلات</target>
 
-<source>Alternate comparison settings</source>
-<target>خيارات المفارنة البديلة</target>
+<source>Local comparison settings</source>
+<target></target>
 
-<source>Alternate synchronization settings</source>
-<target>خيارات المزامنة البديلة</target>
+<source>Local synchronization settings</source>
+<target></target>
 
 <source>Local filter</source>
 <target>فلتر محلي</target>
@@ -682,11 +688,11 @@ The command is triggered if:
 <source>None</source>
 <target>لا شيء</target>
 
-<source>Remove alternate settings</source>
-<target>إزالة الإعدادات البديلة</target>
+<source>Remove local settings</source>
+<target></target>
 
-<source>Clear filter settings</source>
-<target>مسح إعدادات عامل الفلترة</target>
+<source>Reset local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>نسخ</target>
@@ -694,14 +700,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>لصق</target>
 
-<source>Alternate Comparison Settings</source>
-<target>خيارات المفارنة البديلة</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>خيارات المزامنة البديلة</target>
-
-<source>Local Filter</source>
-<target>فلتر محلي</target>
+<source>Local Synchronization Settings</source>
+<target></target>
 
 <source>&New</source>
 <target>&جديد</target>
@@ -718,8 +718,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &مزامنة</target>
 
-<source>&Global settings</source>
-<target>&الإعدادات العامة</target>
+<source>&Options</source>
+<target></target>
 
 <source>&Language</source>
 <target>&اللغة</target>
@@ -742,11 +742,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>&التحقق من وجود نسخة جديدة</target>
 
-<source>Compare</source>
-<target>قارن</target>
-
 <source>Cancel</source>
 <target>إلغاء الأمر</target>
+
+<source>Compare</source>
+<target>قارن</target>
 
 <source>Synchronize</source>
 <target>مزامنة</target>
@@ -769,8 +769,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>مطابقة حالة الأحرف (Match case)</target>
 
+<source>Open...</source>
+<target>فتح...</target>
+
+<source>Save</source>
+<target>حفظ</target>
+
+<source>Save as GUI job</source>
+<target></target>
+
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
+
+<source>Save as...</source>
+<target></target>
 
 <source>View type:</source>
 <target>عرض النوع:</target>
@@ -793,6 +805,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>إجمالي عدد الـ bytes التي سيتم نسخها</target>
 
+<source>Use local settings:</source>
+<target></target>
+
 <source>Select a variant:</source>
 <target>اختيار بديل:</target>
 
@@ -808,20 +823,35 @@ The command is triggered if:
 <source>More information</source>
 <target>المزيد من المعلومات</target>
 
-<source>OK</source>
-<target>موافق</target>
+<source>Local settings:</source>
+<target></target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات</target>
+<source>Include:</source>
+<target>إدخال:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>إنشاء نسخة احتياطية من الجانب الأيمن عن طريق تعديل الطرف الأيسر ليطابق الأيمن.</target>
+<source>Exclude:</source>
+<target>استثناء:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>نسخ الملفات المحدثة إلى المجلد المناسب</target>
+<source>Show examples</source>
+<target>إظهار أمثلة</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>تحديد قواعد المزامنة الخاصة بك.</target>
+<source>Time span:</source>
+<target>المجال الزمني:</target>
+
+<source>File size:</source>
+<target>حجم الملف:</target>
+
+<source>Minimum:</source>
+<target>الحد الأدنى:</target>
+
+<source>Maximum:</source>
+<target>الحد الأقصى:</target>
+
+<source>&Reset</source>
+<target>إعادة&</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
 
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
@@ -836,6 +866,9 @@ The command is triggered if:
 - يبدأ التعرف على التغيرات بعد المزامنة الأولية
 - غير مدعوم من قبل جميع أنطمة الملفات (file systems)
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
 
 <source>Delete files:</source>
 <target>حذف الملفات:</target>
@@ -861,9 +894,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>اصطلاح التسمية:</target>
 
-<source>Show examples</source>
-<target>إظهار أمثلة</target>
-
 <source>Handle errors:</source>
 <target>التعامل مع الأخطاء:</target>
 
@@ -882,8 +912,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>عند الانتهاء:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
+<source>OK</source>
+<target>موافق</target>
 
 <source>Start synchronization now?</source>
 <target>بدأ المزامنة الآن؟</target>
@@ -944,30 +974,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&سلة المهملات</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
-
-<source>Include:</source>
-<target>إدخال:</target>
-
-<source>Exclude:</source>
-<target>استثناء:</target>
-
-<source>Time span:</source>
-<target>المجال الزمني:</target>
-
-<source>File size:</source>
-<target>حجم الملف:</target>
-
-<source>Minimum:</source>
-<target>الحد الأدنى:</target>
-
-<source>Maximum:</source>
-<target>الحد الأقصى:</target>
-
-<source>&Reset</source>
-<target>إعادة&</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة</target>
@@ -1053,11 +1059,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>حذف العناصر</target>
 
-<source>Global Settings</source>
-<target>الخيارات العامة</target>
+<source>Options</source>
+<target></target>
 
 <source>Select Time Span</source>
 <target>اختيار المطال الزمني</target>
+
+<source>&Preferences...</source>
+<target></target>
 
 <source>Folder Pairs</source>
 <target>أزواج المجلدات</target>
@@ -1076,12 +1085,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>الشريط الرئيسي</target>
-
-<source>Open...</source>
-<target>فتح...</target>
-
-<source>Save</source>
-<target>حفظ</target>
 
 <source>Compare both sides</source>
 <target>مقارنة بين كلا الجانبين</target>
@@ -1225,8 +1228,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>حذف الخيارات المنتقاة</target>
 
-<source>Filter</source>
-<target>عامل الفلترة</target>
+<source>Synchronization Settings</source>
+<target>إعدادات المزامنة</target>
+
+<source>Reset filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
@@ -1276,14 +1282,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>تحديد كوضع افتراضي</target>
 
+<source>Filter</source>
+<target>عامل الفلترة</target>
+
 <source>All files are in sync</source>
 <target>جميع الملفات في تزامن كامل</target>
-
-<source>Synchronization Settings</source>
-<target>إعدادات المزامنة</target>
-
-<source>Comparison Settings</source>
-<target>إعدادات المقارنة</target>
 
 <source>Cannot find %x</source>
 <target>لا يمكن العثور على  %x</target>
@@ -1345,30 +1348,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>السجل</target>
 
-<source>Today</source>
-<target>اليوم</target>
-
-<source>This week</source>
-<target>هذا الأسبوع</target>
-
-<source>This month</source>
-<target>هذا الشهر</target>
-
-<source>This year</source>
-<target>هذه السنة</target>
-
-<source>Last x days</source>
-<target>الأيام x الماضية</target>
-
-<source>Byte</source>
-<target>Byte</target>
-
-<source>KB</source>
-<target>KB</target>
-
-<source>MB</source>
-<target>MB</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1398,14 +1377,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>هل تريد حقاً حذف الـ %x ملف التالية ؟</pluralform>
 </target>
 
-<source>Exclude</source>
-<target>استبعاد</target>
-
-<source>Direct</source>
-<target>مباشر</target>
-
-<source>Follow</source>
-<target>اتبع</target>
+<source>Preferences</source>
+<target></target>
 
 <source>Copy NTFS permissions</source>
 <target>نسخ أذونات NTFS</target>
@@ -1428,8 +1401,50 @@ This guarantees a consistent state even in case of a serious error.
 <source>Restore all hidden windows and warnings?</source>
 <target>استعادة جميع نوافذ الحوار و التحذيرات المخفية؟</target>
 
-<source>Leave as unresolved conflict</source>
-<target>ترك كاختلافات من دون حل</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>إنشاء نسخة احتياطية من الجانب الأيمن عن طريق تعديل الطرف الأيسر ليطابق الأيمن.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>نسخ الملفات المحدثة إلى المجلد المناسب</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>تحديد قواعد المزامنة الخاصة بك.</target>
+
+<source>Exclude</source>
+<target>استبعاد</target>
+
+<source>Direct</source>
+<target>مباشر</target>
+
+<source>Follow</source>
+<target>اتبع</target>
+
+<source>Today</source>
+<target>اليوم</target>
+
+<source>This week</source>
+<target>هذا الأسبوع</target>
+
+<source>This month</source>
+<target>هذا الشهر</target>
+
+<source>This year</source>
+<target>هذه السنة</target>
+
+<source>Last x days</source>
+<target>الأيام x الماضية</target>
+
+<source>Byte</source>
+<target>Byte</target>
+
+<source>KB</source>
+<target>KB</target>
+
+<source>MB</source>
+<target>MB</target>
 
 <source>Replace</source>
 <target>استبدال</target>
@@ -1442,6 +1457,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>إلحاق ختم زمني بكل اسم ملف</target>
+
+<source>Comparison</source>
+<target></target>
+
+<source>Synchronization</source>
+<target></target>
+
+<source>Leave as unresolved conflict</source>
+<target>ترك كاختلافات من دون حل</target>
 
 <source>File</source>
 <target>ملف</target>

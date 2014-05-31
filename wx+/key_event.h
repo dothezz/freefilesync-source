@@ -15,8 +15,8 @@
 
 namespace zen
 {
-//wxWidgets provides no elegant way to register shortcut keys scoped for dialog windows =>
-//enable dialog-specific local key events!
+//wxWidgets provides no elegant way to register shortcut keys scoped for dialog windows
+// => enable dialog-specific local key events!
 
 //setup in wxDialog-derived class' constructor, e.g.:
 //	setupLocalKeyEvents(*this, [this](wxKeyEvent& event){ this->onLocalKeyEvent(event); });
@@ -31,7 +31,7 @@ void setupLocalKeyEvents(wxWindow& wnd, const std::function<void(wxKeyEvent& eve
 
 
 
-//pretty much the same like "bool wxWindowBase::IsDescendant(wxWindowBase* child) const" but without the obvious misnaming
+//pretty much the same like "bool wxWindowBase::IsDescendant(wxWindowBase* child) const" but without the obvious misnomer
 inline
 bool isComponentOf(const wxWindow* child, const wxWindow* top)
 {

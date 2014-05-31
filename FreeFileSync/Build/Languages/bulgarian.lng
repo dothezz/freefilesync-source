@@ -44,7 +44,7 @@
 <target>Символна връзка %x се изтрива</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Кошчето е недостъпно за следните папки. Вместо това файловете ще бъдат изтрити безвъзвратно:</target>
+<target>Кошчето е недостъпно за следните папки. Вместо това файловете ще бъдат изтрити необратимо:</target>
 
 <source>An exception occurred</source>
 <target>Получи се изключение</target>
@@ -65,7 +65,7 @@
 <target>Зададен е нееднакъв брой директории отляво и отдясно.</target>
 
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target>Не може конфигурационния файл да има настройки на ниво двойки директории, ако директориите се задават от команден ред.</target>
+<target>Конфигурационният файл не може да съдържа настройки на ниво двойка директории, ако директориите се задават от команден ред.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>Не може да се задават директории за повече от един конфигурационен файл.</target>
@@ -86,13 +86,13 @@
 <target>директория</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Път към алтернативен файл GlobalSettings.xml.</target>
+<target>Път до алтернативен файл GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>Произволен брой FreeFileSync .ffs_gui и/или .ffs_batch конфигурационни файлове.</target>
+<target>Всеки брой .ffs_gui и/или .ffs_batch конфигурационни файлове на  FreeFileSync.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>Произволен брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
+<target>Всеки брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не са намерени следните папки:</target>
@@ -604,7 +604,7 @@ The command is triggered if:
 <target>Има нова версия на FreeFileSync:</target>
 
 <source>Download now?</source>
-<target>Сваляне сега?</target>
+<target>Свали сега?</target>
 
 <source>&Download</source>
 <target>Свал&яне</target>
@@ -657,11 +657,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>Влачи && Пусни</target>
 
-<source>Alternate comparison settings</source>
-<target>Алтернативни настройки за сравняване</target>
+<source>Local comparison settings</source>
+<target>Локални настройки за сравняване</target>
 
-<source>Alternate synchronization settings</source>
-<target>Алтернативни настройки за синхронизация</target>
+<source>Local synchronization settings</source>
+<target>Локални настройки за синхронизация</target>
 
 <source>Local filter</source>
 <target>Локален филтър</target>
@@ -672,11 +672,11 @@ The command is triggered if:
 <source>None</source>
 <target>Няма</target>
 
-<source>Remove alternate settings</source>
-<target>Премахни алтернативните настройки</target>
+<source>Remove local settings</source>
+<target>Премахни локалните настройки</target>
 
-<source>Clear filter settings</source>
-<target>Изчисти настройките на филтъра</target>
+<source>Reset local filter</source>
+<target>Инициализирай локалния филтър</target>
 
 <source>Copy</source>
 <target>Копирай</target>
@@ -685,7 +685,7 @@ The command is triggered if:
 <target>Вмъкни</target>
 
 <source>Local Synchronization Settings</source>
-<target>Локални настройки за синхронизация</target>
+<target>Локални Настройки за Синхронизация</target>
 
 <source>&New</source>
 <target>&Нов</target>
@@ -702,8 +702,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &Синхронизирай</target>
 
-<source>&Global settings</source>
-<target>Гло&бални настройки</target>
+<source>&Options</source>
+<target>&Опции</target>
 
 <source>&Language</source>
 <target>&Език</target>
@@ -751,7 +751,7 @@ The command is triggered if:
 <target>Намери:</target>
 
 <source>Match case</source>
-<target>Спазвайки регистъра</target>
+<target>Спазвай регистъра</target>
 
 <source>Open...</source>
 <target>Отвори...</target>
@@ -790,16 +790,16 @@ The command is triggered if:
 <target>Общо байтове за копиране</target>
 
 <source>Use local settings:</source>
-<target>Използвайте локални настройки</target>
+<target>Ползвай локални настройки</target>
 
 <source>Select a variant:</source>
 <target>Избор на вариант:</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
-<target>Определяне на еднаквите файлове, сравнявайки времето на промяна и размера.</target>
+<target>Определи еднаквите файлове, сравнявайки времето на промяна и размера.</target>
 
 <source>Identify equal files by comparing the file content.</source>
-<target>Определяне на еднаквите файлове, сравнявайки файловото съдържание.</target>
+<target>Определи еднаквите файлове, сравнявайки файловото съдържание.</target>
 
 <source>Symbolic links:</source>
 <target>Символни връзки:</target>
@@ -811,10 +811,10 @@ The command is triggered if:
 <target>Локални настройки:</target>
 
 <source>Include:</source>
-<target>Включване:</target>
+<target>Включи:</target>
 
 <source>Exclude:</source>
-<target>Изключване:</target>
+<target>Изключи:</target>
 
 <source>Show examples</source>
 <target>Примери</target>
@@ -832,10 +832,10 @@ The command is triggered if:
 <target>Максимум:</target>
 
 <source>&Reset</source>
-<target>&Инициализиране на настройките</target>
+<target>&Инициализирай настройките</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Изберете филтриращи правила за изключване на дадени файлове от синхронизация. Въведете файлови пътища относно съответните им двойки папки.</target>
+<target>Изберете филтърни правила за изключване на някои файлове от синхронизация. Въведете файлови пътища относно съответните им двойки папки.</target>
 
 <source>Detect moved files</source>
 <target>Откриване на преместени файлове</target>
@@ -852,28 +852,28 @@ The command is triggered if:
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
-<target>Откриване посоката на синхронизация чрез файлове на базата данни</target>
+<target>Открий посоката на синхронизация чрез файловете на базата данни</target>
 
 <source>Delete files:</source>
-<target>Изтриване на файлове:</target>
+<target>Изтрий файлове:</target>
 
 <source>Permanent</source>
-<target>Безвъзвратно</target>
+<target>Необратимо</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>Безвъзвратно изтриване или презапис на файлове</target>
+<target>Изтрий или презапиши файловете необратимо</target>
 
 <source>Recycle bin</source>
 <target>Кошче</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Резервиране на изтрити или презаписани файлове в кошчето</target>
+<target>Резервирай изтритите или презаписани файлове в кошчето</target>
 
 <source>Versioning</source>
 <target>Версифициране</target>
 
 <source>Move files to a user-defined folder</source>
-<target>Преместване на файловете в зададена потребителска папка</target>
+<target>Премести файловете в зададена потребителска папка</target>
 
 <source>Naming convention:</source>
 <target>Конвенция за преименуване:</target>
@@ -900,7 +900,7 @@ The command is triggered if:
 <target>ОК</target>
 
 <source>Start synchronization now?</source>
-<target>Започни синхронизация сега?</target>
+<target>Почни синхронизация сега?</target>
 
 <source>Variant:</source>
 <target>Вариант:</target>
@@ -936,16 +936,16 @@ The command is triggered if:
 <target>Стоп</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>Създаване на пакетен файл за автоматична синхронизация. За старт щракнете двукратно върху този файл или задайте планова задача: %x</target>
+<target>Създай пакетен файл за автоматична синхронизация. За старт щракнете двукратно върху този файл или задайте планова задача: %x</target>
 
 <source>Stop synchronization at first error</source>
 <target>Спри синхронизацията при първа грешка</target>
 
 <source>Run minimized</source>
-<target>Изпълнение в минимизиран вид</target>
+<target>Изпълнявай в минимизиран вид</target>
 
 <source>Save log:</source>
-<target>Запазване на протокол:</target>
+<target>Запази протокол:</target>
 
 <source>Limit:</source>
 <target>Ограничи:</target>
@@ -970,7 +970,7 @@ Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
 </source>
 <target>
-Копиране във временен файл (*.ffs_tmp) преди презапис на целевия файл.
+Копирай във временен файл (*.ffs_tmp) преди презапис на целевия файл.
 Това гарантира цялостност на файла дори в случай на сериозна грешка.
 </target>
 
@@ -978,19 +978,19 @@ This guarantees a consistent state even in case of a serious error.
 <target>(препоръчително)</target>
 
 <source>Copy locked files</source>
-<target>Копиране на заключени файлове</target>
+<target>Копирай заключени файлове</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
-<target>Копиране на споделени или заключени файлове с услугата Volume Shadow Copy</target>
+<target>Копирай споделени или заключени файлове с услугата Volume Shadow Copy</target>
 
 <source>(requires administrator rights)</source>
 <target>(изисква администраторски права)</target>
 
 <source>Copy file access permissions</source>
-<target>Копиране правата за достъп на файла</target>
+<target>Копирай правата за достъп на файла</target>
 
 <source>Transfer file and folder permissions.</source>
-<target>Пренос на правата за достъп на файла и папката.</target>
+<target>Прехвърли правата за достъп на файла и папката.</target>
 
 <source>Automatic retry on error:</source>
 <target>Автоматично повтаряне при грешка:</target>
@@ -1002,7 +1002,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Забавяне (сек.):</target>
 
 <source>Customize context menu:</source>
-<target>Настройка на контекстното меню:</target>
+<target>Настрой контекстното меню:</target>
 
 <source>Description</source>
 <target>Описание</target>
@@ -1020,7 +1020,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Ако харесвате FreeFileSync</target>
 
 <source>Donate with PayPal</source>
-<target>Дарете чрез PayPal</target>
+<target>Дарение чрез PayPal</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Забележки и предложения са добре дошли</target>
@@ -1038,16 +1038,19 @@ This guarantees a consistent state even in case of a serious error.
 <target>Много благодарности за локализацията:</target>
 
 <source>Save as Batch Job</source>
-<target>Запазване като пакетна задача</target>
+<target>Запази като пакетна задача</target>
 
 <source>Delete Items</source>
-<target>Изтриване на елементи</target>
+<target>Изтрий елементите</target>
 
-<source>Global Settings</source>
-<target>Глобални настройки</target>
+<source>Options</source>
+<target>Опции</target>
 
 <source>Select Time Span</source>
-<target>Избор на интервал време</target>
+<target>Избери интервала време</target>
+
+<source>&Preferences...</source>
+<target>&Предпочитания...</target>
 
 <source>Folder Pairs</source>
 <target>Двойки папки</target>
@@ -1087,8 +1090,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
-<pluralform>Трябва ли да бъде ли изпълнена командата %y за един елемент?</pluralform>
-<pluralform>Трябва ли да бъде ли изпълнена командата %y за %x елемента?</pluralform>
+<pluralform>Трябва ли да бъде изпълнена командата %y за един елемент?</pluralform>
+<pluralform>Трябва ли да бъде изпълнена командата %y за %x елемента?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1122,10 +1125,10 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>Set direction:</source>
-<target>Задаване на посока:</target>
+<target>Задай посока:</target>
 
 <source>multiple selection</source>
-<target>групов избор</target>
+<target>групово маркиране</target>
 
 <source>Include via filter:</source>
 <target>Включи чрез филтъра:</target>
@@ -1161,7 +1164,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Големи</target>
 
 <source>Select time span...</source>
-<target>Избор на интервал време...</target>
+<target>Избори интервала време...</target>
 
 <source>Default view</source>
 <target>Изглед по подразбиране</target>
@@ -1195,6 +1198,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Synchronization Settings</source>
 <target>Настройки на синхронизацията</target>
+
+<source>Reset filter</source>
+<target>Инициализирай филтъра</target>
 
 <source>Show files that exist on left side only</source>
 <target>Покажи файловете, съществуващи само отляво</target>
@@ -1269,7 +1275,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Режим на очакване</target>
 
 <source>Log off</source>
-<target>Изход от сесията</target>
+<target>Излез от сесията</target>
 
 <source>Shut down</source>
 <target>Изключи компютъра</target>
@@ -1331,47 +1337,50 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Трябва ли следните %x елемента да бъдат изтрити?</pluralform>
 </target>
 
+<source>Preferences</source>
+<target>Предпочитания</target>
+
 <source>Copy NTFS permissions</source>
-<target>Копиране NTFS-права за достъп</target>
+<target>Копирай NTFS-правата за достъп</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Интегрира външни приложения в контекстното меню. Налични са следните макроси:</target>
+<target>Интегрирай външни приложения в контекстното меню. Налични са следните макроси:</target>
 
 <source>- full file or folder name</source>
-<target>- пълно име на файла или на папката</target>
+<target>- пълно име на файла или папката</target>
 
 <source>- folder part only</source>
 <target>- само частта на папката</target>
 
 <source>- Other side's counterpart to %item_path%</source>
-<target>- съответствието на %item_path% от другата страна</target>
+<target>- съответствие от другата страна на %item_path%</target>
 
 <source>- Other side's counterpart to %item_folder%</source>
-<target>- съответствието на %item_folder% от другата страна</target>
+<target>- съответствие от другата страна на %item_folder%</target>
 
 <source>Restore all hidden windows and warnings?</source>
 <target>Да се възстановят ли всички скрити прозорци и предупреждения?</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Определя и разпространява промените върху двете страни. Изтривания, премествания и конфликти се откриват автоматично чрез база данни.</target>
+<target>Определи и разпространи промените върху двете страни. Изтривания, премествания и конфликти се откриват автоматично чрез база данни.</target>
 
 <source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Създава огледално копие на лявата папка, привеждайки дясната папка в пълно съответствие.</target>
+<target>Създай огледално копие на лявата папка, привеждайки дясната папка в съответствие.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>Копира новите или актуализирани файлове към дясната папка.</target>
+<target>Копирай новите и актуализирани файлове към дясната папка.</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>Дефинира собствени правила за синхронизация.</target>
+<target>Дефиниране на свои правила за синхронизация.</target>
 
 <source>Exclude</source>
-<target>Изключване</target>
+<target>Изключи</target>
 
 <source>Direct</source>
 <target>Директно</target>
 
 <source>Follow</source>
-<target>Следване</target>
+<target>Следвай</target>
 
 <source>Today</source>
 <target>Днес</target>
@@ -1416,7 +1425,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Синхронизиране</target>
 
 <source>Leave as unresolved conflict</source>
-<target>Остава като нерешен конфликт</target>
+<target>Остави като нерешен конфликт</target>
 
 <source>File</source>
 <target>Файл</target>

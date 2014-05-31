@@ -55,8 +55,8 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_menubar1->Append( m_menuFile, _("&Program") );
 
     m_menuTools = new wxMenu();
-    m_menuItemGlobSett = new wxMenuItem( m_menuTools, wxID_PREFERENCES, wxString( _("&Global settings") ) , wxEmptyString, wxITEM_NORMAL );
-    m_menuTools->Append( m_menuItemGlobSett );
+    m_menuItemOptions = new wxMenuItem( m_menuTools, wxID_PREFERENCES, wxString( _("&Options") ) , wxEmptyString, wxITEM_NORMAL );
+    m_menuTools->Append( m_menuItemOptions );
 
     m_menuTools->AppendSeparator();
 
@@ -883,7 +883,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     this->Connect( m_menuItem10->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCompare ) );
     this->Connect( m_menuItem11->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnStartSync ) );
     this->Connect( m_menuItem4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
-    this->Connect( m_menuItemGlobSett->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuGlobalSettings ) );
+    this->Connect( m_menuItemOptions->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuOptions ) );
     this->Connect( m_menuItem15->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuFindItem ) );
     this->Connect( m_menuItem5->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuExportFileList ) );
     this->Connect( m_menuItemManual->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnShowHelp ) );
@@ -957,26 +957,26 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer7 = new wxBoxSizer( wxVERTICAL );
 
     m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-    m_panel39 = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel39->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_panelCompSettingsHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelCompSettingsHolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer275;
     bSizer275 = new wxBoxSizer( wxVERTICAL );
 
     bSizerLocalCompSettings = new wxBoxSizer( wxVERTICAL );
 
-    m_checkBoxUseLocalCmpOptions = new wxCheckBox( m_panel39, wxID_ANY, _("Use local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxUseLocalCmpOptions = new wxCheckBox( m_panelCompSettingsHolder, wxID_ANY, _("Use local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_checkBoxUseLocalCmpOptions->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     bSizerLocalCompSettings->Add( m_checkBoxUseLocalCmpOptions, 0, wxALL|wxEXPAND, 10 );
 
-    m_staticline59 = new wxStaticLine( m_panel39, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    m_staticline59 = new wxStaticLine( m_panelCompSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizerLocalCompSettings->Add( m_staticline59, 0, wxEXPAND, 5 );
 
 
     bSizer275->Add( bSizerLocalCompSettings, 0, wxEXPAND, 5 );
 
-    m_panelComparisonSettings = new wxPanel( m_panel39, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelComparisonSettings = new wxPanel( m_panelCompSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelComparisonSettings->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer159;
@@ -1064,29 +1064,29 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer275->Add( m_panelComparisonSettings, 0, wxEXPAND, 5 );
 
 
-    m_panel39->SetSizer( bSizer275 );
-    m_panel39->Layout();
-    bSizer275->Fit( m_panel39 );
-    m_notebook->AddPage( m_panel39, _("dummy"), false );
-    m_panel40 = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel40->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_panelCompSettingsHolder->SetSizer( bSizer275 );
+    m_panelCompSettingsHolder->Layout();
+    bSizer275->Fit( m_panelCompSettingsHolder );
+    m_notebook->AddPage( m_panelCompSettingsHolder, _("dummy"), true );
+    m_panelFilterSettingsHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelFilterSettingsHolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer278;
     bSizer278 = new wxBoxSizer( wxVERTICAL );
 
     bSizerLocalFilterSettings = new wxBoxSizer( wxVERTICAL );
 
-    m_staticText144 = new wxStaticText( m_panel40, wxID_ANY, _("Local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText144 = new wxStaticText( m_panelFilterSettingsHolder, wxID_ANY, _("Local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText144->Wrap( -1 );
     bSizerLocalFilterSettings->Add( m_staticText144, 0, wxALL, 10 );
 
-    m_staticline61 = new wxStaticLine( m_panel40, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    m_staticline61 = new wxStaticLine( m_panelFilterSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizerLocalFilterSettings->Add( m_staticline61, 0, wxEXPAND, 5 );
 
 
     bSizer278->Add( bSizerLocalFilterSettings, 0, wxEXPAND, 5 );
 
-    m_panelFilterSettings = new wxPanel( m_panel40, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelFilterSettings = new wxPanel( m_panelFilterSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelFilterSettings->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer1591;
@@ -1265,16 +1265,16 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer1591->Fit( m_panelFilterSettings );
     bSizer278->Add( m_panelFilterSettings, 1, wxEXPAND, 5 );
 
-    m_staticline62 = new wxStaticLine( m_panel40, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    m_staticline62 = new wxStaticLine( m_panelFilterSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer278->Add( m_staticline62, 0, wxEXPAND, 5 );
 
     wxBoxSizer* bSizer280;
     bSizer280 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonReset = new wxButton( m_panel40, wxID_DEFAULT, _("&Reset"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    bSizer280->Add( m_buttonReset, 0, wxALL, 5 );
+    m_buttonReset = new wxButton( m_panelFilterSettingsHolder, wxID_DEFAULT, _("&Reset"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    bSizer280->Add( m_buttonReset, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_staticText44 = new wxStaticText( m_panel40, wxID_ANY, _("Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_staticText44 = new wxStaticText( m_panelFilterSettingsHolder, wxID_ANY, _("Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_staticText44->Wrap( 600 );
     bSizer280->Add( m_staticText44, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 10 );
 
@@ -1282,28 +1282,28 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer278->Add( bSizer280, 0, wxEXPAND, 5 );
 
 
-    m_panel40->SetSizer( bSizer278 );
-    m_panel40->Layout();
-    bSizer278->Fit( m_panel40 );
-    m_notebook->AddPage( m_panel40, _("dummy"), false );
-    m_panel41 = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel41->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_panelFilterSettingsHolder->SetSizer( bSizer278 );
+    m_panelFilterSettingsHolder->Layout();
+    bSizer278->Fit( m_panelFilterSettingsHolder );
+    m_notebook->AddPage( m_panelFilterSettingsHolder, _("dummy"), false );
+    m_panelSyncSettingsHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelSyncSettingsHolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer276;
     bSizer276 = new wxBoxSizer( wxVERTICAL );
 
     bSizerLocalSyncSettings = new wxBoxSizer( wxVERTICAL );
 
-    m_checkBoxUseLocalSyncOptions = new wxCheckBox( m_panel41, wxID_ANY, _("Use local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxUseLocalSyncOptions = new wxCheckBox( m_panelSyncSettingsHolder, wxID_ANY, _("Use local settings:"), wxDefaultPosition, wxDefaultSize, 0 );
     bSizerLocalSyncSettings->Add( m_checkBoxUseLocalSyncOptions, 0, wxALL|wxEXPAND, 10 );
 
-    m_staticline60 = new wxStaticLine( m_panel41, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    m_staticline60 = new wxStaticLine( m_panelSyncSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizerLocalSyncSettings->Add( m_staticline60, 0, wxEXPAND, 5 );
 
 
     bSizer276->Add( bSizerLocalSyncSettings, 0, wxEXPAND, 5 );
 
-    m_panelSyncSettings = new wxPanel( m_panel41, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelSyncSettings = new wxPanel( m_panelSyncSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelSyncSettings->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer232;
@@ -1644,22 +1644,22 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer276->Add( m_panelSyncSettings, 1, wxEXPAND, 5 );
 
 
-    m_panel41->SetSizer( bSizer276 );
-    m_panel41->Layout();
-    bSizer276->Fit( m_panel41 );
-    m_notebook->AddPage( m_panel41, _("dummy"), true );
+    m_panelSyncSettingsHolder->SetSizer( bSizer276 );
+    m_panelSyncSettingsHolder->Layout();
+    bSizer276->Fit( m_panelSyncSettingsHolder );
+    m_notebook->AddPage( m_panelSyncSettingsHolder, _("dummy"), false );
 
     bSizer7->Add( m_notebook, 1, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonOkay, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -1910,13 +1910,13 @@ SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wx
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonStartSync = new wxButton( this, wxID_OK, _("&Start"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonStartSync = new wxButton( this, wxID_OK, _("&Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonStartSync->SetDefault();
     m_buttonStartSync->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonStartSync, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -2448,16 +2448,16 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
 
     bSizerStdButtons->Add( bSizer160, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
-    m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonClose->SetDefault();
     m_buttonClose->Enable( false );
 
     bSizerStdButtons->Add( m_buttonClose, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonPause = new wxButton( this, wxID_ANY, _("&Pause"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonPause = new wxButton( this, wxID_ANY, _("&Pause"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonPause, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
-    m_buttonStop = new wxButton( this, wxID_CANCEL, _("Stop"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonStop = new wxButton( this, wxID_CANCEL, _("Stop"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonStop, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -2643,7 +2643,7 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer1721->Add( m_checkBoxLogfilesLimit, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 
-    m_spinCtrlLogfileLimit = new wxSpinCtrl( m_panelLogfile, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
+    m_spinCtrlLogfileLimit = new wxSpinCtrl( m_panelLogfile, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70,-1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
     m_spinCtrlLogfileLimit->SetToolTip( _("Limit maximum number of log files") );
 
     bSizer1721->Add( m_spinCtrlLogfileLimit, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -2674,13 +2674,13 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizerStdButtons->Add( 0, 0, 1, wxEXPAND, 5 );
 
-    m_buttonSaveAs = new wxButton( this, wxID_SAVE, _("Save &as..."), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonSaveAs = new wxButton( this, wxID_SAVE, _("Save &as..."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonSaveAs->SetDefault();
     m_buttonSaveAs->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonSaveAs, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -2768,13 +2768,13 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     bSizerStdButtons->Add( bSizer99, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonOK = new wxButton( this, wxID_OK, _("dummy"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOK = new wxButton( this, wxID_OK, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonOK->SetDefault();
     m_buttonOK->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonOK, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -2798,7 +2798,7 @@ DeleteDlgGenerated::~DeleteDlgGenerated()
 {
 }
 
-GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+OptionsDlgGenerated::OptionsDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
     this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
@@ -3015,19 +3015,19 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonDefault = new wxButton( this, wxID_DEFAULT, _("&Default"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonDefault = new wxButton( this, wxID_DEFAULT, _("&Default"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonDefault, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizerStdButtons->Add( 0, 0, 1, 0, 5 );
 
-    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonOkay, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -3041,18 +3041,18 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
     this->Centre( wxBOTH );
 
     // Connect Events
-    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GlobalSettingsDlgGenerated::OnClose ) );
-    m_spinCtrlAutoRetryCount->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnToggleAutoRetryCount ), NULL, this );
-    m_bpButtonAddRow->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnAddRow ), NULL, this );
-    m_bpButtonRemoveRow->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnRemoveRow ), NULL, this );
-    m_hyperlink17->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GlobalSettingsDlgGenerated::OnHelpShowExamples ), NULL, this );
-    m_buttonResetDialogs->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnResetDialogs ), NULL, this );
-    m_buttonDefault->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnDefault ), NULL, this );
-    m_buttonOkay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnOkay ), NULL, this );
-    m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnCancel ), NULL, this );
+    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( OptionsDlgGenerated::OnClose ) );
+    m_spinCtrlAutoRetryCount->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( OptionsDlgGenerated::OnToggleAutoRetryCount ), NULL, this );
+    m_bpButtonAddRow->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnAddRow ), NULL, this );
+    m_bpButtonRemoveRow->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnRemoveRow ), NULL, this );
+    m_hyperlink17->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( OptionsDlgGenerated::OnHelpShowExamples ), NULL, this );
+    m_buttonResetDialogs->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnResetDialogs ), NULL, this );
+    m_buttonDefault->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnDefault ), NULL, this );
+    m_buttonOkay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnOkay ), NULL, this );
+    m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OptionsDlgGenerated::OnCancel ), NULL, this );
 }
 
-GlobalSettingsDlgGenerated::~GlobalSettingsDlgGenerated()
+OptionsDlgGenerated::~OptionsDlgGenerated()
 {
 }
 
@@ -3111,13 +3111,13 @@ SelectTimespanDlgGenerated::SelectTimespanDlgGenerated( wxWindow* parent, wxWind
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizerStdButtons->Add( m_buttonOkay, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
@@ -3426,7 +3426,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonClose->SetDefault();
     bSizerStdButtons->Add( m_buttonClose, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 

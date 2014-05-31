@@ -237,7 +237,7 @@ private:
     void OnSearchPanelKeyPressed(wxKeyEvent& event);
 
     //menu events
-    virtual void OnMenuGlobalSettings(wxCommandEvent& event) override;
+    virtual void OnMenuOptions       (wxCommandEvent& event) override;
     virtual void OnMenuExportFileList(wxCommandEvent& event) override;
     virtual void OnMenuFindItem      (wxCommandEvent& event) override;
     virtual void OnMenuCheckVersion  (wxCommandEvent& event) override;

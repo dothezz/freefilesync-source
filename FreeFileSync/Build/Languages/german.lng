@@ -657,11 +657,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternative Vergleichseinstellungen</target>
+<source>Local comparison settings</source>
+<target>Lokale Vergleichseinstellungen</target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternative Synchronisationseinstellungen</target>
+<source>Local synchronization settings</source>
+<target>Lokale Synchronisationseinstellungen</target>
 
 <source>Local filter</source>
 <target>Lokaler Filter</target>
@@ -672,11 +672,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>None</source>
 <target>Ohne</target>
 
-<source>Remove alternate settings</source>
-<target>Alternative Einstellungen entfernen</target>
+<source>Remove local settings</source>
+<target>Lokale Einstellungen entfernen</target>
 
-<source>Clear filter settings</source>
-<target>Filtereinstellungen löschen</target>
+<source>Reset local filter</source>
+<target>Lokalen Filter zurücksetzen</target>
 
 <source>Copy</source>
 <target>Kopieren</target>
@@ -702,8 +702,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>2. &Synchronize</source>
 <target>2. &Synchronisieren</target>
 
-<source>&Global settings</source>
-<target>&Globale Einstellungen</target>
+<source>&Options</source>
+<target>&Optionen</target>
 
 <source>&Language</source>
 <target>&Sprache</target>
@@ -1043,11 +1043,14 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Delete Items</source>
 <target>Elemente löschen</target>
 
-<source>Global Settings</source>
-<target>Globale Einstellungen</target>
+<source>Options</source>
+<target>Optionen</target>
 
 <source>Select Time Span</source>
 <target>Zeitspanne auswählen</target>
+
+<source>&Preferences...</source>
+<target>&Einstellungen</target>
 
 <source>Folder Pairs</source>
 <target>Ordnerpaare</target>
@@ -1196,6 +1199,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Synchronization Settings</source>
 <target>Synchronisationseinstellungen</target>
 
+<source>Reset filter</source>
+<target>Filter zurücksetzen</target>
+
 <source>Show files that exist on left side only</source>
 <target>Nur links existierende Dateien anzeigen</target>
 
@@ -1330,6 +1336,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <pluralform>Soll das folgende Element wirklich gelöscht werden?</pluralform>
 <pluralform>Sollen die folgenden %x Elemente wirklich gelöscht werden?</pluralform>
 </target>
+
+<source>Preferences</source>
+<target>Einstellungen</target>
 
 <source>Copy NTFS permissions</source>
 <target>NTFS Berechtigungen kopieren</target>

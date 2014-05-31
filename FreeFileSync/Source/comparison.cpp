@@ -140,7 +140,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
 {
     std::vector<std::pair<Zstring, Zstring>> dependentDirs;
 
-    auto dependentDir = [](const Zstring& lhs, const Zstring& rhs)
+    auto areDependent = [](const Zstring& lhs, const Zstring& rhs)
     {
         return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())), //note: this is NOT an equivalence relation!
                                Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
@@ -149,7 +149,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
     for (const ResolvedFolderPair& fp : folderPairs)
         if (!fp.dirnameLeft.empty() && !fp.dirnameRight.empty()) //empty folders names may be accepted by user
         {
-            if (dependentDir(fp.dirnameLeft, fp.dirnameRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
+            if (areDependent(fp.dirnameLeft, fp.dirnameRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
                 dependentDirs.push_back(std::make_pair(fp.dirnameLeft, fp.dirnameRight));
         }
 

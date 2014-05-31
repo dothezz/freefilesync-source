@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Sintaksa:</target>
 
-<source>config files</source>
-<target>konfiguracijske datoteke</target>
+<source>global config file:</source>
+<target></target>
+
+<source>config files:</source>
+<target></target>
 
 <source>directory</source>
 <target>imenik</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target></target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Poljubno število FreeFileSync .ffs_gui in/ali .ffs_batch konfigracijskih datotek.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Poljubno število alternatvnih imenikov za največ eno konfiguracijsko datoteko.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target></target>
 
 <source>Cannot find the following folders:</source>
 <target>Ne morem najti naslednjih map:</target>
@@ -659,11 +665,11 @@ Ukaz se sproži če:
 <source>Drag && drop</source>
 <target>Povleci && spusti</target>
 
-<source>Alternate comparison settings</source>
-<target>Alternativne nastavitve primerjave</target>
+<source>Local comparison settings</source>
+<target></target>
 
-<source>Alternate synchronization settings</source>
-<target>Alternativne nastavitve sinhnorizacije</target>
+<source>Local synchronization settings</source>
+<target></target>
 
 <source>Local filter</source>
 <target>Lokalni filter</target>
@@ -674,11 +680,11 @@ Ukaz se sproži če:
 <source>None</source>
 <target>Nič</target>
 
-<source>Remove alternate settings</source>
-<target>Odstrani nadomestne nastavitve</target>
+<source>Remove local settings</source>
+<target></target>
 
-<source>Clear filter settings</source>
-<target>Počisti nastavitve filtra</target>
+<source>Reset local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>Kopiraj</target>
@@ -686,14 +692,8 @@ Ukaz se sproži če:
 <source>Paste</source>
 <target>Prilepi</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Alternativne nastavitve primerjave</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Alternativne nastavitve sinhnorizacije</target>
-
-<source>Local Filter</source>
-<target>Lokalni filter</target>
+<source>Local Synchronization Settings</source>
+<target></target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -710,8 +710,8 @@ Ukaz se sproži če:
 <source>2. &Synchronize</source>
 <target>2. &Sinhroniziraj</target>
 
-<source>&Global settings</source>
-<target>&Skupne nastavitve</target>
+<source>&Options</source>
+<target></target>
 
 <source>&Language</source>
 <target>&Jezik</target>
@@ -734,11 +734,11 @@ Ukaz se sproži če:
 <source>&Check for new version</source>
 <target>&Preveri, če obstaja nova verzija</target>
 
-<source>Compare</source>
-<target>Primerjaj</target>
-
 <source>Cancel</source>
 <target>Prekliči</target>
+
+<source>Compare</source>
+<target>Primerjaj</target>
 
 <source>Synchronize</source>
 <target>Sinhroniziraj</target>
@@ -761,8 +761,20 @@ Ukaz se sproži če:
 <source>Match case</source>
 <target>Ujemaj se s primerom</target>
 
+<source>Open...</source>
+<target>Odpri...</target>
+
+<source>Save</source>
+<target>Shrani</target>
+
+<source>Save as GUI job</source>
+<target></target>
+
 <source>Save as batch job</source>
 <target>Shrani kot serijsko opravilo</target>
+
+<source>Save as...</source>
+<target></target>
 
 <source>View type:</source>
 <target>Tip pogleda:</target>
@@ -785,6 +797,9 @@ Ukaz se sproži če:
 <source>Total bytes to copy</source>
 <target>Skupno bajtov za kopiranje</target>
 
+<source>Use local settings:</source>
+<target></target>
+
 <source>Select a variant:</source>
 <target>Izberi možnost:</target>
 
@@ -800,20 +815,35 @@ Ukaz se sproži če:
 <source>More information</source>
 <target>Več informacij</target>
 
-<source>OK</source>
-<target>V redu</target>
+<source>Local settings:</source>
+<target></target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identificiraj in razširjaj spremembe na obeh straneh. Izbrisi, premiki in spori so samodejno zaznani z uporabo podatkovne baze.</target>
+<source>Include:</source>
+<target>Vključi:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Ustvari zrcalno kopijo levega imenika s prilagoditvijo desnega imenika, tako da se ujemata.</target>
+<source>Exclude:</source>
+<target>Izključi:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopiraj nove in posodobljene datoteke v desni imenik.</target>
+<source>Show examples</source>
+<target>Pokaži primere</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
+<source>Time span:</source>
+<target>Časovno obdobje</target>
+
+<source>File size:</source>
+<target>Velikost datoteke:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maksimum:</target>
+
+<source>&Reset</source>
+<target>&Ponovni zagon</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Izberi filtrirna pravila za izključitev določenih datotek iz sinhnorizacije. Vpiši pot datotek relativno na imenik v obdelavi</target>
 
 <source>Detect moved files</source>
 <target>Zaznaj premaknjene datoteke</target>
@@ -828,6 +858,9 @@ Ukaz se sproži če:
 - Zaznavane je aktivno po začetnem sinhnoriziranju
 - Ni podprto s strani vseh datotečnih sistemov
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
 
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
@@ -853,9 +886,6 @@ Ukaz se sproži če:
 <source>Naming convention:</source>
 <target>Konvencija poimenovanja:</target>
 
-<source>Show examples</source>
-<target>Pokaži primere</target>
-
 <source>Handle errors:</source>
 <target>Upravljanje napak:</target>
 
@@ -874,8 +904,8 @@ Ukaz se sproži če:
 <source>On completion:</source>
 <target>Ob zaključku:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
+<source>OK</source>
+<target>V redu</target>
 
 <source>Start synchronization now?</source>
 <target>Zaženem sinhnorizacijo takoj?</target>
@@ -936,30 +966,6 @@ Ukaz se sproži če:
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Izberi filtrirna pravila za izključitev določenih datotek iz sinhnorizacije. Vpiši pot datotek relativno na imenik v obdelavi</target>
-
-<source>Include:</source>
-<target>Vključi:</target>
-
-<source>Exclude:</source>
-<target>Izključi:</target>
-
-<source>Time span:</source>
-<target>Časovno obdobje</target>
-
-<source>File size:</source>
-<target>Velikost datoteke:</target>
-
-<source>Minimum:</source>
-<target>Minimum:</target>
-
-<source>Maximum:</source>
-<target>Maksimum:</target>
-
-<source>&Reset</source>
-<target>&Ponovni zagon</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Naslednje nastavitve se uporabljajo pri vseh sinhronizacijskih opravilih.</target>
@@ -1045,11 +1051,14 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Delete Items</source>
 <target>Izbriši elemente</target>
 
-<source>Global Settings</source>
-<target>Skupne nastavitve</target>
+<source>Options</source>
+<target></target>
 
 <source>Select Time Span</source>
 <target>Izberi časovno obdobje</target>
+
+<source>&Preferences...</source>
+<target></target>
 
 <source>Folder Pairs</source>
 <target>Pari imenikov</target>
@@ -1068,12 +1077,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Main Bar</source>
 <target>Glavna vrstica</target>
-
-<source>Open...</source>
-<target>Odpri...</target>
-
-<source>Save</source>
-<target>Shrani</target>
 
 <source>Compare both sides</source>
 <target>Primerjaj obe strani</target>
@@ -1209,8 +1212,11 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Delete selected configurations</source>
 <target>Izbriši izbrane konfiguracije</target>
 
-<source>Filter</source>
-<target>Filter</target>
+<source>Synchronization Settings</source>
+<target>Nastavitve sinhnorizacije</target>
+
+<source>Reset filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke, ki obstajajo samo na levi</target>
@@ -1260,14 +1266,11 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Set as default</source>
 <target>Nastavi kot privzeto</target>
 
+<source>Filter</source>
+<target>Filter</target>
+
 <source>All files are in sync</source>
 <target>Vse datoteke so sinhronizirane</target>
-
-<source>Synchronization Settings</source>
-<target>Nastavitve sinhnorizacije</target>
-
-<source>Comparison Settings</source>
-<target>Nastavitve primerjave</target>
 
 <source>Cannot find %x</source>
 <target>Ne najdem %x</target>
@@ -1329,30 +1332,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Log</source>
 <target>Dnevnik</target>
 
-<source>Today</source>
-<target>Danes</target>
-
-<source>This week</source>
-<target>Ta teden</target>
-
-<source>This month</source>
-<target>Ta mesec</target>
-
-<source>This year</source>
-<target>To leto</target>
-
-<source>Last x days</source>
-<target>Zadnjih x dni</target>
-
-<source>Byte</source>
-<target>Bajt</target>
-
-<source>KB</source>
-<target>KB</target>
-
-<source>MB</source>
-<target>MB</target>
-
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1378,14 +1357,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <pluralform>Ali resnično želite izbrisati naslednjih %x elementov?</pluralform>
 </target>
 
-<source>Exclude</source>
-<target>Izključi</target>
-
-<source>Direct</source>
-<target>Neposredno</target>
-
-<source>Follow</source>
-<target>Sledi</target>
+<source>Preferences</source>
+<target></target>
 
 <source>Copy NTFS permissions</source>
 <target>Kopiraj NTFS dovoljenja</target>
@@ -1408,8 +1381,50 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Restore all hidden windows and warnings?</source>
 <target>Obnovim vsa skrita okna in opozorila?</target>
 
-<source>Leave as unresolved conflict</source>
-<target>Pusti kot nerešeni spor</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identificiraj in razširjaj spremembe na obeh straneh. Izbrisi, premiki in spori so samodejno zaznani z uporabo podatkovne baze.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Ustvari zrcalno kopijo levega imenika s prilagoditvijo desnega imenika, tako da se ujemata.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopiraj nove in posodobljene datoteke v desni imenik.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
+
+<source>Exclude</source>
+<target>Izključi</target>
+
+<source>Direct</source>
+<target>Neposredno</target>
+
+<source>Follow</source>
+<target>Sledi</target>
+
+<source>Today</source>
+<target>Danes</target>
+
+<source>This week</source>
+<target>Ta teden</target>
+
+<source>This month</source>
+<target>Ta mesec</target>
+
+<source>This year</source>
+<target>To leto</target>
+
+<source>Last x days</source>
+<target>Zadnjih x dni</target>
+
+<source>Byte</source>
+<target>Bajt</target>
+
+<source>KB</source>
+<target>KB</target>
+
+<source>MB</source>
+<target>MB</target>
 
 <source>Replace</source>
 <target>Zamenjaj</target>
@@ -1422,6 +1437,15 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Append a time stamp to each file name</source>
 <target>Imenu vsake datoteke pripni časovni žig</target>
+
+<source>Comparison</source>
+<target></target>
+
+<source>Synchronization</source>
+<target></target>
+
+<source>Leave as unresolved conflict</source>
+<target>Pusti kot nerešeni spor</target>
 
 <source>File</source>
 <target>Datoteka</target>

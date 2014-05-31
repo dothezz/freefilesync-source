@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Syntaxe:</target>
 
-<source>config files</source>
+<source>global config file:</source>
+<target>konfigurační soubory</target>
+
+<source>config files:</source>
 <target>konfigurační soubory</target>
 
 <source>directory</source>
 <target>adresář</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Cesta k alternativnímu souboru GlobalSettings.xml.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Libovolný počet konfiguračních souborů FreeFileSync typu .ffs_gui a/nebo .ffs_batch.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Libovolný počet alternativních adresářů na alespoň jednu konfiguraci.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Libovolný počet alternativních párů adresářů na alespoň jednu konfiguraci.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nelze najít následující složky:</target>
@@ -655,11 +661,11 @@ Příkaz je spuštěn když:
 <source>Drag && drop</source>
 <target>Přetáhni sem && pusť</target>
 
-<source>Alternate comparison settings</source>
-<target>Jiné nastavení porovnání</target>
+<source>Local comparison settings</source>
+<target>Nastavení porovnání</target>
 
-<source>Alternate synchronization settings</source>
-<target>Jiné nastavení synchronizace</target>
+<source>Local synchronization settings</source>
+<target>Nastavení synchronizace</target>
 
 <source>Local filter</source>
 <target>Místní filtr</target>
@@ -670,10 +676,10 @@ Příkaz je spuštěn když:
 <source>None</source>
 <target>Žádný</target>
 
-<source>Remove alternate settings</source>
-<target>Zrušit jiné nastavení</target>
+<source>Remove local settings</source>
+<target>Zrušit nastavení</target>
 
-<source>Clear filter settings</source>
+<source>Reset local filter</source>
 <target>Zrušit nastavení filtru</target>
 
 <source>Copy</source>
@@ -682,14 +688,8 @@ Příkaz je spuštěn když:
 <source>Paste</source>
 <target>Vložit</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Jiné nastavení porovnání</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Jiné nastavení synchronizace</target>
-
-<source>Local Filter</source>
-<target>Místní filtr</target>
+<source>Local Synchronization Settings</source>
+<target>Nastavení porovnání</target>
 
 <source>&New</source>
 <target>&Nový</target>
@@ -706,7 +706,7 @@ Příkaz je spuštěn když:
 <source>2. &Synchronize</source>
 <target>2. &Synchronizovat</target>
 
-<source>&Global settings</source>
+<source>&Options</source>
 <target>&Nastavení programu</target>
 
 <source>&Language</source>
@@ -730,11 +730,11 @@ Příkaz je spuštěn když:
 <source>&Check for new version</source>
 <target>&Zkontrolovat aktualizace</target>
 
-<source>Compare</source>
-<target>Porovnání</target>
-
 <source>Cancel</source>
 <target>Zrušit</target>
+
+<source>Compare</source>
+<target>Porovnání</target>
 
 <source>Synchronize</source>
 <target>Synchronizace</target>
@@ -757,8 +757,20 @@ Příkaz je spuštěn když:
 <source>Match case</source>
 <target>Rozlišovat malá a velká písmena</target>
 
+<source>Open...</source>
+<target>Otevřít...</target>
+
+<source>Save</source>
+<target>Uložit</target>
+
+<source>Save as GUI job</source>
+<target>Uložit jako úlohu</target>
+
 <source>Save as batch job</source>
 <target>Uložit jako dávku</target>
+
+<source>Save as...</source>
+<target>Uložit jako...</target>
 
 <source>View type:</source>
 <target>Typ zobrazení:</target>
@@ -781,6 +793,9 @@ Příkaz je spuštěn když:
 <source>Total bytes to copy</source>
 <target>Celkový objem dat</target>
 
+<source>Use local settings:</source>
+<target>Použít nastavení:</target>
+
 <source>Select a variant:</source>
 <target>Výběr varianty:</target>
 
@@ -796,20 +811,35 @@ Příkaz je spuštěn když:
 <source>More information</source>
 <target>Více informací</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Nastavení:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>
+<source>Include:</source>
+<target>Zahrnout:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Vytvořit zrcadlovou kopii levé složky tak, aby po synchronizci pravá složka přesně odpovídala levé.</target>
+<source>Exclude:</source>
+<target>Vynechat:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Kopírovat nové a aktualizované soubory do pravé složky.</target>
+<source>Show examples</source>
+<target>Ukázat příklady</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Nastavení vlastních pravidel synchronizace.</target>
+<source>Time span:</source>
+<target>Časové rozmezí:</target>
+
+<source>File size:</source>
+<target>Velikost soubor:</target>
+
+<source>Minimum:</source>
+<target>Od:</target>
+
+<source>Maximum:</source>
+<target>Do:</target>
+
+<source>&Reset</source>
+<target>&Smazat</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávajte cesty relativně k odpovídající složce.</target>
 
 <source>Detect moved files</source>
 <target>Detekce přesunutých souborů</target>
@@ -824,6 +854,9 @@ Příkaz je spuštěn když:
 - je k dispozici po prvotní synchronizaci
 - není dostupné na všech systémech
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Určit směr synchronizace pomocí databáze</target>
 
 <source>Delete files:</source>
 <target>Mazání souborů:</target>
@@ -849,9 +882,6 @@ Příkaz je spuštěn když:
 <source>Naming convention:</source>
 <target>Pojmenování:</target>
 
-<source>Show examples</source>
-<target>Ukázat příklady</target>
-
 <source>Handle errors:</source>
 <target>Zpracování chyb:</target>
 
@@ -870,8 +900,8 @@ Příkaz je spuštěn když:
 <source>On completion:</source>
 <target>Po dokončení:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Určit směr synchronizace pomocí databáze</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Začít synchronizovat nyní?</target>
@@ -932,30 +962,6 @@ Příkaz je spuštěn když:
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávajte cesty relativně k odpovídající složce.</target>
-
-<source>Include:</source>
-<target>Zahrnout:</target>
-
-<source>Exclude:</source>
-<target>Vynechat:</target>
-
-<source>Time span:</source>
-<target>Časové rozmezí:</target>
-
-<source>File size:</source>
-<target>Velikost soubor:</target>
-
-<source>Minimum:</source>
-<target>Od:</target>
-
-<source>Maximum:</source>
-<target>Do:</target>
-
-<source>&Reset</source>
-<target>&Smazat</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Toto nastavení je platné pro všechny synchronizační úlohy.</target>
@@ -1038,11 +1044,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Smazané položky</target>
 
-<source>Global Settings</source>
+<source>Options</source>
 <target>Nastavení programu</target>
 
 <source>Select Time Span</source>
 <target>Časové rozmezí</target>
+
+<source>&Preferences...</source>
+<target>&Předvolby...</target>
 
 <source>Folder Pairs</source>
 <target>Adresářové páry</target>
@@ -1061,12 +1070,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Hlavní lišta</target>
-
-<source>Open...</source>
-<target>Otevřít...</target>
-
-<source>Save</source>
-<target>Uložit</target>
 
 <source>Compare both sides</source>
 <target>Porovnat obě strany</target>
@@ -1198,8 +1201,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Smazat vybrané konfigurace</target>
 
-<source>Filter</source>
-<target>Filtr</target>
+<source>Synchronization Settings</source>
+<target>Nastavení synchronizace</target>
+
+<source>Reset filter</source>
+<target>Zrušit filtr</target>
 
 <source>Show files that exist on left side only</source>
 <target>Zobrazit soubory existující pouze vlevo</target>
@@ -1249,14 +1255,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Nastavit jako výchozí</target>
 
+<source>Filter</source>
+<target>Filtr</target>
+
 <source>All files are in sync</source>
 <target>Všechny soubory jsou synchronizovány</target>
-
-<source>Synchronization Settings</source>
-<target>Nastavení synchronizace</target>
-
-<source>Comparison Settings</source>
-<target>Nastavení porovnání</target>
 
 <source>Cannot find %x</source>
 <target>Nelze najít %x</target>
@@ -1318,6 +1321,74 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Záznam zpracování</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Opravdu chcete přesunout následující položku do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následující %x položky do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Přesunout</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Opravdu chcete smazat následující položku?</pluralform>
+<pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
+<pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Předvolby</target>
+
+<source>Copy NTFS permissions</source>
+<target>Kopírovat oprávnění NTFS</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:</target>
+
+<source>- full file or folder name</source>
+<target>- celá cesta nebo jméno souboru</target>
+
+<source>- folder part only</source>
+<target>- pouze cesta</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- celá cesta nebo jméno z opačného panelu pro %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- pouze cesta z opačného panelu pro %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Obnovit všechny skryté dialogy a varování?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Vytvořit zrcadlovou kopii levé složky tak, aby po synchronizci pravá složka přesně odpovídala levé.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Kopírovat nové a aktualizované soubory do pravé složky.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Nastavení vlastních pravidel synchronizace.</target>
+
+<source>Exclude</source>
+<target>Vynechat</target>
+
+<source>Direct</source>
+<target>Zachovat</target>
+
+<source>Follow</source>
+<target>Použít cíl</target>
+
 <source>Today</source>
 <target>Dnes</target>
 
@@ -1342,62 +1413,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Opravdu chcete přesunout následující položku do Koše?</pluralform>
-<pluralform>Opravdu chcete přesunout následující %x položky do Koše?</pluralform>
-<pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Přesunout</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Opravdu chcete smazat následující položku?</pluralform>
-<pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
-<pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Vynechat</target>
-
-<source>Direct</source>
-<target>Zachovat</target>
-
-<source>Follow</source>
-<target>Použít cíl</target>
-
-<source>Copy NTFS permissions</source>
-<target>Kopírovat oprávnění NTFS</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:</target>
-
-<source>- full file or folder name</source>
-<target>- celá cesta nebo jméno souboru</target>
-
-<source>- folder part only</source>
-<target>- pouze cesta</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- celá cesta nebo jméno z opačného panelu pro %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- pouze cesta z opačného panelu pro %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Obnovit všechny skryté dialogy a varování?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Ponechat jako nevyřešený konflikt</target>
-
 <source>Replace</source>
 <target>Nahradit</target>
 
@@ -1409,6 +1424,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Přidat časovou značku ke jménu souboru</target>
+
+<source>Comparison</source>
+<target>Porovnání</target>
+
+<source>Synchronization</source>
+<target>Synchronizace</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Ponechat jako nevyřešený konflikt</target>
 
 <source>File</source>
 <target>Soubor</target>

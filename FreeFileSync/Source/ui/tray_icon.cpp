@@ -142,7 +142,7 @@ private:
         wxMenu* contextMenu = new wxMenu;
 
         wxMenuItem* defaultItem = new wxMenuItem(contextMenu, CONTEXT_RESTORE, _("&Restore"));
-        //wxWidgets font messup:
+        //wxWidgets font mess-up:
         //1. font must be set *before* wxMenu::Append()!
         //2. don't use defaultItem->GetFont(); making it bold creates a huge font size for some reason
 #ifdef ZEN_WIN //no wxMenuItem::SetFont() on Linux and OS X: wasn't wxWidgets supposed to be *portable* at some point in time?????

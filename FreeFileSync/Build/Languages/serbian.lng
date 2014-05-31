@@ -76,17 +76,23 @@
 <source>Syntax:</source>
 <target>Синтакса:</target>
 
-<source>config files</source>
-<target>конфигурационе датотеке</target>
+<source>global config file:</source>
+<target>глобална датотека конфигурације:</target>
+
+<source>config files:</source>
+<target>конфигурационе датотеке:</target>
 
 <source>directory</source>
 <target>фолдер</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Путања до алтернативне GlobalSettings.xml датотеке.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Било који број FreeFileSync .ffs_gui и/или .ffs_batch конфигурационих датотека.</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Било који број алтернативних фолдера за најмање једну конфигурациону датотеку.</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Било који број алтернативних фолдерских парова за бар једну конфигурациону датотеку.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не могу пронаћи следеће фолдере:</target>
@@ -655,11 +661,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>Вуци && пусти</target>
 
-<source>Alternate comparison settings</source>
-<target>Алтернативна подешавања упоређивања</target>
+<source>Local comparison settings</source>
+<target>Локална подешавања упоређивања</target>
 
-<source>Alternate synchronization settings</source>
-<target>Алтернативна подешавања синхронизације</target>
+<source>Local synchronization settings</source>
+<target>Локална подешавања синхронизације</target>
 
 <source>Local filter</source>
 <target>Локални филтер</target>
@@ -670,11 +676,11 @@ The command is triggered if:
 <source>None</source>
 <target>Ниједан</target>
 
-<source>Remove alternate settings</source>
-<target>Уклони алтернативна подешавања</target>
+<source>Remove local settings</source>
+<target>Уклони локална подешавања</target>
 
-<source>Clear filter settings</source>
-<target>Уклони подешавања филтера</target>
+<source>Reset local filter</source>
+<target>Ресетуј локални филтер</target>
 
 <source>Copy</source>
 <target>Копирај</target>
@@ -682,14 +688,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>Залепи</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Алтернативна подешавања упоређивања</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Алтернативна подешавања синхронизације</target>
-
-<source>Local Filter</source>
-<target>Локални филтер</target>
+<source>Local Synchronization Settings</source>
+<target>Локална подешавања синхронизације</target>
 
 <source>&New</source>
 <target>&Ново</target>
@@ -706,8 +706,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. &Синхронизуј</target>
 
-<source>&Global settings</source>
-<target>&Глобална подешавања</target>
+<source>&Options</source>
+<target>&Опције</target>
 
 <source>&Language</source>
 <target>&Језик</target>
@@ -730,11 +730,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>&Провери постојање нове верзије</target>
 
-<source>Compare</source>
-<target>Упореди</target>
-
 <source>Cancel</source>
 <target>Одустани</target>
+
+<source>Compare</source>
+<target>Упореди</target>
 
 <source>Synchronize</source>
 <target>Синхронизуј</target>
@@ -757,8 +757,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>По величини слова</target>
 
+<source>Open...</source>
+<target>Отвори...</target>
+
+<source>Save</source>
+<target>Сачувај</target>
+
+<source>Save as GUI job</source>
+<target>Сачувај као GUI задатак</target>
+
 <source>Save as batch job</source>
 <target>Сачувај као беч задатак</target>
+
+<source>Save as...</source>
+<target>Сачувај као...</target>
 
 <source>View type:</source>
 <target>Тип приказа:</target>
@@ -781,6 +793,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Укупно бајтова за копирање</target>
 
+<source>Use local settings:</source>
+<target>Употреби локална подешавања:</target>
+
 <source>Select a variant:</source>
 <target>Одаберите варијанту:</target>
 
@@ -796,20 +811,35 @@ The command is triggered if:
 <source>More information</source>
 <target>Више информација</target>
 
-<source>OK</source>
-<target>У реду</target>
+<source>Local settings:</source>
+<target>Локална подешавања:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
+<source>Include:</source>
+<target>Укључи:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Креирај огледални бекап левог фолдера прилагођавајући га потпуно десном фолдеру.</target>
+<source>Exclude:</source>
+<target>Искључи:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Копирај нове и ажуриране датотеке у десни фолдер.</target>
+<source>Show examples</source>
+<target>Прикажи примере</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Конфигуришите ваша властита синхронизациона правила.</target>
+<source>Time span:</source>
+<target>Временско ограничење:</target>
+
+<source>File size:</source>
+<target>Величина датотеке:</target>
+
+<source>Minimum:</source>
+<target>Минимум:</target>
+
+<source>Maximum:</source>
+<target>Максимум:</target>
+
+<source>&Reset</source>
+<target>&Ресетуј</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
 
 <source>Detect moved files</source>
 <target>Уочи премештене датотеке</target>
@@ -824,6 +854,9 @@ The command is triggered if:
 - Детекција активна после иницијалног синка
 - Није подржано за све системе датотека
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Уочи синхронизацијске смерове уз помоћ датотека базе</target>
 
 <source>Delete files:</source>
 <target>Обриши датотеке:</target>
@@ -849,9 +882,6 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Правило именовања:</target>
 
-<source>Show examples</source>
-<target>Прикажи примере</target>
-
 <source>Handle errors:</source>
 <target>Обрада грешака:</target>
 
@@ -870,8 +900,8 @@ The command is triggered if:
 <source>On completion:</source>
 <target>При завршетку:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Уочи синхронизацијске смерове уз помоћ датотека базе</target>
+<source>OK</source>
+<target>У реду</target>
 
 <source>Start synchronization now?</source>
 <target>Почни синхронизацију сада?</target>
@@ -932,30 +962,6 @@ The command is triggered if:
 
 <source>&Recycle bin</source>
 <target>&Корпа за смеће</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
-
-<source>Include:</source>
-<target>Укључи:</target>
-
-<source>Exclude:</source>
-<target>Искључи:</target>
-
-<source>Time span:</source>
-<target>Временско ограничење:</target>
-
-<source>File size:</source>
-<target>Величина датотеке:</target>
-
-<source>Minimum:</source>
-<target>Минимум:</target>
-
-<source>Maximum:</source>
-<target>Максимум:</target>
-
-<source>&Reset</source>
-<target>&Ресетуј</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
@@ -1041,11 +1047,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Избриши ставке</target>
 
-<source>Global Settings</source>
-<target>Глобална подешавања</target>
+<source>Options</source>
+<target>Опције</target>
 
 <source>Select Time Span</source>
 <target>Изаберите временски распон</target>
+
+<source>&Preferences...</source>
+<target>&Преференце...</target>
 
 <source>Folder Pairs</source>
 <target>Фолдерски парови</target>
@@ -1064,12 +1073,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Main Bar</source>
 <target>Главна трака</target>
-
-<source>Open...</source>
-<target>Отвори...</target>
-
-<source>Save</source>
-<target>Сачувај</target>
 
 <source>Compare both sides</source>
 <target>Упореди обе стране</target>
@@ -1201,8 +1204,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete selected configurations</source>
 <target>Обриши селектоване конфигурације</target>
 
-<source>Filter</source>
-<target>Филтрирање</target>
+<source>Synchronization Settings</source>
+<target>Подешавања синхронизације</target>
+
+<source>Reset filter</source>
+<target>Ресетуј филтер</target>
 
 <source>Show files that exist on left side only</source>
 <target>Прикажи датотеке које постоје само на левој страни</target>
@@ -1252,14 +1258,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Set as default</source>
 <target>Постави као подразумевано</target>
 
+<source>Filter</source>
+<target>Филтрирање</target>
+
 <source>All files are in sync</source>
 <target>Све датотеке су синхронизоване</target>
-
-<source>Synchronization Settings</source>
-<target>Подешавања синхронизације</target>
-
-<source>Comparison Settings</source>
-<target>Подешавања упоређивања</target>
 
 <source>Cannot find %x</source>
 <target>Немогу пронаћи %x</target>
@@ -1321,6 +1324,74 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Да ли стварно желите да преместите следећу %x ставку у Корпи за смеће?</pluralform>
+<pluralform>Да ли стварно желите да преместите следеће %x ставке у Корпи за смеће?</pluralform>
+<pluralform>Да ли стварно желите да преместите следећих %x ставки у Корпи за смеће?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Премести</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Да ли стварно желите да обришете следећу %x ставку?</pluralform>
+<pluralform>Да ли стварно желите да обришете следеће %x ставке?</pluralform>
+<pluralform>Да ли стварно желите да обришете следећих %x ставки?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Преференце</target>
+
+<source>Copy NTFS permissions</source>
+<target>Копирај NTFS овлашћења</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Интегриши спољне апликације у контекстни мени. Следећи макрои су доступни:</target>
+
+<source>- full file or folder name</source>
+<target>- цело име датотеке или фолдера</target>
+
+<source>- folder part only</source>
+<target>- само фолдерски део</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Дупликат с друге стране у %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Дупликат с друге стране у %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Прикажи све скривене прозоре и упозорења?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>Креирај огледални бекап левог фолдера прилагођавајући га потпуно десном фолдеру.</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Копирај нове и ажуриране датотеке у десни фолдер.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Конфигуришите ваша властита синхронизациона правила.</target>
+
+<source>Exclude</source>
+<target>Искључи</target>
+
+<source>Direct</source>
+<target>Непосредно</target>
+
+<source>Follow</source>
+<target>Следи</target>
+
 <source>Today</source>
 <target>Данас</target>
 
@@ -1345,62 +1416,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Да ли стварно желите да преместите следећу %x ставку у Корпи за смеће?</pluralform>
-<pluralform>Да ли стварно желите да преместите следеће %x ставке у Корпи за смеће?</pluralform>
-<pluralform>Да ли стварно желите да преместите следећих %x ставки у Корпи за смеће?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Премести</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Да ли стварно желите да обришете следећу %x ставку?</pluralform>
-<pluralform>Да ли стварно желите да обришете следеће %x ставке?</pluralform>
-<pluralform>Да ли стварно желите да обришете следећих %x ставки?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Искључи</target>
-
-<source>Direct</source>
-<target>Непосредно</target>
-
-<source>Follow</source>
-<target>Следи</target>
-
-<source>Copy NTFS permissions</source>
-<target>Копирај NTFS овлашћења</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Интегриши спољне апликације у контекстни мени. Следећи макрои су доступни:</target>
-
-<source>- full file or folder name</source>
-<target>- цело име датотеке или фолдера</target>
-
-<source>- folder part only</source>
-<target>- само фолдерски део</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Дупликат с друге стране у %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Дупликат с друге стране у %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Прикажи све скривене прозоре и упозорења?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Остави као неразрешени конфликт</target>
-
 <source>Replace</source>
 <target>Замени</target>
 
@@ -1412,6 +1427,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Додај временску ознаку за свако име датотеке</target>
+
+<source>Comparison</source>
+<target>Упоређење</target>
+
+<source>Synchronization</source>
+<target>Синхронизација</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Остави као неразрешени конфликт</target>
 
 <source>File</source>
 <target>Датотека</target>

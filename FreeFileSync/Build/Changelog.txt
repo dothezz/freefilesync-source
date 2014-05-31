@@ -1,3 +1,17 @@
+FreeFileSync 6.6 [2014-06-01]
+-----------------------------
+Fixed large font size standard button layout
+Fixed config dialog graphics glitch with large font sizes
+Exit FreeFileSync launcher process during update
+Exclude temporary files from RealtimeSync monitor
+Implement correct standard button spacing (OS X)
+Fixed SELinux compilation issue (Linux)
+Installer adds RealtimeSync link to desktop (Windows)
+Improved makefile (Linux, OS X)
+Reduced binary file size (Linux)
+Updated translation files
+
+
 FreeFileSync 6.5 [2014-05-01]
 -----------------------------
 Support preview for RAW CR2 image files (Windows Vista and later)

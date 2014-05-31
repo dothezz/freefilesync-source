@@ -8,6 +8,7 @@
 #include "main_dlg.h"
 #include <zen/file_handling.h>
 #include <zen/thread.h>
+#include <zen/dll.h>
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/tooltip.h>

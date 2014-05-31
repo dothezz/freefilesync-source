@@ -7,39 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural_definition>
 </header>
 
-<source>Synchronization</source>
-<target></target>
-
-<source>Comparison</source>
-<target></target>
-
-<source>Local settings:</source>
-<target></target>
-
-<source>Use local settings:</source>
-<target></target>
-
-<source>Save as...</source>
-<target></target>
-
-<source>Save as GUI job</source>
-<target></target>
-
-<source>Local Synchronization Settings</source>
-<target></target>
-
-<source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
-
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
-
-<source>config files:</source>
-<target></target>
-
-<source>global config file:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения.</target>
 
@@ -112,11 +79,23 @@
 <source>Syntax:</source>
 <target>Синтаксис:</target>
 
+<source>global config file:</source>
+<target>глобальный конфигурационный файл:</target>
+
+<source>config files:</source>
+<target>конфигурационный файл:</target>
+
 <source>directory</source>
 <target>папка</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Путь к альтернативному файлу GlobalSettings.xml.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Любое количество FreeFileSync .ffs_gui и/или .ffs_batch конфигурационных файлов.</target>
+
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Любое количество альтернативных пар папок для не более одного конфигурационного файла.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
@@ -688,11 +667,11 @@ The command is triggered if:
 <source>Drag && drop</source>
 <target>Drag && drop</target>
 
-<source>Alternate comparison settings</source>
-<target>Альтернативные настройки сравнения</target>
+<source>Local comparison settings</source>
+<target>Локальные настройки сравнения</target>
 
-<source>Alternate synchronization settings</source>
-<target>Альтернативные настройки синхронизации</target>
+<source>Local synchronization settings</source>
+<target>Локальные настройки синхронизации</target>
 
 <source>Local filter</source>
 <target>Локальный фильтр</target>
@@ -703,17 +682,20 @@ The command is triggered if:
 <source>None</source>
 <target>неактивный</target>
 
-<source>Remove alternate settings</source>
-<target>Удалить альтернативные настройки</target>
+<source>Remove local settings</source>
+<target>Удалить локальные настройки</target>
 
-<source>Clear filter settings</source>
-<target>Очистить настройки фильтра</target>
+<source>Reset local filter</source>
+<target>Сбросить локальный фильтр</target>
 
 <source>Copy</source>
 <target>Копировать</target>
 
 <source>Paste</source>
 <target>Вставить</target>
+
+<source>Local Synchronization Settings</source>
+<target>Локальные настройки синхронизации</target>
 
 <source>&New</source>
 <target>&Новая</target>
@@ -730,8 +712,8 @@ The command is triggered if:
 <source>2. &Synchronize</source>
 <target>2. С&инхронизировать</target>
 
-<source>&Global settings</source>
-<target>&Глобальные настройки</target>
+<source>&Options</source>
+<target>&Настройки</target>
 
 <source>&Language</source>
 <target>&Язык</target>
@@ -754,11 +736,11 @@ The command is triggered if:
 <source>&Check for new version</source>
 <target>&Проверка обновлений</target>
 
-<source>Compare</source>
-<target>Сравнить</target>
-
 <source>Cancel</source>
 <target>Отмена</target>
+
+<source>Compare</source>
+<target>Сравнить</target>
 
 <source>Synchronize</source>
 <target>Синхронизировать</target>
@@ -787,8 +769,14 @@ The command is triggered if:
 <source>Save</source>
 <target>Сохранить</target>
 
+<source>Save as GUI job</source>
+<target>Сохранить как обычное задание</target>
+
 <source>Save as batch job</source>
 <target>Сохранить как пакетное задание</target>
+
+<source>Save as...</source>
+<target>Сохранить как...</target>
 
 <source>View type:</source>
 <target>Тип просмотра:</target>
@@ -811,6 +799,9 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Всего байт для копирования</target>
 
+<source>Use local settings:</source>
+<target>Использовать локальные настройки:</target>
+
 <source>Select a variant:</source>
 <target>Выберите вариант:</target>
 
@@ -825,6 +816,9 @@ The command is triggered if:
 
 <source>More information</source>
 <target>Подробнее</target>
+
+<source>Local settings:</source>
+<target>Локальные настройки:</target>
 
 <source>Include:</source>
 <target>Включить:</target>
@@ -1063,11 +1057,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Удаление элементов</target>
 
-<source>Global Settings</source>
-<target>Глобальные настройки</target>
+<source>Options</source>
+<target>Настройки</target>
 
 <source>Select Time Span</source>
 <target>Выбор промежутка времени</target>
+
+<source>&Preferences...</source>
+<target>&Предпочтения...</target>
 
 <source>Folder Pairs</source>
 <target>Пары папок для синхронизации</target>
@@ -1082,7 +1079,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Главная</target>
 
 <source>Configuration</source>
-<target>Настройки</target>
+<target>Конфигурация</target>
 
 <source>Main Bar</source>
 <target>Главная панель</target>
@@ -1200,7 +1197,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Сравнение и синхронизация</target>
 
 <source>Configuration saved</source>
-<target>Настройки синхронизации сохранены</target>
+<target>Конфигурация сохранена</target>
 
 <source>FreeFileSync batch</source>
 <target>Пакетное задание FreeFileSync</target>
@@ -1215,10 +1212,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>&Не сохранять</target>
 
 <source>Delete selected configurations</source>
-<target>Удалить выделенные настройки</target>
+<target>Удалить выделенные конфигурации</target>
 
 <source>Synchronization Settings</source>
 <target>Настройки синхронизации</target>
+
+<source>Reset filter</source>
+<target>Сбросить фильтр</target>
 
 <source>Show files that exist on left side only</source>
 <target>Показать файлы, существующие только слева</target>
@@ -1357,6 +1357,9 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Вы точно хотите удалить следующие %x элементов?</pluralform>
 </target>
 
+<source>Preferences</source>
+<target>Предпочтения</target>
+
 <source>Copy NTFS permissions</source>
 <target>Копирование NTFS прав доступа</target>
 
@@ -1437,6 +1440,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
+
+<source>Comparison</source>
+<target>Сравнение</target>
+
+<source>Synchronization</source>
+<target>Синхронизация</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Оставить как нерешенный конфликт</target>
@@ -1580,5 +1589,5 @@ This guarantees a consistent state even in case of a serious error.
 <target>Невозможно прочитать следующие XML элементы:</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>Файл конфигурации %x загрузился частично.</target>
+<target>Конфигурационный файл %x загрузился частично.</target>
 

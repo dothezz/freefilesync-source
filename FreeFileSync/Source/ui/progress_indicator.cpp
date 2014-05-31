@@ -22,7 +22,7 @@
 #include <wx+/context_menu.h>
 #include <wx+/no_flicker.h>
 #include <wx+/font_size.h>
-#include <wx+/std_button_order.h>
+#include <wx+/std_button_layout.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include <wx+/key_event.h>
@@ -1206,7 +1206,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_panelItemsProcessed->Hide();
     pnl.m_buttonClose        ->Show(false);
     //set std order after button visibility was set
-    setStandardButtonOrder(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonPause).setCancel(pnl.m_buttonStop));
+    setStandardButtonLayout(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonPause).setCancel(pnl.m_buttonStop));
 
     pnl.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
 
@@ -1847,7 +1847,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     pnl.bSizerOnCompletion->Show(false);
 
     //set std order after button visibility was set
-    setStandardButtonOrder(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonClose));
+    setStandardButtonLayout(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonClose));
 
     //hide current operation status
     pnl.bSizerStatusText->Show(false);

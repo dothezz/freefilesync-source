@@ -6,7 +6,7 @@
 
 #include "popup_dlg.h"
 #include <wx/app.h>
-#include <wx+/std_button_order.h>
+#include <wx+/std_button_layout.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
 #include "popup_dlg_generated.h"
@@ -194,7 +194,7 @@ public:
         m_buttonCancel->Hide();
 
         //set std order after button visibility was set
-        setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative));
+        setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     }
@@ -212,7 +212,7 @@ public:
         m_buttonNegative->Hide();
 
         //set std order after button visibility was set
-        setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setCancel(m_buttonCancel));
+        setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     }
@@ -237,7 +237,7 @@ public:
         updateGui();
 
         //set std order after button visibility was set
-        setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setNegative(m_buttonNegative).setCancel(m_buttonCancel));
+        setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setNegative(m_buttonNegative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     }

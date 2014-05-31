@@ -501,6 +501,13 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_bpButtonAddPair   ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonHideSearch->SetBitmapLabel(getResourceImage(L"close_panel"));
 
+    warn_static("remove after test")
+#ifdef ZEN_MAC
+    //follow OS conventions:
+    //	m_menuItemOptions->SetItemLabel(_("&Preferences...") + L"\tCtrl+,"); //"Ctrl" is automatically mapped to command button!
+    //this->SetMenuBar(m_menubar1);
+#endif
+
     //---------------- support for dockable gui style --------------------------------
     bSizerPanelHolder->Detach(m_panelTopButtons);
     bSizerPanelHolder->Detach(m_panelDirectoryPairs);
@@ -634,8 +641,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     setMenuItemImage(m_menuItemLoad, getResourceImage(L"load_small"));
     setMenuItemImage(m_menuItemSave, getResourceImage(L"save_small"));
 
-    setMenuItemImage(m_menuItemGlobSett, getResourceImage(L"settings_small"));
-    setMenuItemImage(m_menuItem7,        getResourceImage(L"batch_small"));
+    setMenuItemImage(m_menuItemOptions, getResourceImage(L"settings_small"));
+    setMenuItemImage(m_menuItem7,       getResourceImage(L"batch_small"));
 
     setMenuItemImage(m_menuItemManual, getResourceImage(L"help_small"));
     setMenuItemImage(m_menuItemAbout,  getResourceImage(L"about_small"));
@@ -3321,7 +3328,7 @@ void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
     };
 
     ContextMenu menu;
-    menu.addItem( _("Clear filter settings"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
+    menu.addItem( _("Reset filter"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
     menu.addSeparator();
     menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
     menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);
@@ -4339,9 +4346,9 @@ void MainDialog::setAddFolderPairs(const std::vector<zen::FolderPairEnh>& newPai
 
 
 //menu events
-void MainDialog::OnMenuGlobalSettings(wxCommandEvent& event)
+void MainDialog::OnMenuOptions(wxCommandEvent& event)
 {
-    zen::showGlobalSettingsDlg(this, globalCfg);
+    zen::showOptionsDlg(this, globalCfg);
 }
 
 

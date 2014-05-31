@@ -76,23 +76,29 @@
 <source>Syntax:</source>
 <target>Szintaxis:</target>
 
-<source>config files</source>
-<target>konfigurációs fájlok</target>
+<source>global config file:</source>
+<target>globális konfigurációs fájl:</target>
+
+<source>config files:</source>
+<target>konfigurációs fájlok:</target>
 
 <source>directory</source>
 <target>könyvtár</target>
 
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Útvonal egy alternatív GlobalSettings.xml fájlhoz.</target>
+
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Tetszőleges számú .ffs_gui és/vagy .ffs_batch konfigurációs fájl készíthető a FreeFileSync-hez</target>
 
-<source>Any number of alternative directories for at most one config file.</source>
-<target>Tetszőleges számú alternatív könyvtár legfeljebb egy konfigurációs fájlhoz</target>
+<source>Any number of alternative directory pairs for at most one config file.</source>
+<target>Tetszőleges számú alternatív könyvtár-pár legfeljebb egy konfigurációs fájlban.</target>
 
 <source>Cannot find the following folders:</source>
 <target>A következő könyvtárak nem találhatóak:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Figyelmen kívül hagyhatod ezt a hibát, ezzel üresnek tekintve minden egyes könyvtárat. A könytárak ekkor automatikusan létrejönnek a szinkronizálás folyamán.</target>
+<target>Figyelmen kívül hagyhatod ezt a hibát, ezzel üresnek tekintve minden egyes könyvtárat. A könyvtárak ekkor automatikusan létrejönnek a szinkronizálás folyamán.</target>
 
 <source>A folder input field is empty.</source>
 <target>A könyvtár beviteli mező üres.</target>
@@ -651,11 +657,11 @@ A parancs végrehajtódik, ha:
 <source>Drag && drop</source>
 <target>Húzd && Ejtsd</target>
 
-<source>Alternate comparison settings</source>
-<target>Megváltoztatja az összehasonlítási beállításokat</target>
+<source>Local comparison settings</source>
+<target>Helyi összehasonlítási beállítások</target>
 
-<source>Alternate synchronization settings</source>
-<target>Megváltoztatja a szinkronizálási beállításokat</target>
+<source>Local synchronization settings</source>
+<target>Helyi szinkronizálási beállítások</target>
 
 <source>Local filter</source>
 <target>Helyi szűrő</target>
@@ -666,11 +672,11 @@ A parancs végrehajtódik, ha:
 <source>None</source>
 <target>Egyik sem</target>
 
-<source>Remove alternate settings</source>
-<target>Törölje a módosított beállításokat</target>
+<source>Remove local settings</source>
+<target>Törli a helyi beállításokat</target>
 
-<source>Clear filter settings</source>
-<target>Törölje a szűrőbeállításokat</target>
+<source>Reset local filter</source>
+<target>Visszaállítja a helyi szűrőt</target>
 
 <source>Copy</source>
 <target>Másol</target>
@@ -678,14 +684,8 @@ A parancs végrehajtódik, ha:
 <source>Paste</source>
 <target>Beilleszt</target>
 
-<source>Alternate Comparison Settings</source>
-<target>Megváltoztatja az összehasonlítási beállításokat</target>
-
-<source>Alternate Synchronization Settings</source>
-<target>Megváltoztatja a szinkronizálási beállításokat</target>
-
-<source>Local Filter</source>
-<target>Helyi szűrő</target>
+<source>Local Synchronization Settings</source>
+<target>Helyi Szinkronizálási Beállítások</target>
 
 <source>&New</source>
 <target>&Új</target>
@@ -702,8 +702,8 @@ A parancs végrehajtódik, ha:
 <source>2. &Synchronize</source>
 <target>2. &Szinkronizál</target>
 
-<source>&Global settings</source>
-<target>&Globális beállítások</target>
+<source>&Options</source>
+<target>&Beállítások</target>
 
 <source>&Language</source>
 <target>&Nyelv</target>
@@ -726,11 +726,11 @@ A parancs végrehajtódik, ha:
 <source>&Check for new version</source>
 <target>&Új verzió keresése</target>
 
-<source>Compare</source>
-<target>Összehasonlít</target>
-
 <source>Cancel</source>
 <target>Mégsem</target>
+
+<source>Compare</source>
+<target>Összehasonlít</target>
 
 <source>Synchronize</source>
 <target>Szinkronizál</target>
@@ -753,8 +753,20 @@ A parancs végrehajtódik, ha:
 <source>Match case</source>
 <target>Kis-/nagybetű megkülönböztetése</target>
 
+<source>Open...</source>
+<target>Megnyit...</target>
+
+<source>Save</source>
+<target>Ment</target>
+
+<source>Save as GUI job</source>
+<target>Mentse GUI feladatként</target>
+
 <source>Save as batch job</source>
 <target>Mentse kötegelt feladatként</target>
+
+<source>Save as...</source>
+<target>Mentse mint...</target>
 
 <source>View type:</source>
 <target>Nézet típusa:</target>
@@ -777,6 +789,9 @@ A parancs végrehajtódik, ha:
 <source>Total bytes to copy</source>
 <target>Összesen másolandó bájtok</target>
 
+<source>Use local settings:</source>
+<target>Használja a helyi beállításokat:</target>
+
 <source>Select a variant:</source>
 <target>Válasszon egy változatot:</target>
 
@@ -792,20 +807,35 @@ A parancs végrehajtódik, ha:
 <source>More information</source>
 <target>További információ</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Local settings:</source>
+<target>Helyi beállítások:</target>
 
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Változások keresése és bemutatása mindkét oldalon. A törléseket, mozgatásokat és ütközéseket automatikusan ismeri fel egy adatbázis segítségével.</target>
+<source>Include:</source>
+<target>Bevonva:</target>
 
-<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>A baloldali könyvtár tükörmásolatát készíti el úgy, hogy a jobb oldali könyvtár egyezzen meg</target>
+<source>Exclude:</source>
+<target>Kizárva:</target>
 
-<source>Copy new and updated files to the right folder.</source>
-<target>Másolja az új és módosult fájlokat a jobb oldali könyvtárba.</target>
+<source>Show examples</source>
+<target>Mutasson példákat</target>
 
-<source>Configure your own synchronization rules.</source>
-<target>Állítsd be a saját szinkronizálási szabályaidat</target>
+<source>Time span:</source>
+<target>Idősáv (időtartam):</target>
+
+<source>File size:</source>
+<target>Fájl méret:</target>
+
+<source>Minimum:</source>
+<target>Minimum:</target>
+
+<source>Maximum:</source>
+<target>Maximum:</target>
+
+<source>&Reset</source>
+<target>&Visszaállít</target>
+
+<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
+<target>Meghatározott fájlok szinkronizálásból történő kizárásához válasszon szűrőt. Az útvonalakat a megfelelő könyvtár-párjaikhoz viszonyítva adja meg.</target>
 
 <source>Detect moved files</source>
 <target>Érzékelje a mozgatott fájlokat</target>
@@ -820,6 +850,9 @@ A parancs végrehajtódik, ha:
 - Az érzékelés a kezdeti szinkronizálás után válik aktívvá
 - Nem minden fájlrendszer támogatja
 </target>
+
+<source>Detect synchronization directions with the help of database files</source>
+<target>Érzékelje a szinkronizálási irányokat az adatbázis-fájlok segítségével</target>
 
 <source>Delete files:</source>
 <target>Törölje a következő fájlokat:</target>
@@ -845,9 +878,6 @@ A parancs végrehajtódik, ha:
 <source>Naming convention:</source>
 <target>Elnevezési konvenció:</target>
 
-<source>Show examples</source>
-<target>Mutasson példákat</target>
-
 <source>Handle errors:</source>
 <target>A következő hibák kezelése:</target>
 
@@ -866,8 +896,8 @@ A parancs végrehajtódik, ha:
 <source>On completion:</source>
 <target>Végrehajtás alatt:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Érzékelje a szinkronizálási irányokat az adatbázis-fájlok segítségével</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Start synchronization now?</source>
 <target>Megkezdje a szinkronizálást?</target>
@@ -928,30 +958,6 @@ A parancs végrehajtódik, ha:
 
 <source>&Recycle bin</source>
 <target>Lomtá&r</target>
-
-<source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Meghatározott fájlok szinkronizálásból történő kizárásához válasszon szűrőt. Az útvonalakat a megfelelő könyvtár-párjaikhoz viszonyítva adja meg.</target>
-
-<source>Include:</source>
-<target>Bevonva:</target>
-
-<source>Exclude:</source>
-<target>Kizárva:</target>
-
-<source>Time span:</source>
-<target>Idősáv (időtartam):</target>
-
-<source>File size:</source>
-<target>Fájl méret:</target>
-
-<source>Minimum:</source>
-<target>Minimum:</target>
-
-<source>Maximum:</source>
-<target>Maximum:</target>
-
-<source>&Reset</source>
-<target>&Visszaállít</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>A következő beállítások minden szinkronizálási feladatnál használja.</target>
@@ -1037,11 +1043,14 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Delete Items</source>
 <target>Törölje az elemeket</target>
 
-<source>Global Settings</source>
-<target>Globális beállítások</target>
+<source>Options</source>
+<target>Beállítások</target>
 
 <source>Select Time Span</source>
 <target>Válassza ki az idősávot (időtartamot)</target>
+
+<source>&Preferences...</source>
+<target>&Beállítások...</target>
 
 <source>Folder Pairs</source>
 <target>Könyvtár-párok</target>
@@ -1060,12 +1069,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Main Bar</source>
 <target>Fő sáv</target>
-
-<source>Open...</source>
-<target>Megnyit...</target>
-
-<source>Save</source>
-<target>Ment</target>
 
 <source>Compare both sides</source>
 <target>Vesse össze mindkét oldalt</target>
@@ -1193,8 +1196,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Delete selected configurations</source>
 <target>Törölje a kiválasztott beállításokat</target>
 
-<source>Filter</source>
-<target>Szűrő</target>
+<source>Synchronization Settings</source>
+<target>Szinkronizálási beállítások</target>
+
+<source>Reset filter</source>
+<target>Szűrő visszaállítása</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mutassa a csak a bal oldalon létező fájlokat</target>
@@ -1244,14 +1250,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Set as default</source>
 <target>Beállítás alapértelmezettként</target>
 
+<source>Filter</source>
+<target>Szűrő</target>
+
 <source>All files are in sync</source>
 <target>Az összes fájl szinkronizált</target>
-
-<source>Synchronization Settings</source>
-<target>Szinkronizálási beállítások</target>
-
-<source>Comparison Settings</source>
-<target>Összehasonlítási beállítások</target>
 
 <source>Cannot find %x</source>
 <target>Nem található: %x</target>
@@ -1313,6 +1316,72 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Log</source>
 <target>Napló</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő elemet?</pluralform>
+<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő %x elemet?</pluralform>
+</target>
+
+<source>Move</source>
+<target>Mozgat</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Valóban törölni akarod a következő elemet?</pluralform>
+<pluralform>Valóban törölni akarod a következő %x elemet?</pluralform>
+</target>
+
+<source>Preferences</source>
+<target>Beállítások</target>
+
+<source>Copy NTFS permissions</source>
+<target>Másolja az NTFS jogosultságokat</target>
+
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integráljon a helyi menübe külső alkalmazásokat. A következő makrók érhetők el:</target>
+
+<source>- full file or folder name</source>
+<target>- teljes fájl- vagy könyvtárnév</target>
+
+<source>- folder part only</source>
+<target>- csak a könyvtár része</target>
+
+<source>- Other side's counterpart to %item_path%</source>
+<target>- A másik oldali megfelelőjét a következő fájlba: %item_path%</target>
+
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- A másik oldali megfelelőjét a következő könyvtárba: %item_folder%</target>
+
+<source>Restore all hidden windows and warnings?</source>
+<target>Visszaállítsa az összes rejtett ablakot és figyelmeztetést?</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Változások keresése és bemutatása mindkét oldalon. A törléseket, mozgatásokat és ütközéseket automatikusan ismeri fel egy adatbázis segítségével.</target>
+
+<source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
+<target>A baloldali könyvtár tükörmásolatát készíti el úgy, hogy a jobb oldali könyvtár egyezzen meg</target>
+
+<source>Copy new and updated files to the right folder.</source>
+<target>Másolja az új és módosult fájlokat a jobb oldali könyvtárba.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Állítsd be a saját szinkronizálási szabályaidat</target>
+
+<source>Exclude</source>
+<target>Kizár</target>
+
+<source>Direct</source>
+<target>Közvetlen</target>
+
+<source>Follow</source>
+<target>Követ</target>
+
 <source>Today</source>
 <target>Mai</target>
 
@@ -1337,60 +1406,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>MB</source>
 <target>MB</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
-</source>
-<target>
-<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő elemet?</pluralform>
-<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő %x elemet?</pluralform>
-</target>
-
-<source>Move</source>
-<target>Mozgat</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Valóban törölni akarod a következő elemet?</pluralform>
-<pluralform>Valóban törölni akarod a következő %x elemet?</pluralform>
-</target>
-
-<source>Exclude</source>
-<target>Kizár</target>
-
-<source>Direct</source>
-<target>Közvetlen</target>
-
-<source>Follow</source>
-<target>Követ</target>
-
-<source>Copy NTFS permissions</source>
-<target>Másolja az NTFS jogosultságokat</target>
-
-<source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integráljon a helyi menübe külső alkalmazásokat. A következő makrók érhetők el:</target>
-
-<source>- full file or folder name</source>
-<target>- teljes fájl- vagy könyvtárnév</target>
-
-<source>- folder part only</source>
-<target>- csak a könyvtár része</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- A másik oldali megfelelőjét a következő fájlba: %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- A másik oldali megfelelőjét a következő könyvtárba: %item_folder%</target>
-
-<source>Restore all hidden windows and warnings?</source>
-<target>Visszaállítsa az összes rejtett ablakot és figyelmeztetést?</target>
-
-<source>Leave as unresolved conflict</source>
-<target>Hagyja feloldatlan ütközésként</target>
-
 <source>Replace</source>
 <target>Felülír</target>
 
@@ -1402,6 +1417,15 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Append a time stamp to each file name</source>
 <target>Minden fájlnévhez adjon egy-egy időbélyeget</target>
+
+<source>Comparison</source>
+<target>Összehasonlítás</target>
+
+<source>Synchronization</source>
+<target>Szinkronizálás</target>
+
+<source>Leave as unresolved conflict</source>
+<target>Hagyja feloldatlan ütközésként</target>
 
 <source>File</source>
 <target>Fájl</target>
