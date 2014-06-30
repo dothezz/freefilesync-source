@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SIMPLE_H_INCLUDED_18134135134135345489
-#define SIMPLE_H_INCLUDED_18134135134135345489
+#ifndef ZLIB_H_INCLUDED_428597064566
+#define ZLIB_H_INCLUDED_428597064566
 
 #include <zen/serialize.h>
 
@@ -22,15 +22,6 @@ BinContainer compress(const BinContainer& stream, int level); //throw ZlibIntern
 
 template <class BinContainer>
 BinContainer decompress(const BinContainer& stream);          //throw ZlibInternalError
-
-
-
-
-
-
-
-
-
 
 
 
@@ -94,13 +85,13 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
         std::copy(&*stream.begin(),
                   &*stream.begin() + sizeof(uncompressedSize),
                   reinterpret_cast<char*>(&uncompressedSize));
-        try
-        {
             //attention: contOut MUST NOT be empty! Else it will pass a nullptr to zlib_decompress() => Z_STREAM_ERROR although "uncompressedSize == 0"!!!
             //secondary bug: don't dereference iterator into empty container!
             if (uncompressedSize == 0) //cannot be 0: compress() directly maps empty -> empty container skipping zlib!
                 throw ZlibInternalError();
 
+			try
+        {
             contOut.resize(static_cast<size_t>(uncompressedSize)); //throw std::bad_alloc
         }
         catch (std::bad_alloc&) //most likely due to data corruption!
@@ -119,4 +110,4 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
 }
 }
 
-#endif //SIMPLE_H_INCLUDED_18134135134135345489
+#endif //ZLIB_H_INCLUDED_428597064566

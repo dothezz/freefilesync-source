@@ -67,8 +67,8 @@ struct DstHackCallback; //DST hack not required on Unix
 #endif
 
 //custom traverser with detail information about files
-//Win: client needs to handle duplicate file notifications! (FilePlusTraverser fallback)
-//directory may end with PATH_SEPARATOR
+//- client needs to handle duplicate file reports! (FilePlusTraverser fallback, retrying to read directory contents, ...)
+//- directory may end with PATH_SEPARATOR
 void traverseFolder(const Zstring& dirname, //throw()
                     TraverseCallback& sink,
                     DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied

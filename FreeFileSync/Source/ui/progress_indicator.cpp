@@ -102,7 +102,7 @@ public:
     Pimpl(wxFrame& parentWindow);
 
     void init(const Statistics& syncStat); //constructor/destructor semantics, but underlying Window is reused
-    void finalize(); //
+    void teardown();                       //
 
     void switchToCompareBytewise();
     void updateStatusPanelNow();
@@ -130,7 +130,15 @@ CompareProgressDialog::Pimpl::Pimpl(wxFrame& parentWindow) :
     syncStat_(nullptr),
     timeLastSpeedEstimateMs(-1000000) //some big number
 {
-    //init(); -> needed?
+    //make sure that standard height matches PHASE_COMPARING_CONTENT statistics layout
+    m_staticTextItemsFoundLabel->Hide();
+    m_staticTextItemsFound     ->Hide();
+
+    m_panelStatistics->Layout();
+    Layout();
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
 }
 
 
@@ -153,20 +161,26 @@ void CompareProgressDialog::Pimpl::init(const Statistics& syncStat)
     timeElapsed.restart(); //measure total time
 
     //initially hide status that's relevant for comparing bytewise only
-    bSizerFilesFound    ->Show(true);
-    bSizerFilesRemaining->Show(false);
-    sSizerSpeed         ->Show(false);
-    sSizerTimeRemaining ->Show(false);
+    m_staticTextItemsFoundLabel->Show();
+    m_staticTextItemsFound     ->Show();
+
+    m_staticTextItemsRemainingLabel->Hide();
+    bSizerItemsRemaining           ->Show(false);
+
+    m_staticTextTimeRemainingLabel->Hide();
+    m_staticTextTimeRemaining     ->Hide();
+
+    m_gauge2->Hide();
+    m_staticTextSpeed->Hide();
 
     updateStatusPanelNow();
 
-    m_gauge2->Hide();
-    bSizer42->Layout();
+    m_panelStatistics->Layout();
     Layout();
 }
 
 
-void CompareProgressDialog::Pimpl::finalize()
+void CompareProgressDialog::Pimpl::teardown()
 {
     syncStat_ = nullptr;
     parentWindow_.SetTitle(titleTextBackup);
@@ -183,13 +197,19 @@ void CompareProgressDialog::Pimpl::switchToCompareBytewise()
     binCompStartMs = timeElapsed.timeMs();
 
     //show status for comparing bytewise
-    bSizerFilesFound    ->Show(false);
-    bSizerFilesRemaining->Show(true);
-    sSizerSpeed         ->Show(true);
-    sSizerTimeRemaining ->Show(true);
+    m_staticTextItemsFoundLabel->Hide();
+    m_staticTextItemsFound     ->Hide();
 
-    m_gauge2->Show();
-    bSizer42->Layout();
+    m_staticTextItemsRemainingLabel->Show();
+    bSizerItemsRemaining           ->Show(true);
+
+    m_staticTextTimeRemainingLabel->Show();
+    m_staticTextTimeRemaining     ->Show();
+
+    m_gauge2         ->Show();
+    m_staticTextSpeed->Show();
+
+    m_panelStatistics->Layout();
     Layout();
 }
 
@@ -198,8 +218,6 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
 {
     if (!syncStat_) //no comparison running!!
         return;
-
-    const wxString& scannedObjects = toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
 
     auto setTitle = [&](const wxString& title)
     {
@@ -211,18 +229,25 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
     const int64_t timeNowMs = timeElapsed.timeMs();
 
     //status texts
-    setText(*m_textCtrlStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
+    setText(*m_staticTextStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
 
     //write status information to taskbar, parent title ect.
     switch (syncStat_->currentPhase())
     {
         case ProcessCallback::PHASE_NONE:
         case ProcessCallback::PHASE_SCANNING:
+        {
+            const wxString& scannedObjects = toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
+
             //dialog caption, taskbar
             setTitle(scannedObjects + L" - " + _("Scanning..."));
             if (taskbar_.get()) //support Windows 7 taskbar
                 taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
-            break;
+
+            //nr of scanned objects
+            setText(*m_staticTextItemsFound, scannedObjects, &layoutChanged);
+        }
+        break;
 
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         {
@@ -246,7 +271,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
 
             //remaining objects and bytes for file comparison
-            setText(*m_staticTextFilesRemaining, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextItemsRemaining, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
 
             //remaining time and speed: only visible during binary comparison
@@ -259,14 +284,14 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
                     if (numeric::dist(binCompStartMs, timeNowMs) >= 1000) //discard stats for first second: probably messy
                         perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNowMs);
 
-                    //current speed -> Win 7 copy uses 1 sec update interval instead
-                    Opt<std::wstring> bps = perf->getBytesPerSecond();
-                    setText(*m_staticTextSpeed, bps ? *bps : L"-", &layoutChanged);
-
                     //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
                     //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
                     Opt<double> remTimeSec = perf->getRemainingTimeSec(to<double>(dataTotal - dataCurrent));
-                    setText(*m_staticTextRemTime, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
+                    setText(*m_staticTextTimeRemaining, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
+
+                    //current speed -> Win 7 copy uses 1 sec update interval instead
+                    Opt<std::wstring> bps = perf->getBytesPerSecond();
+                    setText(*m_staticTextSpeed, bps ? *bps : L"-", &layoutChanged);
                 }
         }
         break;
@@ -276,9 +301,6 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             break;
     }
 
-    //nr of scanned objects
-    setText(*m_staticTextScanned, scannedObjects, &layoutChanged);
-
     //time elapsed
     const int64_t timeElapSec = timeNowMs / 1000;
     setText(*m_staticTextTimeElapsed,
@@ -287,7 +309,10 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
 
     if (layoutChanged)
-        bSizer42->Layout();
+    {
+        m_panelStatistics->Layout();
+        Layout();
+    }
 
     //do the ui update
     wxTheApp->Yield();
@@ -309,9 +334,9 @@ void CompareProgressDialog::init(const Statistics& syncStat)
     pimpl->init(syncStat);
 }
 
-void CompareProgressDialog::finalize()
+void CompareProgressDialog::teardown()
 {
-    pimpl->finalize();
+    pimpl->teardown();
 }
 
 void CompareProgressDialog::switchToCompareBytewise()
@@ -1250,6 +1275,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     this->GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     pnl.Layout();
 
+    this->Center(); //call *after* dialog layout update and *before* wxWindow::Show()!
+
     if (showProgress)
     {
         this->Show();
@@ -1265,8 +1292,6 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     }
     else
         minimizeToTray();
-
-    this->Centre(wxBOTH); //call *after* dialog layout update!
 }
 
 

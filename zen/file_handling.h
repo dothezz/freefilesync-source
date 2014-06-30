@@ -32,7 +32,6 @@ void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSym
 UInt64 getFilesize(const Zstring& filename); //throw FileError
 UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 
-//file handling
 bool removeFile(const Zstring& filename); //throw FileError; return "false" if file is not existing
 void removeDirectory(const Zstring& directory, //throw FileError
                      const std::function<void (const Zstring& filename)>& onBeforeFileDeletion = nullptr,  //optional;
@@ -41,7 +40,7 @@ void removeDirectory(const Zstring& directory, //throw FileError
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
-bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
+bool supportsPermissions(const Zstring& dirname); //throw FileError, dereferences symlinks
 
 //if parent directory not existing: create recursively:
 void makeDirectory(const Zstring& directory, bool failIfExists = false); //throw FileError, ErrorTargetExisting

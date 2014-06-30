@@ -146,13 +146,26 @@ class GridDataRight;
 
 struct IconManager
 {
-    IconManager(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer::IconSize sz) : iconBuffer(sz),
+    IconManager(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer::IconSize sz) :
+		iconBuffer(sz),
+        fileIcon       (IconBuffer::genericFileIcon(sz)),
+        dirIcon        (IconBuffer::genericDirIcon (sz)),
+		linkOverlayIcon(IconBuffer::linkOverlayIcon(sz)),
         iconUpdater(make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
 
     void startIconUpdater();
     IconBuffer& refIconBuffer() { return iconBuffer; }
+
+	wxBitmap getGenericFileIcon() const { return fileIcon;        }
+	wxBitmap getGenericDirIcon () const { return dirIcon;         }
+	wxBitmap getLinkOverlayIcon() const { return linkOverlayIcon; }
+
 private:
     IconBuffer iconBuffer;
+        const wxBitmap fileIcon;
+        const wxBitmap dirIcon;
+		const wxBitmap linkOverlayIcon;
+
     std::unique_ptr<IconUpdater> iconUpdater; //bind ownership to GridDataRim<>!
 };
 
@@ -208,8 +221,7 @@ public:
     GridDataRim(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataBase(grid, gridDataView) {}
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
-
-
+	
     void updateNewAndGetUnbufferedIcons(std::vector<Zstring>& newLoad) //loads all not yet drawn icons
     {
         if (iconMgr_)
@@ -530,14 +542,14 @@ private:
 
                 wxBitmap fileIcon;
                 if (ii.drawAsFolder)
-                    fileIcon = iconMgr_->refIconBuffer().genericDirIcon();
+                    fileIcon = iconMgr_->getGenericDirIcon();
                 else if (!ii.iconPath.empty()) //retrieve file icon
                 {
                     if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.iconPath))
                         fileIcon = *tmpIco;
                     else
                     {
-                        fileIcon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
+                        fileIcon = iconMgr_->getGenericFileIcon(); //better than nothing
                         setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
                         //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
                         //see repaint behavior of ::ScrollWindow() function!
@@ -561,7 +573,7 @@ private:
                     drawIcon(fileIcon);
 
                     if (ii.drawAsLink)
-                        drawIcon(iconMgr_->refIconBuffer().linkOverlayIcon());
+                        drawIcon(iconMgr_->getLinkOverlayIcon());
                 }
             }
             rectTmp.x     += iconSize;
@@ -729,6 +741,8 @@ private:
     }
 
     std::shared_ptr<IconManager> iconMgr_; //optional
+
+
     std::vector<char> failedLoads; //effectively a vector<bool> of size "number of rows"
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
 };
@@ -1717,7 +1731,7 @@ void IconManager::startIconUpdater() { if (iconUpdater) iconUpdater->start(); }
 
 void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz)
 {
-    auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft .getDataProvider());
+    auto* provLeft  = dynamic_cast<GridDataLeft *>(gridLeft .getDataProvider());
     auto* provRight = dynamic_cast<GridDataRight*>(gridRight.getDataProvider());
 
     if (provLeft && provRight)

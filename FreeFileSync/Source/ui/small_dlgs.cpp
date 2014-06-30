@@ -98,26 +98,32 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //generate logo: put *after* first Fit()
     Layout(); //make sure m_panelLogo has final width (required by wxGTK)
 
-    wxImage titelImage = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
+    wxImage appnameImg = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
                                              wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"),
                                              *wxBLACK); //accessibility: align foreground/background colors!
-    wxImage buildImage = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
-                                             *wxNORMAL_FONT,
-                                             *wxBLACK);
-    wxImage headerImage = stackImages(titelImage, buildImage, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
+    wxImage buildImg = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
+                                           *wxNORMAL_FONT,
+                                           *wxBLACK);
+    wxImage versionImage = stackImages(appnameImg, buildImg, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
 
-    wxBitmap bmpLogo;
+    const int BORDER_SIZE = 5;
+    wxBitmap headerBmp(GetClientSize().GetWidth(), versionImage.GetHeight() + 2 * BORDER_SIZE);
     {
-        wxImage tmp = getResourceImage(L"logo").ConvertToImage();
-        tmp.Resize(wxSize(GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
-        bmpLogo = wxBitmap(tmp);
+        wxMemoryDC dc(headerBmp);
+        dc.SetBackground(*wxWHITE_BRUSH);
+        dc.Clear();
+
+        const wxBitmap& bmpGradient = getResourceImage(L"logo_gradient");
+        dc.DrawBitmap(bmpGradient, wxPoint(0, (headerBmp.GetHeight() - bmpGradient.GetHeight()) / 2));
+
+        const int logoSize = versionImage.GetHeight();
+        const wxBitmap logoBmp = getResourceImage(L"FreeFileSync").ConvertToImage().Scale(logoSize, logoSize, wxIMAGE_QUALITY_HIGH);
+        dc.DrawBitmap(logoBmp, wxPoint(2 * BORDER_SIZE, (headerBmp.GetHeight() - logoBmp.GetHeight()) / 2));
+
+        dc.DrawBitmap(versionImage, wxPoint((headerBmp.GetWidth () - versionImage.GetWidth ()) / 2,
+                                            (headerBmp.GetHeight() - versionImage.GetHeight()) / 2));
     }
-    {
-        wxMemoryDC dc(bmpLogo);
-        dc.DrawBitmap(headerImage, wxPoint((bmpLogo.GetWidth () - headerImage.GetWidth ()) / 2,
-                                           (bmpLogo.GetHeight() - headerImage.GetHeight()) / 2));
-    }
-    m_bitmapLogo->SetBitmap(bmpLogo);
+    m_bitmapLogo->SetBitmap(headerBmp);
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!

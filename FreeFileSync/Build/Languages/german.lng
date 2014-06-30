@@ -7,6 +7,9 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Reset layout</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -106,8 +109,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Der entsprechende Ordner wird als leer angesehen.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Die folgenden Ordner haben abhängige Pfade. Achtung beim Festlegen der Synchronisationsregeln:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Die folgenden Ordnerpfade sind voneinander abhängig:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Die Datei %x hat ein ungültiges Datum.</target>
@@ -329,7 +332,7 @@
 <target>Laufwerksname %x ist kein Teil des Dateipfades %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
-<target>Stop wurde eingeleitet: Warte bis die aktuelle Operation beendet ist...</target>
+<target>Unterbrechung wurde eingeleitet: Warte bis die aktuelle Operation beendet ist...</target>
 
 <source>Unable to create time stamp for versioning:</source>
 <target>Der Zeitstempel für die Versionierung kann nicht erstellt werden:</target>
@@ -435,9 +438,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Show error</source>
 <target>&Zeige Fehler</target>
 
-<source>&Exit</source>
-<target>&Beenden</target>
-
 <source>Incorrect command line:</source>
 <target>Ungültige Befehlszeile:</target>
 
@@ -501,8 +501,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Verifizierungsfehler: %x und %y haben unterschiedlichen Inhalt.</target>
 
-<source>Cannot find %x.</source>
-<target>%x wurde nicht gefunden.</target>
+<source>Cannot find folder %x.</source>
+<target>Der Ordner %x wurde nicht gefunden.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Der Zielordner %x existiert bereits.</target>
@@ -531,7 +531,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Available:</source>
 <target>Verfügbar:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<source>A folder will be modified that is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Ein Ordner wird verändert werden, der Teil mehrerer Ordnerpaare ist. Bitte überprüfen Sie die Synchronisationseinstellungen.</target>
 
 <source>Synchronizing folder pair:</source>
@@ -544,7 +544,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Auftragsname</target>
 
 <source>Synchronization stopped</source>
-<target>Synchronisation gestoppt</target>
+<target>Synchronisation unterbrochen</target>
 
 <source>Synchronization completed with errors</source>
 <target>Synchronisation mit Fehlern abgeschlossen</target>
@@ -562,7 +562,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Speichere Protokolldatei %x...</target>
 
 <source>Stopped</source>
-<target>Angehalten</target>
+<target>Unterbrochen</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Sie können auf FreeFileSyncs Hauptfenster wechseln, um das Problem zu beheben.</target>
@@ -696,11 +696,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Save as &batch job...</source>
 <target>Speichern als Batch-&Auftrag...</target>
 
-<source>1. &Compare</source>
-<target>1. &Vergleichen</target>
+<source>Start &comparison</source>
+<target>&Vergleich starten</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchronisieren</target>
+<source>Start synchronization</source>
+<target>Synchronisation starten</target>
+
+<source>File</source>
+<target>Datei</target>
 
 <source>&Options</source>
 <target>&Optionen</target>
@@ -717,14 +720,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Tools</source>
 <target>E&xtras</target>
 
+<source>&Check for new version</source>
+<target>&Auf neue Version prüfen</target>
+
 <source>&Check now</source>
 <target>&Jetzt prüfen</target>
 
 <source>Check &automatically once a week</source>
 <target>&Automatisch wöchentlich prüfen</target>
-
-<source>&Check for new version</source>
-<target>&Auf neue Version prüfen</target>
 
 <source>Cancel</source>
 <target>Abbrechen</target>
@@ -777,14 +780,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Statistics:</source>
 <target>Statistiken:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Anzahl der zu erstellenden Dateien und Ordner</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Anzahl der zu löschenden Dateien und Ordner</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Anzahl der zu überschreibenden Dateien</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Anzahl der zu löschenden Dateien und Ordner</target>
+<source>Number of files and folders that will be created</source>
+<target>Anzahl der zu erstellenden Dateien und Ordner</target>
 
 <source>Total bytes to copy</source>
 <target>Gesamtmenge der zu kopierenden Daten</target>
@@ -863,8 +866,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Delete or overwrite files permanently</source>
 <target>Dateien endgültig löschen oder überschreiben</target>
 
-<source>Recycle bin</source>
-<target>Papierkorb</target>
+<source>&Recycle bin</source>
+<target>&Papierkorb</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
@@ -880,9 +883,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Handle errors:</source>
 <target>Fehlerbehandlung:</target>
-
-<source>Ignore</source>
-<target>Ignorieren</target>
 
 <source>Hide all error and warning messages</source>
 <target>Alle Fehler- und Warnmeldungen unterdrücken</target>
@@ -911,9 +911,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Items found:</source>
 <target>Gefundene Elemente:</target>
 
-<source>Speed:</source>
-<target>Geschwindigkeit:</target>
-
 <source>Time remaining:</source>
 <target>Verbleibende Zeit:</target>
 
@@ -939,7 +936,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Erstellt eine Batchdatei für die unbeaufsichtigte Synchronisation. Zum Starten die Datei doppelklicken oder in einen Taskplaner eintragen: %x</target>
 
 <source>Stop synchronization at first error</source>
-<target>Synchronisation beim ersten Fehler anhalten</target>
+<target>Synchronisation beim ersten Fehler unterbrechen</target>
 
 <source>Run minimized</source>
 <target>Minimiert ausführen</target>
@@ -955,9 +952,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>How can I schedule a batch job?</source>
 <target>Wie können Batch-Aufträge in den Taskplaner eingetragen werden?</target>
-
-<source>&Recycle bin</source>
-<target>&Papierkorb</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Die folgenden Einstellungen werden für alle Synchronisationsaufgaben verwendet.</target>
@@ -1070,17 +1064,14 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Main Bar</source>
 <target>Hauptleiste</target>
 
-<source>Compare both sides</source>
-<target>Beide Seiten vergleichen</target>
+<source>Start comparison</source>
+<target>Vergleich starten</target>
 
 <source>Comparison settings</source>
 <target>Vergleichseinstellungen</target>
 
 <source>Synchronization settings</source>
 <target>Synchronisationseinstellungen</target>
-
-<source>Start synchronization</source>
-<target>Synchronisation starten</target>
 
 <source>Confirm</source>
 <target>Bestätigen</target>
@@ -1165,9 +1156,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Select time span...</source>
 <target>Zeitspanne auswählen...</target>
-
-<source>Default view</source>
-<target>Standardansicht</target>
 
 <source>Show "%x"</source>
 <target>Zeige "%x"</target>
@@ -1426,9 +1414,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>
-
-<source>File</source>
-<target>Datei</target>
 
 <source>YYYY-MM-DD hhmmss</source>
 <target>JJJJ-MM-TT hhmmss</target>

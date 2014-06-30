@@ -96,22 +96,22 @@ std::wstring formatUnitTime(int val, UnitRemTime unit)
 
 
 template <int M, int N>
-std::wstring roundToBlock(double timeHigh,
+std::wstring roundToBlock(double timeInHigh,
                           UnitRemTime unitHigh, const int (&stepsHigh)[M],
                           int unitLowPerHigh,
                           UnitRemTime unitLow, const int (&stepsLow)[N])
 {
     assert(unitLowPerHigh > 0);
     const double granularity = 0.1;
-    const double timeLow = timeHigh * unitLowPerHigh;
-    const int blockSizeLow = granularity * timeHigh < 1 ?
-                             numeric::nearMatch(granularity * timeLow,  std::begin(stepsLow),  std::end(stepsLow)):
-                             numeric::nearMatch(granularity * timeHigh, std::begin(stepsHigh), std::end(stepsHigh)) * unitLowPerHigh;
-    const int roundedTimeLow = numeric::round(timeLow / blockSizeLow) * blockSizeLow;
+    const double timeInLow = timeInHigh * unitLowPerHigh;
+    const int blockSizeLow = granularity * timeInHigh < 1 ?
+                             numeric::nearMatch(granularity * timeInLow,  std::begin(stepsLow),  std::end(stepsLow)):
+                             numeric::nearMatch(granularity * timeInHigh, std::begin(stepsHigh), std::end(stepsHigh)) * unitLowPerHigh;
+    const int roundedtimeInLow = numeric::round(timeInLow / blockSizeLow) * blockSizeLow;
 
-    std::wstring output = formatUnitTime(roundedTimeLow / unitLowPerHigh, unitHigh);
+    std::wstring output = formatUnitTime(roundedtimeInLow / unitLowPerHigh, unitHigh);
     if (unitLowPerHigh > blockSizeLow)
-        output += L" " + formatUnitTime(roundedTimeLow % unitLowPerHigh, unitLow);
+        output += L" " + formatUnitTime(roundedtimeInLow % unitLowPerHigh, unitLow);
     return output;
 };
 }

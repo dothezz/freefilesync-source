@@ -655,7 +655,7 @@ The command is triggered if:
 <target>פעולה</target>
 
 <source>Drag && drop</source>
-<target>גרור &והשלך</target>
+<target></target>
 
 <source>Local comparison settings</source>
 <target>הגדרות השוואה מקומיות</target>

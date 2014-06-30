@@ -28,26 +28,23 @@ public:
     IconBuffer(IconSize sz);
     ~IconBuffer();
 
-    static int getSize(IconSize icoSizeType); //expected and *maximum* icon size in pixel
+    static int getSize(IconSize sz); //expected and *maximum* icon size in pixel
     int getSize() const { return getSize(iconSizeType); } //
-
-    const wxBitmap& genericFileIcon() { return genFileIcon; }
-    const wxBitmap& genericDirIcon () { return genDirIcon;  }
-    const wxBitmap& linkOverlayIcon() { return linkIcon;    }
 
     bool readyForRetrieval(const Zstring& filename);
     Opt<wxBitmap> retrieveFileIcon(const Zstring& filename); //... and mark as hot
 
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
+    static wxBitmap genericFileIcon(IconSize sz);
+    static wxBitmap genericDirIcon (IconSize sz);
+    static wxBitmap linkOverlayIcon(IconSize sz);
+
 private:
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl;
 
     const IconSize iconSizeType;
-    const wxBitmap genDirIcon;
-    const wxBitmap genFileIcon;
-    const wxBitmap linkIcon;
 };
 
 bool hasLinkExtension(const Zstring& filename);

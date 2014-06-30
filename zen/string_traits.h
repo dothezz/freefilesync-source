@@ -81,6 +81,7 @@ public:
 
 
 template <class S, bool isStringClass>  struct GetCharTypeImpl : ResultType<NullType> {};
+
 template <class S>
 struct GetCharTypeImpl<S, true> :
         ResultType<

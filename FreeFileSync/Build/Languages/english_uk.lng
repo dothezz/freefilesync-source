@@ -7,6 +7,24 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Start comparison</source>
+<target></target>
+
+<source>New</source>
+<target></target>
+
+<source>Start &comparison</source>
+<target></target>
+
+<source>A folder will be modified that is part of multiple folder pairs. Please review synchronization settings.</source>
+<target></target>
+
+<source>Cannot find folder %x.</source>
+<target></target>
+
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -105,9 +123,6 @@
 
 <source>The corresponding folder will be considered as empty.</source>
 <target>The corresponding folder will be considered as empty.</target>
-
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>The following folders have dependent paths. Be careful when setting up synchronisation rules:</target>
 
 <source>File %x has an invalid date.</source>
 <target>File %x has an invalid date.</target>
@@ -435,9 +450,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Show error</target>
 
-<source>&Exit</source>
-<target>&Exit</target>
-
 <source>Incorrect command line:</source>
 <target>Incorrect command line:</target>
 
@@ -501,9 +513,6 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Data verification error: %x and %y have different content.</target>
 
-<source>Cannot find %x.</source>
-<target>Cannot find %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Target folder %x already existing.</target>
 
@@ -530,9 +539,6 @@ The command is triggered if:
 
 <source>Available:</source>
 <target>Available:</target>
-
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>A folder will be modified which is part of multiple folder pairs. Please review synchronisation settings.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronising folder pair:</target>
@@ -696,11 +702,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>Save as &batch job...</target>
 
-<source>1. &Compare</source>
-<target>1. &Compare</target>
+<source>Start synchronization</source>
+<target>Start synchronisation</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchronise</target>
+<source>File</source>
+<target>File</target>
 
 <source>&Options</source>
 <target>&Options</target>
@@ -717,14 +723,14 @@ The command is triggered if:
 <source>&Tools</source>
 <target>&Tools</target>
 
+<source>&Check for new version</source>
+<target>&Check for new version</target>
+
 <source>&Check now</source>
 <target>&Check now</target>
 
 <source>Check &automatically once a week</source>
 <target>Check &automatically once a week</target>
-
-<source>&Check for new version</source>
-<target>&Check for new version</target>
 
 <source>Cancel</source>
 <target>Cancel</target>
@@ -863,8 +869,8 @@ The command is triggered if:
 <source>Delete or overwrite files permanently</source>
 <target>Delete or overwrite files permanently</target>
 
-<source>Recycle bin</source>
-<target>Recycle bin</target>
+<source>&Recycle bin</source>
+<target>&Recycle bin</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Back up deleted and overwritten files in the recycle bin</target>
@@ -880,9 +886,6 @@ The command is triggered if:
 
 <source>Handle errors:</source>
 <target>Handle errors:</target>
-
-<source>Ignore</source>
-<target>Ignore</target>
 
 <source>Hide all error and warning messages</source>
 <target>Hide all error and warning messages</target>
@@ -910,9 +913,6 @@ The command is triggered if:
 
 <source>Items found:</source>
 <target>Elements found:</target>
-
-<source>Speed:</source>
-<target>Speed:</target>
 
 <source>Time remaining:</source>
 <target>Time remaining:</target>
@@ -955,9 +955,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>How can I schedule a batch job?</target>
-
-<source>&Recycle bin</source>
-<target>&Recycle bin</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>The following settings are used for all synchronisation jobs.</target>
@@ -1070,17 +1067,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Main Bar</target>
 
-<source>Compare both sides</source>
-<target>Compare both sides</target>
-
 <source>Comparison settings</source>
 <target>Comparison settings</target>
 
 <source>Synchronization settings</source>
 <target>Synchronisation settings</target>
-
-<source>Start synchronization</source>
-<target>Start synchronisation</target>
 
 <source>Confirm</source>
 <target>Confirm</target>
@@ -1426,9 +1417,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
-
-<source>File</source>
-<target>File</target>
 
 <source>YYYY-MM-DD hhmmss</source>
 <target>YYYY-MM-DD hhmmss</target>

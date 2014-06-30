@@ -785,7 +785,7 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 
     in["DeletionPolicy"  ](syncCfg.handleDeletion);
     in["VersioningFolder"](syncCfg.versioningDirectory);
-    in["VersioningFolder"].get()->getAttribute("Style", syncCfg.versioningStyle);
+    in["VersioningFolder"].attribute("Style", syncCfg.versioningStyle);
 }
 
 
@@ -1185,7 +1185,6 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
 
     out["DeletionPolicy"  ](syncCfg.handleDeletion);
     out["VersioningFolder"](syncCfg.versioningDirectory);
-    //out["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
     out["VersioningFolder"].attribute("Style", syncCfg.versioningStyle);
 }
 

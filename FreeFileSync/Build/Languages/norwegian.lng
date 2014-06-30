@@ -305,7 +305,7 @@
 <target>%x emner/sek</target>
 
 <source>Show in Explorer</source>
-<target>Åpne filplasering</target>
+<target>Åpne filplassering</target>
 
 <source>Open with default application</source>
 <target>Åpne med standardprogram</target>
@@ -727,7 +727,7 @@ Kommandoen udføres hvis:
 <target>&Søk etter oppdatering</target>
 
 <source>Cancel</source>
-<target>Annuller</target>
+<target>Avbryt</target>
 
 <source>Compare</source>
 <target>Analysér</target>

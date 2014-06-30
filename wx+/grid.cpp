@@ -235,7 +235,7 @@ void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString&
 CornerWin  RowLabelWin  ColLabelWin  MainWin
 
 */
-class Grid::SubWindow : public wxWindow
+class Grid::SubWindow : public wxWindow 
 {
 public:
     SubWindow(Grid& parent) :
@@ -863,6 +863,7 @@ public:
             ColLabelWin& colLabelWin) : SubWindow(parent),
         rowLabelWin_(rowLabelWin),
         colLabelWin_(colLabelWin),
+		cursorRow(0),
         selectionAnchor(0),
         gridUpdatePending(false)
     {

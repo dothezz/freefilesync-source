@@ -1155,11 +1155,9 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
         const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(baseDirPf), false);
 
         bool recExists = false;
-        try
-        {
+        tryReportingError([&]{
             recExists = recycleBinExists(baseDirPf, [&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
-        }
-        catch (const FileError& e) { callback.reportError(e.toString()); /*throw?*/ }
+        }, callback);
 
         hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recExists));
         return recExists;

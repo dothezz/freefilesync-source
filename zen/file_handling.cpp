@@ -2285,7 +2285,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         4. copy file from USB to local drive via explorer
         =>
         NTFS <-> FAT, file exists on both sides; mod times match, DST hack on USB stick causes 1-hour offset when comparing in FFS.
-        When syncing modification time is copied correctly, but new DST hack fails to apply and old creation time is reused (see above).
+        When syncing, modification time is copied correctly, but new DST hack fails to apply and old creation time is reused (see above).
         Unfortunately, the old DST hash matches mod time! => On next comparison FFS will *still* see both sides as different!!!!!!!!!
         */
 

@@ -247,7 +247,6 @@ size_t unicodeLength(const CharString& str, char) //utf8
     while (strFirst < strLast) //[!]
     {
         ++len;
-
         size_t utf8len = getUtf8Len(*strFirst);
         if (utf8len == 0) ++utf8len; //invalid utf8 character
         strFirst += utf8len;
@@ -311,13 +310,15 @@ size_t findUnicodePos(const CharString& str, size_t unicodePos, char) //utf8-cha
     size_t utfPos = 0;
     while (unicodePos-- > 0)
     {
+        if (utfPos >= strLen)
+            return strLen;
+
         size_t utf8len = getUtf8Len(strFirst[utfPos]);
         if (utf8len == 0) ++utf8len; //invalid utf8 character
         utfPos += utf8len;
-
-        if (utfPos >= strLen)
-            return strLen;
     }
+    if (utfPos >= strLen)
+        return strLen;
     return utfPos;
 }
 
@@ -333,13 +334,15 @@ size_t findUnicodePosWide(const WideString& str, size_t unicodePos, Int2Type<2>)
     size_t utfPos = 0;
     while (unicodePos-- > 0)
     {
-        size_t utf16len = getUtf16Len(strFirst[utfPos]);
-        if (utf16len == 0) ++utf16len; //invalid utf16 character
-        utfPos += utf16len;
-
         if (utfPos >= strLen)
             return strLen;
+
+		size_t utf16len = getUtf16Len(strFirst[utfPos]);
+        if (utf16len == 0) ++utf16len; //invalid utf16 character
+        utfPos += utf16len;
     }
+	if (utfPos >= strLen)
+		return strLen;
     return utfPos;
 }
 

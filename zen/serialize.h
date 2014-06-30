@@ -4,13 +4,12 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SERIALIZE_H_INCLUDED
-#define SERIALIZE_H_INCLUDED
+#ifndef SERIALIZE_H_INCLUDED_83940578357
+#define SERIALIZE_H_INCLUDED_83940578357
 
 #include <cstdint>
 #include <zen/string_base.h>
 #include <zen/file_io.h>
-
 
 namespace zen
 {
@@ -134,16 +133,6 @@ template <         class BinInputStream> void readArray    (BinInputStream& stre
 
 
 
-
-
-
-
-
-
-
-
-
-
 //-----------------------implementation-------------------------------
 template <class BinContainer> inline
 void saveBinStream(const Zstring& filename, const BinContainer& cont) //throw FileError
@@ -207,40 +196,43 @@ void writeContainer(BinOutputStream& stream, const C& cont) //don't even conside
 
 
 template <class BinInputStream> inline
-void readArray(BinInputStream& stream, void* data, size_t len)
+void readArray(BinInputStream& stream, void* data, size_t len) //throw UnexpectedEndOfStreamError
 {
-    const char* const src = static_cast<const char*>(stream.requestRead(len)); //expect external write of len bytes
+	//expect external write of len bytes:
+    const char* const src = static_cast<const char*>(stream.requestRead(len)); //throw UnexpectedEndOfStreamError
     std::copy(src, src + len, static_cast<char*>(data));
 }
 
 
 template <class N, class BinInputStream> inline
-N readNumber(BinInputStream& stream)
+N readNumber(BinInputStream& stream) //throw UnexpectedEndOfStreamError
 {
     assert_static((IsArithmetic<N>::value || IsSameType<N, bool>::value));
     N num = 0;
-    readArray(stream, &num, sizeof(N));
+    readArray(stream, &num, sizeof(N)); //throw UnexpectedEndOfStreamError
     return num;
 }
 
 
 template <class C, class BinInputStream> inline
-C readContainer(BinInputStream& stream)
+C readContainer(BinInputStream& stream) //throw UnexpectedEndOfStreamError
 {
     C cont;
     auto strLength = readNumber<std::uint32_t>(stream);
-    if (strLength > 0)
+	if (strLength > 0)
+	{
         try
         {
             cont.resize(strLength); //throw std::bad_alloc
-            readArray(stream, &*cont.begin(), sizeof(typename C::value_type) * strLength);
         }
         catch (std::bad_alloc&) //most likely this is due to data corruption!
         {
             throw UnexpectedEndOfStreamError();
         }
+            readArray(stream, &*cont.begin(), sizeof(typename C::value_type) * strLength); //throw UnexpectedEndOfStreamError
+	}
     return cont;
 }
 }
 
-#endif //SERIALIZE_H_INCLUDED
+#endif //SERIALIZE_H_INCLUDED_83940578357

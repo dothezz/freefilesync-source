@@ -77,22 +77,22 @@
 <target>Sintassi:</target>
 
 <source>global config file:</source>
-<target></target>
+<target>file di configurazione globale:</target>
 
 <source>config files:</source>
-<target></target>
+<target>file di configurazione:</target>
 
 <source>directory</source>
 <target>directory</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
+<target>Percorso di un file GlobalSettings.xml alternativo.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Qualsiasi numero di FreeFileSync.ffs_gui e/o File di configurazione .ffs_batch.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
+<target>Qualsiasi numero di coppie di directory alternative per al massimo un file di configurazione.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Impossibile trovare le seguenti cartelle:</target>
@@ -658,10 +658,10 @@ Il comando è attivato se:
 <target>Trascina</target>
 
 <source>Local comparison settings</source>
-<target></target>
+<target>Impostazioni di confronto locali</target>
 
 <source>Local synchronization settings</source>
-<target></target>
+<target>Impostazioni di sincronizzazione locale</target>
 
 <source>Local filter</source>
 <target>Filtro Locale</target>
@@ -673,10 +673,10 @@ Il comando è attivato se:
 <target>Nessuno</target>
 
 <source>Remove local settings</source>
-<target></target>
+<target>Rimuovere le impostazioni locali</target>
 
 <source>Reset local filter</source>
-<target></target>
+<target>Azzera filtro locale</target>
 
 <source>Copy</source>
 <target>Copia</target>
@@ -685,7 +685,7 @@ Il comando è attivato se:
 <target>Incolla</target>
 
 <source>Local Synchronization Settings</source>
-<target></target>
+<target>Impostazioni di sincronizzazione locale</target>
 
 <source>&New</source>
 <target>&Nuovo</target>
@@ -703,7 +703,7 @@ Il comando è attivato se:
 <target>2. &Sincronizza</target>
 
 <source>&Options</source>
-<target></target>
+<target>&Opzioni</target>
 
 <source>&Language</source>
 <target>&Lingua</target>
@@ -717,14 +717,14 @@ Il comando è attivato se:
 <source>&Tools</source>
 <target>&Strumenti</target>
 
+<source>&Check for new version</source>
+<target>&Controlla nuova versione</target>
+
 <source>&Check now</source>
 <target>&Controlla ora</target>
 
 <source>Check &automatically once a week</source>
 <target>Controlla &automaticamente una volta a settimana</target>
-
-<source>&Check for new version</source>
-<target>&Controlla nuova versione</target>
 
 <source>Cancel</source>
 <target>Annulla</target>
@@ -760,13 +760,13 @@ Il comando è attivato se:
 <target>Salva</target>
 
 <source>Save as GUI job</source>
-<target></target>
+<target>Salva come lavoro GUI</target>
 
 <source>Save as batch job</source>
 <target>Salva come processo batch</target>
 
 <source>Save as...</source>
-<target></target>
+<target>Salva come ...</target>
 
 <source>View type:</source>
 <target>Visualizza tipo:</target>
@@ -790,7 +790,7 @@ Il comando è attivato se:
 <target>Bytes totali da copiare</target>
 
 <source>Use local settings:</source>
-<target></target>
+<target>Utilizza impostazioni locali:</target>
 
 <source>Select a variant:</source>
 <target>Scegli una variante:</target>
@@ -808,7 +808,7 @@ Il comando è attivato se:
 <target>Maggiori informazioni</target>
 
 <source>Local settings:</source>
-<target></target>
+<target>Impostazioni Locali:</target>
 
 <source>Include:</source>
 <target>Includi:</target>
@@ -910,9 +910,6 @@ Il comando è attivato se:
 
 <source>Items found:</source>
 <target>Oggetti trovati:</target>
-
-<source>Speed:</source>
-<target>Velocita':</target>
 
 <source>Time remaining:</source>
 <target>Tempo rimanente:</target>
@@ -1044,13 +1041,13 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Elimina Elementi</target>
 
 <source>Options</source>
-<target></target>
+<target>Opzioni</target>
 
 <source>Select Time Span</source>
 <target>Selezionare Intervallo di Tempo</target>
 
 <source>&Preferences...</source>
-<target></target>
+<target>&Preferenze...</target>
 
 <source>Folder Pairs</source>
 <target>Coppie di Cartelle</target>
@@ -1200,7 +1197,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Impostazioni di Sincronizzazione</target>
 
 <source>Reset filter</source>
-<target></target>
+<target>Azzera il filtro</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostra file esistenti solo a sinistra</target>
@@ -1338,7 +1335,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 </target>
 
 <source>Preferences</source>
-<target></target>
+<target>Preferenze</target>
 
 <source>Copy NTFS permissions</source>
 <target>Copia permessi NTFS</target>
@@ -1365,7 +1362,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Identifica e propaga cambiamenti su entrambi i lati. Cancellazioni, spostamenti e conflitti sono identificati automaticamente usando un database.</target>
 
 <source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
-<target>Creare un backup specchio della cartella di sinistra aggiornando la cartella giusta.</target>
+<target>Creare un backup specchio della cartella di sinistra aggiornando la cartella destra.</target>
 
 <source>Copy new and updated files to the right folder.</source>
 <target>Copiare i file nuovi e aggiornati nella cartella destra.</target>
@@ -1419,10 +1416,10 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Aggiunge un'impronta per ogni nome di file</target>
 
 <source>Comparison</source>
-<target></target>
+<target>Confronto</target>
 
 <source>Synchronization</source>
-<target></target>
+<target>Sincronizzazione</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Lascia come conflitti irrisolti</target>

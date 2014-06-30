@@ -1918,7 +1918,7 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
         zen::Opt<std::wstring> errMsg = tryReportingError([&]
         {
             if (!dirExistsUpdating(dirname, false, callback))
-                throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //should be logged as a "fatal error" if ignored by the user...
+                throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname))); //should be logged as a "fatal error" if ignored by the user...
         }, callback); //may throw in error-callback!
 
         return !errMsg;
@@ -2258,7 +2258,7 @@ void zen::synchronize(const TimeComp& timeStamp,
 
         if (!conflictDirs.empty())
         {
-            std::wstring msg = _("A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
+            std::wstring msg = _("A folder will be modified that is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
             for (const Zstring& dirname : conflictDirs)
                 msg += std::wstring(L"\n") + dirname;
 

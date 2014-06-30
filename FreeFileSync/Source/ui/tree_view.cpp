@@ -752,8 +752,8 @@ class GridDataNavi : private wxEvtHandler, public GridData
 {
 public:
     GridDataNavi(Grid& grid, const std::shared_ptr<TreeView>& treeDataView) : treeDataView_(treeDataView),
-        fileIcon(IconBuffer(IconBuffer::SIZE_SMALL).genericFileIcon()),
-        dirIcon (IconBuffer(IconBuffer::SIZE_SMALL).genericDirIcon ()),
+        fileIcon(IconBuffer::genericFileIcon(IconBuffer::SIZE_SMALL)),
+        dirIcon (IconBuffer::genericDirIcon (IconBuffer::SIZE_SMALL)),
         rootBmp(getResourceImage(L"rootFolder").ConvertToImage().Scale(iconSizeSmall, iconSizeSmall, wxIMAGE_QUALITY_HIGH)),
         widthNodeIcon(iconSizeSmall),
         widthLevelStep(widthNodeIcon),

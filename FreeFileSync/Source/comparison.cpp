@@ -155,7 +155,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
 
     if (!dependentDirs.empty())
     {
-        std::wstring warningMsg = _("The following folders have dependent paths. Be careful when setting up synchronization rules:");
+        std::wstring warningMsg = _("The following folder paths are dependent from each other:");
         for (auto it = dependentDirs.begin(); it != dependentDirs.end(); ++it)
             warningMsg += std::wstring(L"\n\n") +
                           it->first + L"\n" +

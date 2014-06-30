@@ -1,3 +1,18 @@
+FreeFileSync 6.7 [2014-07-01]
+-----------------------------
+Redesigned comparison progress statistics
+Fixed crash when loading incompatible config file
+Added <new> button to config panel
+Avoid sync progress dialog repositioning
+Resolved crash when loading sync settings for Arabic locale
+Restored cancel button width
+Help window not forced to float over main dialog
+Fixed overwriting old-format batch files
+Harmonized view category sequence
+Merged similar translation items
+Fixed crash when scrolling help file without focus
+
+
 FreeFileSync 6.6 [2014-06-01]
 -----------------------------
 Fixed large font size standard button layout

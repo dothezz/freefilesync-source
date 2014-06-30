@@ -245,7 +245,7 @@ public:
             return statusMsg;
     }
 
-    void incItemsScanned() { ++itemsScanned; }
+    void incItemsScanned() { ++itemsScanned; } //perf: irrelevant! scanning is almost entirely file I/O bound, not CPU bound! => no prob having multiple threads poking at the same variable!
     long getItemsScanned() const { return itemsScanned; }
 
     void incActiveWorker() { ++activeWorker; }
@@ -386,7 +386,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
 
         case SYMLINK_FOLLOW:
             //filter symlinks before trying to follow them: handle user-excluded broken symlinks!
-            //since we don't know what the symlink will resolve to, only do this when both variants agree:
+            //since we don't know what type the symlink will resolve to, only do this when both variants agree:
             if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName))
             {
                 bool subObjMightMatch = true;

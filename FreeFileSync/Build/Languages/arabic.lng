@@ -77,22 +77,22 @@
 <target>بنية:</target>
 
 <source>global config file:</source>
-<target></target>
+<target>ملف الخيارات العام:</target>
 
 <source>config files:</source>
-<target></target>
+<target>ملفات الخيارات:</target>
 
 <source>directory</source>
 <target>مسار</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
+<target>تحديد مسار مختلف لملف GlobalSettings.xml</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>أي عدد من ملفات خيارات FreeFileSyn أو\و _gui and/or .ffs_batch</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
+<target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد</target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
@@ -353,13 +353,13 @@
 <target>&حفظ باسم...</target>
 
 <source>&Quit</source>
-<target>&إنهاء</target>
+<target>إ&نهاء</target>
 
 <source>&Program</source>
-<target>&البرنامج</target>
+<target>ال&برنامج</target>
 
 <source>&View help</source>
-<target>&إظهار المساعدة</target>
+<target>إ&ظهار المساعدة</target>
 
 <source>&About</source>
 <target>&حول</target>
@@ -445,7 +445,7 @@ The command is triggered if:
 <target>&استعادة</target>
 
 <source>&Show error</source>
-<target>&إظهار الخطأ</target>
+<target>إ&ظهار الخطأ</target>
 
 <source>&Exit</source>
 <target>&خروج</target>
@@ -454,7 +454,7 @@ The command is triggered if:
 <target>سطر أوامر خاطئ:</target>
 
 <source>&Retry</source>
-<target>&إعادة المحاولة</target>
+<target>إ&عادة المحاولة</target>
 
 <source>File content</source>
 <target>محتوى الملف</target>
@@ -674,10 +674,10 @@ The command is triggered if:
 <target>سحب و إفلات</target>
 
 <source>Local comparison settings</source>
-<target></target>
+<target>إعدادات المقارنة المحلية</target>
 
 <source>Local synchronization settings</source>
-<target></target>
+<target>إعدادات المزامنة المحلية</target>
 
 <source>Local filter</source>
 <target>فلتر محلي</target>
@@ -689,10 +689,10 @@ The command is triggered if:
 <target>لا شيء</target>
 
 <source>Remove local settings</source>
-<target></target>
+<target>إزالة الإعدادات المحلية</target>
 
 <source>Reset local filter</source>
-<target></target>
+<target>إعادة تعيين الفلتر المحلي</target>
 
 <source>Copy</source>
 <target>نسخ</target>
@@ -701,7 +701,7 @@ The command is triggered if:
 <target>لصق</target>
 
 <source>Local Synchronization Settings</source>
-<target></target>
+<target>إعدادات المزامنة المحلية</target>
 
 <source>&New</source>
 <target>&جديد</target>
@@ -719,10 +719,10 @@ The command is triggered if:
 <target>2. &مزامنة</target>
 
 <source>&Options</source>
-<target></target>
+<target>&خيارات</target>
 
 <source>&Language</source>
-<target>&اللغة</target>
+<target>الل&غة</target>
 
 <source>&Find...</source>
 <target>&بحث...</target>
@@ -731,16 +731,16 @@ The command is triggered if:
 <target>&تصدير قائمة الملفات...</target>
 
 <source>&Tools</source>
-<target>&أدوات</target>
+<target>أ&دوات</target>
+
+<source>&Check for new version</source>
+<target>ال&تحقق من وجود نسخة جديدة</target>
 
 <source>&Check now</source>
 <target>&تحقق الآن</target>
 
 <source>Check &automatically once a week</source>
-<target>تحقق &أوتوماتيكياً بشكل أسبوعي</target>
-
-<source>&Check for new version</source>
-<target>&التحقق من وجود نسخة جديدة</target>
+<target>&تحقق أوتوماتيكياً بشكل أسبوعي</target>
 
 <source>Cancel</source>
 <target>إلغاء الأمر</target>
@@ -776,13 +776,13 @@ The command is triggered if:
 <target>حفظ</target>
 
 <source>Save as GUI job</source>
-<target></target>
+<target>الحفظ كمهمة GUI</target>
 
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
 
 <source>Save as...</source>
-<target></target>
+<target>حفظ كـ...</target>
 
 <source>View type:</source>
 <target>عرض النوع:</target>
@@ -806,7 +806,7 @@ The command is triggered if:
 <target>إجمالي عدد الـ bytes التي سيتم نسخها</target>
 
 <source>Use local settings:</source>
-<target></target>
+<target>استخدام الإعدادات المحلية:</target>
 
 <source>Select a variant:</source>
 <target>اختيار بديل:</target>
@@ -824,7 +824,7 @@ The command is triggered if:
 <target>المزيد من المعلومات</target>
 
 <source>Local settings:</source>
-<target></target>
+<target>الإعدادات المحلية</target>
 
 <source>Include:</source>
 <target>إدخال:</target>
@@ -848,7 +848,7 @@ The command is triggered if:
 <target>الحد الأقصى:</target>
 
 <source>&Reset</source>
-<target>إعادة&</target>
+<target>إ&عادة</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
@@ -927,9 +927,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>العناصر التي تم العثور عليها:</target>
 
-<source>Speed:</source>
-<target>السرعة:</target>
-
 <source>Time remaining:</source>
 <target>الوقت المتبقي:</target>
 
@@ -946,7 +943,7 @@ The command is triggered if:
 <target>إغلاق</target>
 
 <source>&Pause</source>
-<target>&إيقاف مؤقت</target>
+<target>إ&يقاف مؤقت</target>
 
 <source>Stop</source>
 <target>توقف</target>
@@ -1027,7 +1024,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>استعادة نوافذ الحوار المخفية</target>
 
 <source>&Default</source>
-<target>&الافتراضي</target>
+<target>الا&فتراضي</target>
 
 <source>Source code written in C++ using:</source>
 <target>الرماز المصدري مكتوب بلغة C++ باستخدام:</target>
@@ -1060,13 +1057,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>حذف العناصر</target>
 
 <source>Options</source>
-<target></target>
+<target>خيارات</target>
 
 <source>Select Time Span</source>
 <target>اختيار المطال الزمني</target>
 
 <source>&Preferences...</source>
-<target></target>
+<target>&خيارات...</target>
 
 <source>Folder Pairs</source>
 <target>أزواج المجلدات</target>
@@ -1220,7 +1217,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>هل تريد حفظ التغييرات إلى %x؟</target>
 
 <source>Never save &changes</source>
-<target>لا تقم بحفظ &التغيرات</target>
+<target>&لا تقم بحفظ التغيرات</target>
 
 <source>Do&n't save</source>
 <target>&لا تحفظ</target>
@@ -1232,7 +1229,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>إعدادات المزامنة</target>
 
 <source>Reset filter</source>
-<target></target>
+<target>إعادة تعيين الفلتر</target>
 
 <source>Show files that exist on left side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
@@ -1378,7 +1375,7 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>Preferences</source>
-<target></target>
+<target>خيارات</target>
 
 <source>Copy NTFS permissions</source>
 <target>نسخ أذونات NTFS</target>
@@ -1459,10 +1456,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>إلحاق ختم زمني بكل اسم ملف</target>
 
 <source>Comparison</source>
-<target></target>
+<target>المقارنة</target>
 
 <source>Synchronization</source>
-<target></target>
+<target>المزامنة</target>
 
 <source>Leave as unresolved conflict</source>
 <target>ترك كاختلافات من دون حل</target>

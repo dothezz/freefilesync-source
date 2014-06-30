@@ -22,7 +22,7 @@ public:
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
     void init(const zen::Statistics& syncStat); //begin of sync: make visible, set pointer to "syncStat", initialize all status values
-    void finalize(); //end of sync: hide again, clear pointer to "syncStat"
+    void teardown(); //end of sync: hide again, clear pointer to "syncStat"
 
     void switchToCompareBytewise();
     void updateStatusPanelNow();

@@ -476,8 +476,16 @@ private:
             checkPlaceholder("%z");
 
             //if source contains ampersand to mark menu accellerator key, so must translation
-            if (hasSingleAmpersand(original) && !hasSingleAmpersand(translation))
-                throw ParsingError(L"Translation is missing the & character to mark an access key for the menu item", scn.posRow(), scn.posCol());
+            const size_t ampCountOrig = getAmpersandTokenCount(original);
+            if (ampCountOrig != getAmpersandTokenCount(translation) ||
+                ampCountOrig > 1)
+                throw ParsingError(L"Source and translation both need exactly one & character to mark a menu item access key or none at all", scn.posRow(), scn.posCol());
+
+            //ampersand at the end makes buggy wxWidgets crash miserably
+            if (ampCountOrig > 0)
+                if ((zen::endsWith(original,    "&") && !zen::endsWith(original,    "&&")) ||
+                    (zen::endsWith(translation, "&") && !zen::endsWith(translation, "&&")))
+                    throw ParsingError(L"The & character to mark a menu item access key must not occur at the end of a string", scn.posRow(), scn.posCol());
         }
     }
 
@@ -545,22 +553,10 @@ private:
         }
     }
 
-    static bool hasSingleAmpersand(const std::string& str)
+    static size_t getAmpersandTokenCount(const std::string& str)
     {
-        size_t pos = 0;
-        for (;;)
-        {
-            pos = str.find('&', pos);
-            if (pos == std::string::npos)
-                return false;
-
-            bool freeBefore = pos == 0 || str[pos - 1] != '&';
-            bool freeAfter  = pos >= str.size() - 1 || str[pos + 1] != '&'; //str.size() > 0 here!
-
-            if (freeBefore && freeAfter) //make sure to not catch && which windows resolves as just one & for display!
-                return true;
-            ++pos;
-        }
+        const std::string tmp = zen::replaceCpy(str, "&&", ""); //make sure to not catch && which windows resolves as just one & for display!
+        return std::count(tmp.begin(), tmp.end(), '&');
     }
 
     void nextToken() { tk = scn.nextToken(); }

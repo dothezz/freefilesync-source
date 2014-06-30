@@ -416,7 +416,7 @@ void MainDialog::create(const Zstring& globalConfigFile)
 
             if (!warningMsg.empty())
                 showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
-            //what about simulating changed config on parsing errors????
+            //what about showing as changed config on parsing errors????
         }
         catch (const FileError& e)
         {
@@ -493,11 +493,12 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     //set icons for this dialog
     SetIcon(getFfsIcon()); //set application icon
 
-    m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
     m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
+    m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
+    m_bpButtonNew       ->SetBitmapLabel(getResourceImage(L"new"));
     m_bpButtonOpen      ->SetBitmapLabel(getResourceImage(L"load"));
     m_bpButtonSaveAs    ->SetBitmapLabel(getResourceImage(L"sync"));
-    m_bpButtonBatchJob  ->SetBitmapLabel(getResourceImage(L"batch"));
+    m_bpButtonSaveAsBatch->SetBitmapLabel(getResourceImage(L"batch"));
     m_bpButtonAddPair   ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonHideSearch->SetBitmapLabel(getResourceImage(L"close_panel"));
 
@@ -544,6 +545,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
     m_panelTopButtons->GetSizer()->SetSizeHints(m_panelTopButtons); //~=Fit() + SetMinSize()
 
+    setBitmapTextLabel(*m_buttonCancel, wxImage(), m_buttonCancel->GetLabel()); //we can't use a wxButton for cancel: it's rendered smaller on OS X than a wxBitmapButton!
     m_buttonCancel->SetMinSize(wxSize(std::max(m_buttonCancel->GetSize().x, TOP_BUTTON_OPTIMAL_WIDTH),
                                       std::max(m_buttonCancel->GetSize().y, m_buttonCompare->GetSize().y)));
 
@@ -604,9 +606,10 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_panelSearch->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnSearchPanelKeyPressed), nullptr, this);
 
     //set tool tips with (non-translated!) short cut hint
-    m_bpButtonOpen ->SetToolTip(_("Open...") + L" (Ctrl+O)");
-    m_bpButtonSave ->SetToolTip(_("Save")    + L" (Ctrl+S)");
-    m_buttonCompare     ->SetToolTip(_("Compare both sides")       + L" (F5)");
+    m_bpButtonNew       ->SetToolTip(_("&New")     + L" (Ctrl+N)");
+    m_bpButtonOpen      ->SetToolTip(_("Open...") + L" (Ctrl+O)");
+    m_bpButtonSave      ->SetToolTip(_("Save")    + L" (Ctrl+S)");
+    m_buttonCompare     ->SetToolTip(_("Start comparison")         + L" (F5)");
     m_bpButtonCmpConfig ->SetToolTip(_("Comparison settings")      + L" (F6)");
     m_bpButtonSyncConfig->SetToolTip(_("Synchronization settings") + L" (F8)");
     m_buttonSync        ->SetToolTip(_("Start synchronization")    + L" (F9)");
@@ -620,13 +623,9 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     new PanelMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere... //ownership passed to "this"
 #endif
 
-    //we can't use a wxButton for cancel: it's rendered smaller on OS X than a wxBitmapButton!
-    setBitmapTextLabel(*m_buttonCancel, wxImage(), m_buttonCancel->GetLabel());
-
     {
-        IconBuffer tmp(IconBuffer::SIZE_SMALL);
-        const wxBitmap& bmpFile = tmp.genericFileIcon();
-        const wxBitmap& bmpDir  = tmp.genericDirIcon();
+        const wxBitmap& bmpFile = IconBuffer::genericFileIcon(IconBuffer::SIZE_SMALL);
+        const wxBitmap& bmpDir  = IconBuffer::genericDirIcon (IconBuffer::SIZE_SMALL);
 
         m_bitmapSmallDirectoryLeft ->SetBitmap(bmpDir);
         m_bitmapSmallFileLeft      ->SetBitmap(bmpFile);
@@ -635,16 +634,18 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     }
 
     //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
-    setMenuItemImage(m_menuItem10, getResourceImage(L"compare_small"));
-    setMenuItemImage(m_menuItem11, getResourceImage(L"sync_small"));
+    setMenuItemImage(m_menuItemNew, getResourceImage(L"new_small"));
 
     setMenuItemImage(m_menuItemLoad, getResourceImage(L"load_small"));
     setMenuItemImage(m_menuItemSave, getResourceImage(L"save_small"));
 
-    setMenuItemImage(m_menuItemOptions, getResourceImage(L"settings_small"));
-    setMenuItemImage(m_menuItem7,       getResourceImage(L"batch_small"));
+    setMenuItemImage(m_menuItemCompare,     getResourceImage(L"compare_small"));
+    setMenuItemImage(m_menuItemSynchronize, getResourceImage(L"sync_small"));
 
-    setMenuItemImage(m_menuItemManual, getResourceImage(L"help_small"));
+    setMenuItemImage(m_menuItemOptions,     getResourceImage(L"settings_small"));
+    setMenuItemImage(m_menuItemSaveAsBatch, getResourceImage(L"batch_small"));
+
+    setMenuItemImage(m_menuItemHelp,   getResourceImage(L"help_small"));
     setMenuItemImage(m_menuItemAbout,  getResourceImage(L"about_small"));
 
     if (!manualProgramUpdateRequired())
@@ -863,11 +864,11 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
         else
         {
             SetSize(wxRect(globalSettings.gui.dlgSize));
-            Centre();
+            Center();
         }
     }
     else
-        Centre();
+        Center();
 
     Maximize(globalSettings.gui.isMaximized);
 
@@ -2416,7 +2417,7 @@ void MainDialog::OnContextSetLayout(wxMouseEvent& event)
 {
     ContextMenu menu;
 
-    menu.addItem(_("Default view"), [&]
+    menu.addItem(_("Reset layout"), [&]
     {
         m_splitterMain->setSashOffset(0);
         auiMgr.LoadPerspective(defaultPerspective);
@@ -2809,9 +2810,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
             std::wstring warningMsg;
             readConfig(referenceBatchFile, referenceBatchCfg, warningMsg); //throw FileError
-
-            if (!warningMsg.empty())
-                throw FileError(warningMsg); //error out on warnings, too!
+            //=> ignore warnings altogether: user has seen them already when loading the config file!
 
             batchCfg = convertGuiToBatch(guiCfg, &referenceBatchCfg);
         }
@@ -3467,16 +3466,18 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
 void MainDialog::updateGlobalFilterButton()
 {
     //global filter: test for Null-filter
+    std::wstring status;
     if (!isNullFilter(currentCfg.mainCfg.globalFilter))
     {
         setImage(*m_bpButtonFilter, getResourceImage(L"filter"));
-        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + _("Active") + L")");
+        status = _("Active");
     }
     else
     {
         setImage(*m_bpButtonFilter, greyScale(getResourceImage(L"filter")));
-        m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + _("None") + L")");
+        status = _("None");
     }
+    m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + status + L")");
 }
 
 

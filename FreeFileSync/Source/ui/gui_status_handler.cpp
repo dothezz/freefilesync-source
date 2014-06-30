@@ -49,7 +49,7 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
     mainDlg.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 
-    mainDlg.compareStatus->finalize();
+    mainDlg.compareStatus->teardown();
     mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
     mainDlg.auiMgr.Update();
 }

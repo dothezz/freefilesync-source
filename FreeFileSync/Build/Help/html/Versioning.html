@@ -18,9 +18,19 @@ FreeFileSync therefore has an additional option, <B>Versioning</B>.
 
 <BR>
 
-<h3>1. Keep all versions of old files</h3>
+<h3>1. Keep only the most recent versions</h3>
 
-<P>In synchronization settings set deletion handling to <B>Versioning</B>
+<P>In synchronization settings set deletion handling to <B>Versioning</B> and naming convention to
+<B>Replace</B>. Deleted files will be moved to the specified folder
+without any decoration and will replace already existing older
+versions.
+</P>
+
+<BR>
+
+<h3>2. Keep all versions of old files</h3>
+
+<P>Set deletion handling to <B>Versioning</B>
 and naming convention to <B>Time stamp</B>. FreeFileSync will move
 deleted files into the provided folder and add a time stamp to each
 file name. The structure of the synchronized folders is preserved so
@@ -44,16 +54,6 @@ A file <FONT FACE="Courier New, monospace">Folder\File.txt</FONT> was updated th
 <BR CLEAR=LEFT>
 
 <BR>
-<BR>
-
-<h3>2. Save only the most recent version</h3>
-
-<P>Set deletion handling to <B>Versioning</B> and naming convention to
-<B>Replace</B>. Deleted files will be moved to the specified folder
-without any decoration and will replace already existing older
-versions.
-</P>
-
 <BR>
 
 <h3>3. Save versions at certain intervals</h3>
@@ -81,7 +81,7 @@ on a per sync session basis by adding the <B>%timestamp%</B> macro:
 
 <P>This allows for a simple manual undo by moving the deleted files from the
 last synchronization session back to their original folders. Other
-macros like <B>%date%</B> or <B>%weekday%</B> can be used to reduce the granularity
+macros like <B>%date%</B> or <B>%weekday%</B> can be used to reduce the granularity down
 to days and weeks.
 </P>
 

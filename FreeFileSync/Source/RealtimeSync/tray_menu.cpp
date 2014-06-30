@@ -143,7 +143,7 @@ private:
         contextMenu->Append(defaultItem);
 
         contextMenu->AppendSeparator();
-        contextMenu->Append(CONTEXT_ABORT, _("&Exit"));
+        contextMenu->Append(CONTEXT_ABORT, _("&Quit"));
         //event handling
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TrayIconObject::OnContextMenuSelection), nullptr, this);
 

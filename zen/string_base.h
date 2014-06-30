@@ -196,11 +196,11 @@ public:
     Zbase(const Char* source); //implicit conversion from a C-string
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
-    Zbase(Zbase&& tmp);
+    Zbase(Zbase&& tmp); //make noexcept in C++11
     explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error!
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
-    ~Zbase();
+    ~Zbase(); //make noexcept in C++11
 
     //operator const Char* () const; //NO implicit conversion to a C-string!! Many problems... one of them: if we forget to provide operator overloads, it'll just work with a Char*...
 
@@ -241,7 +241,7 @@ public:
     void push_back(Char val) { operator+=(val); } //STL access
 
     Zbase& operator=(const Zbase& source);
-    Zbase& operator=(Zbase&& tmp);
+    Zbase& operator=(Zbase&& tmp); //make noexcept in C++11
     Zbase& operator=(const Char* source);
     Zbase& operator=(Char source);
     Zbase& operator+=(const Zbase& other);

@@ -77,22 +77,22 @@
 <target>Sintaksa:</target>
 
 <source>global config file:</source>
-<target></target>
+<target>datoteka z globalnimi konfiguracijami</target>
 
 <source>config files:</source>
-<target></target>
+<target>konfiguracijske datoteke:</target>
 
 <source>directory</source>
 <target>imenik</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target></target>
+<target>Pot do alternativne datoteke GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Poljubno število FreeFileSync .ffs_gui in/ali .ffs_batch konfigracijskih datotek.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target></target>
+<target>Poljubno število alternativnih parov imenikov za največ eno nastavitveno datoteko.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Ne morem najti naslednjih map:</target>
@@ -666,10 +666,10 @@ Ukaz se sproži če:
 <target>Povleci && spusti</target>
 
 <source>Local comparison settings</source>
-<target></target>
+<target>Lokalne primerjalne nastavitve</target>
 
 <source>Local synchronization settings</source>
-<target></target>
+<target>Lokalne sinhnorizacijske nastavitve</target>
 
 <source>Local filter</source>
 <target>Lokalni filter</target>
@@ -681,10 +681,10 @@ Ukaz se sproži če:
 <target>Nič</target>
 
 <source>Remove local settings</source>
-<target></target>
+<target>Odstrani lokalne nastavitve</target>
 
 <source>Reset local filter</source>
-<target></target>
+<target>Ponastavi lokalne filtre</target>
 
 <source>Copy</source>
 <target>Kopiraj</target>
@@ -693,7 +693,7 @@ Ukaz se sproži če:
 <target>Prilepi</target>
 
 <source>Local Synchronization Settings</source>
-<target></target>
+<target>Lokalne sinhnorizacijske nastavitve</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -711,7 +711,7 @@ Ukaz se sproži če:
 <target>2. &Sinhroniziraj</target>
 
 <source>&Options</source>
-<target></target>
+<target>&Možnosti</target>
 
 <source>&Language</source>
 <target>&Jezik</target>
@@ -768,13 +768,13 @@ Ukaz se sproži če:
 <target>Shrani</target>
 
 <source>Save as GUI job</source>
-<target></target>
+<target>Shrani kot opravilo v uporabniškem vmesniku</target>
 
 <source>Save as batch job</source>
 <target>Shrani kot serijsko opravilo</target>
 
 <source>Save as...</source>
-<target></target>
+<target>Shrani kot...</target>
 
 <source>View type:</source>
 <target>Tip pogleda:</target>
@@ -798,7 +798,7 @@ Ukaz se sproži če:
 <target>Skupno bajtov za kopiranje</target>
 
 <source>Use local settings:</source>
-<target></target>
+<target>Uporabi lokalne nastavitve:</target>
 
 <source>Select a variant:</source>
 <target>Izberi možnost:</target>
@@ -816,7 +816,7 @@ Ukaz se sproži če:
 <target>Več informacij</target>
 
 <source>Local settings:</source>
-<target></target>
+<target>Lokalne nastavitve:</target>
 
 <source>Include:</source>
 <target>Vključi:</target>
@@ -1052,13 +1052,13 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Izbriši elemente</target>
 
 <source>Options</source>
-<target></target>
+<target>Možnosti</target>
 
 <source>Select Time Span</source>
 <target>Izberi časovno obdobje</target>
 
 <source>&Preferences...</source>
-<target></target>
+<target>&Nastavitve...</target>
 
 <source>Folder Pairs</source>
 <target>Pari imenikov</target>
@@ -1216,7 +1216,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Nastavitve sinhnorizacije</target>
 
 <source>Reset filter</source>
-<target></target>
+<target>Ponastavi filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke, ki obstajajo samo na levi</target>
@@ -1358,7 +1358,7 @@ To zagotavlja konsistenco podatkov v primeru napake.
 </target>
 
 <source>Preferences</source>
-<target></target>
+<target>Nastavitve</target>
 
 <source>Copy NTFS permissions</source>
 <target>Kopiraj NTFS dovoljenja</target>
@@ -1439,10 +1439,10 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <target>Imenu vsake datoteke pripni časovni žig</target>
 
 <source>Comparison</source>
-<target></target>
+<target>Primerjava</target>
 
 <source>Synchronization</source>
-<target></target>
+<target>Sinhnorizacija</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Pusti kot nerešeni spor</target>

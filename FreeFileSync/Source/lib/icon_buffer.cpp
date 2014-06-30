@@ -320,26 +320,6 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 }
 
 
-IconHolder getGenericDirectoryIcon(IconBuffer::IconSize sz)
-{
-#ifdef ZEN_WIN
-    return getIconByAttribute(L"dummy", //Windows 7 doesn't like this parameter to be an empty string!
-                              FILE_ATTRIBUTE_DIRECTORY, sz);
-#elif defined ZEN_LINUX
-    if (GIcon* dirIcon = ::g_content_type_get_icon("inode/directory")) //should contain fallback to GTK_STOCK_DIRECTORY ("gtk-directory")
-        return iconHolderFromGicon(dirIcon, sz);
-    return IconHolder();
-
-#elif defined ZEN_MAC
-    try
-    {
-        return IconHolder(new osx::ImageData(osx::getDefaultFolderIcon(IconBuffer::getSize(sz)))); //throw SysError
-    }
-    catch (zen::SysError&) { return IconHolder(); }
-#endif
-}
-
-
 IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
 {
     //1. try to load thumbnails
@@ -663,33 +643,6 @@ void WorkerThread::operator()() //thread entry
 
 //#########################  redirect to impl  #####################################################
 
-namespace
-{
-const wchar_t* getLinkResourceName(IconBuffer::IconSize sz)
-{
-    //coordinate with IconBuffer::getSize()!
-    switch (sz)
-    {
-        case IconBuffer::SIZE_SMALL:
-#if defined ZEN_WIN || defined ZEN_MAC
-            return L"link_16";
-#elif defined ZEN_LINUX
-            return L"link_24";
-#endif
-        case IconBuffer::SIZE_MEDIUM:
-#ifdef ZEN_WIN
-            if (!wereVistaOrLater) return L"link_32";
-#endif
-            return L"link_48";
-
-        case IconBuffer::SIZE_LARGE:
-            return L"link_128";
-    }
-    assert(false);
-    return L"link_16";
-}
-}
-
 struct IconBuffer::Pimpl
 {
     Pimpl() :
@@ -703,11 +656,7 @@ struct IconBuffer::Pimpl
 };
 
 
-IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()),
-    iconSizeType(sz),
-    genDirIcon (::getGenericDirectoryIcon(sz).extractWxBitmap()),
-    genFileIcon(::getGenericFileIcon     (sz).extractWxBitmap()),
-    linkIcon(getResourceImage(getLinkResourceName(sz)))
+IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()), iconSizeType(sz)
 {
     pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
@@ -794,4 +743,61 @@ void IconBuffer::setWorkload(const std::vector<Zstring>& load)
 
     pimpl->workload->setWorkload(load); //since buffer can only increase due to new workload,
     pimpl->buffer->limitSize();   //this is the place to impose the limit from main thread!
+}
+
+
+wxBitmap IconBuffer::genericFileIcon(IconSize sz)
+{
+    return ::getGenericFileIcon(sz).extractWxBitmap();
+}
+
+
+wxBitmap IconBuffer::genericDirIcon(IconSize sz)
+{
+    return [sz]
+    {
+#ifdef ZEN_WIN
+        return getIconByAttribute(L"dummy", //Windows 7 doesn't like this parameter to be an empty string!
+        FILE_ATTRIBUTE_DIRECTORY, sz);
+#elif defined ZEN_LINUX
+        if (GIcon* dirIcon = ::g_content_type_get_icon("inode/directory")) //should contain fallback to GTK_STOCK_DIRECTORY ("gtk-directory")
+            return iconHolderFromGicon(dirIcon, sz);
+        return IconHolder();
+
+#elif defined ZEN_MAC
+        try
+        {
+            return IconHolder(new osx::ImageData(osx::getDefaultFolderIcon(IconBuffer::getSize(sz)))); //throw SysError
+        }
+        catch (zen::SysError&) { return IconHolder(); }
+#endif
+    }().extractWxBitmap();
+}
+
+
+wxBitmap IconBuffer::linkOverlayIcon(IconSize sz)
+{
+    //coordinate with IconBuffer::getSize()!
+    return getResourceImage([sz]
+    {
+        switch (sz)
+        {
+            case IconBuffer::SIZE_SMALL:
+#if defined ZEN_WIN || defined ZEN_MAC
+                return L"link_16";
+#elif defined ZEN_LINUX
+                return L"link_24";
+#endif
+            case IconBuffer::SIZE_MEDIUM:
+#ifdef ZEN_WIN
+                if (!wereVistaOrLater) return L"link_32";
+#endif
+                return L"link_48";
+
+            case IconBuffer::SIZE_LARGE:
+                return L"link_128";
+        }
+        assert(false);
+        return L"link_16";
+    }());
 }
