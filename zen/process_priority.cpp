@@ -5,18 +5,17 @@
 // **************************************************************************
 
 #include "process_priority.h"
-#include <zen/sys_error.h>
-#include <zen/i18n.h>
+#include "sys_error.h"
+#include "i18n.h"
 
 #ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 
 #elif defined ZEN_LINUX
-//#include <sys/syscall.h>
 
 #elif defined ZEN_MAC
 #include <sys/resource.h> //getiopolicy_np
-#include <IOKit/pwr_mgt/IOPMLib.h> //keep in .cpp file to not pollute global namespace! e.g. with UInt64
+#include <IOKit/pwr_mgt/IOPMLib.h> //keep in .cpp file to not pollute global namespace!
 #endif
 
 using namespace zen;

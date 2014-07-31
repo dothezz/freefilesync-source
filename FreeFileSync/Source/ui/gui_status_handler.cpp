@@ -29,9 +29,63 @@ CompareStatusHandler::CompareStatusHandler(MainDialog& dlg) :
         wxWindowUpdateLocker dummy(&mainDlg); //leads to GUI corruption problems on Linux/OS X!
 #endif
 
-        //display status panel during compare
         mainDlg.compareStatus->init(*this); //clear old values before showing panel
-        mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Show();
+
+        //------------------------------------------------------------------
+        const wxAuiPaneInfo& topPanel = mainDlg.auiMgr.GetPane(mainDlg.m_panelTopButtons);
+        wxAuiPaneInfo& statusPanel    = mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow());
+
+        //determine best status panel row near top panel
+        switch (topPanel.dock_direction)
+        {
+            case wxAUI_DOCK_TOP:
+            case wxAUI_DOCK_BOTTOM:
+                statusPanel.Layer    (topPanel.dock_layer);
+                statusPanel.Direction(topPanel.dock_direction);
+                statusPanel.Row      (topPanel.dock_row + 1);
+                break;
+
+            case wxAUI_DOCK_LEFT:
+            case wxAUI_DOCK_RIGHT:
+                statusPanel.Layer    (std::max(0, topPanel.dock_layer - 1));
+                statusPanel.Direction(wxAUI_DOCK_TOP);
+                statusPanel.Row      (0);
+                break;
+                //case wxAUI_DOCK_CENTRE:
+        }
+
+        wxAuiPaneInfoArray& paneArray = mainDlg.auiMgr.GetAllPanes();
+
+        const bool statusRowTaken = [&]() -> bool
+        {
+            for (size_t i = 0; i < paneArray.size(); ++i)
+            {
+                wxAuiPaneInfo& paneInfo = paneArray[i];
+
+                if (&paneInfo != &statusPanel &&
+                paneInfo.dock_layer     == statusPanel.dock_layer &&
+                paneInfo.dock_direction == statusPanel.dock_direction &&
+                paneInfo.dock_row       == statusPanel.dock_row)
+                    return true;
+            }
+            return false;
+        }();
+
+        //move all rows that are in the way one step further
+        if (statusRowTaken)
+            for (size_t i = 0; i < paneArray.size(); ++i)
+            {
+                wxAuiPaneInfo& paneInfo = paneArray[i];
+
+                if (&paneInfo != &statusPanel &&
+                    paneInfo.dock_layer     == statusPanel.dock_layer &&
+                    paneInfo.dock_direction == statusPanel.dock_direction &&
+                    paneInfo.dock_row       >= statusPanel.dock_row)
+                    ++paneInfo.dock_row;
+            }
+        //------------------------------------------------------------------
+
+        statusPanel.Show();
         mainDlg.auiMgr.Update();
     }
 
@@ -49,9 +103,9 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
     mainDlg.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 
-    mainDlg.compareStatus->teardown();
     mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
     mainDlg.auiMgr.Update();
+    mainDlg.compareStatus->teardown();
 }
 
 
@@ -68,7 +122,7 @@ void CompareStatusHandler::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void CompareStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseID)
+void CompareStatusHandler::initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID)
 {
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
 
@@ -299,7 +353,7 @@ SyncStatusHandler::~SyncStatusHandler()
 }
 
 
-void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseID)
+void SyncStatusHandler::initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID)
 {
     assert(phaseID == PHASE_SYNCHRONIZING);
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
@@ -310,7 +364,7 @@ void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase ph
 }
 
 
-void SyncStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
+void SyncStatusHandler::updateProcessedData(int objectsDelta, std::int64_t dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
     if (progressDlg)

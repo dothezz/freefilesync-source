@@ -12,7 +12,6 @@
 #include "win_ver.h"
 
 #elif defined ZEN_MAC
-//#include <zen/scope_guard.h>
 #include <ctype.h> //toupper()
 #endif
 
@@ -75,8 +74,8 @@ private:
         }
     }
 
-    LeakChecker(const LeakChecker&);
-    LeakChecker& operator=(const LeakChecker&);
+    LeakChecker           (const LeakChecker&) = delete;
+    LeakChecker& operator=(const LeakChecker&) = delete;
 
     static std::string rawMemToString(const void* ptr, size_t size)
     {
@@ -165,7 +164,7 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
     else //fallback
     {
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
-        //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
+        //the only reliable way to compare filepaths (with XP) is to call "CharUpper" or "LCMapString":
 
         auto copyToUpperCase = [](const wchar_t* strIn, wchar_t* strOut, size_t len)
         {

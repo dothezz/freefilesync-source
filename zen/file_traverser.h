@@ -7,8 +7,8 @@
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
+#include <cstdint>
 #include "zstring.h"
-#include "int64.h"
 #include "file_id_def.h"
 
 //advanced file traverser returning metadata and hierarchical information on files and directories
@@ -21,14 +21,17 @@ struct TraverseCallback
 
     struct SymlinkInfo
     {
-        Int64 lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+        SymlinkInfo() : lastWriteTime() {}
+
+        std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
     };
 
     struct FileInfo
     {
-        FileInfo() : symlinkInfo() {}
-        UInt64 fileSize;     //unit: bytes!
-        Int64 lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+        FileInfo() : fileSize(), lastWriteTime(), symlinkInfo() {}
+
+        std::uint64_t fileSize;     //unit: bytes!
+        std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
         FileId id;           //optional: initial if not supported!
         const SymlinkInfo* symlinkInfo; //only filled if file is a followed symlink
     };
@@ -45,13 +48,13 @@ struct TraverseCallback
         ON_ERROR_IGNORE
     };
 
-    virtual void              onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
-    virtual HandleLink        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
-    virtual TraverseCallback* onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
+    virtual void              onFile   (const Zchar* shortName, const Zstring& filepath, const FileInfo&    details) = 0;
+    virtual HandleLink        onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) = 0;
+    virtual TraverseCallback* onDir    (const Zchar* shortName, const Zstring& dirpath) = 0;
     //nullptr: ignore directory, non-nullptr: traverse into using the (new) callback => implement releaseDirTraverser() if necessary!
     virtual void releaseDirTraverser(TraverseCallback* trav) {}
 
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data as incomplete!
+    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data at current level as incomplete!
     virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
 };
 
@@ -60,7 +63,7 @@ struct TraverseCallback
 struct DstHackCallback
 {
     virtual ~DstHackCallback() {}
-    virtual void requestUiRefresh(const Zstring& filename) = 0; //applying DST hack imposes significant one-time performance drawback => callback to inform user
+    virtual void requestUiRefresh(const Zstring& filepath) = 0; //applying DST hack imposes significant one-time performance drawback => callback to inform user
 };
 #elif defined ZEN_LINUX || defined ZEN_MAC
 struct DstHackCallback; //DST hack not required on Unix
@@ -69,7 +72,7 @@ struct DstHackCallback; //DST hack not required on Unix
 //custom traverser with detail information about files
 //- client needs to handle duplicate file reports! (FilePlusTraverser fallback, retrying to read directory contents, ...)
 //- directory may end with PATH_SEPARATOR
-void traverseFolder(const Zstring& dirname, //throw()
+void traverseFolder(const Zstring& dirpath, //throw()
                     TraverseCallback& sink,
                     DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
 }

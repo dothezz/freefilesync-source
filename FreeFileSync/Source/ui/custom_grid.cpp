@@ -147,24 +147,24 @@ class GridDataRight;
 struct IconManager
 {
     IconManager(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer::IconSize sz) :
-		iconBuffer(sz),
+        iconBuffer(sz),
         fileIcon       (IconBuffer::genericFileIcon(sz)),
         dirIcon        (IconBuffer::genericDirIcon (sz)),
-		linkOverlayIcon(IconBuffer::linkOverlayIcon(sz)),
+        linkOverlayIcon(IconBuffer::linkOverlayIcon(sz)),
         iconUpdater(make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
 
     void startIconUpdater();
     IconBuffer& refIconBuffer() { return iconBuffer; }
 
-	wxBitmap getGenericFileIcon() const { return fileIcon;        }
-	wxBitmap getGenericDirIcon () const { return dirIcon;         }
-	wxBitmap getLinkOverlayIcon() const { return linkOverlayIcon; }
+    wxBitmap getGenericFileIcon() const { return fileIcon;        }
+    wxBitmap getGenericDirIcon () const { return dirIcon;         }
+    wxBitmap getLinkOverlayIcon() const { return linkOverlayIcon; }
 
 private:
     IconBuffer iconBuffer;
-        const wxBitmap fileIcon;
-        const wxBitmap dirIcon;
-		const wxBitmap linkOverlayIcon;
+    const wxBitmap fileIcon;
+    const wxBitmap dirIcon;
+    const wxBitmap linkOverlayIcon;
 
     std::unique_ptr<IconUpdater> iconUpdater; //bind ownership to GridDataRim<>!
 };
@@ -221,7 +221,7 @@ public:
     GridDataRim(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataBase(grid, gridDataView) {}
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
-	
+
     void updateNewAndGetUnbufferedIcons(std::vector<Zstring>& newLoad) //loads all not yet drawn icons
     {
         if (iconMgr_)
@@ -255,7 +255,7 @@ public:
         }
     }
 
-    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, Zstring>>& newLoad) //return (priority, filename) list
+    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, Zstring>>& newLoad) //return (priority, filepath) list
     {
         if (iconMgr_)
         {
@@ -404,18 +404,18 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(appendSeparator(beforeLast(fileObj.getBaseDirPf<side>() + fileObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
+                            value = toWx(fileObj.getFullPath<side>());
                             break;
-                        case COL_TYPE_FILENAME: //filename
-                            value = toWx(fileObj.getShortName<side>());
+                        case COL_TYPE_FILENAME:
+                            value = toWx(fileObj.getItemName<side>());
                             break;
-                        case COL_TYPE_REL_PATH: //relative path
-                            value = toWx(beforeLast(fileObj.getObjRelativeName(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                        case COL_TYPE_REL_FOLDER:
+                            value = toWx(beforeLast(fileObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
                             break;
-                        case COL_TYPE_DIRECTORY:
+                        case COL_TYPE_BASE_DIRECTORY:
                             value = toWx(fileObj.getBaseDirPf<side>());
                             break;
-                        case COL_TYPE_SIZE: //file size
+                        case COL_TYPE_SIZE:
                             if (!fsObj_.isEmpty<side>())
                                 value = zen::toGuiString(fileObj.getFileSize<side>());
 
@@ -423,12 +423,12 @@ private:
                             //if (!fsObj_.isEmpty<side>())
                             //	value = toGuiString(fileObj.getFileId<side>().second) + L" " + toGuiString(fileObj.getFileId<side>().first);
                             break;
-                        case COL_TYPE_DATE: //date
+                        case COL_TYPE_DATE:
                             if (!fsObj_.isEmpty<side>())
                                 value = zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                             break;
-                        case COL_TYPE_EXTENSION: //file extension
-                            value = toWx(getExtension(fileObj.getShortName<side>()));
+                        case COL_TYPE_EXTENSION:
+                            value = toWx(getExtension(fileObj.getItemName<side>()));
                             break;
                     }
                 }
@@ -438,27 +438,27 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(appendSeparator(beforeLast(linkObj.getBaseDirPf<side>() + linkObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
+                            value = toWx(linkObj.getFullPath<side>());
                             break;
-                        case COL_TYPE_FILENAME: //filename
-                            value = toWx(linkObj.getShortName<side>());
+                        case COL_TYPE_FILENAME:
+                            value = toWx(linkObj.getItemName<side>());
                             break;
-                        case COL_TYPE_REL_PATH: //relative path
-                            value = toWx(beforeLast(linkObj.getObjRelativeName(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                        case COL_TYPE_REL_FOLDER:
+                            value = toWx(beforeLast(linkObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
                             break;
-                        case COL_TYPE_DIRECTORY:
+                        case COL_TYPE_BASE_DIRECTORY:
                             value = toWx(linkObj.getBaseDirPf<side>());
                             break;
-                        case COL_TYPE_SIZE: //file size
+                        case COL_TYPE_SIZE:
                             if (!fsObj_.isEmpty<side>())
                                 value = L"<" + _("Symlink") + L">";
                             break;
-                        case COL_TYPE_DATE: //date
+                        case COL_TYPE_DATE:
                             if (!fsObj_.isEmpty<side>())
                                 value = zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                             break;
-                        case COL_TYPE_EXTENSION: //file extension
-                            value = toWx(getExtension(linkObj.getShortName<side>()));
+                        case COL_TYPE_EXTENSION:
+                            value = toWx(getExtension(linkObj.getItemName<side>()));
                             break;
                     }
                 }
@@ -468,26 +468,26 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(appendSeparator(beforeLast(dirObj.getBaseDirPf<side>() + dirObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
+                            value = toWx(dirObj.getFullPath<side>());
                             break;
                         case COL_TYPE_FILENAME:
-                            value = toWx(dirObj.getShortName<side>());
+                            value = toWx(dirObj.getItemName<side>());
                             break;
-                        case COL_TYPE_REL_PATH:
-                            value = toWx(beforeLast(dirObj.getObjRelativeName(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                        case COL_TYPE_REL_FOLDER:
+                            value = toWx(beforeLast(dirObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
                             break;
-                        case COL_TYPE_DIRECTORY:
+                        case COL_TYPE_BASE_DIRECTORY:
                             value = toWx(dirObj.getBaseDirPf<side>());
                             break;
-                        case COL_TYPE_SIZE: //file size
+                        case COL_TYPE_SIZE:
                             if (!fsObj_.isEmpty<side>())
                                 value = L"<" + _("Folder") + L">";
                             break;
-                        case COL_TYPE_DATE: //date
+                        case COL_TYPE_DATE:
                             if (!fsObj_.isEmpty<side>())
                                 value = wxEmptyString;
                             break;
-                        case COL_TYPE_EXTENSION: //file extension
+                        case COL_TYPE_EXTENSION:
                             value = wxEmptyString;
                             break;
                     }
@@ -623,9 +623,9 @@ private:
                 return _("Full path");
             case COL_TYPE_FILENAME:
                 return _("Name"); //= short name
-            case COL_TYPE_REL_PATH:
+            case COL_TYPE_REL_FOLDER:
                 return _("Relative path");
-            case COL_TYPE_DIRECTORY:
+            case COL_TYPE_BASE_DIRECTORY:
                 return _("Base folder");
             case COL_TYPE_SIZE:
                 return _("Size");
@@ -682,12 +682,12 @@ private:
 
                 virtual void visit(const FilePair& fileObj)
                 {
-                    ii_.iconPath = fileObj.getFullName<side>();
+                    ii_.iconPath = fileObj.getFullPath<side>();
                     ii_.drawAsLink = fileObj.isFollowedSymlink<side>() || hasLinkExtension(ii_.iconPath);
                 }
                 virtual void visit(const SymlinkPair& linkObj)
                 {
-                    ii_.iconPath = linkObj.getFullName<side>();
+                    ii_.iconPath = linkObj.getFullPath<side>();
                     ii_.drawAsLink = true;
                 }
                 virtual void visit(const DirPair& dirObj)
@@ -711,8 +711,8 @@ private:
         if (fsObj && !fsObj->isEmpty<side>())
         {
             toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
-                           fsObj->getFullName<side>() :
-                           fsObj->getRelativeName<side>());
+                           fsObj->getFullPath<side>() :
+                           fsObj->getRelativePath<side>());
 
             struct AssembleTooltip : public FSObjectVisitor
             {
@@ -721,7 +721,7 @@ private:
                 virtual void visit(const FilePair& fileObj)
                 {
                     tipMsg_ += L"\n" +
-                               _("Size:") + L" " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
+                               _("Size:") + L" " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + L"\n" +
                                _("Date:") + L" " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                 }
 
@@ -1731,7 +1731,7 @@ void IconManager::startIconUpdater() { if (iconUpdater) iconUpdater->start(); }
 
 void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz)
 {
-    auto* provLeft  = dynamic_cast<GridDataLeft *>(gridLeft .getDataProvider());
+    auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft .getDataProvider());
     auto* provRight = dynamic_cast<GridDataRight*>(gridRight.getDataProvider());
 
     if (provLeft && provRight)

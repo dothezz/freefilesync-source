@@ -43,8 +43,8 @@ std::async replacement without crappy semantics:
 	2. does not follow C++11 [futures.async], Paragraph 5, where std::future waits for thread in destructor
 
 Example:
-        Zstring dirname = ...
-        auto ft = zen::async([=](){ return zen::dirExists(dirname); });
+        Zstring dirpath = ...
+        auto ft = zen::async([=](){ return zen::dirExists(dirpath); });
         if (ft.timed_wait(boost::posix_time::milliseconds(200)) && ft.get())
             //dir exising
 */

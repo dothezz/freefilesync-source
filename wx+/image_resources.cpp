@@ -46,26 +46,26 @@ public:
         return inst;
     }
 
-    void init(const Zstring& filename);
+    void init(const Zstring& filepath);
 
     const wxBitmap& getImage(const wxString& name) const;
     const wxAnimation& getAnimation(const wxString& name) const;
 
 private:
     GlobalResources() {}
-    GlobalResources(const GlobalResources&);
-    GlobalResources& operator=(const GlobalResources&);
+    GlobalResources           (const GlobalResources&) = delete;
+    GlobalResources& operator=(const GlobalResources&) = delete;
 
     std::map<wxString, wxBitmap> bitmaps;
     std::map<wxString, wxAnimation> anims;
 };
 
 
-void GlobalResources::init(const Zstring& filename)
+void GlobalResources::init(const Zstring& filepath)
 {
     assert(bitmaps.empty() && anims.empty());
 
-    wxFFileInputStream input(utfCvrtTo<wxString>(filename));
+    wxFFileInputStream input(utfCvrtTo<wxString>(filepath));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -115,7 +115,7 @@ const wxAnimation& GlobalResources::getAnimation(const wxString& name) const
 }
 
 
-void zen::initResourceImages(const Zstring& filename) { GlobalResources::instance().init(filename); }
+void zen::initResourceImages(const Zstring& filepath) { GlobalResources::instance().init(filepath); }
 
 const wxBitmap& zen::getResourceImage(const wxString& name) { return GlobalResources::instance().getImage(name); }
 

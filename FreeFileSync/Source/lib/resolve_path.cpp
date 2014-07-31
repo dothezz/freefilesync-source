@@ -29,28 +29,28 @@ using namespace zen;
 namespace
 {
 #ifdef ZEN_WIN
-Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathName() is documented not threadsafe!
+Zstring resolveRelativePath(const Zstring& relativePath) //note: ::GetFullPathName() is documented not threadsafe!
 {
     //don't use long path prefix! does not work with relative paths "." and ".."
-    const DWORD bufferSize = ::GetFullPathName(relativeName.c_str(), 0, nullptr, nullptr);
+    const DWORD bufferSize = ::GetFullPathName(relativePath.c_str(), 0, nullptr, nullptr);
     if (bufferSize > 0)
     {
         std::vector<wchar_t> buffer(bufferSize);
-        const DWORD charsWritten = ::GetFullPathName(relativeName.c_str(), //__in   LPCTSTR lpFileName,
+        const DWORD charsWritten = ::GetFullPathName(relativePath.c_str(), //__in   LPCTSTR lpFileName,
                                                      bufferSize, //__in   DWORD nBufferLength,
                                                      &buffer[0], //__out  LPTSTR lpBuffer,
                                                      nullptr);   //__out  LPTSTR *lpFilePart
         if (0 < charsWritten && charsWritten < bufferSize) //theoretically, charsWritten can never be == "bufferSize"
             return Zstring(&buffer[0], charsWritten);
     }
-    return relativeName; //ERROR! Don't do anything
+    return relativePath; //ERROR! Don't do anything
 }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-Zstring resolveRelativePath(const Zstring& relativeName)
+Zstring resolveRelativePath(const Zstring& relativePath)
 {
     //http://linux.die.net/man/2/path_resolution
-    if (!startsWith(relativeName, FILE_NAME_SEPARATOR)) //absolute names are exactly those starting with a '/'
+    if (!startsWith(relativePath, FILE_NAME_SEPARATOR)) //absolute names are exactly those starting with a '/'
     {
         /*
         basic support for '~': strictly speaking this is a shell-layer feature, so "realpath()" won't handle it
@@ -60,15 +60,15 @@ Zstring resolveRelativePath(const Zstring& relativeName)
         should inspect the value of HOME (rather than the value getpwuid(getuid())->pw_dir) since this allows
         the user to modify their notion of "the home directory" during a login session.
         */
-        if (startsWith(relativeName, "~/") || relativeName == "~")
+        if (startsWith(relativePath, "~/") || relativePath == "~")
         {
             const char* homeDir = ::getenv("HOME");
             if (!homeDir)
-                return relativeName; //error! no further processing!
+                return relativePath; //error! no further processing!
 
-            if (startsWith(relativeName, "~/"))
-                return appendSeparator(homeDir) + afterFirst(relativeName, '/');
-            else if (relativeName == "~")
+            if (startsWith(relativePath, "~/"))
+                return appendSeparator(homeDir) + afterFirst(relativePath, '/');
+            else if (relativePath == "~")
                 return homeDir;
         }
 
@@ -76,10 +76,10 @@ Zstring resolveRelativePath(const Zstring& relativeName)
         if (char* dirpath = ::getcwd(nullptr, 0))
         {
             ZEN_ON_SCOPE_EXIT(::free(dirpath));
-            return appendSeparator(dirpath) + relativeName;
+            return appendSeparator(dirpath) + relativePath;
         }
     }
-    return relativeName;
+    return relativePath;
 }
 #endif
 
@@ -110,9 +110,9 @@ private:
                                             0 /* == SHGFP_TYPE_CURRENT*/,   //__in   DWORD dwFlags,
                                             buffer)))					  	//__out  LPTSTR pszPath
             {
-                Zstring dirname = buffer;
-                if (!dirname.empty())
-                    output.insert(std::make_pair(paramName, dirname));
+                Zstring dirpath = buffer;
+                if (!dirpath.empty())
+                    output.insert(std::make_pair(paramName, dirpath));
             }
         };
 
@@ -136,9 +136,9 @@ private:
                 {
                     ZEN_ON_SCOPE_EXIT(::CoTaskMemFree(path));
 
-                    Zstring dirname = path;
-                    if (!dirname.empty())
-                        output.insert(std::make_pair(paramName, dirname));
+                    Zstring dirpath = path;
+                    if (!dirpath.empty())
+                        output.insert(std::make_pair(paramName, dirpath));
                 }
             }
         };
@@ -441,23 +441,23 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
 }
 
 
-void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, LessFilename>& output)
+void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, LessFilename>& output)
 {
 #ifdef ZEN_WIN
-    //1. replace volume path by volume name: c:\dirname -> [SYSTEM]\dirname
-    if (dirname.size() >= 3 &&
-        std::iswalpha(dirname[0]) &&
-        dirname[1] == L':' &&
-        dirname[2] == L'\\')
+    //1. replace volume path by volume name: c:\dirpath -> [SYSTEM]\dirpath
+    if (dirpath.size() >= 3 &&
+        std::iswalpha(dirpath[0]) &&
+        dirpath[1] == L':' &&
+        dirpath[2] == L'\\')
     {
-        if (Opt<Zstring> volname = getVolumeName(Zstring(dirname.c_str(), 3))) //should not block
-            output.insert(L"[" + *volname + L"]" + Zstring(dirname.c_str() + 2));
+        if (Opt<Zstring> volname = getVolumeName(Zstring(dirpath.c_str(), 3))) //should not block
+            output.insert(L"[" + *volname + L"]" + Zstring(dirpath.c_str() + 2));
     }
 
-    //2. replace volume name by volume path: [SYSTEM]\dirname -> c:\dirname
+    //2. replace volume name by volume path: [SYSTEM]\dirpath -> c:\dirpath
     {
-        Zstring testVolname = expandVolumeName(dirname); //should not block
-        if (testVolname != dirname)
+        Zstring testVolname = expandVolumeName(dirpath); //should not block
+        if (testVolname != dirpath)
             if (output.insert(testVolname).second)
                 getDirectoryAliasesRecursive(testVolname, output); //recurse!
     }
@@ -508,72 +508,72 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
 #endif
         };
         for (const auto& entry : envToDir)
-            if (pathStartsWith(dirname, entry.second))
-                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirname.c_str() + entry.second.size()));
+            if (pathStartsWith(dirpath, entry.second))
+                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirpath.c_str() + entry.second.size()));
     }
 
     //4. replace (all) macros: %USERPROFILE% -> C:\Users\<user>
     {
-        Zstring testMacros = expandMacros(dirname);
-        if (testMacros != dirname)
+        Zstring testMacros = expandMacros(dirpath);
+        if (testMacros != dirpath)
             if (output.insert(testMacros).second)
                 getDirectoryAliasesRecursive(testMacros, output); //recurse!
     }
 }
 
 
-std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirString)
+std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirpathPhrase)
 {
-    Zstring dirname = dirString;
-    trim(dirname, true, false);
-    if (dirname.empty())
+    Zstring dirpath = dirpathPhrase;
+    trim(dirpath, true, false);
+    if (dirpath.empty())
         return std::vector<Zstring>();
 
     std::set<Zstring, LessFilename> tmp;
-    getDirectoryAliasesRecursive(dirname, tmp);
+    getDirectoryAliasesRecursive(dirpath, tmp);
 
-    tmp.erase(dirname);
+    tmp.erase(dirpath);
     tmp.erase(Zstring());
 
     return std::vector<Zstring>(tmp.begin(), tmp.end());
 }
 
 
-Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
+Zstring zen::getFormattedDirectoryPath(const Zstring& dirpassPhrase) // throw()
 {
     //formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
 
-    Zstring dirname = dirString;
+    Zstring dirpath = dirpassPhrase;
 
     //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
-    trim(dirname, true, false);
-    while (endsWith(dirname, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
-        dirname.resize(dirname.size() - 1);
+    trim(dirpath, true, false);
+    while (endsWith(dirpath, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+        dirpath.resize(dirpath.size() - 1);
 
-    if (dirname.empty()) //an empty string would later be resolved as "\"; this is not desired
+    if (dirpath.empty()) //an empty string would later be resolved as "\"; this is not desired
         return Zstring();
 
-    dirname = expandMacros(dirname);
-    dirname = expandVolumeName(dirname); //may block for slow USB sticks!
+    dirpath = expandMacros(dirpath);
+    dirpath = expandVolumeName(dirpath); //may block for slow USB sticks!
 
     /*
     need to resolve relative paths:
     WINDOWS:
      - \\?\-prefix which needs absolute names
-     - Volume Shadow Copy: volume name needs to be part of each filename
+     - Volume Shadow Copy: volume name needs to be part of each filepath
      - file icon buffer (at least for extensions that are actually read from disk, like "exe")
      - ::SHFileOperation(): Using relative path names is not thread safe
     WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
-    dirname = resolveRelativePath(dirname);
+    dirpath = resolveRelativePath(dirpath);
 
-    return appendSeparator(dirname);
+    return appendSeparator(dirpath);
 }
 
 
 #ifdef ZEN_WIN
-void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteraction) //throw() - user interaction: show OS password prompt
+void zen::loginNetworkShare(const Zstring& dirpathOrig, bool allowUserInteraction) //throw() - user interaction: show OS password prompt
 {
     /*
     ATTENTION: it is not safe to retrieve UNC path via ::WNetGetConnection() for every type of network share:
@@ -646,13 +646,13 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     };
 
 
-    Zstring dirname = removeLongPathPrefix(dirnameOrig);
-    trim(dirname, true, false);
+    Zstring dirpath = removeLongPathPrefix(dirpathOrig);
+    trim(dirpath, true, false);
 
     //1. locally mapped network share
-    if (dirname.size() >= 2 && iswalpha(dirname[0]) && dirname[1] == L':')
+    if (dirpath.size() >= 2 && iswalpha(dirpath[0]) && dirpath[1] == L':')
     {
-        Zstring driveLetter(dirname.c_str(), 2); //e.g.: "Q:"
+        Zstring driveLetter(dirpath.c_str(), 2); //e.g.: "Q:"
         {
             DWORD bufferSize = 10000;
             std::vector<wchar_t> remoteNameBuffer(bufferSize);
@@ -681,15 +681,15 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
         }
     }
     //2. deviceless network connection
-    else if (startsWith(dirname, L"\\\\")) //UNC path
+    else if (startsWith(dirpath, L"\\\\")) //UNC path
     {
         const Zstring networkShare = [&]() -> Zstring //extract prefix "\\server\share"
         {
-            size_t pos = dirname.find('\\', 2);
+            size_t pos = dirpath.find('\\', 2);
             if (pos == Zstring::npos)
                 return Zstring();
-            pos = dirname.find('\\', pos + 1);
-            return pos == Zstring::npos ? dirname : Zstring(dirname.c_str(), pos);
+            pos = dirpath.find('\\', pos + 1);
+            return pos == Zstring::npos ? dirpath : Zstring(dirpath.c_str(), pos);
         }();
 
         if (!networkShare.empty())

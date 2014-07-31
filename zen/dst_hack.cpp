@@ -14,16 +14,16 @@ using namespace zen;
 namespace
 {
 //fast ::GetVolumePathName() clone: let's hope it's not too simple (doesn't honor mount points)
-Zstring getVolumeName(const Zstring& filename)
+Zstring getVolumeName(const Zstring& filepath)
 {
     //this call is expensive: ~1.5 ms!
-    //    if (!::GetVolumePathName(filename.c_str(), //__in   LPCTSTR lpszFileName,
+    //    if (!::GetVolumePathName(filepath.c_str(), //__in   LPCTSTR lpszFileName,
     //                             fsName,           //__out  LPTSTR lpszVolumePathName,
     //                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
     // ...
     //    Zstring volumePath = appendSeparator(fsName);
 
-    const Zstring nameFmt = appendSeparator(removeLongPathPrefix(filename)); //throw()
+    const Zstring nameFmt = appendSeparator(removeLongPathPrefix(filepath)); //throw()
 
     if (startsWith(nameFmt, Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
     {
@@ -50,9 +50,9 @@ Zstring getVolumeName(const Zstring& filename)
 }
 
 
-bool dst::isFatDrive(const Zstring& fileName) //throw()
+bool dst::isFatDrive(const Zstring& filepath) //throw()
 {
-    const Zstring volumePath = getVolumeName(fileName);
+    const Zstring volumePath = getVolumeName(filepath);
     if (volumePath.empty())
         return false;
 
@@ -123,37 +123,34 @@ Requires Windows Vista!
 
 namespace
 {
-//convert UInt64 and Int64 to FILETIME
+//convert std::uint64_t and std::int64_t to FILETIME
 inline
-FILETIME toFiletime(Int64 number)
+FILETIME toFiletime(std::uint64_t number)
 {
-    const UInt64 unsig = to<UInt64>(number);
+       ULARGE_INTEGER cvt = {};
+        cvt.QuadPart = number;
 
-    FILETIME output = {};
-    output.dwLowDateTime  = unsig.getLo();
-    output.dwHighDateTime = unsig.getHi();
-    return output;
-}
-
-FILETIME toFiletime(UInt64 number)
-{
-    FILETIME output = {};
-    output.dwLowDateTime  = number.getLo();
-    output.dwHighDateTime = number.getHi();
+    const FILETIME output = { cvt.LowPart, cvt.HighPart };
     return output;
 }
 
 inline
-UInt64 toUInt64(const FILETIME& fileTime)
+FILETIME toFiletime(std::int64_t number)
 {
-    return UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime);
+	return toFiletime(static_cast<std::uint64_t>(number));
+}
+
+inline
+std::uint64_t toUInt64(const FILETIME& fileTime)
+{
+    return get64BitUInt(fileTime.dwLowDateTime, fileTime.dwHighDateTime);
 }
 
 
 inline
-Int64 toInt64(const FILETIME& fileTime)
+std::int64_t toInt64(const FILETIME& fileTime)
 {
-    return to<Int64>(UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime));
+    return get64BitUInt(fileTime.dwLowDateTime, fileTime.dwHighDateTime); //convert unsigned to signed in return
 }
 
 
@@ -216,7 +213,7 @@ const size_t WRITE_TIME_HASH_BITS = CREATE_TIME_INFO_BITS - INDICATOR_EXISTING_B
 
 
 template <size_t precision> inline
-FILETIME encodeRawInformation(UInt64 rawInfo)
+FILETIME encodeRawInformation(std::uint64_t rawInfo)
 {
     rawInfo *= precision;
     rawInfo += toUInt64(FAT_MIN_TIME);
@@ -227,13 +224,13 @@ FILETIME encodeRawInformation(UInt64 rawInfo)
 
 
 template <size_t precision> inline
-UInt64 extractRawInformation(const FILETIME& createTime)
+std::uint64_t extractRawInformation(const FILETIME& createTime)
 {
     assert(toUInt64(FAT_MIN_TIME) <= toUInt64(createTime));
     assert(toUInt64(createTime) <= toUInt64(FAT_MAX_TIME));
 
     //FAT create time ranges from 1980 - 2107 (2^7 years) with 1/100 seconds precision
-    UInt64 rawInfo = toUInt64(createTime);
+    std::uint64_t rawInfo = toUInt64(createTime);
 
     rawInfo -= toUInt64(FAT_MIN_TIME);
     rawInfo /= precision;        //reduce precision (FILETIME has unit 10^-7 s)
@@ -245,9 +242,9 @@ UInt64 extractRawInformation(const FILETIME& createTime)
 
 //convert write time to it's minimal representation (no restriction to FAT range "1980 - 2107")
 inline
-UInt64 extractRawWriteTime(const FILETIME& writeTime)
+std::uint64_t extractRawWriteTime(const FILETIME& writeTime)
 {
-    UInt64 rawInfo = toUInt64(writeTime);
+    std::uint64_t rawInfo = toUInt64(writeTime);
     assert(rawInfo % PRECISION_WRITE_TIME == 0U);
     rawInfo /= PRECISION_WRITE_TIME;        //reduce precision (FILETIME has unit 10^-7 s)
     return rawInfo;
@@ -258,7 +255,7 @@ UInt64 extractRawWriteTime(const FILETIME& writeTime)
 inline
 FILETIME roundToFatWriteTime(const FILETIME& writeTime)
 {
-    UInt64 rawData = toUInt64(writeTime);
+    std::uint64_t rawData = toUInt64(writeTime);
 
     if (rawData % PRECISION_WRITE_TIME != 0U)
         rawData += PRECISION_WRITE_TIME;
@@ -277,7 +274,7 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
 
     const FILETIME localTime = utcToLocal(utcTime);
 
-    const int timeShiftSec = to<int>((toInt64(localTime) - toInt64(utcTime)) / 10000000); //time shift in seconds
+    const int timeShiftSec = static_cast<int>((toInt64(localTime) - toInt64(utcTime)) / 10000000); //time shift in seconds
 
     const int timeShiftQuarter = timeShiftSec / (60 * 15); //time shift in quarter-hours
 
@@ -311,7 +308,7 @@ int convertUtcLocalShift(std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift)
 }
 
 
-bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieved by ::FindFirstFile() and ::GetFileAttributesEx(); throw (std::runtime_error)
+bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieved by ::FindFirstFile() and ::GetFileAttributesEx(); throw std::runtime_error
 {
     if (toUInt64(rawTime.createTimeRaw) < toUInt64(FAT_MIN_TIME) ||
         toUInt64(FAT_MAX_TIME) < toUInt64(rawTime.createTimeRaw))
@@ -320,7 +317,7 @@ bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieve
         return false;
     }
 
-    const UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
+    const std::uint64_t rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
 
     assert_static(WRITE_TIME_HASH_BITS == 30);
     return (extractRawWriteTime(utcToLocal(rawTime.writeTimeRaw)) & 0x3FFFFFFFU) == (rawInfo & 0x3FFFFFFFU) && //ensure write time wasn't changed externally
@@ -335,7 +332,7 @@ dst::RawTime dst::fatEncodeUtcTime(const FILETIME& writeTimeRealUtc) //throw std
     //create time lets us store 40 bit of information
 
     //indicator that utc time is encoded -> hopefully results in a date long way in the future; but even if this bit is accidentally set, we still have the hash!
-    UInt64 data = 1U;
+    std::uint64_t data = 1U;
 
     const std::bitset<UTC_LOCAL_OFFSET_BITS> utcShift = getUtcLocalShift();
     data <<= UTC_LOCAL_OFFSET_BITS;
@@ -358,14 +355,14 @@ FILETIME dst::fatDecodeUtcTime(const RawTime& rawTime) //return real UTC time; t
     if (!fatHasUtcEncoded(rawTime))
         return rawTime.writeTimeRaw;
 
-    const UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
+    const std::uint64_t rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
 
-    const std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift(to<int>((rawInfo >> WRITE_TIME_HASH_BITS) & 0x7FU));  //static_cast<int>: a shame MSC... "unsigned long" should be supported instead!
+    const std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift(static_cast<int>((rawInfo >> WRITE_TIME_HASH_BITS) & 0x7FU)); //static_cast<int>: a shame MSC... "unsigned long long" should be supported instead!
     assert_static(UTC_LOCAL_OFFSET_BITS == 7);
 
-    const int timeShiftSec = convertUtcLocalShift(rawShift);
+    const std::int64_t timeShiftSec = convertUtcLocalShift(rawShift);
     const FILETIME writeTimeLocal = utcToLocal(rawTime.writeTimeRaw);
 
-    const Int64 realUTC = toInt64(writeTimeLocal) - Int64(timeShiftSec) * 10000000;
+    const std::int64_t realUTC = toInt64(writeTimeLocal) - timeShiftSec * 10000000;
     return toFiletime(realUTC);
 }

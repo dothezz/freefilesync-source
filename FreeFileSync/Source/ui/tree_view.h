@@ -57,20 +57,20 @@ public:
     //---------------------------------------------------------------------
     struct Node
     {
-        Node(int percent, UInt64 bytes, int itemCount, unsigned int level, NodeStatus status) :
+        Node(int percent, std::uint64_t bytes, int itemCount, unsigned int level, NodeStatus status) :
             percent_(percent), level_(level), status_(status), bytes_(bytes), itemCount_(itemCount) {}
         virtual ~Node() {}
 
         const int percent_; //[0, 100]
         const unsigned int level_;
         const NodeStatus status_;
-        const UInt64 bytes_;
+        const std::uint64_t bytes_;
         const int itemCount_;
     };
 
     struct FilesNode : public Node
     {
-        FilesNode(int percent, UInt64 bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) :
+        FilesNode(int percent, std::uint64_t bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) :
             Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
 
         std::vector<FileSystemObject*> filesAndLinks_; //files and symlinks matching view filter; pointers are bound!
@@ -78,13 +78,13 @@ public:
 
     struct DirNode : public Node
     {
-        DirNode(int percent, UInt64 bytes, int itemCount, unsigned int level, NodeStatus status, DirPair& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
+        DirNode(int percent, std::uint64_t bytes, int itemCount, unsigned int level, NodeStatus status, DirPair& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
         DirPair& dirObj_;
     };
 
     struct RootNode : public Node
     {
-        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const Zstring displayName) :
+        RootNode(int percent, std::uint64_t bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const Zstring displayName) :
             Node(percent, bytes, itemCount, 0, status), baseDirObj_(baseDirObj), displayName_(displayName) {}
 
         BaseDirPair& baseDirObj_;
@@ -108,9 +108,15 @@ private:
 
     struct Container
     {
-        Container() : itemCountGross(), itemCountNet(), firstFileId(nullptr) {}
-        UInt64 bytesGross;
-        UInt64 bytesNet;  //bytes for files on view in this directory only
+        Container() :
+            bytesGross(),
+            bytesNet(),
+            itemCountGross(),
+            itemCountNet(),
+            firstFileId(nullptr) {}
+
+        std::uint64_t bytesGross;
+        std::uint64_t bytesNet;  //bytes for files on view in this directory only
         int itemCountGross;
         int itemCountNet;   //number of files on view for in this directory only
 

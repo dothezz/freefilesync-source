@@ -11,7 +11,6 @@
 #include <functional>
 #include <zen/time.h>
 #include <zen/zstring.h>
-#include <zen/int64.h>
 #include <zen/file_error.h>
 #include "../structures.h"
 
@@ -26,7 +25,7 @@ namespace zen
 	- handles symlinks
 	- replaces already existing target files/dirs (supports retry)
 		=> (unlikely) risk of data loss for naming convention "versioning":
-		race-condition if two FFS instances start at the very same second OR multiple folder pairs process the same filename!!
+		race-condition if two FFS instances start at the very same second OR multiple folder pairs process the same filepath!!
 */
 
 class FileVersioner
@@ -43,31 +42,31 @@ public:
             throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + timeStamp_ + L"\"");
     }
 
-    bool revisionFile(const Zstring& fullName, //throw FileError; return "false" if file is not existing
-                      const Zstring& relativeName,
+    bool revisionFile(const Zstring& filepath, //throw FileError; return "false" if file is not existing
+                      const Zstring& relativePath,
 
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //may be nullptr
+                      const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //may be nullptr
 
-    void revisionDir (const Zstring& fullName,  const Zstring& relativeName, //throw FileError
+    void revisionDir (const Zstring& dirpath,  const Zstring& relativePath, //throw FileError
 
                       //optional callbacks: may be nullptr
                       const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove, //one call for each *existing* object!
                       const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,  //
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                      const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus);
+                      const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus);
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
-    bool revisionFileImpl(const Zstring& fullName, const Zstring& relativeName,
+    bool revisionFileImpl(const Zstring& filepath, const Zstring& relativePath,
                           const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
-                          const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //throw FileError
+                          const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //throw FileError
 
-    void revisionDirImpl (const Zstring& fullName,  const Zstring& relativeName,
+    void revisionDirImpl (const Zstring& filepath,  const Zstring& relativePath,
                           const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
                           const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,
-                          const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus); //throw FileError
+                          const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //throw FileError
 
     const VersioningStyle versioningStyle_;
     const Zstring versioningDirectory_;

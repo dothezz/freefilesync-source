@@ -52,18 +52,18 @@ PopupDialogGenerated::PopupDialogGenerated( wxWindow* parent, wxWindowID id, con
 	bSizer25 = new wxBoxSizer( wxVERTICAL );
 	
 	m_checkBoxCustom = new wxCheckBox( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer25->Add( m_checkBoxCustom, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer25->Add( m_checkBoxCustom, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
 	
 	bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_buttonAffirmative = new wxButton( this, wxID_YES, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	bSizerStdButtons->Add( m_buttonAffirmative, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizerStdButtons->Add( m_buttonAffirmative, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_buttonNegative = new wxButton( this, wxID_NO, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	bSizerStdButtons->Add( m_buttonNegative, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	bSizerStdButtons->Add( m_buttonNegative, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
 	
 	m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
 	
 	
 	bSizer25->Add( bSizerStdButtons, 0, wxALIGN_RIGHT, 5 );

@@ -142,7 +142,7 @@ std::vector<std::set<DirectoryKey>> separateByDistinctDisk(const std::set<Direct
     typedef std::map<DiskInfo, std::set<DirectoryKey>> DiskKeyMapping;
     DiskKeyMapping tmp;
     std::for_each(dirkeys.begin(), dirkeys.end(),
-    [&](const DirectoryKey& key) { tmp[retrieveDiskInfo(key.dirnameFull_)].insert(key); });
+    [&](const DirectoryKey& key) { tmp[retrieveDiskInfo(key.dirpathFull_)].insert(key); });
 
     std::vector<std::set<DirectoryKey>> buckets;
     std::transform(tmp.begin(), tmp.end(), std::back_inserter(buckets),
@@ -201,12 +201,12 @@ public:
 
     void incrementNotifyingThreadId() { ++notifyingThreadID; } //context of main thread
 
-    void reportCurrentFile(const Zstring& filename, long threadID) //context of worker thread
+    void reportCurrentFile(const Zstring& filepath, long threadID) //context of worker thread
     {
         if (threadID != notifyingThreadID) return; //only one thread at a time may report status
 
         boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
-        currentFile = filename;
+        currentFile = filepath;
         currentStatus.clear();
     }
 
@@ -221,24 +221,24 @@ public:
 
     std::wstring getCurrentStatus() //context of main thread, call repreatedly
     {
-        Zstring filename;
+        Zstring filepath;
         std::wstring statusMsg;
         {
             boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
             if (!currentFile.empty())
-                filename = currentFile;
+                filepath = currentFile;
             else if (!currentStatus.empty())
                 statusMsg = copyStringTo<std::wstring>(currentStatus);
         }
 
-        if (!filename.empty())
+        if (!filepath.empty())
         {
             std::wstring statusText = copyStringTo<std::wstring>(textScanning);
             const long activeCount = activeWorker;
             if (activeCount >= 2)
                 statusText += L" [" + replaceCpy(_P("1 thread", "%x threads", activeCount), L"%x", numberTo<std::wstring>(activeCount)) + L"]";
 
-            statusText += L" " + fmtFileName(filename);
+            statusText += L" " + fmtFileName(filepath);
             return statusText;
         }
         else
@@ -313,9 +313,9 @@ public:
         relNameParentPf_(relNameParentPf),
         output_(output) {}
 
-    virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
-    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName);
+    virtual void        onFile   (const Zchar* shortName, const Zstring& filepath, const FileInfo& details);
+    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details);
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath);
     virtual void releaseDirTraverser(TraverseCallback* trav);
 
     virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber);
@@ -328,7 +328,7 @@ private:
 };
 
 
-void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
+void DirCallback::onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
 {
     boost::this_thread::interruption_point();
 
@@ -340,14 +340,14 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
         return;
 
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(filepath, cfg.threadID_);
 
     //------------------------------------------------------------------------------------
     //apply filter before processing (use relative name!)
     if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + fileNameShort))
         return;
 
-    //    std::string fileId = details.fileSize >=  1024 * 1024U ? util::retrieveFileID(fullName) : std::string();
+    //    std::string fileId = details.fileSize >=  1024 * 1024U ? util::retrieveFileID(filepath) : std::string();
     /*
     Perf test Windows 7, SSD, 350k files, 50k dirs, files > 1MB: 7000
     	regular:            6.9s
@@ -364,12 +364,12 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
 }
 
 
-DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details)
 {
     boost::this_thread::interruption_point();
 
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(linkpath, cfg.threadID_);
 
     switch (cfg.handleSymlinks_)
     {
@@ -402,12 +402,12 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
 }
 
 
-TraverseCallback* DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
+TraverseCallback* DirCallback::onDir(const Zchar* shortName, const Zstring& dirpath)
 {
     boost::this_thread::interruption_point();
 
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(dirpath, cfg.threadID_);
 
     //------------------------------------------------------------------------------------
     const Zstring& relPath = relNameParentPf_ + shortName;
@@ -478,11 +478,11 @@ public:
         textApplyingDstHack(replaceCpy(_("Encoding extended time information: %x"), L"%x", L"\n%x")) {}
 
 private:
-    virtual void requestUiRefresh(const Zstring& filename) //applying DST hack imposes significant one-time performance drawback => callback to inform user
+    virtual void requestUiRefresh(const Zstring& filepath) //applying DST hack imposes significant one-time performance drawback => callback to inform user
     {
         boost::this_thread::interruption_point();
 
-        acb_.reportCurrentStatus(replaceCpy(textApplyingDstHack, L"%x", fmtFileName(filename)), threadID_);
+        acb_.reportCurrentStatus(replaceCpy(textApplyingDstHack, L"%x", fmtFileName(filepath)), threadID_);
     }
 
     AsyncCallback& acb_;
@@ -510,7 +510,7 @@ public:
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker(););
 
-        acb_->reportCurrentFile(dirKey_.dirnameFull_, threadID_); //just in case first directory access is blocking
+        acb_->reportCurrentFile(dirKey_.dirpath_, threadID_); //just in case first directory access is blocking
 
         TraverserShared travCfg(threadID_,
                                 dirKey_.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
@@ -530,7 +530,7 @@ public:
 #endif
 
         //get all files and folders from directoryPostfixed (and subdirectories)
-        traverseFolder(dirKey_.dirnameFull_, traverser, dstCallbackPtr); //exceptions may be thrown!
+        traverseFolder(dirKey_.dirpath_, traverser, dstCallbackPtr); //exceptions may be thrown!
     }
 
 private:

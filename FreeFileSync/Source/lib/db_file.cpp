@@ -36,7 +36,7 @@ typedef std::map<UniqueId, BinaryStream> DbStreams; //list of streams ordered by
 //-----------------------------------------------------------------------------------
 
 template <SelectedSide side> inline
-Zstring getDBFilename(const BaseDirPair& baseDirObj, bool tempfile = false)
+Zstring getDatabaseFilePath(const BaseDirPair& baseDirObj, bool tempfile = false)
 {
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity? are UTC file times really compatible?
     //what about endianess!?
@@ -54,7 +54,7 @@ Zstring getDBFilename(const BaseDirPair& baseDirObj, bool tempfile = false)
 
 //#######################################################################################################################################
 
-void saveStreams(const DbStreams& streamList, const Zstring& filename) //throw FileError
+void saveStreams(const DbStreams& streamList, const Zstring& filepath) //throw FileError
 {
     BinStreamOut streamOut;
 
@@ -73,32 +73,32 @@ void saveStreams(const DbStreams& streamList, const Zstring& filename) //throw F
         writeContainer<BinaryStream>(streamOut, stream.second);
     }
 
-    assert(!somethingExists(filename)); //orphan tmp files should be cleaned up already at this point!
-    saveBinStream(filename, streamOut.get()); //throw FileError
+    assert(!somethingExists(filepath)); //orphan tmp files should be cleaned up already at this point!
+    saveBinStream(filepath, streamOut.get()); //throw FileError
 
 #ifdef ZEN_WIN
     //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
-    ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
+    ::SetFileAttributes(applyLongPathPrefix(filepath).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
 #endif
 }
 
 
-DbStreams loadStreams(const Zstring& filename) //throw FileError, FileErrorDatabaseNotExisting
+DbStreams loadStreams(const Zstring& filepath) //throw FileError, FileErrorDatabaseNotExisting
 {
     try
     {
-        BinStreamIn streamIn = loadBinStream<BinaryStream>(filename); //throw FileError
+        BinStreamIn streamIn = loadBinStream<BinaryStream>(filepath); //throw FileError
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
         readArray(streamIn, formatDescr, sizeof(formatDescr)); //throw UnexpectedEndOfStreamError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filepath)));
 
         const int version = readNumber<std::int32_t>(streamIn); //throw UnexpectedEndOfStreamError
         if (version != DB_FORMAT_CONTAINER) //read file format version number
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filepath)));
 
         DbStreams output;
 
@@ -116,18 +116,18 @@ DbStreams loadStreams(const Zstring& filename) //throw FileError, FileErrorDatab
     }
     catch (FileError&)
     {
-        if (!somethingExists(filename)) //a benign(?) race condition with FileError
+        if (!somethingExists(filepath)) //a benign(?) race condition with FileError
             throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
-                                               replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
+                                               replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filepath)));
         throw;
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filename));
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filepath));
     }
     catch (const std::bad_alloc& e) //still required?
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filename),
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filepath),
                         _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
 }
@@ -138,8 +138,8 @@ class StreamGenerator //for db-file back-wards compatibility we stick with two o
 {
 public:
     static void execute(const InSyncDir& dir, //throw FileError
-                        const Zstring& filenameL, //used for diagnostics only
-                        const Zstring& filenameR,
+                        const Zstring& filepathL, //used for diagnostics only
+                        const Zstring& filepathR,
                         BinaryStream& streamL,
                         BinaryStream& streamR)
     {
@@ -149,7 +149,7 @@ public:
         generator.recurse(dir);
         //PERF_STOP
 
-        auto compStream = [](const BinaryStream& stream, const Zstring& filename) -> BinaryStream //throw FileError
+        auto compStream = [](const BinaryStream& stream, const Zstring& filepath) -> BinaryStream //throw FileError
         {
             try
             {
@@ -169,13 +169,13 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename)), L"zlib internal error");
+                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filepath)), L"zlib internal error");
             }
         };
 
-        const BinaryStream tmpL = compStream(generator.outputLeft .get(), filenameL);
-        const BinaryStream tmpR = compStream(generator.outputRight.get(), filenameR);
-        const BinaryStream tmpB = compStream(generator.outputBoth .get(), filenameL + Zstr("/") + filenameR);
+        const BinaryStream tmpL = compStream(generator.outputLeft .get(), filepathL);
+        const BinaryStream tmpR = compStream(generator.outputRight.get(), filepathR);
+        const BinaryStream tmpB = compStream(generator.outputBoth .get(), filepathL + Zstr("/") + filepathR);
 
         BinStreamOut outL;
         BinStreamOut outR;
@@ -211,8 +211,8 @@ private:
         for (const auto& dbFile : container.files)
         {
             writeUtf8(outputBoth, dbFile.first);
-            writeNumber<std::int32_t>(outputBoth, dbFile.second.cmpVar);
-            writeNumber<std::uint64_t>(outputBoth, to<std::uint64_t>(dbFile.second.fileSize));
+            writeNumber<std::int32_t >(outputBoth, dbFile.second.cmpVar);
+            writeNumber<std::uint64_t>(outputBoth, dbFile.second.fileSize);
 
             writeFile(outputLeft,  dbFile.second.left);
             writeFile(outputRight, dbFile.second.right);
@@ -242,7 +242,7 @@ private:
 
     static void writeFile(BinStreamOut& output, const InSyncDescrFile& descr)
     {
-        writeNumber<std:: int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
+        writeNumber<std:: int64_t>(output, descr.lastWriteTimeRaw);
         writeNumber<std::uint64_t>(output, descr.fileId.first);
         writeNumber<std::uint64_t>(output, descr.fileId.second);
         assert_static(sizeof(descr.fileId.first ) <= sizeof(std::uint64_t));
@@ -251,7 +251,7 @@ private:
 
     static void writeLink(BinStreamOut& output, const InSyncDescrLink& descr)
     {
-        writeNumber<std::int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
+        writeNumber<std::int64_t>(output, descr.lastWriteTimeRaw);
     }
 
     BinStreamOut outputLeft;  //data related to one side only
@@ -265,10 +265,10 @@ class StreamParser
 public:
     static std::shared_ptr<InSyncDir> execute(const BinaryStream& streamL, //throw FileError
                                               const BinaryStream& streamR,
-                                              const Zstring& filenameL, //used for diagnostics only
-                                              const Zstring& filenameR)
+                                              const Zstring& filepathL, //used for diagnostics only
+                                              const Zstring& filepathR)
     {
-        auto decompStream = [](const BinaryStream& stream, const Zstring& filename) -> BinaryStream //throw FileError
+        auto decompStream = [](const BinaryStream& stream, const Zstring& filepath) -> BinaryStream //throw FileError
         {
             try
             {
@@ -276,7 +276,7 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)), L"zlib internal error");
+                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filepath)), L"zlib internal error");
             }
         };
 
@@ -289,15 +289,15 @@ public:
             const int streamVersionR = readNumber<std::int32_t>(inR); //
 
             if (streamVersionL != DB_FORMAT_STREAM)
-                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameL)), L"unknown stream format");
+                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filepathL)), L"unknown stream format");
             if (streamVersionR != DB_FORMAT_STREAM)
-                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filenameR)), L"unknown stream format");
+                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filepathR)), L"unknown stream format");
 
             const bool has1stPartL = readNumber<std::int8_t>(inL) != 0; //throw UnexpectedEndOfStreamError
             const bool has1stPartR = readNumber<std::int8_t>(inR) != 0; //
 
             if (has1stPartL == has1stPartR)
-                throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR), L"second part missing");
+                throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filepathL) + L"\n" + fmtFileName(filepathR), L"second part missing");
 
             BinStreamIn& in1stPart = has1stPartL ? inL : inR;
             BinStreamIn& in2ndPart = has1stPartL ? inR : inL;
@@ -314,19 +314,19 @@ public:
             const BinaryStream tmpR = readContainer<BinaryStream>(inR);
 
             auto output = std::make_shared<InSyncDir>(InSyncDir::DIR_STATUS_IN_SYNC);
-            StreamParser parser(decompStream(tmpL, filenameL),
-                                decompStream(tmpR, filenameR),
-                                decompStream(tmpB, filenameL + Zstr("/") + filenameR));
+            StreamParser parser(decompStream(tmpL, filepathL),
+                                decompStream(tmpR, filepathR),
+                                decompStream(tmpB, filepathL + Zstr("/") + filepathR));
             parser.recurse(*output); //throw UnexpectedEndOfStreamError
             return output;
         }
         catch (const UnexpectedEndOfStreamError&)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR));
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filepathL) + L"\n" + fmtFileName(filepathR));
         }
         catch (const std::bad_alloc& e)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR),
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filepathL) + L"\n" + fmtFileName(filepathR),
                             _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         }
     }
@@ -346,7 +346,7 @@ private:
         {
             const Zstring shortName = readUtf8(inputBoth);
             const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
-            const UInt64 fileSize = readNumber<std::uint64_t>(inputBoth);
+            const std::uint64_t fileSize = readNumber<std::uint64_t>(inputBoth);
             const InSyncDescrFile dataL = readFile(inputLeft);
             const InSyncDescrFile dataR = readFile(inputRight);
             container.addFile(shortName, dataL, dataR, cmpVar, fileSize);
@@ -419,9 +419,9 @@ private:
 
     void recurse(const HierarchyObject& hierObj, InSyncDir& dir)
     {
-        process(hierObj.refSubFiles(), hierObj.getObjRelativeNamePf(), dir.files);
-        process(hierObj.refSubLinks(), hierObj.getObjRelativeNamePf(), dir.symlinks);
-        process(hierObj.refSubDirs (), hierObj.getObjRelativeNamePf(), dir.dirs);
+        process(hierObj.refSubFiles(), hierObj.getPairRelativePathPf(), dir.files);
+        process(hierObj.refSubLinks(), hierObj.getPairRelativePathPf(), dir.symlinks);
+        process(hierObj.refSubDirs (), hierObj.getPairRelativePathPf(), dir.dirs);
     }
 
     template <class M, class V>
@@ -475,12 +475,12 @@ private:
                 {
                     //Caveat: If FILE_EQUAL, we *implicitly* assume equal left and right short names matching case: InSyncDir's mapping tables use short name as a key!
                     //This makes us silently dependent from code in algorithm.h!!!
-                    assert(fileObj.getShortName<LEFT_SIDE>() == fileObj.getShortName<RIGHT_SIDE>());
+                    assert(fileObj.getItemName<LEFT_SIDE>() == fileObj.getItemName<RIGHT_SIDE>());
                     //this should be taken for granted:
                     assert(fileObj.getFileSize<LEFT_SIDE>() == fileObj.getFileSize<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncFile& file = updateItem(dbFiles, fileObj.getObjShortName(),
+                    InSyncFile& file = updateItem(dbFiles, fileObj.getPairShortName(),
                                                   InSyncFile(InSyncDescrFile(fileObj.getLastWriteTime<LEFT_SIDE >(),
                                                                              fileObj.getFileId       <LEFT_SIDE >()),
                                                              InSyncDescrFile(fileObj.getLastWriteTime<RIGHT_SIDE>(),
@@ -491,7 +491,7 @@ private:
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto it = dbFiles.find(fileObj.getObjShortName());
+                    auto it = dbFiles.find(fileObj.getPairShortName());
                     if (it != dbFiles.end())
                         toPreserve.insert(&it->second);
                 }
@@ -517,10 +517,10 @@ private:
             {
                 if (linkObj.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
                 {
-                    assert(linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>());
+                    assert(linkObj.getItemName<LEFT_SIDE>() == linkObj.getItemName<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncSymlink& link = updateItem(dbLinks, linkObj.getObjShortName(),
+                    InSyncSymlink& link = updateItem(dbLinks, linkObj.getPairShortName(),
                                                      InSyncSymlink(InSyncDescrLink(linkObj.getLastWriteTime<LEFT_SIDE>()),
                                                                    InSyncDescrLink(linkObj.getLastWriteTime<RIGHT_SIDE>()),
                                                                    activeCmpVar_));
@@ -528,7 +528,7 @@ private:
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto it = dbLinks.find(linkObj.getObjShortName());
+                    auto it = dbLinks.find(linkObj.getPairShortName());
                     if (it != dbLinks.end())
                         toPreserve.insert(&it->second);
                 }
@@ -554,10 +554,10 @@ private:
                 {
                     case DIR_EQUAL:
                     {
-                        assert(dirObj.getShortName<LEFT_SIDE>() == dirObj.getShortName<RIGHT_SIDE>());
+                        assert(dirObj.getItemName<LEFT_SIDE>() == dirObj.getItemName<RIGHT_SIDE>());
 
                         //update directory entry only (shallow), but do *not touch* exising child elements!!!
-                        const Zstring& key = dirObj.getObjShortName();
+                        const Zstring& key = dirObj.getPairShortName();
                         auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::DIR_STATUS_IN_SYNC))); //get or create
                         auto it = insertResult.first;
 
@@ -578,12 +578,12 @@ private:
                     break;
 
                     case DIR_DIFFERENT_METADATA:
-                        //if DIR_DIFFERENT_METADATA and no old database entry yet: we have to insert a new (bogus) database entry:
+                        //if DIR_DIFFERENT_METADATA and no old database entry yet: we have to insert a placeholder database entry:
                         //we cannot simply skip the whole directory, since sub-items might be in sync!
                         //Example: directories on left and right differ in case while sub-files are equal
                     {
-                        //reuse last "in-sync" if available or insert strawman entry (do not try to update thereby removing child elements!!!)
-                        InSyncDir& dir = dbDirs.insert(std::make_pair(dirObj.getObjShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN))).first->second;
+                        //reuse last "in-sync" if available or insert strawman entry (do not try to update and thereby remove child elements!!!)
+                        InSyncDir& dir = dbDirs.insert(std::make_pair(dirObj.getPairShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN))).first->second;
                         toPreserve.insert(&dir);
                         recurse(dirObj, dir);
                     }
@@ -593,7 +593,7 @@ private:
                     case DIR_LEFT_SIDE_ONLY:
                     case DIR_RIGHT_SIDE_ONLY:
                     {
-                        auto it = dbDirs.find(dirObj.getObjShortName());
+                        auto it = dbDirs.find(dirObj.getPairShortName());
                         if (it != dbDirs.end())
                         {
                             toPreserve.insert(&it->second);
@@ -626,22 +626,22 @@ private:
 
 std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
 {
-    const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE >(baseDirObj);
-    const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseDirObj);
+    const Zstring filepathLeft  = getDatabaseFilePath<LEFT_SIDE >(baseDirObj);
+    const Zstring filepathRight = getDatabaseFilePath<RIGHT_SIDE>(baseDirObj);
 
     if (!baseDirObj.isExisting<LEFT_SIDE >() ||
         !baseDirObj.isExisting<RIGHT_SIDE>())
     {
         //avoid race condition with directory existence check: reading sync.ffs_db may succeed although first dir check had failed => conflicts!
         //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430
-        const Zstring filename = !baseDirObj.isExisting<LEFT_SIDE>() ? fileNameLeft : fileNameRight;
+        const Zstring filepath = !baseDirObj.isExisting<LEFT_SIDE>() ? filepathLeft : filepathRight;
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" + //it could be due to a to-be-created target directory not yet existing => FileErrorDatabaseNotExisting
-                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
+                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filepath)));
     }
 
     //read file data: list of session ID + DirInfo-stream
-    const DbStreams streamsLeft  = ::loadStreams(fileNameLeft);  //throw FileError, FileErrorDatabaseNotExisting
-    const DbStreams streamsRight = ::loadStreams(fileNameRight); //
+    const DbStreams streamsLeft  = ::loadStreams(filepathLeft);  //throw FileError, FileErrorDatabaseNotExisting
+    const DbStreams streamsRight = ::loadStreams(filepathRight); //
 
     //find associated session: there can be at most one session within intersection of left and right ids
     for (const auto& streamLeft : streamsLeft)
@@ -651,8 +651,8 @@ std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirPair& base
         {
             return StreamParser::execute(streamLeft.second, //throw FileError
                                          itRight->second,
-                                         fileNameLeft,
-                                         fileNameRight);
+                                         filepathLeft,
+                                         filepathRight);
         }
     }
     throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
@@ -663,11 +663,11 @@ std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirPair& base
 void zen::saveLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileError
 {
     //transactional behaviour! write to tmp files first
-    const Zstring dbNameLeftTmp  = getDBFilename<LEFT_SIDE >(baseDirObj, true);
-    const Zstring dbNameRightTmp = getDBFilename<RIGHT_SIDE>(baseDirObj, true);
+    const Zstring dbNameLeftTmp  = getDatabaseFilePath<LEFT_SIDE >(baseDirObj, true);
+    const Zstring dbNameRightTmp = getDatabaseFilePath<RIGHT_SIDE>(baseDirObj, true);
 
-    const Zstring dbNameLeft  = getDBFilename<LEFT_SIDE >(baseDirObj);
-    const Zstring dbNameRight = getDBFilename<RIGHT_SIDE>(baseDirObj);
+    const Zstring dbNameLeft  = getDatabaseFilePath<LEFT_SIDE >(baseDirObj);
+    const Zstring dbNameRight = getDatabaseFilePath<RIGHT_SIDE>(baseDirObj);
 
     //delete old tmp file, if necessary -> throws if deletion fails!
     removeFile(dbNameLeftTmp);  //

@@ -8,7 +8,7 @@
 #define PROC_HEADER_48257827842345454545
 
 #include <string>
-#include <zen/int64.h>
+#include <cstdint>
 
 //interface for comparison and synchronization process status updates (used by GUI or Batch mode)
 const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary,
@@ -30,12 +30,12 @@ struct ProcessCallback
         PHASE_COMPARING_CONTENT,
         PHASE_SYNCHRONIZING
     };
-    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseId) = 0; //throw ?; informs about the estimated amount of data that will be processed in this phase
+    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) = 0; //throw ?; informs about the estimated amount of data that will be processed in this phase
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
-    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta) = 0; //noexcept!!
-    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta) = 0; //
+    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta) = 0; //noexcept!!
+    virtual void updateTotalData    (int objectsDelta, std::int64_t dataDelta) = 0; //
     /*the estimated and actual total workload may change *during* sync:
     		1. file cannot be moved -> fallback to copy + delete
     		2. file copy, actual size changed after comparison

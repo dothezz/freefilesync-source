@@ -26,14 +26,14 @@ RAII structure to place a directory lock against other FFS processes:
         - ownership shared between all object instances refering to a specific lock location(= GUID)
         - can be copied safely and efficiently! (ref-counting)
         - detects and resolves abandoned locks (instantly if lock is associated with local pc, else after 30 seconds)
-        - temporary locks created during abandoned lock resolution keep "lockfilename"'s extension
+        - temporary locks created during abandoned lock resolution keep "lockfilepath"'s extension
         - race-free (Windows, almost on Linux(NFS))
         - NOT thread-safe! (1. static LockAdmin 2. directory name aliases must be resolved sequentially!)
 */
 class DirLock
 {
 public:
-    DirLock(const Zstring& lockfilename, DirLockCallback* callback = nullptr); //throw FileError, callback only used during construction
+    DirLock(const Zstring& lockfilepath, DirLockCallback* callback = nullptr); //throw FileError, callback only used during construction
 
 private:
     class LockAdmin;

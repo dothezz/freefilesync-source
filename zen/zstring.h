@@ -8,10 +8,9 @@
 #define ZSTRING_H_INCLUDED
 
 #include "string_base.h"
+
 #ifdef ZEN_LINUX
 #include <cstring> //strcmp
-#elif defined ZEN_MAC
-//#include <strings.h> //strcasecmp
 #endif
 
 
@@ -66,7 +65,7 @@ typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChec
 
 
 
-//Compare filenames: Windows does NOT distinguish between upper/lower-case, while Linux DOES
+//Compare filepaths: Windows does NOT distinguish between upper/lower-case, while Linux DOES
 template <template <class, class> class SP, class AP>
 int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs);
 
@@ -114,7 +113,7 @@ int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP
 #if defined ZEN_WIN || defined ZEN_MAC
     return z_impl::compareFilenamesNoCase(lhs.data(), rhs.data(), lhs.length(), rhs.length());
 #elif defined ZEN_LINUX
-    return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filenames don't have embedded 0
+    return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filepaths don't have embedded 0
     //#elif defined ZEN_MAC
     //  return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
 #endif

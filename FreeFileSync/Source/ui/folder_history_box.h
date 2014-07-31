@@ -21,40 +21,40 @@ class FolderHistory
 public:
     FolderHistory() : maxSize_(0) {}
 
-    FolderHistory(const std::vector<Zstring>& dirnames, size_t maxSize) :
+    FolderHistory(const std::vector<Zstring>& dirpaths, size_t maxSize) :
         maxSize_(maxSize),
-        dirnames_(dirnames)
+        dirpaths_(dirpaths)
     {
-        if (dirnames_.size() > maxSize_) //keep maximal size of history list
-            dirnames_.resize(maxSize_);
+        if (dirpaths_.size() > maxSize_) //keep maximal size of history list
+            dirpaths_.resize(maxSize_);
     }
 
-    const std::vector<Zstring>& getList() const { return dirnames_; }
+    const std::vector<Zstring>& getList() const { return dirpaths_; }
 
     static const wxString separationLine() { return L"---------------------------------------------------------------------------------------------------------------"; }
 
-    void addItem(const Zstring& dirname)
+    void addItem(const Zstring& dirpath)
     {
-        if (dirname.empty() || dirname == zen::utfCvrtTo<Zstring>(separationLine()))
+        if (dirpath.empty() || dirpath == zen::utfCvrtTo<Zstring>(separationLine()))
             return;
 
-        Zstring nameTmp = dirname;
+        Zstring nameTmp = dirpath;
         zen::trim(nameTmp);
 
         //insert new folder or put it to the front if already existing
-        vector_remove_if(dirnames_, [&](const Zstring& item) { return ::EqualFilename()(item, nameTmp); });
+        vector_remove_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilename()(item, nameTmp); });
 
-        dirnames_.insert(dirnames_.begin(), nameTmp);
+        dirpaths_.insert(dirpaths_.begin(), nameTmp);
 
-        if (dirnames_.size() > maxSize_) //keep maximal size of history list
-            dirnames_.resize(maxSize_);
+        if (dirpaths_.size() > maxSize_) //keep maximal size of history list
+            dirpaths_.resize(maxSize_);
     }
 
-    void delItem(const Zstring& dirname) { zen::vector_remove_if(dirnames_, [&](const Zstring& entry) { return ::EqualFilename()(entry, dirname); }); }
+    void delItem(const Zstring& dirpath) { zen::vector_remove_if(dirpaths_, [&](const Zstring& entry) { return ::EqualFilename()(entry, dirpath); }); }
 
 private:
     size_t maxSize_;
-    std::vector<Zstring> dirnames_;
+    std::vector<Zstring> dirpaths_;
 };
 
 
@@ -74,9 +74,9 @@ public:
 
     void init(const std::shared_ptr<FolderHistory>& sharedHistory) { sharedHistory_ = sharedHistory; }
 
-    void setValue(const wxString& dirname)
+    void setValue(const wxString& dirpath)
     {
-        setValueAndUpdateList(dirname); //required for setting value correctly; Linux: ensure the dropdown is shown as being populated
+        setValueAndUpdateList(dirpath); //required for setting value correctly; Linux: ensure the dropdown is shown as being populated
     }
 
     // GetValue
@@ -84,7 +84,7 @@ public:
 private:
     void OnKeyEvent(wxKeyEvent& event);
     void OnRequireHistoryUpdate(wxEvent& event);
-    void setValueAndUpdateList(const wxString& dirname);
+    void setValueAndUpdateList(const wxString& dirpath);
 
     std::shared_ptr<FolderHistory> sharedHistory_;
 };

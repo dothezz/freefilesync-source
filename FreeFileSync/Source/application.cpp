@@ -18,7 +18,6 @@
 #include "algorithm.h"
 #include "synchronization.h"
 #include "ui/batch_status_handler.h"
-//#include "ui/check_version.h"
 #include "ui/main_dlg.h"
 #include "ui/switch_to_gui.h"
 #include "lib/process_xml.h"
@@ -140,6 +139,7 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 }
 
 //##################################################################################################################
+
 
 bool Application::OnInit()
 {
@@ -332,37 +332,37 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             else
             {
-                Zstring filename = *it;
-                if (!fileExists(filename)) //...be a little tolerant
+                Zstring filepath = *it;
+                if (!fileExists(filepath)) //...be a little tolerant
                 {
-                    if (fileExists(filename + Zstr(".ffs_batch")))
-                        filename += Zstr(".ffs_batch");
-                    else if (fileExists(filename + Zstr(".ffs_gui")))
-                        filename += Zstr(".ffs_gui");
-                    else if (fileExists(filename + Zstr(".xml")))
-                        filename += Zstr(".xml");
+                    if (fileExists(filepath + Zstr(".ffs_batch")))
+                        filepath += Zstr(".ffs_batch");
+                    else if (fileExists(filepath + Zstr(".ffs_gui")))
+                        filepath += Zstr(".ffs_gui");
+                    else if (fileExists(filepath + Zstr(".xml")))
+                        filepath += Zstr(".xml");
                     else
                     {
-                        notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), std::wstring());
+                        notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filepath)), std::wstring());
                         return;
                     }
                 }
 
                 try
                 {
-                    switch (getXmlType(filename)) //throw FileError
+                    switch (getXmlType(filepath)) //throw FileError
                     {
                         case XML_TYPE_GUI:
-                            configFiles.push_back(std::make_pair(filename, XML_TYPE_GUI));
+                            configFiles.push_back(std::make_pair(filepath, XML_TYPE_GUI));
                             break;
                         case XML_TYPE_BATCH:
-                            configFiles.push_back(std::make_pair(filename, XML_TYPE_BATCH));
+                            configFiles.push_back(std::make_pair(filepath, XML_TYPE_BATCH));
                             break;
                         case XML_TYPE_GLOBAL:
-                            globalConfigFile = filename;
+                            globalConfigFile = filepath;
                             break;
                         case XML_TYPE_OTHER:
-                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), std::wstring());
+                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)), std::wstring());
                             return;
                     }
                 }
@@ -382,8 +382,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     auto hasNonDefaultConfig = [](const FolderPairEnh& fp)
     {
-        return !(fp == FolderPairEnh(fp.dirnamePhraseLeft,
-                                     fp.dirnamePhraseRight,
+        return !(fp == FolderPairEnh(fp.dirpathPhraseLeft,
+                                     fp.dirpathPhraseRight,
                                      nullptr, nullptr, FilterConfig()));
     };
 
@@ -402,8 +402,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             for (size_t i = 0; i < leftDirs.size(); ++i)
                 if (i == 0)
                 {
-                    mainCfg.firstPair.dirnamePhraseLeft  = leftDirs [0];
-                    mainCfg.firstPair.dirnamePhraseRight = rightDirs[0];
+                    mainCfg.firstPair.dirpathPhraseLeft  = leftDirs [0];
+                    mainCfg.firstPair.dirpathPhraseRight = rightDirs[0];
                 }
                 else
                     mainCfg.additionalPairs.push_back(FolderPairEnh(leftDirs [i],
@@ -435,7 +435,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     }
     else if (configFiles.size() == 1)
     {
-        const Zstring filename = configFiles[0].first;
+        const Zstring filepath = configFiles[0].first;
 
         //batch mode
         if (configFiles[0].second == XML_TYPE_BATCH)
@@ -444,7 +444,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             try
             {
                 std::wstring warningMsg;
-                readConfig(filename, batchCfg, warningMsg); //throw FileError
+                readConfig(filepath, batchCfg, warningMsg); //throw FileError
 
                 if (!warningMsg.empty())
                     throw FileError(warningMsg); //batch mode: break on errors AND even warnings!
@@ -456,7 +456,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             if (!replaceDirectories(batchCfg.mainCfg))
                 return;
-            runBatchMode(globalConfigFilePath, batchCfg, filename, returnCode);
+            runBatchMode(globalConfigFilePath, batchCfg, filepath, returnCode);
         }
         //GUI mode: single config
         else
@@ -465,7 +465,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             try
             {
                 std::wstring warningMsg;
-                readConfig(filename, guiCfg, warningMsg); //throw FileError
+                readConfig(filepath, guiCfg, warningMsg); //throw FileError
 
                 if (!warningMsg.empty())
                     showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
@@ -481,7 +481,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //what about simulating changed config due to directory replacement?
             //-> propably fine to not show as changed on GUI and not ask user to save on exit!
 
-            runGuiMode(globalConfigFilePath, guiCfg, { filename }); //caveat: guiCfg and filename do not match if directories were set/replaced via command line!
+            runGuiMode(globalConfigFilePath, guiCfg, { filepath }); //caveat: guiCfg and filepath do not match if directories were set/replaced via command line!
         }
     }
     //gui mode: merged configs
@@ -493,15 +493,15 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             return;
         }
 
-        std::vector<Zstring> filenames;
+        std::vector<Zstring> filepaths;
         for (const auto& item : configFiles)
-            filenames.push_back(item.first);
+            filepaths.push_back(item.first);
 
         XmlGuiConfig guiCfg; //structure to receive gui settings with default values
         try
         {
             std::wstring warningMsg;
-            readAnyConfig(filenames, guiCfg, warningMsg); //throw FileError
+            readAnyConfig(filepaths, guiCfg, warningMsg); //throw FileError
 
             if (!warningMsg.empty())
                 showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
@@ -512,7 +512,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             notifyError(e.toString(), std::wstring());
             return;
         }
-        runGuiMode(globalConfigFilePath, guiCfg, filenames);
+        runGuiMode(globalConfigFilePath, guiCfg, filepaths);
     }
 }
 
@@ -614,7 +614,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                                          batchCfg.mainCfg.onCompletion,
                                          globalCfg.gui.onCompletionHistory);
 
-        const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
+        const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg, globalCfg.fileTimeTolerance);
 
         bool allowPwPrompt = false;
         switch (batchCfg.handleError)
@@ -632,8 +632,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
 
         //COMPARE DIRECTORIES
         FolderComparison folderCmp;
-        compare(globalCfg.fileTimeTolerance,
-                globalCfg.optDialogs,
+        compare(globalCfg.optDialogs,
                 allowPwPrompt,
                 globalCfg.runWithBackgroundPriority,
                 globalCfg.createLockFile,

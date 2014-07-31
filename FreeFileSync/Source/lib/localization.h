@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <zen/file_error.h>
-//#include <wx/string.h>
 
 namespace zen
 {
@@ -28,9 +27,8 @@ public:
 
 private:
     ExistingTranslations();
-    ExistingTranslations(const ExistingTranslations&);
-    ExistingTranslations& operator=(const ExistingTranslations&);
-
+    ExistingTranslations           (const ExistingTranslations&) = delete;
+    ExistingTranslations& operator=(const ExistingTranslations&) = delete;
     std::vector<Entry> locMapping;
 };
 

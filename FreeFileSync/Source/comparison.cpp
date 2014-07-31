@@ -24,7 +24,7 @@
 using namespace zen;
 
 
-std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg)
+std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance)
 {
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
@@ -37,9 +37,11 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
     std::transform(allPairs.begin(), allPairs.end(), std::back_inserter(output),
                    [&](const FolderPairEnh& enhPair) -> FolderPairCfg
     {
-        return FolderPairCfg(enhPair.dirnamePhraseLeft, enhPair.dirnamePhraseRight,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar     : mainCfg.cmpConfig.compareVar,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks : mainCfg.cmpConfig.handleSymlinks,
+        return FolderPairCfg(enhPair.dirpathPhraseLeft, enhPair.dirpathPhraseRight,
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
+        fileTimeTolerance,
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->optTimeShiftHours : mainCfg.cmpConfig.optTimeShiftHours,
 
         normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
 
@@ -54,11 +56,11 @@ namespace
 struct ResolvedFolderPair
 {
     ResolvedFolderPair(const Zstring& left, const Zstring& right) :
-        dirnameLeft(left),
-        dirnameRight(right) {}
+        dirpathLeft(left),
+        dirpathRight(right) {}
 
-    Zstring dirnameLeft;  //resolved directory names
-    Zstring dirnameRight; //
+    Zstring dirpathLeft;  //resolved directory names
+    Zstring dirpathRight; //
 };
 
 
@@ -68,9 +70,9 @@ std::vector<ResolvedFolderPair> resolveDirectoryNames(const std::vector<FolderPa
 
     for (const FolderPairCfg& fpCfg : cfgList)
         output.push_back(ResolvedFolderPair(
-                             getFormattedDirectoryName(fpCfg.dirnamePhraseLeft),
-                             getFormattedDirectoryName(fpCfg.dirnamePhraseRight)));
-    warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryName, but currently not thread-safe")
+                             getFormattedDirectoryPath(fpCfg.dirpathPhraseLeft),
+                             getFormattedDirectoryPath(fpCfg.dirpathPhraseRight)));
+    warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
     return output;
 }
 
@@ -94,21 +96,21 @@ ResolutionInfo resolveFolderPairs(const std::vector<FolderPairCfg>& cfgList,
         output.resolvedPairs = resolveDirectoryNames(cfgList);
         assert(output.resolvedPairs.size() == cfgList.size()); //postcondition!
 
-        std::set<Zstring, LessFilename> dirnames;
+        std::set<Zstring, LessFilename> dirpaths;
         for (const ResolvedFolderPair& fp : output.resolvedPairs)
         {
-            dirnames.insert(fp.dirnameLeft);
-            dirnames.insert(fp.dirnameRight);
+            dirpaths.insert(fp.dirpathLeft);
+            dirpaths.insert(fp.dirpathRight);
         }
 
-        const DirectoryStatus dirStatus = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
+        const DirectoryStatus dirStatus = getExistingDirsUpdating(dirpaths, allowUserInteraction, callback); //check *all* directories on each try!
         output.existingDirs = dirStatus.existing;
 
         if (!dirStatus.missing.empty())
         {
             std::wstring msg = _("Cannot find the following folders:") + L"\n";
-            for (const Zstring& dirname : dirStatus.missing)
-                msg += std::wstring(L"\n") + dirname;
+            for (const Zstring& dirpath : dirStatus.missing)
+                msg += std::wstring(L"\n") + dirpath;
             throw FileError(msg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
         }
     }, callback);
@@ -123,9 +125,9 @@ void checkForIncompleteInput(const std::vector<ResolvedFolderPair>& folderPairs,
     bool haveFullPair    = false;
 
     for (const ResolvedFolderPair& fp : folderPairs)
-        if (fp.dirnameLeft.empty() != fp.dirnameRight.empty())
+        if (fp.dirpathLeft.empty() != fp.dirpathRight.empty())
             havePartialPair = true;
-        else if (!fp.dirnameLeft.empty())
+        else if (!fp.dirpathLeft.empty())
             haveFullPair = true;
 
     if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
@@ -147,10 +149,10 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
     };
 
     for (const ResolvedFolderPair& fp : folderPairs)
-        if (!fp.dirnameLeft.empty() && !fp.dirnameRight.empty()) //empty folders names may be accepted by user
+        if (!fp.dirpathLeft.empty() && !fp.dirpathRight.empty()) //empty folders names may be accepted by user
         {
-            if (areDependent(fp.dirnameLeft, fp.dirnameRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(fp.dirnameLeft, fp.dirnameRight));
+            if (areDependent(fp.dirpathLeft, fp.dirpathRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
+                dependentDirs.push_back(std::make_pair(fp.dirpathLeft, fp.dirpathRight));
         }
 
     if (!dependentDirs.empty())
@@ -170,15 +172,15 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
 class ComparisonBuffer
 {
 public:
-    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int fileTimeTol, ProcessCallback& callback);
+    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, ProcessCallback& callback);
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
     std::shared_ptr<BaseDirPair> compareByTimeSize(const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const;
     std::list<std::shared_ptr<BaseDirPair>> compareByContent(const std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>>& workLoad) const;
 
 private:
-    ComparisonBuffer(const ComparisonBuffer&); //=delete
-    ComparisonBuffer& operator=(const ComparisonBuffer&); //=delete
+    ComparisonBuffer           (const ComparisonBuffer&) = delete;
+    ComparisonBuffer& operator=(const ComparisonBuffer&) = delete;
 
     std::shared_ptr<BaseDirPair> performComparison(const ResolvedFolderPair& fp,
                                                    const FolderPairCfg& fpCfg,
@@ -186,16 +188,11 @@ private:
                                                    std::vector<SymlinkPair*>& undefinedLinks) const;
 
     std::map<DirectoryKey, DirectoryValue> directoryBuffer; //contains only *existing* directories
-    const int fileTimeTolerance;
     ProcessCallback& callback_;
 };
 
 
-ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
-                                   int fileTimeTol,
-                                   ProcessCallback& callback) :
-    fileTimeTolerance(fileTimeTol),
-    callback_(callback)
+ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, ProcessCallback& callback) : callback_(callback)
 {
     class CbImpl : public FillBufferCallback
     {
@@ -249,7 +246,7 @@ const wchar_t arrowRight[] = L"-->";
 
 
 //check for very old dates or dates in the future
-std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
+std::wstring getConflictInvalidDate(const Zstring& fileNameFull, std::int64_t utcTime)
 {
     return replaceCpy(_("File %x has an invalid date."), L"%x", fmtFileName(fileNameFull)) + L"\n" +
            _("Date:") + L" " + utcToLocalTimeString(utcTime);
@@ -259,7 +256,7 @@ std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
 {
-    return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
+    return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtFileName(fileObj.getPairRelativePath())) + L"\n" +
            L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
 }
@@ -267,15 +264,15 @@ std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
 
 std::wstring getConflictSkippedBinaryComparison(const FilePair& fileObj)
 {
-    return replaceCpy(_("Content comparison was skipped for excluded files %x."), L"%x", fmtFileName(fileObj.getObjRelativeName()));
+    return replaceCpy(_("Content comparison was skipped for excluded files %x."), L"%x", fmtFileName(fileObj.getPairRelativePath()));
 }
 
 
 std::wstring getDescrDiffMetaShortnameCase(const FileSystemObject& fsObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + fmtFileName(fsObj.getShortName<LEFT_SIDE >()) + L"\n" +
-           L"    " + arrowRight + L" " + fmtFileName(fsObj.getShortName<RIGHT_SIDE>());
+           L"    " + arrowLeft  + L" " + fmtFileName(fsObj.getItemName<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowRight + L" " + fmtFileName(fsObj.getItemName<RIGHT_SIDE>());
 }
 
 
@@ -289,37 +286,37 @@ std::wstring getDescrDiffMetaDate(const FileOrLinkPair& fileObj)
 
 //-----------------------------------------------------------------------------
 
-void categorizeSymlinkByTime(SymlinkPair& linkObj, int fileTimeTolerance)
+void categorizeSymlinkByTime(SymlinkPair& linkObj, int fileTimeTolerance, unsigned int optTimeShiftHours)
 {
     //categorize symlinks that exist on both sides
-    switch (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(),
-                                   linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
+    switch (compareFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(),
+                            linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance, optTimeShiftHours))
     {
-        case CmpFileTime::TIME_EQUAL:
+        case TimeResult::EQUAL:
             //Caveat:
             //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
             //2. harmonize with "bool stillInSync()" in algorithm.cpp
 
-            if (linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>())
+            if (linkObj.getItemName<LEFT_SIDE>() == linkObj.getItemName<RIGHT_SIDE>())
                 linkObj.setCategory<FILE_EQUAL>();
             else
                 linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
             break;
 
-        case CmpFileTime::TIME_LEFT_NEWER:
+        case TimeResult::LEFT_NEWER:
             linkObj.setCategory<FILE_LEFT_NEWER>();
             break;
 
-        case CmpFileTime::TIME_RIGHT_NEWER:
+        case TimeResult::RIGHT_NEWER:
             linkObj.setCategory<FILE_RIGHT_NEWER>();
             break;
 
-        case CmpFileTime::TIME_LEFT_INVALID:
-            linkObj.setCategoryConflict(getConflictInvalidDate(linkObj.getFullName<LEFT_SIDE>(), linkObj.getLastWriteTime<LEFT_SIDE>()));
+        case TimeResult::LEFT_INVALID:
+            linkObj.setCategoryConflict(getConflictInvalidDate(linkObj.getFullPath<LEFT_SIDE>(), linkObj.getLastWriteTime<LEFT_SIDE>()));
             break;
 
-        case CmpFileTime::TIME_RIGHT_INVALID:
-            linkObj.setCategoryConflict(getConflictInvalidDate(linkObj.getFullName<RIGHT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>()));
+        case TimeResult::RIGHT_INVALID:
+            linkObj.setCategoryConflict(getConflictInvalidDate(linkObj.getFullPath<RIGHT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>()));
             break;
     }
 }
@@ -334,22 +331,22 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::compareByTimeSize(const ResolvedF
 
     //finish symlink categorization
     for (SymlinkPair* linkObj : uncategorizedLinks)
-        categorizeSymlinkByTime(*linkObj, fileTimeTolerance);
+        categorizeSymlinkByTime(*linkObj, fpConfig.fileTimeTolerance, fpConfig.optTimeShiftHours);
 
     //categorize files that exist on both sides
     for (FilePair* fileObj : uncategorizedFiles)
     {
-        switch (CmpFileTime::getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
-                                       fileObj->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
+        switch (compareFileTime(fileObj->getLastWriteTime<LEFT_SIDE>(),
+                                fileObj->getLastWriteTime<RIGHT_SIDE>(), fpConfig.fileTimeTolerance, fpConfig.optTimeShiftHours))
         {
-            case CmpFileTime::TIME_EQUAL:
+            case TimeResult::EQUAL:
                 //Caveat:
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
                 //2. FILE_EQUAL is expected to mean identical file sizes! See InSyncFile
                 //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
                 if (fileObj->getFileSize<LEFT_SIDE>() == fileObj->getFileSize<RIGHT_SIDE>())
                 {
-                    if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>())
+                    if (fileObj->getItemName<LEFT_SIDE>() == fileObj->getItemName<RIGHT_SIDE>())
                         fileObj->setCategory<FILE_EQUAL>();
                     else
                         fileObj->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*fileObj));
@@ -358,20 +355,20 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::compareByTimeSize(const ResolvedF
                     fileObj->setCategoryConflict(getConflictSameDateDiffSize(*fileObj)); //same date, different filesize
                 break;
 
-            case CmpFileTime::TIME_LEFT_NEWER:
+            case TimeResult::LEFT_NEWER:
                 fileObj->setCategory<FILE_LEFT_NEWER>();
                 break;
 
-            case CmpFileTime::TIME_RIGHT_NEWER:
+            case TimeResult::RIGHT_NEWER:
                 fileObj->setCategory<FILE_RIGHT_NEWER>();
                 break;
 
-            case CmpFileTime::TIME_LEFT_INVALID:
-                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullName<LEFT_SIDE>(), fileObj->getLastWriteTime<LEFT_SIDE>()));
+            case TimeResult::LEFT_INVALID:
+                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullPath<LEFT_SIDE>(), fileObj->getLastWriteTime<LEFT_SIDE>()));
                 break;
 
-            case CmpFileTime::TIME_RIGHT_INVALID:
-                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullName<RIGHT_SIDE>(), fileObj->getLastWriteTime<RIGHT_SIDE>()));
+            case TimeResult::RIGHT_INVALID:
+                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullPath<RIGHT_SIDE>(), fileObj->getLastWriteTime<RIGHT_SIDE>()));
                 break;
         }
     }
@@ -379,18 +376,18 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::compareByTimeSize(const ResolvedF
 }
 
 
-void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, ProcessCallback& callback)
+void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, unsigned int optTimeShiftHours, ProcessCallback& callback)
 {
     //categorize symlinks that exist on both sides
     Zstring targetPathRawL;
     Zstring targetPathRawR;
     Opt<std::wstring> errMsg = tryReportingError([&]
     {
-        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullName<LEFT_SIDE>())));
-        targetPathRawL = getSymlinkTargetRaw(linkObj.getFullName<LEFT_SIDE>()); //throw FileError
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullPath<LEFT_SIDE>())));
+        targetPathRawL = getSymlinkTargetRaw(linkObj.getFullPath<LEFT_SIDE>()); //throw FileError
 
-        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullName<RIGHT_SIDE>())));
-        targetPathRawR = getSymlinkTargetRaw(linkObj.getFullName<RIGHT_SIDE>()); //throw FileError
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullPath<RIGHT_SIDE>())));
+        targetPathRawR = getSymlinkTargetRaw(linkObj.getFullPath<RIGHT_SIDE>()); //throw FileError
     }, callback);
 
     if (errMsg)
@@ -400,8 +397,8 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, Pro
         if (targetPathRawL == targetPathRawR
 #ifdef ZEN_WIN //type of symbolic link is relevant for Windows only
             &&
-            dirExists(linkObj.getFullName<LEFT_SIDE >()) == //check if dir-symlink
-            dirExists(linkObj.getFullName<RIGHT_SIDE>())    //
+            dirExists(linkObj.getFullPath<LEFT_SIDE >()) == //check if dir-symlink
+            dirExists(linkObj.getFullPath<RIGHT_SIDE>())    //
 #endif
            )
         {
@@ -410,10 +407,10 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, Pro
             //2. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
 
             //symlinks have same "content"
-            if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>())
+            if (linkObj.getItemName<LEFT_SIDE>() != linkObj.getItemName<RIGHT_SIDE>())
                 linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
             else if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(),
-                                   linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
+                                   linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance, optTimeShiftHours))
                 linkObj.setCategoryDiffMetadata(getDescrDiffMetaDate(linkObj));
             else
                 linkObj.setCategory<FILE_EQUAL>();
@@ -431,48 +428,47 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
         return output;
 
     //PERF_START;
-    std::vector<FilePair*> undefinedFiles;
+    std::vector<FilePair*> filesToCompareBytewise;
 
     //process folder pairs one after another
     for (const auto& w : workLoad)
     {
+        std::vector<FilePair*> undefinedFiles;
         std::vector<SymlinkPair*> uncategorizedLinks;
         //do basis scan and retrieve candidates for binary comparison (files existing on both sides)
 
         output.push_back(performComparison(w.first, w.second, undefinedFiles, uncategorizedLinks));
 
+        //content comparison of file content happens AFTER finding corresponding files and AFTER filtering
+        //in order to separate into two processes (scanning and comparing)
+        for (FilePair* fileObj : undefinedFiles)
+            //pre-check: files have different content if they have a different filesize (must not be FILE_EQUAL: see InSyncFile)
+            if (fileObj->getFileSize<LEFT_SIDE>() != fileObj->getFileSize<RIGHT_SIDE>())
+                fileObj->setCategory<FILE_DIFFERENT>();
+            else
+            {
+                //perf: skip binary comparison for excluded rows (e.g. via time span and size filter)!
+                //both soft and hard filter were already applied in ComparisonBuffer::performComparison()!
+                if (!fileObj->isActive())
+                    fileObj->setCategoryConflict(getConflictSkippedBinaryComparison(*fileObj));
+                else
+                    filesToCompareBytewise.push_back(fileObj);
+            }
+
         //finish symlink categorization
         for (SymlinkPair* linkObj : uncategorizedLinks)
-            categorizeSymlinkByContent(*linkObj, fileTimeTolerance, callback_);
+            categorizeSymlinkByContent(*linkObj, w.second.fileTimeTolerance, w.second.optTimeShiftHours, callback_);
     }
 
     //finish categorization...
-    std::vector<FilePair*> filesToCompareBytewise;
-
-    //content comparison of file content happens AFTER finding corresponding files and AFTER filtering
-    //in order to separate into two processes (scanning and comparing)
-    for (FilePair* fileObj : undefinedFiles)
-        //pre-check: files have different content if they have a different filesize (must not be FILE_EQUAL: see InSyncFile)
-        if (fileObj->getFileSize<LEFT_SIDE>() != fileObj->getFileSize<RIGHT_SIDE>())
-            fileObj->setCategory<FILE_DIFFERENT>();
-        else
-        {
-            //perf: skip binary comparison for excluded rows (e.g. via time span and size filter)!
-            //both soft and hard filter were already applied in ComparisonBuffer::performComparison()!
-            if (!fileObj->isActive())
-                fileObj->setCategoryConflict(getConflictSkippedBinaryComparison(*fileObj));
-            else
-                filesToCompareBytewise.push_back(fileObj);
-        }
-
     const size_t objectsTotal = filesToCompareBytewise.size();
 
-    UInt64 bytesTotal; //left and right filesizes are equal
+    std::uint64_t bytesTotal = 0; //left and right filesizes are equal
     for (FilePair* fileObj : filesToCompareBytewise)
         bytesTotal += fileObj->getFileSize<LEFT_SIDE>();
 
     callback_.initNewPhase(static_cast<int>(objectsTotal), //may throw
-                           to<Int64>(bytesTotal),
+                           bytesTotal,
                            ProcessCallback::PHASE_COMPARING_CONTENT);
 
     const std::wstring txtComparingContentOfFiles = _("Comparing content of files %x");
@@ -480,19 +476,19 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
     //compare files (that have same size) bytewise...
     for (FilePair* fileObj : filesToCompareBytewise)
     {
-        callback_.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", fmtFileName(fileObj->getObjRelativeName()), false));
+        callback_.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", fmtFileName(fileObj->getPairRelativePath()), false));
 
         //check files that exist in left and right model but have different content
 
         bool haveSameContent = false;
         Opt<std::wstring> errMsg = tryReportingError([&]
         {
-            StatisticsReporter statReporter(1, to<Int64>(fileObj->getFileSize<LEFT_SIDE>()), callback_);
+            StatisticsReporter statReporter(1, fileObj->getFileSize<LEFT_SIDE>(), callback_);
 
-            auto onUpdateStatus = [&](Int64 bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            auto onUpdateStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
-            haveSameContent = filesHaveSameContent(fileObj->getFullName<LEFT_SIDE>(),
-                                                   fileObj->getFullName<RIGHT_SIDE>(), onUpdateStatus); //throw FileError
+            haveSameContent = filesHaveSameContent(fileObj->getFullPath<LEFT_SIDE>(),
+                                                   fileObj->getFullPath<RIGHT_SIDE>(), onUpdateStatus); //throw FileError
             statReporter.reportDelta(1, 0);
 
             statReporter.reportFinished();
@@ -508,10 +504,10 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
                 //2. FILE_EQUAL is expected to mean identical file sizes! See InSyncFile
                 //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
-                if (fileObj->getShortName<LEFT_SIDE>() != fileObj->getShortName<RIGHT_SIDE>())
+                if (fileObj->getItemName<LEFT_SIDE>() != fileObj->getItemName<RIGHT_SIDE>())
                     fileObj->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*fileObj));
                 else if (!sameFileTime(fileObj->getLastWriteTime<LEFT_SIDE>(),
-                                       fileObj->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
+                                       fileObj->getLastWriteTime<RIGHT_SIDE>(), fileObj->root().getFileTimeTolerance(), fileObj->root().getTimeShift()))
                     fileObj->setCategoryDiffMetadata(getDescrDiffMetaDate(*fileObj));
                 else
                     fileObj->setCategory<FILE_EQUAL>();
@@ -667,7 +663,7 @@ void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filter
     //process subdirs recursively
     for (DirPair& dirObj : hierObj.refSubDirs())
     {
-        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), nullptr)); //subObjMightMatch is always true in this context!
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getPairRelativePath(), nullptr)); //subObjMightMatch is always true in this context!
         stripExcludedDirectories(dirObj, filterProc);
     }
 
@@ -692,14 +688,14 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
     callback_.reportStatus(_("Generating file list..."));
     callback_.forceUiRefresh();
 
-    auto getDirValue = [&](const Zstring& dirnameFmt) -> const DirectoryValue*
+    auto getDirValue = [&](const Zstring& dirpathFmt) -> const DirectoryValue*
     {
-        auto it = directoryBuffer.find(DirectoryKey(dirnameFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+        auto it = directoryBuffer.find(DirectoryKey(dirpathFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
         return it != directoryBuffer.end() ? &it->second : nullptr;
     };
 
-    const DirectoryValue* bufValueLeft  = getDirValue(fp.dirnameLeft);
-    const DirectoryValue* bufValueRight = getDirValue(fp.dirnameRight);
+    const DirectoryValue* bufValueLeft  = getDirValue(fp.dirpathLeft);
+    const DirectoryValue* bufValueRight = getDirValue(fp.dirpathRight);
 
     Zstring filterFailedRead;
     auto filterAddFailedDirReads = [&filterFailedRead](const std::set<Zstring>& failedDirReads) //exclude directory child items only!
@@ -721,13 +717,14 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
     if (bufValueLeft ) filterAddFailedItemReads(bufValueLeft ->failedItemReads);
     if (bufValueRight) filterAddFailedItemReads(bufValueRight->failedItemReads);
 
-    std::shared_ptr<BaseDirPair> output = std::make_shared<BaseDirPair>(fp.dirnameLeft,
+    std::shared_ptr<BaseDirPair> output = std::make_shared<BaseDirPair>(fp.dirpathLeft,
                                                                         bufValueLeft != nullptr, //dir existence must be checked only once: available iff buffer entry exists!
-                                                                        fp.dirnameRight,
+                                                                        fp.dirpathRight,
                                                                         bufValueRight != nullptr,
                                                                         fpCfg.filter.nameFilter,
                                                                         fpCfg.compareVar,
-                                                                        fileTimeTolerance);
+                                                                        fpCfg.fileTimeTolerance,
+                                                                        fpCfg.optTimeShiftHours);
     //PERF_START;
     MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft  ? bufValueLeft ->dirCont : DirContainer(),
                                                        bufValueRight ? bufValueRight->dirCont : DirContainer(), *output);
@@ -753,8 +750,7 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
 }
 
 
-void zen::compare(int fileTimeTolerance,
-                  xmlAccess::OptionalDialogs& warnings,
+void zen::compare(xmlAccess::OptionalDialogs& warnings,
                   bool allowUserInteraction,
                   bool runWithBackgroundPriority,
                   bool createDirLocks,
@@ -808,7 +804,7 @@ void zen::compare(int fileTimeTolerance,
 
     //-------------------end of basic checks------------------------------------------
 
-    auto dirAvailable = [&](const Zstring& dirnameFmt) { return resInfo.existingDirs.find(dirnameFmt) != resInfo.existingDirs.end(); };
+    auto dirAvailable = [&](const Zstring& dirpathFmt) { return resInfo.existingDirs.find(dirpathFmt) != resInfo.existingDirs.end(); };
 
     std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> totalWorkLoad;
     for (size_t i = 0; i < cfgList.size(); ++i)
@@ -825,10 +821,10 @@ void zen::compare(int fileTimeTolerance,
 
         for (const auto& w : totalWorkLoad)
         {
-            if (dirAvailable(w.first.dirnameLeft)) //only traverse *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
-                dirsToRead.insert(DirectoryKey(w.first.dirnameLeft,  w.second.filter.nameFilter, w.second.handleSymlinks));
-            if (dirAvailable(w.first.dirnameRight))
-                dirsToRead.insert(DirectoryKey(w.first.dirnameRight, w.second.filter.nameFilter, w.second.handleSymlinks));
+            if (dirAvailable(w.first.dirpathLeft)) //only traverse *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+                dirsToRead.insert(DirectoryKey(w.first.dirpathLeft,  w.second.filter.nameFilter, w.second.handleSymlinks));
+            if (dirAvailable(w.first.dirpathRight))
+                dirsToRead.insert(DirectoryKey(w.first.dirpathRight, w.second.filter.nameFilter, w.second.handleSymlinks));
         }
 
         FolderComparison outputTmp; //write to output as a transaction!
@@ -836,7 +832,7 @@ void zen::compare(int fileTimeTolerance,
         //reduce peak memory by restricting lifetime of ComparisonBuffer to have ended when loading potentially huge InSyncDir instance in redetermineSyncDirection()
         {
             //------------ traverse/read folders -----------------------------------------------------
-            ComparisonBuffer cmpBuff(dirsToRead, fileTimeTolerance, callback);
+            ComparisonBuffer cmpBuff(dirsToRead, callback);
 
             //process binary comparison as one junk
             std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> workLoadByContent;

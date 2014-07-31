@@ -8,7 +8,6 @@
 #include <zen/tick_count.h>
 #include <vector>
 #include <zen/file_io.h>
-#include <zen/int64.h>
 #include <boost/thread/tss.hpp>
 
 using namespace zen;
@@ -69,7 +68,7 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec();
 }
 
 
-bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, const std::function<void(Int64 bytesDelta)>& onUpdateStatus)
+bool zen::filesHaveSameContent(const Zstring& filepath1, const Zstring& filepath2, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
 {
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
@@ -81,8 +80,8 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
     std::vector<char>& memory1 = *cpyBuf1;
     std::vector<char>& memory2 = *cpyBuf2;
 
-    FileInput file1(filename1); //throw FileError
-    FileInput file2(filename2); //
+    FileInput file1(filepath1); //throw FileError
+    FileInput file2(filepath2); //
 
     BufferSize bufferSize;
 
@@ -99,7 +98,7 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
         const size_t length2 = file2.read(&memory2[0], bufferSize); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
         if (onUpdateStatus)
-            onUpdateStatus(to<Int64>(std::max(length1, length2)));
+            onUpdateStatus(std::max(length1, length2));
 
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
             return false;

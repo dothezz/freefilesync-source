@@ -11,12 +11,11 @@
 #include "zstring.h"
 #include "file_error.h"
 #include "file_id_def.h"
-#include "int64.h"
 
 namespace zen
 {
-bool fileExists     (const Zstring& filename); //noexcept; check whether file      or file-symlink exists
-bool dirExists      (const Zstring& dirname ); //noexcept; check whether directory or dir-symlink exists
+bool fileExists     (const Zstring& filepath); //noexcept; check whether file      or file-symlink exists
+bool dirExists      (const Zstring& dirpath ); //noexcept; check whether directory or dir-symlink exists
 bool symlinkExists  (const Zstring& linkname); //noexcept; check whether a symbolic link exists
 bool somethingExists(const Zstring& objname ); //noexcept; check whether any object with this name exists
 
@@ -26,21 +25,21 @@ enum class ProcSymlink
     FOLLOW
 };
 
-void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSymlink procSl); //throw FileError
+void setFileTime(const Zstring& filepath, std::int64_t modificationTime, ProcSymlink procSl); //throw FileError
 
 //symlink handling: always evaluate target
-UInt64 getFilesize(const Zstring& filename); //throw FileError
-UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
+std::uint64_t getFilesize(const Zstring& filepath); //throw FileError
+std::uint64_t getFreeDiskSpace(const Zstring& path); //throw FileError
 
-bool removeFile(const Zstring& filename); //throw FileError; return "false" if file is not existing
+bool removeFile(const Zstring& filepath); //throw FileError; return "false" if file is not existing
 void removeDirectory(const Zstring& directory, //throw FileError
-                     const std::function<void (const Zstring& filename)>& onBeforeFileDeletion = nullptr,  //optional;
-                     const std::function<void (const Zstring& dirname)>&  onBeforeDirDeletion  = nullptr); //one call for each *existing* object!
+                     const std::function<void (const Zstring& filepath)>& onBeforeFileDeletion = nullptr,  //optional;
+                     const std::function<void (const Zstring& dirpath)>&  onBeforeDirDeletion  = nullptr); //one call for each *existing* object!
 
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
-bool supportsPermissions(const Zstring& dirname); //throw FileError, dereferences symlinks
+bool supportsPermissions(const Zstring& dirpath); //throw FileError, dereferences symlinks
 
 //if parent directory not existing: create recursively:
 void makeDirectory(const Zstring& directory, bool failIfExists = false); //throw FileError, ErrorTargetExisting
@@ -52,8 +51,8 @@ void makeDirectoryPlain(const Zstring& directory, const Zstring& templateDir, bo
 
 struct InSyncAttributes
 {
-    UInt64 fileSize;
-    Int64 modificationTime; //time_t UTC compatible
+    std::uint64_t fileSize;
+    std::int64_t modificationTime; //time_t UTC compatible
     FileId sourceFileId;
     FileId targetFileId;
 };
@@ -64,11 +63,11 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
               bool transactionalCopy,
               //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
               //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
-              const std::function<void()>& onDeleteTargetFile, //may be nullptr; throw X!
+              const std::function<void()>& onDeleteTargetFile, //may be nullptr; may throw!
               //Linux:   unconditionally
               //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and the exception will propagate as expected
               //accummulated delta != file size! consider ADS, sparse, compressed files
-              const std::function<void(Int64 bytesDelta)>& onUpdateCopyStatus, //may be nullptr; throw X!
+              const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus, //may be nullptr; may throw!
 
               InSyncAttributes* newAttrib = nullptr);  //return current attributes at the time of copy
 

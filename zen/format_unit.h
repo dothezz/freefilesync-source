@@ -8,15 +8,15 @@
 #define FMT_UNIT_8702184019487324
 
 #include <string>
-#include <zen/int64.h>
-#include <zen/string_tools.h>
+#include <cstdint>
+#include "string_tools.h"
 
 namespace zen
 {
-std::wstring filesizeToShortString(Int64 filesize);
+std::wstring filesizeToShortString(std::int64_t filesize);
 std::wstring remainingTimeToString(double timeInSec);
 std::wstring fractionToString(double fraction); //within [0, 1]
-std::wstring utcToLocalTimeString(Int64 utcTime); //like Windows Explorer would...
+std::wstring utcToLocalTimeString(std::int64_t utcTime); //like Windows Explorer would...
 
 std::wstring formatThreeDigitPrecision(double value); //= *at least* three digits
 
@@ -44,7 +44,7 @@ std::wstring includeNumberSeparator(const std::wstring& number);
 template <class NumberType> inline
 std::wstring toGuiString(NumberType number)
 {
-    //assert_static(IsInteger<NumberType>::value); -> doesn't work for UInt64
+    assert_static(IsInteger<NumberType>::value);
     return ffs_Impl::includeNumberSeparator(zen::numberTo<std::wstring>(number));
 }
 }

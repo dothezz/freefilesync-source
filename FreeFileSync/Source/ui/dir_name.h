@@ -35,14 +35,14 @@ class DirectoryName: public wxEvtHandler
 public:
     DirectoryName(wxWindow&     dropWindow,
                   wxButton&     selectButton,
-                  NameControl&  dirName,
+                  NameControl&  dirpath,
                   wxStaticText* staticText  = nullptr,  //optional
                   wxWindow*     dropWindow2 = nullptr); //
 
     ~DirectoryName();
 
-    wxString getName() const;
-    void setName(const wxString& dirname);
+    wxString getPath() const;
+    void setPath(const wxString& dirpath);
 
 private:
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) { return true; }; //return true if drop should be processed
@@ -55,7 +55,7 @@ private:
     wxWindow&     dropWindow_;
     wxWindow*     dropWindow2_;
     wxButton&     selectButton_;
-    NameControl&  dirName_;
+    NameControl&  dirpath_;
     wxStaticText* staticText_; //optional
 };
 }

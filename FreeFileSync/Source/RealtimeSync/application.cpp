@@ -119,25 +119,25 @@ void Application::onEnterEventLoop(wxEvent& event)
         //continue!
     }
 
-    //try to set config/batch-filename set by %1 parameter
+    //try to set config/batch- filepath set by %1 parameter
     std::vector<Zstring> commandArgs;
     for (int i = 1; i < argc; ++i)
     {
-        Zstring filename = toZ(argv[i]);
+        Zstring filepath = toZ(argv[i]);
 
-        if (!fileExists(filename)) //be a little tolerant
+        if (!fileExists(filepath)) //be a little tolerant
         {
-            if (fileExists(filename + Zstr(".ffs_real")))
-                filename += Zstr(".ffs_real");
-            else if (fileExists(filename + Zstr(".ffs_batch")))
-                filename += Zstr(".ffs_batch");
+            if (fileExists(filepath + Zstr(".ffs_real")))
+                filepath += Zstr(".ffs_real");
+            else if (fileExists(filepath + Zstr(".ffs_batch")))
+                filepath += Zstr(".ffs_batch");
             else
             {
-                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename))));
+                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filepath))));
                 return;
             }
         }
-        commandArgs.push_back(filename);
+        commandArgs.push_back(filepath);
     }
 
     Zstring cfgFilename;

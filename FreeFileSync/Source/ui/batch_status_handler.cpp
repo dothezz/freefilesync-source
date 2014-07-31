@@ -23,16 +23,16 @@ namespace
 {
 //"Backup FreeFileSync 2013-09-15 015052.log" ->
 //"Backup FreeFileSync 2013-09-15 015052 (Error).log"
-Zstring addStatusToLogfilename(const Zstring& logfilename, const std::wstring& status)
+Zstring addStatusToLogfilename(const Zstring& logfilepath, const std::wstring& status)
 {
     //attention: do not interfere with naming convention required by limitLogfileCount()!
-    size_t pos = logfilename.rfind(Zstr('.'));
+    size_t pos = logfilepath.rfind(Zstr('.'));
     if (pos != Zstring::npos)
-        return Zstring(logfilename.begin(), logfilename.begin() + pos) +
+        return Zstring(logfilepath.begin(), logfilepath.begin() + pos) +
                utfCvrtTo<Zstring>(L" (" + status + L")") +
-               Zstring(logfilename.begin() + pos, logfilename.end());
+               Zstring(logfilepath.begin() + pos, logfilepath.end());
     assert(false);
-    return logfilename;
+    return logfilepath;
 }
 
 
@@ -42,15 +42,15 @@ public:
     FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
 
 private:
-    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
+    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
     {
         const Zstring fileName(shortName);
         if (startsWith(fileName, prefix_) && endsWith(fileName, Zstr(".log")))
-            logfiles_.push_back(fullName);
+            logfiles_.push_back(filepath);
     }
 
-    virtual TraverseCallback* onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
-    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) { return nullptr; } //DON'T traverse into subdirs
+    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
     virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
@@ -72,7 +72,7 @@ void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_
     std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end(), LessFilename());
 
     std::for_each(logFiles.begin(), logFiles.end() - maxCount,
-    [](const Zstring& filename) { try { removeFile(filename); } catch (FileError&) {} });
+    [](const Zstring& filepath) { try { removeFile(filepath); } catch (FileError&) {} });
 }
 
 
@@ -82,7 +82,7 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
 {
     Zstring logfileDir = logfileDirectory.empty() ?
                          getConfigDir() + Zstr("Logs") :
-                         getFormattedDirectoryName(logfileDirectory);
+                         getFormattedDirectoryPath(logfileDirectory);
 
     //create logfile directory if required
     makeDirectory(logfileDir); //throw FileError
@@ -94,11 +94,11 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
     for (int i = 0;; ++i)
         try
         {
-            const Zstring& filename = i == 0 ?
+            const Zstring& filepath = i == 0 ?
                                       body + Zstr(".log") :
                                       body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
 
-            return make_unique<FileOutput>(filename, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
+            return make_unique<FileOutput>(filepath, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
             //*no* file system race-condition!
         }
         catch (const ErrorTargetExisting&) {}
@@ -250,13 +250,13 @@ BatchStatusHandler::~BatchStatusHandler()
             saveLogToFile(summary, errorLog, *logFile); //throw FileError
 
             //additionally notify errors by showing in log file name
-            const Zstring oldLogfilename = logFile->getFilename();
+            const Zstring oldLogfilepath = logFile->getFilename();
             logFile.reset();
 
             if (abortIsRequested())
-                renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Stopped"))); //throw FileError
+                renameFile(oldLogfilepath, addStatusToLogfilename(oldLogfilepath, _("Stopped"))); //throw FileError
             else if (totalErrors > 0)
-                renameFile(oldLogfilename, addStatusToLogfilename(oldLogfilename, _("Error"))); //throw FileError
+                renameFile(oldLogfilepath, addStatusToLogfilename(oldLogfilepath, _("Error"))); //throw FileError
             //status "warning" is not important enough to show up in log file name
         }
         catch (FileError&) {}
@@ -299,7 +299,7 @@ BatchStatusHandler::~BatchStatusHandler()
 }
 
 
-void BatchStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, ProcessCallback::Phase phaseID)
+void BatchStatusHandler::initNewPhase(int objectsTotal, std::int64_t dataTotal, ProcessCallback::Phase phaseID)
 {
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
     if (progressDlg)
@@ -309,7 +309,7 @@ void BatchStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Process
 }
 
 
-void BatchStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
+void BatchStatusHandler::updateProcessedData(int objectsDelta, std::int64_t dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
 

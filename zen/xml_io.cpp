@@ -12,13 +12,13 @@
 using namespace zen;
 
 
-XmlDoc zen::loadXmlDocument(const Zstring& filename) //throw FileError
+XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
 {
     //can't simply use zen::loadBinStream() due to the short-circuit xml-validation below!
 
     std::string stream;
 
-    FileInput inputFile(filename); //throw FileError
+    FileInput inputFile(filepath); //throw FileError
     {
         //quick test whether input is an XML: avoid loading large binary files up front!
         const std::string xmlBegin = "<?xml version=";
@@ -29,7 +29,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filename) //throw FileError
 
         if (!startsWith(stream, xmlBegin) &&
             !startsWith(stream, BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
-            throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+            throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
     }
 
     const size_t blockSize = 128 * 1024;
@@ -51,32 +51,32 @@ XmlDoc zen::loadXmlDocument(const Zstring& filename) //throw FileError
     {
         throw FileError(
             replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                             L"%x", fmtFileName(filename)),
+                                             L"%x", fmtFileName(filepath)),
                                   L"%y", numberTo<std::wstring>(e.row + 1)),
                        L"%z", numberTo<std::wstring>(e.col + 1)));
     }
 }
 
 
-void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filename) //throw FileError
+void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filepath) //throw FileError
 {
     std::string stream = serialize(doc); //noexcept
 
     //only update xml file if there are real changes
     try
     {
-        if (getFilesize(filename) == stream.size()) //throw FileError
-            if (loadBinStream<std::string>(filename) == stream) //throw FileError
+        if (getFilesize(filepath) == stream.size()) //throw FileError
+            if (loadBinStream<std::string>(filepath) == stream) //throw FileError
                 return;
     }
     catch (FileError&) {}
 
-    FileOutput outputFile(filename, FileOutput::ACC_OVERWRITE); //throw FileError
+    FileOutput outputFile(filepath, FileOutput::ACC_OVERWRITE); //throw FileError
     outputFile.write(stream.c_str(), stream.length());          //
 }
 
 
-void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filename) //throw FileError
+void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath) //throw FileError
 {
     if (xmlInput.errorsOccured())
     {
@@ -84,6 +84,6 @@ void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filename) 
         for (const std::wstring& elem : xmlInput.getErrorsAs<std::wstring>())
             msg += L"\n" + elem;
 
-        throw FileError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" + msg);
+        throw FileError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filepath)) + L"\n\n" + msg);
     }
 }

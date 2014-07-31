@@ -5,20 +5,21 @@
 // **************************************************************************
 
 #include "format_unit.h"
-#include <zen/basic_math.h>
-#include <zen/i18n.h>
-#include <zen/time.h>
+#include "basic_math.h"
+#include "i18n.h"
+#include "time.h"
+#include "int64.h"
 #include <cwchar>  //swprintf
 #include <ctime>
 #include <cstdio>
 
 #ifdef ZEN_WIN
-#include <zen/win.h> //includes "windows.h"
-#include <zen/win_ver.h>
+#include "win.h" //includes "windows.h"
+#include "win_ver.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <clocale>   //thousands separator
-#include <zen/utf.h> //
+#include <clocale> //thousands separator
+#include "utf.h"   //
 #endif
 
 using namespace zen;
@@ -35,14 +36,15 @@ std::wstring zen::formatThreeDigitPrecision(double value)
 }
 
 
-std::wstring zen::filesizeToShortString(Int64 size)
+std::wstring zen::filesizeToShortString(std::int64_t size)
 {
     //if (size < 0) return _("Error"); -> really?
 
     if (numeric::abs(size) <= 999)
-        return _P("1 byte", "%x bytes", to<int>(size));
+        return _P("1 byte", "%x bytes", static_cast<int>(size));
 
-    double sizeInUnit = to<double>(size);
+    double sizeInUnit = static_cast<double>(size);
+
     auto formatUnit = [&](const std::wstring& unitTxt) { return replaceCpy(unitTxt, L"%x", formatThreeDigitPrecision(sizeInUnit)); };
 
     sizeInUnit /= 1024;
@@ -282,12 +284,12 @@ const bool useNewLocalTimeCalculation = zen::vistaOrLater();
 #endif
 
 
-std::wstring zen::utcToLocalTimeString(Int64 utcTime)
+std::wstring zen::utcToLocalTimeString(std::int64_t utcTime)
 {
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 
 #ifdef ZEN_WIN
-    FILETIME lastWriteTimeUtc = toFileTime(utcTime); //convert ansi C time to FILETIME
+    FILETIME lastWriteTimeUtc = timetToFileTime(utcTime); //convert ansi C time to FILETIME
 
     SYSTEMTIME systemTimeLocal = {};
 
@@ -325,7 +327,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     loc.second = systemTimeLocal.wSecond;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    zen::TimeComp loc = zen::localTime(to<time_t>(utcTime));
+    zen::TimeComp loc = zen::localTime(utcTime);
 #endif
 
     std::wstring dateString = formatTime<std::wstring>(L"%x  %X", loc);

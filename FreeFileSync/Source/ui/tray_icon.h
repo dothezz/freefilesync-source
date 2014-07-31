@@ -31,8 +31,8 @@ public:
     void setProgress(double fraction); //number between [0, 1], for small progress indicator
 
 private:
-    FfsTrayIcon(const FfsTrayIcon&); //=delete
-    FfsTrayIcon& operator=(const FfsTrayIcon&); //=delete
+    FfsTrayIcon           (const FfsTrayIcon&) = delete;
+    FfsTrayIcon& operator=(const FfsTrayIcon&) = delete;
 
     class TaskBarImpl;
     TaskBarImpl* trayIcon;

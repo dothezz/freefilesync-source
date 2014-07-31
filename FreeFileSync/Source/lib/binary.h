@@ -10,13 +10,12 @@
 #include <functional>
 #include <zen/zstring.h>
 #include <zen/file_error.h>
-#include <zen/int64.h>
 
 namespace zen
 {
-bool filesHaveSameContent(const Zstring& filename1,  //throw FileError
-                          const Zstring& filename2,
-                          const std::function<void(Int64 bytesDelta)>& onUpdateStatus); //may be nullptr
+bool filesHaveSameContent(const Zstring& filepath1,  //throw FileError
+                          const Zstring& filepath2,
+                          const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus); //may be nullptr
 }
 
 #endif // BINARY_H_INCLUDED

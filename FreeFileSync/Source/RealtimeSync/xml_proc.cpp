@@ -38,19 +38,19 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
+void xmlAccess::readConfig(const Zstring& filepath, XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
 {
-    XmlDoc doc = loadXmlDocument(filename); //throw FileError
+    XmlDoc doc = loadXmlDocument(filepath); //throw FileError
 
     if (!isXmlTypeRTS(doc))
-        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     try
     {
-        checkForMappingErrors(in, filename); //throw FileError
+        checkForMappingErrors(in, filepath); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -70,7 +70,7 @@ void writeConfig(const XmlRealConfig& config, XmlOut& out)
 }
 
 
-void xmlAccess::writeConfig(const XmlRealConfig& config, const Zstring& filename) //throw FileError
+void xmlAccess::writeConfig(const XmlRealConfig& config, const Zstring& filepath) //throw FileError
 {
     XmlDoc doc("FreeFileSync");
     doc.root().setAttribute("XmlType", "REAL");
@@ -78,50 +78,50 @@ void xmlAccess::writeConfig(const XmlRealConfig& config, const Zstring& filename
     XmlOut out(doc);
     ::writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw FileError
+    saveXmlDocument(doc, filepath); //throw FileError
 }
 
 
 namespace
 {
-xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filename)
+xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filepath)
 {
     std::set<Zstring, LessFilename> uniqueFolders;
 
     //add main folders
-    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirnamePhraseLeft);
-    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirnamePhraseRight);
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirpathPhraseLeft);
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirpathPhraseRight);
 
     //additional folders
     for (const FolderPairEnh& fp : batchCfg.mainCfg.additionalPairs)
     {
-        uniqueFolders.insert(fp.dirnamePhraseLeft);
-        uniqueFolders.insert(fp.dirnamePhraseRight);
+        uniqueFolders.insert(fp.dirpathPhraseLeft);
+        uniqueFolders.insert(fp.dirpathPhraseRight);
     }
 
     uniqueFolders.erase(Zstring());
 
     xmlAccess::XmlRealConfig output;
     output.directories.assign(uniqueFolders.begin(), uniqueFolders.end());
-    output.commandline = Zstr("\"") + zen::getFreeFileSyncLauncher() + Zstr("\" \"") + filename + Zstr("\"");
+    output.commandline = Zstr("\"") + zen::getFreeFileSyncLauncher() + Zstr("\" \"") + filepath + Zstr("\"");
     return output;
 }
 }
 
 
-void xmlAccess::readRealOrBatchConfig(const Zstring& filename, xmlAccess::XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
+void xmlAccess::readRealOrBatchConfig(const Zstring& filepath, xmlAccess::XmlRealConfig& config, std::wstring& warningMsg) //throw FileError
 {
     using namespace xmlAccess;
 
-    if (getXmlType(filename) != XML_TYPE_BATCH) //throw FileError
-        return readConfig(filename, config, warningMsg); //throw FileError
+    if (getXmlType(filepath) != XML_TYPE_BATCH) //throw FileError
+        return readConfig(filepath, config, warningMsg); //throw FileError
 
     //convert batch config to RealtimeSync config
     XmlBatchConfig batchCfg;
-    readConfig(filename, batchCfg, warningMsg); //throw FileError
+    readConfig(filepath, batchCfg, warningMsg); //throw FileError
     //<- redirect batch config warnings
 
-    config = convertBatchToReal(batchCfg, filename);
+    config = convertBatchToReal(batchCfg, filepath);
 }
 
 

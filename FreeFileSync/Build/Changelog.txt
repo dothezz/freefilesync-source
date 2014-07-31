@@ -1,16 +1,30 @@
+FreeFileSync 6.8 [2014-08-01]
+-----------------------------
+New comparison option to ignore file time shift in hours
+Tentatively disabled DST hack affecting FAT file creation times
+New menu option to reset gui layout
+File sizes ignore sync direction in overview panel
+Sort by file name also sorts folder names
+Main grid column "full path" includes file name
+Always position comparison progress below main buttons
+Fixed high-precision tick count calculations
+Fully restart directory traversal on errors
+Updated help file with steps to schedule a batch job (OS X)
+
+
 FreeFileSync 6.7 [2014-07-01]
 -----------------------------
 Redesigned comparison progress statistics
 Fixed crash when loading incompatible config file
-Added <new> button to config panel
+Added "new" button to config panel
 Avoid sync progress dialog repositioning
 Resolved crash when loading sync settings for Arabic locale
 Restored cancel button width
-Help window not forced to float over main dialog
+Help window not forced to float over main dialog (Windows)
 Fixed overwriting old-format batch files
 Harmonized view category sequence
 Merged similar translation items
-Fixed crash when scrolling help file without focus
+Fixed crash when scrolling help window without focus
 
 
 FreeFileSync 6.6 [2014-06-01]

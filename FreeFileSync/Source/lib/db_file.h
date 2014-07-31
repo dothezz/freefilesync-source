@@ -16,30 +16,30 @@ const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as glob
 
 struct InSyncDescrFile //subset of FileDescriptor
 {
-    InSyncDescrFile(const Int64& lastWriteTimeRawIn,
-                    const FileId& idIn) :
+    InSyncDescrFile(std::int64_t lastWriteTimeRawIn, const FileId& idIn) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileId(idIn) {}
 
-    Int64  lastWriteTimeRaw;
+    std::int64_t lastWriteTimeRaw;
     FileId fileId; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
 };
 
 struct InSyncDescrLink
 {
-    explicit InSyncDescrLink(const Int64& lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
-    Int64 lastWriteTimeRaw;
+    explicit InSyncDescrLink(std::int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
+
+    std::int64_t lastWriteTimeRaw;
 };
 
 
 //artificial hierarchy of last synchronous state:
 struct InSyncFile
 {
-    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, CompareVariant cv, const UInt64& fileSizeIn) : left(l), right(r), cmpVar(cv), fileSize(fileSizeIn) {}
+    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, CompareVariant cv, std::uint64_t fileSizeIn) : left(l), right(r), cmpVar(cv), fileSize(fileSizeIn) {}
     InSyncDescrFile left;
     InSyncDescrFile right;
     CompareVariant cmpVar; //the one active while finding "file in sync"
-    UInt64 fileSize; //file size must be identical on both sides!
+    std::uint64_t fileSize; //file size must be identical on both sides!
 };
 
 struct InSyncSymlink
@@ -80,7 +80,7 @@ struct InSyncDir
         return dirs.insert(std::make_pair(shortName, InSyncDir(st))).first->second;
     }
 
-    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, const UInt64& fileSize)
+    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, std::uint64_t fileSize)
     {
         files.insert(std::make_pair(shortName, InSyncFile(dataL, dataR, cmpVar, fileSize)));
     }

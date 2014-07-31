@@ -29,7 +29,7 @@ void applyFiltering  (FolderComparison& folderCmp, const MainConfiguration& main
 void addHardFiltering(BaseDirPair& baseDirObj, const Zstring& excludeFilter);     //exclude additional entries only
 void addSoftFiltering(BaseDirPair& baseDirObj, const SoftFilter& timeSizeFilter); //exclude additional entries only
 
-void applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo); //overwrite current active/inactive settings
+void applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom, std::int64_t timeTo); //overwrite current active/inactive settings
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)

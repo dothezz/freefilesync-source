@@ -22,31 +22,36 @@ struct FolderPairCfg
                   const Zstring& dirPhraseRight,
                   CompareVariant cmpVar,
                   SymLinkHandling handleSymlinksIn,
+                  int fileTimeToleranceIn,
+                  unsigned int optTimeShiftHoursIn,
                   const NormalizedFilter& filterIn,
                   const DirectionConfig& directCfg) :
-        dirnamePhraseLeft(dirPhraseLeft),
-        dirnamePhraseRight(dirPhraseRight),
+        dirpathPhraseLeft(dirPhraseLeft),
+        dirpathPhraseRight(dirPhraseRight),
         compareVar(cmpVar),
         handleSymlinks(handleSymlinksIn),
+        fileTimeTolerance(fileTimeToleranceIn),
+        optTimeShiftHours(optTimeShiftHoursIn),
         filter(filterIn),
         directionCfg(directCfg) {}
 
-    Zstring dirnamePhraseLeft;  //unresolved directory names as entered by user!
-    Zstring dirnamePhraseRight; //
+    Zstring dirpathPhraseLeft;  //unresolved directory names as entered by user!
+    Zstring dirpathPhraseRight; //
 
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;
+    int fileTimeTolerance;
+    unsigned int optTimeShiftHours;
 
     NormalizedFilter filter;
 
     DirectionConfig directionCfg;
 };
 
-std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); //fill FolderPairCfg and resolve folder pairs
+std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance); //fill FolderPairCfg and resolve folder pairs
 
 //FFS core routine:
-void compare(int fileTimeTolerance, //max allowed file time deviation
-             xmlAccess::OptionalDialogs& warnings,
+void compare(xmlAccess::OptionalDialogs& warnings,
              bool allowUserInteraction,
              bool runWithBackgroundPriority,
              bool createDirLocks,

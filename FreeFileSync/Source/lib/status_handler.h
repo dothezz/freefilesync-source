@@ -10,7 +10,6 @@
 #include "../process_callback.h"
 #include <vector>
 #include <string>
-#include <zen/int64.h>
 #include <zen/i18n.h>
 
 namespace zen
@@ -42,8 +41,8 @@ struct Statistics
     virtual int getObjectsCurrent(ProcessCallback::Phase phaseId) const = 0;
     virtual int getObjectsTotal  (ProcessCallback::Phase phaseId) const = 0;
 
-    virtual Int64 getDataCurrent(ProcessCallback::Phase phaseId) const = 0;
-    virtual Int64 getDataTotal  (ProcessCallback::Phase phaseId) const = 0;
+    virtual std::int64_t getDataCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual std::int64_t getDataTotal  (ProcessCallback::Phase phaseId) const = 0;
 
     virtual const std::wstring& currentStatusText() const = 0;
 };
@@ -60,14 +59,14 @@ public:
 
 protected:
     //implement parts of ProcessCallback
-    virtual void initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseId) //may throw
+    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) //may throw
     {
         currentPhase_ = phaseId;
         refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);
     }
 
-    virtual void updateProcessedData(int objectsDelta, Int64 dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
-    virtual void updateTotalData    (int objectsDelta, Int64 dataDelta) { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
+    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
+    virtual void updateTotalData    (int objectsDelta, std::int64_t dataDelta) { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
 
     virtual void requestUiRefresh() //throw X
     {
@@ -96,24 +95,24 @@ protected:
     virtual int getObjectsCurrent(Phase phaseId) const {                                    return refNumbers(numbersCurrent_, phaseId).first; }
     virtual int getObjectsTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
 
-    virtual Int64 getDataCurrent(Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    virtual Int64 getDataTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
+    virtual std::int64_t getDataCurrent(Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
+    virtual std::int64_t getDataTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
 
     virtual const std::wstring& currentStatusText() const { return statusText_; }
 
     bool abortIsRequested() const { return abortRequested; }
 
 private:
-    typedef std::vector<std::pair<int, Int64>> StatNumbers;
+    typedef std::vector<std::pair<int, std::int64_t>> StatNumbers;
 
-    void updateData(StatNumbers& num, int objectsDelta, Int64 dataDelta)
+    void updateData(StatNumbers& num, int objectsDelta, std::int64_t dataDelta)
     {
         auto& st = refNumbers(num, currentPhase_);
         st.first  += objectsDelta;
         st.second += dataDelta;
     }
 
-    static const std::pair<int, Int64>& refNumbers(const StatNumbers& num, Phase phaseId)
+    static const std::pair<int, std::int64_t>& refNumbers(const StatNumbers& num, Phase phaseId)
     {
         switch (phaseId)
         {
@@ -130,7 +129,7 @@ private:
         return num[3]; //dummy entry!
     }
 
-    static std::pair<int, Int64>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, Int64>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
+    static std::pair<int, std::int64_t>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, std::int64_t>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
 
     Phase currentPhase_;
     StatNumbers numbersCurrent_;

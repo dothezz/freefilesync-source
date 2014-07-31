@@ -35,8 +35,8 @@ public:
 private:
     MessageProvider();
     ~MessageProvider();
-    MessageProvider(const MessageProvider&);
-    MessageProvider& operator=(const MessageProvider&);
+    MessageProvider           (const MessageProvider&) = delete;
+    MessageProvider& operator=(const MessageProvider&) = delete;
 
     static const wchar_t dummyWindowName[];
 
@@ -173,8 +173,8 @@ public:
     }
 
 private:
-    Pimpl(Pimpl&);
-    Pimpl& operator=(Pimpl&);
+    Pimpl           (const Pimpl&) = delete;
+    Pimpl& operator=(const Pimpl&) = delete;
 
     virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) //throw()!
     {

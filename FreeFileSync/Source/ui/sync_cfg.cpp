@@ -65,13 +65,15 @@ private:
     };
 
     //------------- comparison panel ----------------------
-    virtual void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Comparison Settings.html", this); }
+    virtual void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Comparison Settings.html" , this); }
+    virtual void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Daylight Saving Time.html", this); }
 
     virtual void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
     virtual void OnTimeSize(wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
     virtual void OnContent (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
     virtual void OnTimeSizeDouble(wxMouseEvent& event) override;
     virtual void OnContentDouble (wxMouseEvent& event) override;
+    virtual void OnChangeCompOption(wxCommandEvent& event) override { updateCompGui(); }
 
     void updateCompGui();
 
@@ -249,6 +251,9 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     add(SYMLINK_FOLLOW,  _("Follow"));
 
     setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpCfg.handleSymlinks);
+
+    m_checkBoxTimeShift->SetValue(cmpCfg.optTimeShiftHours != 0);
+    m_spinCtrlTimeShift->SetValue(cmpCfg.optTimeShiftHours == 0 ? 1 : cmpCfg.optTimeShiftHours);
 
     if (useAlternateCmpCfg)
         m_checkBoxUseLocalCmpOptions->SetValue(*useAlternateCmpCfg);
@@ -434,6 +439,8 @@ void ConfigDialog::updateCompGui()
 
     //active variant description:
     setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
+
+    m_spinCtrlTimeShift->Enable(m_checkBoxTimeShift->GetValue());
 }
 
 
@@ -704,7 +711,7 @@ void ConfigDialog::setSyncOptions(const SyncOptions& so)
     directionCfg   = so.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
     handleDeletion = so.syncCfg.handleDeletion;
 
-    versioningFolder.setName(utfCvrtTo<wxString>(so.syncCfg.versioningDirectory));
+    versioningFolder.setPath(utfCvrtTo<wxString>(so.syncCfg.versioningDirectory));
     setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle, so.syncCfg.versioningStyle);
 
     //misc config
@@ -721,7 +728,7 @@ ConfigDialog::SyncOptions ConfigDialog::getSyncOptions() const
 
     output.syncCfg.directionCfg        = directionCfg;
     output.syncCfg.handleDeletion      = handleDeletion;
-    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
+    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getPath());
     output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
 
     output.onGuiError = onGuiError;
@@ -909,6 +916,7 @@ void ConfigDialog::OnOkay(wxCommandEvent& event)
 
     cmpCfgOut.compareVar = localCmpVar;
     cmpCfgOut.handleSymlinks = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
+    cmpCfgOut.optTimeShiftHours = m_checkBoxTimeShift->GetValue() ? m_spinCtrlTimeShift->GetValue() : 0;
 
     //------------- filter panel --------------------------
     FilterConfig filterCfg = getFilter();

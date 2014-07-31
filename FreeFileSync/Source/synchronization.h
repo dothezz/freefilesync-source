@@ -34,11 +34,11 @@ public:
 
     int getConflict() const { return static_cast<int>(conflictMsgs.size()); }
 
-    typedef std::vector<std::pair<Zstring, std::wstring>> ConflictTexts; // Pair(filename/conflict text)
+    typedef std::vector<std::pair<Zstring, std::wstring>> ConflictTexts; // Pair(filepath/conflict text)
     const ConflictTexts& getConflictMessages() const { return conflictMsgs; }
 
-    Int64 getDataToProcess() const { return dataToProcess; }
-    size_t     getRowCount() const { return rowsTotal; }
+    std::int64_t getDataToProcess() const { return dataToProcess; }
+    size_t       getRowCount() const { return rowsTotal; }
 
 private:
     void init();
@@ -53,7 +53,7 @@ private:
     int updateLeft, updateRight;
     int deleteLeft, deleteRight;
     ConflictTexts conflictMsgs; //conflict texts to display as a warning message
-    Int64 dataToProcess;
+    std::int64_t dataToProcess;
     size_t rowsTotal;
 };
 

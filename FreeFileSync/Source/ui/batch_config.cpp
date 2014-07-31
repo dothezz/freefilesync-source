@@ -131,7 +131,7 @@ void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
 
     //transfer parameter ownership to GUI
     m_checkBoxRunMinimized->SetValue(batchCfg.runMinimized);
-    logfileDir->setName(utfCvrtTo<wxString>(batchCfg.logFileDirectory));
+    logfileDir->setPath(utfCvrtTo<wxString>(batchCfg.logFileDirectory));
     m_comboBoxOnCompletion->setValue(batchCfg.mainCfg.onCompletion);
 
     //map single parameter "logfiles limit" to all three checkboxs and spin ctrl:
@@ -152,7 +152,7 @@ XmlBatchConfig BatchDialog::getConfig() const
 
     //load structure with batch settings "batchCfg"
     batchCfg.runMinimized     = m_checkBoxRunMinimized->GetValue();
-    batchCfg.logFileDirectory = utfCvrtTo<Zstring>(logfileDir->getName());
+    batchCfg.logFileDirectory = utfCvrtTo<Zstring>(logfileDir->getPath());
     batchCfg.mainCfg.onCompletion = m_comboBoxOnCompletion->getValue();
     //get single parameter "logfiles limit" from all three checkboxes and spin ctrl:
     batchCfg.logfilesCountLimit = m_checkBoxGenerateLogfile->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;

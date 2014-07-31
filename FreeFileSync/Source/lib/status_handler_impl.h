@@ -39,9 +39,10 @@ zen::Opt<std::wstring> tryReportingError(Function cmd, ProcessCallback& handler)
 class StatisticsReporter
 {
 public:
-    StatisticsReporter(int itemsExpected, const Int64& bytesExpected, ProcessCallback& cb) :
+    StatisticsReporter(int itemsExpected, std::int64_t bytesExpected, ProcessCallback& cb) :
         taskCancelled(true),
-        itemsReported(0),
+        itemsReported(),
+        bytesReported(),
         itemsExpected_(itemsExpected),
         bytesExpected_(bytesExpected),
         cb_(cb) {}
@@ -52,7 +53,7 @@ public:
             cb_.updateTotalData(itemsReported, bytesReported); //=> unexpected increase of total workload
     }
 
-    void reportDelta(int itemsDelta, const Int64& bytesDelta) //may throw!
+    void reportDelta(int itemsDelta, std::int64_t bytesDelta) //may throw!
     {
         cb_.updateProcessedData(itemsDelta, bytesDelta); //nothrow! -> ensure client and service provider are in sync!
         itemsReported += itemsDelta;
@@ -85,9 +86,9 @@ public:
 private:
     bool taskCancelled;
     int itemsReported;
-    Int64 bytesReported;
+    std::int64_t bytesReported;
     const int itemsExpected_;
-    const Int64 bytesExpected_;
+    const std::int64_t bytesExpected_;
     ProcessCallback& cb_;
 };
 }

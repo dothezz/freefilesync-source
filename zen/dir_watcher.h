@@ -49,18 +49,18 @@ public:
     struct Entry
     {
         Entry() : action_(ACTION_CREATE) {}
-        Entry(ActionType action, const Zstring& filename) : action_(action), filename_(filename) {}
+        Entry(ActionType action, const Zstring& filepath) : action_(action), filepath_(filepath) {}
 
         ActionType action_;
-        Zstring filename_;
+        Zstring filepath_;
     };
 
     //extract accumulated changes since last call
     std::vector<Entry> getChanges(const std::function<void()>& processGuiMessages); //throw FileError
 
 private:
-    DirWatcher(const DirWatcher&);
-    DirWatcher& operator=(const DirWatcher&);
+    DirWatcher           (const DirWatcher&) = delete;
+    DirWatcher& operator=(const DirWatcher&) = delete;
 
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl_;

@@ -7,13 +7,12 @@
 #ifndef GUISTATUSHANDLER_H_INCLUDED
 #define GUISTATUSHANDLER_H_INCLUDED
 
-#include <wx/event.h>
 #include <zen/error_log.h>
-//#include <wx/stopwatch.h>
+#include <wx/event.h>
 #include "progress_indicator.h"
+#include "main_dlg.h"
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
-#include "main_dlg.h"
 
 
 //Exception class used to abort the "compare" and "sync" process
@@ -28,7 +27,7 @@ public:
     CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
+    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID);
     virtual void forceUiRefresh();
 
     virtual Response reportError(const std::wstring& text, size_t retryNumber);
@@ -60,8 +59,8 @@ public:
                       std::vector<Zstring>& onCompletionHistory);
     ~SyncStatusHandler();
 
-    virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
-    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
+    virtual void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID);
+    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 

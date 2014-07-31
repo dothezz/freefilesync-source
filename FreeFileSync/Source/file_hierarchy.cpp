@@ -357,8 +357,8 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         case SO_COPY_METADATA_TO_RIGHT:
             //harmonize with synchronization.cpp::SynchronizeFolderPair::synchronizeFileInt, ect!!
         {
-            Zstring shortNameOld = fsObj.getShortName<RIGHT_SIDE>();
-            Zstring shortNameNew = fsObj.getShortName<LEFT_SIDE >();
+            Zstring shortNameOld = fsObj.getItemName<RIGHT_SIDE>();
+            Zstring shortNameNew = fsObj.getItemName<LEFT_SIDE >();
             if (op == SO_COPY_METADATA_TO_LEFT)
                 std::swap(shortNameOld, shortNameNew);
 
@@ -383,7 +383,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                     if (!isSource)
                         std::swap(sourceFile, targetFile);
 
-                    auto getRelName = [&](const FileSystemObject& fso, bool leftSide) { return leftSide ? fso.getRelativeName<LEFT_SIDE>() : fso.getRelativeName<RIGHT_SIDE>(); };
+                    auto getRelName = [&](const FileSystemObject& fso, bool leftSide) { return leftSide ? fso.getRelativePath<LEFT_SIDE>() : fso.getRelativePath<RIGHT_SIDE>(); };
 
                     const Zstring relSource = getRelName(*sourceFile,  onLeft);
                     const Zstring relTarget = getRelName(*targetFile, !onLeft);

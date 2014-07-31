@@ -129,8 +129,8 @@ public:
     size_t size() const { return sz; }
 
 private:
-    FixedList(const FixedList&);
-    FixedList& operator=(const FixedList&);
+    FixedList           (const FixedList&) = delete;
+    FixedList& operator=(const FixedList&) = delete;
 
     void pushNode(Node* newNode) //throw()
     {

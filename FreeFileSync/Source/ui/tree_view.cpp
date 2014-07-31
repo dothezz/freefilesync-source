@@ -40,19 +40,22 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
                                      TreeView::Container& cont, //out
                                      Function pred)
 {
-    auto getBytes = [](const FilePair& fileObj) -> UInt64 //MSVC screws up miserably if we put this lambda into std::for_each
+    auto getBytes = [](const FilePair& fileObj) //MSVC screws up miserably if we put this lambda into std::for_each
     {
-        //give accumulated bytes the semantics of a sync preview!
-        if (fileObj.isActive())
-            switch (fileObj.getSyncDir())
-            {
-                case SyncDirection::LEFT:
-                    return fileObj.getFileSize<RIGHT_SIDE>();
-                case SyncDirection::RIGHT:
-                    return fileObj.getFileSize<LEFT_SIDE>();
-                case SyncDirection::NONE:
-                    break;
-            }
+        ////give accumulated bytes the semantics of a sync preview!
+        //if (fileObj.isActive())
+        //    switch (fileObj.getSyncDir())
+        //    {
+        //        case SyncDirection::LEFT:
+        //            return fileObj.getFileSize<RIGHT_SIDE>();
+        //        case SyncDirection::RIGHT:
+        //            return fileObj.getFileSize<LEFT_SIDE>();
+        //        case SyncDirection::NONE:
+        //            break;
+        //    }
+
+        //prefer file-browser semantics over sync preview (=> always show useful numbers, even for SyncDirection::NONE)
+        //discussion: https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/ba6b6a33
         return std::max(fileObj.getFileSize<LEFT_SIDE>(), fileObj.getFileSize<RIGHT_SIDE>());
     };
 
@@ -86,20 +89,20 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
         const bool included = pred(subDirObj);
 
         cont.subDirs.push_back(TreeView::DirNodeImpl()); //
-        auto& subDirView = cont.subDirs.back();
-        TreeView::extractVisibleSubtree(subDirObj, subDirView, pred);
+        auto& subDirCont = cont.subDirs.back();
+        TreeView::extractVisibleSubtree(subDirObj, subDirCont, pred);
         if (included)
-            ++subDirView.itemCountGross;
+            ++subDirCont.itemCountGross;
 
-        cont.bytesGross     += subDirView.bytesGross;
-        cont.itemCountGross += subDirView.itemCountGross;
+        cont.bytesGross     += subDirCont.bytesGross;
+        cont.itemCountGross += subDirCont.itemCountGross;
 
-        if (!included && !subDirView.firstFileId && subDirView.subDirs.empty())
+        if (!included && !subDirCont.firstFileId && subDirCont.subDirs.empty())
             cont.subDirs.pop_back();
         else
         {
-            subDirView.objId = subDirObj.getId();
-            compressNode(subDirView);
+            subDirCont.objId = subDirObj.getId();
+            compressNode(subDirCont);
         }
     }
 }
@@ -108,22 +111,22 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
 namespace
 {
 //generate nice percentage numbers which precisely sum up to 100
-void calcPercentage(std::vector<std::pair<UInt64, int*>>& workList)
+void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
 {
-    const UInt64 total = std::accumulate(workList.begin(), workList.end(), UInt64(),
-    [](UInt64 sum, const std::pair<UInt64, int*>& pair) { return sum + pair.first; });
+    const std::uint64_t total = std::accumulate(workList.begin(), workList.end(), std::uint64_t(),
+    [](std::uint64_t sum, const std::pair<std::uint64_t, int*>& pair) { return sum + pair.first; });
 
     if (total == 0U) //this case doesn't work with the error minimizing algorithm below
     {
-        for (std::pair<UInt64, int*>& pair : workList)
+        for (auto& pair : workList)
             *pair.second = 0;
         return;
     }
 
     int remainingPercent = 100;
-    for (std::pair<UInt64, int*>& pair : workList)
+    for (auto& pair : workList)
     {
-        *pair.second = to<int>(pair.first * 100U / total); //round down
+        *pair.second = static_cast<int>(pair.first * 100U / total); //round down
         remainingPercent -= *pair.second;
     }
     assert(remainingPercent >= 0);
@@ -134,12 +137,12 @@ void calcPercentage(std::vector<std::pair<UInt64, int*>>& workList)
     if (remainingPercent > 0)
     {
         std::nth_element(workList.begin(), workList.begin() + remainingPercent - 1, workList.end(),
-                         [total](const std::pair<UInt64, int*>& lhs, const std::pair<UInt64, int*>& rhs)
+                         [total](const std::pair<std::uint64_t, int*>& lhs, const std::pair<std::uint64_t, int*>& rhs)
         {
             return lhs.first * 100U % total > rhs.first * 100U % total;
         });
 
-        std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<UInt64, int*>& pair) { ++*pair.second; });
+        std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<std::uint64_t, int*>& pair) { ++*pair.second; });
     }
 }
 
@@ -235,7 +238,7 @@ struct TreeView::LessShortName
                 else if (!dirObjR)
                     return true;
 
-                return makeSortDirection(LessFilename(), Int2Type<ascending>())(dirObjL->getObjShortName(), dirObjR->getObjShortName());
+                return makeSortDirection(LessFilename(), Int2Type<ascending>())(dirObjL->getPairShortName(), dirObjR->getPairShortName());
             }
 
             case TreeView::TYPE_FILES:
@@ -250,7 +253,7 @@ struct TreeView::LessShortName
 template <bool ascending>
 void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi columnType)
 {
-    auto getBytes = [](const TreeLine& line) -> UInt64
+    auto getBytes = [](const TreeLine& line) -> std::uint64_t
     {
         switch (line.type_)
         {
@@ -303,7 +306,7 @@ void TreeView::getChildren(const Container& cont, unsigned int level, std::vecto
 {
     output.clear();
     output.reserve(cont.subDirs.size() + 1); //keep pointers in "workList" valid
-    std::vector<std::pair<UInt64, int*>> workList;
+    std::vector<std::pair<std::uint64_t, int*>> workList;
 
     for (const DirNodeImpl& subDir : cont.subDirs)
     {
@@ -373,7 +376,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
         //this were only possible if we replaced "std::vector<RootNodeImpl>" with "Container"!
 
         flatTree.reserve(folderCmpView.size()); //keep pointers in "workList" valid
-        std::vector<std::pair<UInt64, int*>> workList;
+        std::vector<std::pair<std::uint64_t, int*>> workList;
 
         for (const RootNodeImpl& root : folderCmpView)
         {
@@ -808,13 +811,13 @@ private:
                 switch (static_cast<ColumnTypeNavi>(colType))
                 {
                     case COL_TYPE_NAVI_BYTES:
-                        return filesizeToShortString(to<Int64>(node->bytes_));
+                        return filesizeToShortString(node->bytes_);
 
                     case COL_TYPE_NAVI_DIRECTORY:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                             return utfCvrtTo<wxString>(root->displayName_);
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
-                            return utfCvrtTo<wxString>(dir->dirObj_.getObjShortName());
+                            return utfCvrtTo<wxString>(dir->dirObj_.getPairShortName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
                             return _("Files");
                         break;

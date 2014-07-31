@@ -8,7 +8,6 @@
 #define SMALLDIALOGS_H_INCLUDED
 
 #include <wx/window.h>
-//#include "../file_hierarchy.h"
 #include "../lib/process_xml.h"
 #include "../synchronization.h"
 
@@ -43,7 +42,7 @@ ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig&
 
 ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
-ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
+ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
 }
 
 #endif // SMALLDIALOGS_H_INCLUDED

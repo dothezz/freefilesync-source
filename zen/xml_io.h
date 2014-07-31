@@ -8,8 +8,7 @@
 #define XMLBASE_H_INCLUDED
 
 #include <zenxml/xml.h>
-#include <zen/zstring.h>
-#include <zen/file_error.h>
+#include "file_error.h"
 
 //combine zen::Xml and zen file i/o
 //-> loadXmlDocument vs loadStream:
@@ -18,10 +17,10 @@
 
 namespace zen
 {
-XmlDoc loadXmlDocument(const Zstring& filename); //throw FileError
-void checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filename); //throw FileError
+XmlDoc loadXmlDocument(const Zstring& filepath); //throw FileError
+void checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath); //throw FileError
 
-void saveXmlDocument(const XmlDoc& doc, const Zstring& filename); //throw FileError
+void saveXmlDocument(const XmlDoc& doc, const Zstring& filepath); //throw FileError
 }
 
 #endif // XMLBASE_H_INCLUDED

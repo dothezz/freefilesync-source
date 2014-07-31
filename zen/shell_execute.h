@@ -46,11 +46,11 @@ void shellExecute2(const Zstring& command, ExecutionType type) //throw FileError
         std::copy(tmp, tmp + argc, std::back_inserter(argv));
     }
 
-    Zstring filename;
+    Zstring filepath;
     Zstring arguments;
     if (!argv.empty())
     {
-        filename = argv[0];
+        filepath = argv[0];
         for (auto iter = argv.begin() + 1; iter != argv.end(); ++iter)
             arguments += (iter != argv.begin() ? L" " : L"") +
                          (iter->empty() || std::any_of(iter->begin(), iter->end(), &isWhiteSpace<wchar_t>) ? L"\"" + *iter + L"\"" : *iter);
@@ -63,12 +63,12 @@ void shellExecute2(const Zstring& command, ExecutionType type) //throw FileError
     execInfo.fMask        = type == EXEC_TYPE_SYNC ? (SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT) : 0; //don't use SEE_MASK_ASYNCOK -> returns successful despite errors!
     execInfo.fMask       |= SEE_MASK_UNICODE | SEE_MASK_FLAG_NO_UI; //::ShellExecuteEx() shows a non-blocking pop-up dialog on errors -> we want a blocking one
     execInfo.lpVerb       = nullptr;
-    execInfo.lpFile       = filename.c_str();
+    execInfo.lpFile       = filepath.c_str();
     execInfo.lpParameters = arguments.c_str();
     execInfo.nShow        = SW_SHOWNORMAL;
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
-        throwFileError(_("Incorrect command line:") + L"\nFile: " + filename + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
+        throwFileError(_("Incorrect command line:") + L"\nFile: " + filepath + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
 
     if (execInfo.hProcess)
     {

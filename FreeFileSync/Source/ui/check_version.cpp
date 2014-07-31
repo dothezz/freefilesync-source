@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "check_version.h"
-//#include <memory>
 #include <zen/string_tools.h>
 #include <zen/i18n.h>
 #include <zen/utf.h>
@@ -13,7 +12,6 @@
 #include <wx/utils.h>
 #include <wx+/popup_dlg.h>
 #include "../version/version.h"
-////#include "../lib/ffs_paths.h"
 #include <zen/scope_guard.h>
 
 #ifdef ZEN_WIN

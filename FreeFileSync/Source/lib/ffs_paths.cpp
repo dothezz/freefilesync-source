@@ -14,7 +14,7 @@
 #include <vector>
 #include <zen/scope_guard.h>
 #include <zen/osx_string.h>
-//keep in .cpp file to not pollute global namespace! e.g. with UInt64:
+//keep in .cpp file to not pollute global namespace!
 #include <ApplicationServices/ApplicationServices.h> //LSFindApplicationForInfo
 #endif
 

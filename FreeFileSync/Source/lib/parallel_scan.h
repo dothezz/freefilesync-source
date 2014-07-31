@@ -17,14 +17,14 @@ namespace zen
 {
 struct DirectoryKey
 {
-    DirectoryKey(const Zstring& dirnameFull,
+    DirectoryKey(const Zstring& dirpath,
                  const HardFilter::FilterRef& filter,
                  SymLinkHandling handleSymlinks) :
-        dirnameFull_(dirnameFull),
+        dirpath_(dirpath),
         filter_(filter),
         handleSymlinks_(handleSymlinks) {}
 
-    Zstring dirnameFull_;
+    Zstring dirpath_;
     HardFilter::FilterRef filter_; //filter interface: always bound by design!
     SymLinkHandling handleSymlinks_;
 };
@@ -35,7 +35,7 @@ bool operator<(const DirectoryKey& lhs, const DirectoryKey& rhs)
     if (lhs.handleSymlinks_ != rhs.handleSymlinks_)
         return lhs.handleSymlinks_ < rhs.handleSymlinks_;
 
-    const int cmpName = cmpFileName(lhs.dirnameFull_, rhs.dirnameFull_);
+    const int cmpName = cmpFileName(lhs.dirpath_, rhs.dirpath_);
     if (cmpName != 0)
         return cmpName < 0;
 

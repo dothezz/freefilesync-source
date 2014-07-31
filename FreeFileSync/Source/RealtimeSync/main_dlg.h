@@ -34,7 +34,7 @@ private:
     MainDialog(wxDialog* dlg, const Zstring& cfgFileName);
     ~MainDialog();
 
-    void loadConfig(const Zstring& filename);
+    void loadConfig(const Zstring& filepath);
 
     virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
     virtual void OnShowHelp       (wxCommandEvent& event);
@@ -51,19 +51,19 @@ private:
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();
-    void setLastUsedConfig(const Zstring& filename);
+    void setLastUsedConfig(const Zstring& filepath);
 
     void layoutAsync(); //call Layout() asynchronously
 
-    //void addFolder(const Zstring& dirname, bool addFront = false);
+    //void addFolder(const Zstring& dirpath, bool addFront = false);
     void addFolder(const std::vector<Zstring>& newFolders, bool addFront = false);
     void removeAddFolder(size_t pos);
     void clearAddFolders();
 
     static const Zstring& lastConfigFileName();
 
-    std::unique_ptr<zen::DirectoryName<wxTextCtrl>> dirNameFirst;
-    std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
+    std::unique_ptr<zen::DirectoryName<wxTextCtrl>> dirpathFirst;
+    std::vector<DirectoryPanel*> dirpathsExtra; //additional pairs to the standard pair
 
     Zstring currentConfigFileName;
 

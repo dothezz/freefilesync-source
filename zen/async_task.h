@@ -9,8 +9,8 @@
 
 #include <list>
 #include <functional>
-#include <zen/thread.h>
-#include <zen/scope_guard.h>
+#include "thread.h"
+#include "scope_guard.h"
 //#include "type_tools.h"
 
 namespace zen

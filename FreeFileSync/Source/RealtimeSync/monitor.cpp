@@ -24,14 +24,14 @@ namespace
 const int CHECK_DIR_INTERVAL = 1; //unit: [s]
 
 
-std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirnamePhrases) //throw FileError
+std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirpathPhrases) //throw FileError
 {
-    std::set<Zstring, LessFilename> dirnames; //make unique
-    for (const Zstring& phrase : std::set<Zstring, LessFilename>(dirnamePhrases.begin(), dirnamePhrases.end()))
+    std::set<Zstring, LessFilename> dirpaths; //make unique
+    for (const Zstring& phrase : std::set<Zstring, LessFilename>(dirpathPhrases.begin(), dirpathPhrases.end()))
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
-        dirnames.insert(getFormattedDirectoryName(phrase));
+        dirpaths.insert(getFormattedDirectoryPath(phrase));
 
-    return std::vector<Zstring>(dirnames.begin(), dirnames.end());
+    return std::vector<Zstring>(dirpaths.begin(), dirpaths.end());
 }
 
 
@@ -45,42 +45,42 @@ struct WaitResult
     };
 
     WaitResult(const zen::DirWatcher::Entry& changedItem) : type(CHANGE_DETECTED), changedItem_(changedItem) {}
-    WaitResult(const Zstring& dirname) : type(CHANGE_DIR_MISSING), dirname_(dirname) {}
+    WaitResult(const Zstring& dirpath) : type(CHANGE_DIR_MISSING), dirpath_(dirpath) {}
 
     ChangeType type;
     zen::DirWatcher::Entry changedItem_; //for type == CHANGE_DETECTED: file or directory
-    Zstring dirname_;                    //for type == CHANGE_DIR_MISSING
+    Zstring dirpath_;                    //for type == CHANGE_DIR_MISSING
 };
 
 
-WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw FileError
+WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw FileError
                           const std::function<void(bool readyForSync)>& onRefreshGui)
 {
-    const std::vector<Zstring> dirNamesFmt = getFormattedDirs(dirnamePhrases); //throw FileError
-    if (dirNamesFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
+    const std::vector<Zstring> dirpathsFmt = getFormattedDirs(dirpathPhrases); //throw FileError
+    if (dirpathsFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
         throw zen::FileError(_("A folder input field is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
 
-    for (const Zstring& dirnameFmt : dirNamesFmt)
+    for (const Zstring& dirpathFmt : dirpathsFmt)
     {
         try
         {
             //a non-existent network path may block, so check existence asynchronously!
-            auto ftDirExists = async([=] { return zen::dirExists(dirnameFmt); });
+            auto ftDirExists = async([=] { return zen::dirExists(dirpathFmt); });
             //we need to check dirExists(), not somethingExists(): it's not clear if DirWatcher detects a type clash (file instead of directory!)
             while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2)))
                 onRefreshGui(false); //may throw!
             if (!ftDirExists.get())
-                return WaitResult(dirnameFmt);
+                return WaitResult(dirpathFmt);
 
-            watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError
+            watches.push_back(std::make_pair(dirpathFmt, std::make_shared<DirWatcher>(dirpathFmt))); //throw FileError
         }
         catch (FileError&)
         {
-            if (!somethingExists(dirnameFmt)) //a benign(?) race condition with FileError
-                return WaitResult(dirnameFmt);
+            if (!somethingExists(dirpathFmt)) //a benign(?) race condition with FileError
+                return WaitResult(dirpathFmt);
             throw;
         }
     }
@@ -103,13 +103,13 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
 
         for (auto it = watches.begin(); it != watches.end(); ++it)
         {
-            const Zstring& dirname = it->first;
+            const Zstring& dirpath = it->first;
             DirWatcher& watcher = *(it->second);
 
             //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
             if (checkDirExistNow)
-                if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED -> somethingExists() is NOT sufficient here!
-                    return WaitResult(dirname);
+                if (!dirExists(dirpath)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED -> somethingExists() is NOT sufficient here!
+                    return WaitResult(dirpath);
             try
             {
                 std::vector<DirWatcher::Entry> changedItems = watcher.getChanges([&] { onRefreshGui(false); /*may throw!*/ }); //throw FileError
@@ -119,11 +119,11 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
                 {
                     return
 #ifdef ZEN_MAC
-                        endsWith(e.filename_, Zstr("/.DS_Store")) ||
+                        endsWith(e.filepath_, Zstr("/.DS_Store")) ||
 #endif
-                        endsWith(e.filename_, TEMP_FILE_ENDING)  ||
-                        endsWith(e.filename_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
-                        endsWith(e.filename_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
+                        endsWith(e.filepath_, TEMP_FILE_ENDING)  ||
+                        endsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
+                        endsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
                 });
 
@@ -132,8 +132,8 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
             }
             catch (FileError&)
             {
-                if (!somethingExists(dirname)) //a benign(?) race condition with FileError
-                    return WaitResult(dirname);
+                if (!somethingExists(dirpath)) //a benign(?) race condition with FileError
+                    return WaitResult(dirpath);
                 throw;
             }
         }
@@ -145,26 +145,26 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirnamePhrases, //throw Fi
 
 
 //wait until all directories become available (again) + logs in network share
-void waitForMissingDirs(const std::vector<Zstring>& dirnamePhrases, //throw FileError
-                        const std::function<void(const Zstring& dirname)>& onRefreshGui)
+void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw FileError
+                        const std::function<void(const Zstring& dirpath)>& onRefreshGui)
 {
     while (true)
     {
         bool allExisting = true;
-        //support specifying volume by name => call getFormattedDirectoryName() repeatedly
-        for (const Zstring& dirnameFmt : getFormattedDirs(dirnamePhrases)) //throw FileError
+        //support specifying volume by name => call getFormattedDirectoryPath() repeatedly
+        for (const Zstring& dirpathFmt : getFormattedDirs(dirpathPhrases)) //throw FileError
         {
             auto ftDirExisting = async([=]() -> bool
             {
 #ifdef ZEN_WIN
                 //1. login to network share, if necessary -> we probably do NOT want multiple concurrent runs: GUI!?
-                loginNetworkShare(dirnameFmt, false); //login networks shares, no PW prompt -> is this really RTS's job?
+                loginNetworkShare(dirpathFmt, false); //login networks shares, no PW prompt -> is this really RTS's job?
 #endif
                 //2. check dir existence
-                return zen::dirExists(dirnameFmt);
+                return zen::dirExists(dirpathFmt);
             });
             while (!ftDirExisting.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2)))
-                onRefreshGui(dirnameFmt); //may throw!
+                onRefreshGui(dirpathFmt); //may throw!
 
             if (!ftDirExisting.get())
             {
@@ -174,7 +174,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirnamePhrases, //throw File
                 assert_static(CHECK_DIR_INTERVAL * 1000 % refreshInterval == 0);
                 for (int i = 0; i < CHECK_DIR_INTERVAL * 1000 / refreshInterval; ++i)
                 {
-                    onRefreshGui(dirnameFmt); //may throw!
+                    onRefreshGui(dirpathFmt); //may throw!
                     boost::this_thread::sleep(boost::posix_time::milliseconds(refreshInterval));
                 }
                 break;
@@ -205,9 +205,9 @@ struct ExecCommandNowException {};
 }
 
 
-void rts::monitorDirectories(const std::vector<Zstring>& dirnamePhrases, unsigned int delay, rts::MonitorCallback& callback)
+void rts::monitorDirectories(const std::vector<Zstring>& dirpathPhrases, unsigned int delay, rts::MonitorCallback& callback)
 {
-    if (dirnamePhrases.empty())
+    if (dirpathPhrases.empty())
     {
         assert(false);
         return;
@@ -216,7 +216,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& dirnamePhrases, unsigne
     auto execMonitoring = [&] //throw FileError
     {
         callback.setPhase(MonitorCallback::MONITOR_PHASE_WAITING);
-        waitForMissingDirs(dirnamePhrases, [&](const Zstring& dirname) { callback.requestUiRefresh(); }); //throw FileError
+        waitForMissingDirs(dirpathPhrases, [&](const Zstring& dirpath) { callback.requestUiRefresh(); }); //throw FileError
         callback.setPhase(MonitorCallback::MONITOR_PHASE_ACTIVE);
 
         //schedule initial execution (*after* all directories have arrived, which could take some time which we don't want to include)
@@ -230,7 +230,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& dirnamePhrases, unsigne
                 while (true) //loop over detected changes
                 {
                     //wait for changes (and for all directories to become available)
-                    WaitResult res = waitForChanges(dirnamePhrases, [&](bool readyForSync) //throw FileError, ExecCommandNowException
+                    WaitResult res = waitForChanges(dirpathPhrases, [&](bool readyForSync) //throw FileError, ExecCommandNowException
                     {
                         if (readyForSync)
                             if (nextExecDate <= std::time(nullptr))
@@ -241,7 +241,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& dirnamePhrases, unsigne
                     {
                         case WaitResult::CHANGE_DIR_MISSING: //don't execute the command before all directories are available!
                             callback.setPhase(MonitorCallback::MONITOR_PHASE_WAITING);
-                            waitForMissingDirs(dirnamePhrases, [&](const Zstring& dirname) { callback.requestUiRefresh(); }); //throw FileError
+                            waitForMissingDirs(dirpathPhrases, [&](const Zstring& dirpath) { callback.requestUiRefresh(); }); //throw FileError
                             callback.setPhase(MonitorCallback::MONITOR_PHASE_ACTIVE);
                             break;
 
@@ -254,7 +254,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& dirnamePhrases, unsigne
             }
             catch (ExecCommandNowException&) {}
 
-            ::wxSetEnv(L"change_path", utfCvrtTo<wxString>(lastChangeDetected.filename_)); //some way to output what file changed to the user
+            ::wxSetEnv(L"change_path", utfCvrtTo<wxString>(lastChangeDetected.filepath_)); //some way to output what file changed to the user
             ::wxSetEnv(L"change_action", toString(lastChangeDetected.action_)); //
 
             //execute command

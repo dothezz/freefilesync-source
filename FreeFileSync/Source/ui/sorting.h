@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SORTING_H_INCLUDED
-#define SORTING_H_INCLUDED
+#ifndef SORTING_H_82574232452345
+#define SORTING_H_82574232452345
 
 #include <zen/assert_static.h>
 #include <zen/type_tools.h>
@@ -33,56 +33,65 @@ bool isDirectoryPair(const FileSystemObject& fsObj)
 template <bool ascending, SelectedSide side> inline
 bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
 {
-    //presort types: first files, then directories then empty rows
+    //sort order: first files/symlinks, then directories then empty rows
+
+    //empty rows always last
     if (a.isEmpty<side>())
-        return false;  //empty rows always last
+        return false;
     else if (b.isEmpty<side>())
-        return true;  //empty rows always last
+        return true;
 
-
-    if (isDirectoryPair(a)) //sort directories by relative name
+    //directories after files/symlinks:
+    if (isDirectoryPair(a))
     {
-        if (isDirectoryPair(b))
-            return LessFilename()(a.getRelativeName<side>(), b.getRelativeName<side>());
-        else
+        if (!isDirectoryPair(b))
             return false;
     }
-    else
-    {
-        if (isDirectoryPair(b))
-            return true;
-        else
-            return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getShortName<side>(), b.getShortName<side>());
-    }
+    else if (isDirectoryPair(b))
+        return true;
+
+    //sort directories and files/symlinks by short name
+    return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
+}
+
+template <bool ascending, SelectedSide side> inline
+bool lessFullPath(const FileSystemObject& a, const FileSystemObject& b)
+{
+    //empty rows always last
+    if (a.isEmpty<side>())
+        return false;
+    else if (b.isEmpty<side>())
+        return true;
+
+    return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getFullPath<side>(), b.getFullPath<side>());
 }
 
 
-template <bool ascending> //side currently unused!
-bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
+template <bool ascending>  inline //side currently unused!
+bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
 {
     const bool isDirectoryA = isDirectoryPair(a);
-    const Zstring& relDirNameA = isDirectoryA ?
-                                 a.getObjRelativeName() : //directory
-                                 beforeLast(a.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
+    const Zstring& relFolderA = isDirectoryA ?
+                                a.getPairRelativePath() : //directory
+                                beforeLast(a.getPairRelativePath(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     const bool isDirectoryB = isDirectoryPair(b);
-    const Zstring& relDirNameB = isDirectoryB ?
-                                 b.getObjRelativeName() : //directory
-                                 beforeLast(b.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
+    const Zstring& relFolderB = isDirectoryB ?
+                                b.getPairRelativePath() : //directory
+                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
-    //compare relative names without filenames first
-    const int rv = cmpFileName(relDirNameA, relDirNameB);
+    //compare relative names without filepaths first
+    const int rv = cmpFileName(relFolderA, relFolderB);
     if (rv != 0)
         return makeSortDirection(std::less<int>(), Int2Type<ascending>())(rv, 0);
-    else //compare the filenames
-    {
-        if (isDirectoryB) //directories shall appear before files
-            return false;
-        else if (isDirectoryA)
-            return true;
 
-        return LessFilename()(a.getObjShortName(), b.getObjShortName());
-    }
+    //compare the filepaths
+    if (isDirectoryB) //directories shall appear before files
+        return false;
+    else if (isDirectoryA)
+        return true;
+
+    return LessFilename()(a.getPairShortName(), b.getPairShortName());
 }
 
 
@@ -95,13 +104,10 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    const bool isDirA = dynamic_cast<const DirPair*>(&a) != nullptr;
-    const bool isDirB = dynamic_cast<const DirPair*>(&b) != nullptr;
-
     //directories second last
-    if (isDirA)
+    if (isDirectoryPair(a))
         return false;
-    else if (isDirB)
+    else if (isDirectoryPair(b))
         return true;
 
     const FilePair* fileObjA = dynamic_cast<const FilePair*>(&a);
@@ -114,7 +120,7 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
         return true;
 
     //return list beginning with largest files first
-    return makeSortDirection(std::less<UInt64>(), Int2Type<ascending>())(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
+    return makeSortDirection(std::less<std::uint64_t>(), Int2Type<ascending>())(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
 }
 
 
@@ -125,7 +131,6 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
         return false;  //empty rows always last
     else if (b.isEmpty<side>())
         return true;  //empty rows always last
-
 
     const FilePair* fileObjA = dynamic_cast<const FilePair*>(&a);
     const FilePair* fileObjB = dynamic_cast<const FilePair*>(&b);
@@ -138,11 +143,11 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
     else if (!fileObjB && !linkObjB)
         return true;  //directories last
 
-    zen::Int64 dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
-    zen::Int64 dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
+    const std::int64_t dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
+    const std::int64_t dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
 
     //return list beginning with newest files first
-    return makeSortDirection(std::less<Int64>(), Int2Type<ascending>())(dateA, dateB);
+    return makeSortDirection(std::less<std::int64_t>(), Int2Type<ascending>())(dateA, dateB);
 }
 
 
@@ -161,9 +166,9 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
 
     auto getExtension = [&](const FileSystemObject& fsObj) -> Zstring
     {
-        const Zstring& shortName = fsObj.getShortName<side>();
+        const Zstring& shortName = fsObj.getItemName<side>();
         const size_t pos = shortName.rfind(Zchar('.'));
-        return pos == Zstring::npos ? Zstring() : Zstring(shortName.c_str() + pos + 1);
+        return pos == Zstring::npos ? Zstring() : Zstring(shortName.begin() + pos + 1, shortName.end());
     };
 
     return makeSortDirection(LessFilename(), Int2Type<ascending>())(getExtension(a), getExtension(b));
@@ -190,4 +195,4 @@ bool lessSyncDirection(const FileSystemObject& a, const FileSystemObject& b)
 }
 }
 
-#endif // SORTING_H_INCLUDED
+#endif //SORTING_H_82574232452345

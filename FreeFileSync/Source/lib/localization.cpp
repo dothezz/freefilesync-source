@@ -34,7 +34,7 @@ namespace
 class FFSTranslation : public TranslationHandler
 {
 public:
-    FFSTranslation(const Zstring& filename, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
+    FFSTranslation(const Zstring& filepath, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
 
     wxLanguage langId() const { return langId_; }
 
@@ -70,12 +70,12 @@ private:
 };
 
 
-FFSTranslation::FFSTranslation(const Zstring& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
+FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
 {
     std::string inputStream;
     try
     {
-        inputStream = loadBinStream<std::string>(filename); //throw FileError
+        inputStream = loadBinStream<std::string>(filepath); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -115,14 +115,14 @@ class FindLngfiles : public zen::TraverseCallback
 public:
     FindLngfiles(std::vector<Zstring>& lngFiles) : lngFiles_(lngFiles) {}
 
-    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
+    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
     {
-        if (endsWith(fullName, Zstr(".lng")))
-            lngFiles_.push_back(fullName);
+        if (endsWith(filepath, Zstr(".lng")))
+            lngFiles_.push_back(filepath);
     }
 
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { return LINK_SKIP; }
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) { return nullptr; }
     virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
     virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
@@ -193,11 +193,11 @@ ExistingTranslations::ExistingTranslations()
     traverseFolder(zen::getResourceDir() +  Zstr("Languages"), //throw();
                    traverseCallback);
 
-    for (const Zstring& filename : lngFiles)
+    for (const Zstring& filepath : lngFiles)
     {
         try
         {
-            const std::string stream = loadBinStream<std::string>(filename); //throw FileError
+            const std::string stream = loadBinStream<std::string>(filepath); //throw FileError
 
             lngfile::TransHeader lngHeader;
             lngfile::parseHeader(stream, lngHeader); //throw ParsingError
@@ -215,7 +215,7 @@ ExistingTranslations::ExistingTranslations()
                 ExistingTranslations::Entry newEntry;
                 newEntry.languageID     = locInfo->Language;
                 newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
-                newEntry.languageFile   = utfCvrtTo<std::wstring>(filename);
+                newEntry.languageFile   = utfCvrtTo<std::wstring>(filepath);
                 newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
                 newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
                 locMapping.push_back(newEntry);

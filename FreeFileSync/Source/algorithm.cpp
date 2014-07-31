@@ -11,13 +11,11 @@
 #include <zen/recycler.h>
 #include <zen/stl_tools.h>
 #include <zen/scope_guard.h>
-//#include <zen/thread.h>
 #include <wx+/image_resources.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
 #include "lib/norm_filter.h"
-//#include "process_callback.h" //for UI_UPDATE_INTERVAL
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -56,9 +54,9 @@ private:
         const CompareFilesResult cat = fileObj.getCategory();
 
         //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::LEFT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
@@ -129,9 +127,9 @@ private:
         const CompareDirResult cat = dirObj.getDirCategory();
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
-        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
-        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
@@ -195,9 +193,8 @@ template <> inline
 const InSyncDescrFile& getDescriptor<RIGHT_SIDE>(const InSyncFile& dbFile) { return dbFile.right; }
 
 
-//check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbFile)
+bool matchesDbEntry(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbFile, unsigned int optTimeShiftHours)
 {
     if (fileObj.isEmpty<side>())
         return !dbFile;
@@ -207,9 +204,10 @@ bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbF
     const Zstring&     shortNameDb = dbFile->first;
     const InSyncDescrFile& descrDb = getDescriptor<side>(dbFile->second);
 
-    return fileObj.getShortName<side>() == shortNameDb && //detect changes in case (windows)
+    return fileObj.getItemName<side>() == shortNameDb && //detect changes in case (windows)
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-           sameFileTime(fileObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
+           //we're not interested in "fileTimeTolerance" here!
+           sameFileTime(fileObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, optTimeShiftHours) &&
            fileObj.getFileSize<side>() == dbFile->second.fileSize;
     //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
 }
@@ -217,7 +215,7 @@ bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbF
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTimeTolerance)
+bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTimeTolerance, unsigned int optTimeShiftHours)
 {
     switch (compareVar)
     {
@@ -225,8 +223,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
             if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance);
-        //dbFile.left.fileSize == dbFile.right.fileSize;
+                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, optTimeShiftHours);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -248,7 +245,7 @@ const InSyncDescrLink& getDescriptor<RIGHT_SIDE>(const InSyncSymlink& dbLink) { 
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* dbLink)
+bool matchesDbEntry(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* dbLink, unsigned int optTimeShiftHours)
 {
     if (linkObj.isEmpty<side>())
         return !dbLink;
@@ -258,15 +255,15 @@ bool isEqual(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* 
     const Zstring&     shortNameDb = dbLink->first;
     const InSyncDescrLink& descrDb = getDescriptor<side>(dbLink->second);
 
-    return linkObj.getShortName<side>() == shortNameDb &&
+    return linkObj.getItemName<side>() == shortNameDb &&
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
-           sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2);
+           sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, optTimeShiftHours);
 }
 
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fileTimeTolerance)
+bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fileTimeTolerance, unsigned int optTimeShiftHours)
 {
     switch (compareVar)
     {
@@ -274,7 +271,7 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
             if (dbLink.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance);
+                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, optTimeShiftHours);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -289,7 +286,7 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const DirPair& dirObj, const InSyncDir::DirList::value_type* dbDir)
+bool matchesDbEntry(const DirPair& dirObj, const InSyncDir::DirList::value_type* dbDir)
 {
     if (dirObj.isEmpty<side>())
         return !dbDir || dbDir->second.status == InSyncDir::DIR_STATUS_STRAW_MAN;
@@ -298,7 +295,7 @@ bool isEqual(const DirPair& dirObj, const InSyncDir::DirList::value_type* dbDir)
 
     const Zstring& shortNameDb = dbDir->first;
 
-    return dirObj.getShortName<side>() == shortNameDb;
+    return dirObj.getItemName<side>() == shortNameDb;
 }
 
 
@@ -319,8 +316,9 @@ public:
 
 private:
     DetectMovedFiles(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) :
-        cmpVar(baseDirectory.getCompVariant()),
-        fileTimeTolerance(baseDirectory.getFileTimeTolerance())
+        cmpVar           (baseDirectory.getCompVariant()),
+        fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
+        optTimeShiftHours(baseDirectory.getTimeShift())
     {
         recurse(baseDirectory);
 
@@ -371,14 +369,18 @@ private:
     static bool sameSizeAndDateLeft(const FilePair& fsObj, const InSyncFile& dbEntry)
     {
         return fsObj.getFileSize<LEFT_SIDE>() == dbEntry.fileSize &&
-               sameFileTime(fsObj.getLastWriteTime<LEFT_SIDE>(), dbEntry.left.lastWriteTimeRaw, 2); //respect 2 second FAT/FAT32 precision!
+               sameFileTime(fsObj.getLastWriteTime<LEFT_SIDE>(), dbEntry.left.lastWriteTimeRaw, 2, 0);
+        //- respect 2 second FAT/FAT32 precision!
+        //- a "optTimeShiftHours" != 0 may lead to false positive move detections => let's be conservative and not allow it
+        //  (time shift is only ever required during FAT DST switches)
+
         //PS: *never* allow 2 sec tolerance as container predicate!!
         // => no strict weak ordering relation! reason: no transitivity of equivalence!
     }
     static bool sameSizeAndDateRight(const FilePair& fsObj, const InSyncFile& dbEntry)
     {
         return fsObj.getFileSize<RIGHT_SIDE>() == dbEntry.fileSize &&
-               sameFileTime(fsObj.getLastWriteTime<RIGHT_SIDE>(), dbEntry.right.lastWriteTimeRaw, 2);
+               sameFileTime(fsObj.getLastWriteTime<RIGHT_SIDE>(), dbEntry.right.lastWriteTimeRaw, 2, 0);
     }
 
     void findAndSetMovePair(const InSyncFile& dbEntry) const
@@ -388,7 +390,7 @@ private:
 
         if (idLeft  != FileId() &&
             idRight != FileId() &&
-            stillInSync(dbEntry, cmpVar, fileTimeTolerance))
+            stillInSync(dbEntry, cmpVar, fileTimeTolerance, optTimeShiftHours))
         {
             auto itL = exLeftOnly.find(idLeft);
             if (itL != exLeftOnly.end())
@@ -411,6 +413,7 @@ private:
 
     const CompareVariant cmpVar;
     const int fileTimeTolerance;
+    const unsigned int optTimeShiftHours;
 
     std::map<FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
     std::map<FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
@@ -456,8 +459,9 @@ private:
         txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
         txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
         txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
-        cmpVar(baseDirectory.getCompVariant()),
-        fileTimeTolerance(baseDirectory.getFileTimeTolerance())
+        cmpVar           (baseDirectory.getCompVariant()),
+        fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
+        optTimeShiftHours(baseDirectory.getTimeShift())
     {
         //-> considering filter not relevant:
         //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
@@ -482,9 +486,9 @@ private:
             return;
 
         //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::LEFT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
@@ -492,19 +496,19 @@ private:
         const InSyncDir::FileList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto it = dbContainer->files.find(fileObj.getObjShortName());
+            auto it = dbContainer->files.find(fileObj.getPairShortName());
             if (it != dbContainer->files.end())
                 dbEntry = &*it;
         }
 
         //evaluation
-        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(fileObj, dbEntry);
-        const bool changeOnRight = !isEqual<RIGHT_SIDE>(fileObj, dbEntry);
+        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(fileObj, dbEntry, optTimeShiftHours);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(fileObj, dbEntry, optTimeShiftHours);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, optTimeShiftHours))
                 fileObj.setSyncDirConflict(txtDbNotInSync);
             else
                 fileObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -528,19 +532,19 @@ private:
         const InSyncDir::LinkList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto it = dbContainer->symlinks.find(linkObj.getObjShortName());
+            auto it = dbContainer->symlinks.find(linkObj.getPairShortName());
             if (it != dbContainer->symlinks.end())
                 dbEntry = &*it;
         }
 
         //evaluation
-        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(linkObj, dbEntry);
-        const bool changeOnRight = !isEqual<RIGHT_SIDE>(linkObj, dbEntry);
+        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(linkObj, dbEntry, optTimeShiftHours);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(linkObj, dbEntry, optTimeShiftHours);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, optTimeShiftHours))
                 linkObj.setSyncDirConflict(txtDbNotInSync);
             else
                 linkObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -559,9 +563,9 @@ private:
         const CompareDirResult cat = dirObj.getDirCategory();
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
-        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
-        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
@@ -569,7 +573,7 @@ private:
         const InSyncDir::DirList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto it = dbContainer->dirs.find(dirObj.getObjShortName());
+            auto it = dbContainer->dirs.find(dirObj.getPairShortName());
             if (it != dbContainer->dirs.end())
                 dbEntry = &*it;
         }
@@ -577,8 +581,8 @@ private:
         if (cat != DIR_EQUAL)
         {
             //evaluation
-            const bool changeOnLeft  = !isEqual<LEFT_SIDE >(dirObj, dbEntry);
-            const bool changeOnRight = !isEqual<RIGHT_SIDE>(dirObj, dbEntry);
+            const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(dirObj, dbEntry);
+            const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(dirObj, dbEntry);
 
             if (changeOnLeft != changeOnRight)
             {
@@ -606,6 +610,7 @@ private:
 
     const CompareVariant cmpVar;
     const int fileTimeTolerance;
+    const unsigned int optTimeShiftHours;
 };
 }
 
@@ -848,19 +853,19 @@ private:
     void processFile(FilePair& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
-            fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
+            fileObj.setActive(filterProc.passFileFilter(fileObj.getPairRelativePath()));
     }
 
     void processLink(SymlinkPair& linkObj) const
     {
         if (Eval<strategy>().process(linkObj))
-            linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
+            linkObj.setActive(filterProc.passFileFilter(linkObj.getPairRelativePath()));
     }
 
     void processDir(DirPair& dirObj) const
     {
         bool subObjMightMatch = true;
-        const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
+        const bool filterPassed = filterProc.passDirFilter(dirObj.getPairRelativePath(), &subObjMightMatch);
 
         if (Eval<strategy>().process(dirObj))
             dirObj.setActive(filterPassed);
@@ -1019,12 +1024,12 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 class FilterByTimeSpan
 {
 public:
-    static void execute(HierarchyObject& hierObj, const Int64& timeFrom, const Int64& timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
+    static void execute(HierarchyObject& hierObj, std::int64_t timeFrom, std::int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
 
 private:
     FilterByTimeSpan(HierarchyObject& hierObj,
-                     const Int64& timeFrom,
-                     const Int64& timeTo) :
+                     std::int64_t timeFrom,
+                     std::int64_t timeTo) :
         timeFrom_(timeFrom),
         timeTo_(timeTo) { recurse(hierObj); }
 
@@ -1073,12 +1078,12 @@ private:
                obj.template getLastWriteTime<side>() <= timeTo_;
     }
 
-    const Int64 timeFrom_;
-    const Int64 timeTo_;
+    const std::int64_t timeFrom_;
+    const std::int64_t timeTo_;
 };
 
 
-void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo)
+void zen::applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom, std::int64_t timeTo)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirPair& baseDirObj) { FilterByTimeSpan::execute(baseDirObj, timeFrom, timeTo); });
 }
@@ -1095,14 +1100,14 @@ std::pair<Zstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSy
     for (const FileSystemObject* fsObj : selectionLeft)
         if (!fsObj->isEmpty<LEFT_SIDE>())
         {
-            fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
+            fileList += fsObj->getFullPath<LEFT_SIDE>() + Zstr('\n');
             ++totalDelCount;
         }
 
     for (const FileSystemObject* fsObj : selectionRight)
         if (!fsObj->isEmpty<RIGHT_SIDE>())
         {
-            fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
+            fileList += fsObj->getFullPath<RIGHT_SIDE>() + Zstr('\n');
             ++totalDelCount;
         }
 
@@ -1200,41 +1205,41 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
 
     virtual void visit(const FilePair& fileObj)
     {
-        notifyFileDeletion(fileObj.getFullName<side>());
+        notifyFileDeletion(fileObj.getFullPath<side>());
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(fileObj.getFullName<side>()); //throw FileError
+            zen::recycleOrDelete(fileObj.getFullPath<side>()); //throw FileError
         else
-            zen::removeFile(fileObj.getFullName<side>()); //throw FileError
+            zen::removeFile(fileObj.getFullPath<side>()); //throw FileError
     }
 
     virtual void visit(const SymlinkPair& linkObj)
     {
-        notifySymlinkDeletion(linkObj.getFullName<side>());
+        notifySymlinkDeletion(linkObj.getFullPath<side>());
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(linkObj.getFullName<side>()); //throw FileError
+            zen::recycleOrDelete(linkObj.getFullPath<side>()); //throw FileError
         else
         {
-            if (dirExists(linkObj.getFullName<side>())) //dir symlink
-                zen::removeDirectory(linkObj.getFullName<side>()); //throw FileError
+            if (dirExists(linkObj.getFullPath<side>())) //dir symlink
+                zen::removeDirectory(linkObj.getFullPath<side>()); //throw FileError
             else //file symlink, broken symlink
-                zen::removeFile(linkObj.getFullName<side>()); //throw FileError
+                zen::removeFile(linkObj.getFullPath<side>()); //throw FileError
         }
     }
 
     virtual void visit(const DirPair& dirObj)
     {
-        notifyDirectoryDeletion(dirObj.getFullName<side>()); //notfied twice; see below -> no big deal
+        notifyDirectoryDeletion(dirObj.getFullPath<side>()); //notfied twice; see below -> no big deal
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(dirObj.getFullName<side>()); //throw FileError
+            zen::recycleOrDelete(dirObj.getFullPath<side>()); //throw FileError
         else
         {
-            auto onBeforeFileDeletion = [&](const Zstring& filename) { this->notifyFileDeletion     (filename); }; //without "this->" GCC 4.7.2 runtime crash on Debian
-            auto onBeforeDirDeletion  = [&](const Zstring& dirname ) { this->notifyDirectoryDeletion(dirname ); };
+            auto onBeforeFileDeletion = [&](const Zstring& filepath) { this->notifyFileDeletion     (filepath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
+            auto onBeforeDirDeletion  = [&](const Zstring& dirpath ) { this->notifyDirectoryDeletion(dirpath ); };
 
-            zen::removeDirectory(dirObj.getFullName<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+            zen::removeDirectory(dirObj.getFullPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
         }
     }
 

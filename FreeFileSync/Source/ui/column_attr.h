@@ -13,9 +13,9 @@ namespace zen
 {
 enum ColumnTypeRim
 {
-    COL_TYPE_DIRECTORY,
     COL_TYPE_FULL_PATH,
-    COL_TYPE_REL_PATH,
+    COL_TYPE_BASE_DIRECTORY,
+    COL_TYPE_REL_FOLDER,
     COL_TYPE_FILENAME,
     COL_TYPE_SIZE,
     COL_TYPE_DATE,
@@ -24,7 +24,7 @@ enum ColumnTypeRim
 
 struct ColumnAttributeRim
 {
-    ColumnAttributeRim() : type_(COL_TYPE_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
+    ColumnAttributeRim() : type_(COL_TYPE_BASE_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
     ColumnAttributeRim(ColumnTypeRim type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
     ColumnTypeRim type_;
@@ -38,9 +38,9 @@ inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH, 250, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH, -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,      250, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_BASE_DIRECTORY, 200, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_FOLDER,    -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
     attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  200, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
@@ -52,9 +52,9 @@ inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,  250, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY,  200, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  -280, 1, false)); //already shown on left side
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,      250, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_BASE_DIRECTORY, 200, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_FOLDER  ,  -280, 1, false)); //already shown on left side
     attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,   200, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,       112, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));

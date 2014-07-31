@@ -11,7 +11,6 @@
 #include <memory>
 #include <zen/zstring.h>
 #include <zen/assert_static.h>
-#include <zen/int64.h>
 
 namespace zen
 {
@@ -178,17 +177,20 @@ struct CompConfig
 {
     CompConfig() :
         compareVar(CMP_BY_TIME_SIZE),
-        handleSymlinks(SYMLINK_EXCLUDE) {}
+        handleSymlinks(SYMLINK_EXCLUDE),
+        optTimeShiftHours(0) {}
 
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;
+    unsigned int optTimeShiftHours; //if != 0: treat modification times with this offset as equal
 };
 
 inline
 bool operator==(const CompConfig& lhs, const CompConfig& rhs)
 {
-    return lhs.compareVar     == rhs.compareVar &&
-           lhs.handleSymlinks == rhs.handleSymlinks;
+    return lhs.compareVar        == rhs.compareVar &&
+           lhs.handleSymlinks    == rhs.handleSymlinks &&
+           lhs.optTimeShiftHours == rhs.optTimeShiftHours;
 }
 
 inline
@@ -324,9 +326,9 @@ bool operator==(const FilterConfig& lhs, const FilterConfig& rhs)
 void resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
                   size_t sizeMin,  UnitSize unitSizeMin,
                   size_t sizeMax,  UnitSize unitSizeMax,
-                  zen::Int64&  timeFrom,    //unit: UTC time, seconds
-                  zen::UInt64& sizeMinBy,   //unit: bytes
-                  zen::UInt64& sizeMaxBy);  //unit: bytes
+                  std::int64_t&  timeFrom,   //unit: UTC time, seconds
+                  std::uint64_t& sizeMinBy,  //unit: bytes
+                  std::uint64_t& sizeMaxBy); //unit: bytes
 
 
 struct FolderPairEnh //enhanced folder pairs with (optional) alternate configuration
@@ -338,14 +340,14 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
                   const std::shared_ptr<const CompConfig>& cmpConfig,
                   const std::shared_ptr<const SyncConfig>& syncConfig,
                   const FilterConfig& filter) :
-        dirnamePhraseLeft (phraseLeft),
-        dirnamePhraseRight(phraseRight),
+        dirpathPhraseLeft (phraseLeft),
+        dirpathPhraseRight(phraseRight),
         altCmpConfig(cmpConfig),
         altSyncConfig(syncConfig),
         localFilter(filter) {}
 
-    Zstring dirnamePhraseLeft;  //unresolved directory names as entered by user!
-    Zstring dirnamePhraseRight; //
+    Zstring dirpathPhraseLeft;  //unresolved directory names as entered by user!
+    Zstring dirpathPhraseRight; //
 
     std::shared_ptr<const CompConfig> altCmpConfig;  //optional
     std::shared_ptr<const SyncConfig> altSyncConfig; //
@@ -356,8 +358,8 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 inline
 bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
 {
-    return lhs.dirnamePhraseLeft  == rhs.dirnamePhraseLeft  &&
-           lhs.dirnamePhraseRight == rhs.dirnamePhraseRight &&
+    return lhs.dirpathPhraseLeft  == rhs.dirpathPhraseLeft  &&
+           lhs.dirpathPhraseRight == rhs.dirpathPhraseRight &&
 
            (lhs.altCmpConfig.get() && rhs.altCmpConfig.get() ?
             *lhs.altCmpConfig == *rhs.altCmpConfig :

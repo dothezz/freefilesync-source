@@ -24,7 +24,7 @@ namespace
 {
 #ifdef ZEN_WIN
 //(try to) enhance error messages by showing which processes lock the file
-Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
+Zstring getLockingProcessNames(const Zstring& filepath) //throw(), empty string if none found or error occurred
 {
     if (vistaOrLater())
     {
@@ -33,7 +33,7 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
         const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
 
         if (getLockingProcesses && freeString)
-            if (const wchar_t* procList = getLockingProcesses(filename.c_str()))
+            if (const wchar_t* procList = getLockingProcesses(filepath.c_str()))
             {
                 ZEN_ON_SCOPE_EXIT(freeString(procList));
                 return procList;
@@ -43,11 +43,11 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
 }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-//"filename" could be a named pipe which *blocks* forever during "open()"! https://sourceforge.net/p/freefilesync/bugs/221/
-void checkForUnsupportedType(const Zstring& filename) //throw FileError
+//"filepath" could be a named pipe which *blocks* forever during "open()"! https://sourceforge.net/p/freefilesync/bugs/221/
+void checkForUnsupportedType(const Zstring& filepath) //throw FileError
 {
     struct ::stat fileInfo = {};
-    if (::stat(filename.c_str(), &fileInfo) != 0) //follows symlinks
+    if (::stat(filepath.c_str(), &fileInfo) != 0) //follows symlinks
         return; //let the caller handle errors like "not existing"
 
     if (!S_ISREG(fileInfo.st_mode) &&
@@ -64,21 +64,21 @@ void checkForUnsupportedType(const Zstring& filename) //throw FileError
             const std::wstring numFmt = printNumber<std::wstring>(L"0%06o", m & S_IFMT);
             return name ? numFmt + L", " + name : numFmt;
         };
-        throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtFileName(filename)) + L" " + getTypeName(fileInfo.st_mode));
+        throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtFileName(filepath)) + L" " + getTypeName(fileInfo.st_mode));
     }
 }
 #endif
 }
 
 
-FileInput::FileInput(FileHandle handle, const Zstring& filename) : FileInputBase(filename), fileHandle(handle) {}
+FileInput::FileInput(FileHandle handle, const Zstring& filepath) : FileInputBase(filepath), fileHandle(handle) {}
 
 
-FileInput::FileInput(const Zstring& filename) : FileInputBase(filename) //throw FileError
+FileInput::FileInput(const Zstring& filepath) : FileInputBase(filepath) //throw FileError
 {
 #ifdef ZEN_WIN
     const wchar_t functionName[] = L"CreateFile";
-    fileHandle = ::CreateFile(applyLongPathPrefix(filename).c_str(), //_In_      LPCTSTR lpFileName,
+    fileHandle = ::CreateFile(applyLongPathPrefix(filepath).c_str(), //_In_      LPCTSTR lpFileName,
                               GENERIC_READ,                          //_In_      DWORD dwDesiredAccess,
                               FILE_SHARE_READ | FILE_SHARE_DELETE,   //_In_      DWORD dwShareMode,
                               nullptr,                               //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
@@ -111,21 +111,21 @@ FileInput::FileInput(const Zstring& filename) : FileInputBase(filename) //throw 
                               nullptr); //_In_opt_  HANDLE hTemplateFile
     if (fileHandle == INVALID_HANDLE_VALUE)
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
+    checkForUnsupportedType(filepath); //throw FileError; reading a named pipe would block forever!
     const wchar_t functionName[] = L"fopen";
-    fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
+    fileHandle = ::fopen(filepath.c_str(), "r,type=record,noseek"); //utilize UTF-8 filepath
     if (!fileHandle)
 #endif
     {
         const ErrorCode lastError = getLastError(); //copy before making other system calls!
-        const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filepath));
         std::wstring errorDescr = formatSystemError(functionName, lastError);
 
 #ifdef ZEN_WIN
         if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
             lastError == ERROR_LOCK_VIOLATION)
         {
-            const Zstring procList = getLockingProcessNames(filename); //throw()
+            const Zstring procList = getLockingProcessNames(filepath); //throw()
             if (!procList.empty())
                 errorDescr = _("The file is locked by another process:") + L"\n" + procList;
         }
@@ -184,18 +184,18 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
 }
 
 
-FileOutput::FileOutput(FileHandle handle, const Zstring& filename) : FileOutputBase(filename), fileHandle(handle) {}
+FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileOutputBase(filepath), fileHandle(handle) {}
 
 
-FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-    FileOutputBase(filename)
+FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutputBase(filepath)
 {
 #ifdef ZEN_WIN
     const DWORD dwCreationDisposition = access == FileOutput::ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW;
 
     auto getHandle = [&](DWORD dwFlagsAndAttributes)
     {
-        return ::CreateFile(applyLongPathPrefix(filename).c_str(), //_In_      LPCTSTR lpFileName,
+        return ::CreateFile(applyLongPathPrefix(filepath).c_str(), //_In_      LPCTSTR lpFileName,
                             GENERIC_READ | GENERIC_WRITE, //_In_      DWORD dwDesiredAccess,
                             /*  http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
                                    quote: When an application creates a file across a network, it is better
@@ -220,7 +220,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
         if (lastError == ERROR_ACCESS_DENIED &&
             dwCreationDisposition == CREATE_ALWAYS)
         {
-            const DWORD attrib = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
+            const DWORD attrib = ::GetFileAttributes(applyLongPathPrefix(filepath).c_str());
             if (attrib != INVALID_FILE_ATTRIBUTES)
             {
                 fileHandle = getHandle(attrib); //retry: alas this may still fail for hidden file, e.g. accessing shared folder in XP as Virtual Box guest!
@@ -231,13 +231,13 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
         //begin of "regular" error reporting
         if (fileHandle == INVALID_HANDLE_VALUE)
         {
-            const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename));
+            const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filepath));
             std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
 
             if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
                 lastError == ERROR_LOCK_VIOLATION)
             {
-                const Zstring procList = getLockingProcessNames(filename); //throw()
+                const Zstring procList = getLockingProcessNames(filepath); //throw()
                 if (!procList.empty())
                     errorDescr = _("The file is locked by another process:") + L"\n" + procList;
             }
@@ -254,8 +254,8 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    checkForUnsupportedType(filename); //throw FileError; writing a named pipe would block forever!
-    fileHandle = ::fopen(filename.c_str(),
+    checkForUnsupportedType(filepath); //throw FileError; writing a named pipe would block forever!
+    fileHandle = ::fopen(filepath.c_str(),
                          //GNU extension: https://www.securecoding.cert.org/confluence/display/cplusplus/FIO03-CPP.+Do+not+make+assumptions+about+fopen()+and+file+creation
                          access == ACC_OVERWRITE ? "w,type=record,noseek" : "wx,type=record,noseek");
     if (!fileHandle)
@@ -311,13 +311,13 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
 #if defined ZEN_LINUX || defined ZEN_MAC
 //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-5.0.tar.gz
 
-FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBase(filename) //throw FileError
+FileInputUnbuffered::FileInputUnbuffered(const Zstring& filepath) : FileInputBase(filepath) //throw FileError
 {
-    checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
+    checkForUnsupportedType(filepath); //throw FileError; reading a named pipe would block forever!
 
-    fdFile = ::open(filename.c_str(), O_RDONLY);
+    fdFile = ::open(filepath.c_str(), O_RDONLY);
     if (fdFile == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
-        throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), L"open", getLastError());
+        throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filepath)), L"open", getLastError());
 }
 
 
@@ -348,16 +348,16 @@ size_t FileInputUnbuffered::read(void* buffer, size_t bytesToRead) //throw FileE
 }
 
 
-FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filename, mode_t mode) : FileOutputBase(filename) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filepath, mode_t mode) : FileOutputBase(filepath) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
-    //checkForUnsupportedType(filename); -> not needed, open() + O_EXCL shoul fail fast
+    //checkForUnsupportedType(filepath); -> not needed, open() + O_EXCL shoul fail fast
 
     //overwrite is: O_CREAT | O_WRONLY | O_TRUNC
-    fdFile = ::open(filename.c_str(), O_CREAT | O_WRONLY | O_EXCL, mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+    fdFile = ::open(filepath.c_str(), O_CREAT | O_WRONLY | O_EXCL, mode & (S_IRWXU | S_IRWXG | S_IRWXO));
     if (fdFile == -1)
     {
         const int lastError = errno; //copy before making other system calls!
-        const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filepath));
         const std::wstring errorDescr = formatSystemError(L"open", lastError);
 
         if (lastError == EEXIST)
@@ -370,7 +370,7 @@ FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filename, mode_t mode)
     }
 }
 
-FileOutputUnbuffered::FileOutputUnbuffered(int fd, const Zstring& filename) : FileOutputBase(filename), fdFile(fd) {}
+FileOutputUnbuffered::FileOutputUnbuffered(int fd, const Zstring& filepath) : FileOutputBase(filepath), fdFile(fd) {}
 
 FileOutputUnbuffered::~FileOutputUnbuffered() { ::close(fdFile); }
 

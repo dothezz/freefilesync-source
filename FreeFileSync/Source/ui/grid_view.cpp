@@ -8,7 +8,6 @@
 #include "sorting.h"
 #include "../synchronization.h"
 #include <zen/stl_tools.h>
-//#include <zen/perf.h>
 
 using namespace zen;
 
@@ -120,7 +119,9 @@ GridView::StatusCmpResult::StatusCmpResult() :
     filesOnLeftView   (0),
     foldersOnLeftView (0),
     filesOnRightView  (0),
-    foldersOnRightView(0) {}
+    foldersOnRightView(0),
+    filesizeLeftView  (0),
+    filesizeRightView (0) {}
 
 
 GridView::StatusCmpResult GridView::updateCmpResult(bool showExcluded, //maps sortedRef to viewRef
@@ -198,7 +199,9 @@ GridView::StatusSyncPreview::StatusSyncPreview() :
     filesOnLeftView   (0),
     foldersOnLeftView (0),
     filesOnRightView  (0),
-    foldersOnRightView(0) {}
+    foldersOnRightView(0),
+    filesizeLeftView  (0),
+    filesizeRightView (0) {}
 
 
 GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //maps sortedRef to viewRef
@@ -352,18 +355,11 @@ void GridView::setData(FolderComparison& folderCmp)
 
 
 //------------------------------------ SORTING TEMPLATES ------------------------------------------------
-template <bool ascending>
-class GridView::LessRelativeName : public std::binary_function<RefIndex, RefIndex, bool>
+template <bool ascending, SelectedSide side>
+struct GridView::LessFullPath
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        //presort by folder pair
-        if (a.folderIndex != b.folderIndex)
-            return ascending ?
-                   a.folderIndex < b.folderIndex :
-                   a.folderIndex > b.folderIndex;
-
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (!fsObjA) //invalid rows shall appear at the end
@@ -371,15 +367,37 @@ public:
         else if (!fsObjB)
             return true;
 
-        return lessRelativeName<ascending>(*fsObjA, *fsObjB);
+        return lessFullPath<ascending, side>(*fsObjA, *fsObjB);
     }
 };
 
 
-template <bool ascending, zen::SelectedSide side>
-class GridView::LessShortFileName : public std::binary_function<RefIndex, RefIndex, bool>
+template <bool ascending>
+struct GridView::LessRelativeFolder
 {
-public:
+    bool operator()(const RefIndex a, const RefIndex b) const
+    {
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
+        if (!fsObjA) //invalid rows shall appear at the end
+            return false;
+        else if (!fsObjB)
+            return true;
+
+        //presort by folder pair
+        if (a.folderIndex != b.folderIndex)
+            return ascending ?
+                   a.folderIndex < b.folderIndex :
+                   a.folderIndex > b.folderIndex;
+
+        return lessRelativeFolder<ascending>(*fsObjA, *fsObjB);
+    }
+};
+
+
+template <bool ascending, SelectedSide side>
+struct GridView::LessShortFileName
+{
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -394,10 +412,9 @@ public:
 };
 
 
-template <bool ascending, zen::SelectedSide side>
-class GridView::LessFilesize : public std::binary_function<RefIndex, RefIndex, bool>
+template <bool ascending, SelectedSide side>
+struct GridView::LessFilesize
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -412,10 +429,9 @@ public:
 };
 
 
-template <bool ascending, zen::SelectedSide side>
-class GridView::LessFiletime : public std::binary_function<RefIndex, RefIndex, bool>
+template <bool ascending, SelectedSide side>
+struct GridView::LessFiletime
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -430,10 +446,9 @@ public:
 };
 
 
-template <bool ascending, zen::SelectedSide side>
-class GridView::LessExtension : public std::binary_function<RefIndex, RefIndex, bool>
+template <bool ascending, SelectedSide side>
+struct GridView::LessExtension
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -449,9 +464,8 @@ public:
 
 
 template <bool ascending>
-class GridView::LessCmpResult : public std::binary_function<RefIndex, RefIndex, bool>
+struct GridView::LessCmpResult
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -467,9 +481,8 @@ public:
 
 
 template <bool ascending>
-class GridView::LessSyncDirection : public std::binary_function<RefIndex, RefIndex, bool>
+struct GridView::LessSyncDirection
 {
-public:
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
@@ -492,9 +505,9 @@ bool GridView::getDefaultSortDirection(ColumnTypeRim type) //true: ascending; fa
         case COL_TYPE_DATE:
             return false;
 
-        case COL_TYPE_DIRECTORY:
+        case COL_TYPE_BASE_DIRECTORY:
         case COL_TYPE_FULL_PATH:
-        case COL_TYPE_REL_PATH:
+        case COL_TYPE_REL_FOLDER:
         case COL_TYPE_FILENAME:
         case COL_TYPE_EXTENSION:
             return true;
@@ -514,9 +527,14 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
     switch (type)
     {
         case COL_TYPE_FULL_PATH:
-        case COL_TYPE_REL_PATH:
-            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true>());
-            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false>());
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, RIGHT_SIDE>());
+            break;
+        case COL_TYPE_REL_FOLDER:
+            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<true>());
+            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<false>());
             break;
         case COL_TYPE_FILENAME:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
@@ -550,7 +568,7 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
         //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
         //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
         //    break;
-        case COL_TYPE_DIRECTORY:
+        case COL_TYPE_BASE_DIRECTORY:
             if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex < b.folderIndex; });
             else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex > b.folderIndex; });
             break;

@@ -10,7 +10,6 @@
 #include <numeric>
 #include <zen/basic_math.h>
 #include <zen/scope_guard.h>
-//#include <wx/settings.h>
 #include "dc.h"
 
 using namespace zen;
@@ -224,6 +223,7 @@ void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarke
 {
     assert(curvePoints.size() == oobMarker.size());
     if (curvePoints.size() != oobMarker.size() || curvePoints.empty()) return;
+
     auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; }; //test if point is start of a OOB line
 
     std::vector<CurvePoint> curvePointsTmp;

@@ -21,9 +21,9 @@ struct SummaryInfo
     std::wstring jobName; //may be empty
     std::wstring finalStatus;
     int itemsSynced;
-    Int64 dataSynced;
+    std::int64_t dataSynced;
     int itemsTotal;
-    Int64 dataTotal;
+    std::int64_t dataTotal;
     int64_t totalTime; //unit: [sec]
 };
 
@@ -121,7 +121,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
                         const ErrorLog& log,
                         size_t maxBytesToWrite) //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
 {
-    const Zstring filename = getConfigDir() + Zstr("LastSyncs.log");
+    const Zstring filepath = getConfigDir() + Zstr("LastSyncs.log");
 
     Utf8String newStream = utfCvrtTo<Utf8String>(generateLogHeader(summary));
     replace(newStream, '\n', LINE_BREAK); //don't replace line break any earlier
@@ -147,7 +147,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
         Utf8String oldStream;
         try
         {
-            oldStream = loadBinStream<Utf8String>(filename); //throw FileError
+            oldStream = loadBinStream<Utf8String>(filepath); //throw FileError
         }
         catch (FileError&) {}
 
@@ -174,7 +174,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
         }
     }
 
-    saveBinStream(filename, newStream); //throw FileError
+    saveBinStream(filepath, newStream); //throw FileError
 }
 }
 

@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "status_handler.h"
-//#include <wx/app.h>
 #include <zen/tick_count.h>
 
 using namespace zen;

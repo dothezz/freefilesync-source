@@ -31,8 +31,8 @@ public:
     static int getSize(IconSize sz); //expected and *maximum* icon size in pixel
     int getSize() const { return getSize(iconSizeType); } //
 
-    bool readyForRetrieval(const Zstring& filename);
-    Opt<wxBitmap> retrieveFileIcon(const Zstring& filename); //... and mark as hot
+    bool readyForRetrieval(const Zstring& filepath);
+    Opt<wxBitmap> retrieveFileIcon(const Zstring& filepath); //... and mark as hot
 
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
@@ -47,7 +47,7 @@ private:
     const IconSize iconSizeType;
 };
 
-bool hasLinkExtension(const Zstring& filename);
+bool hasLinkExtension(const Zstring& filepath);
 }
 
 #endif // ICONBUFFER_H_INCLUDED

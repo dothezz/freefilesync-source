@@ -49,8 +49,8 @@ public:
         unsigned int filesOnRightView;
         unsigned int foldersOnRightView;
 
-        zen::UInt64 filesizeLeftView;
-        zen::UInt64 filesizeRightView;
+        std::uint64_t filesizeLeftView;
+        std::uint64_t filesizeRightView;
     };
 
     //comparison results view
@@ -84,8 +84,8 @@ public:
         unsigned int filesOnRightView;
         unsigned int foldersOnRightView;
 
-        zen::UInt64 filesizeLeftView;
-        zen::UInt64 filesizeRightView;
+        std::uint64_t filesizeLeftView;
+        std::uint64_t filesizeRightView;
     };
 
     //synchronization preview
@@ -155,26 +155,29 @@ private:
     class SerializeHierarchy;
 
     //sorting classes
-    template <bool ascending>
-    class LessRelativeName;
-
     template <bool ascending, SelectedSide side>
-    class LessShortFileName;
-
-    template <bool ascending, SelectedSide side>
-    class LessFilesize;
-
-    template <bool ascending, SelectedSide side>
-    class LessFiletime;
-
-    template <bool ascending, SelectedSide side>
-    class LessExtension;
+    struct LessFullPath;
 
     template <bool ascending>
-    class LessCmpResult;
+    struct LessRelativeFolder;
+
+    template <bool ascending, SelectedSide side>
+    struct LessShortFileName;
+
+    template <bool ascending, SelectedSide side>
+    struct LessFilesize;
+
+    template <bool ascending, SelectedSide side>
+    struct LessFiletime;
+
+    template <bool ascending, SelectedSide side>
+    struct LessExtension;
 
     template <bool ascending>
-    class LessSyncDirection;
+    struct LessCmpResult;
+
+    template <bool ascending>
+    struct LessSyncDirection;
 
     std::unique_ptr<SortInfo> currentSort;
 };

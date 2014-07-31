@@ -37,11 +37,11 @@ typedef FILE* FileHandle;
 class FileInput : public FileInputBase
 {
 public:
-    FileInput(const Zstring& filename);                    //throw FileError
-    FileInput(FileHandle handle, const Zstring& filename); //takes ownership!
+    FileInput(const Zstring& filepath);                    //throw FileError
+    FileInput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileInput();
 
-    virtual size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
+    virtual size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
     //expected to fill buffer completely unless "end of file"
 
 private:
@@ -52,11 +52,11 @@ private:
 class FileOutput : public FileOutputBase
 {
 public:
-    FileOutput(const Zstring& filename, AccessFlag access); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-    FileOutput(FileHandle handle, const Zstring& filename); //takes ownership!
+    FileOutput(const Zstring& filepath, AccessFlag access); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileOutput();
 
-    virtual void write(const void* buffer, size_t bytesToWrite); //throw FileError
+    virtual void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
 
 private:
     FileHandle fileHandle;
@@ -66,11 +66,11 @@ private:
 class FileInputUnbuffered : public FileInputBase
 {
 public:
-    FileInputUnbuffered(const Zstring& filename); //throw FileError
+    FileInputUnbuffered(const Zstring& filepath); //throw FileError
     ~FileInputUnbuffered();
 
     //considering safe-read.c it seems buffer size should be a multiple of 8192
-    virtual size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
+    virtual size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
     //do NOT rely on partially filled buffer meaning EOF!
 
     int getDescriptor() { return fdFile;}
@@ -83,11 +83,11 @@ class FileOutputUnbuffered : public FileOutputBase
 {
 public:
     //creates a new file (no overwrite allowed!)
-    FileOutputUnbuffered(const Zstring& filename, mode_t mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-    FileOutputUnbuffered(int fd, const Zstring& filename); //takes ownership!
+    FileOutputUnbuffered(const Zstring& filepath, mode_t mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutputUnbuffered(int fd, const Zstring& filepath); //takes ownership!
     ~FileOutputUnbuffered();
 
-    virtual void write(const void* buffer, size_t bytesToWrite); //throw FileError
+    virtual void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
     int getDescriptor() { return fdFile;}
 
 private:

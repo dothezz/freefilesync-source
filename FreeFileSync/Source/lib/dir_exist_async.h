@@ -28,7 +28,7 @@ struct DirectoryStatus
 
 };
 
-DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& dirnames,
+DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& dirpaths,
                                         bool allowUserInteraction,
                                         ProcessCallback& procCallback)
 {
@@ -37,16 +37,16 @@ DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& d
     DirectoryStatus output;
 
     std::list<std::pair<Zstring, boost::unique_future<bool>>> futureInfo;
-    for (const Zstring& dirname : dirnames)
-        if (!dirname.empty()) //skip empty dirs
-            futureInfo.push_back(std::make_pair(dirname, async2<bool>([=]() -> bool
+    for (const Zstring& dirpath : dirpaths)
+        if (!dirpath.empty()) //skip empty dirs
+            futureInfo.push_back(std::make_pair(dirpath, async2<bool>([=]() -> bool
         {
 #ifdef ZEN_WIN
             //1. login to network share, if necessary
-            loginNetworkShare(dirname, allowUserInteraction);
+            loginNetworkShare(dirpath, allowUserInteraction);
 #endif
             //2. check dir existence
-            return dirExists(dirname);
+            return dirExists(dirpath);
         })));
 
     //don't wait (almost) endlessly like win32 would on not existing network shares:
@@ -70,12 +70,12 @@ DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& d
 }
 
 inline //also silences Clang "unused function" for compilation units depending from getExistingDirsUpdating() only
-bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
+bool dirExistsUpdating(const Zstring& dirpath, bool allowUserInteraction, ProcessCallback& procCallback)
 {
-    if (dirname.empty()) return false;
-    const DirectoryStatus dirStatus = getExistingDirsUpdating({ dirname }, allowUserInteraction, procCallback);
+    if (dirpath.empty()) return false;
+    const DirectoryStatus dirStatus = getExistingDirsUpdating({ dirpath }, allowUserInteraction, procCallback);
     assert(dirStatus.existing.empty() != dirStatus.missing.empty());
-    return dirStatus.existing.find(dirname) != dirStatus.existing.end();
+    return dirStatus.existing.find(dirpath) != dirStatus.existing.end();
 }
 }
 

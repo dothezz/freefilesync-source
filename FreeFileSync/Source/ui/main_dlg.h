@@ -11,7 +11,6 @@
 #include <set>
 #include <stack>
 #include <memory>
-#include <zen/int64.h>
 #include <zen/async_task.h>
 #include <wx+/file_drop.h>
 #include <wx/aui/aui.h>
@@ -66,8 +65,8 @@ private:
     friend class PanelMoveWindow;
 
     //configuration load/save
-    void setLastUsedConfig(const Zstring& filename, const xmlAccess::XmlGuiConfig& guiConfig);
-    void setLastUsedConfig(const std::vector<Zstring>& filenames, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const Zstring& filepath, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const std::vector<Zstring>& filepaths, const xmlAccess::XmlGuiConfig& guiConfig);
 
     xmlAccess::XmlGuiConfig getConfig() const;
     void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<Zstring>& referenceFiles);
@@ -75,7 +74,7 @@ private:
     void setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings); //messes with Maximize(), window sizes, so call just once!
     xmlAccess::XmlGlobalSettings getGlobalCfgBeforeExit(); //destructive "get" thanks to "Iconize(false), Maximize(false)"
 
-    bool loadConfiguration(const std::vector<Zstring>& filenames); //return true if loaded successfully
+    bool loadConfiguration(const std::vector<Zstring>& filepaths); //return true if loaded successfully
 
     bool trySaveConfig     (const Zstring* guiFilename); //return true if saved successfully
     bool trySaveBatchConfig(const Zstring* batchFileToUpdate); //
@@ -88,9 +87,9 @@ private:
     void initViewFilterButtons();
     void setViewFilterDefault();
 
-    void addFileToCfgHistory(const std::vector<Zstring>& filenames); //= update/insert + apply selection
-    void removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filenames);
-    void removeCfgHistoryItems(const std::vector<Zstring>& filenames);
+    void addFileToCfgHistory(const std::vector<Zstring>& filepaths); //= update/insert + apply selection
+    void removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filepaths);
+    void removeCfgHistoryItems(const std::vector<Zstring>& filepaths);
 
     void addAddFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
@@ -129,7 +128,7 @@ private:
 
     //status bar supports one of the following two states at a time:
     void setStatusBarFullText(const wxString& msg);
-    void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, zen::UInt64 filesizeLeftView, zen::UInt64 filesizeRightView);
+    void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, std::uint64_t filesizeLeftView, std::uint64_t filesizeRightView);
 
     void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFullText)
     void restoreStatusInformation();                  //called automatically after a few seconds
@@ -232,6 +231,8 @@ private:
     void hideFindPanel();
     void startFindNext(); //F3
 
+    void resetLayout();
+
     virtual void OnSearchGridEnter(wxCommandEvent& event) override;
     virtual void OnHideSearchPanel(wxCommandEvent& event) override;
     void OnSearchPanelKeyPressed(wxKeyEvent& event);
@@ -239,6 +240,7 @@ private:
     //menu events
     virtual void OnMenuOptions       (wxCommandEvent& event) override;
     virtual void OnMenuExportFileList(wxCommandEvent& event) override;
+    virtual void OnMenuResetLayout   (wxCommandEvent& event) override { resetLayout(); }
     virtual void OnMenuFindItem      (wxCommandEvent& event) override;
     virtual void OnMenuCheckVersion  (wxCommandEvent& event) override;
     virtual void OnMenuCheckVersionAutomatically(wxCommandEvent& event) override;
@@ -304,7 +306,8 @@ private:
 
     wxString defaultPerspective;
 
-    zen::Int64 manualTimeSpanFrom, manualTimeSpanTo; //buffer manual time span selection at session level
+    std::int64_t manualTimeSpanFrom;
+    std::int64_t manualTimeSpanTo; //buffer manual time span selection at session level
 
     std::shared_ptr<FolderHistory> folderHistoryLeft;  //shared by all wxComboBox dropdown controls
     std::shared_ptr<FolderHistory> folderHistoryRight; //always bound!

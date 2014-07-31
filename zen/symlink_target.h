@@ -12,7 +12,6 @@
 
 #ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
-//#include <WinIoCtl.h>
 #include "privilege.h"
 #include "long_path_prefix.h"
 #include "dll.h"

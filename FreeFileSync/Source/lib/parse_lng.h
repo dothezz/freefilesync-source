@@ -21,7 +21,6 @@
 #include <zen/utf.h>
 #include <zen/string_tools.h>
 #include "parse_plural.h"
-//#include <zen/perf.h>
 
 namespace lngfile
 {

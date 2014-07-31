@@ -55,11 +55,11 @@ std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std
 
 
 inline
-std::wstring fmtFileName(const Zstring& filename)
+std::wstring fmtFileName(const Zstring& filepath)
 {
     std::wstring output;
     output += L'\"';
-    output += utfCvrtTo<std::wstring>(filename);
+    output += utfCvrtTo<std::wstring>(filepath);
     output += L'\"';
     return output;
 }

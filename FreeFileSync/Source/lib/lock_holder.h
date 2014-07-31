@@ -6,7 +6,6 @@
 #include <zen/stl_tools.h>
 #include "dir_lock.h"
 #include "status_handler.h"
-//#include "dir_exist_async.h"
 
 namespace zen
 {
@@ -18,13 +17,13 @@ const Zchar LOCK_FILE_ENDING[]  = Zstr(".ffs_lock"); //don't use Zstring as glob
 class LockHolder
 {
 public:
-    LockHolder(const std::set<Zstring, LessFilename>& dirnamesExisting, //resolved dirname ending with path separator
+    LockHolder(const std::set<Zstring, LessFilename>& dirpathsExisting, //resolved dirpaths ending with path separator
                bool& warningDirectoryLockFailed,
                ProcessCallback& procCallback)
     {
-        for (const Zstring& dirnameFmt : dirnamesExisting)
+        for (const Zstring& dirpathFmt : dirpathsExisting)
         {
-            assert(endsWith(dirnameFmt, FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
+            assert(endsWith(dirpathFmt, FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
 
             class WaitOnLockHandler : public DirLockCallback
             {
@@ -39,11 +38,11 @@ public:
             try
             {
                 //lock file creation is synchronous and may block noticeably for very slow devices (usb sticks, mapped cloud storages)
-                lockHolder.push_back(DirLock(dirnameFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)); //throw FileError
+                lockHolder.push_back(DirLock(dirpathFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)); //throw FileError
             }
             catch (const FileError& e)
             {
-                const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtFileName(dirnameFmt)) + L"\n\n" + e.toString();
+                const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtFileName(dirpathFmt)) + L"\n\n" + e.toString();
                 procCallback.reportWarning(msg, warningDirectoryLockFailed); //may throw!
             }
         }

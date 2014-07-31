@@ -87,11 +87,11 @@ public:
 private:
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray)
     {
-        std::vector<wxString> filenames(fileArray.begin(), fileArray.end());
-        if (!filenames.empty())
+        std::vector<wxString> filepaths(fileArray.begin(), fileArray.end());
+        if (!filepaths.empty())
             //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
             if (wxEvtHandler* handler = dropWindow_.GetEventHandler())
-                handler->AddPendingEvent(FileDropEvent(filenames, dropWindow_, wxPoint(x, y)));
+                handler->AddPendingEvent(FileDropEvent(filepaths, dropWindow_, wxPoint(x, y)));
         return true;
     }
 

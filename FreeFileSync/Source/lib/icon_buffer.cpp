@@ -133,12 +133,12 @@ public:
 
 
 #if defined ZEN_WIN || defined ZEN_LINUX
-Zstring getFileExtension(const Zstring& filename)
+Zstring getFileExtension(const Zstring& filepath)
 {
-    const Zstring shortName = afterLast(filename, Zchar('\\')); //warning: using windows file name separator!
+    const Zstring shortName = afterLast(filepath, Zchar('\\')); //warning: using windows file name separator!
 
     return contains(shortName, Zchar('.')) ?
-           afterLast(filename, Zchar('.')) :
+           afterLast(filepath, Zchar('.')) :
            Zstring();
 }
 #endif
@@ -233,13 +233,13 @@ bool isStandardIconExtension(const Zstring& extension)
 #endif
 }
 
-bool zen::hasLinkExtension(const Zstring& filename)
+bool zen::hasLinkExtension(const Zstring& filepath)
 {
 #ifdef ZEN_WIN
-    const Zstring& extension = getFileExtension(filename);
+    const Zstring& extension = getFileExtension(filepath);
     return linkExt.find(extension) != linkExt.end();
 #elif defined ZEN_LINUX
-    const Zstring& extension = getFileExtension(filename);
+    const Zstring& extension = getFileExtension(filepath);
     return extension == "desktop";
 #elif defined ZEN_MAC
     return false; //alias files already get their arrow icon via "NSWorkspace::iconForFile"
@@ -248,16 +248,16 @@ bool zen::hasLinkExtension(const Zstring& filename)
 
 //################################################################################################################################################
 
-IconHolder getThumbnailImage(const Zstring& filename, int requestedSize) //return 0 on failure
+IconHolder getThumbnailImage(const Zstring& filepath, int requestedSize) //return 0 on failure
 {
 #ifdef ZEN_WIN
     if (getThumbnail && releaseImageData)
-        return IconHolder(getThumbnail(filename.c_str(), requestedSize));
+        return IconHolder(getThumbnail(filepath.c_str(), requestedSize));
 
 #elif defined ZEN_LINUX
     gint width  = 0;
     gint height = 0;
-    if (GdkPixbufFormat* fmt = ::gdk_pixbuf_get_file_info(filename.c_str(), &width, &height))
+    if (GdkPixbufFormat* fmt = ::gdk_pixbuf_get_file_info(filepath.c_str(), &width, &height))
     {
         (void)fmt;
         if (width > 0 && height > 0 && requestedSize > 0)
@@ -271,7 +271,7 @@ IconHolder getThumbnailImage(const Zstring& filename, int requestedSize) //retur
                 trgWidth  = width  * requestedSize / maxExtent;
                 trgHeight = height * requestedSize / maxExtent;
             }
-            if (GdkPixbuf* pixBuf = ::gdk_pixbuf_new_from_file_at_size(filename.c_str(), trgWidth, trgHeight, nullptr))
+            if (GdkPixbuf* pixBuf = ::gdk_pixbuf_new_from_file_at_size(filepath.c_str(), trgWidth, trgHeight, nullptr))
                 return IconHolder(pixBuf); //pass ownership
         }
     }
@@ -279,7 +279,7 @@ IconHolder getThumbnailImage(const Zstring& filename, int requestedSize) //retur
 #elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getThumbnail(filename.c_str(), requestedSize))); //throw SysError
+        return IconHolder(new osx::ImageData(osx::getThumbnail(filepath.c_str(), requestedSize))); //throw SysError
     }
     catch (zen::SysError&) {}
 #endif
@@ -320,7 +320,7 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 }
 
 
-IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
+IconHolder getAssociatedIcon(const Zstring& filepath, IconBuffer::IconSize sz)
 {
     //1. try to load thumbnails
     switch (sz)
@@ -329,7 +329,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
             break;
         case IconBuffer::SIZE_MEDIUM:
         case IconBuffer::SIZE_LARGE:
-            if (IconHolder ico = getThumbnailImage(filename, IconBuffer::getSize(sz)))
+            if (IconHolder ico = getThumbnailImage(filepath, IconBuffer::getSize(sz)))
                 return ico;
             //else: fallback to non-thumbnail icon
             break;
@@ -338,13 +338,13 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     //2. retrieve file icons
 #ifdef ZEN_WIN
     //perf: optimize fallback case for SIZE_MEDIUM and SIZE_LARGE:
-    const Zstring& extension = getFileExtension(filename);
+    const Zstring& extension = getFileExtension(filepath);
     if (isStandardIconExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         return getAssociatedIconByExt(extension, sz);
-    //SIZE_MEDIUM or SIZE_LARGE: result will buffered under full filename, not extension; this is okay: failure to load thumbnail is independent from extension in general!
+    //SIZE_MEDIUM or SIZE_LARGE: result will buffered under full filepath, not extension; this is okay: failure to load thumbnail is independent from extension in general!
 
     SHFILEINFO fileInfo = {};
-    if (DWORD_PTR imgList = ::SHGetFileInfo(filename.c_str(), //_In_     LPCTSTR pszPath, -> note: ::SHGetFileInfo() can't handle \\?\-prefix!
+    if (DWORD_PTR imgList = ::SHGetFileInfo(filepath.c_str(), //_In_     LPCTSTR pszPath, -> note: ::SHGetFileInfo() can't handle \\?\-prefix!
                                             0,                //DWORD dwFileAttributes,
                                             &fileInfo,        //_Inout_  SHFILEINFO *psfi,
                                             sizeof(fileInfo), //UINT cbFileInfo,
@@ -367,7 +367,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     }
 
 #elif defined ZEN_LINUX
-    GFile* file = ::g_file_new_for_path(filename.c_str()); //documented to "never fail"
+    GFile* file = ::g_file_new_for_path(filepath.c_str()); //documented to "never fail"
     ZEN_ON_SCOPE_EXIT(::g_object_unref(file);)
 
     if (GFileInfo* fileInfo = ::g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_ICON, G_FILE_QUERY_INFO_NONE, nullptr, nullptr))
@@ -381,7 +381,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
 #elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getFileIcon(filename.c_str(), IconBuffer::getSize(sz)))); //throw SysError
+        return IconHolder(new osx::ImageData(osx::getFileIcon(filepath.c_str(), IconBuffer::getSize(sz)))); //throw SysError
     }
     catch (zen::SysError&) { assert(false); }
 #endif
@@ -402,9 +402,9 @@ public:
         while (filesToLoad.empty())
             conditionNewFiles.timed_wait(dummy, boost::posix_time::milliseconds(100)); //interruption point!
 
-        Zstring fileName = filesToLoad.back();
+        Zstring filepath = filesToLoad.back();
         filesToLoad.pop_back();
-        return fileName;
+        return filepath;
     }
 
     void setWorkload(const std::vector<Zstring>& newLoad) //context of main thread
@@ -441,19 +441,19 @@ public:
     Buffer() : firstInsertPos(iconList.end()), lastInsertPos(iconList.end()) {}
 
     //called by main and worker thread:
-    bool hasIcon(const Zstring& fileName) const
+    bool hasIcon(const Zstring& filepath) const
     {
         boost::lock_guard<boost::mutex> dummy(lockIconList);
-        return iconList.find(fileName) != iconList.end();
+        return iconList.find(filepath) != iconList.end();
     }
 
     //must be called by main thread only! => wxBitmap is NOT thread-safe like an int (non-atomic ref-count!!!)
-    Opt<wxBitmap> retrieve(const Zstring& fileName)
+    Opt<wxBitmap> retrieve(const Zstring& filepath)
     {
         assert(boost::this_thread::get_id() == mainThreadId);
         boost::lock_guard<boost::mutex> dummy(lockIconList);
 
-        auto it = iconList.find(fileName);
+        auto it = iconList.find(filepath);
         if (it == iconList.end())
             return NoValue();
 
@@ -634,10 +634,10 @@ void WorkerThread::operator()() //thread entry
     {
         boost::this_thread::interruption_point();
 
-        const Zstring fileName = workload_->extractNextFile(); //start work: blocks until next icon to load is retrieved
+        const Zstring filepath = workload_->extractNextFile(); //start work: blocks until next icon to load is retrieved
 
-        if (!buffer_->hasIcon(fileName)) //perf: workload may contain duplicate entries?
-            buffer_->insert(fileName, getAssociatedIcon(fileName, iconSizeType));
+        if (!buffer_->hasIcon(filepath)) //perf: workload may contain duplicate entries?
+            buffer_->insert(filepath, getAssociatedIcon(filepath, iconSizeType));
     }
 }
 
@@ -694,24 +694,24 @@ int IconBuffer::getSize(IconSize icoSize)
 }
 
 
-bool IconBuffer::readyForRetrieval(const Zstring& filename)
+bool IconBuffer::readyForRetrieval(const Zstring& filepath)
 {
 #ifdef ZEN_WIN
     if (iconSizeType == IconBuffer::SIZE_SMALL)
-        if (isStandardIconExtension(getFileExtension(filename)))
+        if (isStandardIconExtension(getFileExtension(filepath)))
             return true;
 #endif
-    return pimpl->buffer->hasIcon(filename);
+    return pimpl->buffer->hasIcon(filepath);
 }
 
 
-Opt<wxBitmap> IconBuffer::retrieveFileIcon(const Zstring& filename)
+Opt<wxBitmap> IconBuffer::retrieveFileIcon(const Zstring& filepath)
 {
 #ifdef ZEN_WIN
     //perf: let's read icons which don't need file access right away! No async delay justified!
     if (iconSizeType == IconBuffer::SIZE_SMALL) //non-thumbnail view, we need file type icons only!
     {
-        const Zstring& extension = getFileExtension(filename);
+        const Zstring& extension = getFileExtension(filepath);
         if (isStandardIconExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
             if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(extension))
@@ -727,11 +727,11 @@ Opt<wxBitmap> IconBuffer::retrieveFileIcon(const Zstring& filename)
     }
 #endif
 
-    if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(filename))
+    if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(filepath))
         return ico;
 
     //since this icon seems important right now, we don't want to wait until next setWorkload() to start retrieving
-    pimpl->workload->addToWorkload(filename);
+    pimpl->workload->addToWorkload(filepath);
     pimpl->buffer->limitSize();
     return NoValue();
 }

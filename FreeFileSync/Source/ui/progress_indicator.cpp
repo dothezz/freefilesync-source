@@ -257,7 +257,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             auto dataTotal      = syncStat_->getDataTotal     (ProcessCallback::PHASE_COMPARING_CONTENT);
 
             //add both data + obj-count, to handle "deletion-only" cases
-            const double fraction = dataTotal + objectsTotal == 0 ? 0 : std::max(0.0, to<double>(dataCurrent + objectsCurrent) / to<double>(dataTotal + objectsTotal));
+            const double fraction = dataTotal + objectsTotal == 0 ? 0 : std::max(0.0, 1.0 * (dataCurrent + objectsCurrent) / (dataTotal + objectsTotal));
 
             //dialog caption, taskbar
             setTitle(fractionToString(fraction) + wxT(" - ") + _("Comparing content..."));
@@ -282,11 +282,11 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
                     timeLastSpeedEstimateMs = timeNowMs;
 
                     if (numeric::dist(binCompStartMs, timeNowMs) >= 1000) //discard stats for first second: probably messy
-                        perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNowMs);
+                        perf->addSample(objectsCurrent, dataCurrent, timeNowMs);
 
                     //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
                     //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
-                    Opt<double> remTimeSec = perf->getRemainingTimeSec(to<double>(dataTotal - dataCurrent));
+                    Opt<double> remTimeSec = perf->getRemainingTimeSec(dataTotal - dataCurrent);
                     setText(*m_staticTextTimeRemaining, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
 
                     //current speed -> Win 7 copy uses 1 sec update interval instead
@@ -998,7 +998,7 @@ struct LabelFormatterBytes : public LabelFormatter
         return e * numeric::nearMatch(a, std::begin(steps), std::end(steps));
     }
 
-    virtual wxString formatText(double value, double optimalBlockSize) const { return filesizeToShortString(Int64(value)); };
+    virtual wxString formatText(double value, double optimalBlockSize) const { return filesizeToShortString(static_cast<std::int64_t>(value)); };
 };
 
 
@@ -1382,8 +1382,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::notifyProgressChange() //noexcept!
                 break;
             case ProcessCallback::PHASE_COMPARING_CONTENT:
             case ProcessCallback::PHASE_SYNCHRONIZING:
-                curveDataBytes->addRecord(timeElapsed.timeMs(), to<double>(syncStat_->getDataCurrent   (syncStat_->currentPhase())));
-                curveDataItems->addRecord(timeElapsed.timeMs(),            syncStat_->getObjectsCurrent(syncStat_->currentPhase()));
+                curveDataBytes->addRecord(timeElapsed.timeMs(), syncStat_->getDataCurrent   (syncStat_->currentPhase()));
+                curveDataItems->addRecord(timeElapsed.timeMs(), syncStat_->getObjectsCurrent(syncStat_->currentPhase()));
                 break;
         }
 }
@@ -1519,11 +1519,11 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         {
             const int   itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
             const int   itemsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
-            const Int64 dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
-            const Int64 dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
+            const std::int64_t dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            const std::int64_t dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
 
             //add both data + obj-count, to handle "deletion-only" cases
-            const double fraction = dataTotal + itemsTotal == 0 ? 1 : std::max(0.0, to<double>(dataCurrent + itemsCurrent) / to<double>(dataTotal + itemsTotal));
+            const double fraction = dataTotal + itemsTotal == 0 ? 1 : std::max(0.0, 1.0 * (dataCurrent + itemsCurrent) / (dataTotal + itemsTotal));
             //----------------------------------------------------------------------------------------------------
 
             //dialog caption, taskbar, systray tooltip
@@ -1534,17 +1534,17 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             if (taskbar_.get()) taskbar_->setProgress(fraction);
 
             //constant line graph
-            curveDataBytesCurrent->setValue(timeNowMs / 1000.0, to<double>(dataCurrent));
-            curveDataItemsCurrent->setValue(timeNowMs / 1000.0,           itemsCurrent);
+            curveDataBytesCurrent->setValue(timeNowMs / 1000.0, dataCurrent);
+            curveDataItemsCurrent->setValue(timeNowMs / 1000.0, itemsCurrent);
 
             //tentatively update total time, may be improved on below:
             const double timeTotalSecTentative = dataTotal == dataCurrent ? timeNowMs / 1000.0 : std::max(curveDataBytesTotal->getValueX(), timeNowMs / 1000.0);
-            curveDataBytesTotal->setValue(timeTotalSecTentative, to<double>(dataTotal));
-            curveDataItemsTotal->setValue(timeTotalSecTentative,            itemsTotal);
+            curveDataBytesTotal->setValue(timeTotalSecTentative, dataTotal);
+            curveDataItemsTotal->setValue(timeTotalSecTentative, itemsTotal);
 
             //even though notifyProgressChange() already set the latest data, let's add another sample to have all curves consider "timeNowMs"
             //no problem with adding too many records: CurveDataStatistics will remove duplicate entries!
-            curveDataBytes->addRecord(timeNowMs, to<double>(dataCurrent));
+            curveDataBytes->addRecord(timeNowMs, dataCurrent);
             curveDataItems->addRecord(timeNowMs, itemsCurrent);
 
             //remaining objects and data
@@ -1560,7 +1560,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
                     timeLastSpeedEstimateMs = timeNowMs;
 
                     if (numeric::dist(phaseStartMs, timeNowMs) >= 1000) //discard stats for first second: probably messy
-                        perf->addSample(itemsCurrent, to<double>(dataCurrent), timeNowMs);
+                        perf->addSample(itemsCurrent, dataCurrent, timeNowMs);
 
                     //current speed -> Win 7 copy uses 1 sec update interval instead
                     Opt<std::wstring> bps = perf->getBytesPerSecond();
@@ -1570,7 +1570,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
 
                     //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
                     //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
-                    Opt<double> remTimeSec = perf->getRemainingTimeSec(to<double>(dataTotal - dataCurrent));
+                    Opt<double> remTimeSec = perf->getRemainingTimeSec(dataTotal - dataCurrent);
                     setText(*pnl.m_staticTextRemTime, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
 
                     //update estimated total time marker with precision of "10% remaining time" only to avoid needless jumping around:
@@ -1819,8 +1819,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         {
             const int   itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
             const int   itemsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
-            const Int64 dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
-            const Int64 dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
+            const std::int64_t dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            const std::int64_t dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
             assert(dataCurrent <= dataTotal);
 
             //set overall speed (instead of current speed)

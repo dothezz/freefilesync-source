@@ -22,7 +22,7 @@
 
 #elif defined ZEN_MAC
 #include <CoreServices/CoreServices.h>
-#include <zen/osx_string.h>
+#include "osx_string.h"
 #endif
 
 using namespace zen;
@@ -35,7 +35,7 @@ class SharedData
 {
 public:
     //context of worker thread
-    void addChanges(const char* buffer, DWORD bytesWritten, const Zstring& dirname) //throw ()
+    void addChanges(const char* buffer, DWORD bytesWritten, const Zstring& dirpath) //throw ()
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
@@ -48,7 +48,7 @@ public:
             {
                 const FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION&>(*bufPos);
 
-                const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
+                const Zstring fullpath = dirpath + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
 
                 [&]
                 {
@@ -57,7 +57,7 @@ public:
                     if (notifyInfo.Action == FILE_ACTION_MODIFIED)
                     {
                         //note: this check will not work if top watched directory has been renamed
-                        const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(fullname).c_str());
+                        const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(fullpath).c_str());
                         if (ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY)) //returns true for (dir-)symlinks also
                             return;
                     }
@@ -67,14 +67,14 @@ public:
                     {
                         case FILE_ACTION_ADDED:
                         case FILE_ACTION_RENAMED_NEW_NAME: //harmonize with "move" which is notified as "create + delete"
-                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, fullname));
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, fullpath));
                             break;
                         case FILE_ACTION_REMOVED:
                         case FILE_ACTION_RENAMED_OLD_NAME:
-                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_DELETE, fullname));
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_DELETE, fullpath));
                             break;
                         case FILE_ACTION_MODIFIED:
-                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_UPDATE, fullname));
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_UPDATE, fullpath));
                             break;
                     }
                 }();
@@ -87,10 +87,10 @@ public:
     }
 
     ////context of main thread
-    //void addChange(const Zstring& dirname) //throw ()
+    //void addChange(const Zstring& dirpath) //throw ()
     //{
     //    boost::lock_guard<boost::mutex> dummy(lockAccess);
-    //    changedFiles.insert(dirname);
+    //    changedFiles.insert(dirpath);
     //}
 
 
@@ -144,10 +144,10 @@ public:
     ReadChangesAsync(const Zstring& directory, //make sure to not leak-in thread-unsafe types!
                      const std::shared_ptr<SharedData>& shared) :
         shared_(shared),
-        dirnamePf(appendSeparator(directory)),
+        dirpathPf(appendSeparator(directory)),
         hDir(INVALID_HANDLE_VALUE)
     {
-        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf).c_str(),                 //_In_      LPCTSTR lpFileName,
+        hDir = ::CreateFile(applyLongPathPrefix(dirpathPf).c_str(),                 //_In_      LPCTSTR lpFileName,
                             FILE_LIST_DIRECTORY,                                    //_In_      DWORD dwDesiredAccess,
                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
                             nullptr,              //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
@@ -165,7 +165,7 @@ public:
         hDir(INVALID_HANDLE_VALUE)
     {
         shared_   = std::move(other.shared_);
-        dirnamePf = std::move(other.dirnamePf);
+        dirpathPf = std::move(other.dirpathPf);
         std::swap(hDir, other.hDir);
     }
 
@@ -194,7 +194,7 @@ public:
                 if (overlapped.hEvent == nullptr)
                 {
                     const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"CreateEvent", lastError), lastError);
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"CreateEvent", lastError), lastError);
                 }
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
@@ -214,7 +214,7 @@ public:
                                              nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
                 {
                     const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"ReadDirectoryChangesW", lastError), lastError);
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"ReadDirectoryChangesW", lastError), lastError);
                 }
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
@@ -238,7 +238,7 @@ public:
                 {
                     const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
                     if (lastError != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"GetOverlappedResult", lastError), lastError);
+                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"GetOverlappedResult", lastError), lastError);
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -248,7 +248,7 @@ public:
                 }
                 guardAio.dismiss();
 
-                shared_->addChanges(&buffer[0], bytesWritten, dirnamePf); //throw ()
+                shared_->addChanges(&buffer[0], bytesWritten, dirpathPf); //throw ()
             }
         }
         catch (boost::thread_interrupted&)
@@ -260,13 +260,13 @@ public:
     HANDLE getDirHandle() const { return hDir; } //for reading/monitoring purposes only, don't abuse (e.g. close handle)!
 
 private:
-    ReadChangesAsync(const ReadChangesAsync&);
-    ReadChangesAsync& operator=(const ReadChangesAsync&);
+    ReadChangesAsync           (const ReadChangesAsync&) = delete;
+    ReadChangesAsync& operator=(const ReadChangesAsync&) = delete;
 
     //shared between main and worker:
     std::shared_ptr<SharedData> shared_;
     //worker thread only:
-    Zstring dirnamePf; //thread safe!
+    Zstring dirpathPf; //thread safe!
     HANDLE hDir;
 };
 
@@ -314,7 +314,7 @@ struct DirWatcher::Pimpl
     boost::thread worker;
     std::shared_ptr<SharedData> shared;
 
-    Zstring dirname;
+    Zstring dirpath;
     std::unique_ptr<HandleVolumeRemoval> volRemoval;
 };
 
@@ -323,7 +323,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     pimpl_(new Pimpl)
 {
     pimpl_->shared = std::make_shared<SharedData>();
-    pimpl_->dirname = directory;
+    pimpl_->dirpath = directory;
 
     ReadChangesAsync reader(directory, pimpl_->shared); //throw FileError
     pimpl_->volRemoval.reset(new HandleVolumeRemoval(reader.getDirHandle(), pimpl_->worker)); //throw FileError
@@ -360,7 +360,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
             boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
         }
 
-        output.push_back(Entry(ACTION_DELETE, pimpl_->dirname)); //report removal as change to main directory
+        output.push_back(Entry(ACTION_DELETE, pimpl_->dirpath)); //report removal as change to main directory
     }
     else //the normal case...
         pimpl_->shared->fetchChanges(output); //throw FileError
@@ -376,11 +376,11 @@ class DirsOnlyTraverser : public zen::TraverseCallback
 public:
     DirsOnlyTraverser(std::vector<Zstring>& dirs) : dirs_(dirs) {}
 
-    virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual void onFile   (const Zchar* shortName, const Zstring& filepath, const FileInfo& details) {}
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { return LINK_SKIP; }
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)
     {
-        dirs_.push_back(fullName);
+        dirs_.push_back(dirpath);
         return this;
     }
     virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
@@ -396,7 +396,7 @@ struct DirWatcher::Pimpl
 {
     Pimpl() : notifDescr() {}
 
-    Zstring baseDirname;
+    Zstring basedirpath;
     int notifDescr;
     std::map<int, Zstring> watchDescrs; //watch descriptor and (sub-)directory name (postfixed with separator) -> owned by "notifDescr"
 };
@@ -406,18 +406,18 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     pimpl_(new Pimpl)
 {
     //get all subdirectories
-    Zstring dirname = directory;
-    if (endsWith(dirname, FILE_NAME_SEPARATOR))
-        dirname.resize(dirname.size() - 1);
+    Zstring dirpathFmt = directory;
+    if (endsWith(dirpathFmt, FILE_NAME_SEPARATOR))
+        dirpathFmt.resize(dirpathFmt.size() - 1);
 
-    std::vector<Zstring> fullDirList { dirname };
+    std::vector<Zstring> fullDirList { dirpathFmt };
     {
         DirsOnlyTraverser traverser(fullDirList); //throw FileError
-        zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
+        zen::traverseFolder(dirpathFmt, traverser); //don't traverse into symlinks (analog to windows build)
     }
 
     //init
-    pimpl_->baseDirname = directory;
+    pimpl_->basedirpath = directory;
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
         throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"inotify_init", getLastError());
@@ -481,7 +481,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->baseDirname)), L"read", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->basedirpath)), L"read", getLastError());
     }
 
     std::vector<Entry> output;
@@ -573,18 +573,18 @@ struct DirWatcher::Pimpl
 DirWatcher::DirWatcher(const Zstring& directory) :
     pimpl_(new Pimpl)
 {
-    CFStringRef dirnameCf = osx::createCFString(directory.c_str()); //returns nullptr on error
-    if (!dirnameCf)
+    CFStringRef dirpathCf = osx::createCFString(directory.c_str()); //returns nullptr on error
+    if (!dirpathCf)
         throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: createCFString"); //no error code documented!
-    ZEN_ON_SCOPE_EXIT(::CFRelease(dirnameCf));
+    ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCf));
 
-    CFArrayRef dirnameCfArray = ::CFArrayCreate(nullptr,    //CFAllocatorRef allocator,
-                                                reinterpret_cast<const void**>(&dirnameCf), //const void** values,
+    CFArrayRef dirpathCfArray = ::CFArrayCreate(nullptr,    //CFAllocatorRef allocator,
+                                                reinterpret_cast<const void**>(&dirpathCf), //const void** values,
                                                 1,          //CFIndex numValues,
                                                 nullptr);   //const CFArrayCallBacks* callBacks
-    if (!dirnameCfArray)
+    if (!dirpathCfArray)
         throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: CFArrayCreate"); //no error code documented!
-    ZEN_ON_SCOPE_EXIT(::CFRelease(dirnameCfArray));
+    ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCfArray));
 
     FSEventStreamContext context = {};
     context.info = &pimpl_->changedFiles;
@@ -592,7 +592,7 @@ DirWatcher::DirWatcher(const Zstring& directory) :
     pimpl_->eventStream = ::FSEventStreamCreate(nullptr,        //CFAllocatorRef allocator,
                                                 &eventCallback, //FSEventStreamCallback callback,
                                                 &context,       //FSEventStreamContext* context,
-                                                dirnameCfArray, //CFArrayRef pathsToWatch,
+                                                dirpathCfArray, //CFArrayRef pathsToWatch,
                                                 kFSEventStreamEventIdSinceNow, //FSEventStreamEventId sinceWhen,
                                                 0,              //CFTimeInterval latency, in seconds
                                                 kFSEventStreamCreateFlagWatchRoot |

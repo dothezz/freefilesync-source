@@ -219,9 +219,6 @@ std::wstring zen::getSymbol(SyncOperation op)
 
 namespace
 {
-assert_static(std::numeric_limits<zen:: Int64>::is_specialized);
-assert_static(std::numeric_limits<zen::UInt64>::is_specialized);
-
 /*
 int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 {
@@ -244,7 +241,7 @@ int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 */
 
 
-Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
+std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
 {
     TimeComp locTimeStruc = zen::localTime();
 
@@ -269,7 +266,7 @@ Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
         //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
         //    // +6 == -1 in Z_7
 
-        //    return Int64(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
+        //    return std::int64_t(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
         //}
 
         case UTIME_THIS_MONTH:
@@ -291,7 +288,7 @@ Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
-            return localToTimeT(locTimeStruc) - Int64(value) * 24 * 3600;
+            return localToTimeT(locTimeStruc) - std::int64_t(value) * 24 * 3600;
     }
 
     assert(false);
@@ -299,9 +296,9 @@ Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
 }
 
 
-UInt64 resolve(size_t value, UnitSize unit, UInt64 defaultVal)
+std::uint64_t resolve(size_t value, UnitSize unit, std::uint64_t defaultVal)
 {
-    const UInt64 maxVal =std::numeric_limits<zen::UInt64>::max();
+    const std::uint64_t maxVal = std::numeric_limits<std::uint64_t>::max();
 
     switch (unit)
     {
@@ -324,13 +321,13 @@ UInt64 resolve(size_t value, UnitSize unit, UInt64 defaultVal)
 void zen::resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
                        size_t sizeMin,  UnitSize unitSizeMin,
                        size_t sizeMax,  UnitSize unitSizeMax,
-                       zen::Int64&  timeFrom,  //unit: UTC time, seconds
-                       zen::UInt64& sizeMinBy, //unit: bytes
-                       zen::UInt64& sizeMaxBy) //unit: bytes
+                       std::int64_t&  timeFrom,  //unit: UTC time, seconds
+                       std::uint64_t& sizeMinBy, //unit: bytes
+                       std::uint64_t& sizeMaxBy) //unit: bytes
 {
-    timeFrom  = resolve(timeSpan, unitTimeSpan, std::numeric_limits<Int64>::min());
+    timeFrom  = resolve(timeSpan, unitTimeSpan, std::numeric_limits<std::int64_t>::min());
     sizeMinBy = resolve(sizeMin,  unitSizeMin, 0U);
-    sizeMaxBy = resolve(sizeMax,  unitSizeMax, std::numeric_limits<UInt64>::max());
+    sizeMaxBy = resolve(sizeMax,  unitSizeMax, std::numeric_limits<std::uint64_t>::max());
 }
 
 
@@ -350,9 +347,9 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
     trim(out.excludeFilter, true, false);
 
     //soft filter
-    Int64  loctimeFrom;
-    UInt64 locSizeMinBy;
-    UInt64 locSizeMaxBy;
+    std::int64_t  loctimeFrom  = 0;
+    std::uint64_t locSizeMinBy = 0;
+    std::uint64_t locSizeMaxBy = 0;
     resolveUnits(out.timeSpan, out.unitTimeSpan,
                  out.sizeMin,  out.unitSizeMin,
                  out.sizeMax,  out.unitSizeMax,
@@ -361,9 +358,9 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
                  locSizeMaxBy); //unit: bytes
 
     //soft filter
-    Int64  glotimeFrom;
-    UInt64 gloSizeMinBy;
-    UInt64 gloSizeMaxBy;
+    std::int64_t  glotimeFrom  = 0;
+    std::uint64_t gloSizeMinBy = 0;
+    std::uint64_t gloSizeMaxBy = 0;
     resolveUnits(global.timeSpan, global.unitTimeSpan,
                  global.sizeMin,  global.unitSizeMin,
                  global.sizeMax,  global.unitSizeMax,
@@ -393,12 +390,12 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
 inline
 bool effectivelyEmpty(const FolderPairEnh& fp)
 {
-    auto isEmpty = [](Zstring dirname)
+    auto isEmpty = [](Zstring dirpath)
     {
-        trim(dirname);
-        return dirname.empty();
+        trim(dirpath);
+        return dirpath.empty();
     };
-    return isEmpty(fp.dirnamePhraseLeft) && isEmpty(fp.dirnamePhraseRight);
+    return isEmpty(fp.dirpathPhraseLeft) && isEmpty(fp.dirpathPhraseRight);
 }
 }
 

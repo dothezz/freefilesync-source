@@ -13,7 +13,6 @@
 #include "../structures.h"
 #include "../ui/column_attr.h"
 #include "../ui/folder_history_types.h"
-//#include "ffs_paths.h"
 
 namespace xmlAccess
 {
@@ -25,7 +24,7 @@ enum XmlType
     XML_TYPE_OTHER
 };
 
-XmlType getXmlType(const Zstring& filename); //throw FileError
+XmlType getXmlType(const Zstring& filepath); //throw FileError
 
 
 enum OnError
@@ -274,16 +273,16 @@ struct XmlGlobalSettings
 };
 
 //read/write specific config types
-void readConfig(const Zstring& filename, XmlGuiConfig&      config, std::wstring& warningMsg); //
-void readConfig(const Zstring& filename, XmlBatchConfig&    config, std::wstring& warningMsg); //throw FileError
-void readConfig(const Zstring& filename, XmlGlobalSettings& config, std::wstring& warningMsg); //
+void readConfig(const Zstring& filepath, XmlGuiConfig&      config, std::wstring& warningMsg); //
+void readConfig(const Zstring& filepath, XmlBatchConfig&    config, std::wstring& warningMsg); //throw FileError
+void readConfig(const Zstring& filepath, XmlGlobalSettings& config, std::wstring& warningMsg); //
 
-void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //
-void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FileError
-void writeConfig(const XmlGlobalSettings& config, const Zstring& filename); //
+void writeConfig(const XmlGuiConfig&      config, const Zstring& filepath); //
+void writeConfig(const XmlBatchConfig&    config, const Zstring& filepath); //throw FileError
+void writeConfig(const XmlGlobalSettings& config, const Zstring& filepath); //
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
-void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config, std::wstring& warningMsg); //throw FileError
+void readAnyConfig(const std::vector<Zstring>& filepaths, XmlGuiConfig& config, std::wstring& warningMsg); //throw FileError
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg); //noexcept
@@ -291,6 +290,5 @@ XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg, const XmlBatchCon
 
 std::wstring extractJobName(const Zstring& configFilename);
 }
-
 
 #endif // PROCESSXML_H_INCLUDED

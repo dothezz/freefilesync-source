@@ -7,9 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Reset layout</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -714,6 +711,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Find...</source>
 <target>S&uchen...</target>
 
+<source>&Reset layout</source>
+<target>Oberfläche &zurücksetzen</target>
+
 <source>&Export file list...</source>
 <target>Dateiliste e&xportieren...</target>
 
@@ -803,6 +803,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Erkenne gleiche Dateien durch Vergleich des Dateiinhaltes.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Zeitversatz ignorieren (in Stunden)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Dateizeiten mit angegebenem Versatz als gleich ansehen</target>
+
+<source>Handle daylight saving time</source>
+<target>Sommerzeit berücksichtigen</target>
 
 <source>Symbolic links:</source>
 <target>Symbolische Links:</target>

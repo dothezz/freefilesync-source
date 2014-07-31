@@ -27,21 +27,21 @@ typedef ULONGLONG FileIndex;
 typedef std::pair<DeviceId, FileIndex> FileId;
 
 inline
-FileId extractFileID(const BY_HANDLE_FILE_INFORMATION& fileInfo)
+FileId extractFileId(const BY_HANDLE_FILE_INFORMATION& fileInfo)
 {
-    ULARGE_INTEGER uint = {};
-    uint.HighPart = fileInfo.nFileIndexHigh;
-    uint.LowPart  = fileInfo.nFileIndexLow;
+    ULARGE_INTEGER fileIndex = {};
+    fileIndex.HighPart = fileInfo.nFileIndexHigh;
+    fileIndex.LowPart  = fileInfo.nFileIndexLow;
 
-    return fileInfo.dwVolumeSerialNumber != 0 && uint.QuadPart != 0 ?
-           FileId(fileInfo.dwVolumeSerialNumber, uint.QuadPart) : FileId();
+    return fileInfo.dwVolumeSerialNumber != 0 && fileIndex.QuadPart != 0 ?
+           FileId(fileInfo.dwVolumeSerialNumber, fileIndex.QuadPart) : FileId();
 }
 
 inline
-FileId extractFileID(DWORD dwVolumeSerialNumber, ULARGE_INTEGER fileId)
+FileId extractFileId(DWORD volumeSerialNumber, ULONGLONG fileIndex)
 {
-    return dwVolumeSerialNumber != 0 && fileId.QuadPart != 0 ?
-           FileId(dwVolumeSerialNumber, fileId.QuadPart) : FileId();
+    return volumeSerialNumber != 0 && fileIndex != 0 ?
+           FileId(volumeSerialNumber, fileIndex) : FileId();
 }
 
 assert_static(sizeof(FileId().first ) == sizeof(BY_HANDLE_FILE_INFORMATION().dwVolumeSerialNumber));
@@ -58,7 +58,7 @@ typedef decltype(impl::StatDummy::st_ino) FileIndex;
 typedef std::pair<DeviceId, FileIndex> FileId;
 
 inline
-FileId extractFileID(const struct ::stat& fileInfo)
+FileId extractFileId(const struct ::stat& fileInfo)
 {
     return fileInfo.st_dev != 0 && fileInfo.st_ino != 0 ?
            FileId(fileInfo.st_dev, fileInfo.st_ino) : FileId();

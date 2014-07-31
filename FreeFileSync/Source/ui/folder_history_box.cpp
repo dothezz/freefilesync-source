@@ -69,13 +69,13 @@ void FolderHistoryBox::OnRequireHistoryUpdate(wxEvent& event)
 }
 
 //set value and update list are technically entangled: see potential bug description below
-void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
+void FolderHistoryBox::setValueAndUpdateList(const wxString& dirpath)
 {
     //populate selection list....
     std::vector<wxString> dirList;
     {
         //add some aliases to allow user changing to volume name and back, if possible
-        std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirname)); //may block when resolving [<volume name>]
+        std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirpath)); //may block when resolving [<volume name>]
         std::transform(aliases.begin(), aliases.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfCvrtTo<wxString>(str); });
     }
     if (sharedHistory_.get())
@@ -94,8 +94,8 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
     //attention: if the target value is not part of the dropdown list, SetValue() will look for a string that *starts with* this value:
     //e.g. if the dropdown list contains "222" SetValue("22") will erroneously set and select "222" instead, while "111" would be set correctly!
     // -> by design on Windows!
-    if (std::find(dirList.begin(), dirList.end(), dirname) == dirList.end())
-        dirList.insert(dirList.begin(), dirname);
+    if (std::find(dirList.begin(), dirList.end(), dirpath) == dirList.end())
+        dirList.insert(dirList.begin(), dirpath);
 
     //this->Clear(); -> NO! emits yet another wxEVT_COMMAND_TEXT_UPDATED!!!
     wxItemContainer::Clear(); //suffices to clear the selection items only!
@@ -103,7 +103,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
     for (const wxString& dir : dirList)
         this->Append(dir);
     //this->SetSelection(wxNOT_FOUND); //don't select anything
-    ChangeValue(dirname);          //preserve main text!
+    ChangeValue(dirpath);          //preserve main text!
 }
 
 

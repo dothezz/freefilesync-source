@@ -8,8 +8,8 @@
 #define SERIALIZE_H_INCLUDED_83940578357
 
 #include <cstdint>
-#include <zen/string_base.h>
-#include <zen/file_io.h>
+#include "string_base.h"
+#include "file_io.h"
 
 namespace zen
 {
@@ -54,8 +54,8 @@ private:
 
 //----------------------------------------------------------------------
 //functions based on binary container abstraction
-template <class BinContainer>         void saveBinStream(const Zstring& filename, const BinContainer& cont); //throw FileError
-template <class BinContainer> BinContainer loadBinStream(const Zstring& filename); //throw FileError
+template <class BinContainer>         void saveBinStream(const Zstring& filepath, const BinContainer& cont); //throw FileError
+template <class BinContainer> BinContainer loadBinStream(const Zstring& filepath); //throw FileError
 
 
 /*
@@ -135,22 +135,22 @@ template <         class BinInputStream> void readArray    (BinInputStream& stre
 
 //-----------------------implementation-------------------------------
 template <class BinContainer> inline
-void saveBinStream(const Zstring& filename, const BinContainer& cont) //throw FileError
+void saveBinStream(const Zstring& filepath, const BinContainer& cont) //throw FileError
 {
     assert_static(sizeof(typename BinContainer::value_type) == 1); //expect: bytes (until further)
 
-    FileOutput fileOut(filename, zen::FileOutput::ACC_OVERWRITE); //throw FileError
+    FileOutput fileOut(filepath, zen::FileOutput::ACC_OVERWRITE); //throw FileError
     if (!cont.empty())
         fileOut.write(&*cont.begin(), cont.size()); //throw FileError
 }
 
 
 template <class BinContainer> inline
-BinContainer loadBinStream(const Zstring& filename) //throw FileError
+BinContainer loadBinStream(const Zstring& filepath) //throw FileError
 {
     assert_static(sizeof(typename BinContainer::value_type) == 1); //expect: bytes (until further)
 
-    FileInput fileIn(filename); //throw FileError
+    FileInput fileIn(filepath); //throw FileError
 
     BinContainer contOut;
     const size_t blockSize = 128 * 1024;

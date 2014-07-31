@@ -7,7 +7,6 @@
 #include "perf_check.h"
 
 #include <limits>
-//#include <wx/ffile.h>
 #include <zen/basic_math.h>
 #include <zen/i18n.h>
 #include <zen/format_unit.h>
@@ -103,7 +102,7 @@ zen::Opt<std::wstring> PerfCheck::getBytesPerSecond() const
         const double       dataDelta   = itemBack.second.data_ - itemFront.second.data_;
 
         if (timeDeltaMs != 0)
-            return filesizeToShortString(Int64(dataDelta * 1000.0 / timeDeltaMs)) + _("/sec");
+            return filesizeToShortString(static_cast<std::int64_t>(dataDelta * 1000.0 / timeDeltaMs)) + _("/sec");
     }
     return NoValue();
 }
@@ -180,7 +179,7 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
         const double X = dataCurrent - dataLast;
         dataLast = dataCurrent;
 
-        const zen::Int64 timeCurrent = wxGetLocalTimeMillis();
+        const std::int64_t timeCurrent = wxGetLocalTimeMillis();
         const double F = (timeCurrent - timeLast).ToDouble();
         timeLast = timeCurrent;
 
@@ -205,7 +204,7 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
         const double X = dataCurrent - dataLast; //do not set dataLast, timeLast variables here, but write dummy record instead
         if (!isNull(X))
         {
-            const zen::Int64 timeCurrent = wxGetLocalTimeMillis();
+            const std::int64_t timeCurrent = wxGetLocalTimeMillis();
             const double F = (timeCurrent - timeLast).ToDouble();
 
             record modifyEntry;

@@ -20,12 +20,12 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const int XML_FORMAT_VER_GLOBAL    = 1;
-const int XML_FORMAT_VER_FFS_GUI   = 3; //for FFS 5.22
-const int XML_FORMAT_VER_FFS_BATCH = 3; //
+const int XML_FORMAT_VER_FFS_GUI   = 4; //for FFS 6.8
+const int XML_FORMAT_VER_FFS_BATCH = 4; //
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
-XmlType getXmlTypeNoThrow(const zen::XmlDoc& doc) //throw()
+XmlType getXmlTypeNoThrow(const XmlDoc& doc) //throw()
 {
     if (doc.root().getNameAs<std::string>() == "FreeFileSync")
     {
@@ -44,10 +44,10 @@ XmlType getXmlTypeNoThrow(const zen::XmlDoc& doc) //throw()
 }
 
 
-XmlType xmlAccess::getXmlType(const Zstring& filename) //throw FileError
+XmlType xmlAccess::getXmlType(const Zstring& filepath) //throw FileError
 {
     //do NOT use zen::loadStream as it will needlessly load even huge files!
-    XmlDoc doc = loadXmlDocument(filename); //throw FileError; quick exit if file is not an FFS XML
+    XmlDoc doc = loadXmlDocument(filepath); //throw FileError; quick exit if file is not an FFS XML
     return ::getXmlTypeNoThrow(doc);
 }
 
@@ -394,13 +394,13 @@ void writeText(const ColumnTypeRim& value, std::string& output)
 {
     switch (value)
     {
-        case COL_TYPE_DIRECTORY:
+        case COL_TYPE_BASE_DIRECTORY:
             output = "Base";
             break;
         case COL_TYPE_FULL_PATH:
             output = "Full";
             break;
-        case COL_TYPE_REL_PATH:
+        case COL_TYPE_REL_FOLDER:
             output = "Rel";
             break;
         case COL_TYPE_FILENAME:
@@ -424,11 +424,11 @@ bool readText(const std::string& input, ColumnTypeRim& value)
     std::string tmp = input;
     zen::trim(tmp);
     if (tmp == "Base")
-        value = COL_TYPE_DIRECTORY;
+        value = COL_TYPE_BASE_DIRECTORY;
     else if (tmp == "Full")
         value = COL_TYPE_FULL_PATH;
     else if (tmp == "Rel")
-        value = COL_TYPE_REL_PATH;
+        value = COL_TYPE_REL_FOLDER;
     else if (tmp == "Name")
         value = COL_TYPE_FILENAME;
     else if (tmp == "Size")
@@ -758,8 +758,11 @@ namespace
 {
 void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
-    in["Variant" ](cmpConfig.compareVar);
-    in["Symlinks"](cmpConfig.handleSymlinks);
+    in["Variant"  ](cmpConfig.compareVar);
+    warn_static("remove check after migration?")
+    if (in["TimeShift"]) //-> 27.2.2014
+        in["TimeShift"](cmpConfig.optTimeShiftHours);
+    in["Symlinks" ](cmpConfig.handleSymlinks);
 }
 
 
@@ -813,8 +816,8 @@ void readConfig(const XmlIn& in, FilterConfig& filter)
 void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 {
     //read folder pairs
-    in["Left" ](enhPair.dirnamePhraseLeft);
-    in["Right"](enhPair.dirnamePhraseRight);
+    in["Left" ](enhPair.dirpathPhraseLeft);
+    in["Right"](enhPair.dirpathPhraseRight);
 
     //###########################################################
     //alternate comp configuration (optional)
@@ -1036,23 +1039,23 @@ bool needsMigration(const XmlDoc& doc, int currentXmlFormatVer)
 
 
 template <class ConfigType>
-void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int currentXmlFormatVer, std::wstring& warningMsg) //throw FileError
+void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int currentXmlFormatVer, std::wstring& warningMsg) //throw FileError
 {
-    XmlDoc doc = loadXmlDocument(filename); //throw FileError
+    XmlDoc doc = loadXmlDocument(filepath); //throw FileError
 
     if (getXmlTypeNoThrow(doc) != type) //noexcept
-        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
 
     XmlIn in(doc);
     ::readConfig(in, cfg);
 
     try
     {
-        checkForMappingErrors(in, filename); //throw FileError
+        checkForMappingErrors(in, filepath); //throw FileError
 
         //(try to) migrate old configuration if needed
         if (needsMigration(doc, currentXmlFormatVer))
-            try { xmlAccess::writeConfig(cfg, filename); /*throw FileError*/ }
+            try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
             catch (FileError&) { assert(false); }   //don't bother user!
     }
     catch (const FileError& e)
@@ -1063,28 +1066,28 @@ void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int curr
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlGuiConfig& cfg, std::wstring& warningMsg)
 {
-    ::readConfig(filename, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, warningMsg); //throw FileError
+    ::readConfig(filepath, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlBatchConfig& cfg, std::wstring& warningMsg)
 {
-    ::readConfig(filename, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, warningMsg); //throw FileError
+    ::readConfig(filepath, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGlobalSettings& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlGlobalSettings& cfg, std::wstring& warningMsg)
 {
-    ::readConfig(filename, XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, warningMsg); //throw FileError
+    ::readConfig(filepath, XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, warningMsg); //throw FileError
 }
 
 
 namespace
 {
 template <class XmlCfg>
-XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFormatVer, std::wstring& warningMsg) //nothrow
+XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filepath, int currentXmlFormatVer, std::wstring& warningMsg) //nothrow
 {
     XmlIn in(doc);
     XmlCfg cfg;
@@ -1092,11 +1095,11 @@ XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFor
 
     try
     {
-        checkForMappingErrors(in, filename); //throw FileError
+        checkForMappingErrors(in, filepath); //throw FileError
 
         //(try to) migrate old configuration if needed
         if (needsMigration(doc, currentXmlFormatVer))
-            try { xmlAccess::writeConfig(cfg, filename); /*throw FileError*/ }
+            try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
             catch (FileError&) { assert(false); }     //don't bother user!
     }
     catch (const FileError& e)
@@ -1110,24 +1113,24 @@ XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFor
 }
 
 
-void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config, std::wstring& warningMsg) //throw FileError
+void xmlAccess::readAnyConfig(const std::vector<Zstring>& filepaths, XmlGuiConfig& config, std::wstring& warningMsg) //throw FileError
 {
-    assert(!filenames.empty());
+    assert(!filepaths.empty());
 
     std::vector<zen::MainConfiguration> mainCfgs;
 
-    for (auto it = filenames.begin(); it != filenames.end(); ++it)
+    for (auto it = filepaths.begin(); it != filepaths.end(); ++it)
     {
-        const Zstring& filename = *it;
-        const bool firstItem = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
+        const Zstring& filepath = *it;
+        const bool firstItem = it == filepaths.begin(); //init all non-"mainCfg" settings with first config file
 
-        XmlDoc doc = loadXmlDocument(filename); //throw FileError
+        XmlDoc doc = loadXmlDocument(filepath); //throw FileError
 
         switch (getXmlTypeNoThrow(doc))
         {
             case XML_TYPE_GUI:
             {
-                XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filename, XML_FORMAT_VER_FFS_GUI, warningMsg); //nothrow
+                XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filepath, XML_FORMAT_VER_FFS_GUI, warningMsg); //nothrow
                 if (firstItem)
                     config = guiCfg;
                 mainCfgs.push_back(guiCfg.mainCfg);
@@ -1136,7 +1139,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
 
             case XML_TYPE_BATCH:
             {
-                XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filename, XML_FORMAT_VER_FFS_BATCH, warningMsg); //nothrow
+                XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filepath, XML_FORMAT_VER_FFS_BATCH, warningMsg); //nothrow
                 if (firstItem)
                     config = convertBatchToGui(batchCfg);
                 mainCfgs.push_back(batchCfg.mainCfg);
@@ -1145,7 +1148,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
 
             case XML_TYPE_GLOBAL:
             case XML_TYPE_OTHER:
-                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
         }
     }
 
@@ -1158,8 +1161,9 @@ namespace
 {
 void writeConfig(const CompConfig& cmpConfig, XmlOut& out)
 {
-    out["Variant" ](cmpConfig.compareVar);
-    out["Symlinks"](cmpConfig.handleSymlinks);
+    out["Variant"  ](cmpConfig.compareVar);
+    out["TimeShift"](cmpConfig.optTimeShiftHours);
+    out["Symlinks" ](cmpConfig.handleSymlinks);
 }
 
 
@@ -1210,8 +1214,8 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
     XmlOut outPair = out.ref().addChild("Pair");
 
     //read folder pairs
-    outPair["Left" ](enhPair.dirnamePhraseLeft);
-    outPair["Right"](enhPair.dirnamePhraseRight);
+    outPair["Left" ](enhPair.dirpathPhraseLeft);
+    outPair["Right"](enhPair.dirpathPhraseRight);
 
     //###########################################################
     //alternate comp configuration (optional)
@@ -1400,7 +1404,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
 
 template <class ConfigType>
-void writeConfig(const ConfigType& config, XmlType type, int xmlFormatVer, const Zstring& filename)
+void writeConfig(const ConfigType& config, XmlType type, int xmlFormatVer, const Zstring& filepath)
 {
     XmlDoc doc("FreeFileSync");
     setXmlType(doc, type); //throw()
@@ -1410,25 +1414,25 @@ void writeConfig(const ConfigType& config, XmlType type, int xmlFormatVer, const
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw FileError
+    saveXmlDocument(doc, filepath); //throw FileError
 }
 }
 
-void xmlAccess::writeConfig(const XmlGuiConfig& cfg, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlGuiConfig& cfg, const Zstring& filepath)
 {
-    ::writeConfig(cfg, XML_TYPE_GUI, XML_FORMAT_VER_FFS_GUI, filename); //throw FileError
+    ::writeConfig(cfg, XML_TYPE_GUI, XML_FORMAT_VER_FFS_GUI, filepath); //throw FileError
 }
 
 
-void xmlAccess::writeConfig(const XmlBatchConfig& cfg, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlBatchConfig& cfg, const Zstring& filepath)
 {
-    ::writeConfig(cfg, XML_TYPE_BATCH, XML_FORMAT_VER_FFS_BATCH, filename); //throw FileError
+    ::writeConfig(cfg, XML_TYPE_BATCH, XML_FORMAT_VER_FFS_BATCH, filepath); //throw FileError
 }
 
 
-void xmlAccess::writeConfig(const XmlGlobalSettings& cfg, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlGlobalSettings& cfg, const Zstring& filepath)
 {
-    ::writeConfig(cfg, XML_TYPE_GLOBAL, XML_FORMAT_VER_GLOBAL, filename); //throw FileError
+    ::writeConfig(cfg, XML_TYPE_GLOBAL, XML_FORMAT_VER_GLOBAL, filepath); //throw FileError
 }
 
 

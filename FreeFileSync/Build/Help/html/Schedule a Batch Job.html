@@ -10,31 +10,40 @@
 <H2>Schedule a Batch Job</H2>
 
 <OL>
-	<LI>Create a new batch job via FreeFileSync's main dialog: <B>Menu &rarr; Program &rarr; Save as batch job...</B><BR>&nbsp;
+	<LI>Create a new batch job via FreeFileSync's main dialog: <B>Menu &rarr; File &rarr; Save as batch job...</B><BR>&nbsp;
 	
-	<LI>If the batch job shall run without user interaction or as part of an
-	unattended batch script, make sure that no popup dialog stops the progress:<BR>Enable checkbox <B>Run minimized</B> to avoid blocking while showing
-	the result after synchronization. Alternatively you can leave this option checked and select the <i>On completion</i> action <B>Close progress dialog</B>
-	located in synchronization settings. FreeFileSync will then show a progress dialog but close it automatically when it is finished.<BR>
-	<br>
-	<B>Note:</B> Even if the progress dialog is not shown at the beginning, you can make it
-	visible <B>during</B> synchronization by double-clicking the FreeFileSync notification area icon.<BR>
-	<BR>
+	<LI>By default FreeFileSync will show a progress dialog during synchronization and wait while the results dialog is shown.
+	If the progress dialog is not needed enable checkbox <B>Run minimized</B>. This will also skip the results dialog at the end.
+	<br><br>	
+	Alternatively if you want to see the progress, but not pause at the results, it's sufficient to only select the <i>On completion</i> action <B>Close progress dialog</B>.
+	<br><br>
+	
 	<IMG SRC="../img/SetupBatch.png">
 	<br><br>
 	
-	<LI>In order to prevent error or warning popup messages from stopping progress, set <B>Handle errors</B> to either <B>Ignore</B> or <B>Stop</B>.
+	<div class="bluebox">
+		<div class="bluebox_inner">
+				<B>Note</B><BR>
+				 Even if the progress dialog is not shown at the beginning, you can make it visible at any time <B>during</B> 
+				 synchronization by double-clicking the FreeFileSync notification area icon.
+		</div>
+	</div>
+	<BR CLEAR=LEFT>
+	<BR>
+
+	<LI>If you don't want error or warning messages to pause synchronization, set <B>Handle errors</B> to either <B>Ignore</B> or <B>Stop</B>.
 	<br>&nbsp;
 	
-	<LI>Setup your operating system's scheduler
+	<LI>Setup the FreeFileSync batch job in your operating system's scheduler:
 	<BR>&nbsp;
 	
 	<OL TYPE=A>
-		<LI><B>Windows 7 Task Scheduler:</B>
+		<hr/>
+		<LI><h3>Windows 7 Task Scheduler:</h3>
 		<UL>
-			<LI>Go to Start and run <FONT FACE="Courier New, monospace"><B>taskschd.msc</B></FONT>.			
+			<LI>Click on Start and run <FONT FACE="Courier New, monospace"><B>taskschd.msc</B></FONT>.			
 			
-			<LI>Create a new basic task and follow the wizard.			
+			<LI>Create a new <b>basic task</b> and follow the wizard.			
 			
 			<LI>Make <B>Program/script</B> point to the location of FreeFileSync.exe and insert the ffs_batch file into <B>Add arguments</B>.
 			
@@ -48,16 +57,40 @@
 		<div class="bluebox">
 			<div class="bluebox_inner">
 					<B>Note</B><BR>
-					Beginning with Windows Vista the <i>Program/script</i> always needs point to an executable file like FreeFileSync.exe even
-					if ffs_batch file association is set. If a ffs_batch file is entered instead the task will return with
+					Beginning with Windows Vista the <i>Program/script</i> always needs to point to an executable file like FreeFileSync.exe even
+					if ffs_batch file associations are setup. If a ffs_batch file were entered instead the task would return with
 					error code 0xC1, &quot;%1 is not a valid Win32 application&quot;.
 			</div>
 		</div>
 		<BR CLEAR=LEFT>
-
+		<BR>
 		<BR>
 		
-		<LI><B>Windows XP Scheduled Tasks:</B>
+		<hr/>
+		<LI><h3>OS X Automator and Calendar:</h3>
+		<UL>
+			<LI VALUE=1>Open Launchpad and run <B>Automator</B>.<BR>
+			<IMG SRC="../img/launch_automator.png"><BR>&nbsp;
+			
+			<LI>Create a new <B>Calendar Alarm</B>.<BR>
+			<IMG SRC="../img/new_calendar_alarm.png"><BR>&nbsp;
+			
+			<LI>Drag and drop the ffs_batch file on the workflow panel.<BR>
+			<IMG SRC="../img/automator_file_dropped.png"><BR>&nbsp;
+			
+			<LI>Drag and drop action <i>Files & Folders/Open Finder Items</i> and add it to the workflow.<BR>
+			<IMG SRC="../img/open_finder_items.png"><BR>&nbsp;
+			
+			<LI>Go to <B>File &rarr; Save...</B> and save the Automator job.<BR>
+			<IMG SRC="../img/save_automator.png"><BR>&nbsp;
+			
+			<LI>The Calendar app will start automatically with the Automator job scheduled to the current day. You can now select a different time for synchronization or make it a recurring task.<BR>
+			<IMG SRC="../img/calendar_job_added.png"><BR>&nbsp;
+		</UL>
+		<BR>
+		
+		<hr/>
+		<LI><h3>Windows XP Scheduled Tasks:</h3>
 		<UL>
 			<LI VALUE=1>Go to <B>Start &rarr; Control Panel &rarr; Scheduled Tasks</B> and select <B>Add Scheduled Task</B>.
 			
@@ -67,11 +100,13 @@
 			<FONT FACE="Courier New, monospace">&lt;FreeFileSync installation folder&gt;\FreeFileSync.exe &lt;job name&gt;.ffs_batch</FONT><BR>
 			<BR>
 			<IMG SRC="../img/ScheduleBatch.png"><BR>&nbsp;
-		</UL>
-		
-		<LI><B>Ubuntu Linux Gnome-schedule:</B>
+		</UL>		
+		<BR>
+
+		<hr/>
+		<LI><h3>Ubuntu Linux Gnome-schedule:</h3>
 		<UL>
-			<LI>Install Gnome-schedule, if necessary: <FONT FACE="Courier New, monospace">sudo apt-get install gnome-schedule</FONT>
+			<LI>Install Gnome-schedule if necessary: <FONT FACE="Courier New, monospace">sudo apt-get install gnome-schedule</FONT>
 			
 			<LI>Go to <B>System &rarr; Preferences &rarr; Scheduled tasks</B>
 			
@@ -82,7 +117,6 @@
 		</UL>
 
 	</OL>
-	
 	
 </OL>
 

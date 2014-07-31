@@ -10,7 +10,6 @@
 #include <vector>
 #include <memory>
 #include <zen/zstring.h>
-//#include <wx+/serialize.h>
 
 namespace zen
 {
@@ -81,7 +80,7 @@ private:
 };
 
 
-class NameFilter : public HardFilter  //standard filter by filename
+class NameFilter : public HardFilter  //standard filter by filepath
 {
 public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);

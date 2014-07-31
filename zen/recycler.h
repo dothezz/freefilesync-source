@@ -9,8 +9,7 @@
 
 #include <vector>
 #include <functional>
-#include <zen/file_error.h>
-#include <zen/zstring.h>
+#include "file_error.h"
 
 namespace zen
 {
@@ -32,14 +31,14 @@ Already included in package "gtk+-2.0"!
 */
 
 //move a file or folder to Recycle Bin (deletes permanently if recycler is not available) -> crappy semantics, but we have no choice thanks to Windows' design
-bool recycleOrDelete(const Zstring& filename); //throw FileError, return "true" if file/dir was actually deleted
+bool recycleOrDelete(const Zstring& itempath); //throw FileError, return "true" if file/dir was actually deleted
 
 
 #ifdef ZEN_WIN
 //can take a long time if recycle bin is full and drive is slow!!! => buffer volume ids!
 bool recycleBinExists(const Zstring& pathName, const std::function<void ()>& onUpdateGui); //throw FileError
 
-void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, return "true" if file/dir was actually deleted
+void recycleOrDelete(const std::vector<Zstring>& filepaths, //throw FileError, return "true" if file/dir was actually deleted
                      //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
                      const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus); //optional; currentItem may be empty
 #endif

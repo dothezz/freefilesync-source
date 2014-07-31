@@ -10,7 +10,6 @@
 #include <vector>
 #include <typeinfo>
 #include <iterator>
-//#include "../structures.h"
 
 using namespace zen;
 

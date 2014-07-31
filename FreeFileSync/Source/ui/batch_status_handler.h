@@ -40,8 +40,8 @@ public:
                        std::vector<Zstring>& onCompletionHistory);
     ~BatchStatusHandler();
 
-    virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
-    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
+    virtual void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID);
+    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 

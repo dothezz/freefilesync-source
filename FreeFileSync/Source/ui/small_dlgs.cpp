@@ -624,7 +624,7 @@ ReturnSmallDlg::ButtonPressed zen::showOptionsDlg(wxWindow* parent, xmlAccess::X
 class SelectTimespanDlg : public SelectTimespanDlgGenerated
 {
 public:
-    SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
+    SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
 
 private:
     virtual void OnOkay(wxCommandEvent& event);
@@ -642,8 +642,8 @@ private:
             m_calendarFrom->SetDate(m_calendarTo->GetDate());
     }
 
-    Int64& timeFrom_;
-    Int64& timeTo_;
+    std::int64_t& timeFrom_;
+    std::int64_t& timeTo_;
 };
 
 
@@ -659,7 +659,7 @@ time_t localDateTimeToUtc(const wxDateTime& localTime)
 }
 
 
-SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo) :
+SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo) :
     SelectTimespanDlgGenerated(parent),
     timeFrom_(timeFrom),
     timeTo_(timeTo)
@@ -693,8 +693,8 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     if (timeFrom_ == 0)
         timeFrom_ = timeTo_ - 7 * 24 * 3600; //default time span: one week from "now"
 
-    m_calendarFrom->SetDate(utcToLocalDateTime(to<time_t>(timeFrom_)));
-    m_calendarTo  ->SetDate(utcToLocalDateTime(to<time_t>(timeTo_)));
+    m_calendarFrom->SetDate(utcToLocalDateTime(timeFrom_));
+    m_calendarTo  ->SetDate(utcToLocalDateTime(timeTo_));
 
 #if wxCHECK_VERSION(2, 9, 5)
     //doesn't seem to be a problem here:
@@ -744,7 +744,7 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo)
+ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo)
 {
     SelectTimespanDlg timeSpanDlg(parent, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
