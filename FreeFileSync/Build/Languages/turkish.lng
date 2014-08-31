@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Karşıdaki klasör boş olarak kabul edilecek.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Şu klasörlerin yolları birbirine bağlı. Eşleştirme kurallarını ayarlarken dikkatli olun:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
 
 <source>File %x has an invalid date.</source>
 <target>%x dosyasının tarihi geçersiz.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Sağdaki öznitelikler güncellensin</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 bayt</pluralform>
+<pluralform>%x bayt</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>%x veritabanı dosyası uyumsuz</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Toplam süre:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 bayt</pluralform>
-<pluralform>%x bayt</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>%x dosyası işlenirken hata, satır %y, sütun %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>Çı&kın</target>
 
-<source>&Program</source>
-<target>&Dosya</target>
+<source>&File</source>
+<target></target>
 
 <source>&View help</source>
 <target>&Yardıma bakın</target>
@@ -435,9 +435,6 @@ Komut şu durumlarda yürütülür:
 <source>&Show error</source>
 <target>Hataya &bakın</target>
 
-<source>&Exit</source>
-<target>Çı&kın</target>
-
 <source>Incorrect command line:</source>
 <target>Geçersiz komut satırı:</target>
 
@@ -501,8 +498,8 @@ Komut şu durumlarda yürütülür:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Veri doğrulama hatası: %x ve %y farklı içeriklere sahip.</target>
 
-<source>Cannot find %x.</source>
-<target>%x bulunamadı.</target>
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
 <target>%x hedef klasörü zaten var.</target>
@@ -531,8 +528,8 @@ Komut şu durumlarda yürütülür:
 <source>Available:</source>
 <target>Kullanılabilir:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Çoklu klasör çiftlerinin parçası olan bir klasör değiştirilecek. Lütfen eşleştirme ayarlarını gözden geçirin.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target></target>
 
 <source>Synchronizing folder pair:</source>
 <target>Eşleştirilen klasör çifti:</target>
@@ -633,8 +630,8 @@ Komut şu durumlarda yürütülür:
 <source>Name</source>
 <target>Ad</target>
 
-<source>Relative path</source>
-<target>Bağıl klasör yolu</target>
+<source>Relative folder</source>
+<target></target>
 
 <source>Base folder</source>
 <target>Başlangıç klasörü</target>
@@ -675,8 +672,8 @@ Komut şu durumlarda yürütülür:
 <source>Remove local settings</source>
 <target>Yerel ayarları silin</target>
 
-<source>Reset local filter</source>
-<target>Yerel süzgeci sıfırlayın</target>
+<source>Clear local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>Kopyalayın</target>
@@ -696,11 +693,11 @@ Komut şu durumlarda yürütülür:
 <source>Save as &batch job...</source>
 <target>&Toplu iş olarak kaydedin...</target>
 
-<source>1. &Compare</source>
-<target>1. &Karşılaştırın</target>
+<source>Start &comparison</source>
+<target></target>
 
-<source>2. &Synchronize</source>
-<target>2. &Eşleştirin</target>
+<source>Start &synchronization</source>
+<target></target>
 
 <source>&Options</source>
 <target>A&yarlar</target>
@@ -711,20 +708,23 @@ Komut şu durumlarda yürütülür:
 <source>&Find...</source>
 <target>A&rayın...</target>
 
+<source>&Reset layout</source>
+<target></target>
+
 <source>&Export file list...</source>
 <target>Dosya list&esini verin...</target>
 
 <source>&Tools</source>
 <target>A&raçlar</target>
 
+<source>&Check for new version</source>
+<target>Yeni &sürümü denetleyin</target>
+
 <source>&Check now</source>
 <target>&Sürümü Denetleyin</target>
 
 <source>Check &automatically once a week</source>
 <target>&Haftada bir kendiliğinden denetlensin</target>
-
-<source>&Check for new version</source>
-<target>Yeni &sürümü denetleyin</target>
 
 <source>Cancel</source>
 <target>İptal</target>
@@ -753,17 +753,14 @@ Komut şu durumlarda yürütülür:
 <source>Match case</source>
 <target>Büyük-küçük harf uysun</target>
 
+<source>New</source>
+<target></target>
+
 <source>Open...</source>
 <target>Açın...</target>
 
 <source>Save</source>
 <target>Kaydedin</target>
-
-<source>Save as GUI job</source>
-<target>Grafik arayüz işi olarak kaydedin</target>
-
-<source>Save as batch job</source>
-<target>Toplu iş olarak kaydedin</target>
 
 <source>Save as...</source>
 <target>Farklı kaydedin...</target>
@@ -777,14 +774,14 @@ Komut şu durumlarda yürütülür:
 <source>Statistics:</source>
 <target>İstatistikler:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Eklenecek dosya ve klasör sayısı</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Silinecek dosya ve klasör sayısı</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Üzerine yazılacak dosya sayısı</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Silinecek dosya ve klasör sayısı</target>
+<source>Number of files and folders that will be created</source>
+<target>Eklenecek dosya ve klasör sayısı</target>
 
 <source>Total bytes to copy</source>
 <target>Toplam kopyalanacak bayt</target>
@@ -800,6 +797,15 @@ Komut şu durumlarda yürütülür:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Dosyaların aynı olup olmadığı, içeriklerine göre belirlensin.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Handle daylight saving time</source>
+<target></target>
 
 <source>Symbolic links:</source>
 <target>Sembolik bağlantılar:</target>
@@ -831,8 +837,8 @@ Komut şu durumlarda yürütülür:
 <source>Maximum:</source>
 <target>En büyük:</target>
 
-<source>&Reset</source>
-<target>Sıfı&rlayın</target>
+<source>C&lear</source>
+<target></target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Eşleştirmeye katılmayacak dosyaların süzülme kurallarını belirleyin. Dosya yollarını bulundukları klasör çiftine göre yazın.</target>
@@ -857,20 +863,20 @@ Komut şu durumlarda yürütülür:
 <source>Delete files:</source>
 <target>Dosya silme işlemi:</target>
 
-<source>Permanent</source>
-<target>Kalıcı olarak silinsin</target>
+<source>&Permanent</source>
+<target></target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Dosyalar kalıcı olarak silinir ya da üzerine yazılır</target>
 
-<source>Recycle bin</source>
-<target>Geri Dönüşüm Kutusuna atılsın</target>
+<source>&Recycle bin</source>
+<target>Ge&ri Dönüşüm Kutusu</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Silinen ya da üzerine yazılan dosyalar geri dönüşüm kutusuna gönderilir</target>
 
-<source>Versioning</source>
-<target>Eski sürüm olarak saklansın</target>
+<source>&Versioning</source>
+<target></target>
 
 <source>Move files to a user-defined folder</source>
 <target>Dosyalar kullanıcı tarafından belirtilen bir klasöre taşınır</target>
@@ -881,14 +887,11 @@ Komut şu durumlarda yürütülür:
 <source>Handle errors:</source>
 <target>Hata olursa:</target>
 
-<source>Ignore</source>
-<target>Yoksayılsın</target>
-
 <source>Hide all error and warning messages</source>
 <target>Hiçbir hata ve uyarı iletisi görüntülenmez</target>
 
-<source>Pop-up</source>
-<target>Görüntülensin</target>
+<source>&Pop-up</source>
+<target></target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Hata ya da uyarılar açılır pencerede görüntülenir</target>
@@ -911,9 +914,6 @@ Komut şu durumlarda yürütülür:
 <source>Items found:</source>
 <target>Bulunan öge:</target>
 
-<source>Speed:</source>
-<target>Hız:</target>
-
 <source>Time remaining:</source>
 <target>Kalan süre:</target>
 
@@ -926,6 +926,9 @@ Komut şu durumlarda yürütülür:
 <source>Minimize to notification area</source>
 <target>Bildirim alanına küçültün</target>
 
+<source>Bytes copied:</source>
+<target></target>
+
 <source>Close</source>
 <target>Kapatın</target>
 
@@ -937,6 +940,9 @@ Komut şu durumlarda yürütülür:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Hiç bir soru sorulmadan eşleştirme yapılması için bir toplu iş dosyası oluşturun. İşlemi başlatmak için bu dosyaya çift tıklayın ya da bir görev zamanlayıcıya şu şekilde ekleyin: %x</target>
+
+<source>&Stop</source>
+<target></target>
 
 <source>Stop synchronization at first error</source>
 <target>Oluşacak ilk hatada eşleştirme durdurulur</target>
@@ -955,9 +961,6 @@ Komut şu durumlarda yürütülür:
 
 <source>How can I schedule a batch job?</source>
 <target>Bir toplu işlem nasıl zamanlanır?</target>
-
-<source>&Recycle bin</source>
-<target>Ge&ri Dönüşüm Kutusu</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Aşağıdaki ayarlar tüm eşleştirme işlemleri için geçerlidir.</target>
@@ -1007,8 +1010,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Description</source>
 <target>Açıklama</target>
 
-<source>Restore hidden windows</source>
-<target>Gizlenmiş pencereler yeniden görüntülensin</target>
+<source>Show hidden dialogs again</source>
+<target></target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target></target>
 
 <source>&Default</source>
 <target>&Varsayılan</target>
@@ -1070,8 +1076,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Main Bar</source>
 <target>Ana Çubuk</target>
 
-<source>Compare both sides</source>
-<target>İki tarafı karşılaştırın</target>
+<source>Start comparison</source>
+<target></target>
 
 <source>Comparison settings</source>
 <target>Karşılaştırma ayarları</target>
@@ -1166,9 +1172,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Select time span...</source>
 <target>Zaman aralığını seçin...</target>
 
-<source>Default view</source>
-<target>Varsayılan görünüm</target>
-
 <source>Show "%x"</source>
 <target>"%x" paneli görüntülensin</target>
 
@@ -1199,8 +1202,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Synchronization Settings</source>
 <target>Eşleştirme Ayarları</target>
 
-<source>Reset filter</source>
-<target>Süzgeci sıfırlayın</target>
+<source>Clear filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>Yalnız sol tarafta bulunan dosyaları görüntüler ya da gizler</target>
@@ -1358,8 +1361,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>- Other side's counterpart to %item_folder%</source>
 <target>%item_folder% ögesinin diğer taraftaki karşılığı</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Gizlenmiş tüm pencere ve uyarılar yeniden görüntülensin mi?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target></target>
+
+<source>&Show</source>
+<target></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>İki tarafta da değişikliklere bakılır ve karşılıklı kopyalanır. Silinmiş, taşınmış ve çakışan ögeler, veritabanı kullanılarak kendiliğinden algılanır.</target>

@@ -454,7 +454,7 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
 
             //ensure unique ownership:
             Zstring dirpath = baseDirPf_ + Zstr("RecycleBin") + TEMP_FILE_ENDING;
-            for (int i = 1;; ++i)
+            for (int i = 0;; ++i)
                 try
                 {
                     makeDirectory(dirpath, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
@@ -462,6 +462,7 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
                 }
                 catch (const ErrorTargetExisting&)
                 {
+                    if (i == 10) throw; //avoid endless recursion in pathological cases
                     dirpath = baseDirPf_ + Zstr("RecycleBin") + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
                 }
         }();
@@ -946,7 +947,7 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
 
-    for (int i = 1;; ++i)
+    for (int i = 0;; ++i)
         try
         {
             reportInfo(txtMovingFile, source, tmpTarget);
@@ -955,6 +956,7 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
         }
         catch (const ErrorTargetExisting&) //repeat until unique name found: no file system race condition!
         {
+            if (i == 10) throw; //avoid endless recursion in pathological cases
             tmpTarget = sourceObj.getBaseDirPf<side>() + sourceObj.getItemName<side>() + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
         }
 
@@ -2262,7 +2264,7 @@ void zen::synchronize(const TimeComp& timeStamp,
 
         if (!conflictDirs.empty())
         {
-            std::wstring msg = _("A folder will be modified that is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
+            std::wstring msg = _("Multiple folder pairs write to a common subfolder. Please review your configuration.") + L"\n";
             for (const Zstring& dirpath : conflictDirs)
                 msg += std::wstring(L"\n") + dirpath;
 

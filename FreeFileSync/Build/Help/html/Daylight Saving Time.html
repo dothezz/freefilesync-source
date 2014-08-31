@@ -34,14 +34,21 @@ that used to be the same show up as different after a DST switch or when the tim
 
 <BR>
 
-<h3>Solution:</h3>
+<h3>Solutions:</h3>
 
-<P>In FreeFileSync's comparison settings you can enter a full-hour time shift to ignore during comparison:
-If you need to handle differences due to daylight saving time enter a one hour shift. If the differences are caused by changing the time zone 
-enter a larger shift as needed.
-</P>
-
-<IMG SRC="../img/time_shift.png"><BR>
+<OL TYPE=1>
+	<LI>
+	<P>In FreeFileSync's comparison settings you can enter a full-hour time shift to ignore during comparison:
+	If you need to handle differences due to daylight saving time enter a one hour shift. If the differences are caused by changing the time zone 
+	enter a larger shift as needed.
+	</P>
+	<IMG SRC="../img/time_shift.png"><BR>
+	<BR>
+	
+	<LI>
+	Alternatively you can avoid the problem in first place by only synchronizing from FAT to FAT or NTFS to NTFS file systems.
+	Since most local disks are formatted with NTFS and USB memory sticks with FAT, this situation could be handled by formatting the USB stick with NTFS as well.		
+</OL>
 
 </BODY>
 </HTML>

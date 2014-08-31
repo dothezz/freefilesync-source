@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>A pasta correspondente será considerada como vazia.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>As seguintes pastas tem caminhos dependentes. Cuidado na hora de estabelecer as regras de sincronização:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Os seguintes caminhos de pastas são dependentes um do outro:</target>
 
 <source>File %x has an invalid date.</source>
 <target>O arquivo %x tem uma data inválida.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Atualizar atributos à direita</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x kB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>O arquivo de banco de dados %x é incompatível.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Tempo total:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x kB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Erro analisando o arquivo %x, linha %y, coluna %z.</target>
@@ -343,11 +343,11 @@
 <source>&Quit</source>
 <target>Sai&r</target>
 
-<source>&Program</source>
-<target>&Programa</target>
+<source>&File</source>
+<target>&Arquivo</target>
 
 <source>&View help</source>
-<target>&Ver ajuda</target>
+<target>Ver &ajuda</target>
 
 <source>&About</source>
 <target>&Sobre</target>
@@ -435,9 +435,6 @@ O comando é disparado se:
 <source>&Show error</source>
 <target>&Mostrar erro</target>
 
-<source>&Exit</source>
-<target>&Sair</target>
-
 <source>Incorrect command line:</source>
 <target>Linha de comando incorreta:</target>
 
@@ -501,8 +498,8 @@ O comando é disparado se:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Erro na verificação dos dados: %x e %y têm conteúdo diferente.</target>
 
-<source>Cannot find %x.</source>
-<target>Não foi possível localizar %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Não foi possível encontrar a pasta %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Pasta de destino %x já existe.</target>
@@ -531,8 +528,8 @@ O comando é disparado se:
 <source>Available:</source>
 <target>Disponível:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Uma pasta que é parte de múltiplos pares de pasta será modificada. Por favor, revise as configurações de sincronização.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Múltiplos pares de pastas estão escrevendo em uma mesma subpasta. Favor rever sua configuração.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizando par de pastas:</target>
@@ -633,8 +630,8 @@ O comando é disparado se:
 <source>Name</source>
 <target>Nome</target>
 
-<source>Relative path</source>
-<target>Caminho relativo</target>
+<source>Relative folder</source>
+<target>Pasta relativa</target>
 
 <source>Base folder</source>
 <target>Pasta base</target>
@@ -675,7 +672,7 @@ O comando é disparado se:
 <source>Remove local settings</source>
 <target>Remover configurações locais</target>
 
-<source>Reset local filter</source>
+<source>Clear local filter</source>
 <target>Limpar filtro local</target>
 
 <source>Copy</source>
@@ -696,11 +693,11 @@ O comando é disparado se:
 <source>Save as &batch job...</source>
 <target>Salvar como &tarefa em lote...</target>
 
-<source>1. &Compare</source>
-<target>1. C&omparar</target>
+<source>Start &comparison</source>
+<target>Iniciar c&omparação</target>
 
-<source>2. &Synchronize</source>
-<target>2. S&incronizar</target>
+<source>Start &synchronization</source>
+<target>Iniciar s&incronização</target>
 
 <source>&Options</source>
 <target>&Opções</target>
@@ -711,20 +708,23 @@ O comando é disparado se:
 <source>&Find...</source>
 <target>&Localizar...</target>
 
+<source>&Reset layout</source>
+<target>&Redefinir layout</target>
+
 <source>&Export file list...</source>
 <target>&Exportar lista de arquivos...</target>
 
 <source>&Tools</source>
 <target>&Ferramentas</target>
 
+<source>&Check for new version</source>
+<target>&Verificar se existe nova versão</target>
+
 <source>&Check now</source>
 <target>&Verificar agora</target>
 
 <source>Check &automatically once a week</source>
 <target>Verificar &automaticamente uma vez por semana</target>
-
-<source>&Check for new version</source>
-<target>&Verificar se existe nova versão</target>
 
 <source>Cancel</source>
 <target>Cancelar</target>
@@ -753,17 +753,14 @@ O comando é disparado se:
 <source>Match case</source>
 <target>Diferenciar maiúsculas e minúsculas</target>
 
+<source>New</source>
+<target>Novo</target>
+
 <source>Open...</source>
 <target>Abrir...</target>
 
 <source>Save</source>
 <target>Salvar</target>
-
-<source>Save as GUI job</source>
-<target>Salvar como tarefa GUI</target>
-
-<source>Save as batch job</source>
-<target>Salvar como tarefa em lote</target>
 
 <source>Save as...</source>
 <target>Salvar como...</target>
@@ -777,14 +774,14 @@ O comando é disparado se:
 <source>Statistics:</source>
 <target>Estatísticas:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Número de arquivos e pastas que serão criados</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Número de arquivos e pastas que serão apagados</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Número de arquivos que serão substituídos</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Número de arquivos e pastas que serão apagados</target>
+<source>Number of files and folders that will be created</source>
+<target>Número de arquivos e pastas que serão criados</target>
 
 <source>Total bytes to copy</source>
 <target>Bytes totais a serem copiados</target>
@@ -800,6 +797,15 @@ O comando é disparado se:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Identifica arquivos iguais comparando o conteúdo do arquivo.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignora mudança de horário (em horas)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Considera horário de arquivos com uma diferença especificada como iguais</target>
+
+<source>Handle daylight saving time</source>
+<target>Como lidar com horário de verão</target>
 
 <source>Symbolic links:</source>
 <target>Links simbólicos:</target>
@@ -831,8 +837,8 @@ O comando é disparado se:
 <source>Maximum:</source>
 <target>Máximo:</target>
 
-<source>&Reset</source>
-<target>&Limpar tudo</target>
+<source>C&lear</source>
+<target>&Limpar</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selecione regras de filtro para exlcuir certos arquivos da sincronização. Entre com os caminhos relativos dos pares de pastas correspondentes.</target>
@@ -857,20 +863,20 @@ O comando é disparado se:
 <source>Delete files:</source>
 <target>Apagar arquivos:</target>
 
-<source>Permanent</source>
-<target>Permanente</target>
+<source>&Permanent</source>
+<target>&Permanente</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Apaga ou substitui os arquivos permanentemente</target>
 
-<source>Recycle bin</source>
-<target>Lixeira</target>
+<source>&Recycle bin</source>
+<target>&Lixeira</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Faz uma cópia dos arquivos apagados ou substituídos na Lixeira</target>
 
-<source>Versioning</source>
-<target>Controle de versões</target>
+<source>&Versioning</source>
+<target>Controle de &versão</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Move os arquivos para uma pasta definida pelo usuário</target>
@@ -881,14 +887,11 @@ O comando é disparado se:
 <source>Handle errors:</source>
 <target>Tratamento de erros:</target>
 
-<source>Ignore</source>
-<target>Ignorar</target>
-
 <source>Hide all error and warning messages</source>
 <target>Oculta todas as mensagens de erros e avisos</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostra pop-up em caso de erros ou avisos</target>
@@ -911,9 +914,6 @@ O comando é disparado se:
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Speed:</source>
-<target>Velocidade:</target>
-
 <source>Time remaining:</source>
 <target>Tempo restante:</target>
 
@@ -926,6 +926,9 @@ O comando é disparado se:
 <source>Minimize to notification area</source>
 <target>Minimizar para a área de notificação</target>
 
+<source>Bytes copied:</source>
+<target>Bytes copiados:</target>
+
 <source>Close</source>
 <target>Fechar</target>
 
@@ -937,6 +940,9 @@ O comando é disparado se:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Cria um arquivo de tarefa em lote para sincronização desatendida. Para iniciar, dê um clique duplo neste arquivo ou agende no agendador de tarefas: %x</target>
+
+<source>&Stop</source>
+<target>&Parar</target>
 
 <source>Stop synchronization at first error</source>
 <target>Interrompe a sincronização ao primeiro erro</target>
@@ -955,9 +961,6 @@ O comando é disparado se:
 
 <source>How can I schedule a batch job?</source>
 <target>Como posso agendar uma tarefa em lote?</target>
-
-<source>&Recycle bin</source>
-<target>&Lixeira</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>As seguintes configurações são utilizadas para todas as tarefas de sincronização.</target>
@@ -1007,8 +1010,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Description</source>
 <target>Descrição</target>
 
-<source>Restore hidden windows</source>
-<target>Restaurar janelas ocultadas</target>
+<source>Show hidden dialogs again</source>
+<target>Mostrar diálogos ocultados</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Mostra todos os diálogos e mensagens de alerta permanentemente ocultados</target>
 
 <source>&Default</source>
 <target>&Config. Padrão</target>
@@ -1070,8 +1076,8 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Main Bar</source>
 <target>Barra Principal</target>
 
-<source>Compare both sides</source>
-<target>Comparar os dois lados</target>
+<source>Start comparison</source>
+<target>Iniciar comparação</target>
 
 <source>Comparison settings</source>
 <target>Parâmetros de comparação</target>
@@ -1166,9 +1172,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Select time span...</source>
 <target>Selecionar intervalo de tempo...</target>
 
-<source>Default view</source>
-<target>Visualização padrão</target>
-
 <source>Show "%x"</source>
 <target>Mostrar "%x"</target>
 
@@ -1199,7 +1202,7 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Synchronization Settings</source>
 <target>Configurações de Sincronização</target>
 
-<source>Reset filter</source>
+<source>Clear filter</source>
 <target>Limpar filtro</target>
 
 <source>Show files that exist on left side only</source>
@@ -1358,8 +1361,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Contrapartida do outro lado para %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurar todos as janelas e avisos ocultados?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Mostrar diálogos e mensanges de alerta ocultados novamente?</target>
+
+<source>&Show</source>
+<target>&Mostrar</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifica e propaga as mudanças em ambos os lados. Arquivos e pastas apagados e/ou movidos e conflitos são detectados automaticamente usando um banco de dados.</target>

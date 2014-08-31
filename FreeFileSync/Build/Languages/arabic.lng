@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>سيتم اعتبار المجلد الموافق كمجلد فارغ</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>للمجلدات التالية مسارات مستقلة عن بعضها. انتبه عند ضبط إعدادات المزامنة:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>مسارات المجلدات التالية معتمدة على بعضها:</target>
 
 <source>File %x has an invalid date.</source>
 <target>يحتوي الملف %x تاريخ غير صالح.</target>
@@ -199,6 +199,28 @@
 <source>Update attributes on right</source>
 <target>تحديث السمات على اليسار</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>0 byte</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>2 bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>ملف قاعدة البيانات  %x غير متوافق.</target>
 
@@ -263,28 +285,6 @@
 <source>Total time:</source>
 <target>مجموع الوقت:</target>
 
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>0 byte</pluralform>
-<pluralform>1 byte</pluralform>
-<pluralform>2 bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>حدث خطأ أثناء تحليل الملف  %x، الصف  %y، و العمود  %z.</target>
 
@@ -344,7 +344,7 @@
 <target>طلب إحباط المهمة: في انتظار انتهاء المهمة الحالية...</target>
 
 <source>Unable to create time stamp for versioning:</source>
-<target>تعذر إنشاء بصمة زمنية من أجل مفاضلة الزمنية:</target>
+<target>تعذر إنشاء بصمة زمنية من أجل المفاضلة الزمنية:</target>
 
 <source>&Open...</source>
 <target>&فتح...</target>
@@ -355,8 +355,8 @@
 <source>&Quit</source>
 <target>إ&نهاء</target>
 
-<source>&Program</source>
-<target>ال&برنامج</target>
+<source>&File</source>
+<target>&ملف</target>
 
 <source>&View help</source>
 <target>إ&ظهار المساعدة</target>
@@ -447,9 +447,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>إ&ظهار الخطأ</target>
 
-<source>&Exit</source>
-<target>&خروج</target>
-
 <source>Incorrect command line:</source>
 <target>سطر أوامر خاطئ:</target>
 
@@ -513,8 +510,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>خطأ في التحقق من البيانات: يحتوي %x و %y بيانات مختلفة.</target>
 
-<source>Cannot find %x.</source>
-<target>تعذر العثور على %x.</target>
+<source>Cannot find folder %x.</source>
+<target>تعذر العثور على المجلد %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>المجلد الهدف %x موجود سابقاً.</target>
@@ -543,8 +540,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>متاح:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>سيتم تعديل مجلد الذي هو جزء من أزواج المجلدات المتعددة. الرجاء مراجعة إعدادات المزامنة.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>عدد من أزواج المجلدات يكتب إلى مجلد فرعي مشترك. رجاءً أعد النظر في خياراتك.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>مزامنة زوج مجلدات:</target>
@@ -649,8 +646,8 @@ The command is triggered if:
 <source>Name</source>
 <target>الاسم</target>
 
-<source>Relative path</source>
-<target>المسار النسبي</target>
+<source>Relative folder</source>
+<target>مجلد نسبي</target>
 
 <source>Base folder</source>
 <target>المجلد الأساسي (القاعدي)</target>
@@ -691,8 +688,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>إزالة الإعدادات المحلية</target>
 
-<source>Reset local filter</source>
-<target>إعادة تعيين الفلتر المحلي</target>
+<source>Clear local filter</source>
+<target>إزالة الفلتر المحلي</target>
 
 <source>Copy</source>
 <target>نسخ</target>
@@ -712,11 +709,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>&حفظ كمهمة دفعية...</target>
 
-<source>1. &Compare</source>
-<target>1-&مقارنة</target>
+<source>Start &comparison</source>
+<target>بدأ الم&قارنة</target>
 
-<source>2. &Synchronize</source>
-<target>2. &مزامنة</target>
+<source>Start &synchronization</source>
+<target>بدأ الم&زامنة</target>
 
 <source>&Options</source>
 <target>&خيارات</target>
@@ -726,6 +723,9 @@ The command is triggered if:
 
 <source>&Find...</source>
 <target>&بحث...</target>
+
+<source>&Reset layout</source>
+<target>إعادة ال&تنسيق إلى الإفتراضي</target>
 
 <source>&Export file list...</source>
 <target>&تصدير قائمة الملفات...</target>
@@ -769,17 +769,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>مطابقة حالة الأحرف (Match case)</target>
 
+<source>New</source>
+<target>جديد</target>
+
 <source>Open...</source>
 <target>فتح...</target>
 
 <source>Save</source>
 <target>حفظ</target>
-
-<source>Save as GUI job</source>
-<target>الحفظ كمهمة GUI</target>
-
-<source>Save as batch job</source>
-<target>حفظ كمهمة دفعية</target>
 
 <source>Save as...</source>
 <target>حفظ كـ...</target>
@@ -793,14 +790,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>إحصائيات:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
+<source>Number of files and folders that will be deleted</source>
+<target>عدد الملفات و المجلدات التي سيتم حذفها</target>
 
 <source>Number of files that will be overwritten</source>
 <target>عدد الملفات التي سيتم استبدالها</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>عدد الملفات و المجلدات التي سيتم حذفها</target>
+<source>Number of files and folders that will be created</source>
+<target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
 
 <source>Total bytes to copy</source>
 <target>إجمالي عدد الـ bytes التي سيتم نسخها</target>
@@ -816,6 +813,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>التعرف على الملفات المتساوية عن طريق مقارنة محتوى الملف</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>إهمال الفارق الزمني (بالساعات)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>اعتبار الملفات ذات الفارق الزمني المحدد و كأنها متساوية</target>
+
+<source>Handle daylight saving time</source>
+<target>تعامل مع التوقيت الصيفي</target>
 
 <source>Symbolic links:</source>
 <target>ارتباطات رمزية:</target>
@@ -847,8 +853,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>الحد الأقصى:</target>
 
-<source>&Reset</source>
-<target>إ&عادة</target>
+<source>C&lear</source>
+<target>إ&زالة</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
@@ -873,20 +879,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>حذف الملفات:</target>
 
-<source>Permanent</source>
-<target>الدائم</target>
+<source>&Permanent</source>
+<target>&دائم</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>حذف أو الكتابة فوق الملفات بشكل دائم</target>
 
-<source>Recycle bin</source>
-<target>سلة المهملات</target>
+<source>&Recycle bin</source>
+<target>&سلة المهملات</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>نسخ احتياطي للملفات المحذوفة و المستبدلة في سلة المهملات</target>
 
-<source>Versioning</source>
-<target>الوسم برقم الإصدار</target>
+<source>&Versioning</source>
+<target>ال&وسم حسب الإصدار</target>
 
 <source>Move files to a user-defined folder</source>
 <target>نقل الملفات إلى المجلد المحدد من قبل المستخدم</target>
@@ -897,14 +903,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>التعامل مع الأخطاء:</target>
 
-<source>Ignore</source>
-<target>تجاهل</target>
-
 <source>Hide all error and warning messages</source>
 <target>إخفاء جميع رسائل الأخطاء و التحذير</target>
 
-<source>Pop-up</source>
-<target>إطار منبثق</target>
+<source>&Pop-up</source>
+<target>&منبثق</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>إظهار إطارات منبثقة عند حصول أخطاء أو تحذيرات</target>
@@ -939,6 +942,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>تصغير إلى منطقة التنبيهات</target>
 
+<source>Bytes copied:</source>
+<target>Bytes المنسوخة:</target>
+
 <source>Close</source>
 <target>إغلاق</target>
 
@@ -950,6 +956,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>إنشاء ملف دفعي من أجل عمليات المزامنة غير المحضورة. للبدأ, انقر نقراً مزدوجاً على الملف أو المهمة المجدولة في منظم المهام: %x</target>
+
+<source>&Stop</source>
+<target>&توقف</target>
 
 <source>Stop synchronization at first error</source>
 <target>إحباط المزامنة عند أول خطأ</target>
@@ -968,9 +977,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>كيف يمكنني جدولة مهمة دفعية؟</target>
-
-<source>&Recycle bin</source>
-<target>&سلة المهملات</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة</target>
@@ -1020,8 +1026,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>الوصف</target>
 
-<source>Restore hidden windows</source>
-<target>استعادة نوافذ الحوار المخفية</target>
+<source>Show hidden dialogs again</source>
+<target>إظهار التنبهات و نوافذ الحوار المخفية</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>إعادة إظهار جميع التنبهات و نوافذ الحوار التي تم إخفاؤها</target>
 
 <source>&Default</source>
 <target>الا&فتراضي</target>
@@ -1083,8 +1092,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>الشريط الرئيسي</target>
 
-<source>Compare both sides</source>
-<target>مقارنة بين كلا الجانبين</target>
+<source>Start comparison</source>
+<target>بدأ المقارنة</target>
 
 <source>Comparison settings</source>
 <target>إعدادات المقارنة</target>
@@ -1195,9 +1204,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>حدد المجال الزمني...</target>
 
-<source>Default view</source>
-<target>طريقة العرض الافتراضية</target>
-
 <source>Show "%x"</source>
 <target>إظهار "%x"</target>
 
@@ -1228,8 +1234,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>إعدادات المزامنة</target>
 
-<source>Reset filter</source>
-<target>إعادة تعيين الفلتر</target>
+<source>Clear filter</source>
+<target>إزالة الفلاتر الحالية</target>
 
 <source>Show files that exist on left side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
@@ -1395,8 +1401,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- االنظير للجانب الآخر لـ  %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>استعادة جميع نوافذ الحوار و التحذيرات المخفية؟</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>إظهار التنبيهات و نوافذ الحوار المخفية مرة ثانية؟</target>
+
+<source>&Show</source>
+<target>&إظهار</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات</target>

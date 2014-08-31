@@ -107,7 +107,9 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     wxImage versionImage = stackImages(appnameImg, buildImg, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
 
     const int BORDER_SIZE = 5;
-    wxBitmap headerBmp(GetClientSize().GetWidth(), versionImage.GetHeight() + 2 * BORDER_SIZE);
+    wxBitmap headerBmp(GetClientSize().GetWidth(), versionImage.GetHeight() + 2 * BORDER_SIZE, 24);
+    //attention: *must* pass 24 bits, auto-determination fails on Windows high-contrast colors schemes!!!
+    //problem only manifests when calling wxDC::DrawBitmap
     {
         wxMemoryDC dc(headerBmp);
         dc.SetBackground(*wxWHITE_BRUSH);
@@ -507,8 +509,8 @@ void OptionsDlg::OnOkay(wxCommandEvent& event)
 void OptionsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     switch (showConfirmationDialog(this, DialogInfoType::INFO,
-                                   PopupDialogCfg().setMainInstructions(_("Restore all hidden windows and warnings?")),
-                                   _("&Restore")))
+                                   PopupDialogCfg().setMainInstructions(_("Show hidden dialogs and warning messages again?")),
+                                   _("&Show")))
     {
         case ConfirmationButton::DO_IT:
             settings.optDialogs.resetDialogs();

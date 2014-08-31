@@ -111,7 +111,7 @@ wxImage zen::stackImages(const wxImage& img1, const wxImage& img2, ImageStackLay
 
 namespace
 {
-void makeWhiteTransparent(wxImage& image) //assume black text on white background
+void calcAlphaForBlackWhiteImage(wxImage& image) //assume black text on white background
 {
     assert(image.HasAlpha());
     if (unsigned char* alphaPtr = image.GetAlpha())
@@ -146,13 +146,13 @@ wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const
     if (text.empty())
         return wxImage();
 
-    wxBitmap newBitmap(getTextExtent(text, font));
+    wxBitmap newBitmap(getTextExtent(text, font)); //seems we don't need to pass 24-bit depth here even for high-contrast color schemes
     {
         wxMemoryDC dc(newBitmap);
         dc.SetBackground(*wxWHITE_BRUSH);
         dc.Clear();
 
-        dc.SetTextForeground(*wxBLACK); //for use in makeWhiteTransparent
+        dc.SetTextForeground(*wxBLACK); //for use in calcAlphaForBlackWhiteImage
         dc.SetTextBackground(*wxWHITE); //
         dc.SetFont(font);
 
@@ -172,7 +172,7 @@ wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const
     output.SetAlpha();
 
     //calculate alpha channel
-    makeWhiteTransparent(output);
+    calcAlphaForBlackWhiteImage(output);
 
     //apply actual text color
     unsigned char* dataPtr = output.GetData();

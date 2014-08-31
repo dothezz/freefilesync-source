@@ -20,7 +20,6 @@
 #include <Aclapi.h>
 #include "privilege.h"
 #include "dll.h"
-#include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
 #include "dst_hack.h"
 #include "win_ver.h"
@@ -828,8 +827,8 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
                          nullptr,
                          &lastWriteTimeDbg));
 
-	assert(std::abs(filetimeToTimeT(creationTimeDbg ) - filetimeToTimeT(creationTime )) <= 2); //respect 2 second FAT/FAT32 precision
-	assert(std::abs(filetimeToTimeT(lastWriteTimeDbg) - filetimeToTimeT(lastWriteTime)) <= 2); //
+	assert(std::abs(filetimeToTimeT(lastWriteTimeDbg) - filetimeToTimeT(lastWriteTime)) <= 2); //respect 2 second FAT/FAT32 precision
+	//assert(std::abs(filetimeToTimeT(creationTimeDbg ) - filetimeToTimeT(creationTime )) <= 2); -> creation time not available for Linux-hosted Samba shares!
 #endif
 }
 #endif
@@ -1632,7 +1631,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
 
         throw FileError(errorMsg, errorDescr);
     }
-    ScopeGuard guardTarget = makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: guard just after opening target and before managing hFileOut
+    ScopeGuard guardTarget = makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: guard just after opening target and before managing hFileTarget
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFileTarget));
 
     //----------------------------------------------------------------------
@@ -1772,26 +1771,26 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                       FILE_FLAG_SEQUENTIAL_SCAN,
                                       nullptr);
         if (hFileTarget == INVALID_HANDLE_VALUE)
-            throw 1;
+            throw FileError(L"fail");
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hSparse));
 
         DWORD br = 0;
         if (!::DeviceIoControl(hSparse, FSCTL_SET_SPARSE, nullptr, 0, nullptr, 0, &br,nullptr))
-            throw 1;
+            throw FileError(L"fail");
 
         LARGE_INTEGER liDistanceToMove =  {};
         liDistanceToMove.QuadPart = 1024 * 1024 * 1024; //create 5 TB sparse file
         liDistanceToMove.QuadPart *= 5 * 1024;          //maximum file size on NTFS: 16 TB - 64 kB
         if (!::SetFilePointerEx(hSparse, liDistanceToMove, nullptr, FILE_BEGIN))
-            throw 1;
+            throw FileError(L"fail");
 
         if (!SetEndOfFile(hSparse))
-            throw 1;
+            throw FileError(L"fail");
 
         FILE_ZERO_DATA_INFORMATION zeroInfo = {};
         zeroInfo.BeyondFinalZero.QuadPart = liDistanceToMove.QuadPart;
         if (!::DeviceIoControl(hSparse, FSCTL_SET_ZERO_DATA, &zeroInfo, sizeof(zeroInfo), nullptr, 0, &br, nullptr))
-            throw 1;
+            throw FileError(L"fail");
     */
 }
 
@@ -2044,6 +2043,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
                 dst::isFatDrive(targetFile) &&
                 getFilesize(sourceFile) >= 4U * std::uint64_t(1024U * 1024 * 1024)) //throw FileError
                 errorDescr += L"\nFAT volumes cannot store files larger than 4 gigabyte.";
+			//see "Limitations of the FAT32 File System": http://support.microsoft.com/kb/314463/en-us
 
             //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filepath is of a restricted type.
         }
@@ -2255,14 +2255,15 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         Zstring tmpTarget = targetFile + TEMP_FILE_ENDING; //use temporary file until a correct date has been set
 
         //raw file copy
-        for (int i = 1;; ++i)
+        for (int i = 0;; ++i)
             try
             {
                 copyFileSelectOs(sourceFile, tmpTarget, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
                 break;
             }
-            catch (const ErrorTargetExisting&) //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
+            catch (const ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
             {
+                if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/36adac33
                 tmpTarget = targetFile + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
             }
 

@@ -42,11 +42,11 @@ public:
     FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
 
 private:
-    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
+    virtual void onFile(const Zchar* shortName, const Zstring& filePath, const FileInfo& details)
     {
         const Zstring fileName(shortName);
         if (startsWith(fileName, prefix_) && endsWith(fileName, Zstr(".log")))
-            logfiles_.push_back(filepath);
+            logfiles_.push_back(filePath);
     }
 
     virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) { return nullptr; } //DON'T traverse into subdirs
@@ -91,17 +91,18 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
     const Zstring body = appendSeparator(logfileDir) + utfCvrtTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
 
     //ensure uniqueness
+    Zstring filepath = body + Zstr(".log");
     for (int i = 0;; ++i)
         try
         {
-            const Zstring& filepath = i == 0 ?
-                                      body + Zstr(".log") :
-                                      body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
-
             return make_unique<FileOutput>(filepath, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
             //*no* file system race-condition!
         }
-        catch (const ErrorTargetExisting&) {}
+        catch (const ErrorTargetExisting&)
+        {
+            if (i == 10) throw; //avoid endless recursion in pathological cases
+            filepath = body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
+        }
 }
 }
 

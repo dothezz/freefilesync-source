@@ -38,7 +38,7 @@ private:
     MessageProvider           (const MessageProvider&) = delete;
     MessageProvider& operator=(const MessageProvider&) = delete;
 
-    static const wchar_t dummyWindowName[];
+    static const wchar_t dummyClassName[];
 
     static LRESULT CALLBACK topWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -51,7 +51,7 @@ private:
 };
 
 
-const wchar_t MessageProvider::dummyWindowName[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
+const wchar_t MessageProvider::dummyClassName[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
 
 
 LRESULT CALLBACK MessageProvider::topWndProc(HWND hwnd,     //handle to window
@@ -81,37 +81,30 @@ MessageProvider::MessageProvider() :
     WNDCLASS wc = {};
     wc.lpfnWndProc   = topWndProc;
     wc.hInstance     = hMainModule;
-    wc.lpszClassName = dummyWindowName;
+    wc.lpszClassName = dummyClassName;
 
     if (::RegisterClass(&wc) == 0)
         throwFileError(_("Unable to register to receive system messages."), L"RegisterClass", getLastError());
 
-    ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(dummyWindowName, hMainModule); });
+    ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(dummyClassName, hMainModule); });
 
     //create dummy-window
-    windowHandle = ::CreateWindow(dummyWindowName, //LPCTSTR lpClassName OR ATOM in low-order word!
-                                  nullptr,         //LPCTSTR lpWindowName,
-                                  0, //DWORD dwStyle,
-                                  0, //int x,
-                                  0, //int y,
-                                  0, //int nWidth,
-                                  0, //int nHeight,
-                                  0, //note: we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
-                                  nullptr,     //HMENU hMenu,
-                                  hMainModule, //HINSTANCE hInstance,
-                                  nullptr);    //LPVOID lpParam
+    windowHandle = ::CreateWindow(dummyClassName, //_In_opt_  LPCTSTR lpClassName,
+                                  nullptr,        //_In_opt_  LPCTSTR lpWindowName,
+                                  0,           //_In_      DWORD dwStyle,
+                                  0, 0, 0, 0,  //_In_      int x, y, nWidth, nHeight,
+                                  nullptr,     //_In_opt_  HWND hWndParent; we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
+                                  nullptr,     //_In_opt_  HMENU hMenu,
+                                  hMainModule, //_In_opt_  HINSTANCE hInstance,
+                                  nullptr);    //_In_opt_  LPVOID lpParam
     if (!windowHandle)
         throwFileError(_("Unable to register to receive system messages."), L"CreateWindow", getLastError());
 
     //store this-pointer for topWndProc() to use: do this AFTER CreateWindow() to avoid processing messages while this constructor is running!!!
     //unlike: http://blogs.msdn.com/b/oldnewthing/archive/2014/02/03/10496248.aspx
     ::SetLastError(ERROR_SUCCESS); //[!] required for proper error handling, see MSDN, SetWindowLongPtr
-    if (::SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this)) == 0)
-    {
-        const DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
-        if (lastError != ERROR_SUCCESS)
-            throwFileError(_("Unable to register to receive system messages."), L"SetWindowLongPtr", lastError);
-    }
+    if (::SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this)) == 0 && ::GetLastError() != ERROR_SUCCESS)
+        throwFileError(_("Unable to register to receive system messages."), L"SetWindowLongPtr", ::GetLastError());
 
     guardClass.dismiss();
 }
@@ -121,8 +114,8 @@ MessageProvider::~MessageProvider()
 {
     //clean-up in reverse order
     ::DestroyWindow(windowHandle);
-    ::UnregisterClass(dummyWindowName, //LPCTSTR lpClassName OR ATOM in low-order word!
-                      hMainModule); //HINSTANCE hInstance
+    ::UnregisterClass(dummyClassName, //LPCTSTR lpClassName OR ATOM in low-order word!
+                      hMainModule);   //HINSTANCE hInstance
 }
 
 

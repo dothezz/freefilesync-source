@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>La cartella corrispondente sarà considerata come vuota.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Le seguenti cartelle hanno percorsi dipendenti. Fare attenzione quando si imposta le regole di sincronizzazione:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>I seguenti percorsi delle cartelle sono dipendenti gli uni dagli altri:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Il file %x ha una data non valida.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Aggiorna attributi a destra</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x byte</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Il file del database %x non è compatibile.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Tempo totale:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x byte</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Errore nel parsing del file %x, riga %y, colonna %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Esci</target>
 
-<source>&Program</source>
-<target>&Programma</target>
+<source>&File</source>
+<target>&File</target>
 
 <source>&View help</source>
 <target>&Vedere aiuto</target>
@@ -435,9 +435,6 @@ Il comando è attivato se:
 <source>&Show error</source>
 <target>&Mostra errore</target>
 
-<source>&Exit</source>
-<target>&Esci</target>
-
 <source>Incorrect command line:</source>
 <target>Linea di comando non corretta:</target>
 
@@ -501,8 +498,8 @@ Il comando è attivato se:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Dati di verifica errore: %x e %y hanno un contenuto diverso.</target>
 
-<source>Cannot find %x.</source>
-<target>Impossibile trovare %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Impossibile trovare la cartella %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>La cartella di destinazione %x è già esistente.</target>
@@ -531,8 +528,8 @@ Il comando è attivato se:
 <source>Available:</source>
 <target>Disponibile:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Verrà modificata una cartella che è parte di molte coppie di cartelle. Controlla le impostazioni di sincronizzazione.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Diverse coppie di cartelle scrivono in una sottocartella comune. Si prega di rivedere la configurazione.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizzazione della coppia di cartelle:</target>
@@ -633,8 +630,8 @@ Il comando è attivato se:
 <source>Name</source>
 <target>Nome</target>
 
-<source>Relative path</source>
-<target>Percorso relativo</target>
+<source>Relative folder</source>
+<target>Cartella relativa</target>
 
 <source>Base folder</source>
 <target>Cartella di partenza</target>
@@ -675,8 +672,8 @@ Il comando è attivato se:
 <source>Remove local settings</source>
 <target>Rimuovere le impostazioni locali</target>
 
-<source>Reset local filter</source>
-<target>Azzera filtro locale</target>
+<source>Clear local filter</source>
+<target>Cancella Filtro locale</target>
 
 <source>Copy</source>
 <target>Copia</target>
@@ -696,11 +693,11 @@ Il comando è attivato se:
 <source>Save as &batch job...</source>
 <target>Salva come &processo batch...</target>
 
-<source>1. &Compare</source>
-<target>1. &Compara</target>
+<source>Start &comparison</source>
+<target>Avvio &confronto</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Sincronizza</target>
+<source>Start &synchronization</source>
+<target>Avvio &sincronizzazione</target>
 
 <source>&Options</source>
 <target>&Opzioni</target>
@@ -710,6 +707,9 @@ Il comando è attivato se:
 
 <source>&Find...</source>
 <target>&Trova ...</target>
+
+<source>&Reset layout</source>
+<target>&Ripristina layout</target>
 
 <source>&Export file list...</source>
 <target>&Esporta l'elenco dei file...</target>
@@ -753,17 +753,14 @@ Il comando è attivato se:
 <source>Match case</source>
 <target>Corrispondenza</target>
 
+<source>New</source>
+<target>Nuovo</target>
+
 <source>Open...</source>
 <target>Apri...</target>
 
 <source>Save</source>
 <target>Salva</target>
-
-<source>Save as GUI job</source>
-<target>Salva come lavoro GUI</target>
-
-<source>Save as batch job</source>
-<target>Salva come processo batch</target>
 
 <source>Save as...</source>
 <target>Salva come ...</target>
@@ -777,14 +774,14 @@ Il comando è attivato se:
 <source>Statistics:</source>
 <target>Statistiche:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Numero di file e cartelle che verranno creati</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Numero di file e cartelle che verranno eliminati</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Numero di file che verranno sovrascritti</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Numero di file e cartelle che verranno eliminati</target>
+<source>Number of files and folders that will be created</source>
+<target>Numero di file e cartelle che verranno creati</target>
 
 <source>Total bytes to copy</source>
 <target>Bytes totali da copiare</target>
@@ -800,6 +797,15 @@ Il comando è attivato se:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Identificare i file uguali confrontando il contenuto del file.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignora tempo spostamento (in ore)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Considerare i tempi dei file con specifico offset o uguale</target>
+
+<source>Handle daylight saving time</source>
+<target>Maneggiare l'ora legale</target>
 
 <source>Symbolic links:</source>
 <target>Link simbolici:</target>
@@ -831,8 +837,8 @@ Il comando è attivato se:
 <source>Maximum:</source>
 <target>Massimo:</target>
 
-<source>&Reset</source>
-<target>&Ripristina</target>
+<source>C&lear</source>
+<target>Cance&lla</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selezionare le regole del filtro per escludere alcuni file dalla sincronizzazione. Immettere i percorsi dei file relativi alla loro corrispondente coppia di cartelle.</target>
@@ -857,20 +863,20 @@ Il comando è attivato se:
 <source>Delete files:</source>
 <target>Eliminare i file:</target>
 
-<source>Permanent</source>
-<target>Permanente</target>
+<source>&Permanent</source>
+<target>&Permanente</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Elimina o sovrascrivi i file definitivamente</target>
 
-<source>Recycle bin</source>
-<target>Cestino</target>
+<source>&Recycle bin</source>
+<target>&Cestino</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Eseguire il back up dei file cancellati o sovrascritti nel cestino</target>
 
-<source>Versioning</source>
-<target>Versione</target>
+<source>&Versioning</source>
+<target>&Versione</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Spostare i file in una cartella definita dall'utente</target>
@@ -881,14 +887,11 @@ Il comando è attivato se:
 <source>Handle errors:</source>
 <target>Gestire gli errori:</target>
 
-<source>Ignore</source>
-<target>Ignora</target>
-
 <source>Hide all error and warning messages</source>
 <target>Nascondi tutti gli errori e i messaggi d'avviso</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostra pop-up di errore o avviso</target>
@@ -923,6 +926,9 @@ Il comando è attivato se:
 <source>Minimize to notification area</source>
 <target>Ridurre al minimo l'area di notifica</target>
 
+<source>Bytes copied:</source>
+<target>Byte copiati:</target>
+
 <source>Close</source>
 <target>Chiudi</target>
 
@@ -934,6 +940,9 @@ Il comando è attivato se:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Creare un file batch per la sincronizzazione automatica. Per iniziare, fare doppio clic su questo file o programmarlo in un pianificatore di compiti: %x</target>
+
+<source>&Stop</source>
+<target>&Stop</target>
 
 <source>Stop synchronization at first error</source>
 <target>Interrompere la sincronizzazione al primo errore</target>
@@ -952,9 +961,6 @@ Il comando è attivato se:
 
 <source>How can I schedule a batch job?</source>
 <target>Come posso programmare un lavoro batch?</target>
-
-<source>&Recycle bin</source>
-<target>&Cestino</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Le seguenti impostazioni vengono utilizzate per tutti i processi di sincronizzazione.</target>
@@ -1004,8 +1010,11 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Description</source>
 <target>Descrizione</target>
 
-<source>Restore hidden windows</source>
-<target>Ripristina le finestre nascoste</target>
+<source>Show hidden dialogs again</source>
+<target>Mostra di nuovo le finestre di dialogo nascoste</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Mostra di nuovo tutti i dialoghi nascosti in modo permanente e i messaggi di allarme</target>
 
 <source>&Default</source>
 <target>&Predefinito</target>
@@ -1067,8 +1076,8 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Main Bar</source>
 <target>Barra Principale</target>
 
-<source>Compare both sides</source>
-<target>Confronta entrambi i lati</target>
+<source>Start comparison</source>
+<target>Avviare confronto</target>
 
 <source>Comparison settings</source>
 <target>Impostazioni di comparazione</target>
@@ -1163,9 +1172,6 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Select time span...</source>
 <target>Seleziona intervallo di tempo...</target>
 
-<source>Default view</source>
-<target>Vista predefinita</target>
-
 <source>Show "%x"</source>
 <target>Mostra "%x"</target>
 
@@ -1196,8 +1202,8 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Synchronization Settings</source>
 <target>Impostazioni di Sincronizzazione</target>
 
-<source>Reset filter</source>
-<target>Azzera il filtro</target>
+<source>Clear filter</source>
+<target>Eliminare filtro</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostra file esistenti solo a sinistra</target>
@@ -1355,8 +1361,11 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Omologo dell'altro lato a %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Ripristina tutte le finestre nascoste e gli avvisi?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Mostra di nuovo dialoghi nascosti e messaggi di avviso?</target>
+
+<source>&Show</source>
+<target>&Mostra</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifica e propaga cambiamenti su entrambi i lati. Cancellazioni, spostamenti e conflitti sono identificati automaticamente usando un database.</target>

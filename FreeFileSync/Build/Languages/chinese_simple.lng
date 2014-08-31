@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>相应的文件夹将被视为空.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>如下的文件夹有路径依赖性. 请在设置同步规则时特别小心:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>如下的文件夹路径互相依赖:</target>
 
 <source>File %x has an invalid date.</source>
 <target>文件 %x 的日期非法.</target>
@@ -199,6 +199,23 @@
 <source>Update attributes on right</source>
 <target>更新右侧的文件属性</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x 字节</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>数据库文件 %x 不兼容.</target>
 
@@ -257,23 +274,6 @@
 
 <source>Total time:</source>
 <target>总共时间:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x 字节</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>当分析文件 %x , 行 %y, 列 %z 时出错.</target>
@@ -340,8 +340,8 @@
 <source>&Quit</source>
 <target>退出(&Q)</target>
 
-<source>&Program</source>
-<target>程序(&P)</target>
+<source>&File</source>
+<target>文件(&F)</target>
 
 <source>&View help</source>
 <target>查看帮助(&V)</target>
@@ -432,9 +432,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>显示错误(&S)</target>
 
-<source>&Exit</source>
-<target>退出(&E)</target>
-
 <source>Incorrect command line:</source>
 <target>不正确的命令行:</target>
 
@@ -493,13 +490,13 @@ The command is triggered if:
 <target>更新 %x 的属性</target>
 
 <source>Creating a Volume Shadow Copy for %x...</source>
-<target>为 %x 创建一个卷影副本...</target>
+<target>正在为 %x 创建一个卷影副本...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>数据校验错误: %x 和 %y 有不同的内容.</target>
 
-<source>Cannot find %x.</source>
-<target>无法找到 %x.</target>
+<source>Cannot find folder %x.</source>
+<target>无法找到文件夹 %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>目标文件夹 %x 已经存在.</target>
@@ -528,8 +525,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>可用:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>一个将被修改的文件夹是多个文件夹对的一部分. 请重新检视同步设置.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>多个文件夹对写入到一个公共的子文件夹. 请重新检查你的设置.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>正在同步成对的文件夹:</target>
@@ -629,8 +626,8 @@ The command is triggered if:
 <source>Name</source>
 <target>文件名</target>
 
-<source>Relative path</source>
-<target>相对路径</target>
+<source>Relative folder</source>
+<target>相对文件夹</target>
 
 <source>Base folder</source>
 <target>主文件夹</target>
@@ -671,8 +668,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>移除本地设置</target>
 
-<source>Reset local filter</source>
-<target>重置本地过滤器</target>
+<source>Clear local filter</source>
+<target>清除本地过滤器</target>
 
 <source>Copy</source>
 <target>复制</target>
@@ -690,13 +687,13 @@ The command is triggered if:
 <target>保存(&S)</target>
 
 <source>Save as &batch job...</source>
-<target>另存为批处理作业(&b)</target>
+<target>另存为批处理作业(&B)</target>
 
-<source>1. &Compare</source>
-<target>1. 比较(&C)</target>
+<source>Start &comparison</source>
+<target>开始比较(&C)</target>
 
-<source>2. &Synchronize</source>
-<target>2. 同步(&S)</target>
+<source>Start &synchronization</source>
+<target>开始同步(&S)</target>
 
 <source>&Options</source>
 <target>选项(&O)</target>
@@ -707,20 +704,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>查找...(&F)</target>
 
+<source>&Reset layout</source>
+<target>重置布局(&R)</target>
+
 <source>&Export file list...</source>
 <target>导出文件列表(&E)...</target>
 
 <source>&Tools</source>
 <target>工具(&T)</target>
 
+<source>&Check for new version</source>
+<target>检查新版本(&C)</target>
+
 <source>&Check now</source>
 <target>现在检查(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>每周自动检查一次(&A)</target>
-
-<source>&Check for new version</source>
-<target>检查新版本(&C)</target>
 
 <source>Cancel</source>
 <target>取消</target>
@@ -749,17 +749,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>匹配大小写</target>
 
+<source>New</source>
+<target>新建</target>
+
 <source>Open...</source>
 <target>打开...</target>
 
 <source>Save</source>
 <target>保存</target>
-
-<source>Save as GUI job</source>
-<target>保存为GUI作业</target>
-
-<source>Save as batch job</source>
-<target>另存为批处理作业</target>
 
 <source>Save as...</source>
 <target>另存为...</target>
@@ -773,14 +770,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>统计:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>将被创建的文件和文件夹数</target>
+<source>Number of files and folders that will be deleted</source>
+<target>将被删除的文件和文件夹数</target>
 
 <source>Number of files that will be overwritten</source>
 <target>将被覆盖的文件数</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>将被删除的文件和文件夹数</target>
+<source>Number of files and folders that will be created</source>
+<target>将被创建的文件和文件夹数</target>
 
 <source>Total bytes to copy</source>
 <target>要复制的总字节数</target>
@@ -796,6 +793,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>以比较文件内容来识别相同的文件.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>忽略时间偏移(以小时计)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>将文件时间有指定的偏移时视为相等</target>
+
+<source>Handle daylight saving time</source>
+<target>处理夏令时</target>
 
 <source>Symbolic links:</source>
 <target>符号连接:</target>
@@ -827,8 +833,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大:</target>
 
-<source>&Reset</source>
-<target>重置(&R)</target>
+<source>C&lear</source>
+<target>清除(&L)</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>选择过滤器规则以将某些文件从同步中排除. 输入与相关的文件夹对相对的与文件路径.</target>
@@ -853,20 +859,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>删除文件:</target>
 
-<source>Permanent</source>
-<target>永久</target>
+<source>&Permanent</source>
+<target>永久(&P)</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>永久性删除或覆盖文件</target>
 
-<source>Recycle bin</source>
-<target>回收站</target>
+<source>&Recycle bin</source>
+<target>回收站(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>备份被删除和被覆盖的文件到回收站</target>
 
-<source>Versioning</source>
-<target>保留历史版本</target>
+<source>&Versioning</source>
+<target>历史版本(&V)</target>
 
 <source>Move files to a user-defined folder</source>
 <target>移动文件到一个用户定义的文件夹</target>
@@ -877,14 +883,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>处理错误:</target>
 
-<source>Ignore</source>
-<target>忽略</target>
-
 <source>Hide all error and warning messages</source>
 <target>隐藏所有错误与警告信息</target>
 
-<source>Pop-up</source>
-<target>弹出框</target>
+<source>&Pop-up</source>
+<target>弹出对话框(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>在错误或警告时显示弹出对话框</target>
@@ -907,9 +910,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>已找到的项目:</target>
 
-<source>Speed:</source>
-<target>速度:</target>
-
 <source>Time remaining:</source>
 <target>剩余时间:</target>
 
@@ -922,6 +922,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>最小化到托盘</target>
 
+<source>Bytes copied:</source>
+<target>字节被复制:</target>
+
 <source>Close</source>
 <target>关闭</target>
 
@@ -933,6 +936,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>创建一个用于无人值守同步的批处理文件. 要开始, 双击这个文件或任务计划器中的计划调度: %x</target>
+
+<source>&Stop</source>
+<target>停止(&S)</target>
 
 <source>Stop synchronization at first error</source>
 <target>在遇到第一个错误时停止同步</target>
@@ -951,9 +957,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>我如何计划一个批处理作业?</target>
-
-<source>&Recycle bin</source>
-<target>回收站(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>如下的设置使用于所有同步作业.</target>
@@ -1000,8 +1003,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>描述</target>
 
-<source>Restore hidden windows</source>
-<target>恢复隐藏窗口</target>
+<source>Show hidden dialogs again</source>
+<target>重新显示被隐藏的对话框</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>重新显示所有被永久性隐藏的对话框和警告信息</target>
 
 <source>&Default</source>
 <target>默认(&D)</target>
@@ -1063,8 +1069,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>主工具栏</target>
 
-<source>Compare both sides</source>
-<target>比较两侧</target>
+<source>Start comparison</source>
+<target>开始比较</target>
 
 <source>Comparison settings</source>
 <target>比较设置</target>
@@ -1155,9 +1161,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>选择时间跨度...</target>
 
-<source>Default view</source>
-<target>默认视图</target>
-
 <source>Show "%x"</source>
 <target>显示 "%x"</target>
 
@@ -1188,8 +1191,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>同步设置</target>
 
-<source>Reset filter</source>
-<target>重置过滤器</target>
+<source>Clear filter</source>
+<target>清除过滤器</target>
 
 <source>Show files that exist on left side only</source>
 <target>显示仅存在左侧的文件</target>
@@ -1345,8 +1348,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- 另一边的对应项到 %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>要恢复所有隐藏的窗口和警告吗?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>是否要重新显示被隐藏的对话框和警告信息?</target>
+
+<source>&Show</source>
+<target>显示(&S)</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>

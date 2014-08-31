@@ -84,20 +84,21 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
 
     if (vistaOrLater()) //new recycle bin usage: available since Vista
     {
-        using namespace fileop;
-        const DllFun<FunType_moveToRecycleBin   > moveToRecycler     (getDllName(), funName_moveToRecycleBin);
-        const DllFun<FunType_getLastErrorMessage> getLastErrorMessage(getDllName(), funName_getLastErrorMessage);
+#define DEF_DLL_FUN(name) const DllFun<fileop::FunType_##name> name(fileop::getDllName(), fileop::funName_##name);
+DEF_DLL_FUN(moveToRecycleBin);
+DEF_DLL_FUN(getLastErrorMessage);
+#undef DEF_DLL_FUN
 
-        if (!moveToRecycler || !getLastErrorMessage)
+        if (!moveToRecycleBin || !getLastErrorMessage)
             throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempaths[0])),
-                            replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
+                            replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(fileop::getDllName())));
 
         std::vector<const wchar_t*> cNames;
         for (auto it = itempaths.begin(); it != itempaths.end(); ++it) //CAUTION: do not create temporary strings here!!
             cNames.push_back(it->c_str());
 
         CallbackData cbd(notifyDeletionStatus);
-        if (!moveToRecycler(&cNames[0], cNames.size(), onRecyclerCallback, &cbd))
+        if (!moveToRecycleBin(&cNames[0], cNames.size(), onRecyclerCallback, &cbd))
         {
             if (cbd.exceptionInUserCallback)
             {

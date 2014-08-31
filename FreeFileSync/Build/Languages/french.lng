@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Le dossier correspondant sera considéré comme vide.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Les fichiers suivants ont des chemins interdépendants. Attention à la mise à jour des règles de synchronisation :</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Les chemins des dossiers suivants dépendent les uns des autres</target>
 
 <source>File %x has an invalid date.</source>
 <target>Le fichier %x a une date invalide.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Mise à jour des attributs à droite</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x octet</pluralform>
+<pluralform>%x octets</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x Mo</target>
+
+<source>%x KB</source>
+<target>%x Ko</target>
+
+<source>%x GB</source>
+<target>%x Go</target>
+
 <source>Database file %x is incompatible.</source>
 <target>La base de données %x n'est pas compatible.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Durée totale :</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x octet</pluralform>
-<pluralform>%x octets</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x Mo</target>
-
-<source>%x KB</source>
-<target>%x Ko</target>
-
-<source>%x GB</source>
-<target>%x Go</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Erreur lors de l'analyse du fichier %x, ligne %y, colonne %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Quitter</target>
 
-<source>&Program</source>
-<target>&Programme</target>
+<source>&File</source>
+<target>&Fichiers</target>
 
 <source>&View help</source>
 <target>&Afficher l'aide</target>
@@ -435,9 +435,6 @@ La commande est déclenchée si :
 <source>&Show error</source>
 <target>&Afficher l'erreur</target>
 
-<source>&Exit</source>
-<target>&Quitter</target>
-
 <source>Incorrect command line:</source>
 <target>Ligne de commande incorrecte :</target>
 
@@ -501,8 +498,8 @@ La commande est déclenchée si :
 <source>Data verification error: %x and %y have different content.</source>
 <target>Erreur lors de la vérification des données : %x et %y ont des contenus différents.</target>
 
-<source>Cannot find %x.</source>
-<target>Impossible de trouver %x</target>
+<source>Cannot find folder %x.</source>
+<target>Dossier %x introuvable.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Le dossier destination %x existe déjà.</target>
@@ -531,8 +528,8 @@ La commande est déclenchée si :
 <source>Available:</source>
 <target>Disponible :</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Un dossier faisant partie de paires multiples sera modifié. Veuillez vérifier les paramètres de synchronisation.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Plusieurs dossiers multiples écrivent dans un sous-dossier commun. Veuillez vérifier votre configuration.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisation de la paire de dossiers</target>
@@ -633,8 +630,8 @@ La commande est déclenchée si :
 <source>Name</source>
 <target>Nom</target>
 
-<source>Relative path</source>
-<target>Chemin relatif</target>
+<source>Relative folder</source>
+<target>Dossier relatif</target>
 
 <source>Base folder</source>
 <target>Dossier de base</target>
@@ -675,8 +672,8 @@ La commande est déclenchée si :
 <source>Remove local settings</source>
 <target>supprimer les paramètres locaux</target>
 
-<source>Reset local filter</source>
-<target>Réinitialiser le filtre local</target>
+<source>Clear local filter</source>
+<target>Effacer le filtre local</target>
 
 <source>Copy</source>
 <target>Copier</target>
@@ -696,11 +693,11 @@ La commande est déclenchée si :
 <source>Save as &batch job...</source>
 <target>Enregistrer en temps que job &batch...</target>
 
-<source>1. &Compare</source>
-<target>1. &Comparer</target>
+<source>Start &comparison</source>
+<target>Démarrer la &comparaison</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchroniser</target>
+<source>Start &synchronization</source>
+<target>Démarrer la &synchronisation</target>
 
 <source>&Options</source>
 <target>&Options</target>
@@ -711,20 +708,23 @@ La commande est déclenchée si :
 <source>&Find...</source>
 <target>&Rechercher...</target>
 
+<source>&Reset layout</source>
+<target>&Réinitialiser la disposition</target>
+
 <source>&Export file list...</source>
 <target>&Exportation de la liste des fichiers...</target>
 
 <source>&Tools</source>
 <target>Ou&tils</target>
 
+<source>&Check for new version</source>
+<target>&Vérifier les nouvelles versions</target>
+
 <source>&Check now</source>
 <target>&Contrôler maintenant</target>
 
 <source>Check &automatically once a week</source>
 <target>Contrôler &automatiquement une fois par semaine</target>
-
-<source>&Check for new version</source>
-<target>&Vérifier les nouvelles versions</target>
 
 <source>Cancel</source>
 <target>Annuler</target>
@@ -753,17 +753,14 @@ La commande est déclenchée si :
 <source>Match case</source>
 <target>Respecter la casse</target>
 
+<source>New</source>
+<target>Nouveau</target>
+
 <source>Open...</source>
 <target>Ouvrir ...</target>
 
 <source>Save</source>
 <target>Sauvegarder</target>
-
-<source>Save as GUI job</source>
-<target>Enregistrer en tant que job GUI</target>
-
-<source>Save as batch job</source>
-<target>Enregistrer en tant que fichier batch</target>
 
 <source>Save as...</source>
 <target>Enregistrer en tant que...</target>
@@ -777,14 +774,14 @@ La commande est déclenchée si :
 <source>Statistics:</source>
 <target>Statistiques :</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Nombre de fichiers et de dossiers qui seront créés</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Nombre de fichiers et de dossiers qui seront supprimés</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Nombre de fichiers qui seront remplacés</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Nombre de fichiers et de dossiers qui seront supprimés</target>
+<source>Number of files and folders that will be created</source>
+<target>Nombre de fichiers et de dossiers qui seront créés</target>
 
 <source>Total bytes to copy</source>
 <target>Nombre total d'octets à copier</target>
@@ -800,6 +797,15 @@ La commande est déclenchée si :
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Reconnaître les fichiers identiques à l'aide de leur contenu.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorer les décalages temporels (en heures)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Considérer comme identiques les dates de fichiers avec un décalage spécifié</target>
+
+<source>Handle daylight saving time</source>
+<target>Gérer l'heure d'été</target>
 
 <source>Symbolic links:</source>
 <target>Liens symboliques</target>
@@ -831,8 +837,8 @@ La commande est déclenchée si :
 <source>Maximum:</source>
 <target>Maximum :</target>
 
-<source>&Reset</source>
-<target>&Réinitialiser</target>
+<source>C&lear</source>
+<target>&Effacer</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Sélectionnez les règles de filtrage pour exclure certains fichiers de la synchronisation. Entrez les chemins des fichiers par rapport à leur paire de dossiers.</target>
@@ -857,20 +863,20 @@ La commande est déclenchée si :
 <source>Delete files:</source>
 <target>Supprimer les fichiers :</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target>&Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Supprimer ou écraser les fichiers définitivement</target>
 
-<source>Recycle bin</source>
-<target>Corbeille</target>
+<source>&Recycle bin</source>
+<target>&Corbeille</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Sauvegarder les fichier détruits ou écrasés dans la Corbeille</target>
 
-<source>Versioning</source>
-<target>Gestion des versions</target>
+<source>&Versioning</source>
+<target>Gestion des &Versions</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Déplacer les fichiers vers un dossier utilisateur</target>
@@ -881,14 +887,11 @@ La commande est déclenchée si :
 <source>Handle errors:</source>
 <target>Gestion des erreurs :</target>
 
-<source>Ignore</source>
-<target>Ignorer</target>
-
 <source>Hide all error and warning messages</source>
 <target>Masquer tous les messages d'erreurs et les avertissements</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Montrer les messages d'avertissement ou d'erreur</target>
@@ -911,9 +914,6 @@ La commande est déclenchée si :
 <source>Items found:</source>
 <target>Élements trouvés :</target>
 
-<source>Speed:</source>
-<target>Vitesse :</target>
-
 <source>Time remaining:</source>
 <target>Temps restant :</target>
 
@@ -926,6 +926,9 @@ La commande est déclenchée si :
 <source>Minimize to notification area</source>
 <target>Réduction à la zone de notification</target>
 
+<source>Bytes copied:</source>
+<target>Octets copiés :</target>
+
 <source>Close</source>
 <target>Fermer</target>
 
@@ -937,6 +940,9 @@ La commande est déclenchée si :
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Créer un fichier batch pour une synchronisation non assitée. Pour démarrer, double-cliquez sur ce fichier ou planifiez-le dans le gestionnaire des tâches : %x</target>
+
+<source>&Stop</source>
+<target>&Stop</target>
 
 <source>Stop synchronization at first error</source>
 <target>Arrêter la synchronisation à la première erreur</target>
@@ -955,9 +961,6 @@ La commande est déclenchée si :
 
 <source>How can I schedule a batch job?</source>
 <target>Comment plannifier un job batch ?</target>
-
-<source>&Recycle bin</source>
-<target>&Corbeille</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Les paramètres suivants sont utilisés lors de toutes les synchronisations.</target>
@@ -1007,8 +1010,11 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Description</source>
 <target>Description</target>
 
-<source>Restore hidden windows</source>
-<target>Restaurer les fenêtres masquées</target>
+<source>Show hidden dialogs again</source>
+<target>Réafficher les boîtes de dialogue masquées</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Réafficher en permanence les boîtes de dialogue et les avertissements</target>
 
 <source>&Default</source>
 <target>&Défaut</target>
@@ -1070,8 +1076,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Main Bar</source>
 <target>Barre Principale</target>
 
-<source>Compare both sides</source>
-<target>Comparer les deux listes</target>
+<source>Start comparison</source>
+<target>Démarrer la comparaison</target>
 
 <source>Comparison settings</source>
 <target>Paramètres de comparaison</target>
@@ -1166,9 +1172,6 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Select time span...</source>
 <target>Choisir un intervalle de temps...</target>
 
-<source>Default view</source>
-<target>Vue par défaut</target>
-
 <source>Show "%x"</source>
 <target>Afficher "%x"</target>
 
@@ -1199,8 +1202,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Synchronization Settings</source>
 <target>Configuration de la Synchronisation</target>
 
-<source>Reset filter</source>
-<target>Réinitialiser le filtre</target>
+<source>Clear filter</source>
+<target>Effacer les filtres</target>
 
 <source>Show files that exist on left side only</source>
 <target>Afficher les fichiers existant seulement à gauche</target>
@@ -1358,8 +1361,11 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Duplication vers %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Reataurer toutes les fenêtres masquées et les avertissements ?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Voulez-vous réafficher les boîtes de dialogues et les avertissements ?</target>
+
+<source>&Show</source>
+<target>&Afficher</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifier et propager les modifications des deux côtés. Suppressions, déplacements et conflits sont détectés automatiquement en utilisant une base de données.</target>

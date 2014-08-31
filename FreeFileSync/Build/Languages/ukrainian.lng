@@ -109,8 +109,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Відповідна папка буде вважатися порожньою.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Наступні папки мають залежні шляхи. Будьте обережні при налаштуванні правил синхронізації:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
 
 <source>File %x has an invalid date.</source>
 <target>Файл %x має неіснуючу дату.</target>
@@ -202,6 +202,25 @@
 <source>Update attributes on right</source>
 <target>Оновити атрибути праворуч</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x байт</pluralform>
+<pluralform>%x байти</pluralform>
+<pluralform>%x байтів</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x МБ</target>
+
+<source>%x KB</source>
+<target>%x КБ</target>
+
+<source>%x GB</source>
+<target>%x ГБ</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Несумісний файл бази даних %x.</target>
 
@@ -262,25 +281,6 @@
 
 <source>Total time:</source>
 <target>Загальний час:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x байт</pluralform>
-<pluralform>%x байти</pluralform>
-<pluralform>%x байтів</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x МБ</target>
-
-<source>%x KB</source>
-<target>%x КБ</target>
-
-<source>%x GB</source>
-<target>%x ГБ</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Помилка розбору файла %x, рядок %y, колонка %z.</target>
@@ -349,8 +349,8 @@
 <source>&Quit</source>
 <target>&Вихід</target>
 
-<source>&Program</source>
-<target>&Програма</target>
+<source>&File</source>
+<target></target>
 
 <source>&View help</source>
 <target>&Перегляд довідки</target>
@@ -441,9 +441,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Показати помилку</target>
 
-<source>&Exit</source>
-<target>&Вихід</target>
-
 <source>Incorrect command line:</source>
 <target>Неправильний командний рядок:</target>
 
@@ -507,8 +504,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Помилка перевірки даних: %x та %y мають різний вміст.</target>
 
-<source>Cannot find %x.</source>
-<target>Не вдається знайти %x.</target>
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
 <target>Цільова папка %x вже існує.</target>
@@ -537,8 +534,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Буде змінена папка, яка є частиною кількох пар папок. Будь ласка, перегляньте налаштування синхронізації.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target></target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронізація пари папок:</target>
@@ -640,8 +637,8 @@ The command is triggered if:
 <source>Name</source>
 <target>Назва</target>
 
-<source>Relative path</source>
-<target>Відносний шлях</target>
+<source>Relative folder</source>
+<target></target>
 
 <source>Base folder</source>
 <target>Базова папка</target>
@@ -682,8 +679,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>Вилучити локальні налаштування</target>
 
-<source>Reset local filter</source>
-<target>Оновити локальний фільтр</target>
+<source>Clear local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>Копіювати</target>
@@ -703,11 +700,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>Зберегти як &пакетне завдання</target>
 
-<source>1. &Compare</source>
-<target>1. &Порівняти</target>
+<source>Start &comparison</source>
+<target></target>
 
-<source>2. &Synchronize</source>
-<target>2. &Синхронізувати</target>
+<source>Start &synchronization</source>
+<target></target>
 
 <source>&Options</source>
 <target>&Опції</target>
@@ -718,20 +715,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&Знайти...</target>
 
+<source>&Reset layout</source>
+<target></target>
+
 <source>&Export file list...</source>
 <target>&Експортувати список файлів...</target>
 
 <source>&Tools</source>
 <target>&Інструменти</target>
 
+<source>&Check for new version</source>
+<target>&Перевірка наявності нової версії</target>
+
 <source>&Check now</source>
 <target>&Перевірити тепер</target>
 
 <source>Check &automatically once a week</source>
 <target>Перевіряти &автоматично щотижня</target>
-
-<source>&Check for new version</source>
-<target>&Перевірка наявності нової версії</target>
 
 <source>Cancel</source>
 <target>Відмінити</target>
@@ -760,17 +760,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>Враховувати регістр</target>
 
+<source>New</source>
+<target></target>
+
 <source>Open...</source>
 <target>Відкрити...</target>
 
 <source>Save</source>
 <target>Зберегти</target>
-
-<source>Save as GUI job</source>
-<target>Зберегти як завдання графічного інтерфейсу</target>
-
-<source>Save as batch job</source>
-<target>Зберегти як пакетне завдання</target>
 
 <source>Save as...</source>
 <target>Зберегти як...</target>
@@ -784,14 +781,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>Статистика:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Кількість файлів і папок, які будуть створені</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Кількість файлів і папок, які будуть вилучені</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Кількість файлів, які будуть перезаписані</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Кількість файлів і папок, які будуть вилучені</target>
+<source>Number of files and folders that will be created</source>
+<target>Кількість файлів і папок, які будуть створені</target>
 
 <source>Total bytes to copy</source>
 <target>Всього зкопіювати байтів</target>
@@ -807,6 +804,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Визначити однакові файли порівнюючи їх вміст.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Handle daylight saving time</source>
+<target></target>
 
 <source>Symbolic links:</source>
 <target>Символьні посилання:</target>
@@ -838,8 +844,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>&Reset</source>
-<target>&Відновити</target>
+<source>C&lear</source>
+<target></target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
@@ -864,20 +870,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>Вилучити файли:</target>
 
-<source>Permanent</source>
-<target>Назавжди</target>
+<source>&Permanent</source>
+<target></target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Вилучати чи перезаписати файли назавжди</target>
 
-<source>Recycle bin</source>
-<target>Корзина</target>
+<source>&Recycle bin</source>
+<target>&Корзина</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Резервно зберегти вилучені та перезаисані файли в Корзині</target>
 
-<source>Versioning</source>
-<target>Запис версій</target>
+<source>&Versioning</source>
+<target></target>
 
 <source>Move files to a user-defined folder</source>
 <target>Перемістити файли у визначену користувачем папку</target>
@@ -888,14 +894,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обробка помилок:</target>
 
-<source>Ignore</source>
-<target>Ігнорувати</target>
-
 <source>Hide all error and warning messages</source>
 <target>Приховати всі помилки і повідомлення з попередженнями</target>
 
-<source>Pop-up</source>
-<target>Виринаючі вікна</target>
+<source>&Pop-up</source>
+<target></target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показувати виринаючі вікна при помилках та попередженнях</target>
@@ -918,9 +921,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>Елементів знайдено:</target>
 
-<source>Speed:</source>
-<target>Швидкість:</target>
-
 <source>Time remaining:</source>
 <target>Залишилось часу:</target>
 
@@ -933,6 +933,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>Згорнути в область повідомлень</target>
 
+<source>Bytes copied:</source>
+<target></target>
+
 <source>Close</source>
 <target>Замкнути</target>
 
@@ -944,6 +947,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Створити пакетний файл для автоматичної синхронізації. Щоб розпочати двічі клацніть цей файл або заплануйте в планувальнику завдань: %x</target>
+
+<source>&Stop</source>
+<target></target>
 
 <source>Stop synchronization at first error</source>
 <target>Зупинити синхронізацію при першій помилці</target>
@@ -962,9 +968,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Як можна запланувати пакетне завдання?</target>
-
-<source>&Recycle bin</source>
-<target>&Корзина</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Наступні налаштування використовуються для всіх завдань синхронізації.</target>
@@ -1014,8 +1017,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Опис</target>
 
-<source>Restore hidden windows</source>
-<target>Відновити приховані вікна</target>
+<source>Show hidden dialogs again</source>
+<target></target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target></target>
 
 <source>&Default</source>
 <target>&За замовчуванням</target>
@@ -1077,8 +1083,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Головна панель</target>
 
-<source>Compare both sides</source>
-<target>Порівняти обидві сторони</target>
+<source>Start comparison</source>
+<target></target>
 
 <source>Comparison settings</source>
 <target>Налаштування порівнювання</target>
@@ -1177,9 +1183,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Виберіть інтервал часу...</target>
 
-<source>Default view</source>
-<target>Вигляд за замовчуванням</target>
-
 <source>Show "%x"</source>
 <target>Показати "%x"</target>
 
@@ -1210,8 +1213,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Налаштування Синхронізації</target>
 
-<source>Reset filter</source>
-<target>Оновити фільтр</target>
+<source>Clear filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>Показати файли, які є тільки ліворуч</target>
@@ -1371,8 +1374,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Елемент з протилежної сторони до %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Відновити всі приховані вікна та попередження?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target></target>
+
+<source>&Show</source>
+<target></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>

@@ -7,7 +7,7 @@
 #ifndef TYPE_TRAITS_HEADER_3425628658765467
 #define TYPE_TRAITS_HEADER_3425628658765467
 
-#include <type_traits> //all we need is std::is_class!! 
+#include <type_traits> //all we need is std::is_class!!
 
 namespace zen
 {
@@ -38,10 +38,10 @@ struct ResultType
 
 //Herb Sutter's signedness conversion helpers: http://herbsutter.com/2013/06/13/gotw-93-solution-auto-variables-part-2/
 template<class T> inline
-typename std::make_signed<T>::type makeSigned(T t) { return std::make_signed<T>::type(t); }
+typename std::make_signed<T>::type makeSigned(T t) { return typename std::make_signed<T>::type(t); }
 
 template<class T> inline
-typename std::make_unsigned<T>::type makeUnsigned(T t) { return std::make_unsigned<T>::type(t); }
+typename std::make_unsigned<T>::type makeUnsigned(T t) { return typename std::make_unsigned<T>::type(t); }
 
 //################# Built-in Types  ########################
 //Example: "IsSignedInt<int>::value" evaluates to "true"

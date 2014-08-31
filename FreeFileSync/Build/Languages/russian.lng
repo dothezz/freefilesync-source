@@ -109,8 +109,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Соответствующая папка будет считаться пустой.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Следующие папки имеют зависимые пути. Будьте осторожны при настройке правил синхронизации:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Следующие пути папок зависят друг от друга:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Файл %x имеет недействительную дату.</target>
@@ -202,6 +202,25 @@
 <source>Update attributes on right</source>
 <target>Обновление атрибутов справа</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x байт</pluralform>
+<pluralform>%x байта</pluralform>
+<pluralform>%x байт</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x МБ</target>
+
+<source>%x KB</source>
+<target>%x КБ</target>
+
+<source>%x GB</source>
+<target>%x ГБ</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Файл базы данных %x несовместим.</target>
 
@@ -262,25 +281,6 @@
 
 <source>Total time:</source>
 <target>Общее время:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x байт</pluralform>
-<pluralform>%x байта</pluralform>
-<pluralform>%x байт</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x МБ</target>
-
-<source>%x KB</source>
-<target>%x КБ</target>
-
-<source>%x GB</source>
-<target>%x ГБ</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Ошибка при разборе файла %x, строка %y, колонка %z.</target>
@@ -349,7 +349,7 @@
 <source>&Quit</source>
 <target>&Выход</target>
 
-<source>&Program</source>
+<source>&File</source>
 <target>&Файл</target>
 
 <source>&View help</source>
@@ -441,9 +441,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Показать ошибку</target>
 
-<source>&Exit</source>
-<target>&Выход</target>
-
 <source>Incorrect command line:</source>
 <target>Неверная командная строка:</target>
 
@@ -507,8 +504,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Ошибка проверки данных: %x и %y имеют разное содержание!</target>
 
-<source>Cannot find %x.</source>
-<target>Невозможно найти %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Невозможно найти папку %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Целевая папка %x уже существует.</target>
@@ -540,8 +537,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Несколько пар папок пишут в общую папку. Пожалуйста, проверьте конфигурацию.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизация пары папок:</target>
@@ -643,8 +640,8 @@ The command is triggered if:
 <source>Name</source>
 <target>Имя</target>
 
-<source>Relative path</source>
-<target>Относительный путь</target>
+<source>Relative folder</source>
+<target>Относительная папка</target>
 
 <source>Base folder</source>
 <target>Основная папка</target>
@@ -685,8 +682,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>Удалить локальные настройки</target>
 
-<source>Reset local filter</source>
-<target>Сбросить локальный фильтр</target>
+<source>Clear local filter</source>
+<target>Очистить локальный фильтр</target>
 
 <source>Copy</source>
 <target>Копировать</target>
@@ -704,13 +701,13 @@ The command is triggered if:
 <target>&Сохранить</target>
 
 <source>Save as &batch job...</source>
-<target>Сохранить как &пакетное задание</target>
+<target>Сохранить как пакетное &задание</target>
 
-<source>1. &Compare</source>
-<target>1. С&равнить</target>
+<source>Start &comparison</source>
+<target>Начать с&равнение</target>
 
-<source>2. &Synchronize</source>
-<target>2. С&инхронизировать</target>
+<source>Start &synchronization</source>
+<target>Начать с&инхронизацию</target>
 
 <source>&Options</source>
 <target>&Настройки</target>
@@ -721,20 +718,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&Найти...</target>
 
+<source>&Reset layout</source>
+<target>&Сбросить расположение</target>
+
 <source>&Export file list...</source>
 <target>&Экспортировать список файлов...</target>
 
 <source>&Tools</source>
 <target>&Инструменты</target>
 
+<source>&Check for new version</source>
+<target>&Проверка обновлений</target>
+
 <source>&Check now</source>
 <target>&Проверить сейчас</target>
 
 <source>Check &automatically once a week</source>
 <target>Проверять &автоматически раз в неделю</target>
-
-<source>&Check for new version</source>
-<target>&Проверка обновлений</target>
 
 <source>Cancel</source>
 <target>Отмена</target>
@@ -763,17 +763,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>Учитывать регистр</target>
 
+<source>New</source>
+<target>Новая</target>
+
 <source>Open...</source>
 <target>Открыть...</target>
 
 <source>Save</source>
 <target>Сохранить</target>
-
-<source>Save as GUI job</source>
-<target>Сохранить как обычное задание</target>
-
-<source>Save as batch job</source>
-<target>Сохранить как пакетное задание</target>
 
 <source>Save as...</source>
 <target>Сохранить как...</target>
@@ -787,14 +784,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>Статистика:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Количество файлов и папок, которые будут созданы</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Количество файлов и папок, которые будут удалены</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Количество файлов, которые будут перезаписаны</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Количество файлов и папок, которые будут удалены</target>
+<source>Number of files and folders that will be created</source>
+<target>Количество файлов и папок, которые будут созданы</target>
 
 <source>Total bytes to copy</source>
 <target>Всего байт для копирования</target>
@@ -811,11 +808,20 @@ The command is triggered if:
 <source>Identify equal files by comparing the file content.</source>
 <target>Определять одинаковые файлы путем сравнения содержания файла.</target>
 
+<source>Ignore time shift (in hours)</source>
+<target>Игнорировать временной сдвиг (в часах)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Считать время файлов с указанным смещением равным</target>
+
+<source>Handle daylight saving time</source>
+<target>Ручной переход на летнее время</target>
+
 <source>Symbolic links:</source>
 <target>Символьные ссылки:</target>
 
 <source>More information</source>
-<target>Подробнее</target>
+<target>Больше информации</target>
 
 <source>Local settings:</source>
 <target>Локальные настройки:</target>
@@ -827,7 +833,7 @@ The command is triggered if:
 <target>Исключить:</target>
 
 <source>Show examples</source>
-<target>Подробнее</target>
+<target>Показать примеры</target>
 
 <source>Time span:</source>
 <target>Промежуток времени:</target>
@@ -841,8 +847,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>максимум:</target>
 
-<source>&Reset</source>
-<target>&Сбросить</target>
+<source>C&lear</source>
+<target>&Очистить</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Выберите правила фильтрации для исключения определенных файлов из синхронизации. Введите пути файлов относящиеся к соответствующим парам папок.</target>
@@ -867,20 +873,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>Удаление файлов:</target>
 
-<source>Permanent</source>
-<target>Удалять безвозвратно</target>
+<source>&Permanent</source>
+<target>&Удалять безвозвратно</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Удалять или перезаписывать файлы, не помещая в "Корзину"</target>
 
-<source>Recycle bin</source>
-<target>Перемещать в "Корзину"</target>
+<source>&Recycle bin</source>
+<target>В "&Корзину"</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Делать резервную копию удаленных и перезаписанных файлов в "Корзине"</target>
 
-<source>Versioning</source>
-<target>Архивировать</target>
+<source>&Versioning</source>
+<target>&Архивировать</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Перемещать файлы в пользовательскую папку</target>
@@ -891,14 +897,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обработка ошибкок:</target>
 
-<source>Ignore</source>
-<target>Игнорировать</target>
-
 <source>Hide all error and warning messages</source>
 <target>Скрывать все ошибки и сообщения с предупреждениями</target>
 
-<source>Pop-up</source>
-<target>Показывать всплывающие окна</target>
+<source>&Pop-up</source>
+<target>&Всплывающие окна</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показывать всплывающие окна при ошибках и предупреждениях</target>
@@ -921,9 +924,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>Элементов найдено:</target>
 
-<source>Speed:</source>
-<target>Скорость:</target>
-
 <source>Time remaining:</source>
 <target>Времени осталось:</target>
 
@@ -935,6 +935,9 @@ The command is triggered if:
 
 <source>Minimize to notification area</source>
 <target>Свернуть в область уведомлений</target>
+
+<source>Bytes copied:</source>
+<target>Данных скопированно:</target>
 
 <source>Close</source>
 <target>Закрыть</target>
@@ -951,6 +954,9 @@ The command is triggered if:
 Для запуска дважды кликните этот файл или запланируйте
 в планировщике задач: %x
 </target>
+
+<source>&Stop</source>
+<target>&Остановить</target>
 
 <source>Stop synchronization at first error</source>
 <target>Остановить синхронизацию при первой ошибке</target>
@@ -969,9 +975,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Как запланировать пакетное задание?</target>
-
-<source>&Recycle bin</source>
-<target>В "&Корзину"</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следующие настройки используются для всех заданий синхронизации.</target>
@@ -1021,8 +1024,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Описание</target>
 
-<source>Restore hidden windows</source>
-<target>Восстановить скрытые окна</target>
+<source>Show hidden dialogs again</source>
+<target>Показать скрытые окна снова</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Показать все скрытые окна и сообщения с предупреждениями снова</target>
 
 <source>&Default</source>
 <target>&По умолчанию</target>
@@ -1084,8 +1090,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Главная панель</target>
 
-<source>Compare both sides</source>
-<target>Сравнить обе стороны</target>
+<source>Start comparison</source>
+<target>Начать сравнение</target>
 
 <source>Comparison settings</source>
 <target>Настройки сравнения</target>
@@ -1184,9 +1190,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Выберите промежуток времени...</target>
 
-<source>Default view</source>
-<target>Стандартный вид</target>
-
 <source>Show "%x"</source>
 <target>Показать "%x"</target>
 
@@ -1217,8 +1220,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Настройки синхронизации</target>
 
-<source>Reset filter</source>
-<target>Сбросить фильтр</target>
+<source>Clear filter</source>
+<target>Очистить фильтр</target>
 
 <source>Show files that exist on left side only</source>
 <target>Показать файлы, существующие только слева</target>
@@ -1381,8 +1384,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- аналог %item_folder% с другой стороны</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Восстановить все скрытые окна и предупреждения?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Показать скрытые окна и сообщения с предупреждениями снова?</target>
+
+<source>&Show</source>
+<target>&Показать</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Выявять и распространять изменения на обе стороны. Удаленные, перемещенные и конфликтующие файлы определяются автоматически с использованием базы данных.</target>
@@ -1490,10 +1496,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>Невозможно записать время изменения файла %x.</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Невозможно прочитать контекст безобасности %x.</target>
+<target>Невозможно прочитать контекст безопасности %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>Невозможно записать контекст безобасности %x.</target>
+<target>Невозможно записать контекст безопасности %x.</target>
 
 <source>Cannot read permissions of %x.</source>
 <target>Невозможно прочитать права доступа %x.</target>
@@ -1565,7 +1571,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Невозможно зарегистрироваться для получения системных сообщений.</target>
 
 <source>Cannot set privilege %x.</source>
-<target>Невозможно установить привелегии %x.</target>
+<target>Невозможно установить привилегии %x.</target>
 
 <source>Unable to suspend system sleep mode.</source>
 <target>Невозможно приостановить режим сна системы.</target>

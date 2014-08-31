@@ -204,9 +204,11 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
 #ifdef ZEN_WIN
     if (vistaOrLater())
     {
-        using namespace ifile;
-        const DllFun<FunType_showFolderPicker> showFolderPicker(getDllName(), funName_showFolderPicker);
-        const DllFun<FunType_freeString>       freeString      (getDllName(), funName_freeString);
+#define DEF_DLL_FUN(name) const DllFun<ifile::FunType_##name> name(ifile::getDllName(), ifile::funName_##name);
+        DEF_DLL_FUN(showFolderPicker);
+        DEF_DLL_FUN(freeString);
+#undef DEF_DLL_FUN
+
         if (showFolderPicker && freeString)
         {
             wchar_t* selectedFolder = nullptr;
@@ -215,9 +217,9 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
             ZEN_ON_SCOPE_EXIT(freeString(selectedFolder));
             ZEN_ON_SCOPE_EXIT(freeString(errorMsg));
 
-            const GuidProxy guid = { '\x0', '\x4a', '\xf9', '\x31', '\xb4', '\x92', '\x40', '\xa0',
-                                     '\x8d', '\xc2', '\xc', '\xa5', '\xef', '\x59', '\x6e', '\x3b'
-                                   }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
+            const ifile::GuidProxy guid = { '\x0', '\x4a', '\xf9', '\x31', '\xb4', '\x92', '\x40', '\xa0',
+                                            '\x8d', '\xc2', '\xc', '\xa5', '\xef', '\x59', '\x6e', '\x3b'
+                                          }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
 
             showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),                //in;  ==HWND
                              defaultdirpath.empty() ? static_cast<const wchar_t*>(nullptr) : defaultdirpath.c_str(), //in, optional!

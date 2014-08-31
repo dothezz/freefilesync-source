@@ -92,7 +92,7 @@
 <target>Valfritt antal FreeFileSync .ffs_gui och/eller .ffs_batch konfigurationsfiler.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>Valfritt antal alternativa mapp-par för som mest, en konfigurationsfil</target>
+<target>Valfritt antal alternativa katalogpar för som mest, en konfigurationsfil</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan inte hitta följande mappar:</target>
@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Motsvarande mapp kommer att betraktas som tom.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Följande mappar har beroende sökvägar. Var försiktig vid konfigurering av synkroniseringsregler:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Följande mappsökvägar är beroende av varandra:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Filen %x har ett ogiltigt datum.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Uppdatera attribut på höger sida</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x byte</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Databasfilen %x är inkompatibel</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Total tid:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x byte</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Tolkningsfel på filen %x, rad %y, kolumn %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Avsluta</target>
 
-<source>&Program</source>
-<target>&Program</target>
+<source>&File</source>
+<target>&Arkiv</target>
 
 <source>&View help</source>
 <target>&Visa hjälpen</target>
@@ -435,9 +435,6 @@ Kommandot triggas om:
 <source>&Show error</source>
 <target>&Visa fel</target>
 
-<source>&Exit</source>
-<target>&Avsluta</target>
-
 <source>Incorrect command line:</source>
 <target>Felaktig kommandorad:</target>
 
@@ -501,8 +498,8 @@ Kommandot triggas om:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Dataverifieringsfel: %x och %y har olika innehåll.</target>
 
-<source>Cannot find %x.</source>
-<target>Kan inte hitta %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Kan inte hitta mappen %x</target>
 
 <source>Target folder %x already existing.</source>
 <target>Målmappen %x finns redan.</target>
@@ -531,11 +528,11 @@ Kommandot triggas om:
 <source>Available:</source>
 <target>Tillgängligt:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>En mapp som tillhör flera mapp-par är på väg att ändras. Kontrollera synkroniseringsinställningarna</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Flera katalogpar skriver till samma undermapp. Kontrollera dina inställningar.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>Synkroniserar mapp-par:</target>
+<target>Synkroniserar katalogpar:</target>
 
 <source>Generating database...</source>
 <target>Skapar databas...</target>
@@ -633,8 +630,8 @@ Kommandot triggas om:
 <source>Name</source>
 <target>Namn</target>
 
-<source>Relative path</source>
-<target>Sökväg</target>
+<source>Relative folder</source>
+<target>Relativ mapp</target>
 
 <source>Base folder</source>
 <target>Basmapp</target>
@@ -675,8 +672,8 @@ Kommandot triggas om:
 <source>Remove local settings</source>
 <target>Ta bort lokala inställningar</target>
 
-<source>Reset local filter</source>
-<target>Återställ lokalt filter</target>
+<source>Clear local filter</source>
+<target>Rensa lokalt filter</target>
 
 <source>Copy</source>
 <target>Kopiera</target>
@@ -696,11 +693,11 @@ Kommandot triggas om:
 <source>Save as &batch job...</source>
 <target>Spara som &batch-fil...</target>
 
-<source>1. &Compare</source>
-<target>1. &Jämför</target>
+<source>Start &comparison</source>
+<target>&Jämför</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synkronisera</target>
+<source>Start &synchronization</source>
+<target>&Synkronisera</target>
 
 <source>&Options</source>
 <target>&Alternativ</target>
@@ -711,20 +708,23 @@ Kommandot triggas om:
 <source>&Find...</source>
 <target>&Sök...</target>
 
+<source>&Reset layout</source>
+<target>&Återställ layout</target>
+
 <source>&Export file list...</source>
 <target>&Exportera fillista...</target>
 
 <source>&Tools</source>
 <target>&Verktyg</target>
 
+<source>&Check for new version</source>
+<target>&Sök efter uppdateringar</target>
+
 <source>&Check now</source>
 <target>&Sök nu</target>
 
 <source>Check &automatically once a week</source>
 <target>Sök &automatiskt en gång per vecka</target>
-
-<source>&Check for new version</source>
-<target>&Sök efter uppdateringar</target>
 
 <source>Cancel</source>
 <target>Avbryt</target>
@@ -736,10 +736,10 @@ Kommandot triggas om:
 <target>Synkronisera</target>
 
 <source>Add folder pair</source>
-<target>Lägg till mapp-par</target>
+<target>Lägg till katalogpar</target>
 
 <source>Remove folder pair</source>
-<target>Ta bort mapp-par</target>
+<target>Ta bort katalogpar</target>
 
 <source>Swap sides</source>
 <target>Byt sida</target>
@@ -753,17 +753,14 @@ Kommandot triggas om:
 <source>Match case</source>
 <target>Matcha gemener/VERSALER</target>
 
+<source>New</source>
+<target>Nytt</target>
+
 <source>Open...</source>
 <target>Öppna...</target>
 
 <source>Save</source>
 <target>Spara</target>
-
-<source>Save as GUI job</source>
-<target>Spara som grafisk åtgärd</target>
-
-<source>Save as batch job</source>
-<target>Spara som batch-fil</target>
 
 <source>Save as...</source>
 <target>Spara som...</target>
@@ -777,14 +774,14 @@ Kommandot triggas om:
 <source>Statistics:</source>
 <target>Statistik:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Antal filer och mappar som kommer att skapas</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Antal filer och mappar som kommer att tas bort</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Antal filer som kommer att skrivas över</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Antal filer och mappar som kommer att tas bort</target>
+<source>Number of files and folders that will be created</source>
+<target>Antal filer och mappar som kommer att skapas</target>
 
 <source>Total bytes to copy</source>
 <target>Byte att kopiera</target>
@@ -800,6 +797,15 @@ Kommandot triggas om:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Identifiera likadana filer genom att jämföra filinnehåll.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorera tidsförskjutning (i timmar)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Betrakta filtider med specificerad förskjutning som lika</target>
+
+<source>Handle daylight saving time</source>
+<target>Hantera sommartid</target>
 
 <source>Symbolic links:</source>
 <target>Symboliska länkar:</target>
@@ -831,11 +837,11 @@ Kommandot triggas om:
 <source>Maximum:</source>
 <target>Max:</target>
 
-<source>&Reset</source>
-<target>&Återställ</target>
+<source>C&lear</source>
+<target>&Rensa</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande mapp-par</target>
+<target>Skapa filtreringsregler för att undanta vissa filer från synkronisering. Sökvägar relateras till motsvarande katalogpar</target>
 
 <source>Detect moved files</source>
 <target>Hitta flyttade filer</target>
@@ -857,20 +863,20 @@ Kommandot triggas om:
 <source>Delete files:</source>
 <target>Ta bort filer:</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target>&Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Ta bort eller skriv över permanent</target>
 
-<source>Recycle bin</source>
-<target>Papperskorgen</target>
+<source>&Recycle bin</source>
+<target>&Papperskorgen</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Kopiera borttagna och överskrivna filer till papperskorgen</target>
 
-<source>Versioning</source>
-<target>Versionshantering</target>
+<source>&Versioning</source>
+<target>&Versionshantering</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Flytta filer till en fördefinierad mapp</target>
@@ -881,14 +887,11 @@ Kommandot triggas om:
 <source>Handle errors:</source>
 <target>Felhantering:</target>
 
-<source>Ignore</source>
-<target>Ignorera</target>
-
 <source>Hide all error and warning messages</source>
 <target>Visa inte fel- och varningsmeddelanden</target>
 
-<source>Pop-up</source>
-<target>Popup</target>
+<source>&Pop-up</source>
+<target>&Popup</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Visa popup vid fel och varningar</target>
@@ -911,9 +914,6 @@ Kommandot triggas om:
 <source>Items found:</source>
 <target>Funna poster:</target>
 
-<source>Speed:</source>
-<target>Hastighet:</target>
-
 <source>Time remaining:</source>
 <target>Återstående tid:</target>
 
@@ -926,6 +926,9 @@ Kommandot triggas om:
 <source>Minimize to notification area</source>
 <target>Minimera till meddelandefältet</target>
 
+<source>Bytes copied:</source>
+<target>Kopierade byte:</target>
+
 <source>Close</source>
 <target>Stäng</target>
 
@@ -937,6 +940,9 @@ Kommandot triggas om:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Skapa en batch-fil för obevakad synkronisering. Dubbelklicka på filen för att starta den, eller schemalägg i en åtgärdshanterare: %x</target>
+
+<source>&Stop</source>
+<target>&Stopp</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stoppa synkroniseringen vid första fel som uppstår</target>
@@ -955,9 +961,6 @@ Kommandot triggas om:
 
 <source>How can I schedule a batch job?</source>
 <target>Hur schemalägger jag en batch-fil?</target>
-
-<source>&Recycle bin</source>
-<target>&Papperskorgen</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Följande inställningar används för all synkronisering</target>
@@ -1007,8 +1010,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Description</source>
 <target>Beskrivning</target>
 
-<source>Restore hidden windows</source>
-<target>Återställ dolda vyer</target>
+<source>Show hidden dialogs again</source>
+<target>Visa dolda dialoger igen</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Visa alla permanent dolda dialoger och varningsmeddelanden igen</target>
 
 <source>&Default</source>
 <target>&Standard</target>
@@ -1053,7 +1059,7 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <target>&Inställningar...</target>
 
 <source>Folder Pairs</source>
-<target>Mapp-par</target>
+<target>Katalogpar</target>
 
 <source>Find</source>
 <target>Sök</target>
@@ -1070,8 +1076,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Main Bar</source>
 <target>Primärt verktygsfält</target>
 
-<source>Compare both sides</source>
-<target>Jämför båda sidor</target>
+<source>Start comparison</source>
+<target>Jämför</target>
 
 <source>Comparison settings</source>
 <target>Jämförelseinställningar</target>
@@ -1166,9 +1172,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Select time span...</source>
 <target>Välj tidsintervall...</target>
 
-<source>Default view</source>
-<target>Standardvy</target>
-
 <source>Show "%x"</source>
 <target>Visa "%x"</target>
 
@@ -1199,8 +1202,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Synchronization Settings</source>
 <target>Synkroniseringsinställningar</target>
 
-<source>Reset filter</source>
-<target>Återställ filter</target>
+<source>Clear filter</source>
+<target>Rensa filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Visa filer som endast finns till vänster</target>
@@ -1358,8 +1361,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Andra sidans motsvarighet till %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Vill du återställa alla dolda vyer och varningar</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Vill du visa dolda dialoger och varningsmeddelanden igen?</target>
+
+<source>&Show</source>
+<target>&Visa</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>

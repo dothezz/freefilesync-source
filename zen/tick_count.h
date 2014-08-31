@@ -102,7 +102,7 @@ int64_t ticksPerSec() //return 0 on error
 #ifdef ZEN_WIN
     LARGE_INTEGER frequency = {};
     if (!::QueryPerformanceFrequency(&frequency)) //MSDN promises: "The frequency cannot change while the system is running."
-        return 0;
+        return 0; //MSDN: "This won't occur on any system that runs Windows XP or later."
     static_assert(sizeof(int64_t) >= sizeof(frequency.QuadPart), "");
     return frequency.QuadPart;
 
@@ -126,8 +126,10 @@ TickVal getTicks() //return !isValid() on error
 {
 #ifdef ZEN_WIN
     LARGE_INTEGER now = {};
-    if (!::QueryPerformanceCounter(&now)) //msdn: SetThreadAffinityMask() may be required if there are bugs in BIOS or HAL"
+    if (!::QueryPerformanceCounter(&now)) 
         return TickVal();
+	//detailed info about QPC: http://msdn.microsoft.com/en-us/library/windows/desktop/dn553408%28v=vs.85%29.aspx
+	//- MSDN: "No need to set the thread affinity"
 
 #elif defined ZEN_LINUX
     //gettimeofday() seems fine but is deprecated

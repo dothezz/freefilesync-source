@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef DEBUG_PERF_HEADER
-#define DEBUG_PERF_HEADER
+#ifndef DEBUG_PERF_HEADER_83947184145342652456
+#define DEBUG_PERF_HEADER_83947184145342652456
 
 #include "deprecate.h"
 #include "tick_count.h"
@@ -30,14 +30,10 @@ public:
 
     ZEN_DEPRECATE
     PerfTimer() : //throw TimerError
-        ticksPerSec_(ticksPerSec()), startTime(), resultShown(false)
+        ticksPerSec_(ticksPerSec()), startTime(getTicks()), resultShown(false)
     {
-        //std::clock() - "counts CPU time in C and wall time in VC++" - WTF!???
-#ifdef ZEN_WIN
-        if (::SetThreadAffinityMask(::GetCurrentThread(), 1) == 0) //"should not be required unless there are bugs in BIOS or HAL" - msdn, QueryPerformanceCounter
-            throw TimerError();
-#endif
-        startTime = getTicks();
+        //std::clock() - "counts CPU time in Linux GCC and wall time in VC++" - WTF!???
+
         if (ticksPerSec_ == 0 || !startTime.isValid())
             throw TimerError();
     }
@@ -50,7 +46,7 @@ public:
         if (!now.isValid())
             throw TimerError();
 
-        const auto delta = static_cast<long>(1000.0 * dist(startTime, now) / ticksPerSec_);
+        const std::int64_t delta = 1000 * dist(startTime, now) / ticksPerSec_;
 #ifdef ZEN_WIN
         std::ostringstream ss;
         ss << delta << " ms";
@@ -72,4 +68,4 @@ private:
 };
 }
 
-#endif //DEBUG_PERF_HEADER
+#endif //DEBUG_PERF_HEADER_83947184145342652456

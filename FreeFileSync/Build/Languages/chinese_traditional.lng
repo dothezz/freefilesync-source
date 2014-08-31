@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>對應的資料夾將視為空的。</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>下列資料夾有相依路徑。請小心設定同步規則：</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>以下資料夾路徑是相互依賴：</target>
 
 <source>File %x has an invalid date.</source>
 <target>檔案 %x 的日期無效。</target>
@@ -199,6 +199,23 @@
 <source>Update attributes on right</source>
 <target>更新右邊的屬性</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x 個位元組</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>資料庫檔案 %x 是不相容的。</target>
 
@@ -257,23 +274,6 @@
 
 <source>Total time:</source>
 <target>全部時間：</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x 個位元組</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>解析 %x 檔案，第 %y 列，第 %z 行出現錯誤。</target>
@@ -340,8 +340,8 @@
 <source>&Quit</source>
 <target>離開(&Q)</target>
 
-<source>&Program</source>
-<target>程式(&P)</target>
+<source>&File</source>
+<target>檔案(&F)</target>
 
 <source>&View help</source>
 <target>檢視說明(&V)</target>
@@ -432,9 +432,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>顯示錯誤(&S)</target>
 
-<source>&Exit</source>
-<target>結束(&E)</target>
-
 <source>Incorrect command line:</source>
 <target>不正確的命令列：</target>
 
@@ -498,8 +495,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>資料驗證錯誤：%x 和 %y 內容不同！</target>
 
-<source>Cannot find %x.</source>
-<target>找不到 %x。</target>
+<source>Cannot find folder %x.</source>
+<target>找不到資料夾 %x。</target>
 
 <source>Target folder %x already existing.</source>
 <target>目標資料夾 %x 已存在。</target>
@@ -528,8 +525,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>可用：</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>一個將被修改的資料夾，是多個配對資料夾的一部分。請檢查同步設定。</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>多個配對資料夾寫入一個共同的子資料夾。請檢查您的配置。</target>
 
 <source>Synchronizing folder pair:</source>
 <target>同步配對資料夾：</target>
@@ -629,8 +626,8 @@ The command is triggered if:
 <source>Name</source>
 <target>名稱</target>
 
-<source>Relative path</source>
-<target>相對路徑</target>
+<source>Relative folder</source>
+<target>對應資料夾</target>
 
 <source>Base folder</source>
 <target>底層資料夾</target>
@@ -671,8 +668,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>移除本機設定</target>
 
-<source>Reset local filter</source>
-<target>重置本機篩選器</target>
+<source>Clear local filter</source>
+<target>清除本機篩選器</target>
 
 <source>Copy</source>
 <target>複製</target>
@@ -692,11 +689,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>另存為批次處理作業(&b)</target>
 
-<source>1. &Compare</source>
-<target>1. 比對(&C)</target>
+<source>Start &comparison</source>
+<target>開始比對(&c)</target>
 
-<source>2. &Synchronize</source>
-<target>2. 同步(&S)</target>
+<source>Start &synchronization</source>
+<target>開始同步(&s)</target>
 
 <source>&Options</source>
 <target>選項(&O)</target>
@@ -707,20 +704,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>尋找(&F)</target>
 
+<source>&Reset layout</source>
+<target>重置佈局(&R)</target>
+
 <source>&Export file list...</source>
 <target>匯出檔案清單(&E)...</target>
 
 <source>&Tools</source>
 <target>工具(&T)</target>
 
+<source>&Check for new version</source>
+<target>檢查新版本(&C)</target>
+
 <source>&Check now</source>
 <target>現在檢查(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>一週自動檢查一次(&a)</target>
-
-<source>&Check for new version</source>
-<target>檢查新版本(&C)</target>
 
 <source>Cancel</source>
 <target>取消</target>
@@ -749,17 +749,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>區分大小寫</target>
 
+<source>New</source>
+<target>新增</target>
+
 <source>Open...</source>
 <target>開啟...</target>
 
 <source>Save</source>
 <target>儲存</target>
-
-<source>Save as GUI job</source>
-<target>另存為GUI作業</target>
-
-<source>Save as batch job</source>
-<target>另存為批次處理作業</target>
 
 <source>Save as...</source>
 <target>另存新檔...</target>
@@ -773,14 +770,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>統計資料：</target>
 
-<source>Number of files and folders that will be created</source>
-<target>將被新建的檔案和資料夾數量</target>
+<source>Number of files and folders that will be deleted</source>
+<target>將被刪除的檔案和資料夾數量</target>
 
 <source>Number of files that will be overwritten</source>
 <target>一些檔案和目錄會被覆蓋</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>將被刪除的檔案和資料夾數量</target>
+<source>Number of files and folders that will be created</source>
+<target>將被新建的檔案和資料夾數量</target>
 
 <source>Total bytes to copy</source>
 <target>要複製的位元組總數</target>
@@ -796,6 +793,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>由比對檔案內容來判斷相同檔案。</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>忽略時間的轉變(以小時為單位)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>考慮檔案時間和相等的指定偏移量</target>
+
+<source>Handle daylight saving time</source>
+<target>日光節約時間處理</target>
 
 <source>Symbolic links:</source>
 <target>符號連結：</target>
@@ -827,8 +833,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大：</target>
 
-<source>&Reset</source>
-<target>重置(&R)</target>
+<source>C&lear</source>
+<target>清除(&C)</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>選擇從同步中排除某些檔案的篩選器規則。輸入相對於其對應的配對資料夾路徑。</target>
@@ -853,20 +859,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>刪除檔案：</target>
 
-<source>Permanent</source>
-<target>常駐</target>
+<source>&Permanent</source>
+<target>常駐(&P)</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>永久刪除或覆蓋檔案</target>
 
-<source>Recycle bin</source>
-<target>資源回收筒</target>
+<source>&Recycle bin</source>
+<target>資源回收筒(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>在資源回收筒中刪除備份和覆蓋檔案</target>
 
-<source>Versioning</source>
-<target>版本控制</target>
+<source>&Versioning</source>
+<target>版本控制(&V)</target>
 
 <source>Move files to a user-defined folder</source>
 <target>將檔案移動到一個使用者定義的資料夾</target>
@@ -877,14 +883,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>錯誤處理：</target>
 
-<source>Ignore</source>
-<target>忽略</target>
-
 <source>Hide all error and warning messages</source>
 <target>隱藏所有錯誤和警告訊息</target>
 
-<source>Pop-up</source>
-<target>彈出視窗</target>
+<source>&Pop-up</source>
+<target>彈出(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>在彈出視窗上顯示錯誤或警告訊息</target>
@@ -907,9 +910,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>尋找項目：</target>
 
-<source>Speed:</source>
-<target>速度：</target>
-
 <source>Time remaining:</source>
 <target>剩餘時間：</target>
 
@@ -922,6 +922,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>最小化到通知區域</target>
 
+<source>Bytes copied:</source>
+<target>已複製的位元組:</target>
+
 <source>Close</source>
 <target>關閉</target>
 
@@ -933,6 +936,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>新建一個批次處理檔，用於無人值守同步。開始，點兩下此檔案，或安排在任務規劃中：%x</target>
+
+<source>&Stop</source>
+<target>停止(&S)</target>
 
 <source>Stop synchronization at first error</source>
 <target>在第一個錯誤出現停止同步</target>
@@ -951,9 +957,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>如何安排批次處理作業？</target>
-
-<source>&Recycle bin</source>
-<target>資源回收筒(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下設定用於所有同步作業。</target>
@@ -1003,8 +1006,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>描述</target>
 
-<source>Restore hidden windows</source>
-<target>還原隱藏視窗</target>
+<source>Show hidden dialogs again</source>
+<target>再次顯示隱藏的對話框</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>再次顯示所有永久隱藏的對話框和警告訊息</target>
 
 <source>&Default</source>
 <target>預設(&D)</target>
@@ -1013,7 +1019,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>使用C++編寫的原始碼</target>
 
 <source>If you like FreeFileSync</source>
-<target>如果你喜歡FreeFileSync</target>
+<target>如果您喜歡FreeFileSync</target>
 
 <source>Donate with PayPal</source>
 <target>使用PayPal捐款</target>
@@ -1066,8 +1072,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>主欄位</target>
 
-<source>Compare both sides</source>
-<target>比對兩邊</target>
+<source>Start comparison</source>
+<target>開始比對</target>
 
 <source>Comparison settings</source>
 <target>比對設定</target>
@@ -1086,7 +1092,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
-<pluralform>你真的要執行 %x 項目的命令 %y 嗎？</pluralform>
+<pluralform>您真的要執行 %x 項目的命令 %y 嗎？</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1158,9 +1164,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>選擇時間間隔...</target>
 
-<source>Default view</source>
-<target>預設檢視</target>
-
 <source>Show "%x"</source>
 <target>顯示 "%x"</target>
 
@@ -1191,8 +1194,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>同步設定</target>
 
-<source>Reset filter</source>
-<target>重置篩選器</target>
+<source>Clear filter</source>
+<target>清除篩選器</target>
 
 <source>Show files that exist on left side only</source>
 <target>顯示只存在於左邊的檔案</target>
@@ -1313,7 +1316,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>你真的要將以下項目 %x 移動到資源回收筒嗎？</pluralform>
+<pluralform>您真的要將以下項目 %x 移動到資源回收筒嗎？</pluralform>
 </target>
 
 <source>Move</source>
@@ -1348,8 +1351,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- 另一邊對應到 %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>還原所有隱藏的視窗和警告？</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>再次顯示隱藏對話框和警告訊息？</target>
+
+<source>&Show</source>
+<target>顯示(&S)</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>識別和傳播兩邊的變更。自動檢測刪除、移動和衝突使用的資料庫。</target>
@@ -1361,7 +1367,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>將新的和已更新的檔案複製到右邊資料夾。</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>配置你自己的同步規則。</target>
+<target>配置您自己的同步規則。</target>
 
 <source>Exclude</source>
 <target>排除</target>

@@ -50,7 +50,7 @@
 <target>Получи се изключение</target>
 
 <source>A directory path is expected after %x.</source>
-<target>Очакван път до директорията след %x.</target>
+<target>Очаква се път до директорията след %x.</target>
 
 <source>Syntax error</source>
 <target>Синтактична грешка</target>
@@ -89,10 +89,10 @@
 <target>Път до алтернативен файл GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>Всеки брой .ffs_gui и/или .ffs_batch конфигурационни файлове на  FreeFileSync.</target>
+<target>Произволен брой .ffs_gui и/или .ffs_batch конфигурационни файлове на FFS.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>Всеки брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
+<target>Произволен брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не са намерени следните папки:</target>
@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Съответната папка ще се счита празна.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Следните папки имат зависими пътища. Внимавайте при задаване на правилата за синхронизация:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Пътищата до следните папки са взаимнозависими:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Файл %x има невалидна дата.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Актуализирай атрибутите на десния елемент</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 байт</pluralform>
+<pluralform>%x байта</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x МБ</target>
+
+<source>%x KB</source>
+<target>%x КБ</target>
+
+<source>%x GB</source>
+<target>%x ГБ</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Файлът на базата данни %x е несъвместим.</target>
 
@@ -259,24 +277,6 @@
 <source>Total time:</source>
 <target>Общо време:</target>
 
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 байт</pluralform>
-<pluralform>%x байта</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x МБ</target>
-
-<source>%x KB</source>
-<target>%x КБ</target>
-
-<source>%x GB</source>
-<target>%x ГБ</target>
-
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Грешка при анализ на файл %x, ред %y, колона %z.</target>
 
@@ -317,7 +317,7 @@
 <target>Не може да получи достъп до услуга Volume Shadow Copy.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Моля, използвайте FreeFileSync 64-бит. за създаване фонови копия на тази система.</target>
+<target>Моля, ползвайте 64-бит. версия на FFS за създаване фонови копия на тази система.</target>
 
 <source>Cannot load file %x.</source>
 <target>Файл %x не може да се зареди.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>Кра&й</target>
 
-<source>&Program</source>
-<target>&Програма</target>
+<source>&File</source>
+<target>&Файл</target>
 
 <source>&View help</source>
 <target>Помо&щ</target>
@@ -368,7 +368,7 @@
 <target>3. Натиснете 'Старт'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>За стартиране просто импортирайте .ffs_batch файл.</target>
+<target>За стартиране просто импортирайте файл .ffs_batch.</target>
 
 <source>Folders to watch:</source>
 <target>Папки за следене:</target>
@@ -435,9 +435,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>Покажи гре&шката</target>
 
-<source>&Exit</source>
-<target>Из&ход</target>
-
 <source>Incorrect command line:</source>
 <target>Невалиден команден ред:</target>
 
@@ -466,43 +463,43 @@ The command is triggered if:
 <target>Разни...</target>
 
 <source>Moving file %x to %y</source>
-<target>Преместване на файл %x към %y</target>
+<target>Премества файл %x към %y</target>
 
 <source>Moving folder %x to %y</source>
-<target>Преместване на папка %x към %y</target>
+<target>Премества папка %x към %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>Преместване на символна връзка %x към %y</target>
+<target>Премества символна връзка %x към %y</target>
 
 <source>Removing old versions...</source>
-<target>Премахване на стари версии...</target>
+<target>Премахва стари версии...</target>
 
 <source>Creating symbolic link %x</source>
-<target>Създаване на символна връзка %x</target>
+<target>Създава символна връзка %x</target>
 
 <source>Creating folder %x</source>
-<target>Създаване на папка %x</target>
+<target>Създава папка %x</target>
 
 <source>Overwriting file %x</source>
-<target>Презапис на файл %x</target>
+<target>Презаписва файл %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target>Презапис на символна връзка %x</target>
+<target>Презаписва символна връзка %x</target>
 
 <source>Verifying file %x</source>
-<target>Верификация на файл %x</target>
+<target>Верифицира файл %x</target>
 
 <source>Updating attributes of %x</source>
-<target>Актуализиране атрибутите на %x</target>
+<target>Актуализира атрибутите на %x</target>
 
 <source>Creating a Volume Shadow Copy for %x...</source>
-<target>Създаване на Volume Shadow Copy за %x...</target>
+<target>Създава Volume Shadow Copy за %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Грешка при верификация: %x и %y имат различно съдържание.</target>
 
-<source>Cannot find %x.</source>
-<target>%x не може да се намери.</target>
+<source>Cannot find folder %x.</source>
+<target>Не е открита папка %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Целевата папка %x вече съществува.</target>
@@ -531,8 +528,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>Налично:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Ще бъде променена папка, част от повече двойки папки. Моля, проверете настройките за синхронизация.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Много двойки папки записват в обща подпапка. Моля, проверете конфигурацията.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизация на двойка папки:</target>
@@ -553,7 +550,7 @@ The command is triggered if:
 <target>Синхронизацията завърши с предупреждения</target>
 
 <source>Nothing to synchronize</source>
-<target>Няма нищо за синхронизация</target>
+<target>Няма нищо за синхронизиране</target>
 
 <source>Synchronization completed successfully</source>
 <target>Синхронизацията завърши успешно</target>
@@ -633,8 +630,8 @@ The command is triggered if:
 <source>Name</source>
 <target>Име</target>
 
-<source>Relative path</source>
-<target>Относителен път</target>
+<source>Relative folder</source>
+<target>Относителна папка</target>
 
 <source>Base folder</source>
 <target>Основна папка</target>
@@ -675,8 +672,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>Премахни локалните настройки</target>
 
-<source>Reset local filter</source>
-<target>Инициализирай локалния филтър</target>
+<source>Clear local filter</source>
+<target>Изчисти локалния филтър</target>
 
 <source>Copy</source>
 <target>Копирай</target>
@@ -696,11 +693,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>Запази &като пакетна задача</target>
 
-<source>1. &Compare</source>
-<target>1. С&равни</target>
+<source>Start &comparison</source>
+<target>Почни &сравняване</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Синхронизирай</target>
+<source>Start &synchronization</source>
+<target>Почни &синхронизация</target>
 
 <source>&Options</source>
 <target>&Опции</target>
@@ -711,20 +708,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&Намери...</target>
 
+<source>&Reset layout</source>
+<target>&Инициализирай изгледа</target>
+
 <source>&Export file list...</source>
 <target>Експорт на &файловия списък...</target>
 
 <source>&Tools</source>
 <target>Инстр&ументи</target>
 
+<source>&Check for new version</source>
+<target>&Провери за нова версия</target>
+
 <source>&Check now</source>
 <target>&Провери сега</target>
 
 <source>Check &automatically once a week</source>
 <target>Проверявай &автоматично ежеседмично</target>
-
-<source>&Check for new version</source>
-<target>&Провери за нова версия</target>
 
 <source>Cancel</source>
 <target>Отказ</target>
@@ -753,23 +753,20 @@ The command is triggered if:
 <source>Match case</source>
 <target>Спазвай регистъра</target>
 
+<source>New</source>
+<target>Нов</target>
+
 <source>Open...</source>
 <target>Отвори...</target>
 
 <source>Save</source>
 <target>Запази</target>
 
-<source>Save as GUI job</source>
-<target>Запази като GUI-задача</target>
-
-<source>Save as batch job</source>
-<target>Запази като пакетна задача</target>
-
 <source>Save as...</source>
 <target>Запази като...</target>
 
 <source>View type:</source>
-<target>Тип на изгледа:</target>
+<target>Тип изглед:</target>
 
 <source>Select view:</source>
 <target>Изберете изглед:</target>
@@ -777,14 +774,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>Статистика:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Брой файлове и папки, които ще бъдат създадени</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Брой файлове и папки, които ще бъдат изтрити</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Брой файлове, които ще бъдат презаписани</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Брой файлове и папки, които ще бъдат изтрити</target>
+<source>Number of files and folders that will be created</source>
+<target>Брой файлове и папки, които ще бъдат създадени</target>
 
 <source>Total bytes to copy</source>
 <target>Общо байтове за копиране</target>
@@ -800,6 +797,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Определи еднаквите файлове, сравнявайки файловото съдържание.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Игнорирай отместването на времето (в часове)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Считай файловите времена със зададено отместване за еднакви</target>
+
+<source>Handle daylight saving time</source>
+<target>Отчитай лятното време</target>
 
 <source>Symbolic links:</source>
 <target>Символни връзки:</target>
@@ -831,8 +837,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>&Reset</source>
-<target>&Инициализирай настройките</target>
+<source>C&lear</source>
+<target>И&зчисти</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Изберете филтърни правила за изключване на някои файлове от синхронизация. Въведете файлови пътища относно съответните им двойки папки.</target>
@@ -855,22 +861,22 @@ The command is triggered if:
 <target>Открий посоката на синхронизация чрез файловете на базата данни</target>
 
 <source>Delete files:</source>
-<target>Изтрий файлове:</target>
+<target>Изтриване на файлове:</target>
 
-<source>Permanent</source>
-<target>Необратимо</target>
+<source>&Permanent</source>
+<target>&Необратимо</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Изтрий или презапиши файловете необратимо</target>
 
-<source>Recycle bin</source>
-<target>Кошче</target>
+<source>&Recycle bin</source>
+<target>&Кошче</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Резервирай изтритите или презаписани файлове в кошчето</target>
 
-<source>Versioning</source>
-<target>Версифициране</target>
+<source>&Versioning</source>
+<target>&Версифициране</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Премести файловете в зададена потребителска папка</target>
@@ -881,14 +887,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обработка на грешки:</target>
 
-<source>Ignore</source>
-<target>Игнорирай</target>
-
 <source>Hide all error and warning messages</source>
 <target>Скрий всички грешки и предупреждения</target>
 
-<source>Pop-up</source>
-<target>Изскачащ прозорец</target>
+<source>&Pop-up</source>
+<target>&Запитай</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Питай при грешки или предупреждения</target>
@@ -911,9 +914,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>Намерени елементи:</target>
 
-<source>Speed:</source>
-<target>Скорост:</target>
-
 <source>Time remaining:</source>
 <target>Оставащо време:</target>
 
@@ -926,6 +926,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>Минимизирай в известяващото поле</target>
 
+<source>Bytes copied:</source>
+<target>Копирани байтове:</target>
+
 <source>Close</source>
 <target>Затвори</target>
 
@@ -937,6 +940,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Създай пакетен файл за автоматична синхронизация. За старт щракнете двукратно върху този файл или задайте планова задача: %x</target>
+
+<source>&Stop</source>
+<target>&Стоп</target>
 
 <source>Stop synchronization at first error</source>
 <target>Спри синхронизацията при първа грешка</target>
@@ -955,9 +961,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Как се планира пакетна задача?</target>
-
-<source>&Recycle bin</source>
-<target>&Кошче</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следните настройки се ползват от всички задачи за синхронизация:</target>
@@ -1007,8 +1010,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Описание</target>
 
-<source>Restore hidden windows</source>
-<target>Възстанови скритите  прозорци</target>
+<source>Show hidden dialogs again</source>
+<target>Покажи отново скритите диалози</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Покажи отново всички постоянно скрити диалози и предупреждения</target>
 
 <source>&Default</source>
 <target>&По подразбиране</target>
@@ -1070,8 +1076,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Главен панел</target>
 
-<source>Compare both sides</source>
-<target>Сравни двете страни</target>
+<source>Start comparison</source>
+<target>Почни сравняване</target>
 
 <source>Comparison settings</source>
 <target>Настройки на сравняването</target>
@@ -1166,9 +1172,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Избори интервала време...</target>
 
-<source>Default view</source>
-<target>Изглед по подразбиране</target>
-
 <source>Show "%x"</source>
 <target>Покажи "%x"</target>
 
@@ -1199,8 +1202,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Настройки на синхронизацията</target>
 
-<source>Reset filter</source>
-<target>Инициализирай филтъра</target>
+<source>Clear filter</source>
+<target>Изчисти филтъра</target>
 
 <source>Show files that exist on left side only</source>
 <target>Покажи файловете, съществуващи само отляво</target>
@@ -1358,8 +1361,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- съответствие от другата страна на %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Да се възстановят ли всички скрити прозорци и предупреждения?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Да покажа ли пак скритите диалози и предупреждения?</target>
+
+<source>&Show</source>
+<target>&Покажи</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Определи и разпространи промените върху двете страни. Изтривания, премествания и конфликти се откриват автоматично чрез база данни.</target>
@@ -1371,7 +1377,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Копирай новите и актуализирани файлове към дясната папка.</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>Дефиниране на свои правила за синхронизация.</target>
+<target>Дефинирай свои правила за синхронизация.</target>
 
 <source>Exclude</source>
 <target>Изключи</target>

@@ -619,7 +619,11 @@ void WorkerThread::operator()() //thread entry
     //Prerequisites, see thumbnail.h
 
     //1. Initialize COM
-    ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+		if (FAILED(::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)))
+		{
+		assert(false);
+		return;
+		}
     ZEN_ON_SCOPE_EXIT(::CoUninitialize());
 
     //2. Initialize system image list

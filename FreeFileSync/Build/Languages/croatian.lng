@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Odgovarajuća mapa će se smatrati kao prazna.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Sljedeće mape imaju zavisnu putanju. Budite pažljivi prilikom postavljanja pravila za sinkronizaciju:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Slijedeće putanje mapa su ovisne jedne o drugima:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Datoteka %x ima nevažeći datum.</target>
@@ -199,6 +199,25 @@
 <source>Update attributes on right</source>
 <target>Osvježi atribute desno</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x bajt</pluralform>
+<pluralform>%x bajta</pluralform>
+<pluralform>%x bajtova</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Datoteka baze %x je nekompatibilna.</target>
 
@@ -259,25 +278,6 @@
 
 <source>Total time:</source>
 <target>Ukupno vrijeme:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x bajt</pluralform>
-<pluralform>%x bajta</pluralform>
-<pluralform>%x bajtova</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Greška u analizi datoteke %x, red %y, stupac %z.</target>
@@ -346,8 +346,8 @@
 <source>&Quit</source>
 <target>&Izlaz</target>
 
-<source>&Program</source>
-<target>&Program</target>
+<source>&File</source>
+<target>&Datoteka</target>
 
 <source>&View help</source>
 <target>&Pogledaj pomoć</target>
@@ -438,9 +438,6 @@ Naredba će biti pokrenuta ako se:
 <source>&Show error</source>
 <target>&Prikaži grešku</target>
 
-<source>&Exit</source>
-<target>&Izlaz</target>
-
 <source>Incorrect command line:</source>
 <target>Netočna naredbena linija:</target>
 
@@ -504,8 +501,8 @@ Naredba će biti pokrenuta ako se:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Greška prilikom provjere podataka: %x i %y imaju različit sadržaj.</target>
 
-<source>Cannot find %x.</source>
-<target>Ne mogu pronaći %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Ne mogu pronaći mapu %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Odredišna mapa %x već postoji.</target>
@@ -534,8 +531,8 @@ Naredba će biti pokrenuta ako se:
 <source>Available:</source>
 <target>Dostupno:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Mapa, koja je dio višestrukih parova mapa, biti će promjenjena. Molimo provjerite sinkronizacijske postavke.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Višestruki parovi mapa zapisuju u zajedničku podmapu. Molimo provjerite vaše postavke.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Par sinkroniziranja mapa:</target>
@@ -637,8 +634,8 @@ Naredba će biti pokrenuta ako se:
 <source>Name</source>
 <target>Naziv</target>
 
-<source>Relative path</source>
-<target>Relativna putanja</target>
+<source>Relative folder</source>
+<target>Relativna mapa</target>
 
 <source>Base folder</source>
 <target>Izvorna mapa</target>
@@ -679,8 +676,8 @@ Naredba će biti pokrenuta ako se:
 <source>Remove local settings</source>
 <target>Ukloni lokalne postavke</target>
 
-<source>Reset local filter</source>
-<target>Resetiranje lokalnog filtera</target>
+<source>Clear local filter</source>
+<target>Očisti lokalni filter</target>
 
 <source>Copy</source>
 <target>Kopiraj</target>
@@ -700,11 +697,11 @@ Naredba će biti pokrenuta ako se:
 <source>Save as &batch job...</source>
 <target>Spremi kao &Slijedni zadatak...</target>
 
-<source>1. &Compare</source>
-<target>1. &Usporedi</target>
+<source>Start &comparison</source>
+<target>Započni &usporedbu</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Sinkroniziraj</target>
+<source>Start &synchronization</source>
+<target>Započni &sinkronizaciju</target>
 
 <source>&Options</source>
 <target>&Opcije</target>
@@ -715,20 +712,23 @@ Naredba će biti pokrenuta ako se:
 <source>&Find...</source>
 <target>&Pronađi...</target>
 
+<source>&Reset layout</source>
+<target>&Resetiraj prikaz</target>
+
 <source>&Export file list...</source>
 <target>&Izvoz popisa datoteka...</target>
 
 <source>&Tools</source>
 <target>&Alati</target>
 
+<source>&Check for new version</source>
+<target>&Provjeri za novu verziju</target>
+
 <source>&Check now</source>
 <target>&Provjeri sada</target>
 
 <source>Check &automatically once a week</source>
 <target>Provjeri &automatski jednom tjedno</target>
-
-<source>&Check for new version</source>
-<target>&Provjeri za novu verziju</target>
 
 <source>Cancel</source>
 <target>Odustani</target>
@@ -757,17 +757,14 @@ Naredba će biti pokrenuta ako se:
 <source>Match case</source>
 <target>Identičan naziv</target>
 
+<source>New</source>
+<target>Novo</target>
+
 <source>Open...</source>
 <target>Otvori...</target>
 
 <source>Save</source>
 <target>Spremi</target>
-
-<source>Save as GUI job</source>
-<target>Spremi kao GUI zadatak</target>
-
-<source>Save as batch job</source>
-<target>Spremi kao slijedni zadatak</target>
 
 <source>Save as...</source>
 <target>Spremi kao...</target>
@@ -781,14 +778,14 @@ Naredba će biti pokrenuta ako se:
 <source>Statistics:</source>
 <target>Statistika:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Broj datoteka i foldera koje će biti izrađene</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Broj datoteka i mapa koje će biti obrisane</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Broj datoteka koje će biti prepisane</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Broj datoteka i mapa koje će biti obrisane</target>
+<source>Number of files and folders that will be created</source>
+<target>Broj datoteka i foldera koje će biti izrađene</target>
 
 <source>Total bytes to copy</source>
 <target>Ukupno bajta za kopirati</target>
@@ -804,6 +801,15 @@ Naredba će biti pokrenuta ako se:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Ustanovi jednake datoteke uspoređujući sadržaj datoteke.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignoriraj vremensku razliku (u satima)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Smatraj vrijeme datoteke u ovom razmaku istima</target>
+
+<source>Handle daylight saving time</source>
+<target>Upravljaj ljetnim računanjem vremena</target>
 
 <source>Symbolic links:</source>
 <target>Simbolične poveznice:</target>
@@ -835,8 +841,8 @@ Naredba će biti pokrenuta ako se:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Reset</source>
-<target>&Resetiraj</target>
+<source>C&lear</source>
+<target>O&čisti</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Odaberite filter pravila da biste isključili određene datoteke iz sinkronizacije. Unesite relativnu putanju datoteka prema njihovim odgovarajućim parovima mapa.</target>
@@ -861,20 +867,20 @@ Naredba će biti pokrenuta ako se:
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
 
-<source>Permanent</source>
-<target>Trajno</target>
+<source>&Permanent</source>
+<target>&Trajno</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Trajno izbriši ili prepiši datoteke</target>
 
-<source>Recycle bin</source>
-<target>Koš za smeće</target>
+<source>&Recycle bin</source>
+<target>&Koš za smeće</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Spremi izbrisane ili prepisane datoteke u koš za smeće</target>
 
-<source>Versioning</source>
-<target>Odabir</target>
+<source>&Versioning</source>
+<target>&Označavanje</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Premjesti datoteke u mapu određenu od korsnika</target>
@@ -885,14 +891,11 @@ Naredba će biti pokrenuta ako se:
 <source>Handle errors:</source>
 <target>Obradi pogreške:</target>
 
-<source>Ignore</source>
-<target>Ignoriraj</target>
-
 <source>Hide all error and warning messages</source>
 <target>Sakrij sve poruke za greške i upozorenja</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Prikaži skočni prozor pri greškama i upozorenjima</target>
@@ -915,9 +918,6 @@ Naredba će biti pokrenuta ako se:
 <source>Items found:</source>
 <target>Pronađene stavke:</target>
 
-<source>Speed:</source>
-<target>Brzina:</target>
-
 <source>Time remaining:</source>
 <target>Preostalo vremena:</target>
 
@@ -930,6 +930,9 @@ Naredba će biti pokrenuta ako se:
 <source>Minimize to notification area</source>
 <target>Minimiziraj u područje obavjesti</target>
 
+<source>Bytes copied:</source>
+<target>Bajta kopirano:</target>
+
 <source>Close</source>
 <target>Zatvori</target>
 
@@ -941,6 +944,9 @@ Naredba će biti pokrenuta ako se:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Stvaranje slijednih datoteka za sinkronizaciju bez nadzora. Da započnete, dvostruko-kliknite na ovu datoteku ili planirajte u planeru zadataka: %x</target>
+
+<source>&Stop</source>
+<target>&Zaustavi</target>
 
 <source>Stop synchronization at first error</source>
 <target>Zaustavi sinkronizaciju pri prvoj pogrešci</target>
@@ -959,9 +965,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>How can I schedule a batch job?</source>
 <target>Kako zakazati slijedni zadatak?</target>
-
-<source>&Recycle bin</source>
-<target>&Koš za smeće</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Ove postavke se koriste za sve sinkronizacijske zadatke</target>
@@ -1011,8 +1014,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Description</source>
 <target>Opis</target>
 
-<source>Restore hidden windows</source>
-<target>Prikaži skrivene prozore</target>
+<source>Show hidden dialogs again</source>
+<target>Prikazuj skrivene prozore ponovno</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Prikaži sve trajno skrivene prozore i poruke upozorenja ponovno</target>
 
 <source>&Default</source>
 <target>&Zadano</target>
@@ -1074,8 +1080,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Main Bar</source>
 <target>Glavna traka</target>
 
-<source>Compare both sides</source>
-<target>Usporedi obje strane</target>
+<source>Start comparison</source>
+<target>Započni usporedbu</target>
 
 <source>Comparison settings</source>
 <target>Postavke usporedbe</target>
@@ -1174,9 +1180,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Select time span...</source>
 <target>Odaberite vremenski raspon...</target>
 
-<source>Default view</source>
-<target>Standardni prikaz</target>
-
 <source>Show "%x"</source>
 <target>Prikaži "%x"</target>
 
@@ -1207,8 +1210,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Synchronization Settings</source>
 <target>Postavke Sinkronizacije</target>
 
-<source>Reset filter</source>
-<target>Resetiraj filter</target>
+<source>Clear filter</source>
+<target>Očisti filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke koje postoje samo na lijevoj strani</target>
@@ -1368,8 +1371,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Duplikat s druge strane u %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Prikaži sve skrivene prozore i upozorenja?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Prikazati skrivene prozore i poruke upozorenja ponovno?</target>
+
+<source>&Show</source>
+<target>&Prikaži</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Pronađi i izvrši izmjene na obje strane. Izbrisano, premješteno te sukobi se otkriju automatski pomoću baze podataka.</target>

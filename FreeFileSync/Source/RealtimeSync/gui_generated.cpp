@@ -32,7 +32,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("&Quit") ) , wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItem4 );
 
-    m_menubar1->Append( m_menuFile, _("&Program") );
+    m_menubar1->Append( m_menuFile, _("&File") );
 
     m_menuHelp = new wxMenu();
     wxMenuItem* m_menuItemContent;

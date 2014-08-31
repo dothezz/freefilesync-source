@@ -23,6 +23,7 @@
 
 #ifdef ZEN_WIN
 #include <zen/win_ver.h>
+#include "../lib/app_user_mode_id.h"
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
@@ -69,13 +70,15 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
+        setAppUserModeId(L"RealtimeSync", L"SourceForge.RealtimeSync"); //noexcept
+        //consider: RealtimeSync.exe, RealtimeSync_Win32.exe, RealtimeSync_x64.exe
+
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
+
 #elif defined ZEN_LINUX
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
-#ifdef ZEN_WIN
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
-#endif
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 

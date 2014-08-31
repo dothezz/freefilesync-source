@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>A pasta correspondente será considerada como vazia.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>As seguintes pastas têm caminhos dependentes. Tenha atenção ao definir as regras de sincronizaçção:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Os seguintes pares de pastas são dependentes:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Ficheiro %x tem data inválida.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Actualizar atributos à direita</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Base de dados %x não é compatível.</target>
 
@@ -259,24 +277,6 @@
 <source>Total time:</source>
 <target>Tempo total:</target>
 
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Erro ao analisar ficheiro %x, linha %y, coluna %z.</target>
 
@@ -332,7 +332,7 @@
 <target>Paragem solicitada: À espera que termine a operação actual...</target>
 
 <source>Unable to create time stamp for versioning:</source>
-<target>Não é possível criar data/hora para versionamento:</target>
+<target>Não é possível criar data/hora para controlo de versões:</target>
 
 <source>&Open...</source>
 <target>&Abrir...</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Sair</target>
 
-<source>&Program</source>
-<target>&Programa</target>
+<source>&File</source>
+<target>&Ficheiro</target>
 
 <source>&View help</source>
 <target>&Ver ajuda</target>
@@ -435,9 +435,6 @@ O comando é executado se:
 <source>&Show error</source>
 <target>Mostrar &erro</target>
 
-<source>&Exit</source>
-<target>&Sair</target>
-
 <source>Incorrect command line:</source>
 <target>Linha de comandos incorrecta:</target>
 
@@ -501,8 +498,8 @@ O comando é executado se:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Erro de verificação de dados: %x e %y têm conteúdo diferente.</target>
 
-<source>Cannot find %x.</source>
-<target>Não é possível encontrar %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Não é possível encontrar a pasta %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Directório de destino %x já existe.</target>
@@ -531,8 +528,8 @@ O comando é executado se:
 <source>Available:</source>
 <target>Disponível:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Uma pasta que faz parte de vários pares vai ser modificada. Por favor, reveja os parametros de sincronização.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Vários pares de pastas escrevem para uma subpasta comum. Por favor, revise a sua configuração.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizar o par de pastas:</target>
@@ -633,8 +630,8 @@ O comando é executado se:
 <source>Name</source>
 <target>Nome</target>
 
-<source>Relative path</source>
-<target>Caminho</target>
+<source>Relative folder</source>
+<target>Pasta relativa</target>
 
 <source>Base folder</source>
 <target>Pasta principal</target>
@@ -675,7 +672,7 @@ O comando é executado se:
 <source>Remove local settings</source>
 <target>Apagar opções locais</target>
 
-<source>Reset local filter</source>
+<source>Clear local filter</source>
 <target>Limpar filtro local</target>
 
 <source>Copy</source>
@@ -696,11 +693,11 @@ O comando é executado se:
 <source>Save as &batch job...</source>
 <target>Guardar como &batch...</target>
 
-<source>1. &Compare</source>
-<target>1. &Comparar</target>
+<source>Start &comparison</source>
+<target>Iniciar &comparaçao</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Sincronizar</target>
+<source>Start &synchronization</source>
+<target>Iniciar &sincronização</target>
 
 <source>&Options</source>
 <target>&Opções</target>
@@ -711,20 +708,23 @@ O comando é executado se:
 <source>&Find...</source>
 <target>&Procurar...</target>
 
+<source>&Reset layout</source>
+<target>&Restaurar esquema</target>
+
 <source>&Export file list...</source>
 <target>&Exportar lista de ficheiros...</target>
 
 <source>&Tools</source>
 <target>&Ferramentas</target>
 
+<source>&Check for new version</source>
+<target>&Procurar por actualizações</target>
+
 <source>&Check now</source>
 <target>&Verificar agora</target>
 
 <source>Check &automatically once a week</source>
 <target>Verificar &automaticamente uma vez por semana</target>
-
-<source>&Check for new version</source>
-<target>&Procurar por actualizações</target>
 
 <source>Cancel</source>
 <target>Cancelar</target>
@@ -753,17 +753,14 @@ O comando é executado se:
 <source>Match case</source>
 <target>Correspondência</target>
 
+<source>New</source>
+<target>Novo</target>
+
 <source>Open...</source>
 <target>Abrir...</target>
 
 <source>Save</source>
 <target>Guardar</target>
-
-<source>Save as GUI job</source>
-<target>Guardar como sincronização GUI</target>
-
-<source>Save as batch job</source>
-<target>Guardar como sincronização batch</target>
 
 <source>Save as...</source>
 <target>Guardar como...</target>
@@ -777,14 +774,14 @@ O comando é executado se:
 <source>Statistics:</source>
 <target>Estatísticas:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Número de ficheiros e pastas a ser criados</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Número de ficheiros e pastas a ser eliminados</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Número de ficheiros substituidos</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Número de ficheiros e pastas a ser eliminados</target>
+<source>Number of files and folders that will be created</source>
+<target>Número de ficheiros e pastas a ser criados</target>
 
 <source>Total bytes to copy</source>
 <target>Total em bytes a copiar</target>
@@ -800,6 +797,15 @@ O comando é executado se:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Identificar ficheiros iguais ao comparar o conteúdo.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorar mudança de tempo (em horas)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Considerar ficheiros com o desvio de tempo especificado como iguais</target>
+
+<source>Handle daylight saving time</source>
+<target>Lidar com horário de verão</target>
 
 <source>Symbolic links:</source>
 <target>Links simbólicos:</target>
@@ -831,8 +837,8 @@ O comando é executado se:
 <source>Maximum:</source>
 <target>Máximo</target>
 
-<source>&Reset</source>
-<target>&Reiniciar</target>
+<source>C&lear</source>
+<target>&Limpar</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Seleccionar regras de filtro para excluir certos ficheiros da sincronização. Insira os caminhos relativos ao par de directórios correspondente.</target>
@@ -857,20 +863,20 @@ O comando é executado se:
 <source>Delete files:</source>
 <target>Eliminar ficheiros:</target>
 
-<source>Permanent</source>
-<target>Permanente</target>
+<source>&Permanent</source>
+<target>&Permanente</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Apagar ou substituir ficheiros permanentemente</target>
 
-<source>Recycle bin</source>
-<target>Reciclagem</target>
+<source>&Recycle bin</source>
+<target>&Reciclagem</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Fazer backup dos ficheiros apagados e substituidos na reciclagem</target>
 
-<source>Versioning</source>
-<target>Manter versões anteriores</target>
+<source>&Versioning</source>
+<target>Controlo &Versões</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Mover ficheiros para uma pasta definida pelo utilizador</target>
@@ -881,14 +887,11 @@ O comando é executado se:
 <source>Handle errors:</source>
 <target>Tratar erros:</target>
 
-<source>Ignore</source>
-<target>Ignorar</target>
-
 <source>Hide all error and warning messages</source>
 <target>Ocultar todas as mensagens de erro/aviso</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target>&Popup</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar popup em caso de erros ou avisos</target>
@@ -911,9 +914,6 @@ O comando é executado se:
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Speed:</source>
-<target>Velocidade:</target>
-
 <source>Time remaining:</source>
 <target>Tempo restante:</target>
 
@@ -926,6 +926,9 @@ O comando é executado se:
 <source>Minimize to notification area</source>
 <target>Minimizar para a área de notificação</target>
 
+<source>Bytes copied:</source>
+<target>Bytes copiados:</target>
+
 <source>Close</source>
 <target>Fechar</target>
 
@@ -937,6 +940,9 @@ O comando é executado se:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Criar ficheiro batch para sincronização automática. Para iniciar, fazer duplo clique no ficheiro ou acrescentar ao planeador de tarefas: %x</target>
+
+<source>&Stop</source>
+<target>&Parar</target>
 
 <source>Stop synchronization at first error</source>
 <target>Para sincronização ao primeiro erro</target>
@@ -955,9 +961,6 @@ O comando é executado se:
 
 <source>How can I schedule a batch job?</source>
 <target>Como posso agendar um trabalho batch?</target>
-
-<source>&Recycle bin</source>
-<target>&Reciclagem</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>As seguintes definições são usadas para todas as sincronizações.</target>
@@ -1007,8 +1010,11 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Description</source>
 <target>Descrição</target>
 
-<source>Restore hidden windows</source>
-<target>Restaurar janelas escondidas</target>
+<source>Show hidden dialogs again</source>
+<target>Mostrar diálogos ocultos novamente</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Mostrar todos os diálogos escondidos permanentemente e mensagens de aviso novamente</target>
 
 <source>&Default</source>
 <target>&Config. Iniciais</target>
@@ -1070,8 +1076,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Main Bar</source>
 <target>Barra principal</target>
 
-<source>Compare both sides</source>
-<target>Comparar listas</target>
+<source>Start comparison</source>
+<target>Iniciar comparação</target>
 
 <source>Comparison settings</source>
 <target>Opções de comparação</target>
@@ -1166,9 +1172,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Select time span...</source>
 <target>Selecione intervalo de tempo...</target>
 
-<source>Default view</source>
-<target>Vista normal</target>
-
 <source>Show "%x"</source>
 <target>Mostrar "%x"</target>
 
@@ -1199,7 +1202,7 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Synchronization Settings</source>
 <target>Definições de Sincronização</target>
 
-<source>Reset filter</source>
+<source>Clear filter</source>
 <target>Limpar filtro</target>
 
 <source>Show files that exist on left side only</source>
@@ -1358,8 +1361,11 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Contrapartida de %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurar todas as janelas e avisos escondidos?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Mostrar diálogos ocultos e mensagens de erro novamente?</target>
+
+<source>&Show</source>
+<target>&Mostrar</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificar e propagar mudanças nos dois lados. Eliminações, cópias e conflitos são detectados automaticamente usando base de dados.</target>

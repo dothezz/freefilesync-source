@@ -1,8 +1,20 @@
+FreeFileSync 6.9
+----------------
+Use FreeFileSync taskbar icon when available (Windows 7)
+Limit number of retries when creating temporary files
+Fixed bitmap rendering issue for high-contrast color schemes
+Revised and fixed unclear GUI texts
+Updated deprecated system call when suspending idle (OS X)
+Fixed retry when failing to determine recycle bin status
+Added progress graph legend
+Updated translation files
+
+ 
 FreeFileSync 6.8 [2014-08-01]
 -----------------------------
 New comparison option to ignore file time shift in hours
 Tentatively disabled DST hack affecting FAT file creation times
-New menu option to reset gui layout
+New menu option to reset GUI layout
 File sizes ignore sync direction in overview panel
 Sort by file name also sorts folder names
 Main grid column "full path" includes file name
@@ -64,7 +76,7 @@ Redesigned configuration dialog layouts
 Fixed startup error after moving installation directory
 Fixed retry on failure to resolve path by volume name
 Resolved ERROR_ALREADY_EXISTS when creating temporary recycle bin subdirectory
-Added "save as gui job" button on main dialog
+Added "save as GUI job" button on main dialog
 Added Bulgarian language
 
 
@@ -136,7 +148,7 @@ Copy high-precision modification times for files and symlinks
 Align top panel height with comparison and sync buttons
 Show lock owner while waiting on a locked directory
 Resolved help file W3C validation issues
-Fixed high contrast accessibility issues in help
+Fixed high-contrast accessibility issues in help
 Fixed crash for CPUs without SSE2 when using VSS (Windows XP)
 Prevent progress statistics timer overflow
 Save RealtimeSync settings before forced exit due to shutdown or log off
@@ -162,7 +174,7 @@ Updated and revised help file
 Early parameter validation for filter and sync config dialogs
 Fixed followed directory symlinks being incorrectly excluded
 Automatically calculate best initial message box size
-Progress graph and status icons support high contrast color schemes
+Progress graph and status icons support high-contrast color schemes
 Include directory child-elements when manually setting filter
 Allow manual filter for short name on overview panel
 Don't treat file drops on directory input fields as URI (Linux)
@@ -527,7 +539,7 @@ Use the same time stamp for log file and versioning
 Handle folder drag and drop outside main grid
 Avoid name clash having multiple folder pairs delete into the same versioning folder
 Exit FreeFileSync automatically while upgrading to new version
-Accessibility: Support high contrast color schemes
+Accessibility: Support high-contrast color schemes
 Yet another UI design overhaul
 Fixed "access denied" issue on OS X-hosted network shares
 Support Citrix folder shares

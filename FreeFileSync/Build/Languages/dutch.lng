@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>De overeenkomstige map zal als leeg worden beschouwd.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>De volgende mappen hebben afhankelijke paden. Wees voorzichtig bij het opzetten van synchronisatieregels:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
 
 <source>File %x has an invalid date.</source>
 <target>Bestand %x heeft een ongeldige datum.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Update attributen aan de rechterkant</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Databasebestand %x is niet compatibel.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Totale tijd:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Fout bij het parsen van bestand %x, rij %y, kolom %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Afsluiten</target>
 
-<source>&Program</source>
-<target>&Programma</target>
+<source>&File</source>
+<target></target>
 
 <source>&View help</source>
 <target>Help &bekijken</target>
@@ -435,9 +435,6 @@ De opdracht word geactiveerd als:
 <source>&Show error</source>
 <target>Laat &fouten zien</target>
 
-<source>&Exit</source>
-<target>&Afsluiten</target>
-
 <source>Incorrect command line:</source>
 <target>Incorrectie command line:</target>
 
@@ -501,8 +498,8 @@ De opdracht word geactiveerd als:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Data verificatie fout: %x en %y hebben een verschillende inhoud.</target>
 
-<source>Cannot find %x.</source>
-<target>Kan %x niet vinden.</target>
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
 <target>Doelmap %x bestaat al.</target>
@@ -531,8 +528,8 @@ De opdracht word geactiveerd als:
 <source>Available:</source>
 <target>Beschikbaar:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Een map die onderdeel is van meerdere gekoppelde mappen word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target></target>
 
 <source>Synchronizing folder pair:</source>
 <target>Bezig met synchroniseren van folder paar:</target>
@@ -633,8 +630,8 @@ De opdracht word geactiveerd als:
 <source>Name</source>
 <target>Naam</target>
 
-<source>Relative path</source>
-<target>Relatief pad</target>
+<source>Relative folder</source>
+<target></target>
 
 <source>Base folder</source>
 <target>Hoofdmap</target>
@@ -675,8 +672,8 @@ De opdracht word geactiveerd als:
 <source>Remove local settings</source>
 <target>Verwijder lokale instellingen</target>
 
-<source>Reset local filter</source>
-<target>Reset lokale filter</target>
+<source>Clear local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>Kopiëren</target>
@@ -696,11 +693,11 @@ De opdracht word geactiveerd als:
 <source>Save as &batch job...</source>
 <target>Opslaan als &batch opdracht...</target>
 
-<source>1. &Compare</source>
-<target>1. &Vergelijk</target>
+<source>Start &comparison</source>
+<target></target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchroniseer</target>
+<source>Start &synchronization</source>
+<target></target>
 
 <source>&Options</source>
 <target>&Opties</target>
@@ -711,20 +708,23 @@ De opdracht word geactiveerd als:
 <source>&Find...</source>
 <target>&Zoek...</target>
 
+<source>&Reset layout</source>
+<target></target>
+
 <source>&Export file list...</source>
 <target>&Exporteer bestandslijst...</target>
 
 <source>&Tools</source>
 <target>&Gereedschap</target>
 
+<source>&Check for new version</source>
+<target>&Controleer voor nieuwe versie</target>
+
 <source>&Check now</source>
 <target>&Controleer nu</target>
 
 <source>Check &automatically once a week</source>
 <target>Controleer &automatisch eens per week</target>
-
-<source>&Check for new version</source>
-<target>&Controleer voor nieuwe versie</target>
 
 <source>Cancel</source>
 <target>Annuleren</target>
@@ -753,17 +753,14 @@ De opdracht word geactiveerd als:
 <source>Match case</source>
 <target>Hoofdlettergevoelig</target>
 
+<source>New</source>
+<target></target>
+
 <source>Open...</source>
 <target>Open...</target>
 
 <source>Save</source>
 <target>Opslaan</target>
-
-<source>Save as GUI job</source>
-<target>Opslaan als GUI taak</target>
-
-<source>Save as batch job</source>
-<target>Opslaan als batch opdracht</target>
 
 <source>Save as...</source>
 <target>Opslaan als...</target>
@@ -777,14 +774,14 @@ De opdracht word geactiveerd als:
 <source>Statistics:</source>
 <target>Statistieken:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Aantal bestanden en mappen die zullen worden aangemaakt</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Aantal bestanden en mappen die verwijderd zullen worden</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Aantal bestanden die overschreven zullen worden</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Aantal bestanden en mappen die verwijderd zullen worden</target>
+<source>Number of files and folders that will be created</source>
+<target>Aantal bestanden en mappen die zullen worden aangemaakt</target>
 
 <source>Total bytes to copy</source>
 <target>Aantal bytes om te kopiëren</target>
@@ -800,6 +797,15 @@ De opdracht word geactiveerd als:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Identificeer gelijke bestanden door de bestandsinhoud te vergelijken.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Handle daylight saving time</source>
+<target></target>
 
 <source>Symbolic links:</source>
 <target>Snelkoppelingen:</target>
@@ -831,8 +837,8 @@ De opdracht word geactiveerd als:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Reset</source>
-<target>&Reset</target>
+<source>C&lear</source>
+<target></target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selecteer filter regels om bepaalde bestanden uit te sluiten van synchronisatie. Geef bestandspaden in die relatief zijn aan hun corresponderende folderparen.</target>
@@ -857,20 +863,20 @@ De opdracht word geactiveerd als:
 <source>Delete files:</source>
 <target>Verwijder bestanden:</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target></target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Bestanden definitief verwijderen of overschrijven</target>
 
-<source>Recycle bin</source>
-<target>Prullenbak</target>
+<source>&Recycle bin</source>
+<target>&Prullebak</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Maak een backup van verwijderde en overschreven bestanden in de prullenbak</target>
 
-<source>Versioning</source>
-<target>Versiebeheer</target>
+<source>&Versioning</source>
+<target></target>
 
 <source>Move files to a user-defined folder</source>
 <target>Verplaats bestanden naar een gebruikers gedefineerde map</target>
@@ -881,14 +887,11 @@ De opdracht word geactiveerd als:
 <source>Handle errors:</source>
 <target>Fouten afhandelen:</target>
 
-<source>Ignore</source>
-<target>Negeer</target>
-
 <source>Hide all error and warning messages</source>
 <target>Verberg alle fout- en waarschuwingsberichten</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target></target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
@@ -911,9 +914,6 @@ De opdracht word geactiveerd als:
 <source>Items found:</source>
 <target>Onderdelen gevonden:</target>
 
-<source>Speed:</source>
-<target>Snelheid:</target>
-
 <source>Time remaining:</source>
 <target>Resterende tijd:</target>
 
@@ -926,6 +926,9 @@ De opdracht word geactiveerd als:
 <source>Minimize to notification area</source>
 <target>Minimaliseer naar systeemvak</target>
 
+<source>Bytes copied:</source>
+<target></target>
+
 <source>Close</source>
 <target>Sluiten</target>
 
@@ -937,6 +940,9 @@ De opdracht word geactiveerd als:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Maak een batchbestand voor onbeheerde synchronisatie. Om te starten dubbelklikt u dit bestand of rooster in een taakplanner: %x</target>
+
+<source>&Stop</source>
+<target></target>
 
 <source>Stop synchronization at first error</source>
 <target>Stop synchronisatie bij eerste foutmelding</target>
@@ -955,9 +961,6 @@ De opdracht word geactiveerd als:
 
 <source>How can I schedule a batch job?</source>
 <target>Hoe kan ik een batch opdracht inroosteren?</target>
-
-<source>&Recycle bin</source>
-<target>&Prullebak</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>De volgende instellingen worden gebruikt voor alle synchronisaties.</target>
@@ -1007,8 +1010,11 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Description</source>
 <target>Omschrijving</target>
 
-<source>Restore hidden windows</source>
-<target>Herstel verborgen vensters</target>
+<source>Show hidden dialogs again</source>
+<target></target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target></target>
 
 <source>&Default</source>
 <target>&Standaard</target>
@@ -1070,8 +1076,8 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Main Bar</source>
 <target>Hoofdbalk</target>
 
-<source>Compare both sides</source>
-<target>Vergelijk beide zijdes</target>
+<source>Start comparison</source>
+<target></target>
 
 <source>Comparison settings</source>
 <target>Vergelijksinstellingen</target>
@@ -1166,9 +1172,6 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Select time span...</source>
 <target>Selecteer tijdsspanne...</target>
 
-<source>Default view</source>
-<target>Standaard weergave</target>
-
 <source>Show "%x"</source>
 <target>Toon "%x"</target>
 
@@ -1199,8 +1202,8 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>Synchronization Settings</source>
 <target>Synchronisatie instellingen</target>
 
-<source>Reset filter</source>
-<target>Reset filter</target>
+<source>Clear filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>Toon bestanden die alleen aan de linkerzijde bestaan</target>
@@ -1358,8 +1361,11 @@ Dit garandeert een consistente staat, zelfs in het geval van een serieuze fout.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Tegenhanger van de andere kant naar %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Herstel alle verborgen vensters en waarschuwingen?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target></target>
+
+<source>&Show</source>
+<target></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificeer en pas veranderingen toe aan beide kanten. Verwijderingen, verplaatsingen en conflicten worden automatisch gevonden met behulp van een database.</target>

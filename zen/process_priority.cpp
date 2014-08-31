@@ -5,17 +5,11 @@
 // **************************************************************************
 
 #include "process_priority.h"
-#include "sys_error.h"
+//#include "sys_error.h"
 #include "i18n.h"
 
 #ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
-
-#elif defined ZEN_LINUX
-
-#elif defined ZEN_MAC
-#include <sys/resource.h> //getiopolicy_np
-#include <IOKit/pwr_mgt/IOPMLib.h> //keep in .cpp file to not pollute global namespace!
 #endif
 
 using namespace zen;
@@ -99,51 +93,4 @@ private:
 	const int oldIoPrio;
 };
 */
-
-#elif defined ZEN_MAC
-//https://developer.apple.com/library/mac/#qa/qa1340
-struct PreventStandby::Pimpl
-{
-    Pimpl() : assertionID() {}
-    IOPMAssertionID assertionID;
-};
-
-PreventStandby::PreventStandby() : pimpl(make_unique<Pimpl>())
-{
-    IOReturn rv = ::IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep,
-                                                kIOPMAssertionLevelOn,
-                                                CFSTR("FreeFileSync"),
-                                                &pimpl->assertionID);
-    if (rv != kIOReturnSuccess)
-        throw FileError(_("Unable to suspend system sleep mode."), replaceCpy<std::wstring>(L"IOReturn Code %x", L"%x", numberTo<std::wstring>(rv))); //could not find a better way to convert IOReturn to string
-}
-
-PreventStandby::~PreventStandby()
-{
-    ::IOPMAssertionRelease(pimpl->assertionID);
-}
-
-
-struct ScheduleForBackgroundProcessing::Pimpl
-{
-    Pimpl() : oldIoPrio() {}
-    int oldIoPrio;
-};
-
-
-ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing() : pimpl(make_unique<Pimpl>())
-{
-    pimpl->oldIoPrio = ::getiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS);
-    if (pimpl->oldIoPrio == -1)
-        throwFileError(_("Cannot change process I/O priorities."), L"getiopolicy_np", getLastError());
-
-    if (::setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_THROTTLE) != 0)
-        throwFileError(_("Cannot change process I/O priorities."), L"setiopolicy_np", getLastError());
-}
-
-
-ScheduleForBackgroundProcessing::~ScheduleForBackgroundProcessing()
-{
-    ::setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, pimpl->oldIoPrio);
-}
 #endif

@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>המחיצה המתאימה תחשב כריקה.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>מסלול המחיצות הבאות מותנה. שים לב כאשר חוקי הסינכרון מוגדרים:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>נתיבי התיקיות הבאים תלויים זה בזה:</target>
 
 <source>File %x has an invalid date.</source>
 <target>קובץ %x מכיל תאריך שגוי.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>עדכן תכונות בצד שמאל</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>בית 1</pluralform>
+<pluralform>%x בתים</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x מגה בייט</target>
+
+<source>%x KB</source>
+<target>%x קילו בייט</target>
+
+<source>%x GB</source>
+<target>%x גיגה בייט</target>
+
 <source>Database file %x is incompatible.</source>
 <target>קובץ מסד נתונים %x אינו במבנה מתאים.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>זמן כולל:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>בית 1</pluralform>
-<pluralform>%x בתים</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x מגה בייט</target>
-
-<source>%x KB</source>
-<target>%x קילו בייט</target>
-
-<source>%x GB</source>
-<target>%x גיגה בייט</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>שגיאה בפענוח קובץ %x, שורה %y, טור %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&יציאה</target>
 
-<source>&Program</source>
-<target>&תוכנה</target>
+<source>&File</source>
+<target>&קובץ</target>
 
 <source>&View help</source>
 <target>&הראה עזרה</target>
@@ -435,9 +435,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&הראה שגיאה</target>
 
-<source>&Exit</source>
-<target>&יציאה</target>
-
 <source>Incorrect command line:</source>
 <target>שורת פקודה לא תקינה:</target>
 
@@ -501,8 +498,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>שגיאת אימות נתונים. ל %x ו %y יש תוכן שונה.</target>
 
-<source>Cannot find %x.</source>
-<target>לא מוצא %x.</target>
+<source>Cannot find folder %x.</source>
+<target>לא מוצא תיקייה %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>תיקיית מטרה %x כבר קיימת.</target>
@@ -531,8 +528,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>זמין:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>התיקייה שתשתנה היא חלק מריבוי זוגות תיקיות. אנא סקור מחדש הגדרות סינכרון.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>ריבוי זוגות תיקיות נכתבים לתת תיקייה משותפת. בדוק את הקונפיגורציה שלך.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>מסנכרן זוג תיקיות:</target>
@@ -633,8 +630,8 @@ The command is triggered if:
 <source>Name</source>
 <target>שם</target>
 
-<source>Relative path</source>
-<target>נתיב יחסי</target>
+<source>Relative folder</source>
+<target>תיקייה יחסית</target>
 
 <source>Base folder</source>
 <target>תיקיית בסיס</target>
@@ -655,7 +652,7 @@ The command is triggered if:
 <target>פעולה</target>
 
 <source>Drag && drop</source>
-<target></target>
+<target>גרור ושחרר</target>
 
 <source>Local comparison settings</source>
 <target>הגדרות השוואה מקומיות</target>
@@ -675,8 +672,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>הסר הגדרות מקומיות</target>
 
-<source>Reset local filter</source>
-<target>אפס מסנן מקומי</target>
+<source>Clear local filter</source>
+<target>נקה מסנן מקומי</target>
 
 <source>Copy</source>
 <target>העתק</target>
@@ -696,11 +693,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>שמור כעבודת &אצווה</target>
 
-<source>1. &Compare</source>
-<target>1. &השווה</target>
+<source>Start &comparison</source>
+<target>התחל &והשווה</target>
 
-<source>2. &Synchronize</source>
-<target>2. &סנכרן</target>
+<source>Start &synchronization</source>
+<target>התחל &וסנכרן</target>
 
 <source>&Options</source>
 <target>&אפשרויות</target>
@@ -711,20 +708,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&מצא</target>
 
+<source>&Reset layout</source>
+<target>&אפס פריסה</target>
+
 <source>&Export file list...</source>
 <target>&יצא רשימת קבצים...</target>
 
 <source>&Tools</source>
 <target>&כלים</target>
 
+<source>&Check for new version</source>
+<target>&בדוק קיום גירסה חדשה</target>
+
 <source>&Check now</source>
 <target>&בדוק עכשיו</target>
 
 <source>Check &automatically once a week</source>
 <target>בדוק &אוטומטית אחת לשבוע</target>
-
-<source>&Check for new version</source>
-<target>&בדוק קיום גירסה חדשה</target>
 
 <source>Cancel</source>
 <target>בטל</target>
@@ -753,17 +753,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>התאם רישיות</target>
 
+<source>New</source>
+<target>חדש</target>
+
 <source>Open...</source>
 <target>פתח...</target>
 
 <source>Save</source>
 <target>שמור</target>
-
-<source>Save as GUI job</source>
-<target>שמור כמשימת GUI</target>
-
-<source>Save as batch job</source>
-<target>שמור כעבודת אצווה</target>
 
 <source>Save as...</source>
 <target>שמור כ...</target>
@@ -777,14 +774,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>סטטיסטיקה:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>מספר הקבצים והתיקיות שייוצרו</target>
+<source>Number of files and folders that will be deleted</source>
+<target>מספר הקבצים והתיקיות שימחקו</target>
 
 <source>Number of files that will be overwritten</source>
 <target>מספר הקבצים העומדים להיכתב מחדש</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>מספר הקבצים והתיקיות שימחקו</target>
+<source>Number of files and folders that will be created</source>
+<target>מספר הקבצים והתיקיות שייוצרו</target>
 
 <source>Total bytes to copy</source>
 <target>סה"כ בתים להעתיק</target>
@@ -800,6 +797,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>זהה קבצים זהים באמצעות השוואת תוכן.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>התעלם מהפרש זמן (שעות)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>החשב זמני קובץ עם תזוזת זמן שנקבעה כשווים</target>
+
+<source>Handle daylight saving time</source>
+<target>התמודד עם שעון קיץ</target>
 
 <source>Symbolic links:</source>
 <target>קישורים סימבוליים:</target>
@@ -831,8 +837,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>מקסימום:</target>
 
-<source>&Reset</source>
-<target>&אפס</target>
+<source>C&lear</source>
+<target>א&פס</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>בחר כללי סינון כדי לא לכלול קבצים מסוימים בסנכרון. הזן את נתיבי הקבצים ביחס לזוג התיקיות בהתאמה.</target>
@@ -857,20 +863,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>מחק קבצים:</target>
 
-<source>Permanent</source>
-<target>קבוע</target>
+<source>&Permanent</source>
+<target>&קבוע</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>מחק או דרוס קבצים לצמיתות</target>
 
-<source>Recycle bin</source>
-<target>סל מיחזור</target>
+<source>&Recycle bin</source>
+<target>&סל מחזור</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>גבה קבצים שנמחקו או שנדרסו בסל המיחזור</target>
 
-<source>Versioning</source>
-<target>עדכון גרסאות</target>
+<source>&Versioning</source>
+<target>&גרסאות</target>
 
 <source>Move files to a user-defined folder</source>
 <target>העבר קבצים לתיקייה המוגדרת ע"י המפעיל</target>
@@ -881,14 +887,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>טפל בשגיאות:</target>
 
-<source>Ignore</source>
-<target>התעלם</target>
-
 <source>Hide all error and warning messages</source>
 <target>הסתר את כל הודעות ההזהרה והשגיאה</target>
 
-<source>Pop-up</source>
-<target>מוקפץ</target>
+<source>&Pop-up</source>
+<target>&מוקפץ</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>הראה חלונות מוקפצים עבור שגיאות או אזהרות</target>
@@ -911,9 +914,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>אלמנטים נמצאו:</target>
 
-<source>Speed:</source>
-<target>מהירות:</target>
-
 <source>Time remaining:</source>
 <target>זמן שנשאר:</target>
 
@@ -926,6 +926,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>הקטן לאיזור ההתרעות</target>
 
+<source>Bytes copied:</source>
+<target>בתים שהועתקו:</target>
+
 <source>Close</source>
 <target>סגור</target>
 
@@ -937,6 +940,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>צור קובץ אצווה לסינכרון ללא התערבות מפעיל. כדי להפעיל, הקלק הקלקה כפולה על הקובץ או תזמן במתכנן המשימות: %x</target>
+
+<source>&Stop</source>
+<target>&עצור</target>
 
 <source>Stop synchronization at first error</source>
 <target>עצור סנכרון עם הופעת שגיאה ראשונה</target>
@@ -955,9 +961,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>כיצד לתזמן משימת אצווה?</target>
-
-<source>&Recycle bin</source>
-<target>&סל מחזור</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>ההגדרות הבאות משמשות לכל משימות הסנכרון.</target>
@@ -1007,8 +1010,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>תאור</target>
 
-<source>Restore hidden windows</source>
-<target>שחזר חלונות ניסתרים</target>
+<source>Show hidden dialogs again</source>
+<target>הראה שוב דיאלוגים נסתרים</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>הראה שוב את כל הדיאלוגים והודאות האזהרה המוסתרים באופן קבוע</target>
 
 <source>&Default</source>
 <target>&ברירת מחדל</target>
@@ -1070,8 +1076,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>סרגל ראשי</target>
 
-<source>Compare both sides</source>
-<target>השווה בין שני הצדדים</target>
+<source>Start comparison</source>
+<target>התחל השוואה</target>
 
 <source>Comparison settings</source>
 <target>הגדרות השוואה</target>
@@ -1166,9 +1172,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>בחר תחום זמן...</target>
 
-<source>Default view</source>
-<target>תצוגה בתצורת ברירת מחדל</target>
-
 <source>Show "%x"</source>
 <target>הראה "%x"</target>
 
@@ -1199,8 +1202,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>הגדרות סנכרון</target>
 
-<source>Reset filter</source>
-<target>אפס מסנן</target>
+<source>Clear filter</source>
+<target>נקה מסנן</target>
 
 <source>Show files that exist on left side only</source>
 <target>הראה קבצים הנמצאים אך ורק בצד ימין</target>
@@ -1358,8 +1361,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>הצד השני המקביל ל %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>האם לשחזר את כל החלונות וההודעות הנסתרות?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>להראות שוב את הדיאלוגים והודעות האזהרה המוסתרים?</target>
+
+<source>&Show</source>
+<target>&הראה</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>זהה והפץ שינויים בשני הצדדים. מחיקות העברות וסתירות מתגלים באופן אוטומטי באמצעות מסד נתונים.</target>

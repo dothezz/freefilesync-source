@@ -1236,14 +1236,14 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
 
     //init graph
-    curveDataBytes        = std::make_shared<CurveDataStatistics>();
-    curveDataItems        = std::make_shared<CurveDataStatistics>();
-    curveDataBytesCurrent = std::make_shared<CurveDataRectangleArea>();
-    curveDataItemsCurrent = std::make_shared<CurveDataRectangleArea>();
     curveDataBytesTotal   = std::make_shared<CurveDataRectangleArea>();
     curveDataItemsTotal   = std::make_shared<CurveDataRectangleArea>();
+    curveDataBytesCurrent = std::make_shared<CurveDataRectangleArea>();
+    curveDataItemsCurrent = std::make_shared<CurveDataRectangleArea>();
+    curveDataBytes        = std::make_shared<CurveDataStatistics>();
+    curveDataItems        = std::make_shared<CurveDataStatistics>();
 
-    const int xLabelHeight = 18; //we need to use the same height for both graphs to make sure they stretch evenly
+    const int xLabelHeight = this->GetCharHeight() + 2 * 1/*border*/; //use same height for both graphs to make sure they stretch evenly
     const int yLabelWidth  = 70;
     pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().
                                          setLabelX(Graph2D::X_LABEL_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
@@ -1257,14 +1257,35 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
                                          setBackgroundColor(wxColor(208, 208, 208)). //light grey
                                          setSelectionMode(Graph2D::SELECT_NONE));
 
+    const wxColor colCurveAreaBytes(111, 255,  99); //light green
+    const wxColor colCurveAreaItems(127, 147, 255); //light blue
+
+    const wxColor colCurveAreaBytesRim(20, 200,   0); //medium green
+    const wxColor colCurveAreaItemsRim(90, 120, 255); //medium blue
+
     pnl.m_panelGraphBytes->setCurve(curveDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
     pnl.m_panelGraphItems->setCurve(curveDataItemsTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
 
     pnl.m_panelGraphBytes->addCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(wxColor(205, 255, 202))./*faint green*/ setColor(wxColor(12, 128,  0))); //dark green
     pnl.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(wxColor(198, 206, 255))./*faint blue */ setColor(wxColor(53, 25, 255))); //dark blue
 
-    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(wxColor(111, 255,  99))./*light green*/ setColor(wxColor(20, 200,   0))); //medium green
-    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(wxColor(127, 147, 255))./*light blue */ setColor(wxColor(90, 120, 255))); //medium blue
+    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(colCurveAreaBytes).setColor(colCurveAreaBytesRim));
+    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(colCurveAreaItems).setColor(colCurveAreaItemsRim));
+
+    //graph legend:
+    auto generateSquareBitmap = [&](const wxColor& fillCol, const wxColor& borderCol)
+    {
+        wxBitmap bmpSquare(this->GetCharHeight(), this->GetCharHeight()); //seems we don't need to pass 24-bit depth here even for high-contrast color schemes
+        {
+            wxMemoryDC dc(bmpSquare);
+            wxDCBrushChanger dummy(dc, fillCol);
+            wxDCPenChanger  dummy2(dc, borderCol);
+            dc.DrawRectangle(wxPoint(), bmpSquare.GetSize());
+        }
+        return bmpSquare;
+    };
+    pnl.m_bitmapGraphKeyBytes->SetBitmap(generateSquareBitmap(colCurveAreaBytes, colCurveAreaBytesRim));
+    pnl.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(colCurveAreaItems, colCurveAreaItemsRim));
 
     //allow changing the "on completion" command
     pnl.m_comboBoxOnCompletion->initHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later

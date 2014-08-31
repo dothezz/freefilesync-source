@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Katalog będzie oznaczony jako pusty.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Podane katalogi mają zależne ścieżki. Bądź ostrożny podczas ustawiania reguł synchronizacji:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
 
 <source>File %x has an invalid date.</source>
 <target>Plik %x ma nieprawidłową datę.</target>
@@ -199,6 +199,25 @@
 <source>Update attributes on right</source>
 <target>Aktualizuj atrybuty po prawej stronie</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 bajt</pluralform>
+<pluralform>%x bajty</pluralform>
+<pluralform>%x bajtów</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Plik bazy danych %x nie jest kompatybilny.</target>
 
@@ -259,25 +278,6 @@
 
 <source>Total time:</source>
 <target>Całkowity czas:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 bajt</pluralform>
-<pluralform>%x bajty</pluralform>
-<pluralform>%x bajtów</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Błąd podczas parsowania pliku %x, rząd %y, kolumna %z.</target>
@@ -346,8 +346,8 @@
 <source>&Quit</source>
 <target>Zam&knij</target>
 
-<source>&Program</source>
-<target>&Program</target>
+<source>&File</source>
+<target></target>
 
 <source>&View help</source>
 <target>&Pomoc</target>
@@ -438,9 +438,6 @@ Komenda jest wykonywana gdy:
 <source>&Show error</source>
 <target>Pokaż &błędy</target>
 
-<source>&Exit</source>
-<target>&Wyjście</target>
-
 <source>Incorrect command line:</source>
 <target>Niepoprawne polecenie:</target>
 
@@ -504,8 +501,8 @@ Komenda jest wykonywana gdy:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Nastąpił błąd weryfikacji: %x oraz %y różnią się zawartością.</target>
 
-<source>Cannot find %x.</source>
-<target>Nie można znaleźć %x.</target>
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
 <target>Katalog docelowy %x już istnieje.</target>
@@ -534,8 +531,8 @@ Komenda jest wykonywana gdy:
 <source>Available:</source>
 <target>Dostępne:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Katalog zostanie zmodyfikowany w związku z synchronizacją wielu katalogów. Zweryfikuj ustawienia synchronizacji.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target></target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronizacja katalgów:</target>
@@ -637,8 +634,8 @@ Komenda jest wykonywana gdy:
 <source>Name</source>
 <target>Nazwa</target>
 
-<source>Relative path</source>
-<target>Relatywna ścieżka</target>
+<source>Relative folder</source>
+<target></target>
 
 <source>Base folder</source>
 <target>Katalog bazowy</target>
@@ -679,8 +676,8 @@ Komenda jest wykonywana gdy:
 <source>Remove local settings</source>
 <target>Usuń lokalne ustawienia</target>
 
-<source>Reset local filter</source>
-<target>Resetuj lokalny filtr</target>
+<source>Clear local filter</source>
+<target></target>
 
 <source>Copy</source>
 <target>Kopiuj</target>
@@ -700,11 +697,11 @@ Komenda jest wykonywana gdy:
 <source>Save as &batch job...</source>
 <target>Zapisz w trybie &wsadowym...</target>
 
-<source>1. &Compare</source>
-<target>1. &Porównaj</target>
+<source>Start &comparison</source>
+<target></target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchronizuj</target>
+<source>Start &synchronization</source>
+<target></target>
 
 <source>&Options</source>
 <target>&Opcje</target>
@@ -715,20 +712,23 @@ Komenda jest wykonywana gdy:
 <source>&Find...</source>
 <target>&Szukaj...</target>
 
+<source>&Reset layout</source>
+<target></target>
+
 <source>&Export file list...</source>
 <target>&Eksportuj listę plików...</target>
 
 <source>&Tools</source>
 <target>&Narzędzia</target>
 
+<source>&Check for new version</source>
+<target>Sprawdź &nową wersję</target>
+
 <source>&Check now</source>
 <target>Spra&wdź teraz</target>
 
 <source>Check &automatically once a week</source>
 <target>Sprawdzaj &automatycznie raz w tygodniu</target>
-
-<source>&Check for new version</source>
-<target>Sprawdź &nową wersję</target>
 
 <source>Cancel</source>
 <target>Anuluj</target>
@@ -757,17 +757,14 @@ Komenda jest wykonywana gdy:
 <source>Match case</source>
 <target>Uwzględnij wielkość liter</target>
 
+<source>New</source>
+<target></target>
+
 <source>Open...</source>
 <target>Otwórz...</target>
 
 <source>Save</source>
 <target>Zapisz</target>
-
-<source>Save as GUI job</source>
-<target>Zapisz zadanie</target>
-
-<source>Save as batch job</source>
-<target>Zapisz w trybie wsadowym</target>
 
 <source>Save as...</source>
 <target>Zapisz jako...</target>
@@ -781,14 +778,14 @@ Komenda jest wykonywana gdy:
 <source>Statistics:</source>
 <target>Statystyki:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Liczba plików i katalogów, które zostaną utworzone</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Liczba plików i katalogów, które zostaną usunięte</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Liczba plików, które zostaną nadpisane</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Liczba plików i katalogów, które zostaną usunięte</target>
+<source>Number of files and folders that will be created</source>
+<target>Liczba plików i katalogów, które zostaną utworzone</target>
 
 <source>Total bytes to copy</source>
 <target>Całkowity rozmiar do skopiowania</target>
@@ -804,6 +801,15 @@ Komenda jest wykonywana gdy:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Określ różnice w plikach na podstawie ich zawartości.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Handle daylight saving time</source>
+<target></target>
 
 <source>Symbolic links:</source>
 <target>Dowiązania symboliczne:</target>
@@ -835,8 +841,8 @@ Komenda jest wykonywana gdy:
 <source>Maximum:</source>
 <target>Maksymalny:</target>
 
-<source>&Reset</source>
-<target>&Resetuj</target>
+<source>C&lear</source>
+<target></target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Określ reguły filtrowania w celu wykluczenia niektórych plików z synchronizacji. Ścieżki plików muszą być relatywne do podanych par katalogów.</target>
@@ -861,20 +867,20 @@ Komenda jest wykonywana gdy:
 <source>Delete files:</source>
 <target>Usuwanie plików:</target>
 
-<source>Permanent</source>
-<target>Trwale</target>
+<source>&Permanent</source>
+<target></target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Usuń lub nadpisz pliki na stałe</target>
 
-<source>Recycle bin</source>
-<target>Kosz</target>
+<source>&Recycle bin</source>
+<target>&Kosz systemowy</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Przechowuj pliki, które zostały usunięte lub nadpisane w koszu.</target>
 
-<source>Versioning</source>
-<target>Wersjonowanie</target>
+<source>&Versioning</source>
+<target></target>
 
 <source>Move files to a user-defined folder</source>
 <target>Przenieś pliki do katalogu zdefiniowanego przez użytkownika</target>
@@ -885,14 +891,11 @@ Komenda jest wykonywana gdy:
 <source>Handle errors:</source>
 <target>Obsługa błędów:</target>
 
-<source>Ignore</source>
-<target>Ignoruj</target>
-
 <source>Hide all error and warning messages</source>
 <target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
 
-<source>Pop-up</source>
-<target>Pop-up</target>
+<source>&Pop-up</source>
+<target></target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Pokazuj okna pop-up dla błędów i ostrzeżeń</target>
@@ -915,9 +918,6 @@ Komenda jest wykonywana gdy:
 <source>Items found:</source>
 <target>Znalezione elementy:</target>
 
-<source>Speed:</source>
-<target>Prędkość:</target>
-
 <source>Time remaining:</source>
 <target>Do ukończenia:</target>
 
@@ -930,6 +930,9 @@ Komenda jest wykonywana gdy:
 <source>Minimize to notification area</source>
 <target>Minimalizuj do obszaru powiadomień</target>
 
+<source>Bytes copied:</source>
+<target></target>
+
 <source>Close</source>
 <target>Zamknij</target>
 
@@ -941,6 +944,9 @@ Komenda jest wykonywana gdy:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Utwórz plik wsadowy do zautomatyzowania procesu synchronizacji. Aby rozpocząć, klknij dwa razy plik lub zaplanuj zadanie w harmonogramie zadań: %x</target>
+
+<source>&Stop</source>
+<target></target>
 
 <source>Stop synchronization at first error</source>
 <target>Przerwij synchronizację przy pierwszym błędzie</target>
@@ -959,9 +965,6 @@ Komenda jest wykonywana gdy:
 
 <source>How can I schedule a batch job?</source>
 <target>Jak zaplanować zadanie w trybie wsadowym?</target>
-
-<source>&Recycle bin</source>
-<target>&Kosz systemowy</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Następujące ustawienia stosowane są do wszystkich zadań synchronizacji.</target>
@@ -1011,8 +1014,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Description</source>
 <target>Opis</target>
 
-<source>Restore hidden windows</source>
-<target>Przywróć ukryte dialogi</target>
+<source>Show hidden dialogs again</source>
+<target></target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target></target>
 
 <source>&Default</source>
 <target>&Domyślne</target>
@@ -1074,8 +1080,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Main Bar</source>
 <target>Główny pasek</target>
 
-<source>Compare both sides</source>
-<target>Porównaj foldery</target>
+<source>Start comparison</source>
+<target></target>
 
 <source>Comparison settings</source>
 <target>Ustawienia porównywania</target>
@@ -1174,9 +1180,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Select time span...</source>
 <target>Określ przedział czasowy...</target>
 
-<source>Default view</source>
-<target>Widok domyślny</target>
-
 <source>Show "%x"</source>
 <target>Pokaż "%x"</target>
 
@@ -1207,8 +1210,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Synchronization Settings</source>
 <target>Ustawienia synchronizacji</target>
 
-<source>Reset filter</source>
-<target>Resetuj filtr</target>
+<source>Clear filter</source>
+<target></target>
 
 <source>Show files that exist on left side only</source>
 <target>Pokaż pliki istniejące tylko po lewej stronie</target>
@@ -1368,8 +1371,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Odpowiednik %item_folder% po drugiej stronie</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Przywrócić wszystkie ukryte dialogi?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target></target>
+
+<source>&Show</source>
+<target></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Wyszukaj oraz zastosuj zmiany po obu stronach. Wszystkie operacje na plikach takie jak usunięcia, zmiany oraz konflikty wykrywane są automatycznie przy użyciu bazy danych.</target>

@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Den tilsvarende mappe betragtes som tom.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Følgende mapper har afhængige stier. Opsæt synkroniseringsreglerne med omhu:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Følgende mappestier afhænger af hinanden:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Filen %x har en ugyldig dato.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Opdater attributter mod højre</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x byte</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Databasefilen %x er inkompatibel.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Samlet tid:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x byte</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Behandlingsfejl i filen %x, række %y, kolonne %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Afslut</target>
 
-<source>&Program</source>
-<target>&Filer</target>
+<source>&File</source>
+<target>&Fil</target>
 
 <source>&View help</source>
 <target>&Åben hjælp</target>
@@ -435,9 +435,6 @@ Kommandoen udføres hvis:
 <source>&Show error</source>
 <target>Vi&s fejl</target>
 
-<source>&Exit</source>
-<target>&Luk</target>
-
 <source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
 
@@ -501,8 +498,8 @@ Kommandoen udføres hvis:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Godkendelsesfejl: %x og %y har forskelligt indhold</target>
 
-<source>Cannot find %x.</source>
-<target>Kan ikke finde %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Kan ikke finde mappen %x</target>
 
 <source>Target folder %x already existing.</source>
 <target>Destinationsmappen %x findes allerede.</target>
@@ -531,8 +528,8 @@ Kommandoen udføres hvis:
 <source>Available:</source>
 <target>Tilgængeligt:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Der ændres en mappe der tilhører flere mappepar. Kontroller dine synkroniseringsindstillinger.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Flere mappepar skriver til en almen undermappe. Kontroller dine indstillinger</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synkroniserer mappepar:</target>
@@ -633,8 +630,8 @@ Kommandoen udføres hvis:
 <source>Name</source>
 <target>Navn</target>
 
-<source>Relative path</source>
-<target>Relativ sti</target>
+<source>Relative folder</source>
+<target>Relativ mappe</target>
 
 <source>Base folder</source>
 <target>Hovedmappe</target>
@@ -675,8 +672,8 @@ Kommandoen udføres hvis:
 <source>Remove local settings</source>
 <target>Fjern lokale indstillinger</target>
 
-<source>Reset local filter</source>
-<target>Nulstil lokalt filter</target>
+<source>Clear local filter</source>
+<target>Ryd lokale filtre</target>
 
 <source>Copy</source>
 <target>Kopiér</target>
@@ -696,11 +693,11 @@ Kommandoen udføres hvis:
 <source>Save as &batch job...</source>
 <target>Gem som &batchfil</target>
 
-<source>1. &Compare</source>
-<target>1. &Analyser</target>
+<source>Start &comparison</source>
+<target>Start &analyse</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synkroniser</target>
+<source>Start &synchronization</source>
+<target>Start &synkronisering</target>
 
 <source>&Options</source>
 <target>&Indstillinger</target>
@@ -711,20 +708,23 @@ Kommandoen udføres hvis:
 <source>&Find...</source>
 <target>S&øg</target>
 
+<source>&Reset layout</source>
+<target>N&ulstil layout</target>
+
 <source>&Export file list...</source>
 <target>&Eksporter filliste...</target>
 
 <source>&Tools</source>
 <target>&Værktøj</target>
 
+<source>&Check for new version</source>
+<target>Søg &efter opdatering</target>
+
 <source>&Check now</source>
 <target>Søg &nu</target>
 
 <source>Check &automatically once a week</source>
 <target>Søg &automatisk en gang om ugen</target>
-
-<source>&Check for new version</source>
-<target>Søg &efter opdatering</target>
 
 <source>Cancel</source>
 <target>Annuller</target>
@@ -753,17 +753,14 @@ Kommandoen udføres hvis:
 <source>Match case</source>
 <target>Versalfølsom (a/A)</target>
 
+<source>New</source>
+<target>Ny</target>
+
 <source>Open...</source>
 <target>Åben...</target>
 
 <source>Save</source>
 <target>Gem</target>
-
-<source>Save as GUI job</source>
-<target>Gem som brugerfladejob</target>
-
-<source>Save as batch job</source>
-<target>Gem som batchfil</target>
 
 <source>Save as...</source>
 <target>Gem som...</target>
@@ -777,14 +774,14 @@ Kommandoen udføres hvis:
 <source>Statistics:</source>
 <target>Statistik:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Antal filer og mapper der oprettes</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Antal filer og mapper der slettes</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Antal filer der overskrives</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Antal filer og mapper der slettes</target>
+<source>Number of files and folders that will be created</source>
+<target>Antal filer og mapper der oprettes</target>
 
 <source>Total bytes to copy</source>
 <target>Antal bytes der kopieres</target>
@@ -800,6 +797,15 @@ Kommandoen udføres hvis:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Genkend ens filer efter indhold.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorer tidsskift (i timer)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Betragt filer med defineret tidsskift som uændrede</target>
+
+<source>Handle daylight saving time</source>
+<target>Tag hensyn til sommertid</target>
 
 <source>Symbolic links:</source>
 <target>Symbolske link:</target>
@@ -831,8 +837,8 @@ Kommandoen udføres hvis:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Reset</source>
-<target>&Nulstil</target>
+<source>C&lear</source>
+<target>R&yd</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
@@ -857,20 +863,20 @@ Kommandoen udføres hvis:
 <source>Delete files:</source>
 <target>Filsletning:</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target>&Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Slet eller overskriv filer permanent</target>
 
-<source>Recycle bin</source>
-<target>Papirkurv</target>
+<source>&Recycle bin</source>
+<target>&Papirkurv</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Backup slettede og overskrevne filer i papirkurven</target>
 
-<source>Versioning</source>
-<target>Versionering</target>
+<source>&Versioning</source>
+<target>&Versionering</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Flyt filer til brugerdefineret mappe</target>
@@ -881,14 +887,11 @@ Kommandoen udføres hvis:
 <source>Handle errors:</source>
 <target>Fejlhåndtering:</target>
 
-<source>Ignore</source>
-<target>Ignorer</target>
-
 <source>Hide all error and warning messages</source>
 <target>Skjul fejlbeskeder og advarsler</target>
 
-<source>Pop-up</source>
-<target>Besked</target>
+<source>&Pop-up</source>
+<target>&Besked</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Vis fejlbeskeder og advarsler</target>
@@ -911,9 +914,6 @@ Kommandoen udføres hvis:
 <source>Items found:</source>
 <target>Emner fundet:</target>
 
-<source>Speed:</source>
-<target>Hastighed:</target>
-
 <source>Time remaining:</source>
 <target>Resterende tid:</target>
 
@@ -926,6 +926,9 @@ Kommandoen udføres hvis:
 <source>Minimize to notification area</source>
 <target>Minimér til uret</target>
 
+<source>Bytes copied:</source>
+<target>Kopierede byte:</target>
+
 <source>Close</source>
 <target>Luk</target>
 
@@ -937,6 +940,9 @@ Kommandoen udføres hvis:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Opret batchfil til automatisk synkronisering. Start ved at dobbeltklikke på filen eller planlæg via opgavestyring: %x</target>
+
+<source>&Stop</source>
+<target>&Stop</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stop synkronisering ved første fejl</target>
@@ -955,9 +961,6 @@ Kommandoen udføres hvis:
 
 <source>How can I schedule a batch job?</source>
 <target>Hvordan oprettes en batchfil?</target>
-
-<source>&Recycle bin</source>
-<target>&Papirkurv</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse indstillinger gælder alle synkroniseringer.</target>
@@ -1004,8 +1007,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Beskrivelse</target>
 
-<source>Restore hidden windows</source>
-<target>Gendan skjulte vinduer</target>
+<source>Show hidden dialogs again</source>
+<target>Gendan skjulte beskeder</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Vis skjulte advarsler og beskeder igen</target>
 
 <source>&Default</source>
 <target>S&tandard</target>
@@ -1067,8 +1073,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Hovedlinie</target>
 
-<source>Compare both sides</source>
-<target>Analyser begge sider</target>
+<source>Start comparison</source>
+<target>Start analyse</target>
 
 <source>Comparison settings</source>
 <target>Analyseindstillinger</target>
@@ -1163,9 +1169,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Vælg tidsinterval...</target>
 
-<source>Default view</source>
-<target>Standardvisning</target>
-
 <source>Show "%x"</source>
 <target>Vis "%x"</target>
 
@@ -1196,8 +1199,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Synkroniseringsindstillinger</target>
 
-<source>Reset filter</source>
-<target>Nulstil filter</target>
+<source>Clear filter</source>
+<target>Ryd filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Vis filer der kun findes på venstre side</target>
@@ -1355,8 +1358,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>Modsat sides pendant til %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Gendan skjulte vinduer og advarsler?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Vis skjulte advarsler og beskeder igen?</target>
+
+<source>&Show</source>
+<target>&Vis</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Find og udbred ændringer på begge sider. Sletninger, omdøbninger og konflikter findes automatisk i en database.</target>

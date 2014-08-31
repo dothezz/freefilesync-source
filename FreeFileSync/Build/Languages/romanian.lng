@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Dosarul corespondent va fi considerat ca fiind gol.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Dosarele următoare au căi dependente. Atenție la setarea regulilor de sincronizare:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Următoarele căi de dosare sînt dependente una de alta:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Fila %x are o dată nevalidă.</target>
@@ -199,6 +199,25 @@
 <source>Update attributes on right</source>
 <target>Actualizează atributele în partea dreaptă</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 bait</pluralform>
+<pluralform>%x baiți</pluralform>
+<pluralform>%x de baiți</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Fila cu baza de date %x este incompatibilă.</target>
 
@@ -259,25 +278,6 @@
 
 <source>Total time:</source>
 <target>Timp Total:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 bait</pluralform>
-<pluralform>%x baiți</pluralform>
-<pluralform>%x de baiți</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Eroare la parsarea filei %x, rîndul %y, coloana %z.</target>
@@ -346,8 +346,8 @@
 <source>&Quit</source>
 <target>&Ieși</target>
 
-<source>&Program</source>
-<target>&Program</target>
+<source>&File</source>
+<target>&Filă</target>
 
 <source>&View help</source>
 <target>&Cuprins</target>
@@ -438,9 +438,6 @@ Comanda este declanșată dacă:
 <source>&Show error</source>
 <target>A&rată eroarea</target>
 
-<source>&Exit</source>
-<target>&Ieși</target>
-
 <source>Incorrect command line:</source>
 <target>Linie de comandă incorectă:</target>
 
@@ -504,8 +501,8 @@ Comanda este declanșată dacă:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Eroare la verificarea datelor: %x și %y au conținut diferit.</target>
 
-<source>Cannot find %x.</source>
-<target>Nu pot găsi %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Nu pot găsi dosarul %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Dosarul țintă %x există deja.</target>
@@ -534,8 +531,8 @@ Comanda este declanșată dacă:
 <source>Available:</source>
 <target>Disponibil:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Va fi modificat un dosar care face parte din mai multe perechi de dosare. Reverifică setările de sincronizare.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Mai multe perechi de dosare scriu într-un subdosar comun. Revezi configurația.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizez perechea de dosare:</target>
@@ -574,7 +571,7 @@ Comanda este declanșată dacă:
 <target>&Nu arăta din nou această atenționare</target>
 
 <source>&Ignore</source>
-<target>&OK</target>
+<target>&Ignoră</target>
 
 <source>&Switch</source>
 <target>&Comută</target>
@@ -637,8 +634,8 @@ Comanda este declanșată dacă:
 <source>Name</source>
 <target>Nume</target>
 
-<source>Relative path</source>
-<target>Cale Relativă</target>
+<source>Relative folder</source>
+<target>Dosar Relativ</target>
 
 <source>Base folder</source>
 <target>Dosar Bază (Rădăcină)</target>
@@ -668,7 +665,7 @@ Comanda este declanșată dacă:
 <target>Setările locale de sincronizare</target>
 
 <source>Local filter</source>
-<target>Filtru local</target>
+<target>Filtru Local</target>
 
 <source>Active</source>
 <target>Activ</target>
@@ -679,8 +676,8 @@ Comanda este declanșată dacă:
 <source>Remove local settings</source>
 <target>Înlătură setările locale</target>
 
-<source>Reset local filter</source>
-<target>Resetează filtrul local</target>
+<source>Clear local filter</source>
+<target>Curăță filtrul local</target>
 
 <source>Copy</source>
 <target>Copiază</target>
@@ -700,11 +697,11 @@ Comanda este declanșată dacă:
 <source>Save as &batch job...</source>
 <target>Salvea&ză ca Sarcină Set...</target>
 
-<source>1. &Compare</source>
-<target>1. &Compară</target>
+<source>Start &comparison</source>
+<target>Pornește &Compararea</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Sincronizează</target>
+<source>Start &synchronization</source>
+<target>Pornește &Sincronizarea</target>
 
 <source>&Options</source>
 <target>&Opțiuni</target>
@@ -715,20 +712,23 @@ Comanda este declanșată dacă:
 <source>&Find...</source>
 <target>&Găsește...</target>
 
+<source>&Reset layout</source>
+<target>&Resetează Aspectul Grafic</target>
+
 <source>&Export file list...</source>
 <target>&Exportă Lista de File...</target>
 
 <source>&Tools</source>
 <target>&Unelte</target>
 
+<source>&Check for new version</source>
+<target>Caută &Versiune Nouă</target>
+
 <source>&Check now</source>
 <target>&Caută Acum</target>
 
 <source>Check &automatically once a week</source>
 <target>Caută &Automat în Fiecare Săptămînă</target>
-
-<source>&Check for new version</source>
-<target>Caută &Versiune Nouă</target>
 
 <source>Cancel</source>
 <target>Anulează</target>
@@ -757,17 +757,14 @@ Comanda este declanșată dacă:
 <source>Match case</source>
 <target>Potrivește cu caseta literelor (MAJ/min)</target>
 
+<source>New</source>
+<target>Nouă</target>
+
 <source>Open...</source>
 <target>Deschide...</target>
 
 <source>Save</source>
 <target>Salvează</target>
-
-<source>Save as GUI job</source>
-<target>Salvează ca Sarcină GUI [*.ffs_gui]</target>
-
-<source>Save as batch job</source>
-<target>Salvează ca Sarcină Set [*.ffs_batch]</target>
 
 <source>Save as...</source>
 <target>Salvează ca...</target>
@@ -781,14 +778,14 @@ Comanda este declanșată dacă:
 <source>Statistics:</source>
 <target>Statistici:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Numărul de file și dosare care vor fi create</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Numărul de file și dosare care vor fi șterse</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Numărul de file care vor fi suprascrise</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Numărul de file și dosare care vor fi șterse</target>
+<source>Number of files and folders that will be created</source>
+<target>Numărul de file și dosare care vor fi create</target>
 
 <source>Total bytes to copy</source>
 <target>Numărul total de baiți copiați</target>
@@ -804,6 +801,15 @@ Comanda este declanșată dacă:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Filele identice sînt descoperite prin compararea conținutului filelor.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignoră decalajul temporal (în ore)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Consideră ca identice timpurile filelor cu decalajul specificat</target>
+
+<source>Handle daylight saving time</source>
+<target>Gestionarea timpului de vară (DST)</target>
 
 <source>Symbolic links:</source>
 <target>Legături Simbolice:</target>
@@ -835,8 +841,8 @@ Comanda este declanșată dacă:
 <source>Maximum:</source>
 <target>Maxim:</target>
 
-<source>&Reset</source>
-<target>&Resetează</target>
+<source>C&lear</source>
+<target>C&urăță</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selectează regulile filtrului pentru a exclude anumite file de la sincronizare. Introdu căile filelor relative la perechea lor de dosare corespondentă.</target>
@@ -861,20 +867,20 @@ Comanda este declanșată dacă:
 <source>Delete files:</source>
 <target>Ștergerea Filelor:</target>
 
-<source>Permanent</source>
-<target>Definitivă</target>
+<source>&Permanent</source>
+<target>&Definitivă</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
-<source>Recycle bin</source>
-<target>Reciclator</target>
+<source>&Recycle bin</source>
+<target>&Reciclator</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Conservă [back up] în Reciclator filele șterse sau suprascrise</target>
 
-<source>Versioning</source>
-<target>Versionare</target>
+<source>&Versioning</source>
+<target>&Versionare</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Mută filele într-un dosar stabilit de utilizator</target>
@@ -885,14 +891,11 @@ Comanda este declanșată dacă:
 <source>Handle errors:</source>
 <target>Gestionarea Erorilor:</target>
 
-<source>Ignore</source>
-<target>Ignorare</target>
-
 <source>Hide all error and warning messages</source>
 <target>Mesajele de eroare și de avertizare nu sînt arătate</target>
 
-<source>Pop-up</source>
-<target>Popîc</target>
+<source>&Pop-up</source>
+<target>&Popîc</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>În caz de erori sau avertizări este arătată o fereastră popîc [popup]</target>
@@ -915,9 +918,6 @@ Comanda este declanșată dacă:
 <source>Items found:</source>
 <target>Elemente Găsite:</target>
 
-<source>Speed:</source>
-<target>Viteză:</target>
-
 <source>Time remaining:</source>
 <target>Timp Rămas:</target>
 
@@ -930,6 +930,9 @@ Comanda este declanșată dacă:
 <source>Minimize to notification area</source>
 <target>Minimizează în aria de notificare (sertar)</target>
 
+<source>Bytes copied:</source>
+<target>Baiți copiați:</target>
+
 <source>Close</source>
 <target>Închide</target>
 
@@ -941,6 +944,9 @@ Comanda este declanșată dacă:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Creează o filă set [batch file] pentru sincronizarea neasistată. Pentru efectuarea sincronizării, dublu-clichează această filă sau programează rularea ei folosind un Planificator de Sarcini [Task Scheduler]: %x</target>
+
+<source>&Stop</source>
+<target>&Oprește</target>
 
 <source>Stop synchronization at first error</source>
 <target>Oprește sincronizarea la prima eroare întîlnită</target>
@@ -959,9 +965,6 @@ Comanda este declanșată dacă:
 
 <source>How can I schedule a batch job?</source>
 <target>Cum pot planifica o sarcină set?</target>
-
-<source>&Recycle bin</source>
-<target>&Reciclator</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Setările următoare sînt folosite pentru toate sarcinile de sincronizare.</target>
@@ -1011,8 +1014,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Description</source>
 <target>Descriere</target>
 
-<source>Restore hidden windows</source>
-<target>Restaurează ferestrele ascunse</target>
+<source>Show hidden dialogs again</source>
+<target>Arată din nou dialogurile ascunse</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Sînt arătate din nou dialogurile și mesajele de eroare care au fost ascunse permanent</target>
 
 <source>&Default</source>
 <target>Coloanele &Implicite</target>
@@ -1074,8 +1080,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Main Bar</source>
 <target>Bara Principală</target>
 
-<source>Compare both sides</source>
-<target>Compară Părțile Stîngă și Dreaptă</target>
+<source>Start comparison</source>
+<target>Pornește Compararea</target>
 
 <source>Comparison settings</source>
 <target>Setările Comparării</target>
@@ -1174,9 +1180,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Select time span...</source>
 <target>Selectează intervalul de timp...</target>
 
-<source>Default view</source>
-<target>Vedere Implicită</target>
-
 <source>Show "%x"</source>
 <target>Arată "%x"</target>
 
@@ -1207,8 +1210,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Synchronization Settings</source>
 <target>Setările Sincronizării</target>
 
-<source>Reset filter</source>
-<target>Resetează Filtrul</target>
+<source>Clear filter</source>
+<target>Curăță Filtrul</target>
 
 <source>Show files that exist on left side only</source>
 <target>Arată filele care există doar în stînga</target>
@@ -1368,8 +1371,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- corespondentul din partea opusă al lui %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurezi toate ferestrele și avertismentele ascunse?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Arăt din nou dialogurile și mesajele de eroare ascunse?</target>
+
+<source>&Show</source>
+<target>&Arată</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifică și propagă modificările din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>

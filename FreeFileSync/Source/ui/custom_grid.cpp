@@ -624,7 +624,7 @@ private:
             case COL_TYPE_FILENAME:
                 return _("Name"); //= short name
             case COL_TYPE_REL_FOLDER:
-                return _("Relative path");
+                return _("Relative folder");
             case COL_TYPE_BASE_DIRECTORY:
                 return _("Base folder");
             case COL_TYPE_SIZE:

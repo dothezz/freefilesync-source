@@ -271,6 +271,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
     m_textCtrlExclude->SetMaxLength(0); //
 #endif
+    assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
 
     m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
     m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
@@ -513,7 +514,7 @@ void ConfigDialog::updateFilterGui()
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
     m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
 
-    m_buttonReset->Enable(!(activeCfg == FilterConfig()));
+    m_buttonClear->Enable(!(activeCfg == FilterConfig()));
 }
 
 

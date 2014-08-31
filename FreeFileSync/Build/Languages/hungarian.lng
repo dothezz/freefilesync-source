@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>A kapcsolódó könyvtárat üresként kezeli.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>A következő könyvtárak egymástól függő útvonalat tartalmaznak. Légy óvatos a szinkronizálás szabályainak meghatározásánál!</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>A következő könyvtárak elérési útvonalai függenek egymástól:</target>
 
 <source>File %x has an invalid date.</source>
 <target>%x fájl dátuma érvénytelen.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Attribútumok frissítése a jobb oldalon</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 bájt</pluralform>
+<pluralform>%x bájt</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x kB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>%x adatbázisfájl inkompatibilis: .</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Összes időszükségelet:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 bájt</pluralform>
-<pluralform>%x bájt</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x kB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Hiba történt a feldolgozás közben: %x fájl, %y sor, %z oszlop.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Kilépés</target>
 
-<source>&Program</source>
-<target>&Program</target>
+<source>&File</source>
+<target>&Fájl</target>
 
 <source>&View help</source>
 <target>&Nézd meg a súgót</target>
@@ -435,9 +435,6 @@ A parancs végrehajtódik, ha:
 <source>&Show error</source>
 <target>&Mutassa a hibákat</target>
 
-<source>&Exit</source>
-<target>&Kilép</target>
-
 <source>Incorrect command line:</source>
 <target>Hibás parancssor:</target>
 
@@ -501,8 +498,8 @@ A parancs végrehajtódik, ha:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Adat-ellenőrzési hiba: %x és %y tartalma különböző.</target>
 
-<source>Cannot find %x.</source>
-<target>%x nem található.</target>
+<source>Cannot find folder %x.</source>
+<target>%x könyvtárat nem találom.</target>
 
 <source>Target folder %x already existing.</source>
 <target>%x célkönyvtár már létezik.</target>
@@ -531,8 +528,8 @@ A parancs végrehajtódik, ha:
 <source>Available:</source>
 <target>Szabad:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Egy olyan könyvtár kerül módosításra, amely több könyvtár-pár része. Kérjük, ellenőrizze a szinkronizálási beállításokat.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Több könyvtár-pár írna egy közös alkönyvtárba. Ellenőrizze a konfigurációját.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>A szinkronizált könyvtár-pár:</target>
@@ -633,8 +630,8 @@ A parancs végrehajtódik, ha:
 <source>Name</source>
 <target>Név</target>
 
-<source>Relative path</source>
-<target>Relatív útvonal</target>
+<source>Relative folder</source>
+<target>Relatív könyvtár</target>
 
 <source>Base folder</source>
 <target>Alapkönyvtár</target>
@@ -675,8 +672,8 @@ A parancs végrehajtódik, ha:
 <source>Remove local settings</source>
 <target>Törli a helyi beállításokat</target>
 
-<source>Reset local filter</source>
-<target>Visszaállítja a helyi szűrőt</target>
+<source>Clear local filter</source>
+<target>Törli a helyi szűrőt</target>
 
 <source>Copy</source>
 <target>Másol</target>
@@ -696,11 +693,11 @@ A parancs végrehajtódik, ha:
 <source>Save as &batch job...</source>
 <target>Mentse &kötegelt feladatként...</target>
 
-<source>1. &Compare</source>
-<target>1. &Összehasonlít</target>
+<source>Start &comparison</source>
+<target>Kezdje az &összehasonlítást</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Szinkronizál</target>
+<source>Start &synchronization</source>
+<target>Kezdje a &szinkronizálást</target>
 
 <source>&Options</source>
 <target>&Beállítások</target>
@@ -711,20 +708,23 @@ A parancs végrehajtódik, ha:
 <source>&Find...</source>
 <target>Ke&res...</target>
 
+<source>&Reset layout</source>
+<target>&Alapállapotba állítja a megjelenést</target>
+
 <source>&Export file list...</source>
 <target>&Exportálja a fájllistát...</target>
 
 <source>&Tools</source>
 <target>Es&zközök</target>
 
+<source>&Check for new version</source>
+<target>&Új verzió keresése</target>
+
 <source>&Check now</source>
 <target>&Ellenőrizze most</target>
 
 <source>Check &automatically once a week</source>
 <target>&Automatikus ellenőrzés hetente</target>
-
-<source>&Check for new version</source>
-<target>&Új verzió keresése</target>
 
 <source>Cancel</source>
 <target>Mégsem</target>
@@ -753,17 +753,14 @@ A parancs végrehajtódik, ha:
 <source>Match case</source>
 <target>Kis-/nagybetű megkülönböztetése</target>
 
+<source>New</source>
+<target>Új</target>
+
 <source>Open...</source>
 <target>Megnyit...</target>
 
 <source>Save</source>
 <target>Ment</target>
-
-<source>Save as GUI job</source>
-<target>Mentse GUI feladatként</target>
-
-<source>Save as batch job</source>
-<target>Mentse kötegelt feladatként</target>
 
 <source>Save as...</source>
 <target>Mentse mint...</target>
@@ -777,14 +774,14 @@ A parancs végrehajtódik, ha:
 <source>Statistics:</source>
 <target>Statisztika:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>A létrehozandó fájlok és könyvtárak száma</target>
+<source>Number of files and folders that will be deleted</source>
+<target>A törlendő fájlok és könyvtárak száma</target>
 
 <source>Number of files that will be overwritten</source>
 <target>A felülírandó fájlok száma</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>A törlendő fájlok és könyvtárak száma</target>
+<source>Number of files and folders that will be created</source>
+<target>A létrehozandó fájlok és könyvtárak száma</target>
 
 <source>Total bytes to copy</source>
 <target>Összesen másolandó bájtok</target>
@@ -800,6 +797,15 @@ A parancs végrehajtódik, ha:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Tartalom összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>(óra) időkülönbséget figyelmen kívül hagy</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>A meghatározott eltolású fájlidőket egyenlőnek tekinti</target>
+
+<source>Handle daylight saving time</source>
+<target>Kezelje a nyári időszámítás különbségét</target>
 
 <source>Symbolic links:</source>
 <target>Szimbolikus linkek:</target>
@@ -831,8 +837,8 @@ A parancs végrehajtódik, ha:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Reset</source>
-<target>&Visszaállít</target>
+<source>C&lear</source>
+<target>&Töröl</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Meghatározott fájlok szinkronizálásból történő kizárásához válasszon szűrőt. Az útvonalakat a megfelelő könyvtár-párjaikhoz viszonyítva adja meg.</target>
@@ -857,20 +863,20 @@ A parancs végrehajtódik, ha:
 <source>Delete files:</source>
 <target>Törölje a következő fájlokat:</target>
 
-<source>Permanent</source>
-<target>Állandó</target>
+<source>&Permanent</source>
+<target>&Állandó</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Törölje vagy írja felül véglegesen a fájlokat</target>
 
-<source>Recycle bin</source>
-<target>Lomtár</target>
+<source>&Recycle bin</source>
+<target>Lomtá&r</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Mentse a törölt és felülírt fájlokat a Lomtárba</target>
 
-<source>Versioning</source>
-<target>Verziókövetés</target>
+<source>&Versioning</source>
+<target>&Verziókezelés</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Mozgassa a fájlokat egy a felhasználó által meghatározott könyvtárba</target>
@@ -881,14 +887,11 @@ A parancs végrehajtódik, ha:
 <source>Handle errors:</source>
 <target>A következő hibák kezelése:</target>
 
-<source>Ignore</source>
-<target>Figyelmen kívül hagy</target>
-
 <source>Hide all error and warning messages</source>
 <target>Rejtse el az összes hibaüzenetet és figyelmeztetést</target>
 
-<source>Pop-up</source>
-<target>Párbeszédablak</target>
+<source>&Pop-up</source>
+<target>&Párbeszédablak</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Hiba vagy figyelmeztetés esetén mutasson párbeszédablakot</target>
@@ -911,9 +914,6 @@ A parancs végrehajtódik, ha:
 <source>Items found:</source>
 <target>Talált elemek száma:</target>
 
-<source>Speed:</source>
-<target>Sebesség:</target>
-
 <source>Time remaining:</source>
 <target>Hátralévő idő:</target>
 
@@ -926,6 +926,9 @@ A parancs végrehajtódik, ha:
 <source>Minimize to notification area</source>
 <target>Minimalizálja a figyelmeztetési területre</target>
 
+<source>Bytes copied:</source>
+<target>Másolt bitek száma:</target>
+
 <source>Close</source>
 <target>Bezár</target>
 
@@ -937,6 +940,9 @@ A parancs végrehajtódik, ha:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Készítsen egy parancsfájlt a felügyelet nélküli szinkronizáláshoz. Az indításhoz kattintson kétszer erre a fájlra vagy ütemezze a feladat-tervezőben: %x</target>
+
+<source>&Stop</source>
+<target>&Stop</target>
 
 <source>Stop synchronization at first error</source>
 <target>Állítsa le a szinkronizálást az első hibánál</target>
@@ -955,9 +961,6 @@ A parancs végrehajtódik, ha:
 
 <source>How can I schedule a batch job?</source>
 <target>Hogyan tudok kötegelt feldolgozást ütemezni?</target>
-
-<source>&Recycle bin</source>
-<target>Lomtá&r</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>A következő beállítások minden szinkronizálási feladatnál használja.</target>
@@ -1007,8 +1010,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Description</source>
 <target>Leírás</target>
 
-<source>Restore hidden windows</source>
-<target>Állítsa vissza a rejtett ablakokat</target>
+<source>Show hidden dialogs again</source>
+<target>Mutassa ismét a rejtett párbeszédablakokat?</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Mutassa újra az összes ideiglenesen rejtett párbeszédablakot és figyelmeztetést</target>
 
 <source>&Default</source>
 <target>&Alapértelmezett</target>
@@ -1070,8 +1076,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Main Bar</source>
 <target>Fő sáv</target>
 
-<source>Compare both sides</source>
-<target>Vesse össze mindkét oldalt</target>
+<source>Start comparison</source>
+<target>Kezdje az összehasonlítást</target>
 
 <source>Comparison settings</source>
 <target>Összehasonlítási beállítások</target>
@@ -1166,9 +1172,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Select time span...</source>
 <target>Időintervallum kiválasztása...</target>
 
-<source>Default view</source>
-<target>Alapértelmezett nézet</target>
-
 <source>Show "%x"</source>
 <target>"%x" mutatása</target>
 
@@ -1199,8 +1202,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Synchronization Settings</source>
 <target>Szinkronizálási beállítások</target>
 
-<source>Reset filter</source>
-<target>Szűrő visszaállítása</target>
+<source>Clear filter</source>
+<target>Törölje a szűrőt</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mutassa a csak a bal oldalon létező fájlokat</target>
@@ -1358,8 +1361,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- A másik oldali megfelelőjét a következő könyvtárba: %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Visszaállítsa az összes rejtett ablakot és figyelmeztetést?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Mutassa újra a rejtett párbeszédablakokat és figyelmeztetéseket</target>
+
+<source>&Show</source>
+<target>&Mutat</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Változások keresése és bemutatása mindkét oldalon. A törléseket, mozgatásokat és ütközéseket automatikusan ismeri fel egy adatbázis segítségével.</target>

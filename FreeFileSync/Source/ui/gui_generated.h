@@ -300,7 +300,7 @@ protected:
     wxSpinCtrl* m_spinCtrlMaxSize;
     wxChoice* m_choiceUnitMaxSize;
     wxStaticLine* m_staticline62;
-    wxButton* m_buttonReset;
+    wxButton* m_buttonClear;
     wxStaticText* m_staticText44;
     wxPanel* m_panelSyncSettingsHolder;
     wxBoxSizer* bSizerLocalSyncSettings;
@@ -546,7 +546,9 @@ public:
     wxPanel* m_panelTimeRemaining;
     wxStaticText* m_staticTextRemTime;
     wxStaticText* m_staticTextTimeElapsed;
+    wxStaticBitmap* m_bitmapGraphKeyBytes;
     zen::Graph2D* m_panelGraphBytes;
+    wxStaticBitmap* m_bitmapGraphKeyItems;
     zen::Graph2D* m_panelGraphItems;
     wxNotebook* m_notebookResult;
     wxStaticLine* m_staticlineFooter;

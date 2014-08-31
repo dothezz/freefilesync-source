@@ -158,15 +158,27 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilepath) //make sure to NOT 
 #ifdef ZEN_WIN
 Zstring getLoginSid() //throw FileError
 {
-    HANDLE hToken = 0;
+    HANDLE hToken = nullptr;
     if (!::OpenProcessToken(::GetCurrentProcess(), //__in   HANDLE ProcessHandle,
                             TOKEN_ALL_ACCESS,      //__in   DWORD DesiredAccess,
                             &hToken))              //__out  PHANDLE TokenHandle
         throwFileError(_("Cannot get process information."), L"OpenProcessToken", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hToken));
 
-    DWORD bufferSize = 0;
-    ::GetTokenInformation(hToken, TokenGroups, nullptr, 0, &bufferSize);
+    DWORD bufferSize = [&]
+    {
+        DWORD sz = 0;
+        if (!::GetTokenInformation(hToken, TokenGroups, nullptr, 0, &sz))
+        {
+            if (::GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+                throwFileError(_("Cannot get process information."), L"GetTokenInformation", getLastError());
+
+            if (sz > 0)
+                return sz;
+        }
+
+        throw FileError(_("Cannot get process information."), L"failed to get GetTokenInformation buffer size"); //shouldn't happen
+    }();
 
     std::vector<char> buffer(bufferSize);
     if (!::GetTokenInformation(hToken,       //__in       HANDLE TokenHandle,

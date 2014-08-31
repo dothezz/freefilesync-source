@@ -7,6 +7,9 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Unable to set application identifier.</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Ambos lados han cambiado desde la última sincronización.</target>
 
@@ -106,8 +109,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>La siguiente carpeta será considerada como vacía.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Las carpetas siguientes usan rutas dependientes. Tenga cuidado al definir reglas de sincronización:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Las rutas de carpetas siguientes tienen dependencias reciprocas:</target>
 
 <source>File %x has an invalid date.</source>
 <target>El archivo %x tiene una fecha inválida.</target>
@@ -199,6 +202,27 @@
 <source>Update attributes on right</source>
 <target>Actualizar atributos en la derecha</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>No se puede cargar el archivo %x.</target>
+
 <source>Database file %x is incompatible.</source>
 <target>El archivo de base de datos %x es incompatible.</target>
 
@@ -259,24 +283,6 @@
 <source>Total time:</source>
 <target>Tiempo total:</target>
 
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Error analizando archivo %x, fila %y, columna %z.</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Por favor, use la versión de 64 bits de FreeFileSync para crear copias de Shadow en el sistema.</target>
 
-<source>Cannot load file %x.</source>
-<target>No se puede cargar el archivo %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>No se puede determinar nombre del volumen de %x.</target>
 
@@ -343,8 +346,8 @@
 <source>&Quit</source>
 <target>&Salir</target>
 
-<source>&Program</source>
-<target>&Programa</target>
+<source>&File</source>
+<target>&Archivo</target>
 
 <source>&View help</source>
 <target>&Ver ayuda</target>
@@ -353,7 +356,7 @@
 <target>&Acerca de</target>
 
 <source>&Help</source>
-<target>&Ayuda</target>
+<target>A&yuda</target>
 
 <source>Usage:</source>
 <target>Uso:</target>
@@ -435,9 +438,6 @@ El comando es disparado si:
 <source>&Show error</source>
 <target>Mo&strar error</target>
 
-<source>&Exit</source>
-<target>&Salir</target>
-
 <source>Incorrect command line:</source>
 <target>Línea de comandos incorrecta:</target>
 
@@ -501,8 +501,8 @@ El comando es disparado si:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Error al comprobar los datos: %x y %y tienen contenidos diferentes.</target>
 
-<source>Cannot find %x.</source>
-<target>No se pudo encontrar %x.</target>
+<source>Cannot find folder %x.</source>
+<target>No se puede encontrar la carpeta %x</target>
 
 <source>Target folder %x already existing.</source>
 <target>La carpeta de destino %x ya existe.</target>
@@ -531,8 +531,8 @@ El comando es disparado si:
 <source>Available:</source>
 <target>Disponible:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Una carpeta, que es parte de múltiple pares de carpetas, será modificada. Por favor, revise las opciones de sincronización.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Tiene varias carpetas emparejadas para escribir en la misma subcarpeta. Revise su configuración.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizando par de carpetas:</target>
@@ -633,8 +633,8 @@ El comando es disparado si:
 <source>Name</source>
 <target>Nombre</target>
 
-<source>Relative path</source>
-<target>Ruta relativa</target>
+<source>Relative folder</source>
+<target>Carpeta relativa</target>
 
 <source>Base folder</source>
 <target>Carpeta base</target>
@@ -675,8 +675,8 @@ El comando es disparado si:
 <source>Remove local settings</source>
 <target>Eliminar opciones locales</target>
 
-<source>Reset local filter</source>
-<target>Reiniciar el filtro local</target>
+<source>Clear local filter</source>
+<target>Borrar el filtro local</target>
 
 <source>Copy</source>
 <target>Copiar</target>
@@ -696,11 +696,11 @@ El comando es disparado si:
 <source>Save as &batch job...</source>
 <target>Guardar como tarea por &lotes…</target>
 
-<source>1. &Compare</source>
-<target>1. &Comparar</target>
+<source>Start &comparison</source>
+<target>Iniciar la &comparación</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Sincronizar</target>
+<source>Start &synchronization</source>
+<target>Iniciar la &sincronización</target>
 
 <source>&Options</source>
 <target>&Opciones</target>
@@ -711,20 +711,23 @@ El comando es disparado si:
 <source>&Find...</source>
 <target>&Buscar…</target>
 
+<source>&Reset layout</source>
+<target>&Reiniciar la presentación</target>
+
 <source>&Export file list...</source>
 <target>&Exportar lista de archivos…</target>
 
 <source>&Tools</source>
 <target>Herramien&tas</target>
 
+<source>&Check for new version</source>
+<target>&Comprobar nueva versión</target>
+
 <source>&Check now</source>
 <target>&Comprobar ahora</target>
 
 <source>Check &automatically once a week</source>
 <target>Comprobar &automáticamente una vez por semana</target>
-
-<source>&Check for new version</source>
-<target>&Comprobar nueva versión</target>
 
 <source>Cancel</source>
 <target>Cancelar</target>
@@ -753,17 +756,14 @@ El comando es disparado si:
 <source>Match case</source>
 <target>Coincidir mayúsculas y minúsculas</target>
 
+<source>New</source>
+<target>Nuevo</target>
+
 <source>Open...</source>
 <target>Abrir…</target>
 
 <source>Save</source>
 <target>Guardar</target>
-
-<source>Save as GUI job</source>
-<target>Guardar como tarea de interfaz</target>
-
-<source>Save as batch job</source>
-<target>Guardar como tarea por lotes</target>
 
 <source>Save as...</source>
 <target>Guardar como…</target>
@@ -777,14 +777,14 @@ El comando es disparado si:
 <source>Statistics:</source>
 <target>Estadísticas:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Número de archivos y carpetas que serán creados</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Número de archivos y carpetas que serán eliminados</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Número de archivos que serán sobrescritos</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Número de archivos y carpetas que serán eliminados</target>
+<source>Number of files and folders that will be created</source>
+<target>Número de archivos y carpetas que serán creados</target>
 
 <source>Total bytes to copy</source>
 <target>Total de bytes a copiar</target>
@@ -800,6 +800,15 @@ El comando es disparado si:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Comparar archivos iguales por el contenido.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorar desfase horario (en horas)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Considerar que las fechas con el desfase indicado son idénticas</target>
+
+<source>Handle daylight saving time</source>
+<target>Tener en cuenta la hora de verano</target>
 
 <source>Symbolic links:</source>
 <target>Vínculos simbólicos:</target>
@@ -831,8 +840,8 @@ El comando es disparado si:
 <source>Maximum:</source>
 <target>Máximo:</target>
 
-<source>&Reset</source>
-<target>&Reiniciar</target>
+<source>C&lear</source>
+<target>B&orrar</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Seleccione reglas para excluir archivos durante la sincronización. Indique rutas relativas a la carpeta emparejada correspondiente.</target>
@@ -857,20 +866,20 @@ El comando es disparado si:
 <source>Delete files:</source>
 <target>Eliminar archivos:</target>
 
-<source>Permanent</source>
-<target>Permanente</target>
+<source>&Permanent</source>
+<target>&Permanente</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Borrar o sobrescribir los archivos permanentemente</target>
 
-<source>Recycle bin</source>
-<target>Papelera de reciclaje</target>
+<source>&Recycle bin</source>
+<target>Papelera de &reciclaje</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Copiar a la papelera de reciclaje los archivos eliminados y reemplazados</target>
 
-<source>Versioning</source>
-<target>Control de versiones</target>
+<source>&Versioning</source>
+<target>&Versionado</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Mover los archivos a una carpeta del usuario</target>
@@ -881,14 +890,11 @@ El comando es disparado si:
 <source>Handle errors:</source>
 <target>Tratar errores:</target>
 
-<source>Ignore</source>
-<target>Ignorar</target>
-
 <source>Hide all error and warning messages</source>
 <target>Ocultar todos los mensajes de error y aviso</target>
 
-<source>Pop-up</source>
-<target>Automático</target>
+<source>&Pop-up</source>
+<target>E&mergentep</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar ventana emergente de errores o avisos</target>
@@ -911,9 +917,6 @@ El comando es disparado si:
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Speed:</source>
-<target>Velocidad:</target>
-
 <source>Time remaining:</source>
 <target>Tiempo restante:</target>
 
@@ -926,6 +929,9 @@ El comando es disparado si:
 <source>Minimize to notification area</source>
 <target>Minimizar en el área de notificación</target>
 
+<source>Bytes copied:</source>
+<target>Bytes copiados:</target>
+
 <source>Close</source>
 <target>Cerrar</target>
 
@@ -937,6 +943,9 @@ El comando es disparado si:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Crear tarea por lotes para sincronización desatendida. Para iniciar, haga doble clic en este archivo o prográmelo en el planificador de tareas : %x</target>
+
+<source>&Stop</source>
+<target>&Detener</target>
 
 <source>Stop synchronization at first error</source>
 <target>Detener la sincronización con el primer error</target>
@@ -955,9 +964,6 @@ El comando es disparado si:
 
 <source>How can I schedule a batch job?</source>
 <target>Cómo puedo programar una tarea por lotes?</target>
-
-<source>&Recycle bin</source>
-<target>Papelera de &reciclaje</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Las opciones siguientes se utilizan para todas las tareas de sincronización.</target>
@@ -1007,8 +1013,11 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Description</source>
 <target>Descripción</target>
 
-<source>Restore hidden windows</source>
-<target>Restaurar ventanas ocultas</target>
+<source>Show hidden dialogs again</source>
+<target>Volver a mostrar los diálogos ocultos</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Volver a mostrar todos los diálogos y mensajes de advertencia que fueron permanentemente ocultados</target>
 
 <source>&Default</source>
 <target>&Configuración predeterminada</target>
@@ -1070,8 +1079,8 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Main Bar</source>
 <target>Barra principal</target>
 
-<source>Compare both sides</source>
-<target>Comparar ambos lados</target>
+<source>Start comparison</source>
+<target>Iniciar la comparación</target>
 
 <source>Comparison settings</source>
 <target>Opciones de comparación</target>
@@ -1166,9 +1175,6 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Select time span...</source>
 <target>Seleccionar duración…</target>
 
-<source>Default view</source>
-<target>Vista predeterminada</target>
-
 <source>Show "%x"</source>
 <target>Mostrar "%x"</target>
 
@@ -1199,8 +1205,8 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>Synchronization Settings</source>
 <target>Opciones de sincronización</target>
 
-<source>Reset filter</source>
-<target>Reiniciar el filtro</target>
+<source>Clear filter</source>
+<target>Borrar filtro</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar sólo archivos existentes en la izquierda</target>
@@ -1358,8 +1364,11 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- El otro lado de %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Restaurar todas las ventanas y mensajes de advertencia ocultados ?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>¿Volver a mostrar los diálogos ocultos y las advertencias?</target>
+
+<source>&Show</source>
+<target>Mo&strar</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificar y propagar cambios en ambos lados. Archivos eliminados, movidos y conflictos se detectan automáticamente usando una base de datos.</target>
@@ -1377,7 +1386,7 @@ Se garantiza un estado coherente incluso en caso de error grave.
 <target>Excluir</target>
 
 <source>Direct</source>
-<target>Enviar</target>
+<target>Directo</target>
 
 <source>Follow</source>
 <target>Seguir</target>

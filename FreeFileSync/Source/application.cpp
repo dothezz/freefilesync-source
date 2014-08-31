@@ -25,6 +25,7 @@
 
 #ifdef ZEN_WIN
 #include <zen/win_ver.h>
+#include "lib/app_user_mode_id.h"
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
@@ -140,7 +141,6 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 //##################################################################################################################
 
-
 bool Application::OnInit()
 {
     //-> this seems rather useless:
@@ -155,14 +155,16 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
+        setAppUserModeId(L"FreeFileSync", L"SourceForge.FreeFileSync"); //noexcept
+        //consider: FreeFileSync.exe, FreeFileSync_Win32.exe, FreeFileSync_x64.exe
+
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
+
 #elif defined ZEN_LINUX
     ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
-#ifdef ZEN_WIN
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
-#endif
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 
@@ -199,6 +201,7 @@ void Application::onEnterEventLoop(wxEvent& event)
     std::vector<Zstring> commandArgs = getCommandlineArgs(*this);
     launch(commandArgs);
 }
+
 
 #ifdef ZEN_MAC
 /*
@@ -283,7 +286,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         //tentatively set program language to OS default until GlobalSettings.xml is read later
         setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
     }
-    catch (const FileError&) { assert(false); } //no messagebox: consider batch job!
+    catch (const FileError&) { assert(false); }
 
     auto notifyError = [&](const std::wstring& msg, const std::wstring& title)
     {

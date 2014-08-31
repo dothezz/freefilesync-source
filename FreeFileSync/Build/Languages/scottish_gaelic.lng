@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Thèid am pasgan a leanas a làimhseachadh mar phasgan falamh.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Tha slighean eisimeileachdach aig na pasganan a leanas. Bi faiceallach nuair a chruthaicheas tu riaghailtean sioncronachaidh:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Tha slighean nam pasganan a leanas an eisimeil a chèile:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Tha ceann-là mì-dhligheach aig an fhaidhle %x.</target>
@@ -137,7 +137,7 @@
 <target>A’ gintinn liosta nam faidhle...</target>
 
 <source>Starting comparison</source>
-<target>A’ tòiseachadh air a’ choimeas</target>
+<target>A’ tòiseachadh air a’ choimeasadh</target>
 
 <source>Calculating sync directions...</source>
 <target>Ag àireamhachadh comhairean an t-sioncronachaidh...</target>
@@ -198,6 +198,26 @@
 
 <source>Update attributes on right</source>
 <target>Ùraich na buadhan air an taobh deas</target>
+
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x byte</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Chan eil am faidhle stòir-dhàta %x co-chòrdail.</target>
@@ -260,26 +280,6 @@
 
 <source>Total time:</source>
 <target>An ùine gu lèir:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x byte</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Mearachd le parsadh an fhaidhle %x, loidhne %y, colbh %z.</target>
@@ -349,8 +349,8 @@
 <source>&Quit</source>
 <target>&Fàg</target>
 
-<source>&Program</source>
-<target>&Prògram</target>
+<source>&File</source>
+<target>&Faidhle</target>
 
 <source>&View help</source>
 <target>&Faic a’ chobhair</target>
@@ -441,9 +441,6 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>&Show error</source>
 <target>&Seall a’ mhearachd</target>
 
-<source>&Exit</source>
-<target>&Fàg an-seo</target>
-
 <source>Incorrect command line:</source>
 <target>Loidhne-àithne chearr:</target>
 
@@ -507,8 +504,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Mearachd le dearbhadh an dàta: tha susbaint eadar-dhealaichte ann an %x agus %y.</target>
 
-<source>Cannot find %x.</source>
-<target>Cha ghabh %x a lorg.</target>
+<source>Cannot find folder %x.</source>
+<target>Chan urrainn dhuinn am pasgan %x a lorg</target>
 
 <source>Target folder %x already existing.</source>
 <target>Tha am pasgan-uidhe %x ann mu thràth.</target>
@@ -537,8 +534,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Available:</source>
 <target>Na tha ri làimh:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Thèid pasgan atharrachadh a tha ’na phàirt de dh’iomadh paidhir de phasgain. Nach doir thu sùil air roghainnean an t-sioncronachaidh?</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Tha grunnan a phaidhrichean phasganan a’ sgrìobhadh anns an aon fho-phasgan. Thoir sùil air an rèiteachadh</target>
 
 <source>Synchronizing folder pair:</source>
 <target>A’ sioncronachadh paidhir nam pasgan:</target>
@@ -641,8 +638,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Name</source>
 <target>Ainm</target>
 
-<source>Relative path</source>
-<target>An t-slighe dhàimheach</target>
+<source>Relative folder</source>
+<target>Pasgan dàimheach</target>
 
 <source>Base folder</source>
 <target>Bun-phasgan</target>
@@ -683,8 +680,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Remove local settings</source>
 <target>Thoir air falbh na roghainnean ionadail</target>
 
-<source>Reset local filter</source>
-<target>Ath-shuidhich a’ chriathrag ionadail</target>
+<source>Clear local filter</source>
+<target>Falamhaich a’ chriathrag iondail</target>
 
 <source>Copy</source>
 <target>Dèan lethbhreac</target>
@@ -704,11 +701,11 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Save as &batch job...</source>
 <target>Sàbhail mar obair &baidse...</target>
 
-<source>1. &Compare</source>
-<target>1. &Dèan coimeas</target>
+<source>Start &comparison</source>
+<target>Tòisich air a’ &choimheas</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Dèan sioncronachadh</target>
+<source>Start &synchronization</source>
+<target>Tòisich air an t-&sioncronachadh</target>
 
 <source>&Options</source>
 <target>R&oghainnean</target>
@@ -719,20 +716,23 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>&Find...</source>
 <target>L&org...</target>
 
+<source>&Reset layout</source>
+<target>&Ath-shuidhich a’ cho-dhealbhachd</target>
+
 <source>&Export file list...</source>
 <target>Às-p&hortaich liosta nam faidhle...</target>
 
 <source>&Tools</source>
 <target>&Innealan</target>
 
+<source>&Check for new version</source>
+<target>Thoir sùil a&ch a bheil tionndadh ùr ann</target>
+
 <source>&Check now</source>
 <target>&Thoir sùil an-dràsta</target>
 
 <source>Check &automatically once a week</source>
 <target>Thoir sùil gu &fèin-obrachail turas san t-seachdain</target>
-
-<source>&Check for new version</source>
-<target>Thoir sùil a&ch a bheil tionndadh ùr ann</target>
 
 <source>Cancel</source>
 <target>Sguir dheth</target>
@@ -761,17 +761,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Match case</source>
 <target>An aire do litrichean mòra ’s beaga</target>
 
+<source>New</source>
+<target>Ùr</target>
+
 <source>Open...</source>
 <target>Fosgail...</target>
 
 <source>Save</source>
 <target>Sàbhail</target>
-
-<source>Save as GUI job</source>
-<target>Sàbhail mar obair GUI</target>
-
-<source>Save as batch job</source>
-<target>Sàbhail mar obair baidse</target>
 
 <source>Save as...</source>
 <target>Sàbhail mar...</target>
@@ -785,14 +782,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Statistics:</source>
 <target>Stats:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Àireamh nam faidhle ’s nam pasgan a thèid a chruthachadh</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Àireamh nam faidhle ’s nam pasgan a thèid a sguabadh às</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Àireamh nam faidhle a thèid sgrìobhadh thairis orra</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Àireamh nam faidhle ’s nam pasgan a thèid a sguabadh às</target>
+<source>Number of files and folders that will be created</source>
+<target>Àireamh nam faidhle ’s nam pasgan a thèid a chruthachadh</target>
 
 <source>Total bytes to copy</source>
 <target>Co mheud baidht a thèid lethbhreac a dhèanamh dhiubh</target>
@@ -808,6 +805,15 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Lorg faidhlichean a tha co-ionnann le bhith a’ dèanamh coimeas eadar susbaint nam faidhlichean.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Leig seachad sioft an ama (ann an uairean a thìde)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Làimhsich amannan fhaidhlichean aig a bheil an offset sin mar gum biodh iad co-ionnann</target>
+
+<source>Handle daylight saving time</source>
+<target>Aire ri tìde an t-samhraidh</target>
 
 <source>Symbolic links:</source>
 <target>Ceanglaichean samhlachail:</target>
@@ -839,8 +845,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Maximum:</source>
 <target>Air a’ char as motha:</target>
 
-<source>&Reset</source>
-<target>&Ath-shuidhich</target>
+<source>C&lear</source>
+<target>Fala&mhaich</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Tagh riaghailteach criathraidh gus seòrsachan àraidh de dh’fhaidhlichean fhàgail às an t-sioncronachadh. Cuir a-steach slighean fhaidhlichean a-rèir paidhir an dà phasgan aca.</target>
@@ -865,20 +871,20 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Delete files:</source>
 <target>Sguab às na faidhlichean:</target>
 
-<source>Permanent</source>
-<target>Buan</target>
+<source>&Permanent</source>
+<target>&Buan</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Sguab às no sgrìobh thairis air faidhlichean gu buan</target>
 
-<source>Recycle bin</source>
-<target>Am biona</target>
+<source>&Recycle bin</source>
+<target>A&m biona</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Dèan lethbhreac-glèidhidh de dh’fhaidhlichean sa bhiona a chaidh a sguabadh às no a chaidh sgrìobhadh thairis orra</target>
 
-<source>Versioning</source>
-<target>Versioning</target>
+<source>&Versioning</source>
+<target>&Versioning</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Gluais na faidhlichean gu àite a shònraich an cleachdaiche</target>
@@ -889,14 +895,11 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Handle errors:</source>
 <target>Mearachdan làimhseachaidh:</target>
 
-<source>Ignore</source>
-<target>Leig seachad</target>
-
 <source>Hide all error and warning messages</source>
 <target>Falaich gach teachdaireachd mu mhearachdan no rabhaidhean</target>
 
-<source>Pop-up</source>
-<target>Priob-uinneag</target>
+<source>&Pop-up</source>
+<target>&Priob-uinneag</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Seall priob-uinneagan a thaobh mhearachdan no rabhaidhean</target>
@@ -919,9 +922,6 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Items found:</source>
 <target>Rudan a chaidh a lorg:</target>
 
-<source>Speed:</source>
-<target>Astar:</target>
-
 <source>Time remaining:</source>
 <target>An ùine a tha air fhàgail:</target>
 
@@ -934,6 +934,9 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Minimize to notification area</source>
 <target>Lùghdach ’s gluais gu raon nam brathan</target>
 
+<source>Bytes copied:</source>
+<target>Bytes a chaidh lethbhreac a dhèanamh dhiubh</target>
+
 <source>Close</source>
 <target>Dùin</target>
 
@@ -945,6 +948,9 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Cruthaich faidhle batch airson sioncronachadh a dh’obraicheas gun thusa a bhith an làthair. Gus a thòiseachadh, dèan briogadh dùbailte air an fhaidhle seo ann am planadair shaothraichean: %x</target>
+
+<source>&Stop</source>
+<target>&Sguir dheth</target>
 
 <source>Stop synchronization at first error</source>
 <target>Sguir dhen t-sioncronachadh aig a’ chiad mhearachd</target>
@@ -963,9 +969,6 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>How can I schedule a batch job?</source>
 <target>Ciamar a chuireas mi obair baidse air an sgeideal?</target>
-
-<source>&Recycle bin</source>
-<target>A&m biona</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Thèid na roghainnean a leanas a chleachdadh airson a h-uile obair sioncronachaidh.</target>
@@ -1015,8 +1018,11 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Description</source>
 <target>Tuairisgeul</target>
 
-<source>Restore hidden windows</source>
-<target>Aisig na h-uinneagan falaichte</target>
+<source>Show hidden dialogs again</source>
+<target>Seall na còmraidhean falaichte a-rithist</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Seall na còmraidhean is rabhaidhean falaichte uile a-rithist</target>
 
 <source>&Default</source>
 <target>&Bun-roghainn</target>
@@ -1078,8 +1084,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Main Bar</source>
 <target>Am prìomh-bhàr</target>
 
-<source>Compare both sides</source>
-<target>Dèan coimeas air an dà thaobh</target>
+<source>Start comparison</source>
+<target>Tòisich air a’ choimeasadh</target>
 
 <source>Comparison settings</source>
 <target>Roghainnean a’ choimeasaidh</target>
@@ -1182,9 +1188,6 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Select time span...</source>
 <target>Tagh an raon-ama...</target>
 
-<source>Default view</source>
-<target>An sealladh bunaiteach</target>
-
 <source>Show "%x"</source>
 <target>Seall “%x”</target>
 
@@ -1215,8 +1218,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Synchronization Settings</source>
 <target>Roghainnean an t-sioncronachaidh</target>
 
-<source>Reset filter</source>
-<target>Ath-shuidhich a’ chriathrag</target>
+<source>Clear filter</source>
+<target>Falamhaich a’ chriathrag</target>
 
 <source>Show files that exist on left side only</source>
 <target>Na seall ach faidhlichean a tha air an taobh chlì a-mhàin</target>
@@ -1378,8 +1381,11 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Seise %item_folder% aig a’ choimpiutair eile</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>A bheil thu airson gach uinneag is rabhadh falaichte aiseaga?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>A bheil thu airson na còmhraidhean is rabhaidhean falaichte a shealltainn a-rithist?</target>
+
+<source>&Show</source>
+<target>&Seall</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Lorg is sìolaich na h-atharraichean air an dà thaobh. Mothaichidh sinn do rudan a chaidh a sguabadh às, a ghluasad no còmhstrithean gu fèin-obrachail le stòr-dàta.</target>

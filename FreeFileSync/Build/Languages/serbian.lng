@@ -7,6 +7,9 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
+<source>Unable to set application identifier.</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Обе су стране промењене од последње синхронизације.</target>
 
@@ -106,8 +109,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Одговарајући фолдер сматраће се празним.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Следећи фолдери имају зависне путање. Будите пажљиви када подешавате синхронизациона правила:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Следећи фолдерски парови зависни су један од другог:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Датотека %x има невалидни датум.</target>
@@ -199,6 +202,28 @@
 <source>Update attributes on right</source>
 <target>Освежи атрибуте десно</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x бајт</pluralform>
+<pluralform>%x бајта</pluralform>
+<pluralform>%x бајтова</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Не могу учитати датотеку %x.</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Датотека базе %x је некомпатибилна.</target>
 
@@ -260,25 +285,6 @@
 <source>Total time:</source>
 <target>Укупно време:</target>
 
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x бајт</pluralform>
-<pluralform>%x бајта</pluralform>
-<pluralform>%x бајтова</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Грешка у анализи датотеке %x, ред %y, колона %z.</target>
 
@@ -322,9 +328,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Молимо користите FreeFileSync 64-битну верзију за израду shadow копија на овом систему.</target>
 
-<source>Cannot load file %x.</source>
-<target>Не могу учитати датотеку %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Не могу утврдити назив партиције за %x.</target>
 
@@ -346,8 +349,8 @@
 <source>&Quit</source>
 <target>&Излаз</target>
 
-<source>&Program</source>
-<target>&Програм</target>
+<source>&File</source>
+<target>&Датотека</target>
 
 <source>&View help</source>
 <target>&Погледај помоћ</target>
@@ -438,9 +441,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Прикажи грешку</target>
 
-<source>&Exit</source>
-<target>&Излаз</target>
-
 <source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
 
@@ -504,8 +504,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Грешка при провери података: %x и %y имају различит садржај.</target>
 
-<source>Cannot find %x.</source>
-<target>Не могу пронаћи %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Не могу пронаћи фолдер %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Одредишни фолдер %x већ постоји.</target>
@@ -534,8 +534,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Фолдер ће бити промењен који је део више парова фолдера. Молимо проверите синхронизацијска подешавања.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Више парова фолдера уписује у заједничком фолдеру. Молимо проверите вашу конфигурацију.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизовање фолдерског пара:</target>
@@ -637,8 +637,8 @@ The command is triggered if:
 <source>Name</source>
 <target>Име</target>
 
-<source>Relative path</source>
-<target>Релативна путања</target>
+<source>Relative folder</source>
+<target>Релативни фолдер</target>
 
 <source>Base folder</source>
 <target>Основни фолдер</target>
@@ -679,8 +679,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>Уклони локална подешавања</target>
 
-<source>Reset local filter</source>
-<target>Ресетуј локални филтер</target>
+<source>Clear local filter</source>
+<target>Обриши локални филтер</target>
 
 <source>Copy</source>
 <target>Копирај</target>
@@ -700,11 +700,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>Сачувај као &беч задатак...</target>
 
-<source>1. &Compare</source>
-<target>1. &Упореди</target>
+<source>Start &comparison</source>
+<target>Почни &упоређивање</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Синхронизуј</target>
+<source>Start &synchronization</source>
+<target>Почни &синхронизацију</target>
 
 <source>&Options</source>
 <target>&Опције</target>
@@ -715,20 +715,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&Нађи...</target>
 
+<source>&Reset layout</source>
+<target>&Ресетуј распоред</target>
+
 <source>&Export file list...</source>
 <target>&Извоз листе датотека...</target>
 
 <source>&Tools</source>
 <target>&Алати</target>
 
+<source>&Check for new version</source>
+<target>&Провери постојање нове верзије</target>
+
 <source>&Check now</source>
 <target>&Провери сада</target>
 
 <source>Check &automatically once a week</source>
 <target>Провери &аутоматски једном недељно</target>
-
-<source>&Check for new version</source>
-<target>&Провери постојање нове верзије</target>
 
 <source>Cancel</source>
 <target>Одустани</target>
@@ -757,17 +760,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>По величини слова</target>
 
+<source>New</source>
+<target>Ново</target>
+
 <source>Open...</source>
 <target>Отвори...</target>
 
 <source>Save</source>
 <target>Сачувај</target>
-
-<source>Save as GUI job</source>
-<target>Сачувај као GUI задатак</target>
-
-<source>Save as batch job</source>
-<target>Сачувај као беч задатак</target>
 
 <source>Save as...</source>
 <target>Сачувај као...</target>
@@ -781,14 +781,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>Статистика:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Број датотека и фолдера који ће бити креирани</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Број датотека и фолдера који ће бити избрисани</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Број датотека које ће бити замењене у садржају</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Број датотека и фолдера који ће бити избрисани</target>
+<source>Number of files and folders that will be created</source>
+<target>Број датотека и фолдера који ће бити креирани</target>
 
 <source>Total bytes to copy</source>
 <target>Укупно бајтова за копирање</target>
@@ -804,6 +804,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Идентификуј једнаке датотеке упоређивањем садржаја датотека.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Игнориши временски помак (у сатима)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Сматрај времена датотека са задатим помаком као једнака</target>
+
+<source>Handle daylight saving time</source>
+<target>Руковођење сезонским рачунањем времена</target>
 
 <source>Symbolic links:</source>
 <target>Симболичне везе:</target>
@@ -835,8 +844,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>&Reset</source>
-<target>&Ресетуј</target>
+<source>C&lear</source>
+<target>О&бриши</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
@@ -861,20 +870,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>Обриши датотеке:</target>
 
-<source>Permanent</source>
-<target>Трајно</target>
+<source>&Permanent</source>
+<target>&Трајно</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Трајно избриши или замени датотеке</target>
 
-<source>Recycle bin</source>
-<target>Корпа за смеће</target>
+<source>&Recycle bin</source>
+<target>&Корпа за смеће</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Направи резервне копије обрисаних и замењених датотека у Корпи за смеће</target>
 
-<source>Versioning</source>
-<target>Верзионирање</target>
+<source>&Versioning</source>
+<target>&Верзионирање</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Премести датотеке у кориснички одабран фолдер</target>
@@ -885,14 +894,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обрада грешака:</target>
 
-<source>Ignore</source>
-<target>Игнориши</target>
-
 <source>Hide all error and warning messages</source>
 <target>Сакриј све грешке и упозорења</target>
 
-<source>Pop-up</source>
-<target>Искачући прозор</target>
+<source>&Pop-up</source>
+<target>&Искачући прозор</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Прикажи искачући прозор при грешкама и упозорењима</target>
@@ -915,9 +921,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>Пронађене ставке:</target>
 
-<source>Speed:</source>
-<target>Брзина:</target>
-
 <source>Time remaining:</source>
 <target>Преостало време:</target>
 
@@ -930,6 +933,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>Минимизирај у области за обавештења</target>
 
+<source>Bytes copied:</source>
+<target>Бајта копирано:</target>
+
 <source>Close</source>
 <target>Затвори</target>
 
@@ -941,6 +947,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Креирај беч датотеку за ненадзирану синхронизацију. Да би почели, кликните дуплим кликом ову датотеку или додајте задатак у таск менаџеру: %x</target>
+
+<source>&Stop</source>
+<target>&Заустави</target>
 
 <source>Stop synchronization at first error</source>
 <target>Заустави синхронизацију при првој грешци</target>
@@ -959,9 +968,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Како могу заказати беч задатак?</target>
-
-<source>&Recycle bin</source>
-<target>&Корпа за смеће</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
@@ -1011,8 +1017,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Опис</target>
 
-<source>Restore hidden windows</source>
-<target>Прикажи скривене прозоре</target>
+<source>Show hidden dialogs again</source>
+<target>Прикажи скривене прозоре поново</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Прикажи све трајно скривене прозоре и поруке упозорења поново</target>
 
 <source>&Default</source>
 <target>&Подразумевано</target>
@@ -1074,8 +1083,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Главна трака</target>
 
-<source>Compare both sides</source>
-<target>Упореди обе стране</target>
+<source>Start comparison</source>
+<target>Почни упоређивање</target>
 
 <source>Comparison settings</source>
 <target>Подешавања упоређивања</target>
@@ -1174,9 +1183,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Одаберите временски распон...</target>
 
-<source>Default view</source>
-<target>Подразумевани приказ</target>
-
 <source>Show "%x"</source>
 <target>Прикажи "%x"</target>
 
@@ -1207,8 +1213,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Подешавања синхронизације</target>
 
-<source>Reset filter</source>
-<target>Ресетуј филтер</target>
+<source>Clear filter</source>
+<target>Обриши филтер</target>
 
 <source>Show files that exist on left side only</source>
 <target>Прикажи датотеке које постоје само на левој страни</target>
@@ -1368,8 +1374,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Дупликат с друге стране у %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Прикажи све скривене прозоре и упозорења?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Прикажи све скривене прозоре и упозорења поново?</target>
+
+<source>&Show</source>
+<target>&Прикажи</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>

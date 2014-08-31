@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Vastaava hakemisto tulkitaan tyhjäksi.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Hakemiston hakemistopolussa on alikansioita. Luo täsmäyksen vertailusäännöt huolella:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Nämä polut ovat ovat riippuvaisia toisistaan:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Tiedostolla %x on virheellinen päiväys.</target>
@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Päivitä oikeudet oikealla</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 tavu</pluralform>
+<pluralform>%x tavua</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x Mt</target>
+
+<source>%x KB</source>
+<target>%x kt</target>
+
+<source>%x GB</source>
+<target>%x Gt</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Tietokanta %x ei ole yhteensopiva.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Kokonaisaika:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 tavu</pluralform>
-<pluralform>%x tavua</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x Mt</target>
-
-<source>%x KB</source>
-<target>%x kt</target>
-
-<source>%x GB</source>
-<target>%x Gt</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Jäsennysvirhe - tiedosto: %x, rivi: %y, sarake: %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Lopeta</target>
 
-<source>&Program</source>
-<target>&Ohjelma</target>
+<source>&File</source>
+<target>&Tiedosto</target>
 
 <source>&View help</source>
 <target>&Näytä ohje</target>
@@ -435,9 +435,6 @@ Käsky suoritetaan jos:
 <source>&Show error</source>
 <target>&Näytä virhe</target>
 
-<source>&Exit</source>
-<target>&Poistu</target>
-
 <source>Incorrect command line:</source>
 <target>Virheellinen komento:</target>
 
@@ -501,8 +498,8 @@ Käsky suoritetaan jos:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Tiedon tarkistusvirhe: %x:n ja %y:n sisältö ovat erilaiset.</target>
 
-<source>Cannot find %x.</source>
-<target>%x ei löydy.</target>
+<source>Cannot find folder %x.</source>
+<target>Hakemistoa %x ei löydy.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Kohdehakemisto %x on jo olemassa.</target>
@@ -531,8 +528,8 @@ Käsky suoritetaan jos:
 <source>Available:</source>
 <target>Saatavilla:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Useampiin hakemistopareihin kuuluvaa hakemistoa muutetaan. Tarkista täsmäysasetukset.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Useat hakemistoparit tallentaa yhteen alikansioon. Tarkista asetukset.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Täsmäytetään  hakemistoparia:</target>
@@ -633,8 +630,8 @@ Käsky suoritetaan jos:
 <source>Name</source>
 <target>Nimi</target>
 
-<source>Relative path</source>
-<target>Suhteellinen polku</target>
+<source>Relative folder</source>
+<target>Suhteellinen hakemisto</target>
 
 <source>Base folder</source>
 <target>Juurihakemisto</target>
@@ -675,8 +672,8 @@ Käsky suoritetaan jos:
 <source>Remove local settings</source>
 <target>Poista paikalliset asetukset</target>
 
-<source>Reset local filter</source>
-<target>Nollaa paikalliset suotimet</target>
+<source>Clear local filter</source>
+<target>Nollaa paikallinen suodin</target>
 
 <source>Copy</source>
 <target>Monista</target>
@@ -696,11 +693,11 @@ Käsky suoritetaan jos:
 <source>Save as &batch job...</source>
 <target>Tallenna &eräajona...</target>
 
-<source>1. &Compare</source>
-<target>1. &Vertaa</target>
+<source>Start &comparison</source>
+<target>Aloita &vertailu</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Täsmäytä</target>
+<source>Start &synchronization</source>
+<target>Aloita &täsmäytys</target>
 
 <source>&Options</source>
 <target>&Asetukset</target>
@@ -711,20 +708,23 @@ Käsky suoritetaan jos:
 <source>&Find...</source>
 <target>&Etsi...</target>
 
+<source>&Reset layout</source>
+<target>&Nollaa asettelu</target>
+
 <source>&Export file list...</source>
 <target>&Vie tiedostojoukko...</target>
 
 <source>&Tools</source>
 <target>&Asetukset</target>
 
+<source>&Check for new version</source>
+<target>&Hae uusi versio</target>
+
 <source>&Check now</source>
 <target>&Tarkista nyt</target>
 
 <source>Check &automatically once a week</source>
 <target>Tarkista &viikoittain</target>
-
-<source>&Check for new version</source>
-<target>&Hae uusi versio</target>
 
 <source>Cancel</source>
 <target>Lopeta</target>
@@ -753,17 +753,14 @@ Käsky suoritetaan jos:
 <source>Match case</source>
 <target>Täsmäytä kirjainkoko</target>
 
+<source>New</source>
+<target>Uusi</target>
+
 <source>Open...</source>
 <target>Avaa...</target>
 
 <source>Save</source>
 <target>Tallenna</target>
-
-<source>Save as GUI job</source>
-<target>Tallenna GUI-työnä</target>
-
-<source>Save as batch job</source>
-<target>Tallenna eräajona</target>
 
 <source>Save as...</source>
 <target>Tallenna nimellä...</target>
@@ -777,14 +774,14 @@ Käsky suoritetaan jos:
 <source>Statistics:</source>
 <target>Tilastot:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Luotavien tiedostojen ja hakemistojen määrä</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Poistettavien tiedostojen ja hakemistojen määrä</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Korvattavien tiedostojen ja hakemistojen määrä</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Poistettavien tiedostojen ja hakemistojen määrä</target>
+<source>Number of files and folders that will be created</source>
+<target>Luotavien tiedostojen ja hakemistojen määrä</target>
 
 <source>Total bytes to copy</source>
 <target>Kopioitava määrä tavuja</target>
@@ -800,6 +797,15 @@ Käsky suoritetaan jos:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Tunnista identtiset tiedostot sisältöä vertailemalla.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Sivuta aikasiirtymä (tuntia)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Oleta tiedostoja tietyllä aikasiirtymällä olevan vastaavia</target>
+
+<source>Handle daylight saving time</source>
+<target>Käsittele kesäaika</target>
 
 <source>Symbolic links:</source>
 <target>Pikakuvike:</target>
@@ -831,8 +837,8 @@ Käsky suoritetaan jos:
 <source>Maximum:</source>
 <target>Enintään:</target>
 
-<source>&Reset</source>
-<target>&Palauta</target>
+<source>C&lear</source>
+<target>&Nollaa</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Määrittele suodatussäännöt täsmäyksestä pois jätettäville tiedostoille. Anna hakemistopariin nähden suhteellinen osoite.</target>
@@ -857,20 +863,20 @@ Käsky suoritetaan jos:
 <source>Delete files:</source>
 <target>Poista tiedosto:</target>
 
-<source>Permanent</source>
-<target>Pysyvä</target>
+<source>&Permanent</source>
+<target>&Pysyvä</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Poista tai korvaa tiedostoja pysyvästi</target>
 
-<source>Recycle bin</source>
-<target>Roskakori</target>
+<source>&Recycle bin</source>
+<target>&Roskakori</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Tallenna poistetut/korvatut tiedostot Roskakoriin</target>
 
-<source>Versioning</source>
-<target>Versiointi</target>
+<source>&Versioning</source>
+<target>&Versiointi</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Siirrä tiedostot itse määräämäsi hakemistoon</target>
@@ -881,14 +887,11 @@ Käsky suoritetaan jos:
 <source>Handle errors:</source>
 <target>Hoida virheet:</target>
 
-<source>Ignore</source>
-<target>Ohita</target>
-
 <source>Hide all error and warning messages</source>
 <target>Piilota kaikki virhe- ja varoitusviestit</target>
 
-<source>Pop-up</source>
-<target>Ponnahdusikkuna</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Näytä ponnahdusikkuna virheiden tai varoituksien kohdalla</target>
@@ -911,9 +914,6 @@ Käsky suoritetaan jos:
 <source>Items found:</source>
 <target>Osioita löytyi:</target>
 
-<source>Speed:</source>
-<target>Nopeus:</target>
-
 <source>Time remaining:</source>
 <target>Aikaa jäljellä:</target>
 
@@ -926,6 +926,9 @@ Käsky suoritetaan jos:
 <source>Minimize to notification area</source>
 <target>Pienennä ilmaisinalueelle</target>
 
+<source>Bytes copied:</source>
+<target>Kopioituja tavuja:</target>
+
 <source>Close</source>
 <target>Sulje</target>
 
@@ -933,13 +936,16 @@ Käsky suoritetaan jos:
 <target>&Keskeytä</target>
 
 <source>Stop</source>
-<target>Keskeytä</target>
+<target>Lopeta</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Luo eräajotiedosto automaattista täsmäystä varten. Käynnistä kaksoisnapsauttamalla tai ajasta tehtävä: %x</target>
 
+<source>&Stop</source>
+<target>&Lopeta</target>
+
 <source>Stop synchronization at first error</source>
-<target>Keskeytä täsmäys ensimmäiseen virheeseen</target>
+<target>Lopeta täsmäys ensimmäiseen virheeseen</target>
 
 <source>Run minimized</source>
 <target>Suorita pienennettynä</target>
@@ -955,9 +961,6 @@ Käsky suoritetaan jos:
 
 <source>How can I schedule a batch job?</source>
 <target>Miten ajastan eräajon?</target>
-
-<source>&Recycle bin</source>
-<target>&Roskakori</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Näitä asetuksia käytetään kaikkiin täsmäyksiin.</target>
@@ -1007,8 +1010,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Description</source>
 <target>Kuvaus</target>
 
-<source>Restore hidden windows</source>
-<target>Palauta piilotetut ikkunat</target>
+<source>Show hidden dialogs again</source>
+<target>Näytä piiloitetut dialogit uudestaan</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Näytä pysyvästi piiloitetut dialogit ja varoitukset uudestaan</target>
 
 <source>&Default</source>
 <target>&Oletus</target>
@@ -1070,8 +1076,8 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Main Bar</source>
 <target>Pääpalkki</target>
 
-<source>Compare both sides</source>
-<target>Vertaile molempia puolia</target>
+<source>Start comparison</source>
+<target>Aloita vertailu</target>
 
 <source>Comparison settings</source>
 <target>Vertailun asetukset</target>
@@ -1166,9 +1172,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Select time span...</source>
 <target>Valitse aikajana...</target>
 
-<source>Default view</source>
-<target>Oletusnäkymä</target>
-
 <source>Show "%x"</source>
 <target>Näytä "%x"</target>
 
@@ -1199,7 +1202,7 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Synchronization Settings</source>
 <target>Täsmäyksen asetukset</target>
 
-<source>Reset filter</source>
+<source>Clear filter</source>
 <target>Nollaa suodin</target>
 
 <source>Show files that exist on left side only</source>
@@ -1358,8 +1361,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Toisen puolen osa liittyy %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Palauta kaikki piiloitetut ikkunat ja varoitukset?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Näytetäänkö piiloitetut dialogit ja varoitukset uudestaan?</target>
+
+<source>&Show</source>
+<target>&Näytä</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Löydä ja monista muutokset molemmille puolille. Poistot, siirrot ja eroavuudet tunnistetaan tietokannan avulla.</target>

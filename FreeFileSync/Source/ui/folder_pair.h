@@ -146,7 +146,7 @@ private:
         };
 
         ContextMenu menu;
-        menu.addItem(_("Reset local filter"), removeLocalFilterCfg, nullptr, !isNullFilter(localFilter));
+        menu.addItem(_("Clear local filter"), removeLocalFilterCfg, nullptr, !isNullFilter(localFilter));
         menu.addSeparator();
         menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(localFilter));
         menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);

@@ -57,7 +57,7 @@ bool dst::isFatDrive(const Zstring& filepath) //throw()
         return false;
 
     const DWORD bufferSize = MAX_PATH + 1;
-    wchar_t fsName[bufferSize];
+	wchar_t fsName[bufferSize] = {};
 
     //suprisingly fast: ca. 0.03 ms per call!
     if (!::GetVolumeInformation(appendSeparator(volumePath).c_str(), //__in_opt   LPCTSTR lpRootPathName,

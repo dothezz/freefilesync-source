@@ -607,9 +607,12 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_panelSearch->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnSearchPanelKeyPressed), nullptr, this);
 
     //set tool tips with (non-translated!) short cut hint
-    m_bpButtonNew       ->SetToolTip(_("&New")     + L" (Ctrl+N)");
-    m_bpButtonOpen      ->SetToolTip(_("Open...") + L" (Ctrl+O)");
-    m_bpButtonSave      ->SetToolTip(_("Save")    + L" (Ctrl+S)");
+    m_bpButtonNew        ->SetToolTip(replaceCpy(_("&New"),                  L"&", L"") + L" (Ctrl+N)"); //
+    m_bpButtonOpen       ->SetToolTip(replaceCpy(_("&Open..."),              L"&", L"") + L" (Ctrl+O)"); //reuse texts from gui builder
+    m_bpButtonSave       ->SetToolTip(replaceCpy(_("&Save"),                 L"&", L"") + L" (Ctrl+S)"); //
+    m_bpButtonSaveAs     ->SetToolTip(replaceCpy(_("Save &as..."),           L"&", L""));                //
+    m_bpButtonSaveAsBatch->SetToolTip(replaceCpy(_("Save as &batch job..."), L"&", L""));                //
+
     m_buttonCompare     ->SetToolTip(_("Start comparison")         + L" (F5)");
     m_bpButtonCmpConfig ->SetToolTip(_("Comparison settings")      + L" (F6)");
     m_bpButtonSyncConfig->SetToolTip(_("Synchronization settings") + L" (F8)");
@@ -3331,7 +3334,7 @@ void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
     };
 
     ContextMenu menu;
-    menu.addItem( _("Reset filter"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
+    menu.addItem( _("Clear filter"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
     menu.addSeparator();
     menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
     menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);

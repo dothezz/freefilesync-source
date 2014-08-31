@@ -199,6 +199,24 @@
 <source>Update attributes on right</source>
 <target>Aktualisiere Attribute des rechten Elements</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Die Datenbankdatei %x ist nicht kompatibel.</target>
 
@@ -258,24 +276,6 @@
 
 <source>Total time:</source>
 <target>Gesamtzeit:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Fehler beim Auswerten der Datei %x, Zeile %y, Spalte %z.</target>
@@ -343,8 +343,8 @@
 <source>&Quit</source>
 <target>&Beenden</target>
 
-<source>&Program</source>
-<target>&Programm</target>
+<source>&File</source>
+<target>&Datei</target>
 
 <source>&View help</source>
 <target>&Hilfe anzeigen</target>
@@ -528,8 +528,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Available:</source>
 <target>Verfügbar:</target>
 
-<source>A folder will be modified that is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Ein Ordner wird verändert werden, der Teil mehrerer Ordnerpaare ist. Bitte überprüfen Sie die Synchronisationseinstellungen.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Mehrere Ordnerpaare schreiben in einen gemeinsamen Unterordner. Bitte überprüfen Sie ihre Konfiguration.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisiere Ordnerpaar:</target>
@@ -630,8 +630,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Name</source>
 <target>Name</target>
 
-<source>Relative path</source>
-<target>Relativer Pfad</target>
+<source>Relative folder</source>
+<target>Relativer Ordner</target>
 
 <source>Base folder</source>
 <target>Basisordner</target>
@@ -672,8 +672,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Remove local settings</source>
 <target>Lokale Einstellungen entfernen</target>
 
-<source>Reset local filter</source>
-<target>Lokalen Filter zurücksetzen</target>
+<source>Clear local filter</source>
+<target>Lokalen Filter löschen</target>
 
 <source>Copy</source>
 <target>Kopieren</target>
@@ -691,16 +691,13 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>&Speichern</target>
 
 <source>Save as &batch job...</source>
-<target>Speichern als Batch-&Auftrag...</target>
+<target>Speichern als Batch&auftrag...</target>
 
 <source>Start &comparison</source>
 <target>&Vergleich starten</target>
 
-<source>Start synchronization</source>
-<target>Synchronisation starten</target>
-
-<source>File</source>
-<target>Datei</target>
+<source>Start &synchronization</source>
+<target>&Synchronisation starten</target>
 
 <source>&Options</source>
 <target>&Optionen</target>
@@ -756,17 +753,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Match case</source>
 <target>Groß-/Kleinschreibung</target>
 
+<source>New</source>
+<target>Neu</target>
+
 <source>Open...</source>
 <target>Öffnen...</target>
 
 <source>Save</source>
 <target>Speichern</target>
-
-<source>Save as GUI job</source>
-<target>Als GUI-Auftrag speichern</target>
-
-<source>Save as batch job</source>
-<target>Als Batch-Auftrag speichern</target>
 
 <source>Save as...</source>
 <target>Speichern unter...</target>
@@ -829,7 +823,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Ausschließen:</target>
 
 <source>Show examples</source>
-<target>Zeige Beispiele</target>
+<target>Beispiele zeigen</target>
 
 <source>Time span:</source>
 <target>Zeitspanne:</target>
@@ -843,8 +837,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>&Reset</source>
-<target>&Zurücksetzen</target>
+<source>C&lear</source>
+<target>&Löschen</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Wählen Sie Filterregeln aus, um einzelne Dateien von der Synchronisation auszuschließen. Geben Sie Dateipfade relativ zu ihrem zugehörigen Ordnerpaar an.</target>
@@ -869,8 +863,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Delete files:</source>
 <target>Dateien löschen:</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target>&Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Dateien endgültig löschen oder überschreiben</target>
@@ -881,8 +875,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
 
-<source>Versioning</source>
-<target>Versionierung</target>
+<source>&Versioning</source>
+<target>&Versionierung</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Dateien in einen benutzerdefinierten Ordner verschieben</target>
@@ -896,8 +890,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Hide all error and warning messages</source>
 <target>Alle Fehler- und Warnmeldungen unterdrücken</target>
 
-<source>Pop-up</source>
-<target>Nachfragen</target>
+<source>&Pop-up</source>
+<target>&Nachfragen</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Ein Auswahlfenster bei Fehlern oder Warnungen anzeigen</target>
@@ -932,6 +926,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Minimize to notification area</source>
 <target>In das Benachrichtigungsfeld minimieren</target>
 
+<source>Bytes copied:</source>
+<target>Kopierte Datenmenge:</target>
+
 <source>Close</source>
 <target>Schließen</target>
 
@@ -943,6 +940,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Erstellt eine Batchdatei für die unbeaufsichtigte Synchronisation. Zum Starten die Datei doppelklicken oder in einen Taskplaner eintragen: %x</target>
+
+<source>&Stop</source>
+<target>&Stop</target>
 
 <source>Stop synchronization at first error</source>
 <target>Synchronisation beim ersten Fehler unterbrechen</target>
@@ -960,7 +960,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Maximale Anzahl der Protokolldateien begrenzen</target>
 
 <source>How can I schedule a batch job?</source>
-<target>Wie können Batch-Aufträge in den Taskplaner eingetragen werden?</target>
+<target>Wie können Batchaufträge in den Taskplaner eingetragen werden?</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Die folgenden Einstellungen werden für alle Synchronisationsaufgaben verwendet.</target>
@@ -1010,8 +1010,11 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Description</source>
 <target>Beschreibung</target>
 
-<source>Restore hidden windows</source>
-<target>Versteckte Fenster wiederherstellen</target>
+<source>Show hidden dialogs again</source>
+<target>Versteckte Fenster wieder zeigen</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Alle dauerhaft versteckten Fenster und Warnmeldungen wieder anzeigen</target>
 
 <source>&Default</source>
 <target>&Standard</target>
@@ -1041,7 +1044,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Vielen Dank für die Lokalisation:</target>
 
 <source>Save as Batch Job</source>
-<target>Als Batch-Auftrag speichern</target>
+<target>Als Batchauftrag speichern</target>
 
 <source>Delete Items</source>
 <target>Elemente löschen</target>
@@ -1081,6 +1084,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Synchronization settings</source>
 <target>Synchronisationseinstellungen</target>
+
+<source>Start synchronization</source>
+<target>Synchronisation starten</target>
 
 <source>Confirm</source>
 <target>Bestätigen</target>
@@ -1196,8 +1202,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Synchronization Settings</source>
 <target>Synchronisationseinstellungen</target>
 
-<source>Reset filter</source>
-<target>Filter zurücksetzen</target>
+<source>Clear filter</source>
+<target>Filter löschen</target>
 
 <source>Show files that exist on left side only</source>
 <target>Nur links existierende Dateien anzeigen</target>
@@ -1266,7 +1272,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Suche nach aktualisierten Programmversionen...</target>
 
 <source>Close progress dialog</source>
-<target>Schließe Fortschrittsdialog</target>
+<target>Schließe Verlaufsdialog</target>
 
 <source>Standby</source>
 <target>Energie sparen</target>
@@ -1308,7 +1314,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>&Fortfahren</target>
 
 <source>Progress</source>
-<target>Fortschritt</target>
+<target>Verlauf</target>
 
 <source>Log</source>
 <target>Protokoll</target>
@@ -1355,8 +1361,11 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Entsprechung der anderen Seite zu %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Sollen alle versteckten Fenster und Warnungen wiederhergestellt werden?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Sollen versteckte Fenster und Warnmeldungen wieder gezeigt werden?</target>
+
+<source>&Show</source>
+<target>&Zeigen</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifiziere und propagiere Änderungen auf beiden Seiten. Löschungen, Verschiebungen und Konflikte werden automatisch mit Hilfe einer Datenbank erkannt.</target>
@@ -1423,6 +1432,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>
+
+<source>File</source>
+<target>Datei</target>
 
 <source>YYYY-MM-DD hhmmss</source>
 <target>JJJJ-MM-TT hhmmss</target>
@@ -1539,7 +1551,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Der Schlafmodus des Betriebssystems kann nicht ausgesetzt werden.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>Die Eingabe/Ausgabe Prioritäten für den Prozess kann nicht geändert werden.</target>
+<target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
 <target>%x kann nicht in den Papierkorb verschoben werden.</target>

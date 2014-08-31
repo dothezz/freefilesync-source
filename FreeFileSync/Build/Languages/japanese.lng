@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>対応するフォルダは空であるとみなされます</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>以下のフォルダには、依存関係にあるパスが存在します。同期規則を設定する時は慎重に行ってください:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>以下のフォルダパスは互いに依存関係にあります。</target>
 
 <source>File %x has an invalid date.</source>
 <target>ファイル %x の日付は無効なものです.</target>
@@ -199,6 +199,23 @@
 <source>Update attributes on right</source>
 <target>右の属性を更新</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x バイト</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>データベース %x とは互換性がありません.</target>
 
@@ -257,23 +274,6 @@
 
 <source>Total time:</source>
 <target>合計時間:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x バイト</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>ファイル %x の構文解析エラー, 行 %y, 列 %z.</target>
@@ -340,8 +340,8 @@
 <source>&Quit</source>
 <target>終了(&Q)</target>
 
-<source>&Program</source>
-<target>プログラム(&P)</target>
+<source>&File</source>
+<target>ファイル(&F)</target>
 
 <source>&View help</source>
 <target>ヘルプを表示(&V)</target>
@@ -432,9 +432,6 @@ The command is triggered if:
 <source>&Show error</source>
 <target>エラー表示(&S)</target>
 
-<source>&Exit</source>
-<target>終了(&E)</target>
-
 <source>Incorrect command line:</source>
 <target>不正なコマンドライン:</target>
 
@@ -498,8 +495,8 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>データ検証エラー: %x と %y には異なる内容が含まれています.</target>
 
-<source>Cannot find %x.</source>
-<target>%x が見つかりません</target>
+<source>Cannot find folder %x.</source>
+<target>%x フォルダがみつかりません</target>
 
 <source>Target folder %x already existing.</source>
 <target>対象フォルダ %x は既に存在します.</target>
@@ -528,8 +525,8 @@ The command is triggered if:
 <source>Available:</source>
 <target>利用可能:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>複数フォルダペアの一部であるフォルダが変更されています. 同期設定を確認してください.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>共通サブフォルダに複数フォルダペアの書き込みがあります。構成を確認してください。</target>
 
 <source>Synchronizing folder pair:</source>
 <target>フォルダペアを同期処理:</target>
@@ -629,8 +626,8 @@ The command is triggered if:
 <source>Name</source>
 <target>名前</target>
 
-<source>Relative path</source>
-<target>相対パス</target>
+<source>Relative folder</source>
+<target>相対フォルダ</target>
 
 <source>Base folder</source>
 <target>基準フォルダ</target>
@@ -671,8 +668,8 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>ローカルの設定を除去</target>
 
-<source>Reset local filter</source>
-<target>ローカルフィルターをリセット</target>
+<source>Clear local filter</source>
+<target>ローカルフィルタをクリア</target>
 
 <source>Copy</source>
 <target>コピー</target>
@@ -692,11 +689,11 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>一括ジョブで保存(&B)...</target>
 
-<source>1. &Compare</source>
-<target>1. 比較(&C)</target>
+<source>Start &comparison</source>
+<target>比較を開始(&C)</target>
 
-<source>2. &Synchronize</source>
-<target>2. 同期処理(&S)</target>
+<source>Start &synchronization</source>
+<target>同期を開始(&S)</target>
 
 <source>&Options</source>
 <target>設定(&O)</target>
@@ -707,20 +704,23 @@ The command is triggered if:
 <source>&Find...</source>
 <target>検索(&F)...</target>
 
+<source>&Reset layout</source>
+<target>レイアウトをリセット(&R)</target>
+
 <source>&Export file list...</source>
 <target>ファイル一覧をエクスポート(&E)...</target>
 
 <source>&Tools</source>
 <target>ツール(&T)</target>
 
+<source>&Check for new version</source>
+<target>新バージョンの確認(&C)</target>
+
 <source>&Check now</source>
 <target>今すぐ確認(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>週に一回、自動的に確認する(&A)</target>
-
-<source>&Check for new version</source>
-<target>新バージョンの確認(&C)</target>
 
 <source>Cancel</source>
 <target>キャンセル</target>
@@ -749,17 +749,14 @@ The command is triggered if:
 <source>Match case</source>
 <target>文字種を区別</target>
 
+<source>New</source>
+<target>新規</target>
+
 <source>Open...</source>
 <target>開く...</target>
 
 <source>Save</source>
 <target>保存</target>
-
-<source>Save as GUI job</source>
-<target>GUI ジョブで保存</target>
-
-<source>Save as batch job</source>
-<target>一括ジョブで保存</target>
 
 <source>Save as...</source>
 <target>別名保存...</target>
@@ -773,14 +770,14 @@ The command is triggered if:
 <source>Statistics:</source>
 <target>統計情報:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>作成されたファイル、およびフォルダの数</target>
+<source>Number of files and folders that will be deleted</source>
+<target>削除されたファイル、およびフォルダの数</target>
 
 <source>Number of files that will be overwritten</source>
 <target>上書きされたファイルの数</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>削除されたファイル、およびフォルダの数</target>
+<source>Number of files and folders that will be created</source>
+<target>作成されたファイル、およびフォルダの数</target>
 
 <source>Total bytes to copy</source>
 <target>コピーの合計バイト</target>
@@ -796,6 +793,15 @@ The command is triggered if:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>ファイルの内容を比較して、同一ファイルを識別します</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>指定時間内のズレは無視</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>指定されたオフセット値でファイル時刻を考慮</target>
+
+<source>Handle daylight saving time</source>
+<target>夏時間の取り扱い</target>
 
 <source>Symbolic links:</source>
 <target>シンボリック リンク:</target>
@@ -827,8 +833,8 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大:</target>
 
-<source>&Reset</source>
-<target>リセット(&R)</target>
+<source>C&lear</source>
+<target>クリア(&L)</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>同期処理から特定のファイルを除外するためのフィルター規則を選択、対応するそれらフォルダ ペアからの相対ファイルパスを入力します.</target>
@@ -853,20 +859,20 @@ The command is triggered if:
 <source>Delete files:</source>
 <target>ファイルの削除:</target>
 
-<source>Permanent</source>
-<target>完全消去</target>
+<source>&Permanent</source>
+<target>完全消去(&P)</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>ファイルを上書き/または完全に削除します</target>
+<target>ファイルを上書き/または完全に消去します</target>
 
-<source>Recycle bin</source>
-<target>ゴミ箱</target>
+<source>&Recycle bin</source>
+<target>ゴミ箱(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>ファイルを削除/上書きする時に、ゴミ箱にバックアップをとる</target>
 
-<source>Versioning</source>
-<target>バージョン管理</target>
+<source>&Versioning</source>
+<target>バージョン管理(&V)</target>
 
 <source>Move files to a user-defined folder</source>
 <target>ユーザ定義のフォルダにファイルを移動</target>
@@ -877,14 +883,11 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>エラーの取り扱い:</target>
 
-<source>Ignore</source>
-<target>無視</target>
-
 <source>Hide all error and warning messages</source>
 <target>すべてのエラーと警告メッセージを非表示</target>
 
-<source>Pop-up</source>
-<target>ポップアップ</target>
+<source>&Pop-up</source>
+<target>ポップアップ(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>エラーと警告をポップアップで表示</target>
@@ -907,9 +910,6 @@ The command is triggered if:
 <source>Items found:</source>
 <target>見つかった要素:</target>
 
-<source>Speed:</source>
-<target>速度:</target>
-
 <source>Time remaining:</source>
 <target>残り時間:</target>
 
@@ -922,6 +922,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>通知領域に最小化</target>
 
+<source>Bytes copied:</source>
+<target>バイトをコピー済:</target>
+
 <source>Close</source>
 <target>閉じる</target>
 
@@ -933,6 +936,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>無人で同期を行う為のバッチファイルを作成 - このファイルか、タスクプランナーからスケジュールをダブルクリックすることで開始: %x</target>
+
+<source>&Stop</source>
+<target>停止(&S)</target>
 
 <source>Stop synchronization at first error</source>
 <target>最初のエラーで同期処理を停止</target>
@@ -951,9 +957,6 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>一括ジョブ スケジュールの作成方法</target>
-
-<source>&Recycle bin</source>
-<target>ゴミ箱(&R)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下の設定は、すべての同期ジョブで使用されます</target>
@@ -1003,8 +1006,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>説明</target>
 
-<source>Restore hidden windows</source>
-<target>非表示ウィンドウを復帰</target>
+<source>Show hidden dialogs again</source>
+<target>非表示のダイアログを再表示</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>非表示にしたすべてのダイアログと警告メッセージを再表示</target>
 
 <source>&Default</source>
 <target>デフォルト(&D)</target>
@@ -1066,8 +1072,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>メインバー</target>
 
-<source>Compare both sides</source>
-<target>両方を比較</target>
+<source>Start comparison</source>
+<target>比較を開始</target>
 
 <source>Comparison settings</source>
 <target>比較設定</target>
@@ -1158,9 +1164,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>タイムスパンを選択...</target>
 
-<source>Default view</source>
-<target>デフォルト表示</target>
-
 <source>Show "%x"</source>
 <target>"%x" で表示</target>
 
@@ -1191,8 +1194,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>同期の設定</target>
 
-<source>Reset filter</source>
-<target>フィルターをリセット</target>
+<source>Clear filter</source>
+<target>フィルタをクリア</target>
 
 <source>Show files that exist on left side only</source>
 <target>左側のみに存在するファイルを表示</target>
@@ -1264,7 +1267,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>進捗ダイアログを閉じる</target>
 
 <source>Standby</source>
-<target>スタンバイ</target>
+<target>スリープ</target>
 
 <source>Log off</source>
 <target>ログオフ</target>
@@ -1348,8 +1351,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- %item_folder% の反対側の対象</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>すべての非表示ウィンドウと警告を元に戻しますか?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>非表示のダイアログと警告を再表示しますか?</target>
+
+<source>&Show</source>
+<target>表示(&S)</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>変更箇所を識別して両側に変更を反映します。データベースを使用することで、削除/移動/競合などは自動的に検出されます。</target>
@@ -1376,13 +1382,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>今日</target>
 
 <source>This week</source>
-<target>この週</target>
+<target>今週</target>
 
 <source>This month</source>
-<target>この月</target>
+<target>今月</target>
 
 <source>This year</source>
-<target>この年</target>
+<target>今年</target>
 
 <source>Last x days</source>
 <target>最後の x 日</target>

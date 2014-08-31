@@ -3,11 +3,11 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
-#ifndef PREVENTSTANDBY_H_INCLUDED
-#define PREVENTSTANDBY_H_INCLUDED
+#ifndef PREVENTSTANDBY_H_83421759082143245
+#define PREVENTSTANDBY_H_83421759082143245
 
 #include <memory>
-#include <zen/file_error.h>
+#include "file_error.h"
 
 namespace zen
 {
@@ -34,4 +34,4 @@ private:
 };
 }
 
-#endif // PREVENTSTANDBY_H_INCLUDED
+#endif //PREVENTSTANDBY_H_83421759082143245

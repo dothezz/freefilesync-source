@@ -7,6 +7,12 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>C&lear</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Begge sider er endret siden siste synkronisering.</target>
 
@@ -106,8 +112,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Den tilsvarende mappe betraktes som tom.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Følgende mapper har avhengige stier. Vær forsiktig med synkroniseringsreglene:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>De følgende mappebaner er avhengige av hverandre</target>
 
 <source>File %x has an invalid date.</source>
 <target>Filen %x har en ugyldig dato.</target>
@@ -146,10 +152,10 @@
 <target>Ikke nok minne.</target>
 
 <source>Item exists on left side only</source>
-<target>Emnet finnes kun på venstre side</target>
+<target>Mappen finnes kun på venstre side</target>
 
 <source>Item exists on right side only</source>
-<target>Emnet finnes kun på høyre side</target>
+<target>Mappen finnes kun på høyre side</target>
 
 <source>Left side is newer</source>
 <target>Venstre er nyest</target>
@@ -164,19 +170,19 @@
 <target>Begge sider er like</target>
 
 <source>Conflict/item cannot be categorized</source>
-<target>Konflikt/ukjent emne</target>
+<target>Konflikt/ukjent mappe</target>
 
 <source>Copy new item to left</source>
-<target>Kopier nytt emne mot venstre</target>
+<target>Kopier ny mappe mot venstre</target>
 
 <source>Copy new item to right</source>
-<target>Kopier nytt emne mot høyre</target>
+<target>Kopier ny mappe mot høyre</target>
 
 <source>Delete left item</source>
-<target>Slett venstre emne</target>
+<target>Slett venstre mappe</target>
 
 <source>Delete right item</source>
-<target>Slett høyre emne</target>
+<target>Slett høyre mappe</target>
 
 <source>Move file on left</source>
 <target>Flytt filen til venstre</target>
@@ -185,10 +191,10 @@
 <target>Flytt filen til høyre</target>
 
 <source>Overwrite left item</source>
-<target>Overskriv venstre emne</target>
+<target>Overskriv venstre mappe</target>
 
 <source>Overwrite right item</source>
-<target>Overskriv høyre emne</target>
+<target>Overskriv høyre mappe</target>
 
 <source>Do nothing</source>
 <target>Ikke gjør noe</target>
@@ -198,6 +204,24 @@
 
 <source>Update attributes on right</source>
 <target>Oppdater attributter til høyre</target>
+
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x byte</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Databasefilen %x er inkompatibel.</target>
@@ -251,31 +275,13 @@
 <target>Oppretter filen %x</target>
 
 <source>Items processed:</source>
-<target>Emner behandlet:</target>
+<target>Mapper behandlet:</target>
 
 <source>Items remaining:</source>
-<target>Gjenstående emner:</target>
+<target>Gjenstående mapper:</target>
 
 <source>Total time:</source>
 <target>Samlet tid:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>1 byte</pluralform>
-<pluralform>%x byte</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Behandlingsfeil i filen %x, rekke %y, kolonne %z.</target>
@@ -302,7 +308,7 @@
 <target>/sek</target>
 
 <source>%x items/sec</source>
-<target>%x emner/sek</target>
+<target>%x mapper/sek</target>
 
 <source>Show in Explorer</source>
 <target>Åpne filplassering</target>
@@ -317,7 +323,7 @@
 <target>VSS tjenesten er ikke tilgjengelig</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Bruk FreeFileSync 64-bit til at lage VSS kopier på dette system.</target>
+<target>Bruk FreeFileSync 64-bit til å lage VSS kopier på dette system.</target>
 
 <source>Cannot load file %x.</source>
 <target>Kan ikke lese filen %x.</target>
@@ -329,7 +335,7 @@
 <target>Volumnavnet %x er ikke en del av filstien %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
-<target>Avbrytelse: Venter til aktuell oppgave avsluttes...</target>
+<target>Avbryter: Venter til aktuell oppgave avsluttes...</target>
 
 <source>Unable to create time stamp for versioning:</source>
 <target>Kan ikke opprette tidsstempel til versionering:</target>
@@ -343,8 +349,8 @@
 <source>&Quit</source>
 <target>&Avslutt</target>
 
-<source>&Program</source>
-<target>&Filer</target>
+<source>&File</source>
+<target>&Fil</target>
 
 <source>&View help</source>
 <target>&Åpne hjelp</target>
@@ -400,7 +406,7 @@ The command is triggered if:
 - new folders arrive (e.g. USB stick insert)
 </source>
 <target>
-Kommandoen udføres hvis:
+Kommandoen utføres hvis:
 - filer eller undermapper endres
 - nye mapper finnes (f.eks USB nøkkel)
 </target>
@@ -434,9 +440,6 @@ Kommandoen udføres hvis:
 
 <source>&Show error</source>
 <target>&Vis feil</target>
-
-<source>&Exit</source>
-<target>&Lukk</target>
 
 <source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
@@ -501,8 +504,8 @@ Kommandoen udføres hvis:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Godkjennelsesfeil: %x og %y har forskellig innhold</target>
 
-<source>Cannot find %x.</source>
-<target>Kan ikke finne %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Finner ikke mappen %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Destinasjonsmappen %x finnes allerede.</target>
@@ -517,7 +520,7 @@ Kommandoen udføres hvis:
 <target>Kildemappen %x ble ikke funnet.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>Følgende emner har uløste konflikter og synkroniseres ikke:</target>
+<target>Følgende mapper har uløste konflikter og synkroniseres ikke:</target>
 
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
 <target>Følgende mapper har markante forskeller. Kontroller at du synkroniserer de rigtige mapper</target>
@@ -531,8 +534,8 @@ Kommandoen udføres hvis:
 <source>Available:</source>
 <target>Tilgjengelig:</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Der endres en mappe som tilhører flere mappepar. Kontroller dine synkroniseringsinnstillinger.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Flere mappepar til er skrevet til en felles undermappe. Se konfigureringen.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synkroniserer mappepar:</target>
@@ -562,7 +565,7 @@ Kommandoen udføres hvis:
 <target>Lagrer rapport %x...</target>
 
 <source>Stopped</source>
-<target>Avbrudt</target>
+<target>Avbrutt</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Skift til FreeFileSyncs hovedvindu for at løse problemet.</target>
@@ -633,8 +636,8 @@ Kommandoen udføres hvis:
 <source>Name</source>
 <target>Navn</target>
 
-<source>Relative path</source>
-<target>Relativ sti</target>
+<source>Relative folder</source>
+<target>Relativ mappe</target>
 
 <source>Base folder</source>
 <target>Hovedmappe</target>
@@ -655,7 +658,7 @@ Kommandoen udføres hvis:
 <target>Handling</target>
 
 <source>Drag && drop</source>
-<target>Trekk emner hit</target>
+<target>Trekk mapper hit</target>
 
 <source>Local comparison settings</source>
 <target>Lokale sammenlignings-instillinger</target>
@@ -675,8 +678,8 @@ Kommandoen udføres hvis:
 <source>Remove local settings</source>
 <target>Fjern lokale instillinger</target>
 
-<source>Reset local filter</source>
-<target>Tilbakestill lokalt filter</target>
+<source>Clear local filter</source>
+<target>Slett lokalt filter</target>
 
 <source>Copy</source>
 <target>Kopiér</target>
@@ -696,11 +699,11 @@ Kommandoen udføres hvis:
 <source>Save as &batch job...</source>
 <target>Lagre som &batchfil</target>
 
-<source>1. &Compare</source>
-<target>1. &Analyser</target>
+<source>Start &comparison</source>
+<target>Start &sammenligning</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synkroniser</target>
+<source>Start &synchronization</source>
+<target>Start &synkronisering</target>
 
 <source>&Options</source>
 <target>&Valg</target>
@@ -711,20 +714,23 @@ Kommandoen udføres hvis:
 <source>&Find...</source>
 <target>&Søk</target>
 
+<source>&Reset layout</source>
+<target>&Reset layout</target>
+
 <source>&Export file list...</source>
 <target>&Eksporter filliste...</target>
 
 <source>&Tools</source>
 <target>&Verktøy</target>
 
+<source>&Check for new version</source>
+<target>&Søk etter oppdatering</target>
+
 <source>&Check now</source>
 <target>&Søk nå</target>
 
 <source>Check &automatically once a week</source>
 <target>Søk &automatisk en gang i uken</target>
-
-<source>&Check for new version</source>
-<target>&Søk etter oppdatering</target>
 
 <source>Cancel</source>
 <target>Avbryt</target>
@@ -753,17 +759,14 @@ Kommandoen udføres hvis:
 <source>Match case</source>
 <target>Treffølsomhet (a/A)</target>
 
+<source>New</source>
+<target>Ny</target>
+
 <source>Open...</source>
 <target>Åpne...</target>
 
 <source>Save</source>
 <target>Lagre</target>
-
-<source>Save as GUI job</source>
-<target>Lagre som GUI arbeid</target>
-
-<source>Save as batch job</source>
-<target>Lagre som batchfil</target>
 
 <source>Save as...</source>
 <target>Lagre som</target>
@@ -777,14 +780,14 @@ Kommandoen udføres hvis:
 <source>Statistics:</source>
 <target>Statistikk:</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Antall filer og mapper som vil bli opprettet</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Antall filer og mapper som slettes</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Antall filer som overskrives</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Antall filer og mapper som slettes</target>
+<source>Number of files and folders that will be created</source>
+<target>Antall filer og mapper som vil bli opprettet</target>
 
 <source>Total bytes to copy</source>
 <target>Antal bytes som kopieres</target>
@@ -800,6 +803,12 @@ Kommandoen udføres hvis:
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Gjennkjenn like filer etter innhold.</target>
+
+<source>Ignore time shift (in hours)</source>
+<target>Ignorer tidsbytte (i timer)</target>
+
+<source>Handle daylight saving time</source>
+<target>Behandle sommertid</target>
 
 <source>Symbolic links:</source>
 <target>Symbolsk link:</target>
@@ -831,9 +840,6 @@ Kommandoen udføres hvis:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>&Reset</source>
-<target>&Nullstill</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Angi filterregler til ekskludering av bestemte filer fra synkroniseringen. Filstier skal relatere til kildemappene.</target>
 
@@ -857,20 +863,20 @@ Kommandoen udføres hvis:
 <source>Delete files:</source>
 <target>Slett filer:</target>
 
-<source>Permanent</source>
-<target>Permanent</target>
+<source>&Permanent</source>
+<target>&Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Slett eller overskriv filer permanent</target>
 
-<source>Recycle bin</source>
-<target>Papirkurv</target>
+<source>&Recycle bin</source>
+<target>&Papirkurv</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Backup slettede og overskrevne filer i papirkurven</target>
 
-<source>Versioning</source>
-<target>Versionering</target>
+<source>&Versioning</source>
+<target>&Versjonering</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Flytt filer til brukerdefinert mappe</target>
@@ -881,14 +887,11 @@ Kommandoen udføres hvis:
 <source>Handle errors:</source>
 <target>Feilhåndtering:</target>
 
-<source>Ignore</source>
-<target>Ignorer</target>
-
 <source>Hide all error and warning messages</source>
 <target>Skjul feilmeldinger og advarsler</target>
 
-<source>Pop-up</source>
-<target>Melding</target>
+<source>&Pop-up</source>
+<target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Vis feilmeldinger og advarsler</target>
@@ -909,10 +912,7 @@ Kommandoen udføres hvis:
 <target>&Ikke vis igjen</target>
 
 <source>Items found:</source>
-<target>Emner funnet:</target>
-
-<source>Speed:</source>
-<target>Hastighet:</target>
+<target>Mapper funnet:</target>
 
 <source>Time remaining:</source>
 <target>Resterende tid:</target>
@@ -926,6 +926,9 @@ Kommandoen udføres hvis:
 <source>Minimize to notification area</source>
 <target>Minimér til systemfeltet</target>
 
+<source>Bytes copied:</source>
+<target>Byte kopiert</target>
+
 <source>Close</source>
 <target>Lukk</target>
 
@@ -937,6 +940,9 @@ Kommandoen udføres hvis:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Oppret batchfil til automatisk synkronisering. Start ved aå dobbeltklikke på filen eller planlegg via oppgaveplanlegger: %x</target>
+
+<source>&Stop</source>
+<target>&Stopp</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stopp synkronisering ved første feil</target>
@@ -955,9 +961,6 @@ Kommandoen udføres hvis:
 
 <source>How can I schedule a batch job?</source>
 <target>Hvordan opprettes en batchfil?</target>
-
-<source>&Recycle bin</source>
-<target>&Papirkurv</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse innstillinger gjelder alle synkroniseringer.</target>
@@ -1004,8 +1007,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Beskrivelse</target>
 
-<source>Restore hidden windows</source>
-<target>Åpne skjulte vinduer</target>
+<source>Show hidden dialogs again</source>
+<target>Vis skjulte vinduer</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Vis alle vinduer og advarsler igjen</target>
 
 <source>&Default</source>
 <target>&Standard</target>
@@ -1038,7 +1044,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Lagre som batchfil</target>
 
 <source>Delete Items</source>
-<target>Slett emner</target>
+<target>Slett mapperr</target>
 
 <source>Options</source>
 <target>Valg</target>
@@ -1067,8 +1073,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Hovedlinje</target>
 
-<source>Compare both sides</source>
-<target>Analyser begge sider</target>
+<source>Start comparison</source>
+<target>Start sammenligning</target>
 
 <source>Comparison settings</source>
 <target>Analyseinnstillinger</target>
@@ -1087,8 +1093,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to execute the command %y for %x items?</pluralform>
 </source>
 <target>
-<pluralform>Vil du kjøre kommandoen %y for 1 emne?</pluralform>
-<pluralform>Vil du kjøre kommandoen %y for %x emner?</pluralform>
+<pluralform>Vil du kjøre kommandoen %y for 1 mappe?</pluralform>
+<pluralform>Vil du kjøre kommandoen %y for %x mapper?</pluralform>
 </target>
 
 <source>&Execute</source>
@@ -1163,9 +1169,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Velg tidsinterval...</target>
 
-<source>Default view</source>
-<target>Standardvisning</target>
-
 <source>Show "%x"</source>
 <target>Vis "%x"</target>
 
@@ -1196,8 +1199,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Synkroniseringsinnstillinger</target>
 
-<source>Reset filter</source>
-<target>Tilbakestill filter</target>
+<source>Clear filter</source>
+<target>Slett filter</target>
 
 <source>Show files that exist on left side only</source>
 <target>Vis filer som kun finnes på venstre side</target>
@@ -1318,8 +1321,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Vil du flytte følgende emne til papirkurven?</pluralform>
-<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
+<pluralform>Vil du flytte følgende mappe til papirkurven?</pluralform>
+<pluralform>Vil du flytte følgende %x mapper til papirkurven?</pluralform>
 </target>
 
 <source>Move</source>
@@ -1330,8 +1333,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Vil du slette følgende emne?</pluralform>
-<pluralform>Vil du slette følgende %x emner?</pluralform>
+<pluralform>Vil du slette følgende mappe?</pluralform>
+<pluralform>Vil du slette følgende %x mapper?</pluralform>
 </target>
 
 <source>Preferences</source>
@@ -1355,8 +1358,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>Motsatt sides motstykke til %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Åpne alle skjulte vinduer og advarsler?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Vis gjemte vinduer og advarsler igjen?</target>
+
+<source>&Show</source>
+<target>&Vis</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Finn og fordel endringer på begge sider. Slettede filer, omdøpninger og konflikter finnes automatisk i en database.</target>
@@ -1434,7 +1440,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Filer</target>
 
 <source>Items</source>
-<target>Emner</target>
+<target>Mapper</target>
 
 <source>Percentage</source>
 <target>Prosent</target>
@@ -1557,8 +1563,8 @@ This guarantees a consistent state even in case of a serious error.
 <target>Feilkode %x:</target>
 
 <source>Cannot read the following XML elements:</source>
-<target>Kan ikke lese følgende XML emner:</target>
+<target>Kan ikke lese følgende XML mapper:</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>Configureringsfilen %x er delvis innlastet</target>
+<target>Konfigureringsfilen %x er delvis innlastet</target>
 

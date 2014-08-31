@@ -106,8 +106,8 @@
 <source>The corresponding folder will be considered as empty.</source>
 <target>Odpovídající složka bude považována za prázdnou.</target>
 
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target>Následující složky mají navzájem závislé cesty! Buďte opatrní s definicí synchronizačních pravidel:</target>
+<source>The following folder paths are dependent from each other:</source>
+<target>Následující složky mají navzájem závislé cesty:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Soubor %x má chybné datum.</target>
@@ -199,6 +199,25 @@
 <source>Update attributes on right</source>
 <target>Nastavit vlastnosti vpravo</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>%x B</pluralform>
+<pluralform>%x B</pluralform>
+<pluralform>%x B</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Chybný formát databáze %x.</target>
 
@@ -259,25 +278,6 @@
 
 <source>Total time:</source>
 <target>Celkový čas:</target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target>
-<pluralform>%x B</pluralform>
-<pluralform>%x B</pluralform>
-<pluralform>%x B</pluralform>
-</target>
-
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Chyba zpracování souboru %x: na řádku %y ve sloupci %z</target>
@@ -346,8 +346,8 @@
 <source>&Quit</source>
 <target>U&končit</target>
 
-<source>&Program</source>
-<target>&Nástroje</target>
+<source>&File</source>
+<target>&Soubor</target>
 
 <source>&View help</source>
 <target>&Nápověda (pouze anglicky)</target>
@@ -438,9 +438,6 @@ Příkaz je spuštěn když:
 <source>&Show error</source>
 <target>&Zobrazit chybu</target>
 
-<source>&Exit</source>
-<target>&Konec</target>
-
 <source>Incorrect command line:</source>
 <target>Neplatný příkaz:</target>
 
@@ -504,8 +501,8 @@ Příkaz je spuštěn když:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Chyba porovnání dat: %x má jiný obsah než %y</target>
 
-<source>Cannot find %x.</source>
-<target>Nelze najít %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Nelze najít složku %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Cílová složka %x již existuje.</target>
@@ -523,7 +520,7 @@ Příkaz je spuštěn když:
 <target>Následující položky jsou nevyřešené konflikty a nebudou synchronizovány:</target>
 
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target>Nsledující složky se významně liší. Zkontrolujte zda porovnáváte správnou dvojici složek pro synchronizaci.</target>
+<target>Následující složky se významně liší. Zkontrolujte zda porovnáváte správnou dvojici složek pro synchronizaci.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nedostatek místa na disku:</target>
@@ -534,8 +531,8 @@ Příkaz je spuštěn když:
 <source>Available:</source>
 <target>K dispozici</target>
 
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Bude změněna složka, která je součástí adresářového páru vícenásobného porovnání. Prosím zkontrolujte si nastavení synchronizace.</target>
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target>Více složek obsahuje společnou podsložku. Prosím zkontrolujte si nastavení synchronizace.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Zpracovávání páru složek:</target>
@@ -637,8 +634,8 @@ Příkaz je spuštěn když:
 <source>Name</source>
 <target>Jméno</target>
 
-<source>Relative path</source>
-<target>Relativní cesta</target>
+<source>Relative folder</source>
+<target>Relativní složka</target>
 
 <source>Base folder</source>
 <target>Složka</target>
@@ -679,8 +676,8 @@ Příkaz je spuštěn když:
 <source>Remove local settings</source>
 <target>Zrušit nastavení</target>
 
-<source>Reset local filter</source>
-<target>Zrušit nastavení filtru</target>
+<source>Clear local filter</source>
+<target>Vymazat nastavení filtru</target>
 
 <source>Copy</source>
 <target>Kopírovat</target>
@@ -700,14 +697,14 @@ Příkaz je spuštěn když:
 <source>Save as &batch job...</source>
 <target>Uložit jako &dávku</target>
 
-<source>1. &Compare</source>
-<target>1. &Porovnat</target>
+<source>Start &comparison</source>
+<target>Začít &porovnání</target>
 
-<source>2. &Synchronize</source>
-<target>2. &Synchronizovat</target>
+<source>Start &synchronization</source>
+<target>Začít &synchronizaci</target>
 
 <source>&Options</source>
-<target>&Nastavení programu</target>
+<target>Nastavení &programu</target>
 
 <source>&Language</source>
 <target>&Jazyk</target>
@@ -715,20 +712,23 @@ Příkaz je spuštěn když:
 <source>&Find...</source>
 <target>&Najít...</target>
 
+<source>&Reset layout</source>
+<target>&Obnovit rozložení</target>
+
 <source>&Export file list...</source>
 <target>&Exportovat seznam souborů...</target>
 
 <source>&Tools</source>
-<target>&Upřesnit</target>
+<target>&Nastavení</target>
+
+<source>&Check for new version</source>
+<target>&Zkontrolovat aktualizace</target>
 
 <source>&Check now</source>
 <target>Zkontrolovat &nyní</target>
 
 <source>Check &automatically once a week</source>
 <target>Kontrolovat &automaticky jednou týdně</target>
-
-<source>&Check for new version</source>
-<target>&Zkontrolovat aktualizace</target>
 
 <source>Cancel</source>
 <target>Zrušit</target>
@@ -757,17 +757,14 @@ Příkaz je spuštěn když:
 <source>Match case</source>
 <target>Rozlišovat malá a velká písmena</target>
 
+<source>New</source>
+<target>Nový</target>
+
 <source>Open...</source>
 <target>Otevřít...</target>
 
 <source>Save</source>
 <target>Uložit</target>
-
-<source>Save as GUI job</source>
-<target>Uložit jako úlohu</target>
-
-<source>Save as batch job</source>
-<target>Uložit jako dávku</target>
 
 <source>Save as...</source>
 <target>Uložit jako...</target>
@@ -781,14 +778,14 @@ Příkaz je spuštěn když:
 <source>Statistics:</source>
 <target>Statistika</target>
 
-<source>Number of files and folders that will be created</source>
-<target>Počet souborů a složek k vytvoření</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Počet souborů a složek ke smazání</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Počet souborů a adresářů k přepsání</target>
 
-<source>Number of files and folders that will be deleted</source>
-<target>Počet souborů a složek ke smazání</target>
+<source>Number of files and folders that will be created</source>
+<target>Počet souborů a složek k vytvoření</target>
 
 <source>Total bytes to copy</source>
 <target>Celkový objem dat</target>
@@ -805,8 +802,17 @@ Příkaz je spuštěn když:
 <source>Identify equal files by comparing the file content.</source>
 <target>Rozpoznat shodné soubory porovnáním jejich obsahu.</target>
 
+<source>Ignore time shift (in hours)</source>
+<target>Ignorovat časový posun (v hodinách)</target>
+
+<source>Consider file times with specified offset as equal</source>
+<target>Považovat časy souborů s daným posunem jako stejné</target>
+
+<source>Handle daylight saving time</source>
+<target>Používat letní čas</target>
+
 <source>Symbolic links:</source>
-<target>Symbolickéh odkazy:</target>
+<target>Symbolické odkazy:</target>
 
 <source>More information</source>
 <target>Více informací</target>
@@ -835,11 +841,11 @@ Příkaz je spuštěn když:
 <source>Maximum:</source>
 <target>Do:</target>
 
-<source>&Reset</source>
-<target>&Smazat</target>
+<source>C&lear</source>
+<target>Vy&mazat</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávajte cesty relativně k odpovídající složce.</target>
+<target>Nastavte pravidla filtru pro vynechání některých souborů ze synchronizace. Zadávejte cesty relativně k odpovídající složce.</target>
 
 <source>Detect moved files</source>
 <target>Detekce přesunutých souborů</target>
@@ -861,20 +867,20 @@ Příkaz je spuštěn když:
 <source>Delete files:</source>
 <target>Mazání souborů:</target>
 
-<source>Permanent</source>
-<target>Trvale</target>
+<source>&Permanent</source>
+<target>&Trvale</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Smazat nebo přepsat soubory trvale</target>
 
-<source>Recycle bin</source>
-<target>Koš</target>
+<source>&Recycle bin</source>
+<target>&Koš</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Použít Koš při mazání nebo přepisu souborů</target>
 
-<source>Versioning</source>
-<target>Verzování</target>
+<source>&Versioning</source>
+<target>&Verzování</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Přesunout soubory do uživatelského adresáře</target>
@@ -885,14 +891,11 @@ Příkaz je spuštěn když:
 <source>Handle errors:</source>
 <target>Zpracování chyb:</target>
 
-<source>Ignore</source>
-<target>Přeskočit</target>
-
 <source>Hide all error and warning messages</source>
 <target>Skrýt všechny chyby a varování</target>
 
-<source>Pop-up</source>
-<target>Hlášení</target>
+<source>&Pop-up</source>
+<target>&Hlášení</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Zobrazit hlášení při chybě nebo varování</target>
@@ -915,9 +918,6 @@ Příkaz je spuštěn když:
 <source>Items found:</source>
 <target>Nalezeno položek:</target>
 
-<source>Speed:</source>
-<target>Rychlost:</target>
-
 <source>Time remaining:</source>
 <target>Zbývající čas:</target>
 
@@ -930,6 +930,9 @@ Příkaz je spuštěn když:
 <source>Minimize to notification area</source>
 <target>Minimalizovat do oznamovací oblasti</target>
 
+<source>Bytes copied:</source>
+<target>Zkopírováno dat:</target>
+
 <source>Close</source>
 <target>Zavřít</target>
 
@@ -941,6 +944,9 @@ Příkaz je spuštěn když:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Vytvoří dávkový souboru pro automatickou synchronizaci. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo využijte plánovač úloh vašeho systému: %x</target>
+
+<source>&Stop</source>
+<target>&Zastavit</target>
 
 <source>Stop synchronization at first error</source>
 <target>Ukončit synchronizaci při první chybě</target>
@@ -959,9 +965,6 @@ Příkaz je spuštěn když:
 
 <source>How can I schedule a batch job?</source>
 <target>Jak nastavit spouštění dávky?</target>
-
-<source>&Recycle bin</source>
-<target>&Koš</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Toto nastavení je platné pro všechny synchronizační úlohy.</target>
@@ -1008,8 +1011,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Popis</target>
 
-<source>Restore hidden windows</source>
-<target>Obnovit skryté dialogy</target>
+<source>Show hidden dialogs again</source>
+<target>Znovu zobrazit skryté dialogy</target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target>Zobrazit znovu všechny trvale skryté dialogy a varovná hlášení</target>
 
 <source>&Default</source>
 <target>&Předdefinované</target>
@@ -1071,8 +1077,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Hlavní lišta</target>
 
-<source>Compare both sides</source>
-<target>Porovnat obě strany</target>
+<source>Start comparison</source>
+<target>Začít porovnání</target>
 
 <source>Comparison settings</source>
 <target>Nastavení porovnání</target>
@@ -1171,9 +1177,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Zadejte časové rozmezí...</target>
 
-<source>Default view</source>
-<target>Výchozí zobrazení</target>
-
 <source>Show "%x"</source>
 <target>Zobrazit "%x"</target>
 
@@ -1204,8 +1207,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Nastavení synchronizace</target>
 
-<source>Reset filter</source>
-<target>Zrušit filtr</target>
+<source>Clear filter</source>
+<target>Vymazat filtr</target>
 
 <source>Show files that exist on left side only</source>
 <target>Zobrazit soubory existující pouze vlevo</target>
@@ -1365,8 +1368,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- pouze cesta z opačného panelu pro %item_folder%</target>
 
-<source>Restore all hidden windows and warnings?</source>
-<target>Obnovit všechny skryté dialogy a varování?</target>
+<source>Show hidden dialogs and warning messages again?</source>
+<target>Zobrazit skryté dialogy a varovná hlášení?</target>
+
+<source>&Show</source>
+<target>&Zobrazit</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>

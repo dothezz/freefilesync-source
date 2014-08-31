@@ -18,6 +18,7 @@
 #ifndef NDEBUG
 #include <mutex>
 #include <iostream>
+#include "thread.h"
 #endif
 
 using namespace zen;
@@ -38,14 +39,14 @@ public:
 
     void insert(const void* ptr, size_t size)
     {
-        std::lock_guard<std::mutex> dummy(lockActStrings);
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (!activeStrings.insert(std::make_pair(ptr, size)).second)
             reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
     void remove(const void* ptr)
     {
-        std::lock_guard<std::mutex> dummy(lockActStrings);
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.erase(ptr) != 1)
             reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
@@ -94,7 +95,7 @@ private:
         throw std::logic_error("Memory leak! " + message);
     }
 
-    std::mutex lockActStrings;
+    boost::mutex lockActStrings;
     zen::hash_map<const void*, size_t> activeStrings;
 };
 
