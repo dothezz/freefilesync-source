@@ -56,7 +56,7 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
         return wxIcon();
 
     const int pixelCount = logo.GetWidth() * logo.GetHeight();
-    const int startFillPixel = numeric::confineCpy(numeric::round(fraction * pixelCount), 0, pixelCount);
+    const int startFillPixel = numeric::clampCpy(numeric::round(fraction * pixelCount), 0, pixelCount);
 
     //minor optimization
     static std::pair<int, wxIcon> buffer = std::make_pair(-1, wxNullIcon);

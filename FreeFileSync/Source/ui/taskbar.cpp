@@ -30,15 +30,15 @@ using namespace tbseven;
 class Taskbar::Pimpl //throw TaskbarNotAvailable
 {
 public:
-    Pimpl(const wxFrame& window) :
-        assocWindow(window.GetHWND()),
-        setStatus_  (getDllName(), funName_setStatus),
-        setProgress_(getDllName(), funName_setProgress)
+    Pimpl(const wxFrame& window) : assocWindow(window.GetHWND())
     {
-        if (!assocWindow || !setProgress_ || !setStatus_)
+        if (!win7OrLater()) //check *before* trying to load DLL
             throw TaskbarNotAvailable();
 
-        if (!zen::win7OrLater())
+        setStatus_   = DllFun<FunType_setStatus  >(getDllName(), funName_setStatus);
+        setProgress_ = DllFun<FunType_setProgress>(getDllName(), funName_setProgress);
+
+        if (!assocWindow || !setStatus_ || !setProgress_)
             throw TaskbarNotAvailable();
     }
 
@@ -72,9 +72,9 @@ public:
     }
 
 private:
-    void* assocWindow; //HWND
-    const DllFun<FunType_setStatus>   setStatus_;
-    const DllFun<FunType_setProgress> setProgress_;
+    void* const assocWindow; //HWND
+    DllFun<FunType_setStatus>   setStatus_;
+    DllFun<FunType_setProgress> setProgress_;
 };
 
 #elif defined HAVE_UBUNTU_UNITY //Ubuntu unity

@@ -19,7 +19,8 @@ using namespace zen;
 
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
-const std::shared_ptr<LabelFormatter> Graph2D::MainAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>(); //for some buggy reason MSVC isn't able to use a temporary as a default argument
+//for some buggy reason MSVC isn't able to use a temporary as a default argument
+const std::shared_ptr<LabelFormatter> Graph2D::MainAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>();
 
 
 double zen::nextNiceNumber(double blockSize) //round to next number which is a convenient to read block size
@@ -82,7 +83,7 @@ public:
         outOfBoundsLow (-1 * scaleToReal + valMin),
         outOfBoundsHigh((screenSize + 1) * scaleToReal + valMin) { if (outOfBoundsLow > outOfBoundsHigh) std::swap(outOfBoundsLow, outOfBoundsHigh); }
 
-    double screenToReal(double screenPos) const //input value: [0, screenSize - 1]
+    double screenToReal(double screenPos) const //map [0, screenSize] -> [valMin, valMax]
     {
         return screenPos * scaleToReal + min_;
     }
@@ -93,7 +94,7 @@ public:
     int realToScreenRound(double realPos) const //returns -1 and screenSize + 1 if out of bounds!
     {
         //catch large double values: if double is larger than what int can represent => undefined behavior!
-        numeric::confine(realPos , outOfBoundsLow, outOfBoundsHigh);
+        numeric::clamp(realPos , outOfBoundsLow, outOfBoundsHigh);
         return numeric::round(realToScreen(realPos));
     }
 
@@ -120,9 +121,14 @@ void widenRange(double& valMin, double& valMax, //in/out
         valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
         if (!numeric::isNull(valRangePerBlock))
         {
-            valMin = std::floor(valMin / valRangePerBlock) * valRangePerBlock;
-            valMax = std::ceil (valMax / valRangePerBlock) * valRangePerBlock;
-            blockCount = numeric::round((valMax - valMin) / valRangePerBlock); //"round" to avoid IEEE 754 surprises
+			int blockMin = std::floor(valMin / valRangePerBlock);
+			int blockMax = std::ceil (valMax / valRangePerBlock);
+			if (blockMin == blockMax) //handle valMin == valMax == integer
+				++blockMax; 
+
+            valMin = blockMin * valRangePerBlock;
+            valMax = blockMax * valRangePerBlock;	
+            blockCount = blockMax - blockMin;
             return;
         }
     }
@@ -670,10 +676,10 @@ void Graph2D::render(wxDC& dc) const
                 const wxPoint screenCurrent = activeSel->refCurrentPos() - graphAreaOrigin;
 
                 //normalize positions: a mouse selection is symmetric and *not* an half-open range!
-                double screenFromX = confineCpy(screenStart  .x, 0, graphArea.width  - 1);
-                double screenFromY = confineCpy(screenStart  .y, 0, graphArea.height - 1);
-                double screenToX   = confineCpy(screenCurrent.x, 0, graphArea.width  - 1);
-                double screenToY   = confineCpy(screenCurrent.y, 0, graphArea.height - 1);
+                double screenFromX = clampCpy(screenStart  .x, 0, graphArea.width  - 1);
+                double screenFromY = clampCpy(screenStart  .y, 0, graphArea.height - 1);
+                double screenToX   = clampCpy(screenCurrent.x, 0, graphArea.width  - 1);
+                double screenToY   = clampCpy(screenCurrent.y, 0, graphArea.height - 1);
                 widen(&screenFromX, &screenToX); //use full pixel range for selection!
                 widen(&screenFromY, &screenToY);
 
@@ -731,10 +737,10 @@ void Graph2D::render(wxDC& dc) const
                     shrink(&screenFromX, &screenToX);
                     shrink(&screenFromY, &screenToY);
 
-                    confine(screenFromX, 0.0, graphArea.width  - 1.0);
-                    confine(screenFromY, 0.0, graphArea.height - 1.0);
-                    confine(screenToX,   0.0, graphArea.width  - 1.0);
-                    confine(screenToY,   0.0, graphArea.height - 1.0);
+                    clamp(screenFromX, 0.0, graphArea.width  - 1.0);
+                    clamp(screenFromY, 0.0, graphArea.height - 1.0);
+                    clamp(screenToX,   0.0, graphArea.width  - 1.0);
+                    clamp(screenToY,   0.0, graphArea.height - 1.0);
 
                     const wxPoint pixelFrom = wxPoint(numeric::round(screenFromX),
                                                       numeric::round(screenFromY)) + graphAreaOrigin;

@@ -11,7 +11,7 @@
 #include <memory>
 #include <cstdint>
 #include "string_tools.h"
-
+#include "format_unit.h"
 
 //minimal layer enabling text translation - without platform/library dependencies!
 #ifdef __WXMSW__ //we have wxWidgets
@@ -75,7 +75,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
         return translation;
     }
     else
-        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", zen::numberTo<std::wstring>(n));
+        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n));
 }
 
 template <class T> inline

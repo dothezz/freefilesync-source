@@ -155,8 +155,8 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
-        setAppUserModeId(L"FreeFileSync", L"SourceForge.FreeFileSync"); //noexcept
-        //consider: FreeFileSync.exe, FreeFileSync_Win32.exe, FreeFileSync_x64.exe
+    setAppUserModeId(L"FreeFileSync", L"SourceForge.FreeFileSync"); //noexcept
+    //consider: FreeFileSync.exe, FreeFileSync_Win32.exe, FreeFileSync_x64.exe
 
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
 

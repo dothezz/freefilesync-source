@@ -1,6 +1,21 @@
-FreeFileSync 6.9
-----------------
-Use FreeFileSync taskbar icon when available (Windows 7)
+FreeFileSync 6.10
+-----------------
+Fixed crash when accessing recycle bin in compatibility mode (Windows 7, 8)
+Draw middle grid selection irrespective of focus column
+Don't show parts of progress graph if nothing to sync
+Break on missing directories before evaluating warnings
+Ignore leading/trailing whitespace in search panel
+Disable search panel during comparison
+Disable shortkeys during comparison
+Log folder pair only if files are synced
+Fixed number separator formatting for english locale
+Copying locked files now inactive by default
+Show all affected folders when warning about a shared sub folder
+
+
+FreeFileSync 6.9 [2014-09-01]
+-----------------------------
+Reuse FreeFileSync taskbar link when available (Windows 7)
 Limit number of retries when creating temporary files
 Fixed bitmap rendering issue for high-contrast color schemes
 Revised and fixed unclear GUI texts

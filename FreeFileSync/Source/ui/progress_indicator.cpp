@@ -515,7 +515,7 @@ public:
         return wxEmptyString;
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         wxRect rectTmp = rect;
 
@@ -954,24 +954,24 @@ private:
 class CurveDataRectangleArea : public CurveData
 {
 public:
-    CurveDataRectangleArea () : x(0), y(0) {}
+    CurveDataRectangleArea() : x_(), y_() {}
 
-    void setValue (double xVal, double yVal) { x = xVal; y = yVal; }
-    void setValueX(double xVal)              { x = xVal; }
-    double getValueX() const { return x; }
+    void setValue (double x, double y) { x_ = x; y_ = y; }
+    void setValueX(double x)           { x_ = x; }
+    double getValueX() const { return x_; }
 
 private:
-    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(x, x); } //conceptually just a vertical line!
+    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(x_, x_); } //conceptually just a vertical line!
 
     virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
     {
-        points.push_back(CurvePoint(0, y));
-        points.push_back(CurvePoint(x, y));
-        points.push_back(CurvePoint(x, 0));
+        points.push_back(CurvePoint(0,  y_));
+        points.push_back(CurvePoint(x_, y_));
+        points.push_back(CurvePoint(x_, 0));
     }
 
-    double x; //time elapsed in seconds
-    double y; //items/bytes processed
+    double x_; //time elapsed in seconds
+    double y_; //items/bytes processed
 };
 
 
@@ -1375,9 +1375,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
     curveDataItemsCurrent->setValue(0, 0);
     curveDataBytesTotal  ->setValue(0, 0);
     curveDataItemsTotal  ->setValue(0, 0);
-
-    curveDataBytes->clear();
-    curveDataItems->clear();
+    curveDataBytes       ->clear();
+    curveDataItems       ->clear();
 
     notifyProgressChange(); //make sure graphs get initial values
 
@@ -1403,9 +1402,14 @@ void SyncProgressDialogImpl<TopLevelDialog>::notifyProgressChange() //noexcept!
                 break;
             case ProcessCallback::PHASE_COMPARING_CONTENT:
             case ProcessCallback::PHASE_SYNCHRONIZING:
-                curveDataBytes->addRecord(timeElapsed.timeMs(), syncStat_->getDataCurrent   (syncStat_->currentPhase()));
-                curveDataItems->addRecord(timeElapsed.timeMs(), syncStat_->getObjectsCurrent(syncStat_->currentPhase()));
-                break;
+            {
+                const std::int64_t dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+                const int          itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+
+                curveDataBytes->addRecord(timeElapsed.timeMs(), dataCurrent);
+                curveDataItems->addRecord(timeElapsed.timeMs(), itemsCurrent);
+            }
+            break;
         }
 }
 
@@ -1538,10 +1542,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         case ProcessCallback::PHASE_SYNCHRONIZING:
         {
-            const int   itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
-            const int   itemsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
             const std::int64_t dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
             const std::int64_t dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
+            const int   itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+            const int   itemsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
 
             //add both data + obj-count, to handle "deletion-only" cases
             const double fraction = dataTotal + itemsTotal == 0 ? 1 : std::max(0.0, 1.0 * (dataCurrent + itemsCurrent) / (dataTotal + itemsTotal));

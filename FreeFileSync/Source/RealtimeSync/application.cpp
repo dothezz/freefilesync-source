@@ -70,8 +70,8 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
-        setAppUserModeId(L"RealtimeSync", L"SourceForge.RealtimeSync"); //noexcept
-        //consider: RealtimeSync.exe, RealtimeSync_Win32.exe, RealtimeSync_x64.exe
+    setAppUserModeId(L"RealtimeSync", L"SourceForge.RealtimeSync"); //noexcept
+    //consider: RealtimeSync.exe, RealtimeSync_Win32.exe, RealtimeSync_x64.exe
 
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
 

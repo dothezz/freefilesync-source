@@ -221,7 +221,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
                                             '\x8d', '\xc2', '\xc', '\xa5', '\xef', '\x59', '\x6e', '\x3b'
                                           }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
 
-            showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),                //in;  ==HWND
+            showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()), //in;  ==HWND
                              defaultdirpath.empty() ? static_cast<const wchar_t*>(nullptr) : defaultdirpath.c_str(), //in, optional!
                              &guid,
                              selectedFolder, //out: call freeString() after use!

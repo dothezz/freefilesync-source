@@ -380,7 +380,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
     //auto-retry
     if (retryNumber < automaticRetryCount_)
     {
-        errorLog.logMsg(errorMessage + L"\n=> " +
+        errorLog.logMsg(errorMessage + L"\n-> " +
                         _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...", automaticRetryDelay_), TYPE_INFO);
         //delay
         const int iterations = static_cast<int>(1000 * automaticRetryDelay_ / UI_UPDATE_INTERVAL); //always round down: don't allow for negative remaining time below
@@ -418,7 +418,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
 
                 case ConfirmationButton3::DONT_DO_IT: //retry
                     guardWriteLog.dismiss();
-                    errorLog.logMsg(errorMessage + L"\n=> " + _("Retrying operation..."), TYPE_INFO);
+                    errorLog.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO);
                     return ProcessCallback::RETRY;
 
                 case ConfirmationButton3::CANCEL:

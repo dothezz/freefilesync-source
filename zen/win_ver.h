@@ -7,30 +7,48 @@
 #ifndef WINDOWS_VERSION_HEADER_238470348254325
 #define WINDOWS_VERSION_HEADER_238470348254325
 
-#include <cstdint>
+#include <utility>
 #include "win.h" //includes "windows.h"
 
 namespace zen
 {
-std::uint64_t getOsVersion();
-std::uint64_t toBigOsNumber(DWORD high, DWORD low);
+	struct OsVersion
+	{
+		OsVersion() : major(), minor() {}
+		OsVersion(DWORD high, DWORD low) : major(high), minor(low) {}
+
+			DWORD major;
+			DWORD minor;
+	};
+	inline bool operator< (const OsVersion& lhs, const OsVersion& rhs) { return lhs.major != rhs.major ? lhs.major < rhs.major : lhs.minor < rhs.minor; }
+	inline bool operator==(const OsVersion& lhs, const OsVersion& rhs) { return lhs.major == rhs.major && lhs.minor == rhs.minor; }
+
 
 //version overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
-const std::uint64_t osVersionWin81         = toBigOsNumber(6, 3);
-const std::uint64_t osVersionWin8          = toBigOsNumber(6, 2);
-const std::uint64_t osVersionWin7          = toBigOsNumber(6, 1);
-const std::uint64_t osVersionWinVista      = toBigOsNumber(6, 0);
-const std::uint64_t osVersionWinServer2003 = toBigOsNumber(5, 2);
-const std::uint64_t osVersionWinXp         = toBigOsNumber(5, 1);
+const OsVersion osVersionWin81        (6, 3);
+const OsVersion osVersionWin8         (6, 2);
+const OsVersion osVersionWin7         (6, 1);
+const OsVersion osVersionWinVista     (6, 0);
+const OsVersion osVersionWinServer2003(5, 2);
+const OsVersion osVersionWinXp        (5, 1);
 
-inline bool win81OrLater        () { return getOsVersion() >= osVersionWin81;         }
-inline bool win8OrLater         () { return getOsVersion() >= osVersionWin8;          }
-inline bool win7OrLater         () { return getOsVersion() >= osVersionWin7;          }
-inline bool vistaOrLater        () { return getOsVersion() >= osVersionWinVista;      }
-inline bool winServer2003orLater() { return getOsVersion() >= osVersionWinServer2003; }
-inline bool winXpOrLater        () { return getOsVersion() >= osVersionWinXp;         }
+/*
+	NOTE: there are two basic APIs to check Windows version: (empiric study following)
+		GetVersionEx      -> reports version considering compatibility mode (and compatibility setting in app manifest since Windows 8.1)
+		VerifyVersionInfo -> always reports *real* Windows Version
+*/
 
+//GetVersionEx()-based APIs:
+OsVersion getOsVersion();
+inline bool win81OrLater        () { using namespace std::rel_ops; return getOsVersion() >= osVersionWin81;         }
+inline bool win8OrLater         () { using namespace std::rel_ops; return getOsVersion() >= osVersionWin8;          }
+inline bool win7OrLater         () { using namespace std::rel_ops; return getOsVersion() >= osVersionWin7;          }
+inline bool vistaOrLater        () { using namespace std::rel_ops; return getOsVersion() >= osVersionWinVista;      }
+inline bool winServer2003orLater() { using namespace std::rel_ops; return getOsVersion() >= osVersionWinServer2003; }
+inline bool winXpOrLater        () { using namespace std::rel_ops; return getOsVersion() >= osVersionWinXp;         }
 
+//VerifyVersionInfo()-based APIs:
+bool isRealOsVersion(const OsVersion& ver);
 
 
 
@@ -39,25 +57,37 @@ inline bool winXpOrLater        () { return getOsVersion() >= osVersionWinXp;   
 
 //######################### implementation #########################
 inline
-std::uint64_t toBigOsNumber(DWORD high, DWORD low)
+OsVersion getOsVersion()
 {
-    ULARGE_INTEGER tmp = {};
-    tmp.HighPart = high;
-    tmp.LowPart  = low;
-
-    static_assert(sizeof(tmp) == sizeof(std::uint64_t), "");
-    return tmp.QuadPart;
+    OSVERSIONINFO osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (!::GetVersionEx(&osvi)) //38 ns per call! (yes, that's nano!) -> we do NOT miss C++11 thread-safe statics right now...
+	{
+		assert(false);
+		return OsVersion();
+	}
+    return OsVersion(osvi.dwMajorVersion, osvi.dwMinorVersion);
 }
 
 
 inline
-std::uint64_t getOsVersion()
+bool isRealOsVersion(const OsVersion& ver)
 {
-    OSVERSIONINFO osvi = {};
-    osvi.dwOSVersionInfoSize = sizeof(osvi);
-    if (!::GetVersionEx(&osvi)) //38 ns per call! (yes, that's nano!) -> we do NOT miss C++11 thread safe statics right now...
-        return 0;
-    return toBigOsNumber(osvi.dwMajorVersion, osvi.dwMinorVersion);
+    OSVERSIONINFOEX verInfo = {};
+    verInfo.dwOSVersionInfoSize = sizeof(verInfo);
+    verInfo.dwMajorVersion = ver.major;
+    verInfo.dwMinorVersion = ver.minor;
+
+	//Syntax: http://msdn.microsoft.com/en-us/library/windows/desktop/ms725491%28v=vs.85%29.aspx
+    DWORDLONG conditionMask = 0;
+    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_EQUAL);
+
+    const bool rv = ::VerifyVersionInfo(&verInfo, VER_MAJORVERSION | VER_MINORVERSION, conditionMask)
+           == TRUE; //silence VC "performance warnings"
+	assert(rv || GetLastError() == ERROR_OLD_WIN_VERSION);
+
+	return rv;
 }
 }
 

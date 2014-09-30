@@ -866,7 +866,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         //wxRect rectTmp= drawCellBorder(dc, rect);
         wxRect rectTmp = rect;

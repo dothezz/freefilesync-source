@@ -135,7 +135,7 @@ struct XmlGlobalSettings
     XmlGlobalSettings() :
         programLanguage(zen::retrieveSystemLanguage()),
         failsafeFileCopy(true),
-        copyLockedFiles(true),
+        copyLockedFiles(false), //safer default: avoid copies of partially written files
         copyFilePermissions(false),
         automaticRetryCount(0),
         automaticRetryDelay(5),

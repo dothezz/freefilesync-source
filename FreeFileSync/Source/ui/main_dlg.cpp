@@ -474,7 +474,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     manualTimeSpanTo  (0),
     folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
     folderHistoryRight(std::make_shared<FolderHistory>()), //
-    focusWindowAfterSearch(nullptr)
+    focusWindowAfterSearch(nullptr),
+    localKeyEventsEnabled(true)
 {
     m_directoryLeft ->init(folderHistoryLeft);
     m_directoryRight->init(folderHistoryRight);
@@ -1547,6 +1548,8 @@ void MainDialog::disableAllElements(bool enableAbort)
 
     //OS X: wxWidgets portability promise is again a mess: http://wxwidgets.10942.n7.nabble.com/Disable-panel-and-appropriate-children-windows-linux-macos-td35357.html
 
+    localKeyEventsEnabled = false;
+
     m_menubar1->EnableTop(0, false);
     m_menubar1->EnableTop(1, false);
     m_menubar1->EnableTop(2, false);
@@ -1559,6 +1562,7 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_panelViewFilter    ->Disable();
     m_panelConfig        ->Disable();
     m_gridNavi           ->Disable();
+    m_panelSearch        ->Disable();
 
     if (enableAbort)
     {
@@ -1582,6 +1586,8 @@ void MainDialog::enableAllElements()
 
     EnableCloseButton(true);
 
+    localKeyEventsEnabled = true;
+
     m_menubar1->EnableTop(0, true);
     m_menubar1->EnableTop(1, true);
     m_menubar1->EnableTop(2, true);
@@ -1594,6 +1600,7 @@ void MainDialog::enableAllElements()
     m_panelViewFilter    ->Enable();
     m_panelConfig        ->Enable();
     m_gridNavi           ->Enable();
+    m_panelSearch        ->Enable();
 
     //show compare button
     m_buttonCancel->Disable();
@@ -1845,6 +1852,12 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
 
 void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
 {
+    if (!localKeyEventsEnabled)
+    {
+        event.Skip();
+        return;
+    }
+
     const int keyCode = event.GetKeyCode();
 
     //CTRL + X
@@ -1926,7 +1939,7 @@ void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without
                     m_gridMainL->SetFocus();
 
                     event.SetEventType(wxEVT_KEY_DOWN); //the grid event handler doesn't expect wxEVT_CHAR_HOOK!
-                    evtHandler->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but we prevented it...
+                    evtHandler->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but code in key_event.h prevents it...
                     event.Skip(false); //definitively handled now!
                     return;
                 }
@@ -4055,7 +4068,7 @@ void MainDialog::OnSearchPanelKeyPressed(wxKeyEvent& event)
     switch (event.GetKeyCode())
     {
         case WXK_RETURN:
-        case WXK_NUMPAD_ENTER: //catches ENTER keys while focus is on *any* part of m_panelSearch! Seems to obsolete OnHideSearchPanel()!
+        case WXK_NUMPAD_ENTER: //catches ENTER keys while focus is on *any* part of m_panelSearch! Seems to obsolete OnSearchGridEnter()!
             startFindNext();
             return;
         case WXK_ESCAPE:
@@ -4096,7 +4109,8 @@ void MainDialog::hideFindPanel()
 
 void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
 {
-    const wxString& searchString = m_textCtrlSearchTxt->GetValue();
+    wxString searchString = m_textCtrlSearchTxt->GetValue();
+    trim(searchString);
 
     if (searchString.empty())
         showFindPanel();

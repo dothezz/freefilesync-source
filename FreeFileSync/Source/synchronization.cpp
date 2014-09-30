@@ -1898,19 +1898,6 @@ void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring&
 
 //###########################################################################################
 
-/*
-struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
-{
-->  a *very* bad idea: this is NOT a strict weak ordering! No transitivity of equivalence!
-
-    bool operator()(const Zstring& lhs, const Zstring& rhs) const
-    {
-        return LessFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())),
-                              Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
-    }
-};
-*/
-
 template <SelectedSide side> //create base directories first (if not yet existing) -> no symlink or attribute copying!
 bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //nothrow; return false if fatal error occurred
 {
@@ -1918,18 +1905,7 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
     if (dirpath.empty())
         return true;
 
-    if (baseDirObj.isExisting<side>()) //atomicity: do NOT check directory existence again!
-    {
-        //just convenience: exit sync right here instead of showing tons of error messages during file copy
-        zen::Opt<std::wstring> errMsg = tryReportingError([&]
-        {
-            if (!dirExistsUpdating(dirpath, false, callback))
-                throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirpath))); //should be logged as a "fatal error" if ignored by the user...
-        }, callback); //may throw in error-callback!
-
-        return !errMsg;
-    }
-    else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
+    if (!baseDirObj.isExisting<side>()) //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
     {
         bool temporaryNetworkDrop = false;
         zen::Opt<std::wstring> errMsg = tryReportingError([&]
@@ -1942,7 +1918,7 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
             }
             catch (const ErrorTargetExisting&)
             {
-                //TEMPORARY network drop: base directory not found during comparison, but reappears during synchronization
+                //TEMPORARY network drop! base directory not found during comparison, but reappears during synchronization
                 //=> sync-directions are based on false assumptions! Abort.
                 callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtFileName(dirpath)));
                 temporaryNetworkDrop = true;
@@ -1955,7 +1931,16 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
         }, callback); //may throw in error-callback!
         return !errMsg && !temporaryNetworkDrop;
     }
+
+    return true;
 }
+
+struct ReadWriteCount
+{
+    ReadWriteCount() : reads(), writes() {}
+    size_t reads;
+    size_t writes;
+};
 }
 
 
@@ -2011,6 +1996,19 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     //-------------------execute basic checks all at once before starting sync--------------------------------------
 
+    auto dirNotFoundAnymore = [&](const Zstring& baseDirPf, bool wasExisting)
+    {
+        if (wasExisting)
+            if (Opt<std::wstring> errMsg = tryReportingError([&]
+        {
+            if (!dirExistsUpdating(baseDirPf, false, callback))
+                    throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(baseDirPf))); //should be logged as a "fatal error" if ignored by the user...
+            }, callback)) //may throw in error-callback!
+        return true;
+
+        return false;
+    };
+
     auto dependentDir = [](const Zstring& lhs, const Zstring& rhs) //note: this is NOT an equivalence relation!
     {
         return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())),
@@ -2018,20 +2016,24 @@ void zen::synchronize(const TimeComp& timeStamp,
     };
 
     //aggregate information
-    std::map<Zstring, std::pair<size_t, size_t>, LessFilename> dirReadWriteCount; //count read/write accesses
+    std::map<Zstring, ReadWriteCount, LessFilename> dirReadWriteCount; //count read/write accesses
+    for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
+    {
+        dirReadWriteCount[j->getBaseDirPf<LEFT_SIDE >()]; //create all entries first!
+        dirReadWriteCount[j->getBaseDirPf<RIGHT_SIDE>()]; //=> counting accesses is complex for later inserts!
+    }
+
     auto incReadCount = [&](const Zstring& baseDir)
     {
-        dirReadWriteCount[baseDir]; //create entry
         for (auto& item : dirReadWriteCount)
             if (dependentDir(baseDir, item.first))
-                ++item.second.first;
+                ++item.second.reads;
     };
     auto incWriteCount = [&](const Zstring& baseDir)
     {
-        dirReadWriteCount[baseDir]; //create entry
         for (auto& item : dirReadWriteCount)
             if (dependentDir(baseDir, item.first))
-                ++item.second.second;
+                ++item.second.writes;
     };
 
     std::vector<std::pair<Zstring, Zstring>>  significantDiffPairs;
@@ -2047,16 +2049,18 @@ void zen::synchronize(const TimeComp& timeStamp,
     for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
     {
         const size_t folderIndex = j - begin(folderCmp);
+        const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
 
         //exclude some pathological case (leftdir, rightdir are empty)
         if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
+        {
+            skipFolderPair[folderIndex] = true;
             continue;
-
-        const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
-
-        const SyncStatistics folderPairStat(*j);
+        }
 
         //aggregate basic information
+        const SyncStatistics folderPairStat(*j);
+
         const bool writeLeft = folderPairStat.getCreate<LEFT_SIDE>() +
                                folderPairStat.getUpdate<LEFT_SIDE>() +
                                folderPairStat.getDelete<LEFT_SIDE>() > 0;
@@ -2070,15 +2074,6 @@ void zen::synchronize(const TimeComp& timeStamp,
             !folderPairCfg.saveSyncDB_)
         {
             skipFolderPair[folderIndex] = true; //skip creating (not yet existing) base directories in particular if there's no need
-            continue;
-        }
-
-        //check empty input fields: this only makes sense if empty field is source (and no DB files need to be created)
-        if ((j->getBaseDirPf<LEFT_SIDE >().empty() && (writeLeft  || folderPairCfg.saveSyncDB_)) ||
-            (j->getBaseDirPf<RIGHT_SIDE>().empty() && (writeRight || folderPairCfg.saveSyncDB_)))
-        {
-            callback.reportFatalError(_("Target folder input field must not be empty."));
-            skipFolderPair[folderIndex] = true;
             continue;
         }
 
@@ -2107,45 +2102,60 @@ void zen::synchronize(const TimeComp& timeStamp,
                 incWriteCount(j->getBaseDirPf<LEFT_SIDE>());
         }
 
-
-        if (folderPairStat.getUpdate() + folderPairStat.getDelete() > 0 &&
-            folderPairCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
+        //check empty input fields: this only makes sense if empty field is source (and no DB files need to be created)
+        if ((j->getBaseDirPf<LEFT_SIDE >().empty() && (writeLeft  || folderPairCfg.saveSyncDB_)) ||
+            (j->getBaseDirPf<RIGHT_SIDE>().empty() && (writeRight || folderPairCfg.saveSyncDB_)))
         {
-            //check if user-defined directory for deletion was specified
+            callback.reportFatalError(_("Target folder input field must not be empty."));
+            skipFolderPair[folderIndex] = true;
+            continue;
+        }
+
+        //check for network drops after comparison
+        // - convenience: exit sync right here instead of showing tons of errors during file copy
+        // - early failure! there's no point in evaluating subsequent warnings
+        if (dirNotFoundAnymore(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+            dirNotFoundAnymore(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
+        {
+            skipFolderPair[folderIndex] = true;
+            continue;
+        }
+
+        //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover source created after comparison, but before sync!!!
+        auto sourceDirNotFound = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
+        {
+            if (!baseDirPf.empty())
+                //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
+                if (folderPairStat.getCreate() + folderPairStat.getUpdate() == 0 &&
+                folderPairStat.getDelete() > 0) //deletions only... (respect filtered items!)
+                    //folderPairStat.getConflict() == 0 && -> there COULD be conflicts for <automatic> if directory existence check fails, but loading sync.ffs_db succeeds
+                    //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430 -> fixed, but still better not consider conflicts!
+                    if (!wasExisting) //avoid race-condition: we need to evaluate existence status from time of comparison!
+                    {
+                        callback.reportFatalError(replaceCpy(_("Source folder %x not found."), L"%x", fmtFileName(baseDirPf)));
+                        return true;
+                    }
+            return false;
+        };
+        if (sourceDirNotFound(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+            sourceDirNotFound(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
+        {
+            skipFolderPair[folderIndex] = true;
+            continue;
+        }
+
+        //check if user-defined directory for deletion was specified
+        if (folderPairCfg.handleDeletion == zen::DELETE_TO_VERSIONING &&
+            folderPairStat.getUpdate() + folderPairStat.getDelete() > 0)
+        {
             if (folderPairCfg.versioningFolder.empty()) //already trimmed by getFormattedDirectoryPath()
             {
-                //should never arrive here: already checked in SyncCfgDialog
+                //should not arrive here: already checked in SyncCfgDialog
                 callback.reportFatalError(_("Please enter a target folder for versioning."));
                 skipFolderPair[folderIndex] = true;
                 continue;
             }
         }
-
-        //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover source created after comparison, but before sync!!!
-        auto checkSourceMissing = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
-        {
-            if (!baseDirPf.empty())
-            {
-                //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
-                if (folderPairStat.getCreate() +
-                folderPairStat.getUpdate() == 0 &&
-                folderPairStat.getDelete() > 0) //deletions only... (respect filtered items!)
-                    //folderPairStat.getConflict() == 0 && -> there COULD be conflicts for <automatic> if directory existence check fails, but loading sync.ffs_db succeeds
-                    //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430 -> fixed, but still better not consider conflicts
-                {
-                    if (!wasExisting) //avoid race-condition: we need to evaluate existence status from time of comparison!
-                    {
-                        callback.reportFatalError(replaceCpy(_("Source folder %x not found."), L"%x", fmtFileName(baseDirPf)));
-                        skipFolderPair[folderIndex] = true;
-                        return false;
-                    }
-                }
-            }
-            return true;
-        };
-        if (!checkSourceMissing(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
-            !checkSourceMissing(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
-            continue;
 
         //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
         if (significantDifferenceDetected(folderPairStat))
@@ -2172,7 +2182,8 @@ void zen::synchronize(const TimeComp& timeStamp,
         //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
         auto checkRecycler = [&](const Zstring& baseDirPf)
         {
-            if (!baseDirPf.empty()) //should be
+            assert(!baseDirPf.empty());
+            if (!baseDirPf.empty())
                 if (baseDirHasRecycler.find(baseDirPf) == baseDirHasRecycler.end()) //perf: avoid duplicate checks!
                 {
                     callback.reportStatus(replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(baseDirPf), false));
@@ -2255,12 +2266,8 @@ void zen::synchronize(const TimeComp& timeStamp,
     {
         std::vector<Zstring> conflictDirs;
         for (const auto& item : dirReadWriteCount)
-        {
-            const std::pair<size_t, size_t>& countRef = item.second; //# read/write accesses
-
-            if (countRef.first + countRef.second >= 2 && countRef.second >= 1) //race condition := multiple accesses of which at least one is a write
+            if (item.second.reads + item.second.writes >= 2 && item.second.writes >= 1) //race condition := multiple accesses of which at least one is a write
                 conflictDirs.push_back(item.first);
-        }
 
         if (!conflictDirs.empty())
         {
@@ -2286,8 +2293,10 @@ void zen::synchronize(const TimeComp& timeStamp,
         //loop through all directory pairs
         for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
-            //exclude pathological cases (e.g. leftdir, rightdir are empty)
-            if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
+            const size_t folderIndex = j - begin(folderCmp);
+            const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
+
+            if (skipFolderPair[folderIndex]) //folder pairs may be skipped after fatal errors were found
                 continue;
 
             //------------------------------------------------------------------------------------------
@@ -2296,16 +2305,15 @@ void zen::synchronize(const TimeComp& timeStamp,
                                 L"    " + j->getBaseDirPf<RIGHT_SIDE>());
             //------------------------------------------------------------------------------------------
 
-            const size_t folderIndex = j - begin(folderCmp);
-            const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
-
-            if (skipFolderPair[folderIndex]) //folder pairs may be skipped after fatal errors were found
+            //checking a second time: (a long time may have passed since the intro checks!)
+            if (dirNotFoundAnymore(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+                dirNotFoundAnymore(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
                 continue;
 
             //create base directories first (if not yet existing) -> no symlink or attribute copying!
             if (!createBaseDirectory<LEFT_SIDE >(*j, callback) ||
                 !createBaseDirectory<RIGHT_SIDE>(*j, callback))
-                continue; //skip this folder pair
+                continue;
 
             //------------------------------------------------------------------------------------------
             //execute synchronization recursively
@@ -2338,7 +2346,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
                 {
                     auto it = baseDirHasRecycler.find(baseDirPf);
-                    if (it != baseDirHasRecycler.end())
+                    if (it != baseDirHasRecycler.end()) //buffer filled during intro checks (but only if deletions are expected)
                         if (!it->second)
                             return DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
                 }
@@ -2370,8 +2378,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             syncFP.startSync(*j);
 
             //(try to gracefully) cleanup temporary Recycle bin folders and versioning -> will be done in ~DeletionHandling anyway...
-            tryReportingError([&] { delHandlerL.tryCleanup(); }, callback); //show error dialog if necessary
-            tryReportingError([&] { delHandlerR.tryCleanup(); }, callback); //
+            tryReportingError([&] { delHandlerL.tryCleanup(); /*throw FileError*/}, callback); //show error dialog if necessary
+            tryReportingError([&] { delHandlerR.tryCleanup(); /*throw FileError*/}, callback); //
 
             //(try to gracefully) write database file
             if (folderPairCfg.saveSyncDB_)
@@ -2379,7 +2387,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 callback.reportStatus(_("Generating database..."));
                 callback.forceUiRefresh();
 
-                tryReportingError([&] { zen::saveLastSynchronousState(*j); }, callback); //throw FileError
+                tryReportingError([&] { zen::saveLastSynchronousState(*j); /*throw FileError*/ }, callback);
                 guardUpdateDb.dismiss();
             }
         }

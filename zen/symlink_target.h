@@ -157,6 +157,13 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
 {
     using namespace zen;
 #ifdef ZEN_WIN
+    //GetFinalPathNameByHandle() is not available before Vista!
+    typedef DWORD (WINAPI* GetFinalPathNameByHandleWFunc)(HANDLE hFile, LPTSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+    const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
+    if (!getFinalPathNameByHandle)
+        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), replaceCpy(_("Cannot find system function %x."), L"%x", L"\"GetFinalPathNameByHandleW\""));
+
+
     const HANDLE hDir = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),                  //_In_      LPCTSTR lpFileName,
                                      0,                                                      //_In_      DWORD dwDesiredAccess,
                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
@@ -168,13 +175,6 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
     if (hDir == INVALID_HANDLE_VALUE)
         throwFileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), L"CreateFile", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
-
-    //GetFinalPathNameByHandle() is not available before Vista!
-    typedef DWORD (WINAPI* GetFinalPathNameByHandleWFunc)(HANDLE hFile, LPTSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-    const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
-
-    if (!getFinalPathNameByHandle)
-        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), replaceCpy(_("Cannot find system function %x."), L"%x", L"\"GetFinalPathNameByHandleW\""));
 
     const DWORD bufferSize = getFinalPathNameByHandle(hDir, nullptr, 0, 0);
     if (bufferSize == 0)

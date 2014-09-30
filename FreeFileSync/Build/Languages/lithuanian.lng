@@ -8,19 +8,19 @@
 </header>
 
 <source>Both sides have changed since last synchronization.</source>
-<target>Abi pusės buvo pakeistos nuo paskutinio sinchronizavimo.</target>
+<target>Abi pusės buvo pakeistos nuo paskutinio suvienodinimo.</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Nepavyksta nustatyti sinchronizavimo krypties:</target>
+<target>Nepavyksta nustatyti suvienodinimo krypties:</target>
 
 <source>No change since last synchronization.</source>
-<target>Nėra pakitimo nuo pakutinio sinchronizavimo.</target>
+<target>Nėra pakitimo nuo pakutinio suvienodinimo.</target>
 
 <source>The database entry is not in sync considering current settings.</source>
-<target>Duomenų bazės įrašas nesinchronizuotas remiantis šiais nustatymais.</target>
+<target>Duomenų bazės įrašas nesuvienodintas remiantis šiais nustatymais.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Nustatomos numatytos sinchronizavimo kryptys: Seni failai bus perrašyti naujesniais failais.</target>
+<target>Nustatomos numatytos suvienodinimo kryptys: Seni failai bus perrašyti naujesniais failais.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Tikrinamas šiukšliadėžės prieinamumas aplankui %x...</target>
@@ -98,7 +98,7 @@
 <target>Nepavyksta rasti šių aplankų:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Jei žinote, kad kiekvienas katalogas yra tuščias, šią klaidą galite ignoruoti. Katalogai bus automatiškai sukurti sinchronizacijos metu.</target>
+<target>Jei žinote, kad kiekvienas katalogas yra tuščias, šią klaidą galite ignoruoti. Katalogai bus automatiškai sukurti suvienodinimo metu.</target>
 
 <source>A folder input field is empty.</source>
 <target>Aplanko įvesties laukas yra tuščias.</target>
@@ -107,7 +107,7 @@
 <target>Atitinkamas aplankas bus laikomas tuščiu.</target>
 
 <source>The following folder paths are dependent from each other:</source>
-<target></target>
+<target>Sekančios aplankų nuorodos yra priklausomos viena nuo kitos</target>
 
 <source>File %x has an invalid date.</source>
 <target>Failas %x turi netinkamą datą.</target>
@@ -131,7 +131,7 @@
 <target>Ieškoma simbolinės nuorodos %x</target>
 
 <source>Comparing content of files %x</source>
-<target>Sulyginamas failų turinys %x</target>
+<target>Palyginamas failų turinys %x</target>
 
 <source>Generating file list...</source>
 <target>Sukuriamas failų sąrašas...</target>
@@ -218,11 +218,14 @@
 <source>%x GB</source>
 <target>%x GB</target>
 
+<source>Cannot load file %x.</source>
+<target>Nepavyksta įkelti failo %x.</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Duomenų bazė %x yra netinkama.</target>
 
 <source>Initial synchronization:</source>
-<target>Pirminis sinchronizavimas:</target>
+<target>Pirminis suvienodinimas:</target>
 
 <source>Database file %x does not yet exist.</source>
 <target>Duomenų bazės failo %x dar nėra.</target>
@@ -322,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Prašome naudoti 64-bit FreeFileSync versiją, kad sukurti šėšėlines kopijas šioje sistemoje.</target>
 
-<source>Cannot load file %x.</source>
-<target>Nepavyksta įkelti failo %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Vietos vardo %x nustatyti nepavyko</target>
 
@@ -347,7 +347,7 @@
 <target>&Išeiti</target>
 
 <source>&File</source>
-<target></target>
+<target>&Failas</target>
 
 <source>&View help</source>
 <target>&Rodyti pagalbą</target>
@@ -501,26 +501,26 @@ Komanda inicijuojama jei:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Duomenų patikros klaida: %x ir %y turinys yra skirtingas.</target>
 
-<source>Cannot find folder %x.</source>
-<target></target>
-
 <source>Target folder %x already existing.</source>
 <target>Tikslo aplankas %x jau yra.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Negalima rasti aplanko %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Tikslo aplanko įvesties laukas negali būti tuščias.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Prašome nurodyti aplanką kitoms versijoms</target>
-
 <source>Source folder %x not found.</source>
 <target>Šaltinio aplankas %x nerastas.</target>
 
+<source>Please enter a target folder for versioning.</source>
+<target>Prašome nurodyti aplanką kitoms versijoms</target>
+
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>Šie elementai turi neišspręstų konfliktų ir nebus sinchronizuoti:</target>
+<target>Šie elementai turi neišspręstų konfliktų ir nebus suvienodinti:</target>
 
 <source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target>Šie katalogai yra labai skirtingi. Įsitikinkite, kad sinchronizacijai pasirinkote teisingus katalogus.</target>
+<target>Šie katalogai yra labai skirtingi. Įsitikinkite, kad suvienodinimui pasirinkote teisingus katalogus.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nepakanka laisvos disko vietos:</target>
@@ -532,7 +532,7 @@ Komanda inicijuojama jei:
 <target>Pasiekiama:</target>
 
 <source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target></target>
+<target>Aplankai grupuojami į vieną poaplankį. Prašome patikrinti jūsų pasirinkimus</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Suvienodinama aplankų pora:</target>
@@ -635,10 +635,10 @@ Komanda inicijuojama jei:
 <target>Pavadinimas</target>
 
 <source>Relative folder</source>
-<target></target>
+<target>Aplanai</target>
 
 <source>Base folder</source>
-<target>Bazinis aplankas</target>
+<target>Pasirinktas aplankas</target>
 
 <source>Size</source>
 <target>Dydis</target>
@@ -656,7 +656,7 @@ Komanda inicijuojama jei:
 <target>Veiksmas</target>
 
 <source>Drag && drop</source>
-<target>Vilkti ir numesti</target>
+<target>Vilkti && numesti</target>
 
 <source>Local comparison settings</source>
 <target>Vietiniai palyginimo parametrai</target>
@@ -677,7 +677,7 @@ Komanda inicijuojama jei:
 <target>Pašalinti vietinius parametrus</target>
 
 <source>Clear local filter</source>
-<target></target>
+<target>Ištrinti vietos filtrą</target>
 
 <source>Copy</source>
 <target>Kopijuoti</target>
@@ -698,10 +698,10 @@ Komanda inicijuojama jei:
 <target>Išsaugoti kaip &užduočių paketą...</target>
 
 <source>Start &comparison</source>
-<target></target>
+<target>Pradėti &palyginimą</target>
 
 <source>Start &synchronization</source>
-<target></target>
+<target>Pradėti &suvienodinimą</target>
 
 <source>&Options</source>
 <target>&Parinktys</target>
@@ -713,7 +713,7 @@ Komanda inicijuojama jei:
 <target>&Ieškoti...</target>
 
 <source>&Reset layout</source>
-<target></target>
+<target>&Išnaujo nustatyti išdėstymą</target>
 
 <source>&Export file list...</source>
 <target>&Eksportuoti failų sąrašą...</target>
@@ -734,7 +734,7 @@ Komanda inicijuojama jei:
 <target>Atšaukti</target>
 
 <source>Compare</source>
-<target>Sulyginti</target>
+<target>Palyginti</target>
 
 <source>Synchronize</source>
 <target>Suvienodinti</target>
@@ -758,7 +758,7 @@ Komanda inicijuojama jei:
 <target>Atitikti atveją</target>
 
 <source>New</source>
-<target></target>
+<target>Naujas</target>
 
 <source>Open...</source>
 <target>Atversti...</target>
@@ -803,13 +803,13 @@ Komanda inicijuojama jei:
 <target>Sutapatinti vienodus failus lyginant failų turinį.</target>
 
 <source>Ignore time shift (in hours)</source>
-<target></target>
+<target>Ignoruoti laiko pasikeitimą (valandomis)</target>
 
 <source>Consider file times with specified offset as equal</source>
-<target></target>
+<target>Failai su tam tikra paklaida skaitomi kaip lygūs</target>
 
 <source>Handle daylight saving time</source>
-<target></target>
+<target>Naudoti vasaros laiką</target>
 
 <source>Symbolic links:</source>
 <target>Simbolinės nuorodos:</target>
@@ -842,7 +842,7 @@ Komanda inicijuojama jei:
 <target>Didžiausias:</target>
 
 <source>C&lear</source>
-<target></target>
+<target>&Išvalyti</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Pasirinkti filtro taisykles norint išskirti pasirinktus failus iš Suvienodinimo. Įveskite failo kelią, kuris atitinka aplanką.</target>
@@ -868,7 +868,7 @@ Komanda inicijuojama jei:
 <target>Ištrinti failus:</target>
 
 <source>&Permanent</source>
-<target></target>
+<target>&Pastovus</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Trinti ar perrašyti failus visam laikui</target>
@@ -880,7 +880,7 @@ Komanda inicijuojama jei:
 <target>Padaryti šiukšlių dėžėje esančių ištrintų ar perrašytų failų atsarginę kopiją</target>
 
 <source>&Versioning</source>
-<target></target>
+<target>&Atsarginės versijos kūrimas</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Perkelti failus į vartotojo nustatytą katalogą</target>
@@ -895,7 +895,7 @@ Komanda inicijuojama jei:
 <target>Slėpti visus klaidų ir perspėjimų pranešimus</target>
 
 <source>&Pop-up</source>
-<target></target>
+<target>&Iškylančiame</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Rodyti pranešimą esant klaidoms ar perspėjimams</target>
@@ -931,7 +931,7 @@ Komanda inicijuojama jei:
 <target>Nuleisti į apačią dešinėje</target>
 
 <source>Bytes copied:</source>
-<target></target>
+<target>Nukopijuota baitų:</target>
 
 <source>Close</source>
 <target>Uždaryti</target>
@@ -946,7 +946,7 @@ Komanda inicijuojama jei:
 <target>Sukurti paleidimo failą suvienodinimui be priežiūros. Norint jį paleisti reikia paspausti and failo du kartus pele arba nustatyti su užduočių planuotoju: %x</target>
 
 <source>&Stop</source>
-<target></target>
+<target>&Sustabdyti</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stabdyti suvienodinimą, pirmai klaidai įvykus</target>
@@ -1015,10 +1015,10 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Apibūdinimas</target>
 
 <source>Show hidden dialogs again</source>
-<target></target>
+<target>Vėl rodyti paslėptus dialogo langus</target>
 
 <source>Show all permanently hidden dialogs and warning messages again</source>
-<target></target>
+<target>Vėl rodyti visus paslėptus dialogo langus ir įspėjamuosius pranešimus</target>
 
 <source>&Default</source>
 <target>&Numatyta</target>
@@ -1081,10 +1081,10 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Pagrindinė įrankinė</target>
 
 <source>Start comparison</source>
-<target></target>
+<target>Pradėti palyginimą</target>
 
 <source>Comparison settings</source>
-<target>Sulyginimo nustatymai</target>
+<target>Palyginimo nustatymai</target>
 
 <source>Synchronization settings</source>
 <target>Suvienodinimo nustatymai</target>
@@ -1187,7 +1187,7 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Paskutinė sesija</target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Aplankų palyginimas ir suvienodinimas</target>
+<target>Aplankų Palyginimas ir Suvienodinimas</target>
 
 <source>Configuration saved</source>
 <target>Nustatymai išsaugoti</target>
@@ -1211,7 +1211,7 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Suvienodinimo parametrai</target>
 
 <source>Clear filter</source>
-<target></target>
+<target>Panaikinti filtrą</target>
 
 <source>Show files that exist on left side only</source>
 <target>Rodyti failus, kurie egzistuoja tik kairėje pusėje</target>
@@ -1298,7 +1298,7 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Tikrinama...</target>
 
 <source>Comparing content...</source>
-<target>Sulyginamas turinys...</target>
+<target>Palyginimo turinys...</target>
 
 <source>Info</source>
 <target>Informacija</target>
@@ -1372,10 +1372,10 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>- Kitos pusės atitikmuo %item_folder%</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
-<target></target>
+<target>Ar vėl rodyti visus paslėptus dialogo langus ir įspėjamuosius pranešimus</target>
 
 <source>&Show</source>
-<target></target>
+<target>&Rodyti</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Nustatyti ir skatinti pokyčius apbiejose pusėse. Trinimai, perkėlimai ir konfliktai yra aptinkami automatiškai naudojant duomenų bazę.</target>

@@ -92,8 +92,8 @@ public:
 
     //grid area
     virtual wxString getValue(size_t row, ColumnType colType) const = 0;
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected); //default implementation
-    virtual void renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected); //
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row,                     bool enabled, bool selected); //default implementation
+    virtual void renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected); //
     virtual int  getBestSize       (wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
     virtual wxString getToolTip(size_t row, ColumnType colType) const { return wxString(); }
 
@@ -250,8 +250,8 @@ private:
         {
             if (rowFirst <= rowLast)
             {
-                numeric::confine<size_t>(rowFirst, 0, rowSelectionValue.size());
-                numeric::confine<size_t>(rowLast,  0, rowSelectionValue.size());
+                numeric::clamp<size_t>(rowFirst, 0, rowSelectionValue.size());
+                numeric::clamp<size_t>(rowLast,  0, rowSelectionValue.size());
 
                 std::fill(rowSelectionValue.begin() + rowFirst, rowSelectionValue.begin() + rowLast, positive);
             }

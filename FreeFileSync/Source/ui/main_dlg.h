@@ -319,6 +319,8 @@ private:
     std::unique_ptr<zen::FilterConfig> filterCfgOnClipboard; //copy/paste of filter config
 
     wxWindow* focusWindowAfterSearch; //used to restore focus after search panel is closed
+
+    bool localKeyEventsEnabled;
 };
 
 #endif //MAINDIALOG_H_891048132454564

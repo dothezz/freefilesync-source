@@ -38,10 +38,10 @@ DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 
 //CAVEAT: evalulate global error code *before* "throw" statement which may overwrite error code
 //due to a memory allocation before it creates the thrown instance! (e.g. affects MinGW + Win XP!!!)
-inline
+template <class FE = FileError> inline
 void throwFileError(const std::wstring& msg, const std::wstring& functionName, const ErrorCode ec) //throw FileError
 {
-    throw FileError(msg, formatSystemError(functionName, ec));
+    throw FE(msg, formatSystemError(functionName, ec));
 }
 
 

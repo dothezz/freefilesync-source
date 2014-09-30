@@ -79,7 +79,7 @@ void GridData::renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool
 }
 
 
-void GridData::renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected)
+void GridData::renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected)
 {
     wxRect rectTmp = drawCellBorder(dc, rect);
 
@@ -938,7 +938,7 @@ private:
                         {
                             const wxRect cellRect(cellAreaTL.x, cellAreaTL.y + row * rowHeight, cw.width_, rowHeight);
                             RecursiveDcClipper dummy3(dc, cellRect);
-                            prov->renderCell(dc, cellRect, row, cw.type_, drawAsSelected(row));
+                            prov->renderCell(dc, cellRect, row, cw.type_, refParent().IsThisEnabled(), drawAsSelected(row));
                         }
                     cellAreaTL.x += cw.width_;
                 }
@@ -1161,7 +1161,7 @@ private:
             {
                 //select current row *after* scrolling
                 wxPoint clientPosTrimmed = clientPos;
-                numeric::confine(clientPosTrimmed.y, 0, clientSize.GetHeight() - 1); //do not select row outside client window!
+                numeric::clamp(clientPosTrimmed.y, 0, clientSize.GetHeight() - 1); //do not select row outside client window!
 
                 const wxPoint absPos = wnd_.refParent().CalcUnscrolledPosition(clientPosTrimmed);
                 const ptrdiff_t newRow = wnd_.rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
@@ -1310,8 +1310,8 @@ void Grid::updateWindowSizes(bool updateScrollbar)
     {
         ptrdiff_t yFrom = CalcUnscrolledPosition(wxPoint(0, 0)).y;
         ptrdiff_t yTo   = CalcUnscrolledPosition(wxPoint(0, mainWinHeightGross - 1)).y ;
-        numeric::confine<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
-        numeric::confine<ptrdiff_t>(yTo,   0, logicalHeight - 1);
+        numeric::clamp<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
+        numeric::clamp<ptrdiff_t>(yTo,   0, logicalHeight - 1);
 
         const ptrdiff_t rowFrom = rowLabelWin_->getRowAtPos(yFrom);
         const ptrdiff_t rowTo   = rowLabelWin_->getRowAtPos(yTo);
@@ -1416,8 +1416,8 @@ wxSize Grid::GetSizeAvailableForScrollTarget(const wxSize& size)
     {
         ptrdiff_t yFrom = CalcUnscrolledPosition(wxPoint(0, 0)).y;
         ptrdiff_t yTo   = CalcUnscrolledPosition(wxPoint(0, mainWinHeightGross - 1)).y ;
-        numeric::confine<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
-        numeric::confine<ptrdiff_t>(yTo,   0, logicalHeight - 1);
+        numeric::clamp<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
+        numeric::clamp<ptrdiff_t>(yTo,   0, logicalHeight - 1);
 
         const ptrdiff_t rowFrom = rowLabelWin_->getRowAtPos(yFrom);
         const ptrdiff_t rowTo   = rowLabelWin_->getRowAtPos(yTo);
@@ -1454,7 +1454,7 @@ void Grid::onKeyDown(wxKeyEvent& event)
     {
         if (rowCount > 0)
         {
-            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
+            numeric::clamp<ptrdiff_t>(row, 0, rowCount - 1);
             setGridCursor(row);
         }
     };
@@ -1463,7 +1463,7 @@ void Grid::onKeyDown(wxKeyEvent& event)
     {
         if (rowCount > 0)
         {
-            numeric::confine<ptrdiff_t>(row, 0, rowCount - 1);
+            numeric::clamp<ptrdiff_t>(row, 0, rowCount - 1);
             selectWithCursor(row);
         }
     };
@@ -2009,8 +2009,8 @@ void Grid::selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positiv
     auto rowLast  = std::max(rowFrom, rowTo) + 1;
 
     const size_t rowCount = getRowCount();
-    numeric::confine<ptrdiff_t>(rowFirst, 0, rowCount);
-    numeric::confine<ptrdiff_t>(rowLast,  0, rowCount);
+    numeric::clamp<ptrdiff_t>(rowFirst, 0, rowCount);
+    numeric::clamp<ptrdiff_t>(rowLast,  0, rowCount);
 
     selection.selectRange(rowFirst, rowLast, positive);
 

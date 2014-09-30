@@ -32,9 +32,9 @@ template <class T>
 const T& max(const T& a, const T& b, const T& c);
 
 template <class T>
-void confine(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
+void clamp(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
 template <class T>
-T confineCpy(const T& val, const T& minVal, const T& maxVal);
+T clampCpy(const T& val, const T& minVal, const T& maxVal);
 
 template <class T, class InputIterator> //precondition: range must be sorted!
 auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type;
@@ -134,7 +134,7 @@ const T& max(const T& a, const T& b, const T& c)
 
 
 template <class T> inline
-T confineCpy(const T& val, const T& minVal, const T& maxVal)
+T clampCpy(const T& val, const T& minVal, const T& maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)
@@ -145,7 +145,7 @@ T confineCpy(const T& val, const T& minVal, const T& maxVal)
 }
 
 template <class T> inline
-void confine(T& val, const T& minVal, const T& maxVal) //name trim, clamp?
+void clamp(T& val, const T& minVal, const T& maxVal) 
 {
     assert(minVal <= maxVal);
     if (val < minVal)

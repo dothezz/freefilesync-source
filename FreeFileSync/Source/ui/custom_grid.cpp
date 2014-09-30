@@ -506,7 +506,7 @@ private:
 
     static const int GAP_SIZE = 2;
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         wxRect rectTmp = rect;
 
@@ -958,20 +958,33 @@ private:
 
     virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
-        const FileSystemObject* fsObj = getRawData(row);
-        GridData::drawCellBackground(dc, rect, enabled, selected, highlightSyncAction_ ?
-                                     getBackGroundColorSyncAction(fsObj) :
-                                     getBackGroundColorCmpCategory(fsObj));
+        if (enabled)
+        {
+            if (selected)
+                dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
+            else
+            {
+                if (const FileSystemObject* fsObj = getRawData(row))
+                {
+                    if (fsObj->isActive())
+                        fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+                    else
+                        clearArea(dc, rect, COLOR_NOT_ACTIVE);
+                }
+                else
+                    clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+            }
+        }
+        else
+            clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool selected) override
+    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
-        auto drawInactiveColumBackground = [&](const FileSystemObject& fsObj)
+        auto drawHighlightBackground = [&](const FileSystemObject& fsObj, const wxColor& col)
         {
-            if (fsObj.isActive())
-                fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
-            else
-                clearArea(dc, rect, COLOR_NOT_ACTIVE);
+            if (enabled && !selected && fsObj.isActive()) //coordinate with renderRowBackgound()!
+                clearArea(dc, rect, col);
         };
 
         switch (static_cast<ColumnTypeMiddle>(colType))
@@ -979,54 +992,46 @@ private:
             case COL_TYPE_CHECKBOX:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    wxRect rectInside = rect;
-
-                    //if sync action is shown draw notch on left side, right side otherwise
-                    if (notch.GetHeight() != rectInside.GetHeight())
-                        notch.Rescale(notch.GetWidth(), rectInside.GetHeight());
-                    if (highlightSyncAction_)
-                    {
-                        drawBitmapRtlMirror(dc, notch, rectInside, wxALIGN_LEFT, buffer);
-                        rectInside.x     += notch.GetWidth();
-                        rectInside.width -= notch.GetWidth();
-                    }
-                    else
-                    {
-                        //wxWidgets screws up again and has wxALIGN_RIGHT off by one pixel! -> use wxALIGN_LEFT instead
-                        wxRect rectNotch(rectInside.x + rectInside.width - notch.GetWidth(), rectInside.y,
-                                         notch.GetWidth(), rectInside.height);
-                        drawBitmapRtlMirror(dc, notch, rectNotch, wxALIGN_LEFT, buffer);
-                        rectInside.width -= notch.GetWidth();
-                    }
-
                     const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
 
                     if (rowHighlighted && highlightBlock == BLOCKPOS_CHECK_BOX)
-                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), rectInside, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), rect, wxALIGN_CENTER, buffer);
                     else //default
-                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), rectInside, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), rect, wxALIGN_CENTER, buffer);
                 }
                 break;
 
             case COL_TYPE_CMP_CATEGORY:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    if (highlightSyncAction_)
-                        drawInactiveColumBackground(*fsObj);
+                    if (!highlightSyncAction_)
+                        drawHighlightBackground(*fsObj, getBackGroundColorCmpCategory(fsObj));
+
+                    wxRect rectTmp = rect;
+                    {
+                        //draw notch on left side
+                        if (notch.GetHeight() != rectTmp.GetHeight())
+                            notch.Rescale(notch.GetWidth(), rectTmp.GetHeight());
+
+                        //wxWidgets screws up again and has wxALIGN_RIGHT off by one pixel! -> use wxALIGN_LEFT instead
+                        const wxRect rectNotch(rectTmp.x + rectTmp.width - notch.GetWidth(), rectTmp.y, notch.GetWidth(), rectTmp.height);
+                        drawBitmapRtlMirror(dc, notch, rectNotch, wxALIGN_LEFT, buffer);
+                        rectTmp.width -= notch.GetWidth();
+                    }
 
                     if (!highlightSyncAction_)
-                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rect, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rectTmp, wxALIGN_CENTER, buffer);
                     else if (fsObj->getCategory() != FILE_EQUAL) //don't show = in both middle columns
-                        drawBitmapRtlMirror(dc, greyScale(getCmpResultImage(fsObj->getCategory())), rect, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, greyScale(getCmpResultImage(fsObj->getCategory())), rectTmp, wxALIGN_CENTER, buffer);
                 }
                 break;
 
             case COL_TYPE_SYNC_ACTION:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    if (!highlightSyncAction_)
-                        drawInactiveColumBackground(*fsObj);
+                    if (highlightSyncAction_)
+                        drawHighlightBackground(*fsObj, getBackGroundColorSyncAction(fsObj));
 
                     const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
@@ -1620,14 +1625,14 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
     //gridLeft  .showScrollBars(Grid::SB_SHOW_AUTOMATIC, Grid::SB_SHOW_NEVER); -> redundant: configuration happens in GridEventManager::onAlignScrollBars()
     //gridCenter.showScrollBars(Grid::SB_SHOW_NEVER,     Grid::SB_SHOW_NEVER);
 
-    const int widthCategory = 30;
     const int widthCheckbox = getResourceImage(L"checkboxTrue").GetWidth() + 4 + getResourceImage(L"notch").GetWidth();
+    const int widthCategory = 30;
     const int widthAction   = 45;
     gridCenter.SetSize(widthCategory + widthCheckbox + widthAction, -1);
 
     std::vector<Grid::ColumnAttribute> attribMiddle;
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CMP_CATEGORY), widthCategory, 0, true));
     attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CHECKBOX    ), widthCheckbox, 0, true));
+    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CMP_CATEGORY), widthCategory, 0, true));
     attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_SYNC_ACTION ), widthAction,   0, true));
     gridCenter.setColumnConfig(attribMiddle);
 }
