@@ -28,6 +28,26 @@ using namespace zen;
 
 namespace
 {
+std::wstring getUserAgentName()
+{
+    std::wstring agentName = std::wstring(L"FreeFileSync ") + zen::currentVersion;
+#ifdef ZEN_WIN
+    agentName += L" Windows";
+#elif defined ZEN_LINUX
+    agentName += L" Linux";
+#elif defined ZEN_MAC
+    agentName += L" Mac";
+#else
+#error wtf
+#endif
+    const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
+    if (!localeName.empty())
+        agentName += L" " + localeName;
+
+    return agentName;
+}
+
+
 #ifdef ZEN_WIN
 class InternetConnectionError {};
 
@@ -38,7 +58,7 @@ public:
     {
         //::InternetAttemptConnect(0) -> not working as expected: succeeds even when there is no internet connection!
 
-        hInternet = ::InternetOpen(L"FreeFileSync", //_In_  LPCTSTR lpszAgent,
+        hInternet = ::InternetOpen(getUserAgentName().c_str(), //_In_  LPCTSTR lpszAgent,
                                    INTERNET_OPEN_TYPE_PRECONFIG, //_In_  DWORD dwAccessType,
                                    nullptr,	//_In_  LPCTSTR lpszProxyName,
                                    nullptr,	//_In_  LPCTSTR lpszProxyBypass,
@@ -129,7 +149,7 @@ OutputIterator readBytesUrl(const wchar_t* url, OutputIterator result) //throw I
 enum GetVerResult
 {
     GET_VER_SUCCESS,
-    GET_VER_NO_CONNECTION, //no internet connection or just Sourceforge down?
+    GET_VER_NO_CONNECTION, //no internet connection or homepage down?
     GET_VER_PAGE_NOT_FOUND //version file seems to have moved! => trigger an update!
 };
 
@@ -140,11 +160,11 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
     std::vector<char> output;
     try
     {
-        readBytesUrl(L"http://freefilesync.sourceforge.net/latest_version.txt", std::back_inserter(output)); //throw InternetConnectionError
+        readBytesUrl(L"http://www.freefilesync.org/latest_version.txt", std::back_inserter(output)); //throw InternetConnectionError
     }
     catch (const InternetConnectionError&)
     {
-        return canAccessUrl(L"http://sourceforge.net/") ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+        return canAccessUrl(L"http://www.freefilesync.org/") ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
     }
 
     output.push_back('\0');
@@ -158,6 +178,8 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
     {
         wxHTTP webAccess;
         webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
+        webAccess.SetHeader(L"USER-AGENT", getUserAgentName());
+
         webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are these wxWidgets people thinking???)...
 
         if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
@@ -181,10 +203,10 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
         return false;
     };
 
-    if (getStringFromUrl(L"freefilesync.sourceforge.net", L"/latest_version.txt", 5, &version))
+    if (getStringFromUrl(L"freefilesync.org", L"/latest_version.txt", 5, &version))
         return GET_VER_SUCCESS;
 
-    const bool canConnectToSf = getStringFromUrl(L"sourceforge.net", L"/", 1, nullptr);
+    const bool canConnectToSf = getStringFromUrl(L"freefilesync.org", L"/", 1, nullptr);
     return canConnectToSf ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
 #endif
 }
@@ -230,7 +252,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
                                                _("&Download")))
                 {
                     case ConfirmationButton::DO_IT:
-                        wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                        wxLaunchDefaultBrowser(L"http://freefilesync.org/get_latest.php");
                         break;
                     case ConfirmationButton::CANCEL:
                         break;
@@ -245,7 +267,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
         case GET_VER_NO_CONNECTION:
             showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                    setTitle(("Check for Program Updates")).
-                                   setMainInstructions(_("Unable to connect to sourceforge.net.")));
+                                   setMainInstructions(_("Unable to connect to freefilesync.org.")));
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
@@ -255,7 +277,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
                                            _("&Check")))
             {
                 case ConfirmationButton::DO_IT:
-                    wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+                    wxLaunchDefaultBrowser(L"http://www.freefilesync.org/");
                     break;
                 case ConfirmationButton::CANCEL:
                     break;
@@ -286,7 +308,7 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
                                                        _("&Download")))
                         {
                             case ConfirmationButton::DO_IT:
-                                wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
+                                wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
                                 break;
                             case ConfirmationButton::CANCEL:
                                 break;
@@ -304,7 +326,7 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
                                                    _("&Check")))
                     {
                         case ConfirmationButton::DO_IT:
-                            wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
+                            wxLaunchDefaultBrowser(L"http://www.freefilesync.org/");
                             break;
                         case ConfirmationButton::CANCEL:
                             break;

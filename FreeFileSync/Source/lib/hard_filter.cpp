@@ -57,7 +57,7 @@ bool zen::operator<(const HardFilter& lhs, const HardFilter& rhs)
 namespace
 {
 //constructing them in addFilterEntry becomes perf issue for large filter lists
-const Zstring asterisk(Zstr('*'));
+const Zstring asterisk(Zstr("*"));
 const Zstring sepAsterisk         = FILE_NAME_SEPARATOR + asterisk;
 const Zstring asteriskSep         = asterisk + FILE_NAME_SEPARATOR;
 const Zstring asteriskSepAsterisk = asteriskSep + asterisk;
@@ -68,10 +68,9 @@ void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& fileFilte
 {
 #if defined ZEN_WIN || defined ZEN_MAC
     //Windows does NOT distinguish between upper/lower-case
-    Zstring filterFormatted = filterPhrase;
-    makeUpper(filterFormatted);
+    const Zstring& filterFmt= makeUpperCopy(filterPhrase);
 #elif defined ZEN_LINUX
-    const Zstring& filterFormatted = filterPhrase;
+    const Zstring& filterFmt = filterPhrase;
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
     /*
@@ -116,13 +115,13 @@ void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& fileFilte
         }
     };
 
-    if (startsWith(filterFormatted, FILE_NAME_SEPARATOR)) // \abc
-        processTail(afterFirst(filterFormatted, FILE_NAME_SEPARATOR));
+    if (startsWith(filterFmt, FILE_NAME_SEPARATOR)) // \abc
+        processTail(afterFirst(filterFmt, FILE_NAME_SEPARATOR));
     else
     {
-        processTail(filterFormatted);
-        if (startsWith(filterFormatted, asteriskSep)) // *\abc
-            processTail(afterFirst(filterFormatted, asteriskSep));
+        processTail(filterFmt);
+        if (startsWith(filterFmt, asteriskSep)) // *\abc
+            processTail(afterFirst(filterFmt, asteriskSep));
     }
 }
 
@@ -302,14 +301,13 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
 #if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
-    Zstring nameFormatted = relFilename;
-    makeUpper(nameFormatted);
+    const Zstring& nameFmt = makeUpperCopy(relFilename);
 #elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
-    const Zstring& nameFormatted = relFilename; //nothing to do here
+    const Zstring& nameFmt = relFilename; //nothing to do here
 #endif
 
-    return matchesFilter(nameFormatted, filterFileIn) && //process include filters
-           !matchesFilter(nameFormatted, filterFileEx);  //process exclude filters
+    return matchesFilter(nameFmt, filterFileIn) && //process include filters
+           !matchesFilter(nameFmt, filterFileEx);  //process exclude filters
 }
 
 
@@ -318,24 +316,23 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
     assert(!subObjMightMatch || *subObjMightMatch == true); //check correct usage
 
 #if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
-    Zstring nameFormatted = relDirname;
-    makeUpper(nameFormatted);
+    const Zstring& nameFmt = makeUpperCopy(relDirname);
 #elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
-    const Zstring& nameFormatted = relDirname; //nothing to do here
+    const Zstring& nameFmt = relDirname; //nothing to do here
 #endif
 
-    if (matchesFilter(nameFormatted, filterFolderEx)) //process exclude filters
+    if (matchesFilter(nameFmt, filterFolderEx)) //process exclude filters
     {
         if (subObjMightMatch)
             *subObjMightMatch = false; //exclude subfolders/subfiles as well
         return false;
     }
 
-    if (!matchesFilter(nameFormatted, filterFolderIn)) //process include filters
+    if (!matchesFilter(nameFmt, filterFolderIn)) //process include filters
     {
         if (subObjMightMatch)
         {
-            const Zstring& subNameBegin = nameFormatted + FILE_NAME_SEPARATOR; //const-ref optimization
+            const Zstring& subNameBegin = nameFmt + FILE_NAME_SEPARATOR; //const-ref optimization
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
                                 matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory

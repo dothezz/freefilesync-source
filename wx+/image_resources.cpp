@@ -84,7 +84,7 @@ void GlobalResources::init(const Zstring& filepath)
 
             //generic image loading
             if (endsWith(name, L".png"))
-                bitmaps.insert(std::make_pair(name, wxImage(streamIn, wxBITMAP_TYPE_PNG)));
+                bitmaps.emplace(name, wxImage(streamIn, wxBITMAP_TYPE_PNG));
             else if (endsWith(name, L".gif"))
                 loadAnimFromZip(streamIn, anims[name]);
         }

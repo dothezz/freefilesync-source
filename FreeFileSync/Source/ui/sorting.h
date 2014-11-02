@@ -7,7 +7,6 @@
 #ifndef SORTING_H_82574232452345
 #define SORTING_H_82574232452345
 
-#include <zen/assert_static.h>
 #include <zen/type_tools.h>
 #include "../file_hierarchy.h"
 
@@ -17,9 +16,9 @@ namespace
 {
 struct CompileTimeReminder : public FSObjectVisitor
 {
-    virtual void visit(const FilePair&    fileObj) {}
-    virtual void visit(const SymlinkPair& linkObj) {}
-    virtual void visit(const DirPair&     dirObj ) {}
+    void visit(const FilePair&    fileObj) override {}
+    void visit(const SymlinkPair& linkObj) override {}
+    void visit(const DirPair&     dirObj ) override {}
 } checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file when needed
 }
 

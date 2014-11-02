@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "localization.h"
+#include <unordered_map>
 #include <map>
 #include <list>
 #include <iterator>
@@ -38,7 +39,7 @@ public:
 
     wxLanguage langId() const { return langId_; }
 
-    virtual std::wstring translate(const std::wstring& text) override
+    std::wstring translate(const std::wstring& text) override
     {
         //look for translation in buffer table
         auto it = transMapping.find(text);
@@ -47,7 +48,7 @@ public:
         return text; //fallback
     }
 
-    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) override
+    std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) override
     {
         auto it = transMappingPl.find(std::make_pair(singular, plural));
         if (it != transMappingPl.end())
@@ -60,7 +61,7 @@ public:
     }
 
 private:
-    typedef hash_map<std::wstring, std::wstring> Translation; //hash_map is 15% faster than std::map on GCC
+    typedef std::unordered_map<std::wstring, std::wstring> Translation; //hash_map is 15% faster than std::map on GCC
     typedef std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring>> TranslationPlural;
 
     Translation       transMapping; //map original text |-> translation
@@ -75,7 +76,7 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
     std::string inputStream;
     try
     {
-        inputStream = loadBinStream<std::string>(filepath); //throw FileError
+        inputStream = loadBinStream<std::string>(filepath,  nullptr); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -91,7 +92,7 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
     {
         const std::wstring original    = utfCvrtTo<std::wstring>(item.first);
         const std::wstring translation = utfCvrtTo<std::wstring>(item.second);
-        transMapping.insert(std::make_pair(original, translation));
+        transMapping.emplace(original, translation);
     }
 
     for (const auto& item : transPluralInput)
@@ -103,10 +104,10 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
         for (const std::string& pf : item.second)
             plFormsWide.push_back(utfCvrtTo<std::wstring>(pf));
 
-        transMappingPl.insert(std::make_pair(std::make_pair(engSingular, engPlural), plFormsWide));
+        transMappingPl.emplace(std::make_pair(engSingular, engPlural), plFormsWide);
     }
 
-    pluralParser = make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
+    pluralParser = zen::make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
 }
 
 
@@ -115,16 +116,16 @@ class FindLngfiles : public zen::TraverseCallback
 public:
     FindLngfiles(std::vector<Zstring>& lngFiles) : lngFiles_(lngFiles) {}
 
-    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
+    void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details) override
     {
         if (endsWith(filepath, Zstr(".lng")))
             lngFiles_.push_back(filepath);
     }
 
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) { return nullptr; }
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
+    HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override { return LINK_SKIP; }
+    TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)                           override { return nullptr; }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)  override { assert(false); return ON_ERROR_IGNORE; } //
 
 private:
     std::vector<Zstring>& lngFiles_;
@@ -197,7 +198,7 @@ ExistingTranslations::ExistingTranslations()
     {
         try
         {
-            const std::string stream = loadBinStream<std::string>(filepath); //throw FileError
+            const std::string stream = loadBinStream<std::string>(filepath,  nullptr); //throw FileError
 
             lngfile::TransHeader lngHeader;
             lngfile::parseHeader(stream, lngHeader); //throw ParsingError
@@ -395,7 +396,7 @@ public:
     static void init(wxLanguage lng)
     {
         locale.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
-        locale.reset(new wxLocale);
+        locale = zen::make_unique<wxLocale>();
 
         const wxLanguageInfo* sysLngInfo = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
         const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(lng);
@@ -453,7 +454,7 @@ void zen::setLanguage(int language) //throw FileError
     else
         try
         {
-            zen::setTranslator(new FFSTranslation(utfCvrtTo<Zstring>(languageFile), static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
+            zen::setTranslator(zen::make_unique<FFSTranslation>(utfCvrtTo<Zstring>(languageFile), static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {

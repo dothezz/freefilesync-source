@@ -12,9 +12,8 @@
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
 #include <zen/tick_count.h>
-#include <zen/assert_static.h>
 #include <zen/int64.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/serialize.h>
 #include <zen/optional.h>
 
@@ -341,8 +340,8 @@ struct LockInformation //throw FileError
         writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
         writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
 
-        assert_static(sizeof(processId) <= sizeof(std::uint64_t)); //ensure cross-platform compatibility!
-        assert_static(sizeof(sessionId) <= sizeof(std::uint64_t)); //
+        static_assert(sizeof(processId) <= sizeof(std::uint64_t), ""); //ensure cross-platform compatibility!
+        static_assert(sizeof(sessionId) <= sizeof(std::uint64_t), ""); //
 
         writeContainer(stream, lockId);
         writeContainer(stream, computerName);
@@ -368,7 +367,7 @@ struct LockInformation //throw FileError
 
 LockInformation retrieveLockInfo(const Zstring& lockfilepath) //throw FileError
 {
-    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilepath); //throw FileError
+    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilepath,  nullptr); //throw FileError
     try
     {
         return LockInformation(streamIn); //throw UnexpectedEndOfStreamError
@@ -484,7 +483,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
             }
 
             //wait some time...
-            assert_static(1000 * POLL_LIFE_SIGN_INTERVAL % GUI_CALLBACK_INTERVAL == 0);
+            static_assert(1000 * POLL_LIFE_SIGN_INTERVAL % GUI_CALLBACK_INTERVAL == 0, "");
             for (size_t i = 0; i < 1000 * POLL_LIFE_SIGN_INTERVAL / GUI_CALLBACK_INTERVAL; ++i)
             {
                 if (callback) callback->requestUiRefresh();

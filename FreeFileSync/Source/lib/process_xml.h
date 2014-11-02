@@ -209,17 +209,17 @@ struct XmlGlobalSettings
         {
             //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
 #ifdef ZEN_WIN
-            externelApplications.push_back(std::make_pair(L"Show in Explorer",              L"explorer /select, \"%item_path%\""));
-            externelApplications.push_back(std::make_pair(L"Open with default application", L"\"%item_path%\""));
+            externelApplications.emplace_back(L"Show in Explorer",              L"explorer /select, \"%item_path%\"");
+            externelApplications.emplace_back(L"Open with default application", L"\"%item_path%\"");
             //mark for extraction: _("Show in Explorer")
             //mark for extraction: _("Open with default application")
 #elif defined ZEN_LINUX
-            externelApplications.push_back(std::make_pair(L"Browse directory",              L"xdg-open \"%item_folder%\""));
-            externelApplications.push_back(std::make_pair(L"Open with default application", L"xdg-open \"%item_path%\""));
+            externelApplications.emplace_back(L"Browse directory",              L"xdg-open \"%item_folder%\"");
+            externelApplications.emplace_back(L"Open with default application", L"xdg-open \"%item_path%\"");
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
 #elif defined ZEN_MAC
-            externelApplications.push_back(std::make_pair(L"Browse directory",              L"open -R \"%item_path%\""));
-            externelApplications.push_back(std::make_pair(L"Open with default application", L"open \"%item_path%\""));
+            externelApplications.emplace_back(L"Browse directory",              L"open -R \"%item_path%\"");
+            externelApplications.emplace_back(L"Open with default application", L"open \"%item_path%\"");
 #endif
         }
 

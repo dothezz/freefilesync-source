@@ -88,22 +88,20 @@ private:
 #error just some paranoia check...
 #endif
 
-template <class T, class Function> inline
-auto async2(Function fun) -> boost::unique_future<T> //support for workaround of VS2010 bug: bool (*fun)();  decltype(fun()) == int!
+template <class Function> inline
+auto async(Function fun) -> boost::unique_future<decltype(fun())>
 {
+    typedef decltype(fun()) ResultType;
+
 #if defined BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK //mirror "boost/thread/future.hpp", hopefully they know what they're doing
-    boost::packaged_task<T()> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
+    boost::packaged_task<ResultType()> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
 #else
-    boost::packaged_task<T> pt(std::move(fun));
+    boost::packaged_task<ResultType> pt(std::move(fun));
 #endif
     auto fut = pt.get_future();
     boost::thread(std::move(pt)).detach(); //we have to explicitly detach since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
     return std::move(fut); //compiler error without "move", why needed???
 }
-
-
-template <class Function> inline
-auto async(Function fun) -> boost::unique_future<decltype(fun())> { return async2<decltype(fun())>(fun); }
 
 
 template<class InputIterator, class Duration> inline

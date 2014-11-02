@@ -271,7 +271,7 @@ SyncStatusHandler::~SyncStatusHandler()
                     try
                     {
                         //use EXEC_TYPE_ASYNC until there is reason not to: https://sourceforge.net/p/freefilesync/discussion/help/thread/828dca52
-                        tryReportingError([&] { shellExecute2(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
+                        tryReportingError([&] { shellExecute(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
                                           *this);
                     }
                     catch (...) {}
@@ -318,9 +318,10 @@ SyncStatusHandler::~SyncStatusHandler()
         (wxGetUTCTimeMillis().GetValue() - startTime_) / 1000
     };
 
+    //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
     }
     catch (FileError&) {}
 

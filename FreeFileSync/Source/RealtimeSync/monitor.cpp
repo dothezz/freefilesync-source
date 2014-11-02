@@ -7,7 +7,7 @@
 #include "monitor.h"
 #include <ctime>
 #include <set>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/dir_watcher.h>
 #include <zen/thread.h>
 #include <zen/tick_count.h>
@@ -75,7 +75,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw Fi
             if (!ftDirExists.get())
                 return WaitResult(dirpathFmt);
 
-            watches.push_back(std::make_pair(dirpathFmt, std::make_shared<DirWatcher>(dirpathFmt))); //throw FileError
+            watches.emplace_back(dirpathFmt, std::make_shared<DirWatcher>(dirpathFmt)); //throw FileError
         }
         catch (FileError&)
         {
@@ -171,7 +171,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw File
                 allExisting = false;
                 //wait some time...
                 const int refreshInterval = rts::UI_UPDATE_INTERVAL / 2;
-                assert_static(CHECK_DIR_INTERVAL * 1000 % refreshInterval == 0);
+                static_assert(CHECK_DIR_INTERVAL * 1000 % refreshInterval == 0, "");
                 for (int i = 0; i < CHECK_DIR_INTERVAL * 1000 / refreshInterval; ++i)
                 {
                     onRefreshGui(dirpathFmt); //may throw!

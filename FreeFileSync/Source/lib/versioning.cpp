@@ -1,7 +1,7 @@
 #include "versioning.h"
 #include <map>
 #include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/file_traverser.h>
 #include <zen/string_tools.h>
 
@@ -172,14 +172,13 @@ void moveFile(const Zstring& sourceFile, //throw FileError
 {
     auto copyDelete = [&]
     {
+        assert(!somethingExists(targetFile));
+
         //create target
         if (symlinkExists(sourceFile))
             copySymlink(sourceFile, targetFile, false); //throw FileError; don't copy filesystem permissions
         else
-        {
-            auto onDeleteTargetFile = [&]() { assert(!somethingExists(targetFile)); };
-            copyFile(sourceFile, targetFile, false, true, onDeleteTargetFile, onUpdateCopyStatus); //throw FileError - permissions "false", transactional copy "true"
-        }
+            copyFile(sourceFile, targetFile, false, true, nullptr, onUpdateCopyStatus); //throw FileError - permissions "false", transactional copy "true"
 
         //delete source
         removeFile(sourceFile); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
@@ -210,12 +209,12 @@ public:
     TraverseFilesOneLevel(std::vector<Zstring>& files, std::vector<Zstring>& dirs) : files_(files), dirs_(dirs) {}
 
 private:
-    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
+    void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details) override
     {
         files_.push_back(shortName);
     }
 
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details)
+    HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override
     {
         if (dirExists(linkpath)) //dir symlink
             dirs_.push_back(shortName);
@@ -224,14 +223,14 @@ private:
         return LINK_SKIP;
     }
 
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)
+    TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) override
     {
         dirs_.push_back(shortName);
         return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
     }
 
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { throw FileError(msg); }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { throw FileError(msg); }
 
     std::vector<Zstring>& files_;
     std::vector<Zstring>& dirs_;
@@ -317,11 +316,11 @@ void FileVersioner::revisionDirImpl(const Zstring& dirpath, const Zstring& relat
         std::vector<Zstring> dirList;  //
         {
             TraverseFilesOneLevel tol(fileList, dirList); //throw FileError
-            traverseFolder(dirpath, tol);               //
+            traverseFolder(dirpath, tol);                 //
         }
 
         const Zstring dirpathPf = appendSeparator(dirpath);
-        const Zstring relpathPf  = appendSeparator(relativePath);
+        const Zstring relpathPf = appendSeparator(relativePath);
 
         //move files
         for (const Zstring& shortname : fileList)
@@ -352,11 +351,11 @@ public:
     TraverseVersionsOneLevel(std::vector<Zstring>& files, std::function<void()> updateUI) : files_(files), updateUI_(updateUI) {}
 
 private:
-    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details) { files_.push_back(shortName); updateUI_(); }
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { files_.push_back(shortName); updateUI_(); return LINK_SKIP; }
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& dirpath) { updateUI_(); return nullptr; } //DON'T traverse into subdirs
-    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
+    void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details) override { files_.push_back(shortName); updateUI_(); }
+    HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override { files_.push_back(shortName); updateUI_(); return LINK_SKIP; }
+    std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& dirpath) override { updateUI_(); return nullptr; } //DON'T traverse into subdirs
+    HandleError reportDirError (const std::wstring& msg)                         override { throw FileError(msg); }
+    HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) override { throw FileError(msg); }
 
     std::vector<Zstring>& files_;
     std::function<void()> updateUI_;

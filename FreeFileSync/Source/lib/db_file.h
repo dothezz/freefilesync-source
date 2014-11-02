@@ -76,18 +76,17 @@ struct InSyncDir
     //convenience
     InSyncDir& addDir(const Zstring& shortName, InSyncStatus st)
     {
-        //use C++11 emplace when available
-        return dirs.insert(std::make_pair(shortName, InSyncDir(st))).first->second;
+        return dirs.emplace(shortName, InSyncDir(st)).first->second;
     }
 
     void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, std::uint64_t fileSize)
     {
-        files.insert(std::make_pair(shortName, InSyncFile(dataL, dataR, cmpVar, fileSize)));
+        files.emplace(shortName, InSyncFile(dataL, dataR, cmpVar, fileSize));
     }
 
     void addSymlink(const Zstring& shortName, const InSyncDescrLink& dataL, const InSyncDescrLink& dataR, CompareVariant cmpVar)
     {
-        symlinks.insert(std::make_pair(shortName, InSyncSymlink(dataL, dataR, cmpVar)));
+        symlinks.emplace(shortName, InSyncSymlink(dataL, dataR, cmpVar));
     }
 };
 

@@ -88,7 +88,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
     {
         const bool included = pred(subDirObj);
 
-        cont.subDirs.push_back(TreeView::DirNodeImpl()); //
+        cont.subDirs.emplace_back(); //
         auto& subDirCont = cont.subDirs.back();
         TreeView::extractVisibleSubtree(subDirObj, subDirCont, pred);
         if (included)
@@ -310,14 +310,14 @@ void TreeView::getChildren(const Container& cont, unsigned int level, std::vecto
 
     for (const DirNodeImpl& subDir : cont.subDirs)
     {
-        output.push_back(TreeView::TreeLine(level, 0, &subDir, TreeView::TYPE_DIRECTORY));
-        workList.push_back(std::make_pair(subDir.bytesGross, &output.back().percent_));
+        output.emplace_back(level, 0, &subDir, TreeView::TYPE_DIRECTORY);
+        workList.emplace_back(subDir.bytesGross, &output.back().percent_);
     }
 
     if (cont.firstFileId)
     {
-        output.push_back(TreeLine(level, 0, &cont, TreeView::TYPE_FILES));
-        workList.push_back(std::make_pair(cont.bytesNet, &output.back().percent_));
+        output.emplace_back(level, 0, &cont, TreeView::TYPE_FILES);
+        workList.emplace_back(cont.bytesNet, &output.back().percent_);
     }
     calcPercentage(workList);
 
@@ -349,7 +349,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
         return nullptr;
     };
 
-    zen::hash_set<const HierarchyObject*> expandedNodes;
+    std::unordered_set<const HierarchyObject*> expandedNodes;
     if (!flatTree.empty())
     {
         auto it = flatTree.begin();
@@ -380,8 +380,8 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
 
         for (const RootNodeImpl& root : folderCmpView)
         {
-            flatTree.push_back(TreeView::TreeLine(0, 0, &root, TreeView::TYPE_ROOT));
-            workList.push_back(std::make_pair(root.bytesGross, &flatTree.back().percent_));
+            flatTree.emplace_back(0, 0, &root, TreeView::TYPE_ROOT);
+            workList.emplace_back(root.bytesGross, &flatTree.back().percent_);
         }
 
         calcPercentage(workList);
@@ -418,7 +418,7 @@ void TreeView::updateView(Predicate pred)
 
     for (const std::shared_ptr<BaseDirPair>& baseObj : folderCmp)
     {
-        newView.push_back(TreeView::RootNodeImpl());
+        newView.emplace_back();
         RootNodeImpl& root = newView.back();
         this->extractVisibleSubtree(*baseObj, root, pred); //"this->" is bogus for a static method, but GCC screws this one up
 
@@ -683,7 +683,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             case TreeView::TYPE_ROOT:
             {
                 const auto& root = *static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
-                return make_unique<TreeView::RootNode>(percent, root.bytesGross, root.itemCountGross, getStatus(row), *root.baseDirObj, root.displayName);
+                return zen::make_unique<TreeView::RootNode>(percent, root.bytesGross, root.itemCountGross, getStatus(row), *root.baseDirObj, root.displayName);
             }
             break;
 
@@ -691,7 +691,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             {
                 const auto* dir = static_cast<const TreeView::DirNodeImpl*>(flatTree[row].node_);
                 if (auto dirObj = dynamic_cast<DirPair*>(FileSystemObject::retrieve(dir->objId)))
-                    return make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
+                    return zen::make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
             }
             break;
 
@@ -712,7 +712,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
                         if (lastViewFilterPred(fsObj))
                             filesAndLinks.push_back(&fsObj);
 
-                    return make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
+                    return zen::make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
                 }
             }
             break;
@@ -775,9 +775,9 @@ public:
     bool getShowPercentage() const { return showPercentBar; }
 
 private:
-    virtual size_t getRowCount() const { return treeDataView_ ? treeDataView_->linesTotal() : 0; }
+    size_t getRowCount() const override { return treeDataView_ ? treeDataView_->linesTotal() : 0; }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const override
+    wxString getToolTip(size_t row, ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
@@ -803,7 +803,7 @@ private:
         return wxString();
     }
 
-    virtual wxString getValue(size_t row, ColumnType colType) const
+    wxString getValue(size_t row, ColumnType colType) const override
     {
         if (treeDataView_)
         {
@@ -829,7 +829,7 @@ private:
         return wxString();
     }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
+    void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
@@ -852,7 +852,7 @@ private:
 
     static const int GAP_SIZE = 2;
 
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
+    void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
@@ -866,7 +866,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         //wxRect rectTmp= drawCellBorder(dc, rect);
         wxRect rectTmp = rect;
@@ -1036,7 +1036,7 @@ private:
         }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
+    int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
@@ -1054,7 +1054,7 @@ private:
                    2 * GAP_SIZE; //include gap from right!
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const
+    wxString getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {

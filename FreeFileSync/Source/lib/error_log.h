@@ -34,7 +34,7 @@ void logError(const std::string& msg) //throw()
     const std::string logEntry = "[" + formatTime<std::string>(FORMAT_DATE) + " "+ formatTime<std::string>(FORMAT_TIME) + "] " + msg;
     try
     {
-        saveBinStream(getConfigDir() + Zstr("LastError.log"), logEntry); //throw FileError
+        saveBinStream(getConfigDir() + Zstr("LastError.log"), logEntry, nullptr); //throw FileError
     }
     catch (const FileError&) {}
 }

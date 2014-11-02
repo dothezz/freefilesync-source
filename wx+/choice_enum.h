@@ -41,7 +41,7 @@ struct EnumDescrList
 {
     EnumDescrList& add(Enum value, const wxString& text, const wxString& tooltip = wxEmptyString)
     {
-        descrList.push_back(std::make_pair(value, std::make_pair(text, tooltip)));
+        descrList.emplace_back(value, std::make_pair(text, tooltip));
         return *this;
     }
     typedef std::vector<std::pair<Enum, std::pair<wxString, wxString>>> DescrList;

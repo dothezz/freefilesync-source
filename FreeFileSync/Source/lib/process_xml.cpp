@@ -7,7 +7,7 @@
 #include "process_xml.h"
 #include <utility>
 #include <zenxml/xml.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/file_io.h>
 #include <zen/xml_io.h>
 #include "ffs_paths.h"
@@ -794,11 +794,11 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 
 void readConfig(const XmlIn& in, FilterConfig& filter)
 {
-    std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //default value
+    std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //save default value
     in["Include"](tmp);
     filter.includeFilter = mergeFilterLines(tmp);
 
-    std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //default value
+    std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //save default value
     in["Exclude"](tmp2);
     filter.excludeFilter = mergeFilterLines(tmp2);
 

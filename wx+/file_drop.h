@@ -59,7 +59,7 @@ public:
         dropWindow_(dropWindow),
         dropPos_(dropPos) {}
 
-    virtual wxEvent* Clone() const { return new FileDropEvent(*this); }
+    wxEvent* Clone() const override { return new FileDropEvent(*this); }
 
     const std::vector<wxString>& getFiles()        const { return filesDropped_; }
     const wxWindow&              getDropWindow()   const { return dropWindow_;   }
@@ -85,7 +85,7 @@ public:
     WindowDropTarget(wxWindow& dropWindow) : dropWindow_(dropWindow) {}
 
 private:
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray)
+    bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray) override
     {
         std::vector<wxString> filepaths(fileArray.begin(), fileArray.end());
         if (!filepaths.empty())

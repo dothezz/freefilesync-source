@@ -49,8 +49,8 @@ const struct FormatIsoDateTimeTag {} FORMAT_ISO_DATE_TIME = {}; //%Y-%m-%d %H:%M
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-template <class String>
-bool parseTime(const String& format, const String& str, TimeComp& comp); //similar to ::strptime(), return true on success
+template <class String, class String2>
+bool parseTime(const String& format, const String2& str, TimeComp& comp); //similar to ::strptime(), return true on success
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
@@ -272,10 +272,11 @@ String formatTime(const String2& format, const TimeComp& comp)
 }
 
 
-template <class String>
-bool parseTime(const String& format, const String& str, TimeComp& comp) //return true on success
+template <class String, class String2>
+bool parseTime(const String& format, const String2& str, TimeComp& comp) //return true on success
 {
     typedef typename GetCharType<String>::Type CharType;
+    static_assert(IsSameType<CharType, typename GetCharType<String2>::Type>::value, "");
 
     const CharType*       iterFmt = strBegin(format);
     const CharType* const fmtLast = iterFmt + strLength(format);
@@ -285,7 +286,7 @@ bool parseTime(const String& format, const String& str, TimeComp& comp) //return
 
     auto extractNumber = [&](int& result, size_t digitCount) -> bool
     {
-        if (strLast - iterStr < digitCount)
+        if (strLast - iterStr < makeSigned(digitCount))
             return false;
 
         if (std::any_of(iterStr, iterStr + digitCount, [](CharType c) { return !isDigit(c); }))

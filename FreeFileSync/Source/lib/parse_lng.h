@@ -139,8 +139,8 @@ public:
 
 private:
     struct Item { virtual ~Item() {} virtual bool hasTranslation() const = 0; };
-    struct RegularItem : public Item { RegularItem(const TranslationMap      ::value_type& val) : value(val) {} virtual bool hasTranslation() const { return !value.second.empty(); } TranslationMap      ::value_type value; };
-    struct PluralItem  : public Item { PluralItem (const TranslationPluralMap::value_type& val) : value(val) {} virtual bool hasTranslation() const { return !value.second.empty(); } TranslationPluralMap::value_type value; };
+    struct RegularItem : public Item { RegularItem(const TranslationMap      ::value_type& val) : value(val) {} bool hasTranslation() const override { return !value.second.empty(); } TranslationMap      ::value_type value; };
+    struct PluralItem  : public Item { PluralItem (const TranslationPluralMap::value_type& val) : value(val) {} bool hasTranslation() const override { return !value.second.empty(); } TranslationPluralMap::value_type value; };
 
     const TranslationNewItemPos newItemPos_;
     std::list<std::shared_ptr<Item>> sequence; //ordered list of translation elements
@@ -212,28 +212,28 @@ private:
     KnownTokens()
     {
         //header information
-        tokens.insert(std::make_pair(Token::TK_HEADER_BEGIN,      "<header>"));
-        tokens.insert(std::make_pair(Token::TK_HEADER_END,        "</header>"));
-        tokens.insert(std::make_pair(Token::TK_LANG_NAME_BEGIN,   "<language>"));
-        tokens.insert(std::make_pair(Token::TK_LANG_NAME_END,     "</language>"));
-        tokens.insert(std::make_pair(Token::TK_TRANS_NAME_BEGIN,  "<translator>"));
-        tokens.insert(std::make_pair(Token::TK_TRANS_NAME_END,    "</translator>"));
-        tokens.insert(std::make_pair(Token::TK_LOCALE_NAME_BEGIN, "<locale>"));
-        tokens.insert(std::make_pair(Token::TK_LOCALE_NAME_END,   "</locale>"));
-        tokens.insert(std::make_pair(Token::TK_FLAG_FILE_BEGIN,   "<image>"));
-        tokens.insert(std::make_pair(Token::TK_FLAG_FILE_END,     "</image>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_BEGIN, "<plural_count>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_END,   "</plural_count>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_DEF_BEGIN,  "<plural_definition>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_DEF_END,    "</plural_definition>"));
+        tokens.emplace(Token::TK_HEADER_BEGIN,       "<header>");
+        tokens.emplace(Token::TK_HEADER_END,         "</header>");
+        tokens.emplace(Token::TK_LANG_NAME_BEGIN,    "<language>");
+        tokens.emplace(Token::TK_LANG_NAME_END,      "</language>");
+        tokens.emplace(Token::TK_TRANS_NAME_BEGIN,   "<translator>");
+        tokens.emplace(Token::TK_TRANS_NAME_END,     "</translator>");
+        tokens.emplace(Token::TK_LOCALE_NAME_BEGIN,  "<locale>");
+        tokens.emplace(Token::TK_LOCALE_NAME_END,    "</locale>");
+        tokens.emplace(Token::TK_FLAG_FILE_BEGIN,    "<image>");
+        tokens.emplace(Token::TK_FLAG_FILE_END,      "</image>");
+        tokens.emplace(Token::TK_PLURAL_COUNT_BEGIN, "<plural_count>");
+        tokens.emplace(Token::TK_PLURAL_COUNT_END,   "</plural_count>");
+        tokens.emplace(Token::TK_PLURAL_DEF_BEGIN,   "<plural_definition>");
+        tokens.emplace(Token::TK_PLURAL_DEF_END,     "</plural_definition>");
 
         //item level
-        tokens.insert(std::make_pair(Token::TK_SRC_BEGIN,    "<source>"));
-        tokens.insert(std::make_pair(Token::TK_SRC_END,      "</source>"));
-        tokens.insert(std::make_pair(Token::TK_TRG_BEGIN,    "<target>"));
-        tokens.insert(std::make_pair(Token::TK_TRG_END,      "</target>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_BEGIN, "<pluralform>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_END,   "</pluralform>"));
+        tokens.emplace(Token::TK_SRC_BEGIN,    "<source>");
+        tokens.emplace(Token::TK_SRC_END,      "</source>");
+        tokens.emplace(Token::TK_TRG_BEGIN,    "<target>");
+        tokens.emplace(Token::TK_TRG_END,      "</target>");
+        tokens.emplace(Token::TK_PLURAL_BEGIN, "<pluralform>");
+        tokens.emplace(Token::TK_PLURAL_END,   "</pluralform>");
     }
     TokenMap tokens;
 };
@@ -418,7 +418,7 @@ private:
         consumeToken(Token::TK_TRG_END);
 
         validateTranslation(original, translation); //throw throw ParsingError
-        out.insert(std::make_pair(original, translation));
+        out.emplace(original, translation);
     }
 
     void parsePlural(TranslationPluralMap& pluralOut, const parse_plural::PluralFormInfo& pluralInfo)
@@ -453,7 +453,7 @@ private:
 
         const SingularPluralPair original(engSingular, engPlural);
         validateTranslation(original, pluralList, pluralInfo);
-        pluralOut.insert(std::make_pair(original, pluralList));
+        pluralOut.emplace(original, pluralList);
     }
 
     void validateTranslation(const std::string& original, const std::string& translation) //throw ParsingError

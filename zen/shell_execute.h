@@ -31,7 +31,7 @@ enum ExecutionType
 
 namespace
 {
-void shellExecute2(const Zstring& command, ExecutionType type) //throw FileError
+void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
 {
 #ifdef ZEN_WIN
     //parse commandline

@@ -10,7 +10,7 @@
 
 #ifdef ZEN_WIN
 #include <zen/long_path_prefix.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/win.h> //includes "windows.h"
 #include <zen/dll.h>
 #include <Shlobj.h>
@@ -112,7 +112,7 @@ private:
             {
                 Zstring dirpath = buffer;
                 if (!dirpath.empty())
-                    output.insert(std::make_pair(paramName, dirpath));
+                    output.emplace(paramName, dirpath);
             }
         };
 
@@ -138,7 +138,7 @@ private:
 
                     Zstring dirpath = path;
                     if (!dirpath.empty())
-                        output.insert(std::make_pair(paramName, dirpath));
+                        output.emplace(paramName, dirpath);
                 }
             }
         };
@@ -224,7 +224,7 @@ std::unique_ptr<Zstring> getEnvironmentVar(const Zstring& envName) //return null
         value.length() >= 2)
         value = wxString(value.c_str() + 1, value.length() - 2);
 
-    return make_unique<Zstring>(utfCvrtTo<Zstring>(value));
+    return zen::make_unique<Zstring>(utfCvrtTo<Zstring>(value));
 }
 
 
@@ -235,13 +235,13 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
 
     //there exist environment variables named %TIME%, %DATE% so check for our internal macros first!
     if (equalNoCase(macro, Zstr("time")))
-        return make_unique<Zstring>(formatTime<Zstring>(Zstr("%H%M%S")));
+        return zen::make_unique<Zstring>(formatTime<Zstring>(Zstr("%H%M%S")));
 
     if (equalNoCase(macro, Zstr("date")))
-        return make_unique<Zstring>(formatTime<Zstring>(FORMAT_ISO_DATE));
+        return zen::make_unique<Zstring>(formatTime<Zstring>(FORMAT_ISO_DATE));
 
     if (equalNoCase(macro, Zstr("timestamp")))
-        return make_unique<Zstring>(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"))); //e.g. "2012-05-15 131513"
+        return zen::make_unique<Zstring>(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"))); //e.g. "2012-05-15 131513"
 
     std::unique_ptr<Zstring> cand;
     auto processPhrase = [&](const Zchar* phrase, const Zchar* format) -> bool
@@ -249,7 +249,7 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
         if (!equalNoCase(macro, phrase))
             return false;
 
-        cand = make_unique<Zstring>(formatTime<Zstring>(format));
+        cand = zen::make_unique<Zstring>(formatTime<Zstring>(format));
         return true;
     };
 
@@ -266,7 +266,7 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
     {
         auto it = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return equalNoCase(macro, p.first); });
         if (it != ext.end())
-            return make_unique<Zstring>(it->second);
+            return zen::make_unique<Zstring>(it->second);
     }
 
     //try to resolve as environment variable
@@ -279,7 +279,7 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
         const auto& csidlMap = CsidlConstants::get();
         auto it = csidlMap.find(macro);
         if (it != csidlMap.end())
-            return make_unique<Zstring>(it->second);
+            return zen::make_unique<Zstring>(it->second);
     }
 #endif
 
@@ -471,7 +471,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
         auto addEnvVar = [&](const Zstring& envName)
         {
             if (std::unique_ptr<Zstring> value = getEnvironmentVar(envName))
-                envToDir.insert(std::make_pair(envName, *value));
+                envToDir.emplace(envName, *value);
         };
 #ifdef ZEN_WIN
         addEnvVar(L"AllUsersProfile");  // C:\ProgramData
@@ -498,11 +498,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
         auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
         {
 #if defined ZEN_WIN || defined ZEN_MAC
-            Zstring tmp = path;
-            Zstring tmp2 = prefix;
-            ::makeUpper(tmp);
-            ::makeUpper(tmp2);
-            return startsWith(tmp, tmp2);
+            return startsWith(makeUpperCopy(path), makeUpperCopy(prefix));
 #elif defined ZEN_LINUX
             return startsWith(path, prefix);
 #endif

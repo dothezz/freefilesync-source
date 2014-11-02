@@ -235,7 +235,7 @@ void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString&
 CornerWin  RowLabelWin  ColLabelWin  MainWin
 
 */
-class Grid::SubWindow : public wxWindow 
+class Grid::SubWindow : public wxWindow
 {
 public:
     SubWindow(Grid& parent) :
@@ -378,9 +378,9 @@ public:
     CornerWin(Grid& parent) : SubWindow(parent) {}
 
 private:
-    virtual bool AcceptsFocus() const { return false; }
+    bool AcceptsFocus() const override { return false; }
 
-    virtual void render(wxDC& dc, const wxRect& rect)
+    void render(wxDC& dc, const wxRect& rect) override
     {
         const wxRect& clientRect = GetClientRect();
 
@@ -466,9 +466,9 @@ public:
 private:
     static wxString formatRow(size_t row) { return toGuiString(row + 1); } //convert number to std::wstring including thousands separator
 
-    virtual bool AcceptsFocus() const { return false; }
+    bool AcceptsFocus() const override { return false; }
 
-    virtual void render(wxDC& dc, const wxRect& rect)
+    void render(wxDC& dc, const wxRect& rect) override
     {
 
         /*
@@ -537,9 +537,9 @@ private:
         }
     }
 
-    virtual void onMouseLeftDown(wxMouseEvent& event) { refParent().redirectRowLabelEvent(event); }
-    virtual void onMouseMovement(wxMouseEvent& event) { refParent().redirectRowLabelEvent(event); }
-    virtual void onMouseLeftUp  (wxMouseEvent& event) { refParent().redirectRowLabelEvent(event); }
+    void onMouseLeftDown(wxMouseEvent& event) override { refParent().redirectRowLabelEvent(event); }
+    void onMouseMovement(wxMouseEvent& event) override { refParent().redirectRowLabelEvent(event); }
+    void onMouseLeftUp  (wxMouseEvent& event) override { refParent().redirectRowLabelEvent(event); }
 
     int rowHeight;
 };
@@ -608,9 +608,9 @@ public:
     ColLabelWin(Grid& parent) : SubWindow(parent) {}
 
 private:
-    virtual bool AcceptsFocus() const { return false; }
+    bool AcceptsFocus() const override { return false; }
 
-    virtual void render(wxDC& dc, const wxRect& rect)
+    void render(wxDC& dc, const wxRect& rect) override
     {
         if (IsThisEnabled())
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -680,7 +680,7 @@ private:
         }
     }
 
-    virtual void onMouseLeftDown(wxMouseEvent& event)
+    void onMouseLeftDown(wxMouseEvent& event) override
     {
         if (FindFocus() != &refParent().getMainWin())
             refParent().getMainWin().SetFocus();
@@ -702,7 +702,7 @@ private:
         event.Skip();
     }
 
-    virtual void onMouseLeftUp(wxMouseEvent& event)
+    void onMouseLeftUp(wxMouseEvent& event) override
     {
         activeResizing.reset(); //nothing else to do, actual work done by onMouseMovement()
 
@@ -734,7 +734,7 @@ private:
         event.Skip();
     }
 
-    virtual void onMouseCaptureLost(wxMouseCaptureLostEvent& event)
+    void onMouseCaptureLost(wxMouseCaptureLostEvent& event) override
     {
         activeResizing.reset();
         activeMove.reset();
@@ -742,7 +742,7 @@ private:
         //event.Skip(); -> we DID handle it!
     }
 
-    virtual void onMouseLeftDouble(wxMouseEvent& event)
+    void onMouseLeftDouble(wxMouseEvent& event) override
     {
         if (Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition()))
             if (action->wantResize)
@@ -758,7 +758,7 @@ private:
         event.Skip();
     }
 
-    virtual void onMouseMovement(wxMouseEvent& event)
+    void onMouseMovement(wxMouseEvent& event) override
     {
         if (activeResizing)
         {
@@ -820,14 +820,14 @@ private:
         event.Skip();
     }
 
-    virtual void onLeaveWindow(wxMouseEvent& event)
+    void onLeaveWindow(wxMouseEvent& event) override
     {
         highlightCol.reset(); //wxEVT_LEAVE_WINDOW does not respect mouse capture! -> however highlight is drawn unconditionally during move/resize!
         Refresh();
         event.Skip();
     }
 
-    virtual void onMouseRightDown(wxMouseEvent& event)
+    void onMouseRightDown(wxMouseEvent& event) override
     {
         if (const Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition()))
         {
@@ -863,7 +863,7 @@ public:
             ColLabelWin& colLabelWin) : SubWindow(parent),
         rowLabelWin_(rowLabelWin),
         colLabelWin_(colLabelWin),
-		cursorRow(0),
+        cursorRow(0),
         selectionAnchor(0),
         gridUpdatePending(false)
     {
@@ -883,7 +883,7 @@ public:
     }
 
 private:
-    virtual void render(wxDC& dc, const wxRect& rect)
+    void render(wxDC& dc, const wxRect& rect) override
     {
         if (IsThisEnabled())
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -959,12 +959,12 @@ private:
         return refParent().isSelected(row);
     }
 
-    virtual void onMouseLeftDown (wxMouseEvent& event) { onMouseDown(event); }
-    virtual void onMouseLeftUp   (wxMouseEvent& event) { onMouseUp  (event); }
-    virtual void onMouseRightDown(wxMouseEvent& event) { onMouseDown(event); }
-    virtual void onMouseRightUp  (wxMouseEvent& event) { onMouseUp  (event); }
+    void onMouseLeftDown (wxMouseEvent& event) override { onMouseDown(event); }
+    void onMouseLeftUp   (wxMouseEvent& event) override { onMouseUp  (event); }
+    void onMouseRightDown(wxMouseEvent& event) override { onMouseDown(event); }
+    void onMouseRightUp  (wxMouseEvent& event) override { onMouseUp  (event); }
 
-    virtual void onMouseLeftDouble(wxMouseEvent& event)
+    void onMouseLeftDouble(wxMouseEvent& event) override
     {
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
         const auto row       = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
@@ -1058,14 +1058,14 @@ private:
         event.Skip(); //allow changing focus
     }
 
-    virtual void onMouseCaptureLost(wxMouseCaptureLostEvent& event)
+    void onMouseCaptureLost(wxMouseCaptureLostEvent& event) override
     {
         activeSelection.reset();
         Refresh();
         //event.Skip(); -> we DID handle it!
     }
 
-    virtual void onMouseMovement(wxMouseEvent& event)
+    void onMouseMovement(wxMouseEvent& event) override
     {
         if (activeSelection)
             activeSelection->evalMousePos(); //eval on both mouse movement + timer event!
@@ -1089,7 +1089,7 @@ private:
         event.Skip();
     }
 
-    virtual void onFocus(wxFocusEvent& event) { Refresh(); event.Skip(); }
+    void onFocus(wxFocusEvent& event) override { Refresh(); event.Skip(); }
 
     class MouseSelection : private wxEvtHandler
     {
@@ -1188,7 +1188,7 @@ private:
         const std::int64_t ticksPerSec_;
     };
 
-    virtual void ScrollWindow(int dx, int dy, const wxRect* rect)
+    void ScrollWindow(int dx, int dy, const wxRect* rect) override
     {
         wxWindow::ScrollWindow(dx, dy, rect);
         rowLabelWin_.ScrollWindow(0, dy, rect);
@@ -1678,7 +1678,7 @@ void Grid::setColumnConfig(const std::vector<Grid::ColumnAttribute>& attr)
     std::vector<VisibleColumn> visCols;
     for (const ColumnAttribute& ca : attr)
         if (ca.visible_)
-            visCols.push_back(VisibleColumn(ca.type_, ca.offset_, ca.stretch_));
+            visCols.emplace_back(ca.type_, ca.offset_, ca.stretch_);
 
     //"ownership" of visible columns is now within Grid
     visibleCols = visCols;
@@ -2202,7 +2202,7 @@ std::vector<Grid::ColumnWidth> Grid::getColWidths(int mainWinWidth) const //eval
         else
             width = std::max(width, 0); //support smaller width than COLUMN_MIN_WIDTH if set via configuration
 
-        output.push_back(ColumnWidth(vc.type_, width));
+        output.emplace_back(vc.type_, width);
     }
     return output;
 }

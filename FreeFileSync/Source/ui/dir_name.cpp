@@ -6,7 +6,7 @@
 
 #include "dir_name.h"
 #include <zen/thread.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <wx/dnd.h>
 #include <wx/window.h>
 #include <wx/textctrl.h>

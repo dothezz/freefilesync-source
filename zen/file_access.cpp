@@ -4,7 +4,7 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#include "file_handling.h"
+#include "file_access.h"
 #include <map>
 #include <algorithm>
 #include <stdexcept>
@@ -13,7 +13,6 @@
 #include "scope_guard.h"
 #include "symlink_target.h"
 #include "file_io.h"
-#include "assert_static.h"
 #include "file_id_def.h"
 
 #ifdef ZEN_WIN
@@ -21,7 +20,6 @@
 #include "privilege.h"
 #include "dll.h"
 #include "long_path_prefix.h"
-#include "dst_hack.h"
 #include "win_ver.h"
 #include "IFileOperation/file_op.h"
 
@@ -134,6 +132,70 @@ bool zen::somethingExists(const Zstring& objname)
 namespace
 {
 #ifdef ZEN_WIN
+//fast ::GetVolumePathName() clone: let's hope it's not too simple (doesn't honor mount points)
+Zstring getVolumeNameFast(const Zstring& filepath)
+{
+    //this call is expensive: ~1.5 ms!
+    //    if (!::GetVolumePathName(filepath.c_str(), //__in   LPCTSTR lpszFileName,
+    //                             fsName,           //__out  LPTSTR lpszVolumePathName,
+    //                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
+    // ...
+    //    Zstring volumePath = appendSeparator(fsName);
+
+    const Zstring nameFmt = appendSeparator(removeLongPathPrefix(filepath)); //throw()
+
+    if (startsWith(nameFmt, Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
+    {
+        size_t nameSize = nameFmt.size();
+        const size_t posFirstSlash = nameFmt.find(Zstr("\\"), 2);
+        if (posFirstSlash != Zstring::npos)
+        {
+            nameSize = posFirstSlash + 1;
+            const size_t posSecondSlash = nameFmt.find(Zstr("\\"), posFirstSlash + 1);
+            if (posSecondSlash != Zstring::npos)
+                nameSize = posSecondSlash + 1;
+        }
+        return Zstring(nameFmt.c_str(), nameSize); //include trailing backslash!
+    }
+    else //local path: "C:\Folder\"
+    {
+        const size_t pos = nameFmt.find(Zstr(":\\"));
+        if (pos == 1) //expect single letter volume
+            return Zstring(nameFmt.c_str(), 3);
+    }
+
+    return Zstring();
+}
+
+
+bool isFatDrive(const Zstring& filepath) //throw()
+{
+    const Zstring volumePath = getVolumeNameFast(filepath);
+    if (volumePath.empty())
+        return false;
+
+    const DWORD bufferSize = MAX_PATH + 1;
+    wchar_t fsName[bufferSize] = {};
+
+    //suprisingly fast: ca. 0.03 ms per call!
+    if (!::GetVolumeInformation(appendSeparator(volumePath).c_str(), //__in_opt   LPCTSTR lpRootPathName,
+                                nullptr,     //__out      LPTSTR lpVolumeNameBuffer,
+                                0,           //__in       DWORD nVolumeNameSize,
+                                nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
+                                nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
+                                fsName,      //__out      LPTSTR lpFileSystemNameBuffer,
+                                bufferSize)) //__in       DWORD nFileSystemNameSize
+    {
+        assert(false); //shouldn't happen
+        return false;
+    }
+    //DST hack seems to be working equally well for FAT and FAT32 (in particular creation time has 10^-2 s precision as advertised)
+    return fsName == Zstring(L"FAT") ||
+           fsName == Zstring(L"FAT32");
+}
+
+
 //(try to) enhance error messages by showing which processes lock the file
 Zstring getLockingProcessNames(const Zstring& filepath) //throw(), empty string if none found or error occurred
 {
@@ -159,40 +221,38 @@ Zstring getLockingProcessNames(const Zstring& filepath) //throw(), empty string 
 std::uint64_t zen::getFilesize(const Zstring& filepath) //throw FileError
 {
 #ifdef ZEN_WIN
-    WIN32_FIND_DATA fileInfo = {};
     {
+        WIN32_FIND_DATA fileInfo = {};
         const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filepath).c_str(), &fileInfo);
         if (searchHandle == INVALID_HANDLE_VALUE)
             throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"FindFirstFile", getLastError());
         ::FindClose(searchHandle);
+
+        if (!isSymlink(fileInfo))
+            return get64BitUInt(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     }
     //        WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
-    //        if (!::GetFileAttributesEx(applyLongPathPrefix(sourceObj).c_str(), //__in   LPCTSTR lpFileName,
-    //                                   GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-    //                                   &sourceAttr))                           //__out  LPVOID lpFileInformation
+    //        if (!::GetFileAttributesEx(applyLongPathPrefix(filepath).c_str(), //__in   LPCTSTR lpFileName,
+    //                                   GetFileExInfoStandard,                 //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+    //                                   &sourceAttr))                          //__out  LPVOID lpFileInformation
 
-    if (!isSymlink(fileInfo))
-        return get64BitUInt(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
-    else
-    {
-        //open handle to target of symbolic link
-        const HANDLE hFile = ::CreateFile(applyLongPathPrefix(filepath).c_str(),                  //_In_      LPCTSTR lpFileName,
-                                          0,                                                      //_In_      DWORD dwDesiredAccess,
-                                          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
-                                          nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-                                          OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
-                                          FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
-                                          nullptr);                                               //_In_opt_  HANDLE hTemplateFile
-        if (hFile == INVALID_HANDLE_VALUE)
-            throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"CreateFile", getLastError());
-        ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
+    //open handle to target of symbolic link
+    const HANDLE hFile = ::CreateFile(applyLongPathPrefix(filepath).c_str(),                  //_In_      LPCTSTR lpFileName,
+                                      0,                                                      //_In_      DWORD dwDesiredAccess,
+                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                      nullptr,                                                //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                      OPEN_EXISTING,                                          //_In_      DWORD dwCreationDisposition,
+                                      FILE_FLAG_BACKUP_SEMANTICS, /*needed to open a directory*/ //_In_      DWORD dwFlagsAndAttributes,
+                                      nullptr);                                               //_In_opt_  HANDLE hTemplateFile
+    if (hFile == INVALID_HANDLE_VALUE)
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"CreateFile", getLastError());
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
-        BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
-        if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
-            throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"GetFileInformationByHandle", getLastError());
+    BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
+    if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"GetFileInformationByHandle", getLastError());
 
-        return get64BitUInt(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
-    }
+    return get64BitUInt(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
@@ -494,11 +554,11 @@ public:
         files_(files),
         dirs_(dirs) {}
 
-    virtual void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details)
+    void onFile(const Zchar* shortName, const Zstring& filepath, const FileInfo& details) override
     {
         files_.push_back(filepath);
     }
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details)
+    HandleLink onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override
     {
         if (dirExists(linkpath)) //dir symlink
             dirs_.push_back(shortName);
@@ -506,13 +566,13 @@ public:
             files_.push_back(shortName);
         return LINK_SKIP;
     }
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)
+    TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) override
     {
         dirs_.push_back(dirpath);
         return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
     }
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { throw FileError(msg); }
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { throw FileError(msg); }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { throw FileError(msg); }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { throw FileError(msg); }
 
 private:
     CollectFilesFlat           (const CollectFilesFlat&) = delete;
@@ -525,7 +585,7 @@ private:
 
 void removeDirectoryImpl(const Zstring& directory, //throw FileError
                          const std::function<void (const Zstring& filepath)>& onBeforeFileDeletion,
-                         const std::function<void (const Zstring& dirpath)>&  onBeforeDirDeletion)
+                         const std::function<void (const Zstring& dirpath )>& onBeforeDirDeletion)
 {
     assert(somethingExists(directory)); //[!]
 
@@ -592,7 +652,10 @@ void removeDirectoryImpl(const Zstring& directory, //throw FileError
 
 
 #ifdef ZEN_WIN
-void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const FILETIME& lastWriteTime, ProcSymlink procSl) //throw FileError
+void setFileTimeRaw(const Zstring& filepath,
+                    const FILETIME* creationTime, //optional
+                    const FILETIME& lastWriteTime,
+                    ProcSymlink procSl) //throw FileError
 {
     {
         //extra scope for debug check below
@@ -696,7 +759,7 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
         auto isNullTime = [](const FILETIME& ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
 
         if (!::SetFileTime(hFile,           //__in      HANDLE hFile,
-                           !isNullTime(creationTime) ? &creationTime : nullptr, //__in_opt  const FILETIME *lpCreationTime,
+                           creationTime,    //__in_opt  const FILETIME *lpCreationTime,
                            nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
                            &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
         {
@@ -736,8 +799,8 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
                             FILE_BASIC_INFO basicInfo = {}; //undocumented: file times of "0" stand for "don't change"
                             basicInfo.FileAttributes = FILE_ATTRIBUTE_NORMAL;        //[!] the bug in the ticket above requires we set this together with file times!!!
                             basicInfo.LastWriteTime = toLargeInteger(lastWriteTime); //
-                            if (!isNullTime(creationTime))
-                                basicInfo.CreationTime = toLargeInteger(creationTime);
+                            if (creationTime)
+                                basicInfo.CreationTime = toLargeInteger(*creationTime);
 
                             //set file time + attributes
                             setFileInfo(basicInfo); //throw FileError
@@ -759,7 +822,7 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
 
             //add more meaningful message: FAT accepts only a subset of the NTFS date range
             if (lastError == ERROR_INVALID_PARAMETER &&
-                dst::isFatDrive(filepath))
+                isFatDrive(filepath))
             {
                 //we need a low-level reliable routine to format a potentially invalid date => don't use strftime!!!
                 auto fmtDate = [](const FILETIME& ft) -> Zstring
@@ -800,7 +863,7 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
 
                 errorMsg += std::wstring(L"\nA FAT volume can only store dates between 1980 and 2107:\n") +
                             L"\twrite (UTC): \t" + fmtDate(lastWriteTime) +
-                            (!isNullTime(creationTime) ? L"\n\tcreate (UTC): \t" + fmtDate(creationTime) : L"");
+                            (creationTime ? L"\n\tcreate (UTC): \t" + fmtDate(*creationTime) : L"");
             }
 
             if (lastError != ERROR_SUCCESS)
@@ -827,8 +890,8 @@ void setFileTimeRaw(const Zstring& filepath, const FILETIME& creationTime, const
                          nullptr,
                          &lastWriteTimeDbg));
 
-	assert(std::abs(filetimeToTimeT(lastWriteTimeDbg) - filetimeToTimeT(lastWriteTime)) <= 2); //respect 2 second FAT/FAT32 precision
-	//assert(std::abs(filetimeToTimeT(creationTimeDbg ) - filetimeToTimeT(creationTime )) <= 2); -> creation time not available for Linux-hosted Samba shares!
+    assert(std::abs(filetimeToTimeT(lastWriteTimeDbg) - filetimeToTimeT(lastWriteTime)) <= 2); //respect 2 second FAT/FAT32 precision
+    //assert(std::abs(filetimeToTimeT(creationTimeDbg ) - filetimeToTimeT(creationTime )) <= 2); -> creation time not available for Linux-hosted Samba shares!
 #endif
 }
 #endif
@@ -849,22 +912,7 @@ void zen::removeDirectory(const Zstring& directory, //throw FileError
 void zen::setFileTime(const Zstring& filepath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
 {
 #ifdef ZEN_WIN
-    FILETIME creationTime  = {};
-    FILETIME lastWriteTime = timetToFileTime(modTime);
-
-    //####################################### DST hack ###########################################
-			warn_static("let's tentatively disable the DST hack:")
-#if 0
-    if (dst::isFatDrive(filepath)) //throw(); hacky: does not consider symlinks pointing to FAT!
-    {
-        const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTime); //throw std::runtime_error
-        creationTime  = encodedTime.createTimeRaw;
-        lastWriteTime = encodedTime.writeTimeRaw;
-    }
-#endif
-    //####################################### DST hack ###########################################
-
-    setFileTimeRaw(filepath, creationTime, lastWriteTime, procSl); //throw FileError
+    setFileTimeRaw(filepath, nullptr, timetToFileTime(modTime), procSl); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     //sigh, we can't use utimensat on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
@@ -878,7 +926,7 @@ void zen::setFileTime(const Zstring& filepath, std::int64_t modTime, ProcSymlink
 
     //=> fallback to "retarded-idiot version"! -- DarkByte
 
-	//OS X: utime() is obsoleted by utimes()! utimensat() not yet implemented
+    //OS X: utime() is obsoleted by utimes()! utimensat() not yet implemented
 
     struct ::timeval newTimes[2] = {};
     newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
@@ -1300,7 +1348,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
     if (!templateDir.empty())
     {
 #ifdef ZEN_WIN
-        //try to copy file attributes (dereference symlinks and junctions)
+        //optional: try to copy file attributes (dereference symlinks and junctions)
         const HANDLE hDirSrc = ::CreateFile(zen::applyLongPathPrefix(templateDir).c_str(),          //_In_      LPCTSTR lpFileName,
                                             0,                                                      //_In_      DWORD dwDesiredAccess,
                                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
@@ -1343,14 +1391,14 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
                     {
                         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
                         DWORD bytesReturned = 0;
-                        /*bool rv = */::DeviceIoControl(hDirTrg,               //handle to file or directory
-                                                        FSCTL_SET_COMPRESSION, //dwIoControlCode
-                                                        &cmpState,             //input buffer
-                                                        sizeof(cmpState),      //size of input buffer
-                                                        nullptr,               //lpOutBuffer
-                                                        0,                     //OutBufferSize
-                                                        &bytesReturned,        //number of bytes returned
-                                                        nullptr);              //OVERLAPPED structure
+                        /*bool rv = */::DeviceIoControl(hDirTrg,               //_In_         HANDLE hDevice,
+                                                        FSCTL_SET_COMPRESSION, //_In_         DWORD dwIoControlCode,
+                                                        &cmpState,             //_In_opt_     LPVOID lpInBuffer,
+                                                        sizeof(cmpState),      //_In_         DWORD nInBufferSize,
+                                                        nullptr,               //_Out_opt_    LPVOID lpOutBuffer,
+                                                        0,                     //_In_         DWORD nOutBufferSize,
+                                                        &bytesReturned,        //_Out_opt_    LPDWORD lpBytesReturned,
+                                                        nullptr);              //_Inout_opt_  LPOVERLAPPED lpOverlapped
                     }
 
                     //(try to) set creation and modification time
@@ -1385,12 +1433,12 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
         return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY);
     }();
 
-    //dynamically load windows API function
     typedef BOOLEAN (WINAPI* CreateSymbolicLinkFunc)(LPCTSTR lpSymlinkFileName, LPCTSTR lpTargetFileName, DWORD dwFlags);
     const SysDllFun<CreateSymbolicLinkFunc> createSymbolicLink(L"kernel32.dll", "CreateSymbolicLinkW");
 
     if (!createSymbolicLink)
-        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
+        throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtFileName(sourceLink)), L"%y", L"\n" + fmtFileName(targetLink)),
+		                           replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
 
     const wchar_t functionName[] = L"CreateSymbolicLinkW";
     if (!createSymbolicLink(targetLink.c_str(), //__in  LPTSTR lpSymlinkFileName, - seems no long path prefix is required...
@@ -1400,9 +1448,9 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     const wchar_t functionName[] = L"symlink";
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throwFileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), functionName, getLastError());
+        throwFileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtFileName(sourceLink)), L"%y", L"\n" + fmtFileName(targetLink)), functionName, getLastError());
 
-    //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
+    //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist!
     zen::ScopeGuard guardNewLink = zen::makeGuard([&]
     {
         try
@@ -1425,7 +1473,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
                                &sourceAttr))                            //__out  LPVOID lpFileInformation
         throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceLink)), L"GetFileAttributesEx", getLastError());
 
-    setFileTimeRaw(targetLink, sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, ProcSymlink::DIRECT); //throw FileError
+    setFileTimeRaw(targetLink, &sourceAttr.ftCreationTime, sourceAttr.ftLastWriteTime, ProcSymlink::DIRECT); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat srcInfo = {};
@@ -1547,7 +1595,7 @@ bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //thr
 void copyFileWindowsSparse(const Zstring& sourceFile,
                            const Zstring& targetFile,
                            const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus,
-                           InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+                           InSyncAttributes* newAttrib) //throw FileError, ErrorTargetExisting, ErrorFileLocked
 {
     assert(canCopyAsSparse(sourceFile, targetFile));
 
@@ -1626,8 +1674,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
             lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
             throw ErrorTargetExisting(errorMsg, errorDescr);
 
-        if (lastError == ERROR_PATH_NOT_FOUND)
-            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        //if (lastError == ERROR_PATH_NOT_FOUND) throw ErrorTargetPathMissing(errorMsg, errorDescr);
 
         throw FileError(errorMsg, errorDescr);
     }
@@ -1655,14 +1702,14 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     {
         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
         DWORD bytesReturned = 0;
-        if (!::DeviceIoControl(hFileTarget,           //handle to file or directory
-                               FSCTL_SET_COMPRESSION, //dwIoControlCode
-                               &cmpState,             //input buffer
-                               sizeof(cmpState),      //size of input buffer
-                               nullptr,               //lpOutBuffer
-                               0,                     //OutBufferSize
-                               &bytesReturned,        //number of bytes returned
-                               nullptr))              //OVERLAPPED structure
+        if (!::DeviceIoControl(hFileTarget,           //_In_         HANDLE hDevice,
+                               FSCTL_SET_COMPRESSION, //_In_         DWORD dwIoControlCode,
+                               &cmpState,             //_In_opt_     LPVOID lpInBuffer,
+                               sizeof(cmpState),      //_In_         DWORD nInBufferSize,
+                               nullptr,               //_Out_opt_    LPVOID lpOutBuffer,
+                               0,                     //_In_         DWORD nOutBufferSize,
+                               &bytesReturned,        //_Out_opt_    LPDWORD lpBytesReturned,
+                               nullptr))              //_Inout_opt_  LPOVERLAPPED lpOverlapped
         {} //may legitimately fail with ERROR_INVALID_FUNCTION if:
         // - target folder is encrypted
         // - target volume does not support compressed attribute -> unlikely in this context
@@ -1678,14 +1725,14 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //if (sourceIsSparse && targetSupportsSparse) -> no need to check, this is our precondition!
     {
         DWORD bytesReturned = 0;
-        if (!::DeviceIoControl(hFileTarget,      //handle to file
-                               FSCTL_SET_SPARSE, //dwIoControlCode
-                               nullptr,          //input buffer
-                               0,                //size of input buffer
-                               nullptr,          //lpOutBuffer
-                               0,                //OutBufferSize
-                               &bytesReturned,   //number of bytes returned
-                               nullptr))         //OVERLAPPED structure
+        if (!::DeviceIoControl(hFileTarget,      //_In_         HANDLE hDevice,
+                               FSCTL_SET_SPARSE, //_In_         DWORD dwIoControlCode,
+                               nullptr,          //_In_opt_     LPVOID lpInBuffer,
+                               0,                //_In_         DWORD nInBufferSize,
+                               nullptr,          //_Out_opt_    LPVOID lpOutBuffer,
+                               0,                //_In_         DWORD nOutBufferSize,
+                               &bytesReturned,   //_Out_opt_    LPDWORD lpBytesReturned,
+                               nullptr))         //_Inout_opt_  LPOVERLAPPED lpOverlapped
             throwFileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)), L"DeviceIoControl, FSCTL_SET_SPARSE", getLastError());
     }
 
@@ -1805,7 +1852,7 @@ public:
     //call context: copyCallbackInternal()
     void reportErrorShouldCopyAsSparse() { shouldCopyAsSparse = true; }
 
-    void reportUserException(const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus) { exceptionInUserCallback = onUpdateCopyStatus; }
+    void reportUserException(const std::exception_ptr& e) { exception = e; }
 
     void reportError(const std::wstring& msg, const std::wstring& description) { errorMsg = std::make_pair(msg, description); }
 
@@ -1815,11 +1862,8 @@ public:
         if (shouldCopyAsSparse)
             throw ErrorShouldCopyAsSparse(L"sparse dummy value");
 
-        if (exceptionInUserCallback)
-        {
-            exceptionInUserCallback(0); //should throw again!!!
-            assert(false);              //
-        }
+        if (exception)
+            std::rethrow_exception(exception);
 
         if (!errorMsg.first.empty())
             throw FileError(errorMsg.first, errorMsg.second);
@@ -1828,7 +1872,7 @@ public:
 private:
     bool shouldCopyAsSparse;                        //
     std::pair<std::wstring, std::wstring> errorMsg; //these are exclusive!
-    std::function<void(std::int64_t bytesDelta)> exceptionInUserCallback; // -> optional
+    std::exception_ptr exception;
 };
 
 
@@ -1924,15 +1968,16 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         {
             USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
             DWORD bytesReturned = 0;
-            if (!::DeviceIoControl(hDestinationFile,      //handle to file or directory
-                                   FSCTL_SET_COMPRESSION, //dwIoControlCode
-                                   &cmpState,             //input buffer
-                                   sizeof(cmpState),      //size of input buffer
-                                   nullptr,               //lpOutBuffer
-                                   0,                     //OutBufferSize
-                                   &bytesReturned,        //number of bytes returned
-                                   nullptr))              //OVERLAPPED structure
+            if (!::DeviceIoControl(hDestinationFile,      //_In_         HANDLE hDevice,
+                                   FSCTL_SET_COMPRESSION, //_In_         DWORD dwIoControlCode,
+                                   &cmpState,             //_In_opt_     LPVOID lpInBuffer,
+                                   sizeof(cmpState),      //_In_         DWORD nInBufferSize,
+                                   nullptr,               //_Out_opt_    LPVOID lpOutBuffer,
+                                   0,                     //_In_         DWORD nOutBufferSize,
+                                   &bytesReturned,        //_Out_opt_    LPDWORD lpBytesReturned
+                                   nullptr))              //_Inout_opt_  LPOVERLAPPED lpOverlapped
             {} //may legitimately fail with ERROR_INVALID_FUNCTION if
+
             // - if target folder is encrypted
             // - target volume does not support compressed attribute
             //#############################################################################
@@ -1949,9 +1994,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         }
         catch (...)
         {
-            //#warning migrate to std::exception_ptr when available
-
-            cbd.errorHandler.reportUserException(cbd.onUpdateCopyStatus_);
+            cbd.errorHandler.reportUserException(std::current_exception());
             return PROGRESS_CANCEL;
         }
     return PROGRESS_CONTINUE;
@@ -1965,7 +2008,7 @@ const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destinat
 void copyFileWindowsDefault(const Zstring& sourceFile,
                             const Zstring& targetFile,
                             const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus,
-                            InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
+                            InSyncAttributes* newAttrib) //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
 {
     //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
     try { activatePrivilege(SE_BACKUP_NAME); }
@@ -1979,7 +2022,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
 
     if (supportNonEncryptedDestination)
-        copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrytped location
+        copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrypted location
 
     //if (vistaOrLater()) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
     //  copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, huge improvement for large files (20% in test NTFS -> NTFS)
@@ -1989,13 +2032,12 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
     CallbackData cbd(onUpdateCopyStatus, sourceFile, targetFile);
 
-    const bool success = ::CopyFileEx( //same performance like CopyFile()
-                             applyLongPathPrefix(sourceFile).c_str(), //__in      LPCTSTR lpExistingFileName,
-                             applyLongPathPrefix(targetFile).c_str(), //__in      LPCTSTR lpNewFileName,
-                             copyCallbackInternal, //__in_opt  LPPROGRESS_ROUTINE lpProgressRoutine,
-                             &cbd,                 //__in_opt  LPVOID lpData,
-                             nullptr,              //__in_opt  LPBOOL pbCancel,
-                             copyFlags) != FALSE;  //__in      DWORD dwCopyFlags
+    const bool success = ::CopyFileEx(applyLongPathPrefix(sourceFile).c_str(), //__in      LPCTSTR lpExistingFileName,
+                                      applyLongPathPrefix(targetFile).c_str(), //__in      LPCTSTR lpNewFileName,
+                                      copyCallbackInternal, //__in_opt  LPPROGRESS_ROUTINE lpProgressRoutine,
+                                      &cbd,                 //__in_opt  LPVOID lpData,
+                                      nullptr,              //__in_opt  LPBOOL pbCancel,
+                                      copyFlags) != FALSE;  //__in      DWORD dwCopyFlags
 
     cbd.errorHandler.evaluateErrors(); //throw ?, process errors in callback first!
     if (!success)
@@ -2005,7 +2047,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
         //don't suppress "lastError == ERROR_REQUEST_ABORTED": a user aborted operation IS an error condition!
 
         //trying to copy huge sparse files may directly fail with ERROR_DISK_FULL before entering the callback function
-        if (canCopyAsSparse(sourceFile, targetFile)) //throw ()
+        if (canCopyAsSparse(sourceFile, targetFile)) //noexcept
             throw ErrorShouldCopyAsSparse(L"sparse dummy value2");
 
         //assemble error message...
@@ -2030,20 +2072,16 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             throw ErrorTargetExisting(errorMsg, errorDescr);
         }
 
-        if (lastError == ERROR_PATH_NOT_FOUND)
-        {
-            guardTarget.dismiss(); //not relevant
-            throw ErrorTargetPathMissing(errorMsg, errorDescr); //could this also be source path missing!?
-        }
+        //if (lastError == ERROR_PATH_NOT_FOUND) throw ErrorTargetPathMissing(errorMsg, errorDescr); //could this also be source path missing!?
 
         try //add more meaningful message
         {
             //trying to copy > 4GB file to FAT/FAT32 volume gives obscure ERROR_INVALID_PARAMETER (FAT can indeed handle files up to 4 Gig, tested!)
             if (lastError == ERROR_INVALID_PARAMETER &&
-                dst::isFatDrive(targetFile) &&
+                isFatDrive(targetFile) &&
                 getFilesize(sourceFile) >= 4U * std::uint64_t(1024U * 1024 * 1024)) //throw FileError
                 errorDescr += L"\nFAT volumes cannot store files larger than 4 gigabyte.";
-			//see "Limitations of the FAT32 File System": http://support.microsoft.com/kb/314463/en-us
+            //see "Limitations of the FAT32 File System": http://support.microsoft.com/kb/314463/en-us
 
             //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filepath is of a restricted type.
         }
@@ -2055,51 +2093,15 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     if (newAttrib)
     {
         newAttrib->fileSize         = get64BitUInt(cbd.fileInfoSrc.nFileSizeLow, cbd.fileInfoSrc.nFileSizeHigh);
-        //newAttrib->modificationTime = -> set further below
+        newAttrib->modificationTime = filetimeToTimeT(cbd.fileInfoSrc.ftLastWriteTime);
         newAttrib->sourceFileId     = extractFileId(cbd.fileInfoSrc);
         newAttrib->targetFileId     = extractFileId(cbd.fileInfoTrg);
     }
+    warn_static("new perf check + investigate improvements now that DST hcak is gone! =>")
 
-    {
-        FILETIME creationtime     = cbd.fileInfoSrc.ftCreationTime;
-        FILETIME lastWriteTimeRaw = cbd.fileInfoSrc.ftLastWriteTime;
-        //####################################### DST hack ###########################################
-			warn_static("let's tentatively disable the DST hack:")
-#if 0
-        if (dst::isFatDrive(sourceFile)) //throw(); hacky: does not consider symlinks pointing to FAT!
-        {
-            const dst::RawTime rawTime(creationtime, lastWriteTimeRaw);
-            if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
-            {
-                lastWriteTimeRaw = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
-                ::GetSystemTimeAsFileTime(&creationtime); //real creation time information is not available...
-            }
-        }
-#endif
-        //####################################### DST hack ###########################################
-
-        if (newAttrib)
-            newAttrib->modificationTime = filetimeToTimeT(lastWriteTimeRaw);
-
-        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we always need to set it again but with proper error checking!
-        //	      - perf-loss on USB sticks with many small files of about 30%!
-        FILETIME creationTimeOut  = creationtime;
-        FILETIME lastWriteTimeOut = lastWriteTimeRaw;
-
-        //####################################### DST hack ###########################################
-			warn_static("let's tentatively disable the DST hack:")
-#if 0
-        if (dst::isFatDrive(targetFile)) //throw(); target cannot be a symlink in this context!
-        {
-            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTimeRaw); //throw std::runtime_error
-            creationTimeOut  = encodedTime.createTimeRaw;
-            lastWriteTimeOut = encodedTime.writeTimeRaw;
-        }
-#endif
-        //####################################### DST hack ###########################################
-
-        setFileTimeRaw(targetFile, creationTimeOut, lastWriteTimeOut, ProcSymlink::FOLLOW); //throw FileError
-    }
+    //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we always need to set it again but with proper error checking!
+    //	      - perf-loss on USB sticks with many small files of about 30%!
+    setFileTimeRaw(targetFile, &cbd.fileInfoSrc.ftCreationTime, cbd.fileInfoSrc.ftLastWriteTime, ProcSymlink::FOLLOW); //throw FileError
 
     guardTarget.dismiss(); //target has been created successfully!
 }
@@ -2111,11 +2113,11 @@ void copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targ
 {
     try
     {
-        copyFileWindowsDefault(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw ErrorShouldCopyAsSparse et al.
+        copyFileWindowsDefault(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
     }
-    catch (ErrorShouldCopyAsSparse&) //we cheaply check for this condition within callback of ::CopyFileEx()!
+    catch (ErrorShouldCopyAsSparse&) //we quickly check for this condition within callback of ::CopyFileEx()!
     {
-        copyFileWindowsSparse(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr);
+        copyFileWindowsSparse(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     }
 }
 
@@ -2129,7 +2131,7 @@ void copyFileWindows(const Zstring& sourceFile,
 {
     try
     {
-        copyFileWindowsSelectRoutine(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+        copyFileWindowsSelectRoutine(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     }
     catch (const ErrorTargetExisting&)
     {
@@ -2149,22 +2151,19 @@ void copyFileWindows(const Zstring& sourceFile,
 void copyFileLinuxMac(const Zstring& sourceFile,
                       const Zstring& targetFile,
                       const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus,
-                      InSyncAttributes* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+                      InSyncAttributes* newAttrib) //throw FileError, ErrorTargetExisting
 {
-    //open sourceFile for reading
     FileInputUnbuffered fileIn(sourceFile); //throw FileError
 
     struct ::stat sourceInfo = {};
-    if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
+    if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0)
         throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), L"fstat", getLastError());
 
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: place guard before lifetime of FileOutput
     try
     {
-        //create targetFile and open it for writing
-        FileOutputUnbuffered fileOut(targetFile, sourceInfo.st_mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+        FileOutputUnbuffered fileOut(targetFile, sourceInfo.st_mode); //throw FileError, ErrorTargetExisting
 
-        //copy contents of sourceFile to targetFile
         std::vector<char> buffer(128 * 1024); //see comment in FileInputUnbuffered::read
         do
         {
@@ -2172,7 +2171,6 @@ void copyFileLinuxMac(const Zstring& sourceFile,
 
             fileOut.write(&buffer[0], bytesRead); //throw FileError
 
-            //invoke callback method to update progress indicators
             if (onUpdateCopyStatus)
                 onUpdateCopyStatus(bytesRead); //throw X!
         }
@@ -2229,20 +2227,31 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsSparse(::BackupRead/::Backu
 inline
 void copyFileSelectOs(const Zstring& sourceFile,
                       const Zstring& targetFile,
+                      bool copyFilePermissions,
                       const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus,
                       InSyncAttributes* sourceAttr)
 {
 #ifdef ZEN_WIN
-    copyFileWindows(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+    copyFileWindows(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    copyFileLinuxMac(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    copyFileLinuxMac(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting
 #endif
+
+    if (copyFilePermissions)
+    {
+        //at this point we know we created a new file, so it's fine to delete it for cleanup!
+        zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {}});
+
+        copyObjectPermissions(sourceFile, targetFile, ProcSymlink::FOLLOW); //throw FileError
+
+        guardTargetFile.dismiss(); //target has been created successfully!
+    }
 }
 }
 
 
-void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissing, ErrorFileLocked
+void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorFileLocked
                    const Zstring& targetFile,
                    bool copyFilePermissions,
                    bool transactionalCopy,
@@ -2252,13 +2261,12 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
 {
     if (transactionalCopy)
     {
-        Zstring tmpTarget = targetFile + TEMP_FILE_ENDING; //use temporary file until a correct date has been set
+        Zstring tmpTarget = targetFile + TEMP_FILE_ENDING;
 
-        //raw file copy
         for (int i = 0;; ++i)
             try
             {
-                copyFileSelectOs(sourceFile, tmpTarget, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+                copyFileSelectOs(sourceFile, tmpTarget, copyFilePermissions, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked
                 break;
             }
             catch (const ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
@@ -2274,7 +2282,6 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         if (onDeleteTargetFile)
             onDeleteTargetFile(); //throw X
 
-        //rename temporary file:
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
         renameFile(tmpTarget, targetFile); //throw FileError
 
@@ -2284,45 +2291,23 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         This "feature" is called "File System Tunneling":
         http://blogs.msdn.com/b/oldnewthing/archive/2005/07/15/439261.aspx
         http://support.microsoft.com/kb/172190/en-us
-
-        However during the next comparison the DST hack will be applied correctly since the DST-hash of the mod.time is invalid.
-
-        EXCEPTION: the hash may match!!! reproduce:
-        1. set system time back to date within previous DST
-        2. save some file on FAT32 usb stick and FFS-compare to make sure the DST hack is applied correctly
-        4. pull out usb stick, put back in
-        3. restore system time
-        4. copy file from USB to local drive via explorer
-        =>
-        NTFS <-> FAT, file exists on both sides; mod times match, DST hack on USB stick causes 1-hour offset when comparing in FFS.
-        When syncing, modification time is copied correctly, but new DST hack fails to apply and old creation time is reused (see above).
-        Unfortunately, the old DST hash matches mod time! => On next comparison FFS will *still* see both sides as different!!!!!!!!!
         */
 
         guardTempFile.dismiss();
     }
     else
     {
+        /*
+           Note: non-transactional file copy solves at least four problems:
+            	-> skydrive - doesn't allow for .ffs_tmp extension and returns ERROR_INVALID_PARAMETER
+            	-> network renaming issues
+            	-> allow for true delete before copy to handle low disk space problems
+            	-> higher performance on non-buffered drives (e.g. usb sticks)
+        */
+
         if (onDeleteTargetFile)
             onDeleteTargetFile();
 
-        copyFileSelectOs(sourceFile, targetFile, onUpdateCopyStatus, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
-    }
-    /*
-       Note: non-transactional file copy solves at least four problems:
-        	-> skydrive - doesn't allow for .ffs_tmp extension and returns ERROR_INVALID_PARAMETER
-        	-> network renaming issues
-        	-> allow for true delete before copy to handle low disk space problems
-        	-> higher performance on non-buffered drives (e.g. usb sticks)
-    */
-
-    //file permissions
-    if (copyFilePermissions)
-    {
-        zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {}});
-
-        copyObjectPermissions(sourceFile, targetFile, ProcSymlink::FOLLOW); //throw FileError
-
-        guardTargetFile.dismiss(); //target has been created successfully!
+        copyFileSelectOs(sourceFile, targetFile, copyFilePermissions, onUpdateCopyStatus, sourceAttr); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     }
 }

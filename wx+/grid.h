@@ -39,7 +39,7 @@ extern const wxEventType EVENT_GRID_SELECT_RANGE; //generates: GridRangeSelectEv
 struct GridClickEvent : public wxMouseEvent
 {
     GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, ColumnType colType) : wxMouseEvent(me), row_(row), colType_(colType) { SetEventType(et); }
-    virtual wxEvent* Clone() const { return new GridClickEvent(*this); }
+    wxEvent* Clone() const override { return new GridClickEvent(*this); }
 
     const ptrdiff_t row_; //-1 for invalid position, >= rowCount if out of range
     const ColumnType colType_; //may be DUMMY_COLUMN_TYPE
@@ -48,7 +48,7 @@ struct GridClickEvent : public wxMouseEvent
 struct GridColumnResizeEvent : public wxCommandEvent
 {
     GridColumnResizeEvent(int offset, ColumnType colType) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset) {}
-    virtual wxEvent* Clone() const { return new GridColumnResizeEvent(*this); }
+    wxEvent* Clone() const override { return new GridColumnResizeEvent(*this); }
 
     const ColumnType colType_;
     const int        offset_;
@@ -57,7 +57,7 @@ struct GridColumnResizeEvent : public wxCommandEvent
 struct GridRangeSelectEvent : public wxCommandEvent
 {
     GridRangeSelectEvent(size_t rowFirst, size_t rowLast, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), positive_(positive), rowFirst_(rowFirst), rowLast_(rowLast) { assert(rowFirst <= rowLast); }
-    virtual wxEvent* Clone() const { return new GridRangeSelectEvent(*this); }
+    wxEvent* Clone() const override { return new GridRangeSelectEvent(*this); }
 
     const bool   positive_; //"false" when clearing selection!
     const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
@@ -92,10 +92,10 @@ public:
 
     //grid area
     virtual wxString getValue(size_t row, ColumnType colType) const = 0;
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row,                     bool enabled, bool selected); //default implementation
-    virtual void renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected); //
-    virtual int  getBestSize       (wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
-    virtual wxString getToolTip(size_t row, ColumnType colType) const { return wxString(); }
+    virtual void     renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row,                     bool enabled, bool selected); //default implementation
+    virtual void     renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected); //
+    virtual int      getBestSize       (wxDC& dc, size_t row, ColumnType colType                                                 ); //must correspond to renderCell()!
+    virtual wxString getToolTip        (size_t row, ColumnType colType) const { return wxString(); }
 
     //label area
     virtual wxString getColumnLabel(ColumnType colType) const = 0;
@@ -191,8 +191,8 @@ public:
 
     void scrollTo(size_t row);
 
-    virtual void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr);
-    virtual bool Enable( bool enable = true) { Refresh(); return wxScrolledWindow::Enable(enable); }
+    void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr) override;
+    bool Enable( bool enable = true) override { Refresh(); return wxScrolledWindow::Enable(enable); }
     //############################################################################################################
 
 private:
@@ -208,10 +208,10 @@ private:
 
     void redirectRowLabelEvent(wxMouseEvent& event);
 
-    virtual wxSize GetSizeAvailableForScrollTarget(const wxSize& size); //required since wxWidgets 2.9 if SetTargetWindow() is used
+    wxSize GetSizeAvailableForScrollTarget(const wxSize& size) override; //required since wxWidgets 2.9 if SetTargetWindow() is used
 
 #if defined ZEN_WIN || defined ZEN_MAC
-    virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
+    void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh) override; //get rid of scrollbars, but preserve scrolling behavior!
 #endif
 
     int getBestColumnSize(size_t col) const; //return -1 on error

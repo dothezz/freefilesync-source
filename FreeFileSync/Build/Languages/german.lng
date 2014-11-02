@@ -7,6 +7,15 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Der Symbolische Link %x kann nicht nach %y kopiert werden.</target>
+
+<source>Unable to connect to freefilesync.org.</source>
+<target>Es kann keine Verbindung zu freefilesync.org aufgebaut werden.</target>
+
+<source>Open configuration for edit without executing.</source>
+<target>Konfiguration zum Editieren öffnen ohne auszuführen.</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -217,6 +226,9 @@
 <source>%x GB</source>
 <target>%x GB</target>
 
+<source>Cannot load file %x.</source>
+<target>Die Datei %x kann nicht geladen werden.</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Die Datenbankdatei %x ist nicht kompatibel.</target>
 
@@ -268,6 +280,9 @@
 <source>Creating file %x</source>
 <target>Erstelle Datei %x</target>
 
+<source>Saving log file %x...</source>
+<target>Speichere Protokolldatei %x...</target>
+
 <source>Items processed:</source>
 <target>Verarbeitete Elemente:</target>
 
@@ -295,9 +310,6 @@
 <pluralform>%x Threads</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Speichere erweiterte Zeitinformation: %x</target>
-
 <source>/sec</source>
 <target>/sek</target>
 
@@ -318,9 +330,6 @@
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Bitte benutzen Sie die FreeFileSync 64-Bit Version, um Schattenkopien auf diesem System zu erstellen.</target>
-
-<source>Cannot load file %x.</source>
-<target>Die Datei %x kann nicht geladen werden.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Der Laufwerksname für %x kann nicht bestimmt werden.</target>
@@ -498,20 +507,20 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Verifizierungsfehler: %x und %y haben unterschiedlichen Inhalt.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Der Ordner %x wurde nicht gefunden.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Der Zielordner %x existiert bereits.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Der Ordner %x wurde nicht gefunden.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Das Eingabefeld für den Zielordner darf nicht leer sein.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Bitte geben Sie einen Zielorder für die Versionierung ein.</target>
-
 <source>Source folder %x not found.</source>
 <target>Der Quellordner %x wurde nicht gefunden.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Bitte geben Sie einen Zielorder für die Versionierung ein.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Die folgenden Elemente haben ungelöste Konflikte und werden nicht synchronisiert werden:</target>
@@ -554,9 +563,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Synchronization completed successfully</source>
 <target>Synchronisation erfolgreich abgeschlossen</target>
-
-<source>Saving log file %x...</source>
-<target>Speichere Protokolldatei %x...</target>
 
 <source>Stopped</source>
 <target>Unterbrochen</target>
@@ -608,9 +614,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync ist auf dem neuesten Stand.</target>
-
-<source>Unable to connect to sourceforge.net.</source>
-<target>Es kann keine Verbindung zu Sourceforge.net aufgebaut werden.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Möchten Sie manuell prüfen?</target>
@@ -837,23 +840,23 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>C&lear</source>
-<target>&Löschen</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Wählen Sie Filterregeln aus, um einzelne Dateien von der Synchronisation auszuschließen. Geben Sie Dateipfade relativ zu ihrem zugehörigen Ordnerpaar an.</target>
+
+<source>C&lear</source>
+<target>&Löschen</target>
 
 <source>Detect moved files</source>
 <target>Verschobene Dateien erkennen</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
+- Erkennung nach erstmaliger Synchronisation aktiv.
 - Benötigt und erstellt Datenbankdateien.
-- Erst nach einmaliger Synchronisation aktiv.
 - Wird nicht von allen Dateisystemen unterstützt.
 </target>
 
@@ -1067,11 +1070,11 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>View Settings</source>
 <target>Ansichtseinstellungen</target>
 
-<source>Overview</source>
-<target>Übersicht</target>
-
 <source>Configuration</source>
 <target>Konfiguration</target>
+
+<source>Overview</source>
+<target>Übersicht</target>
 
 <source>Main Bar</source>
 <target>Hauptleiste</target>
@@ -1451,9 +1454,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot monitor directory %x.</source>
 <target>Das Verzeichnis %x kann nicht überwacht werden.</target>
 
-<source>Conversion error:</source>
-<target>Fehler bei Konvertierung:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Die Datei %x kann nicht gelöscht werden.</target>
 
@@ -1486,9 +1486,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Cannot create directory %x.</source>
 <target>Das Verzeichnis %x kann nicht erstellt werden.</target>
-
-<source>Cannot create symbolic link %x.</source>
-<target>Der Symbolische Link %x kann nicht erstellt werden.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Die Systemfunktion %x wurde nicht gefunden.</target>

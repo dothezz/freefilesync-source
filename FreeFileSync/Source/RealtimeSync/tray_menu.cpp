@@ -122,7 +122,7 @@ private:
         CONTEXT_ABORT = wxID_EXIT
     };
 
-    virtual wxMenu* CreatePopupMenu()
+    wxMenu* CreatePopupMenu() override
     {
         wxMenu* contextMenu = new wxMenu;
 
@@ -268,7 +268,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
         MonitorCallbackImpl(const wxString& jobname,
                             const Zstring& cmdLine) : trayIcon(jobname), cmdLine_(cmdLine) {}
 
-        virtual void setPhase(WatchPhase mode)
+        void setPhase(WatchPhase mode) override
         {
             switch (mode)
             {
@@ -281,12 +281,12 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
             }
         }
 
-        virtual void executeExternalCommand()
+        void executeExternalCommand() override
         {
             auto cmdLineExp = expandMacros(cmdLine_);
             try
             {
-                shellExecute2(cmdLineExp, EXEC_TYPE_SYNC); //throw FileError
+                shellExecute(cmdLineExp, EXEC_TYPE_SYNC); //throw FileError
             }
             catch (const FileError& e)
             {
@@ -294,19 +294,19 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
             }
         }
 
-        virtual void requestUiRefresh()
+        void requestUiRefresh() override
         {
             if (updateUiIsAllowed())
                 trayIcon.doUiRefreshNow(); //throw AbortMonitoring
         }
 
-        virtual void reportError(const std::wstring& msg)
+        void reportError(const std::wstring& msg) override
         {
             trayIcon.setMode(TRAY_MODE_ERROR);
             trayIcon.clearShowErrorRequested();
 
             //wait for some time, then return to retry
-            assert_static(15 * 1000 % UI_UPDATE_INTERVAL == 0);
+            static_assert(15 * 1000 % UI_UPDATE_INTERVAL == 0, "");
             for (int i = 0; i < 15 * 1000 / UI_UPDATE_INTERVAL; ++i)
             {
                 trayIcon.doUiRefreshNow(); //throw AbortMonitoring

@@ -9,6 +9,7 @@
 #ifdef ZEN_WIN
 #include <zen/dll.h>
 #include <zen/win_ver.h>
+#include <zen/stl_tools.h>
 #include "../dll/Taskbar_Seven/taskbar.h"
 
 #elif defined HAVE_UBUNTU_UNITY
@@ -169,7 +170,7 @@ public:
 
 //########################################################################################################
 
-Taskbar::Taskbar(const wxFrame& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
+Taskbar::Taskbar(const wxFrame& window) : pimpl_(zen::make_unique<Pimpl>(window)) {} //throw TaskbarNotAvailable
 Taskbar::~Taskbar() {}
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }

@@ -67,16 +67,16 @@ HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
 class NullFilter : public HardFilter  //no filtering at all
 {
 public:
-    virtual bool passFileFilter(const Zstring& relFilename) const;
-    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
-    virtual bool isNull() const;
+    bool passFileFilter(const Zstring& relFilename) const override;
+    bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const override;
+    bool isNull() const override;
 
 private:
     friend class HardFilter;
-    //    virtual void save(ZstreamOut& stream) const {}
-    virtual std::string uniqueClassIdentifier() const { return "NullFilter"; }
+    //    void save(ZstreamOut& stream) const override {}
+    std::string uniqueClassIdentifier() const override { return "NullFilter"; }
     //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
-    virtual bool cmpLessSameType(const HardFilter& other) const;
+    bool cmpLessSameType(const HardFilter& other) const override;
 };
 
 
@@ -85,18 +85,18 @@ class NameFilter : public HardFilter  //standard filter by filepath
 public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);
 
-    virtual bool passFileFilter(const Zstring& relFilename) const;
-    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
+    bool passFileFilter(const Zstring& relFilename) const override;
+    bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const override;
 
-    virtual bool isNull() const;
+    bool isNull() const override;
     static bool isNull(const Zstring& includeFilter, const Zstring& excludeFilter); //*fast* check without expensively constructing NameFilter instance!
 
 private:
     friend class HardFilter;
-    //    virtual void save(ZstreamOut& stream) const;
-    virtual std::string uniqueClassIdentifier() const { return "NameFilter"; }
+    //    void save(ZstreamOut& stream) const override;
+    std::string uniqueClassIdentifier() const override { return "NameFilter"; }
     //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
-    virtual bool cmpLessSameType(const HardFilter& other) const;
+    bool cmpLessSameType(const HardFilter& other) const override;
 
     std::vector<Zstring> filterFileIn;   //
     std::vector<Zstring> filterFolderIn; //upper case (windows) + unique items by construction
@@ -113,16 +113,16 @@ class CombinedFilter : public HardFilter  //combine two filters to match if and 
 public:
     CombinedFilter(const FilterRef& first, const FilterRef& second) : first_(first), second_(second) {}
 
-    virtual bool passFileFilter(const Zstring& relFilename) const;
-    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
-    virtual bool isNull() const;
+    bool passFileFilter(const Zstring& relFilename) const override;
+    bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const override;
+    bool isNull() const override;
 
 private:
     friend class HardFilter;
-    //    virtual void save(ZstreamOut& stream) const;
-    virtual std::string uniqueClassIdentifier() const { return "CombinedFilter"; }
+    //    void save(ZstreamOut& stream) const override;
+    std::string uniqueClassIdentifier() const override { return "CombinedFilter"; }
     //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
-    virtual bool cmpLessSameType(const HardFilter& other) const;
+    bool cmpLessSameType(const HardFilter& other) const override;
 
     const FilterRef first_;
     const FilterRef second_;

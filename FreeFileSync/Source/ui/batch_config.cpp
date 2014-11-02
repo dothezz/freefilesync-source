@@ -40,16 +40,16 @@ public:
                 size_t onCompletionHistoryMax);
 
 private:
-    virtual void OnClose       (wxCloseEvent&   event) { EndModal(BUTTON_CANCEL); }
-    virtual void OnCancel      (wxCommandEvent& event) { EndModal(BUTTON_CANCEL); }
-    virtual void OnSaveBatchJob(wxCommandEvent& event);
-    virtual void OnErrorPopup (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
-    virtual void OnErrorIgnore(wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
-    virtual void OnErrorStop  (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
-    virtual void OnHelpScheduleBatch(wxHyperlinkEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
+    void OnClose       (wxCloseEvent&   event) override { EndModal(BUTTON_CANCEL); }
+    void OnCancel      (wxCommandEvent& event) override { EndModal(BUTTON_CANCEL); }
+    void OnSaveBatchJob(wxCommandEvent& event) override;
+    void OnErrorPopup  (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
+    void OnErrorIgnore (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
+    void OnErrorStop   (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
+    void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
 
-    virtual void OnToggleGenerateLogfile(wxCommandEvent& event) { updateGui(); }
-    virtual void OnToggleLogfilesLimit  (wxCommandEvent& event) { updateGui(); }
+    void OnToggleGenerateLogfile(wxCommandEvent& event) override { updateGui(); }
+    void OnToggleLogfilesLimit  (wxCommandEvent& event) override { updateGui(); }
 
     void updateGui(); //re-evaluate gui after config changes
 

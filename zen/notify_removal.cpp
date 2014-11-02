@@ -169,7 +169,7 @@ private:
     Pimpl           (const Pimpl&) = delete;
     Pimpl& operator=(const Pimpl&) = delete;
 
-    virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) //throw()!
+    void onMessage(UINT message, WPARAM wParam, LPARAM lParam) override //throw()!
     {
         //DBT_DEVICEQUERYREMOVE example: http://msdn.microsoft.com/en-us/library/aa363427(v=VS.85).aspx
         if (message == WM_DEVICECHANGE)
@@ -205,10 +205,7 @@ private:
 
 //####################################################################################################
 
-NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(HANDLE hDir)
-{
-    pimpl.reset(new Pimpl(*this, hDir));
-}
+NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(HANDLE hDir) : pimpl(zen::make_unique<Pimpl>(*this, hDir)) {}
 
 
 NotifyRequestDeviceRemoval::~NotifyRequestDeviceRemoval() {} //make sure ~unique_ptr() works with complete type

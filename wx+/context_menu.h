@@ -28,7 +28,7 @@ namespace zen
 class ContextMenu : private wxEvtHandler
 {
 public:
-    ContextMenu() : menu(new wxMenu) {}
+    ContextMenu() : menu(zen::make_unique<wxMenu>()) {}
 
     void addItem(const wxString& label, const std::function<void()>& command, const wxBitmap* bmp = nullptr, bool enabled = true)
     {

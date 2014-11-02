@@ -26,7 +26,7 @@ static const char LINE_BREAK[] = "\r\n";
 static const char LINE_BREAK[] = "\n"; //since OS X apple uses newline, too
 #endif
 
-//buffered file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
+//buffered file IO optimized for sequential read/write accesses + better error reporting + long path support + following symlinks
 
 #ifdef ZEN_WIN
 typedef HANDLE FileHandle;
@@ -41,8 +41,7 @@ public:
     FileInput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileInput();
 
-    virtual size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
-    //expected to fill buffer completely unless "end of file"
+    size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
 
 private:
     FileHandle fileHandle;
@@ -52,17 +51,19 @@ private:
 class FileOutput : public FileOutputBase
 {
 public:
-    FileOutput(const Zstring& filepath, AccessFlag access); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutput(const Zstring& filepath, AccessFlag access); //throw FileError, ErrorTargetExisting
     FileOutput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileOutput();
 
-    virtual void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
+    void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
 
 private:
     FileHandle fileHandle;
 };
 
 #if defined ZEN_LINUX || defined ZEN_MAC
+warn_static("get rid of FileInputUnbuffered/FileOutputUnbuffered, use fdopen instead")
+
 class FileInputUnbuffered : public FileInputBase
 {
 public:
@@ -70,7 +71,7 @@ public:
     ~FileInputUnbuffered();
 
     //considering safe-read.c it seems buffer size should be a multiple of 8192
-    virtual size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
+    size_t read(void* buffer, size_t bytesToRead) override; //throw FileError; returns actual number of bytes read
     //do NOT rely on partially filled buffer meaning EOF!
 
     int getDescriptor() { return fdFile;}
@@ -83,11 +84,11 @@ class FileOutputUnbuffered : public FileOutputBase
 {
 public:
     //creates a new file (no overwrite allowed!)
-    FileOutputUnbuffered(const Zstring& filepath, mode_t mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutputUnbuffered(const Zstring& filepath, mode_t mode); //throw FileError, ErrorTargetExisting
     FileOutputUnbuffered(int fd, const Zstring& filepath); //takes ownership!
     ~FileOutputUnbuffered();
 
-    virtual void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
+    void write(const void* buffer, size_t bytesToWrite) override; //throw FileError
     int getDescriptor() { return fdFile;}
 
 private:

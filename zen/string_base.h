@@ -21,7 +21,7 @@ namespace zen
 Allocator Policy:
 -----------------
     void* allocate(size_t size) //throw std::bad_alloc
-    void deallocate(void* ptr)  //must handle deallocate(nullptr)!
+    void deallocate(void* ptr)
     size_t calcCapacity(size_t length)
 */
 class AllocatorOptimalSpeed //exponential growth + min size
@@ -53,7 +53,7 @@ template <typename Char, //Character Type
     Char* create(size_t size)
     Char* create(size_t size, size_t minCapacity)
     Char* clone(Char* ptr)
-    void destroy(Char* ptr) //must handle destroy(nullptr)!
+    void destroy(Char* ptr) //must handle "destroy(nullptr)"!
     bool canWrite(const Char* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
     size_t length(const Char* ptr)
     void setLength(Char* ptr, size_t newLength)
@@ -66,29 +66,34 @@ class StorageDeepCopy : public AP
 protected:
     ~StorageDeepCopy() {}
 
-    static Char* create(size_t size) { return create(size, size); }
-    static Char* create(size_t size, size_t minCapacity)
+    Char* create(size_t size) { return create(size, size); }
+    Char* create(size_t size, size_t minCapacity)
     {
         assert(size <= minCapacity);
         const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
 
-        Descriptor* const newDescr = static_cast<Descriptor*>(AP::allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char)));
-
-        newDescr->length   = size;
-        newDescr->capacity = newCapacity;
+        Descriptor* const newDescr = static_cast<Descriptor*>(this->allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char))); //throw std::bad_alloc
+		new (newDescr) Descriptor(size, newCapacity);
 
         return reinterpret_cast<Char*>(newDescr + 1); //alignment note: "newDescr + 1" is Descriptor-aligned, which is larger than alignment for Char-array! => no problem!
     }
 
-    static Char* clone(Char* ptr)
+    Char* clone(Char* ptr)
     {
-        Char* newData = create(length(ptr));
+        Char* newData = create(length(ptr)); //throw std::bad_alloc
         std::copy(ptr, ptr + length(ptr) + 1, newData);
         return newData;
     }
 
-    static void destroy(Char* ptr) { AP::deallocate(descr(ptr)); } //should support destroy(nullptr)!
+    void destroy(Char* ptr) 
+	{ 
+        if (!ptr) return; //support "destroy(nullptr)"
+
+		Descriptor* const d = descr(ptr);
+		d->~Descriptor();
+		this->deallocate(d); 
+	}
 
     //this needs to be checked before writing to "ptr"
     static bool canWrite(const Char* ptr, size_t minCapacity) { return minCapacity <= descr(ptr)->capacity; }
@@ -103,6 +108,10 @@ protected:
 private:
     struct Descriptor
     {
+        Descriptor(size_t len, size_t cap) :
+            length  (static_cast<std::uint32_t>(len)),
+            capacity(static_cast<std::uint32_t>(cap)) {}
+
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
     };
@@ -119,42 +128,44 @@ class StorageRefCountThreadSafe : public AP
 protected:
     ~StorageRefCountThreadSafe() {}
 
-    static Char* create(size_t size) { return create(size, size); }
-    static Char* create(size_t size, size_t minCapacity)
+    Char* create(size_t size) { return create(size, size); }
+    Char* create(size_t size, size_t minCapacity)
     {
         assert(size <= minCapacity);
 
         const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
 
-        Descriptor* const newDescr = static_cast<Descriptor*>(AP::allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char)));
-        new (newDescr) Descriptor(1, size, newCapacity);
+        Descriptor* const newDescr = static_cast<Descriptor*>(this->allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char))); //throw std::bad_alloc
+        new (newDescr) Descriptor(size, newCapacity);
 
         return reinterpret_cast<Char*>(newDescr + 1);
     }
 
     static Char* clone(Char* ptr)
     {
-        assert(descr(ptr)->refCount > 0);
         ++descr(ptr)->refCount;
         return ptr;
     }
 
-    static void destroy(Char* ptr)
+    void destroy(Char* ptr)
     {
-        if (!ptr) return; //support destroy(nullptr)
-        assert(descr(ptr)->refCount > 0);
-        if (--descr(ptr)->refCount == 0) //operator--() is overloaded to decrement and evaluate in a single atomic operation!
+        if (!ptr) return; //support "destroy(nullptr)"
+
+        Descriptor* const d = descr(ptr);
+
+        if (--(d->refCount) == 0) //operator--() is overloaded to decrement and evaluate in a single atomic operation!
         {
-            descr(ptr)->~Descriptor();
-            AP::deallocate(descr(ptr));
+            d->~Descriptor();
+            this->deallocate(d);
         }
     }
 
     static bool canWrite(const Char* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
     {
-        assert(descr(ptr)->refCount > 0);
-        return descr(ptr)->refCount == 1 && minCapacity <= descr(ptr)->capacity;
+        const Descriptor* const d = descr(ptr);
+		assert(d->refCount > 0);
+        return d->refCount == 1 && minCapacity <= d->capacity;
     }
 
     static size_t length(const Char* ptr) { return descr(ptr)->length; }
@@ -168,14 +179,14 @@ protected:
 private:
     struct Descriptor
     {
-        Descriptor(int rc, size_t len, size_t cap) :
+        Descriptor(size_t len, size_t cap) :
+			refCount(1),
             length  (static_cast<std::uint32_t>(len)),
-            capacity(static_cast<std::uint32_t>(cap)),
-            refCount(rc) { assert_static(ATOMIC_INT_LOCK_FREE == 2); } //2: "the types are always lock-free"
+            capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "the types are always lock-free"
 
+        std::atomic<unsigned int> refCount;
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
-        std::atomic<int> refCount; //practically no perf loss: ~0.2%! (FFS comparison)
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
@@ -237,7 +248,7 @@ public:
     Zbase& assign(const Char* source, size_t len);
     Zbase& append(const Char* source, size_t len);
     void resize(size_t newSize, Char fillChar = 0);
-    void swap(Zbase& other);
+    void swap(Zbase& other); //make noexcept in C++11
     void push_back(Char val) { operator+=(val); } //STL access
 
     Zbase& operator=(const Zbase& source);
@@ -251,10 +262,10 @@ public:
     static const size_t	npos = static_cast<size_t>(-1);
 
 private:
-    Zbase(int);             //
-    Zbase& operator=(int);  //detect usage errors by creating an intentional ambiguity with "Char"
-    Zbase& operator+=(int); //
-    void push_back(int);    //
+    Zbase            (int) = delete; //
+    Zbase& operator= (int) = delete; //detect usage errors by creating an intentional ambiguity with "Char"
+    Zbase& operator+=(int) = delete; //
+    void   push_back (int) = delete; //
 
     Char* rawStr;
 };
@@ -626,8 +637,7 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(const Zbase<Char, SP, AP>& o
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP>&& tmp)
 {
-    //don't use unifying assignment but save one move-construction in the r-value case instead!
-    swap(tmp);
+    swap(tmp); //don't use unifying assignment but save one move-construction in the r-value case instead!
     return *this;
 }
 

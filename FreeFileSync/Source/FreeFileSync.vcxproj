@@ -208,7 +208,7 @@
     <ClCompile Include="..\..\wx+\tooltip.cpp" />
     <ClCompile Include="..\..\wx+\zlib_wrap.cpp" />
     <ClCompile Include="..\..\zen\dst_hack.cpp" />
-    <ClCompile Include="..\..\zen\file_handling.cpp" />
+    <ClCompile Include="..\..\zen\file_access.cpp" />
     <ClCompile Include="..\..\zen\file_io.cpp" />
     <ClCompile Include="..\..\zen\file_traverser.cpp" />
     <ClCompile Include="..\..\zen\format_unit.cpp" />

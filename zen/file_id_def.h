@@ -8,7 +8,6 @@
 #define FILE_ID_INTERNAL_HEADER_013287632486321493
 
 #include <utility>
-#include "assert_static.h"
 
 #ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
@@ -44,9 +43,9 @@ FileId extractFileId(DWORD volumeSerialNumber, ULONGLONG fileIndex)
            FileId(volumeSerialNumber, fileIndex) : FileId();
 }
 
-assert_static(sizeof(FileId().first ) == sizeof(BY_HANDLE_FILE_INFORMATION().dwVolumeSerialNumber));
-assert_static(sizeof(FileId().second) == sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexHigh) + sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexLow));
-assert_static(sizeof(FileId().second) == sizeof(ULARGE_INTEGER));
+static_assert(sizeof(FileId().first ) == sizeof(BY_HANDLE_FILE_INFORMATION().dwVolumeSerialNumber), "");
+static_assert(sizeof(FileId().second) == sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexHigh) + sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexLow), "");
+static_assert(sizeof(FileId().second) == sizeof(ULARGE_INTEGER), "");
 
 
 #elif defined ZEN_LINUX || defined ZEN_MAC

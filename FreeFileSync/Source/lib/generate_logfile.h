@@ -29,13 +29,42 @@ struct SummaryInfo
 
 void saveLogToFile(const SummaryInfo& summary, //throw FileError
                    const ErrorLog& log,
-                   FileOutput& fileOut);
+                   FileOutput& fileOut,
+                   const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus);
 
 void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
                         const ErrorLog& log,
-                        size_t maxBytesToWrite);
+                        size_t maxBytesToWrite,
+                        const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus);
+
+Zstring getLastSyncsLogfilePath();
 
 
+
+struct OnUpdateLogfileStatusNoThrow
+{
+    OnUpdateLogfileStatusNoThrow(ProcessCallback& pc, const Zstring& logfilePath) : pc_(pc), logfilePath_(logfilePath), bytesWritten(),
+        msg(replaceCpy(_("Saving log file %x..."), L"%x", fmtFileName(logfilePath_))) {}
+
+    void operator()(std::int64_t bytesDelta)
+    {
+        bytesWritten += bytesDelta;
+
+        if (updateUiIsAllowed()) //test if specific time span between ui updates is over
+            try
+            {
+                pc_.reportStatus(msg + L" (" + filesizeToShortString(bytesWritten) + L")"); //throw?
+                pc_.forceUiRefresh(); //throw?
+            }
+            catch (...) {}
+    }
+
+private:
+    ProcessCallback& pc_;
+    const Zstring logfilePath_;
+    std::int64_t bytesWritten;
+    const std::wstring msg;
+};
 
 
 
@@ -78,12 +107,12 @@ std::wstring generateLogHeader(const SummaryInfo& s)
 
     //calculate max width, this considers UTF-16 only, not true Unicode...but maybe good idea? those 2-char-UTF16 codes are usually wider than fixed width chars anyway!
     size_t sepLineLen = 0;
-    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { sepLineLen = std::max(sepLineLen, str.size()); });
+    for (const std::wstring& str : results) sepLineLen = std::max(sepLineLen, str.size());
 
     output.resize(output.size() + sepLineLen + 1, L'_');
     output += L'\n';
 
-    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += L'|'; output += str; output += L'\n'; });
+    for (const std::wstring& str : results) { output += L'|'; output += str; output += L'\n'; }
 
     output += L'|';
     output.resize(output.size() + sepLineLen, L'_');
@@ -97,7 +126,8 @@ std::wstring generateLogHeader(const SummaryInfo& s)
 inline
 void saveLogToFile(const SummaryInfo& summary, //throw FileError
                    const ErrorLog& log,
-                   FileOutput& fileOut)
+                   FileOutput& fileOut,
+                   const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus)
 {
     Utf8String header = utfCvrtTo<Utf8String>(generateLogHeader(summary));
     replace(header, '\n', LINE_BREAK); //don't replace line break any earlier
@@ -112,16 +142,22 @@ void saveLogToFile(const SummaryInfo& summary, //throw FileError
         msg += LINE_BREAK; //make sure string is not empty!
 
         fileOut.write(&*msg.begin(), msg.size()); //throw FileError
+        if (onUpdateSaveStatus) onUpdateSaveStatus(msg.size());
     }
 }
 
 
 inline
+Zstring getLastSyncsLogfilePath() { return getConfigDir() + Zstr("LastSyncs.log"); }
+
+
+inline
 void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
                         const ErrorLog& log,
-                        size_t maxBytesToWrite) //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
+                        size_t maxBytesToWrite, //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
+                        const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus)
 {
-    const Zstring filepath = getConfigDir() + Zstr("LastSyncs.log");
+    const Zstring filepath = getLastSyncsLogfilePath();
 
     Utf8String newStream = utfCvrtTo<Utf8String>(generateLogHeader(summary));
     replace(newStream, '\n', LINE_BREAK); //don't replace line break any earlier
@@ -144,10 +180,14 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
     //fill up the rest of permitted space by appending old log
     if (newStream.size() < maxBytesToWrite)
     {
+        std::function<void(std::int64_t bytesDelta)> onUpdateLoadStatus;
+        if (onUpdateSaveStatus)
+            onUpdateLoadStatus = [&](std::int64_t bytesDelta) { onUpdateSaveStatus(0); };
+
         Utf8String oldStream;
         try
         {
-            oldStream = loadBinStream<Utf8String>(filepath); //throw FileError
+            oldStream = loadBinStream<Utf8String>(filepath, onUpdateLoadStatus); //throw FileError
         }
         catch (FileError&) {}
 
@@ -174,7 +214,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
         }
     }
 
-    saveBinStream(filepath, newStream); //throw FileError
+    saveBinStream(filepath, newStream, onUpdateSaveStatus); //throw FileError
 }
 }
 

@@ -91,14 +91,14 @@ DiskInfo retrieveDiskInfo(const Zstring& pathName)
     std::vector<char> buffer(sizeof(VOLUME_DISK_EXTENTS) + sizeof(DISK_EXTENT)); //reserve buffer for at most one disk! call below will then fail if volume spans multiple disks!
 
     DWORD bytesReturned = 0;
-    if (!::DeviceIoControl(hVolume,                              // handle to device
-                           IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, // dwIoControlCode
-                           nullptr,                                 // lpInBuffer
-                           0,                                    // nInBufferSize
-                           &buffer[0],                           // output buffer
-                           static_cast<DWORD>(buffer.size()),    // size of output buffer
-                           &bytesReturned,                       // number of bytes returned
-                           nullptr))                                // OVERLAPPED structure
+    if (!::DeviceIoControl(hVolume,                              //_In_         HANDLE hDevice,
+                           IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, //_In_         DWORD dwIoControlCode,
+                           nullptr,                              //_In_opt_     LPVOID lpInBuffer,
+                           0,                                    //_In_         DWORD nInBufferSize,
+                           &buffer[0],                           //_Out_opt_    LPVOID lpOutBuffer,
+                           static_cast<DWORD>(buffer.size()),    //_In_         DWORD nOutBufferSize,
+                           &bytesReturned,                       //_Out_opt_    LPDWORD lpBytesReturned
+                           nullptr))                             //_Inout_opt_  LPOVERLAPPED lpOverlapped
         return output;
 
     const VOLUME_DISK_EXTENTS& volDisks = *reinterpret_cast<VOLUME_DISK_EXTENTS*>(&buffer[0]);
@@ -313,13 +313,13 @@ public:
         relNameParentPf_(relNameParentPf),
         output_(output) {}
 
-    virtual void        onFile   (const Zchar* shortName, const Zstring& filepath, const FileInfo& details);
-    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details);
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath);
-    virtual void releaseDirTraverser(TraverseCallback* trav);
+    void        onFile   (const Zchar* shortName, const Zstring& filepath, const FileInfo&    details) override;
+    HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override;
+    TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)                            override;
+    void releaseDirTraverser(TraverseCallback* trav)                                                   override;
 
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber);
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName);
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                           override;
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)   override;
 
 private:
     TraverserShared& cfg;
@@ -467,30 +467,6 @@ DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, s
     return ON_ERROR_IGNORE;
 }
 
-
-#ifdef ZEN_WIN
-class DstHackCallbackImpl : public DstHackCallback
-{
-public:
-    DstHackCallbackImpl(AsyncCallback& acb, long threadID) :
-        acb_(acb),
-        threadID_(threadID),
-        textApplyingDstHack(replaceCpy(_("Encoding extended time information: %x"), L"%x", L"\n%x")) {}
-
-private:
-    virtual void requestUiRefresh(const Zstring& filepath) //applying DST hack imposes significant one-time performance drawback => callback to inform user
-    {
-        boost::this_thread::interruption_point();
-
-        acb_.reportCurrentStatus(replaceCpy(textApplyingDstHack, L"%x", fmtFileName(filepath)), threadID_);
-    }
-
-    AsyncCallback& acb_;
-    long threadID_;
-    const std::wstring textApplyingDstHack;
-};
-#endif
-
 //------------------------------------------------------------------------------------------
 
 class WorkerThread
@@ -523,14 +499,8 @@ public:
                               Zstring(),
                               dirOutput_.dirCont);
 
-        DstHackCallback* dstCallbackPtr = nullptr;
-#ifdef ZEN_WIN
-        DstHackCallbackImpl dstCallback(*acb_, threadID_);
-        dstCallbackPtr = &dstCallback;
-#endif
-
         //get all files and folders from directoryPostfixed (and subdirectories)
-        traverseFolder(dirKey_.dirpath_, traverser, dstCallbackPtr); //exceptions may be thrown!
+        traverseFolder(dirKey_.dirpath_, traverser); //exceptions may be thrown!
     }
 
 private:

@@ -60,7 +60,7 @@ void setBitmapTextLabel(wxBitmapButton& btn, const wxImage& img, const wxString&
     }
 
     //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work corretly
-	const int defaultHeight = wxButton::GetDefaultSize().GetHeight();
+    const int defaultHeight = wxButton::GetDefaultSize().GetHeight();
     btn.SetMinSize(wxSize(dynImage.GetWidth () + 2 * border,
                           std::max(dynImage.GetHeight() + 2 * border, defaultHeight)));
 

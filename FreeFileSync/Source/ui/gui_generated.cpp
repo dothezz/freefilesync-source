@@ -1325,12 +1325,18 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     wxBoxSizer* bSizer280;
     bSizer280 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonClear = new wxButton( m_panelFilterSettingsHolder, wxID_DEFAULT, _("C&lear"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer280->Add( m_buttonClear, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-
     m_staticText44 = new wxStaticText( m_panelFilterSettingsHolder, wxID_ANY, _("Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    m_staticText44->Wrap( 600 );
-    bSizer280->Add( m_staticText44, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 10 );
+    m_staticText44->Wrap( 590 );
+    bSizer280->Add( m_staticText44, 0, wxALIGN_CENTER_VERTICAL|wxALL, 10 );
+
+
+    bSizer280->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    m_staticline46 = new wxStaticLine( m_panelFilterSettingsHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
+    bSizer280->Add( m_staticline46, 0, wxEXPAND, 5 );
+
+    m_buttonClear = new wxButton( m_panelFilterSettingsHolder, wxID_DEFAULT, _("C&lear"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    bSizer280->Add( m_buttonClear, 0, wxALL|wxALIGN_CENTER_VERTICAL, 10 );
 
 
     bSizer278->Add( bSizer280, 0, wxEXPAND, 5 );
@@ -1339,7 +1345,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_panelFilterSettingsHolder->SetSizer( bSizer278 );
     m_panelFilterSettingsHolder->Layout();
     bSizer278->Fit( m_panelFilterSettingsHolder );
-    m_notebook->AddPage( m_panelFilterSettingsHolder, _("dummy"), true );
+    m_notebook->AddPage( m_panelFilterSettingsHolder, _("dummy"), false );
     m_panelSyncSettingsHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelSyncSettingsHolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
@@ -1401,7 +1407,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     m_checkBoxDetectMove = new wxCheckBox( m_panelSyncSettings, wxID_ANY, _("Detect moved files"), wxDefaultPosition, wxDefaultSize, 0 );
     m_checkBoxDetectMove->SetValue(true);
-    m_checkBoxDetectMove->SetToolTip( _("- Requires and creates database files\n- Detection active after initial sync\n- Not supported by all file systems") );
+    m_checkBoxDetectMove->SetToolTip( _("- Detection active after initial sync\n- Requires and creates database files\n- Not supported by all file systems") );
 
     bSizer235->Add( m_checkBoxDetectMove, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 5 );
 
@@ -1701,7 +1707,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_panelSyncSettingsHolder->SetSizer( bSizer276 );
     m_panelSyncSettingsHolder->Layout();
     bSizer276->Fit( m_panelSyncSettingsHolder );
-    m_notebook->AddPage( m_panelSyncSettingsHolder, _("dummy"), false );
+    m_notebook->AddPage( m_panelSyncSettingsHolder, _("dummy"), true );
 
     bSizer7->Add( m_notebook, 1, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
@@ -3319,7 +3325,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     m_buttonDonate = new wxButton( m_panel39, wxID_ANY, _("Donate with PayPal"), wxDefaultPosition, wxDefaultSize, 0 );
     m_buttonDonate->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
-    m_buttonDonate->SetToolTip( _("http://freefilesync.sourceforge.net/donate.php") );
+    m_buttonDonate->SetToolTip( _("http://www.freefilesync.org/donate.php") );
 
     bSizer178->Add( m_buttonDonate, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -3359,7 +3365,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer166->Add( m_bitmap9, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 
-    m_hyperlink1 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("freefilesync.sf.net"), wxT("http://freefilesync.sf.net/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink1 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("freefilesync.org"), wxT("http://www.freefilesync.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, true, wxEmptyString ) );
     m_hyperlink1->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 

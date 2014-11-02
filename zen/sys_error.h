@@ -35,7 +35,7 @@ typedef int ErrorCode;
 ErrorCode getLastError();
 
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError);
-
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError, const std::wstring& lastErrorMsg);
 
 //A low-level exception class giving (non-translated) detail information only - same conceptional level like "GetLastError()"!
 class SysError
@@ -75,11 +75,7 @@ std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastE
 {
     const ErrorCode currentError = getLastError(); //not necessarily == lastError
 
-    //determine error code if none was specified
-    if (lastError == 0)
-        lastError = currentError;
-
-    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", numberTo<std::wstring>(lastError));
+    std::wstring lastErrorMsg;
 
 #ifdef ZEN_WIN
     ZEN_ON_SCOPE_EXIT(::SetLastError(currentError)); //this function must not change active system error variable!
@@ -92,22 +88,37 @@ std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastE
         if (buffer) //"don't trust nobody"
         {
             ZEN_ON_SCOPE_EXIT(::LocalFree(buffer));
-            output += L" ";
-            output += buffer;
+            lastErrorMsg = buffer;
         }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     ZEN_ON_SCOPE_EXIT(errno = currentError);
 
-    output += L" ";
-    output += utfCvrtTo<std::wstring>(::strerror(lastError));
+    lastErrorMsg = utfCvrtTo<std::wstring>(::strerror(lastError));
 #endif
+
+    return formatSystemError(functionName, lastError, lastErrorMsg);
+}
+
+
+inline
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError, const std::wstring& lastErrorMsg)
+{
+    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", numberTo<std::wstring>(lastError));
+
+    if (!lastErrorMsg.empty())
+    {
+        output += L" ";
+        output += lastErrorMsg;
+    }
+
     if (!endsWith(output, L" ")) //Windows messages seem to end with a blank...
         output += L" ";
     output += L"(" + functionName + L")";
 
     return output;
 }
+
 }
 
 #endif //SYS_ERROR_H_3284791347018951324534

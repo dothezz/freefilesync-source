@@ -5,7 +5,7 @@
 // **************************************************************************
 
 #include "xml_proc.h"
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <wx/filefn.h>
 #include <wx+/string_conv.h>
 #include "../lib/process_xml.h"

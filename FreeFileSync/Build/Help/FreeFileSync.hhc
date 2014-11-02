@@ -83,10 +83,5 @@
 			<param name="Local" value="html\Run as Service.html">
 			</OBJECT>
 	</UL>
-	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Links">
-		<param name="Local" value="html\Links.html">
-		<param name="ImageNumber" value="19">
-		</OBJECT>
 </UL>
 </BODY></HTML>

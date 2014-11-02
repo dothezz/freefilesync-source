@@ -32,8 +32,8 @@ void setScrollMaster(Grid& grid);
 
 //mark rows selected in navigation/compressed tree and navigate to leading object
 void setNavigationMarker(Grid& gridLeft,
-                         hash_set<const FileSystemObject*>&& markedFilesAndLinks,//mark files/symlinks directly within a container
-                         hash_set<const HierarchyObject*>&& markedContainer);   //mark full container including child-objects
+                         std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,//mark files/symlinks directly within a container
+                         std::unordered_set<const HierarchyObject*>&& markedContainer);    //mark full container including child-objects
 }
 
 wxBitmap getSyncOpImage(SyncOperation syncOp);
@@ -50,7 +50,7 @@ extern const wxEventType EVENT_GRID_SYNC_DIRECTION;
 struct CheckRowsEvent : public wxCommandEvent
 {
     CheckRowsEvent(size_t rowFirst, size_t rowLast, bool setIncluded) : wxCommandEvent(EVENT_GRID_CHECK_ROWS), rowFirst_(rowFirst), rowLast_(rowLast), setIncluded_(setIncluded) { assert(rowFirst <= rowLast); }
-    virtual wxEvent* Clone() const { return new CheckRowsEvent(*this); }
+    wxEvent* Clone() const override { return new CheckRowsEvent(*this); }
 
     const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
     const size_t rowLast_;  //range is empty when clearing selection
@@ -61,7 +61,7 @@ struct CheckRowsEvent : public wxCommandEvent
 struct SyncDirectionEvent : public wxCommandEvent
 {
     SyncDirectionEvent(size_t rowFirst, size_t rowLast, SyncDirection direction) : wxCommandEvent(EVENT_GRID_SYNC_DIRECTION), rowFirst_(rowFirst), rowLast_(rowLast), direction_(direction) { assert(rowFirst <= rowLast); }
-    virtual wxEvent* Clone() const { return new SyncDirectionEvent(*this); }
+    wxEvent* Clone() const override { return new SyncDirectionEvent(*this); }
 
     const size_t rowFirst_; //see CheckRowsEvent
     const size_t rowLast_;  //

@@ -12,9 +12,8 @@
 <FONT SIZE=3><I><SPAN STYLE="font-weight: normal">Automated Synchronization</SPAN></I></FONT>
 </H2>
 
-<P>The primary purpose of RealtimeSync is to execute a command line each time a directory becomes 
-available (e. g. insert of a USB-stick) <b>or</b> when it detects changes in one of the monitored directories. Usually this command line will trigger
-a FreeFileSync batch job.
+<P>The primary purpose of RealtimeSync is to execute a command line each time it detects changes in one of the monitored directories
+<b>or</b> when a directory becomes available (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.
 </P>
 
 <BR>
@@ -93,7 +92,7 @@ on the stick. RealtimeSync will also trigger each time files are modified in <FO
 			Write a list of all changes to a log file:<BR>
 			
 			<FONT FACE="Courier New, monospace">
-			&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &gt;&gt; C:\log.txt
+			&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &gt;&gt; %UserProfile%\Desktop\log.txt
 			</FONT>
 	</div>
 </div>

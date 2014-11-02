@@ -8,8 +8,6 @@
 #define STRING_TRAITS_HEADER_813274321443234
 
 #include "type_tools.h"
-#include "assert_static.h"
-
 
 //uniform access to string-like types, both classes and character arrays
 namespace zen
@@ -165,7 +163,11 @@ namespace implementation
 template <class C> inline
 size_t cStringLength(const C* str) //naive implementation seems somewhat faster than "optimized" strlen/wcslen!
 {
-    assert_static((IsSameType<C, char>::value || IsSameType<C, wchar_t>::value));
+#if defined _MSC_VER && _MSC_VER > 1800
+    static_assert(false, "strlen/wcslen are vectorized in VS14 CTP3 -> test again!");
+#endif
+
+    static_assert(IsSameType<C, char>::value || IsSameType<C, wchar_t>::value, "");
     size_t len = 0;
     while (*str++ != 0)
         ++len;
@@ -184,8 +186,8 @@ inline const char*    strBegin(const char*    str) { return str; }
 inline const wchar_t* strBegin(const wchar_t* str) { return str; }
 inline const char*    strBegin(const char&    ch)  { return &ch; }
 inline const wchar_t* strBegin(const wchar_t& ch)  { return &ch; }
-inline const char*     strBegin(const StringRef<char   >& ref) { return ref.data(); }
-inline const wchar_t*  strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
+inline const char*    strBegin(const StringRef<char   >& ref) { return ref.data(); }
+inline const wchar_t* strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
 
 
 template <class S> inline

@@ -104,7 +104,7 @@ size_t getUtf16Len(Char16 ch) //ch must be first code unit! returns 0 on error!
 template <class CharIterator, class Function> inline
 void utf16ToCodePoint(CharIterator first, CharIterator last, Function writeOutput) //"writeOutput" is a unary function taking a CodePoint
 {
-    assert_static(sizeof(typename std::iterator_traits<CharIterator>::value_type) == 2);
+    static_assert(sizeof(typename std::iterator_traits<CharIterator>::value_type) == 2, "");
 
     for ( ; first != last; ++first)
     {
@@ -201,7 +201,7 @@ bool decodeTrail(CharIterator& first, CharIterator last, CodePoint& cp) //decode
 template <class CharIterator, class Function> inline
 void utf8ToCodePoint(CharIterator first, CharIterator last, Function writeOutput) //"writeOutput" is a unary function taking a CodePoint
 {
-    assert_static(sizeof(typename std::iterator_traits<CharIterator>::value_type) == 1);
+    static_assert(sizeof(typename std::iterator_traits<CharIterator>::value_type) == 1, "");
 
     for ( ; first != last; ++first)
     {
@@ -337,12 +337,12 @@ size_t findUnicodePosWide(const WideString& str, size_t unicodePos, Int2Type<2>)
         if (utfPos >= strLen)
             return strLen;
 
-		size_t utf16len = getUtf16Len(strFirst[utfPos]);
+        size_t utf16len = getUtf16Len(strFirst[utfPos]);
         if (utf16len == 0) ++utf16len; //invalid utf16 character
         utfPos += utf16len;
     }
-	if (utfPos >= strLen)
-		return strLen;
+    if (utfPos >= strLen)
+        return strLen;
     return utfPos;
 }
 
@@ -416,8 +416,8 @@ CharString wideToUtf8(const WideString& str, Int2Type<4>) //other OS: convert ut
 template <class WideString, class CharString> inline
 WideString utf8ToWide(const CharString& str)
 {
-    assert_static((IsSameType<typename GetCharType<CharString>::Type, char   >::value));
-    assert_static((IsSameType<typename GetCharType<WideString>::Type, wchar_t>::value));
+    static_assert(IsSameType<typename GetCharType<CharString>::Type, char   >::value, "");
+    static_assert(IsSameType<typename GetCharType<WideString>::Type, wchar_t>::value, "");
 
     return implementation::utf8ToWide<WideString>(str, Int2Type<sizeof(wchar_t)>());
 }
@@ -426,8 +426,8 @@ WideString utf8ToWide(const CharString& str)
 template <class CharString, class WideString> inline
 CharString wideToUtf8(const WideString& str)
 {
-    assert_static((IsSameType<typename GetCharType<CharString>::Type, char   >::value));
-    assert_static((IsSameType<typename GetCharType<WideString>::Type, wchar_t>::value));
+    static_assert(IsSameType<typename GetCharType<CharString>::Type, char   >::value, "");
+    static_assert(IsSameType<typename GetCharType<WideString>::Type, wchar_t>::value, "");
 
     return implementation::wideToUtf8<CharString>(str, Int2Type<sizeof(wchar_t)>());
 }

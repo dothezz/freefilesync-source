@@ -58,23 +58,10 @@ struct TraverseCallback
     virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
 };
 
-
-#ifdef ZEN_WIN
-struct DstHackCallback
-{
-    virtual ~DstHackCallback() {}
-    virtual void requestUiRefresh(const Zstring& filepath) = 0; //applying DST hack imposes significant one-time performance drawback => callback to inform user
-};
-#elif defined ZEN_LINUX || defined ZEN_MAC
-struct DstHackCallback; //DST hack not required on Unix
-#endif
-
 //custom traverser with detail information about files
 //- client needs to handle duplicate file reports! (FilePlusTraverser fallback, retrying to read directory contents, ...)
 //- directory may end with PATH_SEPARATOR
-void traverseFolder(const Zstring& dirpath, //throw()
-                    TraverseCallback& sink,
-                    DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
+void traverseFolder(const Zstring& dirpath, TraverseCallback& sink); //noexcept
 }
 
 #endif // FILETRAVERSER_H_INCLUDED

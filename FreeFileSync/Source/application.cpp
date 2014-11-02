@@ -6,7 +6,7 @@
 
 #include "application.h"
 #include <memory>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/dll.h>
 #include <wx/tooltip.h>
 #include <wx/log.h>
@@ -102,7 +102,7 @@ std::vector<Zstring> getCommandlineArgs(const wxApp& app)
         {
             if (iterStart != cmdLine.end())
             {
-                args.push_back(Zstring(iterStart, it));
+                args.emplace_back(iterStart, it);
                 iterStart = cmdLine.end(); //expect consecutive blanks!
             }
         }
@@ -120,7 +120,7 @@ std::vector<Zstring> getCommandlineArgs(const wxApp& app)
             }
         }
     if (iterStart != cmdLine.end())
-        args.push_back(Zstring(iterStart, cmdLine.end()));
+        args.emplace_back(iterStart, cmdLine.end());
 
     if (!args.empty())
         args.erase(args.begin()); //remove first argument which is exe path by convention: http://blogs.msdn.com/b/oldnewthing/archive/2006/05/15/597984.aspx
@@ -155,7 +155,7 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    setAppUserModeId(L"FreeFileSync", L"SourceForge.FreeFileSync"); //noexcept
+    setAppUserModeId(L"FreeFileSync", L"Zenju.FreeFileSync"); //noexcept
     //consider: FreeFileSync.exe, FreeFileSync_Win32.exe, FreeFileSync_x64.exe
 
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
@@ -270,7 +270,7 @@ void Application::onQueryEndSession(wxEvent& event)
 
 
 void runGuiMode  (const Zstring& globalConfigFile);
-void runGuiMode  (const Zstring& globalConfigFile, const XmlGuiConfig& guiCfg, const std::vector<Zstring>& referenceFiles);
+void runGuiMode  (const Zstring& globalConfigFile, const XmlGuiConfig& guiCfg, const std::vector<Zstring>& referenceFiles, bool startComparison);
 void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode);
 void showSyntaxHelp();
 
@@ -294,28 +294,36 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         raiseReturnCode(returnCode, FFS_RC_ABORTED);
     };
 
+    auto equalNoCase = [](const Zstring& lhs, const Zstring& rhs) { return utfCvrtTo<wxString>(lhs).CmpNoCase(utfCvrtTo<wxString>(rhs)) == 0; };
+
     //parse command line arguments
     std::vector<Zstring> leftDirs;
     std::vector<Zstring> rightDirs;
     std::vector<std::pair<Zstring, XmlType>> configFiles; //XmlType: batch or GUI files only
     Opt<Zstring> globalConfigFile;
+    bool openForEdit = false;
     {
+        const Zchar optionEdit    [] = Zstr("-edit");
         const Zchar optionLeftDir [] = Zstr("-leftdir");
         const Zchar optionRightDir[] = Zstr("-rightdir");
 
-        auto syntaxHelpRequested = [](const Zstring& arg)
+        auto syntaxHelpRequested = [&](const Zstring& arg)
         {
             auto it = std::find_if(arg.begin(), arg.end(), [](Zchar c) { return c != Zchar('/') && c != Zchar('-'); });
+            if (it == arg.begin()) return false; //require at least one prefix character
+
             const Zstring argTmp(it, arg.end());
-            return argTmp == Zstr("help") ||
-                   argTmp == Zstr("h")    ||
+            return equalNoCase(argTmp, Zstr("help")) ||
+                   equalNoCase(argTmp, Zstr("h"))    ||
                    argTmp == Zstr("?");
         };
 
         for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
             if (syntaxHelpRequested(*it))
                 return showSyntaxHelp();
-            else if (*it == optionLeftDir)
+            else if (equalNoCase(*it, optionEdit))
+                openForEdit = true;
+            else if (equalNoCase(*it, optionLeftDir))
             {
                 if (++it == commandArgs.end())
                 {
@@ -324,7 +332,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 }
                 leftDirs.push_back(*it);
             }
-            else if (*it == optionRightDir)
+            else if (equalNoCase(*it, optionRightDir))
             {
                 if (++it == commandArgs.end())
                 {
@@ -356,10 +364,10 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                     switch (getXmlType(filepath)) //throw FileError
                     {
                         case XML_TYPE_GUI:
-                            configFiles.push_back(std::make_pair(filepath, XML_TYPE_GUI));
+                            configFiles.emplace_back(filepath, XML_TYPE_GUI);
                             break;
                         case XML_TYPE_BATCH:
-                            configFiles.push_back(std::make_pair(filepath, XML_TYPE_BATCH));
+                            configFiles.emplace_back(filepath, XML_TYPE_BATCH);
                             break;
                         case XML_TYPE_GLOBAL:
                             globalConfigFile = filepath;
@@ -409,9 +417,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                     mainCfg.firstPair.dirpathPhraseRight = rightDirs[0];
                 }
                 else
-                    mainCfg.additionalPairs.push_back(FolderPairEnh(leftDirs [i],
-                                                                    rightDirs[i],
-                                                                    nullptr, nullptr, FilterConfig()));
+                    mainCfg.additionalPairs.emplace_back(leftDirs[i], rightDirs[i],
+                                                         nullptr, nullptr, FilterConfig());
         }
         return true;
     };
@@ -433,7 +440,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
             if (!replaceDirectories(guiCfg.mainCfg))
                 return;
-            runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>());
+            runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>(), !openForEdit);
         }
     }
     else if (configFiles.size() == 1)
@@ -441,7 +448,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         const Zstring filepath = configFiles[0].first;
 
         //batch mode
-        if (configFiles[0].second == XML_TYPE_BATCH)
+        if (configFiles[0].second == XML_TYPE_BATCH && !openForEdit)
         {
             XmlBatchConfig batchCfg;
             try
@@ -461,14 +468,14 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 return;
             runBatchMode(globalConfigFilePath, batchCfg, filepath, returnCode);
         }
-        //GUI mode: single config
+        //GUI mode: single config (ffs_gui *or* ffs_batch)
         else
         {
             XmlGuiConfig guiCfg;
             try
             {
                 std::wstring warningMsg;
-                readConfig(filepath, guiCfg, warningMsg); //throw FileError
+                readAnyConfig({ filepath }, guiCfg, warningMsg); //throw FileError
 
                 if (!warningMsg.empty())
                     showNotificationDialog(nullptr, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warningMsg));
@@ -484,7 +491,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //what about simulating changed config due to directory replacement?
             //-> propably fine to not show as changed on GUI and not ask user to save on exit!
 
-            runGuiMode(globalConfigFilePath, guiCfg, { filepath }); //caveat: guiCfg and filepath do not match if directories were set/replaced via command line!
+            runGuiMode(globalConfigFilePath, guiCfg, { filepath }, !openForEdit); //caveat: guiCfg and filepath do not match if directories were set/replaced via command line!
         }
     }
     //gui mode: merged configs
@@ -515,7 +522,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             notifyError(e.toString(), std::wstring());
             return;
         }
-        runGuiMode(globalConfigFilePath, guiCfg, filepaths);
+        runGuiMode(globalConfigFilePath, guiCfg, filepaths, !openForEdit);
     }
 }
 
@@ -525,9 +532,10 @@ void runGuiMode(const Zstring& globalConfigFile) { MainDialog::create(globalConf
 
 void runGuiMode(const Zstring& globalConfigFile,
                 const xmlAccess::XmlGuiConfig& guiCfg,
-                const std::vector<Zstring>& referenceFiles)
+                const std::vector<Zstring>& referenceFiles,
+                bool startComparison)
 {
-    MainDialog::create(globalConfigFile, nullptr, guiCfg, referenceFiles, /*bool startComparison = */true);
+    MainDialog::create(globalConfigFile, nullptr, guiCfg, referenceFiles, startComparison);
 }
 
 
@@ -538,18 +546,22 @@ void showSyntaxHelp()
                            setDetailInstructions(_("Syntax:") + L"\n\n" +
 
                                                  L"FreeFileSync.exe " + L"\n" +
-                                                 L"    [" + _("global config file:") + L" GlobalSettings.xml]\n" +
-                                                 L"    [" + _("config files:") + L" *.ffs_gui/*.ffs_batch]\n" +
-                                                 L"    [-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n\n" +
+                                                 L"    [" + _("global config file:") + L" GlobalSettings.xml]" + L"\n" +
+                                                 L"    [" + _("config files:") + L" *.ffs_gui/*.ffs_batch]" + L"\n" +
+                                                 L"    [-LeftDir " + _("directory") + L"] [-RightDir " + _("directory") + L"]" + L"\n" +
+                                                 L"    [-Edit]" + L"\n\n" +
 
                                                  _("global config file:") + L"\n" +
                                                  _("Path to an alternate GlobalSettings.xml file.") + L"\n\n" +
 
                                                  _("config files:") + L"\n" +
-                                                 _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n"
+                                                 _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n" +
 
-                                                 L"-leftdir " + _("directory") + L" -rightdir " + _("directory") + L"\n" +
-                                                 _("Any number of alternative directory pairs for at most one config file.")));
+                                                 L"-LeftDir " + _("directory") + L" -RightDir " + _("directory") + L"\n" +
+                                                 _("Any number of alternative directory pairs for at most one config file.") + L"\n\n" +
+
+                                                 L"-Edit" + L"\n" +
+                                                 _("Open configuration for edit without executing.")));
 }
 
 

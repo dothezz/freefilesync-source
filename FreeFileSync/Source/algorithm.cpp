@@ -6,8 +6,9 @@
 
 #include "algorithm.h"
 #include <set>
+#include <unordered_map>
 #include <stdexcept>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/recycler.h>
 #include <zen/stl_tools.h>
 #include <zen/scope_guard.h>
@@ -336,7 +337,7 @@ private:
             {
                 if (fileObj.getFileId<LEFT_SIDE>() != FileId())
                 {
-                    auto rv = exLeftOnly.insert(std::make_pair(fileObj.getFileId<LEFT_SIDE>(), &fileObj));
+                    auto rv = exLeftOnly.emplace(fileObj.getFileId<LEFT_SIDE>(), &fileObj);
                     assert(rv.second);
                     if (!rv.second) //duplicate file ID!
                         rv.first->second = nullptr;
@@ -346,7 +347,7 @@ private:
             {
                 if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
                 {
-                    auto rv = exRightOnly.insert(std::make_pair(fileObj.getFileId<RIGHT_SIDE>(), &fileObj));
+                    auto rv = exRightOnly.emplace(fileObj.getFileId<RIGHT_SIDE>(), &fileObj);
                     assert(rv.second);
                     if (!rv.second) //duplicate file ID!
                         rv.first->second = nullptr;
@@ -728,15 +729,15 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
     struct Recurse: public FSObjectVisitor
     {
         Recurse(SyncDirection newDir) : newDir_(newDir) {}
-        virtual void visit(const FilePair& fileObj)
+        void visit(const FilePair& fileObj) override
         {
             SetNewDirection::execute(const_cast<FilePair&>(fileObj), newDir_); //phyiscal object is not const in this method anyway
         }
-        virtual void visit(const SymlinkPair& linkObj)
+        void visit(const SymlinkPair& linkObj) override
         {
             SetNewDirection::execute(const_cast<SymlinkPair&>(linkObj), newDir_); //
         }
-        virtual void visit(const DirPair& dirObj)
+        void visit(const DirPair& dirObj) override
         {
             SetNewDirection::execute(const_cast<DirPair&>(dirObj), newDir_); //
         }
@@ -783,9 +784,9 @@ void zen::setActiveStatus(bool newStatus, zen::FileSystemObject& fsObj)
     struct Recurse: public FSObjectVisitor
     {
         Recurse(bool newStat) : newStatus_(newStat) {}
-        virtual void visit(const FilePair& fileObj) {}
-        virtual void visit(const SymlinkPair& linkObj) {}
-        virtual void visit(const DirPair& dirObj)
+        void visit(const FilePair&    fileObj) override {}
+        void visit(const SymlinkPair& linkObj) override {}
+        void visit(const DirPair&      dirObj) override
         {
             if (newStatus_)
                 inOrExcludeAllRows<true>(const_cast<DirPair&>(dirObj)); //object is not physically const here anyway
@@ -1164,7 +1165,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
             recExists = recycleBinExists(baseDirPf, [&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
         }, callback);
 
-        hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recExists));
+        hasRecyclerBuffer.emplace(baseDirPf, recExists);
         return recExists;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
@@ -1203,7 +1204,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
         }
     }
 
-    virtual void visit(const FilePair& fileObj)
+    void visit(const FilePair& fileObj) override
     {
         notifyFileDeletion(fileObj.getFullPath<side>());
 
@@ -1213,7 +1214,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
             zen::removeFile(fileObj.getFullPath<side>()); //throw FileError
     }
 
-    virtual void visit(const SymlinkPair& linkObj)
+    void visit(const SymlinkPair& linkObj) override
     {
         notifySymlinkDeletion(linkObj.getFullPath<side>());
 
@@ -1228,7 +1229,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
         }
     }
 
-    virtual void visit(const DirPair& dirObj)
+    void visit(const DirPair& dirObj) override
     {
         notifyDirectoryDeletion(dirObj.getFullPath<side>()); //notfied twice; see below -> no big deal
 
@@ -1293,7 +1294,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //build up mapping from base directory to corresponding direction config
-    hash_map<const BaseDirPair*, DirectionConfig> baseDirCfgs;
+    std::unordered_map<const BaseDirPair*, DirectionConfig> baseDirCfgs;
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
         baseDirCfgs[&** it] = directCfgs[it - folderCmp.begin()];
 

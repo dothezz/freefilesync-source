@@ -5,7 +5,7 @@
 // **************************************************************************
 
 #include "ffs_paths.h"
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <wx/stdpaths.h>
 #include <wx/app.h>
 #include <wx+/string_conv.h>
@@ -124,7 +124,7 @@ Zstring zen::getFreeFileSyncLauncher()
     ZEN_ON_SCOPE_EXIT(if (appURL) ::CFRelease(appURL));
 
     if (::LSFindApplicationForInfo(kLSUnknownCreator, // OSType inCreator,
-                                   CFSTR("net.SourceForge.FreeFileSync"),//CFStringRef inBundleID,
+                                   CFSTR("Zenju.FreeFileSync"),//CFStringRef inBundleID,
                                    nullptr,           //CFStringRef inName,
                                    nullptr,           //FSRef *outAppRef,
                                    &appURL) == noErr) //CFURLRef *outAppURL

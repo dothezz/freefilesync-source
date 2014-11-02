@@ -32,7 +32,7 @@ namespace
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer: must be big enough to hold visible icons + preload buffer! Consider OS limit on GDI resources (wxBitmap)!!!
 
 #ifndef NDEBUG
-boost::thread::id mainThreadId = boost::this_thread::get_id();
+const boost::thread::id mainThreadId = boost::this_thread::get_id();
 #endif
 
 #ifdef ZEN_WIN
@@ -89,7 +89,7 @@ public:
     wxBitmap extractWxBitmap()
     {
         ZEN_ON_SCOPE_EXIT(assert(!*this));
-        assert(boost::this_thread::get_id() == mainThreadId );
+        assert(boost::this_thread::get_id() == mainThreadId);
 
         if (!handle_)
             return wxNullBitmap;
@@ -396,20 +396,20 @@ class WorkLoad
 public:
     Zstring extractNextFile() //context of worker thread, blocking
     {
-        assert(boost::this_thread::get_id() != mainThreadId );
+        assert(boost::this_thread::get_id() != mainThreadId);
         boost::unique_lock<boost::mutex> dummy(lockFiles);
 
         while (filesToLoad.empty())
             conditionNewFiles.timed_wait(dummy, boost::posix_time::milliseconds(100)); //interruption point!
 
-        Zstring filepath = filesToLoad.back();
-        filesToLoad.pop_back();
+        Zstring filepath = filesToLoad.back(); //yes, not std::bad_alloc exception-safe, but bad_alloc is not relevant for us
+        filesToLoad.pop_back();                //
         return filepath;
     }
 
     void setWorkload(const std::vector<Zstring>& newLoad) //context of main thread
     {
-        assert(boost::this_thread::get_id() == mainThreadId );
+        assert(boost::this_thread::get_id() == mainThreadId);
         {
             boost::lock_guard<boost::mutex> dummy(lockFiles);
             filesToLoad = newLoad;
@@ -420,7 +420,7 @@ public:
 
     void addToWorkload(const Zstring& newEntry) //context of main thread
     {
-        assert(boost::this_thread::get_id() == mainThreadId );
+        assert(boost::this_thread::get_id() == mainThreadId);
         {
             boost::lock_guard<boost::mutex> dummy(lockFiles);
             filesToLoad.push_back(newEntry); //set as next item to retrieve
@@ -474,7 +474,7 @@ public:
         boost::lock_guard<boost::mutex> dummy(lockIconList);
 
         //thread safety: moving IconHolder is free from side effects, but ~wxBitmap() is NOT! => do NOT delete items from iconList here!
-        auto rc = iconList.insert(std::make_pair(entryName, makeValueObject()));
+        auto rc = iconList.emplace(entryName, makeValueObject());
         assert(rc.second);
         if (rc.second) //if insertion took place
         {

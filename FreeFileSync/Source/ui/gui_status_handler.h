@@ -27,14 +27,14 @@ public:
     CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID);
-    virtual void forceUiRefresh();
+    void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
+    void forceUiRefresh() override;
 
-    virtual Response reportError(const std::wstring& text, size_t retryNumber);
-    virtual void reportFatalError(const std::wstring& errorMessage);
-    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
+    Response reportError     (const std::wstring& text, size_t retryNumber)            override;
+    void     reportFatalError(const std::wstring& errorMessage)                        override;
+    void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
-    virtual void abortProcessNow(); //throw GuiAbortProcess
+    void abortProcessNow() override; //throw GuiAbortProcess
 
 private:
     void OnKeyPressed(wxKeyEvent& event);
@@ -59,16 +59,16 @@ public:
                       std::vector<Zstring>& onCompletionHistory);
     ~SyncStatusHandler();
 
-    virtual void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID);
-    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta);
-    virtual void reportInfo(const std::wstring& text);
-    virtual void forceUiRefresh();
+    void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
+    void updateProcessedData(int objectsDelta, std::int64_t dataDelta               ) override;
+    void reportInfo         (const std::wstring& text                               ) override;
+    void forceUiRefresh     ()                                                        override;
 
-    virtual Response reportError(const std::wstring& text, size_t retryNumber);
-    virtual void reportFatalError(const std::wstring& errorMessage);
-    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
+    Response reportError     (const std::wstring& text, size_t retryNumber           ) override;
+    void     reportFatalError(const std::wstring& errorMessage                       ) override;
+    void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
-    virtual void abortProcessNow(); //throw GuiAbortProcess
+    void abortProcessNow() override; //throw GuiAbortProcess
 
 private:
     void onProgressDialogTerminate();

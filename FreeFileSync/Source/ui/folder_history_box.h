@@ -42,7 +42,7 @@ public:
         zen::trim(nameTmp);
 
         //insert new folder or put it to the front if already existing
-        vector_remove_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilename()(item, nameTmp); });
+        zen::vector_remove_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilename()(item, nameTmp); });
 
         dirpaths_.insert(dirpaths_.begin(), nameTmp);
 

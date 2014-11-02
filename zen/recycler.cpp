@@ -5,12 +5,11 @@
 // **************************************************************************
 
 #include "recycler.h"
-#include "file_handling.h"
+#include "file_access.h"
 
 #ifdef ZEN_WIN
 #include "thread.h"
 #include "dll.h"
-#include "assert_static.h"
 #include "win_ver.h"
 #include "long_path_prefix.h"
 #include "IFileOperation/file_op.h"
@@ -46,11 +45,10 @@ Nevertheless, let's use IFileOperation for better error reporting (including det
 struct CallbackData
 {
     CallbackData(const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus) :
-        notifyDeletionStatus_(notifyDeletionStatus),
-        exceptionInUserCallback(false) {}
+        notifyDeletionStatus_(notifyDeletionStatus) {}
 
-    const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus_; //optional!
-    bool exceptionInUserCallback;
+    const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus_; //in, optional
+    std::exception_ptr exception; //out
 };
 
 
@@ -65,7 +63,7 @@ bool onRecyclerCallback(const wchar_t* itempath, void* sink)
         }
         catch (...)
         {
-            cbd.exceptionInUserCallback = true; //try again outside the C call stack!
+            cbd.exception = std::current_exception();
             return false;
         }
     return true;
@@ -85,8 +83,8 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
     if (vistaOrLater()) //new recycle bin usage: available since Vista
     {
 #define DEF_DLL_FUN(name) const DllFun<fileop::FunType_##name> name(fileop::getDllName(), fileop::funName_##name);
-DEF_DLL_FUN(moveToRecycleBin);
-DEF_DLL_FUN(getLastErrorMessage);
+        DEF_DLL_FUN(moveToRecycleBin);
+        DEF_DLL_FUN(getLastErrorMessage);
 #undef DEF_DLL_FUN
 
         if (!moveToRecycleBin || !getLastErrorMessage)
@@ -100,12 +98,8 @@ DEF_DLL_FUN(getLastErrorMessage);
         CallbackData cbd(notifyDeletionStatus);
         if (!moveToRecycleBin(&cNames[0], cNames.size(), onRecyclerCallback, &cbd))
         {
-            if (cbd.exceptionInUserCallback)
-            {
-                assert(notifyDeletionStatus);
-                notifyDeletionStatus(Zstring()); //should throw again!!!
-                assert(false);
-            }
+            if (cbd.exception)
+                std::rethrow_exception(cbd.exception);
 
             std::wstring itempathFmt = fmtFileName(itempaths[0]); //probably not the correct file name for file lists larger than 1!
             if (itempaths.size() > 1)
@@ -188,7 +182,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
 #elif defined ZEN_MAC
     //we cannot use FSPathMoveObjectToTrashSync directly since it follows symlinks!
 
-    assert_static(sizeof(Zchar) == sizeof(char));
+    static_assert(sizeof(Zchar) == sizeof(char), "");
     const UInt8* itempathUtf8 = reinterpret_cast<const UInt8*>(itempath.c_str());
 
     auto throwFileError = [&](OSStatus oss)

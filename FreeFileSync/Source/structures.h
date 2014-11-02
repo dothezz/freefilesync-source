@@ -10,7 +10,6 @@
 #include <vector>
 #include <memory>
 #include <zen/zstring.h>
-#include <zen/assert_static.h>
 
 namespace zen
 {

@@ -37,7 +37,7 @@ struct TranslationHandler
     virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) = 0;
 };
 
-void setTranslator(TranslationHandler* newHandler = nullptr); //takes ownership
+void setTranslator(std::unique_ptr<TranslationHandler>&& newHandler = nullptr); //take ownership
 TranslationHandler* getTranslator();
 
 
@@ -58,7 +58,10 @@ namespace implementation
 inline
 std::wstring translate(const std::wstring& text)
 {
-    return getTranslator() ? getTranslator()->translate(text) : text;
+    if (TranslationHandler* t = getTranslator())
+        return t->translate(text);
+
+    return text;
 }
 
 //translate plural forms: "%x day" "%x days"
@@ -68,13 +71,13 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 {
     assert(contains(plural, L"%x"));
 
-    if (getTranslator())
+    if (TranslationHandler* t = getTranslator())
     {
-        std::wstring translation = getTranslator()->translate(singular, plural, n);
+        std::wstring translation = t->translate(singular, plural, n);
         assert(!contains(translation, L"%x"));
         return translation;
     }
-    else
+
         return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n));
 }
 
@@ -94,7 +97,7 @@ std::unique_ptr<TranslationHandler>& globalHandler()
 }
 
 inline
-void setTranslator(TranslationHandler* newHandler) { implementation::globalHandler().reset(newHandler); } //takes ownership
+void setTranslator(std::unique_ptr<TranslationHandler>&& newHandler) { implementation::globalHandler() = std::move(newHandler); }
 
 inline
 TranslationHandler* getTranslator() { return implementation::globalHandler().get(); }

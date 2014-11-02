@@ -8,7 +8,7 @@
 #define DIR_EXIST_HEADER_08173281673432158067342132467183267
 
 #include <zen/thread.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/file_error.h>
 #include "../process_callback.h"
 #include "resolve_path.h"
@@ -39,7 +39,7 @@ DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& d
     std::list<std::pair<Zstring, boost::unique_future<bool>>> futureInfo;
     for (const Zstring& dirpath : dirpaths)
         if (!dirpath.empty()) //skip empty dirs
-            futureInfo.push_back(std::make_pair(dirpath, async2<bool>([=]() -> bool
+            futureInfo.emplace_back(dirpath, async([=]() -> bool
         {
 #ifdef ZEN_WIN
             //1. login to network share, if necessary
@@ -47,7 +47,7 @@ DirectoryStatus getExistingDirsUpdating(const std::set<Zstring, LessFilename>& d
 #endif
             //2. check dir existence
             return dirExists(dirpath);
-        })));
+        }));
 
     //don't wait (almost) endlessly like win32 would on not existing network shares:
     const boost::system_time endTime = boost::get_system_time() + boost::posix_time::seconds(20); //consider CD-rom insert or hard disk spin up time from sleep

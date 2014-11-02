@@ -26,7 +26,7 @@
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include <wx+/key_event.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/thread.h>
 #include "gui_generated.h"
 #include "../lib/ffs_paths.h"
@@ -410,7 +410,7 @@ public:
         for (auto it = log_.begin(); it != log_.end(); ++it)
             if (it->type & includedTypes)
             {
-                assert_static((IsSameType<GetCharType<MsgString>::Type, wchar_t>::value));
+                static_assert(IsSameType<GetCharType<MsgString>::Type, wchar_t>::value, "");
                 assert(!startsWith(it->message, L'\n'));
 
                 size_t rowNumber = 0;
@@ -419,7 +419,7 @@ public:
                     if (c == L'\n')
                     {
                         if (!lastCharNewline) //do not reference empty lines!
-                            viewRef.push_back(Line(it, rowNumber));
+                            viewRef.emplace_back(it, rowNumber);
                         ++rowNumber;
                         lastCharNewline = true;
                     }
@@ -427,7 +427,7 @@ public:
                         lastCharNewline = false;
 
                 if (!lastCharNewline)
-                    viewRef.push_back(Line(it, rowNumber));
+                    viewRef.emplace_back(it, rowNumber);
             }
     }
 
@@ -481,9 +481,9 @@ class GridDataMessages : public GridData
 public:
     GridDataMessages(const std::shared_ptr<MessageView>& msgView) : msgView_(msgView) {}
 
-    virtual size_t getRowCount() const override { return msgView_ ? msgView_->rowsOnView() : 0; }
+    size_t getRowCount() const override { return msgView_ ? msgView_->rowsOnView() : 0; }
 
-    virtual wxString getValue(size_t row, ColumnType colType) const override
+    wxString getValue(size_t row, ColumnType colType) const override
     {
         if (msgView_)
             if (Opt<MessageView::LogEntryView> entry = msgView_->getEntry(row))
@@ -515,7 +515,7 @@ public:
         return wxEmptyString;
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         wxRect rectTmp = rect;
 
@@ -572,7 +572,7 @@ public:
                 }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
+    int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         // -> synchronize renderCell() <-> getBestSize()
 
@@ -609,7 +609,7 @@ public:
         return std::max(getResourceImage(L"msg_info_small").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
     }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const override
+    wxString getToolTip(size_t row, ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeMsg>(colType))
         {
@@ -623,7 +623,7 @@ public:
         return wxEmptyString;
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const override { return wxEmptyString; }
+    wxString getColumnLabel(ColumnType colType) const override { return wxEmptyString; }
 
 private:
     const std::shared_ptr<MessageView> msgView_;
@@ -665,9 +665,9 @@ public:
         m_gridMessages->showRowLabel(false);
         m_gridMessages->setRowHeight(rowHeight);
         std::vector<Grid::ColumnAttribute> attr;
-        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_TIME    ), colMsgTimeWidth, 0));
-        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_CATEGORY), colMsgCategoryWidth, 0));
-        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_TEXT    ), -colMsgTimeWidth - colMsgCategoryWidth, 1));
+        attr.emplace_back(static_cast<ColumnType>(COL_TYPE_MSG_TIME    ), colMsgTimeWidth, 0);
+        attr.emplace_back(static_cast<ColumnType>(COL_TYPE_MSG_CATEGORY), colMsgCategoryWidth, 0);
+        attr.emplace_back(static_cast<ColumnType>(COL_TYPE_MSG_TEXT    ), -colMsgTimeWidth - colMsgCategoryWidth, 1);
         m_gridMessages->setColumnConfig(attr);
 
         //support for CTRL + C
@@ -682,19 +682,19 @@ public:
     }
 
 private:
-    virtual void OnErrors(wxCommandEvent& event) override
+    void OnErrors(wxCommandEvent& event) override
     {
         m_bpButtonErrors->toggle();
         updateGrid();
     }
 
-    virtual void OnWarnings(wxCommandEvent& event) override
+    void OnWarnings(wxCommandEvent& event) override
     {
         m_bpButtonWarnings->toggle();
         updateGrid();
     }
 
-    virtual void OnInfo(wxCommandEvent& event) override
+    void OnInfo(wxCommandEvent& event) override
     {
         m_bpButtonInfo->toggle();
         updateGrid();
@@ -871,10 +871,10 @@ public:
         assert((!samples.empty() || lastSample == std::pair<int64_t, double>(0, 0)));
 
         //samples.clear();
-        //samples.insert(std::make_pair(-1000, 0));
-        //samples.insert(std::make_pair(0, 0));
-        //samples.insert(std::make_pair(1, 1));
-        //samples.insert(std::make_pair(1000, 0));
+        //samples.emplace(-1000, 0);
+        //samples.emplace(0, 0);
+        //samples.emplace(1, 1);
+        //samples.emplace(1000, 0);
         //return;
 
         lastSample = std::make_pair(timeNowMs, value);
@@ -893,7 +893,7 @@ public:
     }
 
 private:
-    virtual std::pair<double, double> getRangeX() const override
+    std::pair<double, double> getRangeX() const override
     {
         if (samples.empty())
             return std::make_pair(0.0, 0.0);
@@ -911,7 +911,7 @@ private:
                               upperEndMs / 1000.0);
     }
 
-    virtual Opt<CurvePoint> getLessEq(double x) const override //x: seconds since begin
+    Opt<CurvePoint> getLessEq(double x) const override //x: seconds since begin
     {
         const int64_t timex = std::floor(x * 1000);
         //------ add artifical last sample value -------
@@ -929,7 +929,7 @@ private:
         return CurvePoint(it->first / 1000.0, it->second);
     }
 
-    virtual Opt<CurvePoint> getGreaterEq(double x) const override
+    Opt<CurvePoint> getGreaterEq(double x) const override
     {
         const int64_t timex = std::ceil(x * 1000);
         //------ add artifical last sample value -------
@@ -961,13 +961,13 @@ public:
     double getValueX() const { return x_; }
 
 private:
-    virtual std::pair<double, double> getRangeX() const override { return std::make_pair(x_, x_); } //conceptually just a vertical line!
+    std::pair<double, double> getRangeX() const override { return std::make_pair(x_, x_); } //conceptually just a vertical line!
 
-    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
+    void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override
     {
-        points.push_back(CurvePoint(0,  y_));
-        points.push_back(CurvePoint(x_, y_));
-        points.push_back(CurvePoint(x_, 0));
+        points.emplace_back(0,  y_);
+        points.emplace_back(x_, y_);
+        points.emplace_back(x_,  0);
     }
 
     double x_; //time elapsed in seconds
@@ -980,7 +980,7 @@ const double stretchDefaultBlockSize = 1.4; //enlarge block default size
 
 struct LabelFormatterBytes : public LabelFormatter
 {
-    virtual double getOptimalBlockSize(double bytesProposed) const
+    double getOptimalBlockSize(double bytesProposed) const override
     {
         bytesProposed *= stretchDefaultBlockSize; //enlarge block default size
 
@@ -998,13 +998,13 @@ struct LabelFormatterBytes : public LabelFormatter
         return e * numeric::nearMatch(a, std::begin(steps), std::end(steps));
     }
 
-    virtual wxString formatText(double value, double optimalBlockSize) const { return filesizeToShortString(static_cast<std::int64_t>(value)); };
+    wxString formatText(double value, double optimalBlockSize) const override { return filesizeToShortString(static_cast<std::int64_t>(value)); };
 };
 
 
 struct LabelFormatterItemCount : public LabelFormatter
 {
-    virtual double getOptimalBlockSize(double itemsProposed) const
+    double getOptimalBlockSize(double itemsProposed) const override
     {
         itemsProposed *= stretchDefaultBlockSize; //enlarge block default size
 
@@ -1014,7 +1014,7 @@ struct LabelFormatterItemCount : public LabelFormatter
         return nextNiceNumber(itemsProposed);
     }
 
-    virtual wxString formatText(double value, double optimalBlockSize) const
+    wxString formatText(double value, double optimalBlockSize) const override
     {
         return toGuiString(numeric::round(value)); //not enough room for a "%x items" representation
     };
@@ -1025,7 +1025,7 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 {
     LabelFormatterTimeElapsed(bool drawLabel) : drawLabel_(drawLabel) {}
 
-    virtual double getOptimalBlockSize(double secProposed) const
+    double getOptimalBlockSize(double secProposed) const override
     {
         //5 sec minimum block size
         const double stepsSec[] = { 5, 10, 20, 30, 60 }; //nice numbers for seconds
@@ -1034,7 +1034,7 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 
         const double stepsMin[] = { 1, 2, 5, 10, 15, 20, 30, 60 }; //nice numbers for minutes
         if (secProposed <= 3600)
-            return 60.0 * numeric::nearMatch(secProposed / 60, std::begin(stepsMin), std::end(stepsMin));
+            return 60 * numeric::nearMatch(secProposed / 60, std::begin(stepsMin), std::end(stepsMin));
 
         if (secProposed <= 3600 * 24)
             return 3600 * nextNiceNumber(secProposed / 3600); //round up to full hours
@@ -1042,7 +1042,7 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
         return 24 * 3600 * nextNiceNumber(secProposed / (24 * 3600)); //round to full days
     }
 
-    virtual wxString formatText(double timeElapsed, double optimalBlockSize) const
+    wxString formatText(double timeElapsed, double optimalBlockSize) const override
     {
         if (!drawLabel_)
             return wxString();
@@ -1078,27 +1078,27 @@ public:
                            const wxString& jobName,
                            const Zstring& onCompletion,
                            std::vector<Zstring>& onCompletionHistory);
-    virtual ~SyncProgressDialogImpl();
+    ~SyncProgressDialogImpl() override;
 
     //call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
-    virtual void processHasFinished(SyncResult resultId, const ErrorLog& log);
-    virtual void closeWindowDirectly();
+    void processHasFinished(SyncResult resultId, const ErrorLog& log) override;
+    void closeWindowDirectly() override;
 
-    virtual wxWindow* getWindowIfVisible() { return this->IsShown() ? this : nullptr; }
+    wxWindow* getWindowIfVisible() override { return this->IsShown() ? this : nullptr; }
     //workaround OS X bug: if "this" is used as parent window for a modal dialog then this dialog will erroneously un-hide its parent!
 
-    virtual void initNewPhase();
-    virtual void notifyProgressChange();
-    virtual void updateGui() { updateGuiInt(true); }
+    void initNewPhase        () override;
+    void notifyProgressChange() override;
+    void updateGui           () override { updateGuiInt(true); }
 
-    virtual Zstring getExecWhenFinishedCommand() const { return pnl.m_comboBoxOnCompletion->getValue(); }
+    Zstring getExecWhenFinishedCommand() const override { return pnl.m_comboBoxOnCompletion->getValue(); }
 
-    virtual void stopTimer() //halt all internal counters!
+    void stopTimer() override //halt all internal counters!
     {
         pnl.m_animCtrlSyncing->Stop();
         timeElapsed.pause();
     }
-    virtual void resumeTimer()
+    void resumeTimer() override
     {
         pnl.m_animCtrlSyncing->Play();
         timeElapsed.resume();
@@ -1182,8 +1182,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     timeLastSpeedEstimateMs    (-1000000), //some big number
     phaseStartMs(0)
 {
-    assert_static((IsSameType<TopLevelDialog, wxFrame >::value ||
-                   IsSameType<TopLevelDialog, wxDialog>::value));
+    static_assert(IsSameType<TopLevelDialog, wxFrame >::value ||
+                  IsSameType<TopLevelDialog, wxDialog>::value, "");
     assert((IsSameType<TopLevelDialog, wxFrame>::value == !parentFrame));
 
     //finish construction of this dialog:

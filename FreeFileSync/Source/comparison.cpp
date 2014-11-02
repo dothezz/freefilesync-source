@@ -69,9 +69,8 @@ std::vector<ResolvedFolderPair> resolveDirectoryNames(const std::vector<FolderPa
     std::vector<ResolvedFolderPair> output;
 
     for (const FolderPairCfg& fpCfg : cfgList)
-        output.push_back(ResolvedFolderPair(
-                             getFormattedDirectoryPath(fpCfg.dirpathPhraseLeft),
-                             getFormattedDirectoryPath(fpCfg.dirpathPhraseRight)));
+        output.emplace_back(getFormattedDirectoryPath(fpCfg.dirpathPhraseLeft),
+                            getFormattedDirectoryPath(fpCfg.dirpathPhraseRight));
     warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
     return output;
 }
@@ -142,7 +141,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
 {
     std::vector<std::pair<Zstring, Zstring>> dependentDirs;
 
-    auto areDependent = [](const Zstring& lhs, const Zstring& rhs)
+    auto havePathDependency = [](const Zstring& lhs, const Zstring& rhs)
     {
         return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())), //note: this is NOT an equivalence relation!
                                Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
@@ -151,8 +150,8 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
     for (const ResolvedFolderPair& fp : folderPairs)
         if (!fp.dirpathLeft.empty() && !fp.dirpathRight.empty()) //empty folders names may be accepted by user
         {
-            if (areDependent(fp.dirpathLeft, fp.dirpathRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(fp.dirpathLeft, fp.dirpathRight));
+            if (havePathDependency(fp.dirpathLeft, fp.dirpathRight)) //test wheter leftDirectory begins with rightDirectory or the other way round
+                dependentDirs.emplace_back(fp.dirpathLeft, fp.dirpathRight);
         }
 
     if (!dependentDirs.empty())
@@ -201,7 +200,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, Pro
             callback_(pcb),
             itemsReported(0) {}
 
-        virtual void reportStatus(const std::wstring& statusMsg, int itemsTotal)
+        void reportStatus(const std::wstring& statusMsg, int itemsTotal) override
         {
             callback_.updateProcessedData(itemsTotal - itemsReported, 0); //processed bytes are reported in subfunctions!
             itemsReported = itemsTotal;
@@ -210,7 +209,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, Pro
             //callback_.requestUiRefresh(); //already called by reportStatus()
         }
 
-        virtual HandleError reportError(const std::wstring& msg, size_t retryNumber)
+        HandleError reportError(const std::wstring& msg, size_t retryNumber) override
         {
             switch (callback_.reportError(msg, retryNumber))
             {
@@ -808,11 +807,11 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
 
     std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> totalWorkLoad;
     for (size_t i = 0; i < cfgList.size(); ++i)
-        totalWorkLoad.push_back(std::make_pair(resInfo.resolvedPairs[i], cfgList[i]));
+        totalWorkLoad.emplace_back(resInfo.resolvedPairs[i], cfgList[i]);
 
     //lock (existing) directories before comparison
     if (createDirLocks)
-        dirLocks = make_unique<LockHolder>(resInfo.existingDirs, warnings.warningDirectoryLockFailed, callback);
+        dirLocks = zen::make_unique<LockHolder>(resInfo.existingDirs, warnings.warningDirectoryLockFailed, callback);
 
     try
     {
@@ -822,9 +821,9 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
         for (const auto& w : totalWorkLoad)
         {
             if (dirAvailable(w.first.dirpathLeft)) //only traverse *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
-                dirsToRead.insert(DirectoryKey(w.first.dirpathLeft,  w.second.filter.nameFilter, w.second.handleSymlinks));
+                dirsToRead.emplace(w.first.dirpathLeft,  w.second.filter.nameFilter, w.second.handleSymlinks);
             if (dirAvailable(w.first.dirpathRight))
-                dirsToRead.insert(DirectoryKey(w.first.dirpathRight, w.second.filter.nameFilter, w.second.handleSymlinks));
+                dirsToRead.emplace(w.first.dirpathRight, w.second.filter.nameFilter, w.second.handleSymlinks);
         }
 
         FolderComparison outputTmp; //write to output as a transaction!

@@ -91,7 +91,7 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
         {
             assert(btn->GetMinSize().GetHeight() == -1); //let OS or this routine do the sizing! note: OS X does not allow changing the (visible!) button height!
 #if defined ZEN_WIN || defined ZEN_LINUX
-    const int defaultHeight = wxButton::GetDefaultSize().GetHeight(); //buffered by wxWidgets
+            const int defaultHeight = wxButton::GetDefaultSize().GetHeight(); //buffered by wxWidgets
             btn->SetMinSize(wxSize(-1, std::max(defaultHeight, 30))); //default button height is much too small => increase!
 #endif
 

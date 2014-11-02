@@ -6,7 +6,7 @@
 
 #include "main_dlg.h"
 #include <zen/format_unit.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/serialize.h>
 #include <zen/thread.h>
 #include <zen/shell_execute.h>
@@ -94,7 +94,7 @@ public:
         DirectoryName(dropWindow1, dirSelectButton, dirpath, &staticText, &dropGrid.getMainWin()),
         mainDlg_(mainDlg) {}
 
-    virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) override
+    bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) override
     {
         if (std::any_of(droppedFiles.begin(), droppedFiles.end(), [](const wxString& filepath)
     {
@@ -155,13 +155,13 @@ public:
         mainDlg(mainDialog) {}
 
 private:
-    virtual MainConfiguration getMainConfig() const override { return mainDlg.getConfig().mainCfg; }
-    virtual wxWindow* getParentWindow() override { return &mainDlg; }
-    virtual std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() override { return mainDlg.filterCfgOnClipboard; }
+    MainConfiguration getMainConfig() const override { return mainDlg.getConfig().mainCfg; }
+    wxWindow* getParentWindow() override { return &mainDlg; }
+    std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() override { return mainDlg.filterCfgOnClipboard; }
 
-    virtual void onAltCompCfgChange    () override { mainDlg.applyCompareConfig(); }
-    virtual void onAltSyncCfgChange    () override { mainDlg.applySyncConfig(); }
-    virtual void onLocalFilterCfgChange() override { mainDlg.applyFilterConfig(); } //re-apply filter
+    void onAltCompCfgChange    () override { mainDlg.applyCompareConfig(); }
+    void onAltSyncCfgChange    () override { mainDlg.applySyncConfig(); }
+    void onLocalFilterCfgChange() override { mainDlg.applyFilterConfig(); } //re-apply filter
 
     MainDialog& mainDlg;
 };
@@ -260,7 +260,7 @@ public:
         MouseMoveWindow(mainDlg, false), //don't include main dialog itself, thereby prevent various mouse capture lost issues
         mainDlg_(mainDlg) {}
 
-    virtual bool allowMove(const wxMouseEvent& event) override
+    bool allowMove(const wxMouseEvent& event) override
     {
         if (wxPanel* panel = dynamic_cast<wxPanel*>(event.GetEventObject()))
         {
@@ -537,11 +537,11 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     auiMgr.AddPane(m_panelViewFilter,
                    wxAuiPaneInfo().Name(L"PanelView").Layer(2).Bottom().Row(1).Caption(_("View Settings")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
-    auiMgr.AddPane(m_gridNavi,
-                   wxAuiPaneInfo().Name(L"PanelOverview").Layer(3).Left().Position(1).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
-
     auiMgr.AddPane(m_panelConfig,
-                   wxAuiPaneInfo().Name(L"PanelConfig").Layer(3).Left().Position(2).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"PanelConfig").Layer(3).Left().Position(1).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
+
+    auiMgr.AddPane(m_gridNavi,
+                   wxAuiPaneInfo().Name(L"PanelOverview").Layer(3).Left().Position(2).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
 
     //set comparison button label tentatively for m_panelTopButtons to receive final height:
     updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
@@ -672,7 +672,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
         newItem->SetBitmap(getResourceImage(entry.languageFlag));
 
         //map menu item IDs with language IDs: evaluated when processing event handler
-        languageMenuItemMap.insert(std::make_pair(newItem->GetId(), entry.languageID));
+        languageMenuItemMap.emplace(newItem->GetId(), entry.languageID);
 
         //connect event
         this->Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnMenuLanguageSwitch));
@@ -917,7 +917,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     CaptionNameMapping captionNameMap;
     const wxAuiPaneInfoArray& paneArray = auiMgr.GetAllPanes();
     for (size_t i = 0; i < paneArray.size(); ++i)
-        captionNameMap.push_back(std::make_pair(paneArray[i].caption, paneArray[i].name));
+        captionNameMap.emplace_back(paneArray[i].caption, paneArray[i].name);
 
     auiMgr.LoadPerspective(globalSettings.gui.guiPerspectiveLast);
 
@@ -961,7 +961,7 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     std::map<int, Zstring> historyDetail; //(cfg-file/last use index)
     for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
         if (auto clientString = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
-            historyDetail.insert(std::make_pair(clientString->lastUseIndex_, clientString->cfgFile_));
+            historyDetail.emplace(clientString->lastUseIndex_, clientString->cfgFile_);
         else
             assert(false);
 
@@ -1162,7 +1162,7 @@ public:
         mainDlg.enableAllElements();
     }
 
-    virtual Response reportError(const std::wstring& msg) override
+    Response reportError(const std::wstring& msg) override
     {
         if (ignoreErrors)
             return DeleteFilesHandler::IGNORE_ERROR;
@@ -1189,7 +1189,7 @@ public:
         return DeleteFilesHandler::IGNORE_ERROR; //dummy return value
     }
 
-    virtual void reportWarning(const std::wstring& msg, bool& warningActive) override
+    void reportWarning(const std::wstring& msg, bool& warningActive) override
     {
         if (!warningActive || ignoreErrors)
             return;
@@ -1208,7 +1208,7 @@ public:
         }
     }
 
-    virtual void reportStatus (const std::wstring& msg) override
+    void reportStatus (const std::wstring& msg) override
     {
         statusMsg = msg;
         requestUiRefresh();
@@ -1363,11 +1363,11 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
             try
             {
 #ifdef ZEN_WIN
-                shellExecute2(L"\"" + fallbackDir + L"\"", EXEC_TYPE_ASYNC); //throw FileError
+                shellExecute(L"\"" + fallbackDir + L"\"", EXEC_TYPE_ASYNC); //throw FileError
 #elif defined ZEN_LINUX
-                shellExecute2("xdg-open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("xdg-open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
 #elif defined ZEN_MAC
-                shellExecute2("open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
 #endif
             }
             catch (const FileError& e) { showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); }
@@ -1422,7 +1422,7 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
         try
         {
             //caveat: spawning too many threads asynchronously can easily kill a user's desktop session on Ubuntu!
-            shellExecute2(cmdExp, selectionTmp.size() > massInvokeThreshold ? EXEC_TYPE_SYNC : EXEC_TYPE_ASYNC); //throw FileError
+            shellExecute(cmdExp, selectionTmp.size() > massInvokeThreshold ? EXEC_TYPE_SYNC : EXEC_TYPE_ASYNC); //throw FileError
         }
         catch (const FileError& e) { showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); }
     }
@@ -1986,8 +1986,8 @@ void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
     }
 
     //get selection on navigation tree and set corresponding markers on main grid
-    hash_set<const FileSystemObject*> markedFilesAndLinks; //mark files/symlinks directly
-    hash_set<const HierarchyObject*>  markedContainer;     //mark full container including child-objects
+    std::unordered_set<const FileSystemObject*> markedFilesAndLinks; //mark files/symlinks directly
+    std::unordered_set<const HierarchyObject*> markedContainer;      //mark full container including child-objects
 
     const std::vector<size_t>& selection = m_gridNavi->getSelectedRows();
     std::for_each(selection.begin(), selection.end(),
@@ -2054,13 +2054,13 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
             //by short name
             Zstring labelShort = Zstring(Zstr("*")) + FILE_NAME_SEPARATOR + selection[0]->getPairShortName();
             if (isDir)
-                labelShort += Zstring(FILE_NAME_SEPARATOR) + Zstr("*");
+                labelShort += FILE_NAME_SEPARATOR + Zstring(Zstr("*"));
             submenu.addItem(utfCvrtTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
 
             //by relative path
             Zstring labelRel = FILE_NAME_SEPARATOR + selection[0]->getPairRelativePath();
             if (isDir)
-                labelRel += Zstring(FILE_NAME_SEPARATOR) + Zstr("*");
+                labelRel += FILE_NAME_SEPARATOR + Zstring(Zstr("*"));
             submenu.addItem(utfCvrtTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
 
             menu.addSubmenu(label, submenu, &getResourceImage(iconName));
@@ -2182,13 +2182,13 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             //by short name
             Zstring labelShort = Zstring(Zstr("*")) + FILE_NAME_SEPARATOR + selection[0]->getPairShortName();
             if (isDir)
-                labelShort += Zstring(FILE_NAME_SEPARATOR) + Zstr("*");
+                labelShort += FILE_NAME_SEPARATOR + Zstring(Zstr("*"));
             submenu.addItem(utfCvrtTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
 
             //by relative path
             Zstring labelRel = FILE_NAME_SEPARATOR + selection[0]->getPairRelativePath();
             if (isDir)
-                labelRel += Zstring(FILE_NAME_SEPARATOR) + Zstr("*");
+                labelRel += FILE_NAME_SEPARATOR + Zstring(Zstr("*"));
             submenu.addItem(utfCvrtTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
 
             menu.addSubmenu(label, submenu, &getResourceImage(iconName));
@@ -2306,7 +2306,7 @@ void MainDialog::filterShortname(const FileSystemObject& fsObj, bool include)
     Zstring phrase = Zstring(Zstr("*")) + FILE_NAME_SEPARATOR + fsObj.getPairShortName();
     const bool isDir = dynamic_cast<const DirPair*>(&fsObj) != nullptr;
     if (isDir)
-        phrase += Zstring(FILE_NAME_SEPARATOR) + Zstr("*"); //include filter: * required; exclude filter: * optional, but let's still apply it!
+        phrase += FILE_NAME_SEPARATOR + Zstring(Zstr("*")); //include filter: * required; exclude filter: * optional, but let's still apply it!
 
     filterPhrase(phrase, include, true);
 }
@@ -2329,7 +2329,7 @@ void MainDialog::filterItems(const std::vector<FileSystemObject*>& selection, bo
 
             const bool isDir = dynamic_cast<const DirPair*>(fsObj) != nullptr;
             if (isDir)
-                phrase += Zstring(FILE_NAME_SEPARATOR) + Zstr("*"); //include filter: * required; exclude filter: * optional, but let's still apply it!
+                phrase += FILE_NAME_SEPARATOR + Zstring(Zstr("*")); //include filter: * required; exclude filter: * optional, but let's still apply it!
         }
         filterPhrase(phrase, include, true);
     }
@@ -2486,8 +2486,8 @@ void MainDialog::OnCompSettingsContext(wxMouseEvent& event)
 
     auto currentVar = getConfig().mainCfg.cmpConfig.compareVar;
 
-    menu.addRadio(_("File time and size"), [&] { setVariant(CMP_BY_TIME_SIZE); }, currentVar == CMP_BY_TIME_SIZE);
-    menu.addRadio(_("File content"      ), [&] { setVariant(CMP_BY_CONTENT);   }, currentVar == CMP_BY_CONTENT);
+    menu.addRadio(getVariantName(CMP_BY_TIME_SIZE), [&] { setVariant(CMP_BY_TIME_SIZE); }, currentVar == CMP_BY_TIME_SIZE);
+    menu.addRadio(getVariantName(CMP_BY_CONTENT  ), [&] { setVariant(CMP_BY_CONTENT);   }, currentVar == CMP_BY_CONTENT);
 
     menu.popup(*this);
 }
@@ -2505,10 +2505,10 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
 
     const auto currentVar = getConfig().mainCfg.syncCfg.directionCfg.var;
 
-    menu.addRadio(L"<- " + _("Two way") + L" ->" , [&] { setVariant(DirectionConfig::TWOWAY); }, currentVar == DirectionConfig::TWOWAY);
-    menu.addRadio(         _("Mirror")  + L" ->>", [&] { setVariant(DirectionConfig::MIRROR); }, currentVar == DirectionConfig::MIRROR);
-    menu.addRadio(         _("Update")  + L" ->" , [&] { setVariant(DirectionConfig::UPDATE); }, currentVar == DirectionConfig::UPDATE);
-    menu.addRadio(         _("Custom")           , [&] { setVariant(DirectionConfig::CUSTOM); }, currentVar == DirectionConfig::CUSTOM);
+    menu.addRadio(getVariantName(DirectionConfig::TWOWAY), [&] { setVariant(DirectionConfig::TWOWAY); }, currentVar == DirectionConfig::TWOWAY);
+    menu.addRadio(getVariantName(DirectionConfig::MIRROR), [&] { setVariant(DirectionConfig::MIRROR); }, currentVar == DirectionConfig::MIRROR);
+    menu.addRadio(getVariantName(DirectionConfig::UPDATE), [&] { setVariant(DirectionConfig::UPDATE); }, currentVar == DirectionConfig::UPDATE);
+    menu.addRadio(getVariantName(DirectionConfig::CUSTOM), [&] { setVariant(DirectionConfig::CUSTOM); }, currentVar == DirectionConfig::CUSTOM);
 
     menu.popup(*this);
 }
@@ -2632,7 +2632,7 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filep
         std::list<boost::unique_future<bool>> fileEx;
 
         for (const Zstring& filepath : filepaths)
-            fileEx.push_back(zen::async2<bool>([=] { return fileExists(filepath); }));
+            fileEx.push_back(zen::async([=] { return fileExists(filepath); }));
 
         //potentially slow network access => limit maximum wait time!
         wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(1000));
@@ -3727,7 +3727,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                 if (it->isExisting<RIGHT_SIDE>())
                     dirpathsExisting.insert(it->getBaseDirPf<RIGHT_SIDE>());
             }
-            dirLocks = make_unique<LockHolder>(dirpathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
+            dirLocks = zen::make_unique<LockHolder>(dirpathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -4433,18 +4433,16 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     if (provLeft && provMiddle && provRight)
     {
-        std::for_each(colAttrLeft.begin(), colAttrLeft.end(),
-                      [&](const Grid::ColumnAttribute& ca)
+        for (const Grid::ColumnAttribute& ca : colAttrLeft)
         {
             header += fmtValue(provLeft->getColumnLabel(ca.type_));
             header += CSV_SEP;
-        });
-        std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
-                      [&](const Grid::ColumnAttribute& ca)
+        }
+        for (const Grid::ColumnAttribute& ca : colAttrMiddle)
         {
             header += fmtValue(provMiddle->getColumnLabel(ca.type_));
             header += CSV_SEP;
-        });
+        }
         if (!colAttrRight.empty())
         {
             std::for_each(colAttrRight.begin(), colAttrRight.end() - 1,

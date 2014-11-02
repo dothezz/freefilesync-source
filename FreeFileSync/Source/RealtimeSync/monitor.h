@@ -25,8 +25,8 @@ struct MonitorCallback
         MONITOR_PHASE_WAITING,
     };
     virtual void setPhase(WatchPhase mode) = 0;
-    virtual void executeExternalCommand() = 0;
-    virtual void requestUiRefresh() = 0;
+    virtual void executeExternalCommand () = 0;
+    virtual void requestUiRefresh       () = 0;
     virtual void reportError(const std::wstring& msg) = 0; //automatically retries after return!
 };
 void monitorDirectories(const std::vector<Zstring>& dirpathPhrases,

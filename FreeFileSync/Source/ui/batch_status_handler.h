@@ -40,16 +40,16 @@ public:
                        std::vector<Zstring>& onCompletionHistory);
     ~BatchStatusHandler();
 
-    virtual void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID);
-    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta);
-    virtual void reportInfo(const std::wstring& text);
-    virtual void forceUiRefresh();
+    void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
+    void updateProcessedData(int objectsDelta, std::int64_t dataDelta)                override;
+    void reportInfo         (const std::wstring& text)                                override;
+    void forceUiRefresh     ()                                                        override;
 
-    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
-    virtual Response reportError(const std::wstring& errorMessage, size_t retryNumber);
-    virtual void reportFatalError(const std::wstring& errorMessage);
+    void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
+    Response reportError     (const std::wstring& errorMessage, size_t retryNumber   ) override;
+    void     reportFatalError(const std::wstring& errorMessage                       ) override;
 
-    virtual void abortProcessNow(); //throw BatchAbortProcess
+    void abortProcessNow() override; //throw BatchAbortProcess
 
 private:
     void onProgressDialogTerminate();

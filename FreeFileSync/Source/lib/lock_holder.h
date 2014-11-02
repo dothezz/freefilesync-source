@@ -29,8 +29,8 @@ public:
             {
             public:
                 WaitOnLockHandler(ProcessCallback& pc) : pc_(pc) {}
-                virtual void requestUiRefresh() { pc_.requestUiRefresh(); }  //allowed to throw exceptions
-                virtual void reportStatus(const std::wstring& text) { pc_.reportStatus(text); }
+                void requestUiRefresh()                     override { pc_.requestUiRefresh(); }  //allowed to throw exceptions
+                void reportStatus(const std::wstring& text) override { pc_.reportStatus(text); }
             private:
                 ProcessCallback& pc_;
             } callback(procCallback);
@@ -38,7 +38,7 @@ public:
             try
             {
                 //lock file creation is synchronous and may block noticeably for very slow devices (usb sticks, mapped cloud storages)
-                lockHolder.push_back(DirLock(dirpathFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)); //throw FileError
+                lockHolder.emplace_back(dirpathFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback); //throw FileError
             }
             catch (const FileError& e)
             {

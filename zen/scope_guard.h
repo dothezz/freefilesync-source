@@ -40,8 +40,8 @@ protected:
     bool isDismissed() const { return dismissed_; }
 
 private:
-    ScopeGuardBase           (const ScopeGuardBase&); // = delete
-    ScopeGuardBase& operator=(const ScopeGuardBase&); //
+    ScopeGuardBase           (const ScopeGuardBase&) = delete;
+    ScopeGuardBase& operator=(const ScopeGuardBase&) = delete;
 
     bool dismissed_;
 };
@@ -52,7 +52,7 @@ class ScopeGuardImpl : public ScopeGuardBase
 {
 public:
     explicit ScopeGuardImpl(const F& fun) : fun_(fun) {}
-    explicit ScopeGuardImpl(F&& fun) : fun_(std::move(fun)) {}
+    explicit ScopeGuardImpl(     F&& fun) : fun_(std::move(fun)) {}
     ScopeGuardImpl(ScopeGuardImpl&& other) : ScopeGuardBase(std::move(other)), fun_(std::move(other.fun_)) {}
 
     ~ScopeGuardImpl()

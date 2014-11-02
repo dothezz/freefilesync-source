@@ -7,10 +7,29 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Cannot copy symbolic link %x to %y.</source>
+<target></target>
+
+<source>
+- Detection active after initial sync
+- Requires and creates database files
+- Not supported by all file systems
+</source>
+<target></target>
+
 <source>C&lear</source>
 <target></target>
 
 <source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Unable to connect to freefilesync.org.</source>
+<target></target>
+
+<source>Removing old log files exceeding limit...</source>
+<target></target>
+
+<source>Open configuration for edit without executing.</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -223,6 +242,9 @@
 <source>%x GB</source>
 <target>%x GB</target>
 
+<source>Cannot load file %x.</source>
+<target>Kan ikke lese filen %x.</target>
+
 <source>Database file %x is incompatible.</source>
 <target>Databasefilen %x er inkompatibel.</target>
 
@@ -274,6 +296,9 @@
 <source>Creating file %x</source>
 <target>Oppretter filen %x</target>
 
+<source>Saving log file %x...</source>
+<target>Lagrer rapport %x...</target>
+
 <source>Items processed:</source>
 <target>Mapper behandlet:</target>
 
@@ -301,9 +326,6 @@
 <pluralform>%x tråder</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Oppretter udvidet tidsinformasjon: %x</target>
-
 <source>/sec</source>
 <target>/sek</target>
 
@@ -324,9 +346,6 @@
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Bruk FreeFileSync 64-bit til å lage VSS kopier på dette system.</target>
-
-<source>Cannot load file %x.</source>
-<target>Kan ikke lese filen %x.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan ikke bestemme volumnavn for %x.</target>
@@ -504,20 +523,20 @@ Kommandoen utføres hvis:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Godkjennelsesfeil: %x og %y har forskellig innhold</target>
 
-<source>Cannot find folder %x.</source>
-<target>Finner ikke mappen %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Destinasjonsmappen %x finnes allerede.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Finner ikke mappen %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Destinasjonsmappen skal angis.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Angi mappe til versionering.</target>
-
 <source>Source folder %x not found.</source>
 <target>Kildemappen %x ble ikke funnet.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Angi mappe til versionering.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Følgende mapper har uløste konflikter og synkroniseres ikke:</target>
@@ -560,9 +579,6 @@ Kommandoen utføres hvis:
 
 <source>Synchronization completed successfully</source>
 <target>Synkronisering gjennomført</target>
-
-<source>Saving log file %x...</source>
-<target>Lagrer rapport %x...</target>
 
 <source>Stopped</source>
 <target>Avbrutt</target>
@@ -614,9 +630,6 @@ Kommandoen utføres hvis:
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er oppdatert.</target>
-
-<source>Unable to connect to sourceforge.net.</source>
-<target>Kan ikke kontakte sourceforge.net.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Kunne ikke finne FreeFileSync's versjonsnummer online. Vil du kontrollere manuelt?</target>
@@ -846,17 +859,6 @@ Kommandoen utføres hvis:
 <source>Detect moved files</source>
 <target>Gjennkjenn flyttede filer</target>
 
-<source>
-- Requires and creates database files
-- Detection active after initial sync
-- Not supported by all file systems
-</source>
-<target>
-- Krever og oppretter databasefiler
-- Gjennkjennelse aktiv etter første synk
-- Understøtter ikke alle filsystemer
-</target>
-
 <source>Detect synchronization directions with the help of database files</source>
 <target>Gjennkjenn synkretninger ved hjelp av databasefiler</target>
 
@@ -1064,11 +1066,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Visninger</target>
 
-<source>Overview</source>
-<target>Oversikt</target>
-
 <source>Configuration</source>
 <target>Innstilling</target>
+
+<source>Overview</source>
+<target>Oversikt</target>
 
 <source>Main Bar</source>
 <target>Hovedlinje</target>
@@ -1448,9 +1450,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Kan ikke overvåke mappen %x.</target>
 
-<source>Conversion error:</source>
-<target>Konverteringsfeil:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Kan ikke slette filen %x.</target>
 
@@ -1483,9 +1482,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot create directory %x.</source>
 <target>Kan ikke opprette mappen %x.</target>
-
-<source>Cannot create symbolic link %x.</source>
-<target>Kan ikke opprette symbolsk link %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finne systemfunksjonen %x.</target>

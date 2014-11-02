@@ -11,22 +11,15 @@
 
 namespace zen
 {
-//std::list(C++11) compatible class for inplace element construction supporting non-copyable/movable types
+//std::list(C++11)-like class for inplace element construction supporting non-copyable/movable types
 //may be replaced by C++11 std::list when available...or never...
 template <class T>
 class FixedList
 {
     struct Node
     {
-        Node() : next(nullptr), val() {}
-        //no variadic templates on VC2010... :(
-        template <class A>                                                       Node(A&& a)                                           : next(nullptr), val(std::forward<A>(a)) {}
-        template <class A, class B>                                              Node(A&& a, B&& b)                                    : next(nullptr), val(std::forward<A>(a), std::forward<B>(b)) {}
-        template <class A, class B, class C>                                     Node(A&& a, B&& b, C&& c)                             : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c)) {}
-        template <class A, class B, class C, class D>                            Node(A&& a, B&& b, C&& c, D&& d)                      : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d)) {}
-        template <class A, class B, class C, class D, class E>                   Node(A&& a, B&& b, C&& c, D&& d, E&& e)               : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e)) {}
-        template <class A, class B, class C, class D, class E, class F>          Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f)        : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f)) {}
-        template <class A, class B, class C, class D, class E, class F, class G> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g) : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f), std::forward<G>(g)) {}
+        template <class... Args>
+        Node(Args&& ... args) : next(nullptr), val(std::forward<Args>(args)...) {}
 
         Node* next; //singly linked list is sufficient
         T val;
@@ -48,20 +41,20 @@ public:
         ListIterator& operator++() { iter = iter->next; return *this; }
         inline friend bool operator==(const ListIterator& lhs, const ListIterator& rhs) { return lhs.iter == rhs.iter; }
         inline friend bool operator!=(const ListIterator& lhs, const ListIterator& rhs) { return !(lhs == rhs); }
-        U& operator* () { return  iter->val; }
-        U* operator->() { return &iter->val; }
+        U& operator* () const { return  iter->val; }
+        U* operator->() const { return &iter->val; }
     private:
         NodeT* iter;
     };
 
     typedef T value_type;
-    typedef ListIterator<Node, T> iterator;
+    typedef ListIterator<      Node,       T> iterator;
     typedef ListIterator<const Node, const T> const_iterator;
-    typedef T& reference;
+    typedef       T& reference;
     typedef const T& const_reference;
 
     iterator begin() { return firstInsert; }
-    iterator end()   { return iterator(); }
+    iterator end  () { return iterator(); }
 
     const_iterator begin() const { return firstInsert; }
     const_iterator end  () const { return const_iterator(); }
@@ -75,14 +68,8 @@ public:
     reference&       back()       { return lastInsert->val; }
     const_reference& back() const { return lastInsert->val; }
 
-    void emplace_back() { pushNode(new Node); }
-    template <class A>                                                       void emplace_back(A&& a)                                           { pushNode(new Node(std::forward<A>(a))); }
-    template <class A, class B>                                              void emplace_back(A&& a, B&& b)                                    { pushNode(new Node(std::forward<A>(a), std::forward<B>(b))); }
-    template <class A, class B, class C>                                     void emplace_back(A&& a, B&& b, C&& c)                             { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c))); }
-    template <class A, class B, class C, class D>                            void emplace_back(A&& a, B&& b, C&& c, D&& d)                      { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d))); }
-    template <class A, class B, class C, class D, class E>                   void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e)               { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e))); }
-    template <class A, class B, class C, class D, class E, class F>          void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f)        { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f))); }
-    template <class A, class B, class C, class D, class E, class F, class G> void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g) { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f), std::forward<G>(g))); }
+    template <class... Args>
+    void emplace_back(Args&& ... args) { pushNode(new Node(std::forward<Args>(args)...)); }
 
     template <class Predicate>
     void remove_if(Predicate pred)
@@ -126,6 +113,7 @@ public:
     }
 
     bool empty() const { return firstInsert == nullptr; }
+
     size_t size() const { return sz; }
 
 private:

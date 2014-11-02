@@ -85,12 +85,12 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
         std::copy(&*stream.begin(),
                   &*stream.begin() + sizeof(uncompressedSize),
                   reinterpret_cast<char*>(&uncompressedSize));
-            //attention: contOut MUST NOT be empty! Else it will pass a nullptr to zlib_decompress() => Z_STREAM_ERROR although "uncompressedSize == 0"!!!
-            //secondary bug: don't dereference iterator into empty container!
-            if (uncompressedSize == 0) //cannot be 0: compress() directly maps empty -> empty container skipping zlib!
-                throw ZlibInternalError();
+        //attention: contOut MUST NOT be empty! Else it will pass a nullptr to zlib_decompress() => Z_STREAM_ERROR although "uncompressedSize == 0"!!!
+        //secondary bug: don't dereference iterator into empty container!
+        if (uncompressedSize == 0) //cannot be 0: compress() directly maps empty -> empty container skipping zlib!
+            throw ZlibInternalError();
 
-			try
+        try
         {
             contOut.resize(static_cast<size_t>(uncompressedSize)); //throw std::bad_alloc
         }

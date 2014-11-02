@@ -48,9 +48,9 @@ public:
                  const wxString& title);
 
 private:
-    virtual void OnOkay  (wxCommandEvent& event) override;
-    virtual void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
-    virtual void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
+    void OnOkay  (wxCommandEvent& event) override;
+    void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
 
     void onLocalKeyEvent(wxKeyEvent& event);
 
@@ -65,15 +65,15 @@ private:
     };
 
     //------------- comparison panel ----------------------
-    virtual void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Comparison Settings.html" , this); }
-    virtual void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Daylight Saving Time.html", this); }
+    void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Comparison Settings.html" , this); }
+    void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Daylight Saving Time.html", this); }
 
-    virtual void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    virtual void OnTimeSize(wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    virtual void OnContent (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    virtual void OnTimeSizeDouble(wxMouseEvent& event) override;
-    virtual void OnContentDouble (wxMouseEvent& event) override;
-    virtual void OnChangeCompOption(wxCommandEvent& event) override { updateCompGui(); }
+    void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    void OnTimeSize               (wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    void OnContent                (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
+    void OnTimeSizeDouble         (wxMouseEvent&   event) override;
+    void OnContentDouble          (wxMouseEvent&   event) override;
+    void OnChangeCompOption       (wxCommandEvent& event) override { updateCompGui(); }
 
     void updateCompGui();
 
@@ -83,9 +83,9 @@ private:
     EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 
     //------------- filter panel --------------------------
-    virtual void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Exclude Items.html", this); }
-    virtual void OnChangeFilterOption(wxCommandEvent& event) override { updateFilterGui(); }
-    virtual void OnFilterReset       (wxCommandEvent& event) override { setFilter(FilterConfig()); }
+    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Exclude Items.html", this); }
+    void OnChangeFilterOption(wxCommandEvent& event) override { updateFilterGui(); }
+    void OnFilterReset       (wxCommandEvent& event) override { setFilter(FilterConfig()); }
 
     void onFilterKeyEvent(wxKeyEvent& event);
     void setFilter(const FilterConfig& filter);
@@ -98,35 +98,35 @@ private:
     EnumDescrList<UnitSize> enumSizeDescr;
 
     //------------- synchronization panel -----------------
-    virtual void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWOWAY; updateSyncGui(); }
-    virtual void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR; updateSyncGui(); }
-    virtual void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE; updateSyncGui(); }
-    virtual void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM; updateSyncGui(); }
+    void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWOWAY; updateSyncGui(); }
+    void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR; updateSyncGui(); }
+    void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE; updateSyncGui(); }
+    void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM; updateSyncGui(); }
 
-    virtual void OnToggleLocalSyncSettings(wxCommandEvent& event) override { updateSyncGui(); }
-    virtual void OnToggleDetectMovedFiles(wxCommandEvent& event) override { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateSyncGui(); }
-    virtual void OnChangeSyncOption      (wxCommandEvent& event) override { updateSyncGui(); }
+    void OnToggleLocalSyncSettings(wxCommandEvent& event) override { updateSyncGui(); }
+    void OnToggleDetectMovedFiles (wxCommandEvent& event) override { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateSyncGui(); }
+    void OnChangeSyncOption       (wxCommandEvent& event) override { updateSyncGui(); }
 
-    virtual void OnSyncTwoWayDouble(wxMouseEvent& event) override;
-    virtual void OnSyncMirrorDouble(wxMouseEvent& event) override;
-    virtual void OnSyncUpdateDouble(wxMouseEvent& event) override;
-    virtual void OnSyncCustomDouble(wxMouseEvent& event) override;
+    void OnSyncTwoWayDouble(wxMouseEvent& event) override;
+    void OnSyncMirrorDouble(wxMouseEvent& event) override;
+    void OnSyncUpdateDouble(wxMouseEvent& event) override;
+    void OnSyncCustomDouble(wxMouseEvent& event) override;
 
-    virtual void OnExLeftSideOnly (wxCommandEvent& event) override;
-    virtual void OnExRightSideOnly(wxCommandEvent& event) override;
-    virtual void OnLeftNewer      (wxCommandEvent& event) override;
-    virtual void OnRightNewer     (wxCommandEvent& event) override;
-    virtual void OnDifferent      (wxCommandEvent& event) override;
-    virtual void OnConflict       (wxCommandEvent& event) override;
+    void OnExLeftSideOnly (wxCommandEvent& event) override;
+    void OnExRightSideOnly(wxCommandEvent& event) override;
+    void OnLeftNewer      (wxCommandEvent& event) override;
+    void OnRightNewer     (wxCommandEvent& event) override;
+    void OnDifferent      (wxCommandEvent& event) override;
+    void OnConflict       (wxCommandEvent& event) override;
 
-    virtual void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DELETE_PERMANENTLY;   updateSyncGui(); }
-    virtual void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
-    virtual void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
+    void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DELETE_PERMANENTLY;   updateSyncGui(); }
+    void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
+    void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
 
-    virtual void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateSyncGui(); }
-    virtual void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateSyncGui(); }
+    void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateSyncGui(); }
+    void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateSyncGui(); }
 
-    virtual void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Versioning.html", this); }
+    void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Versioning.html", this); }
 
     struct SyncOptions
     {

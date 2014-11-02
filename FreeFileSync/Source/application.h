@@ -19,10 +19,10 @@ public:
     Application() : returnCode(zen::FFS_RC_SUCCESS) {}
 
 private:
-    virtual bool OnInit();
-    virtual int  OnExit();
-    virtual int  OnRun();
-    virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
+    bool OnInit() override;
+    int  OnExit() override;
+    int  OnRun() override;
+    bool OnExceptionInMainLoop() override { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 
     void onEnterEventLoop(wxEvent& event);
     void onQueryEndSession(wxEvent& event);

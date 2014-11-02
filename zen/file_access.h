@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FILE_HANDLING_H_8017341345614857
-#define FILE_HANDLING_H_8017341345614857
+#ifndef FILE_ACCESS_H_8017341345614857
+#define FILE_ACCESS_H_8017341345614857
 
 #include <functional>
 #include "zstring.h"
@@ -57,15 +57,13 @@ struct InSyncAttributes
     FileId targetFileId;
 };
 
-void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissing, ErrorFileLocked (Windows-only)
+void copyFile(const Zstring& sourceFile, //throw FileError, ErrorFileLocked (Windows-only)
               const Zstring& targetFile, //symlink handling: dereference source
               bool copyFilePermissions,
               bool transactionalCopy,
               //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
               //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
               const std::function<void()>& onDeleteTargetFile, //may be nullptr; may throw!
-              //Linux:   unconditionally
-              //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and the exception will propagate as expected
               //accummulated delta != file size! consider ADS, sparse, compressed files
               const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus, //may be nullptr; may throw!
 
@@ -79,4 +77,4 @@ const Zchar TEMP_FILE_ENDING[] = Zstr(".ffs_tmp"); //don't use Zstring as global
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
 }
 
-#endif //FILE_HANDLING_H_8017341345614857
+#endif //FILE_ACCESS_H_8017341345614857

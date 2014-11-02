@@ -18,29 +18,29 @@ namespace zen
 {
 #ifdef ZEN_WIN
 inline
-    std::int64_t get64BitInt(DWORD low, LONG high)
-    {
-        static_assert(sizeof(low) + sizeof(high) == sizeof(std::int64_t), "");
+std::int64_t get64BitInt(DWORD low, LONG high)
+{
+    static_assert(sizeof(low) + sizeof(high) == sizeof(std::int64_t), "");
 
-        LARGE_INTEGER cvt = {};
-        cvt.LowPart  = low;
-        cvt.HighPart = high;
-        return cvt.QuadPart;
-    }
+    LARGE_INTEGER cvt = {};
+    cvt.LowPart  = low;
+    cvt.HighPart = high;
+    return cvt.QuadPart;
+}
 
 std::int64_t get64BitInt(std::uint64_t low, std::int64_t high) = delete;
 
 
 inline
 std::uint64_t get64BitUInt(DWORD low, DWORD high)
-    {
-        static_assert(sizeof(low) + sizeof(high) == sizeof(std::uint64_t), "");
+{
+    static_assert(sizeof(low) + sizeof(high) == sizeof(std::uint64_t), "");
 
-        ULARGE_INTEGER cvt = {};
-        cvt.LowPart  = low;
-        cvt.HighPart = high;
-        return cvt.QuadPart;
-    }
+    ULARGE_INTEGER cvt = {};
+    cvt.LowPart  = low;
+    cvt.HighPart = high;
+    return cvt.QuadPart;
+}
 
 std::int64_t get64BitUInt(std::uint64_t low, std::uint64_t high) = delete;
 
@@ -52,15 +52,15 @@ std::int64_t get64BitUInt(std::uint64_t low, std::uint64_t high) = delete;
 inline
 std::int64_t filetimeToTimeT(const FILETIME& ft)
 {
-     return static_cast<std::int64_t>(get64BitUInt(ft.dwLowDateTime, ft.dwHighDateTime) / 10000000U) - get64BitInt(3054539008UL, 2); //caveat: signed/unsigned arithmetics!
+    return static_cast<std::int64_t>(get64BitUInt(ft.dwLowDateTime, ft.dwHighDateTime) / 10000000U) - get64BitInt(3054539008UL, 2); //caveat: signed/unsigned arithmetics!
     //timeshift between ansi C time and FILETIME in seconds == 11644473600s
 }
 
 inline
 FILETIME timetToFileTime(std::int64_t utcTime)
-{	
-        ULARGE_INTEGER cvt = {};
-        cvt.QuadPart = (utcTime + get64BitInt(3054539008UL, 2)) * 10000000U; //caveat: signed/unsigned arithmetics!
+{
+    ULARGE_INTEGER cvt = {};
+    cvt.QuadPart = (utcTime + get64BitInt(3054539008UL, 2)) * 10000000U; //caveat: signed/unsigned arithmetics!
 
     const FILETIME output = { cvt.LowPart, cvt.HighPart };
     return output;

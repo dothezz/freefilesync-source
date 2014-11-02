@@ -63,16 +63,19 @@ struct FolderPairSyncCfg
     FolderPairSyncCfg(bool saveSyncDB,
                       const DeletionPolicy handleDel,
                       VersioningStyle versioningStyle,
-                      const Zstring& versioningDirFmt) :
+                      const Zstring& versioningDirFmt,
+                      DirectionConfig::Variant syncVariant) :
         saveSyncDB_(saveSyncDB),
         handleDeletion(handleDel),
         versioningStyle_(versioningStyle),
-        versioningFolder(versioningDirFmt) {}
+        versioningFolder(versioningDirFmt),
+        syncVariant_(syncVariant) {}
 
     bool saveSyncDB_; //save database if in automatic mode or dection of moved files is active
     DeletionPolicy handleDeletion;
     VersioningStyle versioningStyle_;
     Zstring versioningFolder; //formatted directory name
+    DirectionConfig::Variant syncVariant_;
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 

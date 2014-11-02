@@ -7,24 +7,26 @@
 #ifndef WINDOWS_VERSION_HEADER_238470348254325
 #define WINDOWS_VERSION_HEADER_238470348254325
 
+#include <cassert>
 #include <utility>
 #include "win.h" //includes "windows.h"
 
 namespace zen
 {
-	struct OsVersion
-	{
-		OsVersion() : major(), minor() {}
-		OsVersion(DWORD high, DWORD low) : major(high), minor(low) {}
+struct OsVersion
+{
+    OsVersion() : major(), minor() {}
+    OsVersion(DWORD high, DWORD low) : major(high), minor(low) {}
 
-			DWORD major;
-			DWORD minor;
-	};
-	inline bool operator< (const OsVersion& lhs, const OsVersion& rhs) { return lhs.major != rhs.major ? lhs.major < rhs.major : lhs.minor < rhs.minor; }
-	inline bool operator==(const OsVersion& lhs, const OsVersion& rhs) { return lhs.major == rhs.major && lhs.minor == rhs.minor; }
+    DWORD major;
+    DWORD minor;
+};
+inline bool operator< (const OsVersion& lhs, const OsVersion& rhs) { return lhs.major != rhs.major ? lhs.major < rhs.major : lhs.minor < rhs.minor; }
+inline bool operator==(const OsVersion& lhs, const OsVersion& rhs) { return lhs.major == rhs.major && lhs.minor == rhs.minor; }
 
 
 //version overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
+const OsVersion osVersionWin10        (6, 4);
 const OsVersion osVersionWin81        (6, 3);
 const OsVersion osVersionWin8         (6, 2);
 const OsVersion osVersionWin7         (6, 1);
@@ -61,11 +63,18 @@ OsVersion getOsVersion()
 {
     OSVERSIONINFO osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(osvi);
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996) //"'GetVersionExW': was declared deprecated"
+#endif
     if (!::GetVersionEx(&osvi)) //38 ns per call! (yes, that's nano!) -> we do NOT miss C++11 thread-safe statics right now...
-	{
-		assert(false);
-		return OsVersion();
-	}
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+    {
+        assert(false);
+        return OsVersion();
+    }
     return OsVersion(osvi.dwMajorVersion, osvi.dwMinorVersion);
 }
 
@@ -78,16 +87,16 @@ bool isRealOsVersion(const OsVersion& ver)
     verInfo.dwMajorVersion = ver.major;
     verInfo.dwMinorVersion = ver.minor;
 
-	//Syntax: http://msdn.microsoft.com/en-us/library/windows/desktop/ms725491%28v=vs.85%29.aspx
+    //Syntax: http://msdn.microsoft.com/en-us/library/windows/desktop/ms725491%28v=vs.85%29.aspx
     DWORDLONG conditionMask = 0;
     VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_EQUAL);
     VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_EQUAL);
 
     const bool rv = ::VerifyVersionInfo(&verInfo, VER_MAJORVERSION | VER_MINORVERSION, conditionMask)
-           == TRUE; //silence VC "performance warnings"
-	assert(rv || GetLastError() == ERROR_OLD_WIN_VERSION);
+                    == TRUE; //silence VC "performance warnings"
+    assert(rv || GetLastError() == ERROR_OLD_WIN_VERSION);
 
-	return rv;
+    return rv;
 }
 }
 

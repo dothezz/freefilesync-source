@@ -12,8 +12,7 @@
 #include <wx+/font_size.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
-#include <zen/assert_static.h>
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/build_info.h>
 #include "xml_proc.h"
 #include "tray_menu.h"
@@ -93,7 +92,7 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
-    dirpathFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
+    dirpathFirst = zen::make_unique<DirectoryName<wxTextCtrl>>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -202,7 +201,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 #endif
 
     build += zen::is64BitBuild ? L" x64" : L" x86";
-    assert_static(zen::is32BitBuild || zen::is64BitBuild);
+    static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
 
     showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
                            setTitle(_("About")).

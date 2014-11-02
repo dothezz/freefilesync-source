@@ -210,7 +210,7 @@
     <ClCompile Include="..\..\..\zen\debug_memory_leaks.cpp" />
     <ClCompile Include="..\..\..\zen\dir_watcher.cpp" />
     <ClCompile Include="..\..\..\zen\dst_hack.cpp" />
-    <ClCompile Include="..\..\..\zen\file_handling.cpp" />
+    <ClCompile Include="..\..\..\zen\file_access.cpp" />
     <ClCompile Include="..\..\..\zen\file_io.cpp" />
     <ClCompile Include="..\..\..\zen\file_traverser.cpp" />
     <ClCompile Include="..\..\..\zen\format_unit.cpp" />

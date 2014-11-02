@@ -19,7 +19,7 @@ void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
     {
         GetValues(StatusResult& res) : result_(res) {}
 
-        virtual void visit(const FilePair& fileObj)
+        void visit(const FilePair& fileObj) override
         {
             if (!fileObj.isEmpty<LEFT_SIDE>())
             {
@@ -33,7 +33,7 @@ void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
             }
         }
 
-        virtual void visit(const SymlinkPair& linkObj)
+        void visit(const SymlinkPair& linkObj) override
         {
             if (!linkObj.isEmpty<LEFT_SIDE>())
                 ++result_.filesOnLeftView;
@@ -42,7 +42,7 @@ void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
                 ++result_.filesOnRightView;
         }
 
-        virtual void visit(const DirPair& dirObj)
+        void visit(const DirPair& dirObj) override
         {
             if (!dirObj.isEmpty<LEFT_SIDE>())
                 ++result_.foldersOnLeftView;
@@ -70,14 +70,14 @@ void GridView::updateView(Predicate pred)
             if (pred(*fsObj))
             {
                 //save row position for direct random access to FilePair or DirPair
-                this->rowPositions.insert(std::make_pair(ref.objId, viewRef.size())); //costs: 0.28 µs per call - MSVC based on std::set
+                this->rowPositions.emplace(ref.objId, viewRef.size()); //costs: 0.28 µs per call - MSVC based on std::set
                 //"this->" required by two-pass lookup as enforced by GCC 4.7
 
                 //save row position to identify first child *on sorted subview* of DirPair or BaseDirPair in case latter are filtered out
                 const HierarchyObject* parent = &fsObj->parent();
                 for (;;) //map all yet unassociated parents to this row
                 {
-                    const auto rv = this->rowPositionsFirstChild.insert(std::make_pair(parent, viewRef.size()));
+                    const auto rv = this->rowPositionsFirstChild.emplace(parent, viewRef.size());
                     if (!rv.second)
                         break;
 
@@ -320,12 +320,12 @@ private:
     void recurse(HierarchyObject& hierObj)
     {
         for (FilePair& fileObj : hierObj.refSubFiles())
-            sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
+            sortedRef_.emplace_back(index_, fileObj.getId());
         for (SymlinkPair& linkObj : hierObj.refSubLinks())
-            sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
+            sortedRef_.emplace_back(index_, linkObj.getId());
         for (DirPair& dirObj : hierObj.refSubDirs())
         {
-            sortedRef_.push_back(RefIndex(index_, dirObj.getId()));
+            sortedRef_.emplace_back(index_, dirObj.getId());
             recurse(dirObj); //add recursion here to list sub-objects directly below parent!
         }
     }

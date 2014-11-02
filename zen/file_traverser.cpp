@@ -6,15 +6,13 @@
 
 #include "file_traverser.h"
 #include "sys_error.h"
-#include "assert_static.h"
 #include "symlink_target.h"
 #include "int64.h"
 
 #ifdef ZEN_WIN
 #include "win_ver.h"
 #include "long_path_prefix.h"
-#include "dst_hack.h"
-#include "file_handling.h" //remove this huge dependency when getting rid of DST hack!! until then we need "setFileTime"
+#include "file_access.h"
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
 
@@ -30,7 +28,7 @@
 
 using namespace zen;
 
- 
+
 namespace
 {
 //implement "retry" in a generic way:
@@ -179,8 +177,8 @@ struct Win32Traverser
 {
     struct DirHandle
     {
-		DirHandle(HANDLE hnd, const WIN32_FIND_DATA& d) : searchHandle(hnd), haveData(true), data(d) {}
-		explicit DirHandle(HANDLE hnd)                  : searchHandle(hnd), haveData(false) {}
+        DirHandle(HANDLE hnd, const WIN32_FIND_DATA& d) : searchHandle(hnd), haveData(true), data(d) {}
+        explicit DirHandle(HANDLE hnd)                  : searchHandle(hnd), haveData(false) {}
 
         HANDLE searchHandle;
         bool haveData;
@@ -193,7 +191,7 @@ struct Win32Traverser
     {
         const Zstring& dirpathPf = appendSeparator(dirpath);
 
-		WIN32_FIND_DATA fileData = {};
+        WIN32_FIND_DATA fileData = {};
         HANDLE hnd = ::FindFirstFile(applyLongPathPrefix(dirpathPf + L'*').c_str(), &fileData);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd == INVALID_HANDLE_VALUE)
@@ -208,7 +206,7 @@ struct Win32Traverser
             }
             throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirpath)), L"FindFirstFile", lastError);
         }
-		return DirHandle(hnd, fileData);
+        return DirHandle(hnd, fileData);
     }
 
     static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
@@ -271,11 +269,11 @@ struct FilePlusTraverser
 
     static DirHandle create(const Zstring& dirpath) //throw FileError
     {
-		const findplus::FindHandle hnd = ::openDir(applyLongPathPrefix(dirpath).c_str());
+        const findplus::FindHandle hnd = ::openDir(applyLongPathPrefix(dirpath).c_str());
         if (!hnd)
-		throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirpath)), L"openDir", getLastError());
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirpath)), L"openDir", getLastError());
 
-		return DirHandle(hnd);
+        return DirHandle(hnd);
     }
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
@@ -325,13 +323,13 @@ struct FilePlusTraverser
 class DirTraverser
 {
 public:
-    static void execute(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback)
+    static void execute(const Zstring& baseDirectory, TraverseCallback& sink)
     {
-        DirTraverser(baseDirectory, sink, dstCallback);
+        DirTraverser(baseDirectory, sink);
     }
 
 private:
-    DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback);
+    DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink);
     DirTraverser           (const DirTraverser&) = delete;
     DirTraverser& operator=(const DirTraverser&) = delete;
 
@@ -340,58 +338,6 @@ private:
 
     template <class Trav>
     void traverseWithException(const Zstring& dirpath, TraverseCallback& sink, DWORD volumeSerial /*may be 0!*/); //throw FileError, NeedFallbackToWin32Traverser
-
-    //####################################### DST hack ###########################################
-    void applyDstHack(zen::DstHackCallback& dstCallback)
-    {
-        int failedAttempts  = 0;
-        int filesToValidate = 50; //don't let data verification become a performance issue
-
-        for (auto it = markForDstHack.begin(); it != markForDstHack.end(); ++it)
-        {
-            if (failedAttempts >= 10) //some cloud storages don't support changing creation/modification times => don't waste (a lot of) time trying to
-                return;
-
-            dstCallback.requestUiRefresh(it->first);
-
-            try
-            {
-                //set modification time including DST hack: this function is too clever to not introduce this dependency
-                setFileTime(it->first, it->second, ProcSymlink::FOLLOW); //throw FileError
-            }
-            catch (FileError&)
-            {
-                ++failedAttempts;
-                assert(false); //don't throw exceptions due to dst hack here
-                continue;
-            }
-
-            //even at this point it's not sure whether data was written correctly, again cloud storages tend to lie about success status
-            if (filesToValidate-- > 0)
-            {
-                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(timetToFileTime(it->second)); //throw std::runtime_error
-
-                //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
-                WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-                ::GetFileAttributesEx(zen::applyLongPathPrefix(it->first).c_str(), //__in   LPCTSTR lpFileName,
-                                      GetFileExInfoStandard,                //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                      &debugeAttr);                         //__out  LPVOID lpFileInformation
-
-                if (::CompareFileTime(&debugeAttr.ftCreationTime,  &encodedTime.createTimeRaw) != 0 ||
-                    ::CompareFileTime(&debugeAttr.ftLastWriteTime, &encodedTime.writeTimeRaw)  != 0)
-                {
-                    ++failedAttempts;
-                    assert(false); //don't throw exceptions due to dst hack here
-                    continue;
-                }
-            }
-        }
-    }
-
-    const bool needDstHack;
-    typedef std::vector<std::pair<Zstring, std::int64_t>> FilenameTimeList;
-    FilenameTimeList markForDstHack;
-    //####################################### DST hack ###########################################
 };
 
 
@@ -420,8 +366,7 @@ void DirTraverser::traverse<FilePlusTraverser>(const Zstring& dirpath, TraverseC
 
 
 inline
-DirTraverser::DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback) :
-    needDstHack(dstCallback ? dst::isFatDrive(baseDirectory) : false)
+DirTraverser::DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink) 
 {
     try //traversing certain folders with restricted permissions requires this privilege! (but copying these files may still fail)
     {
@@ -433,11 +378,6 @@ DirTraverser::DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink,
         traverse<FilePlusTraverser>(baseDirectory, sink, retrieveVolumeSerial(baseDirectory)); //retrieveVolumeSerial returns 0 on error
     else //fallback
         traverse<Win32Traverser>(baseDirectory, sink, 0);
-
-    //apply daylight saving time hack AFTER file traversing, to give separate feedback to user
-    if (needDstHack)
-        if (dstCallback) //bound if "needDstHack == true"
-            applyDstHack(*dstCallback);
 }
 
 
@@ -507,20 +447,7 @@ void DirTraverser::traverseWithException(const Zstring& dirpath, TraverseCallbac
         }
         else //a file
         {
-            TraverseCallback::FileInfo fileInfo = Trav::extractFileInfo(findData, volumeSerial);
-
-            //####################################### DST hack ###########################################
-            if (needDstHack)
-            {
-                const dst::RawTime rawTime(Trav::getCreateTimeRaw(findData), Trav::getModTimeRaw(findData));
-
-                if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
-                    fileInfo.lastWriteTime = filetimeToTimeT(dst::fatDecodeUtcTime(rawTime)); //return real UTC time; throw std::runtime_error
-                else
-                    markForDstHack.push_back(std::make_pair(itempath, filetimeToTimeT(rawTime.writeTimeRaw)));
-            }
-            //####################################### DST hack ###########################################
-
+            const TraverseCallback::FileInfo fileInfo = Trav::extractFileInfo(findData, volumeSerial);
             sink.onFile(shortName, itempath, fileInfo);
         }
     }
@@ -531,13 +458,13 @@ void DirTraverser::traverseWithException(const Zstring& dirpath, TraverseCallbac
 class DirTraverser
 {
 public:
-    static void execute(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback)
+    static void execute(const Zstring& baseDirectory, TraverseCallback& sink)
     {
-        DirTraverser(baseDirectory, sink, dstCallback);
+        DirTraverser(baseDirectory, sink);
     }
 
 private:
-    DirTraverser(const Zstring& baseDirectory, zen::TraverseCallback& sink, zen::DstHackCallback* dstCallback)
+    DirTraverser(const Zstring& baseDirectory, zen::TraverseCallback& sink)
     {
         const Zstring directoryFormatted = //remove trailing slash
             baseDirectory.size() > 1 && endsWith(baseDirectory, FILE_NAME_SEPARATOR) ?  //exception: allow '/'
@@ -701,12 +628,4 @@ private:
 }
 
 
-void zen::traverseFolder(const Zstring& dirpath, TraverseCallback& sink, DstHackCallback* dstCallback)
-{
-	warn_static("let's tentatively disable the DST hack:")
-	DirTraverser::execute(dirpath, sink, nullptr);
-	return;
-#if 0
-    DirTraverser::execute(dirpath, sink, dstCallback);
-#endif
-}
+void zen::traverseFolder(const Zstring& dirpath, TraverseCallback& sink) { DirTraverser::execute(dirpath, sink); }

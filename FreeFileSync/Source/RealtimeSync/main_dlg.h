@@ -36,17 +36,17 @@ private:
 
     void loadConfig(const Zstring& filepath);
 
-    virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
-    virtual void OnShowHelp       (wxCommandEvent& event);
-    virtual void OnMenuAbout      (wxCommandEvent& event);
-    virtual void OnAddFolder      (wxCommandEvent& event);
-    virtual void OnRemoveFolder   (wxCommandEvent& event);
-    virtual void OnRemoveTopFolder(wxCommandEvent& event);
-    virtual void OnKeyPressed     (wxKeyEvent& event);
-    virtual void OnStart          (wxCommandEvent& event);
-    virtual void OnConfigSave     (wxCommandEvent& event);
-    virtual void OnConfigLoad     (wxCommandEvent& event);
-    virtual void OnMenuQuit       (wxCommandEvent& event) { Close(); }
+    void OnClose          (wxCloseEvent&  event ) override  { Destroy(); }
+    void OnShowHelp       (wxCommandEvent& event) override;
+    void OnMenuAbout      (wxCommandEvent& event) override;
+    void OnAddFolder      (wxCommandEvent& event) override;
+    void OnRemoveFolder   (wxCommandEvent& event);
+    void OnRemoveTopFolder(wxCommandEvent& event) override;
+    void OnKeyPressed     (wxKeyEvent&     event);
+    void OnStart          (wxCommandEvent& event) override;
+    void OnConfigSave     (wxCommandEvent& event) override;
+    void OnConfigLoad     (wxCommandEvent& event) override;
+    void OnMenuQuit       (wxCommandEvent& event) override { Close(); }
     void onFilesDropped(zen::FileDropEvent& event);
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);

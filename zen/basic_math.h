@@ -145,7 +145,7 @@ T clampCpy(const T& val, const T& minVal, const T& maxVal)
 }
 
 template <class T> inline
-void clamp(T& val, const T& minVal, const T& maxVal) 
+void clamp(T& val, const T& minVal, const T& maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)

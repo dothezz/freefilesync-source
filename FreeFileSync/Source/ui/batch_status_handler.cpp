@@ -5,7 +5,7 @@
 // **************************************************************************
 
 #include "batch_status_handler.h"
-#include <zen/file_handling.h>
+#include <zen/file_access.h>
 #include <zen/file_traverser.h>
 #include <zen/shell_execute.h>
 #include <wx+/popup_dlg.h>
@@ -39,30 +39,34 @@ Zstring addStatusToLogfilename(const Zstring& logfilepath, const std::wstring& s
 class FindLogfiles : public TraverseCallback
 {
 public:
-    FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
+    FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles, const std::function<void()>& onUpdateStatus) : prefix_(prefix), logfiles_(logfiles), onUpdateStatus_(onUpdateStatus) {}
 
 private:
-    virtual void onFile(const Zchar* shortName, const Zstring& filePath, const FileInfo& details)
+    void onFile(const Zchar* shortName, const Zstring& filePath, const FileInfo& details) override
     {
         const Zstring fileName(shortName);
         if (startsWith(fileName, prefix_) && endsWith(fileName, Zstr(".log")))
             logfiles_.push_back(filePath);
+
+        if (onUpdateStatus_)
+            onUpdateStatus_();
     }
 
-    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath) { return nullptr; } //DON'T traverse into subdirs
-    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
-    virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
+    TraverseCallback* onDir(const Zchar* shortName, const Zstring& dirpath)                            override { return nullptr; } //DON'T traverse into subdirs
+    HandleLink  onSymlink(const Zchar* shortName, const Zstring& linkpath, const SymlinkInfo& details) override { return LINK_SKIP; }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                           override { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)   override { assert(false); return ON_ERROR_IGNORE; } //
 
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
+    const std::function<void()> onUpdateStatus_;
 };
 
 
-void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_t maxCount) //throw()
+void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_t maxCount, const std::function<void()>& onUpdateStatus) //throw()
 {
     std::vector<Zstring> logFiles;
-    FindLogfiles traverseCallback(utfCvrtTo<Zstring>(jobname), logFiles); //throw()!
+    FindLogfiles traverseCallback(utfCvrtTo<Zstring>(jobname), logFiles, onUpdateStatus); //throw()!
     traverseFolder(logdir, traverseCallback);
 
     if (logFiles.size() <= maxCount)
@@ -71,8 +75,12 @@ void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_
     //delete oldest logfiles: take advantage of logfile naming convention to find them
     std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end(), LessFilename());
 
-    std::for_each(logFiles.begin(), logFiles.end() - maxCount,
-    [](const Zstring& filepath) { try { removeFile(filepath); } catch (FileError&) {} });
+    std::for_each(logFiles.begin(), logFiles.end() - maxCount, [&](const Zstring& filepath)
+    {
+        try { removeFile(filepath); }
+        catch (FileError&) {};
+        onUpdateStatus();
+    });
 }
 
 
@@ -95,7 +103,7 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
     for (int i = 0;; ++i)
         try
         {
-            return make_unique<FileOutput>(filepath, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
+            return zen::make_unique<FileOutput>(filepath, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
             //*no* file system race-condition!
         }
         catch (const ErrorTargetExisting&)
@@ -161,7 +169,7 @@ BatchStatusHandler::~BatchStatusHandler()
         {
             switchBatchToGui_.execute(); //open FreeFileSync GUI
         }
-        catch (...) {}
+        catch (...) { assert(false); }
         showFinalResults = false;
     }
     else if (progressDlg)
@@ -181,7 +189,7 @@ BatchStatusHandler::~BatchStatusHandler()
                     try
                     {
                         //use EXEC_TYPE_ASYNC until there is reason no to: https://sourceforge.net/p/freefilesync/discussion/help/thread/828dca52
-                        tryReportingError([&] { shellExecute2(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
+                        tryReportingError([&] { shellExecute(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError, throw X?
                                           *this);
                     }
                     catch (...) {}
@@ -232,23 +240,19 @@ BatchStatusHandler::~BatchStatusHandler()
         (wxGetUTCTimeMillis().GetValue() - startTime_) / 1000
     };
 
-    //print the results list: logfile
+    //----------------- write results into user-specified logfile ------------------------
     if (logFile.get())
     {
-        try
-        {
-            //saving log file below may take a *long* time, so report (without logging)
-            reportStatus(replaceCpy(_("Saving log file %x..."), L"%x", fmtFileName(logFile->getFilename()))); //throw?
-            forceUiRefresh(); //
-        }
-        catch (...) {}
-
         if (logfilesCountLimit_ > 0)
-            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit_); //throw()
+        {
+            try { reportStatus(_("Cleaning up old log files exceeding limit...")); }
+            catch (...) {}
+            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit_, [&] { try { requestUiRefresh(); } catch (...) {} }); //throw()
+        }
 
         try
         {
-            saveLogToFile(summary, errorLog, *logFile); //throw FileError
+            saveLogToFile(summary, errorLog, *logFile, OnUpdateLogfileStatusNoThrow(*this, logFile->getFilename())); //throw FileError
 
             //additionally notify errors by showing in log file name
             const Zstring oldLogfilepath = logFile->getFilename();
@@ -262,9 +266,10 @@ BatchStatusHandler::~BatchStatusHandler()
         }
         catch (FileError&) {}
     }
+    //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
     }
     catch (FileError&) {}
 

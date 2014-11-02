@@ -5,7 +5,8 @@
 // **************************************************************************
 
 #include "db_file.h"
-#include <zen/file_handling.h>
+#include <unordered_set>
+#include <zen/file_access.h>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
 #include <zen/utf.h>
@@ -54,7 +55,7 @@ Zstring getDatabaseFilePath(const BaseDirPair& baseDirObj, bool tempfile = false
 
 //#######################################################################################################################################
 
-void saveStreams(const DbStreams& streamList, const Zstring& filepath) //throw FileError
+void saveStreams(const DbStreams& streamList, const Zstring& filepath, const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus) //throw FileError
 {
     BinStreamOut streamOut;
 
@@ -73,8 +74,8 @@ void saveStreams(const DbStreams& streamList, const Zstring& filepath) //throw F
         writeContainer<BinaryStream>(streamOut, stream.second);
     }
 
-    assert(!somethingExists(filepath)); //orphan tmp files should be cleaned up already at this point!
-    saveBinStream(filepath, streamOut.get()); //throw FileError
+    assert(!somethingExists(filepath)); //orphan tmp files should have been cleaned up at this point!
+    saveBinStream(filepath, streamOut.get(), onUpdateSaveStatus); //throw FileError
 
 #ifdef ZEN_WIN
     //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
@@ -87,7 +88,9 @@ DbStreams loadStreams(const Zstring& filepath) //throw FileError, FileErrorDatab
 {
     try
     {
-        BinStreamIn streamIn = loadBinStream<BinaryStream>(filepath); //throw FileError
+        warn_static("TODO: implement loadBinStream callback")
+
+        BinStreamIn streamIn = loadBinStream<BinaryStream>(filepath, nullptr); //throw FileError
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
@@ -245,8 +248,8 @@ private:
         writeNumber<std:: int64_t>(output, descr.lastWriteTimeRaw);
         writeNumber<std::uint64_t>(output, descr.fileId.first);
         writeNumber<std::uint64_t>(output, descr.fileId.second);
-        assert_static(sizeof(descr.fileId.first ) <= sizeof(std::uint64_t));
-        assert_static(sizeof(descr.fileId.second) <= sizeof(std::uint64_t));
+        static_assert(sizeof(descr.fileId.first ) <= sizeof(std::uint64_t), "");
+        static_assert(sizeof(descr.fileId.second) <= sizeof(std::uint64_t), "");
     }
 
     static void writeLink(BinStreamOut& output, const InSyncDescrLink& descr)
@@ -427,14 +430,14 @@ private:
     template <class M, class V>
     static V& updateItem(M& map, const Zstring& key, const V& value)
     {
-        auto rv = map.insert(typename M::value_type(key, value));
+        auto rv = map.emplace(key, value);
         if (!rv.second)
         {
 #if defined ZEN_WIN || defined ZEN_MAC //caveat: key must be updated, if there is a change in short name case!!!
             if (rv.first->first != key)
             {
                 map.erase(rv.first);
-                return map.insert(typename M::value_type(key, value)).first->second;
+                return map.emplace(key, value).first->second;
             }
 #endif
             rv.first->second = value;
@@ -455,7 +458,7 @@ private:
             if (it->first != key)
             {
                 map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
-                return map.insert(typename M::value_type(key, value)).first->second;
+                return map.emplace(key, value).first->second;
             }
         #endif
             it->second = value;
@@ -467,7 +470,7 @@ private:
 
     void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelativeNamePf, InSyncDir::FileList& dbFiles)
     {
-        hash_set<const InSyncFile*> toPreserve; //referencing fixed-in-memory std::map elements
+        std::unordered_set<const InSyncFile*> toPreserve; //referencing fixed-in-memory std::map elements
         for (const FilePair& fileObj : currentFiles)
             if (!fileObj.isEmpty())
             {
@@ -511,7 +514,7 @@ private:
 
     void process(const HierarchyObject::SubLinkVec& currentLinks, const Zstring& parentRelativeNamePf, InSyncDir::LinkList& dbLinks)
     {
-        hash_set<const InSyncSymlink*> toPreserve;
+        std::unordered_set<const InSyncSymlink*> toPreserve;
         for (const SymlinkPair& linkObj : currentLinks)
             if (!linkObj.isEmpty())
             {
@@ -547,7 +550,7 @@ private:
 
     void process(const HierarchyObject::SubDirVec& currentDirs, const Zstring& parentRelativeNamePf, InSyncDir::DirList& dbDirs)
     {
-        hash_set<const InSyncDir*> toPreserve;
+        std::unordered_set<const InSyncDir*> toPreserve;
         for (const DirPair& dirObj : currentDirs)
             if (!dirObj.isEmpty())
                 switch (dirObj.getDirCategory())
@@ -558,7 +561,7 @@ private:
 
                         //update directory entry only (shallow), but do *not touch* exising child elements!!!
                         const Zstring& key = dirObj.getPairShortName();
-                        auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::DIR_STATUS_IN_SYNC))); //get or create
+                        auto insertResult = dbDirs.emplace(key, InSyncDir(InSyncDir::DIR_STATUS_IN_SYNC)); //get or create
                         auto it = insertResult.first;
 
 #if defined ZEN_WIN || defined ZEN_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
@@ -567,7 +570,7 @@ private:
                         {
                             auto oldValue = std::move(it->second);
                             dbDirs.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
-                            it = dbDirs.insert(InSyncDir::DirList::value_type(key, std::move(oldValue))).first;
+                            it = dbDirs.emplace(key, std::move(oldValue)).first;
                         }
 #endif
                         InSyncDir& dir = it->second;
@@ -583,7 +586,7 @@ private:
                         //Example: directories on left and right differ in case while sub-files are equal
                     {
                         //reuse last "in-sync" if available or insert strawman entry (do not try to update and thereby remove child elements!!!)
-                        InSyncDir& dir = dbDirs.insert(std::make_pair(dirObj.getPairShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN))).first->second;
+                        InSyncDir& dir = dbDirs.emplace(dirObj.getPairShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN)).first->second;
                         toPreserve.insert(&dir);
                         recurse(dirObj, dir);
                     }
@@ -739,12 +742,14 @@ void zen::saveLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileEr
     streamsLeft [sessionID] = std::move(updatedStreamLeft);
     streamsRight[sessionID] = std::move(updatedStreamRight);
 
+    warn_static("TODO: implement saveStreams callback")
+
     //write (temp-) files...
     zen::ScopeGuard guardTempFileLeft = zen::makeGuard([&] {zen::removeFile(dbNameLeftTmp); });
-    saveStreams(streamsLeft, dbNameLeftTmp);  //throw FileError
+    saveStreams(streamsLeft, dbNameLeftTmp, nullptr);  //throw FileError
 
     zen::ScopeGuard guardTempFileRight = zen::makeGuard([&] {zen::removeFile(dbNameRightTmp); });
-    saveStreams(streamsRight, dbNameRightTmp); //throw FileError
+    saveStreams(streamsRight, dbNameRightTmp, nullptr); //throw FileError
 
     //operation finished: rename temp files -> this should work transactionally:
     //if there were no write access, creation of temp files would have failed

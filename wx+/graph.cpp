@@ -119,18 +119,19 @@ void widenRange(double& valMin, double& valMax, //in/out
     {
         double valRangePerBlock = (valMax - valMin) * optimalBlockSizePx / graphAreaSize; //proposal
         valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
-        if (!numeric::isNull(valRangePerBlock))
-        {
-			int blockMin = std::floor(valMin / valRangePerBlock);
-			int blockMax = std::ceil (valMax / valRangePerBlock);
-			if (blockMin == blockMax) //handle valMin == valMax == integer
-				++blockMax; 
+        if (numeric::isNull(valRangePerBlock)) //handle valMin == valMax
+            valRangePerBlock = 1;
+        warn_static("/|  arbitrary!?")
 
-            valMin = blockMin * valRangePerBlock;
-            valMax = blockMax * valRangePerBlock;	
-            blockCount = blockMax - blockMin;
-            return;
-        }
+        int blockMin = std::floor(valMin / valRangePerBlock);
+        int blockMax = std::ceil (valMax / valRangePerBlock);
+        if (blockMin == blockMax) //handle valMin == valMax == integer
+            ++blockMax;
+
+        valMin = blockMin * valRangePerBlock;
+        valMax = blockMax * valRangePerBlock;
+        blockCount = blockMax - blockMin;
+        return;
     }
     blockCount = 0;
 }
@@ -322,7 +323,7 @@ void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, st
         for (int i = posFrom; i <= posTo; ++i)
         {
             const double x = cvrtX.screenToReal(i);
-            points.push_back(CurvePoint(x, getValue(x)));
+            points.emplace_back(x, getValue(x));
         }
     }
 }
@@ -343,7 +344,7 @@ void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::v
 
             if (addSteps_)
                 if (pt.y != points.back().y)
-                    points.push_back(CurvePoint(pt.x, points.back().y));
+                    points.emplace_back(CurvePoint(pt.x, points.back().y)); //[!] aliasing parameter not yet supported via emplace_back: VS bug! => make copy
         }
         points.push_back(pt);
     };
@@ -442,7 +443,7 @@ void Graph2D::onPaintEvent(wxPaintEvent& event)
 
 void Graph2D::OnMouseLeftDown(wxMouseEvent& event)
 {
-    activeSel.reset(new MouseSelection(*this, event.GetPosition()));
+    activeSel = zen::make_unique<MouseSelection>(*this, event.GetPosition());
 
     if (!event.ControlDown())
         oldSel.clear();
@@ -498,7 +499,7 @@ void Graph2D::addCurve(const std::shared_ptr<CurveData>& data, const CurveAttrib
     CurveAttributes newAttr = ca;
     if (newAttr.autoColor)
         newAttr.setColor(getDefaultColor(curves_.size()));
-    curves_.push_back(std::make_pair(data, newAttr));
+    curves_.emplace_back(data, newAttr);
     Refresh();
 }
 
@@ -699,8 +700,8 @@ void Graph2D::render(wxDC& dc) const
                     std::vector<wxPoint> points = drawPoints[it - curves_.begin()];
                     if (!points.empty())
                     {
-                        points.push_back(wxPoint(points.back ().x, graphArea.GetBottom())); //add lower right and left corners
-                        points.push_back(wxPoint(points.front().x, graphArea.GetBottom())); //
+                        points.emplace_back(wxPoint(points.back ().x, graphArea.GetBottom())); //add lower right and left corners
+                        points.emplace_back(wxPoint(points.front().x, graphArea.GetBottom())); //[!] aliasing parameter not yet supported via emplace_back: VS bug! => make copy
 
                         wxDCBrushChanger dummy(dc, it->second.fillColor);
                         wxDCPenChanger  dummy2(dc, it->second.fillColor);

@@ -300,8 +300,9 @@ protected:
     wxSpinCtrl* m_spinCtrlMaxSize;
     wxChoice* m_choiceUnitMaxSize;
     wxStaticLine* m_staticline62;
-    wxButton* m_buttonClear;
     wxStaticText* m_staticText44;
+    wxStaticLine* m_staticline46;
+    wxButton* m_buttonClear;
     wxPanel* m_panelSyncSettingsHolder;
     wxBoxSizer* bSizerLocalSyncSettings;
     wxCheckBox* m_checkBoxUseLocalSyncOptions;

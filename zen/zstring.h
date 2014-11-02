@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef ZSTRING_H_INCLUDED
-#define ZSTRING_H_INCLUDED
+#ifndef ZSTRING_H_INCLUDED_73425873425789
+#define ZSTRING_H_INCLUDED_73425873425789
 
 #include "string_base.h"
 
@@ -66,30 +66,26 @@ typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChec
 
 
 //Compare filepaths: Windows does NOT distinguish between upper/lower-case, while Linux DOES
-template <template <class, class> class SP, class AP>
-int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs);
+int cmpFileName(const Zstring& lhs, const Zstring& rhs);
 
 struct LessFilename //case-insensitive on Windows, case-sensitive on Linux
 {
-    template <template <class, class> class SP, class AP>
-    bool operator()(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs) const { return cmpFileName(lhs, rhs) < 0; }
+    bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) < 0; }
 };
 
 struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
 {
-    template <template <class, class> class SP, class AP>
-    bool operator()(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs) const { return cmpFileName(lhs, rhs) == 0; }
+    bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) == 0; }
 };
 
 #if defined ZEN_WIN || defined ZEN_MAC
-template <template <class, class> class SP, class AP>
-void makeUpper(zen::Zbase<Zchar, SP, AP>& str);
+Zstring makeUpperCopy(const Zstring& str);
 #endif
 
 inline
 Zstring appendSeparator(Zstring path) //support rvalue references!
 {
-    return endsWith(path, FILE_NAME_SEPARATOR) ? path : (path += FILE_NAME_SEPARATOR);
+    return zen::endsWith(path, FILE_NAME_SEPARATOR) ? path : (path += FILE_NAME_SEPARATOR);
 }
 
 
@@ -98,44 +94,13 @@ Zstring appendSeparator(Zstring path) //support rvalue references!
 
 
 //################################# inline implementation ########################################
-namespace z_impl
-{
-#if defined ZEN_WIN || defined ZEN_MAC
-int compareFilenamesNoCase(const Zchar* lhs, const Zchar* rhs, size_t sizeLhs, size_t sizeRhs);
-void makeFilenameUpperCase(Zchar* str, size_t size);
-#endif
-}
 
-
-template <template <class, class> class SP, class AP> inline
-int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs)
+#ifdef ZEN_LINUX
+inline
+int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 {
-#if defined ZEN_WIN || defined ZEN_MAC
-    return z_impl::compareFilenamesNoCase(lhs.data(), rhs.data(), lhs.length(), rhs.length());
-#elif defined ZEN_LINUX
     return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filepaths don't have embedded 0
-    //#elif defined ZEN_MAC
-    //  return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
-#endif
-}
-
-
-#if defined ZEN_WIN || defined ZEN_MAC
-template <template <class, class> class SP, class AP> inline
-void makeUpper(zen::Zbase<Zchar, SP, AP>& str)
-{
-    z_impl::makeFilenameUpperCase(str.begin(), str.length());
 }
 #endif
 
-
-namespace std
-{
-template<> inline
-void swap(Zstring& rhs, Zstring& lhs)
-{
-    rhs.swap(lhs);
-}
-}
-
-#endif //ZSTRING_H_INCLUDED
+#endif //ZSTRING_H_INCLUDED_73425873425789

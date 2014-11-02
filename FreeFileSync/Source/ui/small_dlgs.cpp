@@ -40,9 +40,9 @@ public:
     AboutDlg(wxWindow* parent);
 
 private:
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnOK    (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
-    virtual void OnDonate(wxCommandEvent& event) { wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/donate.php"); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnOK    (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
+    void OnDonate(wxCommandEvent& event) override { wxLaunchDefaultBrowser(L"http://www.freefilesync.org/donate.php"); }
 };
 
 
@@ -91,7 +91,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 #endif
 
     build += zen::is64BitBuild ? L" x64" : L" x86";
-    assert_static(zen::is32BitBuild || zen::is64BitBuild);
+    static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
 
@@ -151,11 +151,10 @@ public:
                  bool& useRecycleBin);
 
 private:
-    virtual void OnOK(wxCommandEvent& event);
-    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnDelOnBothSides(wxCommandEvent& event);
-    virtual void OnUseRecycler(wxCommandEvent& event);
+    void OnOK    (wxCommandEvent& event) override;
+    void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnUseRecycler   (wxCommandEvent& event) override;
 
     void updateGui();
 
@@ -256,10 +255,6 @@ void DeleteDialog::OnOK(wxCommandEvent& event)
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
-void DeleteDialog::OnDelOnBothSides(wxCommandEvent& event)
-{
-    updateGui();
-}
 
 void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 {
@@ -289,9 +284,9 @@ public:
                         const zen::SyncStatistics& st,
                         bool& dontShowAgain);
 private:
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnStartSync(wxCommandEvent& event);
+    void OnClose    (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnCancel   (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnStartSync(wxCommandEvent& event) override;
 
     bool& m_dontShowAgain;
 };
@@ -379,18 +374,18 @@ public:
     OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 private:
-    virtual void OnOkay(wxCommandEvent& event);
-    virtual void OnResetDialogs(wxCommandEvent& event);
-    virtual void OnDefault(wxCommandEvent& event);
-    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnAddRow(wxCommandEvent& event);
-    virtual void OnRemoveRow(wxCommandEvent& event);
-    virtual void OnHelpShowExamples(wxHyperlinkEvent& event) { displayHelpEntry(L"html/External Applications.html", this); }
+    void OnOkay        (wxCommandEvent& event) override;
+    void OnResetDialogs(wxCommandEvent& event) override;
+    void OnDefault     (wxCommandEvent& event) override;
+    void OnCancel      (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose       (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnAddRow      (wxCommandEvent& event) override;
+    void OnRemoveRow   (wxCommandEvent& event) override;
+    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/External Applications.html", this); }
     void onResize(wxSizeEvent& event);
     void updateGui();
 
-    virtual void OnToggleAutoRetryCount(wxCommandEvent& event) { updateGui(); }
+    void OnToggleAutoRetryCount(wxCommandEvent& event) override { updateGui(); }
 
     void setExtApp(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp() const;
@@ -578,7 +573,7 @@ xmlAccess::ExternalApps OptionsDlg::getExtApp() const
             description = it->second;
 
         if (!description.empty() || !commandline.empty())
-            output.push_back(std::make_pair(description, commandline));
+            output.emplace_back(description, commandline);
     }
     return output;
 }
@@ -629,16 +624,16 @@ public:
     SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
 
 private:
-    virtual void OnOkay(wxCommandEvent& event);
-    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnOkay  (wxCommandEvent& event) override;
+    void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
-    virtual void OnChangeSelectionFrom(wxCalendarEvent& event)
+    void OnChangeSelectionFrom(wxCalendarEvent& event) override
     {
         if (m_calendarFrom->GetDate() > m_calendarTo->GetDate())
             m_calendarTo->SetDate(m_calendarFrom->GetDate());
     }
-    virtual void OnChangeSelectionTo(wxCalendarEvent& event)
+    void OnChangeSelectionTo(wxCalendarEvent& event) override
     {
         if (m_calendarFrom->GetDate() > m_calendarTo->GetDate())
             m_calendarFrom->SetDate(m_calendarTo->GetDate());

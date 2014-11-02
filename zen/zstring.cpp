@@ -6,6 +6,7 @@
 
 #include "zstring.h"
 #include <stdexcept>
+#include <unordered_map>
 
 #ifdef ZEN_WIN
 #include "dll.h"
@@ -40,7 +41,7 @@ public:
     void insert(const void* ptr, size_t size)
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
-        if (!activeStrings.insert(std::make_pair(ptr, size)).second)
+        if (!activeStrings.emplace(ptr, size).second)
             reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
@@ -96,7 +97,7 @@ private:
     }
 
     boost::mutex lockActStrings;
-    zen::hash_map<const void*, size_t> activeStrings;
+    std::unordered_map<const void*, size_t> activeStrings;
 };
 
 //caveat: function scope static initialization is not thread-safe in VS 2010!
@@ -148,15 +149,15 @@ const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<Compa
 }
 
 
-int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs)
+int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 {
     if (compareStringOrdinal) //this additional test has no noticeable performance impact
     {
-        const int rv = compareStringOrdinal(lhs,                       //__in  LPCWSTR lpString1,
-                                            static_cast<int>(sizeLhs), //__in  int cchCount1,
-                                            rhs,                       //__in  LPCWSTR lpString2,
-                                            static_cast<int>(sizeRhs), //__in  int cchCount2,
-                                            true);                     //__in  BOOL bIgnoreCase
+        const int rv = compareStringOrdinal(lhs.c_str(),                  //__in  LPCWSTR lpString1,
+                                            static_cast<int>(lhs.size()), //__in  int cchCount1,
+                                            rhs.c_str(),                  //__in  LPCWSTR lpString2,
+                                            static_cast<int>(rhs.size()), //__in  int cchCount2,
+                                            true);                        //__in  BOOL bIgnoreCase
         if (rv <= 0)
             throw std::runtime_error("Error comparing strings (CompareStringOrdinal).");
         else
@@ -167,31 +168,35 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
         //the only reliable way to compare filepaths (with XP) is to call "CharUpper" or "LCMapString":
 
-        auto copyToUpperCase = [](const wchar_t* strIn, wchar_t* strOut, size_t len)
-        {
-            //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
-                              LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
-                              strIn,                    //__in   LPCTSTR lpSrcStr,
-                              static_cast<int>(len),    //__in   int cchSrc,
-                              strOut,                   //__out  LPTSTR lpDestStr,
-                              static_cast<int>(len)) == 0) //__in   int cchDest
-                throw std::runtime_error("Error comparing strings (LCMapString).");
-        };
+		const size_t sizeLhs = lhs.size();
+		const size_t sizeRhs = rhs.size();
 
         const auto minSize = std::min(sizeLhs, sizeRhs);
 
+        if (minSize == 0) //LCMapString does not allow input sizes of 0!
+            return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
+
+        auto copyToUpperCase = [&](const wchar_t* strIn, wchar_t* strOut)
+        {
+            //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE,  //__in   LCID Locale,
+                              LCMAP_UPPERCASE,           //__in   DWORD dwMapFlags,
+                              strIn,                     //__in   LPCTSTR lpSrcStr,
+                              static_cast<int>(minSize), //__in   int cchSrc,
+                              strOut,                    //__out  LPTSTR lpDestStr,
+                              static_cast<int>(minSize)) == 0) //__in   int cchDest
+                throw std::runtime_error("Error comparing strings (LCMapString).");
+        };
+
         auto eval = [&](wchar_t* bufL, wchar_t* bufR)
         {
-            if (minSize > 0) //LCMapString does not allow input sizes of 0!
-            {
-                copyToUpperCase(lhs, bufL, minSize);
-                copyToUpperCase(rhs, bufR, minSize);
+            copyToUpperCase(lhs.c_str(), bufL);
+            copyToUpperCase(rhs.c_str(), bufR);
 
-                const int rv = ::wmemcmp(bufL, bufR, minSize);
-                if (rv != 0)
-                    return rv;
-            }
+            const int rv = ::wmemcmp(bufL, bufR, minSize);
+            if (rv != 0)
+                return rv;
+
             return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
         };
 
@@ -203,35 +208,55 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
         }
         else //use freestore
         {
-            std::vector<wchar_t> bufferL(minSize);
-            std::vector<wchar_t> bufferR(minSize);
-            return eval(&bufferL[0], &bufferR[0]);
+            std::vector<wchar_t> buffer(2 * minSize);
+            return eval(&buffer[0], &buffer[minSize]);
         }
     }
 }
 
 
-void z_impl::makeFilenameUpperCase(wchar_t* str, size_t size)
+Zstring makeUpperCopy(const Zstring& str)
 {
-    if (size == 0) //LCMapString does not allow input sizes of 0!
-        return;
+    const int len = static_cast<int>(str.size());
+
+    if (len == 0) //LCMapString does not allow input sizes of 0!
+        return str;
+
+    Zstring output;
+    output.resize(len);
 
     //use Windows' upper case conversion: faster than ::CharUpper()
-    if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, str, static_cast<int>(size), str, static_cast<int>(size)) == 0)
-        throw std::runtime_error("Error converting to upper case! (LCMapString)");
+    if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
+                      LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
+                      str.c_str(),              //__in   LPCTSTR lpSrcStr,
+                      len,                      //__in   int cchSrc,
+                      &*output.begin(),         //__out  LPTSTR lpDestStr,
+                      len) == 0)                //__in   int cchDest
+        throw std::runtime_error("Error comparing strings (LCMapString).");
+
+    return output;
 }
+
 
 #elif defined ZEN_MAC
-int z_impl::compareFilenamesNoCase(const char* lhs, const char* rhs, size_t sizeLhs, size_t sizeRhs)
+int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 {
-    return ::strcasecmp(lhs, rhs); //locale-dependent!
+    return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
 }
 
 
-void z_impl::makeFilenameUpperCase(char* str, size_t size)
+Zstring makeUpperCopy(const Zstring& str)
 {
-    std::for_each(str, str + size, [](char& c) { c = static_cast<char>(::toupper(static_cast<unsigned char>(c))); }); //locale-dependent!
+    const size_t len = str.size();
+
+    Zstring output;
+    output.resize(len);
+
+    std::transform(str.begin(), str.end(), output.begin(), [](char c) { return static_cast<char>(::toupper(static_cast<unsigned char>(c))); }); //locale-dependent!
+
     //result of toupper() is an unsigned char mapped to int range, so the char representation is in the last 8 bits and we need not care about signedness!
     //this should work for UTF-8, too: all chars >= 128 are mapped upon themselves!
+
+    return output;
 }
 #endif

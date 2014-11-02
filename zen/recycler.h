@@ -39,7 +39,6 @@ bool recycleOrDelete(const Zstring& itempath); //throw FileError, return "true" 
 bool recycleBinExists(const Zstring& pathName, const std::function<void ()>& onUpdateGui); //throw FileError
 
 void recycleOrDelete(const std::vector<Zstring>& filepaths, //throw FileError, return "true" if file/dir was actually deleted
-                     //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
                      const std::function<void (const Zstring& currentItem)>& notifyDeletionStatus); //optional; currentItem may be empty
 #endif
 }

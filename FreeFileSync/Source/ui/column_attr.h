@@ -38,13 +38,13 @@ inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,      250, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_BASE_DIRECTORY, 200, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_FOLDER,    -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  200, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, 0, false));
+    attr.emplace_back(COL_TYPE_FULL_PATH,      250, 0, false);
+    attr.emplace_back(COL_TYPE_BASE_DIRECTORY, 200, 0, false);
+    attr.emplace_back(COL_TYPE_REL_FOLDER,    -280, 1, true); //stretch to full width and substract sum of fixed size widths!
+    attr.emplace_back(COL_TYPE_FILENAME,       200, 0, true);
+    attr.emplace_back(COL_TYPE_DATE,           112, 0, false);
+    attr.emplace_back(COL_TYPE_SIZE,            80, 0, true);
+    attr.emplace_back(COL_TYPE_EXTENSION,       60, 0, false);
     return attr;
 }
 
@@ -52,13 +52,13 @@ inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,      250, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_BASE_DIRECTORY, 200, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_FOLDER  ,  -280, 1, false)); //already shown on left side
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,   200, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,       112, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,   60, 0, false));
+    attr.emplace_back(COL_TYPE_FULL_PATH,      250, 0, false);
+    attr.emplace_back(COL_TYPE_BASE_DIRECTORY, 200, 0, false);
+    attr.emplace_back(COL_TYPE_REL_FOLDER  ,  -280, 1, false); //already shown on left side
+    attr.emplace_back(COL_TYPE_FILENAME,       200, 0, true);
+    attr.emplace_back(COL_TYPE_DATE,           112, 0, false);
+    attr.emplace_back(COL_TYPE_SIZE,            80, 0, true);
+    attr.emplace_back(COL_TYPE_EXTENSION,       60, 0, false);
     return attr;
 }
 
@@ -101,9 +101,9 @@ inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
     std::vector<ColumnAttributeNavi> attr;
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -120, 1, true)); //stretch to full width and substract sum of fixed size widths
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_ITEM_COUNT,  60, 0, true));
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_BYTES,       60, 0, true)); //GTK needs a few pixels width more
+    attr.emplace_back(COL_TYPE_NAVI_DIRECTORY, -120, 1, true); //stretch to full width and substract sum of fixed size widths
+    attr.emplace_back(COL_TYPE_NAVI_ITEM_COUNT,  60, 0, true);
+    attr.emplace_back(COL_TYPE_NAVI_BYTES,       60, 0, true); //GTK needs a few pixels width more
     return attr;
 }
 }

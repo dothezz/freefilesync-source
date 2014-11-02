@@ -122,7 +122,7 @@ struct BinaryExp : public Expr<typename StlOp::result_type>
     typedef std::shared_ptr<Expr<typename StlOp::second_argument_type>> ExpRhs;
 
     BinaryExp(const ExpLhs& lhs, const ExpRhs& rhs, StlOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) { assert(lhs && rhs); }
-    virtual typename StlOp::result_type eval() const { return biop_(lhs_->eval(), rhs_->eval()); }
+    typename StlOp::result_type eval() const override { return biop_(lhs_->eval(), rhs_->eval()); }
 private:
     ExpLhs lhs_;
     ExpRhs rhs_;
@@ -146,7 +146,7 @@ struct ConditionalExp : public Expr<T>
                    const std::shared_ptr<Expr<T>>& thenExp,
                    const std::shared_ptr<Expr<T>>& elseExp) : ifExp_(ifExp), thenExp_(thenExp), elseExp_(elseExp) { assert(ifExp && thenExp && elseExp); }
 
-    virtual typename Expr<T>::ValueType eval() const { return ifExp_->eval() ? thenExp_->eval() : elseExp_->eval(); }
+    typename Expr<T>::ValueType eval() const override { return ifExp_->eval() ? thenExp_->eval() : elseExp_->eval(); }
 private:
     std::shared_ptr<Expr<bool>> ifExp_;
     std::shared_ptr<Expr<T>> thenExp_;
@@ -156,7 +156,7 @@ private:
 struct ConstNumberExp : public Expr<std::int64_t>
 {
     ConstNumberExp(std::int64_t n) : n_(n) {}
-    virtual std::int64_t eval() const { return n_; }
+    std::int64_t eval() const override { return n_; }
 private:
     std::int64_t n_;
 };
@@ -164,7 +164,7 @@ private:
 struct VariableNumberNExp : public Expr<std::int64_t>
 {
     VariableNumberNExp(std::int64_t& n) : n_(n) {}
-    virtual std::int64_t eval() const { return n_; }
+    std::int64_t eval() const override { return n_; }
 private:
     std::int64_t& n_;
 };
@@ -205,21 +205,21 @@ class Scanner
 public:
     Scanner(const std::string& stream) : stream_(stream), pos(stream_.begin())
     {
-        tokens.push_back(std::make_pair("?" , Token::TK_TERNARY_QUEST));
-        tokens.push_back(std::make_pair(":" , Token::TK_TERNARY_COLON));
-        tokens.push_back(std::make_pair("||", Token::TK_OR           ));
-        tokens.push_back(std::make_pair("&&", Token::TK_AND          ));
-        tokens.push_back(std::make_pair("==", Token::TK_EQUAL        ));
-        tokens.push_back(std::make_pair("!=", Token::TK_NOT_EQUAL    ));
-        tokens.push_back(std::make_pair("<=", Token::TK_LESS_EQUAL   ));
-        tokens.push_back(std::make_pair("<" , Token::TK_LESS         ));
-        tokens.push_back(std::make_pair(">=", Token::TK_GREATER_EQUAL));
-        tokens.push_back(std::make_pair(">" , Token::TK_GREATER      ));
-        tokens.push_back(std::make_pair("%" , Token::TK_MODULUS      ));
-        tokens.push_back(std::make_pair("n" , Token::TK_VARIABLE_N   ));
-        tokens.push_back(std::make_pair("N" , Token::TK_VARIABLE_N   ));
-        tokens.push_back(std::make_pair("(" , Token::TK_BRACKET_LEFT ));
-        tokens.push_back(std::make_pair(")" , Token::TK_BRACKET_RIGHT));
+        tokens.emplace_back("?" , Token::TK_TERNARY_QUEST);
+        tokens.emplace_back(":" , Token::TK_TERNARY_COLON);
+        tokens.emplace_back("||", Token::TK_OR           );
+        tokens.emplace_back("&&", Token::TK_AND          );
+        tokens.emplace_back("==", Token::TK_EQUAL        );
+        tokens.emplace_back("!=", Token::TK_NOT_EQUAL    );
+        tokens.emplace_back("<=", Token::TK_LESS_EQUAL   );
+        tokens.emplace_back("<" , Token::TK_LESS         );
+        tokens.emplace_back(">=", Token::TK_GREATER_EQUAL);
+        tokens.emplace_back(">" , Token::TK_GREATER      );
+        tokens.emplace_back("%" , Token::TK_MODULUS      );
+        tokens.emplace_back("n" , Token::TK_VARIABLE_N   );
+        tokens.emplace_back("N" , Token::TK_VARIABLE_N   );
+        tokens.emplace_back("(" , Token::TK_BRACKET_LEFT );
+        tokens.emplace_back(")" , Token::TK_BRACKET_RIGHT);
     }
 
     Token nextToken()

@@ -8,6 +8,7 @@
 #define GRIDVIEW_H_INCLUDED
 
 #include <set>
+#include <unordered_map>
 #include "column_attr.h"
 #include "../file_hierarchy.h"
 
@@ -136,8 +137,8 @@ private:
     template <class Predicate> void updateView(Predicate pred);
 
 
-    zen::hash_map<FileSystemObject::ObjectIdConst, size_t> rowPositions; //find row positions on sortedRef directly
-    zen::hash_map<const void*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
+    std::unordered_map<FileSystemObject::ObjectIdConst, size_t> rowPositions; //find row positions on sortedRef directly
+    std::unordered_map<const void*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
     //void* instead of HierarchyObject*: these are weak pointers and should *never be dereferenced*!
 
     std::vector<FileSystemObject::ObjectId> viewRef;  //partial view on sortedRef

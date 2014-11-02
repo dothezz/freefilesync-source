@@ -82,7 +82,7 @@ bool isWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
 template <class Char> inline
 bool isDigit(Char ch) //similar to implmenetation of std::::isdigit()!
 {
-    assert_static((IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value));
+    static_assert(IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value, "");
     return static_cast<Char>('0') <= ch && ch <= static_cast<Char>('9');
 }
 
@@ -90,7 +90,7 @@ bool isDigit(Char ch) //similar to implmenetation of std::::isdigit()!
 template <class S, class T> inline
 bool startsWith(const S& str, const T& prefix)
 {
-    assert_static(IsStringLike<S>::value && IsStringLike<T>::value);
+    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t pfLength = strLength(prefix);
@@ -106,7 +106,7 @@ bool startsWith(const S& str, const T& prefix)
 template <class S, class T> inline
 bool endsWith(const S& str, const T& postfix)
 {
-    assert_static(IsStringLike<S>::value && IsStringLike<T>::value);
+    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t strLen = strLength(str);
@@ -123,7 +123,7 @@ bool endsWith(const S& str, const T& postfix)
 template <class S, class T> inline
 bool contains(const S& str, const T& term)
 {
-    assert_static(IsStringLike<S>::value && IsStringLike<T>::value);
+    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t strLen  = strLength(str);
@@ -144,7 +144,7 @@ bool contains(const S& str, const T& term)
 template <class S, class T> inline
 S afterLast(const S& str, const T& term)
 {
-    assert_static(IsStringLike<T>::value);
+    static_assert(IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t termLen = strLength(term);
@@ -167,7 +167,7 @@ S afterLast(const S& str, const T& term)
 template <class S, class T> inline
 S beforeLast(const S& str, const T& term)
 {
-    assert_static(IsStringLike<T>::value);
+    static_assert(IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const CharType* const strFirst  = strBegin(str);
@@ -187,7 +187,7 @@ S beforeLast(const S& str, const T& term)
 template <class S, class T> inline
 S afterFirst(const S& str, const T& term)
 {
-    assert_static(IsStringLike<T>::value);
+    static_assert(IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t termLen = strLength(term);
@@ -209,7 +209,7 @@ S afterFirst(const S& str, const T& term)
 template <class S, class T> inline
 S beforeFirst(const S& str, const T& term)
 {
-    assert_static(IsStringLike<T>::value);
+    static_assert(IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const CharType* const strFirst  = strBegin(str);
@@ -223,7 +223,7 @@ S beforeFirst(const S& str, const T& term)
 template <class S, class T> inline
 std::vector<S> split(const S& str, const T& delimiter)
 {
-    assert_static(IsStringLike<T>::value);
+    static_assert(IsStringLike<T>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     std::vector<S> output;
@@ -245,7 +245,7 @@ std::vector<S> split(const S& str, const T& delimiter)
             const CharType* const blockEnd = std::search(blockStart, strLast,
                                                          delimFirst, delimLast);
 
-            output.push_back(S(blockStart, blockEnd - blockStart));
+            output.emplace_back(blockStart, blockEnd - blockStart);
             if (blockEnd == strLast)
                 break;
             blockStart = blockEnd + delimLen;
@@ -271,7 +271,7 @@ typename EnableIf<!HasMember_append<S>::value>::Type stringAppend(S& str, const 
 template <class S, class T, class U> inline
 S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
 {
-    assert_static(IsStringLike<T>::value && IsStringLike<U>::value);
+    static_assert(IsStringLike<T>::value && IsStringLike<U>::value, "");
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t oldLen = strLength(oldTerm);
@@ -395,10 +395,10 @@ int saferPrintf(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const
 template <class S, class T, class Num> inline
 S printNumber(const T& format, const Num& number) //format a single number using ::sprintf
 {
-    assert_static(IsStringLike<T>::value);
-    assert_static((IsSameType<
-                   typename GetCharType<S>::Type,
-                   typename GetCharType<T>::Type>::value));
+    static_assert(IsStringLike<T>::value, "");
+    static_assert(IsSameType<
+                  typename GetCharType<S>::Type,
+                  typename GetCharType<T>::Type>::value, "");
 
     typedef typename GetCharType<S>::Type CharType;
 

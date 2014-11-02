@@ -5,7 +5,7 @@
 // **************************************************************************
 
 #include "xml_io.h"
-#include "file_handling.h"
+#include "file_access.h"
 #include "file_io.h"
 #include "serialize.h"
 
@@ -66,7 +66,7 @@ void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filepath) //throw Fi
     try
     {
         if (getFilesize(filepath) == stream.size()) //throw FileError
-            if (loadBinStream<std::string>(filepath) == stream) //throw FileError
+            if (loadBinStream<std::string>(filepath, nullptr) == stream) //throw FileError
                 return;
     }
     catch (FileError&) {}

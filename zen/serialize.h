@@ -7,6 +7,7 @@
 #ifndef SERIALIZE_H_INCLUDED_83940578357
 #define SERIALIZE_H_INCLUDED_83940578357
 
+#include <functional>
 #include <cstdint>
 #include "string_base.h"
 #include "file_io.h"
@@ -54,8 +55,8 @@ private:
 
 //----------------------------------------------------------------------
 //functions based on binary container abstraction
-template <class BinContainer>         void saveBinStream(const Zstring& filepath, const BinContainer& cont); //throw FileError
-template <class BinContainer> BinContainer loadBinStream(const Zstring& filepath); //throw FileError
+template <class BinContainer>         void saveBinStream(const Zstring& filepath, const BinContainer& cont, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus); //throw FileError
+template <class BinContainer> BinContainer loadBinStream(const Zstring& filepath,                           const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus); //throw FileError
 
 
 /*
@@ -135,20 +136,38 @@ template <         class BinInputStream> void readArray    (BinInputStream& stre
 
 //-----------------------implementation-------------------------------
 template <class BinContainer> inline
-void saveBinStream(const Zstring& filepath, const BinContainer& cont) //throw FileError
+void saveBinStream(const Zstring& filepath, //throw FileError
+					const BinContainer& cont, 
+					const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
 {
-    assert_static(sizeof(typename BinContainer::value_type) == 1); //expect: bytes (until further)
+    static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes (until further)
 
     FileOutput fileOut(filepath, zen::FileOutput::ACC_OVERWRITE); //throw FileError
     if (!cont.empty())
-        fileOut.write(&*cont.begin(), cont.size()); //throw FileError
+	{
+		const size_t blockSize = 128 * 1024;
+		auto bytePtr = &*cont.begin();
+		size_t bytesLeft = cont.size();
+
+		while (bytesLeft > blockSize)
+		{
+			fileOut.write(bytePtr, blockSize); //throw FileError
+			bytePtr += blockSize;			
+			bytesLeft -= blockSize;
+			if (onUpdateStatus) onUpdateStatus(blockSize);
+		}
+
+		fileOut.write(bytePtr, bytesLeft); //throw FileError
+		if (onUpdateStatus) onUpdateStatus(bytesLeft);
+	}
 }
 
 
 template <class BinContainer> inline
-BinContainer loadBinStream(const Zstring& filepath) //throw FileError
+BinContainer loadBinStream(const Zstring& filepath, //throw FileError
+							const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
 {
-    assert_static(sizeof(typename BinContainer::value_type) == 1); //expect: bytes (until further)
+    static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes (until further)
 
     FileInput fileIn(filepath); //throw FileError
 
@@ -161,6 +180,8 @@ BinContainer loadBinStream(const Zstring& filepath) //throw FileError
         const size_t bytesRead = fileIn.read(&*contOut.begin() + contOut.size() - blockSize, blockSize); //throw FileError
         if (bytesRead < blockSize)
             contOut.resize(contOut.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
+
+		if (onUpdateStatus) onUpdateStatus(bytesRead);
     }
     while (!fileIn.eof());
 
@@ -180,7 +201,7 @@ void writeArray(BinOutputStream& stream, const void* data, size_t len)
 template <class N, class BinOutputStream> inline
 void writeNumber(BinOutputStream& stream, const N& num)
 {
-    assert_static((IsArithmetic<N>::value || IsSameType<N, bool>::value));
+    static_assert(IsArithmetic<N>::value || IsSameType<N, bool>::value, "");
     writeArray(stream, &num, sizeof(N));
 }
 
@@ -198,7 +219,7 @@ void writeContainer(BinOutputStream& stream, const C& cont) //don't even conside
 template <class BinInputStream> inline
 void readArray(BinInputStream& stream, void* data, size_t len) //throw UnexpectedEndOfStreamError
 {
-	//expect external write of len bytes:
+    //expect external write of len bytes:
     const char* const src = static_cast<const char*>(stream.requestRead(len)); //throw UnexpectedEndOfStreamError
     std::copy(src, src + len, static_cast<char*>(data));
 }
@@ -207,7 +228,7 @@ void readArray(BinInputStream& stream, void* data, size_t len) //throw Unexpecte
 template <class N, class BinInputStream> inline
 N readNumber(BinInputStream& stream) //throw UnexpectedEndOfStreamError
 {
-    assert_static((IsArithmetic<N>::value || IsSameType<N, bool>::value));
+    static_assert(IsArithmetic<N>::value || IsSameType<N, bool>::value, "");
     N num = 0;
     readArray(stream, &num, sizeof(N)); //throw UnexpectedEndOfStreamError
     return num;
@@ -219,8 +240,8 @@ C readContainer(BinInputStream& stream) //throw UnexpectedEndOfStreamError
 {
     C cont;
     auto strLength = readNumber<std::uint32_t>(stream);
-	if (strLength > 0)
-	{
+    if (strLength > 0)
+    {
         try
         {
             cont.resize(strLength); //throw std::bad_alloc
@@ -229,8 +250,8 @@ C readContainer(BinInputStream& stream) //throw UnexpectedEndOfStreamError
         {
             throw UnexpectedEndOfStreamError();
         }
-            readArray(stream, &*cont.begin(), sizeof(typename C::value_type) * strLength); //throw UnexpectedEndOfStreamError
-	}
+        readArray(stream, &*cont.begin(), sizeof(typename C::value_type) * strLength); //throw UnexpectedEndOfStreamError
+    }
     return cont;
 }
 }

@@ -12,15 +12,15 @@
 class Application : public wxApp
 {
 public:
-    virtual bool OnInit();
-    virtual int OnExit();
-    virtual int OnRun();
-    virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
+    bool OnInit() override;
+    int  OnExit() override;
+    int  OnRun () override;
+    bool OnExceptionInMainLoop() override { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
     void onQueryEndSession(wxEvent& event);
 
 private:
     void onEnterEventLoop(wxEvent& event);
-    //virtual wxLayoutDirection GetLayoutDirection() const { return wxLayout_LeftToRight; }
+    //wxLayoutDirection GetLayoutDirection() const override { return wxLayout_LeftToRight; }
 };
 
 #endif // REALTIMESYNCAPP_H

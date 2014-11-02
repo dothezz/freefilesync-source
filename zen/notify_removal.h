@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef NOTIFY_H_INCLUDED
-#define NOTIFY_H_INCLUDED
+#ifndef NOTIFY_H_INCLUDED_257804267562
+#define NOTIFY_H_INCLUDED_257804267562
 
 #include <memory>
 #include "win.h" //includes "windows.h"
@@ -24,12 +24,11 @@ private:
     //NOTE: onRemovalFinished is NOT guaranteed to execute after onRequestRemoval()! but most likely will
     virtual void onRemovalFinished(HANDLE hnd, bool successful) = 0; //throw()!
 
-    NotifyRequestDeviceRemoval(NotifyRequestDeviceRemoval&); //no copying
-    void operator=(NotifyRequestDeviceRemoval&);             //
+    NotifyRequestDeviceRemoval           (NotifyRequestDeviceRemoval&) = delete;
+    NotifyRequestDeviceRemoval& operator=(NotifyRequestDeviceRemoval&) = delete;
 
     class Pimpl;
     std::unique_ptr<Pimpl> pimpl;
 };
 
-
-#endif // NOTIFY_H_INCLUDED
+#endif //NOTIFY_H_INCLUDED_257804267562

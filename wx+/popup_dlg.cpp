@@ -149,8 +149,8 @@ public:
     }
 
 private:
-    virtual void OnClose (wxCloseEvent&   event) override { EndModal(static_cast<int>(ConfirmationButton3::CANCEL)); }
-    virtual void OnCancel(wxCommandEvent& event) override { EndModal(static_cast<int>(ConfirmationButton3::CANCEL)); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(static_cast<int>(ConfirmationButton3::CANCEL)); }
+    void OnCancel(wxCommandEvent& event) override { EndModal(static_cast<int>(ConfirmationButton3::CANCEL)); }
 
     void OnKeyPressed(wxKeyEvent& event)
     {
@@ -163,14 +163,14 @@ private:
         event.Skip();
     }
 
-    virtual void OnButtonAffirmative(wxCommandEvent& event) override
+    void OnButtonAffirmative(wxCommandEvent& event) override
     {
         if (checkBoxValue_)
             * checkBoxValue_ = m_checkBoxCustom->GetValue();
         EndModal(static_cast<int>(ConfirmationButton3::DO_IT));
     }
 
-    virtual void OnButtonNegative(wxCommandEvent& event) override
+    void OnButtonNegative(wxCommandEvent& event) override
     {
         if (checkBoxValue_)
             * checkBoxValue_ = m_checkBoxCustom->GetValue();
@@ -243,7 +243,7 @@ public:
     }
 
 private:
-    virtual void OnCheckBoxClick(wxCommandEvent& event) override { updateGui(); event.Skip(); }
+    void OnCheckBoxClick(wxCommandEvent& event) override { updateGui(); event.Skip(); }
 
     void updateGui()
     {

@@ -7,6 +7,7 @@
 #ifndef DC_3813704987123956832143243214
 #define DC_3813704987123956832143243214
 
+#include <unordered_map>
 #include <wx/dcbuffer.h> //for macro: wxALWAYS_NATIVE_DOUBLE_BUFFER
 
 namespace zen
@@ -47,7 +48,7 @@ public:
         auto it = refDcToAreaMap().find(&dc);
         if (it != refDcToAreaMap().end())
         {
-            oldRect.reset(new wxRect(it->second));
+            oldRect = zen::make_unique<wxRect>(it->second);
 
             wxRect tmp = r;
             tmp.Intersect(*oldRect);    //better safe than sorry
@@ -57,7 +58,7 @@ public:
         else
         {
             dc_.SetClippingRegion(r);
-            refDcToAreaMap().insert(std::make_pair(&dc_, r));
+            refDcToAreaMap().emplace(&dc_, r);
         }
     }
 
@@ -75,7 +76,7 @@ public:
 
 private:
     //associate "active" clipping area with each DC
-    static hash_map<wxDC*, wxRect>& refDcToAreaMap() { static hash_map<wxDC*, wxRect> clippingAreas; return clippingAreas; }
+    static std::unordered_map<wxDC*, wxRect>& refDcToAreaMap() { static std::unordered_map<wxDC*, wxRect> clippingAreas; return clippingAreas; }
 
     std::unique_ptr<wxRect> oldRect;
     wxDC& dc_;
@@ -97,7 +98,7 @@ public:
     {
         const wxSize clientSize = wnd.GetClientSize();
         if (!buffer_ || clientSize != wxSize(buffer->GetWidth(), buffer->GetHeight()))
-            buffer.reset(new wxBitmap(clientSize.GetWidth(), clientSize.GetHeight()));
+            buffer = zen::make_unique<wxBitmap>(clientSize.GetWidth(), clientSize.GetHeight());
 
         SelectObject(*buffer);
 

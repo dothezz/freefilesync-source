@@ -187,7 +187,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
 FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileOutputBase(filepath), fileHandle(handle) {}
 
 
-FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw FileError, ErrorTargetExisting
     FileOutputBase(filepath)
 {
 #ifdef ZEN_WIN
@@ -246,8 +246,7 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw Fil
                 lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
                 throw ErrorTargetExisting(errorMsg, errorDescr);
 
-            if (lastError == ERROR_PATH_NOT_FOUND)
-                throw ErrorTargetPathMissing(errorMsg, errorDescr);
+            //if (lastError == ERROR_PATH_NOT_FOUND) throw ErrorTargetPathMissing(errorMsg, errorDescr);
 
             throw FileError(errorMsg, errorDescr);
         }
@@ -267,8 +266,7 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw Fil
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMsg, errorDescr);
 
-        if (lastError == ENOENT)
-            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        //if (lastError == ENOENT) throw ErrorTargetPathMissing(errorMsg, errorDescr);
 
         throw FileError(errorMsg, errorDescr);
     }
@@ -348,7 +346,7 @@ size_t FileInputUnbuffered::read(void* buffer, size_t bytesToRead) //throw FileE
 }
 
 
-FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filepath, mode_t mode) : FileOutputBase(filepath) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filepath, mode_t mode) : FileOutputBase(filepath) //throw FileError, ErrorTargetExisting
 {
     //checkForUnsupportedType(filepath); -> not needed, open() + O_EXCL shoul fail fast
 
@@ -363,8 +361,7 @@ FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filepath, mode_t mode)
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMsg, errorDescr);
 
-        if (lastError == ENOENT)
-            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        //if (lastError == ENOENT) throw ErrorTargetPathMissing(errorMsg, errorDescr);
 
         throw FileError(errorMsg, errorDescr);
     }

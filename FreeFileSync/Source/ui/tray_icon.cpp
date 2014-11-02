@@ -129,12 +129,10 @@ public:
         //=> the only way to distinguish single left click and double-click is to wait wxSystemSettings::GetMetric(wxSYS_DCLICK_MSEC) (480ms) which is way too long!
     }
 
-    //virtual ~TaskBarImpl(){}
-
     void dontCallbackAnymore() { onRequestResume_ = nullptr; }
 
 private:
-    virtual wxMenu* CreatePopupMenu()
+    wxMenu* CreatePopupMenu() override
     {
         if (!onRequestResume_)
             return nullptr;

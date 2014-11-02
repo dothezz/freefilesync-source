@@ -28,7 +28,7 @@ std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/c
 {
     std::vector<std::pair<std::wstring, Zstring>> output;
 
-    auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.push_back(std::make_pair(name, value)); };
+    auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.emplace_back(name, value); };
 
 #ifdef ZEN_WIN
     if (zen::vistaOrLater())
@@ -36,7 +36,7 @@ std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/c
         addEntry(_("Standby"  ), Zstr("rundll32.exe powrprof.dll,SetSuspendState Sleep")); //suspend/Suspend to RAM/sleep
         addEntry(_("Log off"  ), Zstr("shutdown /l"));
         addEntry(_("Shut down"), Zstr("shutdown /s /t 60"));
-        //addEntry(_("Hibernate"), L"shutdown /h"); //Suspend to disk -> Standby is better anyway
+        //addEntry(_"Hibernate", L"shutdown /h"); //Suspend to disk -> Standby is better anyway
     }
     else //XP
     {

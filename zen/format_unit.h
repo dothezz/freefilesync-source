@@ -44,7 +44,7 @@ std::wstring includeNumberSeparator(const std::wstring& number);
 template <class NumberType> inline
 std::wstring toGuiString(NumberType number)
 {
-    assert_static(IsInteger<NumberType>::value);
+    static_assert(IsInteger<NumberType>::value, "");
     return ffs_Impl::includeNumberSeparator(zen::numberTo<std::wstring>(number));
 }
 }

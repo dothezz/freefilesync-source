@@ -1,5 +1,27 @@
-FreeFileSync 6.10
------------------
+FreeFileSync 6.11 [2014-11-03]
+------------------------------
+Updated Recycle Bin access for Windows 10
+New command line option "-edit" to load configuration without executing
+Case-insensitive command line argument evaluation
+New Explorer context menu options for ffs_gui, ffs_batch files
+Added sync variant to folder pair info in log file
+Don't process and log folder pair if nothing to do except writing DB file
+Fixed liblzma.5.dylib not found during startup (OS X 10.8)
+Added version info to application bundles (OS X)
+Fixed incorrect warning when configuration contains empty folder pairs
+Replaced misleading inotify error message "No space left on device" (Linux)
+Fixed FreeFileSync launcher blocking app folder move (OS X)
+Updated default main dialog layout
+Fixed async error evaluation when creating volume shadow copies
+Keep user interface responsive while creating a volume shadow copy
+Fixed error when starting asynchronously from a batch script
+Show progress of writing log files
+Fixed updated file being left deleted when copying permission failed
+New Project website: http://www.freefilesync.org/
+
+
+FreeFileSync 6.10 [2014-10-01]
+------------------------------
 Fixed crash when accessing recycle bin in compatibility mode (Windows 7, 8)
 Draw middle grid selection irrespective of focus column
 Don't show parts of progress graph if nothing to sync

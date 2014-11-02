@@ -59,16 +59,16 @@ public:
 
 protected:
     //implement parts of ProcessCallback
-    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) //may throw
+    void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) override //may throw
     {
         currentPhase_ = phaseId;
         refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);
     }
 
-    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
-    virtual void updateTotalData    (int objectsDelta, std::int64_t dataDelta) { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
+    void updateProcessedData(int objectsDelta, std::int64_t dataDelta) override { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
+    void updateTotalData    (int objectsDelta, std::int64_t dataDelta) override { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
 
-    virtual void requestUiRefresh() //throw X
+    void requestUiRefresh() override //throw X
     {
         if (abortRequested) //triggered by requestAbortion()
         {
@@ -79,26 +79,26 @@ protected:
             forceUiRefresh();
     }
 
-    virtual void reportStatus(const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw X */ }
-    virtual void reportInfo  (const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
+    void reportStatus(const std::wstring& text) override { if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ }
+    void reportInfo  (const std::wstring& text) override { if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
 
     //implement AbortCallback
-    virtual void requestAbortion()
+    void requestAbortion() override
     {
         abortRequested = true;
         statusText_ = _("Stop requested: Waiting for current operation to finish...");
-    } //this does NOT call abortProcessNow() immediately, but when we're out of the C GUI call stack
+    } //called from GUI code: this does NOT call abortProcessNow() immediately, but when we're out of the C GUI call stack
 
     //implement Statistics
-    virtual Phase currentPhase() const { return currentPhase_; }
+    Phase currentPhase() const override { return currentPhase_; }
 
-    virtual int getObjectsCurrent(Phase phaseId) const {                                    return refNumbers(numbersCurrent_, phaseId).first; }
-    virtual int getObjectsTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
+    int getObjectsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
+    int getObjectsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
 
-    virtual std::int64_t getDataCurrent(Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    virtual std::int64_t getDataTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
+    std::int64_t getDataCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
+    std::int64_t getDataTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
 
-    virtual const std::wstring& currentStatusText() const { return statusText_; }
+    const std::wstring& currentStatusText() const override { return statusText_; }
 
     bool abortIsRequested() const { return abortRequested; }
 

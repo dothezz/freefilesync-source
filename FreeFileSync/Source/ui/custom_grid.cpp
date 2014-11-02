@@ -193,7 +193,7 @@ protected:
     }
 
 private:
-    virtual size_t getRowCount() const
+    size_t getRowCount() const override
     {
         if (gridDataView_)
         {
@@ -273,7 +273,7 @@ public:
                 const IconInfo ii = getIconInfo(currentRow);
                 if (!ii.iconPath.empty())
                     if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.iconPath))
-                        newLoad.push_back(std::make_pair(i, ii.iconPath)); //insert least-important items on outer rim first
+                        newLoad.emplace_back(i, ii.iconPath); //insert least-important items on outer rim first
             }
         }
     }
@@ -298,7 +298,7 @@ private:
     }
 
 protected:
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
+    void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
@@ -375,12 +375,12 @@ private:
         {
             GetRowType(DisplayType& result) : result_(result) {}
 
-            virtual void visit(const FilePair& fileObj) {}
-            virtual void visit(const SymlinkPair& linkObj)
+            void visit(const FilePair&    fileObj) override {}
+            void visit(const SymlinkPair& linkObj) override
             {
                 result_ = DISP_TYPE_SYMLINK;
             }
-            virtual void visit(const DirPair& dirObj)
+            void visit(const DirPair& dirObj) override
             {
                 result_ = DISP_TYPE_FOLDER;
             }
@@ -391,7 +391,7 @@ private:
         return output;
     }
 
-    virtual wxString getValue(size_t row, ColumnType colType) const
+    wxString getValue(size_t row, ColumnType colType) const override
     {
         if (const FileSystemObject* fsObj = getRawData(row))
         {
@@ -399,7 +399,7 @@ private:
             {
                 GetTextValue(ColumnTypeRim colType, const FileSystemObject& fso) : colType_(colType), fsObj_(fso) {}
 
-                virtual void visit(const FilePair& fileObj)
+                void visit(const FilePair& fileObj) override
                 {
                     switch (colType_)
                     {
@@ -433,7 +433,7 @@ private:
                     }
                 }
 
-                virtual void visit(const SymlinkPair& linkObj)
+                void visit(const SymlinkPair& linkObj) override
                 {
                     switch (colType_)
                     {
@@ -463,7 +463,7 @@ private:
                     }
                 }
 
-                virtual void visit(const DirPair& dirObj)
+                void visit(const DirPair& dirObj) override
                 {
                     switch (colType_)
                     {
@@ -506,7 +506,7 @@ private:
 
     static const int GAP_SIZE = 2;
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         wxRect rectTmp = rect;
 
@@ -599,7 +599,7 @@ private:
         }
     }
 
-    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
+    int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         //  Partitioning:
         //   ________________________________
@@ -615,7 +615,7 @@ private:
         return bestSize; // + 1 pix for cell border line -> not used anymore!
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const
+    wxString getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeRim>(colType))
         {
@@ -637,7 +637,7 @@ private:
         return wxEmptyString;
     }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
+    void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
@@ -680,17 +680,17 @@ private:
             {
                 GetIcon(IconInfo& ii) : ii_(ii) {}
 
-                virtual void visit(const FilePair& fileObj)
+                void visit(const FilePair& fileObj) override
                 {
                     ii_.iconPath = fileObj.getFullPath<side>();
                     ii_.drawAsLink = fileObj.isFollowedSymlink<side>() || hasLinkExtension(ii_.iconPath);
                 }
-                virtual void visit(const SymlinkPair& linkObj)
+                void visit(const SymlinkPair& linkObj) override
                 {
                     ii_.iconPath = linkObj.getFullPath<side>();
                     ii_.drawAsLink = true;
                 }
-                virtual void visit(const DirPair& dirObj)
+                void visit(const DirPair& dirObj) override
                 {
                     ii_.drawAsFolder = true;
                     //todo: if ("is followed symlink") ii_.drawAsLink = true;
@@ -703,40 +703,40 @@ private:
         return out;
     }
 
-    virtual wxString getToolTip(size_t row, ColumnType colType) const override
+    wxString getToolTip(size_t row, ColumnType colType) const override
     {
         wxString toolTip;
 
-        const FileSystemObject* fsObj = getRawData(row);
-        if (fsObj && !fsObj->isEmpty<side>())
-        {
-            toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
-                           fsObj->getFullPath<side>() :
-                           fsObj->getRelativePath<side>());
-
-            struct AssembleTooltip : public FSObjectVisitor
+        if (const FileSystemObject* fsObj = getRawData(row))
+            if (!fsObj->isEmpty<side>())
             {
-                AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
+                toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
+                               fsObj->getFullPath<side>() :
+                               fsObj->getRelativePath<side>());
 
-                virtual void visit(const FilePair& fileObj)
+                struct AssembleTooltip : public FSObjectVisitor
                 {
-                    tipMsg_ += L"\n" +
-                               _("Size:") + L" " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + L"\n" +
-                               _("Date:") + L" " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
-                }
+                    AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
 
-                virtual void visit(const SymlinkPair& linkObj)
-                {
-                    tipMsg_ += L"\n" +
-                               _("Date:") + L" " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
-                }
+                    void visit(const FilePair& fileObj) override
+                    {
+                        tipMsg_ += L"\n" +
+                                   _("Size:") + L" " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + L"\n" +
+                                   _("Date:") + L" " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
+                    }
 
-                virtual void visit(const DirPair& dirObj) {}
+                    void visit(const SymlinkPair& linkObj) override
+                    {
+                        tipMsg_ += L"\n" +
+                                   _("Date:") + L" " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
+                    }
 
-                wxString& tipMsg_;
-            } assembler(toolTip);
-            fsObj->accept(assembler);
-        }
+                    void visit(const DirPair& dirObj) override {}
+
+                    wxString& tipMsg_;
+                } assembler(toolTip);
+                fsObj->accept(assembler);
+            }
         return toolTip;
     }
 
@@ -753,15 +753,15 @@ class GridDataLeft : public GridDataRim<LEFT_SIDE>
 public:
     GridDataLeft(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<LEFT_SIDE>(gridDataView, grid) {}
 
-    void setNavigationMarker(hash_set<const FileSystemObject*>&& markedFilesAndLinks,
-                             hash_set<const HierarchyObject*>&& markedContainer)
+    void setNavigationMarker(std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,
+                             std::unordered_set<const HierarchyObject*>&& markedContainer)
     {
         markedFilesAndLinks_.swap(markedFilesAndLinks);
         markedContainer_    .swap(markedContainer);
     }
 
 private:
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
+    void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         GridDataRim<LEFT_SIDE>::renderRowBackgound(dc, rect, row, enabled, selected);
 
@@ -809,8 +809,8 @@ private:
         }
     }
 
-    hash_set<const FileSystemObject*> markedFilesAndLinks_; //mark files/symlinks directly within a container
-    hash_set<const HierarchyObject*> markedContainer_;      //mark full container including all child-objects
+    std::unordered_set<const FileSystemObject*> markedFilesAndLinks_; //mark files/symlinks directly within a container
+    std::unordered_set<const HierarchyObject*> markedContainer_;       //mark full container including all child-objects
     //DO NOT DEREFERENCE!!!! NOT GUARANTEED TO BE VALID!!!
 };
 
@@ -941,7 +941,7 @@ public:
     void highlightSyncAction(bool value) { highlightSyncAction_ = value; }
 
 private:
-    virtual wxString getValue(size_t row, ColumnType colType) const override
+    wxString getValue(size_t row, ColumnType colType) const override
     {
         if (const FileSystemObject* fsObj = getRawData(row))
             switch (static_cast<ColumnTypeMiddle>(colType))
@@ -956,7 +956,7 @@ private:
         return wxString();
     }
 
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
+    void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
@@ -979,7 +979,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
     {
         auto drawHighlightBackground = [&](const FileSystemObject& fsObj, const wxColor& col)
         {
@@ -1064,7 +1064,7 @@ private:
         }
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const override
+    wxString getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
@@ -1078,9 +1078,9 @@ private:
         return wxEmptyString;
     }
 
-    virtual wxString getToolTip(ColumnType colType) const override { return getColumnLabel(colType); }
+    wxString getToolTip(ColumnType colType) const override { return getColumnLabel(colType); }
 
-    virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
+    void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted) override
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
@@ -1631,9 +1631,9 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
     gridCenter.SetSize(widthCategory + widthCheckbox + widthAction, -1);
 
     std::vector<Grid::ColumnAttribute> attribMiddle;
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CHECKBOX    ), widthCheckbox, 0, true));
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CMP_CATEGORY), widthCategory, 0, true));
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_SYNC_ACTION ), widthAction,   0, true));
+    attribMiddle.emplace_back(static_cast<ColumnType>(COL_TYPE_CHECKBOX    ), widthCheckbox, 0, true);
+    attribMiddle.emplace_back(static_cast<ColumnType>(COL_TYPE_CMP_CATEGORY), widthCategory, 0, true);
+    attribMiddle.emplace_back(static_cast<ColumnType>(COL_TYPE_SYNC_ACTION ), widthAction,   0, true);
     gridCenter.setColumnConfig(attribMiddle);
 }
 
@@ -1788,8 +1788,8 @@ void gridview::setScrollMaster(Grid& grid)
 
 
 void gridview::setNavigationMarker(Grid& gridLeft,
-                                   hash_set<const FileSystemObject*>&& markedFilesAndLinks,
-                                   hash_set<const HierarchyObject*>&& markedContainer)
+                                   std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,
+                                   std::unordered_set<const HierarchyObject*>&& markedContainer)
 {
     if (auto provLeft = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
         provLeft->setNavigationMarker(std::move(markedFilesAndLinks), std::move(markedContainer));

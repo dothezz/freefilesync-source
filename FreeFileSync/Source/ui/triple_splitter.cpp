@@ -6,6 +6,7 @@
 
 #include "triple_splitter.h"
 #include <algorithm>
+#include <zen/stl_tools.h>
 
 using namespace zen;
 
@@ -173,7 +174,7 @@ void TripleSplitter::onMouseLeftDown(wxMouseEvent& event)
 
     const int posX = event.GetPosition().x;
     if (hitOnSashLine(posX))
-        activeMove.reset(new SashMove(*this, posX, centerOffset));
+        activeMove = zen::make_unique<SashMove>(*this, posX, centerOffset);
     event.Skip();
 }
 
