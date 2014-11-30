@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -323,7 +323,7 @@ SyncStatusHandler::~SyncStatusHandler()
     {
         saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
     }
-    catch (FileError&) {}
+    catch (FileError&) { assert(false); }
 
     if (progressDlg)
     {

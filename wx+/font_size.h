@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,10 +10,10 @@
 #include <zen/basic_math.h>
 #include <wx/window.h>
 #ifdef ZEN_WIN
-#include <zen/dll.h>
-#include <Uxtheme.h>
-#include <vsstyle.h> //TEXT_MAININSTRUCTION
-#include <vssym32.h> //TMT_COLOR
+    #include <zen/dll.h>
+    #include <Uxtheme.h>
+    #include <vsstyle.h> //TEXT_MAININSTRUCTION
+    #include <vssym32.h> //TMT_COLOR
 #endif
 
 namespace zen

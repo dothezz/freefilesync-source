@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Dowolna liczba alternatywnych par katalogów dla najwyżej jednego pliku konfiguracyjnego.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Otwórz konfigurację do edycji bez uruchamiania synchronizacji.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Przenieś plik na prawą stronę</target>
 
-<source>Overwrite left item</source>
-<target>Nadpisz lewy element</target>
+<source>Update left item</source>
+<target>Aktualizuj lewy element</target>
 
-<source>Overwrite right item</source>
-<target>Nadpisz prawy element</target>
+<source>Update right item</source>
+<target>Aktualizuj prawy element</target>
 
 <source>Do nothing</source>
 <target>Nie rób nic</target>
@@ -273,6 +276,9 @@
 <source>Creating file %x</source>
 <target>Tworzenie pliku %x</target>
 
+<source>Saving file %x...</source>
+<target>Zapisywanie pliku %x...</target>
+
 <source>Items processed:</source>
 <target>Przetworzone elementy:</target>
 
@@ -300,9 +306,6 @@
 <pluralform>%x wątki</pluralform>
 <pluralform>%x wątków</pluralform>
 </target>
-
-<source>Encoding extended time information: %x</source>
-<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
 
 <source>/sec</source>
 <target>/sekundę</target>
@@ -343,8 +346,8 @@
 <source>Save &as...</source>
 <target>&Zapisz jako...</target>
 
-<source>&Quit</source>
-<target>Zam&knij</target>
+<source>E&xit</source>
+<target>&Wyjście</target>
 
 <source>&File</source>
 <target>&Plik</target>
@@ -438,6 +441,9 @@ Komenda jest wykonywana gdy:
 <source>&Show error</source>
 <target>Pokaż &błędy</target>
 
+<source>&Quit</source>
+<target>Zam&knij</target>
+
 <source>Incorrect command line:</source>
 <target>Niepoprawne polecenie:</target>
 
@@ -483,11 +489,11 @@ Komenda jest wykonywana gdy:
 <source>Creating folder %x</source>
 <target>Tworzenie folderu %x</target>
 
-<source>Overwriting file %x</source>
-<target>Nadpisywanie pliku %x</target>
+<source>Updating file %x</source>
+<target>Aktualizowanie pliku %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Nadpisywanie dowiązania symbolicznego %x</target>
+<source>Updating symbolic link %x</source>
+<target>Aktualizowanie dowiązania symbolicznego %x</target>
 
 <source>Verifying file %x</source>
 <target>Weryfikowanie pliku %x</target>
@@ -544,7 +550,7 @@ Komenda jest wykonywana gdy:
 <target>nazwa zadania</target>
 
 <source>Synchronization stopped</source>
-<target>Synchronizacja zatrzymana</target>
+<target>Synchronizacja przerwana</target>
 
 <source>Synchronization completed with errors</source>
 <target>Synchronizacja zakończona z błędami</target>
@@ -558,8 +564,8 @@ Komenda jest wykonywana gdy:
 <source>Synchronization completed successfully</source>
 <target>Synchronizacja zakończona pomyślnie</target>
 
-<source>Saving log file %x...</source>
-<target>Zapisywanie pliku logów %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Usuwanie starych plików logów...</target>
 
 <source>Stopped</source>
 <target>Zatrzymana</target>
@@ -613,8 +619,8 @@ Komenda jest wykonywana gdy:
 <source>FreeFileSync is up to date.</source>
 <target>Posiadasz aktualną wersję FreeFileSync.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Nie można się połączyć z sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Nie można połączyć się z FreeFileSync.org</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Nie można znaleźć obecnej wersji FreeFileSync. Czy chcesz sprawdzić ręcznie?</target>
@@ -700,8 +706,20 @@ Komenda jest wykonywana gdy:
 <source>Start &comparison</source>
 <target>Rozpo&cznij porównywanie</target>
 
+<source>C&omparison settings</source>
+<target>Ustawienia &porównywania</target>
+
+<source>&Filter settings</source>
+<target>Ustawienia &filtra</target>
+
+<source>S&ynchronization settings</source>
+<target>U&stawienia synchronizacji</target>
+
 <source>Start &synchronization</source>
 <target>Rozpocznij &synchronizację</target>
+
+<source>&Actions</source>
+<target>&akcje</target>
 
 <source>&Options</source>
 <target>&Opcje</target>
@@ -781,8 +799,8 @@ Komenda jest wykonywana gdy:
 <source>Number of files and folders that will be deleted</source>
 <target>Liczba plików i katalogów, które zostaną usunięte</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Liczba plików, które zostaną nadpisane</target>
+<source>Number of files that will be updated</source>
+<target>Liczba plików, która będą zaktualizowane</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Liczba plików i katalogów, które zostaną utworzone</target>
@@ -811,8 +829,14 @@ Komenda jest wykonywana gdy:
 <source>Handle daylight saving time</source>
 <target>Uwzględniaj przesunięcie czasu</target>
 
-<source>Symbolic links:</source>
-<target>Dowiązania symboliczne:</target>
+<source>Include symbolic links:</source>
+<target>Uwzględniaj dowiązania symboliczne</target>
+
+<source>Direct</source>
+<target>Bezpośrednio</target>
+
+<source>Follow</source>
+<target>Podążaj</target>
 
 <source>More information</source>
 <target>Więcej informacji</target>
@@ -841,24 +865,24 @@ Komenda jest wykonywana gdy:
 <source>Maximum:</source>
 <target>Maksymalny:</target>
 
-<source>C&lear</source>
-<target>&Wyczyść</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Określ reguły filtrowania w celu wykluczenia niektórych plików z synchronizacji. Ścieżki plików muszą być relatywne do podanych par katalogów.</target>
+
+<source>C&lear</source>
+<target>&Wyczyść</target>
 
 <source>Detect moved files</source>
 <target>Wykryj przeniesione pliki.</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Wymagane utworzenie pliku bazy danych
-- Funkcja aktywna po pierwszej synchronizacji
-- Niewspierany przez wszystkie systemy plików
+- Wykrywanie aktywne po pierwszej synchronizacji
+- Wymaga utworzenia plików bazy danych
+- Nie jest wspierana przez wszystkie systemy plików
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1071,26 +1095,14 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>View Settings</source>
 <target>Ustawienia widoku</target>
 
-<source>Overview</source>
-<target>Przegląd</target>
-
 <source>Configuration</source>
 <target>Konfiguracja</target>
 
+<source>Overview</source>
+<target>Przegląd</target>
+
 <source>Main Bar</source>
 <target>Główny pasek</target>
-
-<source>Start comparison</source>
-<target>Rozpocznij porównywanie</target>
-
-<source>Comparison settings</source>
-<target>Ustawienia porównywania</target>
-
-<source>Synchronization settings</source>
-<target>Ustawienia synchronizacji</target>
-
-<source>Start synchronization</source>
-<target>Rozpocznij synchronizację</target>
 
 <source>Confirm</source>
 <target>Potwierdź</target>
@@ -1246,11 +1258,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Show files that will be deleted on the right side</source>
 <target>Pokaż pliki, które będą usunięte po prawej stronie</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Pokaż pliki, które zostaną nadpisane po lewej stronie</target>
+<source>Show files that will be updated on the left side</source>
+<target>Pokaż pliki, które będą zaktualizowane po lewej stronie</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Pokaż pliki, które zostaną nadpisane po prawej stronie</target>
+<source>Show files that will be updated on the right side</source>
+<target>Pokaż pliki, które będą zaktualizowane po prawej stronie</target>
 
 <source>Show files that won't be copied</source>
 <target>Pokaż pliki, które nie będą kopiowane</target>
@@ -1389,15 +1401,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Configure your own synchronization rules.</source>
 <target>Skonfiguruj swoje własne reguły synchronizacji.</target>
 
-<source>Exclude</source>
-<target>Wyklucz</target>
-
-<source>Direct</source>
-<target>Bezpośrednio</target>
-
-<source>Follow</source>
-<target>Podążaj</target>
-
 <source>Today</source>
 <target>Dzisiaj</target>
 
@@ -1461,9 +1464,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Cannot monitor directory %x.</source>
 <target>Nie można monitorować katalogu %x.</target>
 
-<source>Conversion error:</source>
-<target>Błąd konwersji:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Nie można usunąć pliku %x.</target>
 
@@ -1497,8 +1497,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Cannot create directory %x.</source>
 <target>Nie można utworzyć katalogu %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Nie można utworzyć dowiązania symbolicznego dla %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nie można skopiować linku symbolicznego %x do %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nie można odnaleźć funkcji systemowej %x.</target>
@@ -1583,4 +1583,73 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Plik konfiguracyjny %x został wczytany tylko częściowo.</target>
+
+<source>Prepare installation</source>
+<target>Przygotuj instalację</target>
+
+<source>Choose which components you want to install.</source>
+<target>Określ komponenty do instalacji.</target>
+
+<source>Select installation type:</source>
+<target>Typ instalacji:</target>
+
+<source>Local</source>
+<target>Lokalna</target>
+
+<source>Portable</source>
+<target>Przenośna</target>
+
+<source>recommended</source>
+<target>rekomendowana</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Zapisuje ustawienia do "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Tworzy powiązania plików z programem FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Integracja z menu kontekstowym Windows Explorer</target>
+
+<source>Save settings in installation directory</source>
+<target>Zapisz ustawienia w katalogu instalacyjnym</target>
+
+<source>Do not write to Registry</source>
+<target>Nie tworzy wpisów w rejestrze</target>
+
+<source>Just copy the files</source>
+<target>Kopiuje tylko pliki</target>
+
+<source>Choose a directory for installation:</source>
+<target>Wybierz katalog docelowy:</target>
+
+<source>Create shortcuts:</source>
+<target>Utwórz skróty:</target>
+
+<source>Desktop</source>
+<target>Na Pulpicie</target>
+
+<source>Start menu</source>
+<target>Menu Start</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Rejestrowanie rozszerzeń plików FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Usuwanie rozszerzeń plików FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Konfiguracja FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Plik wsadowy FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>Baza danych FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Konfiguracja RealtimeSync</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Edytuj przy użyciu FreeFileSync</target>
 

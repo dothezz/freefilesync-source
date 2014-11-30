@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -15,9 +15,9 @@
 
 //minimal layer enabling text translation - without platform/library dependencies!
 #ifdef __WXMSW__ //we have wxWidgets
-#ifndef WXINTL_NO_GETTEXT_MACRO
-#error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
-#endif
+    #ifndef WXINTL_NO_GETTEXT_MACRO
+        #error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
+    #endif
 #endif
 
 #define ZEN_TRANS_CONCAT_SUB(X, Y) X ## Y
@@ -78,7 +78,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
         return translation;
     }
 
-        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n));
+    return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n));
 }
 
 template <class T> inline

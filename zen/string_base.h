@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -74,7 +74,7 @@ protected:
         assert(newCapacity >= minCapacity);
 
         Descriptor* const newDescr = static_cast<Descriptor*>(this->allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char))); //throw std::bad_alloc
-		new (newDescr) Descriptor(size, newCapacity);
+        new (newDescr) Descriptor(size, newCapacity);
 
         return reinterpret_cast<Char*>(newDescr + 1); //alignment note: "newDescr + 1" is Descriptor-aligned, which is larger than alignment for Char-array! => no problem!
     }
@@ -86,14 +86,14 @@ protected:
         return newData;
     }
 
-    void destroy(Char* ptr) 
-	{ 
+    void destroy(Char* ptr)
+    {
         if (!ptr) return; //support "destroy(nullptr)"
 
-		Descriptor* const d = descr(ptr);
-		d->~Descriptor();
-		this->deallocate(d); 
-	}
+        Descriptor* const d = descr(ptr);
+        d->~Descriptor();
+        this->deallocate(d);
+    }
 
     //this needs to be checked before writing to "ptr"
     static bool canWrite(const Char* ptr, size_t minCapacity) { return minCapacity <= descr(ptr)->capacity; }
@@ -164,7 +164,7 @@ protected:
     static bool canWrite(const Char* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
     {
         const Descriptor* const d = descr(ptr);
-		assert(d->refCount > 0);
+        assert(d->refCount > 0);
         return d->refCount == 1 && minCapacity <= d->capacity;
     }
 
@@ -180,7 +180,7 @@ private:
     struct Descriptor
     {
         Descriptor(size_t len, size_t cap) :
-			refCount(1),
+            refCount(1),
             length  (static_cast<std::uint32_t>(len)),
             capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "the types are always lock-free"
 

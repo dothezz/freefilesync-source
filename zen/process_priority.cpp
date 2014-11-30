@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -9,7 +9,7 @@
 #include "i18n.h"
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
+    #include "win.h" //includes "windows.h"
 #endif
 
 using namespace zen;
@@ -32,8 +32,8 @@ PreventStandby::~PreventStandby()
 
 
 #ifndef PROCESS_MODE_BACKGROUND_BEGIN
-#define PROCESS_MODE_BACKGROUND_BEGIN     0x00100000 // Windows Server 2003 and Windows XP/2000:  This value is not supported!
-#define PROCESS_MODE_BACKGROUND_END       0x00200000 //
+    #define PROCESS_MODE_BACKGROUND_BEGIN     0x00100000 // Windows Server 2003 and Windows XP/2000:  This value is not supported!
+    #define PROCESS_MODE_BACKGROUND_END       0x00200000 //
 #endif
 
 struct ScheduleForBackgroundProcessing::Pimpl {};

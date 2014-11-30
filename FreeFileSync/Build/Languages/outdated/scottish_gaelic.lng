@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Àireamh sam bith de phaidhrichean pasgain eile airson aon fhaidhle rèiteachaidh air a’ char as fhaide</target>
 
+<source>Open configuration for edit without executing.</source>
+<target></target>
+
 <source>Cannot find the following folders:</source>
 <target>Chan urrainn dhuinn na pasgain a leanas a lorg:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Gluais am faidhle a tha air an taobh deas</target>
 
-<source>Overwrite left item</source>
-<target>Sgrìobh thairis air an nì chlì</target>
+<source>Update left item</source>
+<target></target>
 
-<source>Overwrite right item</source>
-<target>Sgrìobh thairis air an nì deas</target>
+<source>Update right item</source>
+<target></target>
 
 <source>Do nothing</source>
 <target>Na dèan dad</target>
@@ -218,6 +221,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Cha ghabh am faidhle %x a lorg.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Chan eil am faidhle stòir-dhàta %x co-chòrdail.</target>
@@ -272,6 +278,9 @@
 <source>Creating file %x</source>
 <target>A’ cruthachadh an fhaidhle %x</target>
 
+<source>Saving file %x...</source>
+<target></target>
+
 <source>Items processed:</source>
 <target>Nithean a tha deiseil:</target>
 
@@ -301,9 +310,6 @@
 <pluralform>%x snàithlean</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>A’ còdachadh fiosrachadh leudaichte an ama: %x</target>
-
 <source>/sec</source>
 <target>/diog</target>
 
@@ -325,9 +331,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Nach cleachd sibh an tionndadh 64 biot de FreeFileSync gus lethbhreacan-sgàile a chruthachadh air an t-siostam seo?</target>
 
-<source>Cannot load file %x.</source>
-<target>Cha ghabh am faidhle %x a lorg.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Chan urrainn dhuinn ainm an draibh airson %x a dhearbhadh.</target>
 
@@ -346,8 +349,8 @@
 <source>Save &as...</source>
 <target>Sàbhail &mar...</target>
 
-<source>&Quit</source>
-<target>&Fàg</target>
+<source>E&xit</source>
+<target></target>
 
 <source>&File</source>
 <target>&Faidhle</target>
@@ -441,6 +444,9 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>&Show error</source>
 <target>&Seall a’ mhearachd</target>
 
+<source>&Quit</source>
+<target>&Fàg</target>
+
 <source>Incorrect command line:</source>
 <target>Loidhne-àithne chearr:</target>
 
@@ -486,11 +492,11 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Creating folder %x</source>
 <target>A’ cruthachadh a’ phasgain %x</target>
 
-<source>Overwriting file %x</source>
-<target>A’ sgrìobhadh thairis air an fhaidhle %x</target>
+<source>Updating file %x</source>
+<target></target>
 
-<source>Overwriting symbolic link %x</source>
-<target>A’ sgrìobhadh thairis air an symbolic link %x</target>
+<source>Updating symbolic link %x</source>
+<target></target>
 
 <source>Verifying file %x</source>
 <target>A’ dearbhadh an fhaidhle %x</target>
@@ -504,20 +510,20 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Mearachd le dearbhadh an dàta: tha susbaint eadar-dhealaichte ann an %x agus %y.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Chan urrainn dhuinn am pasgan %x a lorg</target>
-
 <source>Target folder %x already existing.</source>
 <target>Tha am pasgan-uidhe %x ann mu thràth.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Chan urrainn dhuinn am pasgan %x a lorg</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Chan fhaod raon a’ phasgain a bhith falamh.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Cuir a-steach pasgan-targaide a chum versioning.</target>
-
 <source>Source folder %x not found.</source>
 <target>Cha deach am pasgan tùsail %x a lorg.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Cuir a-steach pasgan-targaide a chum versioning.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Tha còmstrithean aig na nithean a leanas fhathast is cha dèid an sioncronachadh:</target>
@@ -561,8 +567,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Synchronization completed successfully</source>
 <target>Chaidh a shioncronachadh</target>
 
-<source>Saving log file %x...</source>
-<target>A’ sàbhaladh faidhle an loga %x...</target>
+<source>Cleaning up old log files...</source>
+<target></target>
 
 <source>Stopped</source>
 <target>Chaidh stad a chur air</target>
@@ -617,8 +623,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>FreeFileSync is up to date.</source>
 <target>Tha FreeFileSync cho ùr ’s a ghabhas.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Cha b’ urrainn dhuinn ceangal a dhèanamh ri Sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target></target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Chan urrainn dhuinn àireamh an tionndaidh làithrich aig FreeFileSync a lorg air loidhne. A bheil thu airson sùil a thoirt thu fhèin?</target>
@@ -704,8 +710,20 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Start &comparison</source>
 <target>Tòisich air a’ &choimheas</target>
 
+<source>C&omparison settings</source>
+<target></target>
+
+<source>&Filter settings</source>
+<target></target>
+
+<source>S&ynchronization settings</source>
+<target></target>
+
 <source>Start &synchronization</source>
 <target>Tòisich air an t-&sioncronachadh</target>
+
+<source>&Actions</source>
+<target></target>
 
 <source>&Options</source>
 <target>R&oghainnean</target>
@@ -785,8 +803,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Number of files and folders that will be deleted</source>
 <target>Àireamh nam faidhle ’s nam pasgan a thèid a sguabadh às</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Àireamh nam faidhle a thèid sgrìobhadh thairis orra</target>
+<source>Number of files that will be updated</source>
+<target></target>
 
 <source>Number of files and folders that will be created</source>
 <target>Àireamh nam faidhle ’s nam pasgan a thèid a chruthachadh</target>
@@ -815,8 +833,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Handle daylight saving time</source>
 <target>Aire ri tìde an t-samhraidh</target>
 
-<source>Symbolic links:</source>
-<target>Ceanglaichean samhlachail:</target>
+<source>Include symbolic links:</source>
+<target></target>
+
+<source>Direct</source>
+<target>Dìreach</target>
+
+<source>Follow</source>
+<target>Lean</target>
 
 <source>More information</source>
 <target>Barrachd fiosrachaidh</target>
@@ -845,25 +869,21 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Maximum:</source>
 <target>Air a’ char as motha:</target>
 
-<source>C&lear</source>
-<target>Fala&mhaich</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Tagh riaghailteach criathraidh gus seòrsachan àraidh de dh’fhaidhlichean fhàgail às an t-sioncronachadh. Cuir a-steach slighean fhaidhlichean a-rèir paidhir an dà phasgan aca.</target>
+
+<source>C&lear</source>
+<target>Fala&mhaich</target>
 
 <source>Detect moved files</source>
 <target>Mothaich do dh’fhaidhlichean a chaidh a ghluasad</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
-<target>
-- Feumaidh seo faidhlichean stòir-dhàta ’s cruthaichidh seo faidhlichean mar sin
-- Bidh am mothachadh an gnìomh an dèidh a’ chiad sioncronachaidh
-- Chan eil gach siostam fhaidhlichean a’ cur taic ris
-</target>
+<target></target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>Mothaich do chomhair an t-sioncronachaidh le taic o fhaidhlichean stòir-dhàta</target>
@@ -1075,26 +1095,14 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>View Settings</source>
 <target>Seall na roghainnean</target>
 
-<source>Overview</source>
-<target>Foir-shealladh</target>
-
 <source>Configuration</source>
 <target>Rèiteachadh</target>
 
+<source>Overview</source>
+<target>Foir-shealladh</target>
+
 <source>Main Bar</source>
 <target>Am prìomh-bhàr</target>
-
-<source>Start comparison</source>
-<target>Tòisich air a’ choimeasadh</target>
-
-<source>Comparison settings</source>
-<target>Roghainnean a’ choimeasaidh</target>
-
-<source>Synchronization settings</source>
-<target>Roghainnean an t-sioncronachaidh</target>
-
-<source>Start synchronization</source>
-<target>Tòisich air an t-sioncronachadh</target>
 
 <source>Confirm</source>
 <target>Dearbh</target>
@@ -1254,11 +1262,11 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Show files that will be deleted on the right side</source>
 <target>Seall faidhlichean a thèid a sguabadh às air an taobh deas</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Seall faidhlichean a thèid a thar-sgrìobhadh air an taobh chlì</target>
+<source>Show files that will be updated on the left side</source>
+<target></target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Seall faidhlichean a thèid a thar-sgrìobhadh air an taobh deas</target>
+<source>Show files that will be updated on the right side</source>
+<target></target>
 
 <source>Show files that won't be copied</source>
 <target>Seall faidhlichean nach dèid lethbhreac a dhèanamh dhiubh</target>
@@ -1399,15 +1407,6 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Configure your own synchronization rules.</source>
 <target>Sònraich riaghailtean sioncronachaidh thu fhèin.</target>
 
-<source>Exclude</source>
-<target>Dùin a-mach</target>
-
-<source>Direct</source>
-<target>Dìreach</target>
-
-<source>Follow</source>
-<target>Lean</target>
-
 <source>Today</source>
 <target>An-diugh</target>
 
@@ -1471,9 +1470,6 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Cannot monitor directory %x.</source>
 <target>Chan urrainn dhuinn sùil a chumail air %x.</target>
 
-<source>Conversion error:</source>
-<target>Mearachd iompachaidh:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Cha ghabh am faidhle %x a sguabadh às.</target>
 
@@ -1507,8 +1503,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Cannot create directory %x.</source>
 <target>Cha ghabh am pasgan %x a chruthachadh.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Cha ghabh an symbolic link %x a chruthachadh</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target></target>
 
 <source>Cannot find system function %x.</source>
 <target>Chan urrainn dhuinn foincsean an t-siostaim %x a lorg.</target>
@@ -1596,4 +1592,73 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Cha deach faidhle an rèiteachaidh %x a luchdadh gu tur.</target>
+
+<source>Prepare installation</source>
+<target></target>
+
+<source>Choose which components you want to install.</source>
+<target></target>
+
+<source>Select installation type:</source>
+<target></target>
+
+<source>Local</source>
+<target></target>
+
+<source>Portable</source>
+<target></target>
+
+<source>recommended</source>
+<target></target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target></target>
+
+<source>Register FreeFileSync file extensions</source>
+<target></target>
+
+<source>Create Explorer context menu entries</source>
+<target></target>
+
+<source>Save settings in installation directory</source>
+<target></target>
+
+<source>Do not write to Registry</source>
+<target></target>
+
+<source>Just copy the files</source>
+<target></target>
+
+<source>Choose a directory for installation:</source>
+<target></target>
+
+<source>Create shortcuts:</source>
+<target></target>
+
+<source>Desktop</source>
+<target></target>
+
+<source>Start menu</source>
+<target></target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target></target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target></target>
+
+<source>FreeFileSync Configuration</source>
+<target></target>
+
+<source>FreeFileSync Batch File</source>
+<target></target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target></target>
+
+<source>RealtimeSync Configuration</source>
+<target></target>
+
+<source>Edit with FreeFileSync</source>
+<target></target>
 

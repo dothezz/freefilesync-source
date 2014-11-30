@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -14,12 +14,12 @@
 #include <cstdio>
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
-#include "win_ver.h"
+    #include "win.h" //includes "windows.h"
+    #include "win_ver.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <clocale> //thousands separator
-#include "utf.h"   //
+    #include <clocale> //thousands separator
+    #include "utf.h"   //
 #endif
 
 using namespace zen;

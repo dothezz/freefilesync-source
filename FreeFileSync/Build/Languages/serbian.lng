@@ -7,9 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>Unable to set application identifier.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Обе су стране промењене од последње синхронизације.</target>
 
@@ -96,6 +93,9 @@
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Било који број алтернативних фолдерских парова за бар једну конфигурациону датотеку.</target>
+
+<source>Open configuration for edit without executing.</source>
+<target>Отвори конфигурацију за уређивање без покретања.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не могу пронаћи следеће фолдере:</target>
@@ -187,11 +187,11 @@
 <source>Move file on right</source>
 <target>Премести датотеку десно</target>
 
-<source>Overwrite left item</source>
-<target>Замени леву ставку</target>
+<source>Update left item</source>
+<target>Ажурирај леву ставку</target>
 
-<source>Overwrite right item</source>
-<target>Замени десну ставку</target>
+<source>Update right item</source>
+<target>Ажурирај десну ставку</target>
 
 <source>Do nothing</source>
 <target>Не ради ништа</target>
@@ -276,6 +276,9 @@
 <source>Creating file %x</source>
 <target>Правим датотеку %x</target>
 
+<source>Saving file %x...</source>
+<target>Уписујем датотеку %x...</target>
+
 <source>Items processed:</source>
 <target>Обрађени елементи:</target>
 
@@ -303,9 +306,6 @@
 <pluralform>%x нити</pluralform>
 <pluralform>%x нити</pluralform>
 </target>
-
-<source>Encoding extended time information: %x</source>
-<target>Кодирам проширене информације о времену: %x</target>
 
 <source>/sec</source>
 <target>/сек</target>
@@ -346,8 +346,8 @@
 <source>Save &as...</source>
 <target>Сачувај &као...</target>
 
-<source>&Quit</source>
-<target>&Излаз</target>
+<source>E&xit</source>
+<target>И&зађи</target>
 
 <source>&File</source>
 <target>&Датотека</target>
@@ -441,6 +441,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Прикажи грешку</target>
 
+<source>&Quit</source>
+<target>&Излаз</target>
+
 <source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
 
@@ -486,11 +489,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>Креирам фолдер %x</target>
 
-<source>Overwriting file %x</source>
-<target>Замењујем датотеку %x</target>
+<source>Updating file %x</source>
+<target>Ажурирам датотеку %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Замењујем симболичну везу %x</target>
+<source>Updating symbolic link %x</source>
+<target>Ажурирам симболичну везу %x</target>
 
 <source>Verifying file %x</source>
 <target>Проверавам датотеку %x</target>
@@ -504,20 +507,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Грешка при провери података: %x и %y имају различит садржај.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Не могу пронаћи фолдер %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Одредишни фолдер %x већ постоји.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Не могу пронаћи фолдер %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Поље за одабир одредишног фолдера не може бити празно.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Молим унесите одредишни фолдер за верзионирање.</target>
-
 <source>Source folder %x not found.</source>
 <target>Изворни фолдер %x није пронађен.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Молим унесите одредишни фолдер за верзионирање.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следеће ставке имају неразрешених конфликата и неће бити синхронизоване:</target>
@@ -561,8 +564,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>Синхронизација успешно завршена</target>
 
-<source>Saving log file %x...</source>
-<target>Уписујем лог датотеку %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Уклањање старих датотека лога...</target>
 
 <source>Stopped</source>
 <target>Заустављено</target>
@@ -616,8 +619,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync је ажуриран.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Не могу се повезати на sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Не може се успоставити веза са FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Да ли желите да проверите ручно?</target>
@@ -703,8 +706,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>Почни &упоређивање</target>
 
+<source>C&omparison settings</source>
+<target>Подешавања уп&оређивања</target>
+
+<source>&Filter settings</source>
+<target>Подешавања &филтера</target>
+
+<source>S&ynchronization settings</source>
+<target>Подешавања &синхронизације</target>
+
 <source>Start &synchronization</source>
 <target>Почни &синхронизацију</target>
+
+<source>&Actions</source>
+<target>&Акције</target>
 
 <source>&Options</source>
 <target>&Опције</target>
@@ -784,8 +799,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Број датотека и фолдера који ће бити избрисани</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Број датотека које ће бити замењене у садржају</target>
+<source>Number of files that will be updated</source>
+<target>Број датотека које ће бити ажуриране</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Број датотека и фолдера који ће бити креирани</target>
@@ -814,8 +829,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>Руковођење сезонским рачунањем времена</target>
 
-<source>Symbolic links:</source>
-<target>Симболичне везе:</target>
+<source>Include symbolic links:</source>
+<target>Укључи симболичне везе:</target>
+
+<source>Direct</source>
+<target>Непосредно</target>
+
+<source>Follow</source>
+<target>Следи</target>
 
 <source>More information</source>
 <target>Више информација</target>
@@ -844,24 +865,24 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>C&lear</source>
-<target>О&бриши</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Одаберите филтерска подешавања да би искључили одређене датотеке из синхронизације. Унесите путање датотека релативно према њиховим одговарајућим фолдерским паровима.</target>
+
+<source>C&lear</source>
+<target>О&бриши</target>
 
 <source>Detect moved files</source>
 <target>Уочи премештене датотеке</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Потребује и креира датотеке база
-- Детекција активна после иницијалног синка
-- Није подржано за све системе датотека
+- Детекција активна после почетне синхронизације
+- Потребује и креира датотеке базе
+- Није подржано од свих система датотека
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1074,26 +1095,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Подешавања приказа</target>
 
-<source>Overview</source>
-<target>Преглед</target>
-
 <source>Configuration</source>
 <target>Подешавања</target>
 
+<source>Overview</source>
+<target>Преглед</target>
+
 <source>Main Bar</source>
 <target>Главна трака</target>
-
-<source>Start comparison</source>
-<target>Почни упоређивање</target>
-
-<source>Comparison settings</source>
-<target>Подешавања упоређивања</target>
-
-<source>Synchronization settings</source>
-<target>Подешавања синхронизације</target>
-
-<source>Start synchronization</source>
-<target>Почни синхронизацију</target>
 
 <source>Confirm</source>
 <target>Потврди</target>
@@ -1249,11 +1258,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Прикажи датотеке које ће бити избрисане на десној страни</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Прикажи датотеке које ће бити замењене на левој страни</target>
+<source>Show files that will be updated on the left side</source>
+<target>Прикажи датотеке које ће бити ажуриране на левој страни</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Прикажи датотеке које ће бити замењене на десној страни</target>
+<source>Show files that will be updated on the right side</source>
+<target>Прикажи датотеке које ће бити ажуриране на десној страни</target>
 
 <source>Show files that won't be copied</source>
 <target>Прикажи датотеке које неће бити копиране</target>
@@ -1392,15 +1401,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Конфигуришите ваша властита синхронизациона правила.</target>
 
-<source>Exclude</source>
-<target>Искључи</target>
-
-<source>Direct</source>
-<target>Непосредно</target>
-
-<source>Follow</source>
-<target>Следи</target>
-
 <source>Today</source>
 <target>Данас</target>
 
@@ -1464,9 +1464,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Не могу надгледати фолдер %x.</target>
 
-<source>Conversion error:</source>
-<target>Грешка при претварању:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Не могу избрисати датотеку %x.</target>
 
@@ -1500,8 +1497,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Не могу креирати фолдер %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Не могу креирати симболичну везу %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Не могу копирати симболичну везу %x у %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Не могу пронаћи системску функцију %x.</target>
@@ -1586,4 +1583,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Датотека подешавања %x учитана само делимично.</target>
+
+<source>Prepare installation</source>
+<target>Припремање инсталације</target>
+
+<source>Choose which components you want to install.</source>
+<target>Одаберите које компоненте желите да инсталирате.</target>
+
+<source>Select installation type:</source>
+<target>Одаберите тип инсталације:</target>
+
+<source>Local</source>
+<target>Локални</target>
+
+<source>Portable</source>
+<target>Преносни</target>
+
+<source>recommended</source>
+<target>препоручени</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Сачувај подешавања у "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Региструј FreeFileSync екстензије датотека</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Направи уносе Експлореровог контекстног менија</target>
+
+<source>Save settings in installation directory</source>
+<target>Сачувај подешавања у инсталационом фолдеру</target>
+
+<source>Do not write to Registry</source>
+<target>Не уписуј у Регистар бази</target>
+
+<source>Just copy the files</source>
+<target>Само копирај датотеке</target>
+
+<source>Choose a directory for installation:</source>
+<target>Одабери фолдер за инсталацију:</target>
+
+<source>Create shortcuts:</source>
+<target>Направи пречице:</target>
+
+<source>Desktop</source>
+<target>Десктоп</target>
+
+<source>Start menu</source>
+<target>Старт мени</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Регистрација FreeFileSync екстензија датотека</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Дерегистрација FreeFileSync екстензија датотека</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Конфигурација FreeFileSync-а</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Беч датотека FreeFileSync-а</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>База података FreeFileSync синхронизације</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Конфигурација RealtimeSync-а</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Уреди са FreeFileSync-ом</target>
 

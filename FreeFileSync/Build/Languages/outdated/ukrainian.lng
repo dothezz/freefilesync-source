@@ -7,81 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
-<source>&Show</source>
-<target></target>
-
-<source>Show hidden dialogs and warning messages again?</source>
-<target></target>
-
-<source>Clear filter</source>
-<target></target>
-
-<source>Start comparison</source>
-<target></target>
-
-<source>Show all permanently hidden dialogs and warning messages again</source>
-<target></target>
-
-<source>Show hidden dialogs again</source>
-<target></target>
-
-<source>&Stop</source>
-<target></target>
-
-<source>Bytes copied:</source>
-<target></target>
-
-<source>&Pop-up</source>
-<target></target>
-
-<source>&Versioning</source>
-<target></target>
-
-<source>&Permanent</source>
-<target></target>
-
-<source>C&lear</source>
-<target></target>
-
-<source>Handle daylight saving time</source>
-<target></target>
-
-<source>Consider file times with specified offset as equal</source>
-<target></target>
-
-<source>Ignore time shift (in hours)</source>
-<target></target>
-
-<source>New</source>
-<target></target>
-
-<source>&Reset layout</source>
-<target></target>
-
-<source>Start &synchronization</source>
-<target></target>
-
-<source>Start &comparison</source>
-<target></target>
-
-<source>Clear local filter</source>
-<target></target>
-
-<source>Relative folder</source>
-<target></target>
-
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target></target>
-
-<source>Cannot find folder %x.</source>
-<target></target>
-
-<source>&File</source>
-<target></target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>З моменту останньої синхронізації з обох сторін відбулися зміни.</target>
 
@@ -172,6 +97,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Будь-яка кількість альтернативних пар каталогів для не більше одного конфігураційного файлу.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target></target>
+
 <source>Cannot find the following folders:</source>
 <target>Не вдається знайти такі папки:</target>
 
@@ -183,6 +111,9 @@
 
 <source>The corresponding folder will be considered as empty.</source>
 <target>Відповідна папка буде вважатися порожньою.</target>
+
+<source>The following folder paths are dependent from each other:</source>
+<target></target>
 
 <source>File %x has an invalid date.</source>
 <target>Файл %x має неіснуючу дату.</target>
@@ -259,11 +190,11 @@
 <source>Move file on right</source>
 <target>Перемістити файли праворуч</target>
 
-<source>Overwrite left item</source>
-<target>Перезаписати елемент ліворуч</target>
+<source>Update left item</source>
+<target></target>
 
-<source>Overwrite right item</source>
-<target>Перезаписати елемент праворуч</target>
+<source>Update right item</source>
+<target></target>
 
 <source>Do nothing</source>
 <target>Нічого не робити</target>
@@ -348,6 +279,9 @@
 <source>Creating file %x</source>
 <target>Створення файлу %x</target>
 
+<source>Saving file %x...</source>
+<target></target>
+
 <source>Items processed:</source>
 <target>Елементів оброблено:</target>
 
@@ -375,9 +309,6 @@
 <pluralform>%x ниті виконання</pluralform>
 <pluralform>%x нитей виконання</pluralform>
 </target>
-
-<source>Encoding extended time information: %x</source>
-<target>Кодування розширеної інформації про час: %x</target>
 
 <source>/sec</source>
 <target>/сек</target>
@@ -418,8 +349,11 @@
 <source>Save &as...</source>
 <target>Зберегти &як...</target>
 
-<source>&Quit</source>
-<target>&Вихід</target>
+<source>E&xit</source>
+<target></target>
+
+<source>&File</source>
+<target></target>
 
 <source>&View help</source>
 <target>&Перегляд довідки</target>
@@ -510,6 +444,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Показати помилку</target>
 
+<source>&Quit</source>
+<target>&Вихід</target>
+
 <source>Incorrect command line:</source>
 <target>Неправильний командний рядок:</target>
 
@@ -555,11 +492,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>Створення папки %x</target>
 
-<source>Overwriting file %x</source>
-<target>Перезапис файлу %x</target>
+<source>Updating file %x</source>
+<target></target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Перезапис символьного посилання %x</target>
+<source>Updating symbolic link %x</source>
+<target></target>
 
 <source>Verifying file %x</source>
 <target>Перевірка файлу %x</target>
@@ -575,6 +512,9 @@ The command is triggered if:
 
 <source>Target folder %x already existing.</source>
 <target>Цільова папка %x вже існує.</target>
+
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Поле цільової папки не повинно бути порожнім.</target>
@@ -600,6 +540,9 @@ The command is triggered if:
 <source>Available:</source>
 <target>Доступно:</target>
 
+<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
+<target></target>
+
 <source>Synchronizing folder pair:</source>
 <target>Синхронізація пари папок:</target>
 
@@ -624,8 +567,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>Синхронізація успішно завершена</target>
 
-<source>Saving log file %x...</source>
-<target>Збереження файла журналу %x...</target>
+<source>Cleaning up old log files...</source>
+<target></target>
 
 <source>Stopped</source>
 <target>Зупинено</target>
@@ -679,8 +622,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>У Вас найновіша версія FreeFileSync.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Не можна з’єднатися з sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target></target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Не вдається знайти номер поточної версії FreeFileSync онлайн. Бажаєте перевірити вручну?</target>
@@ -699,6 +642,9 @@ The command is triggered if:
 
 <source>Name</source>
 <target>Назва</target>
+
+<source>Relative folder</source>
+<target></target>
 
 <source>Base folder</source>
 <target>Базова папка</target>
@@ -739,6 +685,9 @@ The command is triggered if:
 <source>Remove local settings</source>
 <target>Вилучити локальні налаштування</target>
 
+<source>Clear local filter</source>
+<target></target>
+
 <source>Copy</source>
 <target>Копіювати</target>
 
@@ -757,6 +706,24 @@ The command is triggered if:
 <source>Save as &batch job...</source>
 <target>Зберегти як &пакетне завдання</target>
 
+<source>Start &comparison</source>
+<target></target>
+
+<source>C&omparison settings</source>
+<target></target>
+
+<source>&Filter settings</source>
+<target></target>
+
+<source>S&ynchronization settings</source>
+<target></target>
+
+<source>Start &synchronization</source>
+<target></target>
+
+<source>&Actions</source>
+<target></target>
+
 <source>&Options</source>
 <target>&Опції</target>
 
@@ -765,6 +732,9 @@ The command is triggered if:
 
 <source>&Find...</source>
 <target>&Знайти...</target>
+
+<source>&Reset layout</source>
+<target></target>
 
 <source>&Export file list...</source>
 <target>&Експортувати список файлів...</target>
@@ -808,6 +778,9 @@ The command is triggered if:
 <source>Match case</source>
 <target>Враховувати регістр</target>
 
+<source>New</source>
+<target></target>
+
 <source>Open...</source>
 <target>Відкрити...</target>
 
@@ -829,8 +802,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Кількість файлів і папок, які будуть вилучені</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Кількість файлів, які будуть перезаписані</target>
+<source>Number of files that will be updated</source>
+<target></target>
 
 <source>Number of files and folders that will be created</source>
 <target>Кількість файлів і папок, які будуть створені</target>
@@ -850,8 +823,23 @@ The command is triggered if:
 <source>Identify equal files by comparing the file content.</source>
 <target>Визначити однакові файли порівнюючи їх вміст.</target>
 
-<source>Symbolic links:</source>
-<target>Символьні посилання:</target>
+<source>Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Consider file times with specified offset as equal</source>
+<target></target>
+
+<source>Handle daylight saving time</source>
+<target></target>
+
+<source>Include symbolic links:</source>
+<target></target>
+
+<source>Direct</source>
+<target>Прямо</target>
+
+<source>Follow</source>
+<target>Послідовно</target>
 
 <source>More information</source>
 <target>Додаткова інформація</target>
@@ -883,25 +871,27 @@ The command is triggered if:
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
 
+<source>C&lear</source>
+<target></target>
+
 <source>Detect moved files</source>
 <target>Виявляти переміщені файли</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
-<target>
-- Вимагає і створює файли бази даних
-- Активне спостереження після первинної синхронізації
-- Підтримується не всіма файловими системами
-</target>
+<target></target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
 
 <source>Delete files:</source>
 <target>Вилучити файли:</target>
+
+<source>&Permanent</source>
+<target></target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Вилучати чи перезаписати файли назавжди</target>
@@ -911,6 +901,9 @@ The command is triggered if:
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Резервно зберегти вилучені та перезаисані файли в Корзині</target>
+
+<source>&Versioning</source>
+<target></target>
 
 <source>Move files to a user-defined folder</source>
 <target>Перемістити файли у визначену користувачем папку</target>
@@ -923,6 +916,9 @@ The command is triggered if:
 
 <source>Hide all error and warning messages</source>
 <target>Приховати всі помилки і повідомлення з попередженнями</target>
+
+<source>&Pop-up</source>
+<target></target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показувати виринаючі вікна при помилках та попередженнях</target>
@@ -957,6 +953,9 @@ The command is triggered if:
 <source>Minimize to notification area</source>
 <target>Згорнути в область повідомлень</target>
 
+<source>Bytes copied:</source>
+<target></target>
+
 <source>Close</source>
 <target>Замкнути</target>
 
@@ -968,6 +967,9 @@ The command is triggered if:
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Створити пакетний файл для автоматичної синхронізації. Щоб розпочати двічі клацніть цей файл або заплануйте в планувальнику завдань: %x</target>
+
+<source>&Stop</source>
+<target></target>
 
 <source>Stop synchronization at first error</source>
 <target>Зупинити синхронізацію при першій помилці</target>
@@ -1035,6 +1037,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Description</source>
 <target>Опис</target>
 
+<source>Show hidden dialogs again</source>
+<target></target>
+
+<source>Show all permanently hidden dialogs and warning messages again</source>
+<target></target>
+
 <source>&Default</source>
 <target>&За замовчуванням</target>
 
@@ -1086,23 +1094,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Налаштування перегляду</target>
 
-<source>Overview</source>
-<target>Огляд</target>
-
 <source>Configuration</source>
 <target>Налаштування</target>
 
+<source>Overview</source>
+<target>Огляд</target>
+
 <source>Main Bar</source>
 <target>Головна панель</target>
-
-<source>Comparison settings</source>
-<target>Налаштування порівнювання</target>
-
-<source>Synchronization settings</source>
-<target>Налаштування синхронізації</target>
-
-<source>Start synchronization</source>
-<target>Розпочати синхронізацію</target>
 
 <source>Confirm</source>
 <target>Підтвердити</target>
@@ -1222,6 +1221,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Synchronization Settings</source>
 <target>Налаштування Синхронізації</target>
 
+<source>Clear filter</source>
+<target></target>
+
 <source>Show files that exist on left side only</source>
 <target>Показати файли, які є тільки ліворуч</target>
 
@@ -1255,11 +1257,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Показати файли, які будуть вилучені праворуч</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Показати файли, які будуть перезаписані ліворуч</target>
+<source>Show files that will be updated on the left side</source>
+<target></target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Показати файли, які будуть перезаписані праворуч</target>
+<source>Show files that will be updated on the right side</source>
+<target></target>
 
 <source>Show files that won't be copied</source>
 <target>Показати файли, які не будуть зкопійовані</target>
@@ -1380,6 +1382,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Елемент з протилежної сторони до %item_folder%</target>
 
+<source>Show hidden dialogs and warning messages again?</source>
+<target></target>
+
+<source>&Show</source>
+<target></target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>
 
@@ -1391,15 +1399,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Налаштувати власні правила синхронізації.</target>
-
-<source>Exclude</source>
-<target>Виключити</target>
-
-<source>Direct</source>
-<target>Прямо</target>
-
-<source>Follow</source>
-<target>Послідовно</target>
 
 <source>Today</source>
 <target>Сьогодні</target>
@@ -1464,9 +1463,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Не вдається контролювати каталог %x.</target>
 
-<source>Conversion error:</source>
-<target>Помилка перетворення:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Не вдається видалити файл %x.</target>
 
@@ -1500,8 +1496,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Не вдається створити каталогу %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Не вдається створити символьного посилання %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target></target>
 
 <source>Cannot find system function %x.</source>
 <target>Не вдається знайти системної функції %x.</target>
@@ -1586,4 +1582,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Файл конфігурації %x завантажено лише частково.</target>
+
+<source>Prepare installation</source>
+<target>Підготовка інсталяції</target>
+
+<source>Choose which components you want to install.</source>
+<target>Виберіть які компоненти ви хочете встановити.</target>
+
+<source>Select installation type:</source>
+<target></target>
+
+<source>Local</source>
+<target>Локальна</target>
+
+<source>Portable</source>
+<target>Портативна</target>
+
+<source>recommended</source>
+<target>рекомендовано</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Зберегти налаштування в "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Зареєструвати розширення файлів FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target></target>
+
+<source>Save settings in installation directory</source>
+<target>Зберегти налаштування у каталозі встановлення</target>
+
+<source>Do not write to Registry</source>
+<target>Не записувати у Реєстр</target>
+
+<source>Just copy the files</source>
+<target>Просто зкопіювати файли</target>
+
+<source>Choose a directory for installation:</source>
+<target>Виберіть каталог для встановлення:</target>
+
+<source>Create shortcuts:</source>
+<target>Створити ярлики:</target>
+
+<source>Desktop</source>
+<target>Робочий стіл</target>
+
+<source>Start menu</source>
+<target>Меню Пуск</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Реєструю розширення файлів FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Вилучаю реєстрацію розширення файлів FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target></target>
+
+<source>FreeFileSync Batch File</source>
+<target></target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target></target>
+
+<source>RealtimeSync Configuration</source>
+<target></target>
+
+<source>Edit with FreeFileSync</source>
+<target></target>
 

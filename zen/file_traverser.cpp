@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,20 +10,20 @@
 #include "int64.h"
 
 #ifdef ZEN_WIN
-#include "win_ver.h"
-#include "long_path_prefix.h"
-#include "file_access.h"
-#include "dll.h"
-#include "FindFilePlus/find_file_plus.h"
+    #include "win_ver.h"
+    #include "long_path_prefix.h"
+    #include "file_access.h"
+    #include "dll.h"
+    #include "FindFilePlus/find_file_plus.h"
 
 #elif defined ZEN_MAC
-#include "osx_string.h"
+    #include "osx_string.h"
 #endif
 
 #if defined ZEN_LINUX || defined ZEN_MAC
-#include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
-#include <sys/stat.h>
-#include <dirent.h>
+    #include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
+    #include <sys/stat.h>
+    #include <dirent.h>
 #endif
 
 using namespace zen;
@@ -366,7 +366,7 @@ void DirTraverser::traverse<FilePlusTraverser>(const Zstring& dirpath, TraverseC
 
 
 inline
-DirTraverser::DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink) 
+DirTraverser::DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink)
 {
     try //traversing certain folders with restricted permissions requires this privilege! (but copying these files may still fail)
     {

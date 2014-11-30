@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Vilkårligt antal alternative mappepar til højst en indstillingsfil</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Åben indstillingsfil for redigering</target>
+
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finde følgende mapper:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>flyt filen til højre</target>
 
-<source>Overwrite left item</source>
-<target>Overskriv venstre emne</target>
+<source>Update left item</source>
+<target>Opdater venstre emne</target>
 
-<source>Overwrite right item</source>
-<target>Overskriv højre emne</target>
+<source>Update right item</source>
+<target>Opdater højre emne</target>
 
 <source>Do nothing</source>
 <target>Gør intet</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Kan ikke indlæse filen %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Databasefilen %x er inkompatibel.</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>Opretter filen %x</target>
 
+<source>Saving file %x...</source>
+<target>Gemmer filen %x...</target>
+
 <source>Items processed:</source>
 <target>Emner behandlet:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x tråde</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Opretter udvidet tidsinformation: %x</target>
-
 <source>/sec</source>
 <target>/sek</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Brug FreeFileSync 64-bit til at lave VSS kopier på dette system.</target>
 
-<source>Cannot load file %x.</source>
-<target>Kan ikke indlæse filen %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Kan ikke bestemme volumennavn for %x.</target>
 
@@ -340,8 +343,8 @@
 <source>Save &as...</source>
 <target>Gem &som...</target>
 
-<source>&Quit</source>
-<target>&Afslut</target>
+<source>E&xit</source>
+<target>L&uk</target>
 
 <source>&File</source>
 <target>&Fil</target>
@@ -368,7 +371,7 @@
 <target>3. Klik 'Start'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Importer en .ffs_batchfil (Filer > Åben...) for at komme igang.</target>
+<target>Importer en .ffs_batchfil (Fil > Åben...) for at komme igang.</target>
 
 <source>Folders to watch:</source>
 <target>Jobbets mapper:</target>
@@ -435,6 +438,9 @@ Kommandoen udføres hvis:
 <source>&Show error</source>
 <target>Vi&s fejl</target>
 
+<source>&Quit</source>
+<target>&Afslut</target>
+
 <source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
 
@@ -480,11 +486,11 @@ Kommandoen udføres hvis:
 <source>Creating folder %x</source>
 <target>Opretter mappen %x</target>
 
-<source>Overwriting file %x</source>
-<target>Overskriver filen %x</target>
+<source>Updating file %x</source>
+<target>Opdaterer filen %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Overskriver symlinket %x</target>
+<source>Updating symbolic link %x</source>
+<target>Opdaterer symbolsk link %x</target>
 
 <source>Verifying file %x</source>
 <target>Verificerer filen %x</target>
@@ -498,20 +504,20 @@ Kommandoen udføres hvis:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Godkendelsesfejl: %x og %y har forskelligt indhold</target>
 
-<source>Cannot find folder %x.</source>
-<target>Kan ikke finde mappen %x</target>
-
 <source>Target folder %x already existing.</source>
 <target>Destinationsmappen %x findes allerede.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Kan ikke finde mappen %x</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Destinationsmappen skal angives.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Angiv mappe til versionering.</target>
-
 <source>Source folder %x not found.</source>
 <target>Kildemappen %x blev ikke fundet.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Angiv mappe til versionering.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Følgende emner har uløste konflikter og synkroniseres ikke:</target>
@@ -555,8 +561,8 @@ Kommandoen udføres hvis:
 <source>Synchronization completed successfully</source>
 <target>Synkronisering gennemført</target>
 
-<source>Saving log file %x...</source>
-<target>Gemmer rapport %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Fjerner gamle logfiler...</target>
 
 <source>Stopped</source>
 <target>Afbrudt</target>
@@ -609,8 +615,8 @@ Kommandoen udføres hvis:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er opdateret.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Kan ikke kontakte sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Kan ikke kontakte FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Kunne ikke finde FreeFileSync's versionsnummer online. Vil du kontrollere manuelt?</target>
@@ -696,8 +702,20 @@ Kommandoen udføres hvis:
 <source>Start &comparison</source>
 <target>Start &analyse</target>
 
+<source>C&omparison settings</source>
+<target>A&nalyseindstillinger</target>
+
+<source>&Filter settings</source>
+<target>&Filterindstillinger</target>
+
+<source>S&ynchronization settings</source>
+<target>S&ynkroniseringsindstillinger</target>
+
 <source>Start &synchronization</source>
 <target>Start &synkronisering</target>
+
+<source>&Actions</source>
+<target>&Handlinger</target>
 
 <source>&Options</source>
 <target>&Indstillinger</target>
@@ -777,8 +795,8 @@ Kommandoen udføres hvis:
 <source>Number of files and folders that will be deleted</source>
 <target>Antal filer og mapper der slettes</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Antal filer der overskrives</target>
+<source>Number of files that will be updated</source>
+<target>Antal filer der opdateres</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Antal filer og mapper der oprettes</target>
@@ -807,8 +825,14 @@ Kommandoen udføres hvis:
 <source>Handle daylight saving time</source>
 <target>Tag hensyn til sommertid</target>
 
-<source>Symbolic links:</source>
-<target>Symbolske link:</target>
+<source>Include symbolic links:</source>
+<target>Medtag symlinks:</target>
+
+<source>Direct</source>
+<target>Direkte</target>
+
+<source>Follow</source>
+<target>Følg</target>
 
 <source>More information</source>
 <target>Mere information</target>
@@ -837,24 +861,24 @@ Kommandoen udføres hvis:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>C&lear</source>
-<target>R&yd</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Angiv filterregler til ekskludering af bestemte filer fra synkroniseringen. Filstier skal relatere til kildemapperne.</target>
+
+<source>C&lear</source>
+<target>R&yd</target>
 
 <source>Detect moved files</source>
 <target>Genkend flyttede filer</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
+- Overvågning akiv efter første synk
 - Kræver og opretter databasefiler
-- Genkendelse aktiv efter første synk
-- Understøtter ikke alle filsystemer
+- Støttes ikke af alle filsystemer
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1064,26 +1088,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Visninger</target>
 
-<source>Overview</source>
-<target>Oversigt</target>
-
 <source>Configuration</source>
 <target>Indstilling</target>
 
+<source>Overview</source>
+<target>Oversigt</target>
+
 <source>Main Bar</source>
 <target>Hovedlinie</target>
-
-<source>Start comparison</source>
-<target>Start analyse</target>
-
-<source>Comparison settings</source>
-<target>Analyseindstillinger</target>
-
-<source>Synchronization settings</source>
-<target>Synkroniseringsindstillinger</target>
-
-<source>Start synchronization</source>
-<target>Start synkronisering</target>
 
 <source>Confirm</source>
 <target>Bekræft</target>
@@ -1235,11 +1247,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Vis filer der slettes på højre side</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Vis filer der overskrives på venstre side</target>
+<source>Show files that will be updated on the left side</source>
+<target>Vis filer der opdateres på venstre side</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Vis filer der overskrives på højre side</target>
+<source>Show files that will be updated on the right side</source>
+<target>Vis filer der opdateres på højre side</target>
 
 <source>Show files that won't be copied</source>
 <target>Vis filer der ikke kopieres</target>
@@ -1376,15 +1388,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Opret dine egne synkroniseringsregler.</target>
 
-<source>Exclude</source>
-<target>Ekskludér</target>
-
-<source>Direct</source>
-<target>Direkte</target>
-
-<source>Follow</source>
-<target>Følg</target>
-
 <source>Today</source>
 <target>Idag</target>
 
@@ -1448,9 +1451,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Kan ikke overvåge mappen %x.</target>
 
-<source>Conversion error:</source>
-<target>Konverteringsfejl:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Kan ikke slette filen %x.</target>
 
@@ -1484,8 +1484,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Kan ikke oprette mappen %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Kan ikke oprette symbolsk link %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan ikke kopiere symlink fra %x til %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finde systemfunktionen %x.</target>
@@ -1567,4 +1567,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Indstillingsfilen %x er kun delvist indlæst.</target>
+
+<source>Prepare installation</source>
+<target>Forbereder installering</target>
+
+<source>Choose which components you want to install.</source>
+<target>Vælg hvordan FreeFileSync skal installeres.</target>
+
+<source>Select installation type:</source>
+<target>Vælg installeringstype:</target>
+
+<source>Local</source>
+<target>Standard</target>
+
+<source>Portable</source>
+<target>Portable</target>
+
+<source>recommended</source>
+<target>anbefales</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Gemmer indstillinger i "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Registrerer FreeFileSync filtyper</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Føj til Stifinders højrekliksmenu</target>
+
+<source>Save settings in installation directory</source>
+<target>Gemmer indstillinger i programmets mappe</target>
+
+<source>Do not write to Registry</source>
+<target>Skriver ikke til registreringsdatabasen</target>
+
+<source>Just copy the files</source>
+<target>Udpakker filer til valgt mappe</target>
+
+<source>Choose a directory for installation:</source>
+<target>Vælg installeringsmappe:</target>
+
+<source>Create shortcuts:</source>
+<target>Opret genveje:</target>
+
+<source>Desktop</source>
+<target>På skrivebord</target>
+
+<source>Start menu</source>
+<target>I startmenu</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registrerer FreeFileSync filtyper</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Fjerner FreeFileSync filtyperegistrering</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync indstillinger</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync batchfil</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync synkroniseringsdatabase</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync indstillinger</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Rediger med FreeFileSync</target>
 

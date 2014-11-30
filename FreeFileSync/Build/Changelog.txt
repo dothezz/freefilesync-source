@@ -1,3 +1,20 @@
+FreeFileSync 6.12 [2014-12-01]
+------------------------------
+New "Actions" menu bar entry with basic operations
+Fixed crash after comparison while needlessly copying traveral results
+Support auto-updater URL redirection (Linux, OS X)
+Merged installer translations into .lng files
+Fully translated FreeFileSync context menu options and file types in Windows Explorer
+More structured symlink handling options
+Scroll to active selection in config list box on startup
+Fixed delete key to remove items in config history panel (OS X)
+Fixed language file parser showing incorrect row on error
+Fixed crash during sync due to unsupported SSE instructions (Server 2003, XP 64-bit)
+Fixed startup error due to invalid handle type
+Always log folder pair paths even if there is nothing to sync
+Updated translation files
+
+
 FreeFileSync 6.11 [2014-11-03]
 ------------------------------
 Updated Recycle Bin access for Windows 10
@@ -16,7 +33,7 @@ Fixed async error evaluation when creating volume shadow copies
 Keep user interface responsive while creating a volume shadow copy
 Fixed error when starting asynchronously from a batch script
 Show progress of writing log files
-Fixed updated file being left deleted when copying permission failed
+Fixed updated file being left deleted when copying permissions failed
 New Project website: http://www.freefilesync.org/
 
 

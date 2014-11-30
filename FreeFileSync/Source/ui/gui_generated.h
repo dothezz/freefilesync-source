@@ -44,6 +44,7 @@ namespace zen { class TripleSplitter; }
 #include <wx/tglbtn.h>
 #include <wx/spinctrl.h>
 #include <wx/hyperlink.h>
+#include <wx/radiobut.h>
 #include <wx/choice.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
@@ -72,7 +73,11 @@ protected:
     wxMenuItem* m_menuItemSave;
     wxMenuItem* m_menuItemSaveAs;
     wxMenuItem* m_menuItemSaveAsBatch;
+    wxMenu* m_menu4;
     wxMenuItem* m_menuItemCompare;
+    wxMenuItem* m_menuItemCompSettings;
+    wxMenuItem* m_menuItemFilter;
+    wxMenuItem* m_menuItemSyncSettings;
     wxMenuItem* m_menuItemSynchronize;
     wxMenu* m_menuTools;
     wxMenuItem* m_menuItemOptions;
@@ -192,9 +197,12 @@ protected:
     virtual void OnConfigSave( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnConfigSaveAs( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSaveAsBatchJob( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuOptions( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuFindItem( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuResetLayout( wxCommandEvent& event ) { event.Skip(); }
@@ -203,11 +211,8 @@ protected:
     virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuCheckVersionAutomatically( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCompSettingsContext( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnGlobalFilterContext( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSyncSettingsContext( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
@@ -267,8 +272,9 @@ protected:
     wxSpinCtrl* m_spinCtrlTimeShift;
     wxHyperlinkCtrl* m_hyperlink241;
     wxStaticLine* m_staticline44;
-    wxStaticText* m_staticText92;
-    wxChoice* m_choiceHandleSymlinks;
+    wxCheckBox* m_checkBoxSymlinksInclude;
+    wxRadioButton* m_radioBtnSymlinksDirect;
+    wxRadioButton* m_radioBtnSymlinksFollow;
     wxHyperlinkCtrl* m_hyperlink24;
     wxStaticLine* m_staticline441;
     wxStaticLine* m_staticline331;

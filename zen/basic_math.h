@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -42,7 +42,10 @@ auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typenam
 template <class T>
 bool isNull(T value);
 
-int round(double d); //little rounding function
+int round(double d); //"little rounding function"
+
+template <class N>
+N integerDivideRoundUp(N numerator, N denominator);
 
 template <size_t N, class T>
 T power(const T& value);
@@ -98,7 +101,7 @@ const double ln2   = 0.693147180559945309417;
 template <class T> inline
 T abs(T value)
 {
-    //static_assert(std::is_signed<T>::value, ""); might not compile for non-built-in arithmetic types; anyway "-value" should emit compiler error or warning for unsigned types
+    static_assert(std::is_signed<T>::value, "");
     if (value < 0)
         return -value; // operator "?:" caveat: may be different type than "value"
     else
@@ -231,6 +234,15 @@ int round(double d)
     assert(d - 0.5 >= std::numeric_limits<int>::min() && //if double is larger than what int can represent:
            d + 0.5 <= std::numeric_limits<int>::max());  //=> undefined behavior!
     return static_cast<int>(d < 0 ? d - 0.5 : d + 0.5);
+}
+
+
+template <class N> inline
+N integerDivideRoundUp(N numerator, N denominator)
+{
+    static_assert(std::is_unsigned<N>::value, "");
+    assert(denominator > 0);
+    return (numerator + denominator - 1) / denominator;
 }
 
 

@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,7 +10,7 @@
 #include "string_base.h"
 
 #ifdef ZEN_LINUX
-#include <cstring> //strcmp
+    #include <cstring> //strcmp
 #endif
 
 
@@ -49,14 +49,14 @@ public:
 //############################## helper functions #############################################
 
 #ifdef ZEN_WIN //Windows encodes Unicode as UTF-16 wchar_t
-typedef wchar_t Zchar;
-#define Zstr(x) L ## x
-const Zchar FILE_NAME_SEPARATOR = L'\\';
+    typedef wchar_t Zchar;
+    #define Zstr(x) L ## x
+    const Zchar FILE_NAME_SEPARATOR = L'\\';
 
 #elif defined ZEN_LINUX || defined ZEN_MAC //Linux uses UTF-8
-typedef char Zchar;
-#define Zstr(x) x
-const Zchar FILE_NAME_SEPARATOR = '/';
+    typedef char Zchar;
+    #define Zstr(x) x
+    const Zchar FILE_NAME_SEPARATOR = '/';
 #endif
 
 //"The reason for all the fuss above" - Loki/SmartPtr
@@ -79,7 +79,7 @@ struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
 };
 
 #if defined ZEN_WIN || defined ZEN_MAC
-Zstring makeUpperCopy(const Zstring& str);
+    Zstring makeUpperCopy(const Zstring& str);
 #endif
 
 inline

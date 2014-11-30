@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -11,11 +11,11 @@
 #include <wx+/string_conv.h>
 
 #ifdef ZEN_MAC
-#include <vector>
-#include <zen/scope_guard.h>
-#include <zen/osx_string.h>
-//keep in .cpp file to not pollute global namespace!
-#include <ApplicationServices/ApplicationServices.h> //LSFindApplicationForInfo
+    #include <vector>
+    #include <zen/scope_guard.h>
+    #include <zen/osx_string.h>
+    //keep in .cpp file to not pollute global namespace!
+    #include <ApplicationServices/ApplicationServices.h> //LSFindApplicationForInfo
 #endif
 
 using namespace zen;
@@ -42,7 +42,11 @@ Zstring getInstallDir() //root install directory WITH path separator at end
 
 #ifdef ZEN_WIN
 inline
-bool isPortableVersion() { return !fileExists(getInstallDir() + L"uninstall.exe"); } //this check is a bit lame...
+bool isPortableVersion()
+{
+    return !(fileExists(getInstallDir() + L"uninstall.exe") || //created by NSIS
+             dirExists (getInstallDir() + L"Uninstall"));      //created by Inno Setup
+}
 #elif defined ZEN_LINUX
 inline
 bool isPortableVersion() { return !endsWith(getExecutableDir(), "/bin/"); } //this check is a bit lame...

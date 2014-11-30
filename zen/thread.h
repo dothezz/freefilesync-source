@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -12,27 +12,27 @@
 
 //workaround this pathetic boost thread warning mess
 #ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#pragma GCC diagnostic ignored "-Wredundant-decls"
-#pragma GCC diagnostic ignored "-Wshadow"
-#ifndef __clang__ //clang defines __GNUC__, but doesn't support this warning
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wswitch-enum"
+    #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+    #pragma GCC diagnostic ignored "-Wredundant-decls"
+    #pragma GCC diagnostic ignored "-Wshadow"
+    #ifndef __clang__ //clang defines __GNUC__, but doesn't support this warning
+        #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+    #endif
 #endif
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702 4913) //unreachable code; user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
+    #pragma warning(push)
+    #pragma warning(disable : 4702 4913) //unreachable code; user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
 #endif
 
 #include <boost/thread.hpp>
 
 #ifdef __GNUC__
-#pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
-#pragma warning(pop)
+    #pragma warning(pop)
 #endif
 
 namespace zen
@@ -85,7 +85,7 @@ private:
 
 //###################### implementation ######################
 #ifndef BOOST_HAS_THREADS
-#error just some paranoia check...
+    #error just some paranoia check...
 #endif
 
 template <class Function> inline

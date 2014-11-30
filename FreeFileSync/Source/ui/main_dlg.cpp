@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -23,7 +23,6 @@
 #include <wx+/no_flicker.h>
 #include <wx+/rtl.h>
 #include <wx+/font_size.h>
-#include <wx+/key_event.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "check_version.h"
@@ -45,10 +44,10 @@
 #include "../lib/localization.h"
 
 #ifdef ZEN_WIN
-#include <wx+/mouse_move_dlg.h>
+    #include <wx+/mouse_move_dlg.h>
 
 #elif defined ZEN_MAC
-#include <ApplicationServices/ApplicationServices.h>
+    #include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -78,6 +77,16 @@ IconBuffer::IconSize convert(xmlAccess::FileIconSize isize)
             return IconBuffer::SIZE_LARGE;
     }
     return IconBuffer::SIZE_SMALL;
+}
+
+//pretty much the same like "bool wxWindowBase::IsDescendant(wxWindowBase* child) const" but without the obvious misnomer
+inline
+bool isComponentOf(const wxWindow* child, const wxWindow* top)
+{
+    for (const wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
+        if (wnd == top)
+            return true;
+    return false;
 }
 }
 
@@ -609,15 +618,15 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
     //set tool tips with (non-translated!) short cut hint
     m_bpButtonNew        ->SetToolTip(replaceCpy(_("&New"),                  L"&", L"") + L" (Ctrl+N)"); //
-    m_bpButtonOpen       ->SetToolTip(replaceCpy(_("&Open..."),              L"&", L"") + L" (Ctrl+O)"); //reuse texts from gui builder
-    m_bpButtonSave       ->SetToolTip(replaceCpy(_("&Save"),                 L"&", L"") + L" (Ctrl+S)"); //
+    m_bpButtonOpen       ->SetToolTip(replaceCpy(_("&Open..."),              L"&", L"") + L" (Ctrl+O)"); //
+    m_bpButtonSave       ->SetToolTip(replaceCpy(_("&Save"),                 L"&", L"") + L" (Ctrl+S)"); //reuse texts from gui builder
     m_bpButtonSaveAs     ->SetToolTip(replaceCpy(_("Save &as..."),           L"&", L""));                //
     m_bpButtonSaveAsBatch->SetToolTip(replaceCpy(_("Save as &batch job..."), L"&", L""));                //
 
-    m_buttonCompare     ->SetToolTip(_("Start comparison")         + L" (F5)");
-    m_bpButtonCmpConfig ->SetToolTip(_("Comparison settings")      + L" (F6)");
-    m_bpButtonSyncConfig->SetToolTip(_("Synchronization settings") + L" (F8)");
-    m_buttonSync        ->SetToolTip(_("Start synchronization")    + L" (F9)");
+    m_buttonCompare     ->SetToolTip(replaceCpy(_("Start &comparison"),         L"&", L"") + L" (F5)"); //
+    m_bpButtonCmpConfig ->SetToolTip(replaceCpy(_("C&omparison settings"),      L"&", L"") + L" (F6)"); //
+    m_bpButtonSyncConfig->SetToolTip(replaceCpy(_("S&ynchronization settings"), L"&", L"") + L" (F8)"); //
+    m_buttonSync        ->SetToolTip(replaceCpy(_("Start &synchronization"),    L"&", L"") + L" (F9)"); //
 
     gridDataView = std::make_shared<GridView>();
     treeDataView = std::make_shared<TreeView>();
@@ -644,8 +653,11 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     setMenuItemImage(m_menuItemLoad, getResourceImage(L"load_small"));
     setMenuItemImage(m_menuItemSave, getResourceImage(L"save_small"));
 
-    setMenuItemImage(m_menuItemCompare,     getResourceImage(L"compare_small"));
-    setMenuItemImage(m_menuItemSynchronize, getResourceImage(L"sync_small"));
+    setMenuItemImage(m_menuItemCompare,      getResourceImage(L"compare_small"));
+    setMenuItemImage(m_menuItemCompSettings, getResourceImage(L"cfg_compare_small"));
+    setMenuItemImage(m_menuItemFilter,       getResourceImage(L"filter_small"));
+    setMenuItemImage(m_menuItemSyncSettings, getResourceImage(L"cfg_sync_small"));
+    setMenuItemImage(m_menuItemSynchronize,  getResourceImage(L"sync_small"));
 
     setMenuItemImage(m_menuItemOptions,     getResourceImage(L"settings_small"));
     setMenuItemImage(m_menuItemSaveAsBatch, getResourceImage(L"batch_small"));
@@ -704,7 +716,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_gridNavi->getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onTreeButtonEvent), nullptr, this);
 
     //enable dialog-specific key local events
-    setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::onLocalKeyEvent), nullptr, this);
 
     //drag & drop on navi panel
     setupFileDrop(*m_gridNavi);
@@ -741,6 +753,16 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     Connect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnLayoutWindowAsync), nullptr, this);
     wxCommandEvent evtDummy;       //call once before OnLayoutWindowAsync()
     OnResizeLeftFolderWidth(evtDummy); //
+
+    //scroll list box to show the new selection (after window resizing is hopefully complete)
+    for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
+        if (m_listBoxHistory->IsSelected(i))
+        {
+            m_listBoxHistory->SetFirstItem(std::max(0, i - 2)); //add some head room
+            break;
+            //can't use wxListBox::EnsureVisible(): it's an empty stub on Windows! Undocumented! Not even a runtime-error!
+            //=> yet another piece of "high-quality" code from wxWidgets making a dev's life "easy"...
+        }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
     //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right away
@@ -1705,11 +1727,7 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-            {
-                std::vector<const Grid*> gridRefs;
-                gridRefs.push_back(m_gridNavi);
-                copySelectionToClipboard(gridRefs);
-            }
+               copySelectionToClipboard({ m_gridNavi });
             return;
         }
     else if (event.AltDown())
@@ -1790,12 +1808,7 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-            {
-                std::vector<const Grid*> gridRefs;
-                gridRefs.push_back(m_gridMainL);
-                gridRefs.push_back(m_gridMainR);
-                copySelectionToClipboard(gridRefs);
-            }
+				copySelectionToClipboard({ m_gridMainL, m_gridMainR} );
             return; // -> swallow event! don't allow default grid commands!
         }
 
@@ -1857,6 +1870,9 @@ void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without
         event.Skip();
         return;
     }
+    localKeyEventsEnabled = false; //avoid recursion
+    ZEN_ON_SCOPE_EXIT(localKeyEventsEnabled = true;)
+
 
     const int keyCode = event.GetKeyCode();
 
@@ -1876,29 +1892,29 @@ void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without
             startFindNext();
             return; //-> swallow event!
 
-        case WXK_F6:
-        {
-            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
-            if (wxEvtHandler* evtHandler = m_bpButtonCmpConfig->GetEventHandler())
-                evtHandler->ProcessEvent(dummy2); //synchronous call
-        }
-        return; //-> swallow event!
+        //case WXK_F6:
+        //{
+        //    wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
+        //    if (wxEvtHandler* evtHandler = m_bpButtonCmpConfig->GetEventHandler())
+        //        evtHandler->ProcessEvent(dummy2); //synchronous call
+        //}
+        //return; //-> swallow event!
 
-        case WXK_F7:
-        {
-            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
-            if (wxEvtHandler* evtHandler = m_bpButtonFilter->GetEventHandler())
-                evtHandler->ProcessEvent(dummy2); //synchronous call
-        }
-        return; //-> swallow event!
+        //case WXK_F7:
+        //{
+        //    wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
+        //    if (wxEvtHandler* evtHandler = m_bpButtonFilter->GetEventHandler())
+        //        evtHandler->ProcessEvent(dummy2); //synchronous call
+        //}
+        //return; //-> swallow event!
 
-        case WXK_F8:
-        {
-            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
-            if (wxEvtHandler* evtHandler = m_bpButtonSyncConfig->GetEventHandler())
-                evtHandler->ProcessEvent(dummy2); //synchronous call
-        }
-        return; //-> swallow event!
+        //case WXK_F8:
+        //{
+        //    wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED); //simulate button click
+        //    if (wxEvtHandler* evtHandler = m_bpButtonSyncConfig->GetEventHandler())
+        //        evtHandler->ProcessEvent(dummy2); //synchronous call
+        //}
+        //return; //-> swallow event!
 
         case WXK_F10:
             setViewTypeSyncAction(!m_bpButtonViewTypeSyncAction->isActive());
@@ -1939,7 +1955,7 @@ void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without
                     m_gridMainL->SetFocus();
 
                     event.SetEventType(wxEVT_KEY_DOWN); //the grid event handler doesn't expect wxEVT_CHAR_HOOK!
-                    evtHandler->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but code in key_event.h prevents it...
+                    evtHandler->ProcessEvent(event); //propagating event to child lead to recursion with old key_event.h handling => still an issue?
                     event.Skip(false); //definitively handled now!
                     return;
                 }
@@ -3111,7 +3127,8 @@ void MainDialog::OnCfgHistoryRightClick(wxMouseEvent& event)
 void MainDialog::OnCfgHistoryKeyEvent(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
-    if (keyCode == WXK_DELETE || keyCode == WXK_NUMPAD_DELETE)
+    if (keyCode == WXK_DELETE ||
+        keyCode == WXK_NUMPAD_DELETE)
     {
         deleteSelectedCfgHistoryItems();
         return; //"swallow" event
@@ -3414,8 +3431,8 @@ void MainDialog::initViewFilterButtons()
     initButton(*m_bpButtonShowCreateRight, "so_create_right", _("Show files that will be created on the right side"));
     initButton(*m_bpButtonShowDeleteLeft,  "so_delete_left",  _("Show files that will be deleted on the left side"));
     initButton(*m_bpButtonShowDeleteRight, "so_delete_right", _("Show files that will be deleted on the right side"));
-    initButton(*m_bpButtonShowUpdateLeft,  "so_update_left",  _("Show files that will be overwritten on left side"));
-    initButton(*m_bpButtonShowUpdateRight, "so_update_right", _("Show files that will be overwritten on right side"));
+    initButton(*m_bpButtonShowUpdateLeft,  "so_update_left",  _("Show files that will be updated on the left side"));
+    initButton(*m_bpButtonShowUpdateRight, "so_update_right", _("Show files that will be updated on the right side"));
     initButton(*m_bpButtonShowDoNothing,   "so_none",         _("Show files that won't be copied"));
 
     initButton(*m_bpButtonShowExcluded, "checkboxFalse", _("Show filtered or temporarily excluded files"));

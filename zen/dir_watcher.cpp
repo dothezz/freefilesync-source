@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -11,18 +11,18 @@
 #include "scope_guard.h"
 
 #ifdef ZEN_WIN
-#include "notify_removal.h"
-#include "win.h" //includes "windows.h"
-#include "long_path_prefix.h"
+    #include "notify_removal.h"
+    #include "win.h" //includes "windows.h"
+    #include "long_path_prefix.h"
 
 #elif defined ZEN_LINUX
-#include <sys/inotify.h>
-#include <fcntl.h>
-#include "file_traverser.h"
+    #include <sys/inotify.h>
+    #include <fcntl.h>
+    #include "file_traverser.h"
 
 #elif defined ZEN_MAC
-#include <CoreServices/CoreServices.h>
-#include "osx_string.h"
+    #include <CoreServices/CoreServices.h>
+    #include "osx_string.h"
 #endif
 
 using namespace zen;

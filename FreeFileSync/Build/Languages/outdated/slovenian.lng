@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Poljubno število alternativnih parov imenikov za največ eno nastavitveno datoteko.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target></target>
+
 <source>Cannot find the following folders:</source>
 <target>Ne morem najti naslednjih map:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Premakni datoteko na desno</target>
 
-<source>Overwrite left item</source>
-<target>Prepiši levi element</target>
+<source>Update left item</source>
+<target></target>
 
-<source>Overwrite right item</source>
-<target>Prepiši desni element</target>
+<source>Update right item</source>
+<target></target>
 
 <source>Do nothing</source>
 <target>Ne naredi ničesar</target>
@@ -218,6 +221,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Ne morem naložiti datoteko %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Datoteka podatkovne baze %x je nekompatibilna.</target>
@@ -272,6 +278,9 @@
 <source>Creating file %x</source>
 <target>Ustvarjam datoteko %x</target>
 
+<source>Saving file %x...</source>
+<target></target>
+
 <source>Items processed:</source>
 <target>Obdelanih elementov:</target>
 
@@ -301,9 +310,6 @@
 <pluralform>%x niti</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Podrobne informacije o času enkodiranja: %x</target>
-
 <source>/sec</source>
 <target>/sek</target>
 
@@ -325,9 +331,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Prosimo uporabite 64-bitno različico FreeFileSync za ustvarjanje senčnih kopij na tem sistemu.</target>
 
-<source>Cannot load file %x.</source>
-<target>Ne morem naložiti datoteko %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Ne morem določiti ime nosilca za %x.</target>
 
@@ -346,8 +349,8 @@
 <source>Save &as...</source>
 <target>Shr&ani kot...</target>
 
-<source>&Quit</source>
-<target>&Zapri</target>
+<source>E&xit</source>
+<target></target>
 
 <source>&File</source>
 <target>&Datoteka</target>
@@ -441,6 +444,9 @@ Ukaz se sproži če:
 <source>&Show error</source>
 <target>&Pokaži napako</target>
 
+<source>&Quit</source>
+<target>&Zapri</target>
+
 <source>Incorrect command line:</source>
 <target>Napačna ukazna vrstica:</target>
 
@@ -486,11 +492,11 @@ Ukaz se sproži če:
 <source>Creating folder %x</source>
 <target>Ustvarjam mapo %x</target>
 
-<source>Overwriting file %x</source>
-<target>Prepisujem datoteko %x</target>
+<source>Updating file %x</source>
+<target></target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Prepisujem simbolično povezavo %x</target>
+<source>Updating symbolic link %x</source>
+<target></target>
 
 <source>Verifying file %x</source>
 <target>Preverjam datoteko %x</target>
@@ -504,20 +510,20 @@ Ukaz se sproži če:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Napaka pri preverjanju podatkov: %x in %y imata drugačno vsebino.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Ne najdem mape %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Ciljna mapa %x že obstaja.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Ne najdem mape %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Vnosno polje za ciljno mapo ne sme biti prazno.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Prosimo vnesite ciljno mapo za verzioniranje.</target>
-
 <source>Source folder %x not found.</source>
 <target>Izvorna mapa %x se ne najde.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Prosimo vnesite ciljno mapo za verzioniranje.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Naslednji elementi imajo nerešene konflikte in ne bodo sinhronizirani:</target>
@@ -561,8 +567,8 @@ Ukaz se sproži če:
 <source>Synchronization completed successfully</source>
 <target>Sinhronizacija se je uspešno končala</target>
 
-<source>Saving log file %x...</source>
-<target>Shranjujem datoteko beleženja %x...</target>
+<source>Cleaning up old log files...</source>
+<target></target>
 
 <source>Stopped</source>
 <target>Ustavljen</target>
@@ -617,8 +623,8 @@ Ukaz se sproži če:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je posodobljen.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Ne morem se povezati na sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target></target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Na omrežju ne najdem obstoječe verzije FreeFileSync-a. Ali želite preveriti lastnoročno?</target>
@@ -704,8 +710,20 @@ Ukaz se sproži če:
 <source>Start &comparison</source>
 <target>Začni &primerjavo</target>
 
+<source>C&omparison settings</source>
+<target></target>
+
+<source>&Filter settings</source>
+<target></target>
+
+<source>S&ynchronization settings</source>
+<target></target>
+
 <source>Start &synchronization</source>
 <target>Začni &sinhnorizacijo</target>
+
+<source>&Actions</source>
+<target></target>
 
 <source>&Options</source>
 <target>&Možnosti</target>
@@ -785,8 +803,8 @@ Ukaz se sproži če:
 <source>Number of files and folders that will be deleted</source>
 <target>Število datotek in map, ki bodo izbrisane</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Število datotek, ki bodo prepisane</target>
+<source>Number of files that will be updated</source>
+<target></target>
 
 <source>Number of files and folders that will be created</source>
 <target>Število datotek in map, ki bodo ustvarjene</target>
@@ -815,8 +833,14 @@ Ukaz se sproži če:
 <source>Handle daylight saving time</source>
 <target>Upoštevaj poletni in zimski čas</target>
 
-<source>Symbolic links:</source>
-<target>Simbolične povezave:</target>
+<source>Include symbolic links:</source>
+<target></target>
+
+<source>Direct</source>
+<target>Neposredno</target>
+
+<source>Follow</source>
+<target>Sledi</target>
 
 <source>More information</source>
 <target>Več informacij</target>
@@ -845,25 +869,21 @@ Ukaz se sproži če:
 <source>Maximum:</source>
 <target>Maksimum:</target>
 
-<source>C&lear</source>
-<target>&Počisti</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Izberi filtrirna pravila za izključitev določenih datotek iz sinhnorizacije. Vpiši pot datotek relativno na imenik v obdelavi</target>
+
+<source>C&lear</source>
+<target>&Počisti</target>
 
 <source>Detect moved files</source>
 <target>Zaznaj premaknjene datoteke</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
-<target>
-- Zahteva in ustvari datoteke podatkovne baze
-- Zaznavane je aktivno po začetnem sinhnoriziranju
-- Ni podprto s strani vseh datotečnih sistemov
-</target>
+<target></target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
@@ -1075,26 +1095,14 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>View Settings</source>
 <target>Nastavitve pogleda</target>
 
-<source>Overview</source>
-<target>Pregled</target>
-
 <source>Configuration</source>
 <target>Konfiguracija</target>
 
+<source>Overview</source>
+<target>Pregled</target>
+
 <source>Main Bar</source>
 <target>Glavna vrstica</target>
-
-<source>Start comparison</source>
-<target>Začni primerjavo</target>
-
-<source>Comparison settings</source>
-<target>Nastavitve primerjanja</target>
-
-<source>Synchronization settings</source>
-<target>Nastavitve sinhronizacije</target>
-
-<source>Start synchronization</source>
-<target>Začni sinhronizacijo</target>
 
 <source>Confirm</source>
 <target>Potrdi</target>
@@ -1254,11 +1262,11 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Show files that will be deleted on the right side</source>
 <target>Prikaži datoteke, ki bodo izbrisane na desni strani</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Prikaži datoteke, ki bodo prepisane na levi strani</target>
+<source>Show files that will be updated on the left side</source>
+<target></target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Prikaži datoteke, ki bodo prepisane na desni strani</target>
+<source>Show files that will be updated on the right side</source>
+<target></target>
 
 <source>Show files that won't be copied</source>
 <target>Prikaži datoteke, ki ne bodo kopirane</target>
@@ -1399,15 +1407,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
 
-<source>Exclude</source>
-<target>Izključi</target>
-
-<source>Direct</source>
-<target>Neposredno</target>
-
-<source>Follow</source>
-<target>Sledi</target>
-
 <source>Today</source>
 <target>Danes</target>
 
@@ -1471,9 +1470,6 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Cannot monitor directory %x.</source>
 <target>Ne morem nadzorovati imenika %x.</target>
 
-<source>Conversion error:</source>
-<target>Napaka pri pretvorbi:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Ne morem izbrisati datoteke %x.</target>
 
@@ -1507,8 +1503,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Cannot create directory %x.</source>
 <target>Ne morem ustvariti imenika %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Ne morem ustvariti simbolične povezave %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target></target>
 
 <source>Cannot find system function %x.</source>
 <target>Ne morem najti sistemske funkcije %x.</target>
@@ -1596,4 +1592,73 @@ To zagotavlja konsistenco podatkov v primeru napake.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Nastavitvena datoteka %x naložena samo delno.</target>
+
+<source>Prepare installation</source>
+<target>Pripravljam namestitev</target>
+
+<source>Choose which components you want to install.</source>
+<target>Izberite komponente za inštalacijo</target>
+
+<source>Select installation type:</source>
+<target></target>
+
+<source>Local</source>
+<target>Lokalna</target>
+
+<source>Portable</source>
+<target>Prenosna</target>
+
+<source>recommended</source>
+<target>priporočena</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Shrani nastavitve v "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Registracija FreeFileSync datotečnih razširitev</target>
+
+<source>Create Explorer context menu entries</source>
+<target></target>
+
+<source>Save settings in installation directory</source>
+<target>Shrani nastavitve v namestitveni imenik</target>
+
+<source>Do not write to Registry</source>
+<target>Ne zapisuj v register</target>
+
+<source>Just copy the files</source>
+<target>Kopiraj samo datoteke</target>
+
+<source>Choose a directory for installation:</source>
+<target>Izberite imenik za namestitev:</target>
+
+<source>Create shortcuts:</source>
+<target>Ustvari bližnjice:</target>
+
+<source>Desktop</source>
+<target>Namizje</target>
+
+<source>Start menu</source>
+<target>Start meni</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registriram FreeFileSync datotečne končnice</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Odregistriram FreeFileSync datotečne končnice</target>
+
+<source>FreeFileSync Configuration</source>
+<target></target>
+
+<source>FreeFileSync Batch File</source>
+<target></target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target></target>
+
+<source>RealtimeSync Configuration</source>
+<target></target>
+
+<source>Edit with FreeFileSync</source>
+<target></target>
 

@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Bet koks skaičius alternatyvių katalogų grupuojams tik su vienu konfigūraciniu failu</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Atidaryti ir koreguoti pasirinkimus be programos vykdymo</target>
+
 <source>Cannot find the following folders:</source>
 <target>Nepavyksta rasti šių aplankų:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Perkelti failą į dešinę</target>
 
-<source>Overwrite left item</source>
-<target>Perrašyti kairįjį elementą</target>
+<source>Update left item</source>
+<target>Atnaujinti kairėje esantį elementą</target>
 
-<source>Overwrite right item</source>
-<target>Perrašyti dešinįjį elementą</target>
+<source>Update right item</source>
+<target>Atnaujinti dešinėje esantį elementą</target>
 
 <source>Do nothing</source>
 <target>Nieko nedaryti</target>
@@ -273,6 +276,9 @@
 <source>Creating file %x</source>
 <target>Kuriamas failas %x</target>
 
+<source>Saving file %x...</source>
+<target>Išsaugomas failas %x...</target>
+
 <source>Items processed:</source>
 <target>Elementų apdorota:</target>
 
@@ -300,9 +306,6 @@
 <pluralform>%x srautai</pluralform>
 <pluralform>%x srautų</pluralform>
 </target>
-
-<source>Encoding extended time information: %x</source>
-<target>Koduojama išplėstinė laiko informacija: %x</target>
 
 <source>/sec</source>
 <target>/sek.</target>
@@ -343,8 +346,8 @@
 <source>Save &as...</source>
 <target>Išsaugoti &kaip...</target>
 
-<source>&Quit</source>
-<target>&Išeiti</target>
+<source>E&xit</source>
+<target>I&šeiti</target>
 
 <source>&File</source>
 <target>&Failas</target>
@@ -438,6 +441,9 @@ Komanda inicijuojama jei:
 <source>&Show error</source>
 <target>&Parodyti klaidą</target>
 
+<source>&Quit</source>
+<target>&Išeiti</target>
+
 <source>Incorrect command line:</source>
 <target>Netaisyklinga Komandinė eilutė:</target>
 
@@ -483,11 +489,11 @@ Komanda inicijuojama jei:
 <source>Creating folder %x</source>
 <target>Kuriamas aplankas %x</target>
 
-<source>Overwriting file %x</source>
-<target>Perrašomas failas %x</target>
+<source>Updating file %x</source>
+<target>Atnaujinamas failas %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Perrašoma simbolinė nuoroda %x</target>
+<source>Updating symbolic link %x</source>
+<target>Atnaujinama virtuali nuoroda %x</target>
 
 <source>Verifying file %x</source>
 <target>Tikrinamas failas %x</target>
@@ -558,8 +564,8 @@ Komanda inicijuojama jei:
 <source>Synchronization completed successfully</source>
 <target>Suvienodinimas sėkmingai baigtas</target>
 
-<source>Saving log file %x...</source>
-<target>Iš saugomas žurnalo failas %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Išvalomi seni žurnalo įrašai...</target>
 
 <source>Stopped</source>
 <target>Sustabdyta</target>
@@ -613,8 +619,8 @@ Komanda inicijuojama jei:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync yra naujausia.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Nepavyksta prisijungti prie sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Nepavyko prisijungti prie FreeFileSync.org</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Dabartinės FreeFileSync versijos numeris internete nerastas. Ar norėtumėte patikrinti rankiniu būdu?</target>
@@ -656,7 +662,7 @@ Komanda inicijuojama jei:
 <target>Veiksmas</target>
 
 <source>Drag && drop</source>
-<target>Vilkti && numesti</target>
+<target>Vilkti && Numesti</target>
 
 <source>Local comparison settings</source>
 <target>Vietiniai palyginimo parametrai</target>
@@ -700,8 +706,20 @@ Komanda inicijuojama jei:
 <source>Start &comparison</source>
 <target>Pradėti &palyginimą</target>
 
+<source>C&omparison settings</source>
+<target>P&alyginimo parametrai</target>
+
+<source>&Filter settings</source>
+<target>&Filtro parametrai</target>
+
+<source>S&ynchronization settings</source>
+<target>S&uvienodinimo parametrai</target>
+
 <source>Start &synchronization</source>
 <target>Pradėti &suvienodinimą</target>
+
+<source>&Actions</source>
+<target>&Veiksmai</target>
 
 <source>&Options</source>
 <target>&Parinktys</target>
@@ -781,8 +799,8 @@ Komanda inicijuojama jei:
 <source>Number of files and folders that will be deleted</source>
 <target>Failų ir aplankų, kurie bus ištrinti, skaičius</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Skaičius failų, kurie bus perrašyti</target>
+<source>Number of files that will be updated</source>
+<target>Atnaujinamų failų kiekis</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Failų ir aplankų, kurie bus sukurti, skaičius</target>
@@ -811,8 +829,14 @@ Komanda inicijuojama jei:
 <source>Handle daylight saving time</source>
 <target>Naudoti vasaros laiką</target>
 
-<source>Symbolic links:</source>
-<target>Simbolinės nuorodos:</target>
+<source>Include symbolic links:</source>
+<target>Pridėti simbolinias nuorodas:</target>
+
+<source>Direct</source>
+<target>Tiesiogiai</target>
+
+<source>Follow</source>
+<target>Sekti</target>
 
 <source>More information</source>
 <target>Daugiau informacijos</target>
@@ -841,24 +865,24 @@ Komanda inicijuojama jei:
 <source>Maximum:</source>
 <target>Didžiausias:</target>
 
-<source>C&lear</source>
-<target>&Išvalyti</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Pasirinkti filtro taisykles norint išskirti pasirinktus failus iš Suvienodinimo. Įveskite failo kelią, kuris atitinka aplanką.</target>
+
+<source>C&lear</source>
+<target>&Išvalyti</target>
 
 <source>Detect moved files</source>
 <target>Rasti perkeltus failus</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Sukuriami reikalingi duomenų bazės failai
-- Aktyvus tikrinimas vykdant suvienodinimą
-- Nesuderinamas su visomis failų sistemomis
+- Aptikimas aktyvuosis pradėjus suvienodinimui
+- Sukuriami būtini duomenų bazės failai
+- Nesuderinama su visomis failų sistemomis
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1071,26 +1095,14 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>View Settings</source>
 <target>Rodymo parametrai</target>
 
-<source>Overview</source>
-<target>Apžvalga</target>
-
 <source>Configuration</source>
 <target>Nustatymai</target>
 
+<source>Overview</source>
+<target>Apžvalga</target>
+
 <source>Main Bar</source>
 <target>Pagrindinė įrankinė</target>
-
-<source>Start comparison</source>
-<target>Pradėti palyginimą</target>
-
-<source>Comparison settings</source>
-<target>Palyginimo nustatymai</target>
-
-<source>Synchronization settings</source>
-<target>Suvienodinimo nustatymai</target>
-
-<source>Start synchronization</source>
-<target>Pradėti suvienodinimą</target>
 
 <source>Confirm</source>
 <target>Patvirtinti</target>
@@ -1246,11 +1258,11 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Show files that will be deleted on the right side</source>
 <target>Rodyti failus, kurie bus ištrinti dešinėje pusėje</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Rodyti failus, kurie bus perrašyti kairėje pusėje</target>
+<source>Show files that will be updated on the left side</source>
+<target>Rodyti failus, kurie bus atnaujinti kairėje pusėje</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Rodyti failus, kurie bus perrašyti dešinėje pusėje</target>
+<source>Show files that will be updated on the right side</source>
+<target>Rodyti failus, kurie bus atnaujinti dešinėje pusėje</target>
 
 <source>Show files that won't be copied</source>
 <target>Rodyti failus, kurie ne bus kopijuojami</target>
@@ -1389,15 +1401,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Configure your own synchronization rules.</source>
 <target>Nustatyti Jūsų pačių suvienodinimo taisykles.</target>
 
-<source>Exclude</source>
-<target>Neįtraukti</target>
-
-<source>Direct</source>
-<target>Tiesiogiai</target>
-
-<source>Follow</source>
-<target>Sekti</target>
-
 <source>Today</source>
 <target>Šiandien</target>
 
@@ -1461,9 +1464,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Cannot monitor directory %x.</source>
 <target>Nepavyko stebėti katalogo %x.</target>
 
-<source>Conversion error:</source>
-<target>Konvertavimo klaida:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Nepavyksta ištrinti failo %x.</target>
 
@@ -1497,17 +1497,17 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Cannot create directory %x.</source>
 <target>Nepavyksta sukurti katalogo %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Nepavyko sukurti simbolinės nuorodos %x</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nepavyko nukopijuoti simbolinės nuorodos %x į %y.</target>
 
 <source>Cannot find system function %x.</source>
-<target>Nepavyksta rasti sistemos funkcijos %x.</target>
+<target>Nepavyksta rasti sisteminės funkcijos %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>Nepavyksta nukopijuoti failo %x į %y.</target>
+<target>Nepavyksta nukopijuoti failų %x į %y.</target>
 
 <source>Type of item %x is not supported:</source>
-<target>Element tipas %x nepalaikomas:</target>
+<target>Elemento tipas %x nepalaikomas:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nepavyko rasti simbolinės nuorodos %x reikšmės</target>
@@ -1583,4 +1583,73 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Nustatymų failas %x įkeltas tik dalinai.</target>
+
+<source>Prepare installation</source>
+<target>Ruošiamasi įdiegimui</target>
+
+<source>Choose which components you want to install.</source>
+<target>Pasirinkite kuriuos komponentus norėtumėte įdiegti</target>
+
+<source>Select installation type:</source>
+<target>Pasirinkti įdiegimo būdą</target>
+
+<source>Local</source>
+<target>Vietoje</target>
+
+<source>Portable</source>
+<target>Nešiojamas</target>
+
+<source>recommended</source>
+<target>rekomenduojama</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Išsaugoti nustatymus į "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Įrašyti FreeFileSync failų plėtinius</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Sukurti failų naršyklės turinio įrašus</target>
+
+<source>Save settings in installation directory</source>
+<target>Išsaugoti parametrus įdiegimo kataloge</target>
+
+<source>Do not write to Registry</source>
+<target>Nerašyti į registrų skiltį</target>
+
+<source>Just copy the files</source>
+<target>Tiesiog kopijuoti failus</target>
+
+<source>Choose a directory for installation:</source>
+<target>Pasirinkite aplanką į kurį norėtumėte įdiegti:</target>
+
+<source>Create shortcuts:</source>
+<target>Sukurti nuorodas:</target>
+
+<source>Desktop</source>
+<target>Darbalaukis</target>
+
+<source>Start menu</source>
+<target>Pradėti meniu</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registruojami FreeFileSync failų plėtiniai</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Išregistruojami FreeFileSync failų plėtiniai</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync Konfigūracijos</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync Failų Paketas</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync Suvienodinimo duomenų bazė</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Realaus laiko suvienodinimo konfiguracija</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Koreguoti su FreeFileSync</target>
 

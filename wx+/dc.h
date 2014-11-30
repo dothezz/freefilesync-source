@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -84,7 +84,7 @@ private:
 
 
 #ifndef wxALWAYS_NATIVE_DOUBLE_BUFFER
-#error we need this one!
+    #error we need this one!
 #endif
 
 #if wxALWAYS_NATIVE_DOUBLE_BUFFER

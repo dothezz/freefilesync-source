@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -44,7 +44,7 @@ Zstring getLastSyncsLogfilePath();
 struct OnUpdateLogfileStatusNoThrow
 {
     OnUpdateLogfileStatusNoThrow(ProcessCallback& pc, const Zstring& logfilePath) : pc_(pc), logfilePath_(logfilePath), bytesWritten(),
-        msg(replaceCpy(_("Saving log file %x..."), L"%x", fmtFileName(logfilePath_))) {}
+        msg(replaceCpy(_("Saving file %x..."), L"%x", fmtFileName(logfilePath_))) {}
 
     void operator()(std::int64_t bytesDelta)
     {

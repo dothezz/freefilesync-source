@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -319,9 +319,9 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
         case SO_MOVE_RIGHT_TARGET:
             return _("Move file on right");
         case SO_OVERWRITE_LEFT:
-            return _("Overwrite left item");
+            return _("Update left item");
         case SO_OVERWRITE_RIGHT:
-            return _("Overwrite right item");
+            return _("Update right item");
         case SO_DO_NOTHING:
             return _("Do nothing");
         case SO_EQUAL:

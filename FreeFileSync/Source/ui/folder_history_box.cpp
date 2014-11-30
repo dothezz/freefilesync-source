@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,7 +10,7 @@
 #include <wx+/string_conv.h>
 #include "../lib/resolve_path.h"
 #ifdef ZEN_LINUX
-#include <gtk/gtk.h>
+    #include <gtk/gtk.h>
 #endif
 
 using namespace zen;

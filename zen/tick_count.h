@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -12,13 +12,13 @@
 #include "basic_math.h"
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
+    #include "win.h" //includes "windows.h"
 
 #elif defined ZEN_LINUX
-#include <time.h> //Posix ::clock_gettime()
+    #include <time.h> //Posix ::clock_gettime()
 
 #elif defined ZEN_MAC
-#include <mach/mach_time.h>
+    #include <mach/mach_time.h>
 #endif
 //template <class T> inline
 //T dist(T a, T b)

@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -9,17 +9,16 @@
 #include <unordered_map>
 
 #ifdef ZEN_WIN
-#include "dll.h"
-#include "win_ver.h"
+    #include "dll.h"
+    #include "win_ver.h"
 
 #elif defined ZEN_MAC
-#include <ctype.h> //toupper()
+    #include <ctype.h> //toupper()
 #endif
 
 #ifndef NDEBUG
-#include <mutex>
-#include <iostream>
-#include "thread.h"
+    #include <mutex>
+    #include <iostream>
 #endif
 
 using namespace zen;
@@ -40,14 +39,14 @@ public:
 
     void insert(const void* ptr, size_t size)
     {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        std::lock_guard<std::mutex> dummy(lockActStrings);
         if (!activeStrings.emplace(ptr, size).second)
             reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
     void remove(const void* ptr)
     {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        std::lock_guard<std::mutex> dummy(lockActStrings);
         if (activeStrings.erase(ptr) != 1)
             reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
@@ -96,7 +95,7 @@ private:
         throw std::logic_error("Memory leak! " + message);
     }
 
-    boost::mutex lockActStrings;
+    std::mutex lockActStrings;
     std::unordered_map<const void*, size_t> activeStrings;
 };
 
@@ -168,8 +167,8 @@ int cmpFileName(const Zstring& lhs, const Zstring& rhs)
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
         //the only reliable way to compare filepaths (with XP) is to call "CharUpper" or "LCMapString":
 
-		const size_t sizeLhs = lhs.size();
-		const size_t sizeRhs = rhs.size();
+        const size_t sizeLhs = lhs.size();
+        const size_t sizeRhs = rhs.size();
 
         const auto minSize = std::min(sizeLhs, sizeRhs);
 

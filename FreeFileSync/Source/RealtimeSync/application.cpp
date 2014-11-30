@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -8,7 +8,6 @@
 #include "main_dlg.h"
 #include <zen/file_access.h>
 #include <zen/thread.h>
-#include <zen/dll.h>
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/tooltip.h>
@@ -22,11 +21,12 @@
 #include "../lib/error_log.h"
 
 #ifdef ZEN_WIN
-#include <zen/win_ver.h>
-#include "../lib/app_user_mode_id.h"
+    #include <zen/win_ver.h>
+#include <zen/dll.h>
+    #include "../lib/app_user_mode_id.h"
 
 #elif defined ZEN_LINUX
-#include <gtk/gtk.h>
+    #include <gtk/gtk.h>
 #endif
 
 using namespace zen;

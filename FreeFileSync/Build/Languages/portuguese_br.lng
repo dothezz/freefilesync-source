@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Qualquer número de pares alternativos de diretórios para no máximo um arquivo de configuração.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Abrir configuração para editar sem executar.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Não foi possível localizar as seguintes pastas:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Mover arquivo à direita</target>
 
-<source>Overwrite left item</source>
-<target>Sobrescrever item à esquerda</target>
+<source>Update left item</source>
+<target>Atualizar item da esquerda</target>
 
-<source>Overwrite right item</source>
-<target>Sobrescrever item à direita</target>
+<source>Update right item</source>
+<target>Atualizar item da direita</target>
 
 <source>Do nothing</source>
 <target>Não fazer nada</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Não foi possível carregar o aquivo %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>O arquivo de banco de dados %x é incompatível.</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>Criando arquivo %x</target>
 
+<source>Saving file %x...</source>
+<target>Salvando arquivo %x...</target>
+
 <source>Items processed:</source>
 <target>Elementos processados:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x threads</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Codificando informações adicionais de tempo: %x</target>
-
 <source>/sec</source>
 <target>/seg</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Por favor, utilize a versão 64 bits do FreeFileSync para criar cópias de sombra neste sistema.</target>
 
-<source>Cannot load file %x.</source>
-<target>Não foi possível carregar o aquivo %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Não foi possível determinar o nome do volume para %x.</target>
 
@@ -340,7 +343,7 @@
 <source>Save &as...</source>
 <target>Salvar &como...</target>
 
-<source>&Quit</source>
+<source>E&xit</source>
 <target>Sai&r</target>
 
 <source>&File</source>
@@ -435,6 +438,9 @@ O comando é disparado se:
 <source>&Show error</source>
 <target>&Mostrar erro</target>
 
+<source>&Quit</source>
+<target>Sai&r</target>
+
 <source>Incorrect command line:</source>
 <target>Linha de comando incorreta:</target>
 
@@ -480,11 +486,11 @@ O comando é disparado se:
 <source>Creating folder %x</source>
 <target>Criando pasta %x</target>
 
-<source>Overwriting file %x</source>
-<target>Substituindo arquivo %x</target>
+<source>Updating file %x</source>
+<target>Atualizando arquivo %x...</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Substituindo link simbólico %x</target>
+<source>Updating symbolic link %x</source>
+<target>Atualizando link simbólico %x</target>
 
 <source>Verifying file %x</source>
 <target>Verificando arquivo %x</target>
@@ -498,20 +504,20 @@ O comando é disparado se:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Erro na verificação dos dados: %x e %y têm conteúdo diferente.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Não foi possível encontrar a pasta %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Pasta de destino %x já existe.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Não foi possível encontrar a pasta %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Campo de entrada da pasta de destino não pode ficar vazio.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Por favor, entre com uma pasta destino para controle de versões.</target>
-
 <source>Source folder %x not found.</source>
 <target>Pasta de origem %x não foi encontrada.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Por favor, entre com uma pasta destino para controle de versões.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Os seguintes itens possuem conflitos não resolvidos e não serão sincronizados:</target>
@@ -555,8 +561,8 @@ O comando é disparado se:
 <source>Synchronization completed successfully</source>
 <target>Sincronização finalizada com sucesso</target>
 
-<source>Saving log file %x...</source>
-<target>Salvando arquivo de log %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Limpando arquivo de log antigo...</target>
 
 <source>Stopped</source>
 <target>Interrompido</target>
@@ -609,8 +615,8 @@ O comando é disparado se:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync está atualizado.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Não foi possível conectar a sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Não foi possível conectar a FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Não foi possível encontrar a versão atual do FreeFileSync online. Deseja verificar manualmente?</target>
@@ -694,10 +700,22 @@ O comando é disparado se:
 <target>Salvar como &tarefa em lote...</target>
 
 <source>Start &comparison</source>
-<target>Iniciar c&omparação</target>
+<target>Iniciar &Comparação</target>
+
+<source>C&omparison settings</source>
+<target>Configurações de C&omparação</target>
+
+<source>&Filter settings</source>
+<target>Configurações de &Filtro</target>
+
+<source>S&ynchronization settings</source>
+<target>Configurações de S&incronização</target>
 
 <source>Start &synchronization</source>
-<target>Iniciar s&incronização</target>
+<target>Iniciar &Sincronização</target>
+
+<source>&Actions</source>
+<target>A&ções</target>
 
 <source>&Options</source>
 <target>&Opções</target>
@@ -777,8 +795,8 @@ O comando é disparado se:
 <source>Number of files and folders that will be deleted</source>
 <target>Número de arquivos e pastas que serão apagados</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Número de arquivos que serão substituídos</target>
+<source>Number of files that will be updated</source>
+<target>Número de arquivos que serão atualizados</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Número de arquivos e pastas que serão criados</target>
@@ -807,8 +825,14 @@ O comando é disparado se:
 <source>Handle daylight saving time</source>
 <target>Como lidar com horário de verão</target>
 
-<source>Symbolic links:</source>
-<target>Links simbólicos:</target>
+<source>Include symbolic links:</source>
+<target>Incluir links simbólicos:</target>
+
+<source>Direct</source>
+<target>Direto</target>
+
+<source>Follow</source>
+<target>Seguir</target>
 
 <source>More information</source>
 <target>Mais informação</target>
@@ -837,24 +861,24 @@ O comando é disparado se:
 <source>Maximum:</source>
 <target>Máximo:</target>
 
-<source>C&lear</source>
-<target>&Limpar</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selecione regras de filtro para exlcuir certos arquivos da sincronização. Entre com os caminhos relativos dos pares de pastas correspondentes.</target>
+
+<source>C&lear</source>
+<target>&Limpar</target>
 
 <source>Detect moved files</source>
 <target>Detectar arquivos movidos</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
+- Detecção ativa após sincronização inicial
 - Requer e cria arquivos de banco de dados
-- Detecção ativa após sincronismo incial
-- Não suportado por todos os sistemas de arquivo
+- Não suportado por todos os sistemas
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1067,26 +1091,14 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>View Settings</source>
 <target>Ver configurações</target>
 
-<source>Overview</source>
-<target>Parâmetros</target>
-
 <source>Configuration</source>
 <target>Configuração</target>
 
+<source>Overview</source>
+<target>Parâmetros</target>
+
 <source>Main Bar</source>
 <target>Barra Principal</target>
-
-<source>Start comparison</source>
-<target>Iniciar comparação</target>
-
-<source>Comparison settings</source>
-<target>Parâmetros de comparação</target>
-
-<source>Synchronization settings</source>
-<target>Parâmetros de sincronização</target>
-
-<source>Start synchronization</source>
-<target>Iniciar a sincronização</target>
 
 <source>Confirm</source>
 <target>Confirmar</target>
@@ -1238,11 +1250,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Show files that will be deleted on the right side</source>
 <target>Mostrar arquivos que serão apagados no lado direito</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Mostrar arquivos que serão substituídos no lado esquerdo</target>
+<source>Show files that will be updated on the left side</source>
+<target>Mostrar arquivos que serão atualizados no lado esquerdo</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Mostrar arquivos que serão substituídos no lado direito</target>
+<source>Show files that will be updated on the right side</source>
+<target>Mostrar arquivos que serão atualizados no lado direito</target>
 
 <source>Show files that won't be copied</source>
 <target>Mostrar arquivos que não serão copiados</target>
@@ -1379,15 +1391,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Configure your own synchronization rules.</source>
 <target>Configure as suas próprias regras de sincronização.</target>
 
-<source>Exclude</source>
-<target>Excluir</target>
-
-<source>Direct</source>
-<target>Direto</target>
-
-<source>Follow</source>
-<target>Seguir</target>
-
 <source>Today</source>
 <target>Hoje</target>
 
@@ -1451,9 +1454,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Cannot monitor directory %x.</source>
 <target>Não foi possível monitorar o diretório %x.</target>
 
-<source>Conversion error:</source>
-<target>Erro de conversão:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Não foi possível apagar o arquivo %x.</target>
 
@@ -1487,8 +1487,8 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Cannot create directory %x.</source>
 <target>Não foi possível criar o diretório %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Não foi possível criar o link simbólico %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Não foi possível copiar o link simbólico %x para %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Não foi possível localizar a função de sistema %x.</target>
@@ -1570,4 +1570,73 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>O arquivo de configuração %x foi carregado parcialmente.</target>
+
+<source>Prepare installation</source>
+<target>Preparando a instalação</target>
+
+<source>Choose which components you want to install.</source>
+<target>Escolha os componentes a serem instalados.</target>
+
+<source>Select installation type:</source>
+<target>Selecione o tipo de instalação:</target>
+
+<source>Local</source>
+<target>Local</target>
+
+<source>Portable</source>
+<target>Portátil</target>
+
+<source>recommended</source>
+<target>recomendada</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Salva as configurações em "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Registra as extensões de arquivos do FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Cria entrada no menu de contexto do Explorer</target>
+
+<source>Save settings in installation directory</source>
+<target>Salva as configurações no diretório de instalação</target>
+
+<source>Do not write to Registry</source>
+<target>Não escreve no Registro</target>
+
+<source>Just copy the files</source>
+<target>Apenas copia os arquivos</target>
+
+<source>Choose a directory for installation:</source>
+<target>Escolha um diretório para a instalação:</target>
+
+<source>Create shortcuts:</source>
+<target>Criar atalhos:</target>
+
+<source>Desktop</source>
+<target>Área de trabalho</target>
+
+<source>Start menu</source>
+<target>Menu Iniciar</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registrando as extensões de arquivos do FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Desregistrando as extensões de arquivos do FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Configuração do FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Arquivo de lote do FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>Banco de dados de sincronização do FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Configuração do RealtimeSync</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Editar com FreeFileSync</target>
 

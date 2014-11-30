@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -16,27 +16,27 @@
 #include "file_id_def.h"
 
 #ifdef ZEN_WIN
-#include <Aclapi.h>
-#include "privilege.h"
-#include "dll.h"
-#include "long_path_prefix.h"
-#include "win_ver.h"
-#include "IFileOperation/file_op.h"
+    #include <Aclapi.h>
+    #include "privilege.h"
+    #include "dll.h"
+    #include "long_path_prefix.h"
+    #include "win_ver.h"
+    #include "IFileOperation/file_op.h"
 
 #elif defined ZEN_LINUX
-#include <sys/vfs.h> //statfs
-#include <fcntl.h> //AT_SYMLINK_NOFOLLOW, UTIME_OMIT
-#ifdef HAVE_SELINUX
-#include <selinux/selinux.h>
-#endif
+    #include <sys/vfs.h> //statfs
+    #include <fcntl.h> //AT_SYMLINK_NOFOLLOW, UTIME_OMIT
+    #ifdef HAVE_SELINUX
+        #include <selinux/selinux.h>
+    #endif
 
 #elif defined ZEN_MAC
-#include <sys/mount.h> //statfs
+    #include <sys/mount.h> //statfs
 #endif
 
 #if defined ZEN_LINUX || defined ZEN_MAC
-#include <sys/stat.h>
-#include <sys/time.h> //lutimes
+    #include <sys/stat.h>
+    #include <sys/time.h> //lutimes
 #endif
 
 using namespace zen;
@@ -756,8 +756,6 @@ void setFileTimeRaw(const Zstring& filepath,
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
 
-        auto isNullTime = [](const FILETIME& ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
-
         if (!::SetFileTime(hFile,           //__in      HANDLE hFile,
                            creationTime,    //__in_opt  const FILETIME *lpCreationTime,
                            nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
@@ -1438,7 +1436,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 
     if (!createSymbolicLink)
         throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtFileName(sourceLink)), L"%y", L"\n" + fmtFileName(targetLink)),
-		                           replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
+                        replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
 
     const wchar_t functionName[] = L"CreateSymbolicLinkW";
     if (!createSymbolicLink(targetLink.c_str(), //__in  LPTSTR lpSymlinkFileName, - seems no long path prefix is required...
@@ -1744,7 +1742,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     LPVOID contextWrite = nullptr; //
 
     ZEN_ON_SCOPE_EXIT(
-        if (contextRead ) ::BackupRead (0, nullptr, 0, nullptr, true, false, &contextRead); //lpContext must be passed [...] all other parameters are ignored.
+        if (contextRead ) ::BackupRead (0, nullptr, 0, nullptr, true, false, &contextRead); //MSDN: "lpContext must be passed [...] all other parameters are ignored."
         if (contextWrite) ::BackupWrite(0, nullptr, 0, nullptr, true, false, &contextWrite); );
 
     //stream-copy sourceFile to targetFile
@@ -1792,8 +1790,6 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     }
     while (!eof);
 
-    //DST hack not required, since both source and target volumes cannot be FAT!
-
     //::BackupRead() silently fails reading encrypted files -> double check!
     if (!someBytesWritten && get64BitUInt(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
         //note: there is no guaranteed ordering relation beween bytes transferred and file size! Consider ADS (>) and compressed/sparse files (<)!
@@ -1807,38 +1803,6 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)), L"SetFileTime", getLastError());
 
     guardTarget.dismiss();
-
-    /*
-        //create sparse file for testing:
-        HANDLE hSparse = ::CreateFile(L"C:\\sparse.file",
-                                      GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      nullptr,
-                                      CREATE_NEW,
-                                      FILE_FLAG_SEQUENTIAL_SCAN,
-                                      nullptr);
-        if (hFileTarget == INVALID_HANDLE_VALUE)
-            throw FileError(L"fail");
-        ZEN_ON_SCOPE_EXIT(::CloseHandle(hSparse));
-
-        DWORD br = 0;
-        if (!::DeviceIoControl(hSparse, FSCTL_SET_SPARSE, nullptr, 0, nullptr, 0, &br,nullptr))
-            throw FileError(L"fail");
-
-        LARGE_INTEGER liDistanceToMove =  {};
-        liDistanceToMove.QuadPart = 1024 * 1024 * 1024; //create 5 TB sparse file
-        liDistanceToMove.QuadPart *= 5 * 1024;          //maximum file size on NTFS: 16 TB - 64 kB
-        if (!::SetFilePointerEx(hSparse, liDistanceToMove, nullptr, FILE_BEGIN))
-            throw FileError(L"fail");
-
-        if (!SetEndOfFile(hSparse))
-            throw FileError(L"fail");
-
-        FILE_ZERO_DATA_INFORMATION zeroInfo = {};
-        zeroInfo.BeyondFinalZero.QuadPart = liDistanceToMove.QuadPart;
-        if (!::DeviceIoControl(hSparse, FSCTL_SET_ZERO_DATA, &zeroInfo, sizeof(zeroInfo), nullptr, 0, &br, nullptr))
-            throw FileError(L"fail");
-    */
 }
 
 

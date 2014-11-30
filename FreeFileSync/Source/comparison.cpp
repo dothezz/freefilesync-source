@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -724,9 +724,11 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
                                                                         fpCfg.compareVar,
                                                                         fpCfg.fileTimeTolerance,
                                                                         fpCfg.optTimeShiftHours);
+
     //PERF_START;
-    MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft  ? bufValueLeft ->dirCont : DirContainer(),
-                                                       bufValueRight ? bufValueRight->dirCont : DirContainer(), *output);
+    DirContainer emptyDirCont; //WTF!!! => using a temporary in the ternary conditional would implicitly call the DirContainer copy-constructor!!!!!!
+    MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft  ? bufValueLeft ->dirCont : emptyDirCont,
+                                                       bufValueRight ? bufValueRight->dirCont : emptyDirCont, *output);
     //PERF_STOP;
 
     //##################### in/exclude rows according to filtering #####################

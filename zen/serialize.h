@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -137,35 +137,35 @@ template <         class BinInputStream> void readArray    (BinInputStream& stre
 //-----------------------implementation-------------------------------
 template <class BinContainer> inline
 void saveBinStream(const Zstring& filepath, //throw FileError
-					const BinContainer& cont, 
-					const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
+                   const BinContainer& cont,
+                   const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
 {
     static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes (until further)
 
     FileOutput fileOut(filepath, zen::FileOutput::ACC_OVERWRITE); //throw FileError
     if (!cont.empty())
-	{
-		const size_t blockSize = 128 * 1024;
-		auto bytePtr = &*cont.begin();
-		size_t bytesLeft = cont.size();
+    {
+        const size_t blockSize = 128 * 1024;
+        auto bytePtr = &*cont.begin();
+        size_t bytesLeft = cont.size();
 
-		while (bytesLeft > blockSize)
-		{
-			fileOut.write(bytePtr, blockSize); //throw FileError
-			bytePtr += blockSize;			
-			bytesLeft -= blockSize;
-			if (onUpdateStatus) onUpdateStatus(blockSize);
-		}
+        while (bytesLeft > blockSize)
+        {
+            fileOut.write(bytePtr, blockSize); //throw FileError
+            bytePtr += blockSize;
+            bytesLeft -= blockSize;
+            if (onUpdateStatus) onUpdateStatus(blockSize);
+        }
 
-		fileOut.write(bytePtr, bytesLeft); //throw FileError
-		if (onUpdateStatus) onUpdateStatus(bytesLeft);
-	}
+        fileOut.write(bytePtr, bytesLeft); //throw FileError
+        if (onUpdateStatus) onUpdateStatus(bytesLeft);
+    }
 }
 
 
 template <class BinContainer> inline
 BinContainer loadBinStream(const Zstring& filepath, //throw FileError
-							const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
+                           const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
 {
     static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes (until further)
 
@@ -181,7 +181,7 @@ BinContainer loadBinStream(const Zstring& filepath, //throw FileError
         if (bytesRead < blockSize)
             contOut.resize(contOut.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
 
-		if (onUpdateStatus) onUpdateStatus(bytesRead);
+        if (onUpdateStatus) onUpdateStatus(bytesRead);
     }
     while (!fileIn.eof());
 

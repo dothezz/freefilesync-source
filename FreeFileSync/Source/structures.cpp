@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -447,7 +447,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
     std::vector<std::pair<SyncConfig, int>> syncCfgStat;
     for (const FolderPairEnh& fp : fpMerged)
     {
-        //rather inefficient algorithm, but it does not require a less-than operator:
+        //a rather inefficient algorithm, but it does not require a less-than operator:
         {
             const CompConfig& cmpCfg = *fp.altCmpConfig;
 

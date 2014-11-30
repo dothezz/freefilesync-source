@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -27,8 +27,8 @@ Zstring expandMacros(const Zstring& text);
 std::vector<Zstring> getDirectoryAliases(const Zstring& dirpassPhrase); //may block for slow USB sticks when resolving [<volume name>]
 
 #ifdef ZEN_WIN
-//*blocks* if network is not reachable or when showing login prompt dialog!
-void loginNetworkShare(const Zstring& dirpath, bool allowUserInteraction); //noexcept; user interaction: show OS password prompt
+    //*blocks* if network is not reachable or when showing login prompt dialog!
+    void loginNetworkShare(const Zstring& dirpath, bool allowUserInteraction); //noexcept; user interaction: show OS password prompt
 #endif
 }
 

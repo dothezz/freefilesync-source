@@ -1,36 +1,11 @@
 <header>
 	<language>Norsk</language>
-	<translator>bjorn039</translator>
+	<translator>bjorn96</translator>
 	<locale>nb_NO</locale>
 	<image>flag_norway.png</image>
 	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
-
-<source>Cannot copy symbolic link %x to %y.</source>
-<target></target>
-
-<source>
-- Detection active after initial sync
-- Requires and creates database files
-- Not supported by all file systems
-</source>
-<target></target>
-
-<source>C&lear</source>
-<target></target>
-
-<source>Consider file times with specified offset as equal</source>
-<target></target>
-
-<source>Unable to connect to freefilesync.org.</source>
-<target></target>
-
-<source>Removing old log files exceeding limit...</source>
-<target></target>
-
-<source>Open configuration for edit without executing.</source>
-<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Begge sider er endret siden siste synkronisering.</target>
@@ -118,6 +93,9 @@
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Et ubegrenset antall alternative kataloger for maksimalt én konfigurasjonsfil</target>
+
+<source>Open configuration for edit without executing.</source>
+<target>Åpne konfigurasjon for å redigere, uten å kjøre den</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finne følgende mapper:</target>
@@ -209,11 +187,11 @@
 <source>Move file on right</source>
 <target>Flytt filen til høyre</target>
 
-<source>Overwrite left item</source>
-<target>Overskriv venstre mappe</target>
+<source>Update left item</source>
+<target>Oppdater fil til venstre</target>
 
-<source>Overwrite right item</source>
-<target>Overskriv høyre mappe</target>
+<source>Update right item</source>
+<target>Oppdater fil til høyre</target>
 
 <source>Do nothing</source>
 <target>Ikke gjør noe</target>
@@ -296,8 +274,8 @@
 <source>Creating file %x</source>
 <target>Oppretter filen %x</target>
 
-<source>Saving log file %x...</source>
-<target>Lagrer rapport %x...</target>
+<source>Saving file %x...</source>
+<target>Lagrer fil %x...</target>
 
 <source>Items processed:</source>
 <target>Mapper behandlet:</target>
@@ -365,8 +343,8 @@
 <source>Save &as...</source>
 <target>Lagre &som...</target>
 
-<source>&Quit</source>
-<target>&Avslutt</target>
+<source>E&xit</source>
+<target>A&vslutt</target>
 
 <source>&File</source>
 <target>&Fil</target>
@@ -460,6 +438,9 @@ Kommandoen utføres hvis:
 <source>&Show error</source>
 <target>&Vis feil</target>
 
+<source>&Quit</source>
+<target>&Avslutt</target>
+
 <source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
 
@@ -505,11 +486,11 @@ Kommandoen utføres hvis:
 <source>Creating folder %x</source>
 <target>Oppretter mappen %x</target>
 
-<source>Overwriting file %x</source>
-<target>Overskriver filen %x</target>
+<source>Updating file %x</source>
+<target>Oppdaterer fil %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Overskriver symlinken %x</target>
+<source>Updating symbolic link %x</source>
+<target>Oppdaterer symbolsk link %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifiserer filen %x</target>
@@ -580,6 +561,9 @@ Kommandoen utføres hvis:
 <source>Synchronization completed successfully</source>
 <target>Synkronisering gjennomført</target>
 
+<source>Cleaning up old log files...</source>
+<target>Fjerner gamle loggfiler</target>
+
 <source>Stopped</source>
 <target>Avbrutt</target>
 
@@ -630,6 +614,9 @@ Kommandoen utføres hvis:
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er oppdatert.</target>
+
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Kan ikke koble til FreeFileSync.org</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Kunne ikke finne FreeFileSync's versjonsnummer online. Vil du kontrollere manuelt?</target>
@@ -715,8 +702,20 @@ Kommandoen utføres hvis:
 <source>Start &comparison</source>
 <target>Start &sammenligning</target>
 
+<source>C&omparison settings</source>
+<target>S&ammenligner instillinger</target>
+
+<source>&Filter settings</source>
+<target>&Filtrer instillinger</target>
+
+<source>S&ynchronization settings</source>
+<target>S&ynkroniserings-instillinger</target>
+
 <source>Start &synchronization</source>
 <target>Start &synkronisering</target>
+
+<source>&Actions</source>
+<target>&Handling</target>
 
 <source>&Options</source>
 <target>&Valg</target>
@@ -796,8 +795,8 @@ Kommandoen utføres hvis:
 <source>Number of files and folders that will be deleted</source>
 <target>Antall filer og mapper som slettes</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Antall filer som overskrives</target>
+<source>Number of files that will be updated</source>
+<target>Antall filer som vil bli oppdatert</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Antall filer og mapper som vil bli opprettet</target>
@@ -820,11 +819,20 @@ Kommandoen utføres hvis:
 <source>Ignore time shift (in hours)</source>
 <target>Ignorer tidsbytte (i timer)</target>
 
+<source>Consider file times with specified offset as equal</source>
+<target>Vurder filtidspunkt med spesifisert oppstilling som like</target>
+
 <source>Handle daylight saving time</source>
 <target>Behandle sommertid</target>
 
-<source>Symbolic links:</source>
-<target>Symbolsk link:</target>
+<source>Include symbolic links:</source>
+<target>Inkluder symbolske linker:</target>
+
+<source>Direct</source>
+<target>Direkte</target>
+
+<source>Follow</source>
+<target>Følg</target>
 
 <source>More information</source>
 <target>Mer informasjon</target>
@@ -856,8 +864,22 @@ Kommandoen utføres hvis:
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Angi filterregler til ekskludering av bestemte filer fra synkroniseringen. Filstier skal relatere til kildemappene.</target>
 
+<source>C&lear</source>
+<target>F&jern</target>
+
 <source>Detect moved files</source>
 <target>Gjennkjenn flyttede filer</target>
+
+<source>
+- Detection active after initial sync
+- Requires and creates database files
+- Not supported by all file systems
+</source>
+<target>
+- Detektering er aktiv etter første synkronisering
+- Krever og skaper databasefiler
+- Ikke støttet av alle filsystemer
+</target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>Gjennkjenn synkretninger ved hjelp av databasefiler</target>
@@ -1019,7 +1041,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>&Standard</target>
 
 <source>Source code written in C++ using:</source>
-<target>Kildekoden er skrevet i C++ med Hjelp fra:</target>
+<target>Kildekoden er skrevet i C++ med hjelp fra:</target>
 
 <source>If you like FreeFileSync</source>
 <target>Hvis du liker FreeFileSync</target>
@@ -1075,18 +1097,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Main Bar</source>
 <target>Hovedlinje</target>
 
-<source>Start comparison</source>
-<target>Start sammenligning</target>
-
-<source>Comparison settings</source>
-<target>Analyseinnstillinger</target>
-
-<source>Synchronization settings</source>
-<target>Synkroniseringsinnstillinger</target>
-
-<source>Start synchronization</source>
-<target>Start synkronisering</target>
-
 <source>Confirm</source>
 <target>Bekreft</target>
 
@@ -1125,8 +1135,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Showing %y of %x rows</pluralform>
 </source>
 <target>
-<pluralform>Viser %y af 1 rekke</pluralform>
-<pluralform>Viser %y af %x rekker</pluralform>
+<pluralform>Viser %y av 1 rekke</pluralform>
+<pluralform>Viser %y av %x rekker</pluralform>
 </target>
 
 <source>Set direction:</source>
@@ -1237,11 +1247,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Vis filer som slettes på høyre side</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Vis filer som overskrives på venstre side</target>
+<source>Show files that will be updated on the left side</source>
+<target>Vis filer som vil bli oppdaters på venstre side</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Vis filer som overskrives på høyre side</target>
+<source>Show files that will be updated on the right side</source>
+<target>Vis filer som vil bli oppdatert på høyre side</target>
 
 <source>Show files that won't be copied</source>
 <target>Vis filer som ikke kopieres</target>
@@ -1378,15 +1388,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Oppret dine egne synkroniseringsregler.</target>
 
-<source>Exclude</source>
-<target>Ekskludér</target>
-
-<source>Direct</source>
-<target>Direkte</target>
-
-<source>Follow</source>
-<target>Følg</target>
-
 <source>Today</source>
 <target>I dag</target>
 
@@ -1483,6 +1484,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Kan ikke opprette mappen %x.</target>
 
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan ikke kopiere symolsk link %x til %y</target>
+
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finne systemfunksjonen %x.</target>
 
@@ -1563,4 +1567,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Konfigureringsfilen %x er delvis innlastet</target>
+
+<source>Prepare installation</source>
+<target>Forbered installering</target>
+
+<source>Choose which components you want to install.</source>
+<target>Velg hva du vil installere</target>
+
+<source>Select installation type:</source>
+<target>Velg installasjonstype</target>
+
+<source>Local</source>
+<target>Lokal</target>
+
+<source>Portable</source>
+<target>Portabel (USB)</target>
+
+<source>recommended</source>
+<target>anbefalt</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Lagre innstillinger til "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Registrer FreeFileSync filendelser</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Legg til i høyreklikkmeny</target>
+
+<source>Save settings in installation directory</source>
+<target>Lagre innstillinger i installasjonsmappen</target>
+
+<source>Do not write to Registry</source>
+<target>Ikke skriv til registeret</target>
+
+<source>Just copy the files</source>
+<target>Bare kopier filene</target>
+
+<source>Choose a directory for installation:</source>
+<target>Velg en mappe for installasjon:</target>
+
+<source>Create shortcuts:</source>
+<target>Opprett snarveier:</target>
+
+<source>Desktop</source>
+<target>Skrivebord</target>
+
+<source>Start menu</source>
+<target>Startmeny</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registrerer FreeFileSync filendelser</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Avregistrerer FreeFileSync filendelser</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync konfigurering</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync Batch Fil</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync Synkronisering</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync konfigurering</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Rediger med FreeFileSync</target>
 

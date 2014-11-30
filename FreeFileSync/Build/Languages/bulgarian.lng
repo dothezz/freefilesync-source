@@ -23,7 +23,7 @@
 <target>Задават се подразбиращи се посоки на синхронизация: старите файлове ще се заменят с по-нови.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target>Проверява се достъпността на кошчето за папка %x...</target>
+<target>Проверява достъпността на кошчето за папка %x...</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Файл %x се премества в кошчето</target>
@@ -93,6 +93,9 @@
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Произволен брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
+
+<source>Open configuration for edit without executing.</source>
+<target>Отвори конфигурацията за редактиране без изпълнение.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не са намерени следните папки:</target>
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Премести десния файл</target>
 
-<source>Overwrite left item</source>
-<target>Презапиши левия елемент</target>
+<source>Update left item</source>
+<target>Актуализирай левия елемент</target>
 
-<source>Overwrite right item</source>
-<target>Презапиши десния елемент</target>
+<source>Update right item</source>
+<target>Актуализирай десния елемент</target>
 
 <source>Do nothing</source>
 <target>Не прави нищо</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x ГБ</target>
+
+<source>Cannot load file %x.</source>
+<target>Файл %x не може да се зареди.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Файлът на базата данни %x е несъвместим.</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>Създава файл %x</target>
 
+<source>Saving file %x...</source>
+<target>Запазва файл %x...</target>
+
 <source>Items processed:</source>
 <target>Обработени елементи:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x нишки</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Кодира разширената информация за време: %x</target>
-
 <source>/sec</source>
 <target>/сек.</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Моля, ползвайте 64-бит. версия на FFS за създаване фонови копия на тази система.</target>
 
-<source>Cannot load file %x.</source>
-<target>Файл %x не може да се зареди.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Името на тома за %x не може да се определи.</target>
 
@@ -340,8 +343,8 @@
 <source>Save &as...</source>
 <target>Запази к&ато...</target>
 
-<source>&Quit</source>
-<target>Кра&й</target>
+<source>E&xit</source>
+<target>И&зход</target>
 
 <source>&File</source>
 <target>&Файл</target>
@@ -402,7 +405,7 @@ The command is triggered if:
 <target>
 Командния ред се изпълнява, ако:
 - се променят файлове или подпапки,
-- се появят нови папки (напр. вкарана флашка)
+- се явят нови папки (напр. вкарана флашка).
 </target>
 
 <source>&Start</source>
@@ -434,6 +437,9 @@ The command is triggered if:
 
 <source>&Show error</source>
 <target>Покажи гре&шката</target>
+
+<source>&Quit</source>
+<target>Кра&й</target>
 
 <source>Incorrect command line:</source>
 <target>Невалиден команден ред:</target>
@@ -480,11 +486,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>Създава папка %x</target>
 
-<source>Overwriting file %x</source>
-<target>Презаписва файл %x</target>
+<source>Updating file %x</source>
+<target>Актуализира файл %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Презаписва символна връзка %x</target>
+<source>Updating symbolic link %x</source>
+<target>Актуализира символна връзка %x</target>
 
 <source>Verifying file %x</source>
 <target>Верифицира файл %x</target>
@@ -498,20 +504,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Грешка при верификация: %x и %y имат различно съдържание.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Не е открита папка %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Целевата папка %x вече съществува.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Не е открита папка %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Полето за целева папка не бива да е празно.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Моля, въведете целева папка за версификация.</target>
-
 <source>Source folder %x not found.</source>
 <target>Изходната папка %x не е намерена.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Моля, въведете целева папка за версификация.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следните елементи имат нерешени конфликти и няма да бъдат синхронизирани:</target>
@@ -555,8 +561,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>Синхронизацията завърши успешно</target>
 
-<source>Saving log file %x...</source>
-<target>Запазване на протоколния файл %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Изчиства старите log-файлове...</target>
 
 <source>Stopped</source>
 <target>Стопирано</target>
@@ -609,8 +615,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync вече е актуална.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Няма връзка със sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Не мога да се свържа с FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Номера на текущата версия на FreeFileSync не е открит онлайн. Ще опитате ли ръчно?</target>
@@ -696,8 +702,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>Почни &сравняване</target>
 
+<source>C&omparison settings</source>
+<target>Настройки на с&равняване</target>
+
+<source>&Filter settings</source>
+<target>&Настройки на филтъра</target>
+
+<source>S&ynchronization settings</source>
+<target>Настройки на с&инхронизацията</target>
+
 <source>Start &synchronization</source>
 <target>Почни &синхронизация</target>
+
+<source>&Actions</source>
+<target>&Действия</target>
 
 <source>&Options</source>
 <target>&Опции</target>
@@ -777,8 +795,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Брой файлове и папки, които ще бъдат изтрити</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Брой файлове, които ще бъдат презаписани</target>
+<source>Number of files that will be updated</source>
+<target>Брой файлове, които ще бъдат актуализирани</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Брой файлове и папки, които ще бъдат създадени</target>
@@ -807,8 +825,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>Отчитай лятното време</target>
 
-<source>Symbolic links:</source>
-<target>Символни връзки:</target>
+<source>Include symbolic links:</source>
+<target>Включи символни връзки:</target>
+
+<source>Direct</source>
+<target>Директно</target>
+
+<source>Follow</source>
+<target>Следвай</target>
 
 <source>More information</source>
 <target>Още информация</target>
@@ -837,23 +861,23 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Максимум:</target>
 
-<source>C&lear</source>
-<target>И&зчисти</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Изберете филтърни правила за изключване на някои файлове от синхронизация. Въведете файлови пътища относно съответните им двойки папки.</target>
+
+<source>C&lear</source>
+<target>И&зчисти</target>
 
 <source>Detect moved files</source>
 <target>Откриване на преместени файлове</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Изисква и създава файлове на базата данни.
-- Активизира се след предходна синхронизация.
+- Откриването е активно след начална синхронизация,
+- Изисква и създава файлове на базата данни,
 - Не се поддържа от всички файлови системи.
 </target>
 
@@ -1041,7 +1065,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Публикува се по лиценза GNU General Public License</target>
 
 <source>Many thanks for localization:</source>
-<target>Много благодарности за локализацията:</target>
+<target>Благодарности за локализацията:</target>
 
 <source>Save as Batch Job</source>
 <target>Запази като пакетна задача</target>
@@ -1067,26 +1091,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Настройки на изгледа</target>
 
-<source>Overview</source>
-<target>Обзор</target>
-
 <source>Configuration</source>
 <target>Конфигурация</target>
 
+<source>Overview</source>
+<target>Обзор</target>
+
 <source>Main Bar</source>
 <target>Главен панел</target>
-
-<source>Start comparison</source>
-<target>Почни сравняване</target>
-
-<source>Comparison settings</source>
-<target>Настройки на сравняването</target>
-
-<source>Synchronization settings</source>
-<target>Настройки на синхронизацията</target>
-
-<source>Start synchronization</source>
-<target>Старт на синхронизацията</target>
 
 <source>Confirm</source>
 <target>Потвърждение</target>
@@ -1238,11 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Покажи файловете, които ще бъдат изтрити отдясно</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Покажи файловете, които ще бъдат презаписани отляво</target>
+<source>Show files that will be updated on the left side</source>
+<target>Покажи файловете, които ще бъдат обновени отляво</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Покажи файловете, които ще бъдат презаписани отдясно</target>
+<source>Show files that will be updated on the right side</source>
+<target>Покажи файловете, които ще бъдат обновени отдясно</target>
 
 <source>Show files that won't be copied</source>
 <target>Покажи файловете, които няма да бъдат копирани</target>
@@ -1379,15 +1391,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Дефинирай свои правила за синхронизация.</target>
 
-<source>Exclude</source>
-<target>Изключи</target>
-
-<source>Direct</source>
-<target>Директно</target>
-
-<source>Follow</source>
-<target>Следвай</target>
-
 <source>Today</source>
 <target>Днес</target>
 
@@ -1451,9 +1454,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Директория %x не може да се следи.</target>
 
-<source>Conversion error:</source>
-<target>Грешка на преобразуване:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Файл %x не може да се изтрие.</target>
 
@@ -1487,8 +1487,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Директория %x не може да се създаде.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Символната връзка %x не може да се създаде.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Символната връзка %x не може да се копира в %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Системната функция %x не може да се намери.</target>
@@ -1570,4 +1570,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Конфигурационния файл %x се зареди само частично.</target>
+
+<source>Prepare installation</source>
+<target>Подготовка за инсталиране</target>
+
+<source>Choose which components you want to install.</source>
+<target>Изберете желаните компоненти за исталиране.</target>
+
+<source>Select installation type:</source>
+<target>Изберете типа инсталация:</target>
+
+<source>Local</source>
+<target>Локална</target>
+
+<source>Portable</source>
+<target>Преносима</target>
+
+<source>recommended</source>
+<target>препоръчително</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Запази настройките в "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Регистрирай файлови разширения за FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Създай полета в контекстното меню на Explorer</target>
+
+<source>Save settings in installation directory</source>
+<target>Запази настройките в инсталационната директория</target>
+
+<source>Do not write to Registry</source>
+<target>Не записвай нищо в Регистъра</target>
+
+<source>Just copy the files</source>
+<target>Само копирай файловете</target>
+
+<source>Choose a directory for installation:</source>
+<target>Изберете директория за инсталиране:</target>
+
+<source>Create shortcuts:</source>
+<target>Създай къси пътища:</target>
+
+<source>Desktop</source>
+<target>На десктопа</target>
+
+<source>Start menu</source>
+<target>В стартовото меню</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Регистриране на файлови разширения за FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Де-регистриране на файлови разширения за FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Конфигуриране на FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Пакетен файл на FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>Синхронизираща база данни на FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Конфигуриране на RealtimeSync</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Редактиране с FreeFileSync</target>
 

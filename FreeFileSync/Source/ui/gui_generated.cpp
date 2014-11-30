@@ -29,6 +29,8 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_OPEN, wxString( _("&Open...") ) + wxT('\t') + wxT("Ctrl+O"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemLoad );
 
+    m_menuFile->AppendSeparator();
+
     m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemSave );
 
@@ -40,19 +42,33 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     m_menuFile->AppendSeparator();
 
-    m_menuItemCompare = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("Start &comparison") ) + wxT('\t') + wxT("F5"), wxEmptyString, wxITEM_NORMAL );
-    m_menuFile->Append( m_menuItemCompare );
-
-    m_menuItemSynchronize = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("Start &synchronization") ) + wxT('\t') + wxT("F9"), wxEmptyString, wxITEM_NORMAL );
-    m_menuFile->Append( m_menuItemSynchronize );
-
-    m_menuFile->AppendSeparator();
-
     wxMenuItem* m_menuItem4;
-    m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("&Quit") ) , wxEmptyString, wxITEM_NORMAL );
+    m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("E&xit") ) , wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItem4 );
 
     m_menubar1->Append( m_menuFile, _("&File") );
+
+    m_menu4 = new wxMenu();
+    m_menuItemCompare = new wxMenuItem( m_menu4, wxID_ANY, wxString( _("Start &comparison") ) + wxT('\t') + wxT("F5"), wxEmptyString, wxITEM_NORMAL );
+    m_menu4->Append( m_menuItemCompare );
+
+    m_menu4->AppendSeparator();
+
+    m_menuItemCompSettings = new wxMenuItem( m_menu4, wxID_ANY, wxString( _("C&omparison settings") ) + wxT('\t') + wxT("F6"), wxEmptyString, wxITEM_NORMAL );
+    m_menu4->Append( m_menuItemCompSettings );
+
+    m_menuItemFilter = new wxMenuItem( m_menu4, wxID_ANY, wxString( _("&Filter settings") ) + wxT('\t') + wxT("F7"), wxEmptyString, wxITEM_NORMAL );
+    m_menu4->Append( m_menuItemFilter );
+
+    m_menuItemSyncSettings = new wxMenuItem( m_menu4, wxID_ANY, wxString( _("S&ynchronization settings") ) + wxT('\t') + wxT("F8"), wxEmptyString, wxITEM_NORMAL );
+    m_menu4->Append( m_menuItemSyncSettings );
+
+    m_menu4->AppendSeparator();
+
+    m_menuItemSynchronize = new wxMenuItem( m_menu4, wxID_ANY, wxString( _("Start &synchronization") ) + wxT('\t') + wxT("F9"), wxEmptyString, wxITEM_NORMAL );
+    m_menu4->Append( m_menuItemSynchronize );
+
+    m_menubar1->Append( m_menu4, _("&Actions") );
 
     m_menuTools = new wxMenu();
     m_menuItemOptions = new wxMenuItem( m_menuTools, wxID_PREFERENCES, wxString( _("&Options") ) , wxEmptyString, wxITEM_NORMAL );
@@ -727,7 +743,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     bSizer172 = new wxBoxSizer( wxVERTICAL );
 
     m_bitmapUpdateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+    m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be updated") );
 
     bSizer172->Add( m_bitmapUpdateLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -739,7 +755,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     m_staticTextUpdateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateLeft->Wrap( -1 );
-    m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+    m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be updated") );
 
     bSizer172->Add( m_staticTextUpdateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -830,7 +846,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     bSizer177 = new wxBoxSizer( wxVERTICAL );
 
     m_bitmapUpdateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+    m_bitmapUpdateRight->SetToolTip( _("Number of files that will be updated") );
 
     bSizer177->Add( m_bitmapUpdateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -842,7 +858,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     m_staticTextUpdateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateRight->Wrap( -1 );
-    m_staticTextUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+    m_staticTextUpdateRight->SetToolTip( _("Number of files that will be updated") );
 
     bSizer177->Add( m_staticTextUpdateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -901,9 +917,12 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ) );
     this->Connect( m_menuItemSaveAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ) );
     this->Connect( m_menuItemSaveAsBatch->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnSaveAsBatchJob ) );
-    this->Connect( m_menuItemCompare->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCompare ) );
-    this->Connect( m_menuItemSynchronize->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnStartSync ) );
     this->Connect( m_menuItem4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
+    this->Connect( m_menuItemCompare->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCompare ) );
+    this->Connect( m_menuItemCompSettings->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCmpSettings ) );
+    this->Connect( m_menuItemFilter->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ) );
+    this->Connect( m_menuItemSyncSettings->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnSyncSettings ) );
+    this->Connect( m_menuItemSynchronize->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnStartSync ) );
     this->Connect( m_menuItemOptions->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuOptions ) );
     this->Connect( m_menuItem15->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuFindItem ) );
     this->Connect( m_menuItem51->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuResetLayout ) );
@@ -930,7 +949,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_bpButtonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ), NULL, this );
     m_bpButtonSaveAs->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ), NULL, this );
     m_bpButtonSaveAsBatch->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSaveAsBatchJob ), NULL, this );
-    m_listBoxHistory->Connect( wxEVT_CHAR, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
+    m_listBoxHistory->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
     m_listBoxHistory->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistory ), NULL, this );
     m_listBoxHistory->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistoryDoubleClick ), NULL, this );
     m_listBoxHistory->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( MainDialogGenerated::OnCfgHistoryRightClick ), NULL, this );
@@ -1087,20 +1106,27 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     wxBoxSizer* bSizer1721;
     bSizer1721 = new wxBoxSizer( wxVERTICAL );
 
-    m_staticText92 = new wxStaticText( m_panelComparisonSettings, wxID_ANY, _("Symbolic links:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText92->Wrap( -1 );
-    bSizer1721->Add( m_staticText92, 0, wxBOTTOM, 5 );
+    m_checkBoxSymlinksInclude = new wxCheckBox( m_panelComparisonSettings, wxID_ANY, _("Include symbolic links:"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer1721->Add( m_checkBoxSymlinksInclude, 0, wxALL, 5 );
 
-    wxArrayString m_choiceHandleSymlinksChoices;
-    m_choiceHandleSymlinks = new wxChoice( m_panelComparisonSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceHandleSymlinksChoices, 0 );
-    m_choiceHandleSymlinks->SetSelection( 0 );
-    bSizer1721->Add( m_choiceHandleSymlinks, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    wxBoxSizer* bSizer176;
+    bSizer176 = new wxBoxSizer( wxVERTICAL );
+
+    m_radioBtnSymlinksDirect = new wxRadioButton( m_panelComparisonSettings, wxID_ANY, _("Direct"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_radioBtnSymlinksDirect->SetValue( true );
+    bSizer176->Add( m_radioBtnSymlinksDirect, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+
+    m_radioBtnSymlinksFollow = new wxRadioButton( m_panelComparisonSettings, wxID_ANY, _("Follow"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer176->Add( m_radioBtnSymlinksFollow, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+
+
+    bSizer1721->Add( bSizer176, 0, wxEXPAND|wxLEFT, 18 );
 
     m_hyperlink24 = new wxHyperlinkCtrl( m_panelComparisonSettings, wxID_ANY, _("More information"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    bSizer1721->Add( m_hyperlink24, 0, wxTOP, 5 );
+    bSizer1721->Add( m_hyperlink24, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
 
-    bSizer1734->Add( bSizer1721, 0, wxALIGN_CENTER_VERTICAL|wxALL, 10 );
+    bSizer1734->Add( bSizer1721, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     m_staticline441 = new wxStaticLine( m_panelComparisonSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
     bSizer1734->Add( m_staticline441, 0, wxEXPAND, 5 );
@@ -1121,7 +1147,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_panelCompSettingsHolder->SetSizer( bSizer275 );
     m_panelCompSettingsHolder->Layout();
     bSizer275->Fit( m_panelCompSettingsHolder );
-    m_notebook->AddPage( m_panelCompSettingsHolder, _("dummy"), false );
+    m_notebook->AddPage( m_panelCompSettingsHolder, _("dummy"), true );
     m_panelFilterSettingsHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelFilterSettingsHolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
@@ -1707,7 +1733,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_panelSyncSettingsHolder->SetSizer( bSizer276 );
     m_panelSyncSettingsHolder->Layout();
     bSizer276->Fit( m_panelSyncSettingsHolder );
-    m_notebook->AddPage( m_panelSyncSettingsHolder, _("dummy"), true );
+    m_notebook->AddPage( m_panelSyncSettingsHolder, _("dummy"), false );
 
     bSizer7->Add( m_notebook, 1, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
@@ -1741,6 +1767,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_toggleBtnContent->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnContent ), NULL, this );
     m_checkBoxTimeShift->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnChangeCompOption ), NULL, this );
     m_hyperlink241->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( ConfigDlgGenerated::OnHelpTimeShift ), NULL, this );
+    m_checkBoxSymlinksInclude->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnChangeCompOption ), NULL, this );
     m_hyperlink24->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( ConfigDlgGenerated::OnHelpComparisonSettings ), NULL, this );
     m_textCtrlInclude->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigDlgGenerated::OnChangeFilterOption ), NULL, this );
     m_hyperlink171->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( ConfigDlgGenerated::OnHelpShowExamples ), NULL, this );
@@ -1865,7 +1892,7 @@ SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wx
     fgSizer11->Add( m_bitmapDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_bitmapUpdateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+    m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be updated") );
 
     fgSizer11->Add( m_bitmapUpdateLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -1885,7 +1912,7 @@ SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wx
     fgSizer11->Add( m_bitmapCreateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
     m_bitmapUpdateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+    m_bitmapUpdateRight->SetToolTip( _("Number of files that will be updated") );
 
     fgSizer11->Add( m_bitmapUpdateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -1902,7 +1929,7 @@ SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wx
 
     m_staticTextUpdateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateLeft->Wrap( -1 );
-    m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+    m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be updated") );
 
     fgSizer11->Add( m_staticTextUpdateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -1926,7 +1953,7 @@ SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wx
 
     m_staticTextUpdateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateRight->Wrap( -1 );
-    m_staticTextUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+    m_staticTextUpdateRight->SetToolTip( _("Number of files that will be updated") );
 
     fgSizer11->Add( m_staticTextUpdateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -3223,9 +3250,9 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer171;
     bSizer171 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_hyperlink11 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("MS Visual C++"), wxT("http://msdn.microsoft.com/library/60k1461a.aspx"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink11 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("MS Visual C++"), wxT("http://www.visualstudio.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink11->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink11->SetToolTip( _("http://msdn.microsoft.com/library/60k1461a.aspx") );
+    m_hyperlink11->SetToolTip( _("http://www.visualstudio.com") );
 
     bSizer171->Add( m_hyperlink11, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
@@ -3365,7 +3392,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer166->Add( m_bitmap9, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 
-    m_hyperlink1 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("freefilesync.org"), wxT("http://www.freefilesync.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink1 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("FreeFileSync.org"), wxT("http://www.freefilesync.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, true, wxEmptyString ) );
     m_hyperlink1->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
@@ -3410,7 +3437,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_bitmap13 = new wxStaticBitmap( m_panel41, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizer1671->Add( m_bitmap13, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink5 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("http://www.gnu.org/licenses/gpl.html"), wxT("http://www.gnu.org/licenses/gpl.html"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink5 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("http://www.gnu.org/licenses/gpl-3.0"), wxT("http://www.gnu.org/licenses/gpl-3.0"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink5->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     bSizer1671->Add( m_hyperlink5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );

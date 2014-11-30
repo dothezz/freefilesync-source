@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -12,16 +12,16 @@
 #include <wx+/image_resources.h>
 
 #ifdef ZEN_WIN
-#include <zen/dll.h>
-#include <zen/win_ver.h>
-#include <wx/image.h>
-#include "../dll/Thumbnail/thumbnail.h"
+    #include <zen/dll.h>
+    #include <zen/win_ver.h>
+    #include <wx/image.h>
+    #include "../dll/Thumbnail/thumbnail.h"
 
 #elif defined ZEN_LINUX
-#include <gtk/gtk.h>
+    #include <gtk/gtk.h>
 
 #elif defined ZEN_MAC
-#include "osx_file_icon.h"
+    #include "osx_file_icon.h"
 #endif
 
 using namespace zen;
@@ -32,16 +32,16 @@ namespace
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer: must be big enough to hold visible icons + preload buffer! Consider OS limit on GDI resources (wxBitmap)!!!
 
 #ifndef NDEBUG
-const boost::thread::id mainThreadId = boost::this_thread::get_id();
+    const boost::thread::id mainThreadId = boost::this_thread::get_id();
 #endif
 
 #ifdef ZEN_WIN
-const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
+    const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
 
-#define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
-DEF_DLL_FUN(getIconByIndex);   //
-DEF_DLL_FUN(getThumbnail);     //let's spare the boost::call_once hustle and allocate statically
-DEF_DLL_FUN(releaseImageData); //
+    #define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
+    DEF_DLL_FUN(getIconByIndex);   //
+    DEF_DLL_FUN(getThumbnail);     //let's spare the boost::call_once hustle and allocate statically
+    DEF_DLL_FUN(releaseImageData); //
 #endif
 
 class IconHolder //handle HICON/GdkPixbuf ownership supporting thread-safe usage (in contrast to wxIcon/wxBitmap)

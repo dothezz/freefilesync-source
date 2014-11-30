@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -361,32 +361,32 @@ public:
         consumeToken(Token::TK_HEADER_BEGIN);
 
         consumeToken(Token::TK_LANG_NAME_BEGIN);
-        header.languageName = tk.text;
+        header.languageName = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_LANG_NAME_END);
 
         consumeToken(Token::TK_TRANS_NAME_BEGIN);
-        header.translatorName = tk.text;
+        header.translatorName = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_TRANS_NAME_END);
 
         consumeToken(Token::TK_LOCALE_NAME_BEGIN);
-        header.localeName = tk.text;
+        header.localeName = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_LOCALE_NAME_END);
 
         consumeToken(Token::TK_FLAG_FILE_BEGIN);
-        header.flagFile = tk.text;
+        header.flagFile = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_FLAG_FILE_END);
 
         consumeToken(Token::TK_PLURAL_COUNT_BEGIN);
-        header.pluralCount = zen::stringTo<int>(tk.text);
+        header.pluralCount = zen::stringTo<int>(token().text);
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_PLURAL_COUNT_END);
 
         consumeToken(Token::TK_PLURAL_DEF_BEGIN);
-        header.pluralDefinition = tk.text;
+        header.pluralDefinition = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_PLURAL_DEF_END);
 
@@ -401,11 +401,8 @@ private:
         if (token().type == Token::TK_PLURAL_BEGIN)
             return parsePlural(pluralOut, pluralInfo);
 
-        if (token().type != Token::TK_TEXT)
-            throw ParsingError(L"Source text empty", scn.posRow(), scn.posCol());
-        std::string original = tk.text;
-        nextToken();
-
+        std::string original = token().text;
+        consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_SRC_END);
 
         consumeToken(Token::TK_TRG_BEGIN);
@@ -415,9 +412,9 @@ private:
             translation = token().text;
             nextToken();
         }
+        validateTranslation(original, translation); //throw throw ParsingError
         consumeToken(Token::TK_TRG_END);
 
-        validateTranslation(original, translation); //throw throw ParsingError
         out.emplace(original, translation);
     }
 
@@ -426,16 +423,17 @@ private:
         //Token::TK_SRC_BEGIN already consumed
 
         consumeToken(Token::TK_PLURAL_BEGIN);
-        std::string engSingular = tk.text;
+        std::string engSingular = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_PLURAL_END);
 
         consumeToken(Token::TK_PLURAL_BEGIN);
-        std::string engPlural = tk.text;
+        std::string engPlural = token().text;
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_PLURAL_END);
 
         consumeToken(Token::TK_SRC_END);
+        const SingularPluralPair original(engSingular, engPlural);
 
         consumeToken(Token::TK_TRG_BEGIN);
 
@@ -443,16 +441,14 @@ private:
         while (token().type == Token::TK_PLURAL_BEGIN)
         {
             consumeToken(Token::TK_PLURAL_BEGIN);
-            std::string pluralForm = tk.text;
+            std::string pluralForm = token().text;
             consumeToken(Token::TK_TEXT);
             consumeToken(Token::TK_PLURAL_END);
             pluralList.push_back(pluralForm);
         }
-
+        validateTranslation(original, pluralList, pluralInfo);
         consumeToken(Token::TK_TRG_END);
 
-        const SingularPluralPair original(engSingular, engPlural);
-        validateTranslation(original, pluralList, pluralInfo);
         pluralOut.emplace(original, pluralList);
     }
 
@@ -463,7 +459,7 @@ private:
 
         if (!translation.empty())
         {
-            //if original contains placeholder, so should translation!
+            //if original contains placeholder, so must translation!
             auto checkPlaceholder = [&](const std::string& placeholder)
             {
                 if (zen::contains(original, placeholder) &&
@@ -474,9 +470,15 @@ private:
             checkPlaceholder("%y");
             checkPlaceholder("%z");
 
+            auto ampersandTokenCount = [](const std::string& str) -> size_t
+            {
+                const std::string tmp = zen::replaceCpy(str, "&&", ""); //make sure to not catch && which windows resolves as just one & for display!
+                return std::count(tmp.begin(), tmp.end(), '&');
+            };
+
             //if source contains ampersand to mark menu accellerator key, so must translation
-            const size_t ampCountOrig = getAmpersandTokenCount(original);
-            if (ampCountOrig != getAmpersandTokenCount(translation) ||
+            const size_t ampCountOrig = ampersandTokenCount(original);
+            if (ampCountOrig != ampersandTokenCount(translation) ||
                 ampCountOrig > 1)
                 throw ParsingError(L"Source and translation both need exactly one & character to mark a menu item access key or none at all", scn.posRow(), scn.posCol());
 
@@ -485,6 +487,28 @@ private:
                 if ((zen::endsWith(original,    "&") && !zen::endsWith(original,    "&&")) ||
                     (zen::endsWith(translation, "&") && !zen::endsWith(translation, "&&")))
                     throw ParsingError(L"The & character to mark a menu item access key must not occur at the end of a string", scn.posRow(), scn.posCol());
+
+#if 0
+            //if source ends with colon, so must translation (note: character seems to be universally used, even for asian and arabic languages)
+            if (zen::endsWith(original, ":") &&
+                !zen::endsWith(translation, ":") &&
+                !zen::endsWith(translation, "\xef\xbc\x9a")) //chinese colon
+                throw ParsingError(L"Source text ends with a colon character \":\", but translation does not", scn.posRow(), scn.posCol());
+
+            auto endsWithSingleDot = [](const std::string& s) { return zen::endsWith(s, ".") && !zen::endsWith(s, ".."); };
+
+            //if source ends with a period, so must translation (note: character seems to be universally used, even for asian and arabic languages)
+            if (endsWithSingleDot(original) &&
+                !endsWithSingleDot(translation) &&
+                !zen::endsWith(translation, "\xe3\x80\x82")) //chinese period
+                throw ParsingError(L"Source text ends with a punctuation mark character \".\", but translation does not", scn.posRow(), scn.posCol());
+
+            //if source ends with an ellipsis, so must translation (note: character seems to be universally used, even for asian and arabic languages)
+            if (zen::endsWith(original, "...") &&
+                !zen::endsWith(translation, "...") &&
+                !zen::endsWith(translation, "\xe2\x80\xa6")) //narrow ellipsis (spanish?)
+                throw ParsingError(L"Source text ends with an ellipsis \"...\", but translation does not", scn.posRow(), scn.posCol());
+#endif
         }
     }
 
@@ -550,12 +574,6 @@ private:
             checkSecondaryPlaceholder("%y");
             checkSecondaryPlaceholder("%z");
         }
-    }
-
-    static size_t getAmpersandTokenCount(const std::string& str)
-    {
-        const std::string tmp = zen::replaceCpy(str, "&&", ""); //make sure to not catch && which windows resolves as just one & for display!
-        return std::count(tmp.begin(), tmp.end(), '&');
     }
 
     void nextToken() { tk = scn.nextToken(); }

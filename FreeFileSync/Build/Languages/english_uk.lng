@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Any number of alternative directory pairs for at most one config file.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Open configuration for edit without executing.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Move file on right</target>
 
-<source>Overwrite left item</source>
-<target>Overwrite left item</target>
+<source>Update left item</source>
+<target>Update left item</target>
 
-<source>Overwrite right item</source>
-<target>Overwrite right item</target>
+<source>Update right item</source>
+<target>Update right item</target>
 
 <source>Do nothing</source>
 <target>Do nothing</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Cannot load file %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Database file %x is incompatible.</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>Creating file %x</target>
 
+<source>Saving file %x...</source>
+<target>Saving file %x...</target>
+
 <source>Items processed:</source>
 <target>Elements processed:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x threads</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Encoding extended time information: %x</target>
-
 <source>/sec</source>
 <target>/sec</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Please use FreeFileSync 64-bit version to create shadow copies on this system.</target>
 
-<source>Cannot load file %x.</source>
-<target>Cannot load file %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Cannot determine volume name for %x.</target>
 
@@ -340,8 +343,8 @@
 <source>Save &as...</source>
 <target>Save &as...</target>
 
-<source>&Quit</source>
-<target>&Quit</target>
+<source>E&xit</source>
+<target>E&xit</target>
 
 <source>&File</source>
 <target>&File</target>
@@ -435,6 +438,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Show error</target>
 
+<source>&Quit</source>
+<target>&Quit</target>
+
 <source>Incorrect command line:</source>
 <target>Incorrect command line:</target>
 
@@ -480,11 +486,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>Creating folder %x</target>
 
-<source>Overwriting file %x</source>
-<target>Overwriting file %x</target>
+<source>Updating file %x</source>
+<target>Updating file %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Overwriting symbolic link %x</target>
+<source>Updating symbolic link %x</source>
+<target>Updating symbolic link %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifying file %x</target>
@@ -498,20 +504,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Data verification error: %x and %y have different content.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Cannot find folder %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Target folder %x already existing.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Cannot find folder %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Target folder input field must not be empty.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Please enter a target folder for versioning.</target>
-
 <source>Source folder %x not found.</source>
 <target>Source folder %x not found.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Please enter a target folder for versioning.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>The following items have unresolved conflicts and will not be synchronised:</target>
@@ -555,8 +561,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>Synchronisation completed successfully</target>
 
-<source>Saving log file %x...</source>
-<target>Saving log file %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Cleaning up old log files...</target>
 
 <source>Stopped</source>
 <target>Stopped</target>
@@ -609,8 +615,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync is up to date.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Unable to connect to sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Unable to connect to FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Cannot find current FreeFileSync version number online. Do you want to check manually?</target>
@@ -696,8 +702,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>Start &comparison</target>
 
+<source>C&omparison settings</source>
+<target>C&omparison settings</target>
+
+<source>&Filter settings</source>
+<target>&Filter settings</target>
+
+<source>S&ynchronization settings</source>
+<target>S&ynchronization settings</target>
+
 <source>Start &synchronization</source>
 <target>Start &synchronisation</target>
+
+<source>&Actions</source>
+<target>&Actions</target>
 
 <source>&Options</source>
 <target>&Options</target>
@@ -777,8 +795,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Number of files and folders that will be deleted</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Number of files that will be overwritten</target>
+<source>Number of files that will be updated</source>
+<target>Number of files that will be updated</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Number of files and folders that will be created</target>
@@ -807,8 +825,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>Handle daylight saving time</target>
 
-<source>Symbolic links:</source>
-<target>Symbolic links:</target>
+<source>Include symbolic links:</source>
+<target>Include symbolic links:</target>
+
+<source>Direct</source>
+<target>Direct</target>
+
+<source>Follow</source>
+<target>Follow</target>
 
 <source>More information</source>
 <target>More information</target>
@@ -837,23 +861,23 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>C&lear</source>
-<target>C&lear</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Select filter rules to exclude certain files from synchronisation. Enter file paths relative to their corresponding folder pair.</target>
+
+<source>C&lear</source>
+<target>C&lear</target>
 
 <source>Detect moved files</source>
 <target>Detect moved files</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </target>
 
@@ -1067,26 +1091,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>View Settings</target>
 
-<source>Overview</source>
-<target>Overview</target>
-
 <source>Configuration</source>
 <target>Configuration</target>
 
+<source>Overview</source>
+<target>Overview</target>
+
 <source>Main Bar</source>
 <target>Main Bar</target>
-
-<source>Start comparison</source>
-<target>Start comparison</target>
-
-<source>Comparison settings</source>
-<target>Comparison settings</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisation settings</target>
-
-<source>Start synchronization</source>
-<target>Start synchronisation</target>
 
 <source>Confirm</source>
 <target>Confirm</target>
@@ -1238,11 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Show files that will be deleted on the right side</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Show files that will be overwritten on left side</target>
+<source>Show files that will be updated on the left side</source>
+<target>Show files that will be updated on the left side</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Show files that will be overwritten on right side</target>
+<source>Show files that will be updated on the right side</source>
+<target>Show files that will be updated on the right side</target>
 
 <source>Show files that won't be copied</source>
 <target>Show files that won't be copied</target>
@@ -1379,15 +1391,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Configure your own synchronisation rules.</target>
 
-<source>Exclude</source>
-<target>Exclude</target>
-
-<source>Direct</source>
-<target>Direct</target>
-
-<source>Follow</source>
-<target>Follow</target>
-
 <source>Today</source>
 <target>Today</target>
 
@@ -1451,9 +1454,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Cannot monitor directory %x.</target>
 
-<source>Conversion error:</source>
-<target>Conversion error:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Cannot delete file %x.</target>
 
@@ -1487,8 +1487,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Cannot create directory %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Cannot create symbolic link %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Cannot copy symbolic link %x to %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Cannot find system function %x.</target>
@@ -1570,4 +1570,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Configuration file %x loaded partially only.</target>
+
+<source>Prepare installation</source>
+<target>Prepare installation</target>
+
+<source>Choose which components you want to install.</source>
+<target>Choose which components you want to install.</target>
+
+<source>Select installation type:</source>
+<target>Select installation type:</target>
+
+<source>Local</source>
+<target>Local</target>
+
+<source>Portable</source>
+<target>Portable</target>
+
+<source>recommended</source>
+<target>recommended</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Save settings to "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Register FreeFileSync file extensions</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Create Explorer context menu entries</target>
+
+<source>Save settings in installation directory</source>
+<target>Save settings in installation directory</target>
+
+<source>Do not write to Registry</source>
+<target>Do not write to Registry</target>
+
+<source>Just copy the files</source>
+<target>Just copy the files</target>
+
+<source>Choose a directory for installation:</source>
+<target>Choose a directory for installation:</target>
+
+<source>Create shortcuts:</source>
+<target>Create shortcuts:</target>
+
+<source>Desktop</source>
+<target>Desktop</target>
+
+<source>Start menu</source>
+<target>Start menu</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registering FreeFileSync file extensions</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Unregistering FreeFileSync file extensions</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync Configuration</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync Batch File</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync Synchronisation Database</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync Configuration</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Edit with FreeFileSync</target>
 

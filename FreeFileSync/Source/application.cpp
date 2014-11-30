@@ -1,13 +1,12 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "application.h"
 #include <memory>
 #include <zen/file_access.h>
-#include <zen/dll.h>
 #include <wx/tooltip.h>
 #include <wx/log.h>
 #include <wx+/app_main.h>
@@ -24,11 +23,12 @@
 #include "lib/error_log.h"
 
 #ifdef ZEN_WIN
-#include <zen/win_ver.h>
-#include "lib/app_user_mode_id.h"
+    #include <zen/win_ver.h>
+    #include <zen/dll.h>
+    #include "lib/app_user_mode_id.h"
 
 #elif defined ZEN_LINUX
-#include <gtk/gtk.h>
+    #include <gtk/gtk.h>
 #endif
 
 using namespace zen;
@@ -204,30 +204,30 @@ void Application::onEnterEventLoop(wxEvent& event)
 
 
 #ifdef ZEN_MAC
-/*
-wxWidgets initialization sequence on OS X is a mess:
-----------------------------------------------------
-1. double click FFS app bundle or execute from command line without arguments
-	OnInit()
-	OnRun()
-	onEnterEventLoop()
-	MacNewFile()
+    /*
+    wxWidgets initialization sequence on OS X is a mess:
+    ----------------------------------------------------
+    1. double click FFS app bundle or execute from command line without arguments
+    OnInit()
+    OnRun()
+    onEnterEventLoop()
+    MacNewFile()
 
-2. double-click .ffs_gui file
-	OnInit()
-	OnRun()
-	onEnterEventLoop()
-	MacOpenFiles()
+    2. double-click .ffs_gui file
+    OnInit()
+    OnRun()
+    onEnterEventLoop()
+    MacOpenFiles()
 
-3. start from command line with .ffs_gui file as first argument
-	OnInit()
-	OnRun()
-	MacOpenFiles() -> WTF!?
-	onEnterEventLoop()
-	MacNewFile()   -> yes, wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/14558
+    3. start from command line with .ffs_gui file as first argument
+    OnInit()
+    OnRun()
+    MacOpenFiles() -> WTF!?
+    onEnterEventLoop()
+    MacNewFile()   -> yes, wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/14558
 
-=> solution: map Apple events to regular command line via launcher
-*/
+    => solution: map Apple events to regular command line via launcher
+    */
 #endif
 
 

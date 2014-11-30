@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -25,7 +25,6 @@
 #include <wx+/std_button_layout.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
-#include <wx+/key_event.h>
 #include <zen/file_access.h>
 #include <zen/thread.h>
 #include "gui_generated.h"
@@ -37,10 +36,10 @@
 #include "app_icon.h"
 
 #ifdef ZEN_WIN
-#include <wx+/mouse_move_dlg.h>
+    #include <wx+/mouse_move_dlg.h>
 
 #elif defined ZEN_MAC
-#include <ApplicationServices/ApplicationServices.h>
+    #include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -352,6 +351,17 @@ void CompareProgressDialog::updateStatusPanelNow()
 
 namespace
 {
+//pretty much the same like "bool wxWindowBase::IsDescendant(wxWindowBase* child) const" but without the obvious misnomer
+inline
+bool isComponentOf(const wxWindow* child, const wxWindow* top)
+{
+    for (const wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
+        if (wnd == top)
+            return true;
+    return false;
+}
+
+
 inline
 wxBitmap getImageButtonPressed(const wchar_t* name)
 {
@@ -635,7 +645,7 @@ class LogPanel : public LogPanelGenerated
 {
 public:
     LogPanel(wxWindow* parent, const ErrorLog& log) : LogPanelGenerated(parent),
-        msgView(std::make_shared<MessageView>(log))
+        msgView(std::make_shared<MessageView>(log)), processingKeyEventHandler(false)
     {
         const int errorCount   = log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
         const int warningCount = log.getItemCount(TYPE_WARNING);
@@ -676,7 +686,7 @@ public:
         m_gridMessages->Connect(EVENT_GRID_MOUSE_RIGHT_UP, GridClickEventHandler(LogPanel::onMsgGridContext), nullptr, this);
 
         //enable dialog-specific key local events
-        setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
+        Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(LogPanel::onLocalKeyEvent), nullptr, this);
 
         updateGrid();
     }
@@ -763,6 +773,15 @@ private:
 
     void onLocalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
     {
+        if (processingKeyEventHandler) //avoid recursion
+        {
+            event.Skip();
+            return;
+        }
+        processingKeyEventHandler = true;
+        ZEN_ON_SCOPE_EXIT(processingKeyEventHandler = false;)
+
+
         const int keyCode = event.GetKeyCode();
 
         if (event.ControlDown())
@@ -853,6 +872,7 @@ private:
     }
 
     std::shared_ptr<MessageView> msgView; //bound!
+    bool processingKeyEventHandler;
 };
 
 //########################################################################################

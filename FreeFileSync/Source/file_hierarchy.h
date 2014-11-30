@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -104,6 +104,10 @@ struct DirContainer
     typedef std::map<Zstring, FileDescriptor, LessFilename> FileList; //key: file name
     typedef std::map<Zstring, LinkDescriptor, LessFilename> LinkList; //
     //------------------------------------------------------------------
+
+    DirContainer() = default;
+    DirContainer           (const DirContainer&) = delete; //catch accidental (and unnecessary) copying
+    DirContainer& operator=(const DirContainer&) = delete; //
 
     DirList  dirs;
     FileList files;
@@ -541,7 +545,7 @@ class SymlinkPair : public FileSystemObject //this class models a TRUE symbolic 
     friend class HierarchyObject; //construction
 
 public:
-    virtual void accept(FSObjectVisitor& visitor) const;
+    void accept(FSObjectVisitor& visitor) const override;
 
     template <SelectedSide side> std::int64_t getLastWriteTime() const; //write time of the link, NOT target!
 

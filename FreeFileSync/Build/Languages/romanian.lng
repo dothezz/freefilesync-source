@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Orice număr de perechi alternative de dosare pentru cel mult o filă de configurare.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Deschide configurația pentru editare fără executarea ei.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Mută fila în dreapta</target>
 
-<source>Overwrite left item</source>
-<target>Suprascrie elementul stîng cu cel drept</target>
+<source>Update left item</source>
+<target>Actualizează elementul stîng</target>
 
-<source>Overwrite right item</source>
-<target>Suprascrie elementul drept cu cel stîng</target>
+<source>Update right item</source>
+<target>Actualizează elementul drept</target>
 
 <source>Do nothing</source>
 <target>Nici o acțiune</target>
@@ -217,6 +220,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Nu pot deschide fila %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Fila cu baza de date %x este incompatibilă.</target>
@@ -270,6 +276,9 @@
 <source>Creating file %x</source>
 <target>Creez fila %x</target>
 
+<source>Saving file %x...</source>
+<target>Salvez fila %x...</target>
+
 <source>Items processed:</source>
 <target>Elemente Procesate:</target>
 
@@ -298,9 +307,6 @@
 <pluralform>%x de fire</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Codez informațiile extinse despre timp: %x</target>
-
 <source>/sec</source>
 <target>/sec</target>
 
@@ -322,9 +328,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Folosește versiunea pe 64-biți a FreeFileSync pentru a crea conservări (copii de rezervă) pe acest sistem.</target>
 
-<source>Cannot load file %x.</source>
-<target>Nu pot deschide fila %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Nu pot determina numele volumului pentru %x.</target>
 
@@ -343,7 +346,7 @@
 <source>Save &as...</source>
 <target>Salvează c&a...</target>
 
-<source>&Quit</source>
+<source>E&xit</source>
 <target>&Ieși</target>
 
 <source>&File</source>
@@ -368,7 +371,7 @@
 <target>2. Scrie calea.</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. Apasă 'Pornește'.</target>
+<target>3. Apasă pe 'Pornește'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
 <target>Pentru a începe, importă o filă de tipul .ffs_batch.</target>
@@ -438,6 +441,9 @@ Comanda este declanșată dacă:
 <source>&Show error</source>
 <target>A&rată eroarea</target>
 
+<source>&Quit</source>
+<target>&Ieși</target>
+
 <source>Incorrect command line:</source>
 <target>Linie de comandă incorectă:</target>
 
@@ -483,11 +489,11 @@ Comanda este declanșată dacă:
 <source>Creating folder %x</source>
 <target>Creez dosarul %x</target>
 
-<source>Overwriting file %x</source>
-<target>Suprascriu fila %x</target>
+<source>Updating file %x</source>
+<target>Actualizez fila %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Suprascriu legătura simbolică %x</target>
+<source>Updating symbolic link %x</source>
+<target>Actualizez legătura simbolică %x</target>
 
 <source>Verifying file %x</source>
 <target>Verific fila %x</target>
@@ -501,20 +507,20 @@ Comanda este declanșată dacă:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Eroare la verificarea datelor: %x și %y au conținut diferit.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Nu pot găsi dosarul %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Dosarul țintă %x există deja.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Nu pot găsi dosarul %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Cîmpul de introducere a dosarului țintă nu trebuie să fie gol.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Introdu dosarul țintă pentru versionare.</target>
-
 <source>Source folder %x not found.</source>
 <target>Dosarul sursă %x nu a fost găsit.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Introdu dosarul țintă pentru versionare.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Există conflicte nerezolvate la elementele listate mai jos, deci ele nu vor fi sincronizate:</target>
@@ -558,8 +564,8 @@ Comanda este declanșată dacă:
 <source>Synchronization completed successfully</source>
 <target>Sincronizare realizată cu succes</target>
 
-<source>Saving log file %x...</source>
-<target>Salvez fila jurnal %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Curăț filele de jurnalizare vechi...</target>
 
 <source>Stopped</source>
 <target>Oprită</target>
@@ -613,8 +619,8 @@ Comanda este declanșată dacă:
 <source>FreeFileSync is up to date.</source>
 <target>Ai deja ultima versiune a softului.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Conectarea la situl sourceforge.net nu poate fi realizată.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Nu pot face conectarea la FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Nu pot afla numărul versiunii FreeFileSync disponibile acum pe internet. Vrei să-l cauți manual?</target>
@@ -668,7 +674,7 @@ Comanda este declanșată dacă:
 <target>Filtru Local</target>
 
 <source>Active</source>
-<target>Activ</target>
+<target>Activă</target>
 
 <source>None</source>
 <target>Nimic</target>
@@ -700,8 +706,20 @@ Comanda este declanșată dacă:
 <source>Start &comparison</source>
 <target>Pornește &Compararea</target>
 
+<source>C&omparison settings</source>
+<target>Setările C&omparării</target>
+
+<source>&Filter settings</source>
+<target>Setările &Filtrării</target>
+
+<source>S&ynchronization settings</source>
+<target>Setările Sincroni&zării</target>
+
 <source>Start &synchronization</source>
 <target>Pornește &Sincronizarea</target>
+
+<source>&Actions</source>
+<target>&Acțiuni</target>
 
 <source>&Options</source>
 <target>&Opțiuni</target>
@@ -770,7 +788,7 @@ Comanda este declanșată dacă:
 <target>Salvează ca...</target>
 
 <source>View type:</source>
-<target>Tipul de Vedere:</target>
+<target>Tipul Vederii:</target>
 
 <source>Select view:</source>
 <target>Selectează Vederea:</target>
@@ -781,8 +799,8 @@ Comanda este declanșată dacă:
 <source>Number of files and folders that will be deleted</source>
 <target>Numărul de file și dosare care vor fi șterse</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Numărul de file care vor fi suprascrise</target>
+<source>Number of files that will be updated</source>
+<target>Numărul filelor care vor fi actualizate</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Numărul de file și dosare care vor fi create</target>
@@ -811,8 +829,14 @@ Comanda este declanșată dacă:
 <source>Handle daylight saving time</source>
 <target>Gestionarea timpului de vară (DST)</target>
 
-<source>Symbolic links:</source>
-<target>Legături Simbolice:</target>
+<source>Include symbolic links:</source>
+<target>Include legăturile simbolice:</target>
+
+<source>Direct</source>
+<target>Direcționează</target>
+
+<source>Follow</source>
+<target>Urmărește</target>
 
 <source>More information</source>
 <target>Mai multe informații</target>
@@ -841,24 +865,24 @@ Comanda este declanșată dacă:
 <source>Maximum:</source>
 <target>Maxim:</target>
 
-<source>C&lear</source>
-<target>C&urăță</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selectează regulile filtrului pentru a exclude anumite file de la sincronizare. Introdu căile filelor relative la perechea lor de dosare corespondentă.</target>
+
+<source>C&lear</source>
+<target>C&urăță</target>
 
 <source>Detect moved files</source>
 <target>Detectează filele mutate</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Solicită și creează file cu baze de date
 - Detectare activă după sincronizarea inițială
-- Nesuportat de toate sistemele de file
+- Necesită și creează file cu bază de date
+- Nu-i suportat de toate sistemele de file
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1071,26 +1095,14 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>View Settings</source>
 <target>Setări de Vedere</target>
 
-<source>Overview</source>
-<target>Panoramă</target>
-
 <source>Configuration</source>
 <target>Configurație</target>
 
+<source>Overview</source>
+<target>Panoramă</target>
+
 <source>Main Bar</source>
 <target>Bara Principală</target>
-
-<source>Start comparison</source>
-<target>Pornește Compararea</target>
-
-<source>Comparison settings</source>
-<target>Setările Comparării</target>
-
-<source>Synchronization settings</source>
-<target>Setările Sincronizării</target>
-
-<source>Start synchronization</source>
-<target>Pornește Sincronizarea</target>
 
 <source>Confirm</source>
 <target>Confirmă</target>
@@ -1246,11 +1258,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Show files that will be deleted on the right side</source>
 <target>Arată elementele (file/dosare) care vor fi șterse în dreapta</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Arată elementele (file/dosare) care vor fi suprascrise în stînga</target>
+<source>Show files that will be updated on the left side</source>
+<target>Arată elementele (file/dosare) care vor fi actualizate în partea stîngă</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Arată elementele (file/dosare) care vor fi suprascrise în dreapta</target>
+<source>Show files that will be updated on the right side</source>
+<target>Arată elementele (file/dosare) care vor fi actualizate în partea dreaptă</target>
 
 <source>Show files that won't be copied</source>
 <target>Arată elementele (file/dosare) care nu vor fi copiate</target>
@@ -1262,7 +1274,7 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>Setează ca implicit</target>
 
 <source>Filter</source>
-<target>Filtru</target>
+<target>Filtrare</target>
 
 <source>All files are in sync</source>
 <target>Toate filele sînt sincronizate</target>
@@ -1389,15 +1401,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Configure your own synchronization rules.</source>
 <target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
 
-<source>Exclude</source>
-<target>Exclude</target>
-
-<source>Direct</source>
-<target>Direcționează</target>
-
-<source>Follow</source>
-<target>Urmărește</target>
-
 <source>Today</source>
 <target>Azi</target>
 
@@ -1461,9 +1464,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Cannot monitor directory %x.</source>
 <target>Nu pot monitoriza dosarul %x.</target>
 
-<source>Conversion error:</source>
-<target>Eroare de convertire:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Nu pot șterge fila %x.</target>
 
@@ -1497,8 +1497,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Cannot create directory %x.</source>
 <target>Nu pot crea dosarul %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Nu pot crea legătura simbolică %x.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nu pot copia legătura simbolică %x în %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nu pot găsi funcția de sistem %x.</target>
@@ -1583,4 +1583,73 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Fila de configurație %x a fost deschisă doar parțial.</target>
+
+<source>Prepare installation</source>
+<target>Pregătirea Instalării</target>
+
+<source>Choose which components you want to install.</source>
+<target>Alege ce componente vrei să instalezi.</target>
+
+<source>Select installation type:</source>
+<target>Selectează tipul de instalare:</target>
+
+<source>Local</source>
+<target>Locală</target>
+
+<source>Portable</source>
+<target>Portabilă</target>
+
+<source>recommended</source>
+<target>recomandată</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Salvează setările în "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Înregistrează extensiile de file FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Creează intrări în meniul contextual al Exploratorului de File</target>
+
+<source>Save settings in installation directory</source>
+<target>Salvează setările în dosarul de instalare</target>
+
+<source>Do not write to Registry</source>
+<target>Nu scrie în Registru</target>
+
+<source>Just copy the files</source>
+<target>Copiază doar filele</target>
+
+<source>Choose a directory for installation:</source>
+<target>Alege un dosar pentru instalare:</target>
+
+<source>Create shortcuts:</source>
+<target>Creează scurtături:</target>
+
+<source>Desktop</source>
+<target>Birou [Desktop]</target>
+
+<source>Start menu</source>
+<target>Meniul de Start</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Înregistrez extensiile de file FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Dezînregistrez extensiile de file FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Configurație FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Filă Set [Batch] FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>Bază de Date pentru Sincronizare FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Configurație a Sincronizării în Timp Real</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Editează cu FreeFileSync</target>
 

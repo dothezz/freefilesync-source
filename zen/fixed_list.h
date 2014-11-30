@@ -1,12 +1,13 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FIXED_LIST_01238467085684139453534
 #define FIXED_LIST_01238467085684139453534
 
+#include <cassert>
 #include <iterator>
 
 namespace zen
@@ -115,6 +116,13 @@ public:
     bool empty() const { return firstInsert == nullptr; }
 
     size_t size() const { return sz; }
+
+    void swap(FixedList& other)
+    {
+        std::swap(firstInsert, other.firstInsert);
+        std::swap(lastInsert , other.lastInsert);
+        std::swap(sz         , other.sz);
+    }
 
 private:
     FixedList           (const FixedList&) = delete;

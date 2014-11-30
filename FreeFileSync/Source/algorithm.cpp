@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -627,11 +627,8 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
                     mainCfg.additionalPairs.end());
 
     std::vector<DirectionConfig> output;
-    std::for_each(allPairs.begin(), allPairs.end(),
-                  [&](const FolderPairEnh& fp)
-    {
+    for (const FolderPairEnh& fp : allPairs)
         output.push_back(fp.altSyncConfig.get() ? fp.altSyncConfig->directionCfg : mainCfg.syncCfg.directionCfg);
-    });
 
     return output;
 }

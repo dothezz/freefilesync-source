@@ -15,12 +15,9 @@
 
 <H3>Symbolic Link Handling</H3>
 
-<P>FreeFileSync offers three options to configure handling of symbolic links (also called symlinks or soft links):</P>
+<P>FreeFileSync let's you choose to include symbolic links (also called symlinks or soft links) when scanning directories rather than skipping over them. When included, you can select between two ways to handle them:</P>
 
 <OL>
-	<LI><B>Exclude:</B>
-	Skip symbolic links while scanning directories.<BR>&nbsp;
-	
 	<LI><B>Direct:</B>
 	Evaluate the symbolic link object
 	directly. Symbolic links will be shown as separate entities.
@@ -83,8 +80,7 @@ time <B>and</B> file size match. The following categories are distinguished:</P>
 
 <P>Two files with the same name are marked as equal if and only if they have
 the same content. This option is more useful for consistency checks
-rather than backup operations since it is naturally slower. The file
-modification time is not taken into account at all.
+rather than backup operations since a bitwise comparison can be slow.
 </P>
 
 <OL TYPE=i>

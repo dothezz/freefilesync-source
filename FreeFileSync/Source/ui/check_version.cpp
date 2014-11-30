@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -15,12 +15,12 @@
 #include <zen/scope_guard.h>
 
 #ifdef ZEN_WIN
-#include <zen/win.h> //tame wininet include
-#include <wininet.h>
+    #include <zen/win.h> //tame wininet include
+    #include <wininet.h>
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <wx/protocol/http.h>
-#include <wx/sstream.h>
+    #include <wx/protocol/http.h>
+    #include <wx/sstream.h>
 #endif
 
 using namespace zen;
@@ -51,7 +51,7 @@ std::wstring getUserAgentName()
 #ifdef ZEN_WIN
 class InternetConnectionError {};
 
-class WinInetAccess //using IE proxy settings! :)
+class WinInetAccess //1. uses IE proxy settings! :) 2. follows HTTP redirects by default
 {
 public:
     WinInetAccess(const wchar_t* url) //throw InternetConnectionError (if url cannot be reached; no need to also call readBytes())
@@ -143,6 +143,57 @@ OutputIterator readBytesUrl(const wchar_t* url, OutputIterator result) //throw I
 {
     return WinInetAccess(url).readBytes(result); //throw InternetConnectionError
 }
+
+#else
+bool getStringFromUrl(const wxString& server, const wxString& page, int timeout, wxString* output, int level = 0) //true on successful connection
+{
+    wxHTTP webAccess;
+    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
+    webAccess.SetHeader(L"USER-AGENT", getUserAgentName());
+
+    webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are these wxWidgets people thinking???)...
+
+    if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
+    {
+        //wxApp::IsMainLoopRunning(); // should return true
+
+        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page));
+        //must be deleted BEFORE webAccess is closed
+        const int rs = webAccess.GetResponse();
+
+        if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
+            rs == 302 ||
+            rs == 303 ||
+            rs == 307)
+            if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
+            {
+
+                wxString newLocation = webAccess.GetHeader(L"Location");
+                if (!newLocation.empty())
+                {
+                    if (startsWith(newLocation, L"http://"))
+                        newLocation = afterFirst(newLocation, L"http://");
+                    const wxString serverNew = beforeFirst(newLocation, L"/"); //returns the whole string if term not found
+                    const wxString pageNew   = L"/" + afterFirst(newLocation, L"/"); //returns empty string if term not found
+
+                    return getStringFromUrl(serverNew, pageNew, timeout, output, level + 1);
+                }
+            }
+
+        if (rs == 200) //HTTP_STATUS_OK
+            if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
+            {
+                if (output)
+                {
+                    output->clear();
+                    wxStringOutputStream outStream(output);
+                    httpStream->Read(outStream);
+                }
+                return true;
+            }
+    }
+    return false;
+}
 #endif
 
 
@@ -174,39 +225,10 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
 #elif defined ZEN_LINUX || defined ZEN_MAC
     wxWindowDisabler dummy;
 
-    auto getStringFromUrl = [](const wxString& server, const wxString& page, int timeout, wxString* output) -> bool //true on successful connection
-    {
-        wxHTTP webAccess;
-        webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
-        webAccess.SetHeader(L"USER-AGENT", getUserAgentName());
-
-        webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are these wxWidgets people thinking???)...
-
-        if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        {
-            //wxApp::IsMainLoopRunning(); // should return true
-
-            std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page));
-            //must be deleted BEFORE webAccess is closed
-
-            if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
-            {
-                if (output)
-                {
-                    output->clear();
-                    wxStringOutputStream outStream(output);
-                    httpStream->Read(outStream);
-                }
-                return true;
-            }
-        }
-        return false;
-    };
-
-    if (getStringFromUrl(L"freefilesync.org", L"/latest_version.txt", 5, &version))
+    if (getStringFromUrl(L"www.freefilesync.org", L"/latest_version.txt", 5, &version))
         return GET_VER_SUCCESS;
 
-    const bool canConnectToSf = getStringFromUrl(L"freefilesync.org", L"/", 1, nullptr);
+    const bool canConnectToSf = getStringFromUrl(L"www.freefilesync.org", L"/", 1, nullptr);
     return canConnectToSf ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
 #endif
 }
@@ -267,7 +289,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
         case GET_VER_NO_CONNECTION:
             showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                    setTitle(("Check for Program Updates")).
-                                   setMainInstructions(_("Unable to connect to freefilesync.org.")));
+                                   setMainInstructions(_("Unable to connect to FreeFileSync.org.")));
             break;
 
         case GET_VER_PAGE_NOT_FOUND:

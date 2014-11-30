@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -13,11 +13,11 @@
 #include "scope_guard.h"
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
+    #include "win.h" //includes "windows.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <cstring>
-#include <cerrno>
+    #include <cstring>
+    #include <cerrno>
 #endif
 
 
@@ -25,11 +25,11 @@ namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
 #ifdef ZEN_WIN
-typedef DWORD ErrorCode;
+    typedef DWORD ErrorCode;
 #elif defined ZEN_LINUX || defined ZEN_MAC
-typedef int ErrorCode;
+    typedef int ErrorCode;
 #else
-#error define a platform!
+    #error define a platform!
 #endif
 
 ErrorCode getLastError();

@@ -7,15 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Der Symbolische Link %x kann nicht nach %y kopiert werden.</target>
-
-<source>Unable to connect to freefilesync.org.</source>
-<target>Es kann keine Verbindung zu freefilesync.org aufgebaut werden.</target>
-
-<source>Open configuration for edit without executing.</source>
-<target>Konfiguration zum Editieren öffnen ohne auszuführen.</target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -41,7 +32,7 @@
 <target>Verschiebe Ordner %x in den Papierkorb</target>
 
 <source>Moving symbolic link %x to the recycle bin</source>
-<target>Verschiebe Symbolischen Link %x in den Papierkorb</target>
+<target>Verschiebe symbolische Verknüpfung %x in den Papierkorb</target>
 
 <source>Deleting file %x</source>
 <target>Lösche Datei %x</target>
@@ -50,7 +41,7 @@
 <target>Lösche Ordner %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target>Lösche Symbolischen Link %x</target>
+<target>Lösche symbolische Verknüpfung %x</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Dateien werden stattdessen permanent gelöscht:</target>
@@ -103,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Beliebige Anzahl von alternativen Verzeichnispaaren für maximal eine Konfigurationsdatei.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Konfiguration zum Editieren öffnen ohne auszuführen.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Die folgenden Ordner wurden nicht gefunden:</target>
 
@@ -137,7 +131,7 @@
 <target>Die Elemente unterscheiden sich nur in Attributen</target>
 
 <source>Resolving symbolic link %x</source>
-<target>Folge dem Symbolischen Link %x</target>
+<target>Folge der symbolischen Verknüpfung %x</target>
 
 <source>Comparing content of files %x</source>
 <target>Vergleiche Inhalt der Dateien %x</target>
@@ -193,11 +187,11 @@
 <source>Move file on right</source>
 <target>Verschiebe rechte Datei</target>
 
-<source>Overwrite left item</source>
-<target>Überschreibe linkes Element</target>
+<source>Update left item</source>
+<target>Aktualisiere linkes Element</target>
 
-<source>Overwrite right item</source>
-<target>Überschreibe rechtes Element</target>
+<source>Update right item</source>
+<target>Aktualisiere rechtes Element</target>
 
 <source>Do nothing</source>
 <target>Nichts tun</target>
@@ -280,8 +274,8 @@
 <source>Creating file %x</source>
 <target>Erstelle Datei %x</target>
 
-<source>Saving log file %x...</source>
-<target>Speichere Protokolldatei %x...</target>
+<source>Saving file %x...</source>
+<target>Speichere Datei %x...</target>
 
 <source>Items processed:</source>
 <target>Verarbeitete Elemente:</target>
@@ -349,7 +343,7 @@
 <source>Save &as...</source>
 <target>Speichern &unter...</target>
 
-<source>&Quit</source>
+<source>E&xit</source>
 <target>&Beenden</target>
 
 <source>&File</source>
@@ -444,6 +438,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Show error</source>
 <target>&Zeige Fehler</target>
 
+<source>&Quit</source>
+<target>&Beenden</target>
+
 <source>Incorrect command line:</source>
 <target>Ungültige Befehlszeile:</target>
 
@@ -478,22 +475,22 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Verschiebe Ordner %x nach %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>Verschiebe Symbolischen Link %x nach %y</target>
+<target>Verschiebe symbolische Verknüpfung %x nach %y</target>
 
 <source>Removing old versions...</source>
 <target>Entferne alte Versionen...</target>
 
 <source>Creating symbolic link %x</source>
-<target>Erstelle Symbolischen Link %x</target>
+<target>Erstelle symbolischen Verknüpfung %x</target>
 
 <source>Creating folder %x</source>
 <target>Erstelle Ordner %x</target>
 
-<source>Overwriting file %x</source>
-<target>Überschreibe Datei %x</target>
+<source>Updating file %x</source>
+<target>Aktualisiere Datei %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Überschreibe Symbolischen Link %x</target>
+<source>Updating symbolic link %x</source>
+<target>Aktualisiere symbolischen Verknüpfung %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifiziere Datei %x</target>
@@ -564,6 +561,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Synchronization completed successfully</source>
 <target>Synchronisation erfolgreich abgeschlossen</target>
 
+<source>Cleaning up old log files...</source>
+<target>Bereinige alte Protokolldateien...</target>
+
 <source>Stopped</source>
 <target>Unterbrochen</target>
 
@@ -614,6 +614,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync ist auf dem neuesten Stand.</target>
+
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Es kann keine Verbindung zu FreeFileSync.org aufgebaut werden.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Möchten Sie manuell prüfen?</target>
@@ -699,8 +702,20 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Start &comparison</source>
 <target>&Vergleich starten</target>
 
+<source>C&omparison settings</source>
+<target>V&ergleichseinstellungen</target>
+
+<source>&Filter settings</source>
+<target>&Filtereinstellungen</target>
+
+<source>S&ynchronization settings</source>
+<target>S&ynchronisationseinstellungen</target>
+
 <source>Start &synchronization</source>
 <target>&Synchronisation starten</target>
+
+<source>&Actions</source>
+<target>&Aktionen</target>
 
 <source>&Options</source>
 <target>&Optionen</target>
@@ -780,8 +795,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Number of files and folders that will be deleted</source>
 <target>Anzahl der zu löschenden Dateien und Ordner</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Anzahl der zu überschreibenden Dateien</target>
+<source>Number of files that will be updated</source>
+<target>Anzahl der zu aktualisierenden Dateien</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Anzahl der zu erstellenden Dateien und Ordner</target>
@@ -810,8 +825,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Handle daylight saving time</source>
 <target>Sommerzeit berücksichtigen</target>
 
-<source>Symbolic links:</source>
-<target>Symbolische Links:</target>
+<source>Include symbolic links:</source>
+<target>Symbolische Verknüpfungen einschließen:</target>
+
+<source>Direct</source>
+<target>Direkt</target>
+
+<source>Follow</source>
+<target>Folgen</target>
 
 <source>More information</source>
 <target>Mehr Information</target>
@@ -1059,7 +1080,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Zeitspanne auswählen</target>
 
 <source>&Preferences...</source>
-<target>&Einstellungen</target>
+<target>&Einstellungen...</target>
 
 <source>Folder Pairs</source>
 <target>Ordnerpaare</target>
@@ -1078,18 +1099,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Main Bar</source>
 <target>Hauptleiste</target>
-
-<source>Start comparison</source>
-<target>Vergleich starten</target>
-
-<source>Comparison settings</source>
-<target>Vergleichseinstellungen</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisationseinstellungen</target>
-
-<source>Start synchronization</source>
-<target>Synchronisation starten</target>
 
 <source>Confirm</source>
 <target>Bestätigen</target>
@@ -1230,25 +1239,25 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Konflikte zeigen</target>
 
 <source>Show files that will be created on the left side</source>
-<target>Dateien die links erstellt werden anzeigen</target>
+<target>Dateien zeigen, die links erstellt werden</target>
 
 <source>Show files that will be created on the right side</source>
-<target>Dateien die rechts erstellt werden anzeigen</target>
+<target>Dateien zeigen, die rechts erstellt werden</target>
 
 <source>Show files that will be deleted on the left side</source>
-<target>Dateien die links gelöscht werden anzeigen</target>
+<target>Dateien zeigen, die links gelöscht werden</target>
 
 <source>Show files that will be deleted on the right side</source>
-<target>Dateien die rechts gelöscht werden anzeigen</target>
+<target>Dateien zeigen, die rechts gelöscht werden</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Dateien die links überschrieben werden anzeigen</target>
+<source>Show files that will be updated on the left side</source>
+<target>Dateien zeigen, die links aktualisiert werden</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Dateien die rechts überschrieben werden anzeigen</target>
+<source>Show files that will be updated on the right side</source>
+<target>Dateien zeigen, die rechts aktualisiert werden</target>
 
 <source>Show files that won't be copied</source>
-<target>Dateien die nicht kopiert werden anzeigen</target>
+<target>Dateien zeigen, die nicht kopiert werden</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Gefilterte oder temporär ausgeschlossene Dateien zeigen</target>
@@ -1382,15 +1391,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Configure your own synchronization rules.</source>
 <target>Eigene Synchronisationsregeln definieren.</target>
 
-<source>Exclude</source>
-<target>Ausschließen</target>
-
-<source>Direct</source>
-<target>Direkt</target>
-
-<source>Follow</source>
-<target>Folgen</target>
-
 <source>Today</source>
 <target>Heute</target>
 
@@ -1487,6 +1487,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot create directory %x.</source>
 <target>Das Verzeichnis %x kann nicht erstellt werden.</target>
 
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
+
 <source>Cannot find system function %x.</source>
 <target>Die Systemfunktion %x wurde nicht gefunden.</target>
 
@@ -1497,7 +1500,7 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Der Typ des Elements %x wird nicht unterstützt:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Der Symbolische Link %x kann nicht aufgelöst werden.</target>
+<target>Die symbolische Verknüpfung %x kann nicht aufgelöst werden.</target>
 
 <source>Cannot open directory %x.</source>
 <target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
@@ -1567,4 +1570,73 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Die Konfigurationsdatei %x wurde nur teilweise geladen.</target>
+
+<source>Prepare installation</source>
+<target>Installation vorbereiten</target>
+
+<source>Choose which components you want to install.</source>
+<target>Wählen Sie die zu installierenden Komponenten.</target>
+
+<source>Select installation type:</source>
+<target>Installationstyp wählen:</target>
+
+<source>Local</source>
+<target>Lokal</target>
+
+<source>Portable</source>
+<target>Portabel</target>
+
+<source>recommended</source>
+<target>empfohlen</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Einstellungen unter "%APPDATA%\FreeFileSync" sichern</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>FreeFileSync Dateiendungen registrieren</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Einträge im Explorer Kontextmenü erstellen</target>
+
+<source>Save settings in installation directory</source>
+<target>Einstellungen im Installationsverzeichnis sichern</target>
+
+<source>Do not write to Registry</source>
+<target>Kein Eintrag in Windows Registrierung</target>
+
+<source>Just copy the files</source>
+<target>Nur die Dateien kopieren</target>
+
+<source>Choose a directory for installation:</source>
+<target>Wählen Sie ein Verzeichnis für die Installation:</target>
+
+<source>Create shortcuts:</source>
+<target>Verknüpfungen erstellen:</target>
+
+<source>Desktop</source>
+<target>Desktop</target>
+
+<source>Start menu</source>
+<target>Startmenü</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registriere FreeFileSync Dateiendungen</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Deregistriere FreeFileSync Dateiendungen</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync Konfiguration</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync Batchdatei</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync Synchronisationsdatenbank</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync Konfiguration</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Mit FreeFileSync editieren</target>
 

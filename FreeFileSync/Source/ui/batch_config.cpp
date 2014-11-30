@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -15,7 +15,7 @@
 #include "../lib/help_provider.h"
 
 #ifdef ZEN_WIN
-#include <wx+/mouse_move_dlg.h>
+    #include <wx+/mouse_move_dlg.h>
 #endif
 
 using namespace zen;

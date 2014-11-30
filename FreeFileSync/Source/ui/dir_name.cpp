@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -19,9 +19,9 @@
 #include "folder_history_box.h"
 
 #ifdef ZEN_WIN
-#include <zen/dll.h>
-#include <zen/win_ver.h>
-#include "../dll/IFileDialog_Vista\ifile_dialog.h"
+    #include <zen/dll.h>
+    #include <zen/win_ver.h>
+    #include "../dll/IFileDialog_Vista\ifile_dialog.h"
 #endif
 
 using namespace zen;

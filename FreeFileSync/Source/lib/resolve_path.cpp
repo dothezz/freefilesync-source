@@ -9,18 +9,18 @@
 #include <wx/utils.h> //wxGetEnv
 
 #ifdef ZEN_WIN
-#include <zen/long_path_prefix.h>
-#include <zen/file_access.h>
-#include <zen/win.h> //includes "windows.h"
-#include <zen/dll.h>
-#include <Shlobj.h>
-#ifdef _MSC_VER
-#pragma comment(lib, "Mpr.lib")
-#endif
+    #include <zen/long_path_prefix.h>
+    #include <zen/file_access.h>
+    #include <zen/win.h> //includes "windows.h"
+    #include <zen/dll.h>
+    #include <Shlobj.h>
+    #ifdef _MSC_VER
+        #pragma comment(lib, "Mpr.lib")
+    #endif
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <stdlib.h> //getenv()
-#include <unistd.h> //getcwd
+    #include <stdlib.h> //getenv()
+    #include <unistd.h> //getcwd
 #endif
 
 using namespace zen;

@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Tetszőleges számú alternatív könyvtár-pár legfeljebb egy konfigurációs fájlban.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Nyisd meg a konfigurációt szerkesztésre végrehajtás nélkül.</target>
+
 <source>Cannot find the following folders:</source>
 <target>A következő könyvtárak nem találhatóak:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Jobb oldali fájl mozgatása</target>
 
-<source>Overwrite left item</source>
-<target>Bal oldali elem fölülírása</target>
+<source>Update left item</source>
+<target>Bal oldal frissítése</target>
 
-<source>Overwrite right item</source>
-<target>Jobb oldali elem fölülírása</target>
+<source>Update right item</source>
+<target>Jobb oldal frissítése</target>
 
 <source>Do nothing</source>
 <target>Nincs mit csinálni</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>%x fájl betöltése nem sikerült.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>%x adatbázisfájl inkompatibilis: .</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>%x fájl létrehozása</target>
 
+<source>Saving file %x...</source>
+<target>%x fájl mentése</target>
+
 <source>Items processed:</source>
 <target>Feldolgozott elemek száma:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x szál</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Kibővített időinformációk kódolása: %x</target>
-
 <source>/sec</source>
 <target>/másodperc</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Kérjük, használd a FreeFileSync 64 bites verzióját az árnyékmásolatok készítéséhez ezen a rendszeren.</target>
 
-<source>Cannot load file %x.</source>
-<target>%x fájl betöltése nem sikerült.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Nem lehet meghatározni a kötet-nevet a(z) %x számára</target>
 
@@ -340,8 +343,8 @@
 <source>Save &as...</source>
 <target>Mentés m&ásként...</target>
 
-<source>&Quit</source>
-<target>&Kilépés</target>
+<source>E&xit</source>
+<target>&Kilép</target>
 
 <source>&File</source>
 <target>&Fájl</target>
@@ -435,6 +438,9 @@ A parancs végrehajtódik, ha:
 <source>&Show error</source>
 <target>&Mutassa a hibákat</target>
 
+<source>&Quit</source>
+<target>&Kilépés</target>
+
 <source>Incorrect command line:</source>
 <target>Hibás parancssor:</target>
 
@@ -480,11 +486,11 @@ A parancs végrehajtódik, ha:
 <source>Creating folder %x</source>
 <target>%x könyvtár létrehozása</target>
 
-<source>Overwriting file %x</source>
-<target>%x fájl felülírása</target>
+<source>Updating file %x</source>
+<target>%x fájl frissítése</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>%x szimbolikus hivatkozás felülírása</target>
+<source>Updating symbolic link %x</source>
+<target>%x szimbolikus link frissítése</target>
 
 <source>Verifying file %x</source>
 <target>%x fájl ellenőrzése</target>
@@ -498,20 +504,20 @@ A parancs végrehajtódik, ha:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Adat-ellenőrzési hiba: %x és %y tartalma különböző.</target>
 
-<source>Cannot find folder %x.</source>
-<target>%x könyvtárat nem találom.</target>
-
 <source>Target folder %x already existing.</source>
 <target>%x célkönyvtár már létezik.</target>
+
+<source>Cannot find folder %x.</source>
+<target>%x könyvtárat nem találom.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>A célkönyvtárat meghatározó beviteli mező nem lehet üres.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Adja meg a célkönyvtárat a verziókövetéshez.</target>
-
 <source>Source folder %x not found.</source>
 <target>%x forráskönyvtár nem található .</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Adja meg a célkönyvtárat a verziókövetéshez.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>A következő elemek feloldatlan ütközést tartalmaznak, így nem lesznek szinkronizálva:</target>
@@ -555,8 +561,8 @@ A parancs végrehajtódik, ha:
 <source>Synchronization completed successfully</source>
 <target>A szinkronizálás sikeresen befejeződött</target>
 
-<source>Saving log file %x...</source>
-<target>Naplófájl mentése a következő fájlba: %x.</target>
+<source>Cleaning up old log files...</source>
+<target>Régi log fájlok törlése</target>
 
 <source>Stopped</source>
 <target>Leállítva</target>
@@ -609,8 +615,8 @@ A parancs végrehajtódik, ha:
 <source>FreeFileSync is up to date.</source>
 <target>A FreeFileSync naprakész.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Nem sikerült a csatlakozás a sourceforge.net-hez.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Nem tudok csatlakozni a FreeFileSync.org-hoz</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Nem lehet online megtalálni a jelenlegi FreeFileSync verziószámot. Meg akarod keresni manuálisan?</target>
@@ -696,8 +702,20 @@ A parancs végrehajtódik, ha:
 <source>Start &comparison</source>
 <target>Kezdje az &összehasonlítást</target>
 
+<source>C&omparison settings</source>
+<target>Öss&zehasonlítási beállítások</target>
+
+<source>&Filter settings</source>
+<target>&Szűrési beállítások</target>
+
+<source>S&ynchronization settings</source>
+<target>Sz&inkronizálási beállítások</target>
+
 <source>Start &synchronization</source>
 <target>Kezdje a &szinkronizálást</target>
+
+<source>&Actions</source>
+<target>&Műveletek</target>
 
 <source>&Options</source>
 <target>&Beállítások</target>
@@ -777,8 +795,8 @@ A parancs végrehajtódik, ha:
 <source>Number of files and folders that will be deleted</source>
 <target>A törlendő fájlok és könyvtárak száma</target>
 
-<source>Number of files that will be overwritten</source>
-<target>A felülírandó fájlok száma</target>
+<source>Number of files that will be updated</source>
+<target>Frissítendő fájlok száma</target>
 
 <source>Number of files and folders that will be created</source>
 <target>A létrehozandó fájlok és könyvtárak száma</target>
@@ -807,8 +825,14 @@ A parancs végrehajtódik, ha:
 <source>Handle daylight saving time</source>
 <target>Kezelje a nyári időszámítás különbségét</target>
 
-<source>Symbolic links:</source>
-<target>Szimbolikus linkek:</target>
+<source>Include symbolic links:</source>
+<target>Csatolja a szimbolikus linkeket:</target>
+
+<source>Direct</source>
+<target>Közvetlen</target>
+
+<source>Follow</source>
+<target>Követ</target>
 
 <source>More information</source>
 <target>További információ</target>
@@ -837,23 +861,23 @@ A parancs végrehajtódik, ha:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>C&lear</source>
-<target>&Töröl</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Meghatározott fájlok szinkronizálásból történő kizárásához válasszon szűrőt. Az útvonalakat a megfelelő könyvtár-párjaikhoz viszonyítva adja meg.</target>
+
+<source>C&lear</source>
+<target>&Töröl</target>
 
 <source>Detect moved files</source>
 <target>Érzékelje a mozgatott fájlokat</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Adatbázis fájlokat feltételez és készít
-- Az érzékelés a kezdeti szinkronizálás után válik aktívvá
+- Az érzékelés a kezdeti szinkronizálás után aktív
+- Adatbázisok fájlokat hoz létre és használ
 - Nem minden fájlrendszer támogatja
 </target>
 
@@ -1067,26 +1091,14 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>View Settings</source>
 <target>Mutassa a beállításokat</target>
 
-<source>Overview</source>
-<target>Áttekintés</target>
-
 <source>Configuration</source>
 <target>Beállítás</target>
 
+<source>Overview</source>
+<target>Áttekintés</target>
+
 <source>Main Bar</source>
 <target>Fő sáv</target>
-
-<source>Start comparison</source>
-<target>Kezdje az összehasonlítást</target>
-
-<source>Comparison settings</source>
-<target>Összehasonlítási beállítások</target>
-
-<source>Synchronization settings</source>
-<target>Szinkronizálási beállítások</target>
-
-<source>Start synchronization</source>
-<target>Indítja a szinkronizálást</target>
 
 <source>Confirm</source>
 <target>Jóváhagy</target>
@@ -1238,11 +1250,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Show files that will be deleted on the right side</source>
 <target>Mutassa a jobb oldalon törlendő fájlokat</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Mutassa a bal oldalon felülírandó fájlokat</target>
+<source>Show files that will be updated on the left side</source>
+<target>Mutassa a bal oldalon a frissítendő fájlokat</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Mutassa a jobb oldalon felülírandó fájlokat</target>
+<source>Show files that will be updated on the right side</source>
+<target>Mutassa a jobb oldalon a frissítendő fájlokat</target>
 
 <source>Show files that won't be copied</source>
 <target>Mutassa a nem másolandó fájlokat</target>
@@ -1379,15 +1391,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Configure your own synchronization rules.</source>
 <target>Állítsd be a saját szinkronizálási szabályaidat</target>
 
-<source>Exclude</source>
-<target>Kizár</target>
-
-<source>Direct</source>
-<target>Közvetlen</target>
-
-<source>Follow</source>
-<target>Követ</target>
-
 <source>Today</source>
 <target>Mai</target>
 
@@ -1451,9 +1454,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Cannot monitor directory %x.</source>
 <target>Nem sikerült monitorozni a(z) %x könyvtárat.</target>
 
-<source>Conversion error:</source>
-<target>Konverziós hiba:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Nem sikerült a(z) %x fájl törlése.</target>
 
@@ -1487,8 +1487,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Cannot create directory %x.</source>
 <target>Nem sikerült a következő könyvtár létrehozása: %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Nem lehet létrehozni a(z) %x szimbolikus hivatkozást.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nem tudja másolni a(z) %x szimbolikus linket %y-ba.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nem található a következő rendszerfunkció: %x.</target>
@@ -1570,4 +1570,73 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>%x konfigurációs fájl csak részlegesen töltődött be.</target>
+
+<source>Prepare installation</source>
+<target>Telepítés előkészítése</target>
+
+<source>Choose which components you want to install.</source>
+<target>Válassza ki, mely komponenseket akarja telepíteni</target>
+
+<source>Select installation type:</source>
+<target>Válassza ki a telepítési módot:</target>
+
+<source>Local</source>
+<target>Lokális</target>
+
+<source>Portable</source>
+<target>Hordozható</target>
+
+<source>recommended</source>
+<target>ajánlott</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Beállítások mentése a "%APPDATA%\FreeFileSync" mappába</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>A FreeFileSync fájlkiterjesztéseinek regisztrálása</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Készítsen környezetfüggő menüsorokat az Explorerbe</target>
+
+<source>Save settings in installation directory</source>
+<target>Beállítások mentése a telepítési mappába</target>
+
+<source>Do not write to Registry</source>
+<target>Ne írjon a rendszerleíró adatbázisba</target>
+
+<source>Just copy the files</source>
+<target>Csak a fájlok másolása</target>
+
+<source>Choose a directory for installation:</source>
+<target>Válassza ki a telepítési mappát:</target>
+
+<source>Create shortcuts:</source>
+<target>Hivatkozások létrehozása:</target>
+
+<source>Desktop</source>
+<target>Asztalon</target>
+
+<source>Start menu</source>
+<target>Start menü</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>A FreeFileSync fájlkiterjesztéseinek regisztrálása</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>A FreeFileSync fájlkiterjesztések regisztrációjának törlése</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync konfigurálása</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync kötegelt fájl</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync szinkronizációs adatbázis</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync konfigurálása</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Szerkesztés FreeFileSync-kel</target>
 

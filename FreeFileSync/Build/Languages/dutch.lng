@@ -7,9 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Open configuration for edit without executing.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide zijden zijn gewijzigd sinds de laatste synchronisatie.</target>
 
@@ -89,7 +86,7 @@
 <target>directory</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Bestandspad naar alternatieve GlobalSettings.xml.</target>
+<target>Bestandspad naar plaatsvervangend GlobalSettings.xml bestand.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Een willekeurig aantal FreeFileSync. ffs_gui en/of .ffs_batch configuratiebestanden.</target>
@@ -97,8 +94,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Een willekeurig aantal alternatieve directoryparen voor maximaal een configuratiebestand.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Open configuratie voor het bewerken zonder uit te voeren.</target>
+
 <source>Cannot find the following folders:</source>
-<target>De volgende map kon niet worden gevonden:</target>
+<target>De volgende mappen kon niet worden gevonden:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Deze fout kan worden genegeerd, om de mappen als leeg te zien en de folders automatisch te creëren wanneer u synchroniseert.</target>
@@ -149,16 +149,16 @@
 <target>Onvoldoende werkgeheugen.</target>
 
 <source>Item exists on left side only</source>
-<target>Item bestaat alleen aan de linkerkant</target>
+<target>Item bestaat alleen aan de linkerzijde</target>
 
 <source>Item exists on right side only</source>
-<target>Item bestaat alleen aan de rechterkant</target>
+<target>Item bestaat alleen aan de rechterzijde</target>
 
 <source>Left side is newer</source>
-<target>Linkerkant is nieuwer</target>
+<target>Linkerzijde is nieuwer</target>
 
 <source>Right side is newer</source>
-<target>Rechterkant is nieuwer</target>
+<target>Rechterzijde is nieuwer</target>
 
 <source>Items have different content</source>
 <target>Items hebben verschillende inhoud</target>
@@ -187,11 +187,11 @@
 <source>Move file on right</source>
 <target>Verplaats rechter bestand</target>
 
-<source>Overwrite left item</source>
-<target>Overschrijf linker item</target>
+<source>Update left item</source>
+<target>Update linker item</target>
 
-<source>Overwrite right item</source>
-<target>Overschrijf rechter item</target>
+<source>Update right item</source>
+<target>Update rechter item</target>
 
 <source>Do nothing</source>
 <target>Niets doen</target>
@@ -248,7 +248,7 @@
 <target>Zoek naar map %x...</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>Kan de bestandskenmerken niet lezen van %x.</target>
+<target>Kan de bestandskenmerken van %x niet lezen.</target>
 
 <source>Cannot get process information.</source>
 <target>Kan geen procesinformatie krijgen.</target>
@@ -264,8 +264,8 @@
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>1 Sek.</pluralform>
-<pluralform>%x Sek.</pluralform>
+<pluralform>1 sec</pluralform>
+<pluralform>%x sec</pluralform>
 </target>
 
 <source>Detecting abandoned lock...</source>
@@ -273,6 +273,9 @@
 
 <source>Creating file %x</source>
 <target>Bestand %x maken</target>
+
+<source>Saving file %x...</source>
+<target>Opslaan van bestand %x...</target>
 
 <source>Items processed:</source>
 <target>Items verwerkt:</target>
@@ -301,9 +304,6 @@
 <pluralform>%x Threads</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Codering van langere tijdinformatie: %x</target>
-
 <source>/sec</source>
 <target>/sec</target>
 
@@ -320,7 +320,7 @@
 <target>Blader in directory</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>Geen toegang tot het Volume Shadow Copy Service.</target>
+<target>Kan geen toegang krijgen tot de Volume Shadow Copy Service.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Gebruik FreeFileSync 64-bits versie voor het maken van schaduwkopieën op dit systeem.</target>
@@ -332,7 +332,7 @@
 <target>Volumenaam %x behoort niet tot bestandspad %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
-<target>Stop opgevraagd: wachten totdat de huidige bewerking is voltooit...</target>
+<target>Stoppen gevraagd: wachten totdat de huidige bewerking is voltooid...</target>
 
 <source>Unable to create time stamp for versioning:</source>
 <target>Kan geen tijdstempel maken voor versiebeheer:</target>
@@ -343,8 +343,8 @@
 <source>Save &as...</source>
 <target>Opslaan &als...</target>
 
-<source>&Quit</source>
-<target>&Stoppen</target>
+<source>E&xit</source>
+<target>A&fsluiten</target>
 
 <source>&File</source>
 <target>&Bestand</target>
@@ -438,6 +438,9 @@ De opdracht wordt geactiveerd als:
 <source>&Show error</source>
 <target>&Toon fout</target>
 
+<source>&Quit</source>
+<target>&Stoppen</target>
+
 <source>Incorrect command line:</source>
 <target>Onjuiste opdrachtregel:</target>
 
@@ -478,16 +481,16 @@ De opdracht wordt geactiveerd als:
 <target>Verwijderen van oude versies...</target>
 
 <source>Creating symbolic link %x</source>
-<target>Creëren symbolische link %x</target>
+<target>Symbolische link %x maken</target>
 
 <source>Creating folder %x</source>
 <target>Map %x maken</target>
 
-<source>Overwriting file %x</source>
-<target>Overschrijven bestand %x</target>
+<source>Updating file %x</source>
+<target>File %x bijwerken</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Symbolische link %x overschrijven</target>
+<source>Updating symbolic link %x</source>
+<target>Symbolische link %x bijwerken</target>
 
 <source>Verifying file %x</source>
 <target>Controleren van bestand %x</target>
@@ -558,8 +561,8 @@ De opdracht wordt geactiveerd als:
 <source>Synchronization completed successfully</source>
 <target>Synchronisatie succesvol voltooid</target>
 
-<source>Saving log file %x...</source>
-<target>Opslaan logbestand %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Opruimen oude logboekbestanden...</target>
 
 <source>Stopped</source>
 <target>Gestopt</target>
@@ -612,8 +615,8 @@ De opdracht wordt geactiveerd als:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync is actueel.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Kan geen verbinding maken met sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Kan geen verbinding maken met FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Kan online niet het actuele FreeFileSync versienummer vinden. Wilt u handmatig controleren?</target>
@@ -699,8 +702,20 @@ De opdracht wordt geactiveerd als:
 <source>Start &comparison</source>
 <target>Start &vergelijking</target>
 
+<source>C&omparison settings</source>
+<target>V&ergelijking instellingen</target>
+
+<source>&Filter settings</source>
+<target>&Filter instellingen</target>
+
+<source>S&ynchronization settings</source>
+<target>S&ynchronisatie instellingen</target>
+
 <source>Start &synchronization</source>
 <target>Start &synchronisatie</target>
+
+<source>&Actions</source>
+<target>&Acties</target>
 
 <source>&Options</source>
 <target>&Opties</target>
@@ -709,7 +724,7 @@ De opdracht wordt geactiveerd als:
 <target>&Taal</target>
 
 <source>&Find...</source>
-<target>&Vinden...</target>
+<target>&Zoeken...</target>
 
 <source>&Reset layout</source>
 <target>&Reset lay-out</target>
@@ -727,7 +742,7 @@ De opdracht wordt geactiveerd als:
 <target>&Nu conroleren</target>
 
 <source>Check &automatically once a week</source>
-<target>Controleer eens per week &automatisch</target>
+<target>Controleer een keer per week &automatisch</target>
 
 <source>Cancel</source>
 <target>Annuleren</target>
@@ -780,14 +795,14 @@ De opdracht wordt geactiveerd als:
 <source>Number of files and folders that will be deleted</source>
 <target>Aantal bestanden en mappen die worden verwijderd</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Aantal bestanden die worden overschreven</target>
+<source>Number of files that will be updated</source>
+<target>Aantal bestanden die bijgewerkt zullen worden</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Aantal bestanden en mappen die worden gemaakt</target>
 
 <source>Total bytes to copy</source>
-<target>Totaal aantal te kopiëren bytes</target>
+<target>Totaal aantal te kopieëren bytes</target>
 
 <source>Use local settings:</source>
 <target>Gebruik lokale instellingen:</target>
@@ -810,8 +825,14 @@ De opdracht wordt geactiveerd als:
 <source>Handle daylight saving time</source>
 <target>Zomertijd gebruiken</target>
 
-<source>Symbolic links:</source>
-<target>Symbolische koppelingen:</target>
+<source>Include symbolic links:</source>
+<target>Omvat symbolische koppelingen</target>
+
+<source>Direct</source>
+<target>Direct</target>
+
+<source>Follow</source>
+<target>Volgen</target>
 
 <source>More information</source>
 <target>Meer informatie</target>
@@ -840,23 +861,23 @@ De opdracht wordt geactiveerd als:
 <source>Maximum:</source>
 <target>Maximum:</target>
 
-<source>C&lear</source>
-<target>&Wissen</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Selecteer filterregels om bepaalde bestanden uit te sluiten van synchronisatie. Voer bestandspaden in ten opzichte van hun bijbehorend map-paar.</target>
 
+<source>C&lear</source>
+<target>&Wissen</target>
+
 <source>Detect moved files</source>
-<target>Verplaatste bestanden detecteren</target>
+<target>Detecteren van verplaatste bestanden</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Vereist en maakt database bestanden.
-- Detectie actief na intitiële syncronisatie
+- Detectie actief na eerste synchronisatie
+- Vereist en maakt databasebestanden
 - Niet ondersteund door alle bestandssystemen
 </target>
 
@@ -942,7 +963,7 @@ De opdracht wordt geactiveerd als:
 <target>Stop</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>Creërt een batch-bestand om zonder toezicht te synchroniseren. Dubbelklikt u op het bestand om te starten of maak een opdracht in de taakplanner: %x</target>
+<target>Maak een batch-bestand om zonder toezicht te synchroniseren. Om te starten, dubbelklik op het bestand of maak een opdracht in de taakplanner: %x</target>
 
 <source>&Stop</source>
 <target>&Stop</target>
@@ -969,14 +990,14 @@ De opdracht wordt geactiveerd als:
 <target>De volgende instellingen worden gebruikt voor alle synchronisatie opdrachten.</target>
 
 <source>Fail-safe file copy</source>
-<target>Fail-safe bestand kopiëren</target>
+<target>Fail-safe bestand kopieëren</target>
 
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
 </source>
 <target>
-Kopiëren naar een tijdelijk bestand (*.ffs_tmp) voordat het doel wordt overschreven. 
+Kopieëren naar een tijdelijk bestand (*.ffs_tmp) voordat het doel wordt overschreven. 
 Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 </target>
 
@@ -984,16 +1005,16 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>(aanbevolen)</target>
 
 <source>Copy locked files</source>
-<target>Vergrendelde bestanden kopiëren</target>
+<target>Vergrendelde bestanden kopieëren</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
-<target>Gedeelde of vergrendelde bestanden met behulp van de Volume Schaduw copy-Service kopiëren.</target>
+<target>Gedeelde of vergrendelde bestanden met behulp van de Volume Schaduw copy-Service kopieëren.</target>
 
 <source>(requires administrator rights)</source>
 <target>(vereist beheerdersrechten)</target>
 
 <source>Copy file access permissions</source>
-<target>Toegangsmachtigingen om bestanden te kopiëren</target>
+<target>Toegangsmachtigingen om bestanden te kopieëren</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Overdracht van bestands- en mapmachtigingen.</target>
@@ -1070,26 +1091,14 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>View Settings</source>
 <target>Instellingen bekijken</target>
 
-<source>Overview</source>
-<target>Overzicht</target>
-
 <source>Configuration</source>
 <target>Configuratie</target>
 
+<source>Overview</source>
+<target>Overzicht</target>
+
 <source>Main Bar</source>
 <target>Hoofd balk</target>
-
-<source>Start comparison</source>
-<target>Vergelijking starten</target>
-
-<source>Comparison settings</source>
-<target>Vergelijkings-instellingen</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisatie-instellingen</target>
-
-<source>Start synchronization</source>
-<target>Synchronisatie starten</target>
 
 <source>Confirm</source>
 <target>Bevestigen</target>
@@ -1140,7 +1149,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>meervoudige selectie</target>
 
 <source>Include via filter:</source>
-<target>Via filter bijvoegen:</target>
+<target>Opnemen via filter:</target>
 
 <source>Exclude via filter:</source>
 <target>Uitsluiten via filter:</target>
@@ -1209,10 +1218,10 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Filter wissen</target>
 
 <source>Show files that exist on left side only</source>
-<target>Toon bestanden die bestaan alleen aan de linkerkant</target>
+<target>Toon bestanden die bestaan alleen aan de linkerzijde</target>
 
 <source>Show files that exist on right side only</source>
-<target>Toon bestanden die bestaan alleen aan de rechterkant</target>
+<target>Toon bestanden die bestaan alleen aan de rechterzijde</target>
 
 <source>Show files that are newer on left</source>
 <target>Bestanden die nieuwer zijn aan de linkerzijde weergeven</target>
@@ -1230,22 +1239,22 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Conflicten weergeven</target>
 
 <source>Show files that will be created on the left side</source>
-<target>Bestanden die gemaakt worden aan de linkerkant weergeven</target>
+<target>Bestanden die gemaakt worden aan de linkerzijde weergeven</target>
 
 <source>Show files that will be created on the right side</source>
-<target>Bestanden die gemaakt worden aan de rechterkant weergeven</target>
+<target>Bestanden die gemaakt worden aan de rechterzijde weergeven</target>
 
 <source>Show files that will be deleted on the left side</source>
-<target>Bestanden die worden verwijderd aan de linker kant weergeven</target>
+<target>Bestanden die worden verwijderd aan de linkerzijde weergeven</target>
 
 <source>Show files that will be deleted on the right side</source>
-<target>Bestanden die worden verwijderd op de rechterkant weergeven</target>
+<target>Bestanden die worden verwijderd aan de rechterzijde weergeven</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Bestanden die overschreven worden aan de linkerzijde weergeven</target>
+<source>Show files that will be updated on the left side</source>
+<target>Toon bestanden die worden bijgewerkt aan de linkerzijde</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Bestanden die overschreven worden aan de rechterzijde weergeven</target>
+<source>Show files that will be updated on the right side</source>
+<target>Toon bestanden die worden bijgewerkt aan de rechterzijde</target>
 
 <source>Show files that won't be copied</source>
 <target>Bestanden weergeven die niet gekopieerd worden</target>
@@ -1272,7 +1281,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Bestandenlijst geëxporteerd</target>
 
 <source>Searching for program updates...</source>
-<target>Programma-updates zoekt...</target>
+<target>Zoeken naar programma-updates...</target>
 
 <source>Close progress dialog</source>
 <target>Voortgang dialoogvenster sluiten</target>
@@ -1347,7 +1356,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Voorkeuren</target>
 
 <source>Copy NTFS permissions</source>
-<target>Kopiëren van NTFS-machtigingen</target>
+<target>Kopieëren van NTFS-machtigingen</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Externe applicaties integreren in het contextmenu. De volgende macro's zijn beschikbaar:</target>
@@ -1377,19 +1386,10 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Maak een spiegel-backup van de linkermap, door de rechtermap aan te aanpassen.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>Nieuwe en bijgewerkte bestanden naar de rechter map kopiëren.</target>
+<target>Nieuwe en bijgewerkte bestanden naar de rechter map kopieëren.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configureer uw eigen synchronisatie regels.</target>
-
-<source>Exclude</source>
-<target>Uitsluiten</target>
-
-<source>Direct</source>
-<target>Direct</target>
-
-<source>Follow</source>
-<target>Volgen</target>
 
 <source>Today</source>
 <target>Vandaag</target>
@@ -1454,9 +1454,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Cannot monitor directory %x.</source>
 <target>Kan map %x niet bewaken.</target>
 
-<source>Conversion error:</source>
-<target>Conversie fout:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Kan bestand %x niet verwijderen.</target>
 
@@ -1490,14 +1487,14 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Cannot create directory %x.</source>
 <target>Kan de map %x niet maken.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Kan de symbolische koppeling %x niet maken.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan de symbolische koppeling %x niet kopiëren naar %y</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan de systeemfunctie %x niet vinden.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>Kan bestand %x niet kopieëren naar %y.</target>
+<target>Kan bestand %x niet kopieÃ«ren naar %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Dit itemtype %x wordt niet ondersteund:</target>
@@ -1573,4 +1570,73 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Configuratiebestand %x alleen gedeeltelijk ingelezen.</target>
+
+<source>Prepare installation</source>
+<target>Installatie voorbereiden</target>
+
+<source>Choose which components you want to install.</source>
+<target>Kies welke onderdelen u wilt installeren.</target>
+
+<source>Select installation type:</source>
+<target>Selecteer type installatie:</target>
+
+<source>Local</source>
+<target>Lokaal</target>
+
+<source>Portable</source>
+<target>Portable</target>
+
+<source>recommended</source>
+<target>aanbevolen</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Instellingen opslaan in "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Registreer FreeFileSync bestands-extensies</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Maak Explorer contect menu-items</target>
+
+<source>Save settings in installation directory</source>
+<target>Sla instellingen op in de installatiemap</target>
+
+<source>Do not write to Registry</source>
+<target>Schrijf niet naar het register</target>
+
+<source>Just copy the files</source>
+<target>Kopieer de bestanden</target>
+
+<source>Choose a directory for installation:</source>
+<target>Kies een map voor de installatie:</target>
+
+<source>Create shortcuts:</source>
+<target>Maak snelkoppelingen:</target>
+
+<source>Desktop</source>
+<target>Bureaublad</target>
+
+<source>Start menu</source>
+<target>Startmenu</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Registeren van de FreeFileSync bestands-extensies</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>De-installeren van de FreeFileSync bestands-extensies</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync configuratie</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync batch bestand</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync synchronisatie database</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync configuratie</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Bewerken met FreeFileSync</target>
 

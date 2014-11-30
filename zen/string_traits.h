@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -82,10 +82,10 @@ template <class S, bool isStringClass>  struct GetCharTypeImpl : ResultType<Null
 
 template <class S>
 struct GetCharTypeImpl<S, true> :
-        ResultType<
-        typename SelectIf<HasConversion<S, wchar_t>::value, wchar_t,
-        typename SelectIf<HasConversion<S, char   >::value, char, NullType>::Type
-        >::Type>
+    ResultType<
+    typename SelectIf<HasConversion<S, wchar_t>::value, wchar_t,
+    typename SelectIf<HasConversion<S, char   >::value, char, NullType>::Type
+    >::Type>
 {
     //typedef typename S::value_type Type;
     /*DON'T use S::value_type:

@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -8,11 +8,11 @@
 #define HELPPROVIDER_H_INCLUDED
 
 #ifdef ZEN_WIN
-#include <zen/zstring.h>
-#include <wx/msw/helpchm.h>
+    #include <zen/zstring.h>
+    #include <wx/msw/helpchm.h>
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <wx/html/helpctrl.h>
+    #include <wx/html/helpctrl.h>
 #endif
 
 #include "ffs_paths.h"

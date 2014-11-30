@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 #include "dir_lock.h"
@@ -18,18 +18,18 @@
 #include <zen/optional.h>
 
 #ifdef ZEN_WIN
-#include <tlhelp32.h>
-#include <zen/win.h> //includes "windows.h"
-#include <zen/long_path_prefix.h>
-#include <Sddl.h> //login sid
-#include <Lmcons.h> //UNLEN
+    #include <tlhelp32.h>
+    #include <zen/win.h> //includes "windows.h"
+    #include <zen/long_path_prefix.h>
+    #include <Sddl.h> //login sid
+    #include <Lmcons.h> //UNLEN
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <fcntl.h>    //open()
-#include <sys/stat.h> //
-#include <unistd.h> //getsid()
-#include <signal.h> //kill()
-#include <pwd.h> //getpwuid_r()
+    #include <fcntl.h>    //open()
+    #include <sys/stat.h> //
+    #include <unistd.h> //getsid()
+    #include <signal.h> //kill()
+    #include <pwd.h> //getpwuid_r()
 #endif
 
 using namespace zen;
@@ -205,11 +205,11 @@ Zstring getLoginSid() //throw FileError
 
 
 #ifdef ZEN_WIN
-typedef DWORD ProcessId;
-typedef DWORD SessionId;
+    typedef DWORD ProcessId;
+    typedef DWORD SessionId;
 #elif defined ZEN_LINUX || defined ZEN_MAC
-typedef pid_t ProcessId;
-typedef pid_t SessionId;
+    typedef pid_t ProcessId;
+    typedef pid_t SessionId;
 #endif
 
 //return ppid on Windows, sid on Linux/Mac, "no value" if process corresponding to "processId" is not existing

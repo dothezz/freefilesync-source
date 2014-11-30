@@ -1,20 +1,20 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "file_io.h"
 
 #ifdef ZEN_WIN
-#include "long_path_prefix.h"
-#include "IFileOperation/file_op.h"
-#include "win_ver.h"
-#include "dll.h"
+    #include "long_path_prefix.h"
+    #include "IFileOperation/file_op.h"
+    #include "win_ver.h"
+    #include "dll.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <fcntl.h>  //open, close
-#include <unistd.h> //read, write
+    #include <fcntl.h>  //open, close
+    #include <unistd.h> //read, write
 #endif
 
 using namespace zen;

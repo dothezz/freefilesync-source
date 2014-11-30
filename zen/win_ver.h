@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,6 +10,8 @@
 #include <cassert>
 #include <utility>
 #include "win.h" //includes "windows.h"
+#include "build_info.h"
+#include "dll.h"
 
 namespace zen
 {
@@ -33,6 +35,7 @@ const OsVersion osVersionWin7         (6, 1);
 const OsVersion osVersionWinVista     (6, 0);
 const OsVersion osVersionWinServer2003(5, 2);
 const OsVersion osVersionWinXp        (5, 1);
+const OsVersion osVersionWin2000      (5, 0);
 
 /*
 	NOTE: there are two basic APIs to check Windows version: (empiric study following)
@@ -53,6 +56,8 @@ inline bool winXpOrLater        () { using namespace std::rel_ops; return getOsV
 bool isRealOsVersion(const OsVersion& ver);
 
 
+bool runningWOW64();
+bool running64BitWindows();
 
 
 
@@ -97,6 +102,30 @@ bool isRealOsVersion(const OsVersion& ver)
     assert(rv || GetLastError() == ERROR_OLD_WIN_VERSION);
 
     return rv;
+}
+
+
+inline
+bool runningWOW64() //test if process is running under WOW64: http://msdn.microsoft.com/en-us/library/ms684139(VS.85).aspx
+{
+    typedef BOOL (WINAPI* IsWow64ProcessFun)(HANDLE hProcess, PBOOL Wow64Process);
+
+    const SysDllFun<IsWow64ProcessFun> isWow64Process(L"kernel32.dll", "IsWow64Process");
+    if (isWow64Process)
+    {
+        BOOL isWow64 = FALSE;
+        if (isWow64Process(::GetCurrentProcess(), &isWow64))
+            return isWow64 != FALSE;
+    }
+    return false;
+}
+
+
+inline
+bool running64BitWindows() //http://blogs.msdn.com/b/oldnewthing/archive/2005/02/01/364563.aspx
+{
+    static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
+    return is64BitBuild || runningWOW64(); //should we bother to make this a compile-time check?
 }
 }
 

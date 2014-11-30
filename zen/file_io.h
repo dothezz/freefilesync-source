@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -11,27 +11,27 @@
 #include "file_error.h"
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
+    #include "win.h" //includes "windows.h"
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <cstdio>
-#include <sys/stat.h>
+    #include <cstdio>
+    #include <sys/stat.h>
 #endif
 
 
 namespace zen
 {
 #ifdef ZEN_WIN
-static const char LINE_BREAK[] = "\r\n";
+    static const char LINE_BREAK[] = "\r\n";
 #elif defined ZEN_LINUX || defined ZEN_MAC
-static const char LINE_BREAK[] = "\n"; //since OS X apple uses newline, too
+    static const char LINE_BREAK[] = "\n"; //since OS X apple uses newline, too
 #endif
 
 //buffered file IO optimized for sequential read/write accesses + better error reporting + long path support + following symlinks
 
 #ifdef ZEN_WIN
-typedef HANDLE FileHandle;
+    typedef HANDLE FileHandle;
 #elif defined ZEN_LINUX || defined ZEN_MAC
-typedef FILE* FileHandle;
+    typedef FILE* FileHandle;
 #endif
 
 class FileInput : public FileInputBase

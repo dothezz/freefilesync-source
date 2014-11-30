@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -245,7 +245,7 @@ BatchStatusHandler::~BatchStatusHandler()
     {
         if (logfilesCountLimit_ > 0)
         {
-            try { reportStatus(_("Cleaning up old log files exceeding limit...")); }
+            try { reportStatus(_("Cleaning up old log files...")); }
             catch (...) {}
             limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit_, [&] { try { requestUiRefresh(); } catch (...) {} }); //throw()
         }
@@ -264,14 +264,14 @@ BatchStatusHandler::~BatchStatusHandler()
                 renameFile(oldLogfilepath, addStatusToLogfilename(oldLogfilepath, _("Error"))); //throw FileError
             //status "warning" is not important enough to show up in log file name
         }
-        catch (FileError&) {}
+        catch (FileError&) { assert(false); }
     }
     //----------------- write results into LastSyncs.log------------------------
     try
     {
         saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
     }
-    catch (FileError&) {}
+    catch (FileError&) { assert(false); }
 
     if (progressDlg)
     {

@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Οποιοσδήποτε αριθμός από εναλλακτικά ζεύγη υποκαταλόγων για το πολύ ένα αρχείο ρυθμίσεων.</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>Άνοιγμα των ρυθμίσεων προς επεξεργασία χωρίς εκτέλεση.</target>
+
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>Μεταφορά του αρχείου που βρίσκεται δεξιά</target>
 
-<source>Overwrite left item</source>
-<target>Αντικατάσταση του στοιχείου που βρίσκεται στα αριστερά</target>
+<source>Update left item</source>
+<target>Ενημέρωση του στοιχείου που βρίσκεται αριστερά</target>
 
-<source>Overwrite right item</source>
-<target>Αντικατάσταση του στοιχείου που βρίσκεται στα δεξιά</target>
+<source>Update right item</source>
+<target>Ενημέρωση του στοιχείου που βρίσκεται δεξιά</target>
 
 <source>Do nothing</source>
 <target>Καμία ενέργεια</target>
@@ -216,6 +219,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>Το αρχείο %x δεν ήταν δυνατόν να φορτωθεί.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Το αρχείο βάσης δεδομένων %x δεν είναι συμβατό</target>
@@ -268,6 +274,9 @@
 <source>Creating file %x</source>
 <target>Δημιουργία του αρχείου %x</target>
 
+<source>Saving file %x...</source>
+<target>Αποθήκευση του αρχείου %x...</target>
+
 <source>Items processed:</source>
 <target>Επεξεργάστηκαν στοιχεία:</target>
 
@@ -295,9 +304,6 @@
 <pluralform>%x νήματα</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>Κωδικοποίηση εκτεταμένων πληροφοριών για την ώρα: %x</target>
-
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 
@@ -319,9 +325,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Χρησιμοποιήστε την 64-μπιτη έκδοση του FreeFileSync για να δημιουργήσετε σκιώδη αντίγραφα σε αυτόν τον υπολογιστή.</target>
 
-<source>Cannot load file %x.</source>
-<target>Το αρχείο %x δεν ήταν δυνατόν να φορτωθεί.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>Δεν μπορεί να προσδιοριστεί το όνομα τόμου για το %x.</target>
 
@@ -340,7 +343,7 @@
 <source>Save &as...</source>
 <target>Αποθήκευση &ως...</target>
 
-<source>&Quit</source>
+<source>E&xit</source>
 <target>Έ&ξοδος</target>
 
 <source>&File</source>
@@ -435,6 +438,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>&Εμφάνιση σφάλματος</target>
 
+<source>&Quit</source>
+<target>Έ&ξοδος</target>
+
 <source>Incorrect command line:</source>
 <target>Εσφαλμένη γραμμή εντολών:</target>
 
@@ -480,11 +486,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>Δημιουργία του υποκαταλόγου %x</target>
 
-<source>Overwriting file %x</source>
-<target>Αντικατάσταση του αρχείου %x</target>
+<source>Updating file %x</source>
+<target>Ενημέρωση του αρχείου %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>Αντικατάσταση του συμβολικού δεσμού %x</target>
+<source>Updating symbolic link %x</source>
+<target>Ενημέρωση του συμβολικού δεσμού %x</target>
 
 <source>Verifying file %x</source>
 <target>Επικύρωση του αρχείου %x</target>
@@ -498,20 +504,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>Σφάλμα επαλήθευσης δεδομένων: το %x και το %y έχουν διαφορετικό περιεχόμενο.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Ο υποκατάλογος %x δεν μπορεί να βρεθεί.</target>
-
 <source>Target folder %x already existing.</source>
 <target>Ο υποκατάλογος-στόχος %x υπάρχει ήδη.</target>
+
+<source>Cannot find folder %x.</source>
+<target>Ο υποκατάλογος %x δεν μπορεί να βρεθεί.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Το πεδίο εισαγωγής του υποκαταλόγου-στόχου πρέπει να μην είναι κενό.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>Παρακαλώ εισάγετε έναν υποκατάλογο για αποθήκευση εκδόσεων.</target>
-
 <source>Source folder %x not found.</source>
 <target>Ο υποκατάλογος %x δε βρέθηκε.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>Παρακαλώ εισάγετε έναν υποκατάλογο για αποθήκευση εκδόσεων.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Τα ακόλουθα στοιχεία έχουν ανεπίλυτες διενέξεις και δε θα συγχρονιστούν:</target>
@@ -555,8 +561,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>Ο συγχρονισμός ολοκληρώθηκε επιτυχώς</target>
 
-<source>Saving log file %x...</source>
-<target>Αποθήκευση του αρχείου καταγραφής %x...</target>
+<source>Cleaning up old log files...</source>
+<target>Καθαρισμός των παλιών αρχείων καταγραφής...</target>
 
 <source>Stopped</source>
 <target>Διεκόπη</target>
@@ -609,8 +615,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>Το FreeFileSync είναι ενημερωμένο.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Δεν είναι δυνατή η σύνδεση με το sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>Αδυναμία επικοινωνίας με το FreeFileSync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>Ο αριθμός της τρέχουσας έκδοσης του FreeFileSync δεν βρέθηκε στο δίκτυο. Θέλετε να το ελέγξετε εσείς;</target>
@@ -694,10 +700,22 @@ The command is triggered if:
 <target>Αποθήκευση ως δέσ&μη ενεργειών...</target>
 
 <source>Start &comparison</source>
-<target>Έναρξη &σύγκρισης</target>
+<target>Έ&ναρξη σύγκρισης</target>
+
+<source>C&omparison settings</source>
+<target>Ρυθμίσεις &σύγκρισης</target>
+
+<source>&Filter settings</source>
+<target>Ρυθμίσεις &φίλτρων</target>
+
+<source>S&ynchronization settings</source>
+<target>Ρυθμίσεις σ&υγχρονισμού</target>
 
 <source>Start &synchronization</source>
-<target>Έναρξη συγχρο&νισμού</target>
+<target>Έναρ&ξη συγχρονισμού</target>
+
+<source>&Actions</source>
+<target>Ε&νέργειες</target>
 
 <source>&Options</source>
 <target>&Επιλογές</target>
@@ -777,8 +795,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα διαγραφούν</target>
 
-<source>Number of files that will be overwritten</source>
-<target>Αριθμός αρχείων και υποκαταλόγων που θα αντικατασταθούν</target>
+<source>Number of files that will be updated</source>
+<target>Αριθμός αρχείων που θα ενημερωθούν</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα δημιουργηθούν</target>
@@ -807,8 +825,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>Διαχείριση θερινής ώρας</target>
 
-<source>Symbolic links:</source>
-<target>Συμβολικοί δεσμοί:</target>
+<source>Include symbolic links:</source>
+<target>Συμπερίληψη των συμβολικών δεσμών:</target>
+
+<source>Direct</source>
+<target>Ως δεσμοί</target>
+
+<source>Follow</source>
+<target>Ως περιεχόμενο</target>
 
 <source>More information</source>
 <target>Περισσότερες πληροφορίες</target>
@@ -837,23 +861,23 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>Μέγιστο</target>
 
-<source>C&lear</source>
-<target>&Καθαρισμός</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος υποκαταλόγων.</target>
+
+<source>C&lear</source>
+<target>&Καθαρισμός</target>
 
 <source>Detect moved files</source>
 <target>Ανίχνευση των αρχείων που μεταφέρθηκαν</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- Απαιτεί και δημιουργεί αρχεία-βάσεις δεδομένων
-- Η ανίχνευση είναι ενεργή μετά τον αρχικό συγχρονισμό
+- Η ανίχνευση είναι ενεργή μετά από τον αρχικό συγχρονισμό
+- Απαιτεί και δημιουργεί αρχεία βάσεων δεδομένων
 - Δεν υποστηρίζεται από όλα τα συστήματα αρχείων
 </target>
 
@@ -1067,26 +1091,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>Προβολή Ρυθμίσεων</target>
 
-<source>Overview</source>
-<target>Σύνοψη</target>
-
 <source>Configuration</source>
 <target>Διάταξη</target>
 
+<source>Overview</source>
+<target>Σύνοψη</target>
+
 <source>Main Bar</source>
 <target>Κύρια Γραμμή</target>
-
-<source>Start comparison</source>
-<target>Έναρξη σύγκρισης</target>
-
-<source>Comparison settings</source>
-<target>Ρυθμίσεις σύγκρισης</target>
-
-<source>Synchronization settings</source>
-<target>Ρυθμίσεις συγχρονισμού</target>
-
-<source>Start synchronization</source>
-<target>Έναρξη του συγχρονισμού</target>
 
 <source>Confirm</source>
 <target>Επιβεβαίωση</target>
@@ -1238,11 +1250,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>Εμφάνιση των αρχείων που θα διαγραφούν στα δεξιά</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά</target>
+<source>Show files that will be updated on the left side</source>
+<target>Εμφάνιση των αρχείων που θα ενημερωθούν στα αριστερά</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά</target>
+<source>Show files that will be updated on the right side</source>
+<target>Εμφάνιση των αρχείων που θα ενημερωθούν στα δεξιά</target>
 
 <source>Show files that won't be copied</source>
 <target>Εμφάνιση των αρχείων που δε θα αντιγραφούν</target>
@@ -1379,15 +1391,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
 
-<source>Exclude</source>
-<target>Εξαίρεση</target>
-
-<source>Direct</source>
-<target>Ως δεσμοί</target>
-
-<source>Follow</source>
-<target>Ως περιεχόμενο</target>
-
 <source>Today</source>
 <target>Σήμερα</target>
 
@@ -1451,9 +1454,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>Δεν είναι δυνατή η παρακολύθηση του υποκαταλόγου %x.</target>
 
-<source>Conversion error:</source>
-<target>Σφάλμα μετατροπής:</target>
-
 <source>Cannot delete file %x.</source>
 <target>Δεν μπορεί να διαγραφεί το αρχείο %x.</target>
 
@@ -1487,8 +1487,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>Δεν μπορεί να δημιουργηθεί ο υποκατάλογος %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>Ο συμβολικός δεσμός %x δεν μπορεί να δημιουργηθεί.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Αδυναμία αντιγραφής του συμβολικού δεσμού %x στο %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Δεν ανευρίσκεται η λειτουργία συστήματος %x.</target>
@@ -1570,4 +1570,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Το αρχείο διάταξης %x έχει φορτωθεί μόνο κατά ένα μέρος.</target>
+
+<source>Prepare installation</source>
+<target>Προετοιμασία εγκατάστασης</target>
+
+<source>Choose which components you want to install.</source>
+<target>Επιλέξτε ποια στοιχεία θέλετε να εγκαταστήσετε</target>
+
+<source>Select installation type:</source>
+<target>Επιλογή τύπου εγκατάστασης:</target>
+
+<source>Local</source>
+<target>Τοπική</target>
+
+<source>Portable</source>
+<target>Φορητή</target>
+
+<source>recommended</source>
+<target>συνιστώμενη</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>Αποθήκευση ρυθμίσεων στο "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>Καταχώρηση των επεκτάσεων των αρχείων του FreeFileSync</target>
+
+<source>Create Explorer context menu entries</source>
+<target>Δημιουργία καταχωρήσεων στο μενού περιβάλλοντος του Explorer</target>
+
+<source>Save settings in installation directory</source>
+<target>Αποθήκευση των ρυθμίσεων στον υποκατάλογο εγκατάστασης</target>
+
+<source>Do not write to Registry</source>
+<target>Χωρίς εγγραφές στο Μητρώο</target>
+
+<source>Just copy the files</source>
+<target>Απλή αντιγραφή των αρχείων</target>
+
+<source>Choose a directory for installation:</source>
+<target>Επιλέξτε έναν υποκατάλογο για εγκατάσταση:</target>
+
+<source>Create shortcuts:</source>
+<target>Δημιουργία συντομεύσεων:</target>
+
+<source>Desktop</source>
+<target>Επιφάνεια εργασίας</target>
+
+<source>Start menu</source>
+<target>Μενού έναρξης</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>Καταχώρηση των επεκτάσεων των αρχείων του FreeFileSync</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>Αναίρεση της καταχώρησης των επεκτάσεων των αρχείων του FreeFileSync</target>
+
+<source>FreeFileSync Configuration</source>
+<target>Ρυθμίσεις του FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>Δέσμη Ενεργειών του FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>Βάση Δεδομένων Συγχρονισμού του FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>Ρυθμίσεις του RealtimeSync</target>
+
+<source>Edit with FreeFileSync</source>
+<target>Επεξεργασία με FreeFileSync</target>
 

@@ -89,10 +89,13 @@
 <target>GlobalSettings.xml 대체 파일에 대한 경로</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>FreeFileSync .ffs_gui 또는 .ffs_batch 설정파일 개수</target>
+<target>FreeFileSync .ffs_gui 또는 .ffs_batch 설정 파일 개수</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>최대 1개 설정파일에 대한 대체 디렉토리 페어 개수</target>
+
+<source>Open configuration for edit without executing.</source>
+<target>실행하지 않은 상태로 편집 구성 열기</target>
 
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다:</target>
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>우측 파일 이동</target>
 
-<source>Overwrite left item</source>
-<target>좌측 항목 덮어쓰기</target>
+<source>Update left item</source>
+<target>좌측 항목 업데이트</target>
 
-<source>Overwrite right item</source>
-<target>우측 항목 덮어쓰기</target>
+<source>Update right item</source>
+<target>우측 항목 업데이트</target>
 
 <source>Do nothing</source>
 <target>아무 것도 하지 않음</target>
@@ -215,6 +218,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>파일 %x을(를) 로드할 수 없습니다.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>데이터베이스 파일 %x 은(는) 호환 불가능합니다.</target>
@@ -266,6 +272,9 @@
 <source>Creating file %x</source>
 <target>파일 %x 생성 중</target>
 
+<source>Saving file %x...</source>
+<target>파일 %x 저장 중...</target>
+
 <source>Items processed:</source>
 <target>처리된 항목:</target>
 
@@ -292,9 +301,6 @@
 <pluralform>%x 스레드</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>인코딩 확장 시간 정보: %x</target>
-
 <source>/sec</source>
 <target>/초</target>
 
@@ -316,9 +322,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>본 운영체제에서의 Shadow Copy 생성은 FreeFileSync 64-비트 버전을 사용하세요.</target>
 
-<source>Cannot load file %x.</source>
-<target>파일 %x을(를) 로드할 수 없습니다.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>%x 에 대한 볼륨 이름을 결정할 수 없습니다.</target>
 
@@ -337,8 +340,8 @@
 <source>Save &as...</source>
 <target>다른 이름으로 저장(&a)</target>
 
-<source>&Quit</source>
-<target>종료(&Q)</target>
+<source>E&xit</source>
+<target>나가기(&x)</target>
 
 <source>&File</source>
 <target>파일(&F)</target>
@@ -365,7 +368,7 @@
 <target>3. '시작'을 누르세요.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>시작하려면 .ffs_batch file (일괄 파일)을 가져오십시오.</target>
+<target>시작하려면 .ffs_batch file을 가져 오십시오.</target>
 
 <source>Folders to watch:</source>
 <target>열어 볼 폴더:</target>
@@ -432,6 +435,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>오류 표시(&S)</target>
 
+<source>&Quit</source>
+<target>종료(&Q)</target>
+
 <source>Incorrect command line:</source>
 <target>부정확한 명령줄:</target>
 
@@ -445,7 +451,7 @@ The command is triggered if:
 <target>파일 시간 및 크기</target>
 
 <source>Two way</source>
-<target>양방/양면 (Two Way)</target>
+<target>양측 방향 (Two Way)</target>
 
 <source>Mirror</source>
 <target>미러</target>
@@ -477,11 +483,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>폴더 %x 생성 중</target>
 
-<source>Overwriting file %x</source>
-<target>파일 %x 덮어쓰는 중</target>
+<source>Updating file %x</source>
+<target>파일 %x 업데이트 중</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>심볼릭 링크 %x 덮어쓰는 중</target>
+<source>Updating symbolic link %x</source>
+<target>심볼릭 링크 %x 업데이트 중</target>
 
 <source>Verifying file %x</source>
 <target>파일 %x 확인 중</target>
@@ -495,20 +501,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>데이터 확인 오류: %x 및 %y 의 내용이 서로 다릅니다.</target>
 
-<source>Cannot find folder %x.</source>
-<target>%x 폴더를 찾을 수 없습니다.</target>
-
 <source>Target folder %x already existing.</source>
 <target>대상 폴더 %x이(가) 이미 존재함.</target>
+
+<source>Cannot find folder %x.</source>
+<target>%x 폴더를 찾을 수 없습니다.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>대상 폴더 입력 필드가 비어 있어서는 안 됩니다.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>버저닝을 위한 대상 폴더를 입력하세요.</target>
-
 <source>Source folder %x not found.</source>
 <target>소스 폴더 %x을(를) 찾을 수 없음.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>버저닝을 위한 대상 폴더를 입력하세요.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>아래의 항목들은 해결치 못 한 충돌로 인해 동기화할 수 없습니다:</target>
@@ -552,8 +558,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>동기화가 성공적으로 완료 됐습니다</target>
 
-<source>Saving log file %x...</source>
-<target>로그 파일 %x 저장 중...</target>
+<source>Cleaning up old log files...</source>
+<target>이전 로그 파일 정리 중...</target>
 
 <source>Stopped</source>
 <target>중단</target>
@@ -605,8 +611,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync는 현재 최신버전 상태입니다.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Sourceforge.net에 접속할 수 없습니다.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>FreeFileSync.org.에 접속할 수 없습니다.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>현재 사용 중인 FreeFileSync 버전 번호를 온라인에서 찾을 수 없습니다. 수동으로 확인해 보시겠습니까?</target>
@@ -692,8 +698,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>비교 시작(&C)</target>
 
+<source>C&omparison settings</source>
+<target>비교 설정(&o)</target>
+
+<source>&Filter settings</source>
+<target>필터 설정(&F)</target>
+
+<source>S&ynchronization settings</source>
+<target>동기화 설정(&y)</target>
+
 <source>Start &synchronization</source>
 <target>동기화 시작(&S)</target>
+
+<source>&Actions</source>
+<target>실행(&A)</target>
 
 <source>&Options</source>
 <target>옵션(&O)</target>
@@ -773,8 +791,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>삭제될 파일 및 폴더 개수</target>
 
-<source>Number of files that will be overwritten</source>
-<target>덮어 씌어질 파일 개수</target>
+<source>Number of files that will be updated</source>
+<target>업데이트 될 파일 개수</target>
 
 <source>Number of files and folders that will be created</source>
 <target>생성될 파일 및 폴더 개수</target>
@@ -803,8 +821,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>서머타임 설정</target>
 
-<source>Symbolic links:</source>
-<target>심볼링 링크:</target>
+<source>Include symbolic links:</source>
+<target>심볼릭 링크 포함:</target>
+
+<source>Direct</source>
+<target>다이렉트</target>
+
+<source>Follow</source>
+<target>팔로우</target>
 
 <source>More information</source>
 <target>상세 정보</target>
@@ -833,24 +857,24 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>최대:</target>
 
-<source>C&lear</source>
-<target>제거(&l)</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>동기화에서 특정 파일을 제외시키는 필터 규칙을 선택합니다. 해당 폴더 페어에 대한 상대 파일 경로를 입력하세요.</target>
+
+<source>C&lear</source>
+<target>제거(&l)</target>
 
 <source>Detect moved files</source>
 <target>이동 파일 탐지</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- 데이터베이스 파일 필요 및 생성
 - 초기 동기화 이후 탐지기능 활성화
-- 모든 파일 시스템에서 지원되지 않음
+- 데이터베이스 파일 요청 및 생성
+- 모든 파일 시스템에서 지원되지는 않음
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -935,7 +959,7 @@ The command is triggered if:
 <target>중지</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>직접 지켜보지 않는 자동 동기화의 경우, 배치 파일을 만듭니다. 시작하려면 파일을 더블 클릭하거나 작업 플래너에서 일정을 만듭니다: %x</target>
+<target>직접 지켜보지 않는 자동 동기화의 경우, 배치 파일을 만듭니다. 시작하려면 파일을 더블 클릭하거나 작업 플래너에서 일정을 만드십시오: %x</target>
 
 <source>&Stop</source>
 <target>중지(&S)</target>
@@ -1063,26 +1087,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>설정 보기</target>
 
-<source>Overview</source>
-<target>개요</target>
-
 <source>Configuration</source>
 <target>구성 설정</target>
 
+<source>Overview</source>
+<target>개요</target>
+
 <source>Main Bar</source>
 <target>메인 바</target>
-
-<source>Start comparison</source>
-<target>비교 시작</target>
-
-<source>Comparison settings</source>
-<target>비교 설정</target>
-
-<source>Synchronization settings</source>
-<target>동기화 설정</target>
-
-<source>Start synchronization</source>
-<target>동기화 시작</target>
 
 <source>Confirm</source>
 <target>확인</target>
@@ -1177,7 +1189,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>설정 저장 완료</target>
 
 <source>FreeFileSync batch</source>
-<target>FreeFileSync 일괄처리(배치)</target>
+<target>FreeFileSync 배치(일괄) 처리</target>
 
 <source>Do you want to save changes to %x?</source>
 <target>%x의 변경사항을 저장하시겠습니까?</target>
@@ -1230,11 +1242,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>우측에서 삭제될 파일 표시</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>좌측에 덮어쓰여질 파일 표시</target>
+<source>Show files that will be updated on the left side</source>
+<target>좌측에 업데이트 될 파일 표시</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>우측에 덮어쓰여질 파일 표시</target>
+<source>Show files that will be updated on the right side</source>
+<target>우측에 업데이트 될 파일 표시</target>
 
 <source>Show files that won't be copied</source>
 <target>복사되지 않을 파일 표시</target>
@@ -1369,15 +1381,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>개인 동기화 규칙 설정</target>
 
-<source>Exclude</source>
-<target>제외</target>
-
-<source>Direct</source>
-<target>다이렉트</target>
-
-<source>Follow</source>
-<target>팔로우</target>
-
 <source>Today</source>
 <target>오늘</target>
 
@@ -1441,9 +1444,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>디렉토리 %x을(를) 모니터링 할 수 없습니다.</target>
 
-<source>Conversion error:</source>
-<target>변환 오류:</target>
-
 <source>Cannot delete file %x.</source>
 <target>파일 %x을(를) 삭제할 수 없습니다.</target>
 
@@ -1477,8 +1477,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>디렉토리 %x을(를) 생성할 수 없습니다.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>심볼릭 링크 %x을(를) 생성할 수 없습니다.</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>심볼릭 링크 %x을(를) %y(으)로 복사할 수 없습니다.</target>
 
 <source>Cannot find system function %x.</source>
 <target>시스템 함수 %x을(를) 찾을 수 없습니다.</target>
@@ -1557,4 +1557,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>구성 파일 %x이(가) 부분적으로만 로드 되었음.</target>
+
+<source>Prepare installation</source>
+<target>설치 준비</target>
+
+<source>Choose which components you want to install.</source>
+<target>설치할 구성 요소를 선택하세요.</target>
+
+<source>Select installation type:</source>
+<target>설치 유형 선택:</target>
+
+<source>Local</source>
+<target>로컬</target>
+
+<source>Portable</source>
+<target>포터블</target>
+
+<source>recommended</source>
+<target>권장</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>"%APPDATA%\FreeFileSync"에 설정 저장</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>FreeFileSync 파일 확장자 등록</target>
+
+<source>Create Explorer context menu entries</source>
+<target>익스플로러 컨텍스트 메뉴 항목 생성</target>
+
+<source>Save settings in installation directory</source>
+<target>설치 디렉토리에 설정 저장</target>
+
+<source>Do not write to Registry</source>
+<target>레지스트리에 기록 안 함</target>
+
+<source>Just copy the files</source>
+<target>파일만 복사</target>
+
+<source>Choose a directory for installation:</source>
+<target>설치할 디렉토리를 선택하세요 :</target>
+
+<source>Create shortcuts:</source>
+<target>바로가기 생성 :</target>
+
+<source>Desktop</source>
+<target>바탕화면</target>
+
+<source>Start menu</source>
+<target>시작 메뉴</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>FreeFileSync 파일 확장자 등록 중</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>FreeFileSync 파일 확장자 등록 해제 중</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync 환경설정</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync 배치(일괄) 파일</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync 동기화 데이터베이스</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync (실시간 동기화) 환경설정</target>
+
+<source>Edit with FreeFileSync</source>
+<target>FreeFileSync로 편집</target>
 

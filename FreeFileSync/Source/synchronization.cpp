@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -26,9 +26,9 @@
 #include "lib/versioning.h"
 
 #ifdef ZEN_WIN
-#include <zen/long_path_prefix.h>
-#include <zen/perf.h>
-#include "lib/shadow.h"
+    #include <zen/long_path_prefix.h>
+    #include <zen/perf.h>
+    #include "lib/shadow.h"
 #endif
 
 using namespace zen;
@@ -806,8 +806,8 @@ public:
         txtCreatingFile     (_("Creating file %x"            )),
         txtCreatingLink     (_("Creating symbolic link %x"   )),
         txtCreatingFolder   (_("Creating folder %x"          )),
-        txtOverwritingFile  (_("Overwriting file %x"         )),
-        txtOverwritingLink  (_("Overwriting symbolic link %x")),
+        txtOverwritingFile  (_("Updating file %x"         )),
+        txtOverwritingLink  (_("Updating symbolic link %x")),
         txtVerifying        (_("Verifying file %x"           )),
         txtWritingAttributes(_("Updating attributes of %x"   )),
         txtMovingFile       (_("Moving file %x to %y"))
@@ -1922,7 +1922,7 @@ struct ReadWriteCount
 enum class FolderPairJobType
 {
     PROCESS,
-    WRITE_DB_ONLY,
+    ALREADY_IN_SYNC,
     SKIP,
 };
 }
@@ -2062,7 +2062,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         //-> skip creating (not yet existing) base directories in particular if there's no need
         if (!writeLeft && !writeRight)
         {
-            jobType[folderIndex] = folderPairCfg.saveSyncDB_ ? FolderPairJobType::WRITE_DB_ONLY : FolderPairJobType::SKIP;
+            jobType[folderIndex] = FolderPairJobType::ALREADY_IN_SYNC;
             continue;
         }
 
@@ -2289,10 +2289,9 @@ void zen::synchronize(const TimeComp& timeStamp,
                 continue;
 
             //------------------------------------------------------------------------------------------
-            if (jobType[folderIndex] == FolderPairJobType::PROCESS)
-                callback.reportInfo(_("Synchronizing folder pair:") + L" [" + getVariantName(folderPairCfg.syncVariant_) + L"]\n" +
-                                    L"    " + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
-                                    L"    " + j->getBaseDirPf<RIGHT_SIDE>());
+            callback.reportInfo(_("Synchronizing folder pair:") + L" [" + getVariantName(folderPairCfg.syncVariant_) + L"]\n" +
+                                L"    " + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
+                                L"    " + j->getBaseDirPf<RIGHT_SIDE>());
             //------------------------------------------------------------------------------------------
 
             //checking a second time: (a long time may have passed since the intro checks!)

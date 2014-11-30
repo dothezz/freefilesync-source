@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -21,10 +21,10 @@
 #include "ffs_paths.h"
 
 #ifdef ZEN_LINUX
-#include <wchar.h> //wcscasecmp
+    #include <wchar.h> //wcscasecmp
 
 #elif defined ZEN_MAC
-#include <CoreServices/CoreServices.h>
+    #include <CoreServices/CoreServices.h>
 #endif
 
 using namespace zen;
@@ -441,10 +441,10 @@ void zen::setLanguage(int language) //throw FileError
     //(try to) retrieve language file
     std::wstring languageFile;
 
-    for (auto it = ExistingTranslations::get().begin(); it != ExistingTranslations::get().end(); ++it)
-        if (it->languageID == language)
+    for (const ExistingTranslations::Entry& e : ExistingTranslations::get())
+        if (e.languageID == language)
         {
-            languageFile = it->languageFile;
+            languageFile = e.languageFile;
             break;
         }
 

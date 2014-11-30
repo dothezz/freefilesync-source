@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -22,13 +22,13 @@
 #include "../lib/ffs_paths.h"
 
 #ifdef ZEN_WIN
-#include <wx+/mouse_move_dlg.h>
+    #include <wx+/mouse_move_dlg.h>
 
 #elif defined ZEN_LINUX
-#include <gtk/gtk.h>
+    #include <gtk/gtk.h>
 #elif defined ZEN_MAC
-#include <ApplicationServices/ApplicationServices.h>
-#include <wx/app.h>
+    #include <ApplicationServices/ApplicationServices.h>
+    #include <wx/app.h>
 #endif
 
 using namespace zen;
@@ -422,9 +422,9 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 
 
 #ifdef ZEN_WIN
-static const size_t MAX_ADD_FOLDERS = 8;
+    static const size_t MAX_ADD_FOLDERS = 8;
 #elif defined ZEN_LINUX || defined ZEN_MAC
-static const size_t MAX_ADD_FOLDERS = 6;
+    static const size_t MAX_ADD_FOLDERS = 6;
 #endif
 
 

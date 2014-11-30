@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -14,7 +14,6 @@
 #include <wx+/font_size.h>
 #include <wx+/std_button_layout.h>
 #include <wx+/popup_dlg.h>
-#include <wx+/key_event.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "on_completion_box.h"
@@ -24,7 +23,7 @@
 #include "../lib/norm_filter.h"
 
 #ifdef ZEN_WIN
-#include <wx+/mouse_move_dlg.h>
+    #include <wx+/mouse_move_dlg.h>
 #endif
 
 using namespace zen;
@@ -80,7 +79,6 @@ private:
     CompConfig& cmpCfgOut; //for output only
     bool* useAlternateCmpCfgOptOut;
     CompareVariant localCmpVar;
-    EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 
     //------------- filter panel --------------------------
     void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Exclude Items.html", this); }
@@ -245,12 +243,20 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_toggleBtnTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
     m_toggleBtnContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
 
-    enumDescrHandleSyml.
-    add(SYMLINK_EXCLUDE, _("Exclude")).
-    add(SYMLINK_DIRECT,  _("Direct")).
-    add(SYMLINK_FOLLOW,  _("Follow"));
-
-    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpCfg.handleSymlinks);
+    switch (cmpCfg.handleSymlinks)
+    {
+        case SYMLINK_EXCLUDE:
+            m_checkBoxSymlinksInclude->SetValue(false);
+            break;
+        case SYMLINK_DIRECT:
+            m_checkBoxSymlinksInclude->SetValue(true);
+            m_radioBtnSymlinksDirect->SetValue(true);
+            break;
+        case SYMLINK_FOLLOW:
+            m_checkBoxSymlinksInclude->SetValue(true);
+            m_radioBtnSymlinksFollow->SetValue(true);
+            break;
+    }
 
     m_checkBoxTimeShift->SetValue(cmpCfg.optTimeShiftHours != 0);
     m_spinCtrlTimeShift->SetValue(cmpCfg.optTimeShiftHours == 0 ? 1 : cmpCfg.optTimeShiftHours);
@@ -354,7 +360,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     //-----------------------------------------------------
 
     //enable dialog-specific key local events
-    setupLocalKeyEvents(*this, [this](wxKeyEvent& event) { this->onLocalKeyEvent(event); });
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(ConfigDialog::onLocalKeyEvent), nullptr, this);
 
     m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::COMPARISON), _("Comparison")      + L" (F6)");
     m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::FILTER    ), _("Filter")          + L" (F7)");
@@ -442,6 +448,9 @@ void ConfigDialog::updateCompGui()
     setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
 
     m_spinCtrlTimeShift->Enable(m_checkBoxTimeShift->GetValue());
+
+    m_radioBtnSymlinksDirect->Enable(m_checkBoxSymlinksInclude->GetValue());
+    m_radioBtnSymlinksFollow->Enable(m_checkBoxSymlinksInclude->GetValue());
 }
 
 
@@ -916,7 +925,7 @@ void ConfigDialog::OnOkay(wxCommandEvent& event)
         *useAlternateCmpCfgOptOut = m_checkBoxUseLocalCmpOptions->GetValue();
 
     cmpCfgOut.compareVar = localCmpVar;
-    cmpCfgOut.handleSymlinks = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
+    cmpCfgOut.handleSymlinks = !m_checkBoxSymlinksInclude->GetValue() ? SYMLINK_EXCLUDE : m_radioBtnSymlinksDirect->GetValue() ? SYMLINK_DIRECT : SYMLINK_FOLLOW;
     cmpCfgOut.optTimeShiftHours = m_checkBoxTimeShift->GetValue() ? m_spinCtrlTimeShift->GetValue() : 0;
 
     //------------- filter panel --------------------------

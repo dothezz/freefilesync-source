@@ -1,6 +1,6 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -11,22 +11,22 @@
 #include "file_error.h"
 
 #ifdef ZEN_WIN
-#include "win.h" //includes "windows.h"
-#include "privilege.h"
-#include "long_path_prefix.h"
-#include "dll.h"
+    #include "win.h" //includes "windows.h"
+    #include "privilege.h"
+    #include "long_path_prefix.h"
+    #include "dll.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-#include <unistd.h>
-#include <stdlib.h> //realpath
+    #include <unistd.h>
+    #include <stdlib.h> //realpath
 #endif
 
 
 namespace zen
 {
 #ifdef ZEN_WIN
-bool isSymlink(const WIN32_FIND_DATA& data); //*not* a simple FILE_ATTRIBUTE_REPARSE_POINT check!
-bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
+    bool isSymlink(const WIN32_FIND_DATA& data); //*not* a simple FILE_ATTRIBUTE_REPARSE_POINT check!
+    bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
 #endif
 
 Zstring getResolvedFilePath(const Zstring& linkPath); //throw FileError; Win: requires Vista or later!

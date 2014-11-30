@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>任意の数の代替ディレクトリペア(ひとつの構成ファイル)</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>実行しないで構成ファイルを編集用に開く.</target>
+
 <source>Cannot find the following folders:</source>
 <target>以下のフォルダがみつかりません:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>ファイルを右に移動</target>
 
-<source>Overwrite left item</source>
-<target>左の項目に上書き</target>
+<source>Update left item</source>
+<target>左の項目を更新</target>
 
-<source>Overwrite right item</source>
-<target>右の項目に上書き</target>
+<source>Update right item</source>
+<target>右の項目を更新</target>
 
 <source>Do nothing</source>
 <target>何もしない</target>
@@ -215,6 +218,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>ファイル %x を読み込めません.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>データベース %x とは互換性がありません.</target>
@@ -266,6 +272,9 @@
 <source>Creating file %x</source>
 <target>ファイル %x を作成中</target>
 
+<source>Saving file %x...</source>
+<target>ファイル %x を保存中...</target>
+
 <source>Items processed:</source>
 <target>処理された要素:</target>
 
@@ -292,9 +301,6 @@
 <pluralform>%x スレッド</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>拡張された時間情報のエンコーディング: %x</target>
-
 <source>/sec</source>
 <target>/秒</target>
 
@@ -316,9 +322,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>FreeFileSync 64-bit 版を使用してこのシステムにシャドウコピーを作成してください.</target>
 
-<source>Cannot load file %x.</source>
-<target>ファイル %x を読み込めません.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>%x のボリューム名が決定されていません</target>
 
@@ -337,8 +340,8 @@
 <source>Save &as...</source>
 <target>別名保存(&A)...</target>
 
-<source>&Quit</source>
-<target>終了(&Q)</target>
+<source>E&xit</source>
+<target>終了(&X)</target>
 
 <source>&File</source>
 <target>ファイル(&F)</target>
@@ -432,6 +435,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>エラー表示(&S)</target>
 
+<source>&Quit</source>
+<target>終了(&Q)</target>
+
 <source>Incorrect command line:</source>
 <target>不正なコマンドライン:</target>
 
@@ -477,11 +483,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>フォルダ %x を作成中</target>
 
-<source>Overwriting file %x</source>
-<target>ファイル %x を上書き中</target>
+<source>Updating file %x</source>
+<target>ファイル %x を更新中</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>シンボリックリンク %x を上書き中</target>
+<source>Updating symbolic link %x</source>
+<target>シンボリックリンク %x を更新中</target>
 
 <source>Verifying file %x</source>
 <target>ファイル %x の検証中</target>
@@ -495,20 +501,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>データ検証エラー: %x と %y には異なる内容が含まれています.</target>
 
-<source>Cannot find folder %x.</source>
-<target>%x フォルダがみつかりません</target>
-
 <source>Target folder %x already existing.</source>
 <target>対象フォルダ %x は既に存在します.</target>
+
+<source>Cannot find folder %x.</source>
+<target>%x フォルダがみつかりません</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>対象フォルダ入力欄が空白になっています.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>バージョン付けをする対象フォルダを入力</target>
-
 <source>Source folder %x not found.</source>
 <target>ソースフォルダ %x が見つかりません</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>バージョン付けをする対象フォルダを入力</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>以下の項目は、未解決の競合が存在するため同期処理を実行できませんでした:</target>
@@ -552,8 +558,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>同期処理はすべてが正常に完了しました</target>
 
-<source>Saving log file %x...</source>
-<target>ログファイル %x を保存中...</target>
+<source>Cleaning up old log files...</source>
+<target>古いログファイルをクリーン...</target>
 
 <source>Stopped</source>
 <target>停止</target>
@@ -605,8 +611,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync は最新です.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>Sourceforge.net に接続できません.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>FreeFileSync.org に接続できません.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>現在の FreeFileSync バージョン番号を確認できませんでした、手動で確認しますか?</target>
@@ -692,8 +698,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>比較を開始(&C)</target>
 
+<source>C&omparison settings</source>
+<target>比較の設定(&O)</target>
+
+<source>&Filter settings</source>
+<target>フィルター設定(&F)</target>
+
+<source>S&ynchronization settings</source>
+<target>同期の設定(&Y)</target>
+
 <source>Start &synchronization</source>
 <target>同期を開始(&S)</target>
+
+<source>&Actions</source>
+<target>動作(&A)</target>
 
 <source>&Options</source>
 <target>設定(&O)</target>
@@ -773,8 +791,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>削除されたファイル、およびフォルダの数</target>
 
-<source>Number of files that will be overwritten</source>
-<target>上書きされたファイルの数</target>
+<source>Number of files that will be updated</source>
+<target>更新されたファイルの数</target>
 
 <source>Number of files and folders that will be created</source>
 <target>作成されたファイル、およびフォルダの数</target>
@@ -803,8 +821,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>夏時間の取り扱い</target>
 
-<source>Symbolic links:</source>
-<target>シンボリック リンク:</target>
+<source>Include symbolic links:</source>
+<target>Sym リンクを含める:</target>
+
+<source>Direct</source>
+<target>直接</target>
+
+<source>Follow</source>
+<target>考慮</target>
 
 <source>More information</source>
 <target>更に詳細な情報</target>
@@ -833,24 +857,24 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>最大:</target>
 
-<source>C&lear</source>
-<target>クリア(&L)</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>同期処理から特定のファイルを除外するためのフィルター規則を選択、対応するそれらフォルダ ペアからの相対ファイルパスを入力します.</target>
+
+<source>C&lear</source>
+<target>クリア(&L)</target>
 
 <source>Detect moved files</source>
 <target>移動済みのファイルを検出する</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- データベースファイルの作成と要求
-- 初期同期後にアクティブを検出
-- すべてのファイルシステムには非対応
+- 初期同期の後、アクティブを検出
+- 必要なデータベースファイルを作成
+- すべてのシステムには対応していません
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1063,26 +1087,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>表示設定</target>
 
-<source>Overview</source>
-<target>概要</target>
-
 <source>Configuration</source>
 <target>構成設定</target>
 
+<source>Overview</source>
+<target>概要</target>
+
 <source>Main Bar</source>
 <target>メインバー</target>
-
-<source>Start comparison</source>
-<target>比較を開始</target>
-
-<source>Comparison settings</source>
-<target>比較設定</target>
-
-<source>Synchronization settings</source>
-<target>同期処理設定</target>
-
-<source>Start synchronization</source>
-<target>同期の開始</target>
 
 <source>Confirm</source>
 <target>確認</target>
@@ -1230,11 +1242,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>右側で削除されたファイルを表示</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>左側で上書きされたファイルを表示</target>
+<source>Show files that will be updated on the left side</source>
+<target>左側で更新されたファイルを表示</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>右側で上書きされたファイルを表示</target>
+<source>Show files that will be updated on the right side</source>
+<target>右側で更新されたファイルを表示</target>
 
 <source>Show files that won't be copied</source>
 <target>コピーされなかったファイルを表示</target>
@@ -1367,16 +1379,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>新しい、または更新されたファイルを右側フォルダにコピーします。</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>あなたの設定した同期規則を使用します。</target>
-
-<source>Exclude</source>
-<target>除外</target>
-
-<source>Direct</source>
-<target>ダイレクト</target>
-
-<source>Follow</source>
-<target>考慮する</target>
+<target>あなたが使用する同期規則を設定します。</target>
 
 <source>Today</source>
 <target>今日</target>
@@ -1441,9 +1444,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>ディレクトリ %x を監視できません.</target>
 
-<source>Conversion error:</source>
-<target>変換エラー:</target>
-
 <source>Cannot delete file %x.</source>
 <target>ファイル %x を削除出来ません.</target>
 
@@ -1477,8 +1477,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>ディレクトリ %x を作成出来ません.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>シンボリックリンク %x を作成出来ません</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>シンボリックリンク %x を %y にコピーできません.</target>
 
 <source>Cannot find system function %x.</source>
 <target>システム関数 %x がみつかりません.</target>
@@ -1557,4 +1557,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>構成ファイル %x は部分的のみ読み込まれます.</target>
+
+<source>Prepare installation</source>
+<target>インストールの準備</target>
+
+<source>Choose which components you want to install.</source>
+<target>インストールするコンポーネントを選択</target>
+
+<source>Select installation type:</source>
+<target>インストールの種類を選択</target>
+
+<source>Local</source>
+<target>ローカル</target>
+
+<source>Portable</source>
+<target>ポータブル</target>
+
+<source>recommended</source>
+<target>推奨</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>設定の保存先 "%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>ファイル拡張子を登録</target>
+
+<source>Create Explorer context menu entries</source>
+<target>エクスプローラのメニュー項目に統合</target>
+
+<source>Save settings in installation directory</source>
+<target>設定をインストールディレクトリに保存</target>
+
+<source>Do not write to Registry</source>
+<target>レジストリを使用しない</target>
+
+<source>Just copy the files</source>
+<target>ファイルのコピーのみ</target>
+
+<source>Choose a directory for installation:</source>
+<target>インストールするディレクトリを選択:</target>
+
+<source>Create shortcuts:</source>
+<target>ショートカットの作成:</target>
+
+<source>Desktop</source>
+<target>デスクトップ</target>
+
+<source>Start menu</source>
+<target>スタートメニュー</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>FreeFileSync ファイル拡張子を登録中</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>FreeFileSync ファイル拡張子の登録解除中</target>
+
+<source>FreeFileSync Configuration</source>
+<target>FreeFileSync 構成設定</target>
+
+<source>FreeFileSync Batch File</source>
+<target>FreeFileSync 一括ファイル</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>FreeFileSync 同期データベース</target>
+
+<source>RealtimeSync Configuration</source>
+<target>RealtimeSync 構成設定</target>
+
+<source>Edit with FreeFileSync</source>
+<target>FreeFileSync で編集</target>
 

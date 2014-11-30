@@ -94,6 +94,9 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد</target>
 
+<source>Open configuration for edit without executing.</source>
+<target>فتح التضبيطات من أجل التعديل من دون تنفيذ الملف.</target>
+
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
@@ -184,11 +187,11 @@
 <source>Move file on right</source>
 <target>نقل ملف على اليسار</target>
 
-<source>Overwrite left item</source>
-<target>الكتابة فوق العنصر الأيمن</target>
+<source>Update left item</source>
+<target>تحديث العنصر اليميني</target>
 
-<source>Overwrite right item</source>
-<target>الكتابة فوق العنصر الأيسر</target>
+<source>Update right item</source>
+<target>تحديث العنصر اليساري</target>
 
 <source>Do nothing</source>
 <target>لا تفعل شيئا</target>
@@ -220,6 +223,9 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
+
+<source>Cannot load file %x.</source>
+<target>لا يمكن فتح الملف  %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>ملف قاعدة البيانات  %x غير متوافق.</target>
@@ -276,6 +282,9 @@
 <source>Creating file %x</source>
 <target>إنشاء الملف %x</target>
 
+<source>Saving file %x...</source>
+<target>جاري حفظ الملف %x...</target>
+
 <source>Items processed:</source>
 <target>معالجة العناصر:</target>
 
@@ -307,9 +316,6 @@
 <pluralform>%x بند</pluralform>
 </target>
 
-<source>Encoding extended time information: %x</source>
-<target>ترميز المعلومات الموسعة للوقت: %x</target>
-
 <source>/sec</source>
 <target>\ثانية</target>
 
@@ -331,9 +337,6 @@
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>الرجاء استخدام إصدار الـ 64-bit للبرنامج لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
 
-<source>Cannot load file %x.</source>
-<target>لا يمكن فتح الملف  %x.</target>
-
 <source>Cannot determine volume name for %x.</source>
 <target>تعذر تحديد اسم الوسط %x</target>
 
@@ -352,8 +355,8 @@
 <source>Save &as...</source>
 <target>&حفظ باسم...</target>
 
-<source>&Quit</source>
-<target>إ&نهاء</target>
+<source>E&xit</source>
+<target>&إغلاق</target>
 
 <source>&File</source>
 <target>&ملف</target>
@@ -447,6 +450,9 @@ The command is triggered if:
 <source>&Show error</source>
 <target>إ&ظهار الخطأ</target>
 
+<source>&Quit</source>
+<target>إ&نهاء</target>
+
 <source>Incorrect command line:</source>
 <target>سطر أوامر خاطئ:</target>
 
@@ -492,11 +498,11 @@ The command is triggered if:
 <source>Creating folder %x</source>
 <target>إنشاء مجلد %x</target>
 
-<source>Overwriting file %x</source>
-<target>الكتابة فوق الملف %x</target>
+<source>Updating file %x</source>
+<target>جاري تحديث الملف %x</target>
 
-<source>Overwriting symbolic link %x</source>
-<target>الكتابة فوق الارتباط الرمزي %x</target>
+<source>Updating symbolic link %x</source>
+<target>جاري تحديث المسار الرمزي %x</target>
 
 <source>Verifying file %x</source>
 <target>التحقق من الملف %x</target>
@@ -510,20 +516,20 @@ The command is triggered if:
 <source>Data verification error: %x and %y have different content.</source>
 <target>خطأ في التحقق من البيانات: يحتوي %x و %y بيانات مختلفة.</target>
 
-<source>Cannot find folder %x.</source>
-<target>تعذر العثور على المجلد %x.</target>
-
 <source>Target folder %x already existing.</source>
 <target>المجلد الهدف %x موجود سابقاً.</target>
+
+<source>Cannot find folder %x.</source>
+<target>تعذر العثور على المجلد %x.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>يجب أن لا يكون حقل إدخال المجلد الهدف فارغاً.</target>
 
-<source>Please enter a target folder for versioning.</source>
-<target>الرجاء تحديد مجلد هدف من أجل الوسم حسب الإصدار.</target>
-
 <source>Source folder %x not found.</source>
 <target>لم يتم العثور على المجلد المصدر %x.</target>
+
+<source>Please enter a target folder for versioning.</source>
+<target>الرجاء تحديد مجلد هدف من أجل الوسم حسب الإصدار.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>العناصر التالية لم تحل اختلافاتها، و لن يتم مزامنتها:</target>
@@ -567,8 +573,8 @@ The command is triggered if:
 <source>Synchronization completed successfully</source>
 <target>تمت المزامنة بنجاح</target>
 
-<source>Saving log file %x...</source>
-<target>حفظ ملف السجل  %x...</target>
+<source>Cleaning up old log files...</source>
+<target>جاري تنظيف ملفات المتابعة القديمة...</target>
 
 <source>Stopped</source>
 <target>توقف</target>
@@ -625,8 +631,8 @@ The command is triggered if:
 <source>FreeFileSync is up to date.</source>
 <target>البرنامج هو الأحدث حتى الآن.</target>
 
-<source>Unable to connect to sourceforge.net.</source>
-<target>تعذر الاتصال بـ sourceforge.net.</target>
+<source>Unable to connect to FreeFileSync.org.</source>
+<target>تعذر الاتصال بـ FreeFileSync.org</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
@@ -712,8 +718,20 @@ The command is triggered if:
 <source>Start &comparison</source>
 <target>بدأ الم&قارنة</target>
 
+<source>C&omparison settings</source>
+<target>&مقارنة</target>
+
+<source>&Filter settings</source>
+<target>إعدادات ال&فلتر</target>
+
+<source>S&ynchronization settings</source>
+<target>إ&عدادات</target>
+
 <source>Start &synchronization</source>
 <target>بدأ الم&زامنة</target>
+
+<source>&Actions</source>
+<target>&مهام</target>
 
 <source>&Options</source>
 <target>&خيارات</target>
@@ -793,8 +811,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>عدد الملفات و المجلدات التي سيتم حذفها</target>
 
-<source>Number of files that will be overwritten</source>
-<target>عدد الملفات التي سيتم استبدالها</target>
+<source>Number of files that will be updated</source>
+<target>عدد الملفات التي سيتم تحديثها</target>
 
 <source>Number of files and folders that will be created</source>
 <target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
@@ -823,8 +841,14 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>تعامل مع التوقيت الصيفي</target>
 
-<source>Symbolic links:</source>
-<target>ارتباطات رمزية:</target>
+<source>Include symbolic links:</source>
+<target>تضمن السارات الرمزية:</target>
+
+<source>Direct</source>
+<target>مباشر</target>
+
+<source>Follow</source>
+<target>اتبع</target>
 
 <source>More information</source>
 <target>المزيد من المعلومات</target>
@@ -853,24 +877,24 @@ The command is triggered if:
 <source>Maximum:</source>
 <target>الحد الأقصى:</target>
 
-<source>C&lear</source>
-<target>إ&زالة</target>
-
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
 <target>اختيار قوانين فلترة لاستثناء ملفات معينة من المزامنة. أدخل مسارات الملفات منسوبة إلى زوج المجلدات المقابل.</target>
+
+<source>C&lear</source>
+<target>إ&زالة</target>
 
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
 
 <source>
-- Requires and creates database files
 - Detection active after initial sync
+- Requires and creates database files
 - Not supported by all file systems
 </source>
 <target>
-- بحاجة لإنشاء قواعد بيانات لجميع الملفات
-- يبدأ التعرف على التغيرات بعد المزامنة الأولية
-- غير مدعوم من قبل جميع أنطمة الملفات (file systems)
+- تفعيل التحقق بعد المزامنة
+- يحتاج و ينشئ ملفات قواعد معطيات
+- غير مدعوم لجميع أنظمة الملفات
 </target>
 
 <source>Detect synchronization directions with the help of database files</source>
@@ -1083,26 +1107,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>View Settings</source>
 <target>عرض الإعدادات</target>
 
-<source>Overview</source>
-<target>نظرة عامة</target>
-
 <source>Configuration</source>
 <target>التكوين</target>
 
+<source>Overview</source>
+<target>نظرة عامة</target>
+
 <source>Main Bar</source>
 <target>الشريط الرئيسي</target>
-
-<source>Start comparison</source>
-<target>بدأ المقارنة</target>
-
-<source>Comparison settings</source>
-<target>إعدادات المقارنة</target>
-
-<source>Synchronization settings</source>
-<target>إعدادات المزامنة</target>
-
-<source>Start synchronization</source>
-<target>بدء المزامنة</target>
 
 <source>Confirm</source>
 <target>تأكيد</target>
@@ -1270,11 +1282,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show files that will be deleted on the right side</source>
 <target>إظهار الملفات التي سيتم حذفها من الجانب الأيسر</target>
 
-<source>Show files that will be overwritten on left side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
+<source>Show files that will be updated on the left side</source>
+<target>إظهار الملفات التي سيتم تحديثها في الجانب الأيسر</target>
 
-<source>Show files that will be overwritten on right side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
+<source>Show files that will be updated on the right side</source>
+<target>إظهار الملفات التي سيتم تحديثها في الجانب الأيمن</target>
 
 <source>Show files that won't be copied</source>
 <target>إظهار الملفات التي لن يتم نسخها</target>
@@ -1419,15 +1431,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>تحديد قواعد المزامنة الخاصة بك.</target>
 
-<source>Exclude</source>
-<target>استبعاد</target>
-
-<source>Direct</source>
-<target>مباشر</target>
-
-<source>Follow</source>
-<target>اتبع</target>
-
 <source>Today</source>
 <target>اليوم</target>
 
@@ -1491,9 +1494,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot monitor directory %x.</source>
 <target>لا يمكن مراقبة المسار %x.</target>
 
-<source>Conversion error:</source>
-<target>خطأ في تحويل:</target>
-
 <source>Cannot delete file %x.</source>
 <target>لا يمكن حذف الملف  %x.</target>
 
@@ -1527,8 +1527,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot create directory %x.</source>
 <target>لا يمكن إنشاء المسار %x.</target>
 
-<source>Cannot create symbolic link %x.</source>
-<target>تعذر إنشاء رابط رمزي %x</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>لا يمكن نسخ الرابط الرمزي من %x إلى %y</target>
 
 <source>Cannot find system function %x.</source>
 <target>لا يمكن العثور على وظيفة نظام %x.</target>
@@ -1622,4 +1622,73 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x loaded partially only.</source>
 <target>تم تحميل ملف التكوين %x بشكلٍ جزئي فقط.</target>
+
+<source>Prepare installation</source>
+<target>الاستعداد للتثبيت</target>
+
+<source>Choose which components you want to install.</source>
+<target>اختر المكونات التي تريد تنصيبها</target>
+
+<source>Select installation type:</source>
+<target>اختيار نوع التنصيب:</target>
+
+<source>Local</source>
+<target>محلي</target>
+
+<source>Portable</source>
+<target>متنقل</target>
+
+<source>recommended</source>
+<target>‏منصوح به‏</target>
+
+<source>Save settings to "%APPDATA%\FreeFileSync"</source>
+<target>حفظ الإعدادات إلى ‏‪"%APPDATA%\FreeFileSync"</target>
+
+<source>Register FreeFileSync file extensions</source>
+<target>تسجيل لاحقةالملفات</target>
+
+<source>Create Explorer context menu entries</source>
+<target>إنشاء مدخلات القوائم المحلية في متصفح الملفات</target>
+
+<source>Save settings in installation directory</source>
+<target>احفظ إعدادات التثبيت في مسار التثبيت</target>
+
+<source>Do not write to Registry</source>
+<target>لا تسجل في ملفات الرجيستري</target>
+
+<source>Just copy the files</source>
+<target>انسخ الملفات فقط</target>
+
+<source>Choose a directory for installation:</source>
+<target>اختيار مسار التثبيت</target>
+
+<source>Create shortcuts:</source>
+<target>إنشاء اختصار</target>
+
+<source>Desktop</source>
+<target>سطح المكتب</target>
+
+<source>Start menu</source>
+<target>قائمة إبدأ</target>
+
+<source>Registering FreeFileSync file extensions</source>
+<target>تسجيل لاحقة الملفات</target>
+
+<source>Unregistering FreeFileSync file extensions</source>
+<target>إلغاء تسجيل لاحقةالملفات</target>
+
+<source>FreeFileSync Configuration</source>
+<target>تضبيطات FreeFileSync</target>
+
+<source>FreeFileSync Batch File</source>
+<target>الملف الدفعي الخاص بـ FreeFileSync</target>
+
+<source>FreeFileSync Synchronization Database</source>
+<target>قاعدة بيانات المزامنة الخاصة بـ FreeFileSync</target>
+
+<source>RealtimeSync Configuration</source>
+<target>تضبيطات RealtimeSync</target>
+
+<source>Edit with FreeFileSync</source>
+<target>تعديل بواسطة FreeFileSync</target>
 
