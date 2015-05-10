@@ -75,10 +75,9 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
 {
     if (itempaths.empty())
         return;
-    //::SetFileAttributes(applyLongPathPrefix(itempath).c_str(), FILE_ATTRIBUTE_NORMAL);
     //warning: moving long file paths to recycler does not work!
-    //both ::SHFileOperation() and ::IFileOperation() cannot delete a folder named "System Volume Information" with normal attributes but shamelessly report success
-    //both ::SHFileOperation() and ::IFileOperation() can't handle \\?\-prefix!
+    //both ::SHFileOperation() and ::IFileOperation cannot delete a folder named "System Volume Information" with normal attributes but shamelessly report success
+    //both ::SHFileOperation() and ::IFileOperation can't handle \\?\-prefix!
 
     if (vistaOrLater()) //new recycle bin usage: available since Vista
     {
@@ -95,20 +94,28 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
         for (auto it = itempaths.begin(); it != itempaths.end(); ++it) //CAUTION: do not create temporary strings here!!
             cNames.push_back(it->c_str());
 
+
+
         CallbackData cbd(notifyDeletionStatus);
         if (!moveToRecycleBin(&cNames[0], cNames.size(), onRecyclerCallback, &cbd))
         {
             if (cbd.exception)
                 std::rethrow_exception(cbd.exception);
 
-            std::wstring itempathFmt = fmtFileName(itempaths[0]); //probably not the correct file name for file lists larger than 1!
-            if (itempaths.size() > 1)
-                itempathFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
+            if (cNames.size() == 1)
+                throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempaths[0])), getLastErrorMessage());
 
-            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", itempathFmt), getLastErrorMessage()); //already includes details about locking errors!
+            //batch recycling failed: retry one-by-one to get a better error message; see FileOperation.dll
+            for (size_t i = 0; i < cNames.size(); ++i)
+            {
+                if (notifyDeletionStatus) notifyDeletionStatus(itempaths[i]);
+
+                if (!moveToRecycleBin(&cNames[i], 1, nullptr, nullptr))
+                    throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempaths[i])), getLastErrorMessage()); //already includes details about locking errors!
+            }
         }
     }
-    else //regular recycle bin usage: available since XP
+    else //regular recycle bin usage: available since XP: 1. bad error reporting 2. early failure
     {
         Zstring itempathsDoubleNull;
         for (const Zstring& itempath : itempaths)
@@ -122,7 +129,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
         fileOp.wFunc  = FO_DELETE;
         fileOp.pFrom  = itempathsDoubleNull.c_str();
         fileOp.pTo    = nullptr;
-        fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
+        fileOp.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
         fileOp.fAnyOperationsAborted = false;
         fileOp.hNameMappings         = nullptr;
         fileOp.lpszProgressTitle     = nullptr;
@@ -130,7 +137,10 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
         //"You should use fully-qualified path names with this function. Using it with relative path names is not thread safe."
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempaths[0]))); //probably not the correct file name for file list larger than 1!
+            std::wstring itempathFmt = fmtFileName(itempaths[0]); //probably not the correct file name for file lists larger than 1!
+            if (itempaths.size() > 1)
+                itempathFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
+            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", itempathFmt));
         }
     }
 }
@@ -143,7 +153,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
 #ifdef ZEN_WIN
-	recycleOrDelete({ itempath }, nullptr); //throw FileError
+    recycleOrDelete({ itempath }, nullptr); //throw FileError
 
 #elif defined ZEN_LINUX
     GFile* file = ::g_file_new_for_path(itempath.c_str()); //never fails according to docu
@@ -157,7 +167,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
         const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempath));
 
         if (!error)
-            throw FileError(errorMsg, L"Unknown error."); //user should never see this
+            throw FileError(errorMsg, L"g_file_trash: unknown error."); //user should never see this
 
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
         if (error->code == G_IO_ERROR_NOT_SUPPORTED)

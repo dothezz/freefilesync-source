@@ -408,7 +408,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                     const Zstring relTarget = getRelName(*targetFile, !onLeft);
 
                     return getSyncOpDescription(op) + L"\n" +
-                           (EqualFilename()(beforeLast(relSource, FILE_NAME_SEPARATOR), beforeLast(relTarget, FILE_NAME_SEPARATOR)) ? //returns empty string if ch not found
+                           (EqualFilePath()(beforeLast(relSource, FILE_NAME_SEPARATOR), beforeLast(relTarget, FILE_NAME_SEPARATOR)) ? //returns empty string if ch not found
                             //detected pure "rename"
                             fmtFileName(afterLast(relSource, FILE_NAME_SEPARATOR)) + L" ->\n" + //show short name only
                             fmtFileName(afterLast(relTarget, FILE_NAME_SEPARATOR)) :

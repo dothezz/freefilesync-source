@@ -48,11 +48,11 @@ public:
 #endif
     }
 
-    void setPath(const wxString& dirpath) { dirpath_.setPath(dirpath); }
-    wxString getPath() const { return dirpath_.getPath(); }
+    void setPath(const Zstring& dirpath) { dirpath_.setPath(dirpath); }
+    Zstring getPath() const { return dirpath_.getPath(); }
 
 private:
-    zen::DirectoryName<wxTextCtrl> dirpath_;
+    zen::FolderSelector2 dirpath_;
 };
 
 
@@ -92,7 +92,7 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
-    dirpathFirst = zen::make_unique<DirectoryName<wxTextCtrl>>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
+    dirpathFirst = zen::make_unique<FolderSelector2>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -256,9 +256,8 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
     Zstring defaultFileName = currentConfigFileName.empty() ? Zstr("Realtime.ffs_real") : currentConfigFileName;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-    if (endsWith(defaultFileName, Zstr(".ffs_batch")))
-        replace(defaultFileName, Zstr(".ffs_batch"), Zstr(".ffs_real"), false);
-
+    if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
+        defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_real");
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
@@ -349,13 +348,13 @@ void MainDialog::onFilesDropped(FileDropEvent& event)
 void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
 {
     //clear existing folders
-    dirpathFirst->setPath(wxString());
+    dirpathFirst->setPath(Zstring());
     clearAddFolders();
 
     if (!cfg.directories.empty())
     {
         //fill top folder
-        dirpathFirst->setPath(utfCvrtTo<wxString>(*cfg.directories.begin()));
+        dirpathFirst->setPath(*cfg.directories.begin());
 
         //fill additional folders
         addFolder(std::vector<Zstring>(cfg.directories.begin() + 1, cfg.directories.end()));
@@ -389,7 +388,7 @@ void MainDialog::OnAddFolder(wxCommandEvent& event)
     const Zstring topFolder = utfCvrtTo<Zstring>(dirpathFirst->getPath());
 
     //clear existing top folder first
-    dirpathFirst->setPath(wxString());
+    dirpathFirst->setPath(Zstring());
 
     std::vector<Zstring> newFolders;
     newFolders.push_back(topFolder);
@@ -462,7 +461,7 @@ void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront
         newFolder->m_bpButtonRemoveFolder->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolder), nullptr, this );
 
         //insert directory name
-        newFolder->setPath(utfCvrtTo<wxString>(dirpath));
+        newFolder->setPath(dirpath);
     }
 
     //set size of scrolled window

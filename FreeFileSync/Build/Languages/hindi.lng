@@ -1061,9 +1061,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>स्रोत कोड C++ में लिखा गया इनके प्रयोग से :</target>
 
-<source>If you like FreeFileSync</source>
-<target>यदि आपको FreeFileSync पसंद है तो</target>
-
 <source>Donate with PayPal</source>
 <target>PayPal (पेपॉल) द्वारा दान करें</target>
 

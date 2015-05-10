@@ -84,7 +84,7 @@ std::wstring getIso3166Country()
 
 std::wstring getUserAgentName() //coordinate with on_check_latest_version.php
 {
-    std::wstring agentName = std::wstring(L"FreeFileSync (") + zen::currentVersion;
+    std::wstring agentName = std::wstring(L"FreeFileSync (") + zen::ffsVersion;
 
 #ifdef ZEN_WIN
     agentName += L" Windows";
@@ -302,16 +302,14 @@ GetVerResult getOnlineVersion(wxString& version)
         return canConnectToSf ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
     }
 #endif
-	trim(version); //Windows: remove trailing blank and newline
+    trim(version); //Windows: remove trailing blank and newline
     return version.empty() ? GET_VER_PAGE_NOT_FOUND : GET_VER_SUCCESS; //empty version possible??
 }
 
 
-const wchar_t VERSION_SEP = L'.';
-
 std::vector<size_t> parseVersion(const wxString& version)
 {
-    std::vector<wxString> digits = split(version, VERSION_SEP);
+    std::vector<wxString> digits = split(version, FFS_VERSION_SEPERATOR);
 
     std::vector<size_t> output;
     std::transform(digits.begin(), digits.end(), std::back_inserter(output), [&](const wxString& d) { return stringTo<size_t>(d); });
@@ -324,8 +322,8 @@ std::vector<size_t> parseVersion(const wxString& version)
     //use current version to calculate a changing number for the inactive state near UTC begin, in order to always check for updates after installing a new version
     //=> convert version into 11-based *unique* number (this breaks lexicographical version ordering, but that's irrelevant!)
     long id = 0;
-    const wchar_t* first = zen::currentVersion;
-    const wchar_t* last = first + zen::strLength(currentVersion);
+    const wchar_t* first = zen::ffsVersion;
+    const wchar_t* last = first + zen::strLength(ffsVersion);
     std::for_each(first, last, [&](wchar_t c)
     {
         id *= 11;
@@ -333,7 +331,7 @@ std::vector<size_t> parseVersion(const wxString& version)
             id += c - L'0';
         else
         {
-            assert(c == VERSION_SEP);
+            assert(c == FFS_VERSION_SEPERATOR);
             id += 10;
         }
     });
@@ -345,7 +343,7 @@ std::vector<size_t> parseVersion(const wxString& version)
 
 bool zen::isNewerFreeFileSyncVersion(const wxString& onlineVersion)
 {
-    std::vector<size_t> current = parseVersion(zen::currentVersion);
+    std::vector<size_t> current = parseVersion(zen::ffsVersion);
     std::vector<size_t> online  = parseVersion(onlineVersion);
 
     if (online.empty() || online[0] == 0) //online version string may be "This website has been moved..." In this case better check for an update
@@ -374,7 +372,7 @@ void zen::checkForUpdateNow(wxWindow* parent, wxString& lastOnlineVersion)
     switch (getOnlineVersion(onlineVersion))
     {
         case GET_VER_SUCCESS:
-			lastOnlineVersion = onlineVersion;
+            lastOnlineVersion = onlineVersion;
             if (isNewerFreeFileSyncVersion(onlineVersion))
             {
                 switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
@@ -402,7 +400,7 @@ void zen::checkForUpdateNow(wxWindow* parent, wxString& lastOnlineVersion)
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
-			lastOnlineVersion = L"unknown";
+            lastOnlineVersion = L"unknown";
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
@@ -431,7 +429,7 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, wx
             {
                 case GET_VER_SUCCESS:
                     lastUpdateCheck = wxGetLocalTime();
-				lastOnlineVersion = onlineVersion;
+                    lastOnlineVersion = onlineVersion;
 
                     if (isNewerFreeFileSyncVersion(onlineVersion))
                     {
@@ -453,7 +451,7 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, wx
                     break; //ignore this error
 
                 case GET_VER_PAGE_NOT_FOUND:
-					lastOnlineVersion = L"unknown";
+                    lastOnlineVersion = L"unknown";
                     switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                                    setTitle(_("Check for Program Updates")).
                                                    setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),

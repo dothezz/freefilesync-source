@@ -59,7 +59,7 @@ private:
     friend class ManualDeletionHandler;
     friend class FolderPairFirst;
     friend class FolderPairPanel;
-    friend class DirectoryNameMainImpl;
+    friend class FolderSelectorMainImpl;
     template <class GuiPanel>
     friend class FolderPairCallback;
     friend class PanelMoveWindow;

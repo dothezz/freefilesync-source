@@ -345,8 +345,8 @@ void GridView::setData(FolderComparison& folderCmp)
     folderPairCount = std::count_if(begin(folderCmp), end(folderCmp),
                                     [](const BaseDirPair& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
     {
-        return !baseObj.getBaseDirPf<LEFT_SIDE >().empty() ||
-               !baseObj.getBaseDirPf<RIGHT_SIDE>().empty();
+        return !baseObj.getABF<LEFT_SIDE >().emptyBaseFolderPath() ||
+               !baseObj.getABF<RIGHT_SIDE>().emptyBaseFolderPath();
     });
 
     for (auto it = begin(folderCmp); it != end(folderCmp); ++it)

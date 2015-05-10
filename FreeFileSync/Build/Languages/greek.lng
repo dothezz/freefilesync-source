@@ -1046,8 +1046,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Αν σας αρέσει το FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Αν σας αρέσει το FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Κάντε μια δωρεά μέσω PayPal</target>

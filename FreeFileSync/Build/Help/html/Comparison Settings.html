@@ -18,16 +18,16 @@
 <P>FreeFileSync lets you choose to include symbolic links (also called symlinks or soft links) when scanning directories rather than skipping over them. When included, you can select between two ways to handle them:</P>
 
 <OL>
+	<LI><B>Follow:</B>
+	Treat symbolic links like the object they are pointing to. Links
+	pointing to directories are traversed like ordinary directories and
+	the target of each link is copied during synchronization.<BR>&nbsp;	
+	
 	<LI><B>Direct:</B>
 	Evaluate the symbolic link object
 	directly. Symbolic links will be shown as separate entities.
 	Links pointing to directories are not traversed and the link object
-	is copied directly during synchronization.<BR>&nbsp;
-	
-	<LI><B>Follow:</B>
-	Treat symbolic links like the object they are pointing to. Links
-	pointing to directories are traversed like ordinary directories and
-	the target of each link is copied during synchronization.
+	is copied directly during synchronization.
 </OL>
 
 <BR>

@@ -77,7 +77,7 @@ struct XmlBatchConfig
     zen::MainConfiguration mainCfg;
 
     bool runMinimized;
-    Zstring logFileDirectory;
+    Zstring logFolderPathPhrase;
     int logfilesCountLimit; //max logfiles; 0 := don't save logfiles; < 0 := no limit
     OnError handleError;    //reaction on error situation during synchronization
 };
@@ -263,7 +263,7 @@ struct XmlGlobalSettings
         FileIconSize iconSize;
 
         long lastUpdateCheck; //time of last update check
-		wxString lastOnlineVersion;
+        wxString lastOnlineVersion;
 
         ViewFilterDefault viewFilterDefault;
         wxString guiPerspectiveLast; //used by wxAuiManager

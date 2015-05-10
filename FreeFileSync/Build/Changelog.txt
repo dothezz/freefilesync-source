@@ -1,5 +1,25 @@
-FreeFileSync 6.15
------------------
+FreeFileSync 7.0 [2015-05-11]
+-----------------------------
+Support synchronization with MTP devices (Android, iPhone, tablet, digital camera)
+Implemented file system abstraction layer
+New database format supporting generic file ids 
+Pre-allocate disk space when writing file output stream
+Late failure when moving multiple items to recycle bin
+Keep UI responsive while loading/saving database file
+Improved error reporting indicating failed item when moving to recycle bin
+Transactional error handling when closing file streams
+Pass correct thread id when creating Minidump (Windows)
+Fixed directory icon loading resource leak (Linux)
+Fixed RealtimeSync message provider exception safety issue (Windows)
+Avoid locking issues by creating the log file after batch synchronization
+Fixed RealtimeSync monitoring for items beyond subfolders (Linux)
+Fall back to file extension during file icon load error
+Show file icon by extension as temporary placeholder
+Work around silent failure to copy file times to external drives (Linux)
+
+
+FreeFileSync 6.15 [2015-04-07]
+------------------------------
 Revert to log file naming convention without colon character
 Prevent endless recursion when traversing into folder on corrupt file system
 Fixed view filter button rendering issue for RTL languages
@@ -75,7 +95,7 @@ Updated translation files
 
 FreeFileSync 6.11 [2014-11-03]
 ------------------------------
-Updated Recycle Bin access for Windows 10
+Updated recycle bin access for Windows 10
 New command line option "-edit" to load configuration without executing
 Case-insensitive command line argument evaluation
 New Explorer context menu options for ffs_gui, ffs_batch files
@@ -599,7 +619,7 @@ Resize left and right grids equally
 Allow to move middle grid position via mouse
 Automatically resize file name columns
 Do not follow reparse points other than symlinks and mount points
-Warn if Recycle Bin is not available during manual deletion
+Warn if recycle bin is not available during manual deletion
 Fixed error when saving log file into volume root directory
 Show files which differ in attributes only in the same category as "equal" files
 Apply hidden attribute to lock file

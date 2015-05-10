@@ -1047,8 +1047,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Zdrojový kód byl napsán kompletně v C++ pomocí:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Pokud se Vám FreeFileSync líbí</target>
+<source>If you like FreeFileSync:</source>
+<target>Pokud se Vám FreeFileSync líbí:</target>
 
 <source>Donate with PayPal</source>
 <target>Přispět pomocí PayPal</target>

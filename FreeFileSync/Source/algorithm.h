@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef ALGORITHM_H_INCLUDED
-#define ALGORITHM_H_INCLUDED
+#ifndef ALGORITHM_H_34218518475321452548
+#define ALGORITHM_H_34218518475321452548
 
 #include <functional>
 #include "file_hierarchy.h"
@@ -17,8 +17,15 @@ void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
 std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCfg);
 
-void redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirPair& baseDirectory,  std::function<void(const std::wstring& msg)> reportWarning);
-void redetermineSyncDirection(const MainConfiguration& mainCfg,    FolderComparison& folderCmp, std::function<void(const std::wstring& msg)> reportWarning);
+void redetermineSyncDirection(const DirectionConfig& directConfig,
+                              BaseDirPair& baseDirectory,
+                              const std::function<void(const std::wstring& msg)>& reportWarning,
+                              const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
+
+void redetermineSyncDirection(const MainConfiguration& mainCfg,
+                              FolderComparison& folderCmp,
+                              const std::function<void(const std::wstring& msg)>& reportWarning,
+                              const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 
@@ -63,4 +70,4 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          bool& warningRecyclerMissing);
 }
 
-#endif //ALGORITHM_H_INCLUDED
+#endif //ALGORITHM_H_34218518475321452548

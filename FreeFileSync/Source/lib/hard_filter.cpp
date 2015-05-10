@@ -336,10 +336,8 @@ bool NameFilter::passDirFilter(const Zstring& relDirPath, bool* subObjMightMatch
 
 bool NameFilter::isNull(const Zstring& includePhrase, const Zstring& excludePhrase)
 {
-    Zstring include = includePhrase;
-    Zstring exclude = excludePhrase;
-    trim(include);
-    trim(exclude);
+    const Zstring include = trimCpy(includePhrase);
+    const Zstring exclude = trimCpy(excludePhrase);
 
     return include == Zstr("*") && exclude.empty();
     //return NameFilter(includePhrase, excludePhrase).isNull(); -> very expensive for huge lists

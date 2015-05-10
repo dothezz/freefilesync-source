@@ -287,8 +287,8 @@ template <class Char, template <class, class> class SP, class AP> inline Zbase<C
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs,       Char                 rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
 
 //don't use unified first argument but save one move-construction in the r-value case instead!
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Zbase<Char, SP, AP>& rhs) { return std::move(lhs += rhs); } //is the move really needed?
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Char*                rhs) { return std::move(lhs += rhs); } //lhs, is an l-vlaue in the function body...
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Zbase<Char, SP, AP>& rhs) { return std::move(lhs += rhs); } //the move *is* needed!!!
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Char*                rhs) { return std::move(lhs += rhs); } //lhs, is an l-value parameter...
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs,       Char                 rhs) { return std::move(lhs += rhs); } //and not a local variable => no copy elision
 
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }

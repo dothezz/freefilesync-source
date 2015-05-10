@@ -1046,8 +1046,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>קוד מקור נכתב ב- C++ באמצעות:</target>
 
-<source>If you like FreeFileSync</source>
-<target>במידה ו-FreeFileSync מוצאת חן בעינכם</target>
+<source>If you like FreeFileSync:</source>
+<target>במידה ו-FreeFileSync מוצאת חן בעינכם:</target>
 
 <source>Donate with PayPal</source>
 <target>תרום עם פייפל</target>

@@ -1042,8 +1042,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>ソースコードは C++ で書かれています</target>
 
-<source>If you like FreeFileSync</source>
-<target>FreeFileSync を気に入ってくれた方へ</target>
+<source>If you like FreeFileSync:</source>
+<target>FreeFileSync を気に入ってくれた方へ:</target>
 
 <source>Donate with PayPal</source>
 <target>PayPal から寄付</target>

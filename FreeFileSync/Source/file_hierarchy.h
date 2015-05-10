@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FILEHIERARCHY_H_INCLUDED
-#define FILEHIERARCHY_H_INCLUDED
+#ifndef FILEHIERARCHY_H_257235289645296
+#define FILEHIERARCHY_H_257235289645296
 
 #include <map>
 #include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
@@ -20,31 +20,30 @@
 #include <zen/file_id_def.h>
 #include "structures.h"
 #include "lib/hard_filter.h"
+#include "fs/native.h"
 
 namespace zen
 {
+using ABF = AbstractBaseFolder;
+
 struct FileDescriptor
 {
-    FileDescriptor() : lastWriteTimeRaw(), fileSize(), fileIdx(), devId(), isFollowedSymlink() {}
+    FileDescriptor() : lastWriteTimeRaw(), fileSize(), fileId(), isFollowedSymlink() {}
     FileDescriptor(std::int64_t lastWriteTimeRawIn,
                    std::uint64_t fileSizeIn,
-                   const FileId& idIn,
+                   const ABF::FileId& idIn,
                    bool isSymlink) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileSize(fileSizeIn),
-        fileIdx(idIn.second),
-        devId(idIn.first),
+        fileId(idIn),
         isFollowedSymlink(isSymlink) {}
 
     std::int64_t lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     std::uint64_t fileSize;
-    FileIndex fileIdx; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
-    DeviceId  devId;   //split into file id into components to avoid padding overhead of a std::pair!
+    ABF::FileId fileId; // optional!
     bool isFollowedSymlink;
 };
 
-inline
-FileId getFileId(const FileDescriptor& fd) { return FileId(fd.devId, fd.fileIdx); }
 
 struct LinkDescriptor
 {
@@ -100,9 +99,9 @@ class FileSystemObject;
 struct DirContainer
 {
     //------------------------------------------------------------------
-    typedef std::map<Zstring, DirContainer,   LessFilename> DirList;  //
-    typedef std::map<Zstring, FileDescriptor, LessFilename> FileList; //key: file name
-    typedef std::map<Zstring, LinkDescriptor, LessFilename> LinkList; //
+    typedef std::map<Zstring, DirContainer,   LessFilePath> DirList;  //
+    typedef std::map<Zstring, FileDescriptor, LessFilePath> FileList; //key: file name
+    typedef std::map<Zstring, LinkDescriptor, LessFilePath> LinkList; //
     //------------------------------------------------------------------
 
     DirContainer() = default;
@@ -231,9 +230,9 @@ private:
 class BaseDirPair : public HierarchyObject //synchronization base directory
 {
 public:
-    BaseDirPair(const Zstring& dirPostfixedLeft,
+    BaseDirPair(const std::shared_ptr<ABF>& abfLeftIn,
                 bool dirExistsLeft,
-                const Zstring& dirPostfixedRight,
+                const std::shared_ptr<ABF>& abfRightIn,
                 bool dirExistsRight,
                 const HardFilter::FilterRef& filter,
                 CompareVariant cmpVar,
@@ -244,12 +243,13 @@ public:
 #endif
         HierarchyObject(Zstring(), *this),
         filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance), optTimeShiftHours_(optTimeShiftHours),
-        baseDirPfL     (dirPostfixedLeft ),
-        baseDirPfR     (dirPostfixedRight),
-        dirExistsLeft_ (dirExistsLeft    ),
-        dirExistsRight_(dirExistsRight) {}
+        dirExistsLeft_ (dirExistsLeft),
+        dirExistsRight_(dirExistsRight),
+        abfLeft(abfLeftIn),
+        abfRight(abfRightIn) {}
 
-    template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR (or empty!)
+    template <SelectedSide side> ABF& getABF() const;
+
     static void removeEmpty(BaseDirPair& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
 
     template <SelectedSide side> bool isExisting() const; //status of directory existence at the time of comparison!
@@ -258,7 +258,7 @@ public:
     //get settings which were used while creating BaseDirPair
     const HardFilter&   getFilter() const { return *filter_; }
     CompareVariant getCompVariant() const { return cmpVar_; }
-    int getFileTimeTolerance() const { return fileTimeTolerance_; }
+    int  getFileTimeTolerance() const { return fileTimeTolerance_; }
     unsigned int getTimeShift() const { return optTimeShiftHours_; }
 
     void flip() override;
@@ -269,24 +269,24 @@ private:
     const int fileTimeTolerance_;
     const unsigned int optTimeShiftHours_;
 
-    Zstring baseDirPfL; //base sync dir postfixed
-    Zstring baseDirPfR; //
-
     bool dirExistsLeft_;
     bool dirExistsRight_;
+
+    std::shared_ptr<ABF> abfLeft;  //always bound
+    std::shared_ptr<ABF> abfRight; //
 };
 
 
 template <> inline
-const Zstring& BaseDirPair::getBaseDirPf<LEFT_SIDE>() const { return baseDirPfL; }
+ABF& BaseDirPair::getABF<LEFT_SIDE>() const { return *abfLeft; }
 
 template <> inline
-const Zstring& BaseDirPair::getBaseDirPf<RIGHT_SIDE>() const { return baseDirPfR; }
+ABF& BaseDirPair::getABF<RIGHT_SIDE>() const { return *abfRight; }
 
 
 //get rid of shared_ptr indirection
-template <class IterTy,     //underlying iterator type
-          class U>           //target object type
+template <class IterTy, //underlying iterator type
+          class U>      //target object type
 class DerefIter : public std::iterator<std::bidirectional_iterator_tag, U>
 {
 public:
@@ -364,9 +364,11 @@ public:
     Zstring getPairRelativePath() const; //like getRelativePath() but also returns value if either side is empty
     template <SelectedSide side>           bool isEmpty()         const;
     template <SelectedSide side> const Zstring& getItemName()     const; //case sensitive!
-    template <SelectedSide side>       Zstring  getRelativePath() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR prefix
-    template <SelectedSide side> const Zstring& getBaseDirPf()    const; //base sync directory postfixed with FILE_NAME_SEPARATOR
-    template <SelectedSide side>       Zstring  getFullPath()     const; //getFullPath() == getBaseDirPf() + getRelativePath()
+    template <SelectedSide side>       Zstring  getRelativePath() const; //get path relative to base sync dir without FILE_NAME_SEPARATOR prefix
+
+public:
+    template <SelectedSide side> ABF& getABF() const;
+    template <SelectedSide side> AbstractPathRef getAbstractPath() const;
 
     //comparison result
     CompareFilesResult getCategory() const { return cmpResult; }
@@ -503,8 +505,8 @@ public:
 
     template <SelectedSide side> std::int64_t getLastWriteTime() const;
     template <SelectedSide side> std::uint64_t     getFileSize() const;
-    template <SelectedSide side> FileId getFileId        () const;
-    template <SelectedSide side> bool   isFollowedSymlink() const;
+    template <SelectedSide side> ABF::FileId       getFileId  () const;
+    template <SelectedSide side> bool        isFollowedSymlink() const;
 
     void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
     ObjectId getMoveRef() const { return moveFileRef; } //may be nullptr
@@ -519,8 +521,8 @@ public:
                      std::uint64_t fileSize,
                      std::int64_t lastWriteTimeTrg,
                      std::int64_t lastWriteTimeSrc,
-                     const FileId& fileIdTrg,
-                     const FileId& fileIdSrc,
+                     const ABF::FileId& fileIdTrg,
+                     const ABF::FileId& fileIdSrc,
                      bool isSymlinkTrg,
                      bool isSymlinkSrc);
 
@@ -736,18 +738,17 @@ Zstring FileSystemObject::getPairShortName() const
 
 
 template <SelectedSide side> inline
-Zstring FileSystemObject::getFullPath() const
+ABF& FileSystemObject::getABF() const
 {
-    if (isEmpty<side>()) //avoid ternary-WTF!
-        return Zstring();
-    return getBaseDirPf<side>() + parent_.getPairRelativePathPf() + getItemName<side>();
+    return root().getABF<side>();
 }
 
 
 template <SelectedSide side> inline
-const Zstring& FileSystemObject::getBaseDirPf() const
+AbstractPathRef FileSystemObject::getAbstractPath() const
 {
-    return root().getBaseDirPf<side>();
+    assert(!isEmpty<side>());
+    return root().getABF<side>().getAbstractPath(parent_.getPairRelativePathPf() + getItemName<side>());
 }
 
 
@@ -935,8 +936,8 @@ inline
 void BaseDirPair::flip()
 {
     HierarchyObject::flip();
-    std::swap(baseDirPfL, baseDirPfR);
     std::swap(dirExistsLeft_, dirExistsRight_);
+    std::swap(abfLeft, abfRight);
 }
 
 
@@ -1023,10 +1024,9 @@ std::uint64_t FilePair::getFileSize() const
 
 
 template <SelectedSide side> inline
-FileId FilePair::getFileId() const
+ABF::FileId FilePair::getFileId() const
 {
-    return FileId(SelectParam<side>::ref(dataLeft, dataRight).devId,
-                  SelectParam<side>::ref(dataLeft, dataRight).fileIdx);
+    return SelectParam<side>::ref(dataLeft, dataRight).fileId;
 }
 
 
@@ -1042,8 +1042,8 @@ void FilePair::setSyncedTo(const Zstring& shortName,
                            std::uint64_t fileSize,
                            std::int64_t lastWriteTimeTrg,
                            std::int64_t lastWriteTimeSrc,
-                           const FileId& fileIdTrg,
-                           const FileId& fileIdSrc,
+                           const ABF::FileId& fileIdTrg,
+                           const ABF::FileId& fileIdSrc,
                            bool isSymlinkTrg,
                            bool isSymlinkSrc)
 {
@@ -1115,4 +1115,4 @@ void SymlinkPair::removeObjectR()
 }
 }
 
-#endif // FILEHIERARCHY_H_INCLUDED
+#endif //FILEHIERARCHY_H_257235289645296

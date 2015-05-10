@@ -35,7 +35,8 @@ template <class S, class T> S afterFirst (const S& str, const T& term); //return
 template <class S, class T> S beforeFirst(const S& str, const T& term); //returns the whole string if term not found
 
 template <class S, class T> std::vector<S> split(const S& str, const T& delimiter);
-template <class S> void trim(S& str, bool fromLeft = true, bool fromRight = true);
+template <class S> void trim   (      S& str, bool fromLeft = true, bool fromRight = true);
+template <class S> S    trimCpy(const S& str, bool fromLeft = true, bool fromRight = true);
 template <class S, class T, class U> void replace   (      S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 
@@ -331,9 +332,9 @@ void trim(S& str, bool fromLeft, bool fromRight)
     assert(fromLeft || fromRight);
     typedef typename GetCharType<S>::Type CharType; //don't use value_type! (wxString, Glib::ustring)
 
-    const CharType* const oldBegin = str.c_str();
-    const CharType* newBegin = oldBegin;
-    const CharType* newEnd   = oldBegin + str.length();
+    const CharType* const oldBegin = strBegin(str);
+    const CharType*       newBegin = oldBegin;
+    const CharType*       newEnd   = oldBegin + strLength(str);
 
     if (fromRight)
         while (newBegin != newEnd && isWhiteSpace(newEnd[-1]))
@@ -347,6 +348,16 @@ void trim(S& str, bool fromLeft, bool fromRight)
         str = S(newBegin, newEnd - newBegin); //minor inefficiency: in case "str" is not shared, we could save an allocation and do a memory move only
     else
         str.resize(newEnd - newBegin);
+}
+
+
+template <class S> inline
+S trimCpy(const S& str, bool fromLeft, bool fromRight)
+{
+	//implementing trimCpy() in terms of trim(), instead of the other way round, avoids memory allocations when trimming from right!
+	S tmp = str; 
+	trim(tmp, fromLeft, fromRight);
+	return tmp;
 }
 
 

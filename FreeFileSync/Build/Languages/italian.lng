@@ -1046,8 +1046,8 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Source code written in C++ using:</source>
 <target>Codice sorgente scritto in C++ utilizzando:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Se ti piace FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Se ti piace FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Fai una donazione con PayPal</target>

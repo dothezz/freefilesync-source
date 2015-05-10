@@ -1050,8 +1050,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Source code written in C++ using:</source>
 <target>Cod sursă scris în C++ folosind:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Donează pentru FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Donează pentru FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Donează prin PayPal</target>

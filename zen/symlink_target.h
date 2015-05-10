@@ -165,13 +165,13 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
 
 
     const HANDLE hFile = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),                  //_In_      LPCTSTR lpFileName,
-                                     0,                                                      //_In_      DWORD dwDesiredAccess,
-                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
-                                     nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-                                     OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
-                                     //needed to open a directory:
-                                     FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
-                                     nullptr);                   //_In_opt_  HANDLE hTemplateFile
+                                      0,                                                      //_In_      DWORD dwDesiredAccess,
+                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,
+                                      nullptr,                    //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                      OPEN_EXISTING,              //_In_      DWORD dwCreationDisposition,
+                                      //needed to open a directory:
+                                      FILE_FLAG_BACKUP_SEMANTICS, //_In_      DWORD dwFlagsAndAttributes,
+                                      nullptr);                   //_In_opt_  HANDLE hTemplateFile
     if (hFile == INVALID_HANDLE_VALUE)
         throwFileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(linkPath)), L"CreateFile", getLastError());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));

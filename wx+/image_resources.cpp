@@ -89,8 +89,8 @@ void GlobalResources::init(const Zstring& filepath)
                 wxImage img(streamIn, wxBITMAP_TYPE_PNG);
 
                 //end this alpha/no-alpha/mask/wxDC::DrawBitmap/RTL/high-contrast-scheme interoperability nightmare here and now!!!!
-				//=> there's only one type of png image: with alpha channel, no mask!!!
-				 convertToVanillaImage(img);
+                //=> there's only one type of png image: with alpha channel, no mask!!!
+                convertToVanillaImage(img);
 
                 bitmaps.emplace(name, img);
             }

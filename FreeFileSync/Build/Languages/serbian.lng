@@ -1050,8 +1050,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Изворни код написан у C++ уз коришћење:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Ако вам се свиђа FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Ако вам се свиђа FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Донација са PayPal-ом</target>

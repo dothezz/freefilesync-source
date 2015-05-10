@@ -1042,8 +1042,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>소스코드는 C++ 언어로 아래 툴을 사용하여 작성되었습니다:</target>
 
-<source>If you like FreeFileSync</source>
-<target>FreeFileSync를 위한 기부</target>
+<source>If you like FreeFileSync:</source>
+<target>FreeFileSync를 위한 기부:</target>
 
 <source>Donate with PayPal</source>
 <target>PayPal로 기부하기</target>

@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef RESOLVE_PATH_H_INCLUDED
-#define RESOLVE_PATH_H_INCLUDED
+#ifndef RESOLVE_PATH_H_INCLUDED_817402834713454
+#define RESOLVE_PATH_H_INCLUDED_817402834713454
 
 #include <vector>
 #include <zen/zstring.h>
@@ -13,13 +13,15 @@
 namespace zen
 {
 /*
-FULL directory format:
+	- trim whitespace
 	- expand macros
 	- expand volume path by name
 	- convert relative paths into absolute
-	- trim whitespace and append file name separator
+
+	=> may block for slow USB sticks and idle HDDs
+	=> not thread-safe, see ::GetFullPathName()!
 */
-Zstring getFormattedDirectoryPath(const Zstring& dirpathPhrase); //noexcept; may still block for slow USB sticks! not thread-safe!!! see ::GetFullPathName()
+Zstring getResolvedDirectoryPath(const Zstring& dirpassPhrase); //noexcept
 
 //macro substitution only
 Zstring expandMacros(const Zstring& text);
@@ -33,4 +35,4 @@ std::vector<Zstring> getDirectoryAliases(const Zstring& dirpassPhrase); //may bl
 }
 
 
-#endif // RESOLVE_PATH_H_INCLUDED
+#endif //RESOLVE_PATH_H_INCLUDED_817402834713454

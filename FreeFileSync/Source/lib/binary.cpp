@@ -11,7 +11,7 @@
 #include <boost/thread/tss.hpp>
 
 using namespace zen;
-
+using ABF = AbstractBaseFolder;
 
 namespace
 {
@@ -37,7 +37,7 @@ buffer  MB/s
 class BufferSize
 {
 public:
-    BufferSize() : bufSize(BUFFER_SIZE_START) {}
+    BufferSize(size_t initialSize) : bufSize(initialSize) {}
 
     void inc()
     {
@@ -54,9 +54,8 @@ public:
     size_t get() const { return bufSize; }
 
 private:
-    static const size_t BUFFER_SIZE_MIN   =        64 * 1024;
-    static const size_t BUFFER_SIZE_START =       128 * 1024; //initial buffer size
-    static const size_t BUFFER_SIZE_MAX   = 16 * 1024 * 1024;
+    static const size_t BUFFER_SIZE_MIN   =            8 * 1024; //slow FTP transfer!
+    static const size_t BUFFER_SIZE_MAX   =  1024 * 1024 * 1024;
 
     size_t bufSize;
 };
@@ -74,7 +73,7 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec();
 }
 
 
-bool zen::filesHaveSameContent(const Zstring& filepath1, const Zstring& filepath2, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
+bool zen::filesHaveSameContent(const AbstractPathRef& filePath1, const AbstractPathRef& filePath2, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
 {
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
@@ -86,22 +85,23 @@ bool zen::filesHaveSameContent(const Zstring& filepath1, const Zstring& filepath
     std::vector<char>& memory1 = *cpyBuf1;
     std::vector<char>& memory2 = *cpyBuf2;
 
-    FileInput file1(filepath1); //throw FileError
-    FileInput file2(filepath2); //
+    const std::unique_ptr<ABF::InputStream> inStream1 = ABF::getInputStream(filePath1); //throw FileError, (ErrorFileLocked)
+    const std::unique_ptr<ABF::InputStream> inStream2 = ABF::getInputStream(filePath2); //
 
-    BufferSize bufferSize;
+    BufferSize bufferSize(std::min(inStream1->optimalBlockSize(),
+                                   inStream2->optimalBlockSize()));
 
     TickVal lastDelayViolation = getTicks();
 
-    do
+    for (;;)
     {
         setMinSize(memory1, bufferSize.get());
         setMinSize(memory2, bufferSize.get());
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = file1.read(&memory1[0], bufferSize.get()); //throw FileError
-        const size_t length2 = file2.read(&memory2[0], bufferSize.get()); //returns actual number of bytes read
+        const size_t length1 = inStream1->read(&memory1[0], bufferSize.get()); //throw FileError
+        const size_t length2 = inStream2->read(&memory2[0], bufferSize.get()); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
         if (onUpdateStatus)
             onUpdateStatus(std::max(length1, length2));
@@ -130,11 +130,8 @@ bool zen::filesHaveSameContent(const Zstring& filepath1, const Zstring& filepath
             }
         }
         //------------------------------------------------------------------------------------------------
+
+        if (length1 != bufferSize.get()) //end of file
+            return true;
     }
-    while (!file1.eof());
-
-    if (!file2.eof()) //unlikely, but possible
-        return false;
-
-    return true;
 }

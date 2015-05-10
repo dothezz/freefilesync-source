@@ -1050,8 +1050,8 @@ To zagotavlja konsistenco podatkov v primeru napake.
 <source>Source code written in C++ using:</source>
 <target>Izvorna koda napisana v C++ z uporabo:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Če vam je FreeFileSync všeč</target>
+<source>If you like FreeFileSync:</source>
+<target>Če vam je FreeFileSync všeč:</target>
 
 <source>Donate with PayPal</source>
 <target>Doniraj s PayPal</target>

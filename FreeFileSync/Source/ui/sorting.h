@@ -50,7 +50,7 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
         return true;
 
     //sort directories and files/symlinks by short name
-    return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
+    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
 }
 
 template <bool ascending, SelectedSide side> inline
@@ -62,7 +62,8 @@ bool lessFullPath(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getFullPath<side>(), b.getFullPath<side>());
+    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(ABF::getDisplayPath(a.getAbstractPath<side>()),
+                                                                    ABF::getDisplayPath(b.getAbstractPath<side>()));
 }
 
 
@@ -90,7 +91,7 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
     else if (isDirectoryA)
         return true;
 
-    return LessFilename()(a.getPairShortName(), b.getPairShortName());
+    return LessFilePath()(a.getPairShortName(), b.getPairShortName());
 }
 
 
@@ -170,7 +171,7 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
         return pos == Zstring::npos ? Zstring() : Zstring(shortName.begin() + pos + 1, shortName.end());
     };
 
-    return makeSortDirection(LessFilename(), Int2Type<ascending>())(getExtension(a), getExtension(b));
+    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(getExtension(a), getExtension(b));
 }
 
 

@@ -1046,8 +1046,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Source code written in C++ using:</source>
 <target>Källkod skriven i C++ med hjälp av:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Om du gillar FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Om du gillar FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Donera via PayPal</target>

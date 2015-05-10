@@ -618,7 +618,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
                                          extractJobName(referenceFile),
                                          timeStamp,
-                                         batchCfg.logFileDirectory,
+                                         batchCfg.logFolderPathPhrase,
                                          batchCfg.logfilesCountLimit,
                                          globalCfg.lastSyncsLogFileSizeMax,
                                          batchCfg.handleError,

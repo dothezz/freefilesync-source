@@ -222,7 +222,7 @@ struct SyncConfig
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
     //versioning options
     VersioningStyle versioningStyle;
-    Zstring versioningDirectory;
+    Zstring versioningFolderPhrase;
     //int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
 };
 
@@ -230,10 +230,10 @@ struct SyncConfig
 inline
 bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
 {
-    return lhs.directionCfg        == rhs.directionCfg   &&
-           lhs.handleDeletion      == rhs.handleDeletion &&
-           lhs.versioningStyle     == rhs.versioningStyle &&
-           lhs.versioningDirectory == rhs.versioningDirectory;
+    return lhs.directionCfg           == rhs.directionCfg   &&
+           lhs.handleDeletion         == rhs.handleDeletion &&
+           lhs.versioningStyle        == rhs.versioningStyle &&
+           lhs.versioningFolderPhrase == rhs.versioningFolderPhrase;
     //adapt effectivelyEqual() on changes, too!
 }
 
@@ -245,7 +245,7 @@ bool effectivelyEqual(const SyncConfig& lhs, const SyncConfig& rhs)
            lhs.handleDeletion == rhs.handleDeletion &&
            (lhs.handleDeletion != DELETE_TO_VERSIONING || //only compare deletion directory if required!
             (lhs.versioningStyle   == rhs.versioningStyle &&
-             lhs.versioningDirectory == rhs.versioningDirectory));
+             lhs.versioningFolderPhrase == rhs.versioningFolderPhrase));
 }
 
 

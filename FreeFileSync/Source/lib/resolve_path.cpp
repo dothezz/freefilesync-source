@@ -28,7 +28,7 @@ using namespace zen;
 
 namespace
 {
-Zstring resolveRelativePath(const Zstring& relativePath) //note: ::GetFullPathName() is documented to be not thread-safe!
+Zstring resolveRelativePath(const Zstring& relativePath) //note: ::GetFullPathName() is documented to be NOT thread-safe!
 {
 #ifdef ZEN_WIN
     //- don't use long path prefix here! does not work with relative paths "." and ".."
@@ -86,7 +86,7 @@ Zstring resolveRelativePath(const Zstring& relativePath) //note: ::GetFullPathNa
 class CsidlConstants
 {
 public:
-    typedef std::map<Zstring, Zstring, LessFilename> CsidlToDirMap; //case-insensitive comparison
+    typedef std::map<Zstring, Zstring, LessFilePath> CsidlToDirMap; //case-insensitive comparison
 
     static const CsidlToDirMap& get()
     {
@@ -208,7 +208,7 @@ auto& dummy = CsidlConstants::get();
 #endif
 
 
-Opt<Zstring> getEnvironmentVar(const Zstring& envName) //return nullptr if not found
+Opt<Zstring> getEnvironmentVar(const Zstring& envName) //return null if not found
 {
     wxString value;
     if (!wxGetEnv(utfCvrtTo<wxString>(envName), &value))
@@ -353,7 +353,7 @@ Opt<Zstring> getPathByVolumenName(const Zstring& volumeName) //return no value o
                 nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
                 nullptr,     //__out      LPTSTR  lpFileSystemNameBuffer,
                 0))          //__in       DWORD nFileSystemNameSize
-                    if (EqualFilename()(volumeName, Zstring(&volName[0])))
+                    if (EqualFilePath()(volumeName, Zstring(&volName[0])))
                         return zen::make_unique<Zstring>(path);
                 return nullptr;
             });
@@ -396,9 +396,7 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
     //this would be a nice job for a C++11 regex...
 
     //we only expect the [.*] pattern at the beginning => do not touch dir names like "C:\somedir\[stuff]"
-    Zstring textTmp = text;
-    trim(textTmp, true, false);
-
+    const Zstring textTmp = trimCpy(text, true, false);
     if (startsWith(textTmp, Zstr("[")))
     {
         size_t posEnd = textTmp.find(Zstr("]"));
@@ -440,7 +438,7 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
 }
 
 
-void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, LessFilename>& output)
+void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, LessFilePath>& output)
 {
 #ifdef ZEN_WIN
     //1. replace volume path by volume name: c:\dirpath -> [SYSTEM]\dirpath
@@ -495,14 +493,6 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
         addEnvVar("HOME"); //Linux: /home/<user>  Mac: /Users/<user>
 #endif
         //substitute paths by symbolic names
-        auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
-        {
-#if defined ZEN_WIN || defined ZEN_MAC
-            return startsWith(makeUpperCopy(path), makeUpperCopy(prefix));
-#elif defined ZEN_LINUX
-            return startsWith(path, prefix);
-#endif
-        };
         for (const auto& entry : envToDir)
             if (pathStartsWith(dirpath, entry.second))
                 output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirpath.c_str() + entry.second.size()));
@@ -520,12 +510,11 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
 
 std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirpathPhrase)
 {
-    Zstring dirpath = dirpathPhrase;
-    trim(dirpath, true, false);
+    const Zstring dirpath = trimCpy(dirpathPhrase, true, false);
     if (dirpath.empty())
         return std::vector<Zstring>();
 
-    std::set<Zstring, LessFilename> tmp;
+    std::set<Zstring, LessFilePath> tmp;
     getDirectoryAliasesRecursive(dirpath, tmp);
 
     tmp.erase(dirpath);
@@ -535,23 +524,26 @@ std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirpathPhrase)
 }
 
 
-Zstring zen::getFormattedDirectoryPath(const Zstring& dirpassPhrase) // throw()
+//coordinate changes with acceptsFolderPathPhraseNative()!
+Zstring zen::getResolvedDirectoryPath(const Zstring& dirpassPhrase) //noexcept
 {
-    //formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
-
     Zstring dirpath = dirpassPhrase;
+
+    dirpath = expandMacros(dirpath); //expand before trimming!
 
     //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
     trim(dirpath, true, false);
     while (endsWith(dirpath, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
         dirpath.resize(dirpath.size() - 1);
 
+#ifdef ZEN_WIN
+    dirpath = removeLongPathPrefix(dirpath);
+#endif
+
+    dirpath = expandVolumeName(dirpath); //may block for slow USB sticks and idle HDDs!
+
     if (dirpath.empty()) //an empty string would later be resolved as "\"; this is not desired
         return Zstring();
-
-    dirpath = expandMacros(dirpath);
-    dirpath = expandVolumeName(dirpath); //may block for slow USB sticks!
-
     /*
     need to resolve relative paths:
     WINDOWS:
@@ -564,7 +556,21 @@ Zstring zen::getFormattedDirectoryPath(const Zstring& dirpassPhrase) // throw()
      */
     dirpath = resolveRelativePath(dirpath);
 
-    return appendSeparator(dirpath);
+    auto isVolumeRoot = [](const Zstring& path)
+    {
+#ifdef ZEN_WIN
+        return path.size() == 3 && std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+#elif defined ZEN_LINUX || defined ZEN_MAC
+        return path == "/";
+#endif
+    };
+
+    //remove trailing slash, unless volume root:
+    if (endsWith(dirpath, FILE_NAME_SEPARATOR))
+        if (!isVolumeRoot(dirpath))
+            dirpath = beforeLast(dirpath, FILE_NAME_SEPARATOR);
+
+    return dirpath;
 }
 
 

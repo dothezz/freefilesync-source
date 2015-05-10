@@ -44,6 +44,9 @@ const int DETECT_ABANDONED_INTERVAL = 30; //assume abandoned lock; unit: [s]
 
 const char LOCK_FORMAT_DESCR[] = "FreeFileSync";
 const int LOCK_FORMAT_VER = 2; //lock file format version
+
+using MemStreamOut = MemoryStreamOut<ByteArray>;
+using MemStreamIn  = MemoryStreamIn <ByteArray>;
 }
 
 //worker thread
@@ -318,7 +321,7 @@ struct LockInformation //throw FileError
         sessionId = *sessionIdTmp;
     }
 
-    explicit LockInformation(BinStreamIn& stream) //throw UnexpectedEndOfStreamError
+    explicit LockInformation(MemStreamIn& stream) //throw UnexpectedEndOfStreamError
     {
         char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
         readArray(stream, &tmp, sizeof(tmp));                           //file format header
@@ -335,7 +338,7 @@ struct LockInformation //throw FileError
         processId    = static_cast<ProcessId>(readNumber<std::uint64_t>(stream)); //[!] conversion
     }
 
-    void toStream(BinStreamOut& stream) const //throw ()
+    void toStream(MemStreamOut& stream) const //throw ()
     {
         writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
         writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
@@ -367,7 +370,7 @@ struct LockInformation //throw FileError
 
 LockInformation retrieveLockInfo(const Zstring& lockfilepath) //throw FileError
 {
-    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilepath,  nullptr); //throw FileError
+    MemStreamIn streamIn = loadBinStream<ByteArray>(lockfilepath,  nullptr); //throw FileError
     try
     {
         return LockInformation(streamIn); //throw UnexpectedEndOfStreamError
@@ -568,11 +571,11 @@ bool tryLock(const Zstring& lockfilepath) //throw FileError
 #endif
 
     //write housekeeping info: user, process info, lock GUID
-    BinaryStream binStream = [&]
+    ByteArray binStream = [&]
     {
-        BinStreamOut streamOut;
+        MemStreamOut streamOut;
         LockInformation(FromCurrentProcess()).toStream(streamOut);
-        return streamOut.get();
+        return streamOut.ref();
     }();
 
     if (!binStream.empty())
@@ -661,7 +664,7 @@ private:
     LockAdmin& operator=(const LockAdmin&) = delete;
 
     typedef std::string UniqueId;
-    typedef std::map<Zstring, UniqueId, LessFilename>        FileToGuidMap; //n:1 handle uppper/lower case correctly
+    typedef std::map<Zstring, UniqueId, LessFilePath>        FileToGuidMap; //n:1 handle uppper/lower case correctly
     typedef std::map<UniqueId, std::weak_ptr<SharedDirLock>> GuidToLockMap; //1:1
 
     std::shared_ptr<SharedDirLock> getActiveLock(const UniqueId& lockId) //returns null if none found

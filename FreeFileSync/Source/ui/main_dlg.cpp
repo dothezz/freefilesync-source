@@ -37,6 +37,7 @@
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
+#include "../fs/concrete.h"
 #include "../lib/resolve_path.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/help_provider.h"
@@ -91,16 +92,16 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
 }
 
 
-class DirectoryNameMainImpl : public DirectoryName<FolderHistoryBox>
+class FolderSelectorMainImpl : public FolderSelector
 {
 public:
-    DirectoryNameMainImpl(MainDialog&      mainDlg,
-                          wxWindow&        dropWindow1,
-                          Grid&            dropGrid,
-                          wxButton&        dirSelectButton,
-                          FolderHistoryBox& dirpath,
-                          wxStaticText&    staticText) :
-        DirectoryName(dropWindow1, dirSelectButton, dirpath, &staticText, &dropGrid.getMainWin()),
+    FolderSelectorMainImpl(MainDialog&      mainDlg,
+                           wxWindow&        dropWindow1,
+                           Grid&            dropGrid,
+                           wxButton&        dirSelectButton,
+                           FolderHistoryBox& dirpath,
+                           wxStaticText&    staticText) :
+        FolderSelector(dropWindow1, dirSelectButton, dirpath, &staticText, &dropGrid.getMainWin()),
         mainDlg_(mainDlg) {}
 
     bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) override
@@ -134,8 +135,8 @@ public:
     }
 
 private:
-    DirectoryNameMainImpl           (const DirectoryNameMainImpl&) = delete;
-    DirectoryNameMainImpl& operator=(const DirectoryNameMainImpl&) = delete;
+    FolderSelectorMainImpl           (const FolderSelectorMainImpl&) = delete;
+    FolderSelectorMainImpl& operator=(const FolderSelectorMainImpl&) = delete;
 
     MainDialog& mainDlg_;
 };
@@ -199,19 +200,19 @@ public:
     void setValues(const FolderPairEnh& fp)
     {
         setConfig(fp.altCmpConfig, fp.altSyncConfig, fp.localFilter);
-        dirpathLeft .setPath(toWx(fp.dirpathPhraseLeft));
-        dirpathRight.setPath(toWx(fp.dirpathPhraseRight));
+        dirpathLeft .setPath(fp.dirpathPhraseLeft);
+        dirpathRight.setPath(fp.dirpathPhraseRight);
     }
 
     FolderPairEnh getValues() const { return FolderPairEnh(getLeftDir(), getRightDir(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
 
-    Zstring getLeftDir () const { return toZ(dirpathLeft .getPath()); }
-    Zstring getRightDir() const { return toZ(dirpathRight.getPath()); }
+    Zstring getLeftDir () const { return dirpathLeft .getPath(); }
+    Zstring getRightDir() const { return dirpathRight.getPath(); }
 
 private:
     //support for drag and drop
-    DirectoryName<FolderHistoryBox> dirpathLeft;
-    DirectoryName<FolderHistoryBox> dirpathRight;
+    FolderSelector dirpathLeft;
+    FolderSelector dirpathRight;
 };
 
 
@@ -249,19 +250,19 @@ public:
     void setValues(const FolderPairEnh& fp)
     {
         setConfig(fp.altCmpConfig, fp.altSyncConfig, fp.localFilter);
-        dirpathLeft .setPath(toWx(fp.dirpathPhraseLeft));
-        dirpathRight.setPath(toWx(fp.dirpathPhraseRight));
+        dirpathLeft .setPath(fp.dirpathPhraseLeft);
+        dirpathRight.setPath(fp.dirpathPhraseRight);
     }
 
     FolderPairEnh getValues() const { return FolderPairEnh(getLeftDir(), getRightDir(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
 
-    Zstring getLeftDir () const { return toZ(dirpathLeft .getPath()); }
-    Zstring getRightDir() const { return toZ(dirpathRight.getPath()); }
+    Zstring getLeftDir () const { return dirpathLeft .getPath(); }
+    Zstring getRightDir() const { return dirpathRight.getPath(); }
 
 private:
     //support for drag and drop
-    DirectoryNameMainImpl dirpathLeft;
-    DirectoryNameMainImpl dirpathRight;
+    FolderSelectorMainImpl dirpathLeft;
+    FolderSelectorMainImpl dirpathRight;
 };
 
 
@@ -797,8 +798,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
         auto addDirCheck = [&](const FolderPairEnh& fp)
         {
-            const Zstring dirLeft  = getFormattedDirectoryPath(fp.dirpathPhraseLeft ); //should not block!?
-            const Zstring dirRight = getFormattedDirectoryPath(fp.dirpathPhraseRight); //
+            const Zstring dirLeft  = getResolvedDisplayPath(fp.dirpathPhraseLeft ); //should not block!?
+            const Zstring dirRight = getResolvedDisplayPath(fp.dirpathPhraseRight); //
 
             if (dirLeft.empty() != dirRight.empty()) //only skip check if both sides are empty!
                 havePartialPair = true;
@@ -1356,11 +1357,11 @@ Zstring getExistingParentFolder(const FileSystemObject& fsObj)
     while (dirObj)
     {
         if (!dirObj->isEmpty<side>())
-            return dirObj->getFullPath<side>();
+            return ABF::getDisplayPath(dirObj->getAbstractPath<side>());
 
         dirObj = dynamic_cast<const DirPair*>(&dirObj->parent());
     }
-    return fsObj.getBaseDirPf<side>();
+    return ABF::getDisplayPath(fsObj.getABF<side>().getAbstractPath());
 }
 }
 
@@ -1371,7 +1372,7 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
 
     auto selectionTmp = selection;
 
-    const bool openFileBrowserRequested = [&]() -> bool
+    const bool openFileBrowserRequested = [&]
     {
         xmlAccess::XmlGlobalSettings::Gui dummy;
         return !dummy.externelApplications.empty() && dummy.externelApplications[0].second == commandline;
@@ -1390,9 +1391,8 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
             Zstring fallbackDir;
             if (selectionTmp.empty())
                 fallbackDir = leftSide ?
-                              getFormattedDirectoryPath(firstFolderPair->getLeftDir()) :
-                              getFormattedDirectoryPath(firstFolderPair->getRightDir());
-
+                              getResolvedDisplayPath(firstFolderPair->getLeftDir()) :
+                              getResolvedDisplayPath(firstFolderPair->getRightDir());
             else
                 fallbackDir = leftSide ?
                               getExistingParentFolder<LEFT_SIDE >(*selectionTmp[0]) :
@@ -1438,11 +1438,12 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
     //regular command evaluation
     for (const FileSystemObject* fsObj : selectionTmp) //context menu calls this function only if selection is not empty!
     {
-        Zstring path1 = fsObj->getBaseDirPf<LEFT_SIDE>() + fsObj->getPairRelativePath(); //full path, even if item is not existing!
-        Zstring dir1  = beforeLast(path1, FILE_NAME_SEPARATOR); //Win: wrong for root paths like "C:\file.txt"
+        const Zstring& relPath = fsObj->getPairRelativePath();
+        Zstring path1 = ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(relPath)); //full path, even if item is not existing!
+        Zstring dir1  = ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR))); //returns empty string if term not found
 
-        Zstring path2 = fsObj->getBaseDirPf<RIGHT_SIDE>() + fsObj->getPairRelativePath();
-        Zstring dir2  = beforeLast(path2, FILE_NAME_SEPARATOR);
+        Zstring path2 = ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(relPath));
+        Zstring dir2  = ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR)));
 
         if (!leftSide)
         {
@@ -1501,7 +1502,7 @@ void MainDialog::setStatusBarFileStatistics(size_t filesOnLeftView,
     if (gridDataView->rowsTotal() > 0)
     {
         statusMiddleNew = _P("Showing %y of 1 row", "Showing %y of %x rows", gridDataView->rowsTotal());
-        replace(statusMiddleNew, L"%y", toGuiString(gridDataView->rowsOnView()), false); //%x is already used as plural form placeholder!
+        replace(statusMiddleNew, L"%y", toGuiString(gridDataView->rowsOnView())); //%x is already used as plural form placeholder!
     }
 
     //fill middle text (considering flashStatusInformation())
@@ -2569,7 +2570,7 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 wxString getFormattedHistoryElement(const Zstring& filepath)
 {
     Zstring output = afterLast(filepath, FILE_NAME_SEPARATOR);
-    if (endsWith(output, Zstr(".ffs_gui")))
+    if (pathEndsWith(output, Zstr(".ffs_gui")))
         output = beforeLast(output, Zstr('.'));
     return utfCvrtTo<wxString>(output);
 }
@@ -2596,7 +2597,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
                 if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
                 {
-                    if (EqualFilename()(filepath, histData->cfgFile_))
+                    if (EqualFilePath()(filepath, histData->cfgFile_))
                         return std::make_pair(histData, i);
                 }
                 else
@@ -2616,7 +2617,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             wxString label;
             unsigned int newPos = 0;
 
-            if (EqualFilename()(filepath, lastRunConfigName()))
+            if (EqualFilePath()(filepath, lastRunConfigName()))
                 label = lastSessionLabel;
             else
             {
@@ -2688,7 +2689,7 @@ void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filepaths)
         const int histSize = m_listBoxHistory->GetCount();
         for (int i = 0; i < histSize; ++i)
             if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
-                if (EqualFilename()(filepath, histData->cfgFile_))
+                if (EqualFilePath()(filepath, histData->cfgFile_))
                 {
                     m_listBoxHistory->Delete(i);
                     break;
@@ -2699,7 +2700,7 @@ void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filepaths)
 
 void MainDialog::updateUnsavedCfgStatus()
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
 
     const bool haveUnsavedCfg = lastConfigurationSaved != getConfig();
 
@@ -2740,7 +2741,7 @@ void MainDialog::updateUnsavedCfgStatus()
 
 void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
 
     using namespace xmlAccess;
 
@@ -2792,14 +2793,14 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
     if (guiFilename)
     {
         targetFilename = *guiFilename;
-        assert(endsWith(targetFilename, Zstr(".ffs_gui")));
+        assert(pathEndsWith(targetFilename, Zstr(".ffs_gui")));
     }
     else
     {
-        Zstring defaultFileName = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
+        Zstring defaultFileName = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-        if (endsWith(defaultFileName, Zstr(".ffs_batch")))
-            replace(defaultFileName, Zstr(".ffs_batch"), Zstr(".ffs_gui"), false);
+        if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
+            defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_gui");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
@@ -2837,7 +2838,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
     //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "m_bpButtonViewTypeSyncAction" is negliable
 
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
     const XmlGuiConfig guiCfg = getConfig();
 
     //prepare batch config: reuse existing batch-specific settings from file if available
@@ -2874,7 +2875,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
     if (batchFileToUpdate)
     {
         targetFilename = *batchFileToUpdate;
-        assert(endsWith(targetFilename, Zstr(".ffs_batch")));
+        assert(pathEndsWith(targetFilename, Zstr(".ffs_batch")));
     }
     else
     {
@@ -2887,8 +2888,8 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
         Zstring defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : Zstr("BatchRun.ffs_batch");
         //attention: activeConfigFiles may be a *.ffs_gui file! We don't want to overwrite it with a BATCH config!
-        if (endsWith(defaultFileName, Zstr(".ffs_gui")))
-            replace(defaultFileName, Zstr(".ffs_gui"), Zstr(".ffs_batch"));
+        if (pathEndsWith(defaultFileName, Zstr(".ffs_gui")))
+            defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_batch");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
@@ -2922,7 +2923,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 {
     if (lastConfigurationSaved != getConfig())
     {
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
 
         //notify user about changed settings
         if (globalCfg.optDialogs.popupOnConfigChange)
@@ -2981,7 +2982,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
 void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
@@ -3713,7 +3714,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
     try
     {
         //PERF_START;
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilename()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
 
         const auto& guiCfg = getConfig();
 
@@ -3736,15 +3737,18 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         std::unique_ptr<LockHolder> dirLocks;
         if (globalCfg.createLockFile)
         {
-            std::set<Zstring, LessFilename> dirpathsExisting;
+            std::set<Zstring, LessFilePath> dirPathsExisting;
             for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
             {
                 if (it->isExisting<LEFT_SIDE>()) //do NOT check directory existence again!
-                    dirpathsExisting.insert(it->getBaseDirPf<LEFT_SIDE >());
+                    if (Opt<Zstring> nativeFolderPath = ABF::getNativeItemPath(it->getABF<LEFT_SIDE >().getAbstractPath())) //restrict directory locking to native paths until further
+                        dirPathsExisting.insert(*nativeFolderPath);
+
                 if (it->isExisting<RIGHT_SIDE>())
-                    dirpathsExisting.insert(it->getBaseDirPf<RIGHT_SIDE>());
+                    if (Opt<Zstring> nativeFolderPath = ABF::getNativeItemPath(it->getABF<RIGHT_SIDE >().getAbstractPath()))
+                        dirPathsExisting.insert(*nativeFolderPath);
             }
-            dirLocks = zen::make_unique<LockHolder>(dirpathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
+            dirLocks = zen::make_unique<LockHolder>(dirPathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -4053,7 +4057,9 @@ void MainDialog::applySyncConfig()
             showNotificationDialog(this, DialogInfoType::WARNING, PopupDialogCfg().setDetailInstructions(warning).setCheckBox(dontWarnAgain, _("&Don't show this warning again")));
             warningActive = !dontWarnAgain;
         }
-    });
+    },
+    nullptr //[&](std::int64_t bytesDelta){ } -> status update while loading db file
+                                 );
 
     updateGui();
 }
@@ -4123,9 +4129,7 @@ void MainDialog::hideFindPanel()
 
 void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
 {
-    wxString searchString = m_textCtrlSearchTxt->GetValue();
-    trim(searchString);
-
+    const wxString searchString = trimCpy(m_textCtrlSearchTxt->GetValue());
     if (searchString.empty())
         showFindPanel();
     else
@@ -4159,7 +4163,7 @@ void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
             showFindPanel();
             showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
                                    setTitle(_("Find")).
-                                   setMainInstructions(replaceCpy(_("Cannot find %x"), L"%x", L"\"" + searchString + L"\"", false)));
+                                   setMainInstructions(replaceCpy(_("Cannot find %x"), L"%x", L"\"" + searchString + L"\"")));
         }
     }
 }
@@ -4506,8 +4510,8 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     std::for_each(begin(folderCmp), end(folderCmp),
                   [&](BaseDirPair& baseDirObj)
     {
-        header += utfCvrtTo<Utf8String>(baseDirObj.getBaseDirPf<LEFT_SIDE >()) + CSV_SEP;
-        header += utfCvrtTo<Utf8String>(baseDirObj.getBaseDirPf<RIGHT_SIDE>()) + '\n';
+        header += utfCvrtTo<Utf8String>(ABF::getDisplayPath(baseDirObj.getABF<LEFT_SIDE >().getAbstractPath())) + CSV_SEP;
+        header += utfCvrtTo<Utf8String>(ABF::getDisplayPath(baseDirObj.getABF<RIGHT_SIDE>().getAbstractPath())) + '\n';
     });
     header += '\n';
 

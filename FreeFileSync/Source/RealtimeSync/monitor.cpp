@@ -15,6 +15,7 @@
 #include "../lib/resolve_path.h"
 //#include "../library/db_file.h"     //SYNC_DB_FILE_ENDING -> complete file too much of a dependency; file ending too little to decouple into single header
 //#include "../library/lock_holder.h" //LOCK_FILE_ENDING
+//TEMP_FILE_ENDING
 
 using namespace zen;
 
@@ -26,10 +27,10 @@ const int CHECK_DIR_INTERVAL = 1; //unit: [s]
 
 std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirpathPhrases) //throw FileError
 {
-    std::set<Zstring, LessFilename> dirpaths; //make unique
-    for (const Zstring& phrase : std::set<Zstring, LessFilename>(dirpathPhrases.begin(), dirpathPhrases.end()))
+    std::set<Zstring, LessFilePath> dirpaths; //make unique
+    for (const Zstring& phrase : std::set<Zstring, LessFilePath>(dirpathPhrases.begin(), dirpathPhrases.end()))
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
-        dirpaths.insert(getFormattedDirectoryPath(phrase));
+        dirpaths.insert(getResolvedDirectoryPath(phrase));
 
     return std::vector<Zstring>(dirpaths.begin(), dirpaths.end());
 }
@@ -119,11 +120,11 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw Fi
                 {
                     return
 #ifdef ZEN_MAC
-                        endsWith(e.filepath_, Zstr("/.DS_Store")) ||
+                        pathEndsWith(e.filepath_, Zstr("/.DS_Store")) ||
 #endif
-                        endsWith(e.filepath_, TEMP_FILE_ENDING)  ||
-                        endsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
-                        endsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
+                        pathEndsWith(e.filepath_, Zstr(".ffs_tmp"))  ||
+                        pathEndsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
+                        pathEndsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
                 });
 
@@ -151,7 +152,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw File
     while (true)
     {
         bool allExisting = true;
-        //support specifying volume by name => call getFormattedDirectoryPath() repeatedly
+        //support specifying volume by name => call getResolvedDirectoryPath() repeatedly
         for (const Zstring& dirpathFmt : getFormattedDirs(dirpathPhrases)) //throw FileError
         {
             auto ftDirExisting = async([=]() -> bool

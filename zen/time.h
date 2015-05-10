@@ -218,7 +218,7 @@ String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormat
     std::mktime(&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
     //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
 
-	CharType buffer[256] = {};
+    CharType buffer[256] = {};
     const size_t charsWritten = strftimeWrap(buffer, 256, strBegin(format), &ctc);
     return String(buffer, charsWritten);
 }
@@ -237,11 +237,11 @@ TimeComp localTime(time_t utc)
 {
     struct ::tm lt = {};
 
-	//use thread-safe variants of localtime()!
+    //use thread-safe variants of localtime()!
 #ifdef ZEN_WIN
     if (::localtime_s(&lt, &utc) != 0)
 #else
-	if (::localtime_r(&utc, &lt) == nullptr)
+    if (::localtime_r(&utc, &lt) == nullptr)
 #endif
         return TimeComp();
 

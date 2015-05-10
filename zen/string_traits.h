@@ -176,8 +176,8 @@ size_t cStringLength(const C* str) //naive implementation seems somewhat faster 
 }
 
 
-template <class S> inline
-const typename GetCharType<S>::Type* strBegin(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type* = nullptr) //SFINAE: T must be a "string"
+template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
+const typename GetCharType<S>::Type* strBegin(const S& str) //SFINAE: T must be a "string"
 {
     return str.c_str();
 }
@@ -190,8 +190,8 @@ inline const char*    strBegin(const StringRef<char   >& ref) { return ref.data(
 inline const wchar_t* strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
 
 
-template <class S> inline
-size_t strLength(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type* = nullptr) //SFINAE: T must be a "string"
+template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
+size_t strLength(const S& str) //SFINAE: T must be a "string"
 {
     return str.length();
 }

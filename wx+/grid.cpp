@@ -1323,10 +1323,10 @@ void Grid::updateWindowSizes(bool updateScrollbar)
 
     auto setScrollbars2 = [&](int logWidth, int logHeight) //replace SetScrollbars, which loses precision of pixelsPerUnitX for some brain-dead reason
     {
-        mainWin_->SetVirtualSize(logWidth, logHeight); //set before calling SetScrollRate(): 
-		//else SetScrollRate() would fail to preserve scroll position when "new virtual pixel-pos > old virtual height"
+        mainWin_->SetVirtualSize(logWidth, logHeight); //set before calling SetScrollRate():
+        //else SetScrollRate() would fail to preserve scroll position when "new virtual pixel-pos > old virtual height"
 
-		int ppsuX = 0; //pixel per scroll unit
+        int ppsuX = 0; //pixel per scroll unit
         int ppsuY = 0;
         GetScrollPixelsPerUnit(&ppsuX, &ppsuY);
 

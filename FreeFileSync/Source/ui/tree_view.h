@@ -183,6 +183,12 @@ private:
 };
 
 
+namespace impl //declare for unit tests:
+{
+Zstring getShortDisplayNameForFolderPair(const Zstring& dirPathLeft, const Zstring& dirPathRight);
+}
+
+
 namespace treeview
 {
 void init(Grid& grid, const std::shared_ptr<TreeView>& treeDataView);

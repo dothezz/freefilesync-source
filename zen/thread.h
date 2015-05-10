@@ -101,7 +101,7 @@ auto async(Function fun) -> boost::unique_future<decltype(fun())>
 #endif
     auto fut = pt.get_future();
     boost::thread(std::move(pt)).detach(); //we have to explicitly detach since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
-    return std::move(fut); //compiler error without "move", why needed???
+    return fut;
 }
 
 

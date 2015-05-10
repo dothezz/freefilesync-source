@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "file_io.h"
+#include "file_access.h"
 
 #ifdef ZEN_WIN
     #include "long_path_prefix.h"
@@ -75,10 +76,10 @@ void checkForUnsupportedType(const Zstring& filepath) //throw FileError
 }
 
 
-FileInput::FileInput(FileHandle handle, const Zstring& filepath) : FileInputBase(filepath), fileHandle(handle) {}
+FileInput::FileInput(FileHandle handle, const Zstring& filepath) : FileBase(filepath), fileHandle(handle) {}
 
 
-FileInput::FileInput(const Zstring& filepath) : FileInputBase(filepath) //throw FileError
+FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileError, ErrorFileLocked
 {
 #ifdef ZEN_WIN
     auto createHandle = [&](DWORD dwShareMode)
@@ -135,6 +136,7 @@ FileInput::FileInput(const Zstring& filepath) : FileInputBase(filepath) //throw 
                 const Zstring procList = getLockingProcessNames(filepath); //throw()
                 if (!procList.empty())
                     errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+                throw ErrorFileLocked(errorMsg, errorDescr);
             }
             throw FileError(errorMsg, errorDescr);
         }
@@ -169,62 +171,50 @@ FileInput::~FileInput()
 
 size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError; returns actual number of bytes read
 {
-    assert(!eof() || bytesToRead == 0);
-#ifdef ZEN_WIN
-    if (bytesToRead == 0) return 0;
-
-    DWORD bytesRead = 0;
-    if (!::ReadFile(fileHandle, //__in         HANDLE hFile,
-                    buffer,     //__out        LPVOID lpBuffer,
-                    static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
-                    &bytesRead, //__out_opt    LPDWORD lpNumberOfBytesRead,
-                    nullptr))   //__inout_opt  LPOVERLAPPED lpOverlapped
-        throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"ReadFile", getLastError());
-
-    if (bytesRead < bytesToRead) //verify only!
-        setEof();                //
-
-    if (bytesRead > bytesToRead)
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"buffer overflow"); //user should never see this
-
-    return bytesRead;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
-    //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
     size_t bytesReadTotal = 0;
 
-    while (bytesToRead > 0 && !eof()) //"read() with a count of 0 returns zero" => indistinguishable from eof! => check!
+    while (bytesToRead > 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
     {
+#ifdef ZEN_WIN
+        //test for end of file: https://msdn.microsoft.com/en-us/library/windows/desktop/aa365690%28v=vs.85%29.aspx
+        DWORD bytesRead = 0;
+        if (!::ReadFile(fileHandle, //__in         HANDLE hFile,
+                        buffer,     //__out        LPVOID lpBuffer,
+                        static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
+                        &bytesRead, //__out_opt    LPDWORD lpNumberOfBytesRead,
+                        nullptr))   //__inout_opt  LPOVERLAPPED lpOverlapped
+            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilePath())), L"ReadFile", getLastError());
+
+#elif defined ZEN_LINUX || defined ZEN_MAC
         ssize_t bytesRead = 0;
         do
         {
             bytesRead = ::read(fileHandle, buffer, bytesToRead);
         }
-        while (bytesRead < 0 && errno == EINTR);
+        while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
 
         if (bytesRead < 0)
-            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"read", getLastError());
-        else if (bytesRead == 0) //"zero indicates end of file"
-            setEof();
-        else if (bytesRead > static_cast<ssize_t>(bytesToRead)) //better safe than sorry
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())), L"buffer overflow"); //user should never see this
+            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilePath())), L"read", getLastError());
+#endif
+        if (bytesRead == 0) //"zero indicates end of file"
+            return bytesReadTotal;
+        else if (static_cast<size_t>(bytesRead) > bytesToRead) //better safe than sorry
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilePath())), L"ReadFile: buffer overflow."); //user should never see this
 
         //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead" => loop!
         buffer = static_cast<char*>(buffer) + bytesRead; //suppress warning about pointer arithmetics on void*
         bytesToRead -= bytesRead;
         bytesReadTotal += bytesRead;
     }
-
     return bytesReadTotal;
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------
 
-FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileOutputBase(filepath), fileHandle(handle) {}
+FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileBase(filepath), fileHandle(handle) {}
 
 
-FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileOutputBase(filepath) //throw FileError, ErrorTargetExisting
+FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileBase(filepath) //throw FileError, ErrorTargetExisting
 {
 #ifdef ZEN_WIN
     const DWORD dwCreationDisposition = access == FileOutput::ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW;
@@ -307,12 +297,45 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileOutputB
 }
 
 
-FileOutput::~FileOutput()
+namespace
+{
+inline
+FileHandle getInvalidHandle()
 {
 #ifdef ZEN_WIN
-    ::CloseHandle(fileHandle);
+    return INVALID_HANDLE_VALUE;
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    ::close(fileHandle);
+    return -1;
+#endif
+}
+}
+
+
+FileOutput::~FileOutput()
+{
+    if (fileHandle != getInvalidHandle())
+        try
+        {
+            close(); //throw FileError
+        }
+        catch (FileError&) { assert(false); }
+}
+ 
+    
+void FileOutput::close() //throw FileError
+{
+    if (fileHandle == getInvalidHandle())
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"Contract error: close() called more than once.");
+    ZEN_ON_SCOPE_EXIT(fileHandle = getInvalidHandle());
+
+	//no need to clean-up on failure here (just like there is no clean on FileOutput::write failure!) => FileOutput is not transactional! 
+
+#ifdef ZEN_WIN
+    if (!::CloseHandle(fileHandle))
+        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"CloseHandle", getLastError());
+#elif defined ZEN_LINUX || defined ZEN_MAC
+    if (::close(fileHandle) != 0)
+        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"close", getLastError());
 #endif
 }
 
@@ -326,10 +349,10 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
                      static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,
                      &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
                      nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"WriteFile", getLastError());
+        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"WriteFile", getLastError());
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"Incomplete write."); //user should never see this
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"WriteFile: incomplete write."); //user should never see this
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     while (bytesToWrite > 0)
@@ -346,10 +369,10 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
             if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
                 errno = ENOSPC;
 
-            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"write", getLastError());
+            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"write", getLastError());
         }
         if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())), L"buffer overflow"); //user should never see this
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"write: buffer overflow."); //user should never see this
 
         //if ::write() is interrupted (EINTR) right in the middle, it will return successfully with "bytesWritten < bytesToWrite"!
         buffer = static_cast<const char*>(buffer) + bytesWritten; //suppress warning about pointer arithmetics on void*

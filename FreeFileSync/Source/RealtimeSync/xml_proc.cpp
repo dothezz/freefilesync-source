@@ -86,7 +86,7 @@ namespace
 {
 xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filepath)
 {
-    std::set<Zstring, LessFilename> uniqueFolders;
+    std::set<Zstring, LessFilePath> uniqueFolders;
 
     //add main folders
     uniqueFolders.insert(batchCfg.mainCfg.firstPair.dirpathPhraseLeft);

@@ -7,12 +7,11 @@
 #ifndef VERSIONING_HEADER_8760247652438056
 #define VERSIONING_HEADER_8760247652438056
 
-#include <vector>
 #include <functional>
 #include <zen/time.h>
-#include <zen/zstring.h>
 #include <zen/file_error.h>
 #include "../structures.h"
+#include "../fs/abstract.h"
 
 namespace zen
 {
@@ -31,46 +30,51 @@ namespace zen
 class FileVersioner
 {
 public:
-    FileVersioner(const Zstring& versioningDirectory, //throw FileError
+    FileVersioner(std::unique_ptr<AbstractBaseFolder>&& versioningFolder, //must be bound! throw FileError!
                   VersioningStyle versioningStyle,
-                  const TimeComp& timeStamp) : //max versions per file; < 0 := no limit
+                  const TimeComp& timeStamp) :
         versioningStyle_(versioningStyle),
-        versioningDirectory_(versioningDirectory),
         timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)) //e.g. "2012-05-15 131513"
     {
+        if (!versioningFolder)
+            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10000!
             throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + timeStamp_ + L"\"");
+
+        //honor strong exception safety guarantee:
+        versioningFolder_ = std::move(versioningFolder); //noexcept
     }
 
-    bool revisionFile(const Zstring& filepath, //throw FileError; return "false" if file is not existing
+    bool revisionFile(const AbstractPathRef& filePath, //throw FileError; return "false" if file is not existing
                       const Zstring& relativePath,
 
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                      const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //may be nullptr
+                      const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //may be nullptr
 
-    void revisionDir (const Zstring& dirpath,  const Zstring& relativePath, //throw FileError
+    void revisionFolder(const AbstractPathRef& folderPath, const Zstring& relativePath, //throw FileError
 
-                      //optional callbacks: may be nullptr
-                      const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove, //one call for each *existing* object!
-                      const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,  //
-                      //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                      const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus);
+                        //optional callbacks: may be nullptr
+                        const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove, //one call for each *existing* object!
+                        const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeDirMove,  //
+                        //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
+                        const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus);
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
-    bool revisionFileImpl(const Zstring& filepath, const Zstring& relativePath,
-                          const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
-                          const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //throw FileError
+    bool revisionFileImpl(const AbstractPathRef& filePath, const Zstring& relativePath,
+                          const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove,
+                          const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
 
-    void revisionDirImpl (const Zstring& filepath,  const Zstring& relativePath,
-                          const std::function<void(const Zstring& fileFrom, const Zstring& fileTo)>& onBeforeFileMove,
-                          const std::function<void(const Zstring& dirFrom,  const Zstring& dirTo )>& onBeforeDirMove,
-                          const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //throw FileError
+    void revisionFolderImpl(const AbstractPathRef& folderPath, const Zstring& relativePath,
+                            const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove,
+                            const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeDirMove,
+                            const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
 
     const VersioningStyle versioningStyle_;
-    const Zstring versioningDirectory_;
     const Zstring timeStamp_;
+    std::unique_ptr<AbstractBaseFolder> versioningFolder_; //always bound!
 
     //std::vector<Zstring> fileRelNames; //store list of revisioned file and symlink relative names for limitVersions()
 };

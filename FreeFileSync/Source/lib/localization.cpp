@@ -171,7 +171,7 @@ ExistingTranslations::ExistingTranslations()
 
     traverseFolder(zen::getResourceDir() + Zstr("Languages"), [&](const FileInfo& fi)
     {
-        if (endsWith(fi.fullPath, Zstr(".lng")))
+        if (pathEndsWith(fi.fullPath, Zstr(".lng")))
             lngFiles.push_back(fi.fullPath);
     }, nullptr, nullptr, [&](const std::wstring& errorMsg) { assert(false); }); //errors are not really critical in this context
 

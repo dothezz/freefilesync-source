@@ -1050,11 +1050,8 @@ Nì seo cinnteach gum bi fuasgladh ann ma thachras mearachd mhòr.
 <source>Source code written in C++ using:</source>
 <target>Chaidh an còd tùsail a sgrìobhadh ann an C++ le taic:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Ma tha FreeFileSync a’ còrdadh riut</target>
-
-<source>Donate with PayPal</source>
-<target>Nach doir sibh tabhartas le PayPal?</target>
+<source>If you like FreeFileSync:</source>
+<target>Ma tha FreeFileSync a’ còrdadh riut:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Tha sinn a’ cur fàilte mhòr air beachd is moladh sam bith</target>

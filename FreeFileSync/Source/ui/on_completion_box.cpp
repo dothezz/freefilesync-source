@@ -65,9 +65,7 @@ const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 
 bool isCloseProgressDlgCommand(const Zstring& value)
 {
-    auto tmp = utfCvrtTo<std::wstring>(value);
-    trim(tmp);
-    return tmp == cmdTxtCloseProgressDlg;
+    return trimCpy(utfCvrtTo<std::wstring>(value)) == cmdTxtCloseProgressDlg;
 }
 
 
@@ -103,8 +101,7 @@ void OnCompletionBox::addItemHistory()
 {
     if (history_)
     {
-        Zstring command = getValue();
-        trim(command);
+        const Zstring command = trimCpy(getValue());
 
         if (command == utfCvrtTo<Zstring>(separationLine) || //do not add sep. line
             command == utfCvrtTo<Zstring>(cmdTxtCloseProgressDlg) || //do not add special command
@@ -114,10 +111,10 @@ void OnCompletionBox::addItemHistory()
         //do not add built-in commands to history
         for (const auto& item : defaultCommands)
             if (command == utfCvrtTo<Zstring>(item.first) ||
-                ::EqualFilename()(command, item.second))
+                ::EqualFilePath()(command, item.second))
                 return;
 
-        vector_remove_if(*history_, [&](const Zstring& item) { return ::EqualFilename()(command, item); });
+        vector_remove_if(*history_, [&](const Zstring& item) { return ::EqualFilePath()(command, item); });
 
         history_->insert(history_->begin(), command);
 
@@ -129,8 +126,7 @@ void OnCompletionBox::addItemHistory()
 
 Zstring OnCompletionBox::getValue() const
 {
-    auto value = copyStringTo<std::wstring>(GetValue());
-    trim(value);
+    auto value = trimCpy(copyStringTo<std::wstring>(GetValue()));
 
     if (value == implementation::translate(cmdTxtCloseProgressDlg)) //undo translation for config file storage
         value = cmdTxtCloseProgressDlg;
@@ -141,8 +137,7 @@ Zstring OnCompletionBox::getValue() const
 
 void OnCompletionBox::setValue(const Zstring& value)
 {
-    auto tmp = utfCvrtTo<std::wstring>(value);
-    trim(tmp);
+    auto tmp = trimCpy(utfCvrtTo<std::wstring>(value));
 
     if (tmp == cmdTxtCloseProgressDlg)
         tmp = implementation::translate(cmdTxtCloseProgressDlg); //have this symbolic constant translated properly

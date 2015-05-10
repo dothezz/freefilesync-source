@@ -7,25 +7,20 @@
 #include "algorithm.h"
 #include <set>
 #include <unordered_map>
-#include <stdexcept>
-#include <zen/file_access.h>
-#include <zen/recycler.h>
-#include <zen/stl_tools.h>
-#include <zen/scope_guard.h>
-#include <wx+/image_resources.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
-#include "lib/norm_filter.h"
 
 using namespace zen;
-using namespace std::rel_ops;
+//using namespace std::rel_ops;
 
 
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [](BaseDirPair& baseObj) { baseObj.flip(); });
-    redetermineSyncDirection(config, folderCmp, [](const std::wstring&) {});
+    redetermineSyncDirection(config, folderCmp,
+                             nullptr,  //onReportWarning
+                             nullptr); //onUpdateStatus -> status update while loading db file
 }
 
 //----------------------------------------------------------------------------------------------
@@ -55,9 +50,9 @@ private:
         const CompareFilesResult cat = fileObj.getCategory();
 
         //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::LEFT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
@@ -128,9 +123,9 @@ private:
         const CompareDirResult cat = dirObj.getDirCategory();
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
-        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
-        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
@@ -336,21 +331,21 @@ private:
 
             if (cat == FILE_LEFT_SIDE_ONLY)
             {
-                if (fileObj.getFileId<LEFT_SIDE>() != FileId())
+                if (!fileObj.getFileId<LEFT_SIDE>().empty())
                 {
                     auto rv = exLeftOnly.emplace(fileObj.getFileId<LEFT_SIDE>(), &fileObj);
                     assert(rv.second);
-                    if (!rv.second) //duplicate file ID!
+                    if (!rv.second) //duplicate file ID! NTFS hard links?
                         rv.first->second = nullptr;
                 }
             }
             else if (cat == FILE_RIGHT_SIDE_ONLY)
             {
-                if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
+                if (!fileObj.getFileId<RIGHT_SIDE>().empty())
                 {
                     auto rv = exRightOnly.emplace(fileObj.getFileId<RIGHT_SIDE>(), &fileObj);
                     assert(rv.second);
-                    if (!rv.second) //duplicate file ID!
+                    if (!rv.second) //duplicate file ID! NTFS hard links?
                         rv.first->second = nullptr;
                 }
             }
@@ -387,11 +382,11 @@ private:
 
     void findAndSetMovePair(const InSyncFile& dbEntry) const
     {
-        const FileId idLeft  = dbEntry.left .fileId;
-        const FileId idRight = dbEntry.right.fileId;
+        const ABF::FileId idLeft  = dbEntry.left .fileId;
+        const ABF::FileId idRight = dbEntry.right.fileId;
 
-        if (idLeft  != FileId() &&
-            idRight != FileId() &&
+        if (!idLeft .empty() &&
+            !idRight.empty() &&
             stillInSync(dbEntry, cmpVar, fileTimeTolerance, optTimeShiftHours))
         {
             auto itL = exLeftOnly.find(idLeft);
@@ -417,8 +412,8 @@ private:
     const int fileTimeTolerance;
     const unsigned int optTimeShiftHours;
 
-    std::map<FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
-    std::map<FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
+    std::map<ABF::FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
+    std::map<ABF::FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
 
     /*
     detect renamed files:
@@ -488,9 +483,9 @@ private:
             return;
 
         //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getItemName<LEFT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::LEFT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getItemName<RIGHT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
@@ -565,9 +560,9 @@ private:
         const CompareDirResult cat = dirObj.getDirCategory();
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
-        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getItemName<LEFT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
-        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getItemName<RIGHT_SIDE>(), ABF::TEMP_FILE_ENDING))
             return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
@@ -635,7 +630,10 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& baseDirectory, std::function<void(const std::wstring& msg)> reportWarning)
+void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
+                                   BaseDirPair& baseDirectory,
+                                   const std::function<void(const std::wstring& msg)>& reportWarning,
+                                   const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
 {
     //try to load sync-database files
     std::shared_ptr<InSyncDir> lastSyncState;
@@ -645,14 +643,15 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& b
             if (allItemsCategoryEqual(baseDirectory))
                 return; //nothing to do: abort and don't even try to open db files
 
-            lastSyncState = loadLastSynchronousState(baseDirectory); //throw FileError, FileErrorDatabaseNotExisting
+            lastSyncState = loadLastSynchronousState(baseDirectory, onUpdateStatus); //throw FileError, FileErrorDatabaseNotExisting
         }
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than confuse users
-        catch (FileError& error) //e.g. incompatible database version
+        catch (const FileError& e) //e.g. incompatible database version
         {
-            reportWarning(error.toString() +
-                          (dirCfg.var == DirectionConfig::TWOWAY ?
-                           L" \n\n" + _("Setting default synchronization directions: Old files will be overwritten with newer files.") : std::wstring()));
+            if (reportWarning)
+                reportWarning(e.toString() +
+                              (dirCfg.var == DirectionConfig::TWOWAY ?
+                               L" \n\n" + _("Setting default synchronization directions: Old files will be overwritten with newer files.") : std::wstring()));
         }
 
     //set sync directions
@@ -672,7 +671,10 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& b
 }
 
 
-void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, std::function<void(const std::wstring& msg)> reportWarning)
+void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
+                                   FolderComparison& folderCmp,
+                                   const std::function<void(const std::wstring& msg)>& reportWarning,
+                                   const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
 {
     if (folderCmp.empty())
         return;
@@ -685,7 +687,7 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
     {
         const DirectionConfig& cfg = directCfgs[it - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **it, reportWarning);
+        redetermineSyncDirection(cfg, **it, reportWarning, onUpdateStatus);
     }
 }
 
@@ -1089,14 +1091,14 @@ std::pair<Zstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSy
     for (const FileSystemObject* fsObj : selectionLeft)
         if (!fsObj->isEmpty<LEFT_SIDE>())
         {
-            fileList += fsObj->getFullPath<LEFT_SIDE>() + Zstr('\n');
+            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<LEFT_SIDE>()) + Zstr('\n');
             ++totalDelCount;
         }
 
     for (const FileSystemObject* fsObj : selectionRight)
         if (!fsObj->isEmpty<RIGHT_SIDE>())
         {
-            fileList += fsObj->getFullPath<RIGHT_SIDE>() + Zstr('\n');
+            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<RIGHT_SIDE>()) + Zstr('\n');
             ++totalDelCount;
         }
 
@@ -1136,35 +1138,30 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
                 std::vector<FileSystemObject*>& deletePermanent,
                 std::vector<FileSystemObject*>& deleteRecyler,
                 bool useRecycleBin,
-                std::map<Zstring, bool, LessFilename>& hasRecyclerBuffer,
+                std::map<const ABF*, bool, ABF::LessItemPath>& recyclerSupported,
                 DeleteFilesHandler& callback)
 {
-    auto hasRecycler = [&](const Zstring& baseDirPf) -> bool
+    auto hasRecycler = [&](const ABF& baseFolder) -> bool
     {
-#ifdef ZEN_WIN
-        auto it = hasRecyclerBuffer.find(baseDirPf);
-        if (it != hasRecyclerBuffer.end())
+        auto it = recyclerSupported.find(&baseFolder); //perf: avoid duplicate checks!
+        if (it != recyclerSupported.end())
             return it->second;
 
-        const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(baseDirPf), false);
-
-        bool recExists = false;
+        const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x",
+        fmtFileName(ABF::getDisplayPath(baseFolder.getAbstractPath())));
+        bool recSupported = false;
         tryReportingError([&]{
-            recExists = recycleBinExists(baseDirPf, [&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
+            recSupported = baseFolder.supportsRecycleBin([&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
         }, callback); //throw X?
 
-        hasRecyclerBuffer.emplace(baseDirPf, recExists);
-        return recExists;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
-        return true;
-#endif
+        recyclerSupported.emplace(&baseFolder, recSupported);
+        return recSupported;
     };
 
     for (FileSystemObject* row : rowsIn)
         if (!row->isEmpty<side>())
         {
-            if (useRecycleBin && hasRecycler(row->root().getBaseDirPf<side>())) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
+            if (useRecycleBin && hasRecycler(row->root().getABF<side>())) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
                 deleteRecyler.push_back(row);
             else
                 deletePermanent.push_back(row);
@@ -1173,7 +1170,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
 
 
 template <SelectedSide side>
-struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow constructor!!!
+struct ItemDeleter : public FSObjectVisitor //throw FileError, but nothrow constructor!!!
 {
     ItemDeleter(bool useRecycleBin, DeleteFilesHandler& handler) :
         handler_(handler), useRecycleBin_(useRecycleBin)
@@ -1194,52 +1191,52 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
 
     void visit(const FilePair& fileObj) override
     {
-        notifyFileDeletion(fileObj.getFullPath<side>());
+        notifyFileDeletion(ABF::getDisplayPath(fileObj.getAbstractPath<side>()));
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(fileObj.getFullPath<side>()); //throw FileError
+            ABF::recycleItemDirectly(fileObj.getAbstractPath<side>()); //throw FileError
         else
-            zen::removeFile(fileObj.getFullPath<side>()); //throw FileError
+            ABF::removeFile(fileObj.getAbstractPath<side>()); //throw FileError
     }
 
     void visit(const SymlinkPair& linkObj) override
     {
-        notifySymlinkDeletion(linkObj.getFullPath<side>());
+        notifySymlinkDeletion(ABF::getDisplayPath(linkObj.getAbstractPath<side>()));
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(linkObj.getFullPath<side>()); //throw FileError
+            ABF::recycleItemDirectly(linkObj.getAbstractPath<side>()); //throw FileError
         else
         {
-            if (dirExists(linkObj.getFullPath<side>())) //dir symlink
-                zen::removeDirectory(linkObj.getFullPath<side>()); //throw FileError
+            if (ABF::dirExists(linkObj.getAbstractPath<side>())) //dir symlink
+                ABF::removeFolder(linkObj.getAbstractPath<side>()); //throw FileError
             else //file symlink, broken symlink
-                zen::removeFile(linkObj.getFullPath<side>()); //throw FileError
+                ABF::removeFile(linkObj.getAbstractPath<side>()); //throw FileError
         }
     }
 
     void visit(const DirPair& dirObj) override
     {
-        notifyDirectoryDeletion(dirObj.getFullPath<side>()); //notfied twice; see below -> no big deal
+        notifyDirectoryDeletion(ABF::getDisplayPath(dirObj.getAbstractPath<side>())); //notfied twice; see below -> no big deal
 
         if (useRecycleBin_)
-            zen::recycleOrDelete(dirObj.getFullPath<side>()); //throw FileError
+            ABF::recycleItemDirectly(dirObj.getAbstractPath<side>()); //throw FileError
         else
         {
-            auto onBeforeFileDeletion = [&](const Zstring& filepath) { this->notifyFileDeletion     (filepath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
-            auto onBeforeDirDeletion  = [&](const Zstring& dirpath ) { this->notifyDirectoryDeletion(dirpath ); };
+            auto onBeforeFileDeletion = [&](const Zstring& displayPath) { this->notifyFileDeletion     (displayPath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
+            auto onBeforeDirDeletion  = [&](const Zstring& displayPath) { this->notifyDirectoryDeletion(displayPath ); };
 
-            zen::removeDirectory(dirObj.getFullPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+            ABF::removeFolder(dirObj.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
         }
     }
 
 private:
-    void notifyFileDeletion     (const Zstring& objName) { notifyItemDeletion(txtRemovingFile     , objName); }
-    void notifyDirectoryDeletion(const Zstring& objName) { notifyItemDeletion(txtRemovingDirectory, objName); }
-    void notifySymlinkDeletion  (const Zstring& objName) { notifyItemDeletion(txtRemovingSymlink  , objName); }
+    void notifyFileDeletion     (const Zstring& displayPath) { notifyItemDeletion(txtRemovingFile     , displayPath); }
+    void notifyDirectoryDeletion(const Zstring& displayPath) { notifyItemDeletion(txtRemovingDirectory, displayPath); }
+    void notifySymlinkDeletion  (const Zstring& displayPath) { notifyItemDeletion(txtRemovingSymlink  , displayPath); }
 
-    void notifyItemDeletion(const std::wstring& statusText, const Zstring& objName)
+    void notifyItemDeletion(const std::wstring& statusText, const Zstring& displayPath)
     {
-        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtFileName(objName)));
+        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtFileName(displayPath)));
     }
 
     DeleteFilesHandler& handler_;
@@ -1336,19 +1333,19 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteRecylerLeft;
     std::vector<FileSystemObject*> deleteRecylerRight;
 
-    std::map<Zstring, bool, LessFilename> hasRecyclerBuffer;
-    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, hasRecyclerBuffer, statusHandler);
-    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, hasRecyclerBuffer, statusHandler);
+    std::map<const ABF*, bool, ABF::LessItemPath> recyclerSupported;
+    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, recyclerSupported, statusHandler);
+    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, recyclerSupported, statusHandler);
 
     //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
     if (useRecycleBin &&
-    std::any_of(hasRecyclerBuffer.begin(), hasRecyclerBuffer.end(), [](std::pair<Zstring, bool> item) { return !item.second; }))
+    std::any_of(recyclerSupported.begin(), recyclerSupported.end(), [](const decltype(recyclerSupported)::value_type& item) { return !item.second; }))
     {
         std::wstring msg = _("The recycle bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n";
 
-        for (const auto& item : hasRecyclerBuffer)
+        for (const auto& item : recyclerSupported)
             if (!item.second)
-                msg += std::wstring(L"\n") + item.first;
+                msg += std::wstring(L"\n") + ABF::getDisplayPath(item.first->getAbstractPath());
 
         statusHandler.reportWarning(msg, warningRecyclerMissing); //throw?
     }

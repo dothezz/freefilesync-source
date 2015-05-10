@@ -1046,8 +1046,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Source code written in C++ using:</source>
 <target>Code source écrit en C++ utilisant :</target>
 
-<source>If you like FreeFileSync</source>
-<target>Si vous aimez FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Si vous aimez FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Faites un don avec PayPal</target>

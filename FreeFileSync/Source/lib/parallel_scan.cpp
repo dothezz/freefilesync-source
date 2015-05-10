@@ -10,7 +10,6 @@
 #include <zen/scope_guard.h>
 #include <zen/fixed_list.h>
 #include <boost/detail/atomic_count.hpp>
-#include "deep_file_traverser.h"
 #include "db_file.h"
 #include "lock_holder.h"
 
@@ -279,30 +278,33 @@ struct TraverserShared
 {
 public:
     TraverserShared(long threadID,
-                    SymLinkHandling handleSymlinks,
+                    const ABF& abf,
                     const HardFilter::FilterRef& filter,
-                    std::map<Zstring, std::wstring, LessFilename>& failedDirReads,
-                    std::map<Zstring, std::wstring, LessFilename>& failedItemReads,
+                    SymLinkHandling handleSymlinks,
+                    std::map<Zstring, std::wstring, LessFilePath>& failedDirReads,
+                    std::map<Zstring, std::wstring, LessFilePath>& failedItemReads,
                     AsyncCallback& acb) :
-        handleSymlinks_(handleSymlinks),
+        abstractBaseFolder(abf),
         filterInstance(filter),
+        handleSymlinks_(handleSymlinks),
         failedDirReads_ (failedDirReads),
         failedItemReads_(failedItemReads),
         acb_(acb),
         threadID_(threadID) {}
 
-    const SymLinkHandling handleSymlinks_;
+    const ABF& abstractBaseFolder;
     const HardFilter::FilterRef filterInstance; //always bound!
+    const SymLinkHandling handleSymlinks_;
 
-    std::map<Zstring, std::wstring, LessFilename>& failedDirReads_;
-    std::map<Zstring, std::wstring, LessFilename>& failedItemReads_;
+    std::map<Zstring, std::wstring, LessFilePath>& failedDirReads_;
+    std::map<Zstring, std::wstring, LessFilePath>& failedItemReads_;
 
     AsyncCallback& acb_;
     const long threadID_;
 };
 
 
-class DirCallback : public zen::TraverseCallback
+class DirCallback : public ABF::TraverserCallback
 {
 public:
     DirCallback(TraverserShared& config,
@@ -313,10 +315,10 @@ public:
         output_(output) {}
 
     virtual void              onFile   (const FileInfo&    fi) override;
-    virtual TraverseCallback* onDir    (const DirInfo&     di) override;
+    virtual TraverserCallback* onDir    (const DirInfo&     di) override;
     virtual HandleLink        onSymlink(const SymlinkInfo& li) override;
 
-    void releaseDirTraverser(TraverseCallback* trav)                                                   override;
+    void releaseDirTraverser(TraverserCallback* trav)                                                   override;
 
     HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                           override;
     HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)   override;
@@ -339,12 +341,14 @@ void DirCallback::onFile(const FileInfo& fi)
         endsWith(fileNameShort, LOCK_FILE_ENDING))
         return;
 
+    const Zstring relFilePath = relNameParentPf_ + fileNameShort;
+
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(fi.fullPath, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(ABF::getDisplayPath(cfg.abstractBaseFolder.getAbstractPath(relFilePath)), cfg.threadID_);
 
     //------------------------------------------------------------------------------------
     //apply filter before processing (use relative name!)
-    if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + fileNameShort))
+    if (!cfg.filterInstance->passFileFilter(relFilePath))
         return;
 
     //    std::string fileId = details.fileSize >=  1024 * 1024U ? util::retrieveFileID(filepath) : std::string();
@@ -364,19 +368,19 @@ void DirCallback::onFile(const FileInfo& fi)
 }
 
 
-TraverseCallback* DirCallback::onDir(const DirInfo& di)
+ABF::TraverserCallback* DirCallback::onDir(const DirInfo& di)
 {
     boost::this_thread::interruption_point();
 
+    const Zstring& relDirPath = relNameParentPf_ + di.shortName;
+
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(di.fullPath, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(ABF::getDisplayPath(cfg.abstractBaseFolder.getAbstractPath(relDirPath)), cfg.threadID_);
 
     //------------------------------------------------------------------------------------
-    const Zstring& relPath = relNameParentPf_ + di.shortName;
-
     //apply filter before processing (use relative name!)
     bool subObjMightMatch = true;
-    const bool passFilter = cfg.filterInstance->passDirFilter(relPath, &subObjMightMatch);
+    const bool passFilter = cfg.filterInstance->passDirFilter(relDirPath, &subObjMightMatch);
     if (!passFilter && !subObjMightMatch)
         return nullptr; //do NOT traverse subdirs
     //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
@@ -385,7 +389,7 @@ TraverseCallback* DirCallback::onDir(const DirInfo& di)
     if (passFilter)
         cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
-    return new DirCallback(cfg, relPath + FILE_NAME_SEPARATOR, subDir); //releaseDirTraverser() is guaranteed to be called in any case
+    return new DirCallback(cfg, relDirPath + FILE_NAME_SEPARATOR, subDir); //releaseDirTraverser() is guaranteed to be called in any case
 }
 
 
@@ -393,8 +397,10 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
 {
     boost::this_thread::interruption_point();
 
+    const Zstring& relLinkPath = relNameParentPf_ + si.shortName;
+
     //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(si.fullPath, cfg.threadID_);
+    cfg.acb_.reportCurrentFile(ABF::getDisplayPath(cfg.abstractBaseFolder.getAbstractPath(relLinkPath)), cfg.threadID_);
 
     switch (cfg.handleSymlinks_)
     {
@@ -402,7 +408,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
             return LINK_SKIP;
 
         case SYMLINK_DIRECT:
-            if (cfg.filterInstance->passFileFilter(relNameParentPf_ + si.shortName)) //always use file filter: Link type may not be "stable" on Linux!
+            if (cfg.filterInstance->passFileFilter(relLinkPath)) //always use file filter: Link type may not be "stable" on Linux!
             {
                 output_.addSubLink(si.shortName, LinkDescriptor(si.lastWriteTime));
                 cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
@@ -412,10 +418,10 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
         case SYMLINK_FOLLOW:
             //filter symlinks before trying to follow them: handle user-excluded broken symlinks!
             //since we don't know what type the symlink will resolve to, only do this when both variants agree:
-            if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + si.shortName))
+            if (!cfg.filterInstance->passFileFilter(relLinkPath))
             {
                 bool subObjMightMatch = true;
-                if (!cfg.filterInstance->passDirFilter(relNameParentPf_ + si.shortName, &subObjMightMatch))
+                if (!cfg.filterInstance->passDirFilter(relLinkPath, &subObjMightMatch))
                     if (!subObjMightMatch)
                         return LINK_SKIP;
             }
@@ -427,9 +433,9 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
 }
 
 
-void DirCallback::releaseDirTraverser(TraverseCallback* trav)
+void DirCallback::releaseDirTraverser(TraverserCallback* trav)
 {
-    TraverseCallback::releaseDirTraverser(trav); //no-op; introduce compile-time coupling
+    TraverserCallback::releaseDirTraverser(trav); //no-op; introduce compile-time coupling
     delete trav;
 }
 
@@ -486,11 +492,14 @@ public:
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker(););
 
-        acb_->reportCurrentFile(dirKey_.dirpath_, threadID_); //just in case first directory access is blocking
+        const AbstractPathRef& baseFolderItem = dirKey_.baseFolder_->getAbstractPath();
+
+        acb_->reportCurrentFile(ABF::getDisplayPath(baseFolderItem), threadID_); //just in case first directory access is blocking
 
         TraverserShared travCfg(threadID_,
-                                dirKey_.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
+                                *dirKey_.baseFolder_,
                                 dirKey_.filter_,
+                                dirKey_.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
                                 dirOutput_.failedDirReads,
                                 dirOutput_.failedItemReads,
                                 *acb_);
@@ -499,8 +508,7 @@ public:
                               Zstring(),
                               dirOutput_.dirCont);
 
-        //get all files and folders from directoryPostfixed (and subdirectories)
-        deepTraverseFolder(dirKey_.dirpath_, traverser); //exceptions may be thrown!
+        ABF::traverseFolder(baseFolderItem, traverser); //throw X
     }
 
 private:

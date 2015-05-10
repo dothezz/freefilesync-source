@@ -13,7 +13,7 @@
 #include <wx+/bitmap_button.h>
 #include <wx+/image_tools.h>
 #include <wx+/image_resources.h>
-#include "dir_name.h"
+#include "folder_selector.h"
 #include "small_dlgs.h"
 #include "sync_cfg.h"
 #include "../lib/norm_filter.h"

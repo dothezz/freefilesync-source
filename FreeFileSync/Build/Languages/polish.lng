@@ -1050,9 +1050,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Source code written in C++ using:</source>
 <target>Kod stworzony w C++ z wykorzystaniem:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Podoba Ci się FreeFileSync?</target>
-
 <source>Donate with PayPal</source>
 <target>Wesprzyj z PayPal</target>
 

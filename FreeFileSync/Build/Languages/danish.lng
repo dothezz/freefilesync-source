@@ -1043,8 +1043,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Kildekoden er skrevet i C++ med hjælp fra:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Er du glad for FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Er du glad for FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Donér med PayPal</target>

@@ -16,36 +16,26 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
 {
     //can't simply use zen::loadBinStream() due to the short-circuit xml-validation below!
 
-    std::string stream;
-
-    FileInput inputFile(filepath); //throw FileError
+    FileInput fileStreamIn(filepath); //throw FileError
+    MemoryStreamOut<std::string> memStreamOut;
     {
         //quick test whether input is an XML: avoid loading large binary files up front!
         const std::string xmlBegin = "<?xml version=";
-        stream.resize(strLength(BYTE_ORDER_MARK_UTF8) + xmlBegin.size());
+        std::vector<char> buf(xmlBegin.size() + strLength(BYTE_ORDER_MARK_UTF8));
 
-        const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
-        stream.resize(bytesRead);
+        const size_t bytesRead = fileStreamIn.read(&buf[0], buf.size());
+        memStreamOut.write(&buf[0], bytesRead);
 
-        if (!startsWith(stream, xmlBegin) &&
-            !startsWith(stream, BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
+        if (!startsWith(memStreamOut.ref(), xmlBegin) &&
+            !startsWith(memStreamOut.ref(), BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
             throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
     }
 
-    const size_t blockSize = 128 * 1024;
-    do
-    {
-        stream.resize(stream.size() + blockSize);
-
-        const size_t bytesRead = inputFile.read(&*stream.begin() + stream.size() - blockSize, blockSize); //throw FileError
-        if (bytesRead < blockSize)
-            stream.resize(stream.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
-    }
-    while (!inputFile.eof());
+    copyStream(fileStreamIn, memStreamOut, fileStreamIn.optimalBlockSize(), nullptr); //throw FileError
 
     try
     {
-        return parse(stream); //throw XmlParsingError
+        return parse(memStreamOut.ref()); //throw XmlParsingError
     }
     catch (const XmlParsingError& e)
     {

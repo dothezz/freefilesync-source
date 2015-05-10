@@ -98,7 +98,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //generate logo: put *after* first Fit()
     Layout(); //make sure m_panelLogo has final width (required by wxGTK)
 
-    wxImage appnameImg = createImageFromText(wxString(L"FreeFileSync ") + zen::currentVersion,
+    wxImage appnameImg = createImageFromText(wxString(L"FreeFileSync ") + zen::ffsVersion,
                                              wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"),
                                              *wxBLACK); //accessibility: align foreground/background colors!
     wxImage buildImg = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),

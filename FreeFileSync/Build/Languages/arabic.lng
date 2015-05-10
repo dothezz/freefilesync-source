@@ -1062,8 +1062,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>الرماز المصدري مكتوب بلغة C++ باستخدام:</target>
 
-<source>If you like FreeFileSync</source>
-<target>إذا أعجبك FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>إذا أعجبك FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>تبرع باستخدام PayPal</target>

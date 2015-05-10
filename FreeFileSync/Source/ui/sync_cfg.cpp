@@ -17,7 +17,7 @@
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
 #include "on_completion_box.h"
-#include "dir_name.h"
+#include "folder_selector.h"
 #include "../file_hierarchy.h"
 #include "../lib/help_provider.h"
 #include "../lib/norm_filter.h"
@@ -149,7 +149,7 @@ private:
     OnGuiError onGuiError;
 
     EnumDescrList<VersioningStyle> enumVersioningStyle;
-    DirectoryName<FolderHistoryBox> versioningFolder;
+    FolderSelector versioningFolder;
 };
 
 //#################################################################################################################
@@ -721,7 +721,7 @@ void ConfigDialog::setSyncOptions(const SyncOptions& so)
     directionCfg   = so.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
     handleDeletion = so.syncCfg.handleDeletion;
 
-    versioningFolder.setPath(utfCvrtTo<wxString>(so.syncCfg.versioningDirectory));
+    versioningFolder.setPath(so.syncCfg.versioningFolderPhrase);
     setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle, so.syncCfg.versioningStyle);
 
     //misc config
@@ -736,10 +736,10 @@ ConfigDialog::SyncOptions ConfigDialog::getSyncOptions() const
 {
     SyncOptions output;
 
-    output.syncCfg.directionCfg        = directionCfg;
-    output.syncCfg.handleDeletion      = handleDeletion;
-    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getPath());
-    output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+    output.syncCfg.directionCfg           = directionCfg;
+    output.syncCfg.handleDeletion         = handleDeletion;
+    output.syncCfg.versioningFolderPhrase = utfCvrtTo<Zstring>(versioningFolder.getPath());
+    output.syncCfg.versioningStyle        = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
 
     output.onGuiError = onGuiError;
     output.onCompletion = m_comboBoxOnCompletion->getValue();
@@ -908,9 +908,7 @@ void ConfigDialog::OnOkay(wxCommandEvent& event)
     if (m_checkBoxUseLocalSyncOptions->GetValue() &&
         so.syncCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
     {
-        Zstring versioningDir = so.syncCfg.versioningDirectory;
-        trim(versioningDir);
-        if (versioningDir.empty())
+        if (trimCpy(so.syncCfg.versioningFolderPhrase).empty())
         {
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
             showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().setMainInstructions(_("Please enter a target folder for versioning.")));
@@ -932,12 +930,9 @@ void ConfigDialog::OnOkay(wxCommandEvent& event)
     FilterConfig filterCfg = getFilter();
 
     //parameter correction: include filter must not be empty!
-    {
-        Zstring tmp = filterCfg.includeFilter;
-        trim(tmp);
-        if (tmp.empty())
-            filterCfg.includeFilter = FilterConfig().includeFilter; //no need to show error message, just correct user input
-    }
+    if (trimCpy(filterCfg.includeFilter).empty())
+        filterCfg.includeFilter = FilterConfig().includeFilter; //no need to show error message, just correct user input
+
     filterCfgOut = filterCfg;
 
     //------------- synchronization panel -----------------

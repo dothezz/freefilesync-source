@@ -21,7 +21,8 @@ namespace zen
 //watch directory including subdirectories
 /*
 !Note handling of directories!:
-	Windows: removal of top watched directory is NOT notified (e.g. brute force usb stick removal)
+	Windows: removal of top watched directory is NOT notified when watching the dir handle, e.g. brute force usb stick removal,
+			 (watchting for GUID_DEVINTERFACE_WPD OTOH works fine!)
 	         however manual unmount IS notified (e.g. usb stick removal, then re-insert), but watching is stopped!
 			 Renaming of top watched directory handled incorrectly: Not notified(!) + additional changes in subfolders
 			 now do report FILE_ACTION_MODIFIED for directory (check that should prevent this fails!)
@@ -36,7 +37,7 @@ namespace zen
 class DirWatcher
 {
 public:
-    DirWatcher(const Zstring& directory); //throw FileError
+    DirWatcher(const Zstring& dirPath); //throw FileError
     ~DirWatcher();
 
     enum ActionType
@@ -61,6 +62,8 @@ public:
 private:
     DirWatcher           (const DirWatcher&) = delete;
     DirWatcher& operator=(const DirWatcher&) = delete;
+
+    const Zstring baseDirPath;
 
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl_;

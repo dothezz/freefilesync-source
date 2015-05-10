@@ -1046,8 +1046,8 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Source code written in C++ using:</source>
 <target>Broncode werd in C++ geschreven met:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Als FreeFileSync je bevalt</target>
+<source>If you like FreeFileSync:</source>
+<target>Als FreeFileSync je bevalt:</target>
 
 <source>Donate with PayPal</source>
 <target>Doneer met PayPal</target>

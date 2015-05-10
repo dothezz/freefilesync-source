@@ -4,15 +4,14 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef DRAGANDDROP_H_INCLUDED
-#define DRAGANDDROP_H_INCLUDED
+#ifndef DIR_NAME_H_24857842375234523463425
+#define DIR_NAME_H_24857842375234523463425
 
-#include <vector>
-#include <wx/event.h>
-#include <wx/sizer.h>
-#include <wx+/file_drop.h>
+#include <zen/zstring.h>
 #include <wx/stattext.h>
 #include <wx/button.h>
+#include <wx+/file_drop.h>
+#include "folder_history_box.h"
 
 namespace zen
 {
@@ -29,20 +28,19 @@ extern const wxEventType EVENT_ON_DIR_SELECTED;			 //directory is changed by the
 extern const wxEventType EVENT_ON_DIR_MANUAL_CORRECTION; //manual type-in
 //example: wnd.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
 
-template <class NameControl>  //NameControl may be wxTextCtrl, FolderHistoryBox
-class DirectoryName: public wxEvtHandler
+class FolderSelector: public wxEvtHandler
 {
 public:
-    DirectoryName(wxWindow&     dropWindow,
-                  wxButton&     selectButton,
-                  NameControl&  dirpath,
-                  wxStaticText* staticText  = nullptr,  //optional
-                  wxWindow*     dropWindow2 = nullptr); //
+    FolderSelector(wxWindow&          dropWindow,
+                   wxButton&          selectButton,
+                   FolderHistoryBox&  dirpath,
+                   wxStaticText*      staticText  = nullptr,  //optional
+                   wxWindow*          dropWindow2 = nullptr); //
 
-    ~DirectoryName();
+    ~FolderSelector();
 
-    wxString getPath() const;
-    void setPath(const wxString& dirpath);
+    Zstring getPath() const;
+    void setPath(const Zstring& dirpath);
 
 private:
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) { return true; }; //return true if drop should be processed
@@ -52,13 +50,12 @@ private:
     void onWriteDirManually(wxCommandEvent& event);
     void onSelectDir       (wxCommandEvent& event);
 
-    wxWindow&     dropWindow_;
-    wxWindow*     dropWindow2_;
-    wxButton&     selectButton_;
-    NameControl&  dirpath_;
-    wxStaticText* staticText_; //optional
+    wxWindow&          dropWindow_;
+    wxWindow*          dropWindow2_;
+    wxButton&          selectButton_;
+    FolderHistoryBox&  dirpath_;
+    wxStaticText*      staticText_; //optional
 };
 }
 
-
-#endif // DRAGANDDROP_H_INCLUDED
+#endif //DIR_NAME_H_24857842375234523463425

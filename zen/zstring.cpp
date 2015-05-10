@@ -17,7 +17,7 @@
 #endif
 
 #ifndef NDEBUG
-    #include <mutex>
+    #include "thread.h"
     #include <iostream>
 #endif
 
@@ -39,14 +39,14 @@ public:
 
     void insert(const void* ptr, size_t size)
     {
-        std::lock_guard<std::mutex> dummy(lockActStrings);
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (!activeStrings.emplace(ptr, size).second)
             reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
     }
 
     void remove(const void* ptr)
     {
-        std::lock_guard<std::mutex> dummy(lockActStrings);
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.erase(ptr) != 1)
             reportProblem("Serious Error: No memory available for deallocation at this location!");
     }
@@ -92,15 +92,15 @@ private:
 #else
         std::cerr << message;
 #endif
-		throw std::logic_error("Memory leak! " + message + "\n" + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Memory leak! " + message + "\n" + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
     }
 
-    std::mutex lockActStrings;
+    boost::mutex lockActStrings;
     std::unordered_map<const void*, size_t> activeStrings;
 };
 
 //caveat: function scope static initialization is not thread-safe in VS 2010!
-auto& dummy = LeakChecker::get();
+auto& dummy = LeakChecker::get(); //still not sufficient if multiple threads access during static init!!!
 }
 
 void z_impl::leakCheckerInsert(const void* ptr, size_t size) { LeakChecker::get().insert(ptr, size); }
@@ -143,8 +143,8 @@ const LCID ZSTRING_INVARIANT_LOCALE = zen::winXpOrLater() ?
 typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1, int cchCount1,
                                                LPCWSTR lpString2, int cchCount2, BOOL bIgnoreCase);
 const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+//watch for dependencies in global namespace!!!
 //caveat: function scope static initialization is not thread-safe in VS 2010!
-//No global dependencies => no static initialization order problem in global namespace!
 }
 
 
@@ -158,7 +158,7 @@ int cmpFileName(const Zstring& lhs, const Zstring& rhs)
                                             static_cast<int>(rhs.size()), //__in  int cchCount2,
                                             true);                        //__in  BOOL bIgnoreCase
         if (rv <= 0)
-			throw std::runtime_error("Error comparing strings (CompareStringOrdinal). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+            throw std::runtime_error("Error comparing strings (CompareStringOrdinal). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         else
             return rv - 2; //convert to C-style string compare result
     }
@@ -184,7 +184,7 @@ int cmpFileName(const Zstring& lhs, const Zstring& rhs)
                               static_cast<int>(minSize), //__in   int cchSrc,
                               strOut,                    //__out  LPTSTR lpDestStr,
                               static_cast<int>(minSize)) == 0) //__in   int cchDest
-			throw std::runtime_error("Error comparing strings (LCMapString). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+                throw std::runtime_error("Error comparing strings (LCMapString). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         };
 
         auto eval = [&](wchar_t* bufL, wchar_t* bufR)
@@ -231,7 +231,7 @@ Zstring makeUpperCopy(const Zstring& str)
                       len,                      //__in   int cchSrc,
                       &*output.begin(),         //__out  LPTSTR lpDestStr,
                       len) == 0)                //__in   int cchDest
-				throw std::runtime_error("Error comparing strings (LCMapString). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::runtime_error("Error comparing strings (LCMapString). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     return output;
 }
@@ -240,7 +240,8 @@ Zstring makeUpperCopy(const Zstring& str)
 #elif defined ZEN_MAC
 int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 {
-    return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
+	const int rv = ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
+    return rv;
 }
 
 

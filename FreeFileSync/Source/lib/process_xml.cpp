@@ -177,8 +177,7 @@ void writeText(const CompareVariant& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, CompareVariant& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "TimeAndSize")
         value = zen::CMP_BY_TIME_SIZE;
     else if (tmp == "Content")
@@ -209,8 +208,7 @@ void writeText(const SyncDirection& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, SyncDirection& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "left")
         value = SyncDirection::LEFT;
     else if (tmp == "right")
@@ -243,8 +241,7 @@ void writeText(const OnError& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, OnError& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Ignore")
         value = ON_ERROR_IGNORE;
     else if (tmp == "Popup")
@@ -274,8 +271,7 @@ void writeText(const OnGuiError& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, OnGuiError& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Ignore")
         value = ON_GUIERROR_IGNORE;
     else if (tmp == "Popup")
@@ -307,8 +303,7 @@ void writeText(const FileIconSize& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, FileIconSize& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Small")
         value = ICON_SIZE_SMALL;
     else if (tmp == "Medium")
@@ -341,8 +336,7 @@ void writeText(const DeletionPolicy& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, DeletionPolicy& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Permanent")
         value = DELETE_PERMANENTLY;
     else if (tmp == "RecycleBin")
@@ -375,8 +369,7 @@ void writeText(const SymLinkHandling& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, SymLinkHandling& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Exclude")
         value = SYMLINK_EXCLUDE;
     else if (tmp == "Direct")
@@ -421,8 +414,7 @@ void writeText(const ColumnTypeRim& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, ColumnTypeRim& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Base")
         value = COL_TYPE_BASE_DIRECTORY;
     else if (tmp == "Full")
@@ -463,8 +455,7 @@ void writeText(const ColumnTypeNavi& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, ColumnTypeNavi& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Bytes")
         value = COL_TYPE_NAVI_BYTES;
     else if (tmp == "Tree")
@@ -500,8 +491,7 @@ void writeText(const UnitSize& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, UnitSize& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "None")
         value = USIZE_NONE;
     else if (tmp == "Byte")
@@ -541,8 +531,7 @@ void writeText(const UnitTime& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, UnitTime& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "None")
         value = UTIME_NONE;
     else if (tmp == "Today")
@@ -575,8 +564,7 @@ void writeText(const VersioningStyle& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, VersioningStyle& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "Replace")
         value = VER_STYLE_REPLACE;
     else if (tmp == "TimeStamp")
@@ -610,8 +598,7 @@ void writeText(const DirectionConfig::Variant& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, DirectionConfig::Variant& value)
 {
-    std::string tmp = input;
-    zen::trim(tmp);
+    const std::string tmp = trimCpy(input);
     if (tmp == "TwoWay")
         value = DirectionConfig::TWOWAY;
     else if (tmp == "Mirror")
@@ -759,9 +746,7 @@ namespace
 void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
     in["Variant"  ](cmpConfig.compareVar);
-    warn_static("remove check after migration?")
-    if (in["TimeShift"]) //-> 27.2.2014
-        in["TimeShift"](cmpConfig.optTimeShiftHours);
+    in["TimeShift"](cmpConfig.optTimeShiftHours);
     in["Symlinks" ](cmpConfig.handleSymlinks);
 }
 
@@ -787,7 +772,7 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
     readConfig(in, syncCfg.directionCfg);
 
     in["DeletionPolicy"  ](syncCfg.handleDeletion);
-    in["VersioningFolder"](syncCfg.versioningDirectory);
+    in["VersioningFolder"](syncCfg.versioningFolderPhrase);
     in["VersioningFolder"].attribute("Style", syncCfg.versioningStyle);
 }
 
@@ -905,18 +890,9 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
 
-    inBatchCfg["HandleError"     ](config.handleError);
-
-    warn_static("remove after migration?")
-    if (inBatchCfg["ShowProgress"]) //2014-2-17 -> obsolete name
-    {
-        inBatchCfg["ShowProgress"](config.runMinimized);
-        config.runMinimized = !config.runMinimized;
-    }
-    else
-        inBatchCfg["RunMinimized" ](config.runMinimized);
-
-    inBatchCfg["LogfileFolder"](config.logFileDirectory);
+    inBatchCfg["HandleError"  ](config.handleError);
+    inBatchCfg["RunMinimized" ](config.runMinimized);
+    inBatchCfg["LogfileFolder"](config.logFolderPathPhrase);
     inBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 
@@ -1023,7 +999,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
-	inGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
+    inGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
 
     //batch specific global settings
     //XmlIn inBatch = in["Batch"];
@@ -1189,7 +1165,7 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
     writeConfig(syncCfg.directionCfg, out);
 
     out["DeletionPolicy"  ](syncCfg.handleDeletion);
-    out["VersioningFolder"](syncCfg.versioningDirectory);
+    out["VersioningFolder"](syncCfg.versioningFolderPhrase);
     out["VersioningFolder"].attribute("Style", syncCfg.versioningStyle);
 }
 
@@ -1298,7 +1274,7 @@ void writeConfig(const XmlBatchConfig& config, XmlOut& out)
 
     outBatchCfg["HandleError"  ](config.handleError);
     outBatchCfg["RunMinimized" ](config.runMinimized);
-    outBatchCfg["LogfileFolder"](config.logFileDirectory);
+    outBatchCfg["LogfileFolder"](config.logFolderPathPhrase);
     outBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 
@@ -1398,7 +1374,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     //last update check
     outGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
-	outGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
+    outGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
 
     //batch specific global settings
     //XmlOut outBatch = out["Batch"];

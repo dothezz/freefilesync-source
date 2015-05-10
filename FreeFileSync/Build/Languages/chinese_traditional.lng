@@ -1042,8 +1042,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>使用C++編寫的原始碼</target>
 
-<source>If you like FreeFileSync</source>
-<target>如果您喜歡FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>如果您喜歡FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>使用PayPal捐款</target>

@@ -1046,8 +1046,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Изходния код е написан на C++ със:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Ако харесвате FreeFileSync</target>
+<source>If you like FreeFileSync:</source>
+<target>Ако харесвате FreeFileSync:</target>
 
 <source>Donate with PayPal</source>
 <target>Дарение чрез PayPal</target>

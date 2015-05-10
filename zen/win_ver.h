@@ -40,7 +40,7 @@ const OsVersion osVersionWin2000      (5, 0);
 /*
 	NOTE: there are two basic APIs to check Windows version: (empiric study following)
 		GetVersionEx      -> reports version considering compatibility mode (and compatibility setting in app manifest since Windows 8.1)
-		VerifyVersionInfo -> always reports *real* Windows Version 
+		VerifyVersionInfo -> always reports *real* Windows Version
 								*) Win10 Technical preview caveat: VerifyVersionInfo returns 6.3 unless manifest entry is added!!!
 */
 
@@ -118,11 +118,17 @@ bool runningWOW64() //test if process is running under WOW64: http://msdn.micros
 }
 
 
+template <bool is64BitBuild> inline
+bool running64BitWindowsImpl() { return true; }
+
+template <> inline
+bool running64BitWindowsImpl<false>() { return runningWOW64(); }
+
 inline
 bool running64BitWindows() //http://blogs.msdn.com/b/oldnewthing/archive/2005/02/01/364563.aspx
 {
     static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
-    return is64BitBuild || runningWOW64(); //should we bother to give a compile-time result in the first case?
+    return running64BitWindowsImpl<is64BitBuild>();
 }
 }
 

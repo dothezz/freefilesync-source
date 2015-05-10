@@ -107,9 +107,9 @@ Zstring zen::getConfigDir()
     if (!dirExists(userDirectory))
         try
         {
-            makeDirectory(userDirectory); //throw FileError
+            makeNewDirectory(userDirectory); //throw FileError
         }
-        catch (const FileError&) {}
+        catch (const FileError&) { assert(false); }
 
     return appendSeparator(userDirectory);
 }

@@ -181,10 +181,10 @@ bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs)
     if (imLhs.HasAlpha() != imRhs.HasAlpha())
         return false;
 
-	if (!std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData()))
-		return false;
+    if (!std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData()))
+        return false;
 
-	if (imLhs.HasAlpha())
+    if (imLhs.HasAlpha())
         if (!std::equal(imLhs.GetAlpha(), imLhs.GetAlpha() + pixelCount, imRhs.GetAlpha()))
             return false;
 

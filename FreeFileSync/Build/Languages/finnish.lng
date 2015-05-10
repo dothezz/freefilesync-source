@@ -1046,8 +1046,8 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Source code written in C++ using:</source>
 <target>Koodattu C++-kielellä käyttäen:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Jos pidät FreeFileSyncistä</target>
+<source>If you like FreeFileSync:</source>
+<target>Jos pidät FreeFileSyncistä:</target>
 
 <source>Donate with PayPal</source>
 <target>Lahjoita PayPalilla</target>

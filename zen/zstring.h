@@ -68,12 +68,12 @@ typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChec
 //Compare filepaths: Windows does NOT distinguish between upper/lower-case, while Linux DOES
 int cmpFileName(const Zstring& lhs, const Zstring& rhs);
 
-struct LessFilename //case-insensitive on Windows, case-sensitive on Linux
+struct LessFilePath //case-insensitive on Windows, case-sensitive on Linux
 {
     bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) < 0; }
 };
 
-struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
+struct EqualFilePath //case-insensitive on Windows, case-sensitive on Linux
 {
     bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) == 0; }
 };
@@ -85,10 +85,35 @@ struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
 inline
 Zstring appendSeparator(Zstring path) //support rvalue references!
 {
-    return zen::endsWith(path, FILE_NAME_SEPARATOR) ? path : (path += FILE_NAME_SEPARATOR);
+    return zen::endsWith(path, FILE_NAME_SEPARATOR) ? path : (path += FILE_NAME_SEPARATOR); //returning a by-value parameter implicitly converts to r-value!
 }
 
 
+inline
+Zstring getFileExtension(const Zstring& filePath)
+{
+    const Zstring shortName = afterLast(filePath, FILE_NAME_SEPARATOR); //returns the whole string if term not found
+
+    return contains(shortName, Zchar('.')) ?
+           afterLast(filePath, Zchar('.')) :
+           Zstring();
+}
+
+
+inline
+bool pathStartsWith(const Zstring& str, const Zstring& prefix)
+{
+    return str.size() >= prefix.size() &&
+           EqualFilePath()(Zstring(str.begin(), str.begin() + prefix.size()), prefix);
+}
+
+
+inline
+bool pathEndsWith(const Zstring& str, const Zstring& postfix)
+{
+    return str.size() >= postfix.size() &&
+           EqualFilePath()(Zstring(str.end() - postfix.size(), str.end()), postfix);
+}
 
 
 

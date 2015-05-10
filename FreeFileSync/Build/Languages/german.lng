@@ -7,24 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Die Attribute können nicht von %x nach %y kopiert werden.</target>
-
-<source>Cannot copy permissions from %x to %y.</source>
-<target>Die Berechtigungen können nicht von %x nach %y kopiert werden.</target>
-
-<source>Move down</source>
-<target>Nach unten</target>
-
-<source>Move up</source>
-<target>Nach oben</target>
-
-<source>Arrange folder pair</source>
-<target>Ordnerpaar anordnen</target>
-
-<source>Cannot find file %x.</source>
-<target>Die Datei %x wurde nicht gefunden.</target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -72,6 +54,9 @@
 
 <source>Syntax error</source>
 <target>Syntaxfehler</target>
+
+<source>Cannot find file %x.</source>
+<target>Die Datei %x wurde nicht gefunden.</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Die Datei %x enthält keine gültige Konfiguration.</target>
@@ -217,6 +202,77 @@
 <source>Update attributes on right</source>
 <target>Aktualisiere Attribute des rechten Elements</target>
 
+<source>Cannot read file %x.</source>
+<target>Die Datei %x kann nicht gelesen werden.</target>
+
+<source>
+Unexpected size of data stream.
+Expected: %x bytes
+Actual: %y bytes
+</source>
+<target>
+Unerwartete Größe des Datenstroms.
+Erwartet: %x bytes
+Tatsächlich: %y bytes
+</target>
+
+<source>Cannot write permissions of %x.</source>
+<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
+
+<source>Cannot write file %x.</source>
+<target>Die Datei %x kann nicht geschrieben werden.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
+
+<source>Cannot move file %x to %y.</source>
+<target>Die Datei %x kann nicht nach %y verschoben werden.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelistet werden.</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>Die Dateiattribute von %x können nicht gelesen werden.</target>
+
+<source>Cannot find %x.</source>
+<target>%x wurde nicht gefunden.</target>
+
+<source>Cannot open file %x.</source>
+<target>Die Datei %x kann nicht geöffnet werden.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
+
+<source>Cannot delete file %x.</source>
+<target>Die Datei %x kann nicht gelöscht werden.</target>
+
+<source>Cannot find device %x.</source>
+<target>Das Gerät %x wurde nicht gefunden.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Der freie Speicherplatz für %x konnte nicht ermittelt werden.</target>
+
+<source>Cannot create directory %x.</source>
+<target>Das Verzeichnis %x kann nicht erstellt werden.</target>
+
+<source>Cannot write modification time of %x.</source>
+<target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
+
+<source>Cannot determine final path for %x.</source>
+<target>Der endgültige Pfad für %x kann nicht ermittelt werden.</target>
+
+<source>Cannot resolve symbolic link %x.</source>
+<target>Die symbolische Verknüpfung %x kann nicht aufgelöst werden.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x kann nicht in den Papierkorb verschoben werden.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
+
 <source>
 <pluralform>1 byte</pluralform>
 <pluralform>%x bytes</pluralform>
@@ -250,20 +306,14 @@
 <source>Database file is corrupt:</source>
 <target>Die Datenbankdatei ist beschädigt:</target>
 
-<source>Cannot write file %x.</source>
-<target>Die Datei %x kann nicht geschrieben werden.</target>
-
-<source>Cannot read file %x.</source>
-<target>Die Datei %x kann nicht gelesen werden.</target>
-
 <source>Database files do not share a common session.</source>
 <target>Die Datenbankdateien teilen keine gemeinsame Sitzung.</target>
 
 <source>Searching for folder %x...</source>
 <target>Suche Ordner %x...</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>Die Dateiattribute von %x können nicht gelesen werden.</target>
+<source>Time out while searching for folder %x.</source>
+<target>Das Zeitlimit für die Suche nach Ordner %x wurde überschritten.</target>
 
 <source>Cannot get process information.</source>
 <target>Prozessinformationen können nicht gelesen werden.</target>
@@ -352,6 +402,12 @@
 <source>Unable to create time stamp for versioning:</source>
 <target>Der Zeitstempel für die Versionierung kann nicht erstellt werden:</target>
 
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
+<source>Select a folder</source>
+<target>Ordner auswählen</target>
+
 <source>&Open...</source>
 <target>Ö&ffnen...</target>
 
@@ -399,9 +455,6 @@
 
 <source>Browse</source>
 <target>Auswählen</target>
-
-<source>Select a folder</source>
-<target>Ordner auswählen</target>
 
 <source>Idle time (in seconds):</source>
 <target>Ruhezeit (in Sekunden):</target>
@@ -513,11 +566,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Updating attributes of %x</source>
 <target>Aktualisiere Attribute von %x</target>
 
+<source>%x and %y have different content.</source>
+<target>%x und %y haben unterschiedlichen Inhalt.</target>
+
+<source>Data verification error:</source>
+<target>Verifizierungsfehler:</target>
+
 <source>Creating a Volume Shadow Copy for %x...</source>
 <target>Erstelle eine Volumenschattenkopie für %x...</target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target>Verifizierungsfehler: %x und %y haben unterschiedlichen Inhalt.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Der Zielordner %x existiert bereits.</target>
@@ -581,6 +637,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Stopped</source>
 <target>Unterbrochen</target>
+
+<source>Warning</source>
+<target>Warnung</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Sie können auf FreeFileSyncs Hauptfenster wechseln, um das Problem zu beheben.</target>
@@ -672,9 +731,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Action</source>
 <target>Aktion</target>
 
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
 <source>Local comparison settings</source>
 <target>Lokale Vergleichseinstellungen</target>
 
@@ -704,6 +760,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Local Synchronization Settings</source>
 <target>Lokale Synchronisationseinstellungen</target>
+
+<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
+<target>Der ausgewählte Ordner %x kann nicht mit FreeFileSync verwendet werden. Bitte wählen Sie einen Ordner auf einem lokalen Dateisystem, Netzwerk oder MTP Gerät.</target>
 
 <source>&New</source>
 <target>&Neu</target>
@@ -843,11 +902,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Include symbolic links:</source>
 <target>Symbolische Verknüpfungen einschließen:</target>
 
-<source>Direct</source>
-<target>Direkt</target>
-
 <source>Follow</source>
 <target>Folgen</target>
+
+<source>Direct</source>
+<target>Direkt</target>
 
 <source>More information</source>
 <target>Mehr Information</target>
@@ -949,6 +1008,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>&Don't show this dialog again</source>
 <target>&Diesen Dialog nicht mehr anzeigen</target>
+
+<source>Arrange folder pair</source>
+<target>Ordnerpaar anordnen</target>
 
 <source>Items found:</source>
 <target>Gefundene Elemente:</target>
@@ -1061,8 +1123,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Source code written in C++ using:</source>
 <target>Der Quellcode wurde in C++ geschrieben mit:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Wenn Sie FreeFileSync mögen</target>
+<source>If you like FreeFileSync:</source>
+<target>Wenn Sie FreeFileSync mögen:</target>
 
 <source>Donate with PayPal</source>
 <target>Mit PayPal spenden</target>
@@ -1289,6 +1351,12 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot find %x</source>
 <target>%x wurde nicht gefunden.</target>
 
+<source>Move up</source>
+<target>Nach oben</target>
+
+<source>Move down</source>
+<target>Nach unten</target>
+
 <source>Comma-separated values</source>
 <target>Kommagetrennte Werte</target>
 
@@ -1318,9 +1386,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Info</source>
 <target>Info</target>
-
-<source>Warning</source>
-<target>Warnung</target>
 
 <source>Select all</source>
 <target>Alle auswählen</target>
@@ -1463,26 +1528,20 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Percentage</source>
 <target>Prozent</target>
 
+<source>Unable to register to receive system messages.</source>
+<target>Die Registrierung zum Empfang von Systemmeldungen ist fehlgeschlagen.</target>
+
+<source>Unable to register device notifications for %x.</source>
+<target>Die Registrierung für Gerätemeldungen ist für %x fehlgeschlagen.</target>
+
 <source>Cannot monitor directory %x.</source>
 <target>Das Verzeichnis %x kann nicht überwacht werden.</target>
-
-<source>Cannot delete file %x.</source>
-<target>Die Datei %x kann nicht gelöscht werden.</target>
 
 <source>The file is locked by another process:</source>
 <target>Die Datei wird von einem anderen Prozess gesperrt:</target>
 
-<source>Cannot move file %x to %y.</source>
-<target>Die Datei %x kann nicht nach %y verschoben werden.</target>
-
-<source>Cannot delete directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
-
 <source>Cannot write file attributes of %x.</source>
 <target>Die Dateiattribute von %x können nicht geschrieben werden.</target>
-
-<source>Cannot write modification time of %x.</source>
-<target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Der Sicherheitskontext von %x kann nicht gelesen werden.</target>
@@ -1493,35 +1552,20 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot read permissions of %x.</source>
 <target>Die Berechtigungen von %x können nicht gelesen werden.</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
-
-<source>Cannot create directory %x.</source>
-<target>Das Verzeichnis %x kann nicht erstellt werden.</target>
-
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
+<source>Cannot copy permissions from %x to %y.</source>
+<target>Die Berechtigungen können nicht von %x nach %y kopiert werden.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Die Systemfunktion %x wurde nicht gefunden.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Die Attribute können nicht von %x nach %y kopiert werden.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Die Datei %x kann nicht nach %y kopiert werden.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Der Typ des Elements %x wird nicht unterstützt:</target>
-
-<source>Cannot open file %x.</source>
-<target>Die Datei %x kann nicht geöffnet werden.</target>
-
-<source>Cannot resolve symbolic link %x.</source>
-<target>Die symbolische Verknüpfung %x kann nicht aufgelöst werden.</target>
-
-<source>Cannot open directory %x.</source>
-<target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
-
-<source>Cannot enumerate directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelistet werden.</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1556,9 +1600,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <pluralform>%x Tage</pluralform>
 </target>
 
-<source>Unable to register to receive system messages.</source>
-<target>Die Registrierung zum Empfang von Systemmeldungen ist fehlgeschlagen.</target>
-
 <source>Cannot set privilege %x.</source>
 <target>Das Privileg %x kann nicht gesetzt werden.</target>
 
@@ -1568,14 +1609,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x kann nicht in den Papierkorb verschoben werden.</target>
-
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Die Prüfung des Papierkorbs für Ordner %x ist fehlgeschlagen.</target>
-
-<source>Cannot determine final path for %x.</source>
-<target>Der endgültige Pfad für %x kann nicht ermittelt werden.</target>
 
 <source>Error Code %x:</source>
 <target>Fehlercode %x:</target>

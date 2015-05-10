@@ -12,6 +12,7 @@
 #include <zen/zstring.h>
 #include <zen/optional.h>
 #include <wx/bitmap.h>
+#include "../fs/abstract.h"
 
 namespace zen
 {
@@ -31,10 +32,11 @@ public:
     static int getSize(IconSize sz); //expected and *maximum* icon size in pixel
     int getSize() const { return getSize(iconSizeType); } //
 
-    bool readyForRetrieval(const Zstring& filepath);
-    Opt<wxBitmap> retrieveFileIcon(const Zstring& filepath); //... and mark as hot
+    bool          readyForRetrieval(const AbstractPathRef& filePath);
+    Opt<wxBitmap> retrieveFileIcon (const AbstractPathRef& filePath); //... and mark as hot
+    void          setWorkload      (const std::vector<AbstractPathRef>& load); //(re-)set new workload of icons to be retrieved;
 
-    void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
+    wxBitmap getIconByExtension(const Zstring& filePath); //...and add to buffer
 
     static wxBitmap genericFileIcon(IconSize sz);
     static wxBitmap genericDirIcon (IconSize sz);

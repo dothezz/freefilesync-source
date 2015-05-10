@@ -14,7 +14,7 @@
 #include <zen/async_task.h>
 #include <wx+/file_drop.h>
 #include <wx/timer.h>
-#include "../ui/dir_name.h"
+#include "folder_selector2.h"
 
 namespace xmlAccess
 {
@@ -62,7 +62,7 @@ private:
 
     static const Zstring& lastConfigFileName();
 
-    std::unique_ptr<zen::DirectoryName<wxTextCtrl>> dirpathFirst;
+    std::unique_ptr<zen::FolderSelector2> dirpathFirst;
     std::vector<DirectoryPanel*> dirpathsExtra; //additional pairs to the standard pair
 
     Zstring currentConfigFileName;

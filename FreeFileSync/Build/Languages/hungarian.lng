@@ -1046,8 +1046,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Source code written in C++ using:</source>
 <target>A programot C++-ban fejlesztették a következők felhasználásával:</target>
 
-<source>If you like FreeFileSync</source>
-<target>Ha szereted a FreeFileSync-et</target>
+<source>If you like FreeFileSync:</source>
+<target>Ha szereted a FreeFileSync-et:</target>
 
 <source>Donate with PayPal</source>
 <target>Támogasd a PayPal segítségével</target>

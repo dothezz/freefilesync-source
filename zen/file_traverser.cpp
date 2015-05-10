@@ -13,12 +13,12 @@
     #include "file_access.h"
     #include "symlink_target.h"
 #elif defined ZEN_MAC
-        #include "osx_string.h"
+    #include "osx_string.h"
 #endif
 
 #if defined ZEN_LINUX || defined ZEN_MAC
     #include <cstddef> //offsetof
-	#include <unistd.h> //::pathconf()
+    #include <unistd.h> //::pathconf()
     #include <sys/stat.h>
     #include <dirent.h>
 #endif
@@ -27,9 +27,9 @@ using namespace zen;
 
 
 void zen::traverseFolder(const Zstring& dirPath,
-                         const std::function<void (const FileInfo&    fi)>& onFile,         
-                         const std::function<void (const DirInfo&     di)>& onDir,          
-                         const std::function<void (const SymlinkInfo& si)>& onLink,         
+                         const std::function<void (const FileInfo&    fi)>& onFile,
+                         const std::function<void (const DirInfo&     di)>& onDir,
+                         const std::function<void (const SymlinkInfo& si)>& onLink,
                          const std::function<void (const std::wstring& errorMsg)>& onError)
 {
     try
@@ -51,13 +51,12 @@ void zen::traverseFolder(const Zstring& dirPath,
         }
         ZEN_ON_SCOPE_EXIT(::FindClose(hDir));
 
-		bool firstIteration = true;
+        bool firstIteration = true;
         for (;;)
-        {			
-			if (firstIteration) //keep ::FindNextFile at the start of the for-loop to support "continue"!
-				firstIteration = false;
-			else
-            if (!::FindNextFile(hDir, &findData))
+        {
+            if (firstIteration) //keep ::FindNextFile at the start of the for-loop to support "continue"!
+                firstIteration = false;
+            else if (!::FindNextFile(hDir, &findData))
             {
                 const DWORD lastError = ::GetLastError();
                 if (lastError == ERROR_NO_MORE_FILES) //not an error situation
@@ -69,7 +68,7 @@ void zen::traverseFolder(const Zstring& dirPath,
             //skip "." and ".."
             const Zchar* const shortName = findData.cFileName;
 
-			if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"Data corruption: Found item without name.");
+            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"FindNextFile: Data corruption, found item without name.");
             if (shortName[0] == L'.' &&
                 (shortName[1] == 0 || (shortName[1] == L'.' && shortName[2] == 0)))
                 continue;
@@ -94,32 +93,27 @@ void zen::traverseFolder(const Zstring& dirPath,
         }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-        const Zstring dirPathFmt = //remove trailing slash
-            dirPath.size() > 1 && endsWith(dirPath, FILE_NAME_SEPARATOR) ?  //exception: allow '/'
-            beforeLast(dirPath, FILE_NAME_SEPARATOR) :
-            dirPath;
-
         /* quote: "Since POSIX.1 does not specify the size of the d_name field, and other nonstandard fields may precede
                    that field within the dirent structure, portable applications that use readdir_r() should allocate
                    the buffer whose address is passed in entry as follows:
                        len = offsetof(struct dirent, d_name) + pathconf(dirPath, _PC_NAME_MAX) + 1
                        entryp = malloc(len); */
-        const size_t nameMax = std::max<long>(::pathconf(dirPathFmt.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return long(-1)
-		std::vector<char> buffer(offsetof(struct ::dirent, d_name) + nameMax + 1);
+        const size_t nameMax = std::max<long>(::pathconf(dirPath.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return long(-1)
+        std::vector<char> buffer(offsetof(struct ::dirent, d_name) + nameMax + 1);
 #ifdef ZEN_MAC
-		std::vector<char> bufferUtfDecomposed;
+        std::vector<char> bufferUtfDecomposed;
 #endif
 
-        DIR* dirObj = ::opendir(dirPathFmt.c_str()); //directory must NOT end with path separator, except "/"
+        DIR* dirObj = ::opendir(dirPath.c_str()); //directory must NOT end with path separator, except "/"
         if (!dirObj)
-            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirPathFmt)), L"opendir", getLastError());
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirPath)), L"opendir", getLastError());
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
 
         for (;;)
         {
             struct ::dirent* dirEntry = nullptr;
             if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPathFmt)), L"readdir_r", getLastError());
+                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"readdir_r", getLastError());
             //don't retry but restart dir traversal on error! http://blogs.msdn.com/b/oldnewthing/archive/2014/06/12/10533529.aspx
 
             if (!dirEntry) //no more items
@@ -128,7 +122,7 @@ void zen::traverseFolder(const Zstring& dirPath,
             //don't return "." and ".."
             const char* shortName = dirEntry->d_name;
 
-			if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"Data corruption: Found item without name.");
+            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"readdir_r: Data corruption, found item without name.");
             if (shortName[0] == '.' &&
                 (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
@@ -152,20 +146,20 @@ void zen::traverseFolder(const Zstring& dirPath,
             //const char* sampleDecomposed  = "\x6f\xcc\x81.txt";
             //const char* samplePrecomposed = "\xc3\xb3.txt";
 #endif
-            const Zstring& itempath = appendSeparator(dirPathFmt) + shortName;
+            const Zstring& itempath = appendSeparator(dirPath) + shortName;
 
             struct ::stat statData = {};
-			try
-			{
-					if (::lstat(itempath.c_str(), &statData) != 0) //lstat() does not resolve symlinks
-							throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(itempath)), L"lstat", getLastError());
-			}
-		    catch (const FileError& e)
-			{
-				if (onError)
-					onError(e.toString());
-				continue; //ignore error: skip file
-			}           
+            try
+            {
+                if (::lstat(itempath.c_str(), &statData) != 0) //lstat() does not resolve symlinks
+                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(itempath)), L"lstat", getLastError());
+            }
+            catch (const FileError& e)
+            {
+                if (onError)
+                    onError(e.toString());
+                continue; //ignore error: skip file
+            }
 
             if (S_ISLNK(statData.st_mode)) //on Linux there is no distinction between file and directory symlinks!
             {

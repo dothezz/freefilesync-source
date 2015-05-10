@@ -133,12 +133,6 @@ void fillBackgroundDefaultColorAlternating(wxDC& dc, const wxRect& rect, bool ev
 }
 
 
-Zstring getExtension(const Zstring& shortName)
-{
-    return contains(shortName, Zchar('.')) ? afterLast(shortName, Zchar('.')) : Zstring();
-};
-
-
 class IconUpdater;
 class GridEventManager;
 class GridDataLeft;
@@ -148,7 +142,7 @@ struct IconManager
 {
     IconManager(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer::IconSize sz) :
         iconBuffer(sz),
-        fileIcon       (IconBuffer::genericFileIcon(sz)),
+        //fileIcon       (IconBuffer::genericFileIcon(sz)),
         dirIcon        (IconBuffer::genericDirIcon (sz)),
         linkOverlayIcon(IconBuffer::linkOverlayIcon(sz)),
         iconUpdater(make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
@@ -156,13 +150,13 @@ struct IconManager
     void startIconUpdater();
     IconBuffer& refIconBuffer() { return iconBuffer; }
 
-    wxBitmap getGenericFileIcon() const { return fileIcon;        }
+    //wxBitmap getGenericFileIcon() const { return fileIcon;        }
     wxBitmap getGenericDirIcon () const { return dirIcon;         }
     wxBitmap getLinkOverlayIcon() const { return linkOverlayIcon; }
 
 private:
     IconBuffer iconBuffer;
-    const wxBitmap fileIcon;
+    //const wxBitmap fileIcon;
     const wxBitmap dirIcon;
     const wxBitmap linkOverlayIcon;
 
@@ -222,7 +216,7 @@ public:
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
 
-    void updateNewAndGetUnbufferedIcons(std::vector<Zstring>& newLoad) //loads all not yet drawn icons
+    void updateNewAndGetUnbufferedIcons(std::vector<AbstractPathRef>& newLoad) //loads all not yet drawn icons
     {
         if (iconMgr_)
         {
@@ -238,24 +232,24 @@ public:
                 if (isFailedLoad(currentRow)) //find failed attempts to load icon
                 {
                     const IconInfo ii = getIconInfo(currentRow);
-                    if (!ii.iconPath.empty())
+                    if (ii.type == IconInfo::ICON_PATH)
                     {
                         //test if they are already loaded in buffer:
-                        if (iconMgr_->refIconBuffer().readyForRetrieval(ii.iconPath))
+                        if (iconMgr_->refIconBuffer().readyForRetrieval(ii.fsObj->template getAbstractPath<side>()))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
                             refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME));
                             setFailedLoad(currentRow, false);
                         }
                         else //not yet in buffer: mark for async. loading
-                            newLoad.push_back(ii.iconPath);
+                            newLoad.push_back(ii.fsObj->template getAbstractPath<side>());
                     }
                 }
             }
         }
     }
 
-    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, Zstring>>& newLoad) //return (priority, filepath) list
+    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, AbstractPathRef>>& newLoad) //return (priority, filepath) list
     {
         if (iconMgr_)
         {
@@ -271,9 +265,9 @@ public:
                 const ptrdiff_t currentRow = rowsOnScreen.first - (preloadSize + 1) / 2 + getAlternatingPos(i, visibleRowCount + preloadSize); //for odd preloadSize start one row earlier
 
                 const IconInfo ii = getIconInfo(currentRow);
-                if (!ii.iconPath.empty())
-                    if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.iconPath))
-                        newLoad.emplace_back(i, ii.iconPath); //insert least-important items on outer rim first
+                if (ii.type == IconInfo::ICON_PATH)
+                    if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.fsObj->template getAbstractPath<side>()))
+                        newLoad.emplace_back(i, ii.fsObj->template getAbstractPath<side>()); //insert least-important items on outer rim first
             }
         }
     }
@@ -397,106 +391,89 @@ private:
         {
             struct GetTextValue : public FSObjectVisitor
             {
-                GetTextValue(ColumnTypeRim colType, const FileSystemObject& fso) : colType_(colType), fsObj_(fso) {}
+                GetTextValue(ColumnTypeRim colType) : colType_(colType)  {}
 
                 void visit(const FilePair& fileObj) override
                 {
-                    switch (colType_)
+                    value = [&]
                     {
-                        case COL_TYPE_FULL_PATH:
-                            value = toWx(fileObj.getFullPath<side>());
-                            break;
-                        case COL_TYPE_FILENAME:
-                            value = toWx(fileObj.getItemName<side>());
-                            break;
-                        case COL_TYPE_REL_FOLDER:
-                            value = toWx(beforeLast(fileObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
-                            break;
-                        case COL_TYPE_BASE_DIRECTORY:
-                            value = toWx(fileObj.getBaseDirPf<side>());
-                            break;
-                        case COL_TYPE_SIZE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = zen::toGuiString(fileObj.getFileSize<side>());
-
-                            // -> test file id
-                            //if (!fsObj_.isEmpty<side>())
-                            //	value = toGuiString(fileObj.getFileId<side>().second) + L" " + toGuiString(fileObj.getFileId<side>().first);
-                            break;
-                        case COL_TYPE_DATE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
-                            break;
-                        case COL_TYPE_EXTENSION:
-                            value = toWx(getExtension(fileObj.getItemName<side>()));
-                            break;
-                    }
+                        switch (colType_)
+                        {
+                            case COL_TYPE_FULL_PATH:
+                                return fileObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(fileObj.getAbstractPath<side>()));
+                            case COL_TYPE_FILENAME:
+                                return toWx(fileObj.getItemName<side>());
+                            case COL_TYPE_REL_FOLDER:
+                                return toWx(beforeLast(fileObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                            case COL_TYPE_BASE_DIRECTORY:
+                                return toWx(ABF::getDisplayPath(fileObj.getABF<side>().getAbstractPath()));
+                            case COL_TYPE_SIZE:
+                                //return fileObj.isEmpty<side>() ? wxString() : utfCvrtTo<wxString>(fileObj.getFileId<side>()); // -> test file id
+                                return fileObj.isEmpty<side>() ? wxString() : wxString(toGuiString(fileObj.getFileSize<side>()));
+                            case COL_TYPE_DATE:
+                                return fileObj.isEmpty<side>() ? wxString() : wxString(utcToLocalTimeString(fileObj.getLastWriteTime<side>()));
+                            case COL_TYPE_EXTENSION:
+                                return toWx(getFileExtension(fileObj.getItemName<side>()));
+                        }
+                        assert(false);
+                        return wxString();
+                    }();
                 }
 
                 void visit(const SymlinkPair& linkObj) override
                 {
-                    switch (colType_)
+                    value = [&]
                     {
-                        case COL_TYPE_FULL_PATH:
-                            value = toWx(linkObj.getFullPath<side>());
-                            break;
-                        case COL_TYPE_FILENAME:
-                            value = toWx(linkObj.getItemName<side>());
-                            break;
-                        case COL_TYPE_REL_FOLDER:
-                            value = toWx(beforeLast(linkObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
-                            break;
-                        case COL_TYPE_BASE_DIRECTORY:
-                            value = toWx(linkObj.getBaseDirPf<side>());
-                            break;
-                        case COL_TYPE_SIZE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = L"<" + _("Symlink") + L">";
-                            break;
-                        case COL_TYPE_DATE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
-                            break;
-                        case COL_TYPE_EXTENSION:
-                            value = toWx(getExtension(linkObj.getItemName<side>()));
-                            break;
-                    }
+                        switch (colType_)
+                        {
+                            case COL_TYPE_FULL_PATH:
+                                return linkObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(linkObj.getAbstractPath<side>()));
+                            case COL_TYPE_FILENAME:
+                                return toWx(linkObj.getItemName<side>());
+                            case COL_TYPE_REL_FOLDER:
+                                return toWx(beforeLast(linkObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                            case COL_TYPE_BASE_DIRECTORY:
+                                return toWx(ABF::getDisplayPath(linkObj.getABF<side>().getAbstractPath()));
+                            case COL_TYPE_SIZE:
+                                return linkObj.isEmpty<side>() ? wxString() : wxString(L"<" + _("Symlink") + L">");
+                            case COL_TYPE_DATE:
+                                return linkObj.isEmpty<side>() ? wxString() : wxString(utcToLocalTimeString(linkObj.getLastWriteTime<side>()));
+                            case COL_TYPE_EXTENSION:
+                                return toWx(getFileExtension(linkObj.getItemName<side>()));
+                        }
+                        assert(false);
+                        return wxString();
+                    }();
                 }
 
                 void visit(const DirPair& dirObj) override
                 {
-                    switch (colType_)
+                    value = [&]
                     {
-                        case COL_TYPE_FULL_PATH:
-                            value = toWx(dirObj.getFullPath<side>());
-                            break;
-                        case COL_TYPE_FILENAME:
-                            value = toWx(dirObj.getItemName<side>());
-                            break;
-                        case COL_TYPE_REL_FOLDER:
-                            value = toWx(beforeLast(dirObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
-                            break;
-                        case COL_TYPE_BASE_DIRECTORY:
-                            value = toWx(dirObj.getBaseDirPf<side>());
-                            break;
-                        case COL_TYPE_SIZE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = L"<" + _("Folder") + L">";
-                            break;
-                        case COL_TYPE_DATE:
-                            if (!fsObj_.isEmpty<side>())
-                                value = wxEmptyString;
-                            break;
-                        case COL_TYPE_EXTENSION:
-                            value = wxEmptyString;
-                            break;
-                    }
+                        switch (colType_)
+                        {
+                            case COL_TYPE_FULL_PATH:
+                                return dirObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(dirObj.getAbstractPath<side>()));
+                            case COL_TYPE_FILENAME:
+                                return toWx(dirObj.getItemName<side>());
+                            case COL_TYPE_REL_FOLDER:
+                                return toWx(beforeLast(dirObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                            case COL_TYPE_BASE_DIRECTORY:
+                                return toWx(ABF::getDisplayPath(dirObj.getABF<side>().getAbstractPath()));
+                            case COL_TYPE_SIZE:
+                                return dirObj.isEmpty<side>() ? wxString() : wxString(L"<" + _("Folder") + L">");
+                            case COL_TYPE_DATE:
+                                return wxString();
+                            case COL_TYPE_EXTENSION:
+                                return wxString();
+                        }
+                        assert(false);
+                        return wxString();
+                    }();
                 }
                 ColumnTypeRim colType_;
                 wxString value;
-
-                const FileSystemObject& fsObj_;
-            } getVal(static_cast<ColumnTypeRim>(colType), *fsObj);
+            } getVal(static_cast<ColumnTypeRim>(colType));
             fsObj->accept(getVal);
             return getVal.value;
         }
@@ -548,13 +525,14 @@ private:
                             return iconMgr_->getGenericDirIcon();
 
                         case IconInfo::ICON_PATH:
-                            if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.iconPath))
+                            if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.fsObj->template getAbstractPath<side>()))
                                 return *tmpIco;
 
                             setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
                             //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
                             //see repaint behavior of ::ScrollWindow() function!
-                            return iconMgr_->getGenericFileIcon(); //better than nothing
+                            return iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
+                        //return iconMgr_->getGenericFileIcon();
 
                         case IconInfo::EMPTY:
                             break;
@@ -677,7 +655,7 @@ private:
             ICON_PATH,
         };
         IconType type;
-        Zstring iconPath; //only set for type==ICON_PATH
+        const FileSystemObject* fsObj;  //only set if type != EMPTY
         bool drawAsLink;
     };
 
@@ -688,6 +666,8 @@ private:
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<side>())
         {
+            out.fsObj = fsObj;
+
             struct GetIcon : public FSObjectVisitor
             {
                 GetIcon(IconInfo& ii) : ii_(ii) {}
@@ -695,13 +675,11 @@ private:
                 void visit(const FilePair& fileObj) override
                 {
                     ii_.type       = IconInfo::ICON_PATH;
-                    ii_.iconPath   = fileObj.getFullPath<side>();
-                    ii_.drawAsLink = fileObj.isFollowedSymlink<side>() || hasLinkExtension(ii_.iconPath);
+                    ii_.drawAsLink = fileObj.isFollowedSymlink<side>() || hasLinkExtension(fileObj.getItemName<side>());
                 }
                 void visit(const SymlinkPair& linkObj) override
                 {
                     ii_.type       = IconInfo::ICON_PATH;
-                    ii_.iconPath   = linkObj.getFullPath<side>();
                     ii_.drawAsLink = true;
                 }
                 void visit(const DirPair& dirObj) override
@@ -725,7 +703,7 @@ private:
             if (!fsObj->isEmpty<side>())
             {
                 toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
-                               fsObj->getFullPath<side>() :
+                               ABF::getDisplayPath(fsObj->getAbstractPath<side>()) :
                                fsObj->getRelativePath<side>());
 
                 struct AssembleTooltip : public FSObjectVisitor
@@ -1713,16 +1691,16 @@ private:
 
     void loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
     {
-        std::vector<std::pair<ptrdiff_t, Zstring>> prefetchLoad;
+        std::vector<std::pair<ptrdiff_t, AbstractPathRef>> prefetchLoad;
         provLeft_ .getUnbufferedIconsForPreload(prefetchLoad);
         provRight_.getUnbufferedIconsForPreload(prefetchLoad);
 
         //make sure least-important prefetch rows are inserted first into workload (=> processed last)
-        typedef std::pair<ptrdiff_t, Zstring> Pft; //priority index nicely considers both grids at the same time!
+        using Pft = decltype(prefetchLoad)::value_type; //priority index nicely considers both grids at the same time!
         std::sort(prefetchLoad.begin(), prefetchLoad.end(), [](const Pft& lhs, const Pft& rhs) { return lhs.first < rhs.first; });
 
         //last inserted items are processed first in icon buffer:
-        std::vector<Zstring> newLoad;
+        std::vector<AbstractPathRef> newLoad;
         for (const auto& item : prefetchLoad)
             newLoad.push_back(item.second);
 

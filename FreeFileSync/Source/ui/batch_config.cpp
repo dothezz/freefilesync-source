@@ -10,7 +10,7 @@
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
-#include "dir_name.h"
+#include "folder_selector.h"
 #include "../ui/on_completion_box.h"
 #include "../lib/help_provider.h"
 
@@ -59,7 +59,7 @@ private:
     XmlBatchConfig& batchCfgOutRef; //output only!
     XmlBatchConfig localBatchCfg; //a mixture of settings some of which have OWNERSHIP WITHIN GUI CONTROLS! use getConfig() to resolve
 
-    std::unique_ptr<DirectoryName<FolderHistoryBox>> logfileDir; //always bound, solve circular compile-time dependency
+    std::unique_ptr<FolderSelector> logfileDir; //always bound, solve circular compile-time dependency
 };
 
 //###################################################################################################################################
@@ -83,7 +83,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = make_unique<DirectoryName<FolderHistoryBox>>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_logfileDir);
+    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_logfileDir);
 
     setConfig(batchCfg);
 
@@ -131,7 +131,7 @@ void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
 
     //transfer parameter ownership to GUI
     m_checkBoxRunMinimized->SetValue(batchCfg.runMinimized);
-    logfileDir->setPath(utfCvrtTo<wxString>(batchCfg.logFileDirectory));
+    logfileDir->setPath(batchCfg.logFolderPathPhrase);
     m_comboBoxOnCompletion->setValue(batchCfg.mainCfg.onCompletion);
 
     //map single parameter "logfiles limit" to all three checkboxs and spin ctrl:
@@ -152,7 +152,7 @@ XmlBatchConfig BatchDialog::getConfig() const
 
     //load structure with batch settings "batchCfg"
     batchCfg.runMinimized     = m_checkBoxRunMinimized->GetValue();
-    batchCfg.logFileDirectory = utfCvrtTo<Zstring>(logfileDir->getPath());
+    batchCfg.logFolderPathPhrase = utfCvrtTo<Zstring>(logfileDir->getPath());
     batchCfg.mainCfg.onCompletion = m_comboBoxOnCompletion->getValue();
     //get single parameter "logfiles limit" from all three checkboxes and spin ctrl:
     batchCfg.logfilesCountLimit = m_checkBoxGenerateLogfile->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;

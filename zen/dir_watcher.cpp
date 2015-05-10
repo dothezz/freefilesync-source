@@ -11,7 +11,7 @@
 #include "scope_guard.h"
 
 #ifdef ZEN_WIN
-    #include "notify_removal.h"
+    #include "device_notify.h"
     #include "win.h" //includes "windows.h"
     #include "long_path_prefix.h"
 
@@ -161,12 +161,11 @@ public:
         //end of constructor, no need to start managing "hDir"
     }
 
-    ReadChangesAsync(ReadChangesAsync&& other) :
-        hDir(INVALID_HANDLE_VALUE)
+    ReadChangesAsync(ReadChangesAsync&& other) : shared_(std::move(other.shared_)),
+        dirpathPf(std::move(other.dirpathPf)),
+        hDir(other.hDir)
     {
-        shared_   = std::move(other.shared_);
-        dirpathPf = std::move(other.dirpathPf);
-        std::swap(hDir, other.hDir);
+        other.hDir = INVALID_HANDLE_VALUE;
     }
 
     ~ReadChangesAsync()
@@ -271,15 +270,24 @@ private:
 };
 
 
-class HandleVolumeRemoval : public NotifyRequestDeviceRemoval
+class HandleVolumeRemoval
 {
 public:
     HandleVolumeRemoval(HANDLE hDir,
+                        const Zstring& displayPath,
                         boost::thread& worker) :
-        NotifyRequestDeviceRemoval(hDir), //throw FileError
-        worker_(worker),
-        removalRequested(false),
-        operationComplete(false) {}
+        notificationHandle(registerFolderRemovalNotification(hDir, //throw FileError
+                                                             displayPath,
+                                                             [this]                 { this->onRequestRemoval (); },   //noexcept!
+    [this](bool successful) { this->onRemovalFinished(); })), //
+    worker_(worker),
+    removalRequested(false),
+    operationComplete(false) {}
+
+    ~HandleVolumeRemoval()
+    {
+        unregisterDeviceNotification(notificationHandle);
+    }
 
     //all functions are called by main thread!
 
@@ -287,7 +295,7 @@ public:
     bool finished() const { return operationComplete; }
 
 private:
-    void onRequestRemoval(HANDLE hnd) override
+    void onRequestRemoval() //noexcept!
     {
         //must release hDir immediately => stop monitoring!
         if (worker_.joinable()) //= join() precondition: play safe; can't trust Windows to only call-back once
@@ -300,8 +308,9 @@ private:
         removalRequested = true;
     } //don't throw!
 
-    void onRemovalFinished(HANDLE hnd, bool successful) override { operationComplete = true; } //throw()!
+    void onRemovalFinished() { operationComplete = true; } //noexcept!
 
+    DeviceNotificationHandle* notificationHandle;
     boost::thread& worker_;
     bool removalRequested;
     bool operationComplete;
@@ -313,20 +322,18 @@ struct DirWatcher::Pimpl
 {
     boost::thread worker;
     std::shared_ptr<SharedData> shared;
-
-    Zstring dirpath;
     std::unique_ptr<HandleVolumeRemoval> volRemoval;
 };
 
 
-DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
+DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
+    baseDirPath(dirPath),
     pimpl_(zen::make_unique<Pimpl>())
 {
     pimpl_->shared = std::make_shared<SharedData>();
-    pimpl_->dirpath = directory;
 
-    ReadChangesAsync reader(directory, pimpl_->shared); //throw FileError
-    pimpl_->volRemoval = zen::make_unique<HandleVolumeRemoval>(reader.getDirHandle(), pimpl_->worker); //throw FileError
+    ReadChangesAsync reader(dirPath, pimpl_->shared); //throw FileError
+    pimpl_->volRemoval = zen::make_unique<HandleVolumeRemoval>(reader.getDirHandle(), dirPath, pimpl_->worker); //throw FileError
     pimpl_->worker = boost::thread(std::move(reader));
 }
 
@@ -347,6 +354,7 @@ DirWatcher::~DirWatcher()
 std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>& processGuiMessages) //throw FileError
 {
     std::vector<Entry> output;
+    pimpl_->shared->fetchChanges(output); //throw FileError
 
     //wait until device removal is confirmed, to prevent locking hDir again by some new watch!
     if (pimpl_->volRemoval->requestReceived())
@@ -360,10 +368,9 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
             boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
         }
 
-        output.emplace_back(ACTION_DELETE, pimpl_->dirpath); //report removal as change to main directory
+        output.emplace_back(ACTION_DELETE, baseDirPath); //report removal as change to main directory
     }
-    else //the normal case...
-        pimpl_->shared->fetchChanges(output); //throw FileError
+
     return output;
 }
 
@@ -373,32 +380,35 @@ struct DirWatcher::Pimpl
 {
     Pimpl() : notifDescr() {}
 
-    Zstring basedirpath;
     int notifDescr;
     std::map<int, Zstring> watchDescrs; //watch descriptor and (sub-)directory name (postfixed with separator) -> owned by "notifDescr"
 };
 
 
-DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
+DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
+    baseDirPath(dirPath),
     pimpl_(zen::make_unique<Pimpl>())
 {
     //get all subdirectories
-    Zstring dirpathFmt = directory;
-    if (endsWith(dirpathFmt, FILE_NAME_SEPARATOR))
-        dirpathFmt.resize(dirpathFmt.size() - 1);
+    std::vector<Zstring> fullDirList { baseDirPath };
+    {
+        std::function<void (const Zstring& path)> traverse;
 
-    std::vector<Zstring> fullDirList { dirpathFmt };
+        traverse = [&traverse, &fullDirList](const Zstring& path)
+        {
+            traverseFolder(path, nullptr,
+            [&](const DirInfo& di ) { fullDirList.push_back(di.fullPath); traverse(di.fullPath); },
+            nullptr, //don't traverse into symlinks (analog to windows build)
+            [&](const std::wstring& errorMsg) { throw FileError(errorMsg); });
+        };
 
-traverseFolder(dirpathFmt, nullptr, 
-				[&](const DirInfo& di ){ fullDirList.push_back(di.fullPath); }, 
-				nullptr, //don't traverse into symlinks (analog to windows build)
-[&](const std::wstring& errorMsg){ throw FileError(errorMsg); });
+        traverse(baseDirPath);
+    }
 
     //init
-    pimpl_->basedirpath = directory;
-    pimpl_->notifDescr = ::inotify_init();
+    pimpl_->notifDescr  = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"inotify_init", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"inotify_init", getLastError());
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -410,12 +420,12 @@ traverseFolder(dirpathFmt, nullptr,
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"fcntl", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"fcntl", getLastError());
 
     //add watches
-    for (const Zstring& subdir : fullDirList)
+    for (const Zstring& subDirPath : fullDirList)
     {
-        int wd = ::inotify_add_watch(pimpl_->notifDescr, subdir.c_str(),
+        int wd = ::inotify_add_watch(pimpl_->notifDescr, subDirPath.c_str(),
                                      IN_ONLYDIR     | //"Only watch pathname if it is a directory."
                                      IN_DONT_FOLLOW | //don't follow symbolic links
                                      IN_CREATE   	|
@@ -430,12 +440,13 @@ traverseFolder(dirpathFmt, nullptr,
         {
             const auto ec = getLastError();
             if (ec == ENOSPC) //fix misleading system message "No space left on device"
-                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)), formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
+                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)),
+				      formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
 
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)), formatSystemError(L"inotify_add_watch", ec));
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)), formatSystemError(L"inotify_add_watch", ec));
         }
 
-        pimpl_->watchDescrs.emplace(wd, appendSeparator(subdir));
+        pimpl_->watchDescrs.emplace(wd, appendSeparator(subDirPath));
     }
 
     guardDescr.dismiss();
@@ -465,7 +476,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->basedirpath)), L"read", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"read", getLastError());
     }
 
     std::vector<Entry> output;
@@ -523,7 +534,7 @@ void eventCallback(ConstFSEventStreamRef streamRef,
         //events are aggregated => it's possible to see a single event with flags
         //kFSEventStreamEventFlagItemCreated | kFSEventStreamEventFlagItemModified | kFSEventStreamEventFlagItemRemoved
 
-		//https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
+        //https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
         if (eventFlags[i] & kFSEventStreamEventFlagItemCreated ||
             eventFlags[i] & kFSEventStreamEventFlagMount)
             changedFiles.emplace_back(DirWatcher::ACTION_CREATE, paths[i]);
@@ -555,12 +566,13 @@ struct DirWatcher::Pimpl
 };
 
 
-DirWatcher::DirWatcher(const Zstring& directory) :
+DirWatcher::DirWatcher(const Zstring& dirPath) :
+    baseDirPath(dirPath),
     pimpl_(zen::make_unique<Pimpl>())
 {
-    CFStringRef dirpathCf = osx::createCFString(directory.c_str()); //returns nullptr on error
+    CFStringRef dirpathCf = osx::createCFString(baseDirPath.c_str()); //returns nullptr on error
     if (!dirpathCf)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: createCFString"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: createCFString"); //no error code documented!
     ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCf));
 
     CFArrayRef dirpathCfArray = ::CFArrayCreate(nullptr,    //CFAllocatorRef allocator,
@@ -568,7 +580,7 @@ DirWatcher::DirWatcher(const Zstring& directory) :
                                                 1,          //CFIndex numValues,
                                                 nullptr);   //const CFArrayCallBacks* callBacks
     if (!dirpathCfArray)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: CFArrayCreate"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: CFArrayCreate"); //no error code documented!
     ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCfArray));
 
     FSEventStreamContext context = {};
@@ -594,7 +606,7 @@ DirWatcher::DirWatcher(const Zstring& directory) :
     zen::ScopeGuard guardRunloop = zen::makeGuard([&] { ::FSEventStreamInvalidate(pimpl_->eventStream); });
 
     if (!::FSEventStreamStart(pimpl_->eventStream))
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"Function call failed: FSEventStreamStart"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: FSEventStreamStart"); //no error code documented!
 
     guardCreate .dismiss();
     guardRunloop.dismiss();

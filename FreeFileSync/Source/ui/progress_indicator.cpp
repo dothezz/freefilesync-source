@@ -59,20 +59,12 @@ const int WINDOW_BYTES_PER_SEC     =  5000; //
 class StopWatch
 {
 public:
-    StopWatch() : startTime(wxGetUTCTimeMillis().GetValue()), paused(false), elapsedUntilPause(0) {} //start running
-
-    void restart()
-    {
-        startTime = wxGetUTCTimeMillis().GetValue(); //uses ::GetSystemTimeAsFileTime()
-        paused = false;
-    }
-
     void pause()
     {
         if (!paused)
         {
             paused = true;
-            elapsedUntilPause = wxGetUTCTimeMillis().GetValue() - startTime;
+            elapsedUntilPause += numeric::dist(startTime, wxGetUTCTimeMillis().GetValue());
         }
     }
 
@@ -81,16 +73,29 @@ public:
         if (paused)
         {
             paused = false;
-            startTime = wxGetUTCTimeMillis().GetValue() - elapsedUntilPause;
+            startTime = wxGetUTCTimeMillis().GetValue();
         }
     }
 
-    int64_t timeMs() const { return paused ? elapsedUntilPause : wxGetUTCTimeMillis().GetValue() - startTime; }
+    void restart()
+    {
+        startTime = wxGetUTCTimeMillis().GetValue(); //uses ::GetSystemTimeAsFileTime()
+        paused = false;
+        elapsedUntilPause = 0;
+    }
+
+    int64_t timeMs() const
+    {
+        int64_t msTotal = elapsedUntilPause;
+        if (!paused)
+            msTotal += numeric::dist(startTime, wxGetUTCTimeMillis().GetValue());
+        return msTotal;
+    }
 
 private:
-    int64_t startTime;
-    bool paused;
-    int64_t elapsedUntilPause;
+    long long startTime = wxGetUTCTimeMillis().GetValue();
+    bool    paused = false;
+    int64_t elapsedUntilPause = 0;
 };
 }
 
