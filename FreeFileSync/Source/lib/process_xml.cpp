@@ -970,7 +970,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //###########################################################
 
     inWnd["DefaultView" ](config.gui.viewFilterDefault);
-    inWnd["Perspective3"](config.gui.guiPerspectiveLast);
+    inWnd["Perspective4"](config.gui.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1352,7 +1352,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //###########################################################
 
     outWnd["DefaultView" ](config.gui.viewFilterDefault);
-    outWnd["Perspective3"](config.gui.guiPerspectiveLast);
+    outWnd["Perspective4"](config.gui.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 

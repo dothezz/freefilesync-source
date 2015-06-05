@@ -364,14 +364,18 @@ public:
     RunOnStartup()
     {
 #ifdef ZEN_WIN
-        //failure to initialize COM for each thread is a source of hard to reproduce bugs: https://sourceforge.net/tracker/?func=detail&aid=3160472&group_id=234430&atid=1093080
-        //Prerequisites, see thumbnail.h: Initialize system image list
-
+        //thumbnail.h prerequisites: 1. initialize COM, 2. initialize system image list
         typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);
         const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660)); //MS requires and documents this magic number
         assert(fileIconInit);
         if (fileIconInit)
-            fileIconInit(false); //TRUE to restore the system image cache from disk; FALSE otherwise.
+            fileIconInit(true); //MSDN: "TRUE to restore the system image cache from disk; FALSE otherwise."
+        /*
+        	"FileIconInit's "fRestoreCache" parameter determines whether or not it loads the 48-or-so "standard" shell icons. If FALSE is specified,
+        	it only loads a very minimal set of icons. [...] SHGetFileInfo internally call FileIconInit(FALSE), so if you want
+        	your copy of the system image list to contain the standard icons,  you should call FileIconInit(TRUE) at startup."
+        		- Jim Barry, MVP (Windows SDK)
+        */
 #endif
     }
 } dummy;

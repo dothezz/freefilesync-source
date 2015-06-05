@@ -220,8 +220,11 @@ public:
                 zen::ScopeGuard guardAio = zen::makeGuard([&]
                 {
                     //Canceling Pending I/O Operations: http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
-                    //if (::CancelIoEx(hDir, &overlapped) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND) -> Vista only
+#ifdef ZEN_WIN_VISTA_AND_LATER
+                    if (::CancelIoEx(hDir, &overlapped) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
+#else
                     if (::CancelIo(hDir) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
+#endif
                     {
                         DWORD bytesWritten = 0;
                         ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //wait until cancellation is complete
@@ -441,7 +444,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
             const auto ec = getLastError();
             if (ec == ENOSPC) //fix misleading system message "No space left on device"
                 throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)),
-				      formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
+                                formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
 
             throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)), formatSystemError(L"inotify_add_watch", ec));
         }

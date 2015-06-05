@@ -87,10 +87,11 @@ void moveItemToVersioning(const AbstractPathRef& itemPath, //throw FileError
             assert(false);
         case VER_STYLE_REPLACE:
             versionedRelPath = relativePath;
-
+            break;
         case VER_STYLE_ADD_TIMESTAMP: //assemble time-stamped version name
             versionedRelPath = relativePath + Zstr(' ') + timestamp + getDotExtension(relativePath);
             assert(impl::isMatchingVersion(afterLast(relativePath, FILE_NAME_SEPARATOR), afterLast(versionedRelPath, FILE_NAME_SEPARATOR))); //paranoid? no!
+            break;
     }
 
     const AbstractPathRef versionedItemPath = versioningFolder.getAbstractPath(versionedRelPath);

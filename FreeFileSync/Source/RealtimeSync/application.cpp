@@ -19,6 +19,8 @@
 #include "../lib/ffs_paths.h"
 #include "../lib/return_codes.h"
 #include "../lib/error_log.h"
+#include "../lib/help_provider.h"
+
 
 #ifdef ZEN_WIN
     #include <zen/win_ver.h>
@@ -102,6 +104,7 @@ bool Application::OnInit()
 
 int Application::OnExit()
 {
+    uninitializeHelp();
     releaseWxLocale();
     return wxApp::OnExit();
 }
@@ -170,11 +173,13 @@ int Application::OnRun()
         processException(utfCvrtTo<std::wstring>(e.what()));
         return FFS_RC_EXCEPTION;
     }
-    catch (...) //catch the rest
+    /* -> let it crash and create mini dump!!!
+    catch (...)
     {
         processException(L"Unknown error.");
         return FFS_RC_EXCEPTION;
     }
+    */
 
     return FFS_RC_SUCCESS; //program's return code
 }

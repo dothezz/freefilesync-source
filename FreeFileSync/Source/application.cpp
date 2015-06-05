@@ -19,6 +19,7 @@
 #include "ui/batch_status_handler.h"
 #include "ui/main_dlg.h"
 #include "ui/switch_to_gui.h"
+#include "lib/help_provider.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
 
@@ -188,6 +189,7 @@ bool Application::OnInit()
 
 int Application::OnExit()
 {
+    uninitializeHelp();
     releaseWxLocale();
     return wxApp::OnExit();
 }
@@ -249,12 +251,13 @@ int Application::OnRun()
         processException(utfCvrtTo<std::wstring>(e.what()));
         return FFS_RC_EXCEPTION;
     }
-    catch (...) //catch the rest
+    /* -> let it crash and create mini dump!!!
+    catch (...)
     {
         processException(L"Unknown error.");
         return FFS_RC_EXCEPTION;
     }
-
+    */
     return returnCode;
 }
 
@@ -606,6 +609,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
     //regular check for program updates -> disabled for batch
     //if (batchCfg.showProgress && manualProgramUpdateRequired())
     //    checkForUpdatePeriodically(globalCfg.lastUpdateCheck);
+    //WinInet not working when FFS is running as a service!!! https://support.microsoft.com/en-us/kb/238425
 
     try //begin of synchronization process (all in one try-catch block)
     {

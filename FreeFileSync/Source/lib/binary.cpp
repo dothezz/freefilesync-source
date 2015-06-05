@@ -88,20 +88,21 @@ bool zen::filesHaveSameContent(const AbstractPathRef& filePath1, const AbstractP
     const std::unique_ptr<ABF::InputStream> inStream1 = ABF::getInputStream(filePath1); //throw FileError, (ErrorFileLocked)
     const std::unique_ptr<ABF::InputStream> inStream2 = ABF::getInputStream(filePath2); //
 
-    BufferSize bufferSize(std::min(inStream1->optimalBlockSize(),
-                                   inStream2->optimalBlockSize()));
+    BufferSize dynamicBufSize(std::min(inStream1->optimalBlockSize(),
+                                       inStream2->optimalBlockSize()));
 
     TickVal lastDelayViolation = getTicks();
 
     for (;;)
     {
-        setMinSize(memory1, bufferSize.get());
-        setMinSize(memory2, bufferSize.get());
+        const size_t bufSize = dynamicBufSize.get(); //save for reliable eof check below!!!
+        setMinSize(memory1, bufSize);
+        setMinSize(memory2, bufSize);
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = inStream1->read(&memory1[0], bufferSize.get()); //throw FileError
-        const size_t length2 = inStream2->read(&memory2[0], bufferSize.get()); //returns actual number of bytes read
+        const size_t length1 = inStream1->read(&memory1[0], bufSize); //throw FileError
+        const size_t length2 = inStream2->read(&memory2[0], bufSize); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
         if (onUpdateStatus)
             onUpdateStatus(std::max(length1, length2));
@@ -120,18 +121,18 @@ bool zen::filesHaveSameContent(const AbstractPathRef& filePath1, const AbstractP
                 if (dist(lastDelayViolation, now) / TICKS_PER_SEC > 2) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
                 {
                     lastDelayViolation = now;
-                    bufferSize.inc();
+                    dynamicBufSize.inc();
                 }
             }
             else if (loopTime > 500)
             {
                 lastDelayViolation = now;
-                bufferSize.dec();
+                dynamicBufSize.dec();
             }
         }
         //------------------------------------------------------------------------------------------------
 
-        if (length1 != bufferSize.get()) //end of file
+        if (length1 != bufSize) //end of file
             return true;
     }
 }

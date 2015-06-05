@@ -38,6 +38,9 @@
 #include "../synchronization.h"
 #include "../algorithm.h"
 #include "../fs/concrete.h"
+#ifdef ZEN_WIN_VISTA_AND_LATER
+#include "../fs/mtp.h"
+#endif
 #include "../lib/resolve_path.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/help_provider.h"
@@ -92,26 +95,26 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
 }
 
 
-class FolderSelectorMainImpl : public FolderSelector
+class FolderSelectorImpl : public FolderSelector
 {
 public:
-    FolderSelectorMainImpl(MainDialog&      mainDlg,
-                           wxWindow&        dropWindow1,
-                           Grid&            dropGrid,
-                           wxButton&        dirSelectButton,
-                           FolderHistoryBox& dirpath,
-                           wxStaticText&    staticText) :
-        FolderSelector(dropWindow1, dirSelectButton, dirpath, &staticText, &dropGrid.getMainWin()),
+    FolderSelectorImpl(MainDialog&      mainDlg,
+                       wxPanel&         dropWindow1,
+                       wxButton&        dirSelectButton,
+                       FolderHistoryBox& dirpath,
+                       wxStaticText*     staticText = nullptr,
+                       wxWindow*         dropWindow2 = nullptr) :
+        FolderSelector(dropWindow1, dirSelectButton, dirpath, staticText, dropWindow2),
         mainDlg_(mainDlg) {}
 
-    bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) override
+    bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) override
     {
-        if (std::any_of(droppedFiles.begin(), droppedFiles.end(), [](const wxString& filepath)
+        if (std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
     {
         using namespace xmlAccess;
         try
         {
-            switch (getXmlType(utfCvrtTo<Zstring>(filepath))) //throw FileError
+            switch (getXmlType(shellItemPath)) //throw FileError
                 {
                     case XML_TYPE_GUI:
                     case XML_TYPE_BATCH:
@@ -126,7 +129,7 @@ public:
             return false;
         }))
         {
-            mainDlg_.loadConfiguration(toZ(droppedFiles));
+            mainDlg_.loadConfiguration(shellItemPaths);
             return false;
         }
 
@@ -135,8 +138,8 @@ public:
     }
 
 private:
-    FolderSelectorMainImpl           (const FolderSelectorMainImpl&) = delete;
-    FolderSelectorMainImpl& operator=(const FolderSelectorMainImpl&) = delete;
+    FolderSelectorImpl           (const FolderSelectorImpl&) = delete;
+    FolderSelectorImpl& operator=(const FolderSelectorImpl&) = delete;
 
     MainDialog& mainDlg_;
 };
@@ -185,8 +188,8 @@ public:
     FolderPairPanel(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairPanelGenerated(parent),
         FolderPairCallback<FolderPairPanelGenerated>(static_cast<FolderPairPanelGenerated&>(*this), mainDialog), //pass FolderPairPanelGenerated part...
-        dirpathLeft (*m_panelLeft,  *m_buttonSelectDirLeft,  *m_directoryLeft),
-        dirpathRight(*m_panelRight, *m_buttonSelectDirRight, *m_directoryRight)
+        dirpathLeft (mainDialog, *m_panelLeft,  *m_buttonSelectDirLeft,  *m_directoryLeft),
+        dirpathRight(mainDialog, *m_panelRight, *m_buttonSelectDirRight, *m_directoryRight)
     {
         dirpathLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
         dirpathRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
@@ -211,8 +214,8 @@ public:
 
 private:
     //support for drag and drop
-    FolderSelector dirpathLeft;
-    FolderSelector dirpathRight;
+    FolderSelectorImpl dirpathLeft;
+    FolderSelectorImpl dirpathRight;
 };
 
 
@@ -225,16 +228,16 @@ public:
         //prepare drag & drop
         dirpathLeft(mainDialog,
                     *mainDialog.m_panelTopLeft,
-                    *mainDialog.m_gridMainL,
                     *mainDialog.m_buttonSelectDirLeft,
                     *mainDialog.m_directoryLeft,
-                    *mainDialog.m_staticTextResolvedPathL),
+                    mainDialog.m_staticTextResolvedPathL,
+                    &mainDialog.m_gridMainL->getMainWin()),
         dirpathRight(mainDialog,
                      *mainDialog.m_panelTopRight,
-                     *mainDialog.m_gridMainR,
                      *mainDialog.m_buttonSelectDirRight,
                      *mainDialog.m_directoryRight,
-                     *mainDialog.m_staticTextResolvedPathR)
+                     mainDialog.m_staticTextResolvedPathR,
+                     &mainDialog.m_gridMainR->getMainWin())
     {
         dirpathLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
         dirpathRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
@@ -261,8 +264,8 @@ public:
 
 private:
     //support for drag and drop
-    FolderSelectorMainImpl dirpathLeft;
-    FolderSelectorMainImpl dirpathRight;
+    FolderSelectorImpl dirpathLeft;
+    FolderSelectorImpl dirpathRight;
 };
 
 
@@ -349,7 +352,7 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
                        stackImages(descrImage, iconImage, ImageStackLayout::HORIZONTAL, ImageStackAlignment::CENTER, 5);
 
     //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work correctly
-    wxSize minSize = dynImage.GetSize() + wxSize(10, 10); //add border space
+    wxSize minSize = dynImage.GetSize() + wxSize(16, 16); //add border space
     minSize.x = std::max(minSize.x, TOP_BUTTON_OPTIMAL_WIDTH);
 
     btn.SetMinSize(minSize);
@@ -521,7 +524,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     warn_static("remove after test")
 #ifdef ZEN_MAC
     //follow OS conventions:
-    //	m_menuItemOptions->SetItemLabel(_("&Preferences...") + L"\tCtrl+,"); //"Ctrl" is automatically mapped to command button!
+    //	m_menuItemOptions->SetItemLabel(_("&Preferences") + L"\tCtrl+,"); //"Ctrl" is automatically mapped to command button!
     //this->SetMenuBar(m_menubar1);
 #endif
 
@@ -1348,7 +1351,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
 namespace
 {
 template <SelectedSide side>
-Zstring getExistingParentFolder(const FileSystemObject& fsObj)
+AbstractPathRef getExistingParentFolder(const FileSystemObject& fsObj)
 {
     const DirPair* dirObj = dynamic_cast<const DirPair*>(&fsObj);
     if (!dirObj)
@@ -1357,11 +1360,11 @@ Zstring getExistingParentFolder(const FileSystemObject& fsObj)
     while (dirObj)
     {
         if (!dirObj->isEmpty<side>())
-            return ABF::getDisplayPath(dirObj->getAbstractPath<side>());
+            return dirObj->getAbstractPath<side>();
 
         dirObj = dynamic_cast<const DirPair*>(&dirObj->parent());
     }
-    return ABF::getDisplayPath(fsObj.getABF<side>().getAbstractPath());
+    return fsObj.getABF<side>().getAbstractPath();
 }
 }
 
@@ -1377,6 +1380,13 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
         xmlAccess::XmlGlobalSettings::Gui dummy;
         return !dummy.externelApplications.empty() && dummy.externelApplications[0].second == commandline;
     }();
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    const bool openWithDefaultAppRequested = [&]
+    {
+        xmlAccess::XmlGlobalSettings::Gui dummy;
+        return dummy.externelApplications.size() >= 2 && dummy.externelApplications[1].second == commandline;
+    }();
+#endif
 
     //support fallback instead of an error in this special case
     if (openFileBrowserRequested)
@@ -1388,24 +1398,34 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
             (leftSide  && selectionTmp[0]->isEmpty<LEFT_SIDE >()) ||
             (!leftSide && selectionTmp[0]->isEmpty<RIGHT_SIDE>()))
         {
-            Zstring fallbackDir;
-            if (selectionTmp.empty())
-                fallbackDir = leftSide ?
-                              getResolvedDisplayPath(firstFolderPair->getLeftDir()) :
-                              getResolvedDisplayPath(firstFolderPair->getRightDir());
-            else
-                fallbackDir = leftSide ?
-                              getExistingParentFolder<LEFT_SIDE >(*selectionTmp[0]) :
-                              getExistingParentFolder<RIGHT_SIDE>(*selectionTmp[0]);
+            auto abfL = createAbstractBaseFolder(firstFolderPair->getLeftDir ()); //keep AbstractPathRef valid!
+            auto abfR = createAbstractBaseFolder(firstFolderPair->getRightDir()); //
+
+            AbstractPathRef fallbackFolderPath = [&]
+            {
+                if (selectionTmp.empty())
+                    return leftSide ?
+                    abfL->getAbstractPath() :
+                    abfR->getAbstractPath();
+                else
+                    return leftSide ?
+                    getExistingParentFolder<LEFT_SIDE >(*selectionTmp[0]) :
+                    getExistingParentFolder<RIGHT_SIDE>(*selectionTmp[0]);
+            }();
 
             try
             {
 #ifdef ZEN_WIN
-                shellExecute(L"\"" + fallbackDir + L"\"", EXEC_TYPE_ASYNC); //throw FileError
+#ifdef ZEN_WIN_VISTA_AND_LATER
+                if (std::shared_ptr<const void> /*PCIDLIST_ABSOLUTE*/ fallbackFolderPidl = geMtpItemAbsolutePidl(fallbackFolderPath))
+                    shellExecute(fallbackFolderPidl.get(), ABF::getDisplayPath(fallbackFolderPath), EXEC_TYPE_ASYNC); //throw FileError
+                else
+#endif
+                    shellExecute(L"\"" + ABF::getDisplayPath(fallbackFolderPath) + L"\"", EXEC_TYPE_ASYNC); //throw FileError
 #elif defined ZEN_LINUX
-                shellExecute("xdg-open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("xdg-open \"" + ABF::getDisplayPath(fallbackFolderPath) + "\"", EXEC_TYPE_ASYNC); //
 #elif defined ZEN_MAC
-                shellExecute("open \"" + fallbackDir + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("open \"" + ABF::getDisplayPath(fallbackFolderPath) + "\"", EXEC_TYPE_ASYNC); //
 #endif
             }
             catch (const FileError& e) { showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); }
@@ -1460,6 +1480,20 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
         auto cmdExp = expandMacros(command);
         try
         {
+#ifdef ZEN_WIN_VISTA_AND_LATER
+            if (openFileBrowserRequested || openWithDefaultAppRequested)
+            {
+                const AbstractPathRef itemPath = leftSide ? fsObj->getAbstractPath<LEFT_SIDE>() : fsObj->getAbstractPath<RIGHT_SIDE>();
+                if (std::shared_ptr<const void> /*PCIDLIST_ABSOLUTE*/ shellItemPidl = geMtpItemAbsolutePidl(itemPath))
+                {
+                    if (openFileBrowserRequested)
+                        showShellItemInExplorer(shellItemPidl.get()); //throw FileError
+                    else
+                        shellExecute(shellItemPidl.get(), ABF::getDisplayPath(itemPath), EXEC_TYPE_ASYNC); //throw FileError
+                    continue;
+                }
+            }
+#endif
             //caveat: spawning too many threads asynchronously can easily kill a user's desktop session on Ubuntu!
             shellExecute(cmdExp, selectionTmp.size() > massInvokeThreshold ? EXEC_TYPE_SYNC : EXEC_TYPE_ASYNC); //throw FileError
         }
@@ -2547,7 +2581,7 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
 
 void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
 {
-    loadConfiguration(toZ(event.getFiles()));
+    loadConfiguration(event.getFiles());
     event.Skip();
 }
 

@@ -74,8 +74,7 @@ struct LogTraverserCallback: public ABF::TraverserCallback
 
     void onFile(const FileInfo& fi) override
     {
-        const Zstring fileName(fi.shortName);
-        if (pathStartsWith(fileName, prefix_) && pathEndsWith(fileName, Zstr(".log")))
+        if (pathStartsWith(fi.shortName, prefix_) && pathEndsWith(fi.shortName, Zstr(".log")))
             logFileNames_.push_back(fi.shortName);
 
         if (onUpdateStatus_)

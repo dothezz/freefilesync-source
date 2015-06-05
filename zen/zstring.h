@@ -10,43 +10,10 @@
 #include "string_base.h"
 
 #ifdef ZEN_LINUX
-    #include <cstring> //strcmp
+    #include <cstring> //strncmp
 #endif
 
 
-#ifndef NDEBUG
-namespace z_impl
-{
-void leakCheckerInsert(const void* ptr, size_t size);
-void leakCheckerRemove(const void* ptr);
-}
-#endif //NDEBUG
-
-class AllocatorFreeStoreChecked
-{
-public:
-    static void* allocate(size_t size) //throw std::bad_alloc
-    {
-        void* ptr = zen::AllocatorOptimalSpeed::allocate(size);
-#ifndef NDEBUG
-        z_impl::leakCheckerInsert(ptr, size); //test Zbase for memory leaks
-#endif
-        return ptr;
-    }
-
-    static void deallocate(void* ptr)
-    {
-#ifndef NDEBUG
-        z_impl::leakCheckerRemove(ptr); //check for memory leaks
-#endif
-        zen::AllocatorOptimalSpeed::deallocate(ptr);
-    }
-
-    static size_t calcCapacity(size_t length) { return zen::AllocatorOptimalSpeed::calcCapacity(length); }
-};
-
-
-//############################## helper functions #############################################
 
 #ifdef ZEN_WIN //Windows encodes Unicode as UTF-16 wchar_t
     typedef wchar_t Zchar;
@@ -61,26 +28,31 @@ public:
 
 //"The reason for all the fuss above" - Loki/SmartPtr
 //a high-performance string for interfacing with native OS APIs and multithreaded contexts
-typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChecked> Zstring;
+typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, zen::AllocatorOptimalSpeed> Zstring;
 
 
 
 //Compare filepaths: Windows does NOT distinguish between upper/lower-case, while Linux DOES
-int cmpFileName(const Zstring& lhs, const Zstring& rhs);
+int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen);
+
 
 struct LessFilePath //case-insensitive on Windows, case-sensitive on Linux
 {
-    bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) < 0; }
+    template <class S, class T>
+    bool operator()(const S& lhs, const T& rhs) const { using namespace zen; return cmpFilePath(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) < 0; }
 };
 
 struct EqualFilePath //case-insensitive on Windows, case-sensitive on Linux
 {
-    bool operator()(const Zstring& lhs, const Zstring& rhs) const { return cmpFileName(lhs, rhs) == 0; }
+    template <class S, class T>
+    bool operator()(const S& lhs, const T& rhs) const { using namespace zen; return cmpFilePath(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) == 0; }
 };
+
 
 #if defined ZEN_WIN || defined ZEN_MAC
     Zstring makeUpperCopy(const Zstring& str);
 #endif
+
 
 inline
 Zstring appendSeparator(Zstring path) //support rvalue references!
@@ -100,20 +72,30 @@ Zstring getFileExtension(const Zstring& filePath)
 }
 
 
-inline
-bool pathStartsWith(const Zstring& str, const Zstring& prefix)
+template <class S, class T> inline
+bool pathStartsWith(const S& str, const T& prefix)
 {
-    return str.size() >= prefix.size() &&
-           EqualFilePath()(Zstring(str.begin(), str.begin() + prefix.size()), prefix);
+    using namespace zen;
+    const size_t pfLen = strLength(prefix);
+    if (strLength(str) < pfLen)
+        return false;
+
+    return cmpFilePath(strBegin(str), pfLen, strBegin(prefix), pfLen) == 0;
 }
 
 
-inline
-bool pathEndsWith(const Zstring& str, const Zstring& postfix)
+template <class S, class T> inline
+bool pathEndsWith(const S& str, const T& postfix)
 {
-    return str.size() >= postfix.size() &&
-           EqualFilePath()(Zstring(str.end() - postfix.size(), str.end()), postfix);
+    using namespace zen;
+    const size_t strLen = strLength(str);
+    const size_t pfLen  = strLength(postfix);
+    if (strLen < pfLen)
+        return false;
+
+    return cmpFilePath(strBegin(str) + strLen - pfLen, pfLen, strBegin(postfix), pfLen) == 0;
 }
+
 
 
 
@@ -122,10 +104,50 @@ bool pathEndsWith(const Zstring& str, const Zstring& postfix)
 
 #ifdef ZEN_LINUX
 inline
-int cmpFileName(const Zstring& lhs, const Zstring& rhs)
+int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen)
 {
-    return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filepaths don't have embedded 0
+    assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
+    assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
+
+    const int rv = std::strncmp(lhs, rhs, std::min(lhsLen, rhsLen));
+    if (rv != 0)
+        return rv;
+    return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
 }
+#endif
+
+
+//---------------------------------------------------------------------------
+//ZEN macro consistency checks:
+#ifdef ZEN_WIN
+    #if defined ZEN_LINUX || defined ZEN_MAC
+        #error more than one target platform defined
+    #endif
+
+    #ifdef ZEN_WIN_VISTA_AND_LATER
+        #ifdef ZEN_WIN_PRE_VISTA
+            #error choose only one of the two variants
+        #endif
+    #elif defined ZEN_WIN_PRE_VISTA
+        #ifdef ZEN_WIN_VISTA_AND_LATER
+            #error choose only one of the two variants
+        #endif
+    #else
+        #error choose one of the two variants
+    #endif
+
+#elif defined ZEN_LINUX
+    #if defined ZEN_WIN || defined ZEN_MAC
+        #error more than one target platform defined
+    #endif
+
+#elif defined ZEN_MAC
+    #if defined ZEN_WIN || defined ZEN_LINUX
+        #error more than one target platform defined
+    #endif
+
+#else
+    #error no target platform defined
 #endif
 
 #endif //ZSTRING_H_INCLUDED_73425873425789

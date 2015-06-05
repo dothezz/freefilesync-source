@@ -16,97 +16,7 @@
     #include <ctype.h> //toupper()
 #endif
 
-#ifndef NDEBUG
-    #include "thread.h"
-    #include <iostream>
-#endif
-
 using namespace zen;
-
-
-#ifndef NDEBUG
-namespace
-{
-class LeakChecker //small test for memory leaks
-{
-public:
-    static LeakChecker& get()
-    {
-        //meyers singleton: avoid static initialization order problem in global namespace!
-        static LeakChecker inst;
-        return inst;
-    }
-
-    void insert(const void* ptr, size_t size)
-    {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
-        if (!activeStrings.emplace(ptr, size).second)
-            reportProblem("Serious Error: New memory points into occupied space: " + rawMemToString(ptr, size));
-    }
-
-    void remove(const void* ptr)
-    {
-        boost::lock_guard<boost::mutex> dummy(lockActStrings);
-        if (activeStrings.erase(ptr) != 1)
-            reportProblem("Serious Error: No memory available for deallocation at this location!");
-    }
-
-private:
-    LeakChecker() {}
-
-    ~LeakChecker()
-    {
-        if (!activeStrings.empty())
-        {
-            std::string leakingStrings;
-
-            int items = 0;
-            for (auto it = activeStrings.begin(); it != activeStrings.end() && items < 20; ++it, ++items)
-                leakingStrings += "\"" + rawMemToString(it->first, it->second) + "\"\n";
-
-            const std::string message = std::string("Memory leak detected!") + "\n\n"
-                                        + "Candidates:\n" + leakingStrings;
-#ifdef ZEN_WIN
-            MessageBoxA(nullptr, message.c_str(), "Error", MB_SERVICE_NOTIFICATION | MB_ICONERROR);
-#else
-            std::cerr << message;
-            std::abort();
-#endif
-        }
-    }
-
-    LeakChecker           (const LeakChecker&) = delete;
-    LeakChecker& operator=(const LeakChecker&) = delete;
-
-    static std::string rawMemToString(const void* ptr, size_t size)
-    {
-        std::string output(reinterpret_cast<const char*>(ptr), std::min<size_t>(size, 100));
-        replace(output, '\0', ' '); //don't stop at 0-termination
-        return output;
-    }
-
-    void reportProblem(const std::string& message) //throw std::logic_error
-    {
-#ifdef ZEN_WIN
-        ::MessageBoxA(nullptr, message.c_str(), "Error", MB_SERVICE_NOTIFICATION | MB_ICONERROR);
-#else
-        std::cerr << message;
-#endif
-        throw std::logic_error("Memory leak! " + message + "\n" + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
-    }
-
-    boost::mutex lockActStrings;
-    std::unordered_map<const void*, size_t> activeStrings;
-};
-
-//caveat: function scope static initialization is not thread-safe in VS 2010!
-auto& dummy = LeakChecker::get(); //still not sufficient if multiple threads access during static init!!!
-}
-
-void z_impl::leakCheckerInsert(const void* ptr, size_t size) { LeakChecker::get().insert(ptr, size); }
-void z_impl::leakCheckerRemove(const void* ptr             ) { LeakChecker::get().remove(ptr); }
-#endif //NDEBUG
-
 
 /*
 Perf test: compare strings 10 mio times; 64 bit build
@@ -148,15 +58,18 @@ const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<Compa
 }
 
 
-int cmpFileName(const Zstring& lhs, const Zstring& rhs)
+int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen)
 {
+    assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
+    assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
+
     if (compareStringOrdinal) //this additional test has no noticeable performance impact
     {
-        const int rv = compareStringOrdinal(lhs.c_str(),                  //__in  LPCWSTR lpString1,
-                                            static_cast<int>(lhs.size()), //__in  int cchCount1,
-                                            rhs.c_str(),                  //__in  LPCWSTR lpString2,
-                                            static_cast<int>(rhs.size()), //__in  int cchCount2,
-                                            true);                        //__in  BOOL bIgnoreCase
+        const int rv = compareStringOrdinal(lhs,                      //__in  LPCWSTR lpString1,
+                                            static_cast<int>(lhsLen), //__in  int cchCount1,
+                                            rhs,                      //__in  LPCWSTR lpString2,
+                                            static_cast<int>(rhsLen), //__in  int cchCount2,
+                                            true);                    //__in  BOOL bIgnoreCase
         if (rv <= 0)
             throw std::runtime_error("Error comparing strings (CompareStringOrdinal). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         else
@@ -167,13 +80,10 @@ int cmpFileName(const Zstring& lhs, const Zstring& rhs)
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
         //the only reliable way to compare filepaths (with XP) is to call "CharUpper" or "LCMapString":
 
-        const size_t sizeLhs = lhs.size();
-        const size_t sizeRhs = rhs.size();
-
-        const auto minSize = std::min(sizeLhs, sizeRhs);
+        const auto minSize = std::min(lhsLen, rhsLen);
 
         if (minSize == 0) //LCMapString does not allow input sizes of 0!
-            return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
+            return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
 
         auto copyToUpperCase = [&](const wchar_t* strIn, wchar_t* strOut)
         {
@@ -189,14 +99,14 @@ int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 
         auto eval = [&](wchar_t* bufL, wchar_t* bufR)
         {
-            copyToUpperCase(lhs.c_str(), bufL);
-            copyToUpperCase(rhs.c_str(), bufR);
+            copyToUpperCase(lhs, bufL);
+            copyToUpperCase(rhs, bufR);
 
-            const int rv = ::wmemcmp(bufL, bufR, minSize);
+            const int rv = ::wcsncmp(bufL, bufR, minSize);
             if (rv != 0)
                 return rv;
 
-            return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
+            return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
         };
 
         if (minSize <= MAX_PATH) //performance optimization: stack
@@ -238,10 +148,15 @@ Zstring makeUpperCopy(const Zstring& str)
 
 
 #elif defined ZEN_MAC
-int cmpFileName(const Zstring& lhs, const Zstring& rhs)
+int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen)
 {
-	const int rv = ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
-    return rv;
+    assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
+    assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
+
+    const int rv = ::strncasecmp(lhs, rhs, std::min(lhsLen, rhsLen)); //locale-dependent!
+    if (rv != 0)
+        return rv;
+    return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
 }
 
 

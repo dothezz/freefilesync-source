@@ -43,7 +43,7 @@ public:
     void setPath(const Zstring& dirpath);
 
 private:
-    virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) { return true; }; //return true if drop should be processed
+    virtual bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) { return true; }; //return true if drop should be processed
 
     void onMouseWheel      (wxMouseEvent& event);
     void onFilesDropped    (FileDropEvent& event);

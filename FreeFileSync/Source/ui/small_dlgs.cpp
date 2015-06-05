@@ -54,13 +54,13 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     assert(m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
-    m_bitmap9 ->SetBitmap(getResourceImage(L"website"));
-    m_bitmap10->SetBitmap(getResourceImage(L"email"));
-    m_bitmap13->SetBitmap(getResourceImage(L"gpl"));
-    //m_bitmapSmiley->SetBitmap(getResourceImage(L"smiley"));
+    m_bitmapHomepage->SetBitmap(getResourceImage(L"website"));
+    m_bitmapEmail   ->SetBitmap(getResourceImage(L"email"));
+    m_bitmapGpl     ->SetBitmap(getResourceImage(L"gpl"));
+    m_bitmapDonate  ->SetBitmap(getResourceImage(L"paypal"));
 
-    m_animCtrlWink->SetAnimation(getResourceAnimation(L"wink"));
-    m_animCtrlWink->Play();
+    //m_animCtrlWink->SetAnimation(getResourceAnimation(L"wink"));
+    //m_animCtrlWink->Play();
 
     //create language credits
     for (const ExistingTranslations::Entry& trans : ExistingTranslations::get())

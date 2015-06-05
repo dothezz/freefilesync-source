@@ -41,7 +41,7 @@ public:
             throw TimerError();
     }
 
-	~PerfTimer() { if (!resultShown) try { showResult(); } catch (TimerError&){} }
+    ~PerfTimer() { if (!resultShown) try { showResult(); } catch (TimerError&) {} }
 
     void pause()
     {
@@ -67,7 +67,7 @@ public:
         paused = false;
         elapsedUntilPause = 0;
     }
-	
+
     int64_t timeMs() const
     {
         int64_t ticksTotal = elapsedUntilPause;
@@ -78,8 +78,8 @@ public:
 
     void showResult()
     {
-		const bool wasRunning = !paused;
-		if (wasRunning) pause(); //don't include call to MessageBox()!
+        const bool wasRunning = !paused;
+        if (wasRunning) pause(); //don't include call to MessageBox()!
         ZEN_ON_SCOPE_EXIT(if (wasRunning) resume());
 
 #ifdef ZEN_WIN

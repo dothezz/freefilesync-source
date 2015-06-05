@@ -26,7 +26,7 @@ using namespace zen;
 namespace
 {
 #ifdef ZEN_WIN
-    const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
+    const bool isXpOrLater = winXpSP3OrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
 
     #define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
     DEF_DLL_FUN(getIconByIndex);   //
@@ -151,7 +151,7 @@ ImageHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, int pixe
                                         sizeof(fileInfo),
                                         SHGFI_USEFILEATTRIBUTES | //== no disk access: http://blogs.msdn.com/b/oldnewthing/archive/2004/06/01/145428.aspx
                                         SHGFI_SYSICONINDEX);
-    if (!imgList) //no need to IUnknown::Release() imgList!
+    if (!imgList) //not owned: no need for IUnknown::Release()!
         return ImageHolder();
 
     if (getIconByIndex && releaseImageData)

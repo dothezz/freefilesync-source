@@ -13,16 +13,13 @@
 #include <wx+/popup_dlg.h>
 #include "../fs/concrete.h"
 #include "../fs/native.h"
-#ifdef _MSC_VER
+#ifdef ZEN_WIN_VISTA_AND_LATER
     #include "../fs/mtp.h"
-#endif
-#ifdef ZEN_WIN
-    #include <zen/dll.h>
-    #include <zen/win_ver.h>
-    #include "../dll/IFileDialog_Vista\ifile_dialog.h"
+    #include "ifile_dialog.h"
 #endif
 
 using namespace zen;
+using ABF = AbstractBaseFolder;
 
 
 namespace
@@ -45,6 +42,31 @@ void setFolderPath(const Zstring& dirpath, FolderHistoryBox* comboBox, wxWindow&
         staticText->SetLabel(EqualFilePath()(appendSeparator(dirpathFmt), appendSeparator(displayPath)) ? wxString(_("Drag && drop")) : toWx(displayPath));
     }
 }
+
+#ifdef ZEN_WIN_VISTA_AND_LATER
+bool acceptShellItemPaths(const std::vector<Zstring>& shellItemPaths)
+{
+    //accept files or folders from:
+    //- file system paths
+    //- MTP paths
+
+    if (shellItemPaths.empty()) return false;
+    return acceptsFolderPathPhraseNative(shellItemPaths[0]) || //
+           acceptsFolderPathPhraseMtp   (shellItemPaths[0]);   //noexcept
+}
+
+
+bool onIFileDialogAcceptFolder(HWND wnd, const Zstring& shellFolderPath)
+{
+    if (acceptShellItemPaths({ shellFolderPath })) //noexcept
+        return true;
+
+    const std::wstring msg = replaceCpy(_("The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device."), L"%x", fmtFileName(shellFolderPath));
+    ::MessageBox(wnd, msg.c_str(), (_("Select a folder")).c_str(), MB_ICONWARNING);
+    //showNotificationDialog would not support HWND parent
+    return false;
+}
+#endif
 }
 
 //##############################################################################################################
@@ -65,15 +87,18 @@ FolderSelector::FolderSelector(wxWindow&          dropWindow,
     dirpath_(dirpath),
     staticText_(staticText)
 {
-    //prepare drag & drop
-    setupFileDrop(dropWindow_);
-    dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
-
-    if (dropWindow2_)
+    auto setupDragDrop = [&](wxWindow& dropWin)
     {
-        setupFileDrop(*dropWindow2_);
-        dropWindow2_->Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
-    }
+#ifdef ZEN_WIN_VISTA_AND_LATER
+        setupShellItemDrop(dropWin, acceptShellItemPaths);
+#else
+        setupFileDrop(dropWin);
+#endif
+        dropWin.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
+    };
+
+    setupDragDrop(dropWindow_);
+    if (dropWindow2_) setupDragDrop(*dropWindow2_);
 
     //keep dirPicker and dirpath synchronous
     dirpath_     .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel      ), nullptr, this);
@@ -85,6 +110,7 @@ FolderSelector::FolderSelector(wxWindow&          dropWindow,
 FolderSelector::~FolderSelector()
 {
     dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
+
     if (dropWindow2_)
         dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
 
@@ -118,30 +144,34 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
     if (files.empty())
         return;
 
-    if (acceptDrop(files, event.getDropPosition(), event.getDropWindow()))
+    if (canSetDroppedShellPaths(files))
     {
-        const Zstring fileName = toZ(event.getFiles()[0]);
-        if (dirExists(fileName))
-            setFolderPath(fileName, &dirpath_, dirpath_, staticText_);
-        else
+        Zstring newFolderPathPhrase = files[0];
+
+        if (!ABF::dirExists(createAbstractBaseFolder(files[0])->getAbstractPath()))
         {
-            Zstring parentName = beforeLast(fileName, FILE_NAME_SEPARATOR); //returns empty string if ch not found
+            Zstring parentPathPhrase = beforeLast(files[0], FILE_NAME_SEPARATOR); //returns empty string if ch not found
+            if (!parentPathPhrase.empty())
+            {
 #ifdef ZEN_WIN
-            if (endsWith(parentName, L":")) //volume root
-                parentName += FILE_NAME_SEPARATOR;
+                if (endsWith(parentPathPhrase, L":")) //volume root
+                    parentPathPhrase += FILE_NAME_SEPARATOR;
 #endif
-            if (dirExists(parentName))
-                setFolderPath(parentName, &dirpath_, dirpath_, staticText_);
-            else //set original name unconditionally: usecase: inactive mapped network shares
-                setFolderPath(fileName, &dirpath_, dirpath_, staticText_);
+                if (ABF::dirExists(createAbstractBaseFolder(parentPathPhrase)->getAbstractPath()))
+                    newFolderPathPhrase = parentPathPhrase;
+                //else: keep original name unconditionally: usecase: inactive mapped network shares
+            }
         }
+
+        //make sure FFS-specific explicit MTP-syntax is applied!
+        setFolderPath(getResolvedDisplayPath(newFolderPathPhrase), &dirpath_, dirpath_, staticText_);
 
         //notify action invoked by user
         wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
         ProcessEvent(dummy);
     }
     else
-        event.Skip(); //let other handlers try!!!
+        event.Skip(); //let other handlers try -> are there any??
 }
 
 
@@ -155,94 +185,67 @@ void FolderSelector::onWriteDirManually(wxCommandEvent& event)
 }
 
 
-#ifdef ZEN_WIN
-bool onIFileDialogAcceptFolder(void* wnd /*HWND*/, const wchar_t* folderPath, void* sink)
-{
-    if (acceptsFolderPathPhraseNative(folderPath)) //noexcept)
-        return true;
-#ifdef _MSC_VER
-    if (acceptsFolderPathPhraseMtp   (folderPath)) //noexcept)
-        return true;
-#endif
-
-    const std::wstring msg = replaceCpy(_("The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device."), L"%x", fmtFileName(folderPath));
-    ::MessageBox(static_cast<HWND>(wnd), msg.c_str(), (_("Select a folder")).c_str(), MB_ICONWARNING);
-    //showNotificationDialog would not support HWND parent
-    return false;
-}
-#endif
-
-
 void FolderSelector::onSelectDir(wxCommandEvent& event)
 {
-    //IFileDialog requirements for default path: 1. accepts native paths only!!! 2. path must exist!
+    //make sure default folder exists: don't let folder picker hang on non-existing network share!
     Zstring defaultFolderPath;
-    if (Opt<Zstring> nativeFolderPath = AbstractBaseFolder::getNativeItemPath(createAbstractBaseFolder(getPath())->getAbstractPath()))
-        if (!nativeFolderPath->empty())
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    std::shared_ptr<const void> /*PCIDLIST_ABSOLUTE*/ defaultFolderPidl;
+#endif
+    {
+        auto baseFolderExisting = [](const ABF& abf)
         {
-            auto ft = async([nativeFolderPath] { return dirExists(*nativeFolderPath); });
+            std::function<bool()> asyncDirExists = abf.getAsyncCheckDirExists(abf.getAbstractPath()); //noexcept
+            auto ft = async([asyncDirExists] { return asyncDirExists(); /*noexcept*/ });
+            return ft.timed_wait(boost::posix_time::milliseconds(200)) && ft.get(); //potentially slow network access: wait 200ms at most
+        };
 
-            if (ft.timed_wait(boost::posix_time::milliseconds(200)) && ft.get()) //potentially slow network access: wait 200ms at most
-                defaultFolderPath = *nativeFolderPath;
+        const Zstring folderPathPhrase = getPath();
+        if (acceptsFolderPathPhraseNative(folderPathPhrase)) //noexcept
+        {
+            std::unique_ptr<ABF> abf = createBaseFolderNative(folderPathPhrase);
+            if (baseFolderExisting(*abf))
+                if (Opt<Zstring> nativeFolderPath = ABF::getNativeItemPath(abf->getAbstractPath()))
+                    defaultFolderPath = *nativeFolderPath;
         }
+#ifdef ZEN_WIN_VISTA_AND_LATER
+        else if (acceptsFolderPathPhraseMtp(folderPathPhrase)) //noexcept
+        {
+            std::unique_ptr<ABF> abf = createBaseFolderMtp(folderPathPhrase);
+            if (baseFolderExisting(*abf))
+                defaultFolderPidl = geMtpItemAbsolutePidl(abf->getAbstractPath());
+        }
+#endif
+    }
 
     //wxDirDialog internally uses lame-looking SHBrowseForFolder(); we better use IFileDialog() instead! (remembers size and position!)
-    Opt<Zstring> newFolder;
-#ifdef ZEN_WIN
-    if (vistaOrLater())
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    Zstring newFolder;
+    try
     {
-#define DEF_DLL_FUN(name) const DllFun<ifile::FunType_##name> name(ifile::getDllName(), ifile::funName_##name);
-        DEF_DLL_FUN(showFolderPicker);
-        DEF_DLL_FUN(freeString);
-#undef DEF_DLL_FUN
+        //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
+        const GUID guid = { 0x31f94a00, 0x92b4, 0xa040, { 0x8d, 0xc2, 0xc, 0xa5, 0xef, 0x59, 0x6e, 0x3b } };
 
-        if (showFolderPicker && freeString)
-        {
-            wchar_t* selectedFolder = nullptr;
-            wchar_t* errorMsg       = nullptr;
-            bool cancelled = false;
-            ZEN_ON_SCOPE_EXIT(freeString(selectedFolder));
-            ZEN_ON_SCOPE_EXIT(freeString(errorMsg));
-
-            const ifile::GuidProxy guid = { '\x0', '\x4a', '\xf9', '\x31', '\xb4', '\x92', '\x40', '\xa0',
-                                            '\x8d', '\xc2', '\xc', '\xa5', '\xef', '\x59', '\x6e', '\x3b'
-                                          }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
-
-            showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()), //in;  ==HWND
-                             defaultFolderPath.empty() ? nullptr : defaultFolderPath.c_str(), //in, optional!
-                             &guid,
-                             onIFileDialogAcceptFolder,
-                             nullptr /*callbackSink*/,
-                             selectedFolder, //out: call freeString() after use!
-                             cancelled,      //out
-                             errorMsg);      //out, optional: call freeString() after use!
-            if (errorMsg)
-            {
-                showNotificationDialog(&dropWindow_, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(errorMsg));
-                return;
-            }
-            if (cancelled || !selectedFolder)
-                return;
-
-#ifdef _MSC_VER
-            //make sure FFS-specific explicit MTP-syntax is applied!
-            if (acceptsFolderPathPhraseMtp(selectedFolder)) //noexcept
-                newFolder = getResolvedDisplayPathMtp(selectedFolder); //noexcept
-            else
-#endif
-                newFolder = Zstring(selectedFolder);
-        }
-    }
-#endif
-    if (!newFolder)
-    {
-        wxDirDialog dirPicker(&selectButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
-        if (dirPicker.ShowModal() != wxID_OK)
+        const std::pair<Zstring, bool> rv = ifile::showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),
+                                                                    defaultFolderPath,
+                                                                    defaultFolderPidl.get(),
+                                                                    &guid,
+                                                                    onIFileDialogAcceptFolder); //throw FileError
+        if (!rv.second) //cancelled
             return;
-        newFolder = toZ(dirPicker.GetPath());
-    }
 
-    setFolderPath(*newFolder, &dirpath_, dirpath_, staticText_);
+        //make sure FFS-specific explicit MTP-syntax is applied!
+        newFolder = getResolvedDisplayPath(rv.first); //noexcept
+    }
+    catch (const FileError& e) { showNotificationDialog(&dropWindow_, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); return; }
+#else
+    wxDirDialog dirPicker(&selectButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
+    if (dirPicker.ShowModal() != wxID_OK)
+        return;
+    const Zstring newFolder = toZ(dirPicker.GetPath());
+#endif
+
+    setFolderPath(newFolder, &dirpath_, dirpath_, staticText_);
 
     //notify action invoked by user
     wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);

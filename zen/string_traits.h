@@ -173,10 +173,8 @@ size_t cStringLength(const C* str) //naive implementation seems somewhat faster 
         ++len;
     return len;
 }
-}
 
-
-template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
+template <class S, typename = typename EnableIf<StringTraits<S>::isStringClass>::Type> inline
 const typename GetCharType<S>::Type* strBegin(const S& str) //SFINAE: T must be a "string"
 {
     return str.c_str();
@@ -190,18 +188,35 @@ inline const char*    strBegin(const StringRef<char   >& ref) { return ref.data(
 inline const wchar_t* strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
 
 
-template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
+template <class S, typename = typename EnableIf<StringTraits<S>::isStringClass>::Type> inline
 size_t strLength(const S& str) //SFINAE: T must be a "string"
 {
     return str.length();
 }
 
-inline size_t strLength(const char*    str) { return implementation::cStringLength(str); }
-inline size_t strLength(const wchar_t* str) { return implementation::cStringLength(str); }
+inline size_t strLength(const char*    str) { return cStringLength(str); }
+inline size_t strLength(const wchar_t* str) { return cStringLength(str); }
 inline size_t strLength(char)               { return 1; }
 inline size_t strLength(wchar_t)            { return 1; }
 inline size_t strLength(const StringRef<char   >& ref) { return ref.length(); }
 inline size_t strLength(const StringRef<wchar_t>& ref) { return ref.length(); }
+}
+
+
+template <class S> inline
+auto strBegin(S&& str) -> const typename GetCharType<S>::Type*
+{
+    static_assert(IsStringLike<S>::value, "");
+    return implementation::strBegin(std::forward<S>(str));
+}
+
+
+template <class S> inline
+size_t strLength(S&& str)
+{
+    static_assert(IsStringLike<S>::value, "");
+    return implementation::strLength(std::forward<S>(str));
+}
 }
 
 #endif //STRING_TRAITS_HEADER_813274321443234

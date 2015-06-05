@@ -17,7 +17,7 @@
 #include "native_traverser_impl.h"
 
 #if defined ZEN_LINUX || defined ZEN_MAC
-    #include <fcntl.h> //posix_fallocate, fcntl
+    #include <fcntl.h> //fallocate, fcntl
 #endif
 
 
@@ -100,7 +100,7 @@ std::uint64_t getFileSize(FileHandle fh, const Zstring& filePath) //throw FileEr
 }
 
 
-void preAllocateSpace(FileHandle fh, const std::uint64_t streamSize, const Zstring& displayPath) //throw FileError
+void preAllocateSpaceBestEffort(FileHandle fh, const std::uint64_t streamSize, const Zstring& displayPath) //throw FileError
 {
 #ifdef ZEN_WIN
     LARGE_INTEGER fileSize = {};
@@ -118,8 +118,13 @@ void preAllocateSpace(FileHandle fh, const std::uint64_t streamSize, const Zstri
         throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(displayPath)), L"SetFilePointerEx", getLastError());
 
 #elif defined ZEN_LINUX
-    if (::posix_fallocate(fh, 0, streamSize) != 0)
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(displayPath)), L"posix_fallocate", getLastError());
+    //don't use potentially inefficient ::posix_fallocate!
+    const int rv = ::fallocate(fh,          //int fd,
+                               0,           //int mode,
+                               0,           //off_t offset
+                               streamSize); //off_t len
+    if (rv != 0)
+        return; //may fail with "not supported", unlike posix_fallocate
 
 #elif defined ZEN_MAC
     struct ::fstore store = {};
@@ -133,8 +138,14 @@ void preAllocateSpace(FileHandle fh, const std::uint64_t streamSize, const Zstri
     {
         store.fst_flags = F_ALLOCATEALL; //retry, allowing non-contiguous storage
         if (::fcntl(fh, F_PREALLOCATE, &store) == -1)
-            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(displayPath)), L"fcntl, F_PREALLOCATE", getLastError());
+            return; //may fail with ENOTSUP!
     }
+    //https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/ftruncate.2.html
+    //=> file is extended with zeros, file offset is not changed
+    if (::ftruncate(fh, streamSize) != 0)
+        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(displayPath)), L"ftruncate", getLastError());
+
+    //F_PREALLOCATE + ftruncate seems optimal: http://adityaramesh.com/io_benchmark/
 #endif
 }
 
@@ -163,7 +174,7 @@ struct OutputStreamNative : public AbstractBaseFolder::OutputStream
         if (modTime) modTime_ = *modTime;
 
         if (streamSize) //pre-allocate file space, because we can
-            preAllocateSpace(fo.getHandle(), *streamSize, fo.getFilePath()); //throw FileError
+            preAllocateSpaceBestEffort(fo.getHandle(), *streamSize, fo.getFilePath()); //throw FileError
     }
 
     size_t optimalBlockSize() const override { return fo.optimalBlockSize(); } //non-zero block size is ABF contract!
@@ -272,8 +283,8 @@ private:
         const Zstring& lhs = baseDirPathPf;
         const Zstring& rhs = static_cast<const NativeBaseFolder&>(other).baseDirPathPf;
 
-        return EqualFilePath()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())), //note: this is NOT an equivalence relation!
-                               Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
+        const size_t lenMin = std::min(lhs.length(), rhs.length());
+        return cmpFilePath(strBegin(lhs), lenMin, strBegin(rhs), lenMin) == 0; //note: don't make this an equivalence relation!
     }
 
     //----------------------------------------------------------------------------------------------------------------
@@ -500,16 +511,22 @@ bool zen::acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase) //noexc
     //don't accept relative paths!!! indistinguishable from Explorer MTP paths!
 
 #ifdef ZEN_WIN
-    if (path.size() >= 3 &&
+    if (path.size() >= 3 && //path starting with drive letter
         std::iswalpha(path[0]) &&
         path[1] == L':' &&
         path[2] == L'\\')
-        return true; //path starting with drive letter
+        return true;
 
-    return path.size() >= 3 &&
-           path[0] == L'\\' &&
-           path[1] == L'\\' &&
-           std::iswalpha(path[2]); //UNC path
+    //UNC path
+    if (startsWith(path, L"\\\\"))
+    {
+        const Zstring server = beforeFirst<Zstring>(path.c_str() + 2, FILE_NAME_SEPARATOR); //returns the whole string if term not found
+        const Zstring share  = afterFirst <Zstring>(path.c_str() + 2, FILE_NAME_SEPARATOR); //returns empty string if term not found
+        if (!server.empty() && !share.empty())
+            return true;
+        //don't accept paths missing the shared folder! (see drag & drop validation!)
+    }
+    return false;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     return startsWith(path, Zstr("/"));
@@ -517,14 +534,8 @@ bool zen::acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase) //noexc
 }
 
 
-Zstring zen::getResolvedDisplayPathNative(const Zstring& folderPathPhrase) //noexcept
-{
-    return getResolvedDirectoryPath(folderPathPhrase); //noexcept
-    warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
-}
-
-
 std::unique_ptr<AbstractBaseFolder> zen::createBaseFolderNative(const Zstring& folderPathPhrase) //noexcept
 {
     return make_unique<NativeBaseFolder>(getResolvedDirectoryPath(folderPathPhrase));
+    warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
 }

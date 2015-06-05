@@ -9,9 +9,10 @@
 
 #ifdef ZEN_WIN
     #include "long_path_prefix.h"
-    #include "IFileOperation/file_op.h"
-    #include "win_ver.h"
-    #include "dll.h"
+#include "privilege.h"
+    #ifdef ZEN_WIN_VISTA_AND_LATER
+        #include "vista_file_op.h"
+    #endif
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     #include <sys/stat.h>
@@ -24,28 +25,7 @@ using namespace zen;
 
 namespace
 {
-#ifdef ZEN_WIN
-//(try to) enhance error messages by showing which processes lock the file
-Zstring getLockingProcessNames(const Zstring& filepath) //throw(), empty string if none found or error occurred
-{
-    if (vistaOrLater())
-    {
-        using namespace fileop;
-        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
-        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
-
-        const wchar_t* processList = nullptr;
-        if (getLockingProcesses && freeString)
-            if (getLockingProcesses(filepath.c_str(), processList))
-            {
-                ZEN_ON_SCOPE_EXIT(freeString(processList));
-                return processList;
-            }
-    }
-    return Zstring();
-}
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
+#if defined ZEN_LINUX || defined ZEN_MAC
 //- "filepath" could be a named pipe which *blocks* forever for open()!
 //- open() with O_NONBLOCK avoids the block, but opens successfully
 //- create sample pipe: "sudo mkfifo named_pipe"
@@ -82,6 +62,9 @@ FileInput::FileInput(FileHandle handle, const Zstring& filepath) : FileBase(file
 FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileError, ErrorFileLocked
 {
 #ifdef ZEN_WIN
+    try { activatePrivilege(SE_BACKUP_NAME); }
+    catch (const FileError&) {}
+
     auto createHandle = [&](DWORD dwShareMode)
     {
         return ::CreateFile(applyLongPathPrefix(filepath).c_str(),         //_In_      LPCTSTR lpFileName,
@@ -89,7 +72,7 @@ FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileE
                             dwShareMode,               //_In_      DWORD dwShareMode,
                             nullptr,                   //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
                             OPEN_EXISTING,             //_In_      DWORD dwCreationDisposition,
-                            FILE_FLAG_SEQUENTIAL_SCAN, //_In_      DWORD dwFlagsAndAttributes,
+                            FILE_FLAG_SEQUENTIAL_SCAN //_In_      DWORD dwFlagsAndAttributes,
                             /* possible values: (Reference http://msdn.microsoft.com/en-us/library/aa363858(VS.85).aspx#caching_behavior)
                               FILE_FLAG_NO_BUFFERING
                               FILE_FLAG_RANDOM_ACCESS
@@ -114,6 +97,7 @@ FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileE
 
                             for FFS most comparisons are probably between different disks => let's use FILE_FLAG_SEQUENTIAL_SCAN
                              */
+							 | FILE_FLAG_BACKUP_SEMANTICS,
                             nullptr); //_In_opt_  HANDLE hTemplateFile
     };
     fileHandle = createHandle(FILE_SHARE_READ | FILE_SHARE_DELETE);
@@ -133,9 +117,11 @@ FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileE
             if (ec == ERROR_SHARING_VIOLATION || //-> enhance error message!
                 ec == ERROR_LOCK_VIOLATION)
             {
-                const Zstring procList = getLockingProcessNames(filepath); //throw()
+#ifdef ZEN_WIN_VISTA_AND_LATER //(try to) enhance error message
+                const std::wstring procList = vista::getLockingProcesses(filepath); //noexcept
                 if (!procList.empty())
                     errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+#endif
                 throw ErrorFileLocked(errorMsg, errorDescr);
             }
             throw FileError(errorMsg, errorDescr);
@@ -150,10 +136,14 @@ FileInput::FileInput(const Zstring& filepath) : FileBase(filepath) //throw FileE
     if (fileHandle == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
         throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filepath)), L"open", getLastError());
 
-#ifndef ZEN_MAC //posix_fadvise not supported on OS X (and "dtruss" doesn't show alternative use of "fcntl() F_RDAHEAD/F_RDADVISE" for "cp")
+
+#ifdef ZEN_LINUX
     //optimize read-ahead on input file:
     if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
         throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filepath)), L"posix_fadvise", getLastError());
+
+#elif defined ZEN_MAC
+    //"dtruss" doesn't show use of "fcntl() F_RDAHEAD/F_RDADVISE" for "cp")
 #endif
 #endif
 }
@@ -217,6 +207,11 @@ FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileBase(fi
 FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileBase(filepath) //throw FileError, ErrorTargetExisting
 {
 #ifdef ZEN_WIN
+    try { activatePrivilege(SE_BACKUP_NAME); }
+    catch (const FileError&) {}
+    try { activatePrivilege(SE_RESTORE_NAME); }
+    catch (const FileError&) {}
+
     const DWORD dwCreationDisposition = access == FileOutput::ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW;
 
     auto createHandle = [&](DWORD dwFlagsAndAttributes)
@@ -233,7 +228,8 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileBase(fi
                             nullptr,                   //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
                             dwCreationDisposition,     //_In_      DWORD dwCreationDisposition,
                             dwFlagsAndAttributes |
-                            FILE_FLAG_SEQUENTIAL_SCAN, //_In_      DWORD dwFlagsAndAttributes,
+                            FILE_FLAG_SEQUENTIAL_SCAN //_In_      DWORD dwFlagsAndAttributes,
+							| FILE_FLAG_BACKUP_SEMANTICS,
                             nullptr);                  //_In_opt_  HANDLE hTemplateFile
     };
 
@@ -259,14 +255,15 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : FileBase(fi
             const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filepath));
             std::wstring errorDescr = formatSystemError(L"CreateFile", ec);
 
+#ifdef ZEN_WIN_VISTA_AND_LATER //(try to) enhance error message
             if (ec == ERROR_SHARING_VIOLATION || //-> enhance error message!
                 ec == ERROR_LOCK_VIOLATION)
             {
-                const Zstring procList = getLockingProcessNames(filepath); //throw()
+                const std::wstring procList = vista::getLockingProcesses(filepath); //noexcept
                 if (!procList.empty())
                     errorDescr = _("The file is locked by another process:") + L"\n" + procList;
             }
-
+#endif
             if (ec == ERROR_FILE_EXISTS || //confirmed to be used
                 ec == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
                 throw ErrorTargetExisting(errorMsg, errorDescr);
@@ -320,15 +317,15 @@ FileOutput::~FileOutput()
         }
         catch (FileError&) { assert(false); }
 }
- 
-    
+
+
 void FileOutput::close() //throw FileError
 {
     if (fileHandle == getInvalidHandle())
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilePath())), L"Contract error: close() called more than once.");
     ZEN_ON_SCOPE_EXIT(fileHandle = getInvalidHandle());
 
-	//no need to clean-up on failure here (just like there is no clean on FileOutput::write failure!) => FileOutput is not transactional! 
+    //no need to clean-up on failure here (just like there is no clean on FileOutput::write failure!) => FileOutput is not transactional!
 
 #ifdef ZEN_WIN
     if (!::CloseHandle(fileHandle))

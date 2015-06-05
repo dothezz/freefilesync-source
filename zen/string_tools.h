@@ -24,6 +24,7 @@ namespace zen
 {
 template <class Char> bool isWhiteSpace(Char ch);
 template <class Char> bool isDigit     (Char ch); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
+template <class Char> bool isAlpha     (Char ch);
 
 template <class S, class T> bool startsWith(const S& str, const T& prefix);  //
 template <class S, class T> bool endsWith  (const S& str, const T& postfix); //both S and T can be strings or char/wchar_t arrays or simple char/wchar_t
@@ -87,19 +88,20 @@ bool isDigit(Char ch) //similar to implmenetation of std::::isdigit()!
     return static_cast<Char>('0') <= ch && ch <= static_cast<Char>('9');
 }
 
+template <> bool isAlpha(char ch) = delete; //probably not a good idea with UTF-8 anyway...
+
+template <> inline bool isAlpha(wchar_t ch) { return std::iswalpha(ch) != 0; }
+
 
 template <class S, class T> inline
 bool startsWith(const S& str, const T& prefix)
 {
-    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
-    const size_t pfLength = strLength(prefix);
-    if (strLength(str) < pfLength)
+    const size_t pfLen = strLength(prefix);
+    if (strLength(str) < pfLen)
         return false;
 
-    const CharType* const strFirst = strBegin(str);
-    return std::equal(strFirst, strFirst + pfLength,
+    const auto* const cmpFirst = strBegin(str);
+    return std::equal(cmpFirst, cmpFirst + pfLen,
                       strBegin(prefix));
 }
 
@@ -107,15 +109,12 @@ bool startsWith(const S& str, const T& prefix)
 template <class S, class T> inline
 bool endsWith(const S& str, const T& postfix)
 {
-    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     const size_t strLen = strLength(str);
     const size_t pfLen  = strLength(postfix);
     if (strLen < pfLen)
         return false;
 
-    const CharType* const cmpFirst = strBegin(str) + strLen - pfLen;
+    const auto* const cmpFirst = strBegin(str) + strLen - pfLen;
     return std::equal(cmpFirst, cmpFirst + pfLen,
                       strBegin(postfix));
 }
@@ -124,17 +123,14 @@ bool endsWith(const S& str, const T& postfix)
 template <class S, class T> inline
 bool contains(const S& str, const T& term)
 {
-    static_assert(IsStringLike<S>::value && IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     const size_t strLen  = strLength(str);
     const size_t termLen = strLength(term);
     if (strLen < termLen)
         return false;
 
-    const CharType* const strFirst  = strBegin(str);
-    const CharType* const strLast   = strFirst + strLen;
-    const CharType* const termFirst = strBegin(term);
+    const auto* const strFirst  = strBegin(str);
+    const auto* const strLast   = strFirst + strLen;
+    const auto* const termFirst = strBegin(term);
 
     return std::search(strFirst, strLast,
                        termFirst, termFirst + termLen) != strLast;
@@ -145,17 +141,14 @@ bool contains(const S& str, const T& term)
 template <class S, class T> inline
 S afterLast(const S& str, const T& term)
 {
-    static_assert(IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     const size_t termLen = strLength(term);
 
-    const CharType* const strFirst  = strBegin(str);
-    const CharType* const strLast   = strFirst + strLength(str);
-    const CharType* const termFirst = strBegin(term);
+    const auto* const strFirst  = strBegin(str);
+    const auto* const strLast   = strFirst + strLength(str);
+    const auto* const termFirst = strBegin(term);
 
-    const CharType* iter = search_last(strFirst, strLast,
-                                       termFirst, termFirst + termLen);
+    const auto* iter = search_last(strFirst, strLast,
+                                   termFirst, termFirst + termLen);
     if (iter == strLast)
         return str;
 
@@ -168,15 +161,12 @@ S afterLast(const S& str, const T& term)
 template <class S, class T> inline
 S beforeLast(const S& str, const T& term)
 {
-    static_assert(IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
+    const auto* const strFirst  = strBegin(str);
+    const auto* const strLast   = strFirst + strLength(str);
+    const auto* const termFirst = strBegin(term);
 
-    const CharType* const strFirst  = strBegin(str);
-    const CharType* const strLast   = strFirst + strLength(str);
-    const CharType* const termFirst = strBegin(term);
-
-    const CharType* iter = search_last(strFirst, strLast,
-                                       termFirst, termFirst + strLength(term));
+    const auto* iter = search_last(strFirst, strLast,
+                                   termFirst, termFirst + strLength(term));
     if (iter == strLast)
         return S();
 
@@ -188,16 +178,13 @@ S beforeLast(const S& str, const T& term)
 template <class S, class T> inline
 S afterFirst(const S& str, const T& term)
 {
-    static_assert(IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     const size_t termLen = strLength(term);
-    const CharType* const strFirst  = strBegin(str);
-    const CharType* const strLast   = strFirst + strLength(str);
-    const CharType* const termFirst = strBegin(term);
+    const auto* const strFirst  = strBegin(str);
+    const auto* const strLast   = strFirst + strLength(str);
+    const auto* const termFirst = strBegin(term);
 
-    const CharType* iter = std::search(strFirst, strLast,
-                                       termFirst, termFirst + termLen);
+    const auto* iter = std::search(strFirst, strLast,
+                                   termFirst, termFirst + termLen);
     if (iter == strLast)
         return S();
     iter += termLen;
@@ -210,11 +197,8 @@ S afterFirst(const S& str, const T& term)
 template <class S, class T> inline
 S beforeFirst(const S& str, const T& term)
 {
-    static_assert(IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
-    const CharType* const strFirst  = strBegin(str);
-    const CharType* const termFirst = strBegin(term);
+    const auto* const strFirst  = strBegin(str);
+    const auto* const termFirst = strBegin(term);
 
     return S(strFirst, std::search(strFirst, strFirst + strLength(str),
                                    termFirst,  termFirst  + strLength(term)) - strFirst);
@@ -224,9 +208,6 @@ S beforeFirst(const S& str, const T& term)
 template <class S, class T> inline
 std::vector<S> split(const S& str, const T& delimiter)
 {
-    static_assert(IsStringLike<T>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     std::vector<S> output;
 
     const size_t delimLen = strLength(delimiter);
@@ -235,16 +216,16 @@ std::vector<S> split(const S& str, const T& delimiter)
         output.push_back(str);
     else
     {
-        const CharType* const delimFirst = strBegin(delimiter);
-        const CharType* const delimLast  = delimFirst + delimLen;
+        const auto* const delimFirst = strBegin(delimiter);
+        const auto* const delimLast  = delimFirst + delimLen;
 
-        const CharType* blockStart    = strBegin(str);
-        const CharType* const strLast = blockStart + strLength(str);
+        const auto* blockStart    = strBegin(str);
+        const auto* const strLast = blockStart + strLength(str);
 
         for (;;)
         {
-            const CharType* const blockEnd = std::search(blockStart, strLast,
-                                                         delimFirst, delimLast);
+            const auto* const blockEnd = std::search(blockStart, strLast,
+                                                     delimFirst, delimLast);
 
             output.emplace_back(blockStart, blockEnd - blockStart);
             if (blockEnd == strLast)
@@ -272,9 +253,6 @@ typename EnableIf<!HasMember_append<S>::value>::Type stringAppend(S& str, const 
 template <class S, class T, class U> inline
 S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
 {
-    static_assert(IsStringLike<T>::value && IsStringLike<U>::value, "");
-    typedef typename GetCharType<S>::Type CharType;
-
     const size_t oldLen = strLength(oldTerm);
     if (oldLen == 0)
     {
@@ -282,20 +260,20 @@ S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
         return str;
     }
 
-    const CharType*       strPos = strBegin(str);
-    const CharType* const strEnd = strPos + strLength(str);
+    const auto*       strPos = strBegin(str);
+    const auto* const strEnd = strPos + strLength(str);
 
-    const CharType* const oldBegin = strBegin(oldTerm);
-    const CharType* const oldEnd   = oldBegin + oldLen;
+    const auto* const oldBegin = strBegin(oldTerm);
+    const auto* const oldEnd   = oldBegin + oldLen;
 
     //optimize "oldTerm not found"
-    const CharType* strMatch = std::search(strPos, strEnd,
-                                           oldBegin, oldEnd);
+    const auto* strMatch = std::search(strPos, strEnd,
+                                       oldBegin, oldEnd);
     if (strMatch == strEnd)
         return str;
 
     const size_t newLen = strLength(newTerm);
-    const CharType* const newBegin = strBegin(newTerm);
+    const auto* const newBegin = strBegin(newTerm);
     S output;
 
     for (;;)
@@ -330,11 +308,10 @@ template <class S> inline
 void trim(S& str, bool fromLeft, bool fromRight)
 {
     assert(fromLeft || fromRight);
-    typedef typename GetCharType<S>::Type CharType; //don't use value_type! (wxString, Glib::ustring)
 
-    const CharType* const oldBegin = strBegin(str);
-    const CharType*       newBegin = oldBegin;
-    const CharType*       newEnd   = oldBegin + strLength(str);
+    const auto* const oldBegin = strBegin(str);
+    const auto*       newBegin = oldBegin;
+    const auto*       newEnd   = oldBegin + strLength(str);
 
     if (fromRight)
         while (newBegin != newEnd && isWhiteSpace(newEnd[-1]))
@@ -354,10 +331,10 @@ void trim(S& str, bool fromLeft, bool fromRight)
 template <class S> inline
 S trimCpy(const S& str, bool fromLeft, bool fromRight)
 {
-	//implementing trimCpy() in terms of trim(), instead of the other way round, avoids memory allocations when trimming from right!
-	S tmp = str; 
-	trim(tmp, fromLeft, fromRight);
-	return tmp;
+    //implementing trimCpy() in terms of trim(), instead of the other way round, avoids memory allocations when trimming from right!
+    S tmp = str;
+    trim(tmp, fromLeft, fromRight);
+    return tmp;
 }
 
 
@@ -406,16 +383,11 @@ int saferPrintf(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const
 template <class S, class T, class Num> inline
 S printNumber(const T& format, const Num& number) //format a single number using ::sprintf
 {
-    static_assert(IsStringLike<T>::value, "");
-    static_assert(IsSameType<
-                  typename GetCharType<S>::Type,
-                  typename GetCharType<T>::Type>::value, "");
-
     typedef typename GetCharType<S>::Type CharType;
 
     const int BUFFER_SIZE = 128;
     CharType buffer[BUFFER_SIZE];
-    const int charsWritten = implementation::saferPrintf(buffer, BUFFER_SIZE, format, number);
+    const int charsWritten = implementation::saferPrintf(buffer, BUFFER_SIZE, strBegin(format), number);
 
     return charsWritten > 0 ? S(buffer, charsWritten) : S();
 }

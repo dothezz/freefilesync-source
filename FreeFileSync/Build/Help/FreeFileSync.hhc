@@ -56,6 +56,10 @@
 			<param name="Local" value="html\Synchronize with FTP.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tips and Tricks">
+			<param name="Local" value="html\Tips and Tricks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Variable Drive Letters">
 			<param name="Local" value="html\Variable Drive Letters.html">
 			</OBJECT>

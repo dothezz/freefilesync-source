@@ -353,7 +353,7 @@ Opt<Zstring> getPathByVolumenName(const Zstring& volumeName) //return no value o
                 nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
                 nullptr,     //__out      LPTSTR  lpFileSystemNameBuffer,
                 0))          //__in       DWORD nFileSystemNameSize
-                    if (EqualFilePath()(volumeName, Zstring(&volName[0])))
+                    if (EqualFilePath()(volumeName, &volName[0]))
                         return zen::make_unique<Zstring>(path);
                 return nullptr;
             });
@@ -443,7 +443,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
 #ifdef ZEN_WIN
     //1. replace volume path by volume name: c:\dirpath -> [SYSTEM]\dirpath
     if (dirpath.size() >= 3 &&
-        std::iswalpha(dirpath[0]) &&
+        isAlpha(dirpath[0]) &&
         dirpath[1] == L':' &&
         dirpath[2] == L'\\')
     {
@@ -559,7 +559,7 @@ Zstring zen::getResolvedDirectoryPath(const Zstring& dirpassPhrase) //noexcept
     auto isVolumeRoot = [](const Zstring& path)
     {
 #ifdef ZEN_WIN
-        return path.size() == 3 && std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+        return path.size() == 3 && isAlpha(path[0]) && path[1] == L':' && path[2] == L'\\';
 #elif defined ZEN_LINUX || defined ZEN_MAC
         return path == "/";
 #endif

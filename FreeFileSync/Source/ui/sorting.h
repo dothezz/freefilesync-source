@@ -81,7 +81,8 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
                                 beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     //compare relative names without filepaths first
-    const int rv = cmpFileName(relFolderA, relFolderB);
+    const int rv = cmpFilePath(relFolderA.c_str(), relFolderA.size(),
+                               relFolderB.c_str(), relFolderB.size());
     if (rv != 0)
         return makeSortDirection(std::less<int>(), Int2Type<ascending>())(rv, 0);
 

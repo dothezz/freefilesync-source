@@ -103,19 +103,19 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
     m_panelLogfile        ->Enable(m_checkBoxGenerateLogfile->GetValue()); //enabled status is *not* directly dependent from resolved config! (but transitively)
     m_spinCtrlLogfileLimit->Enable(m_checkBoxGenerateLogfile->GetValue() && m_checkBoxLogfilesLimit->GetValue());
 
-    m_toggleBtnErrorIgnore->SetValue(false);
-    m_toggleBtnErrorPopup ->SetValue(false);
-    m_toggleBtnErrorStop  ->SetValue(false);
+    m_radioBtnIgnoreErrors  ->SetValue(false);
+    m_radioBtnPopupOnErrors ->SetValue(false);
+    m_radioBtnStopOnError   ->SetValue(false);
     switch (cfg.handleError) //*not* owned by GUI controls
     {
         case ON_ERROR_IGNORE:
-            m_toggleBtnErrorIgnore->SetValue(true);
+            m_radioBtnIgnoreErrors->SetValue(true);
             break;
         case ON_ERROR_POPUP:
-            m_toggleBtnErrorPopup->SetValue(true);
+            m_radioBtnPopupOnErrors->SetValue(true);
             break;
         case ON_ERROR_STOP:
-            m_toggleBtnErrorStop->SetValue(true);
+            m_radioBtnStopOnError->SetValue(true);
             break;
     }
 }

@@ -122,7 +122,6 @@ std::wstring getUserAgentName() //coordinate with on_check_latest_version.php
     return agentName;
 }
 
-
 #ifdef ZEN_WIN
 class InternetConnectionError {};
 
@@ -133,7 +132,7 @@ public:
     {
         //::InternetAttemptConnect(0) -> not working as expected: succeeds even when there is no internet connection!
 
-        hInternet = ::InternetOpen(getUserAgentName().c_str(), //_In_  LPCTSTR lpszAgent,
+        hInternet = ::InternetOpen(getUserAgentName().c_str(),   //_In_  LPCTSTR lpszAgent,
                                    INTERNET_OPEN_TYPE_PRECONFIG, //_In_  DWORD dwAccessType,
                                    nullptr,	//_In_  LPCTSTR lpszProxyName,
                                    nullptr,	//_In_  LPCTSTR lpszProxyBypass,
@@ -220,6 +219,35 @@ OutputIterator readBytesUrl(const wchar_t* url, OutputIterator result) //throw I
 }
 
 #else
+inline
+bool canAccessUrl(const wxString& server, const wxString& page, int timeout) //throw ()
+{
+    wxWindowDisabler dummy;
+    wxHTTP webAccess;
+    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
+    webAccess.SetHeader(L"USER-AGENT", getUserAgentName());
+
+    webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are these wxWidgets people thinking???)...
+
+    if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
+    {
+        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //call before checking wxHTTP::GetResponse()
+        const int rs = webAccess.GetResponse();
+
+        if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
+            rs == 302 ||
+            rs == 303 ||
+            rs == 307 ||  
+			rs == 308)
+			return true;
+
+        if (rs == 200) //HTTP_STATUS_OK
+			return true;
+    }
+    return false;
+}
+
+
 bool getStringFromUrl(const wxString& server, const wxString& page, int timeout, wxString* output, int level = 0) //true on successful connection
 {
     wxWindowDisabler dummy;
@@ -240,15 +268,17 @@ bool getStringFromUrl(const wxString& server, const wxString& page, int timeout,
         if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
             rs == 302 ||
             rs == 303 ||
-            rs == 307)
+            rs == 307 ||  
+			rs == 308)
             if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
             {
 
                 wxString newLocation = webAccess.GetHeader(L"Location");
                 if (!newLocation.empty())
                 {
+					assert(!startsWith(newLocation, L"https:")); //not supported by wxHTTP!
                     if (startsWith(newLocation, L"http://"))
-                        newLocation = afterFirst(newLocation, L"http://");
+                        newLocation = afterFirst(newLocation, L"://");
                     const wxString serverNew = beforeFirst(newLocation, L"/"); //returns the whole string if term not found
                     const wxString pageNew   = L"/" + afterFirst(newLocation, L"/"); //returns empty string if term not found
 
@@ -286,6 +316,7 @@ GetVerResult getOnlineVersion(wxString& version)
     std::vector<char> output;
     try
     {
+		//harmonize with wxHTTP: latest_version.txt does not use https!!!
         readBytesUrl(L"http://www.freefilesync.org/latest_version.txt", std::back_inserter(output)); //throw InternetConnectionError
     }
     catch (const InternetConnectionError&)
@@ -295,11 +326,10 @@ GetVerResult getOnlineVersion(wxString& version)
     output.push_back('\0');
     version = utfCvrtTo<wxString>(&output[0]);
 
-#elif defined ZEN_LINUX || defined ZEN_MAC
+#else
     if (!getStringFromUrl(L"www.freefilesync.org", L"/latest_version.txt", 5, &version))
     {
-        const bool canConnectToSf = getStringFromUrl(L"www.google.com", L"/", 1, nullptr);
-        return canConnectToSf ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+		return canAccessUrl(L"www.google.com", L"/", 1) ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
     }
 #endif
     trim(version); //Windows: remove trailing blank and newline

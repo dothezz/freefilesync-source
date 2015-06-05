@@ -80,7 +80,8 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
     }
     catch (const FileError& e)
     {
-        throw lngfile::ParsingError(e.toString(), 0, 0); //passing FileError is too high a level for Parsing error, OTOH user is unlikely to see this since file I/O issues are sorted out by ExistingTranslations()!
+        throw lngfile::ParsingError(e.toString(), 0, 0); 
+		//passing FileError is too high a level for Parsing error, OTOH user is unlikely to see this since file I/O issues are sorted out by ExistingTranslations()!
     }
 
     lngfile::TransHeader          header;
@@ -375,7 +376,13 @@ wxLanguage mapLanguageDialect(wxLanguage language)
 class wxWidgetsLocale
 {
 public:
-    static void init(wxLanguage lng)
+    static wxWidgetsLocale& getInstance()
+    {
+        static wxWidgetsLocale inst;
+        return inst;
+    }
+
+    void init(wxLanguage lng)
     {
         locale.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
         locale = zen::make_unique<wxLocale>();
@@ -396,28 +403,30 @@ public:
         locLng = lng;
     }
 
-    static void release() { locale.reset(); locLng = wxLANGUAGE_UNKNOWN; }
+    void release() { locale.reset(); locLng = wxLANGUAGE_UNKNOWN; }
 
-    static wxLanguage getLanguage() { return locLng; }
+    wxLanguage getLanguage() const { return locLng; }
+
 
 private:
-    static std::unique_ptr<wxLocale> locale;
-    static wxLanguage locLng;
+    wxWidgetsLocale() {}
+    ~wxWidgetsLocale() { assert(!locale); }
+
+    std::unique_ptr<wxLocale> locale;
+    wxLanguage locLng = wxLANGUAGE_UNKNOWN;
 };
-std::unique_ptr<wxLocale> wxWidgetsLocale::locale;
-wxLanguage                wxWidgetsLocale::locLng = wxLANGUAGE_UNKNOWN;
 }
 
 
 void zen::releaseWxLocale()
 {
-    wxWidgetsLocale::release();
+    wxWidgetsLocale::getInstance().release();
 }
 
 
 void zen::setLanguage(int language) //throw FileError
 {
-    if (language == getLanguage() && wxWidgetsLocale::getLanguage() == language)
+    if (language == getLanguage() && wxWidgetsLocale::getInstance().getLanguage() == language)
         return; //support polling
 
     //(try to) retrieve language file
@@ -452,7 +461,7 @@ void zen::setLanguage(int language) //throw FileError
         }
 
     //handle RTL swapping: we need wxWidgets to do this
-    wxWidgetsLocale::init(languageFile.empty() ? wxLANGUAGE_ENGLISH : static_cast<wxLanguage>(language));
+    wxWidgetsLocale::getInstance().init(languageFile.empty() ? wxLANGUAGE_ENGLISH : static_cast<wxLanguage>(language));
 }
 
 

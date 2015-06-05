@@ -6,11 +6,12 @@
 
 #include "concrete.h"
 #include "native.h"
-#ifdef _MSC_VER
+#ifdef ZEN_WIN_VISTA_AND_LATER
     #include "mtp.h"
 #endif
 
 using namespace zen;
+using ABF = AbstractBaseFolder;
 
 
 std::unique_ptr<AbstractBaseFolder> zen::createAbstractBaseFolder(const Zstring& folderPathPhrase) //noexcept
@@ -20,7 +21,7 @@ std::unique_ptr<AbstractBaseFolder> zen::createAbstractBaseFolder(const Zstring&
         return createBaseFolderNative(folderPathPhrase); //noexcept
 
     //then the rest:
-#ifdef _MSC_VER
+#ifdef ZEN_WIN_VISTA_AND_LATER
     if (acceptsFolderPathPhraseMtp(folderPathPhrase)) //noexcept
         return createBaseFolderMtp(folderPathPhrase); //noexcept
 #endif
@@ -32,16 +33,5 @@ std::unique_ptr<AbstractBaseFolder> zen::createAbstractBaseFolder(const Zstring&
 
 Zstring zen::getResolvedDisplayPath(const Zstring& folderPathPhrase) //noexcept
 {
-    //greedy: try native evaluation first
-    if (acceptsFolderPathPhraseNative(folderPathPhrase)) //noexcept
-        return getResolvedDisplayPathNative(folderPathPhrase); //noexcept
-
-    //then the rest:
-#ifdef _MSC_VER
-    if (acceptsFolderPathPhraseMtp(folderPathPhrase)) //noexcept
-        return getResolvedDisplayPathMtp(folderPathPhrase); //noexcept
-#endif
-
-    //no idea? => native!
-    return getResolvedDisplayPathNative(folderPathPhrase);
+    return ABF::getDisplayPath(createAbstractBaseFolder(folderPathPhrase)->getAbstractPath());
 }

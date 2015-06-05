@@ -32,10 +32,7 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler  (FolderHistoryBox::OnKeyEvent  ), nullptr, this);
-
-    warn_static("mac")
-    warn_static("linux")
+    Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FolderHistoryBox::OnKeyEvent), nullptr, this);
 
 #if defined ZEN_WIN
     //on Win, this mouse click event only fires, when clicking on the small down arrow, NOT when clicking on the text field

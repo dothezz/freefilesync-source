@@ -91,7 +91,7 @@ struct MemoryStreamIn
         const size_t bytesRead = std::min(len, buffer.size() - pos);
         auto itFirst = buffer.begin() + pos;
         std::copy(itFirst, itFirst + bytesRead, static_cast<char*>(data));
-		pos += bytesRead;
+        pos += bytesRead;
         return bytesRead;
     }
 
@@ -144,7 +144,7 @@ template <class BinInputStream, class BinOutputStream> inline
 void copyStream(BinInputStream& streamIn, BinOutputStream& streamOut, size_t blockSize,
                 const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //optional
 {
-	assert(blockSize > 0);
+    assert(blockSize > 0);
     std::vector<char> buffer(blockSize);
     for (;;)
     {
@@ -167,7 +167,7 @@ void saveBinStream(const Zstring& filepath, //throw FileError
 {
     MemoryStreamIn<BinContainer> streamIn(cont);
     FileOutput streamOut(filepath, zen::FileOutput::ACC_OVERWRITE); //throw FileError, (ErrorTargetExisting)
-	if (onUpdateStatus) onUpdateStatus(0); //throw X!
+    if (onUpdateStatus) onUpdateStatus(0); //throw X!
     copyStream(streamIn, streamOut, streamOut.optimalBlockSize(), onUpdateStatus); //throw FileError
 }
 
@@ -177,7 +177,7 @@ BinContainer loadBinStream(const Zstring& filepath, //throw FileError
                            const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //optional
 {
     FileInput streamIn(filepath); //throw FileError, ErrorFileLocked
-	if (onUpdateStatus) onUpdateStatus(0); //throw X!
+    if (onUpdateStatus) onUpdateStatus(0); //throw X!
     MemoryStreamOut<BinContainer> streamOut;
     copyStream(streamIn, streamOut, streamIn.optimalBlockSize(), onUpdateStatus); //throw FileError
     return streamOut.ref();

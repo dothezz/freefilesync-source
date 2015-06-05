@@ -149,7 +149,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw Fi
 void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw FileError
                         const std::function<void(const Zstring& dirpath)>& onRefreshGui)
 {
-    while (true)
+    for (;;)
     {
         bool allExisting = true;
         //support specifying volume by name => call getResolvedDirectoryPath() repeatedly

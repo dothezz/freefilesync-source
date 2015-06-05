@@ -968,7 +968,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Dateien endgültig löschen oder überschreiben</target>
 
 <source>&Recycle bin</source>
-<target>&Papierkorb</target>
+<target>Papier&korb</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
@@ -1156,8 +1156,8 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Select Time Span</source>
 <target>Zeitspanne auswählen</target>
 
-<source>&Preferences...</source>
-<target>&Einstellungen...</target>
+<source>&Preferences</source>
+<target>&Einstellungen</target>
 
 <source>Main Bar</source>
 <target>Hauptleiste</target>

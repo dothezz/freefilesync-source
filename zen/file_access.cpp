@@ -18,10 +18,12 @@
 #ifdef ZEN_WIN
     #include <Aclapi.h>
     #include "privilege.h"
-    #include "dll.h"
     #include "long_path_prefix.h"
     #include "win_ver.h"
-    #include "IFileOperation/file_op.h"
+    #ifdef ZEN_WIN_VISTA_AND_LATER
+        #include <zen/vista_file_op.h>
+    #endif
+
 
 #elif defined ZEN_LINUX
     #include <sys/vfs.h> //statfs
@@ -166,27 +168,6 @@ bool isFatDrive(const Zstring& filePath) //throw()
     return &buffer[0] == Zstring(L"FAT") ||
            &buffer[0] == Zstring(L"FAT32");
 }
-
-
-//(try to) enhance error messages by showing which processes lock the file
-Zstring getLockingProcessNames(const Zstring& filepath) //throw(), empty string if none found or error occurred
-{
-    if (vistaOrLater())
-    {
-        using namespace fileop;
-        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
-        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
-
-        const wchar_t* processList = nullptr;
-        if (getLockingProcesses && freeString)
-            if (getLockingProcesses(filepath.c_str(), processList))
-            {
-                ZEN_ON_SCOPE_EXIT(freeString(processList));
-                return processList;
-            }
-    }
-    return Zstring();
-}
 #endif
 }
 
@@ -248,13 +229,13 @@ std::uint64_t zen::getFreeDiskSpace(const Zstring& path) //throw FileError, retu
                               nullptr))                      //__out_opt  PULARGE_INTEGER lpTotalNumberOfFreeBytes
         throwFileError(replaceCpy(_("Cannot determine free disk space for %x."), L"%x", fmtFileName(path)), L"GetDiskFreeSpaceEx", getLastError());
 
-	//return 0 if info is not available: "The GetDiskFreeSpaceEx function returns zero for lpFreeBytesAvailable for all CD requests"
+    //return 0 if info is not available: "The GetDiskFreeSpaceEx function returns zero for lpFreeBytesAvailable for all CD requests"
     return get64BitUInt(bytesFree.LowPart, bytesFree.HighPart);
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::statfs info = {};
     if (::statfs(path.c_str(), &info) != 0)
-		throwFileError(replaceCpy(_("Cannot determine free disk space for %x."), L"%x", fmtFileName(path)), L"statfs", getLastError());
+        throwFileError(replaceCpy(_("Cannot determine free disk space for %x."), L"%x", fmtFileName(path)), L"statfs", getLastError());
 
     return static_cast<std::uint64_t>(info.f_bsize) * info.f_bavail;
 #endif
@@ -290,13 +271,13 @@ bool zen::removeFile(const Zstring& filepath) //throw FileError
         const std::wstring errorMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filepath));
         std::wstring errorDescr = formatSystemError(functionName, lastError);
 
-#ifdef ZEN_WIN
+#ifdef ZEN_WIN_VISTA_AND_LATER
         if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
             lastError == ERROR_LOCK_VIOLATION)
         {
-            const Zstring procList = getLockingProcessNames(filepath); //throw()
+            const std::wstring procList = vista::getLockingProcesses(filepath); //noexcept
             if (!procList.empty())
-                errorDescr =  _("The file is locked by another process:") + L"\n" + procList;
+                errorDescr = _("The file is locked by another process:") + L"\n" + procList;
         }
 #endif
         throw FileError(errorMsg, errorDescr);
@@ -315,55 +296,56 @@ namespace
       Fix8Dot3NameClash()
 */
 //wrapper for file system rename function:
-void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 {
 #ifdef ZEN_WIN
-    const Zstring oldNameFmt = applyLongPathPrefix(oldName);
-    const Zstring newNameFmt = applyLongPathPrefix(newName);
+    const Zstring pathSourceFmt = applyLongPathPrefix(pathSource);
+    const Zstring pathTargetFmt = applyLongPathPrefix(pathTarget);
 
-    if (!::MoveFileEx(oldNameFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
-                      newNameFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+    if (!::MoveFileEx(pathSourceFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
+                      pathTargetFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
                       0))                 //__in      DWORD dwFlags
     {
         DWORD lastError = ::GetLastError(); //copy before directly or indirectly making other system calls!
 
         if (lastError == ERROR_ACCESS_DENIED) //MoveFileEx may fail to rename a read-only file on a SAMBA-share -> (try to) handle this
         {
-            const DWORD oldAttr = ::GetFileAttributes(oldNameFmt.c_str());
+            const DWORD oldAttr = ::GetFileAttributes(pathSourceFmt.c_str());
             if (oldAttr != INVALID_FILE_ATTRIBUTES && (oldAttr & FILE_ATTRIBUTE_READONLY))
             {
-                if (::SetFileAttributes(oldNameFmt.c_str(), FILE_ATTRIBUTE_NORMAL)) //remove readonly-attribute
+                if (::SetFileAttributes(pathSourceFmt.c_str(), FILE_ATTRIBUTE_NORMAL)) //remove readonly-attribute
                 {
                     //try again...
-                    if (::MoveFileEx(oldNameFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
-                                     newNameFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+                    if (::MoveFileEx(pathSourceFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
+                                     pathTargetFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
                                      0))                 //__in      DWORD dwFlags
                     {
                         //(try to) restore file attributes
-                        ::SetFileAttributes(newNameFmt.c_str(), oldAttr); //don't handle error
+                        ::SetFileAttributes(pathTargetFmt.c_str(), oldAttr); //don't handle error
                         return;
                     }
                     else
                     {
                         lastError = ::GetLastError(); //use error code from second call to ::MoveFileEx()
-                        //cleanup: (try to) restore file attributes: assume oldName is still existing
-                        ::SetFileAttributes(oldNameFmt.c_str(), oldAttr);
+                        //cleanup: (try to) restore file attributes: assume pathSource is still existing
+                        ::SetFileAttributes(pathSourceFmt.c_str(), oldAttr);
                     }
                 }
             }
         }
         //begin of "regular" error reporting
-        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
+        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(pathSource)), L"%y", L"\n" + fmtFileName(pathTarget));
         std::wstring errorDescr = formatSystemError(L"MoveFileEx", lastError);
 
-        //try to enhance error message:
+#ifdef ZEN_WIN_VISTA_AND_LATER //(try to) enhance error message
         if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
-            const Zstring procList = getLockingProcessNames(oldName); //throw()
+            const std::wstring procList = vista::getLockingProcesses(pathSource); //noexcept
             if (!procList.empty())
                 errorDescr = _("The file is locked by another process:") + L"\n" + procList;
         }
+#endif
 
         if (lastError == ERROR_NOT_SAME_DEVICE)
             throw ErrorDifferentVolume(errorMsg, errorDescr);
@@ -375,10 +357,10 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    if (::rename(oldName.c_str(), newName.c_str()) != 0)
+    if (::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
     {
         const int lastError = errno; //copy before directly or indirectly making other system calls!
-        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
+        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(pathSource)), L"%y", L"\n" + fmtFileName(pathTarget));
         const std::wstring errorDescr = formatSystemError(L"rename", lastError);
 
         if (lastError == EXDEV)
@@ -498,21 +480,21 @@ private:
 
 
 //rename file: no copying!!!
-void zen::renameFile(const Zstring& itemPathOld, const Zstring& itemPathNew) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 {
     try
     {
-        renameFile_sub(itemPathOld, itemPathNew); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+        renameFile_sub(pathSource, pathTarget); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
     }
     catch (const ErrorTargetExisting&)
     {
 #ifdef ZEN_WIN
         //try to handle issues with already existing short 8.3 file names on Windows
-        if (have8dot3NameClash(itemPathNew))
+        if (have8dot3NameClash(pathTarget))
         {
-            Fix8Dot3NameClash dummy(itemPathNew); //throw FileError; move clashing filepath to the side
+            Fix8Dot3NameClash dummy(pathTarget); //throw FileError; move clashing filepath to the side
             //now try again...
-            renameFile_sub(itemPathOld, itemPathNew); //throw FileError
+            renameFile_sub(pathSource, pathTarget); //throw FileError
             return;
         }
 #endif
@@ -840,6 +822,53 @@ void setFileTimeRaw(const Zstring& filepath,
 #endif
 }
 
+
+#elif defined ZEN_LINUX
+DEFINE_NEW_FILE_ERROR(ErrorLinuxFallbackToUtimes);
+
+void setFileTimeRaw(const Zstring& filePath, const struct ::timespec& modTime, ProcSymlink procSl) //throw FileError, ErrorLinuxFallbackToUtimes
+{
+    /*
+    [2013-05-01] sigh, we can't use utimensat() on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
+    => fallback to "retarded-idiot version"! -- DarkByte
+
+    [2015-03-09]
+     - cannot reproduce issues with NTFS and utimensat() on Ubuntu
+     - utimensat() is supposed to obsolete utime/utimes and is also used by "cp" and "touch"
+     - solves utimes() EINVAL bug for certain CIFS/NTFS drives: https://sourceforge.net/p/freefilesync/discussion/help/thread/1ace042d/
+        => don't use utimensat() directly, but open file descriptor manually, else EINVAL, again!
+
+    => let's give utimensat another chance:
+    */
+    struct ::timespec newTimes[2] = {};
+    newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs!!
+    //https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/218564cf/
+    newTimes[1] = modTime; //modification time
+
+    //=> using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
+    if (procSl == ProcSymlink::FOLLOW)
+    {
+        const int fdFile = ::open(filePath.c_str(), O_WRONLY, 0); //"if O_CREAT is not specified, then mode is ignored"
+        if (fdFile == -1)
+        {
+            if (errno == EACCES) //bullshit, access denied even with 0777 permissions! => utimes should work!
+                throw ErrorLinuxFallbackToUtimes(L"");
+
+            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filePath)), L"open", getLastError());
+        }
+        ZEN_ON_SCOPE_EXIT(::close(fdFile));
+
+        if (::futimens(fdFile, newTimes) != 0)
+            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filePath)), L"futimens", getLastError());
+    }
+    else
+    {
+        if (::utimensat(AT_FDCWD, filePath.c_str(), newTimes, AT_SYMLINK_NOFOLLOW) != 0)
+            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filePath)), L"utimensat", getLastError());
+    }
+}
+
+
 #elif defined ZEN_MAC
 struct AttrBufFileTimes
 {
@@ -922,63 +951,40 @@ void zen::removeDirectory(const Zstring& directory, //throw FileError
 }
 
 
-void zen::setFileTime(const Zstring& filepath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
+void zen::setFileTime(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
 {
 #ifdef ZEN_WIN
-    setFileTimeRaw(filepath, nullptr, timetToFileTime(modTime), procSl); //throw FileError
+    setFileTimeRaw(filePath, nullptr, timetToFileTime(modTime), procSl); //throw FileError
 
 #elif defined ZEN_LINUX
-    //[2013-05-01] sigh, we can't use utimensat() on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
-    //=> fallback to "retarded-idiot version"! -- DarkByte
-    //
-    //[2015-03-09]
-    // - cannot reproduce issues with NTFS and utimensat() on Ubuntu
-    // - utimensat() is supposed to obsolete utime/utimes and is also used by "touch"
-    //=> let's give utimensat another chance:
-    struct ::timespec newTimes[2] = {};
-    newTimes[0].tv_sec = modTime; //access time: using UTIME_OMIT for tv_nsec would trigger even more bugs!! https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/218564cf/
-    newTimes[1].tv_sec = modTime; //modification time (seconds)
-
-    if (procSl == ProcSymlink::FOLLOW)
+    try
     {
-        //don't use utimensat() directly, but open file descriptor manually:
-        //=> solves EINVAL bug for certain CIFS/NTFS drives: https://sourceforge.net/p/freefilesync/discussion/help/thread/1ace042d/
-        //=> using utimensat(AT_SYMLINK_NOFOLLOW) for symlinks and open()/futimens() for regular files is consistent with "cp" and "touch"!
-        const int fdFile = ::open(filepath.c_str(), O_WRONLY, 0); //"if O_CREAT is not specified, then mode is ignored"
-        if (fdFile == -1)
-            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filepath)), L"open", getLastError());
-        ZEN_ON_SCOPE_EXIT(::close(fdFile));
-
-        if (::futimens(fdFile, newTimes) != 0)
-            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filepath)), L"futimens", getLastError());
+        struct ::timespec writeTime = {};
+        writeTime.tv_sec = modTime;
+        setFileTimeRaw(filePath, writeTime, procSl); //throw FileError, ErrorLinuxFallbackToUtimes
     }
-    else
+    catch (ErrorLinuxFallbackToUtimes&)
     {
-        if (::utimensat(AT_FDCWD, filepath.c_str(), newTimes, AT_SYMLINK_NOFOLLOW) != 0)
-            throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filepath)), L"utimensat", getLastError());
+        struct ::timeval writeTime[2] = {};
+        writeTime[0].tv_sec = ::time(nullptr); //access time (seconds)
+        writeTime[1].tv_sec = modTime;         //modification time (seconds)
+
+        if (procSl == ProcSymlink::FOLLOW)
+        {
+            if (::utimes(filePath.c_str(), writeTime) != 0)
+                throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filePath)), L"utimes", getLastError());
+        }
+        else
+        {
+            if (::lutimes(filePath.c_str(), writeTime) != 0)
+                throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filePath)), L"lutimes", getLastError());
+        }
     }
-
-    /*
-    	struct ::timeval newTimes[2] = {};
-    	newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
-    	newTimes[1].tv_sec = modTime;         //modification time (seconds)
-
-    	if (procSl == ProcSymlink::FOLLOW)
-    	{
-    		if (::utimes(filepath.c_str(), newTimes) != 0)
-    			throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filepath)), L"utimes", getLastError());
-    	}
-    	else
-    	{
-    		if (::lutimes(filepath.c_str(), newTimes) != 0)
-    			throwFileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filepath)), L"lutimes", getLastError());
-    	}
-    */
 
 #elif defined ZEN_MAC
     struct ::timespec writeTime = {};
     writeTime.tv_sec = modTime;
-    setFileTimeRaw(filepath, nullptr, writeTime, procSl); //throw FileError
+    setFileTimeRaw(filePath, nullptr, writeTime, procSl); //throw FileError
 #endif
 }
 
@@ -1083,11 +1089,11 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
         //Note: trying to copy SACL (SACL_SECURITY_INFORMATION) may return ERROR_PRIVILEGE_NOT_HELD (1314) on Samba shares. This is not due to missing privileges!
         //However, this is okay, since copying NTFS permissions doesn't make sense in this case anyway
 
-        //enable privilege: required to copy owner information
-        activatePrivilege(SE_RESTORE_NAME); //throw FileError
-
         //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
         activatePrivilege(SE_BACKUP_NAME); //throw FileError
+
+        //enable privilege: required to copy owner information
+        activatePrivilege(SE_RESTORE_NAME); //throw FileError
     }
     catch (const FileError& e)//add some more context description (e.g. user is not an admin)
     {
@@ -1100,8 +1106,8 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
     {
         DWORD bytesNeeded = 0;
         if (::GetFileSecurity(applyLongPathPrefix(sourceResolved).c_str(), //__in LPCTSTR lpFileName, -> long path prefix IS needed, although it is NOT mentioned on MSDN!!!
-                              OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
-                              DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION, //__in       SECURITY_INFORMATION RequestedInformation,
+                              DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION | //__in       SECURITY_INFORMATION RequestedInformation,
+                              OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION,
                               reinterpret_cast<PSECURITY_DESCRIPTOR>(&buffer[0]),     //__out_opt  PSECURITY_DESCRIPTOR pSecurityDescriptor,
                               static_cast<DWORD>(buffer.size()), //__in       DWORD nLength,
                               &bytesNeeded))                     //__out      LPDWORD lpnLengthNeeded
@@ -1297,7 +1303,7 @@ void makeDirectoryRecursively(const Zstring& directory) //FileError, ErrorTarget
             {
                 makeDirectoryRecursively(dirParent); //throw FileError, (ErrorTargetExisting)
             }
-			catch (const ErrorTargetExisting&) {} //parent directory created externally in the meantime? => NOT AN ERROR; not a directory? fail in next step!
+            catch (const ErrorTargetExisting&) {} //parent directory created externally in the meantime? => NOT AN ERROR; not a directory? fail in next step!
 
             //now try again...
             copyNewDirectory(Zstring(), directory, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
@@ -1322,14 +1328,14 @@ void zen::makeNewDirectory(const Zstring& directory) //throw FileError, ErrorTar
     }
     catch (const ErrorTargetExisting&) //*something* existing: folder or FILE!
     {
-       //avoid any file system race-condition by *not* checking existence again here!!!
-            throw;
+        //avoid any file system race-condition by *not* checking existence again here!!!
+        throw;
     }
 }
 
 
 void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
-                             bool copyFilePermissions)
+                           bool copyFilePermissions)
 {
 #ifdef ZEN_WIN
     //special handling for volume root: trying to create existing root directory results in ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS!
@@ -1337,7 +1343,7 @@ void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath,
                                           beforeLast(targetPath, FILE_NAME_SEPARATOR) :
                                           targetPath);
     if (dirTmp.size() == 2 &&
-        std::iswalpha(dirTmp[0]) && dirTmp[1] == L':')
+        isAlpha(dirTmp[0]) && dirTmp[1] == L':')
     {
         dirTmp += FILE_NAME_SEPARATOR; //we do not support "C:" to represent a relative path!
 
@@ -1582,7 +1588,7 @@ ADS			     YES            YES				 NO
 Encrypted	     YES            NO(silent fail!) NO
 Compressed	     NO             NO		         NO
 Sparse		     NO             YES				 NO
-Nonstandard FS   YES                  UNKNOWN    -> issues writing ADS to Samba, issues reading from NAS, error copying files having "blocked" state... ect.
+Nonstandard FS   YES                  UNKNOWN    -> error writing ADS to Samba, issues reading from NAS, error copying files having "blocked" state... ect.
 PERF		       -                 6% faster
 
 Mark stream as compressed: FSCTL_SET_COMPRESSION - compatible with both BackupRead() and FileRead()
@@ -1593,11 +1599,11 @@ Current support for combinations of NTFS extended attributes:
 source attr | tf normal | tf compressed | tf encrypted | handled by
 ============|==================================================================
     ---     |    ---           -C-             E--       copyFileWindowsDefault
-    --S     |    --S           -CS             E-S       copyFileWindowsSparse
+    --S     |    --S           -CS             E-S       copyFileWindowsBackupStream
     -C-     |    -C-           -C-             E--       copyFileWindowsDefault
-    -CS     |    -CS           -CS             E-S       copyFileWindowsSparse
+    -CS     |    -CS           -CS             E-S       copyFileWindowsBackupStream
     E--     |    E--           E--             E--       copyFileWindowsDefault
-    E-S     |    E-- (NOK)     E-- (NOK)       E-- (NOK) copyFileWindowsDefault -> may fail with ERROR_DISK_FULL!!
+    E-S     |    E-- (NOK)     E-- (NOK)       E-- (NOK) copyFileWindowsDefault -> may fail with ERROR_DISK_FULL for large sparse files!!
 
 tf  := target folder
 E   := encrypted
@@ -1611,7 +1617,8 @@ Note: - if target parent folder is compressed or encrypted, both attributes are 
 
 
 //due to issues on non-NTFS volumes, we should use the copy-as-sparse routine only if required and supported!
-bool canCopyAsSparse(DWORD fileAttrSource, const Zstring& targetFile) //throw ()
+template <class Function>
+bool canCopyAsSparse(DWORD fileAttrSource, Function getTargetFsFlags) //throw ()
 {
     const bool sourceIsEncrypted = (fileAttrSource & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
     const bool sourceIsSparse    = (fileAttrSource & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
@@ -1619,33 +1626,57 @@ bool canCopyAsSparse(DWORD fileAttrSource, const Zstring& targetFile) //throw ()
     if (sourceIsEncrypted || !sourceIsSparse) //BackupRead() silently fails reading encrypted files!
         return false; //small perf optimization: don't check "targetFile" if not needed
 
-    //------------------------------------------------------------------------------------
-    const DWORD bufferSize = MAX_PATH + 1;
-    std::vector<wchar_t> buffer(bufferSize);
-
-    //full pathName need not yet exist!
-    if (!::GetVolumePathName(targetFile.c_str(), //__in   LPCTSTR lpszFileName,
-                             &buffer[0],         //__out  LPTSTR lpszVolumePathName,
-                             bufferSize))        //__in   DWORD cchBufferLength
+    DWORD targetFsFlags = 0;
+    if (!getTargetFsFlags(targetFsFlags))
         return false;
+    assert(targetFsFlags != 0);
 
-    const Zstring volumePath = appendSeparator(&buffer[0]);
+    return (targetFsFlags & FILE_SUPPORTS_SPARSE_FILES) != 0;
+}
 
-    DWORD fsFlagsTarget = 0;
-    if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName
-                                nullptr,        //__out_opt  LPTSTR lpVolumeNameBuffer,
-                                0,              //__in       DWORD nVolumeNameSize,
-                                nullptr,        //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                nullptr,        //__out_opt  LPDWORD lpMaximumComponentLength,
-                                &fsFlagsTarget, //__out_opt  LPDWORD lpFileSystemFlags,
-                                nullptr,        //__out      LPTSTR lpFileSystemNameBuffer,
-                                0))             //__in       DWORD nFileSystemNameSize
-        return false;
 
-    const bool targetSupportSparse = (fsFlagsTarget & FILE_SUPPORTS_SPARSE_FILES) != 0;
+#ifdef ZEN_WIN_VISTA_AND_LATER
+bool canCopyAsSparse(DWORD fileAttrSource, HANDLE hTargetFile) //throw ()
+{
+    return canCopyAsSparse(fileAttrSource, [&](DWORD& targetFsFlags) -> bool
+    {
+        return ::GetVolumeInformationByHandleW(hTargetFile,    //_In_ HANDLE hFile,
+        nullptr,        //_Out_writes_opt_(nVolumeNameSize) LPWSTR lpVolumeNameBuffer,
+        0,              //_In_ DWORD nVolumeNameSize,
+        nullptr,        //_Out_opt_ LPDWORD lpVolumeSerialNumber,
+        nullptr,        //_Out_opt_ LPDWORD lpMaximumComponentLength,
+        &targetFsFlags, //_Out_opt_ LPDWORD lpFileSystemFlags,
+        nullptr,        //_Out_writes_opt_(nFileSystemNameSize) LPWSTR lpFileSystemNameBuffer,
+        0) != 0;        //_In_ DWORD nFileSystemNameSize
+    });
+}
+#endif
 
-    return targetSupportSparse;
-    //both source and target must not be FAT since copyFileWindowsSparse() does no DST hack! implicitly guaranteed at this point!
+
+bool canCopyAsSparse(DWORD fileAttrSource, const Zstring& targetFile) //throw ()
+{
+    return canCopyAsSparse(fileAttrSource, [&targetFile](DWORD& targetFsFlags) -> bool
+    {
+        const DWORD bufferSize = MAX_PATH + 1;
+        std::vector<wchar_t> buffer(bufferSize);
+
+        //full pathName need not yet exist!
+        if (!::GetVolumePathName(targetFile.c_str(), //__in   LPCTSTR lpszFileName,
+        &buffer[0],         //__out  LPTSTR lpszVolumePathName,
+        bufferSize))        //__in   DWORD cchBufferLength
+            return false;
+
+        const Zstring volumePath = appendSeparator(&buffer[0]);
+
+        return ::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName
+        nullptr,        //__out_opt  LPTSTR lpVolumeNameBuffer,
+        0,              //__in       DWORD nVolumeNameSize,
+        nullptr,        //__out_opt  LPDWORD lpVolumeSerialNumber,
+        nullptr,        //__out_opt  LPDWORD lpMaximumComponentLength,
+        &targetFsFlags, //__out_opt  LPDWORD lpFileSystemFlags,
+        nullptr,        //__out      LPTSTR lpFileSystemNameBuffer,
+        0) != 0;             //__in       DWORD nFileSystemNameSize
+    });
 }
 
 
@@ -1672,15 +1703,14 @@ bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //thr
     return canCopyAsSparse(fileInfoSource.dwFileAttributes, targetFile); //throw ()
 }
 
+//=============================================================================================
 
-//precondition: canCopyAsSparse() must return "true"!
-InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                       const Zstring& targetFile,
-                                       const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
+InSyncAttributes copyFileWindowsBackupStream(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                             const Zstring& targetFile,
+                                             const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
 {
-    assert(canCopyAsSparse(sourceFile, targetFile));
-
-    //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
+    //try to get backup read and write privileges: help solve most "access denied" errors with FILE_FLAG_BACKUP_SEMANTICS:
+    //https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/1998ebf2/
     try { activatePrivilege(SE_BACKUP_NAME); }
     catch (const FileError&) {}
     try { activatePrivilege(SE_RESTORE_NAME); }
@@ -1708,9 +1738,11 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
         if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
-            const Zstring procList = getLockingProcessNames(sourceFile); //throw()
+#ifdef ZEN_WIN_VISTA_AND_LATER //(try to) enhance error message
+            const std::wstring procList = vista::getLockingProcesses(sourceFile); //noexcept
             if (!procList.empty())
                 errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+#endif
             throw ErrorFileLocked(errorMsg, errorDescr);
         }
 
@@ -1723,7 +1755,12 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
     if (!::GetFileInformationByHandle(hFileSource, &fileInfoSource))
         throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), L"GetFileInformationByHandle", getLastError());
 
+    //encrypted files cannot be read with BackupRead which would fail silently!
+    const bool sourceIsEncrypted = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED) != 0;
+    if (sourceIsEncrypted)
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"BackupRead: Source file is encrypted.");
     //----------------------------------------------------------------------
+
     const DWORD validAttribs = FILE_ATTRIBUTE_NORMAL   | //"This attribute is valid only if used alone."
                                FILE_ATTRIBUTE_READONLY |
                                FILE_ATTRIBUTE_HIDDEN   |
@@ -1801,7 +1838,11 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
     //If a file originally had the sparse attribute (FILE_ATTRIBUTE_SPARSE_FILE), the backup utility must explicitly set the
     //attribute on the restored file.
 
-    //if (sourceIsSparse && targetSupportsSparse) -> no need to check, this is our precondition!
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    if (canCopyAsSparse(fileInfoSource.dwFileAttributes, hFileTarget)) //throw ()
+#else
+    if (canCopyAsSparse(fileInfoSource.dwFileAttributes, targetFile)) //throw ()
+#endif
     {
         DWORD bytesReturned = 0;
         if (!::DeviceIoControl(hFileTarget,      //_In_         HANDLE hDevice,
@@ -1828,7 +1869,7 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
 
     //stream-copy sourceFile to targetFile
     bool eof = false;
-    bool someBytesWritten = false; //try to detect failure reading encrypted files
+    bool someBytesRead = false; //try to detect failure reading encrypted files
     do
     {
         DWORD bytesRead = 0;
@@ -1861,18 +1902,15 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), L"BackupWrite: incomplete write."); //user should never see this
 
         //total bytes transferred may be larger than file size! context information + ADS or smaller (sparse, compressed)!
-
-        //invoke callback method to update progress indicators
-        if (onUpdateCopyStatus)
-            onUpdateCopyStatus(bytesRead); //throw X!
+        if (onUpdateCopyStatus) onUpdateCopyStatus(bytesRead); //throw X!
 
         if (bytesRead > 0)
-            someBytesWritten = true;
+            someBytesRead = true;
     }
     while (!eof);
 
     //::BackupRead() silently fails reading encrypted files -> double check!
-    if (!someBytesWritten && get64BitUInt(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
+    if (!someBytesRead && get64BitUInt(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
         //note: there is no guaranteed ordering relation beween bytes transferred and file size! Consider ADS (>) and compressed/sparse files (<)!
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"BackupRead: unknown error"); //user should never see this -> this method is called only if "canCopyAsSparse()"
 
@@ -1888,7 +1926,7 @@ InSyncAttributes copyFileWindowsSparse(const Zstring& sourceFile, //throw FileEr
 }
 
 
-DEFINE_NEW_FILE_ERROR(ErrorShouldCopyAsSparse);
+DEFINE_NEW_FILE_ERROR(ErrorFallbackToCopyAsBackupStream);
 
 
 struct CallbackData
@@ -1960,8 +1998,12 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
                 throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)), L"GetFileInformationByHandle", ::GetLastError());
 
             //#################### switch to sparse file copy if req. #######################
+#ifdef ZEN_WIN_VISTA_AND_LATER
+            if (canCopyAsSparse(cbd.fileInfoSrc.dwFileAttributes, hDestinationFile)) //throw ()
+#else
             if (canCopyAsSparse(cbd.fileInfoSrc.dwFileAttributes, cbd.targetFile_)) //throw ()
-                throw ErrorShouldCopyAsSparse(L"sparse dummy value"); //use a different copy routine!
+#endif
+                throw ErrorFallbackToCopyAsBackupStream(L"sparse, callback"); //use a different copy routine!
 
             //#################### copy file creation time ################################
             ::SetFileTime(hDestinationFile, &cbd.fileInfoSrc.ftCreationTime, nullptr, nullptr); //no error handling!
@@ -2009,15 +2051,16 @@ const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destinat
 //caveat: function scope static initialization is not thread-safe in VS 2010! -> still not sufficient if multiple threads access during static init!!!
 
 
-InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
+InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorFallbackToCopyAsBackupStream
                                         const Zstring& targetFile,
                                         const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
 {
-    //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
+    //try to get backup read and write privileges: may help solve some "access denied" errors
+    bool backupPrivilegesActive = true;
     try { activatePrivilege(SE_BACKUP_NAME); }
-    catch (const FileError&) {}
+    catch (const FileError&) { backupPrivilegesActive = false; }
     try { activatePrivilege(SE_RESTORE_NAME); }
-    catch (const FileError&) {}
+    catch (const FileError&) { backupPrivilegesActive = false; }
 
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} });
     //transactional behavior: guard just before starting copy, we don't trust ::CopyFileEx(), do we? ;)
@@ -2053,7 +2096,17 @@ InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileE
 
         //trying to copy huge sparse files may directly fail with ERROR_DISK_FULL before entering the callback function
         if (canCopyAsSparse(sourceFile, targetFile)) //noexcept
-            throw ErrorShouldCopyAsSparse(L"sparse dummy value2");
+            throw ErrorFallbackToCopyAsBackupStream(L"sparse, copy failure");
+
+        if (lastError == ERROR_ACCESS_DENIED && backupPrivilegesActive)
+            //chances are good this will work with copyFileWindowsBackupStream: https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/1998ebf2/
+            throw ErrorFallbackToCopyAsBackupStream(L"access denied");
+
+        //copying ADS may incorrectly fail with ERROR_FILE_NOT_FOUND: https://sourceforge.net/p/freefilesync/discussion/help/thread/a18a2c02/
+        if (lastError == ERROR_FILE_NOT_FOUND &&
+            cbd.fileInfoSrc.nNumberOfLinks > 0 &&
+            cbd.fileInfoTrg.nNumberOfLinks > 0)
+            throw ErrorFallbackToCopyAsBackupStream(L"bogus file not found");
 
         //assemble error message...
         const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot copy file %x to %y."), L"%x", L"\n" + fmtFileName(sourceFile)), L"%y", L"\n" + fmtFileName(targetFile));
@@ -2063,9 +2116,11 @@ InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileE
         if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
-            const Zstring procList = getLockingProcessNames(sourceFile); //throw() -> enhance error message!
+#ifdef ZEN_WIN_VISTA_AND_LATER //(try to) enhance error message
+            const std::wstring procList = vista::getLockingProcesses(sourceFile); //noexcept
             if (!procList.empty())
                 errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+#endif
             throw ErrorFileLocked(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), errorDescr);
         }
 
@@ -2110,17 +2165,17 @@ InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileE
 }
 
 
-//another layer to support copying sparse files
+//another layer to support copying sparse files and handle some access denied errors
 inline
 InSyncAttributes copyFileWindowsSelectRoutine(const Zstring& sourceFile, const Zstring& targetFile, const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
 {
     try
     {
-        return copyFileWindowsDefault(sourceFile, targetFile, onUpdateCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
+        return copyFileWindowsDefault(sourceFile, targetFile, onUpdateCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorFallbackToCopyAsBackupStream
     }
-    catch (ErrorShouldCopyAsSparse&) //we quickly check for this condition within callback of ::CopyFileEx()!
+    catch (ErrorFallbackToCopyAsBackupStream&)
     {
-        return copyFileWindowsSparse(sourceFile, targetFile, onUpdateCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return copyFileWindowsBackupStream(sourceFile, targetFile, onUpdateCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     }
 }
 
@@ -2209,7 +2264,7 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
             throwFileError(replaceCpy(replaceCpy(_("Cannot copy attributes from %x to %y."), L"%x", L"\n" + fmtFileName(sourceFile)), L"%y", L"\n" + fmtFileName(targetFile)), L"copyfile", getLastError());
 #endif
 
-fileOut.close(); //throw FileError -> optional, but good place to catch errors when closing stream!
+        fileOut.close(); //throw FileError -> optional, but good place to catch errors when closing stream!
     } //close output file handle before setting file time
 
     //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
@@ -2240,7 +2295,7 @@ fileOut.close(); //throw FileError -> optional, but good place to catch errors w
                         |
 			  copyFileWindowsSelectRoutine
 	          /                           \
-copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsSparse(::BackupRead/::BackupWrite)
+copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsBackupStream(::BackupRead/::BackupWrite)
 */
 }
 

@@ -32,6 +32,9 @@ using namespace xmlAccess;
 
 namespace
 {
+void toggleDeletionPolicy(DeletionPolicy& deletionPolicy);
+
+
 class ConfigDialog : public ConfigDlgGenerated
 {
 public:
@@ -120,6 +123,8 @@ private:
     void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DELETE_PERMANENTLY;   updateSyncGui(); }
     void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
     void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
+
+	void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
 
     void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateSyncGui(); }
     void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateSyncGui(); }
@@ -586,33 +591,33 @@ void toggleSyncConfig(DirectionConfig& directionCfg, SyncDirection& custSyncdir)
         case DirectionConfig::MIRROR:
         case DirectionConfig::UPDATE:
             directionCfg.custom = extractDirections(directionCfg);
-            directionCfg.var = DirectionConfig::CUSTOM;
-            toggleSyncDirection(custSyncdir);
             break;
         case DirectionConfig::CUSTOM:
-            toggleSyncDirection(custSyncdir);
-
-            //some config optimization: if custom settings happen to match "mirror" or "update", just switch variant
-            const DirectionSet mirrorSet = []
-            {
-                DirectionConfig mirrorCfg;
-                mirrorCfg.var = DirectionConfig::MIRROR;
-                return extractDirections(mirrorCfg);
-            }();
-
-            const DirectionSet updateSet = []
-            {
-                DirectionConfig updateCfg;
-                updateCfg.var = DirectionConfig::UPDATE;
-                return extractDirections(updateCfg);
-            }();
-
-            if (directionCfg.custom == mirrorSet)
-                directionCfg.var = DirectionConfig::MIRROR;
-            else if (directionCfg.custom == updateSet)
-                directionCfg.var = DirectionConfig::UPDATE;
             break;
     }
+    toggleSyncDirection(custSyncdir);
+
+    //some config optimization: if custom settings happen to match "mirror" or "update", just switch variant
+    const DirectionSet mirrorSet = []
+    {
+        DirectionConfig mirrorCfg;
+        mirrorCfg.var = DirectionConfig::MIRROR;
+        return extractDirections(mirrorCfg);
+    }();
+
+    const DirectionSet updateSet = []
+    {
+        DirectionConfig updateCfg;
+        updateCfg.var = DirectionConfig::UPDATE;
+        return extractDirections(updateCfg);
+    }();
+
+    if (directionCfg.custom == mirrorSet)
+        directionCfg.var = DirectionConfig::MIRROR;
+    else if (directionCfg.custom == updateSet)
+        directionCfg.var = DirectionConfig::UPDATE;
+    else
+        directionCfg.var = DirectionConfig::CUSTOM;
 }
 
 
@@ -712,6 +717,23 @@ void updateSyncDirectionIcons(const DirectionConfig& directionCfg,
                 buttonConflict.SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
         }
+    }
+}
+
+
+void toggleDeletionPolicy(DeletionPolicy& deletionPolicy)
+{
+    switch (deletionPolicy)
+    {
+        case DELETE_PERMANENTLY:
+            deletionPolicy = DELETE_TO_RECYCLER;
+            break;
+        case DELETE_TO_RECYCLER:
+            deletionPolicy = DELETE_TO_VERSIONING;
+            break;
+        case DELETE_TO_VERSIONING:
+            deletionPolicy = DELETE_PERMANENTLY;
+            break;
     }
 }
 
@@ -834,22 +856,37 @@ void ConfigDialog::updateSyncGui()
                 break;
         }
 
-    m_toggleBtnPermanent ->SetValue(false);
-    m_toggleBtnRecycler  ->SetValue(false);
-    m_toggleBtnVersioning->SetValue(false);
+    m_radioBtnPermanent ->SetValue(false);
+    m_radioBtnRecycler  ->SetValue(false);
+    m_radioBtnVersioning->SetValue(false);
 
     if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
         switch (so.syncCfg.handleDeletion)
         {
             case DELETE_PERMANENTLY:
-                m_toggleBtnPermanent->SetValue(true);
-                break;
+            {
+                m_radioBtnPermanent->SetValue(true);
+
+                m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_permanently"));
+                m_bpButtonDeletionType->SetToolTip(_("Delete or overwrite files permanently"));
+            }
+            break;
             case DELETE_TO_RECYCLER:
-                m_toggleBtnRecycler->SetValue(true);
-                break;
+            {
+                m_radioBtnRecycler->SetValue(true);
+
+                m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_recycler"));
+                m_bpButtonDeletionType->SetToolTip(_("Back up deleted and overwritten files in the recycle bin"));
+            }
+            break;
             case DELETE_TO_VERSIONING:
-                m_toggleBtnVersioning->SetValue(true);
-                break;
+            {
+                m_radioBtnVersioning->SetValue(true);
+
+                m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_versioning"));
+                m_bpButtonDeletionType->SetToolTip(_("Move files to a user-defined folder"));
+            }
+            break;
         }
 
     const bool versioningSelected = so.syncCfg.handleDeletion == DELETE_TO_VERSIONING;
@@ -876,16 +913,16 @@ void ConfigDialog::updateSyncGui()
         }
     }
 
-    m_toggleBtnErrorIgnore->SetValue(false);
-    m_toggleBtnErrorPopup ->SetValue(false);
+    m_radioBtnIgnoreErrors->SetValue(false);
+    m_radioBtnPopupOnErrors->SetValue(false);
 
     switch (so.onGuiError)
     {
         case ON_GUIERROR_IGNORE:
-            m_toggleBtnErrorIgnore->SetValue(true);
+            m_radioBtnIgnoreErrors->SetValue(true);
             break;
         case ON_GUIERROR_POPUP:
-            m_toggleBtnErrorPopup->SetValue(true);
+            m_radioBtnPopupOnErrors->SetValue(true);
             break;
     }
 

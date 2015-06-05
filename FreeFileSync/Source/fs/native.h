@@ -12,7 +12,6 @@
 namespace zen
 {
 bool acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase); //noexcept
-Zstring getResolvedDisplayPathNative(const Zstring& folderPathPhrase); //noexcept
 
 std::unique_ptr<AbstractBaseFolder> createBaseFolderNative(const Zstring& folderPathPhrase); //noexcept
 }

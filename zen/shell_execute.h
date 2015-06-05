@@ -31,6 +31,47 @@ enum ExecutionType
 
 namespace
 {
+#ifdef ZEN_WIN
+template <class Function>
+bool shellExecuteImpl(Function fillExecInfo, ExecutionType type)
+{
+    SHELLEXECUTEINFO execInfo = {};
+    execInfo.cbSize = sizeof(execInfo);
+    execInfo.lpVerb = nullptr;
+    execInfo.nShow  = SW_SHOWNORMAL;
+    execInfo.fMask  = type == EXEC_TYPE_SYNC ? (SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC) : 0;
+    //don't use SEE_MASK_ASYNCOK -> different async mode than the default which returns successful despite errors!
+    execInfo.fMask |= SEE_MASK_FLAG_NO_UI; //::ShellExecuteEx() shows a non-blocking pop-up dialog on errors -> we want a blocking one
+    //for the record, SEE_MASK_UNICODE does nothing: http://blogs.msdn.com/b/oldnewthing/archive/2014/02/27/10503519.aspx
+
+    fillExecInfo(execInfo);
+
+    if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
+        return false;
+
+    if (execInfo.hProcess)
+    {
+        ZEN_ON_SCOPE_EXIT(::CloseHandle(execInfo.hProcess));
+
+        if (type == EXEC_TYPE_SYNC)
+            ::WaitForSingleObject(execInfo.hProcess, INFINITE);
+    }
+    return true;
+}
+
+
+void shellExecute(const void* /*PCIDLIST_ABSOLUTE*/ shellItemPidl, const Zstring& displayPath, ExecutionType type) //throw FileError
+{
+    if (!shellExecuteImpl([&](SHELLEXECUTEINFO& execInfo)
+{
+    execInfo.fMask |= SEE_MASK_IDLIST;
+    execInfo.lpIDList = const_cast<void*>(shellItemPidl); //lpIDList is documented as PCIDLIST_ABSOLUTE!
+    }, type)) //throw FileError
+    throwFileError(_("Incorrect command line:") + L"\n" + fmtFileName(displayPath), L"ShellExecuteEx", ::GetLastError());
+}
+#endif
+
+
 void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
 {
 #ifdef ZEN_WIN
@@ -56,27 +97,12 @@ void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
                          (iter->empty() || std::any_of(iter->begin(), iter->end(), &isWhiteSpace<wchar_t>) ? L"\"" + *iter + L"\"" : *iter);
     }
 
-    SHELLEXECUTEINFO execInfo = {};
-    execInfo.cbSize = sizeof(execInfo);
-
-    //SEE_MASK_NOASYNC is equal to SEE_MASK_FLAG_DDEWAIT, but former is defined not before Win SDK 6.0
-    execInfo.fMask        = type == EXEC_TYPE_SYNC ? (SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT) : 0; //don't use SEE_MASK_ASYNCOK -> returns successful despite errors!
-    execInfo.fMask       |= SEE_MASK_UNICODE | SEE_MASK_FLAG_NO_UI; //::ShellExecuteEx() shows a non-blocking pop-up dialog on errors -> we want a blocking one
-    execInfo.lpVerb       = nullptr;
+    if (!shellExecuteImpl([&](SHELLEXECUTEINFO& execInfo)
+{
     execInfo.lpFile       = filepath.c_str();
-    execInfo.lpParameters = arguments.c_str();
-    execInfo.nShow        = SW_SHOWNORMAL;
-
-    if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
-        throwFileError(_("Incorrect command line:") + L"\nFile: " + filepath + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
-
-    if (execInfo.hProcess)
-    {
-        ZEN_ON_SCOPE_EXIT(::CloseHandle(execInfo.hProcess));
-
-        if (type == EXEC_TYPE_SYNC)
-            ::WaitForSingleObject(execInfo.hProcess, INFINITE);
-    }
+        execInfo.lpParameters = arguments.c_str();
+    }, type))
+    throwFileError(_("Incorrect command line:") + L"\nFile: " + fmtFileName(filepath) + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     /*

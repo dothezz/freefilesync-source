@@ -207,7 +207,8 @@ struct XmlGlobalSettings
             iconSize(ICON_SIZE_SMALL),
             lastUpdateCheck(0)
         {
-            //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
+            //default external apps will be translated "on the fly"!!!
+            //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
 #ifdef ZEN_WIN
             externelApplications.emplace_back(L"Show in Explorer",              L"explorer /select, \"%item_path%\"");
             externelApplications.emplace_back(L"Open with default application", L"\"%item_path%\"");

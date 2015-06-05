@@ -23,7 +23,7 @@ namespace zen
 typedef DWORD DeviceId;
 typedef ULONGLONG FileIndex;
 
-typedef std::pair<DeviceId, FileIndex> FileId; //optional! (however, always set on Linux, and *generally* available on Windows)    
+typedef std::pair<DeviceId, FileIndex> FileId; //optional! (however, always set on Linux, and *generally* available on Windows)
 
 
 inline

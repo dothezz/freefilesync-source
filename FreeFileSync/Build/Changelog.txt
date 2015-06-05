@@ -1,3 +1,28 @@
+FreeFileSync 7.1 [2015-06-06]
+-----------------------------
+Avoid various access denied errors when synchronizing with admin rights (Windows)
+Accept Explorer drag and drop from MTP devices
+Support showing MTP files with Explorer
+Support opening MTP files with default application
+Preselect active MTP folder in folder picker dialog
+Work around file not found error when copying alternate data streams
+Fixed access denied error when copying file times (Linux)
+Work around boost bug causing RealtimeSync to wake PC (Windows)
+Fixed naming convention "replace" for versioning
+Skip space pre-allocation if not supported (OS X)
+Use faster space pre-allocation method (Linux)
+Transactional error handling when closing file streams
+Fully initialize system image list for medium and large icons (Windows)
+Handle XP backwards-compatibility with 32-bit build (Windows 64-bit)
+Work around hang due to unsupported AVX2 instructions (Vista 64-bit)
+Fixed invalid argument exception during app launch (OS X)
+Fixed binary comparison checking for wrong buffer size
+Fixed GetLogicalProcessorInformation not found startup error (Windows XP SP2)
+Support IP-based UNC paths with folder selector (Windows)
+Use standard file permissions for application bundle (OS X)
+Updated help file and added tips and tricks chapter
+
+
 FreeFileSync 7.0 [2015-05-11]
 -----------------------------
 Support synchronization with MTP devices (Android, iPhone, tablet, digital camera)
@@ -7,7 +32,6 @@ Pre-allocate disk space when writing file output stream
 Late failure when moving multiple items to recycle bin
 Keep UI responsive while loading/saving database file
 Improved error reporting indicating failed item when moving to recycle bin
-Transactional error handling when closing file streams
 Pass correct thread id when creating Minidump (Windows)
 Fixed directory icon loading resource leak (Linux)
 Fixed RealtimeSync message provider exception safety issue (Windows)
@@ -231,7 +255,7 @@ New synchronization progress graph
 Skip binary comparison for files excluded via time span or size
 Fixed configuration panel ordering for entries starting with numbers
 Filled gap after last grid column to cover full window width
-Workaround wxWidgets image button bug showing obsolete disabled state
+Work around wxWidgets image button bug showing obsolete disabled state
 Refined file existence checks to handle restricted permissions
 Disable file filter button during comparison
 Fixed mouse wheel grid scrolling for GTK2 (Linux)
@@ -451,7 +475,7 @@ Allow to maximize filter dialog
 New column for item count on overview panel
 Allow CTRL + C to copy selection to clipboard on overview panel
 Consider current view filter for file selection on overview panel
-Workaround silent failure to set modification times on NTFS volumes (Linux)
+Work around silent failure to set modification times on NTFS volumes (Linux)
 Avoid main dialog flash when closing progress dialog (Linux)
 Do not show middle grid tool tip when dragging outside visible area
 Reduced file accesses when loading XML files

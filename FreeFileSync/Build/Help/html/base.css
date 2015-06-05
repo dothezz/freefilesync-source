@@ -1,20 +1,31 @@
-* 
+*
 {
 }
 
 body
 {
-    font-family: Tahoma, Verdana, sans-serif;
+	font-family: Segoe UI, Verdana, Tahoma, sans-serif;	
 }
 
 h2 
 {
-	font-size: 20px;
+	font-size: 22px;
 }
 
 h3 
 {
 	font-size: 17px;
+}
+
+table td 
+{
+	padding-right: 20px;
+}
+table th
+{
+	text-align: left;
+	padding-right: 20px;
+	border-bottom: 1px solid black;
 }
 
 .bluebox
@@ -46,4 +57,14 @@ h3
 .greybox_inner
 {
 	padding-left: 0.6cm;
+}
+
+.command_line
+{
+    font-family: Courier New, Courier, monospace;
+}
+
+.file_path
+{
+    font-family: Consolas, Courier New, Courier, monospace;
 }
