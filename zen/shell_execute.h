@@ -60,14 +60,14 @@ bool shellExecuteImpl(Function fillExecInfo, ExecutionType type)
 }
 
 
-void shellExecute(const void* /*PCIDLIST_ABSOLUTE*/ shellItemPidl, const Zstring& displayPath, ExecutionType type) //throw FileError
+void shellExecute(const void* /*PCIDLIST_ABSOLUTE*/ shellItemPidl, const std::wstring& displayPath, ExecutionType type) //throw FileError
 {
     if (!shellExecuteImpl([&](SHELLEXECUTEINFO& execInfo)
 {
     execInfo.fMask |= SEE_MASK_IDLIST;
     execInfo.lpIDList = const_cast<void*>(shellItemPidl); //lpIDList is documented as PCIDLIST_ABSOLUTE!
     }, type)) //throw FileError
-    throwFileError(_("Incorrect command line:") + L"\n" + fmtFileName(displayPath), L"ShellExecuteEx", ::GetLastError());
+    throwFileError(_("Incorrect command line:") + L"\n" + fmtPath(displayPath), L"ShellExecuteEx", ::GetLastError());
 }
 #endif
 
@@ -102,7 +102,7 @@ void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
     execInfo.lpFile       = filepath.c_str();
         execInfo.lpParameters = arguments.c_str();
     }, type))
-    throwFileError(_("Incorrect command line:") + L"\nFile: " + fmtFileName(filepath) + L"\nArg: " + arguments, L"ShellExecuteEx", ::GetLastError());
+    throwFileError(_("Incorrect command line:") + L"\nFile: " + fmtPath(filepath) + L"\nArg: " + copyStringTo<std::wstring>(arguments), L"ShellExecuteEx", ::GetLastError());
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     /*
@@ -117,10 +117,10 @@ void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
         //Posix::system - execute a shell command
         int rv = ::system(command.c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
-            throw FileError(_("Incorrect command line:") + L"\n" + command);
+            throw FileError(_("Incorrect command line:") + L"\n" + utfCvrtTo<std::wstring>(command));
     }
     else
-        async([=] { int rv = ::system(command.c_str()); (void)rv; });
+        runAsync([=] { int rv = ::system(command.c_str()); (void)rv; });
 #endif
 }
 }

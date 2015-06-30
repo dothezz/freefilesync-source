@@ -1021,7 +1021,7 @@ void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int curr
     XmlDoc doc = loadXmlDocument(filepath); //throw FileError
 
     if (getXmlTypeNoThrow(doc) != type) //noexcept
-        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
 
     XmlIn in(doc);
     ::readConfig(in, cfg);
@@ -1125,7 +1125,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filepaths, XmlGuiConfi
 
             case XML_TYPE_GLOBAL:
             case XML_TYPE_OTHER:
-                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
+                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
         }
     }
 
@@ -1416,7 +1416,7 @@ void xmlAccess::writeConfig(const XmlGlobalSettings& cfg, const Zstring& filepat
 
 std::wstring xmlAccess::extractJobName(const Zstring& configFilename)
 {
-    const Zstring shortName = afterLast(configFilename, FILE_NAME_SEPARATOR); //returns the whole string if separator not found
-    const Zstring jobName = beforeLast(shortName, Zstr('.')); //returns empty string if seperator not found
-    return utfCvrtTo<std::wstring>(jobName.empty() ? shortName : jobName);
+    const Zstring shortName = afterLast(configFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
+    const Zstring jobName   = beforeLast(shortName, Zstr('.'), IF_MISSING_RETURN_ALL);
+    return utfCvrtTo<std::wstring>(jobName);
 }

@@ -44,8 +44,8 @@ Zstring getLastSyncsLogfilePath();
 
 struct OnUpdateLogfileStatusNoThrow
 {
-    OnUpdateLogfileStatusNoThrow(ProcessCallback& pc, const Zstring& logfileDisplayPath) : pc_(pc), logfileDisplayPath_(logfileDisplayPath),
-        msg(replaceCpy(_("Saving file %x..."), L"%x", fmtFileName(logfileDisplayPath_))) {}
+    OnUpdateLogfileStatusNoThrow(ProcessCallback& pc, const std::wstring& logfileDisplayPath) : pc_(pc),
+        msg(replaceCpy(_("Saving file %x..."), L"%x", fmtPath(logfileDisplayPath))) {}
 
     void operator()(std::int64_t bytesDelta)
     {
@@ -56,7 +56,6 @@ struct OnUpdateLogfileStatusNoThrow
 
 private:
     ProcessCallback& pc_;
-    const Zstring logfileDisplayPath_;
     std::int64_t bytesWritten = 0;
     const std::wstring msg;
 };

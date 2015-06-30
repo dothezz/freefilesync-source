@@ -37,7 +37,9 @@ private:
 
 struct AbstractBaseFolder
 {
-    static Zstring getDisplayPath(const AbstractPathRef& ap) { return ap.abf->getDisplayPath(ap.itemPathImpl); }
+    virtual Zstring getInitPathPhrase() const = 0; //noexcept
+
+    static std::wstring getDisplayPath(const AbstractPathRef& ap) { return ap.abf->getDisplayPath(ap.itemPathImpl); }
 
     static Zstring getFileShortName(const AbstractPathRef& ap) { return ap.abf->getFileShortName(ap.itemPathImpl); }
 
@@ -57,26 +59,26 @@ struct AbstractBaseFolder
     static bool somethingExists(const AbstractPathRef& ap) { return ap.abf->somethingExists(ap.itemPathImpl); } //noexcept; check whether any object with this name exists
     //----------------------------------------------------------------------------------------------------------------
 
-    //if parent directory is not existing: create recursively
     //should provide for single ATOMIC folder creation!
-    static void createNewFolder(const AbstractPathRef& ap) { return ap.abf->createNewFolder(ap.itemPathImpl); } //throw FileError, ErrorTargetExisting
+    static void createFolderSimple(const AbstractPathRef& ap) { ap.abf->createFolderSimple(ap.itemPathImpl); }; //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+
+    //non-recursive folder deletion:
+    static void removeFolderSimple(const AbstractPathRef& ap) { ap.abf->removeFolderSimple(ap.itemPathImpl); }; //throw FileError
+
+    //- no error if already existing
+    //- create recursively if parent directory is not existing
+    static void createFolderRecursively(const AbstractPathRef& ap); //throw FileError
+
+    static void removeFolderRecursively(const AbstractPathRef& ap, //throw FileError
+                                        const std::function<void (const std::wstring& displayPath)>& onBeforeFileDeletion,    //optional
+                                        const std::function<void (const std::wstring& displayPath)>& onBeforeFolderDeletion); //one call for each *existing* object!
 
     static bool removeFile(const AbstractPathRef& ap) { return ap.abf->removeFile(ap.itemPathImpl); }; //throw FileError; return "false" if file is not existing
 
-    static void removeFolder(const AbstractPathRef& ap, //throw FileError
-                             const std::function<void (const Zstring& displayPath)>& onBeforeFileDeletion = nullptr, //optional;
-                             const std::function<void (const Zstring& displayPath)>& onBeforeDirDeletion  = nullptr) //one call for each *existing* object!
-    { return ap.abf->removeFolder(ap.itemPathImpl, onBeforeFileDeletion, onBeforeDirDeletion); };
-
     //----------------------------------------------------------------------------------------------------------------
 
-    enum class SymlinkHandling
-    {
-        DIRECT,
-        FOLLOW
-    };
-
-    static void setFileTime(const AbstractPathRef& ap, std::int64_t modificationTime, SymlinkHandling procSl) { return ap.abf->setFileTime(ap.itemPathImpl, modificationTime, procSl); } //throw FileError
+    static void setModTime       (const AbstractPathRef& ap, std::int64_t modificationTime) { ap.abf->setModTime       (ap.itemPathImpl, modificationTime); } //throw FileError, follows symlinks
+    static void setModTimeSymlink(const AbstractPathRef& ap, std::int64_t modificationTime) { ap.abf->setModTimeSymlink(ap.itemPathImpl, modificationTime); } //throw FileError
 
     static AbstractPathRef getResolvedSymlinkPath(const AbstractPathRef& ap) { return ap.abf->getResolvedSymlinkPath(ap.itemPathImpl); } //throw FileError
 
@@ -93,7 +95,7 @@ struct AbstractBaseFolder
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
     static IconLoader getAsyncIconLoader(const AbstractPathRef& ap) { return ap.abf->getAsyncIconLoader(ap.itemPathImpl); } //noexcept!
     virtual std::function<void()> /*throw FileError*/ getAsyncConnectFolder(bool allowUserInteraction) const = 0; //noexcept, optional return value
-    static std::function<bool()> /*noexcept*/ getAsyncCheckDirExists(const AbstractPathRef& ap) { return ap.abf->getAsyncCheckDirExists(ap.itemPathImpl); } //noexcept
+    static std::function<bool()> /*throw FileError*/ getAsyncCheckDirExists(const AbstractPathRef& ap) { return ap.abf->getAsyncCheckDirExists(ap.itemPathImpl); } //noexcept
     //----------------------------------------------------------------------------------------------------------------
 
     using FileId = Zbase<char>;
@@ -114,11 +116,13 @@ struct AbstractBaseFolder
         InputStream& operator=(InputStream&) = delete;
     };
 
-    struct OutputStream //TRANSACTIONAL output stream! => call finalize when done!
+    //TRANSACTIONAL output stream! => call finalize when done!
+    //- takes ownership and deletes on errors!!!! => transactionally create output stream first if not existing!!
+    struct OutputStream
     {
         virtual ~OutputStream();
-        void   write(const void* buffer, size_t bytesToWrite); //throw FileError
-        FileId finalize(const std::function<void()>& onUpdateStatus);                                     //throw FileError
+        void write(const void* buffer, size_t bytesToWrite); //throw FileError
+        FileId finalize(const std::function<void()>& onUpdateStatus); //throw FileError
         virtual size_t optimalBlockSize() const = 0; //non-zero block size is ABF contract!
 
     protected:
@@ -181,11 +185,10 @@ struct AbstractBaseFolder
             ON_ERROR_IGNORE
         };
 
-        virtual void               onFile   (const FileInfo&    fi) = 0;
-        virtual TraverserCallback* onDir    (const DirInfo&     di) = 0;
-        virtual HandleLink         onSymlink(const SymlinkInfo& si) = 0;
-        //nullptr: ignore directory, non-nullptr: traverse into using the (new) callback => implement releaseDirTraverser() if necessary!
-        virtual void releaseDirTraverser(TraverserCallback* trav) {}
+        virtual void                               onFile   (const FileInfo&    fi) = 0;
+        virtual HandleLink                         onSymlink(const SymlinkInfo& si) = 0;
+        virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) = 0;
+        //nullptr: ignore directory, non-nullptr: traverse into, using the (new) callback
 
         virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data at current level as incomplete!
         virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
@@ -250,7 +253,7 @@ struct AbstractBaseFolder
     {
         virtual ~RecycleSession() {};
         virtual bool recycleItem(const AbstractPathRef& ap, const Zstring& logicalRelPath) = 0; //throw FileError; return true if item existed
-        virtual void tryCleanup(const std::function<void (const Zstring& displayPath)>& notifyDeletionStatus /*optional; currentItem may be empty*/) = 0; //throw FileError
+        virtual void tryCleanup(const std::function<void (const std::wstring& displayPath)>& notifyDeletionStatus /*optional; currentItem may be empty*/) = 0; //throw FileError
     };
     virtual std::unique_ptr<RecycleSession> createRecyclerSession() const = 0; //throw FileError, precondition: supportsRecycleBin(); return value must be bound!
 
@@ -262,7 +265,7 @@ struct AbstractBaseFolder
     //no need to protect access:
     static const AbstractBaseFolder& getAbf(const AbstractPathRef& ap) { return *ap.abf; }
 
-    static Zstring appendPaths(const Zstring& basePath, const Zstring& relPath);
+    static Zstring appendPaths(const Zstring& basePath, const Zstring& relPath, Zchar pathSep);
 
 protected: //grant derived classes access to AbstractPathRef:
     static Zstring getItemPathImpl(const AbstractPathRef& ap) { return ap.itemPathImpl; }
@@ -272,13 +275,16 @@ private:
     virtual bool isNativeFileSystem() const { return false; };
 
     //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
-    virtual Zstring getDisplayPath(const Zstring& itemPathImpl) const = 0;
+    virtual std::wstring getDisplayPath(const Zstring& itemPathImpl) const = 0;
 
     //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     virtual Zstring appendRelPathToItemPathImpl(const Zstring& itemPathImpl, const Zstring& relPath) const = 0;
 
     //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     virtual Zstring getBasePathImpl() const = 0;
+
+    //used during folder creation if parent folder is missing
+    virtual Opt<Zstring> getParentFolderPathImpl(const Zstring& itemPathImpl) const = 0;
 
     virtual Zstring getFileShortName(const Zstring& itemPathImpl) const = 0;
 
@@ -292,16 +298,18 @@ private:
     virtual bool symlinkExists  (const Zstring& itemPathImpl) const = 0; //noexcept
     virtual bool somethingExists(const Zstring& itemPathImpl) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
-    //should provide for single ATOMIC folder creation! creates recursively!
-    virtual void createNewFolder(const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorTargetExisting
+
+    //should provide for single ATOMIC folder creation!
+    virtual void createFolderSimple(const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+
+    //non-recursive folder deletion:
+    virtual void removeFolderSimple(const Zstring& itemPathImpl) const = 0; //throw FileError
 
     virtual bool removeFile(const Zstring& itemPathImpl) const = 0; //throw FileError
 
-    virtual void removeFolder(const Zstring& itemPathImpl, //throw FileError
-                              const std::function<void (const Zstring& displayPath)>& onBeforeFileDeletion,  //optional;
-                              const std::function<void (const Zstring& displayPath)>& onBeforeDirDeletion) const = 0;
     //----------------------------------------------------------------------------------------------------------------
-    virtual void setFileTime(const Zstring& itemPathImpl, std::int64_t modificationTime, SymlinkHandling procSl) const = 0; //throw FileError
+    virtual void setModTime       (const Zstring& itemPathImpl, std::int64_t modificationTime) const = 0; //throw FileError, follows symlinks
+    virtual void setModTimeSymlink(const Zstring& itemPathImpl, std::int64_t modificationTime) const = 0; //throw FileError
 
     virtual AbstractPathRef getResolvedSymlinkPath(const Zstring& itemPathImpl) const = 0; //throw FileError
 
@@ -312,7 +320,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
     virtual IconLoader getAsyncIconLoader(const Zstring& itemPathImpl) const = 0; //noexcept!
-    virtual std::function<bool()> /*noexcept*/ getAsyncCheckDirExists(const Zstring& itemPathImpl) const = 0; //noexcept
+    virtual std::function<bool()> /*throw FileError*/ getAsyncCheckDirExists(const Zstring& itemPathImpl) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
     virtual std::unique_ptr<InputStream > getInputStream (const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorFileLocked
     virtual std::unique_ptr<OutputStream> getOutputStream(const Zstring& itemPathImpl,  //throw FileError, ErrorTargetExisting
@@ -434,22 +442,24 @@ bool AbstractBaseFolder::havePathDependency(const AbstractBaseFolder& lhs, const
 
 
 inline
-Zstring AbstractBaseFolder::appendPaths(const Zstring& basePath, const Zstring& relPath)
+Zstring AbstractBaseFolder::appendPaths(const Zstring& basePath, const Zstring& relPath, Zchar pathSep)
 {
     if (relPath.empty())
         return basePath;
     if (basePath.empty())
         return relPath;
 
-    if (!startsWith(relPath, FILE_NAME_SEPARATOR))
-        return appendSeparator(basePath) + relPath;
+    if (startsWith(relPath, pathSep))
+    {
+        assert(false);
+        if (relPath.size() == 1)
+            return basePath;
 
-    assert(false);
-    if (relPath.size() == 1)
-        return basePath;
-
-    if (endsWith(basePath, FILE_NAME_SEPARATOR))
-        return Zstring(basePath.begin(), basePath.end() - 1) + relPath;
+        if (endsWith(basePath, pathSep))
+            return basePath + (relPath.c_str() + 1);
+    }
+    else if (!endsWith(basePath, pathSep))
+        return basePath + pathSep + relPath;
 
     return basePath + relPath;
 }
@@ -485,7 +495,7 @@ inline
 AbstractBaseFolder::FileId AbstractBaseFolder::OutputStream::finalize(const std::function<void()>& onUpdateStatus) //throw FileError
 {
     if (bytesExpected && bytesWritten != *bytesExpected)
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getDisplayPath(filePath_))),
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getDisplayPath(filePath_))),
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"), L"%x", numberTo<std::wstring>(*bytesExpected)), L"%y", numberTo<std::wstring>(bytesWritten)));
 
     const FileId fileId = finalizeImpl(onUpdateStatus); //throw FileError
@@ -504,10 +514,10 @@ void AbstractBaseFolder::copyNewFolder(const AbstractPathRef& apSource, const Ab
 
     //fall back:
     if (copyFilePermissions)
-        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(getDisplayPath(apTarget))),
+        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(getDisplayPath(apTarget))),
                         _("Operation not supported for different base folder types."));
 
-    createNewFolder(apTarget); //throw FileError, ErrorTargetExisting
+    createFolderSimple(apTarget); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
 }
 
 
@@ -518,8 +528,8 @@ void AbstractBaseFolder::copySymlink(const AbstractPathRef& apSource, const Abst
         return apSource.abf->copySymlinkForSameAbfType(apSource.itemPathImpl, apTarget, copyFilePermissions); //throw FileError
 
     throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x",
-                                          L"\n" + fmtFileName(getDisplayPath(apSource))), L"%y",
-                               L"\n" + fmtFileName(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
+                                          L"\n" + fmtPath(getDisplayPath(apSource))), L"%y",
+                               L"\n" + fmtPath(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
 }
 
 
@@ -530,8 +540,8 @@ void AbstractBaseFolder::renameItem(const AbstractPathRef& apSource, const Abstr
         return apSource.abf->renameItemForSameAbfType(apSource.itemPathImpl, apTarget); //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
 
     throw ErrorDifferentVolume(replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x",
-                                                     L"\n" + fmtFileName(getDisplayPath(apSource))), L"%y",
-                                          L"\n" + fmtFileName(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
+                                                     L"\n" + fmtPath(getDisplayPath(apSource))), L"%y",
+                                          L"\n" + fmtPath(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
 }
 
 

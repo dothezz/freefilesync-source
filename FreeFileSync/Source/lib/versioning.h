@@ -40,7 +40,7 @@ public:
             throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10000!
-            throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + timeStamp_ + L"\"");
+            throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + utfCvrtTo<std::wstring>(timeStamp_) + L"\"");
 
         //honor strong exception safety guarantee:
         versioningFolder_ = std::move(versioningFolder); //noexcept
@@ -55,22 +55,22 @@ public:
     void revisionFolder(const AbstractPathRef& folderPath, const Zstring& relativePath, //throw FileError
 
                         //optional callbacks: may be nullptr
-                        const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove, //one call for each *existing* object!
-                        const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeDirMove,  //
+                        const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,   //one call for each *existing* object!
+                        const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove, //
                         //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
                         const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus);
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
-    bool revisionFileImpl(const AbstractPathRef& filePath, const Zstring& relativePath,
-                          const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove,
-                          const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
-
     void revisionFolderImpl(const AbstractPathRef& folderPath, const Zstring& relativePath,
-                            const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeFileMove,
-                            const std::function<void(const Zstring& displayPathFrom, const Zstring& displayPathTo)>& onBeforeDirMove,
+                            const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,
+                            const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove,
                             const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
+
+    void moveItemToVersioning(const AbstractPathRef& itemPath, //throw FileError
+                              const Zstring& relativePath,
+                              const std::function<void(const AbstractPathRef& sourcePath, const AbstractPathRef& targetPath)>& moveItem); //may throw FileError
 
     const VersioningStyle versioningStyle_;
     const Zstring timeStamp_;

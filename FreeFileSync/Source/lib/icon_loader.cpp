@@ -10,14 +10,14 @@
 #ifdef ZEN_WIN
     #include <zen/dll.h>
     #include <zen/win_ver.h>
-    #include "../dll/Thumbnail/thumbnail.h"
+    #include "file_icon_win.h"
 
 #elif defined ZEN_LINUX
     #include <gtk/gtk.h>
     #include <sys/stat.h>
 
 #elif defined ZEN_MAC
-    #include "osx_file_icon.h"
+    #include "file_icon_osx.h"
 #endif
 
 using namespace zen;
@@ -25,34 +25,7 @@ using namespace zen;
 
 namespace
 {
-#ifdef ZEN_WIN
-    const bool isXpOrLater = winXpSP3OrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
-
-    #define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
-    DEF_DLL_FUN(getIconByIndex);   //
-    DEF_DLL_FUN(getThumbnail);     //let's spare the boost::call_once hustle and allocate statically
-    DEF_DLL_FUN(releaseImageData); //
-    #undef DEF_DLL_FUN
-#endif
-
-
-#ifdef ZEN_WIN
-ImageHolder copyToImageHolder(const thumb::ImageData& img)
-{
-    assert(img.rgb && img.alpha);
-    if (!img.rgb)
-        return ImageHolder();
-
-    ImageHolder out(img.width, img.height, img.alpha != nullptr);
-    ::memcpy(out.getRgb(), img.rgb, img.width * img.height * 3);
-
-    if (img.alpha)
-        ::memcpy(out.getAlpha(), img.alpha, img.width * img.height);
-
-    return out;
-}
-
-#elif defined ZEN_LINUX
+#ifdef ZEN_LINUX
 ImageHolder copyToImageHolder(const GdkPixbuf* pixbuf)
 {
     //see: https://developer.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-The-GdkPixbuf-Structure.html
@@ -110,29 +83,13 @@ ImageHolder copyToImageHolder(const GdkPixbuf* pixbuf)
     }
     return ImageHolder();
 }
-
-#elif defined ZEN_MAC
-ImageHolder copyToImageHolder(const osx::ImageData& img)
-{
-    assert(!img.rgb.empty() && !img.alpha.empty());
-    if (img.rgb.empty())
-        return ImageHolder();
-
-    ImageHolder out(img.width, img.height, !img.alpha.empty() /*withAlpha*/);
-    ::memcpy(out.getRgb(), &img.rgb[0], img.width * img.height * 3);
-
-    if (!img.alpha.empty())
-        ::memcpy(out.getAlpha(), &img.alpha[0], img.width * img.height);
-    return out;
-}
 #endif
 
 
 #ifdef ZEN_WIN
-thumb::IconSizeType getThumbSizeType(int pixelSize)
+IconSizeType getThumbSizeType(int pixelSize)
 {
     //coordinate with IconBuffer::getSize()!
-    using namespace thumb;
     if (pixelSize >= 256) return ICON_SIZE_256;
     if (pixelSize >= 128) return ICON_SIZE_128;
     if (pixelSize >=  48) return ICON_SIZE_48;
@@ -154,12 +111,8 @@ ImageHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, int pixe
     if (!imgList) //not owned: no need for IUnknown::Release()!
         return ImageHolder();
 
-    if (getIconByIndex && releaseImageData)
-        if (const thumb::ImageData* img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
-        {
-            ZEN_ON_SCOPE_EXIT(releaseImageData(img));
-            return copyToImageHolder(*img);
-        }
+    if (ImageHolder img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
+        return img;
 
     return ImageHolder();
 }
@@ -209,8 +162,7 @@ ImageHolder zen::getIconByTemplatePath(const Zstring& templatePath, int pixelSiz
 #elif defined ZEN_MAC
     try
     {
-        const osx::ImageData& img = osx::getIconByExtension(getFileExtension(templatePath).c_str(), pixelSize); //throw SysError
-        return copyToImageHolder(img);
+        return osx::getIconByExtension(getFileExtension(templatePath).c_str(), pixelSize); //throw SysError
     }
     catch (SysError&) { return ImageHolder(); }
 #endif
@@ -234,7 +186,7 @@ ImageHolder zen::genericFileIcon(int pixelSize)
 #elif defined ZEN_MAC
     try
     {
-        return copyToImageHolder(osx::getDefaultFileIcon(pixelSize)); //throw SysError
+        return osx::getDefaultFileIcon(pixelSize); //throw SysError
     }
     catch (SysError&) { return ImageHolder(); }
 #endif
@@ -257,7 +209,7 @@ ImageHolder zen::genericDirIcon(int pixelSize)
 #elif defined ZEN_MAC
     try
     {
-        return copyToImageHolder(osx::getDefaultFolderIcon(pixelSize)); //throw SysError
+        return osx::getDefaultFolderIcon(pixelSize); //throw SysError
     }
     catch (SysError&) { return ImageHolder(); }
 #endif
@@ -286,12 +238,8 @@ ImageHolder zen::getFileIcon(const Zstring& filePath, int pixelSize)
         //Check for link icon type (= shell links and symlinks): SHGetFileInfo + SHGFI_ATTRIBUTES:
         //const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
 
-        if (getIconByIndex && releaseImageData)
-            if (const thumb::ImageData* img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
-            {
-                ZEN_ON_SCOPE_EXIT(releaseImageData(img));
-                return copyToImageHolder(*img);
-            }
+        if (ImageHolder img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
+            return img;
     }
 
 #elif defined ZEN_LINUX
@@ -309,7 +257,7 @@ ImageHolder zen::getFileIcon(const Zstring& filePath, int pixelSize)
 #elif defined ZEN_MAC
     try
     {
-        return copyToImageHolder(osx::getFileIcon(filePath.c_str(), pixelSize)); //throw SysError
+        return osx::getFileIcon(filePath.c_str(), pixelSize); //throw SysError
     }
     catch (SysError&) { assert(false); }
 #endif
@@ -320,12 +268,8 @@ ImageHolder zen::getFileIcon(const Zstring& filePath, int pixelSize)
 ImageHolder zen::getThumbnailImage(const Zstring& filePath, int pixelSize) //return null icon on failure
 {
 #ifdef ZEN_WIN
-    if (getThumbnail && releaseImageData)
-        if (const thumb::ImageData* img = getThumbnail(filePath.c_str(), pixelSize))
-        {
-            ZEN_ON_SCOPE_EXIT(releaseImageData(img));
-            return copyToImageHolder(*img);
-        }
+    if (ImageHolder img = getThumbnail(filePath.c_str(), pixelSize))
+        return img;
 
 #elif defined ZEN_LINUX
     struct ::stat fileInfo = {};
@@ -360,7 +304,7 @@ ImageHolder zen::getThumbnailImage(const Zstring& filePath, int pixelSize) //ret
 #elif defined ZEN_MAC
     try
     {
-        return copyToImageHolder(osx::getThumbnail(filePath.c_str(), pixelSize)); //throw SysError
+        return osx::getThumbnail(filePath.c_str(), pixelSize); //throw SysError
     }
     catch (SysError&) {}
 #endif

@@ -48,7 +48,7 @@ const int LOCK_FORMAT_VER = 2; //lock file format version
 
 using MemStreamOut = MemoryStreamOut<ByteArray>;
 using MemStreamIn  = MemoryStreamIn <ByteArray>;
-}
+
 
 //worker thread
 class LifeSigns
@@ -61,9 +61,9 @@ public:
     {
         try
         {
-            while (true)
+            for (;;)
             {
-                boost::this_thread::sleep(boost::posix_time::seconds(EMIT_LIFE_SIGN_INTERVAL)); //interruption point!
+                boost::this_thread::sleep_for(boost::chrono::seconds(EMIT_LIFE_SIGN_INTERVAL)); //throw boost::thread_interrupted
 
                 //actual work
                 emitLifeSign(); //throw ()
@@ -77,7 +77,6 @@ public:
 
     void emitLifeSign() const //try to append one byte...; throw()
     {
-        const char buffer[1] = {' '};
 #ifdef ZEN_WIN
         try { activatePrivilege(SE_BACKUP_NAME); }
         catch (const FileError&) {}
@@ -107,7 +106,7 @@ public:
 
         DWORD bytesWritten = 0; //this parameter is NOT optional: http://blogs.msdn.com/b/oldnewthing/archive/2013/04/04/10407417.aspx
         if (!::WriteFile(fileHandle,    //_In_         HANDLE hFile,
-                         buffer,        //_In_         LPCVOID lpBuffer,
+                         " ",           //_In_         LPCVOID lpBuffer,
                          1,             //_In_         DWORD nNumberOfBytesToWrite,
                          &bytesWritten, //_Out_opt_    LPDWORD lpNumberOfBytesWritten,
                          nullptr))      //_Inout_opt_  LPOVERLAPPED lpOverlapped
@@ -119,7 +118,7 @@ public:
             return;
         ZEN_ON_SCOPE_EXIT(::close(fileHandle));
 
-        const ssize_t bytesWritten = ::write(fileHandle, buffer, 1);
+        const ssize_t bytesWritten = ::write(fileHandle, " ", 1);
         (void)bytesWritten;
 #endif
     }
@@ -129,15 +128,13 @@ private:
 };
 
 
-namespace
-{
 std::uint64_t getLockFileSize(const Zstring& filepath) //throw FileError
 {
 #ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
     const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filepath).c_str(), &fileInfo);
     if (searchHandle == INVALID_HANDLE_VALUE)
-        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"FindFirstFile", getLastError());
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filepath)), L"FindFirstFile", getLastError());
     ::FindClose(searchHandle);
 
     return get64BitUInt(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
@@ -145,20 +142,20 @@ std::uint64_t getLockFileSize(const Zstring& filepath) //throw FileError
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     if (::stat(filepath.c_str(), &fileInfo) != 0) //follow symbolic links
-        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filepath)), L"stat", getLastError());
+        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filepath)), L"stat", getLastError());
 
     return fileInfo.st_size;
 #endif
 }
 
 
-Zstring deleteAbandonedLockName(const Zstring& lockfilepath) //make sure to NOT change file ending!
+Zstring abandonedLockDeletionName(const Zstring& lockfilepath) //make sure to NOT change file ending!
 {
     const size_t pos = lockfilepath.rfind(FILE_NAME_SEPARATOR); //search from end
     return pos == Zstring::npos ? Zstr("Del.") + lockfilepath :
            Zstring(lockfilepath.c_str(), pos + 1) + //include path separator
            Zstr("Del.") +
-           afterLast(lockfilepath, FILE_NAME_SEPARATOR); //returns the whole string if ch not found
+           afterLast(lockfilepath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
 }
 
 
@@ -382,7 +379,7 @@ LockInformation retrieveLockInfo(const Zstring& lockfilepath) //throw FileError
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilepath)), L"unexpected end of stream");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(lockfilepath)), L"unexpected end of stream");
     }
 }
 
@@ -425,7 +422,7 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec(); //= 0 on error
 
 void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //throw FileError
 {
-    std::wstring infoMsg = _("Waiting while directory is locked:") + L' ' + fmtFileName(lockfilepath);
+    std::wstring infoMsg = _("Waiting while directory is locked:") + L' ' + fmtPath(lockfilepath);
 
     if (callback)
         callback->reportStatus(infoMsg);
@@ -458,7 +455,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
         std::uint64_t fileSizeOld = 0;
         TickVal lastLifeSign = getTicks();
 
-        while (true)
+        for (;;)
         {
             const TickVal now = getTicks();
             const std::uint64_t fileSizeNew = ::getLockFileSize(lockfilepath); //throw FileError
@@ -475,7 +472,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
             if (lockOwnderDead || //no need to wait any longer...
                 dist(lastLifeSign, now) / TICKS_PER_SEC > DETECT_ABANDONED_INTERVAL)
             {
-                DirLock dummy(deleteAbandonedLockName(lockfilepath), callback); //throw FileError
+                DirLock dummy(abandonedLockDeletionName(lockfilepath), callback); //throw FileError
 
                 //now that the lock is in place check existence again: meanwhile another process may have deleted and created a new lock!
 
@@ -495,7 +492,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
             for (size_t i = 0; i < 1000 * POLL_LIFE_SIGN_INTERVAL / GUI_CALLBACK_INTERVAL; ++i)
             {
                 if (callback) callback->requestUiRefresh();
-                boost::this_thread::sleep(boost::posix_time::milliseconds(GUI_CALLBACK_INTERVAL));
+                boost::this_thread::sleep_for(boost::chrono::milliseconds(GUI_CALLBACK_INTERVAL)); //throw boost::thread_interrupted
 
                 if (callback)
                 {
@@ -554,7 +551,7 @@ bool tryLock(const Zstring& lockfilepath) //throw FileError
             lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
             return false;
         else
-            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilepath)), L"CreateFile", lastError);
+            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(lockfilepath)), L"CreateFile", lastError);
     }
     ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilepath); });
     FileOutput fileOut(fileHandle, lockfilepath); //pass handle ownership
@@ -574,7 +571,7 @@ bool tryLock(const Zstring& lockfilepath) //throw FileError
         if (errno == EEXIST)
             return false;
         else
-            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilepath)), L"open", getLastError());
+            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(lockfilepath)), L"open", getLastError());
     }
     ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilepath); });
     FileOutput fileOut(fileHandle, lockfilepath); //pass handle ownership
@@ -612,7 +609,7 @@ public:
     ~SharedDirLock()
     {
         threadObj.interrupt(); //thread lifetime is subset of this instances's life
-        threadObj.join(); //we assert precondition "threadObj.joinable()"!!!
+        threadObj.join(); //throw boost::thread_interrupted -> not expected => main thread!
 
         ::releaseLock(lockfilepath_); //throw ()
     }
@@ -683,7 +680,7 @@ private:
         return iterLock != guidToLock.end() ? iterLock->second.lock() : nullptr; //try to get shared_ptr; throw()
     }
 
-    void tidyUp() //remove obsolete lock entries
+    void tidyUp() //remove obsolete entries
     {
         map_remove_if(guidToLock, [ ](const GuidToLockMap::value_type& v) { return !v.second.lock(); });
         map_remove_if(fileToGuid, [&](const FileToGuidMap::value_type& v) { return guidToLock.find(v.second) == guidToLock.end(); });
@@ -697,7 +694,7 @@ private:
 DirLock::DirLock(const Zstring& lockfilepath, DirLockCallback* callback) //throw FileError
 {
     if (callback)
-        callback->reportStatus(replaceCpy(_("Creating file %x"), L"%x", fmtFileName(lockfilepath)));
+        callback->reportStatus(replaceCpy(_("Creating file %x"), L"%x", fmtPath(lockfilepath)));
 
 #ifdef ZEN_WIN
     const DWORD bufferSize = 10000;

@@ -84,11 +84,11 @@ public:
 
     struct RootNode : public Node
     {
-        RootNode(int percent, std::uint64_t bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const Zstring displayName) :
+        RootNode(int percent, std::uint64_t bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj, const std::wstring& displayName) :
             Node(percent, bytes, itemCount, 0, status), baseDirObj_(baseDirObj), displayName_(displayName) {}
 
         BaseDirPair& baseDirObj_;
-        Zstring displayName_;
+        const std::wstring displayName_;
     };
 
     std::unique_ptr<Node> getLine(size_t row) const; //return nullptr on error
@@ -137,7 +137,7 @@ private:
     {
         RootNodeImpl() {}
         std::shared_ptr<BaseDirPair> baseDirObj;
-        Zstring displayName;
+        std::wstring displayName;
     };
 
     enum NodeType
@@ -185,7 +185,7 @@ private:
 
 namespace impl //declare for unit tests:
 {
-Zstring getShortDisplayNameForFolderPair(const Zstring& dirPathLeft, const Zstring& dirPathRight);
+std::wstring getShortDisplayNameForFolderPair(const std::wstring& dirPathLeft, const std::wstring& dirPathRight);
 }
 
 

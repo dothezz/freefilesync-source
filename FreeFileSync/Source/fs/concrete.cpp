@@ -8,6 +8,7 @@
 #include "native.h"
 #ifdef ZEN_WIN_VISTA_AND_LATER
     #include "mtp.h"
+    #include "sftp.h"
 #endif
 
 using namespace zen;
@@ -24,14 +25,11 @@ std::unique_ptr<AbstractBaseFolder> zen::createAbstractBaseFolder(const Zstring&
 #ifdef ZEN_WIN_VISTA_AND_LATER
     if (acceptsFolderPathPhraseMtp(folderPathPhrase)) //noexcept
         return createBaseFolderMtp(folderPathPhrase); //noexcept
+
+    if (acceptsFolderPathPhraseSftp(folderPathPhrase)) //noexcept
+        return createBaseFolderSftp(folderPathPhrase); //noexcept
 #endif
 
     //no idea? => native!
     return createBaseFolderNative(folderPathPhrase);
-}
-
-
-Zstring zen::getResolvedDisplayPath(const Zstring& folderPathPhrase) //noexcept
-{
-    return ABF::getDisplayPath(createAbstractBaseFolder(folderPathPhrase)->getAbstractPath());
 }

@@ -39,7 +39,7 @@
 #include "../algorithm.h"
 #include "../fs/concrete.h"
 #ifdef ZEN_WIN_VISTA_AND_LATER
-#include "../fs/mtp.h"
+    #include "../fs/mtp.h"
 #endif
 #include "../lib/resolve_path.h"
 #include "../lib/ffs_paths.h"
@@ -98,13 +98,14 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
 class FolderSelectorImpl : public FolderSelector
 {
 public:
-    FolderSelectorImpl(MainDialog&      mainDlg,
-                       wxPanel&         dropWindow1,
-                       wxButton&        dirSelectButton,
+    FolderSelectorImpl(MainDialog&       mainDlg,
+                       wxPanel&          dropWindow1,
+                       wxButton&         selectFolderButton,
+                       wxButton&         selectSftpButton,
                        FolderHistoryBox& dirpath,
                        wxStaticText*     staticText = nullptr,
                        wxWindow*         dropWindow2 = nullptr) :
-        FolderSelector(dropWindow1, dirSelectButton, dirpath, staticText, dropWindow2),
+        FolderSelector(dropWindow1, selectFolderButton, selectSftpButton, dirpath, staticText, dropWindow2),
         mainDlg_(mainDlg) {}
 
     bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) override
@@ -188,8 +189,8 @@ public:
     FolderPairPanel(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairPanelGenerated(parent),
         FolderPairCallback<FolderPairPanelGenerated>(static_cast<FolderPairPanelGenerated&>(*this), mainDialog), //pass FolderPairPanelGenerated part...
-        dirpathLeft (mainDialog, *m_panelLeft,  *m_buttonSelectDirLeft,  *m_directoryLeft),
-        dirpathRight(mainDialog, *m_panelRight, *m_buttonSelectDirRight, *m_directoryRight)
+        dirpathLeft (mainDialog, *m_panelLeft,  *m_buttonSelectDirLeft,  *m_bpButtonSelectSftpLeft,  *m_directoryLeft),
+        dirpathRight(mainDialog, *m_panelRight, *m_buttonSelectDirRight, *m_bpButtonSelectSftpRight, *m_directoryRight)
     {
         dirpathLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
         dirpathRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
@@ -229,12 +230,14 @@ public:
         dirpathLeft(mainDialog,
                     *mainDialog.m_panelTopLeft,
                     *mainDialog.m_buttonSelectDirLeft,
+                    *mainDialog.m_bpButtonSelectSftpLeft,
                     *mainDialog.m_directoryLeft,
                     mainDialog.m_staticTextResolvedPathL,
                     &mainDialog.m_gridMainL->getMainWin()),
         dirpathRight(mainDialog,
                      *mainDialog.m_panelTopRight,
                      *mainDialog.m_buttonSelectDirRight,
+                     *mainDialog.m_bpButtonSelectSftpRight,
                      *mainDialog.m_directoryRight,
                      mainDialog.m_staticTextResolvedPathR,
                      &mainDialog.m_gridMainR->getMainWin())
@@ -401,7 +404,7 @@ void MainDialog::create(const Zstring& globalConfigFile)
         firstMissingDir.addJob([filepath] { return filepath.empty() /*ever empty??*/ || !fileExists(filepath) ? make_unique<FalseType>() : nullptr; });
 
     //potentially slow network access: give all checks 500ms to finish
-    const bool allFilesExist = firstMissingDir.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
+    const bool allFilesExist = firstMissingDir.timedWait(boost::chrono::milliseconds(500)) && //false: time elapsed
                                !firstMissingDir.get(); //no missing
     if (!allFilesExist)
         filepaths.clear(); //we do NOT want to show an error due to last config file missing on application start!
@@ -784,6 +787,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
             //=> yet another piece of "high-quality" code from wxWidgets making a dev's life "easy"...
         }
 
+    m_buttonCompare->SetFocus();
+
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
     //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right away
     if (startComparison)
@@ -791,28 +796,27 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
         const zen::MainConfiguration currMainCfg = getConfig().mainCfg;
 
         //------------------------------------------------------------------------------------------
-        //check existence of all directories in parallel!
-        GetFirstResult<FalseType> firstMissingDir;
-
         //harmonize checks with comparison.cpp:: checkForIncompleteInput()
         //we're really doing two checks: 1. check directory existence 2. check config validity -> don't mix them!
         bool havePartialPair = false;
         bool haveFullPair    = false;
 
+        std::vector<std::function<bool()>> asyncDirChecks;
+
         auto addDirCheck = [&](const FolderPairEnh& fp)
         {
-            const Zstring dirLeft  = getResolvedDisplayPath(fp.dirpathPhraseLeft ); //should not block!?
-            const Zstring dirRight = getResolvedDisplayPath(fp.dirpathPhraseRight); //
+            std::unique_ptr<ABF> abfL = createAbstractBaseFolder(fp.dirpathPhraseLeft);
+            std::unique_ptr<ABF> abfR = createAbstractBaseFolder(fp.dirpathPhraseRight);
 
-            if (dirLeft.empty() != dirRight.empty()) //only skip check if both sides are empty!
+            if (abfL->emptyBaseFolderPath() != abfR->emptyBaseFolderPath()) //only skip check if both sides are empty!
                 havePartialPair = true;
-            else if (!dirLeft.empty())
+            else if (!abfL->emptyBaseFolderPath())
                 haveFullPair = true;
 
-            if (!dirLeft.empty())
-                firstMissingDir.addJob([=] { return !dirExists(dirLeft ) ? make_unique<FalseType>() : nullptr; });
-            if (!dirRight.empty())
-                firstMissingDir.addJob([=] { return !dirExists(dirRight) ? make_unique<FalseType>() : nullptr; });
+            if (!abfL->emptyBaseFolderPath())
+                asyncDirChecks.push_back(ABF::getAsyncCheckDirExists(abfL->getAbstractPath())); //noexcept
+            if (!abfR->emptyBaseFolderPath())
+                asyncDirChecks.push_back(ABF::getAsyncCheckDirExists(abfR->getAbstractPath())); //noexcept
         };
 
         addDirCheck(currMainCfg.firstPair);
@@ -821,7 +825,21 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
         if (havePartialPair != haveFullPair) //either all pairs full or all half-filled -> validity check!
         {
-            const bool startComparisonNow = !firstMissingDir.timedWait(boost::posix_time::milliseconds(500)) || //= no result yet   => start comparison anyway!
+            //check existence of all directories in parallel!
+            GetFirstResult<FalseType> firstMissingDir;
+            for (const std::function<bool()>& dirExists : asyncDirChecks)
+                firstMissingDir.addJob([dirExists]() -> std::unique_ptr<FalseType>
+            {
+                try
+                {
+                    if (dirExists()) //throw FileError
+                        return nullptr;
+                }
+                catch (FileError&) {}
+                return make_unique<FalseType>();
+            });
+
+            const bool startComparisonNow = !firstMissingDir.timedWait(boost::chrono::milliseconds(500)) || //= no result yet   => start comparison anyway!
                                             !firstMissingDir.get(); //= all directories exist
 
             if (startComparisonNow)
@@ -1421,11 +1439,11 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
                     shellExecute(fallbackFolderPidl.get(), ABF::getDisplayPath(fallbackFolderPath), EXEC_TYPE_ASYNC); //throw FileError
                 else
 #endif
-                    shellExecute(L"\"" + ABF::getDisplayPath(fallbackFolderPath) + L"\"", EXEC_TYPE_ASYNC); //throw FileError
+                    shellExecute(L"\"" + toZ(ABF::getDisplayPath(fallbackFolderPath)) + L"\"", EXEC_TYPE_ASYNC); //throw FileError
 #elif defined ZEN_LINUX
-                shellExecute("xdg-open \"" + ABF::getDisplayPath(fallbackFolderPath) + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("xdg-open \"" + toZ(ABF::getDisplayPath(fallbackFolderPath)) + "\"", EXEC_TYPE_ASYNC); //
 #elif defined ZEN_MAC
-                shellExecute("open \"" + ABF::getDisplayPath(fallbackFolderPath) + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("open \"" + toZ(ABF::getDisplayPath(fallbackFolderPath)) + "\"", EXEC_TYPE_ASYNC); //
 #endif
             }
             catch (const FileError& e) { showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); }
@@ -1459,11 +1477,11 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
     for (const FileSystemObject* fsObj : selectionTmp) //context menu calls this function only if selection is not empty!
     {
         const Zstring& relPath = fsObj->getPairRelativePath();
-        Zstring path1 = ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(relPath)); //full path, even if item is not existing!
-        Zstring dir1  = ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR))); //returns empty string if term not found
+        Zstring path1 = toZ(ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(relPath))); //full path, even if item is not existing!
+        Zstring dir1  = toZ(ABF::getDisplayPath(fsObj->getABF<LEFT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE))));
 
-        Zstring path2 = ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(relPath));
-        Zstring dir2  = ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR)));
+        Zstring path2 = toZ(ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(relPath)));
+        Zstring dir2  = toZ(ABF::getDisplayPath(fsObj->getABF<RIGHT_SIDE>().getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE))));
 
         if (!leftSide)
         {
@@ -1576,7 +1594,7 @@ void MainDialog::flashStatusInformation(const wxString& text)
     m_panelStatusBar->Layout();
     //if (needLayoutUpdate) auiMgr.Update(); -> not needed here, this is called anyway in updateGui()
 
-    processAsync2([] { boost::this_thread::sleep(boost::posix_time::millisec(2500)); },
+    processAsync2([] { boost::this_thread::sleep_for(boost::chrono::milliseconds(2500)); }, //throw boost::thread_interrupted
                   [this] { this->restoreStatusInformation(); });
 }
 
@@ -2235,13 +2253,10 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             //by extension
             if (!isDir)
             {
-                const Zstring filepath = afterLast(selection[0]->getPairRelativePath(), FILE_NAME_SEPARATOR);
-                if (contains(filepath, Zchar('.'))) //be careful: afterLast returns the whole string if '.' is not found!
-                {
-                    const Zstring extension = afterLast(filepath, Zchar('.'));
+                const Zstring extension = getFileExtension(selection[0]->getPairRelativePath());
+                if (!extension.empty())
                     submenu.addItem(L"*." + utfCvrtTo<wxString>(extension),
                                     [this, extension, include] { filterExtension(extension, include); });
-                }
             }
 
             //by short name
@@ -2603,9 +2618,9 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 
 wxString getFormattedHistoryElement(const Zstring& filepath)
 {
-    Zstring output = afterLast(filepath, FILE_NAME_SEPARATOR);
+    Zstring output = afterLast(filepath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
     if (pathEndsWith(output, Zstr(".ffs_gui")))
-        output = beforeLast(output, Zstr('.'));
+        output = beforeLast(output, Zstr('.'), IF_MISSING_RETURN_NONE);
     return utfCvrtTo<wxString>(output);
 }
 
@@ -2691,16 +2706,16 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filep
 
     auto getMissingFilesAsync = [filepaths]() -> std::vector<Zstring>
     {
-        //boost::this_thread::sleep(boost::posix_time::millisec(5000));
+        //boost::this_thread::sleep_for(boost::chrono::seconds(5));
 
         //check existence of all config files in parallel!
         std::list<boost::unique_future<bool>> fileEx;
 
         for (const Zstring& filepath : filepaths)
-            fileEx.push_back(zen::async([=] { return fileExists(filepath); }));
+            fileEx.push_back(zen::runAsync([=] { return fileExists(filepath); }));
 
         //potentially slow network access => limit maximum wait time!
-        wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(1000));
+        wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::chrono::milliseconds(1000));
 
         std::vector<Zstring> missingFiles;
 
@@ -2797,7 +2812,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
                 case XML_TYPE_GLOBAL:
                 case XML_TYPE_OTHER:
                     showNotificationDialog(this, DialogInfoType::ERROR2,
-                                           PopupDialogCfg().setDetailInstructions(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(activeCfgFilename))));
+                                           PopupDialogCfg().setDetailInstructions(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(activeCfgFilename))));
                     break;
             }
         }
@@ -2834,13 +2849,13 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
         Zstring defaultFileName = activeConfigFiles.size() == 1 && !EqualFilePath()(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
         if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
-            defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_gui");
+            defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_gui");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
                                 //OS X really needs dir/file separated like this:
-                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
-                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR)), //default file; whole string if / not found
+                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                                 wxString(L"FreeFileSync (*.ffs_gui)|*.ffs_gui") + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
@@ -2923,13 +2938,13 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
         Zstring defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : Zstr("BatchRun.ffs_batch");
         //attention: activeConfigFiles may be a *.ffs_gui file! We don't want to overwrite it with a BATCH config!
         if (pathEndsWith(defaultFileName, Zstr(".ffs_gui")))
-            defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_batch");
+            defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_batch");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
                                 //OS X really needs dir/file separated like this:
-                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
-                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR)), //default file; whole string if / not found
+                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                                 _("FreeFileSync batch") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
@@ -2967,7 +2982,8 @@ bool MainDialog::saveOldConfig() //return false on user abort
                 bool neverSaveChanges = false;
                 switch (showConfirmationDialog3(this, DialogInfoType::INFO, PopupDialogCfg3().
                                                 setTitle(toWx(activeCfgFilename)).
-                                                setMainInstructions(replaceCpy(_("Do you want to save changes to %x?"), L"%x", fmtFileName(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR)))).
+                                                setMainInstructions(replaceCpy(_("Do you want to save changes to %x?"), L"%x",
+                                                                               fmtPath(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)))).
                                                 setCheckBox(neverSaveChanges, _("Never save &changes"), ConfirmationButton3::DO_IT),
                                                 _("&Save"), _("Do&n't save")))
                 {
@@ -2985,7 +3001,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                                 case XML_TYPE_GLOBAL:
                                 case XML_TYPE_OTHER:
                                     showNotificationDialog(this, DialogInfoType::ERROR2,
-                                                           PopupDialogCfg().setDetailInstructions(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(activeCfgFilename))));
+                                                           PopupDialogCfg().setDetailInstructions(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(activeCfgFilename))));
                                     return false;
                             }
                         }
@@ -3020,7 +3036,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
+                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //set default dir
                             wxEmptyString,
                             wxString(L"FreeFileSync (*.ffs_gui; *.ffs_batch)|*.ffs_gui;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE);
@@ -3167,7 +3183,7 @@ void MainDialog::deleteSelectedCfgHistoryItems()
 void MainDialog::OnCfgHistoryRightClick(wxMouseEvent& event)
 {
     ContextMenu menu;
-    menu.addItem(_("Delete selected configurations") + L"\tDel", [this] { deleteSelectedCfgHistoryItems(); });
+    menu.addItem(_("Remove entry from list") + L"\tDel", [this] { deleteSelectedCfgHistoryItems(); });
     menu.popup(*this);
 }
 
@@ -3523,7 +3539,7 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
     };
 
     ContextMenu menu;
-    menu.addItem( _("Set as default"), saveDefault);
+    menu.addItem( _("Save as default"), saveDefault);
     menu.popup(*this);
 }
 

@@ -1,3 +1,23 @@
+FreeFileSync 7.2 [2015-07-01]
+-----------------------------
+Support synchronization with SFTP (SSH File Transfer Protocol)
+Detailed error reporting when checking folder existence
+Synchronize MTP devices with no modification time support
+Set focus to comparison button on startup
+Fixed transactional stream clean up error if target file already existing
+Fixed incomplete input stream clean up on fadvise failure (Linux)
+Consider non-native paths for direct comparison after startup
+Revised algorithm generating folder pair display name
+Reduced number of file accesses during versioning
+Stricter language file consistency checking
+Resolved crash when running Windows 7 on CPUs without SSE2
+Improved Minidump creation handling stack overflows
+Revised path formatting to always match native representation
+Fixed about dialog layout for large font sizes
+Support Minidump creation for Windows XP
+Updated translation files
+
+
 FreeFileSync 7.1 [2015-06-06]
 -----------------------------
 Avoid various access denied errors when synchronizing with admin rights (Windows)

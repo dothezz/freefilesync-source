@@ -257,13 +257,13 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     Zstring defaultFileName = currentConfigFileName.empty() ? Zstr("Realtime.ffs_real") : currentConfigFileName;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
     if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
-        defaultFileName = beforeLast(defaultFileName, Zstr(".")) + Zstr(".ffs_real");
+        defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_real");
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
                             //OS X really needs dir/file separated like this:
-                            utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
-                            utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR)), //default file; whole string if / not found
+                            utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                             wxString(L"RealtimeSync (*.ffs_real)|*.ffs_real") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (filePicker.ShowModal() != wxID_OK)
@@ -328,7 +328,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            utfCvrtTo<wxString>(beforeLast(currentConfigFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
+                            utfCvrtTo<wxString>(beforeLast(currentConfigFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             wxEmptyString,
                             wxString(L"RealtimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);

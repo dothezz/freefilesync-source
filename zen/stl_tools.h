@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <algorithm>
+#include <zen/type_tools.h>
 
 
 //enhancements for <algorithm>
@@ -66,6 +67,7 @@ std::unique_ptr<T> make_unique(Args&& ... args) { return std::unique_ptr<T>(new 
 template <class V, class Predicate> inline
 void vector_remove_if(V& vec, Predicate p)
 {
+    static_assert(IsSameType<typename std::iterator_traits<typename V::iterator>::iterator_category, std::random_access_iterator_tag>::value, "poor man's check for vector");
     vec.erase(std::remove_if(vec.begin(), vec.end(), p), vec.end());
 }
 
@@ -87,6 +89,9 @@ void set_append(V& s, const W& s2)
 template <class S, class Predicate> inline
 void set_remove_if(S& set, Predicate p)
 {
+    //function compiles and fails (if we're lucky) not before runtime for std::vector!!!
+    static_assert(!IsSameType<typename std::iterator_traits<typename S::iterator>::iterator_category, std::random_access_iterator_tag>::value, "poor man's check for non-vector");
+
     for (auto iter = set.begin(); iter != set.end();)
         if (p(*iter))
             set.erase(iter++);

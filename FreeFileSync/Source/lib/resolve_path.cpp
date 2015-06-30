@@ -65,7 +65,7 @@ Zstring resolveRelativePath(const Zstring& relativePath) //note: ::GetFullPathNa
                 return relativePath; //error! no further processing!
 
             if (startsWith(relativePath, "~/"))
-                return appendSeparator(homeDir) + afterFirst(relativePath, '/');
+                return appendSeparator(homeDir) + afterFirst(relativePath, '/', IF_MISSING_RETURN_NONE);
             else if (relativePath == "~")
                 return homeDir;
         }
@@ -204,6 +204,9 @@ private:
 };
 
 //caveat: function scope static initialization is not thread-safe in VS 2010!
+#if defined _MSC_VER && _MSC_VER > 1800
+    #error get rid!
+#endif
 auto& dummy = CsidlConstants::get();
 #endif
 
@@ -292,12 +295,12 @@ Zstring expandMacros(const Zstring& text, const std::vector<std::pair<Zstring, Z
 {
     if (contains(text, MACRO_SEP))
     {
-        Zstring prefix = beforeFirst(text, MACRO_SEP);
-        Zstring rest   = afterFirst (text, MACRO_SEP);
+        Zstring prefix = beforeFirst(text, MACRO_SEP, IF_MISSING_RETURN_NONE);
+        Zstring rest   = afterFirst (text, MACRO_SEP, IF_MISSING_RETURN_NONE);
         if (contains(rest, MACRO_SEP))
         {
-            Zstring potentialMacro = beforeFirst(rest, MACRO_SEP);
-            Zstring postfix        = afterFirst (rest, MACRO_SEP); //text == prefix + MACRO_SEP + potentialMacro + MACRO_SEP + postfix
+            Zstring potentialMacro = beforeFirst(rest, MACRO_SEP, IF_MISSING_RETURN_NONE);
+            Zstring postfix        = afterFirst (rest, MACRO_SEP, IF_MISSING_RETURN_NONE); //text == prefix + MACRO_SEP + potentialMacro + MACRO_SEP + postfix
 
             if (Opt<Zstring> value = resolveMacro(potentialMacro, ext))
                 return prefix + *value + expandMacros(postfix, ext);
@@ -406,9 +409,9 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
             Zstring rest    = Zstring(textTmp.c_str() + posEnd + 1);
 
             if (startsWith(rest, Zstr(':')))
-                rest = afterFirst(rest, Zstr(':'));
+                rest = afterFirst(rest, Zstr(':'), IF_MISSING_RETURN_NONE);
             if (startsWith(rest, FILE_NAME_SEPARATOR))
-                rest = afterFirst(rest, FILE_NAME_SEPARATOR);
+                rest = afterFirst(rest, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 #ifdef ZEN_WIN
             //[.*] pattern was found...
             if (!volname.empty())
@@ -568,7 +571,7 @@ Zstring zen::getResolvedDirectoryPath(const Zstring& dirpassPhrase) //noexcept
     //remove trailing slash, unless volume root:
     if (endsWith(dirpath, FILE_NAME_SEPARATOR))
         if (!isVolumeRoot(dirpath))
-            dirpath = beforeLast(dirpath, FILE_NAME_SEPARATOR);
+            dirpath = beforeLast(dirpath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 
     return dirpath;
 }

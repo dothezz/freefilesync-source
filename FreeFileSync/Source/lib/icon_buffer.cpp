@@ -136,9 +136,7 @@ public:
     {
         assert(boost::this_thread::get_id() != mainThreadId);
         boost::unique_lock<boost::mutex> dummy(lockFiles);
-
-        while (workLoad.empty())
-            conditionNewWork.timed_wait(dummy, boost::posix_time::milliseconds(100)); //interruption point!
+        conditionNewWork.wait(dummy, [this] { return !workLoad.empty(); }); //throw boost::thread_interrupted
 
         WorkItem workItem = workLoad.back(); //
         workLoad.pop_back();                 //yes, not std::bad_alloc exception-safe, but bad_alloc is not relevant for us
@@ -385,7 +383,7 @@ void WorkerThread::operator()() //thread entry
 {
 #ifdef ZEN_WIN
     //1. Initialize COM
-    if (FAILED(::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) //may return S_FALSE, which is NOT failure, see MSDN
+    if (FAILED(::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) //may return S_FALSE, which is NO failure, see MSDN
     {
         assert(false);
         return;
@@ -393,7 +391,7 @@ void WorkerThread::operator()() //thread entry
     ZEN_ON_SCOPE_EXIT(::CoUninitialize());
 #endif
 
-    while (true)
+    for (;;)
     {
         boost::this_thread::interruption_point();
 
@@ -429,7 +427,7 @@ IconBuffer::~IconBuffer()
 {
     setWorkload({}); //make sure interruption point is always reached!
     pimpl->worker.interrupt();
-    pimpl->worker.join(); //we assume precondition "worker.joinable()"!!!
+    pimpl->worker.join(); //throw boost::thread_interrupted -> not expected => main thread!
 }
 
 

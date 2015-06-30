@@ -32,7 +32,8 @@ class FolderSelector: public wxEvtHandler
 {
 public:
     FolderSelector(wxWindow&          dropWindow,
-                   wxButton&          selectButton,
+                   wxButton&          selectFolderButton,
+                   wxButton&          selectSftpButton,
                    FolderHistoryBox&  dirpath,
                    wxStaticText*      staticText  = nullptr,  //optional
                    wxWindow*          dropWindow2 = nullptr); //
@@ -48,11 +49,13 @@ private:
     void onMouseWheel      (wxMouseEvent& event);
     void onFilesDropped    (FileDropEvent& event);
     void onWriteDirManually(wxCommandEvent& event);
-    void onSelectDir       (wxCommandEvent& event);
+    void onSelectFolder    (wxCommandEvent& event);
+    void onSelectSftp      (wxCommandEvent& event);
 
     wxWindow&          dropWindow_;
     wxWindow*          dropWindow2_;
-    wxButton&          selectButton_;
+    wxButton&          selectFolderButton_;
+    wxButton&          selectSftpButton_;
     FolderHistoryBox&  dirpath_;
     wxStaticText*      staticText_; //optional
 };

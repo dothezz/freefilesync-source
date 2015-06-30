@@ -148,63 +148,61 @@ void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
 }
 
 
-Zstring impl::getShortDisplayNameForFolderPair(const Zstring& displayPathLeft, const Zstring& displayrPathRight)
+std::wstring impl::getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight)
 {
-    auto itL = displayPathLeft .end();
-    auto itR = displayrPathRight.end();
+    const wchar_t sep = L'/';
+    std::wstring fmtPathL = replaceCpy(displayPathLeft,  L'\\', sep); //treat slash, back-slash the same
+    std::wstring fmtPathR = replaceCpy(displayPathRight, L'\\', sep); //
+    if (!startsWith(fmtPathL, sep)) fmtPathL = sep + fmtPathL;
+    if (!startsWith(fmtPathR, sep)) fmtPathR = sep + fmtPathR;
 
+    auto itL = fmtPathL.end();
+    auto itR = fmtPathR.end();
     for (;;)
     {
-        auto itLPrev = find_last(displayPathLeft  .begin(), itL, FILE_NAME_SEPARATOR); //c:\file, d:\1file have no common postfix!
-        auto itRPrev = find_last(displayrPathRight.begin(), itR, FILE_NAME_SEPARATOR);
+        auto itLPrev = find_last(fmtPathL.begin(), itL, sep); //c:\file, d:\1file have no common postfix!
+        auto itRPrev = find_last(fmtPathR.begin(), itR, sep);
 
         if (itLPrev == itL ||
             itRPrev == itR)
-        {
-            if (itLPrev == itL)
-                itLPrev = displayPathLeft.begin();
-            else
-                ++itLPrev; //skip separator
-            if (itRPrev == itR)
-                itRPrev = displayrPathRight.begin();
-            else
-                ++itRPrev;
-
-            if (equal(itLPrev, itL, itRPrev, itR))
-            {
-                itL = itLPrev;
-                itR = itRPrev;
-            }
             break;
-        }
 
-        if (!equal(itLPrev, itL, itRPrev, itR))
+        if (cmpFilePath(&*itLPrev, itL - itLPrev,
+                        &*itRPrev, itR - itRPrev) != 0)
             break;
         itL = itLPrev;
         itR = itRPrev;
     }
 
-    Zstring commonPostfix(itL, displayPathLeft.end());
-    if (startsWith(commonPostfix, FILE_NAME_SEPARATOR))
-        commonPostfix = afterFirst(commonPostfix, FILE_NAME_SEPARATOR);
+    if (itL != fmtPathL.end() && *itL == sep)
+        ++itL;
 
-    if (commonPostfix.empty())
+    const size_t postFixLen = fmtPathL.end() - itL;
+    if (postFixLen > 0)
+        return std::wstring(&*(displayPathLeft.end() - postFixLen), postFixLen);
+
+    auto getLastComponent = [sep](const std::wstring& displayPath) -> std::wstring
     {
-        auto getLastComponent = [](const Zstring& dirPath) -> Zstring
-        {
-            if (endsWith(dirPath, FILE_NAME_SEPARATOR)) //preserve trailing separator, support "C:\"
-                return afterLast(Zstring(dirPath.c_str(), dirPath.size() - 1), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR;
-            return afterLast(dirPath, FILE_NAME_SEPARATOR); //returns the whole string if term not found
-        };
-        if (displayPathLeft.empty())
-            return getLastComponent(displayrPathRight);
-        else if (displayrPathRight.empty())
-            return getLastComponent(displayPathLeft);
-        else
-            return getLastComponent(displayPathLeft) + utfCvrtTo<Zstring>(L" \u2212 ") + //= unicode minus
-                   getLastComponent(displayrPathRight);
-    }
-    return commonPostfix;
+        const std::wstring fmtPath = replaceCpy(displayPath, L'\\', sep);
+
+        auto itEnd = fmtPath.end();
+        if (endsWith(fmtPath, sep)) //preserve trailing separator, support "C:\"
+            --itEnd;
+
+        auto it = find_last(fmtPath.begin(), itEnd, sep);
+        if (it == itEnd)
+            it = fmtPath.begin();
+        else ++it;
+
+        return displayPath.c_str() + (it - fmtPath.begin());
+    };
+    if (displayPathLeft.empty())
+        return getLastComponent(displayPathRight);
+    else if (displayPathRight.empty())
+        return getLastComponent(displayPathLeft);
+    else
+        return getLastComponent(displayPathLeft) + L" \u2212 " + //= unicode minus
+               getLastComponent(displayPathRight);
 }
 
 
@@ -790,8 +788,8 @@ private:
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                         {
-                            const wxString& dirLeft  = utfCvrtTo<wxString>(ABF::getDisplayPath(root->baseDirObj_.getABF<LEFT_SIDE >().getAbstractPath()));
-                            const wxString& dirRight = utfCvrtTo<wxString>(ABF::getDisplayPath(root->baseDirObj_.getABF<RIGHT_SIDE>().getAbstractPath()));
+                            const wxString& dirLeft  = ABF::getDisplayPath(root->baseDirObj_.getABF<LEFT_SIDE >().getAbstractPath());
+                            const wxString& dirRight = ABF::getDisplayPath(root->baseDirObj_.getABF<RIGHT_SIDE>().getAbstractPath());
                             if (dirLeft.empty())
                                 return dirRight;
                             else if (dirRight.empty())

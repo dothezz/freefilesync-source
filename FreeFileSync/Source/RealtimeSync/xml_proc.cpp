@@ -43,7 +43,7 @@ void xmlAccess::readConfig(const Zstring& filepath, XmlRealConfig& config, std::
     XmlDoc doc = loadXmlDocument(filepath); //throw FileError
 
     if (!isXmlTypeRTS(doc))
-        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
+        throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
 
     XmlIn in(doc);
     ::readConfig(in, config);

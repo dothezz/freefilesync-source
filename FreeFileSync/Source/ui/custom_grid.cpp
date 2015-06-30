@@ -400,23 +400,23 @@ private:
                         switch (colType_)
                         {
                             case COL_TYPE_FULL_PATH:
-                                return fileObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(fileObj.getAbstractPath<side>()));
+                                return fileObj.isEmpty<side>() ? std::wstring() : ABF::getDisplayPath(fileObj.getAbstractPath<side>());
                             case COL_TYPE_FILENAME:
-                                return toWx(fileObj.getItemName<side>());
+                                return utfCvrtTo<std::wstring>(fileObj.getItemName<side>());
                             case COL_TYPE_REL_FOLDER:
-                                return toWx(beforeLast(fileObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                                return utfCvrtTo<std::wstring>(beforeLast(fileObj.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
                             case COL_TYPE_BASE_DIRECTORY:
-                                return toWx(ABF::getDisplayPath(fileObj.getABF<side>().getAbstractPath()));
+                                return ABF::getDisplayPath(fileObj.getABF<side>().getAbstractPath());
                             case COL_TYPE_SIZE:
-                                //return fileObj.isEmpty<side>() ? wxString() : utfCvrtTo<wxString>(fileObj.getFileId<side>()); // -> test file id
-                                return fileObj.isEmpty<side>() ? wxString() : wxString(toGuiString(fileObj.getFileSize<side>()));
+                                //return fileObj.isEmpty<side>() ? std::wstring() : utfCvrtTo<std::wstring>(fileObj.getFileId<side>()); // -> test file id
+                                return fileObj.isEmpty<side>() ? std::wstring() : toGuiString(fileObj.getFileSize<side>());
                             case COL_TYPE_DATE:
-                                return fileObj.isEmpty<side>() ? wxString() : wxString(utcToLocalTimeString(fileObj.getLastWriteTime<side>()));
+                                return fileObj.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                             case COL_TYPE_EXTENSION:
-                                return toWx(getFileExtension(fileObj.getItemName<side>()));
+                                return utfCvrtTo<std::wstring>(getFileExtension(fileObj.getItemName<side>()));
                         }
                         assert(false);
-                        return wxString();
+                        return std::wstring();
                     }();
                 }
 
@@ -427,22 +427,22 @@ private:
                         switch (colType_)
                         {
                             case COL_TYPE_FULL_PATH:
-                                return linkObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(linkObj.getAbstractPath<side>()));
+                                return linkObj.isEmpty<side>() ? std::wstring() : ABF::getDisplayPath(linkObj.getAbstractPath<side>());
                             case COL_TYPE_FILENAME:
-                                return toWx(linkObj.getItemName<side>());
+                                return utfCvrtTo<std::wstring>(linkObj.getItemName<side>());
                             case COL_TYPE_REL_FOLDER:
-                                return toWx(beforeLast(linkObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                                return utfCvrtTo<std::wstring>(beforeLast(linkObj.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
                             case COL_TYPE_BASE_DIRECTORY:
-                                return toWx(ABF::getDisplayPath(linkObj.getABF<side>().getAbstractPath()));
+                                return ABF::getDisplayPath(linkObj.getABF<side>().getAbstractPath());
                             case COL_TYPE_SIZE:
-                                return linkObj.isEmpty<side>() ? wxString() : wxString(L"<" + _("Symlink") + L">");
+                                return linkObj.isEmpty<side>() ? std::wstring() : L"<" + _("Symlink") + L">";
                             case COL_TYPE_DATE:
-                                return linkObj.isEmpty<side>() ? wxString() : wxString(utcToLocalTimeString(linkObj.getLastWriteTime<side>()));
+                                return linkObj.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                             case COL_TYPE_EXTENSION:
-                                return toWx(getFileExtension(linkObj.getItemName<side>()));
+                                return utfCvrtTo<std::wstring>(getFileExtension(linkObj.getItemName<side>()));
                         }
                         assert(false);
-                        return wxString();
+                        return std::wstring();
                     }();
                 }
 
@@ -453,32 +453,32 @@ private:
                         switch (colType_)
                         {
                             case COL_TYPE_FULL_PATH:
-                                return dirObj.isEmpty<side>() ? wxString() : toWx(ABF::getDisplayPath(dirObj.getAbstractPath<side>()));
+                                return dirObj.isEmpty<side>() ? std::wstring() : ABF::getDisplayPath(dirObj.getAbstractPath<side>());
                             case COL_TYPE_FILENAME:
-                                return toWx(dirObj.getItemName<side>());
+                                return utfCvrtTo<std::wstring>(dirObj.getItemName<side>());
                             case COL_TYPE_REL_FOLDER:
-                                return toWx(beforeLast(dirObj.getPairRelativePath(), FILE_NAME_SEPARATOR)); //returns empty string if ch not found
+                                return utfCvrtTo<std::wstring>(beforeLast(dirObj.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
                             case COL_TYPE_BASE_DIRECTORY:
-                                return toWx(ABF::getDisplayPath(dirObj.getABF<side>().getAbstractPath()));
+                                return ABF::getDisplayPath(dirObj.getABF<side>().getAbstractPath());
                             case COL_TYPE_SIZE:
-                                return dirObj.isEmpty<side>() ? wxString() : wxString(L"<" + _("Folder") + L">");
+                                return dirObj.isEmpty<side>() ? std::wstring() : L"<" + _("Folder") + L">";
                             case COL_TYPE_DATE:
-                                return wxString();
+                                return std::wstring();
                             case COL_TYPE_EXTENSION:
-                                return wxString();
+                                return std::wstring();
                         }
                         assert(false);
-                        return wxString();
+                        return std::wstring();
                     }();
                 }
-                ColumnTypeRim colType_;
-                wxString value;
+                const ColumnTypeRim colType_;
+                std::wstring value; //out
             } getVal(static_cast<ColumnTypeRim>(colType));
             fsObj->accept(getVal);
             return getVal.value;
         }
         //if data is not found:
-        return wxEmptyString;
+        return wxString();
     }
 
     static const int GAP_SIZE = 2;
@@ -697,18 +697,18 @@ private:
 
     wxString getToolTip(size_t row, ColumnType colType) const override
     {
-        wxString toolTip;
+        std::wstring toolTip;
 
         if (const FileSystemObject* fsObj = getRawData(row))
             if (!fsObj->isEmpty<side>())
             {
-                toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
-                               ABF::getDisplayPath(fsObj->getAbstractPath<side>()) :
-                               fsObj->getRelativePath<side>());
+                toolTip = getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
+                          ABF::getDisplayPath(fsObj->getAbstractPath<side>()) :
+                          utfCvrtTo<std::wstring>(fsObj->getRelativePath<side>());
 
                 struct AssembleTooltip : public FSObjectVisitor
                 {
-                    AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
+                    AssembleTooltip(std::wstring& tipMsg) : tipMsg_(tipMsg) {}
 
                     void visit(const FilePair& fileObj) override
                     {
@@ -725,7 +725,7 @@ private:
 
                     void visit(const DirPair& dirObj) override {}
 
-                    wxString& tipMsg_;
+                    std::wstring& tipMsg_;
                 } assembler(toolTip);
                 fsObj->accept(assembler);
             }

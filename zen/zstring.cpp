@@ -55,6 +55,10 @@ typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1, int cchCount1,
 const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 //watch for dependencies in global namespace!!!
 //caveat: function scope static initialization is not thread-safe in VS 2010!
+#if defined _MSC_VER && _MSC_VER > 1800
+    #error not true anymore
+#endif
+
 }
 
 
@@ -148,18 +152,6 @@ Zstring makeUpperCopy(const Zstring& str)
 
 
 #elif defined ZEN_MAC
-int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen)
-{
-    assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
-    assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
-
-    const int rv = ::strncasecmp(lhs, rhs, std::min(lhsLen, rhsLen)); //locale-dependent!
-    if (rv != 0)
-        return rv;
-    return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
-}
-
-
 Zstring makeUpperCopy(const Zstring& str)
 {
     const size_t len = str.size();

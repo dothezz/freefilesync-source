@@ -69,9 +69,9 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw Fi
         try
         {
             //a non-existent network path may block, so check existence asynchronously!
-            auto ftDirExists = async([=] { return zen::dirExists(dirpathFmt); });
+            auto ftDirExists = runAsync([=] { return zen::dirExists(dirpathFmt); });
             //we need to check dirExists(), not somethingExists(): it's not clear if DirWatcher detects a type clash (file instead of directory!)
-            while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2)))
+            while (ftDirExists.wait_for(boost::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2)) != boost::future_status::ready)
                 onRefreshGui(false); //may throw!
             if (!ftDirExists.get())
                 return WaitResult(dirpathFmt);
@@ -139,7 +139,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirpathPhrases, //throw Fi
             }
         }
 
-        boost::this_thread::sleep(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2));
+        boost::this_thread::sleep_for(boost::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2)); //throw boost::thread_interrupted
         onRefreshGui(true); //throw ?: may start sync at this presumably idle time
     }
 }
@@ -155,7 +155,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw File
         //support specifying volume by name => call getResolvedDirectoryPath() repeatedly
         for (const Zstring& dirpathFmt : getFormattedDirs(dirpathPhrases)) //throw FileError
         {
-            auto ftDirExisting = async([=]() -> bool
+            auto ftDirExisting = runAsync([=]() -> bool
             {
 #ifdef ZEN_WIN
                 //1. login to network share, if necessary -> we probably do NOT want multiple concurrent runs: GUI!?
@@ -164,7 +164,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw File
                 //2. check dir existence
                 return zen::dirExists(dirpathFmt);
             });
-            while (!ftDirExisting.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2)))
+            while (ftDirExisting.wait_for(boost::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2)) != boost::future_status::ready)
                 onRefreshGui(dirpathFmt); //may throw!
 
             if (!ftDirExisting.get())
@@ -176,7 +176,7 @@ void waitForMissingDirs(const std::vector<Zstring>& dirpathPhrases, //throw File
                 for (int i = 0; i < CHECK_DIR_INTERVAL * 1000 / refreshInterval; ++i)
                 {
                     onRefreshGui(dirpathFmt); //may throw!
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(refreshInterval));
+                    boost::this_thread::sleep_for(boost::chrono::milliseconds(refreshInterval)); //throw boost::thread_interrupted
                 }
                 break;
             }

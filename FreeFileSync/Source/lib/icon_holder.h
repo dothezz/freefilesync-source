@@ -20,7 +20,7 @@ struct ImageHolder //prepare conversion to wxImage as much as possible while sta
     ImageHolder(int w, int h, bool withAlpha) : //init with allocated memory
         width(w), height(h),
         rgb(static_cast<unsigned char*>(::malloc(width * height * 3))),
-        alpha(withAlpha ? static_cast<unsigned char*>(::malloc(width * height)) :  nullptr) {}
+        alpha(withAlpha ? static_cast<unsigned char*>(::malloc(width * height)) : nullptr) {}
 
     ImageHolder           (const ImageHolder&) = delete; //move semantics only!
     ImageHolder& operator=(const ImageHolder&) = delete; //

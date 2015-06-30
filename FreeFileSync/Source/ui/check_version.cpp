@@ -51,11 +51,8 @@ std::wstring getIso639Language()
     if (localeName.empty())
         return std::wstring();
 
-    if (contains(localeName, L"_"))
-        return beforeLast(localeName, L"_");
-
-    assert(localeName.size() == 2);
-    return localeName;
+    assert(beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL).size() == 2);
+    return beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL);
 }
 
 std::wstring getIso3166Country()
@@ -75,10 +72,7 @@ std::wstring getIso3166Country()
     if (localeName.empty())
         return std::wstring();
 
-    if (contains(localeName, L"_"))
-        return afterLast(localeName, L"_");
-
-    return std::wstring();
+    return afterLast(localeName, L"_", IF_MISSING_RETURN_NONE);
 }
 
 
@@ -237,12 +231,12 @@ bool canAccessUrl(const wxString& server, const wxString& page, int timeout) //t
         if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
             rs == 302 ||
             rs == 303 ||
-            rs == 307 ||  
-			rs == 308)
-			return true;
+            rs == 307 ||
+            rs == 308)
+            return true;
 
         if (rs == 200) //HTTP_STATUS_OK
-			return true;
+            return true;
     }
     return false;
 }
@@ -268,19 +262,19 @@ bool getStringFromUrl(const wxString& server, const wxString& page, int timeout,
         if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
             rs == 302 ||
             rs == 303 ||
-            rs == 307 ||  
-			rs == 308)
+            rs == 307 ||
+            rs == 308)
             if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
             {
 
                 wxString newLocation = webAccess.GetHeader(L"Location");
                 if (!newLocation.empty())
                 {
-					assert(!startsWith(newLocation, L"https:")); //not supported by wxHTTP!
+                    assert(!startsWith(newLocation, L"https:")); //not supported by wxHTTP!
                     if (startsWith(newLocation, L"http://"))
-                        newLocation = afterFirst(newLocation, L"://");
-                    const wxString serverNew = beforeFirst(newLocation, L"/"); //returns the whole string if term not found
-                    const wxString pageNew   = L"/" + afterFirst(newLocation, L"/"); //returns empty string if term not found
+                        newLocation = afterFirst(newLocation, L"://", IF_MISSING_RETURN_NONE);
+                    const wxString serverNew =       beforeFirst(newLocation, L'/', IF_MISSING_RETURN_ALL);
+                    const wxString pageNew   = L'/' + afterFirst(newLocation, L'/', IF_MISSING_RETURN_NONE);
 
                     return getStringFromUrl(serverNew, pageNew, timeout, output, level + 1);
                 }
@@ -316,7 +310,7 @@ GetVerResult getOnlineVersion(wxString& version)
     std::vector<char> output;
     try
     {
-		//harmonize with wxHTTP: latest_version.txt does not use https!!!
+        //harmonize with wxHTTP: latest_version.txt does not use https!!!
         readBytesUrl(L"http://www.freefilesync.org/latest_version.txt", std::back_inserter(output)); //throw InternetConnectionError
     }
     catch (const InternetConnectionError&)
@@ -329,7 +323,7 @@ GetVerResult getOnlineVersion(wxString& version)
 #else
     if (!getStringFromUrl(L"www.freefilesync.org", L"/latest_version.txt", 5, &version))
     {
-		return canAccessUrl(L"www.google.com", L"/", 1) ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+        return canAccessUrl(L"www.google.com", L"/", 1) ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
     }
 #endif
     trim(version); //Windows: remove trailing blank and newline

@@ -12,8 +12,6 @@
 namespace zen
 {
 std::unique_ptr<AbstractBaseFolder> createAbstractBaseFolder(const Zstring& folderPathPhrase); //noexcept
-
-Zstring getResolvedDisplayPath(const Zstring& folderPathPhrase); //noexcept
 }
 
 #endif //FS_CONCRETE_348787329573243

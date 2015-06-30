@@ -120,7 +120,7 @@ int widenRange(double& valMin, double& valMax, //in/out
     const double minValRangePerBlock      = (valMax - valMin) / graphAreaSize;
     const double proposedValRangePerBlock = (valMax - valMin) * optimalBlockSizePx / graphAreaSize;
     double valRangePerBlock = labelFmt.getOptimalBlockSize(proposedValRangePerBlock);
-	assert(numeric::isNull(proposedValRangePerBlock) || valRangePerBlock > minValRangePerBlock);
+    assert(numeric::isNull(proposedValRangePerBlock) || valRangePerBlock > minValRangePerBlock);
 
     if (numeric::isNull(valRangePerBlock)) //valMin == valMax or strange "optimal block size"
         return 1;
@@ -131,15 +131,15 @@ int widenRange(double& valMin, double& valMax, //in/out
 
     double blockMin = std::floor(valMin / valRangePerBlock); //store as double, not int: truncation possible, e.g. if valRangePerBlock == 1
     double blockMax = std::ceil (valMax / valRangePerBlock); //
-	int blockCount = numeric::round(blockMax - blockMin);
-	assert(blockCount >= 0);
+    int blockCount = numeric::round(blockMax - blockMin);
+    assert(blockCount >= 0);
 
-	 //handle valMin == valMax == integer
+    //handle valMin == valMax == integer
     if (blockCount <= 0)
-	{
-		++blockMax;
-		blockCount = 1;
-	}
+    {
+        ++blockMax;
+        blockCount = 1;
+    }
 
     valMin = blockMin * valRangePerBlock;
     valMax = blockMax * valRangePerBlock;

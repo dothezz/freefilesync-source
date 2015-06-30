@@ -139,7 +139,7 @@ void Application::onEnterEventLoop(wxEvent& event)
                 filepath += Zstr(".ffs_batch");
             else
             {
-                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filepath))));
+                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filepath))));
                 return;
             }
         }

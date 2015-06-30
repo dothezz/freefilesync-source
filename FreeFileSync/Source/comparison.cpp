@@ -65,14 +65,6 @@ struct ResolvedBaseFolders
     std::set<const ABF*, ABF::LessItemPath> existingBaseFolders; //references resolvedPairs variable!!!
 };
 
-struct LessItemPathSharedPtr
-{
-    bool operator()(const std::shared_ptr<ABF>& lhs, const std::shared_ptr<ABF>& rhs) const
-    {
-        return ABF::LessItemPath()(lhs.get(), rhs.get());
-    }
-};
-
 
 ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgList,
                                           bool allowUserInteraction,
@@ -82,7 +74,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
 
     tryReportingError([&]
     {
-        std::set<std::shared_ptr<ABF>, LessItemPathSharedPtr> uniqueBaseFolders;
+        std::set<const ABF*, ABF::LessItemPath> uniqueBaseFolders;
 
         //support "retry" for environment variable and and variable driver letter resolution!
         output.resolvedPairs.clear();
@@ -91,20 +83,13 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
             std::shared_ptr<ABF> abfLeft  = createAbstractBaseFolder(fpCfg.dirpathPhraseLeft);
             std::shared_ptr<ABF> abfRight = createAbstractBaseFolder(fpCfg.dirpathPhraseRight);
 
-            auto rv1 = uniqueBaseFolders.insert(abfLeft);
-            if (!rv1.second) abfLeft = *rv1.first; //use same instance for all identical base paths => e.g. single FTP connect attempt for all!
-
-            auto rv2 = uniqueBaseFolders.insert(abfRight);
-            if (!rv2.second) abfRight = *rv2.first;
+            uniqueBaseFolders.insert(abfLeft .get());
+            uniqueBaseFolders.insert(abfRight.get());
 
             output.resolvedPairs.emplace_back(abfLeft, abfRight);
         }
 
-        std::set<const ABF*, ABF::LessItemPath> uniqueBaseFolders2;
-        for (const auto& item : uniqueBaseFolders)
-            uniqueBaseFolders2.insert(item.get());
-
-        const DirectoryStatus status = checkFolderExistenceUpdating(uniqueBaseFolders2, allowUserInteraction, callback); //re-check *all* directories on each try!
+        const DirectoryStatus status = checkFolderExistenceUpdating(uniqueBaseFolders, allowUserInteraction, callback); //re-check *all* directories on each try!
         output.existingBaseFolders = status.existingBaseFolder;
 
         if (!status.missingBaseFolder.empty() || !status.failedChecks.empty())
@@ -112,19 +97,22 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
             std::wstring errorMsg = _("Cannot find the following folders:") + L"\n";
 
             for (const auto& baseFolder : status.missingBaseFolder)
-                errorMsg += std::wstring(L"\n") + ABF::getDisplayPath(baseFolder->getAbstractPath());
+                errorMsg += L"\n" + ABF::getDisplayPath(baseFolder->getAbstractPath());
 
             for (const auto& fc : status.failedChecks)
-                errorMsg += std::wstring(L"\n") + ABF::getDisplayPath(fc.first->getAbstractPath());
+                errorMsg += L"\n" + ABF::getDisplayPath(fc.first->getAbstractPath());
+
+            errorMsg += L"\n\n";
+            errorMsg +=  _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.");
 
             if (!status.failedChecks.empty())
             {
-                errorMsg += L"\n";
+                errorMsg += L"\n___________________________________________";
                 for (const auto& fc : status.failedChecks)
-                    errorMsg += std::wstring(L"\n") + fc.second.toString();
+                    errorMsg += std::wstring(L"\n\n") + replaceCpy(fc.second.toString(), L"\n\n", L"\n");
             }
 
-            throw FileError(errorMsg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
+            throw FileError(errorMsg);
         }
     }, callback); //throw X?
 
@@ -165,7 +153,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
     {
         std::wstring warningMsg = _("The following folder paths are dependent from each other:");
         for (const ResolvedFolderPair& pair : dependentFolderPairs)
-            warningMsg += std::wstring(L"\n\n") +
+            warningMsg += L"\n\n" +
                           ABF::getDisplayPath(pair.abfLeft ->getAbstractPath()) + L"\n" +
                           ABF::getDisplayPath(pair.abfRight->getAbstractPath());
 
@@ -252,9 +240,9 @@ const wchar_t arrowRight[] = L"-->";
 
 
 //check for very old dates or dates in the future
-std::wstring getConflictInvalidDate(const Zstring& displayPath, std::int64_t utcTime)
+std::wstring getConflictInvalidDate(const std::wstring& displayPath, std::int64_t utcTime)
 {
-    return replaceCpy(_("File %x has an invalid date."), L"%x", fmtFileName(displayPath)) + L"\n" +
+    return replaceCpy(_("File %x has an invalid date."), L"%x", fmtPath(displayPath)) + L"\n" +
            _("Date:") + L" " + utcToLocalTimeString(utcTime);
 }
 
@@ -262,7 +250,7 @@ std::wstring getConflictInvalidDate(const Zstring& displayPath, std::int64_t utc
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
 {
-    return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtFileName(fileObj.getPairRelativePath())) + L"\n" +
+    return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtPath(fileObj.getPairRelativePath())) + L"\n" +
            L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
 }
@@ -270,15 +258,15 @@ std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
 
 std::wstring getConflictSkippedBinaryComparison(const FilePair& fileObj)
 {
-    return replaceCpy(_("Content comparison was skipped for excluded files %x."), L"%x", fmtFileName(fileObj.getPairRelativePath()));
+    return replaceCpy(_("Content comparison was skipped for excluded files %x."), L"%x", fmtPath(fileObj.getPairRelativePath()));
 }
 
 
 std::wstring getDescrDiffMetaShortnameCase(const FileSystemObject& fsObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + fmtFileName(fsObj.getItemName<LEFT_SIDE >()) + L"\n" +
-           L"    " + arrowRight + L" " + fmtFileName(fsObj.getItemName<RIGHT_SIDE>());
+           L"    " + arrowLeft  + L" " + fmtPath(fsObj.getItemName<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowRight + L" " + fmtPath(fsObj.getItemName<RIGHT_SIDE>());
 }
 
 
@@ -389,11 +377,11 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, uns
     Zstring targetPathRawR;
     Opt<std::wstring> errMsg = tryReportingError([&]
     {
-        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(ABF::getDisplayPath(linkObj.getAbstractPath<LEFT_SIDE>()))));
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtPath(ABF::getDisplayPath(linkObj.getAbstractPath<LEFT_SIDE>()))));
 
         targetPathRawL = ABF::getSymlinkContentBuffer(linkObj.getAbstractPath<LEFT_SIDE>()); //throw FileError
 
-        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(ABF::getDisplayPath(linkObj.getAbstractPath<RIGHT_SIDE>()))));
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtPath(ABF::getDisplayPath(linkObj.getAbstractPath<RIGHT_SIDE>()))));
         targetPathRawR = ABF::getSymlinkContentBuffer(linkObj.getAbstractPath<RIGHT_SIDE>()); //throw FileError
     }, callback); //throw X?
 
@@ -485,7 +473,7 @@ std::list<std::shared_ptr<BaseDirPair>> ComparisonBuffer::compareByContent(const
     //compare files (that have same size) bytewise...
     for (FilePair* fileObj : filesToCompareBytewise)
     {
-        callback_.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", fmtFileName(fileObj->getPairRelativePath())));
+        callback_.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", fmtPath(fileObj->getPairRelativePath())));
 
         //check files that exist in left and right model but have different content
 

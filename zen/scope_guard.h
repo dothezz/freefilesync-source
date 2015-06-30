@@ -17,7 +17,7 @@ namespace zen
 {
 //Scope Guard
 /*
-    zen::ScopeGuard lockAio = zen::makeGuard([&] { ::CancelIo(hDir); });
+    zen::ScopeGuard lockAio = zen::makeGuard([&] { ::CloseHandle(hDir); });
 		...
 	lockAio.dismiss();
 */

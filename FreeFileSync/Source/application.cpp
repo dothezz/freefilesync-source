@@ -357,7 +357,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         filepath += Zstr(".xml");
                     else
                     {
-                        notifyError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filepath)), std::wstring());
+                        notifyError(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filepath)), std::wstring());
                         return;
                     }
                 }
@@ -376,7 +376,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                             globalConfigFile = filepath;
                             break;
                         case XML_TYPE_OTHER:
-                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)), std::wstring());
+                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)), std::wstring());
                             return;
                     }
                 }
@@ -564,7 +564,7 @@ void showSyntaxHelp()
                                                  _("Any number of alternative directory pairs for at most one config file.") + L"\n\n" +
 
                                                  L"-Edit" + L"\n" +
-                                                 _("Open configuration for edit without executing.")));
+                                                 _("Open configuration for editing without executing it.")));
 }
 
 

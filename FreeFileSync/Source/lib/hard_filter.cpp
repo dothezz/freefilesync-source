@@ -66,7 +66,7 @@ void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& masksFile
         if (endsWith(phrase, FILE_NAME_SEPARATOR) || //only relevant for folder filtering
             endsWith(phrase, sepAsterisk)) // abc\*
         {
-            const Zstring dirPhrase = beforeLast(phrase, FILE_NAME_SEPARATOR);
+            const Zstring dirPhrase = beforeLast(phrase, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
             if (!dirPhrase.empty())
                 masksFolder.push_back(dirPhrase);
         }
@@ -75,12 +75,12 @@ void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& masksFile
     };
 
     if (startsWith(filterFmt, FILE_NAME_SEPARATOR)) // \abc
-        processTail(afterFirst(filterFmt, FILE_NAME_SEPARATOR));
+        processTail(afterFirst(filterFmt, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
     else
     {
         processTail(filterFmt);
         if (startsWith(filterFmt, asteriskSep)) // *\abc
-            processTail(afterFirst(filterFmt, asteriskSep));
+            processTail(afterFirst(filterFmt, asteriskSep, IF_MISSING_RETURN_NONE));
     }
 }
 

@@ -47,22 +47,14 @@ void throwFileError(const std::wstring& msg, const std::wstring& functionName, c
 
 //----------- facilitate usage of std::wstring for error messages --------------------
 
-//allow implicit UTF8 conversion: since std::wstring models a GUI string, convenience is more important than performance
 inline
-std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += utfCvrtTo<std::wstring>(rhs); }
-
-//we musn't put our overloads in namespace std, but namespace zen (+ using directive) is sufficient
-
-
-inline
-std::wstring fmtFileName(const Zstring& filepath)
+std::wstring fmtPath(const std::wstring& displayPath)
 {
-    std::wstring output;
-    output += L'\"';
-    output += utfCvrtTo<std::wstring>(filepath);
-    output += L'\"';
-    return output;
+    return L'\"' + displayPath + L'\"';
 }
+
+inline std::wstring fmtPath(const Zstring& displayPath) { return fmtPath(utfCvrtTo<std::wstring>(displayPath)); }
+inline std::wstring fmtPath(const wchar_t* displayPath) { return fmtPath(std::wstring(displayPath)); }
 }
 
 #endif //FILEERROR_H_INCLUDED_839567308565656789

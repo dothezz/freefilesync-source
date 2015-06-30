@@ -27,7 +27,7 @@ public:
     //	-> doAsync: the usual thread-safety requirements apply!
     //	-> evalOnGui: no thread-safety concerns, but must only reference variables with greater-equal lifetime than the AsyncTask instance!
     {
-        tasks.push_back(zen::async([=]() -> std::function<void()>
+        tasks.push_back(zen::runAsync([=]() -> std::function<void()>
         {
             auto result = doAsync();
             return [=]{ evalOnGui(result); };
@@ -37,7 +37,7 @@ public:
     template <class Fun, class Fun2>
     void add2(Fun doAsync, Fun2 evalOnGui) //for evalOnGui taking no parameters
     {
-        tasks.push_back(zen::async([=]() -> std::function<void()> { doAsync(); return [=]{ evalOnGui(); }; }));
+        tasks.push_back(zen::runAsync([doAsync, evalOnGui]() -> std::function<void()> { doAsync(); return [evalOnGui]{ evalOnGui(); }; }));
     }
 
     void evalResults() //call from gui thread repreatedly

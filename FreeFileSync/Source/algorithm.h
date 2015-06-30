@@ -43,7 +43,7 @@ void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or
 
 
 //manual deletion of files on main grid
-std::pair<Zstring, int> deleteFromGridAndHDPreview(        //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
+std::pair<std::wstring, int> deleteFromGridAndHDPreview(        //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
     const std::vector<FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
     const std::vector<FileSystemObject*>& selectionRight); //
 

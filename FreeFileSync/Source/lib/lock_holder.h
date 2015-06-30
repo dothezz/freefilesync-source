@@ -40,7 +40,7 @@ public:
             }
             catch (const FileError& e)
             {
-                const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtFileName(dirpath)) + L"\n\n" + e.toString();
+                const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtPath(dirpath)) + L"\n\n" + e.toString();
                 procCallback.reportWarning(msg, warningDirectoryLockFailed); //may throw!
             }
         }

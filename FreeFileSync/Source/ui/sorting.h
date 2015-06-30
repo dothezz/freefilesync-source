@@ -22,6 +22,7 @@ struct CompileTimeReminder : public FSObjectVisitor
 } checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file when needed
 }
 
+
 inline
 bool isDirectoryPair(const FileSystemObject& fsObj)
 {
@@ -53,6 +54,7 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
     return makeSortDirection(LessFilePath(), Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
 }
 
+
 template <bool ascending, SelectedSide side> inline
 bool lessFullPath(const FileSystemObject& a, const FileSystemObject& b)
 {
@@ -73,12 +75,12 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
     const bool isDirectoryA = isDirectoryPair(a);
     const Zstring& relFolderA = isDirectoryA ?
                                 a.getPairRelativePath() : //directory
-                                beforeLast(a.getPairRelativePath(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
+                                beforeLast(a.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 
     const bool isDirectoryB = isDirectoryPair(b);
     const Zstring& relFolderB = isDirectoryB ?
                                 b.getPairRelativePath() : //directory
-                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
+                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR ,IF_MISSING_RETURN_NONE);
 
     //compare relative names without filepaths first
     const int rv = cmpFilePath(relFolderA.c_str(), relFolderA.size(),

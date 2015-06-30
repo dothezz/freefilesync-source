@@ -81,6 +81,8 @@ public:
     FileHandle getHandle() { return fileHandle; }
     size_t optimalBlockSize() const { return 128 * 1024; }
 
+    FileOutput(FileOutput&& tmp);
+
 private:
     FileHandle fileHandle;
 };

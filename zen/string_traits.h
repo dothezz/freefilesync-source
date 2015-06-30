@@ -38,14 +38,15 @@ class StringRef
 {
 public:
     template <class Iterator>
-    StringRef(Iterator first, Iterator last) : length_(last - first), data_(first != last ? &*first : nullptr) {}
+    StringRef(Iterator first, Iterator last) : len_(last - first), str_(first != last ? &*first : nullptr) {}
+    //StringRef(const Char* str, size_t len) : str_(str), len_(len) {} -> needless constraint! Char* not available for empty range!
 
-    size_t length() const { return length_; }
-    const Char* data() const { return data_; } //1. no null-termination! 2. may be nullptr!
+    const Char* data() const { return str_; } //1. no null-termination! 2. may be nullptr!
+    size_t length() const { return len_; }
 
 private:
-    size_t length_;
-    const Char* data_;
+    size_t len_;
+    const Char* str_;
 };
 
 
@@ -98,6 +99,10 @@ struct GetCharTypeImpl<S, true> :
 template <> struct GetCharTypeImpl<char,    false> : ResultType<char   > {};
 template <> struct GetCharTypeImpl<wchar_t, false> : ResultType<wchar_t> {};
 
+template <> struct GetCharTypeImpl<StringRef<char   >, false> : ResultType<char   > {};
+template <> struct GetCharTypeImpl<StringRef<wchar_t>, false> : ResultType<wchar_t> {};
+
+
 ZEN_INIT_DETECT_MEMBER_TYPE(value_type);
 ZEN_INIT_DETECT_MEMBER(c_str);  //we don't know the exact declaration of the member attribute and it may be in a base class!
 ZEN_INIT_DETECT_MEMBER(length); //
@@ -127,28 +132,6 @@ public:
         IsSameType<CharType, wchar_t>::value
     };
 };
-
-
-template <> class StringTraits<StringRef<char>>
-{
-public:
-    enum
-    {
-        isStringClass = false,
-        isStringLike = true
-    };
-    typedef char CharType;
-};
-template <> class StringTraits<StringRef<wchar_t>>
-{
-public:
-    enum
-    {
-        isStringClass = false,
-        isStringLike = true
-    };
-    typedef wchar_t CharType;
-};
 }
 
 template <class T>
@@ -174,7 +157,7 @@ size_t cStringLength(const C* str) //naive implementation seems somewhat faster 
     return len;
 }
 
-template <class S, typename = typename EnableIf<StringTraits<S>::isStringClass>::Type> inline
+template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
 const typename GetCharType<S>::Type* strBegin(const S& str) //SFINAE: T must be a "string"
 {
     return str.c_str();
@@ -188,7 +171,7 @@ inline const char*    strBegin(const StringRef<char   >& ref) { return ref.data(
 inline const wchar_t* strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
 
 
-template <class S, typename = typename EnableIf<StringTraits<S>::isStringClass>::Type> inline
+template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
 size_t strLength(const S& str) //SFINAE: T must be a "string"
 {
     return str.length();

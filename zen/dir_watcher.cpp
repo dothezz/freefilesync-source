@@ -156,7 +156,7 @@ public:
                             FILE_FLAG_OVERLAPPED, //_In_      DWORD dwFlagsAndAttributes,
                             nullptr);             //_In_opt_  HANDLE hTemplateFile
         if (hDir == INVALID_HANDLE_VALUE)
-            throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)), L"CreateFile", getLastError());
+            throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(directory)), L"CreateFile", getLastError());
 
         //end of constructor, no need to start managing "hDir"
     }
@@ -176,86 +176,79 @@ public:
 
     void operator()() //thread entry
     {
-        try
-        {
-            std::vector<char> buffer(64 * 1024); //needs to be aligned on a DWORD boundary; maximum buffer size restricted by some networks protocols (according to docu)
+        std::vector<char> buffer(64 * 1024); //needs to be aligned on a DWORD boundary; maximum buffer size restricted by some networks protocols (according to docu)
 
-            for (;;)
+        for (;;)
+        {
+            boost::this_thread::interruption_point();
+
+            //actual work
+            OVERLAPPED overlapped = {};
+            overlapped.hEvent = ::CreateEvent(nullptr,  //__in_opt  LPSECURITY_ATTRIBUTES lpEventAttributes,
+                                              true,     //__in      BOOL bManualReset,
+                                              false,    //__in      BOOL bInitialState,
+                                              nullptr); //__in_opt  LPCTSTR lpName
+            if (overlapped.hEvent == nullptr)
             {
-                boost::this_thread::interruption_point();
-
-                //actual work
-                OVERLAPPED overlapped = {};
-                overlapped.hEvent = ::CreateEvent(nullptr,  //__in_opt  LPSECURITY_ATTRIBUTES lpEventAttributes,
-                                                  true,     //__in      BOOL bManualReset,
-                                                  false,    //__in      BOOL bInitialState,
-                                                  nullptr); //__in_opt  LPCTSTR lpName
-                if (overlapped.hEvent == nullptr)
-                {
-                    const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"CreateEvent", ec), ec);
-                }
-                ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
-
-                DWORD bytesReturned = 0; //should not be needed for async calls, still pass it to help broken drivers
-
-                //asynchronous variant: runs on this thread's APC queue!
-                if (!::ReadDirectoryChangesW(hDir,                              //  __in   HANDLE hDirectory,
-                                             &buffer[0],                        //  __out  LPVOID lpBuffer,
-                                             static_cast<DWORD>(buffer.size()), //  __in   DWORD nBufferLength,
-                                             true,                              //  __in   BOOL bWatchSubtree,
-                                             FILE_NOTIFY_CHANGE_FILE_NAME |
-                                             FILE_NOTIFY_CHANGE_DIR_NAME  |
-                                             FILE_NOTIFY_CHANGE_SIZE      |
-                                             FILE_NOTIFY_CHANGE_LAST_WRITE, //  __in         DWORD dwNotifyFilter,
-                                             &bytesReturned,                //  __out_opt    LPDWORD lpBytesReturned,
-                                             &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
-                                             nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                {
-                    const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"ReadDirectoryChangesW", ec), ec);
-                }
-
-                //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
-                zen::ScopeGuard guardAio = zen::makeGuard([&]
-                {
-                    //Canceling Pending I/O Operations: http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
-#ifdef ZEN_WIN_VISTA_AND_LATER
-                    if (::CancelIoEx(hDir, &overlapped) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
-#else
-                    if (::CancelIo(hDir) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
-#endif
-                    {
-                        DWORD bytesWritten = 0;
-                        ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //wait until cancellation is complete
-                    }
-                });
-
-                //wait for results
-                DWORD bytesWritten = 0;
-                while (!::GetOverlappedResult(hDir,          //__in   HANDLE hFile,
-                                              &overlapped,   //__in   LPOVERLAPPED lpOverlapped,
-                                              &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
-                                              false))        //__in   BOOL bWait
-                {
-                    const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
-                    if (ec != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirpathPf)), formatSystemError(L"GetOverlappedResult", ec), ec);
-
-                    //execute asynchronous procedure calls (APC) queued on this thread
-                    ::SleepEx(50,    // __in  DWORD dwMilliseconds,
-                              true); // __in  BOOL bAlertable
-
-                    boost::this_thread::interruption_point();
-                }
-                guardAio.dismiss();
-
-                shared_->addChanges(&buffer[0], bytesWritten, dirpathPf); //throw ()
+                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"CreateEvent", ec), ec);
             }
-        }
-        catch (boost::thread_interrupted&)
-        {
-            throw; //this is the only exception expected!
+            ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
+
+            DWORD bytesReturned = 0; //should not be needed for async calls, still pass it to help broken drivers
+
+            //asynchronous variant: runs on this thread's APC queue!
+            if (!::ReadDirectoryChangesW(hDir,                              //  __in   HANDLE hDirectory,
+                                         &buffer[0],                        //  __out  LPVOID lpBuffer,
+                                         static_cast<DWORD>(buffer.size()), //  __in   DWORD nBufferLength,
+                                         true,                              //  __in   BOOL bWatchSubtree,
+                                         FILE_NOTIFY_CHANGE_FILE_NAME |
+                                         FILE_NOTIFY_CHANGE_DIR_NAME  |
+                                         FILE_NOTIFY_CHANGE_SIZE      |
+                                         FILE_NOTIFY_CHANGE_LAST_WRITE, //  __in         DWORD dwNotifyFilter,
+                                         &bytesReturned,                //  __out_opt    LPDWORD lpBytesReturned,
+                                         &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
+                                         nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+            {
+                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"ReadDirectoryChangesW", ec), ec);
+            }
+
+            //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
+            zen::ScopeGuard guardAio = zen::makeGuard([&]
+            {
+                //Canceling Pending I/O Operations: http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
+#ifdef ZEN_WIN_VISTA_AND_LATER
+                if (::CancelIoEx(hDir, &overlapped) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
+#else
+                if (::CancelIo(hDir) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
+#endif
+                {
+                    DWORD bytesWritten = 0;
+                    ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //must wait until cancellation is complete!
+                }
+            });
+
+            //wait for results
+            DWORD bytesWritten = 0;
+            while (!::GetOverlappedResult(hDir,          //__in   HANDLE hFile,
+                                          &overlapped,   //__in   LPOVERLAPPED lpOverlapped,
+                                          &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
+                                          false))        //__in   BOOL bWait
+            {
+                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                if (ec != ERROR_IO_INCOMPLETE)
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"GetOverlappedResult", ec), ec);
+
+                //execute asynchronous procedure calls (APC) queued on this thread
+                ::SleepEx(50,    // __in  DWORD dwMilliseconds,
+                          true); // __in  BOOL bAlertable
+
+                boost::this_thread::interruption_point();
+            }
+            guardAio.dismiss();
+
+            shared_->addChanges(&buffer[0], bytesWritten, dirpathPf); //throw ()
         }
     }
 
@@ -362,13 +355,13 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
     //wait until device removal is confirmed, to prevent locking hDir again by some new watch!
     if (pimpl_->volRemoval->requestReceived())
     {
-        const boost::system_time maxwait = boost::get_system_time() + boost::posix_time::seconds(15);
+        const boost::chrono::steady_clock::time_point endTime = boost::chrono::steady_clock::now() + boost::chrono::seconds(15);
         //HandleVolumeRemoval::finished() not guaranteed! note: Windows gives unresponsive applications ca. 10 seconds until unmounting the usb stick in worst case
 
-        while (!pimpl_->volRemoval->finished() && boost::get_system_time() < maxwait)
+        while (!pimpl_->volRemoval->finished() && boost::chrono::steady_clock::now() < endTime)
         {
             processGuiMessages(); //DBT_DEVICEREMOVECOMPLETE message is sent here!
-            boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(50)); //throw boost::thread_interrupted
         }
 
         output.emplace_back(ACTION_DELETE, baseDirPath); //report removal as change to main directory
@@ -411,7 +404,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
     //init
     pimpl_->notifDescr  = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"inotify_init", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"inotify_init", getLastError());
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -423,7 +416,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"fcntl", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"fcntl", getLastError());
 
     //add watches
     for (const Zstring& subDirPath : fullDirList)
@@ -443,10 +436,10 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
         {
             const auto ec = getLastError();
             if (ec == ENOSPC) //fix misleading system message "No space left on device"
-                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)),
+                throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(subDirPath)),
                                 formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
 
-            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subDirPath)), formatSystemError(L"inotify_add_watch", ec));
+            throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(subDirPath)), formatSystemError(L"inotify_add_watch", ec));
         }
 
         pimpl_->watchDescrs.emplace(wd, appendSeparator(subDirPath));
@@ -479,7 +472,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"read", getLastError());
+        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"read", getLastError());
     }
 
     std::vector<Entry> output;
@@ -575,7 +568,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) :
 {
     CFStringRef dirpathCf = osx::createCFString(baseDirPath.c_str()); //returns nullptr on error
     if (!dirpathCf)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: createCFString"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"Function call failed: createCFString"); //no error code documented!
     ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCf));
 
     CFArrayRef dirpathCfArray = ::CFArrayCreate(nullptr,    //CFAllocatorRef allocator,
@@ -583,7 +576,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) :
                                                 1,          //CFIndex numValues,
                                                 nullptr);   //const CFArrayCallBacks* callBacks
     if (!dirpathCfArray)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: CFArrayCreate"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"Function call failed: CFArrayCreate"); //no error code documented!
     ZEN_ON_SCOPE_EXIT(::CFRelease(dirpathCfArray));
 
     FSEventStreamContext context = {};
@@ -609,7 +602,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) :
     zen::ScopeGuard guardRunloop = zen::makeGuard([&] { ::FSEventStreamInvalidate(pimpl_->eventStream); });
 
     if (!::FSEventStreamStart(pimpl_->eventStream))
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(baseDirPath)), L"Function call failed: FSEventStreamStart"); //no error code documented!
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"Function call failed: FSEventStreamStart"); //no error code documented!
 
     guardCreate .dismiss();
     guardRunloop.dismiss();

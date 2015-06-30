@@ -27,7 +27,7 @@ using namespace zen;
 
 
 #ifdef ZEN_WIN
-void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::function<void (const Zstring& currentItem)>& onRecycleItem)
+void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::function<void (const std::wstring& displayPath)>& onRecycleItem)
 {
     if (itempaths.empty()) return;
     //warning: moving long file paths to recycler does not work!
@@ -70,7 +70,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& itempaths, const std::func
     //"You should use fully-qualified path names with this function. Using it with relative path names is not thread safe."
     if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
     {
-        std::wstring itempathFmt = fmtFileName(itempaths[0]); //probably not the correct file name for file lists larger than 1!
+        std::wstring itempathFmt = fmtPath(itempaths[0]); //probably not the correct file name for file lists larger than 1!
         if (itempaths.size() > 1)
             itempathFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
         throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", itempathFmt));
@@ -97,7 +97,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
 
     if (!::g_file_trash(file, nullptr, &error))
     {
-        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempath));
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtPath(itempath));
 
         if (!error)
             throw FileError(errorMsg, L"g_file_trash: unknown error."); //user should never see this
@@ -112,7 +112,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
             if (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))
                 removeFile(itempath); //throw FileError
             else if (S_ISDIR(fileInfo.st_mode))
-                removeDirectory(itempath); //throw FileError
+                removeDirectoryRecursively(itempath); //throw FileError
             return true;
         }
 
@@ -128,7 +128,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
 
     auto throwFileError = [&](OSStatus oss)
     {
-        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(itempath));
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtPath(itempath));
         std::wstring errorDescr = L"OSStatus Code " + numberTo<std::wstring>(oss);
 
         if (const char* description = ::GetMacOSStatusCommentString(oss)) //found no documentation for proper use of GetMacOSStatusCommentString
@@ -160,7 +160,7 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
             if (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))
                 removeFile(itempath); //throw FileError
             else if (S_ISDIR(fileInfo.st_mode))
-                removeDirectory(itempath); //throw FileError
+                removeDirectoryRecursively(itempath); //throw FileError
             return true;
         }
 
@@ -179,7 +179,7 @@ bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>&
 
 #else
     //excessive runtime if recycle bin exists, is full and drive is slow:
-    auto ft = async([dirpath]()
+    auto ft = runAsync([dirpath]()
     {
         SHQUERYRBINFO recInfo = {};
         recInfo.cbSize = sizeof(recInfo);
@@ -187,7 +187,7 @@ bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>&
                                    &recInfo);       //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
     });
 
-    while (!ft.timed_wait(boost::posix_time::milliseconds(50)))
+    while (ft.wait_for(boost::chrono::milliseconds(50)) != boost::future_status::ready)
         if (onUpdateGui)
             onUpdateGui(); //may throw!
 

@@ -46,6 +46,7 @@ private:
     std::wstring msg_;
 };
 
+#define DEFINE_NEW_SYS_ERROR(X) struct X : public SysError { X(const std::wstring& msg) : SysError(msg) {} };
 
 
 
@@ -92,7 +93,7 @@ std::wstring formatSystemErrorRaw(ErrorCode ec) //return empty string on error
 
     errorMsg = utfCvrtTo<std::wstring>(::strerror(ec));
 #endif
-	trim(errorMsg); //Windows messages seem to end with a blank...
+    trim(errorMsg); //Windows messages seem to end with a blank...
 
     return errorMsg;
 }

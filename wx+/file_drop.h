@@ -16,7 +16,7 @@
 #include <wx/dnd.h>
 
 #ifdef ZEN_WIN_VISTA_AND_LATER
-#include <zen/win.h>
+    #include <zen/win.h>
 #endif
 
 

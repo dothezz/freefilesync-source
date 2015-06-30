@@ -9,6 +9,7 @@
 
 #include "deprecate.h"
 #include "tick_count.h"
+#include "scope_guard.h"
 
 #ifdef ZEN_WIN
     #include <sstream>

@@ -20,7 +20,7 @@ public:
     bool operator()(const wxString& phrase) const { return contains(phrase, textToFind_); }
 
 private:
-    wxString textToFind_;
+    const wxString textToFind_;
 };
 
 
@@ -28,7 +28,7 @@ template <>
 class ContainsMatch<false>
 {
 public:
-    ContainsMatch(const wxString& textToFind) : textToFind_(textToFind) { textToFind_.MakeUpper(); }
+    ContainsMatch(const wxString& textToFind) : textToFind_(textToFind.Upper()) {}
     bool operator()(wxString&& phrase) const
     {
         //wxWidgets::MakeUpper() is inefficient! But performance is not THAT important for this high-level search functionality
@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    wxString textToFind_;
+    const wxString textToFind_;
 };
 
 //###########################################################################################

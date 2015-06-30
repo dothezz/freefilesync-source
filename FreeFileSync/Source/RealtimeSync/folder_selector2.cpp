@@ -98,7 +98,7 @@ void FolderSelector2::onFilesDropped(FileDropEvent& event)
         setFolderPath(filePath, &dirpath_, dirpath_, staticText_);
     else
     {
-        Zstring parentName = beforeLast(filePath, FILE_NAME_SEPARATOR); //returns empty string if ch not found
+        Zstring parentName = beforeLast(filePath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 #ifdef ZEN_WIN
         if (endsWith(parentName, L":")) //volume root
             parentName += FILE_NAME_SEPARATOR;
@@ -125,7 +125,7 @@ bool onIFileDialogAcceptFolder(HWND wnd, const Zstring& folderPath)
     if (dirExists(folderPath))
         return true;
 
-    const std::wstring msg = replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(folderPath));
+    const std::wstring msg = replaceCpy(_("Cannot find folder %x."), L"%x", fmtPath(folderPath));
     ::MessageBox(wnd, msg.c_str(), (_("Select a folder")).c_str(), MB_ICONWARNING);
     //showNotificationDialog would not support HWND parent
     return false;
@@ -141,10 +141,9 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
         const Zstring folderPath = getResolvedDirectoryPath(getPath());
         if (!folderPath.empty())
         {
+            auto ft = runAsync([folderPath] { return dirExists(folderPath); });
 
-            auto ft = async([folderPath] { return dirExists(folderPath); });
-
-            if (ft.timed_wait(boost::posix_time::milliseconds(200)) && ft.get()) //potentially slow network access: wait 200ms at most
+            if (ft.wait_for(boost::chrono::milliseconds(200)) == boost::future_status::ready && ft.get()) //potentially slow network access: wait 200ms at most
                 defaultFolderPath = folderPath;
         }
     }

@@ -27,6 +27,9 @@
 #include "../lib/hard_filter.h"
 #include "../version/version.h"
 
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    #include "../fs/sftp.h"
+#endif
 #ifdef ZEN_WIN
     #include <wx+/mouse_move_dlg.h>
 #endif
@@ -40,8 +43,8 @@ public:
     AboutDlg(wxWindow* parent);
 
 private:
-    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnOK    (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnDonate(wxCommandEvent& event) override { wxLaunchDefaultBrowser(L"http://www.freefilesync.org/donate.php"); }
 };
 
@@ -142,6 +145,98 @@ void zen::showAboutDialog(wxWindow* parent)
 
 //########################################################################################
 
+#ifdef ZEN_WIN_VISTA_AND_LATER
+class SftpSetupDlg : public SftpSetupDlgGenerated
+{
+public:
+    SftpSetupDlg(wxWindow* parent, Zstring& folderPathPhrase);
+
+private:
+    void OnOkay  (wxCommandEvent& event) override;
+    void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnToggleShowPassword(wxCommandEvent& event) override;
+
+    Zstring& folderPathPhraseOut;
+};
+
+
+SftpSetupDlg::SftpSetupDlg(wxWindow* parent, Zstring& folderPathPhrase) : SftpSetupDlgGenerated(parent), folderPathPhraseOut(folderPathPhrase)
+{
+#ifdef ZEN_WIN
+    new zen::MouseMoveWindow(*this);
+#endif
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+
+    m_bitmapSftp->SetBitmap(getResourceImage(L"sftp"));
+    m_checkBoxShowPassword->SetValue(false);
+    m_textCtrlPasswordVisible->Hide();
+
+    if (acceptsFolderPathPhraseSftp(folderPathPhrase)) //noexcept
+    {
+        auto res = getResolvedSftpPath(folderPathPhrase); //noexcept
+        const SftpLoginInfo login         = res.first;
+        const Zstring       serverRelPath = res.second;
+
+        m_textCtrlServer        ->ChangeValue(utfCvrtTo<wxString>(login.server));
+        m_textCtrlUserName      ->ChangeValue(utfCvrtTo<wxString>(login.username));
+        m_textCtrlPasswordHidden->ChangeValue(utfCvrtTo<wxString>(login.password));
+        m_textCtrlServerPath    ->ChangeValue(utfCvrtTo<wxString>(serverRelPath));
+    }
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+
+    m_buttonOkay->SetFocus();
+}
+
+
+void SftpSetupDlg::OnToggleShowPassword(wxCommandEvent& event)
+{
+    if (m_checkBoxShowPassword->GetValue())
+    {
+        m_textCtrlPasswordHidden ->Hide();
+        m_textCtrlPasswordVisible->Show();
+        m_textCtrlPasswordVisible->ChangeValue(m_textCtrlPasswordHidden->GetValue());
+    }
+    else
+    {
+        m_textCtrlPasswordVisible->Hide();
+        m_textCtrlPasswordHidden ->Show();
+        m_textCtrlPasswordHidden->ChangeValue(m_textCtrlPasswordVisible->GetValue());
+    }
+    Layout(); //needed! hidden items are not considered during resize
+}
+
+
+void SftpSetupDlg::OnOkay(wxCommandEvent& event)
+{
+    SftpLoginInfo login = {};
+    login.server   = utfCvrtTo<Zstring>(m_textCtrlServer  ->GetValue());
+    login.username = utfCvrtTo<Zstring>(m_textCtrlUserName->GetValue());
+    login.password = utfCvrtTo<Zstring>((m_checkBoxShowPassword->GetValue() ? m_textCtrlPasswordVisible : m_textCtrlPasswordHidden)->GetValue());
+
+    Zstring serverRelPath = utfCvrtTo<Zstring>(m_textCtrlServerPath->GetValue());
+
+    trim(login.server);
+    trim(serverRelPath);
+
+    folderPathPhraseOut = assembleSftpFolderPathPhrase(login, serverRelPath); //noexcept
+
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
+}
+
+
+ReturnSmallDlg::ButtonPressed zen::showSftpSetupDialog(wxWindow* parent, Zstring& folderPathPhrase)
+{
+    SftpSetupDlg setupDlg(parent, folderPathPhrase);
+    return static_cast<ReturnSmallDlg::ButtonPressed>(setupDlg.ShowModal());
+
+}
+#endif
+
+//########################################################################################
+
 class DeleteDialog : public DeleteDlgGenerated
 {
 public:
@@ -205,8 +300,8 @@ void DeleteDialog::updateGui()
     wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
 #endif
 
-    const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(rowsToDeleteOnLeft,
-                                                                            rowsToDeleteOnRight);
+    const std::pair<std::wstring, int> delInfo = zen::deleteFromGridAndHDPreview(rowsToDeleteOnLeft,
+                                                                                 rowsToDeleteOnRight);
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
@@ -226,8 +321,7 @@ void DeleteDialog::updateGui()
     //it seems like Wrap() needs to be reapplied after SetLabel()
     m_staticTextHeader->Wrap(460);
 
-    const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
-    m_textCtrlFileList->ChangeValue(fileList);
+    m_textCtrlFileList->ChangeValue(delInfo.first);
     /*
     There is a nasty bug on wxGTK under Ubuntu: If a multi-line wxTextCtrl contains so many lines that scrollbars are shown,
     it re-enables all windows that are supposed to be disabled during the current modal loop!
@@ -284,9 +378,9 @@ public:
                         const zen::SyncStatistics& st,
                         bool& dontShowAgain);
 private:
-    void OnClose    (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnCancel   (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnStartSync(wxCommandEvent& event) override;
+    void OnCancel   (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose    (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
     bool& m_dontShowAgain;
 };
@@ -430,7 +524,7 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
     updateGui();
 
 #ifdef ZEN_WIN
-    m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
+    m_checkBoxCopyPermissions->SetLabel(_("Copy DACL, SACL, Owner, Group"));
 #elif defined ZEN_LINUX || defined ZEN_MAC
     bSizerLockedFiles->Show(false);
 #endif

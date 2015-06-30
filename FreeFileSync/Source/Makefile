@@ -8,7 +8,7 @@ DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 CXXFLAGS  = -std=c++11 -pipe -DWXINTL_NO_GETTEXT_MACRO -I../.. -I../../zenXml -include "zen/i18n.h" -include "zen/warn_static.h" -Wall \
 -O3 -DNDEBUG `wx-config --cxxflags --debug=no` -DZEN_LINUX -pthread
 
-LINKFLAGS = -s `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system -lz -pthread
+LINKFLAGS = -s `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_chrono -lboost_system -lz -pthread
 
 #Gtk - support recycler/icon loading/no button border/grid scrolling
 CXXFLAGS  += `pkg-config --cflags gtk+-2.0`

@@ -124,7 +124,7 @@ private:
     void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
     void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
 
-	void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
+    void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
 
     void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateSyncGui(); }
     void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateSyncGui(); }
@@ -212,7 +212,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     miscCfgOut(miscCfg),
     handleDeletion(DELETE_TO_RECYCLER), //
     onGuiError(ON_GUIERROR_POPUP),      //dummy init
-    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder/*, m_staticTextResolvedPath*/)
+    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_bpButtonSelectSftp, *m_versioningFolder/*, m_staticTextResolvedPath*/)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"

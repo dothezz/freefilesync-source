@@ -321,7 +321,7 @@ SyncStatusHandler::~SyncStatusHandler()
     //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
     }
     catch (FileError&) { assert(false); }
 
@@ -348,7 +348,7 @@ SyncStatusHandler::~SyncStatusHandler()
         while (progressDlg)
         {
             wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
-            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted -> not expected => main thread!
         }
     }
 }
@@ -394,7 +394,7 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
         {
             reportStatus(_("Error") + L": " + _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...",
                                                  (1000 * automaticRetryDelay_ - i * UI_UPDATE_INTERVAL + 999) / 1000)); //integer round up
-            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted
         }
         return ProcessCallback::RETRY;
     }

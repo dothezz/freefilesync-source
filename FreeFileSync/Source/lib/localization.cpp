@@ -80,8 +80,8 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
     }
     catch (const FileError& e)
     {
-        throw lngfile::ParsingError(e.toString(), 0, 0); 
-		//passing FileError is too high a level for Parsing error, OTOH user is unlikely to see this since file I/O issues are sorted out by ExistingTranslations()!
+        throw lngfile::ParsingError(e.toString(), 0, 0);
+        //passing FileError is too high a level for Parsing error, OTOH user is unlikely to see this since file I/O issues are sorted out by ExistingTranslations()!
     }
 
     lngfile::TransHeader          header;
@@ -450,7 +450,7 @@ void zen::setLanguage(int language) //throw FileError
         catch (lngfile::ParsingError& e)
         {
             throw FileError(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                                             L"%x", fmtFileName(utfCvrtTo<Zstring>(languageFile))),
+                                                             L"%x", fmtPath(utfCvrtTo<Zstring>(languageFile))),
                                                   L"%y", numberTo<std::wstring>(e.row_ + 1)),
                                        L"%z", numberTo<std::wstring>(e.col_ + 1))
                             + L"\n\n" + e.msg_);

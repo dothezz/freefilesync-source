@@ -113,11 +113,11 @@ DbStreams loadStreams(const AbstractPathRef& dbPath, const std::function<void(st
         readArray(streamIn, formatDescr, sizeof(formatDescr)); //throw UnexpectedEndOfStreamError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(ABF::getDisplayPath(dbPath))));
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(ABF::getDisplayPath(dbPath))));
 
         const int version = readNumber<std::int32_t>(streamIn); //throw UnexpectedEndOfStreamError
         if (version != DB_FORMAT_CONTAINER) //read file format version number
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(ABF::getDisplayPath(dbPath))));
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(ABF::getDisplayPath(dbPath))));
 
         DbStreams output;
 
@@ -137,16 +137,16 @@ DbStreams loadStreams(const AbstractPathRef& dbPath, const std::function<void(st
     {
         if (!ABF::somethingExists(dbPath)) //a benign(?) race condition with FileError
             throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
-                                               replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(ABF::getDisplayPath(dbPath))));
+                                               replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtPath(ABF::getDisplayPath(dbPath))));
         throw;
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(ABF::getDisplayPath(dbPath)));
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(ABF::getDisplayPath(dbPath)));
     }
     catch (const std::bad_alloc& e) //still required?
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(ABF::getDisplayPath(dbPath)),
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(ABF::getDisplayPath(dbPath)),
                         _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
 }
@@ -157,8 +157,8 @@ class StreamGenerator //for db-file back-wards compatibility we stick with two o
 {
 public:
     static void execute(const InSyncDir& dir, //throw FileError
-                        const Zstring& displayFilePathL, //used for diagnostics only
-                        const Zstring& displayFilePathR,
+                        const std::wstring& displayFilePathL, //used for diagnostics only
+                        const std::wstring& displayFilePathR,
                         ByteArray& streamL,
                         ByteArray& streamR)
     {
@@ -168,7 +168,7 @@ public:
         generator.recurse(dir);
         //PERF_STOP
 
-        auto compStream = [](const ByteArray& stream, const Zstring& displayFilePath) -> ByteArray //throw FileError
+        auto compStream = [](const ByteArray& stream, const std::wstring& displayFilePath) -> ByteArray //throw FileError
         {
             try
             {
@@ -188,13 +188,13 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(displayFilePath)), L"zlib internal error");
+                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayFilePath)), L"zlib internal error");
             }
         };
 
         const ByteArray tmpL = compStream(generator.outputLeft .ref(), displayFilePathL);
         const ByteArray tmpR = compStream(generator.outputRight.ref(), displayFilePathR);
-        const ByteArray tmpB = compStream(generator.outputBoth .ref(), displayFilePathL + Zstr("/") + displayFilePathR);
+        const ByteArray tmpB = compStream(generator.outputBoth .ref(), displayFilePathL + L"/" + displayFilePathR);
 
         MemStreamOut outL;
         MemStreamOut outR;
@@ -282,10 +282,10 @@ class StreamParser
 public:
     static std::shared_ptr<InSyncDir> execute(const ByteArray& streamL, //throw FileError
                                               const ByteArray& streamR,
-                                              const Zstring& displayFilePathL, //used for diagnostics only
-                                              const Zstring& displayFilePathR)
+                                              const std::wstring& displayFilePathL, //used for diagnostics only
+                                              const std::wstring& displayFilePathR)
     {
-        auto decompStream = [](const ByteArray& stream, const Zstring& displayFilePath) -> ByteArray //throw FileError
+        auto decompStream = [](const ByteArray& stream, const std::wstring& displayFilePath) -> ByteArray //throw FileError
         {
             try
             {
@@ -293,7 +293,7 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(displayFilePath)), L"zlib internal error");
+                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(displayFilePath)), L"zlib internal error");
             }
         };
 
@@ -306,18 +306,18 @@ public:
             const int streamVersionR = readNumber<std::int32_t>(inR); //
 
             if (streamVersionL != streamVersionR)
-                throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(displayFilePathL) + L"\n" + fmtFileName(displayFilePathR), L"different stream formats");
+                throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"different stream formats");
 
             warn_static("remove check for stream version 1 after migration! 2015-05-02")
             if (streamVersionL != 1 &&
                 streamVersionL != DB_FORMAT_STREAM)
-                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(displayFilePathL)), L"unknown stream format");
+                throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(displayFilePathL)), L"unknown stream format");
 
             const bool has1stPartL = readNumber<std::int8_t>(inL) != 0; //throw UnexpectedEndOfStreamError
             const bool has1stPartR = readNumber<std::int8_t>(inR) != 0; //
 
             if (has1stPartL == has1stPartR)
-                throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(displayFilePathL) + L"\n" + fmtFileName(displayFilePathR), L"second part missing");
+                throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"second part missing");
 
             MemStreamIn& in1stPart = has1stPartL ? inL : inR;
             MemStreamIn& in2ndPart = has1stPartL ? inR : inL;
@@ -337,17 +337,17 @@ public:
             StreamParser parser(streamVersionL,
                                 decompStream(tmpL, displayFilePathL),
                                 decompStream(tmpR, displayFilePathR),
-                                decompStream(tmpB, displayFilePathL + Zstr("/") + displayFilePathR));
+                                decompStream(tmpB, displayFilePathL + L"/" + displayFilePathR));
             parser.recurse(*output); //throw UnexpectedEndOfStreamError
             return output;
         }
         catch (const UnexpectedEndOfStreamError&)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(displayFilePathL) + L"\n" + fmtFileName(displayFilePathR));
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR));
         }
         catch (const std::bad_alloc& e)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(displayFilePathL) + L"\n" + fmtFileName(displayFilePathR),
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR),
                             _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         }
     }
@@ -682,7 +682,7 @@ std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirPair& base
         //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430
         const AbstractPathRef filePath = !baseDirObj.isExisting<LEFT_SIDE>() ? dbPathLeft : dbPathRight;
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" + //it could be due to a to-be-created target directory not yet existing => FileErrorDatabaseNotExisting
-                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(ABF::getDisplayPath(filePath))));
+                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtPath(ABF::getDisplayPath(filePath))));
     }
 
     //read file data: list of session ID + DirInfo-stream

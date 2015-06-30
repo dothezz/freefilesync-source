@@ -47,7 +47,7 @@ void zen::traverseFolder(const Zstring& dirPath,
                 if (dirExists(dirPath)) //yes, a race-condition, still the best we can do
                     return;
             }
-            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirPath)), L"FindFirstFile", lastError);
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtPath(dirPath)), L"FindFirstFile", lastError);
         }
         ZEN_ON_SCOPE_EXIT(::FindClose(hDir));
 
@@ -62,13 +62,13 @@ void zen::traverseFolder(const Zstring& dirPath,
                 if (lastError == ERROR_NO_MORE_FILES) //not an error situation
                     return;
                 //else we have a problem... report it:
-                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"FindNextFile", lastError);
+                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"FindNextFile", lastError);
             }
 
             //skip "." and ".."
             const Zchar* const shortName = findData.cFileName;
 
-            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"FindNextFile: Data corruption, found item without name.");
+            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"FindNextFile: Data corruption; item is missing a name.");
             if (shortName[0] == L'.' &&
                 (shortName[1] == 0 || (shortName[1] == L'.' && shortName[2] == 0)))
                 continue;
@@ -106,14 +106,14 @@ void zen::traverseFolder(const Zstring& dirPath,
 
         DIR* dirObj = ::opendir(dirPath.c_str()); //directory must NOT end with path separator, except "/"
         if (!dirObj)
-            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirPath)), L"opendir", getLastError());
+            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtPath(dirPath)), L"opendir", getLastError());
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
 
         for (;;)
         {
             struct ::dirent* dirEntry = nullptr;
             if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"readdir_r", getLastError());
+                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r", getLastError());
             //don't retry but restart dir traversal on error! http://blogs.msdn.com/b/oldnewthing/archive/2014/06/12/10533529.aspx
 
             if (!dirEntry) //no more items
@@ -122,7 +122,7 @@ void zen::traverseFolder(const Zstring& dirPath,
             //don't return "." and ".."
             const char* shortName = dirEntry->d_name;
 
-            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirPath)), L"readdir_r: Data corruption, found item without name.");
+            if (shortName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item is missing a name.");
             if (shortName[0] == '.' &&
                 (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
@@ -152,7 +152,7 @@ void zen::traverseFolder(const Zstring& dirPath,
             try
             {
                 if (::lstat(itempath.c_str(), &statData) != 0) //lstat() does not resolve symlinks
-                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(itempath)), L"lstat", getLastError());
+                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itempath)), L"lstat", getLastError());
             }
             catch (const FileError& e)
             {

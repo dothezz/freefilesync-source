@@ -14,7 +14,6 @@
 #endif
 
 
-
 #ifdef ZEN_WIN //Windows encodes Unicode as UTF-16 wchar_t
     typedef wchar_t Zchar;
     #define Zstr(x) L ## x
@@ -27,13 +26,19 @@
 #endif
 
 //"The reason for all the fuss above" - Loki/SmartPtr
-//a high-performance string for interfacing with native OS APIs and multithreaded contexts
+//a high-performance string for interfacing with native OS APIs in multithreaded contexts
 typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, zen::AllocatorOptimalSpeed> Zstring;
 
 
 
 //Compare filepaths: Windows does NOT distinguish between upper/lower-case, while Linux DOES
-int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen);
+int cmpFilePath(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen);
+
+#if defined ZEN_LINUX || defined ZEN_MAC
+    int cmpFilePath(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen);
+#endif
+
+
 
 
 struct LessFilePath //case-insensitive on Windows, case-sensitive on Linux
@@ -64,11 +69,8 @@ Zstring appendSeparator(Zstring path) //support rvalue references!
 inline
 Zstring getFileExtension(const Zstring& filePath)
 {
-    const Zstring shortName = afterLast(filePath, FILE_NAME_SEPARATOR); //returns the whole string if term not found
-
-    return contains(shortName, Zchar('.')) ?
-           afterLast(filePath, Zchar('.')) :
-           Zstring();
+    const Zstring shortName = afterLast(filePath, FILE_NAME_SEPARATOR, zen::IF_MISSING_RETURN_ALL);
+    return afterLast(shortName, Zchar('.'), zen::IF_MISSING_RETURN_NONE);
 }
 
 
@@ -102,14 +104,34 @@ bool pathEndsWith(const S& str, const T& postfix)
 
 //################################# inline implementation ########################################
 
-#ifdef ZEN_LINUX
+#if defined ZEN_LINUX || defined ZEN_MAC
 inline
-int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen)
+int cmpFilePath(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen)
 {
     assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
     assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
 
+#if defined ZEN_LINUX
     const int rv = std::strncmp(lhs, rhs, std::min(lhsLen, rhsLen));
+#elif defined ZEN_MAC
+    const int rv = ::strncasecmp(lhs, rhs, std::min(lhsLen, rhsLen)); //locale-dependent!
+#endif
+    if (rv != 0)
+        return rv;
+    return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
+}
+
+inline
+int cmpFilePath(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen)
+{
+    assert(std::find(lhs, lhs + lhsLen, 0) == lhs + lhsLen); //don't expect embedded nulls!
+    assert(std::find(rhs, rhs + rhsLen, 0) == rhs + rhsLen); //
+
+#if defined ZEN_LINUX
+    const int rv = std::wcsncmp(lhs, rhs, std::min(lhsLen, rhsLen));
+#elif defined ZEN_MAC
+    const int rv = ::wcsncasecmp(lhs, rhs, std::min(lhsLen, rhsLen)); //locale-dependent!
+#endif
     if (rv != 0)
         return rv;
     return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);

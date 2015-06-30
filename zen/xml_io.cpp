@@ -28,7 +28,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
 
         if (!startsWith(memStreamOut.ref(), xmlBegin) &&
             !startsWith(memStreamOut.ref(), BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
-            throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filepath)));
+            throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
     }
 
     copyStream(fileStreamIn, memStreamOut, fileStreamIn.optimalBlockSize(), nullptr); //throw FileError
@@ -41,7 +41,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
     {
         throw FileError(
             replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                             L"%x", fmtFileName(filepath)),
+                                             L"%x", fmtPath(filepath)),
                                   L"%y", numberTo<std::wstring>(e.row + 1)),
                        L"%z", numberTo<std::wstring>(e.col + 1)));
     }
@@ -70,10 +70,10 @@ void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath) 
 {
     if (xmlInput.errorsOccured())
     {
-        std::wstring msg = _("Cannot read the following XML elements:") + L"\n";
+        std::wstring msg = _("The following XML elements could not be read:") + L"\n";
         for (const std::wstring& elem : xmlInput.getErrorsAs<std::wstring>())
             msg += L"\n" + elem;
 
-        throw FileError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filepath)) + L"\n\n" + msg);
+        throw FileError(replaceCpy(_("Configuration file %x is incomplete. The missing elements will be set to their default values."), L"%x", fmtPath(filepath)) + L"\n\n" + msg);
     }
 }

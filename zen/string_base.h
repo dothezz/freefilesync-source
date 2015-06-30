@@ -28,8 +28,8 @@ class AllocatorOptimalSpeed //exponential growth + min size
 {
 public:
     //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
-    static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
-    static void  deallocate(void* ptr) { ::operator delete(ptr); }
+    static void* allocate(size_t size) { return ::malloc(size); } //throw std::bad_alloc
+    static void  deallocate(void* ptr) { ::free(ptr); }
     static size_t calcCapacity(size_t length) { return std::max<size_t>(16, std::max(length + length / 2, length)); }
     //- size_t might overflow! => better catch here than return a too small size covering up the real error: a way too large length!
     //- any growth rate should not exceed golden ratio: 1.618033989
@@ -39,8 +39,8 @@ public:
 class AllocatorOptimalMemory //no wasted memory, but more reallocations required when manipulating string
 {
 public:
-    static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
-    static void  deallocate(void* ptr) { ::operator delete(ptr); }
+    static void* allocate(size_t size) { return ::malloc(size); } //throw std::bad_alloc
+    static void  deallocate(void* ptr) { ::free(ptr); }
     static size_t calcCapacity(size_t length) { return length; }
 };
 
@@ -148,9 +148,21 @@ protected:
         return ptr;
     }
 
+#ifdef NDEBUG
     void destroy(Char* ptr)
+#else
+    void destroy(Char*& ptr)
+#endif
     {
-        if (!ptr) return; //support "destroy(nullptr)"
+        assert(ptr != reinterpret_cast<Char*>(0x1)); //detect double-deletion
+
+        if (!ptr) //support "destroy(nullptr)"
+        {
+#ifndef NDEBUG
+            ptr = reinterpret_cast<Char*>(0x1);
+#endif
+            return;
+        }
 
         Descriptor* const d = descr(ptr);
 
@@ -158,6 +170,9 @@ protected:
         {
             d->~Descriptor();
             this->deallocate(d);
+#ifndef NDEBUG
+            ptr = reinterpret_cast<Char*>(0x1);
+#endif
         }
     }
 

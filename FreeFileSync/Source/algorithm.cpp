@@ -1081,24 +1081,24 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom
 
 //############################################################################################################
 
-std::pair<Zstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
-                                                        const std::vector<FileSystemObject*>& selectionRight)
+std::pair<std::wstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
+                                                             const std::vector<FileSystemObject*>& selectionRight)
 {
-    //don't use wxString here, it's linear allocation strategy would bring perf down to a crawl; Zstring: exponential growth!
-    Zstring fileList;
+    //don't use wxString! its imprudent linear allocation strategy brings perf down to a crawl!
+    std::wstring fileList; //
     int totalDelCount = 0;
 
     for (const FileSystemObject* fsObj : selectionLeft)
         if (!fsObj->isEmpty<LEFT_SIDE>())
         {
-            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<LEFT_SIDE>()) + Zstr('\n');
+            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<LEFT_SIDE>()) + L'\n';
             ++totalDelCount;
         }
 
     for (const FileSystemObject* fsObj : selectionRight)
         if (!fsObj->isEmpty<RIGHT_SIDE>())
         {
-            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<RIGHT_SIDE>()) + Zstr('\n');
+            fileList += ABF::getDisplayPath(fsObj->getAbstractPath<RIGHT_SIDE>()) + L'\n';
             ++totalDelCount;
         }
 
@@ -1148,7 +1148,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
             return it->second;
 
         const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x",
-        fmtFileName(ABF::getDisplayPath(baseFolder.getAbstractPath())));
+        fmtPath(ABF::getDisplayPath(baseFolder.getAbstractPath())));
         bool recSupported = false;
         tryReportingError([&]{
             recSupported = baseFolder.supportsRecycleBin([&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
@@ -1208,7 +1208,7 @@ struct ItemDeleter : public FSObjectVisitor //throw FileError, but nothrow const
         else
         {
             if (ABF::dirExists(linkObj.getAbstractPath<side>())) //dir symlink
-                ABF::removeFolder(linkObj.getAbstractPath<side>()); //throw FileError
+                ABF::removeFolderSimple(linkObj.getAbstractPath<side>()); //throw FileError
             else //file symlink, broken symlink
                 ABF::removeFile(linkObj.getAbstractPath<side>()); //throw FileError
         }
@@ -1222,21 +1222,21 @@ struct ItemDeleter : public FSObjectVisitor //throw FileError, but nothrow const
             ABF::recycleItemDirectly(dirObj.getAbstractPath<side>()); //throw FileError
         else
         {
-            auto onBeforeFileDeletion = [&](const Zstring& displayPath) { this->notifyFileDeletion     (displayPath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
-            auto onBeforeDirDeletion  = [&](const Zstring& displayPath) { this->notifyDirectoryDeletion(displayPath ); };
+            auto onBeforeFileDeletion = [&](const std::wstring& displayPath) { this->notifyFileDeletion     (displayPath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
+            auto onBeforeDirDeletion  = [&](const std::wstring& displayPath) { this->notifyDirectoryDeletion(displayPath); };
 
-            ABF::removeFolder(dirObj.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+            ABF::removeFolderRecursively(dirObj.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
         }
     }
 
 private:
-    void notifyFileDeletion     (const Zstring& displayPath) { notifyItemDeletion(txtRemovingFile     , displayPath); }
-    void notifyDirectoryDeletion(const Zstring& displayPath) { notifyItemDeletion(txtRemovingDirectory, displayPath); }
-    void notifySymlinkDeletion  (const Zstring& displayPath) { notifyItemDeletion(txtRemovingSymlink  , displayPath); }
+    void notifyFileDeletion     (const std::wstring& displayPath) { notifyItemDeletion(txtRemovingFile     , displayPath); }
+    void notifyDirectoryDeletion(const std::wstring& displayPath) { notifyItemDeletion(txtRemovingDirectory, displayPath); }
+    void notifySymlinkDeletion  (const std::wstring& displayPath) { notifyItemDeletion(txtRemovingSymlink  , displayPath); }
 
-    void notifyItemDeletion(const std::wstring& statusText, const Zstring& displayPath)
+    void notifyItemDeletion(const std::wstring& statusText, const std::wstring& displayPath)
     {
-        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtFileName(displayPath)));
+        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
     }
 
     DeleteFilesHandler& handler_;
@@ -1345,7 +1345,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
         for (const auto& item : recyclerSupported)
             if (!item.second)
-                msg += std::wstring(L"\n") + ABF::getDisplayPath(item.first->getAbstractPath());
+                msg += L"\n" + ABF::getDisplayPath(item.first->getAbstractPath());
 
         statusHandler.reportWarning(msg, warningRecyclerMissing); //throw?
     }

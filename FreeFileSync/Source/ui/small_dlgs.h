@@ -43,6 +43,10 @@ ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig&
 ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
+
+#ifdef ZEN_WIN_VISTA_AND_LATER
+    ReturnSmallDlg::ButtonPressed showSftpSetupDialog(wxWindow* parent, Zstring& folderPathPhrase);
+#endif
 }
 
 #endif // SMALLDIALOGS_H_INCLUDED

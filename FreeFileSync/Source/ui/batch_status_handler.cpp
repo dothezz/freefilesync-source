@@ -32,11 +32,7 @@ std::pair<std::unique_ptr<ABF::OutputStream>, AbstractPathRef> prepareNewLogfile
     assert(!jobName.empty());
 
     //create logfile directory if required
-    try
-    {
-        ABF::createNewFolder(abf.getAbstractPath()); //throw FileError, ErrorTargetExisting
-    }
-    catch (const FileError&) { if (!ABF::dirExists(abf.getAbstractPath())) throw; }
+    ABF::createFolderRecursively(abf.getAbstractPath()); //throw FileError
 
     //const std::string colon = "\xcb\xb8"; //="modifier letter raised colon" => regular colon is forbidden in file names on Windows and OS X
     //=> too many issues, most notably cmd.exe is not Unicode-awere: http://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/c559a5fb/
@@ -80,8 +76,8 @@ struct LogTraverserCallback: public ABF::TraverserCallback
         if (onUpdateStatus_)
             onUpdateStatus_();
     }
-    TraverserCallback* onDir    (const DirInfo&     di) override { return nullptr; }
-    HandleLink         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
+    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { return nullptr; }
+    HandleLink                         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
     HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { assert(false); return ON_ERROR_IGNORE; } //errors are not critical in this context
     HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { assert(false); return ON_ERROR_IGNORE; } //
 
@@ -153,14 +149,14 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
             logFolderPathPhrase_(logFolderPathPhrase)
 {
     //ATTENTION: "progressDlg" is an unmanaged resource!!! However, at this point we already consider construction complete! =>
-    ScopeGuard guardConstructor = zen::makeGuard([&] { this->~BatchStatusHandler(); });
+    ScopeGuard constructorGuard = zen::makeGuard([&] { /*cleanup();*/ /*destructor call would lead to member double clean-up!!!*/ });
 
     //...
 
     //if (logFile)
     //	::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename()));
 
-    guardConstructor.dismiss();
+    constructorGuard.dismiss();
 }
 
 
@@ -279,7 +275,7 @@ BatchStatusHandler::~BatchStatusHandler()
     //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, getLastSyncsLogfilePath())); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
     }
     catch (FileError&) { assert(false); }
 
@@ -309,7 +305,7 @@ BatchStatusHandler::~BatchStatusHandler()
         while (progressDlg)
         {
             wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
-            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted -> not expected => main thread!
         }
     }
 }
@@ -403,7 +399,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
         {
             reportStatus(_("Error") + L": " + _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...",
                                                  (1000 * automaticRetryDelay_ - i * UI_UPDATE_INTERVAL + 999) / 1000)); //integer round up
-            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted
         }
         return ProcessCallback::RETRY;
     }

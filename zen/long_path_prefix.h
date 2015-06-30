@@ -70,7 +70,7 @@ Zstring applyLongPathPrefixImpl(const Zstring& path)
         if (!startsWith(path, LONG_PATH_PREFIX))
         {
             if (startsWith(path, L"\\\\")) //UNC-name, e.g. \\zenju-pc\Users
-                return LONG_PATH_PREFIX_UNC + afterFirst(path, L'\\'); //convert to \\?\UNC\zenju-pc\Users
+                return LONG_PATH_PREFIX_UNC + afterFirst(path, L'\\', zen::IF_MISSING_RETURN_NONE); //convert to \\?\UNC\zenju-pc\Users
             else
                 return LONG_PATH_PREFIX + path; //prepend \\?\ prefix
         }
