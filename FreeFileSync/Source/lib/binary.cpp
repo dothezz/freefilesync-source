@@ -8,7 +8,6 @@
 #include <zen/tick_count.h>
 #include <vector>
 #include <zen/file_io.h>
-#include <boost/thread/tss.hpp>
 
 using namespace zen;
 using ABF = AbstractBaseFolder;
@@ -75,16 +74,6 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec();
 
 bool zen::filesHaveSameContent(const AbstractPathRef& filePath1, const AbstractPathRef& filePath2, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
 {
-    static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
-    static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
-    if (!cpyBuf1.get())
-        cpyBuf1.reset(new std::vector<char>());
-    if (!cpyBuf2.get())
-        cpyBuf2.reset(new std::vector<char>());
-
-    std::vector<char>& memory1 = *cpyBuf1;
-    std::vector<char>& memory2 = *cpyBuf2;
-
     const std::unique_ptr<ABF::InputStream> inStream1 = ABF::getInputStream(filePath1); //throw FileError, (ErrorFileLocked)
     const std::unique_ptr<ABF::InputStream> inStream2 = ABF::getInputStream(filePath2); //
 
@@ -92,22 +81,24 @@ bool zen::filesHaveSameContent(const AbstractPathRef& filePath1, const AbstractP
                                        inStream2->optimalBlockSize()));
 
     TickVal lastDelayViolation = getTicks();
+    std::vector<char> buf; //make this thread-local? => on noticeable perf advantage!
 
     for (;;)
     {
         const size_t bufSize = dynamicBufSize.get(); //save for reliable eof check below!!!
-        setMinSize(memory1, bufSize);
-        setMinSize(memory2, bufSize);
+        setMinSize(buf, 2 * bufSize);
+        char* buf1 = &buf[0];
+        char* buf2 = &buf[bufSize];
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = inStream1->read(&memory1[0], bufSize); //throw FileError
-        const size_t length2 = inStream2->read(&memory2[0], bufSize); //returns actual number of bytes read
+        const size_t length1 = inStream1->read(buf1, bufSize); //throw FileError
+        const size_t length2 = inStream2->read(buf2, bufSize); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
         if (onUpdateStatus)
             onUpdateStatus(std::max(length1, length2));
 
-        if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
+        if (length1 != length2 || ::memcmp(buf1, buf2, length1) != 0)
             return false;
 
         //-------- dynamically set buffer size to keep callback interval between 100 - 500ms ---------------------

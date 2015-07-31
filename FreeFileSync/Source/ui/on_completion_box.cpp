@@ -80,8 +80,6 @@ OnCompletionBox::OnCompletionBox(wxWindow* parent,
                                  const wxValidator& validator,
                                  const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name),
-    history_(nullptr),
-    historyMax_(0),
     defaultCommands(getDefaultCommands())
 {
     //#####################################

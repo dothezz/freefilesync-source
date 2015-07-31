@@ -18,7 +18,7 @@
 #include "stl_tools.h"
 #include "string_traits.h"
 
-
+ 
 //enhance arbitray string class with useful non-member functions:
 namespace zen
 {
@@ -48,10 +48,10 @@ template <class S, class T, class U> void replace   (      S& str, const T& oldT
 template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 
 //high-performance conversion between numbers and strings
-template <class S, class T, class Num> S printNumber(const T& format, const Num& number); //format a single number using std::snprintf()
-
 template <class S,   class Num> S   numberTo(const Num& number);
 template <class Num, class S  > Num stringTo(const S&   str);
+
+template <class S, class T, class Num> S printNumber(const T& format, const Num& number); //format a single number using std::snprintf()
 
 //string to string conversion: converts string-like type into char-compatible target string class
 template <class T, class S> T copyStringTo(const S& str);

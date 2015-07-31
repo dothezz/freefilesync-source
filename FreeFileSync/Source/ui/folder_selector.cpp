@@ -26,23 +26,22 @@ using ABF = AbstractBaseFolder;
 
 namespace
 {
-void setFolderPathPhrase(const Zstring& dirpath, FolderHistoryBox* comboBox, wxWindow& tooltipWnd, wxStaticText* staticText) //pointers are optional
+void setFolderPathPhrase(const Zstring& folderPathPhrase, FolderHistoryBox* comboBox, wxWindow& tooltipWnd, wxStaticText* staticText) //pointers are optional
 {
     if (comboBox)
-        comboBox->setValue(toWx(dirpath));
+        comboBox->setValue(toWx(folderPathPhrase));
 
-    const Zstring folderPathPhrase = createAbstractBaseFolder(dirpath)->getInitPathPhrase(); //noexcept
+    const Zstring folderPathPhraseFmt = createAbstractBaseFolder(folderPathPhrase)->getInitPathPhrase(); //noexcept
     //may block when resolving [<volume name>]
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
-    tooltipWnd.SetToolTip(toWx(folderPathPhrase)); //who knows when the real bugfix reaches mere mortals via an official release...
+    tooltipWnd.SetToolTip(toWx(folderPathPhraseFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
 
     if (staticText)
     {
         //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
-        const Zstring dirpathFmt = trimCpy(dirpath);
-
-        staticText->SetLabel(EqualFilePath()(appendSeparator(dirpathFmt), appendSeparator(folderPathPhrase)) ? wxString(_("Drag && drop")) : toWx(folderPathPhrase));
+        staticText->SetLabel(EqualFilePath()(appendSeparator(trimCpy(folderPathPhrase)), appendSeparator(folderPathPhraseFmt)) ?
+                             wxString(_("Drag && drop")) : toWx(folderPathPhraseFmt));
     }
 }
 
@@ -74,22 +73,21 @@ bool onIFileDialogAcceptFolder(HWND wnd, const Zstring& shellFolderPath)
 
 //##############################################################################################################
 
+const wxEventType zen::EVENT_ON_FOLDER_SELECTED    = wxNewEventType();
+const wxEventType zen::EVENT_ON_FOLDER_MANUAL_EDIT = wxNewEventType();
 
-const wxEventType zen::EVENT_ON_DIR_SELECTED          = wxNewEventType();
-const wxEventType zen::EVENT_ON_DIR_MANUAL_CORRECTION = wxNewEventType();
 
-
-FolderSelector::FolderSelector(wxWindow&          dropWindow,
-                               wxButton&          selectFolderButton,
-                               wxButton&          selectSftpButton,
-                               FolderHistoryBox&  dirpath,
-                               wxStaticText*      staticText,
-                               wxWindow*          dropWindow2) :
+FolderSelector::FolderSelector(wxWindow&         dropWindow,
+                               wxButton&         selectFolderButton,
+                               wxButton&         selectSftpButton,
+                               FolderHistoryBox& folderComboBox,
+                               wxStaticText*     staticText,
+                               wxWindow*         dropWindow2) :
     dropWindow_(dropWindow),
     dropWindow2_(dropWindow2),
     selectFolderButton_(selectFolderButton),
     selectSftpButton_(selectSftpButton),
-    dirpath_(dirpath),
+    folderComboBox_(folderComboBox),
     staticText_(staticText)
 {
     auto setupDragDrop = [&](wxWindow& dropWin)
@@ -105,7 +103,6 @@ FolderSelector::FolderSelector(wxWindow&          dropWindow,
     setupDragDrop(dropWindow_);
     if (dropWindow2_) setupDragDrop(*dropWindow2_);
 
-
 #ifdef ZEN_WIN_VISTA_AND_LATER
     selectSftpButton.SetBitmapLabel(getResourceImage(L"sftp_small"));
 #else
@@ -113,10 +110,10 @@ FolderSelector::FolderSelector(wxWindow&          dropWindow,
 #endif
 
     //keep dirPicker and dirpath synchronous
-    dirpath_           .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel      ), nullptr, this);
-    dirpath_           .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onWriteDirManually), nullptr, this);
-    selectFolderButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder    ), nullptr, this);
-    selectSftpButton_  .Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectSftp      ), nullptr, this);
+    folderComboBox_    .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel    ), nullptr, this);
+    folderComboBox_    .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onEditFolderPath), nullptr, this);
+    selectFolderButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder  ), nullptr, this);
+    selectSftpButton_  .Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectSftp    ), nullptr, this);
 }
 
 
@@ -127,10 +124,10 @@ FolderSelector::~FolderSelector()
     if (dropWindow2_)
         dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
 
-    dirpath_           .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel      ), nullptr, this);
-    dirpath_           .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onWriteDirManually), nullptr, this);
-    selectFolderButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder    ), nullptr, this);
-    selectSftpButton_  .Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectSftp      ), nullptr, this);
+    folderComboBox_    .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel    ), nullptr, this);
+    folderComboBox_    .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onEditFolderPath), nullptr, this);
+    selectFolderButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder  ), nullptr, this);
+    selectSftpButton_  .Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectSftp    ), nullptr, this);
 }
 
 
@@ -140,7 +137,7 @@ void FolderSelector::onMouseWheel(wxMouseEvent& event)
     //additionally this will delete manual entries, although all the users wanted is scroll the parent window!
 
     //redirect to parent scrolled window!
-    wxWindow* wnd = &dirpath_;
+    wxWindow* wnd = &folderComboBox_;
     while ((wnd = wnd->GetParent()) != nullptr) //silence MSVC warning
         if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
             if (wxEvtHandler* evtHandler = wnd->GetEventHandler())
@@ -154,36 +151,43 @@ void FolderSelector::onMouseWheel(wxMouseEvent& event)
 
 void FolderSelector::onFilesDropped(FileDropEvent& event)
 {
-    const auto& files = event.getFiles();
-    if (files.empty())
+    const auto& itemPaths = event.getPaths();
+    if (itemPaths.empty())
         return;
 
-    if (canSetDroppedShellPaths(files))
+    if (canSetDroppedShellPaths(itemPaths))
     {
-        Zstring newFolderPathPhrase = files[0];
-
-        if (!ABF::dirExists(createAbstractBaseFolder(files[0])->getAbstractPath()))
+        auto fmtShellPath = [](const Zstring& shellItemPath)
         {
-            Zstring parentPathPhrase = beforeLast(files[0], FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-            if (!parentPathPhrase.empty())
+            std::unique_ptr<ABF> abf = createAbstractBaseFolder(shellItemPath);
+
+            if (!ABF::folderExists(abf->getAbstractPath()))
             {
+                Zstring parentShellPath = beforeLast(shellItemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+                if (!parentShellPath.empty())
+                {
 #ifdef ZEN_WIN
-                if (endsWith(parentPathPhrase, L":")) //volume root
-                    parentPathPhrase += FILE_NAME_SEPARATOR;
+                    if (endsWith(parentShellPath, L":")) //volume root
+                        parentShellPath += FILE_NAME_SEPARATOR;
 #endif
-                if (ABF::dirExists(createAbstractBaseFolder(parentPathPhrase)->getAbstractPath()))
-                    newFolderPathPhrase = parentPathPhrase;
-                //else: keep original name unconditionally: usecase: inactive mapped network shares
+                    std::unique_ptr<ABF> abfParent = createAbstractBaseFolder(parentShellPath);
+
+                    if (ABF::folderExists(abfParent->getAbstractPath()))
+                        return abfParent->getInitPathPhrase();
+                    //else: keep original name unconditionally: usecase: inactive mapped network shares
+                }
             }
-        }
+            //make sure FFS-specific explicit MTP-syntax is applied!
+            return abf->getInitPathPhrase();
+        };
 
-        //make sure FFS-specific explicit MTP-syntax is applied!
-        newFolderPathPhrase = createAbstractBaseFolder(newFolderPathPhrase)->getInitPathPhrase();
-
-        setFolderPathPhrase(newFolderPathPhrase, &dirpath_, dirpath_, staticText_);
+        setPath(fmtShellPath(itemPaths[0]));
+        //drop two folder paths at once:
+        if (siblingSelector && itemPaths.size() >= 2)
+            siblingSelector->setPath(fmtShellPath(itemPaths[1]));
 
         //notify action invoked by user
-        wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
+        wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);
         ProcessEvent(dummy);
     }
     else
@@ -191,11 +195,11 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
 }
 
 
-void FolderSelector::onWriteDirManually(wxCommandEvent& event)
+void FolderSelector::onEditFolderPath(wxCommandEvent& event)
 {
-    setFolderPathPhrase(toZ(event.GetString()), nullptr, dirpath_, staticText_);
+    setFolderPathPhrase(toZ(event.GetString()), nullptr, folderComboBox_, staticText_);
 
-    wxCommandEvent dummy(EVENT_ON_DIR_MANUAL_CORRECTION);
+    wxCommandEvent dummy(EVENT_ON_FOLDER_MANUAL_EDIT);
     ProcessEvent(dummy);
     event.Skip();
 }
@@ -211,7 +215,8 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
     {
         auto baseFolderExisting = [](const ABF& abf)
         {
-            std::function<bool()> /*throw FileError*/ dirExists = ABF::getAsyncCheckDirExists(abf.getAbstractPath()); //noexcept
+            std::function<bool()> /*throw FileError*/ dirExists = ABF::getAsyncCheckFolderExists(abf.getAbstractPath()); //noexcept
+
             auto ft = runAsync([dirExists]
             {
                 try
@@ -220,7 +225,7 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
                 }
                 catch (FileError&) { return false; }
             });
-            return ft.wait_for(boost::chrono::milliseconds(200)) == boost::future_status::ready && ft.get(); //potentially slow network access: wait 200ms at most
+            return ft.wait_for(std::chrono::milliseconds(200)) == std::future_status::ready && ft.get(); //potentially slow network access: wait 200ms at most
         };
 
         const Zstring folderPathPhrase = getPath();
@@ -268,10 +273,10 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
     const Zstring newFolderPathPhrase = toZ(dirPicker.GetPath());
 #endif
 
-    setFolderPathPhrase(newFolderPathPhrase, &dirpath_, dirpath_, staticText_);
+    setFolderPathPhrase(newFolderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
 
     //notify action invoked by user
-    wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
+    wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);
     ProcessEvent(dummy);
 }
 
@@ -283,10 +288,10 @@ void FolderSelector::onSelectSftp(wxCommandEvent& event)
     if (showSftpSetupDialog(&selectSftpButton_, folderPathPhrase) != ReturnSmallDlg::BUTTON_OKAY)
         return;
 
-    setFolderPathPhrase(folderPathPhrase, &dirpath_, dirpath_, staticText_);
+    setFolderPathPhrase(folderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
 
     //notify action invoked by user
-    wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
+    wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);
     ProcessEvent(dummy);
 #endif
 }
@@ -294,11 +299,11 @@ void FolderSelector::onSelectSftp(wxCommandEvent& event)
 
 Zstring FolderSelector::getPath() const
 {
-    return toZ(dirpath_.GetValue());
+    return toZ(folderComboBox_.GetValue());
 }
 
 
-void FolderSelector::setPath(const Zstring& dirpath)
+void FolderSelector::setPath(const Zstring& folderPathPhrase)
 {
-    setFolderPathPhrase(dirpath, &dirpath_, dirpath_, staticText_);
+    setFolderPathPhrase(folderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
 }

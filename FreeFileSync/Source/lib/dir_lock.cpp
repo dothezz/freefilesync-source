@@ -4,11 +4,11 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 #include "dir_lock.h"
-#include <utility>
+#include <map>
 #include <wx/log.h>
 #include <memory>
 #include <zen/sys_error.h>
-#include <zen/thread.h> //includes <boost/thread.hpp>
+#include <zen/thread.h>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
 #include <zen/tick_count.h>
@@ -54,16 +54,15 @@ using MemStreamIn  = MemoryStreamIn <ByteArray>;
 class LifeSigns
 {
 public:
-    LifeSigns(const Zstring& lockfilepath) : //throw()!!! siehe SharedDirLock()
-        lockfilepath_(lockfilepath) {} //thread safety: make deep copy!
+    LifeSigns(const Zstring& lockfilepath) : lockfilepath_(lockfilepath) {}
 
-    void operator()() const //thread entry
+    void operator()() const //throw ThreadInterruption
     {
         try
         {
             for (;;)
             {
-                boost::this_thread::sleep_for(boost::chrono::seconds(EMIT_LIFE_SIGN_INTERVAL)); //throw boost::thread_interrupted
+                interruptibleSleep(std::chrono::seconds(EMIT_LIFE_SIGN_INTERVAL)); //throw ThreadInterruption
 
                 //actual work
                 emitLifeSign(); //throw ()
@@ -327,7 +326,7 @@ struct LockInformation //throw FileError
     {
         char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
         readArray(stream, &tmp, sizeof(tmp));                           //file format header
-        const int lockFileVersion = readNumber<boost::int32_t>(stream); //
+        const int lockFileVersion = readNumber<std::int32_t>(stream); //
 
         if (!std::equal(std::begin(tmp), std::end(tmp), std::begin(LOCK_FORMAT_DESCR)) ||
             lockFileVersion != LOCK_FORMAT_VER)
@@ -343,7 +342,7 @@ struct LockInformation //throw FileError
     void toStream(MemStreamOut& stream) const //throw ()
     {
         writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
-        writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
+        writeNumber<std::int32_t>(stream, LOCK_FORMAT_VER);
 
         static_assert(sizeof(processId) <= sizeof(std::uint64_t), ""); //ensure cross-platform compatibility!
         static_assert(sizeof(sessionId) <= sizeof(std::uint64_t), ""); //
@@ -458,7 +457,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
         for (;;)
         {
             const TickVal now = getTicks();
-            const std::uint64_t fileSizeNew = ::getLockFileSize(lockfilepath); //throw FileError
+            const std::uint64_t fileSizeNew = getLockFileSize(lockfilepath); //throw FileError
 
             if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !now.isValid())
                 throw FileError(L"System timer failed."); //no i18n: "should" never throw ;)
@@ -480,7 +479,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
                     if (retrieveLockId(lockfilepath) != originalLockId) //throw FileError -> since originalLockId is filled, we are not expecting errors!
                         return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
-                if (::getLockFileSize(lockfilepath) != fileSizeOld) //throw FileError
+                if (getLockFileSize(lockfilepath) != fileSizeOld) //throw FileError
                     continue; //late life sign
 
                 removeFile(lockfilepath); //throw FileError
@@ -492,7 +491,7 @@ void waitOnDirLock(const Zstring& lockfilepath, DirLockCallback* callback) //thr
             for (size_t i = 0; i < 1000 * POLL_LIFE_SIGN_INTERVAL / GUI_CALLBACK_INTERVAL; ++i)
             {
                 if (callback) callback->requestUiRefresh();
-                boost::this_thread::sleep_for(boost::chrono::milliseconds(GUI_CALLBACK_INTERVAL)); //throw boost::thread_interrupted
+                std::this_thread::sleep_for(std::chrono::milliseconds(GUI_CALLBACK_INTERVAL));
 
                 if (callback)
                 {
@@ -603,13 +602,13 @@ public:
         while (!::tryLock(lockfilepath))             //throw FileError
             ::waitOnDirLock(lockfilepath, callback); //
 
-        threadObj = boost::thread(LifeSigns(lockfilepath));
+        lifeSignthread = InterruptibleThread(LifeSigns(lockfilepath));
     }
 
     ~SharedDirLock()
     {
-        threadObj.interrupt(); //thread lifetime is subset of this instances's life
-        threadObj.join(); //throw boost::thread_interrupted -> not expected => main thread!
+        lifeSignthread.interrupt(); //thread lifetime is subset of this instances's life
+        lifeSignthread.join();
 
         ::releaseLock(lockfilepath_); //throw ()
     }
@@ -619,7 +618,7 @@ private:
     SharedDirLock& operator=(const DirLock&) = delete;
 
     const Zstring lockfilepath_;
-    boost::thread threadObj;
+    InterruptibleThread lifeSignthread;
 };
 
 

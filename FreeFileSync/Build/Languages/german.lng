@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Prüfe Verfügbarkeit des Papierkorbs für Ordner %x...</target>
+<source>Creating folder %x</source>
+<target>Erstelle Ordner %x</target>
+
+<source>Creating file %x</source>
+<target>Erstelle Datei %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Erstelle symbolischen Verknüpfung %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Verschiebe Datei %x in den Papierkorb</target>
@@ -42,6 +48,9 @@
 
 <source>Deleting symbolic link %x</source>
 <target>Lösche symbolische Verknüpfung %x</target>
+
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Prüfe Verfügbarkeit des Papierkorbs für Ordner %x...</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Dateien werden stattdessen permanent gelöscht:</target>
@@ -243,12 +252,6 @@ Tatsächlich: %y bytes
 <source>Cannot open file %x.</source>
 <target>Die Datei %x kann nicht geöffnet werden.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
-
-<source>Cannot delete file %x.</source>
-<target>Die Datei %x kann nicht gelöscht werden.</target>
-
 <source>Cannot find device %x.</source>
 <target>Das Gerät %x wurde nicht gefunden.</target>
 
@@ -257,6 +260,12 @@ Tatsächlich: %y bytes
 
 <source>Cannot create directory %x.</source>
 <target>Das Verzeichnis %x kann nicht erstellt werden.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
+
+<source>Cannot delete file %x.</source>
+<target>Die Datei %x kann nicht gelöscht werden.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
@@ -344,9 +353,6 @@ Tatsächlich: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Ermittle aufgegebene Sperre...</target>
-
-<source>Creating file %x</source>
-<target>Erstelle Datei %x</target>
 
 <source>Saving file %x...</source>
 <target>Speichere Datei %x...</target>
@@ -556,12 +562,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Removing old versions...</source>
 <target>Entferne alte Versionen...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Erstelle symbolischen Verknüpfung %x</target>
-
-<source>Creating folder %x</source>
-<target>Erstelle Ordner %x</target>
 
 <source>Updating file %x</source>
 <target>Aktualisiere Datei %x</target>
@@ -797,8 +797,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Actions</source>
 <target>&Aktionen</target>
 
-<source>&Options</source>
-<target>&Optionen</target>
+<source>&Preferences</source>
+<target>&Einstellungen</target>
 
 <source>&Language</source>
 <target>&Sprache</target>
@@ -1015,6 +1015,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Server name or IP address:</source>
 <target>Servername oder IP-Adresse:</target>
 
+<source>Port:</source>
+<target>Port:</target>
+
 <source>Examples:</source>
 <target>Beispiele:</target>
 
@@ -1092,6 +1095,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>How can I schedule a batch job?</source>
 <target>Wie können Batchaufträge in den Taskplaner eingetragen werden?</target>
+
+<source>&Keep relative paths</source>
+<target>&Relative Pfade beibehalten</target>
+
+<source>&Overwrite existing files</source>
+<target>&Existierende Dateien überschreiben</target>
+
+<source>&Copy</source>
+<target>&Kopieren</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Die folgenden Einstellungen werden für alle Synchronisationsaufgaben verwendet.</target>
@@ -1183,14 +1195,17 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Delete Items</source>
 <target>Elemente löschen</target>
 
+<source>Copy items</source>
+<target>Elemente kopieren</target>
+
 <source>Options</source>
 <target>Optionen</target>
 
 <source>Select Time Span</source>
 <target>Zeitspanne auswählen</target>
 
-<source>&Preferences</source>
-<target>&Einstellungen</target>
+<source>&Options</source>
+<target>&Optionen</target>
 
 <source>Main Bar</source>
 <target>Hauptleiste</target>
@@ -1269,6 +1284,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Exclude temporarily</source>
 <target>Temporär ausschließen</target>
+
+<source>Copy to...</source>
+<target>Kopieren nach...</target>
 
 <source>Delete</source>
 <target>Löschen</target>
@@ -1442,6 +1460,18 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <target>Protokoll</target>
 
 <source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Soll das folgende Element in einen anderen Ordner kopiert werden?</pluralform>
+<pluralform>Sollen die folgenden %x Elemente in einen anderen Ordner kopiert werden?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Bitte geben Sie einen Zielorder ein.</target>
+
+<source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
@@ -1461,9 +1491,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <pluralform>Soll das folgende Element wirklich gelöscht werden?</pluralform>
 <pluralform>Sollen die folgenden %x Elemente wirklich gelöscht werden?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Einstellungen</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>DACL, SACL, Besitzer und Gruppe kopieren</target>

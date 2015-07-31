@@ -8,11 +8,9 @@
 #define BATCH_STATUS_HANDLER_857390451451234566
 
 #include <zen/error_log.h>
-//#include <zen/file_io.h>
 #include <zen/time.h>
 #include "progress_indicator.h"
 #include "switch_to_gui.h"
-//#include "../fs/concrete.h"
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
 #include "../lib/return_codes.h"

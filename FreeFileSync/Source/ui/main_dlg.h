@@ -54,8 +54,8 @@ private:
                bool startComparison);
     ~MainDialog();
 
-    friend class CompareStatusHandler;
-    friend class SyncStatusHandler;
+    friend class StatusHandlerTemporaryPanel;
+    friend class StatusHandlerFloatingDialog;
     friend class ManualDeletionHandler;
     friend class FolderPairFirst;
     friend class FolderPairPanel;
@@ -114,6 +114,10 @@ private:
     void setSyncDirManually(const std::vector<zen::FileSystemObject*>& selection, zen::SyncDirection direction);
     void setFilterManually(const std::vector<zen::FileSystemObject*>& selection, bool setIncluded);
     void copySelectionToClipboard(const std::vector<const zen::Grid*>& gridRefs);
+
+    void copyToAlternateFolder(const std::vector<zen::FileSystemObject*>& selectionLeft,
+                               const std::vector<zen::FileSystemObject*>& selectionRight);
+
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
@@ -128,10 +132,10 @@ private:
     void processAsync2(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add2(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
 
     //status bar supports one of the following two states at a time:
-    void setStatusBarFullText(const wxString& msg);
     void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, std::uint64_t filesizeLeftView, std::uint64_t filesizeRightView);
+    //void setStatusBarFullText(const wxString& msg);
 
-    void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFullText)
+    void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFileStatistics)
     void restoreStatusInformation();                  //called automatically after a few seconds
 
     //events
@@ -149,7 +153,7 @@ private:
     void OnGlobalFilterContext (wxMouseEvent& event) override;
     void OnViewButtonRightClick(wxMouseEvent& event) override;
 
-    void applyCompareConfig(bool setDefaultViewType = false);
+    void applyCompareConfig(bool setDefaultViewType);
 
     //context menu handler methods
     void onMainGridContextL(zen::GridClickEvent& event);

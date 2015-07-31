@@ -28,7 +28,7 @@ namespace zen
 
 /*
 1. setup a window to emit EVENT_DROP_FILE:
-	- simple file system paths: setupFileDrop
+	- simple file system paths:        setupFileDrop
 	- any shell paths with validation: setupShellItemDrop
 
 2. register events:
@@ -64,14 +64,14 @@ const wxEventType EVENT_DROP_FILE = impl::createNewEventType();
 class FileDropEvent : public wxCommandEvent
 {
 public:
-    FileDropEvent(const std::vector<Zstring>& filesDropped) : wxCommandEvent(EVENT_DROP_FILE), filesDropped_(filesDropped) {}
+    FileDropEvent(const std::vector<Zstring>& droppedPaths) : wxCommandEvent(EVENT_DROP_FILE), droppedPaths_(droppedPaths) {}
 
-    const std::vector<Zstring>& getFiles() const { return filesDropped_; }
+    const std::vector<Zstring>& getPaths() const { return droppedPaths_; }
 
 private:
     wxEvent* Clone() const override { return new FileDropEvent(*this); }
 
-    const std::vector<Zstring> filesDropped_;
+    const std::vector<Zstring> droppedPaths_;
 };
 
 typedef void (wxEvtHandler::*FileDropEventFunction)(FileDropEvent&);

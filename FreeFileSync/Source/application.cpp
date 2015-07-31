@@ -50,20 +50,6 @@ int _matherr(struct _exception* except)
 
 namespace
 {
-/*
-boost::thread::id mainThreadId = boost::this_thread::get_id();
-
-void onTerminationRequested()
-{
-std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
-                   L"Termination requested in main thread!\n\n" :
-                   L"Termination requested in worker thread!\n\n";
-msg += L"Please file a bug report at: http://sourceforge.net/projects/freefilesync";
-
-wxSafeShowMessage(_("An exception occurred"), msg);
-std::abort();
-}
-*/
 #ifdef ZEN_WIN
 void enableCrashingOnCrashes() //should be needed for 32-bit code only: http://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work
 {
@@ -144,9 +130,6 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-    //-> this seems rather useless:
-    //std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
-
 #ifdef ZEN_WIN
     enableCrashingOnCrashes();
 #ifdef _MSC_VER
@@ -396,8 +379,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     auto hasNonDefaultConfig = [](const FolderPairEnh& fp)
     {
-        return !(fp == FolderPairEnh(fp.dirpathPhraseLeft,
-                                     fp.dirpathPhraseRight,
+        return !(fp == FolderPairEnh(fp.folderPathPhraseLeft_,
+                                     fp.folderPathPhraseRight_,
                                      nullptr, nullptr, FilterConfig()));
     };
 
@@ -416,8 +399,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             for (size_t i = 0; i < leftDirs.size(); ++i)
                 if (i == 0)
                 {
-                    mainCfg.firstPair.dirpathPhraseLeft  = leftDirs [0];
-                    mainCfg.firstPair.dirpathPhraseRight = rightDirs[0];
+                    mainCfg.firstPair.folderPathPhraseLeft_  = leftDirs [0];
+                    mainCfg.firstPair.folderPathPhraseRight_ = rightDirs[0];
                 }
                 else
                     mainCfg.additionalPairs.emplace_back(leftDirs[i], rightDirs[i],

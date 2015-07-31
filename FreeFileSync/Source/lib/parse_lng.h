@@ -25,7 +25,7 @@
 namespace lngfile
 {
 //singular forms
-typedef std::map <std::string, std::string> TranslationMap;  //orig |-> translation
+typedef std::map <std::string, std::string> TranslationMap; //orig |-> translation
 
 //plural forms
 typedef std::pair<std::string, std::string> SingularPluralPair; //1 house| n houses

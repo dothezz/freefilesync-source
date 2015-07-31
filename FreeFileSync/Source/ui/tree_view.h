@@ -116,9 +116,9 @@ private:
             firstFileId(nullptr) {}
 
         std::uint64_t bytesGross;
-        std::uint64_t bytesNet;  //bytes for files on view in this directory only
+        std::uint64_t bytesNet; //bytes for files on view in this directory only
         int itemCountGross;
-        int itemCountNet;   //number of files on view for in this directory only
+        int itemCountNet; //number of files on view for in this directory only
 
         std::vector<DirNodeImpl> subDirs;
         FileSystemObject::ObjectId firstFileId; //weak pointer to first FilePair or SymlinkPair

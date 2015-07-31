@@ -212,7 +212,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     miscCfgOut(miscCfg),
     handleDeletion(DELETE_TO_RECYCLER), //
     onGuiError(ON_GUIERROR_POPUP),      //dummy init
-    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_bpButtonSelectSftp, *m_versioningFolder/*, m_staticTextResolvedPath*/)
+    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_bpButtonSelectSftp, *m_versioningFolder, nullptr /*staticText*/, nullptr /*wxWindow*/)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -387,12 +387,15 @@ void ConfigDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events witho
     {
         case WXK_F6:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::COMPARISON));
+            m_buttonOkay->SetFocus();
             return; //handled!
         case WXK_F7:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::FILTER));
+            m_buttonOkay->SetFocus();
             return;
         case WXK_F8:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
+            m_buttonOkay->SetFocus();
             return;
     }
 
@@ -740,7 +743,7 @@ void toggleDeletionPolicy(DeletionPolicy& deletionPolicy)
 
 void ConfigDialog::setSyncOptions(const SyncOptions& so)
 {
-    directionCfg   = so.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
+    directionCfg   = so.syncCfg.directionCfg; //make working copy; ownership *not* on GUI
     handleDeletion = so.syncCfg.handleDeletion;
 
     versioningFolder.setPath(so.syncCfg.versioningFolderPhrase);

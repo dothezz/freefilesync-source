@@ -122,7 +122,6 @@ Zstring zen::ntPathToWin32Path(const Zstring& path) //noexcept
             const DWORD charsWritten = ::GetEnvironmentVariable(L"SystemRoot", //_In_opt_   LPCTSTR lpName,
                                                                 &buf[0],       //_Out_opt_  LPTSTR lpBuffer,
                                                                 bufSize);      //_In_       DWORD nSize
-
             if (0 < charsWritten && charsWritten < bufSize)
                 return replaceCpy(path, L"\\SystemRoot\\", appendSeparator(Zstring(&buf[0], charsWritten)), false);
         }

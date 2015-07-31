@@ -76,7 +76,7 @@ ABF::FileAttribAfterCopy ABF::copyFileTransactional(const AbstractPathRef& apSou
 
         //fall back to stream-based file copy:
         if (copyFilePermissions)
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(getDisplayPath(apTargetTmp))),
+            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(ABF::getDisplayPath(apTargetTmp))),
                             _("Operation not supported for different base folder types."));
 
         return copyFileAsStream(apSource, apTargetTmp, onNotifyCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
@@ -100,7 +100,7 @@ ABF::FileAttribAfterCopy ABF::copyFileTransactional(const AbstractPathRef& apSou
             }
 
         //transactional behavior: ensure cleanup; not needed before copyFileBestEffort() which is already transactional
-        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(apTargetTmp); } catch (FileError&) {} });
+        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { ABF::removeFile(apTargetTmp); } catch (FileError&) {} });
 
         //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
         if (onDeleteTargetFile)
@@ -146,10 +146,10 @@ void ABF::createFolderRecursively(const AbstractPathRef& ap) //throw FileError
     catch (ErrorTargetExisting&) {}
     catch (ErrorTargetPathMissing&)
     {
-        if (const Opt<Zstring> parentPathImpl = ap.abf->getParentFolderPathImpl(ap.itemPathImpl))
+        if (std::unique_ptr<AbstractPathRef> parentPath = ABF::getParentFolderPath(ap))
         {
             //recurse...
-            createFolderRecursively(AbstractPathRef(*ap.abf, *parentPathImpl)); //throw FileError
+            createFolderRecursively(*parentPath); //throw FileError
 
             //now try again...
             ABF::createFolderSimple(ap); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
@@ -170,7 +170,7 @@ struct FlatTraverserCallback: public ABF::TraverserCallback
     std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.shortName); return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override
     {
-        if (ABF::dirExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
+        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
             folderLinkNames_.push_back(si.shortName);
         else //file symlink, broken symlink
             fileNames_.push_back(si.shortName);
@@ -196,7 +196,7 @@ void removeFolderRecursivelyImpl(const AbstractPathRef& folderPath, //throw File
                                  const std::function<void (const std::wstring& displayPath)>& onBeforeFolderDeletion) //one call for each *existing* object!
 {
     assert(!ABF::symlinkExists(folderPath)); //[!] no symlinks in this context!!!
-    assert(ABF::dirExists(folderPath));      //Do NOT traverse into it deleting contained files!!!
+    assert(ABF::folderExists(folderPath));   //Do NOT traverse into it deleting contained files!!!
 
     FlatTraverserCallback ft(folderPath); //traverse source directory one level deep
     ABF::traverseFolder(folderPath, ft); //throw FileError

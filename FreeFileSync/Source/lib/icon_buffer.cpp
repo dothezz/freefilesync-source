@@ -5,8 +5,9 @@
 // **************************************************************************
 
 #include "icon_buffer.h"
+#include <map>
 #include <set>
-#include <zen/thread.h> //includes <boost/thread.hpp>
+#include <zen/thread.h> //includes <std/thread.hpp>
 #include <zen/scope_guard.h>
 #include <wx+/image_resources.h>
 #include "icon_loader.h"
@@ -24,7 +25,7 @@ namespace
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer: must be big enough to hold visible icons + preload buffer! Consider OS limit on GDI resources (wxBitmap)!!!
 
 #ifndef NDEBUG
-    const boost::thread::id mainThreadId = boost::this_thread::get_id();
+    const std::thread::id mainThreadId = std::this_thread::get_id();
 #endif
 
 #ifdef ZEN_WIN
@@ -35,7 +36,7 @@ const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer:
 //destroys raw icon! Call from GUI thread only!
 wxBitmap extractWxBitmap(ImageHolder&& ih)
 {
-    assert(boost::this_thread::get_id() == mainThreadId);
+    assert(std::this_thread::get_id() == mainThreadId);
 #ifndef NDEBUG
     auto check = [&] { assert(!ih); }; //work around V120_XP compilation issue
     ZEN_ON_SCOPE_EXIT(check());
@@ -132,11 +133,13 @@ struct WorkItem
 class WorkLoad
 {
 public:
-    WorkItem extractNextFile() //context of worker thread, blocking
+    //context of worker thread, blocking:
+    WorkItem extractNextFile() //throw ThreadInterruption
     {
-        assert(boost::this_thread::get_id() != mainThreadId);
-        boost::unique_lock<boost::mutex> dummy(lockFiles);
-        conditionNewWork.wait(dummy, [this] { return !workLoad.empty(); }); //throw boost::thread_interrupted
+        assert(std::this_thread::get_id() != mainThreadId);
+        std::unique_lock<std::mutex> dummy(lockFiles);
+
+        interruptibleWait(conditionNewWork, dummy, [this] { return !workLoad.empty(); }); //throw ThreadInterruption
 
         WorkItem workItem = workLoad.back(); //
         workLoad.pop_back();                 //yes, not std::bad_alloc exception-safe, but bad_alloc is not relevant for us
@@ -145,9 +148,9 @@ public:
 
     void setWorkload(const std::vector<AbstractPathRef>& newLoad) //context of main thread
     {
-        assert(boost::this_thread::get_id() == mainThreadId);
+        assert(std::this_thread::get_id() == mainThreadId);
         {
-            boost::lock_guard<boost::mutex> dummy(lockFiles);
+            std::lock_guard<std::mutex> dummy(lockFiles);
 
             workLoad.clear();
             for (const AbstractPathRef& filePath : newLoad)
@@ -161,9 +164,9 @@ public:
 
     void addToWorkload(const AbstractPathRef& filePath) //context of main thread
     {
-        assert(boost::this_thread::get_id() == mainThreadId);
+        assert(std::this_thread::get_id() == mainThreadId);
         {
-            boost::lock_guard<boost::mutex> dummy(lockFiles);
+            std::lock_guard<std::mutex> dummy(lockFiles);
 
             workLoad.emplace_back(filePath.getUniqueId(), //set as next item to retrieve
                                   ABF::getAsyncIconLoader(filePath), //noexcept!
@@ -173,9 +176,9 @@ public:
     }
 
 private:
-    std::vector<WorkItem>     workLoad; //processes last elements of vector first!
-    boost::mutex              lockFiles;
-    boost::condition_variable conditionNewWork; //signal event: data for processing available
+    std::vector<WorkItem>   workLoad; //processes last elements of vector first!
+    std::mutex              lockFiles;
+    std::condition_variable conditionNewWork; //signal event: data for processing available
 };
 
 
@@ -187,15 +190,15 @@ public:
     //called by main and worker thread:
     bool hasIcon(const AbstractPathRef::ItemId& id) const
     {
-        boost::lock_guard<boost::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList);
         return iconList.find(id) != iconList.end();
     }
 
     //must be called by main thread only! => wxBitmap is NOT thread-safe like an int (non-atomic ref-count!!!)
     Opt<wxBitmap> retrieve(const AbstractPathRef::ItemId& id)
     {
-        assert(boost::this_thread::get_id() == mainThreadId);
-        boost::lock_guard<boost::mutex> dummy(lockIconList);
+        assert(std::this_thread::get_id() == mainThreadId);
+        std::lock_guard<std::mutex> dummy(lockIconList);
 
         auto it = iconList.find(id);
         if (it == iconList.end())
@@ -215,7 +218,7 @@ public:
     //called by main and worker thread:
     void insert(const AbstractPathRef::ItemId& id, ImageHolder&& icon)
     {
-        boost::lock_guard<boost::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList);
 
         //thread safety: moving ImageHolder is free from side effects, but ~wxBitmap() is NOT! => do NOT delete items from iconList here!
         auto rc = iconList.emplace(id, makeValueObject());
@@ -231,8 +234,8 @@ public:
     //call at an appropriate time, e.g.	after Workload::setWorkload()
     void limitSize()
     {
-        assert(boost::this_thread::get_id() == mainThreadId);
-        boost::lock_guard<boost::mutex> dummy(lockIconList);
+        assert(std::this_thread::get_id() == mainThreadId);
+        std::lock_guard<std::mutex> dummy(lockIconList);
 
         while (iconList.size() > BUFFER_SIZE_MAX)
         {
@@ -329,7 +332,7 @@ private:
         FileIconMap::iterator next_; //
     };
 
-    mutable boost::mutex lockIconList;
+    mutable std::mutex lockIconList;
     FileIconMap iconList; //shared resource; Zstring is thread-safe like an int
     FileIconMap::iterator firstInsertPos;
     FileIconMap::iterator lastInsertPos;
@@ -347,7 +350,7 @@ public:
         buffer_(buffer),
         iconSizeType(st) {}
 
-    void operator()(); //thread entry
+    void operator()() const; //thread entry
 
 private:
     std::shared_ptr<WorkLoad> workload_; //main/worker thread may access different shared_ptr instances safely (even though they have the same target!)
@@ -379,7 +382,7 @@ public:
 } dummy;
 
 
-void WorkerThread::operator()() //thread entry
+void WorkerThread::operator()() const //thread entry
 {
 #ifdef ZEN_WIN
     //1. Initialize COM
@@ -393,9 +396,10 @@ void WorkerThread::operator()() //thread entry
 
     for (;;)
     {
-        boost::this_thread::interruption_point();
+        interruptionPoint(); //throw ThreadInterruption
 
-        const WorkItem workItem = workload_->extractNextFile(); //start work: blocks until next icon to load is retrieved
+        //start work: blocks until next icon to load is retrieved:
+        const WorkItem workItem = workload_->extractNextFile(); //throw ThreadInterruption
 
         if (!buffer_->hasIcon(workItem.id_)) //perf: workload may contain duplicate entries?
             buffer_->insert(workItem.id_, getDisplayIcon(workItem.iconLoader_, workItem.fileName_, iconSizeType));
@@ -413,13 +417,13 @@ struct IconBuffer::Pimpl
     std::shared_ptr<WorkLoad> workload;
     std::shared_ptr<Buffer> buffer;
 
-    boost::thread worker;
+    InterruptibleThread worker;
 };
 
 
 IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()), iconSizeType(sz)
 {
-    pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
+    pimpl->worker = InterruptibleThread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
 
 
@@ -427,7 +431,7 @@ IconBuffer::~IconBuffer()
 {
     setWorkload({}); //make sure interruption point is always reached!
     pimpl->worker.interrupt();
-    pimpl->worker.join(); //throw boost::thread_interrupted -> not expected => main thread!
+    pimpl->worker.join();
 }
 
 
@@ -492,7 +496,7 @@ void IconBuffer::setWorkload(const std::vector<AbstractPathRef>& load)
     assert(load.size() < BUFFER_SIZE_MAX / 2);
 
     pimpl->workload->setWorkload(load); //since buffer can only increase due to new workload,
-    pimpl->buffer->limitSize();   //this is the place to impose the limit from main thread!
+    pimpl->buffer->limitSize();         //this is the place to impose the limit from main thread!
 }
 
 

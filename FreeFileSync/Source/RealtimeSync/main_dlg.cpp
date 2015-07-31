@@ -39,7 +39,7 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        dirpath_(*this, *m_buttonSelectDir, *m_txtCtrlDirectory)
+        folderSelector_(*this, *m_buttonSelectDir, *m_txtCtrlDirectory, nullptr /*staticText*/)
     {
 #ifdef ZEN_LINUX
         //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
@@ -48,11 +48,11 @@ public:
 #endif
     }
 
-    void setPath(const Zstring& dirpath) { dirpath_.setPath(dirpath); }
-    Zstring getPath() const { return dirpath_.getPath(); }
+    void setPath(const Zstring& dirpath) { folderSelector_.setPath(dirpath); }
+    Zstring getPath() const { return folderSelector_.getPath(); }
 
 private:
-    zen::FolderSelector2 dirpath_;
+    zen::FolderSelector2 folderSelector_;
 };
 
 
@@ -339,9 +339,9 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 
 void MainDialog::onFilesDropped(FileDropEvent& event)
 {
-    const auto& files = event.getFiles();
-    if (!files.empty())
-        loadConfig(utfCvrtTo<Zstring>(files[0]));
+    const auto& filePaths = event.getPaths();
+    if (!filePaths.empty())
+        loadConfig(utfCvrtTo<Zstring>(filePaths[0]));
 }
 
 

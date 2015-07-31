@@ -434,26 +434,29 @@ void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //thro
 
         if (lastError == ERROR_NOT_SAME_DEVICE)
             throw ErrorDifferentVolume(errorMsg, errorDescr);
-        else if (lastError == ERROR_ALREADY_EXISTS || //-> used on Win7 x64
+         if (lastError == ERROR_ALREADY_EXISTS || //-> used on Win7 x64
                  lastError == ERROR_FILE_EXISTS)      //-> used by XP???
             throw ErrorTargetExisting(errorMsg, errorDescr);
-        else
-            throw FileError(errorMsg, errorDescr);
+        throw FileError(errorMsg, errorDescr);
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    if (::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
+	//rename() will never fail with EEXIST, but always overwrite!
+	//=> OS X: no solution
+	//=> Linux: renameat2() with RENAME_NOREPLACE -> still new, probably buggy
+	const bool alreadyExists = somethingExists(pathTarget); //we have to let go of atomicity!
+
+    if (alreadyExists || ::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
     {
-        const int lastError = errno; //copy before directly or indirectly making other system calls!
+        const int lastError = alreadyExists ? EEXIST : errno; //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtPath(pathSource)), L"%y", L"\n" + fmtPath(pathTarget));
         const std::wstring errorDescr = formatSystemError(L"rename", lastError);
 
         if (lastError == EXDEV)
             throw ErrorDifferentVolume(errorMsg, errorDescr);
-        else if (lastError == EEXIST)
-            throw ErrorTargetExisting(errorMsg, errorDescr);
-        else
-            throw FileError(errorMsg, errorDescr);
+         if (lastError == EEXIST)
+            throw ErrorTargetExisting(errorMsg, errorDescr); 
+        throw FileError(errorMsg, errorDescr);
     }
 #endif
 }
@@ -2039,12 +2042,6 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
     return PROGRESS_CONTINUE;
 }
 
-#if defined _MSC_VER && _MSC_VER > 1800
-    #error get rid!
-#endif
-const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destination is not supported with Windows 2000
-//caveat: function scope static initialization is not thread-safe in VS 2010! -> still not sufficient if multiple threads access during static init!!!
-
 
 InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting, ErrorFileLocked, ErrorFallbackToCopyAsBackupStream
                                         const Zstring& targetFile,
@@ -2062,8 +2059,8 @@ InSyncAttributes copyFileWindowsDefault(const Zstring& sourceFile, //throw FileE
 
     DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
 
-    if (supportNonEncryptedDestination)
-        copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrypted location
+    //encrypted destination is not supported with Windows 2000! -> whatever
+    copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrypted location
 
     //if (vistaOrLater()) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
     //  copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, improvement for large files (20% in test NTFS -> NTFS)

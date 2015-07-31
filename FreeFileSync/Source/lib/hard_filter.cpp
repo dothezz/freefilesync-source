@@ -218,14 +218,6 @@ bool matchesMaskBegin(const Zstring& name, const std::vector<Zstring>& masks)
 {
     return std::any_of(masks.begin(), masks.end(), [&](const Zstring& mask) { return matchesMaskBegin(name.c_str(), mask.c_str()); });
 }
-
-
-inline
-void removeDuplicates(std::vector<Zstring>& v)
-{
-    std::sort(v.begin(), v.end());
-    v.erase(std::unique(v.begin(), v.end()), v.end());
-}
 }
 
 

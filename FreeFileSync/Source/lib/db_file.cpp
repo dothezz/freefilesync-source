@@ -656,9 +656,10 @@ private:
             //if directory is not included in "currentDirs", it is either not existing anymore, in which case it should be deleted from database
             //or it was excluded via filter and the database entry should be preserved
 
-            warn_static("insufficient for *.txt-include filters! -> e.g. 1. *.txt-include, both sides in sync, txt-fiels in subfolder")
-            warn_static("2. delete all subfolders externally ")
-            warn_static("3. sync => db should be updated == entries removed for .txt; mabye even for deleted subfolders!?!")
+            warn_static("insufficient for *.txt-include filters! -> e.g. "
+            "1. *.txt-include, both sides in sync, txt-fiels in subfolder"
+            "2. delete all subfolders externally "
+            "3. sync => db should be updated == entries removed for .txt; mabye even for deleted subfolders!?!")
         });
     }
 
@@ -720,7 +721,7 @@ void zen::saveLastSynchronousState(const BaseDirPair& baseDirObj, const std::fun
     ABF::removeFile(dbPathRightTmp); //throw FileError
 
     //(try to) load old database files...
-    DbStreams streamsLeft;  //list of session ID + DirInfo-stream
+    DbStreams streamsLeft; //list of session ID + DirInfo-stream
     DbStreams streamsRight;
 
     //std::function<void(std::int64_t bytesDelta)> onUpdateLoadStatus;

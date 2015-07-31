@@ -112,7 +112,7 @@ struct DirectionSet
 
     SyncDirection exLeftSideOnly;
     SyncDirection exRightSideOnly;
-    SyncDirection leftNewer;  //CMP_BY_TIME_SIZE only!
+    SyncDirection leftNewer; //CMP_BY_TIME_SIZE only!
     SyncDirection rightNewer; //
     SyncDirection different; //CMP_BY_CONTENT only!
     SyncDirection conflict;
@@ -335,19 +335,19 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 {
     FolderPairEnh() {}
 
-    FolderPairEnh(const Zstring& phraseLeft,
-                  const Zstring& phraseRight,
+    FolderPairEnh(const Zstring& folderPathPhraseLeft,
+                  const Zstring& folderPathPhraseRight,
                   const std::shared_ptr<const CompConfig>& cmpConfig,
                   const std::shared_ptr<const SyncConfig>& syncConfig,
                   const FilterConfig& filter) :
-        dirpathPhraseLeft (phraseLeft),
-        dirpathPhraseRight(phraseRight),
+        folderPathPhraseLeft_ (folderPathPhraseLeft),
+        folderPathPhraseRight_(folderPathPhraseRight),
         altCmpConfig(cmpConfig),
         altSyncConfig(syncConfig),
         localFilter(filter) {}
 
-    Zstring dirpathPhraseLeft;  //unresolved directory names as entered by user!
-    Zstring dirpathPhraseRight; //
+    Zstring folderPathPhraseLeft_;  //unresolved directory names as entered by user!
+    Zstring folderPathPhraseRight_; //
 
     std::shared_ptr<const CompConfig> altCmpConfig;  //optional
     std::shared_ptr<const SyncConfig> altSyncConfig; //
@@ -358,8 +358,8 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 inline
 bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
 {
-    return lhs.dirpathPhraseLeft  == rhs.dirpathPhraseLeft  &&
-           lhs.dirpathPhraseRight == rhs.dirpathPhraseRight &&
+    return lhs.folderPathPhraseLeft_  == rhs.folderPathPhraseLeft_  &&
+           lhs.folderPathPhraseRight_ == rhs.folderPathPhraseRight_ &&
 
            (lhs.altCmpConfig.get() && rhs.altCmpConfig.get() ?
             *lhs.altCmpConfig == *rhs.altCmpConfig :

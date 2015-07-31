@@ -195,11 +195,10 @@ private:
     struct Descriptor
     {
         Descriptor(size_t len, size_t cap) :
-            refCount(1),
             length  (static_cast<std::uint32_t>(len)),
             capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "the types are always lock-free"
 
-        std::atomic<unsigned int> refCount;
+		std::atomic<unsigned int> refCount { 1 }; //std:atomic is uninitialized by default!
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
     };
@@ -222,11 +221,13 @@ public:
     Zbase(const Char* source); //implicit conversion from a C-string
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
-    Zbase(Zbase&& tmp); //make noexcept in C++11
+    Zbase(Zbase&& tmp) noexcept;
     explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error!
-    //allow explicit construction from different string type, prevent ambiguity via SFINAE
-    template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
-    ~Zbase(); //make noexcept in C++11
+    
+//allow explicit construction from different string type, prevent ambiguity via SFINAE
+//template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
+
+    ~Zbase();
 
     //operator const Char* () const; //NO implicit conversion to a C-string!! Many problems... one of them: if we forget to provide operator overloads, it'll just work with a Char*...
 
@@ -263,11 +264,11 @@ public:
     Zbase& assign(const Char* source, size_t len);
     Zbase& append(const Char* source, size_t len);
     void resize(size_t newSize, Char fillChar = 0);
-    void swap(Zbase& other); //make noexcept in C++11
+    void swap(Zbase& other);
     void push_back(Char val) { operator+=(val); } //STL access
 
     Zbase& operator=(const Zbase& source);
-    Zbase& operator=(Zbase&& tmp); //make noexcept in C++11
+    Zbase& operator=(Zbase&& tmp) noexcept;
     Zbase& operator=(const Char* source);
     Zbase& operator=(Char source);
     Zbase& operator+=(const Zbase& other);
@@ -377,14 +378,14 @@ Zbase<Char, SP, AP>::Zbase(const Zbase<Char, SP, AP>& source)
 
 
 template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp)
+Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp) noexcept
 {
     rawStr = tmp.rawStr;
     tmp.rawStr = nullptr; //usually nullptr would violate the class invarants, but it is good enough for the destructor!
     //caveat: do not increment ref-count of an unshared string! We'd lose optimization opportunity of reusing its memory!
 }
 
-
+/*
 template <class Char, template <class, class> class SP, class AP>
 template <class S> inline
 Zbase<Char, SP, AP>::Zbase(const S& other, typename S::value_type)
@@ -394,11 +395,13 @@ Zbase<Char, SP, AP>::Zbase(const S& other, typename S::value_type)
     std::copy(other.c_str(), other.c_str() + sourceLen, rawStr);
     rawStr[sourceLen] = 0;
 }
-
+*/
 
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::~Zbase()
 {
+    static_assert(noexcept(this->~Zbase()), ""); //has exception spec of compiler-generated destructor by default
+
     this->destroy(rawStr); //rawStr may be nullptr; see move constructor!
 }
 
@@ -650,7 +653,7 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(const Zbase<Char, SP, AP>& o
 
 
 template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP>&& tmp)
+Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP>&& tmp) noexcept
 {
     swap(tmp); //don't use unifying assignment but save one move-construction in the r-value case instead!
     return *this;

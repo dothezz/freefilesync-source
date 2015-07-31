@@ -83,7 +83,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_bpButtonSelectSftp, *m_logfileDir);
+    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_bpButtonSelectSftp, *m_logfileDir, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
     setConfig(batchCfg);
 

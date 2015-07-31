@@ -38,20 +38,6 @@ IMPLEMENT_APP(Application);
 
 namespace
 {
-/*
-boost::thread::id mainThreadId = boost::this_thread::get_id();
-
-void onTerminationRequested()
-{
-std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
-                   L"Termination requested in main thread!\n\n" :
-                   L"Termination requested in worker thread!\n\n";
-msg += L"Please file a bug report at: http://sourceforge.net/projects/freefilesync";
-
-wxSafeShowMessage(_("An exception occurred"), msg);
-std::abort();
-}
-*/
 #ifdef _MSC_VER
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
@@ -62,8 +48,6 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-    //std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
-
 #ifdef ZEN_WIN
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>

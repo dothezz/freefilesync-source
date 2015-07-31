@@ -7,6 +7,9 @@
 	<plural_definition>0</plural_definition>
 </header>
 
+<source>Port:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>自上次同步後，兩邊均已變更過。</target>
 

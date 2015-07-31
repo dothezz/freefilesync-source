@@ -435,6 +435,8 @@ protected:
     wxPanel* m_panel41;
     wxStaticText* m_staticText12311;
     wxTextCtrl* m_textCtrlServer;
+    wxStaticText* m_staticText1233;
+    wxTextCtrl* m_textCtrlPort;
     wxStaticText* m_staticText1381;
     wxStaticText* m_staticText1382;
     wxStaticText* m_staticText138;
@@ -738,6 +740,44 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class CopyToDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class CopyToDlgGenerated : public wxDialog
+{
+private:
+
+protected:
+    wxStaticBitmap* m_bitmapCopyTo;
+    wxStaticText* m_staticTextHeader;
+    wxStaticLine* m_staticline91;
+    wxPanel* m_panel31;
+    wxStaticLine* m_staticline42;
+    wxTextCtrl* m_textCtrlFileList;
+    wxButton* m_buttonSelectFolder;
+    wxStaticLine* m_staticline9;
+    wxBoxSizer* bSizerStdButtons;
+    wxCheckBox* m_checkBoxKeepRelPath;
+    wxCheckBox* m_checkBoxOverwriteIfExists;
+    wxButton* m_buttonOK;
+    wxButton* m_buttonCancel;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnUseRecycler( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+
+
+public:
+    FolderHistoryBox* m_directoryTarget;
+    wxBitmapButton* m_bpButtonSelectSftp;
+
+    CopyToDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Copy items"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
+    ~CopyToDlgGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class OptionsDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
 class OptionsDlgGenerated : public wxDialog
@@ -858,15 +898,15 @@ protected:
     wxStaticLine* m_staticline341;
     wxStaticText* m_staticText96;
     wxHyperlinkCtrl* m_hyperlink11;
-    wxHyperlinkCtrl* m_hyperlink9;
-    wxHyperlinkCtrl* m_hyperlink10;
     wxHyperlinkCtrl* m_hyperlink7;
     wxHyperlinkCtrl* m_hyperlink14;
-    wxHyperlinkCtrl* m_hyperlink15;
-    wxHyperlinkCtrl* m_hyperlink13;
     wxHyperlinkCtrl* m_hyperlink16;
+    wxHyperlinkCtrl* m_hyperlink15;
     wxHyperlinkCtrl* m_hyperlink12;
+    wxHyperlinkCtrl* m_hyperlink13;
+    wxHyperlinkCtrl* m_hyperlink10;
     wxHyperlinkCtrl* m_hyperlink18;
+    wxHyperlinkCtrl* m_hyperlink9;
     wxPanel* m_panelDonate;
     wxPanel* m_panel39;
     wxStaticBitmap* m_bitmapDonate;

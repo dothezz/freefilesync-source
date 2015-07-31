@@ -43,22 +43,12 @@ time per call | function
 #ifdef ZEN_WIN
 namespace
 {
-//warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
-const LCID ZSTRING_INVARIANT_LOCALE = zen::winXpOrLater() ?
-                                      LOCALE_INVARIANT :
-                                      MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
-
 //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
 //by a factor ~3 faster than old string comparison using "LCMapString"
 typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1, int cchCount1,
                                                LPCWSTR lpString2, int cchCount2, BOOL bIgnoreCase);
 const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 //watch for dependencies in global namespace!!!
-//caveat: function scope static initialization is not thread-safe in VS 2010!
-#if defined _MSC_VER && _MSC_VER > 1800
-    #error not true anymore
-#endif
-
 }
 
 
@@ -92,7 +82,7 @@ int cmpFilePath(const Zchar* lhs, size_t lhsLen, const Zchar* rhs, size_t rhsLen
         auto copyToUpperCase = [&](const wchar_t* strIn, wchar_t* strOut)
         {
             //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE,  //__in   LCID Locale,
+            if (::LCMapString(LOCALE_INVARIANT,          //__in   LCID Locale,
                               LCMAP_UPPERCASE,           //__in   DWORD dwMapFlags,
                               strIn,                     //__in   LPCTSTR lpSrcStr,
                               static_cast<int>(minSize), //__in   int cchSrc,
@@ -138,13 +128,15 @@ Zstring makeUpperCopy(const Zstring& str)
     Zstring output;
     output.resize(len);
 
+    //LOCALE_INVARIANT is NOT available with Windows 2000 -> ok
+
     //use Windows' upper case conversion: faster than ::CharUpper()
-    if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
-                      LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
-                      str.c_str(),              //__in   LPCTSTR lpSrcStr,
-                      len,                      //__in   int cchSrc,
-                      &*output.begin(),         //__out  LPTSTR lpDestStr,
-                      len) == 0)                //__in   int cchDest
+    if (::LCMapString(LOCALE_INVARIANT, //__in   LCID Locale,
+                      LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
+                      str.c_str(),      //__in   LPCTSTR lpSrcStr,
+                      len,              //__in   int cchSrc,
+                      &*output.begin(), //__out  LPTSTR lpDestStr,
+                      len) == 0)        //__in   int cchDest
         throw std::runtime_error("Error comparing strings (LCMapString). " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     return output;

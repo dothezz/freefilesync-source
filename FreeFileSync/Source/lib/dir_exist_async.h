@@ -7,6 +7,7 @@
 #ifndef DIR_EXIST_HEADER_08173281673432158067342132467183267
 #define DIR_EXIST_HEADER_08173281673432158067342132467183267
 
+#include <list>
 #include <zen/thread.h>
 #include <zen/file_error.h>
 #include "../fs/abstract.h"
@@ -28,30 +29,13 @@ struct DirectoryStatus
 };
 
 
-struct DirCheckResult
-{
-    bool exists;
-    std::unique_ptr<FileError> error;
-
-    DirCheckResult(bool existsIn, std::unique_ptr<FileError>&& errorIn) : exists(existsIn), error(std::move(errorIn)) {}
-
-    DirCheckResult           (DirCheckResult&& tmp) : exists(tmp.exists), error(std::move(tmp.error)) {} //= default with C++14
-    DirCheckResult& operator=(DirCheckResult&& tmp)  //= default with C++14
-    {
-        exists = tmp.exists;
-        error = std::move(tmp.error);
-        return *this;
-    }
-};
-
-
 DirectoryStatus checkFolderExistenceUpdating(const std::set<const ABF*, ABF::LessItemPath>& baseFolders, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     using namespace zen;
 
     DirectoryStatus output;
 
-    std::list<std::pair<const ABF*, boost::unique_future<DirCheckResult>>> futureInfo;
+    std::list<std::pair<const ABF*, std::future<bool>>> futureInfo;
 
     for (const ABF* baseFolder : baseFolders)
         if (!baseFolder->emptyBaseFolderPath()) //skip empty dirs
@@ -59,28 +43,21 @@ DirectoryStatus checkFolderExistenceUpdating(const std::set<const ABF*, ABF::Les
             AbstractPathRef folderPath = baseFolder->getAbstractPath(Zstring());
 
             std::function<void()> connectFolder /*throw FileError*/ = baseFolder->getAsyncConnectFolder(allowUserInteraction); //noexcept
-            std::function<bool()> dirExists     /*throw FileError*/ = ABF::getAsyncCheckDirExists(folderPath); //noexcept
+            std::function<bool()> dirExists     /*throw FileError*/ = ABF::getAsyncCheckFolderExists(folderPath); //noexcept
 
             futureInfo.emplace_back(baseFolder, runAsync([connectFolder, dirExists]
             {
-                try
-                {
-                    //1. login to network share, open FTP connection, ect.
-                    if (connectFolder)
-                        connectFolder(); //throw FileError
+                //1. login to network share, open FTP connection, ect.
+                if (connectFolder)
+                    connectFolder(); //throw FileError
 
-                    //2. check dir existence
-                    return DirCheckResult(dirExists(), nullptr); //throw FileError
-                }
-                catch (const FileError& e)
-                {
-                    return DirCheckResult(false, make_unique<FileError>(e));
-                }
+                //2. check dir existence
+                return dirExists(); //throw FileError
             }));
         }
 
     //don't wait (almost) endlessly like win32 would on non-existing network shares:
-    boost::chrono::steady_clock::time_point endTime = boost::chrono::steady_clock::now() + boost::chrono::seconds(20); //consider CD-rom insert or hard disk spin up time from sleep
+    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(20); //consider CD-rom insert or hard disk spin up time from sleep
 
     for (auto& fi : futureInfo)
     {
@@ -88,19 +65,21 @@ DirectoryStatus checkFolderExistenceUpdating(const std::set<const ABF*, ABF::Les
 
         procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", displayPathFmt)); //may throw!
 
-        while (boost::chrono::steady_clock::now() < endTime &&
-               fi.second.wait_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL / 2)) != boost::future_status::ready)
+        while (std::chrono::steady_clock::now() < endTime &&
+               fi.second.wait_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL / 2)) != std::future_status::ready)
             procCallback.requestUiRefresh(); //may throw!
 
-        if (fi.second.is_ready())
+        if (isReady(fi.second))
         {
-            const DirCheckResult result = fi.second.get(); //call future::get() only *once*! otherwise: undefined behavior!
-            if (result.error)
-                output.failedChecks.emplace(fi.first, *result.error);
-            else if (result.exists)
-                output.existingBaseFolder.insert(fi.first);
-            else
-                output.missingBaseFolder.insert(fi.first);
+            try
+            {
+                //call future::get() only *once*! otherwise: undefined behavior!
+                if (fi.second.get()) //throw FileError
+                    output.existingBaseFolder.insert(fi.first);
+                else
+                    output.missingBaseFolder.insert(fi.first);
+            }
+            catch (const FileError& e) { output.failedChecks.emplace(fi.first, e); }
         }
         else
             output.failedChecks.emplace(fi.first, FileError(replaceCpy(_("Time out while searching for folder %x."), L"%x", displayPathFmt)));

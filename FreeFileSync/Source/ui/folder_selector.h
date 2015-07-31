@@ -24,40 +24,43 @@ Reasons NOT to use wxDirPickerCtrl, but wxButton instead:
 	- hard-codes "Browse" button label
 */
 
-extern const wxEventType EVENT_ON_DIR_SELECTED;			 //directory is changed by the user (except manual type-in)
-extern const wxEventType EVENT_ON_DIR_MANUAL_CORRECTION; //manual type-in
-//example: wnd.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
+extern const wxEventType EVENT_ON_FOLDER_SELECTED;	  //directory is changed by the user (except manual type-in)
+extern const wxEventType EVENT_ON_FOLDER_MANUAL_EDIT; //manual type-in
+//example: wnd.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
 
 class FolderSelector: public wxEvtHandler
 {
 public:
-    FolderSelector(wxWindow&          dropWindow,
-                   wxButton&          selectFolderButton,
-                   wxButton&          selectSftpButton,
-                   FolderHistoryBox&  dirpath,
-                   wxStaticText*      staticText  = nullptr,  //optional
-                   wxWindow*          dropWindow2 = nullptr); //
+    FolderSelector(wxWindow&         dropWindow,
+                   wxButton&         selectFolderButton,
+                   wxButton&         selectSftpButton,
+                   FolderHistoryBox& folderComboBox,
+                   wxStaticText*     staticText,   //optional
+                   wxWindow*         dropWindow2); //
 
     ~FolderSelector();
 
+    void setSiblingSelector(FolderSelector* selector) { siblingSelector = selector; }
+
     Zstring getPath() const;
-    void setPath(const Zstring& dirpath);
+    void setPath(const Zstring& folderPathPhrase);
 
 private:
     virtual bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) { return true; }; //return true if drop should be processed
 
-    void onMouseWheel      (wxMouseEvent& event);
-    void onFilesDropped    (FileDropEvent& event);
-    void onWriteDirManually(wxCommandEvent& event);
-    void onSelectFolder    (wxCommandEvent& event);
-    void onSelectSftp      (wxCommandEvent& event);
+    void onMouseWheel    (wxMouseEvent& event);
+    void onFilesDropped  (FileDropEvent& event);
+    void onEditFolderPath(wxCommandEvent& event);
+    void onSelectFolder  (wxCommandEvent& event);
+    void onSelectSftp    (wxCommandEvent& event);
 
-    wxWindow&          dropWindow_;
-    wxWindow*          dropWindow2_;
-    wxButton&          selectFolderButton_;
-    wxButton&          selectSftpButton_;
-    FolderHistoryBox&  dirpath_;
-    wxStaticText*      staticText_; //optional
+    wxWindow&         dropWindow_;
+    wxWindow*         dropWindow2_ = nullptr;
+    wxButton&         selectFolderButton_;
+    wxButton&         selectSftpButton_;
+    FolderHistoryBox& folderComboBox_;
+    wxStaticText*     staticText_ = nullptr; //optional
+    FolderSelector* siblingSelector = nullptr;
 };
 }
 

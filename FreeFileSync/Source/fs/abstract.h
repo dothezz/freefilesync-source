@@ -52,9 +52,17 @@ struct AbstractBaseFolder
 
     static Opt<Zstring> getNativeItemPath(const AbstractPathRef& ap) { return ap.abf->isNativeFileSystem() ? Opt<Zstring>(ap.itemPathImpl) : NoValue(); }
 
+    static std::unique_ptr<AbstractPathRef> getParentFolderPath(const AbstractPathRef& ap)
+    {
+        if (const Opt<Zstring> parentPathImpl = ap.abf->getParentFolderPathImpl(ap.itemPathImpl))
+            return std::unique_ptr<AbstractPathRef>(new AbstractPathRef(*ap.abf, *parentPathImpl));
+        return nullptr;
+    }
+    //limitation: zen::Opt requires default-constructibility => we need to use std::unique_ptr:
+
     //----------------------------------------------------------------------------------------------------------------
     static bool fileExists     (const AbstractPathRef& ap) { return ap.abf->fileExists     (ap.itemPathImpl); } //noexcept; check whether file      or file-symlink exists
-    static bool dirExists      (const AbstractPathRef& ap) { return ap.abf->dirExists      (ap.itemPathImpl); } //noexcept; check whether directory or dir-symlink exists
+    static bool folderExists   (const AbstractPathRef& ap) { return ap.abf->folderExists   (ap.itemPathImpl); } //noexcept; check whether directory or dir-symlink exists
     static bool symlinkExists  (const AbstractPathRef& ap) { return ap.abf->symlinkExists  (ap.itemPathImpl); } //noexcept; check whether a symbolic link exists
     static bool somethingExists(const AbstractPathRef& ap) { return ap.abf->somethingExists(ap.itemPathImpl); } //noexcept; check whether any object with this name exists
     //----------------------------------------------------------------------------------------------------------------
@@ -95,7 +103,7 @@ struct AbstractBaseFolder
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
     static IconLoader getAsyncIconLoader(const AbstractPathRef& ap) { return ap.abf->getAsyncIconLoader(ap.itemPathImpl); } //noexcept!
     virtual std::function<void()> /*throw FileError*/ getAsyncConnectFolder(bool allowUserInteraction) const = 0; //noexcept, optional return value
-    static std::function<bool()> /*throw FileError*/ getAsyncCheckDirExists(const AbstractPathRef& ap) { return ap.abf->getAsyncCheckDirExists(ap.itemPathImpl); } //noexcept
+    static std::function<bool()> /*throw FileError*/ getAsyncCheckFolderExists(const AbstractPathRef& ap) { return ap.abf->getAsyncCheckFolderExists(ap.itemPathImpl); } //noexcept
     //----------------------------------------------------------------------------------------------------------------
 
     using FileId = Zbase<char>;
@@ -161,10 +169,10 @@ struct AbstractBaseFolder
 
         struct FileInfo
         {
-            const Zchar*   shortName;
-            std::uint64_t  fileSize;      //unit: bytes!
-            std::int64_t   lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
-            const FileId&  id;            //optional: empty if not supported!
+            const Zchar*  shortName;
+            std::uint64_t fileSize;      //unit: bytes!
+            std::int64_t  lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+            const FileId  id;            //optional: empty if not supported!
             const SymlinkInfo* symlinkInfo; //only filled if file is a followed symlink
         };
 
@@ -294,7 +302,7 @@ private:
 
     //----------------------------------------------------------------------------------------------------------------
     virtual bool fileExists     (const Zstring& itemPathImpl) const = 0; //noexcept
-    virtual bool dirExists      (const Zstring& itemPathImpl) const = 0; //noexcept
+    virtual bool folderExists   (const Zstring& itemPathImpl) const = 0; //noexcept
     virtual bool symlinkExists  (const Zstring& itemPathImpl) const = 0; //noexcept
     virtual bool somethingExists(const Zstring& itemPathImpl) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
@@ -320,7 +328,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
     virtual IconLoader getAsyncIconLoader(const Zstring& itemPathImpl) const = 0; //noexcept!
-    virtual std::function<bool()> /*throw FileError*/ getAsyncCheckDirExists(const Zstring& itemPathImpl) const = 0; //noexcept
+    virtual std::function<bool()> /*throw FileError*/ getAsyncCheckFolderExists(const Zstring& itemPathImpl) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
     virtual std::unique_ptr<InputStream > getInputStream (const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorFileLocked
     virtual std::unique_ptr<OutputStream> getOutputStream(const Zstring& itemPathImpl,  //throw FileError, ErrorTargetExisting

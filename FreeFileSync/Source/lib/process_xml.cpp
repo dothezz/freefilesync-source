@@ -801,8 +801,8 @@ void readConfig(const XmlIn& in, FilterConfig& filter)
 void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 {
     //read folder pairs
-    in["Left" ](enhPair.dirpathPhraseLeft);
-    in["Right"](enhPair.dirpathPhraseRight);
+    in["Left" ](enhPair.folderPathPhraseLeft_);
+    in["Right"](enhPair.folderPathPhraseRight_);
 
     //###########################################################
     //alternate comp configuration (optional)
@@ -939,9 +939,17 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd.attribute("PosY",      config.gui.dlgPos.y);
     inWnd.attribute("Maximized", config.gui.isMaximized);
 
+    XmlIn inCopyTo = inWnd["ManualCopyTo"];
+    inCopyTo.attribute("KeepRelativePaths", config.gui.copyToCfg.keepRelPaths);
+    inCopyTo.attribute("OverwriteIfExists", config.gui.copyToCfg.overwriteIfExists);
+
+    XmlIn inCopyToHistory = inCopyTo["FolderHistory"];
+    inCopyToHistory(config.gui.copyToCfg.folderHistory);
+    inCopyToHistory.attribute("LastUsedPath" , config.gui.copyToCfg.lastUsedPath);
+    inCopyToHistory.attribute("MaxSize"      , config.gui.copyToCfg.historySizeMax);
+
     XmlIn inManualDel = inWnd["ManualDeletion"];
-    //inManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
-    inManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
+    inManualDel.attribute("UseRecycler", config.gui.manualDeletionUseRecycler);
 
     inWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
     inWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);
@@ -991,11 +999,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //external applications
     inGui["ExternalApplications"](config.gui.externelApplications);
-
-    warn_static("remove after migration: cleanup the old placeholder syntax") //26.10.2013
-    if (std::any_of(config.gui.externelApplications.begin(), config.gui.externelApplications.end(),
-    [](const std::pair<Description, Commandline>& ea) { return contains(ea.second, L"%name") || contains(ea.second, L"%nameCo") || contains(ea.second, L"%dir") || contains(ea.second, L"%dirCo"); }))
-    config.gui.externelApplications = XmlGlobalSettings().gui.externelApplications;
 
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
@@ -1191,8 +1194,8 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
     XmlOut outPair = out.ref().addChild("Pair");
 
     //read folder pairs
-    outPair["Left" ](enhPair.dirpathPhraseLeft);
-    outPair["Right"](enhPair.dirpathPhraseRight);
+    outPair["Left" ](enhPair.folderPathPhraseLeft_);
+    outPair["Right"](enhPair.folderPathPhraseRight_);
 
     //###########################################################
     //alternate comp configuration (optional)
@@ -1321,9 +1324,17 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd.attribute("PosY",      config.gui.dlgPos.y);
     outWnd.attribute("Maximized", config.gui.isMaximized);
 
+    XmlOut outCopyTo = outWnd["ManualCopyTo"];
+    outCopyTo.attribute("KeepRelativePaths", config.gui.copyToCfg.keepRelPaths);
+    outCopyTo.attribute("OverwriteIfExists", config.gui.copyToCfg.overwriteIfExists);
+
+    XmlOut outCopyToHistory = outCopyTo["FolderHistory"];
+    outCopyToHistory(config.gui.copyToCfg.folderHistory);
+    outCopyToHistory.attribute("LastUsedPath" , config.gui.copyToCfg.lastUsedPath);
+    outCopyToHistory.attribute("MaxSize"      , config.gui.copyToCfg.historySizeMax);
+
     XmlOut outManualDel = outWnd["ManualDeletion"];
-    //outManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
-    outManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
+    outManualDel.attribute("UseRecycler", config.gui.manualDeletionUseRecycler);
 
     outWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
     outWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);

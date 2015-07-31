@@ -288,7 +288,7 @@ BatchStatusHandler::~BatchStatusHandler()
 
             //notify to progressDlg that current process has ended
             if (abortIsRequested())
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog); //enable okay and close events
             else if (totalErrors > 0)
                 progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
             else if (totalWarnings > 0)
@@ -305,7 +305,7 @@ BatchStatusHandler::~BatchStatusHandler()
         while (progressDlg)
         {
             wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted -> not expected => main thread!
+            std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
         }
     }
 }
@@ -399,7 +399,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
         {
             reportStatus(_("Error") + L": " + _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...",
                                                  (1000 * automaticRetryDelay_ - i * UI_UPDATE_INTERVAL + 999) / 1000)); //integer round up
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted
+            std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
         }
         return ProcessCallback::RETRY;
     }
@@ -502,7 +502,7 @@ void BatchStatusHandler::forceUiRefresh()
 void BatchStatusHandler::abortProcessNow()
 {
     requestAbortion(); //just make sure...
-    throw BatchAbortProcess();  //abort can be triggered by progressDlg
+    throw BatchAbortProcess(); //abort can be triggered by progressDlg
 }
 
 

@@ -31,7 +31,7 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
     std::transform(allPairs.begin(), allPairs.end(), std::back_inserter(output),
                    [&](const FolderPairEnh& enhPair) -> FolderPairCfg
     {
-        return FolderPairCfg(enhPair.dirpathPhraseLeft, enhPair.dirpathPhraseRight,
+        return FolderPairCfg(enhPair.folderPathPhraseLeft_, enhPair.folderPathPhraseRight_,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
         fileTimeTolerance,
@@ -80,8 +80,8 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
         output.resolvedPairs.clear();
         for (const FolderPairCfg& fpCfg : cfgList)
         {
-            std::shared_ptr<ABF> abfLeft  = createAbstractBaseFolder(fpCfg.dirpathPhraseLeft);
-            std::shared_ptr<ABF> abfRight = createAbstractBaseFolder(fpCfg.dirpathPhraseRight);
+            std::shared_ptr<ABF> abfLeft  = createAbstractBaseFolder(fpCfg.folderPathPhraseLeft_);
+            std::shared_ptr<ABF> abfRight = createAbstractBaseFolder(fpCfg.folderPathPhraseRight_);
 
             uniqueBaseFolders.insert(abfLeft .get());
             uniqueBaseFolders.insert(abfRight.get());
@@ -392,8 +392,8 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, int fileTimeTolerance, uns
         if (targetPathRawL == targetPathRawR
 #ifdef ZEN_WIN //type of symbolic link is relevant for Windows only
             &&
-            ABF::dirExists(linkObj.getAbstractPath<LEFT_SIDE >()) == //check if dir-symlink
-            ABF::dirExists(linkObj.getAbstractPath<RIGHT_SIDE>())    //
+            ABF::folderExists(linkObj.getAbstractPath<LEFT_SIDE >()) == //check if dir-symlink
+            ABF::folderExists(linkObj.getAbstractPath<RIGHT_SIDE>())    //
 #endif
            )
         {

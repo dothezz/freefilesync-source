@@ -18,16 +18,16 @@ namespace zen
 {
 struct FolderPairCfg
 {
-    FolderPairCfg(const Zstring& dirPhraseLeft,
-                  const Zstring& dirPhraseRight,
+    FolderPairCfg(const Zstring& folderPathPhraseLeft,
+                  const Zstring& folderPathPhraseRight,
                   CompareVariant cmpVar,
                   SymLinkHandling handleSymlinksIn,
                   int fileTimeToleranceIn,
                   unsigned int optTimeShiftHoursIn,
                   const NormalizedFilter& filterIn,
                   const DirectionConfig& directCfg) :
-        dirpathPhraseLeft(dirPhraseLeft),
-        dirpathPhraseRight(dirPhraseRight),
+        folderPathPhraseLeft_ (folderPathPhraseLeft),
+        folderPathPhraseRight_(folderPathPhraseRight),
         compareVar(cmpVar),
         handleSymlinks(handleSymlinksIn),
         fileTimeTolerance(fileTimeToleranceIn),
@@ -35,8 +35,8 @@ struct FolderPairCfg
         filter(filterIn),
         directionCfg(directCfg) {}
 
-    Zstring dirpathPhraseLeft;  //unresolved directory names as entered by user!
-    Zstring dirpathPhraseRight; //
+    Zstring folderPathPhraseLeft_;  //unresolved directory names as entered by user!
+    Zstring folderPathPhraseRight_; //
 
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;

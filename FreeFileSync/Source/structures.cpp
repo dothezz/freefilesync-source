@@ -391,8 +391,8 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
 inline
 bool effectivelyEmpty(const FolderPairEnh& fp)
 {
-    return trimCpy(fp.dirpathPhraseLeft ).empty() &&
-           trimCpy(fp.dirpathPhraseRight).empty();
+    return trimCpy(fp.folderPathPhraseLeft_ ).empty() &&
+           trimCpy(fp.folderPathPhraseRight_).empty();
 }
 }
 

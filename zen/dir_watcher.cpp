@@ -7,7 +7,7 @@
 #include "dir_watcher.h"
 #include <algorithm>
 #include <set>
-#include "thread.h" //includes <boost/thread.hpp>
+#include "thread.h"
 #include "scope_guard.h"
 
 #ifdef ZEN_WIN
@@ -16,8 +16,11 @@
     #include "long_path_prefix.h"
 
 #elif defined ZEN_LINUX
+    #include <map>
     #include <sys/inotify.h>
-    #include <fcntl.h>
+    #include <fcntl.h> //fcntl
+    #include <unistd.h> //close
+    #include <limits.h> //NAME_MAX
     #include "file_traverser.h"
 
 #elif defined ZEN_MAC
@@ -37,7 +40,7 @@ public:
     //context of worker thread
     void addChanges(const char* buffer, DWORD bytesWritten, const Zstring& dirpath) //throw ()
     {
-        boost::lock_guard<boost::mutex> dummy(lockAccess);
+        std::lock_guard<std::mutex> dummy(lockAccess);
 
         if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
             changedFiles.emplace_back(DirWatcher::ACTION_CREATE, L"Overflow.");
@@ -89,7 +92,7 @@ public:
     ////context of main thread
     //void addChange(const Zstring& dirpath) //throw ()
     //{
-    //    boost::lock_guard<boost::mutex> dummy(lockAccess);
+    //    std::lock_guard<std::mutex> dummy(lockAccess);
     //    changedFiles.insert(dirpath);
     //}
 
@@ -97,7 +100,7 @@ public:
     //context of main thread
     void fetchChanges(std::vector<DirWatcher::Entry>& output) //throw FileError
     {
-        boost::lock_guard<boost::mutex> dummy(lockAccess);
+        std::lock_guard<std::mutex> dummy(lockAccess);
 
         //first check whether errors occurred in thread
         if (errorInfo)
@@ -115,7 +118,7 @@ public:
     //context of worker thread
     void reportError(const std::wstring& msg, const std::wstring& description, DWORD errorCode) //throw()
     {
-        boost::lock_guard<boost::mutex> dummy(lockAccess);
+        std::lock_guard<std::mutex> dummy(lockAccess);
 
         ErrorInfo newInfo = { copyStringTo<BasicWString>(msg), copyStringTo<BasicWString>(description), errorCode };
         errorInfo = make_unique<ErrorInfo>(newInfo);
@@ -124,7 +127,7 @@ public:
 private:
     typedef Zbase<wchar_t> BasicWString; //thread safe string class for UI texts
 
-    boost::mutex lockAccess;
+    std::mutex lockAccess;
     std::vector<DirWatcher::Entry> changedFiles;
 
     struct ErrorInfo
@@ -174,13 +177,13 @@ public:
             ::CloseHandle(hDir);
     }
 
-    void operator()() //thread entry
+    void operator()() const //thread entry
     {
         std::vector<char> buffer(64 * 1024); //needs to be aligned on a DWORD boundary; maximum buffer size restricted by some networks protocols (according to docu)
 
         for (;;)
         {
-            boost::this_thread::interruption_point();
+            interruptionPoint(); //throw ThreadInterruption
 
             //actual work
             OVERLAPPED overlapped = {};
@@ -244,7 +247,7 @@ public:
                 ::SleepEx(50,    // __in  DWORD dwMilliseconds,
                           true); // __in  BOOL bAlertable
 
-                boost::this_thread::interruption_point();
+                interruptionPoint(); //throw ThreadInterruption
             }
             guardAio.dismiss();
 
@@ -271,7 +274,7 @@ class HandleVolumeRemoval
 public:
     HandleVolumeRemoval(HANDLE hDir,
                         const Zstring& displayPath,
-                        boost::thread& worker) :
+                        InterruptibleThread& worker) :
         notificationHandle(registerFolderRemovalNotification(hDir, //throw FileError
                                                              displayPath,
                                                              [this]                 { this->onRequestRemoval (); },   //noexcept!
@@ -307,7 +310,7 @@ private:
     void onRemovalFinished() { operationComplete = true; } //noexcept!
 
     DeviceNotificationHandle* notificationHandle;
-    boost::thread& worker_;
+    InterruptibleThread& worker_;
     bool removalRequested;
     bool operationComplete;
 };
@@ -316,7 +319,7 @@ private:
 
 struct DirWatcher::Pimpl
 {
-    boost::thread worker;
+    InterruptibleThread worker;
     std::shared_ptr<SharedData> shared;
     std::unique_ptr<HandleVolumeRemoval> volRemoval;
 };
@@ -330,7 +333,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
 
     ReadChangesAsync reader(dirPath, pimpl_->shared); //throw FileError
     pimpl_->volRemoval = zen::make_unique<HandleVolumeRemoval>(reader.getDirHandle(), dirPath, pimpl_->worker); //throw FileError
-    pimpl_->worker = boost::thread(std::move(reader));
+    pimpl_->worker = InterruptibleThread(std::move(reader));
 }
 
 
@@ -339,10 +342,8 @@ DirWatcher::~DirWatcher()
     if (pimpl_->worker.joinable()) //= thread::detach() precondition! -> may already be joined by HandleVolumeRemoval::onRequestRemoval()
     {
         pimpl_->worker.interrupt();
-        //if (pimpl_->worker.joinable()) pimpl_->worker.join(); -> we don't have time to wait... will take ~50ms anyway
-        pimpl_->worker.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
+        pimpl_->worker.detach(); //we don't have time to wait... will take ~50ms anyway:
     }
-
     //caveat: exitting the app may simply kill this thread!
 }
 
@@ -355,13 +356,13 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
     //wait until device removal is confirmed, to prevent locking hDir again by some new watch!
     if (pimpl_->volRemoval->requestReceived())
     {
-        const boost::chrono::steady_clock::time_point endTime = boost::chrono::steady_clock::now() + boost::chrono::seconds(15);
+        const std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(15);
         //HandleVolumeRemoval::finished() not guaranteed! note: Windows gives unresponsive applications ca. 10 seconds until unmounting the usb stick in worst case
 
-        while (!pimpl_->volRemoval->finished() && boost::chrono::steady_clock::now() < endTime)
+        while (!pimpl_->volRemoval->finished() && std::chrono::steady_clock::now() < endTime)
         {
             processGuiMessages(); //DBT_DEVICEREMOVECOMPLETE message is sent here!
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(50)); //throw boost::thread_interrupted
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
 
         output.emplace_back(ACTION_DELETE, baseDirPath); //report removal as change to main directory

@@ -71,7 +71,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_menubar1->Append( m_menu4, _("&Actions") );
 
     m_menuTools = new wxMenu();
-    m_menuItemOptions = new wxMenuItem( m_menuTools, wxID_PREFERENCES, wxString( _("&Options") ) , wxEmptyString, wxITEM_NORMAL );
+    m_menuItemOptions = new wxMenuItem( m_menuTools, wxID_PREFERENCES, wxString( _("&Preferences") ) + wxT('\t') + wxT("Ctrl+,"), wxEmptyString, wxITEM_NORMAL );
     m_menuTools->Append( m_menuItemOptions );
 
     m_menuLanguages = new wxMenu();
@@ -1858,48 +1858,61 @@ SftpSetupDlgGenerated::SftpSetupDlgGenerated( wxWindow* parent, wxWindowID id, c
 
     m_staticText12311 = new wxStaticText( m_panel41, wxID_ANY, _("Server name or IP address:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText12311->Wrap( -1 );
-    fgSizer16->Add( m_staticText12311, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    fgSizer16->Add( m_staticText12311, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_textCtrlServer = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 300,-1 ), 0 );
-    fgSizer16->Add( m_textCtrlServer, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    wxBoxSizer* bSizer183;
+    bSizer183 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_textCtrlServer = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 260,-1 ), 0 );
+    bSizer183->Add( m_textCtrlServer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_staticText1233 = new wxStaticText( m_panel41, wxID_ANY, _("Port:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText1233->Wrap( -1 );
+    bSizer183->Add( m_staticText1233, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxTOP|wxBOTTOM|wxLEFT, 5 );
+
+    m_textCtrlPort = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), 0 );
+    bSizer183->Add( m_textCtrlPort, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    fgSizer16->Add( bSizer183, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    fgSizer16->Add( 0, 0, 0, 0, 5 );
+
+    wxBoxSizer* bSizer181;
+    bSizer181 = new wxBoxSizer( wxHORIZONTAL );
 
     m_staticText1381 = new wxStaticText( m_panel41, wxID_ANY, _("Examples:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1381->Wrap( -1 );
     m_staticText1381->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    fgSizer16->Add( m_staticText1381, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    wxBoxSizer* bSizer181;
-    bSizer181 = new wxBoxSizer( wxHORIZONTAL );
+    bSizer181->Add( m_staticText1381, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxBOTTOM|wxRIGHT, 5 );
 
     m_staticText1382 = new wxStaticText( m_panel41, wxID_ANY, _("www.website.com"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1382->Wrap( -1 );
     m_staticText1382->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    bSizer181->Add( m_staticText1382, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
-    bSizer181->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer181->Add( m_staticText1382, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
     m_staticText138 = new wxStaticText( m_panel41, wxID_ANY, _("123.123.123"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText138->Wrap( -1 );
     m_staticText138->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    bSizer181->Add( m_staticText138, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer181->Add( m_staticText138, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
 
-    fgSizer16->Add( bSizer181, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+    fgSizer16->Add( bSizer181, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
     m_staticText123 = new wxStaticText( m_panel41, wxID_ANY, _("User name:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText123->Wrap( -1 );
-    fgSizer16->Add( m_staticText123, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    fgSizer16->Add( m_staticText123, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
     m_textCtrlUserName = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     fgSizer16->Add( m_textCtrlUserName, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticText1231 = new wxStaticText( m_panel41, wxID_ANY, _("Password:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1231->Wrap( -1 );
-    fgSizer16->Add( m_staticText1231, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+    fgSizer16->Add( m_staticText1231, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxTOP|wxLEFT, 5 );
 
     wxBoxSizer* bSizer182;
     bSizer182 = new wxBoxSizer( wxVERTICAL );
@@ -1921,13 +1934,13 @@ SftpSetupDlgGenerated::SftpSetupDlgGenerated( wxWindow* parent, wxWindowID id, c
 
     m_staticText1232 = new wxStaticText( m_panel41, wxID_ANY, _("Directory on server:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1232->Wrap( -1 );
-    fgSizer16->Add( m_staticText1232, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    fgSizer16->Add( m_staticText1232, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
     m_textCtrlServerPath = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     fgSizer16->Add( m_textCtrlServerPath, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer185->Add( fgSizer16, 1, wxALL|wxEXPAND, 5 );
+    bSizer185->Add( fgSizer16, 0, wxALL, 5 );
 
 
     m_panel41->SetSizer( bSizer185 );
@@ -3048,6 +3061,120 @@ DeleteDlgGenerated::~DeleteDlgGenerated()
 {
 }
 
+CopyToDlgGenerated::CopyToDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+    this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
+    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+
+    wxBoxSizer* bSizer24;
+    bSizer24 = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer* bSizer72;
+    bSizer72 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_bitmapCopyTo = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer72->Add( m_bitmapCopyTo, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 10 );
+
+    m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0|wxNO_BORDER );
+    m_staticTextHeader->Wrap( 460 );
+    bSizer72->Add( m_staticTextHeader, 0, wxALIGN_CENTER_VERTICAL|wxALL, 10 );
+
+
+    bSizer24->Add( bSizer72, 0, 0, 5 );
+
+    m_staticline91 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizer24->Add( m_staticline91, 0, wxEXPAND, 5 );
+
+    m_panel31 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panel31->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
+    wxBoxSizer* bSizer185;
+    bSizer185 = new wxBoxSizer( wxHORIZONTAL );
+
+
+    bSizer185->Add( 60, 0, 0, 0, 5 );
+
+    m_staticline42 = new wxStaticLine( m_panel31, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
+    bSizer185->Add( m_staticline42, 0, wxEXPAND, 5 );
+
+    m_textCtrlFileList = new wxTextCtrl( m_panel31, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 500,200 ), wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+    bSizer185->Add( m_textCtrlFileList, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    m_panel31->SetSizer( bSizer185 );
+    m_panel31->Layout();
+    bSizer185->Fit( m_panel31 );
+    bSizer24->Add( m_panel31, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    wxBoxSizer* bSizer182;
+    bSizer182 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_directoryTarget = new FolderHistoryBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+    bSizer182->Add( m_directoryTarget, 1, wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_buttonSelectFolder = new wxButton( this, wxID_ANY, _("Browse"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_buttonSelectFolder->SetToolTip( _("Select a folder") );
+
+    bSizer182->Add( m_buttonSelectFolder, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_bpButtonSelectSftp = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 26,-1 ), wxBU_AUTODRAW );
+    m_bpButtonSelectSftp->SetToolTip( _("Select SFTP folder") );
+
+    bSizer182->Add( m_bpButtonSelectSftp, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+
+
+    bSizer24->Add( bSizer182, 0, wxEXPAND|wxALL, 5 );
+
+    m_staticline9 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizer24->Add( m_staticline9, 0, wxEXPAND, 5 );
+
+    bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
+
+    wxBoxSizer* bSizer189;
+    bSizer189 = new wxBoxSizer( wxVERTICAL );
+
+    m_checkBoxKeepRelPath = new wxCheckBox( this, wxID_ANY, _("&Keep relative paths"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxKeepRelPath->SetValue(true);
+    bSizer189->Add( m_checkBoxKeepRelPath, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 5 );
+
+    m_checkBoxOverwriteIfExists = new wxCheckBox( this, wxID_ANY, _("&Overwrite existing files"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxOverwriteIfExists->SetValue(true);
+    bSizer189->Add( m_checkBoxOverwriteIfExists, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+
+
+    bSizerStdButtons->Add( bSizer189, 1, wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_buttonOK = new wxButton( this, wxID_OK, _("&Copy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_buttonOK->SetDefault();
+    m_buttonOK->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+
+    bSizerStdButtons->Add( m_buttonOK, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+
+
+    bSizer24->Add( bSizerStdButtons, 0, wxEXPAND, 5 );
+
+
+    this->SetSizer( bSizer24 );
+    this->Layout();
+    bSizer24->Fit( this );
+
+    this->Centre( wxBOTH );
+
+    // Connect Events
+    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( CopyToDlgGenerated::OnClose ) );
+    m_checkBoxKeepRelPath->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CopyToDlgGenerated::OnUseRecycler ), NULL, this );
+    m_checkBoxOverwriteIfExists->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CopyToDlgGenerated::OnUseRecycler ), NULL, this );
+    m_buttonOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CopyToDlgGenerated::OnOK ), NULL, this );
+    m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CopyToDlgGenerated::OnCancel ), NULL, this );
+}
+
+CopyToDlgGenerated::~CopyToDlgGenerated()
+{
+}
+
 OptionsDlgGenerated::OptionsDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
@@ -3436,18 +3563,6 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer171->Add( m_hyperlink11, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink9 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("MinGW"), wxT("http://www.mingw.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink9->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink9->SetToolTip( _("http://www.mingw.org") );
-
-    bSizer171->Add( m_hyperlink9, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
-    m_hyperlink10 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Code::Blocks"), wxT("http://www.codeblocks.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink10->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink10->SetToolTip( _("http://www.codeblocks.org") );
-
-    bSizer171->Add( m_hyperlink10, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
     m_hyperlink7 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("wxWidgets"), wxT("http://www.wxwidgets.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink7->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
     m_hyperlink7->SetToolTip( _("http://www.wxwidgets.org") );
@@ -3458,7 +3573,13 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_hyperlink14->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
     m_hyperlink14->SetToolTip( _("http://wxformbuilder.org") );
 
-    bSizer171->Add( m_hyperlink14, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer171->Add( m_hyperlink14, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink16 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Artistic Style"), wxT("http://astyle.sourceforge.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink16->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink16->SetToolTip( _("http://astyle.sourceforge.net") );
+
+    bSizer171->Add( m_hyperlink16, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizer187->Add( bSizer171, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
@@ -3472,29 +3593,35 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer172->Add( m_hyperlink15, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink13 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Boost"), wxT("http://www.boost.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink13->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink13->SetToolTip( _("http://www.boost.org") );
-
-    bSizer172->Add( m_hyperlink13, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
-    m_hyperlink16 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Artistic Style"), wxT("http://astyle.sourceforge.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink16->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink16->SetToolTip( _("http://astyle.sourceforge.net") );
-
-    bSizer172->Add( m_hyperlink16, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
     m_hyperlink12 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Google Test"), wxT("http://code.google.com/p/googletest"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink12->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
     m_hyperlink12->SetToolTip( _("http://code.google.com/p/googletest") );
 
     bSizer172->Add( m_hyperlink12, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink18 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Unicode NSIS"), wxT("http://www.scratchpaper.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink18->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink18->SetToolTip( _("http://www.scratchpaper.com") );
+    m_hyperlink13 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Boost"), wxT("http://www.boost.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink13->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink13->SetToolTip( _("http://www.boost.org") );
 
-    bSizer172->Add( m_hyperlink18, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer172->Add( m_hyperlink13, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink10 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("libssh2"), wxT("http://www.libssh2.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink10->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink10->SetToolTip( _("http://www.libssh2.org") );
+
+    bSizer172->Add( m_hyperlink10, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink18 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("NSIS"), wxT("http://nsis.sourceforge.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink18->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink18->SetToolTip( _("http://nsis.sourceforge.net") );
+
+    bSizer172->Add( m_hyperlink18, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink9 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Inno Setup"), wxT("http://www.jrsoftware.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink9->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink9->SetToolTip( _("http://www.jrsoftware.org") );
+
+    bSizer172->Add( m_hyperlink9, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizer187->Add( bSizer172, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
@@ -3575,6 +3702,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_hyperlink1 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("FreeFileSync.org"), wxT("http://www.freefilesync.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink1->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, true, wxEmptyString ) );
     m_hyperlink1->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink1->SetToolTip( _("http://www.freefilesync.org") );
 
     bSizer166->Add( m_hyperlink1, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -3589,6 +3717,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_hyperlink2 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("zenju@gmx.de"), wxT("mailto:zenju@gmx.de"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink2->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, true, wxEmptyString ) );
     m_hyperlink2->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink2->SetToolTip( _("mailto:zenju@gmx.de") );
 
     bSizer166->Add( m_hyperlink2, 0, wxALIGN_CENTER_VERTICAL, 5 );
 

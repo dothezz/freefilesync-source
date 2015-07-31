@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <algorithm>
-#include <zen/type_tools.h>
+#include "type_tools.h"
 
 
 //enhancements for <algorithm>
@@ -21,6 +21,9 @@ void vector_remove_if(V& vec, Predicate p);
 
 template <class V, class W>
 void vector_append(V& vec, const W& vec2);
+
+template <class V>
+void removeDuplicates(V& v);
 
 template <class V, class W>
 void set_append(V& s, const W& s2);
@@ -69,6 +72,14 @@ void vector_remove_if(V& vec, Predicate p)
 {
     static_assert(IsSameType<typename std::iterator_traits<typename V::iterator>::iterator_category, std::random_access_iterator_tag>::value, "poor man's check for vector");
     vec.erase(std::remove_if(vec.begin(), vec.end(), p), vec.end());
+}
+
+
+template <class V> inline
+void removeDuplicates(V& v)
+{
+    std::sort(v.begin(), v.end());
+    v.erase(std::unique(v.begin(), v.end()), v.end());
 }
 
 

@@ -8,7 +8,6 @@
 #define GEN_LOGFILE_H_93172643216748973216458732165415
 
 #include <zen/error_log.h>
-//#include <zen/file_io.h>
 #include <zen/serialize.h>
 #include <zen/format_unit.h>
 #include "ffs_paths.h"

@@ -42,10 +42,9 @@ class GlobalResources
 public:
     static GlobalResources& instance()
     {
-#if defined _MSC_VER && _MSC_VER > 1800
-#error remove warning
+#if defined _MSC_VER && _MSC_VER < 1900
+#error function scope static initialization is not yet thread-safe!
 #endif
-        //caveat: function scope static initialization is not thread-safe in VS 2010! => but we wouldn't use wxWidgets in combination with multithreading anyway!
         static GlobalResources inst;
         return inst;
     }

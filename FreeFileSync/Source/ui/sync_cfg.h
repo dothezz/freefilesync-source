@@ -29,15 +29,23 @@ enum class SyncConfigPanel
     SYNC       = 2, //
 };
 
-struct MiscGlobalCfg
+struct MiscGlobalCfg //don't use references to allow distinct copies
 {
-    xmlAccess::OnGuiError& handleError; //in/out param
-
-    Zstring& onCompletionCommand;       //
-    std::vector<Zstring>& onCompletionHistory;
+    xmlAccess::OnGuiError handleError; //in/out param
+    Zstring onCompletionCommand;       //
+    std::vector<Zstring> onCompletionHistory;
     size_t onCompletionHistoryMax;
 };
 
+
+inline
+bool operator==(const MiscGlobalCfg& lhs, const MiscGlobalCfg& rhs)
+{
+    return lhs.handleError            == rhs.handleError         &&
+           lhs.onCompletionCommand    == rhs.onCompletionCommand &&
+           lhs.onCompletionHistory    == rhs.onCompletionHistory &&
+           lhs.onCompletionHistoryMax == rhs.onCompletionHistoryMax;
+}
 
 ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
                                                   SyncConfigPanel panelToShow,

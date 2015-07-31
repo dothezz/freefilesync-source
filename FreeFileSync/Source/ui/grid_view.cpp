@@ -281,17 +281,17 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //map
 }
 
 
-std::vector<FileSystemObject*> GridView::getAllFileRef(const std::set<size_t>& rows)
+std::vector<FileSystemObject*> GridView::getAllFileRef(const std::vector<size_t>& rows)
 {
+    const size_t viewSize = viewRef.size();
+
     std::vector<FileSystemObject*> output;
 
-    auto iterLast = rows.lower_bound(rowsOnView()); //loop over valid rows only!
-    std::for_each(rows.begin(), iterLast,
-                  [&](size_t pos)
-    {
-        if (FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef[pos]))
-            output.push_back(fsObj);
-    });
+    for (size_t pos : rows)
+        if (pos < viewSize)
+            if (FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef[pos]))
+                output.push_back(fsObj);
+
     return output;
 }
 

@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "process_priority.h"
-//#include "sys_error.h"
 #include "i18n.h"
 
 #ifdef ZEN_WIN

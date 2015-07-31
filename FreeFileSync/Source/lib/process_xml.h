@@ -156,7 +156,7 @@ struct XmlGlobalSettings
     int fileTimeTolerance; //max. allowed file time deviation; < 0 means unlimited tolerance
     bool runWithBackgroundPriority;
     bool createLockFile;
-    bool verifyFileCopy;   //verify copied files
+    bool verifyFileCopy; //verify copied files
     size_t lastSyncsLogFileSizeMax;
 
     OptionalDialogs optDialogs;
@@ -164,48 +164,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     struct Gui
     {
-        Gui() :
-            dlgPos(wxDefaultCoord, wxDefaultCoord),
-            dlgSize(wxDefaultCoord, wxDefaultCoord),
-            isMaximized(false),
-            sashOffset(0),
-            maxFolderPairsVisible(6),
-            columnAttribNavi (zen::getDefaultColumnAttributesNavi()),
-            columnAttribLeft (zen::getDefaultColumnAttributesLeft()),
-            columnAttribRight(zen::getDefaultColumnAttributesRight()),
-            naviLastSortColumn(zen::defaultValueLastSortColumn),
-            naviLastSortAscending(zen::defaultValueLastSortAscending),
-            showPercentBar(zen::defaultValueShowPercentage),
-            cfgFileHistMax(30),
-            folderHistMax(15),
-            onCompletionHistoryMax(8),
-#ifdef ZEN_WIN
-            defaultExclusionFilter(Zstr("\\System Volume Information\\") Zstr("\n")
-                                   Zstr("\\$Recycle.Bin\\")              Zstr("\n")
-                                   Zstr("\\RECYCLER\\")                  Zstr("\n")
-                                   Zstr("\\RECYCLED\\")                  Zstr("\n")
-                                   Zstr("*\\desktop.ini")                Zstr("\n")
-                                   Zstr("*\\thumbs.db")),
-#elif defined ZEN_LINUX
-            defaultExclusionFilter(Zstr("/.Trash-*/") Zstr("\n")
-                                   Zstr("/.recycle/")),
-#elif defined ZEN_MAC
-            defaultExclusionFilter(Zstr("/.fseventsd/")      Zstr("\n")
-                                   Zstr("/.Spotlight-V100/") Zstr("\n")
-                                   Zstr("/.Trashes/")        Zstr("\n")
-                                   Zstr("*/.DS_Store")       Zstr("\n")
-                                   Zstr("*/._.*")),
-#endif
-            //deleteOnBothSides(false),
-            useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
-#if defined ZEN_WIN || defined ZEN_MAC
-            textSearchRespectCase(false),
-#elif defined ZEN_LINUX
-            textSearchRespectCase(true),
-#endif
-            showIcons(true),
-            iconSize(ICON_SIZE_SMALL),
-            lastUpdateCheck(0)
+        Gui()
         {
             //default external apps will be translated "on the fly"!!!
             //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
@@ -224,46 +183,73 @@ struct XmlGlobalSettings
 #endif
         }
 
-        wxPoint dlgPos;
-        wxSize dlgSize;
-        bool isMaximized;
-        int sashOffset;
+        wxPoint dlgPos { wxDefaultCoord, wxDefaultCoord };
+        wxSize dlgSize { wxDefaultCoord, wxDefaultCoord };
+        bool isMaximized = false;
+        int sashOffset = 0;
 
-        int maxFolderPairsVisible;
+        int maxFolderPairsVisible = 6;
 
-        std::vector<zen::ColumnAttributeNavi> columnAttribNavi; //compressed view/navigation
-        std::vector<zen::ColumnAttributeRim>  columnAttribLeft;
-        std::vector<zen::ColumnAttributeRim>  columnAttribRight;
+        std::vector<zen::ColumnAttributeNavi> columnAttribNavi  = zen::getDefaultColumnAttributesNavi(); //compressed view/navigation
+        std::vector<zen::ColumnAttributeRim>  columnAttribLeft  = zen::getDefaultColumnAttributesLeft();
+        std::vector<zen::ColumnAttributeRim>  columnAttribRight = zen::getDefaultColumnAttributesRight();
 
-        zen::ColumnTypeNavi naviLastSortColumn; //remember sort on navigation panel
-        bool naviLastSortAscending; //
+        zen::ColumnTypeNavi naviLastSortColumn = zen::defaultValueLastSortColumn; //remember sort on navigation panel
+        bool naviLastSortAscending             = zen::defaultValueLastSortAscending; //
 
-        bool showPercentBar; //in navigation panel
+        bool showPercentBar = zen::defaultValueShowPercentage; //in navigation panel
 
         ExternalApps externelApplications;
 
         std::vector<zen::ConfigHistoryItem> cfgFileHistory;
-        size_t cfgFileHistMax;
+        size_t cfgFileHistMax = 30;
 
         std::vector<Zstring> lastUsedConfigFiles;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
-        size_t folderHistMax;
+        size_t folderHistMax = 15;
 
         std::vector<Zstring> onCompletionHistory;
-        size_t onCompletionHistoryMax;
+        size_t onCompletionHistoryMax = 8;
 
-        Zstring defaultExclusionFilter;
+#ifdef ZEN_WIN
+        Zstring defaultExclusionFilter = Zstr("\\System Volume Information\\") Zstr("\n")
+                                         Zstr("\\$Recycle.Bin\\")              Zstr("\n")
+                                         Zstr("\\RECYCLER\\")                  Zstr("\n")
+                                         Zstr("\\RECYCLED\\")                  Zstr("\n")
+                                         Zstr("*\\desktop.ini")                Zstr("\n")
+                                         Zstr("*\\thumbs.db");
+#elif defined ZEN_LINUX
+        Zstring defaultExclusionFilter = Zstr("/.Trash-*/") Zstr("\n")
+                                         Zstr("/.recycle/");
+#elif defined ZEN_MAC
+        Zstring defaultExclusionFilter = Zstr("/.fseventsd/")      Zstr("\n")
+                                         Zstr("/.Spotlight-V100/") Zstr("\n")
+                                         Zstr("/.Trashes/")        Zstr("\n")
+                                         Zstr("*/.DS_Store")       Zstr("\n")
+                                         Zstr("*/._.*");
+#endif
+        struct
+        {
+            bool    keepRelPaths = true;
+            bool    overwriteIfExists = false;
+            Zstring lastUsedPath;
+            std::vector<Zstring> folderHistory;
+            size_t  historySizeMax = 15;
+        } copyToCfg;
 
-        //bool deleteOnBothSides;
-        bool useRecyclerForManualDeletion;
-        bool textSearchRespectCase;
+        bool manualDeletionUseRecycler = true;
 
-        bool showIcons;
-        FileIconSize iconSize;
+#if defined ZEN_WIN || defined ZEN_MAC
+        bool textSearchRespectCase = false;
+#elif defined ZEN_LINUX
+        bool textSearchRespectCase = true;
+#endif
+        bool showIcons = true;
+        FileIconSize iconSize = ICON_SIZE_SMALL;
 
-        long lastUpdateCheck; //time of last update check
+        long lastUpdateCheck = 0; //time of last update check
         wxString lastOnlineVersion;
 
         ViewFilterDefault viewFilterDefault;

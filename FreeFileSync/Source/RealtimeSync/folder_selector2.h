@@ -22,8 +22,8 @@ class FolderSelector2 : public wxEvtHandler
 public:
     FolderSelector2(wxWindow&     dropWindow,
                     wxButton&     selectButton,
-                    wxTextCtrl&   dirpath,
-                    wxStaticText* staticText  = nullptr);  //optional
+                    wxTextCtrl&   folderPathCtrl,
+                    wxStaticText* staticText); //optional
 
     ~FolderSelector2();
 
@@ -31,15 +31,15 @@ public:
     void setPath(const Zstring& dirpath);
 
 private:
-    void onMouseWheel      (wxMouseEvent& event);
-    void onFilesDropped    (FileDropEvent& event);
-    void onWriteDirManually(wxCommandEvent& event);
-    void onSelectDir       (wxCommandEvent& event);
+    void onMouseWheel    (wxMouseEvent& event);
+    void onFilesDropped  (FileDropEvent& event);
+    void onEditFolderPath(wxCommandEvent& event);
+    void onSelectDir     (wxCommandEvent& event);
 
     wxWindow&     dropWindow_;
     wxButton&     selectButton_;
-    wxTextCtrl&   dirpath_;
-    wxStaticText* staticText_; //optional
+    wxTextCtrl&   folderPathCtrl_;
+    wxStaticText* staticText_ = nullptr; //optional
 };
 }
 

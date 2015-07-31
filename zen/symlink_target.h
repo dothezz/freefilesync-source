@@ -25,7 +25,7 @@
 namespace zen
 {
 #ifdef ZEN_WIN
-    bool isSymlink(const WIN32_FIND_DATA& data); //*not* a simple FILE_ATTRIBUTE_REPARSE_POINT check!
+    bool isSymlink(const WIN32_FIND_DATA& data); //checking FILE_ATTRIBUTE_REPARSE_POINT is insufficient!
     bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
 #endif
 
@@ -162,8 +162,7 @@ Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
     const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
     if (!getFinalPathNameByHandle)
         throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtPath(linkPath)), replaceCpy(_("Cannot find system function %x."), L"%x", L"\"GetFinalPathNameByHandleW\""));
-
-
+	
     const HANDLE hFile = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),                  //_In_      LPCTSTR lpFileName,
                                       0,                                                      //_In_      DWORD dwDesiredAccess,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //_In_      DWORD dwShareMode,

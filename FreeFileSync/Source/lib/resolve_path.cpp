@@ -90,6 +90,9 @@ public:
 
     static const CsidlToDirMap& get()
     {
+#if defined _MSC_VER && _MSC_VER < 1900
+#error function scope static initialization is not yet thread-safe!
+#endif
         //function scope static initialization: avoid static initialization order problem in global namespace!
         static const CsidlToDirMap inst = createCsidlMapping();
         return inst;
@@ -117,9 +120,6 @@ private:
 
         //================================================================================================
         //SHGetKnownFolderPath: API available only with Windows Vista and later:
-#ifdef __MINGW32__
-#define KF_FLAG_DONT_VERIFY 0x00004000
-#endif
         typedef HRESULT (STDAPICALLTYPE* SHGetKnownFolderPathFunc)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
         const SysDllFun<SHGetKnownFolderPathFunc> shGetKnownFolderPath(L"Shell32.dll", "SHGetKnownFolderPath");
 
@@ -202,12 +202,6 @@ private:
         return output;
     }
 };
-
-//caveat: function scope static initialization is not thread-safe in VS 2010!
-#if defined _MSC_VER && _MSC_VER > 1800
-    #error get rid!
-#endif
-auto& dummy = CsidlConstants::get();
 #endif
 
 
@@ -511,9 +505,9 @@ void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, Less
 }
 
 
-std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirpathPhrase)
+std::vector<Zstring> zen::getDirectoryAliases(const Zstring& folderPathPhrase)
 {
-    const Zstring dirpath = trimCpy(dirpathPhrase, true, false);
+    const Zstring dirpath = trimCpy(folderPathPhrase, true, false);
     if (dirpath.empty())
         return std::vector<Zstring>();
 
@@ -528,9 +522,9 @@ std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirpathPhrase)
 
 
 //coordinate changes with acceptsFolderPathPhraseNative()!
-Zstring zen::getResolvedDirectoryPath(const Zstring& dirpassPhrase) //noexcept
+Zstring zen::getResolvedDirectoryPath(const Zstring& folderPathPhrase) //noexcept
 {
-    Zstring dirpath = dirpassPhrase;
+    Zstring dirpath = folderPathPhrase;
 
     dirpath = expandMacros(dirpath); //expand before trimming!
 

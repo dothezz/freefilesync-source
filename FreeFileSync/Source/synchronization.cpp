@@ -19,7 +19,8 @@
     #include "lib/shadow.h"
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    #include <fcntl.h>  //open, close
+    #include <unistd.h> //fsync
+    #include <fcntl.h>  //open
 #endif
 
 using namespace zen;
@@ -538,7 +539,7 @@ void DeletionHandling::removeFileWithCallback(const AbstractPathRef& filePath,
 template <class Function> inline
 void DeletionHandling::removeLinkWithCallback(const AbstractPathRef& linkPath, const Zstring& relativePath, Function onNotifyItemDeletion, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //throw FileError
 {
-    if (ABF::dirExists(linkPath)) //dir symlink
+    if (ABF::folderExists(linkPath)) //dir symlink
         return removeDirWithCallback(linkPath, relativePath, onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
     else //file symlink, broken symlink
         return removeFileWithCallback(linkPath, relativePath, onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
@@ -1531,7 +1532,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirPair& dirObj, SyncOperation 
                 if (parentDir->isEmpty<sideTrg>()) //BaseDirPair OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
                     return; //if parent directory creation failed, there's no reason to show more errors!
 
-            warn_static("save this file access:")
+            warn_static("save this file access?")
             if (ABF::somethingExists(dirObj.getAbstractPath<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
             {
                 const AbstractPathRef targetPath = dirObj.getABF<sideTrg>().getAbstractPath(dirObj.getRelativePath<sideSrc>());
@@ -1541,7 +1542,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirPair& dirObj, SyncOperation 
                 {
                     ABF::copyNewFolder(dirObj.getAbstractPath<sideSrc>(), targetPath, copyFilePermissions_); //throw FileError
                 }
-                catch (const FileError&) { if (!ABF::dirExists(targetPath)) throw; }
+                catch (const FileError&) { if (!ABF::folderExists(targetPath)) throw; }
 
                 //update DirPair
                 dirObj.setSyncedTo(dirObj.getItemName<sideSrc>());

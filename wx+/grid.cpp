@@ -40,7 +40,15 @@ const int GridData::COLUMN_GAP_LEFT = 4;
 
 namespace
 {
-//------------ Grid Constants --------------------------------
+//------------------------------ Grid Parameters --------------------------------
+wxColor getColorLabelText() { return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT); }
+
+wxColor getColorLabelGradientFrom     () { return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW); }
+wxColor getColorLabelGradientTo       () { return wxColour(200, 200, 200); } //light grey
+
+wxColor getColorLabelGradientFocusFrom() { return getColorLabelGradientFrom(); }
+wxColor getColorLabelGradientFocusTo  () { return getColorSelectionGradientFrom(); }
+
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value as Explorer!
 const int DEFAULT_COL_LABEL_BORDER = 6; //top + bottom border in addition to label height
 //const int COLUMN_LABEL_BORDER      = GridData::COLUMN_GAP_LEFT;
@@ -49,12 +57,6 @@ const int COLUMN_MIN_WIDTH         = 40; //only honored when resizing manually!
 const int ROW_LABEL_BORDER         = 3;
 const int COLUMN_RESIZE_TOLERANCE  = 6; //unit [pixel]
 const int COLUMN_FILL_GAP_TOLERANCE = 10; //enlarge column to fill full width when resizing
-
-const wxColor COLOR_LABEL_GRADIENT_FROM = *wxWHITE;
-const wxColor COLOR_LABEL_GRADIENT_TO   = wxColour(200, 200, 200); //light grey
-
-const wxColor COLOR_LABEL_GRADIENT_FROM_FOCUS = COLOR_LABEL_GRADIENT_FROM;
-const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = getColorSelectionGradientFrom();
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
 
@@ -202,7 +204,7 @@ wxRect GridData::drawColumnLabelBorder(wxDC& dc, const wxRect& rect) //returns r
     //draw border (with gradient)
     {
         wxDCPenChanger dummy(dc, wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW), 1, wxSOLID));
-        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
+        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight()), getColorLabelGradientFrom(), dc.GetPen().GetColour(), wxSOUTH);
         dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight() + wxPoint(1, 0));
     }
 
@@ -213,15 +215,15 @@ wxRect GridData::drawColumnLabelBorder(wxDC& dc, const wxRect& rect) //returns r
 void GridData::drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool highlighted)
 {
     if (highlighted)
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM_FOCUS, COLOR_LABEL_GRADIENT_TO_FOCUS, wxSOUTH);
+        dc.GradientFillLinear(rect, getColorLabelGradientFocusFrom(), getColorLabelGradientFocusTo(), wxSOUTH);
     else //regular background gradient
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxSOUTH); //clear overlapping cells
+        dc.GradientFillLinear(rect, getColorLabelGradientFrom(), getColorLabelGradientTo(), wxSOUTH); //clear overlapping cells
 }
 
 
 void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString& text)
 {
-    wxDCTextColourChanger dummy(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+    wxDCTextColourChanger dummy(dc, getColorLabelText()); //accessibility: always set both foreground AND background colors!
     drawTextLabelFitting(dc, text, rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 }
 
@@ -384,17 +386,17 @@ private:
     {
         const wxRect& clientRect = GetClientRect();
 
-        dc.GradientFillLinear(clientRect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxSOUTH);
+        dc.GradientFillLinear(clientRect, getColorLabelGradientFrom(), getColorLabelGradientTo(), wxSOUTH);
 
         dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW), 1, wxSOLID));
 
         {
-            wxDCPenChanger dummy(dc, COLOR_LABEL_GRADIENT_FROM);
+            wxDCPenChanger dummy(dc, getColorLabelGradientFrom());
             dc.DrawLine(clientRect.GetTopLeft(), clientRect.GetTopRight());
         }
 
-        dc.GradientFillLinear(wxRect(clientRect.GetBottomLeft (), clientRect.GetTopLeft ()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
-        dc.GradientFillLinear(wxRect(clientRect.GetBottomRight(), clientRect.GetTopRight()), COLOR_LABEL_GRADIENT_FROM, dc.GetPen().GetColour(), wxSOUTH);
+        dc.GradientFillLinear(wxRect(clientRect.GetBottomLeft (), clientRect.GetTopLeft ()), getColorLabelGradientFrom(), dc.GetPen().GetColour(), wxSOUTH);
+        dc.GradientFillLinear(wxRect(clientRect.GetBottomRight(), clientRect.GetTopRight()), getColorLabelGradientFrom(), dc.GetPen().GetColour(), wxSOUTH);
 
         dc.DrawLine(clientRect.GetBottomLeft(), clientRect.GetBottomRight());
 
@@ -470,12 +472,11 @@ private:
 
     void render(wxDC& dc, const wxRect& rect) override
     {
-
         /*
         IsEnabled() vs IsThisEnabled() since wxWidgets 2.9.5:
 
-        void wxWindowBase::NotifyWindowOnEnableChange(), called from bool wxWindowBase::Enable(), has this buggy exception of NOT
-        refreshing child elements when disabling a IsTopLevel() dialog, e.g. when showing a modal dialog.
+        void wxWindowBase::NotifyWindowOnEnableChange(), called from bool wxWindowBase::Enable(), fails to refresh
+        child elements when disabling a IsTopLevel() dialog, e.g. when showing a modal dialog.
         The unfortunate effect on XP for using IsEnabled() when rendering the grid is that the user can move the modal dialog
         and *draw* with it on the background while the grid refreshes as disabled incrementally!
 
@@ -513,8 +514,8 @@ private:
     void drawRowLabel(wxDC& dc, const wxRect& rect, size_t row)
     {
         //clearArea(dc, rect, getColorRowLabel());
-        dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxEAST); //clear overlapping cells
-        wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+        dc.GradientFillLinear(rect, getColorLabelGradientFrom(), getColorLabelGradientTo(), wxEAST); //clear overlapping cells
+        wxDCTextColourChanger dummy3(dc, getColorLabelText()); //accessibility: always set both foreground AND background colors!
 
         //label text
         wxRect textRect = rect;
@@ -673,9 +674,9 @@ private:
                 if (activeMove && activeMove->isRealMove())
                 {
                     if (col + 1 == activeMove->refColumnTo()) //handle pos 1, 2, .. up to "at end" position
-                        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight() + wxPoint(-2, 0)), COLOR_LABEL_GRADIENT_FROM, *wxBLUE, wxSOUTH);
+                        dc.GradientFillLinear(wxRect(rect.GetTopRight(), rect.GetBottomRight() + wxPoint(-2, 0)), getColorLabelGradientFrom(), *wxBLUE, wxSOUTH);
                     else if (col == activeMove->refColumnTo() && col == 0) //pos 0
-                        dc.GradientFillLinear(wxRect(rect.GetTopLeft(), rect.GetBottomLeft() + wxPoint(2, 0)), COLOR_LABEL_GRADIENT_FROM, *wxBLUE, wxSOUTH);
+                        dc.GradientFillLinear(wxRect(rect.GetTopLeft(), rect.GetBottomLeft() + wxPoint(2, 0)), getColorLabelGradientFrom(), *wxBLUE, wxSOUTH);
                 }
         }
     }
@@ -2048,6 +2049,13 @@ void Grid::scrollTo(size_t row)
         }
     }
 }
+
+
+    bool Grid::Enable(bool enable) 
+	{  
+		Refresh(); 
+		return wxScrolledWindow::Enable(enable); 
+	}
 
 
 size_t Grid::getGridCursor() const

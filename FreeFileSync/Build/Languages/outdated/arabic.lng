@@ -7,6 +7,158 @@
 	<plural_definition>n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5</plural_definition>
 </header>
 
+<source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
+<target></target>
+
+<source>The following XML elements could not be read:</source>
+<target></target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target></target>
+
+<source>Cannot copy permissions from %x to %y.</source>
+<target></target>
+
+<source>Unable to register device notifications for %x.</source>
+<target></target>
+
+<source>Copy DACL, SACL, Owner, Group</source>
+<target></target>
+
+<source>Please enter a target folder.</source>
+<target></target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target></target>
+
+<source>Move down</source>
+<target></target>
+
+<source>Move up</source>
+<target></target>
+
+<source>Save as default</source>
+<target></target>
+
+<source>Remove entry from list</source>
+<target></target>
+
+<source>Copy to...</source>
+<target></target>
+
+<source>Copy items</source>
+<target></target>
+
+<source>SSH File Transfer Protocol</source>
+<target></target>
+
+<source>&Copy</source>
+<target></target>
+
+<source>&Overwrite existing files</source>
+<target></target>
+
+<source>&Keep relative paths</source>
+<target></target>
+
+<source>Arrange folder pair</source>
+<target></target>
+
+<source>Directory on server:</source>
+<target></target>
+
+<source>&Show password</source>
+<target></target>
+
+<source>Password:</source>
+<target></target>
+
+<source>User name:</source>
+<target></target>
+
+<source>Examples:</source>
+<target></target>
+
+<source>Port:</source>
+<target></target>
+
+<source>Server name or IP address:</source>
+<target></target>
+
+<source>Enter your SFTP login details:</source>
+<target></target>
+
+<source>
+- Not supported by all file systems
+- Requires and creates database files
+- Detection not available for first sync
+</source>
+<target></target>
+
+<source>&Direct</source>
+<target></target>
+
+<source>&Follow</source>
+<target></target>
+
+<source>Include &symbolic links:</source>
+<target></target>
+
+<source>&Ignore time shift (in hours)</source>
+<target></target>
+
+<source>Select SFTP folder</source>
+<target></target>
+
+<source>&Preferences</source>
+<target></target>
+
+<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
+<target></target>
+
+<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
+<target></target>
+
+<source>Data verification error:</source>
+<target></target>
+
+<source>%x and %y have different content.</source>
+<target></target>
+
+<source>Time out while searching for folder %x.</source>
+<target></target>
+
+<source>Failed to connect to SFTP server %x.</source>
+<target></target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target></target>
+
+<source>Cannot find device %x.</source>
+<target></target>
+
+<source>Cannot find %x.</source>
+<target></target>
+
+<source>Operation not supported for different base folder types.</source>
+<target></target>
+
+<source>
+Unexpected size of data stream.
+Expected: %x bytes
+Actual: %y bytes
+</source>
+<target></target>
+
+<source>Open configuration for editing without executing it.</source>
+<target></target>
+
+<source>Cannot find file %x.</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>كلا الجانبين قد تغير منذ المزامنة الأخيرة.</target>
 
@@ -22,8 +174,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>تحديد الاتجاهات الافتراضية للمزامنة: ستتم الكتابة فوق الملفات القديمة بالملفات الأحدث.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>التحقق من توافر سلة المحذوفات من أجل المجلد %x...</target>
+<source>Creating folder %x</source>
+<target>إنشاء مجلد %x</target>
+
+<source>Creating file %x</source>
+<target>إنشاء الملف %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>إنشاء ارتباط رمزي %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>نقل الملف %x إلى سلة المهملات</target>
@@ -43,6 +201,9 @@
 <source>Deleting symbolic link %x</source>
 <target>حذف الارتباط الرمزي %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>التحقق من توافر سلة المحذوفات من أجل المجلد %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>سلة المهملات غير متوفرة للمجلدات التالية. سيتم حذف الملفات بشكل نهائي بدلاً عن ذلك:</target>
 
@@ -55,20 +216,17 @@
 <source>Syntax error</source>
 <target>خطأ في البنية</target>
 
-<source>Cannot find file %x.</source>
-<target></target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>لا يحتوي الملف %x تكويناً صحيحاً.</target>
 
 <source>Unequal number of left and right directories specified.</source>
-<target>لم يتم تحديد عدد متساوي من المسارات على الطرفين</target>
+<target>لم يتم تحديد عدد متساوي من المسارات على الطرفين.</target>
 
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target>يجب أن يحتوي ملف الخيارات الخيارات على مستوى أزواج المسارات عند تحديد المسارات بواسطة سطر الأوامر</target>
+<target>يجب أن يحتوي ملف الخيارات الخيارات على مستوى أزواج المسارات عند تحديد المسارات بواسطة سطر الأوامر.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
-<target>لا يمكن اختيار المسارات لأكثر من ملف خيارات واحد</target>
+<target>لا يمكن اختيار المسارات لأكثر من ملف خيارات واحد.</target>
 
 <source>Command line</source>
 <target>سطر الأوامر</target>
@@ -86,28 +244,25 @@
 <target>مسار</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target>تحديد مسار مختلف لملف GlobalSettings.xml</target>
+<target>تحديد مسار مختلف لملف GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>أي عدد من ملفات خيارات FreeFileSyn أو\و _gui and/or .ffs_batch</target>
+<target>أي عدد من ملفات خيارات FreeFileSyn أو\و _gui and/or .ffs_batch.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد</target>
-
-<source>Open configuration for editing without executing it.</source>
-<target></target>
+<target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد.</target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>بإمكانك إهمال هذا الخطأ لاعتبار كل مجلد على أنه مجلد فارغ. سيتم إنشاء المجلدات تلقائياً خلال المزامنة</target>
+<target>بإمكانك إهمال هذا الخطأ لاعتبار كل مجلد على أنه مجلد فارغ. سيتم إنشاء المجلدات تلقائياً خلال المزامنة.</target>
 
 <source>A folder input field is empty.</source>
 <target>حقل إدخال خاص بمجلد فارغ.</target>
 
 <source>The corresponding folder will be considered as empty.</source>
-<target>سيتم اعتبار المجلد الموافق كمجلد فارغ</target>
+<target>سيتم اعتبار المجلد الموافق كمجلد فارغ.</target>
 
 <source>The following folder paths are dependent from each other:</source>
 <target>مسارات المجلدات التالية معتمدة على بعضها:</target>
@@ -205,24 +360,14 @@
 <source>Cannot read file %x.</source>
 <target>لا يمكن قراءة الملف  %x.</target>
 
-<source>
-Unexpected size of data stream.
-Expected: %x bytes
-Actual: %y bytes
-</source>
-<target></target>
-
 <source>Cannot write permissions of %x.</source>
 <target>لا يمكن كتابة أذونات %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target></target>
 
 <source>Cannot write file %x.</source>
 <target>لا يمكن كتابة الملف  %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>لا يمكن نسخ الرابط الرمزي من %x إلى %y</target>
+<target>لا يمكن نسخ الرابط الرمزي من %x إلى %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>لا يمكن نقل الملف  %x إلى %y.</target>
@@ -233,26 +378,17 @@ Actual: %y bytes
 <source>Cannot read file attributes of %x.</source>
 <target>لا يمكن قراءة سمات الملف %x.</target>
 
-<source>Cannot find %x.</source>
-<target></target>
-
 <source>Cannot open file %x.</source>
 <target>تعذر فتح الملف %x.</target>
+
+<source>Cannot create directory %x.</source>
+<target>لا يمكن إنشاء المسار %x.</target>
 
 <source>Cannot delete directory %x.</source>
 <target>لا يمكن حذف المسار %x.</target>
 
 <source>Cannot delete file %x.</source>
 <target>لا يمكن حذف الملف  %x.</target>
-
-<source>Cannot find device %x.</source>
-<target></target>
-
-<source>Cannot determine free disk space for %x.</source>
-<target></target>
-
-<source>Cannot create directory %x.</source>
-<target>لا يمكن إنشاء المسار %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>لا يمكن كتابة وقت تعديل %x.</target>
@@ -274,9 +410,6 @@ Actual: %y bytes
 
 <source>Error Code %x:</source>
 <target>خطأ رقم %x:</target>
-
-<source>Failed to connect to SFTP server %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -321,9 +454,6 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>البحث عن المجلد  %x...</target>
 
-<source>Time out while searching for folder %x.</source>
-<target></target>
-
 <source>Cannot get process information.</source>
 <target>لا يمكن الحصول على معلومات العملية.</target>
 
@@ -349,9 +479,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>اكتشاف قفل مهمل...</target>
 
-<source>Creating file %x</source>
-<target>إنشاء الملف %x</target>
-
 <source>Saving file %x...</source>
 <target>جاري حفظ الملف %x...</target>
 
@@ -370,9 +497,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>تعذر إنشاء قفل للمسار %x.</target>
 
-<source>Scanning:</source>
-<target>الفحص:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -385,6 +509,9 @@ Actual: %y bytes
 <pluralform>%x بنداً</pluralform>
 <pluralform>%x بند</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>الفحص:</target>
 
 <source>/sec</source>
 <target>\ثانية</target>
@@ -408,7 +535,7 @@ Actual: %y bytes
 <target>الرجاء استخدام إصدار الـ 64-bit للبرنامج لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
 
 <source>Cannot determine volume name for %x.</source>
-<target>تعذر تحديد اسم الوسط %x</target>
+<target>تعذر تحديد اسم الوسط %x.</target>
 
 <source>Volume name %x is not part of file path %y.</source>
 <target>اسم وحدة التخزين %x ليس جزءاُ من اسم الملف %y.</target>
@@ -477,7 +604,7 @@ Actual: %y bytes
 <target>تصفح</target>
 
 <source>Idle time (in seconds):</source>
-<target>وقت الخمول (بالثانية)</target>
+<target>وقت الخمول (بالثانية):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>وقت الخمول بين آخر تغيير تم الكشف عنه وتنفيذ الأوامر</target>
@@ -565,12 +692,6 @@ The command is triggered if:
 <source>Removing old versions...</source>
 <target>إزالة الإصدارات القديمة...</target>
 
-<source>Creating symbolic link %x</source>
-<target>إنشاء ارتباط رمزي %x</target>
-
-<source>Creating folder %x</source>
-<target>إنشاء مجلد %x</target>
-
 <source>Updating file %x</source>
 <target>جاري تحديث الملف %x</target>
 
@@ -582,12 +703,6 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>تحديث سمات %x</target>
-
-<source>%x and %y have different content.</source>
-<target></target>
-
-<source>Data verification error:</source>
-<target></target>
 
 <source>Creating a Volume Shadow Copy for %x...</source>
 <target>جاري إنشاء نسخة ظل وسيطة لـ %x...</target>
@@ -606,9 +721,6 @@ The command is triggered if:
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>العناصر التالية لم تحل اختلافاتها، و لن يتم مزامنتها:</target>
-
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target></target>
 
 <source>Not enough free disk space available in:</source>
 <target>المساحة الحرة المتوفرة على القرص غير كافية:</target>
@@ -708,7 +820,7 @@ The command is triggered if:
 <target>البرنامج هو الأحدث حتى الآن.</target>
 
 <source>Unable to connect to www.freefilesync.org.</source>
-<target>تعذر الاتصال بـ www.freefilesync.org</target>
+<target>تعذر الاتصال بـ www.freefilesync.org.</target>
 
 <source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
 <target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
@@ -779,9 +891,6 @@ The command is triggered if:
 <source>Local Synchronization Settings</source>
 <target>إعدادات المزامنة المحلية</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target></target>
-
 <source>&New</source>
 <target>&جديد</target>
 
@@ -808,9 +917,6 @@ The command is triggered if:
 
 <source>&Actions</source>
 <target>&مهام</target>
-
-<source>&Options</source>
-<target>&خيارات</target>
 
 <source>&Language</source>
 <target>الل&غة</target>
@@ -851,9 +957,6 @@ The command is triggered if:
 <source>Remove folder pair</source>
 <target>إزالة زوج مجلدات</target>
 
-<source>Select SFTP folder</source>
-<target></target>
-
 <source>Swap sides</source>
 <target>مبادلة الجانبين</target>
 
@@ -861,7 +964,7 @@ The command is triggered if:
 <target>إغلاق شريط البحث</target>
 
 <source>Find:</source>
-<target>بحث</target>
+<target>بحث:</target>
 
 <source>Match case</source>
 <target>مطابقة حالة الأحرف (Match case)</target>
@@ -906,13 +1009,10 @@ The command is triggered if:
 <target>اختيار بديل:</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
-<target>التعرف على الملفات المتساوية عن طريق مقارنة التاريخ و الحجم</target>
+<target>التعرف على الملفات المتساوية عن طريق مقارنة التاريخ و الحجم.</target>
 
 <source>Identify equal files by comparing the file content.</source>
-<target>التعرف على الملفات المتساوية عن طريق مقارنة محتوى الملف</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target></target>
+<target>التعرف على الملفات المتساوية عن طريق مقارنة محتوى الملف.</target>
 
 <source>Consider file times with specified offset as equal</source>
 <target>اعتبار الملفات ذات الفارق الزمني المحدد و كأنها متساوية</target>
@@ -920,20 +1020,11 @@ The command is triggered if:
 <source>Handle daylight saving time</source>
 <target>تعامل مع التوقيت الصيفي</target>
 
-<source>Include &symbolic links:</source>
-<target></target>
-
-<source>&Follow</source>
-<target></target>
-
-<source>&Direct</source>
-<target></target>
-
 <source>More information</source>
 <target>المزيد من المعلومات</target>
 
 <source>Local settings:</source>
-<target>الإعدادات المحلية</target>
+<target>الإعدادات المحلية:</target>
 
 <source>Include:</source>
 <target>إدخال:</target>
@@ -964,13 +1055,6 @@ The command is triggered if:
 
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
-
-<source>
-- Not supported by all file systems
-- Requires and creates database files
-- Detection not available for first sync
-</source>
-<target></target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
@@ -1017,40 +1101,14 @@ The command is triggered if:
 <source>OK</source>
 <target>موافق</target>
 
-<source>Enter your SFTP login details:</source>
-<target></target>
-
-<source>Server name or IP address:</source>
-<target></target>
-
-<source>Examples:</source>
-<target></target>
-
-<source>User name:</source>
-<target></target>
-
-<source>Password:</source>
-<target></target>
-
-<source>&Show password</source>
-<target></target>
-
-<source>Directory on server:</source>
-<target></target>
-
-
-
 <source>Start synchronization now?</source>
 <target>بدأ المزامنة الآن؟</target>
 
 <source>Variant:</source>
-<target>بديل</target>
+<target>بديل:</target>
 
 <source>&Don't show this dialog again</source>
 <target>&لا تظهر نافذة الحوار هذه مرة ثانية</target>
-
-<source>Arrange folder pair</source>
-<target></target>
 
 <source>Items found:</source>
 <target>العناصر التي تم العثور عليها:</target>
@@ -1092,10 +1150,10 @@ The command is triggered if:
 <target>تشغيل بوضع التصغير</target>
 
 <source>Save log:</source>
-<target>حفظ السجل</target>
+<target>حفظ السجل:</target>
 
 <source>Limit:</source>
-<target>حدود</target>
+<target>حدود:</target>
 
 <source>Limit maximum number of log files</source>
 <target>تقييد الحد الأقصى لعدد ملفات السجل</target>
@@ -1104,7 +1162,7 @@ The command is triggered if:
 <target>كيف يمكنني جدولة مهمة دفعية؟</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
-<target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة</target>
+<target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة.</target>
 
 <source>Fail-safe file copy</source>
 <target>نسخ ملفات آمن من الفشل</target>
@@ -1125,7 +1183,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>نسخ الملفات المقفلة</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
-<target>نسخ الملفات المشتركة مع مستخدمين آخرين أو المقفولة باستخدام خدمة نسخ الظل الوسيط</target>
+<target>نسخ الملفات المشتركة مع مستخدمين آخرين أو المقفولة باستخدام خدمة نسخ الظل الوسيط.</target>
 
 <source>(requires administrator rights)</source>
 <target>(بحاجة امتيازات المدير)</target>
@@ -1146,7 +1204,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>التأخير (بالثواني):</target>
 
 <source>Customize context menu:</source>
-<target>تخصيص القائمة المحلية</target>
+<target>تخصيص القائمة المحلية:</target>
 
 <source>Description</source>
 <target>الوصف</target>
@@ -1184,9 +1242,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>شكرا جزيلا للترجمة:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target></target>
-
 <source>Save as Batch Job</source>
 <target>حفظ كمهمة دفعية</target>
 
@@ -1199,8 +1254,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select Time Span</source>
 <target>اختيار المطال الزمني</target>
 
-<source>&Preferences</source>
-<target></target>
+<source>&Options</source>
+<target>&خيارات</target>
 
 <source>Main Bar</source>
 <target>الشريط الرئيسي</target>
@@ -1285,7 +1340,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>تحديد متعدد</target>
 
 <source>Include via filter:</source>
-<target>تضمن عن طريق فلتر</target>
+<target>تضمن عن طريق فلتر:</target>
 
 <source>Exclude via filter:</source>
 <target>استبعاد باستخدام عامل الفلترة:</target>
@@ -1344,9 +1399,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Do&n't save</source>
 <target>&لا تحفظ</target>
 
-<source>Remove entry from list</source>
-<target></target>
-
 <source>Synchronization Settings</source>
 <target>إعدادات المزامنة</target>
 
@@ -1398,9 +1450,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show filtered or temporarily excluded files</source>
 <target>إظهار الملفات التي تم فلترتها أو استبعادها بشكل مؤقت</target>
 
-<source>Save as default</source>
-<target></target>
-
 <source>Filter</source>
 <target>عامل الفلترة</target>
 
@@ -1409,12 +1458,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot find %x</source>
 <target>لا يمكن العثور على  %x</target>
-
-<source>Move up</source>
-<target></target>
-
-<source>Move down</source>
-<target></target>
 
 <source>Comma-separated values</source>
 <target>قائمة قيم مفصولة بفواصل</target>
@@ -1496,12 +1539,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>هل تريد حقاً حذف الـ %x ملف التالية ؟</pluralform>
 </target>
 
-<source>Preferences</source>
-<target>خيارات</target>
-
-<source>Copy DACL, SACL, Owner, Group</source>
-<target></target>
-
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>دمج تطبيقات خارجية في قائمة السياق. تتوفر وحدات الماكرو التالية:</target>
 
@@ -1524,13 +1561,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>&إظهار</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات</target>
+<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات.</target>
 
 <source>Create a mirror backup of the left folder by adapting the right folder to match.</source>
 <target>إنشاء نسخة احتياطية من الجانب الأيمن عن طريق تعديل الطرف الأيسر ليطابق الأيمن.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>نسخ الملفات المحدثة إلى المجلد المناسب</target>
+<target>نسخ الملفات المحدثة إلى المجلد المناسب.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>تحديد قواعد المزامنة الخاصة بك.</target>
@@ -1598,9 +1635,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to register to receive system messages.</source>
 <target>تعذر التسجيل لاستقبال رسائل النظام.</target>
 
-<source>Unable to register device notifications for %x.</source>
-<target></target>
-
 <source>Cannot monitor directory %x.</source>
 <target>لا يمكن مراقبة المسار %x.</target>
 
@@ -1619,14 +1653,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot read permissions of %x.</source>
 <target>لا يمكن قراءة أذونات %x.</target>
 
-<source>Cannot copy permissions from %x to %y.</source>
-<target></target>
-
 <source>Cannot find system function %x.</source>
 <target>لا يمكن العثور على وظيفة نظام %x.</target>
-
-<source>Cannot copy attributes from %x to %y.</source>
-<target></target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>لا يمكن نسخ الملف %x إلى %y.</target>
@@ -1686,22 +1714,16 @@ This guarantees a consistent state even in case of a serious error.
 <target>تعذر تعليق وضع النوم للنظام.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>تعذر تغيير أولويات I/O للعملية</target>
+<target>تعذر تغيير أولويات I/O للعملية.</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>فشل تصفح سلة المهملات من أجل الملف %x.</target>
-
-<source>The following XML elements could not be read:</source>
-<target></target>
-
-<source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target></target>
 
 <source>Prepare installation</source>
 <target>الاستعداد للتثبيت</target>
 
 <source>Choose which components you want to install.</source>
-<target>اختر المكونات التي تريد تنصيبها</target>
+<target>اختر المكونات التي تريد تنصيبها.</target>
 
 <source>Select installation type:</source>
 <target>اختيار نوع التنصيب:</target>
@@ -1734,10 +1756,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>انسخ الملفات فقط</target>
 
 <source>Choose a directory for installation:</source>
-<target>اختيار مسار التثبيت</target>
+<target>اختيار مسار التثبيت:</target>
 
 <source>Create shortcuts:</source>
-<target>إنشاء اختصار</target>
+<target>إنشاء اختصار:</target>
 
 <source>Desktop</source>
 <target>سطح المكتب</target>

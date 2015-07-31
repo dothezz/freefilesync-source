@@ -192,7 +192,8 @@ public:
     void scrollTo(size_t row);
 
     void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr) override;
-    bool Enable( bool enable = true) override { Refresh(); return wxScrolledWindow::Enable(enable); }
+    bool Enable(bool enable = true) override;
+
     //############################################################################################################
 
 private:
@@ -234,11 +235,11 @@ private:
 
         std::vector<size_t> get() const
         {
-            std::vector<size_t> selection;
+            std::vector<size_t> result;
             for (size_t row = 0; row < rowSelectionValue.size(); ++row)
                 if (rowSelectionValue[row] != 0)
-                    selection.push_back(row);
-            return selection;
+                    result.push_back(row);
+            return result;
         }
 
         void selectAll() { selectRange(0, rowSelectionValue.size(), true); }

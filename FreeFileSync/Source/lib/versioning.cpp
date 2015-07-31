@@ -127,14 +127,22 @@ void moveItem(const AbstractPathRef& sourcePath, //throw FileError
 
     auto removeTarget = [&]
     {
-        //remove target object
-        if (ABF::dirExists(targetPath)) //directory or dir-symlink
+        try
         {
-            assert(false); //we do not expect targetPath to be a directory in general (but possible!)
-            ABF::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
-        }
-        else //file or (broken) file-symlink
+            //file or (broken) file-symlink:
             ABF::removeFile(targetPath); //throw FileError
+        }
+        catch (FileError&)
+        {
+            //folder or folder-symlink:
+            if (ABF::folderExists(targetPath)) //directory or dir-symlink
+            {
+                assert(ABF::symlinkExists(targetPath)); //we do not expect targetPath to be a directory in general (but possible!)
+                ABF::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
+            }
+            else
+                throw;
+        }
     };
 
     //first try to move directly without copying
@@ -143,7 +151,7 @@ void moveItem(const AbstractPathRef& sourcePath, //throw FileError
         ABF::renameItem(sourcePath, targetPath); //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
         return; //great, we get away cheaply!
     }
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
+    //if moving failed, treat as error (except when it tried to move to a different volume: in this case we will copy the file)
     catch (const ErrorDifferentVolume&)
     {
         removeTarget(); //throw FileError
@@ -174,8 +182,8 @@ void moveFileOrSymlink(const AbstractPathRef& sourcePath, //throw FileError
         if (ABF::symlinkExists(sourcePath))
             ABF::copySymlink(sourcePath, targetPath, false /*copy filesystem permissions*/); //throw FileError
         else
-            ABF::copyFileTransactional(sourcePath, targetPath, //throw FileError, (ErrorFileLocked)
-            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr, onNotifyCopyStatus);
+            ABF::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
+            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, onNotifyCopyStatus);
 
         ABF::removeFile(sourcePath); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
     };
@@ -191,7 +199,7 @@ void moveFile(const AbstractPathRef& sourcePath, //throw FileError
     auto copyDelete = [&]
     {
         assert(!ABF::somethingExists(targetPath));
-        ABF::copyFileTransactional(sourcePath, targetPath, //throw FileError, (ErrorFileLocked)
+        ABF::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
         false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, onNotifyCopyStatus);
         ABF::removeFile(sourcePath); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
     };
@@ -231,7 +239,7 @@ struct FlatTraverserCallback: public ABF::TraverserCallback
     std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.shortName); return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override
     {
-        if (ABF::dirExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
+        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
             folderLinkNames_.push_back(si.shortName);
         else //file symlink, broken symlink
             fileLinkNames_.push_back(si.shortName);
@@ -299,7 +307,7 @@ void FileVersioner::revisionFolderImpl(const AbstractPathRef& folderPath, const 
                                        const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus)
 {
     assert(!ABF::symlinkExists(folderPath)); //[!] no symlinks in this context!!!
-    assert(ABF::dirExists(folderPath));      //Do NOT traverse into it deleting contained files!!!
+    assert(ABF::folderExists(folderPath));      //Do NOT traverse into it deleting contained files!!!
 
     //create target directories only when needed in moveFileToVersioning(): avoid empty directories!
 

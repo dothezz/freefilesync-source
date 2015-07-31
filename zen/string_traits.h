@@ -7,6 +7,7 @@
 #ifndef STRING_TRAITS_HEADER_813274321443234
 #define STRING_TRAITS_HEADER_813274321443234
 
+#include <cstring> //strlen
 #include "type_tools.h"
 
 //uniform access to string-like types, both classes and character arrays
@@ -143,19 +144,22 @@ struct GetCharType : ResultType<typename implementation::StringTraits<T>::CharTy
 
 namespace implementation
 {
-template <class C> inline
-size_t cStringLength(const C* str) //naive implementation seems somewhat faster than "optimized" strlen/wcslen!
-{
-#if defined _MSC_VER && _MSC_VER > 1800
-    static_assert(false, "strlen/wcslen are vectorized in VS14 CTP3 -> test again!");
-#endif
+//strlen/wcslen are vectorized since VS14 CTP3
+inline size_t cStringLength(const char*    str) { return std::strlen(str); }
+inline size_t cStringLength(const wchar_t* str) { return std::wcslen(str); }
 
+//no significant perf difference for "comparison" test case between cStringLength/wcslen:
+#if 0
+template <class C> inline
+size_t cStringLength(const C* str)
+{
     static_assert(IsSameType<C, char>::value || IsSameType<C, wchar_t>::value, "");
     size_t len = 0;
     while (*str++ != 0)
         ++len;
     return len;
 }
+#endif
 
 template <class S, typename = typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type> inline
 const typename GetCharType<S>::Type* strBegin(const S& str) //SFINAE: T must be a "string"

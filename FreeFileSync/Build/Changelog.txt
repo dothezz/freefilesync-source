@@ -1,6 +1,24 @@
+FreeFileSync 7.3 [2015-08-01]
+-----------------------------
+New context menu option to copy selected files to alternate folder (create diffs)
+Fill a folder pair by dropping two folders at a time from Explorer
+Added option to set non-standard SFTP port
+Prevent recursive creation of temporary Recycle Bin directories (Windows)
+Retrieve grid column label colors from the system
+Fixed detection of already existing files when moving (Linux)
+Follow os convention for preferences (OS X)
+Prevent progress dialog from hiding behind main dialog (OS X)
+Fixed config saved status not updating when changing certain settings
+Support for high dpi display settings
+Fixed crash when help viewer is open during exit (Windows)
+Show manual deletion progress within comparison status panel
+Further reduced number of file accesses during versioning
+Fixed folder picker failing to select Desktop folder (Windows)
+
+
 FreeFileSync 7.2 [2015-07-01]
 -----------------------------
-Support synchronization with SFTP (SSH File Transfer Protocol)
+Support synchronization via SFTP (SSH File Transfer Protocol)
 Detailed error reporting when checking folder existence
 Synchronize MTP devices with no modification time support
 Set focus to comparison button on startup

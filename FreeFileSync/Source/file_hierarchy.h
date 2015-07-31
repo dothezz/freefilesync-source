@@ -238,9 +238,6 @@ public:
                 CompareVariant cmpVar,
                 int fileTimeTolerance,
                 unsigned int optTimeShiftHours) :
-#ifdef _MSC_VER
-#pragma warning(suppress: 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
-#endif
         HierarchyObject(Zstring(), *this),
         filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance), optTimeShiftHours_(optTimeShiftHours),
         dirExistsLeft_ (dirExistsLeft),

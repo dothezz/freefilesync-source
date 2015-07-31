@@ -27,13 +27,13 @@ void setFolderPath(const Zstring& dirpath, wxTextCtrl* txtCtrl, wxWindow& toolti
     if (txtCtrl)
         txtCtrl->ChangeValue(toWx(dirpath));
 
-    const Zstring displayPath = getResolvedDirectoryPath(dirpath); //may block when resolving [<volume name>]
+    const Zstring folderPathFmt = getResolvedDirectoryPath(dirpath); //may block when resolving [<volume name>]
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
-    tooltipWnd.SetToolTip(toWx(displayPath)); //who knows when the real bugfix reaches mere mortals via an official release...
+    tooltipWnd.SetToolTip(toWx(folderPathFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
 
     if (staticText) //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
-        staticText->SetLabel(EqualFilePath()(appendSeparator(trimCpy(dirpath)), appendSeparator(displayPath)) ? wxString(_("Drag && drop")) : toWx(displayPath));
+        staticText->SetLabel(EqualFilePath()(appendSeparator(trimCpy(dirpath)), appendSeparator(folderPathFmt)) ? wxString(_("Drag && drop")) : toWx(folderPathFmt));
 }
 }
 
@@ -41,11 +41,11 @@ void setFolderPath(const Zstring& dirpath, wxTextCtrl* txtCtrl, wxWindow& toolti
 
 FolderSelector2::FolderSelector2(wxWindow&     dropWindow,
                                  wxButton&     selectButton,
-                                 wxTextCtrl&   dirpath,
+                                 wxTextCtrl&   folderPathCtrl,
                                  wxStaticText* staticText) :
     dropWindow_(dropWindow),
     selectButton_(selectButton),
-    dirpath_(dirpath),
+    folderPathCtrl_(folderPathCtrl),
     staticText_(staticText)
 {
     //prepare drag & drop
@@ -53,9 +53,9 @@ FolderSelector2::FolderSelector2(wxWindow&     dropWindow,
     dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector2::onFilesDropped), nullptr, this);
 
     //keep dirPicker and dirpath synchronous
-    dirpath_     .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector2::onMouseWheel      ), nullptr, this);
-    dirpath_     .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector2::onWriteDirManually), nullptr, this);
-    selectButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector2::onSelectDir       ), nullptr, this);
+    folderPathCtrl_.Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector2::onMouseWheel    ), nullptr, this);
+    folderPathCtrl_.Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector2::onEditFolderPath), nullptr, this);
+    selectButton_  .Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector2::onSelectDir     ), nullptr, this);
 }
 
 
@@ -63,9 +63,9 @@ FolderSelector2::~FolderSelector2()
 {
     dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector2::onFilesDropped), nullptr, this);
 
-    dirpath_     .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector2::onMouseWheel      ), nullptr, this);
-    dirpath_     .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector2::onWriteDirManually), nullptr, this);
-    selectButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector2::onSelectDir       ), nullptr, this);
+    folderPathCtrl_.Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector2::onMouseWheel    ), nullptr, this);
+    folderPathCtrl_.Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector2::onEditFolderPath), nullptr, this);
+    selectButton_  .Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector2::onSelectDir     ), nullptr, this);
 }
 
 
@@ -75,7 +75,7 @@ void FolderSelector2::onMouseWheel(wxMouseEvent& event)
     //additionally this will delete manual entries, although all the users wanted is scroll the parent window!
 
     //redirect to parent scrolled window!
-    wxWindow* wnd = &dirpath_;
+    wxWindow* wnd = &folderPathCtrl_;
     while ((wnd = wnd->GetParent()) != nullptr) //silence MSVC warning
         if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
             if (wxEvtHandler* evtHandler = wnd->GetEventHandler())
@@ -89,32 +89,31 @@ void FolderSelector2::onMouseWheel(wxMouseEvent& event)
 
 void FolderSelector2::onFilesDropped(FileDropEvent& event)
 {
-    const auto& files = event.getFiles();
-    if (files.empty())
+    const auto& itemPaths = event.getPaths();
+    if (itemPaths.empty())
         return;
 
-    const Zstring filePath = files[0];
-    if (dirExists(filePath))
-        setFolderPath(filePath, &dirpath_, dirpath_, staticText_);
-    else
+    Zstring itemPath = itemPaths[0];
+    if (!dirExists(itemPath))
     {
-        Zstring parentName = beforeLast(filePath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+        Zstring parentPath = beforeLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 #ifdef ZEN_WIN
-        if (endsWith(parentName, L":")) //volume root
-            parentName += FILE_NAME_SEPARATOR;
+        if (endsWith(parentPath, L":")) //volume root
+            parentPath += FILE_NAME_SEPARATOR;
 #endif
-        if (dirExists(parentName))
-            setFolderPath(parentName, &dirpath_, dirpath_, staticText_);
-        else //set original name unconditionally: usecase: inactive mapped network shares
-            setFolderPath(filePath, &dirpath_, dirpath_, staticText_);
+        if (dirExists(parentPath))
+            itemPath = parentPath;
+        //else: keep original name unconditionally: usecase: inactive mapped network shares
     }
+    setPath(itemPath);
+
     //event.Skip();
 }
 
 
-void FolderSelector2::onWriteDirManually(wxCommandEvent& event)
+void FolderSelector2::onEditFolderPath(wxCommandEvent& event)
 {
-    setFolderPath(toZ(event.GetString()), nullptr, dirpath_, staticText_);
+    setFolderPath(toZ(event.GetString()), nullptr, folderPathCtrl_, staticText_);
     event.Skip();
 }
 
@@ -143,7 +142,7 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
         {
             auto ft = runAsync([folderPath] { return dirExists(folderPath); });
 
-            if (ft.wait_for(boost::chrono::milliseconds(200)) == boost::future_status::ready && ft.get()) //potentially slow network access: wait 200ms at most
+            if (ft.wait_for(std::chrono::milliseconds(200)) == std::future_status::ready && ft.get()) //potentially slow network access: wait 200ms at most
                 defaultFolderPath = folderPath;
         }
     }
@@ -168,17 +167,17 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
     const Zstring newFolder = toZ(dirPicker.GetPath());
 #endif
 
-    setFolderPath(newFolder, &dirpath_, dirpath_, staticText_);
+    setFolderPath(newFolder, &folderPathCtrl_, folderPathCtrl_, staticText_);
 }
 
 
 Zstring FolderSelector2::getPath() const
 {
-    return toZ(dirpath_.GetValue());
+    return toZ(folderPathCtrl_.GetValue());
 }
 
 
 void FolderSelector2::setPath(const Zstring& dirpath)
 {
-    setFolderPath(dirpath, &dirpath_, dirpath_, staticText_);
+    setFolderPath(dirpath, &folderPathCtrl_, folderPathCtrl_, staticText_);
 }

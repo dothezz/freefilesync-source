@@ -45,7 +45,7 @@ std::wstring getIso639Language()
                              bufSize);              //_In_       int cchData
     if (0 < rv && rv < bufSize)
         return buf; //MSDN: "This can be a 3-letter code for languages that don't have a 2-letter code"!
-    else assert(false);
+    assert(false);
 #endif
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
     if (localeName.empty())
@@ -66,7 +66,7 @@ std::wstring getIso3166Country()
                              bufSize);               //_In_       int cchData
     if (0 < rv && rv < bufSize)
         return buf; //MSDN: "This can also return a number, such as "029" for Caribbean."!
-    else assert(false);
+    assert(false);
 #endif
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
     if (localeName.empty())

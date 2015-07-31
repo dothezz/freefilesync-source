@@ -28,6 +28,15 @@ void showAboutDialog(wxWindow* parent);
 
 ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, FilterConfig& filter, const wxString& caption);
 
+ReturnSmallDlg::ButtonPressed showCopyToDialog(wxWindow* parent,
+                                               const std::vector<FileSystemObject*>& rowsOnLeft,
+                                               const std::vector<FileSystemObject*>& rowsOnRight,
+                                               Zstring& lastUsedPath,
+                                               std::vector<Zstring>& folderPathHistory,
+                                               size_t historySizeMax,
+                                               bool& keepRelPaths,
+                                               bool& overwriteIfExists);
+
 ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
                                                const std::vector<FileSystemObject*>& rowsOnLeft,
                                                const std::vector<FileSystemObject*>& rowsOnRight,

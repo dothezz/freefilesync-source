@@ -11,7 +11,6 @@
 #include <functional>
 #include "thread.h"
 #include "scope_guard.h"
-//#include "type_tools.h"
 
 namespace zen
 {
@@ -19,25 +18,25 @@ namespace zen
 class AsyncTasks
 {
 public:
-    AsyncTasks() : inRecursion(false) {}
+    AsyncTasks() {}
 
     template <class Fun, class Fun2>
-    void add(Fun doAsync, Fun2 evalOnGui)
-    //equivalent to "evalOnGui(doAsync())"
-    //	-> doAsync: the usual thread-safety requirements apply!
+    void add(Fun runAsync, Fun2 evalOnGui)
+    //equivalent to "evalOnGui(runAsync())"
+    //	-> runAsync: the usual thread-safety requirements apply!
     //	-> evalOnGui: no thread-safety concerns, but must only reference variables with greater-equal lifetime than the AsyncTask instance!
     {
         tasks.push_back(zen::runAsync([=]() -> std::function<void()>
         {
-            auto result = doAsync();
+            auto result = runAsync();
             return [=]{ evalOnGui(result); };
         }));
     }
 
     template <class Fun, class Fun2>
-    void add2(Fun doAsync, Fun2 evalOnGui) //for evalOnGui taking no parameters
+    void add2(Fun runAsync, Fun2 evalOnGui) //for evalOnGui taking no parameters
     {
-        tasks.push_back(zen::runAsync([doAsync, evalOnGui]() -> std::function<void()> { doAsync(); return [evalOnGui]{ evalOnGui(); }; }));
+        tasks.push_back(zen::runAsync([runAsync, evalOnGui]() -> std::function<void()> { runAsync(); return [evalOnGui]{ evalOnGui(); }; }));
     }
 
     void evalResults() //call from gui thread repreatedly
@@ -47,9 +46,9 @@ public:
             inRecursion = true;
             ZEN_ON_SCOPE_EXIT(inRecursion = false);
 
-            tasks.remove_if([](boost::unique_future<std::function<void()>>& ft) -> bool
+            tasks.remove_if([](std::future<std::function<void()>>& ft) -> bool
             {
-                if (ft.is_ready())
+                if (isReady(ft))
                 {
                     (ft.get())();
                     return true;
@@ -62,8 +61,11 @@ public:
     bool empty() const { return tasks.empty(); }
 
 private:
-    bool inRecursion;
-    std::list<boost::unique_future<std::function<void()>>> tasks;
+    AsyncTasks           (const AsyncTasks&) = delete;
+    AsyncTasks& operator=(const AsyncTasks&) = delete;
+
+    bool inRecursion = false;
+    std::list<std::future<std::function<void()>>> tasks;
 };
 }
 

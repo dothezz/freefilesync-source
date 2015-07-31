@@ -304,7 +304,7 @@ private:
 
     //----------------------------------------------------------------------------------------------------------------
     bool fileExists     (const Zstring& itemPathImpl) const override { return zen::fileExists     (itemPathImpl); } //noexcept
-    bool dirExists      (const Zstring& itemPathImpl) const override { return zen::dirExists      (itemPathImpl); } //noexcept
+    bool folderExists   (const Zstring& itemPathImpl) const override { return zen::dirExists      (itemPathImpl); } //noexcept
     bool symlinkExists  (const Zstring& itemPathImpl) const override { return zen::symlinkExists  (itemPathImpl); } //noexcept
     bool somethingExists(const Zstring& itemPathImpl) const override { return zen::somethingExists(itemPathImpl); } //noexcept
     //----------------------------------------------------------------------------------------------------------------
@@ -357,9 +357,9 @@ private:
     }
 
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
-    std::function<bool()> /*throw FileError*/ getAsyncCheckDirExists(const Zstring& itemPathImpl) const override //noexcept
+    std::function<bool()> /*throw FileError*/ getAsyncCheckFolderExists(const Zstring& itemPathImpl) const override //noexcept
     {
-        warn_static("finish file error handling")
+        warn_static("finish file error detection")
 
         return [itemPathImpl] { return zen::dirExists(itemPathImpl); };
     }
@@ -476,43 +476,61 @@ bool RecycleSessionNative::recycleItem(const AbstractPathRef& ap, const Zstring&
     assert(!startsWith(logicalRelPath, FILE_NAME_SEPARATOR));
 
 #ifdef ZEN_WIN
+    const bool remnantRecyclerItem = [&itemPath] //clean-up of recycler temp directory failed during last sync
+    {
+        //search for path component named "RecycleBin.ffs_tmp" or "RecycleBin_<num>.ffs_tmp":
+        const size_t pos = itemPath.find(L"\\RecycleBin");
+        if (pos == Zstring::npos)
+            return false;
+
+        const size_t pos2 = itemPath.find(L'\\', pos + 1);
+        return endsWith(StringRef<Zchar>(itemPath.begin(), pos2 == Zstring::npos ? itemPath.end() : itemPath.begin() + pos2), ABF::TEMP_FILE_ENDING);
+    }();
+
+    //do not create RecycleBin.ffs_tmp directories recursively if recycling a particular item fails forever!
+    //=> 1. stack overflow crashes 2. paths longer than 260 chars, undeletable/viewable with Explorer
+    if (remnantRecyclerItem)
+        return recycleOrDelete(itemPath); //throw FileError
+
     const Zstring tmpPath = getOrCreateRecyclerTempDirPf() + logicalRelPath; //throw FileError
     bool deleted = false;
 
     auto moveToTempDir = [&]
     {
-        try
-        {
-            //performance optimization: Instead of moving each object into recycle bin separately,
-            //we rename them one by one into a temporary directory and batch-recycle this directory after sync
-            renameFile(itemPath, tmpPath); //throw FileError, ErrorDifferentVolume
-            this->toBeRecycled.push_back(tmpPath);
-            deleted = true;
-        }
-        catch (ErrorDifferentVolume&) //MoveFileEx() returns ERROR_PATH_NOT_FOUND *before* considering ERROR_NOT_SAME_DEVICE! => we have to create tmpParentDir anyway to find out!
-        {
-            deleted = recycleOrDelete(itemPath); //throw FileError
-        }
+        //perf: Instead of recycling each object separately, we rename them one by one
+        //      into a temporary directory and batch-recycle all at once after sync
+        renameFile(itemPath, tmpPath); //throw FileError, ErrorDifferentVolume
+        this->toBeRecycled.push_back(tmpPath);
+        deleted = true;
     };
 
     try
     {
-        moveToTempDir(); //throw FileError, ErrorDifferentVolume
-    }
-    catch (FileError&)
-    {
-        if (somethingExists(itemPath))
+        try
         {
-            const Zstring tmpParentDir = beforeLast(tmpPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE); //what if C:\ ?
-            if (!somethingExists(tmpParentDir))
+            moveToTempDir(); //throw FileError, ErrorDifferentVolume
+        }
+        catch (ErrorDifferentVolume&) { throw; }
+        catch (FileError&)
+        {
+            if (somethingExists(itemPath))
             {
-                makeDirectoryRecursively(tmpParentDir); //throw FileError
-                moveToTempDir(); //throw FileError -> this should work now!
+                const Zstring tmpParentDir = beforeLast(tmpPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE); //what if C:\ ?
+                if (!somethingExists(tmpParentDir))
+                {
+                    makeDirectoryRecursively(tmpParentDir); //throw FileError
+                    moveToTempDir(); //throw FileError, ErrorDifferentVolume -> this should work now!
+                }
+                else
+                    throw;
             }
-            else
-                throw;
         }
     }
+    catch (ErrorDifferentVolume&) //MoveFileEx() returns ERROR_PATH_NOT_FOUND *before* considering ERROR_NOT_SAME_DEVICE! => we have to create tmpParentDir to find out!
+    {
+        return recycleOrDelete(itemPath); //throw FileError
+    }
+
     return deleted;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC

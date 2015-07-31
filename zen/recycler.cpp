@@ -187,7 +187,7 @@ bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>&
                                    &recInfo);       //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
     });
 
-    while (ft.wait_for(boost::chrono::milliseconds(50)) != boost::future_status::ready)
+    while (ft.wait_for(std::chrono::milliseconds(50)) != std::future_status::ready)
         if (onUpdateGui)
             onUpdateGui(); //may throw!
 

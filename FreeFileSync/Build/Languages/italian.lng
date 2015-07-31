@@ -56,7 +56,7 @@
 <target>Errore di sintassi</target>
 
 <source>Cannot find file %x.</source>
-<target></target>
+<target>Impossibile trovare il file %x.</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Il file %x non contiene una configurazione valida.</target>
@@ -95,7 +95,7 @@
 <target>Qualsiasi numero di coppie di directory alternative per al massimo un file di configurazione.</target>
 
 <source>Open configuration for editing without executing it.</source>
-<target></target>
+<target>Apri configurazione per la modifica senza eseguirlo.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Impossibile trovare le seguenti cartelle:</target>
@@ -210,13 +210,17 @@ Unexpected size of data stream.
 Expected: %x bytes
 Actual: %y bytes
 </source>
-<target></target>
+<target>
+Dimensioni impreviste del flusso di dati.
+Previsto: %x byte
+Attuale: %y byte
+</target>
 
 <source>Cannot write permissions of %x.</source>
 <target>Impossibile scrivere i permessi di %x.</target>
 
 <source>Operation not supported for different base folder types.</source>
-<target></target>
+<target>Operazione non supportata per i diversi tipi di cartelle di base.</target>
 
 <source>Cannot write file %x.</source>
 <target>Impossibile scrivere il file %x.</target>
@@ -234,25 +238,25 @@ Actual: %y bytes
 <target>Impossibile leggere gli attributi del file %x.</target>
 
 <source>Cannot find %x.</source>
-<target></target>
+<target>Impossibile trovare %x.</target>
 
 <source>Cannot open file %x.</source>
 <target>Impossibile aprire il file %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Impossibile trovare dispositivo %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Impossibile determinare lo spazio libero su disco per %x.</target>
+
+<source>Cannot create directory %x.</source>
+<target>Impossibile creare la cartella %x.</target>
 
 <source>Cannot delete directory %x.</source>
 <target>Impossibile eliminare la directory %x.</target>
 
 <source>Cannot delete file %x.</source>
 <target>Impossibile eliminare il file %x.</target>
-
-<source>Cannot find device %x.</source>
-<target></target>
-
-<source>Cannot determine free disk space for %x.</source>
-<target></target>
-
-<source>Cannot create directory %x.</source>
-<target>Impossibile creare la cartella %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Impossibile scrivere data e ora di modifica di %x.</target>
@@ -276,7 +280,7 @@ Actual: %y bytes
 <target>Codice Errore %x:</target>
 
 <source>Failed to connect to SFTP server %x.</source>
-<target></target>
+<target>Impossibile connettersi al server SFTP %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -318,7 +322,7 @@ Actual: %y bytes
 <target>Ricerca della cartella %x...</target>
 
 <source>Time out while searching for folder %x.</source>
-<target></target>
+<target>Pausa durante la ricerca per la cartella %x.</target>
 
 <source>Cannot get process information.</source>
 <target>Impossibile ottenere informazioni sul processo.</target>
@@ -378,7 +382,7 @@ Actual: %y bytes
 <target>/sec</target>
 
 <source>%x items/sec</source>
-<target>%x elementi/sec</target>
+<target>%x oggetti/sec</target>
 
 <source>Show in Explorer</source>
 <target>Mostra in Esplora Risorse</target>
@@ -450,7 +454,7 @@ Actual: %y bytes
 <target>3. Premi 'Avvio'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Per iniziare è sufficiente importare un file con estensione .ffs_batch</target>
+<target>Per iniziare è sufficiente importare un file con estensione .ffs_batch.</target>
 
 <source>Folders to watch:</source>
 <target>Cartelle da guardare:</target>
@@ -572,10 +576,10 @@ Il comando è attivato se:
 <target>Aggiornamento attributi di %x</target>
 
 <source>%x and %y have different content.</source>
-<target></target>
+<target>%x e %y hanno un contenuto diverso.</target>
 
 <source>Data verification error:</source>
-<target></target>
+<target>Errore di verifica dei dati:</target>
 
 <source>Creating a Volume Shadow Copy for %x...</source>
 <target>Creazione di un Volume Shadow Copy per %x...</target>
@@ -596,7 +600,7 @@ Il comando è attivato se:
 <target>I seguenti oggetti hanno conflitti irrisolti e non saranno sincronizzati:</target>
 
 <source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target></target>
+<target>Le seguenti cartelle sono significativamente differenti. Assicurarsi di aver selezionato le cartelle corrette per la sincronizzazione.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Spazio libero su disco insufficiente in:</target>
@@ -731,7 +735,7 @@ Il comando è attivato se:
 <target>Categoria</target>
 
 <source>Action</source>
-<target>Azioni</target>
+<target>Azione</target>
 
 <source>Local comparison settings</source>
 <target>Impostazioni di confronto locali</target>
@@ -764,7 +768,7 @@ Il comando è attivato se:
 <target>Impostazioni di sincronizzazione locale</target>
 
 <source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target></target>
+<target>La cartella selezionata %x non può essere utilizzata con FreeFileSync. Si prega di selezionare una cartella su un file system locale, di rete o un dispositivo MTP.</target>
 
 <source>&New</source>
 <target>&Nuovo</target>
@@ -836,7 +840,7 @@ Il comando è attivato se:
 <target>Elimina la coppia di cartelle</target>
 
 <source>Select SFTP folder</source>
-<target></target>
+<target>Selezionare la cartella SFTP</target>
 
 <source>Swap sides</source>
 <target>Inverti i lati</target>
@@ -896,7 +900,7 @@ Il comando è attivato se:
 <target>Identificare i file uguali confrontando il contenuto del file.</target>
 
 <source>&Ignore time shift (in hours)</source>
-<target></target>
+<target>&Ignora tempo di spostamento (in ore)</target>
 
 <source>Consider file times with specified offset as equal</source>
 <target>Considerare i tempi dei file con specifico offset o uguale</target>
@@ -905,13 +909,13 @@ Il comando è attivato se:
 <target>Maneggiare l'ora legale</target>
 
 <source>Include &symbolic links:</source>
-<target></target>
+<target>Includere collegamenti &simbolici:</target>
 
 <source>&Follow</source>
-<target></target>
+<target>&Esegui</target>
 
 <source>&Direct</source>
-<target></target>
+<target>&Diretta</target>
 
 <source>More information</source>
 <target>Maggiori informazioni</target>
@@ -954,7 +958,11 @@ Il comando è attivato se:
 - Requires and creates database files
 - Detection not available for first sync
 </source>
-<target></target>
+<target>
+- Non supportato da tutti i file system
+- Richiede e crea file di database
+- Rilevazione non disponibile per prima sincronizzazione
+</target>
 
 <source>Detect synchronization directions with the help of database files</source>
 <target>Rileva indicazioni sincronizzazione con l'aiuto del file di database</target>
@@ -1002,27 +1010,25 @@ Il comando è attivato se:
 <target>OK</target>
 
 <source>Enter your SFTP login details:</source>
-<target></target>
+<target>Inserisci i tuoi dati d'accesso SFTP:</target>
 
 <source>Server name or IP address:</source>
-<target></target>
+<target>Nome server o indirizzo IP:</target>
 
 <source>Examples:</source>
-<target></target>
+<target>Esempi:</target>
 
 <source>User name:</source>
-<target></target>
+<target>Nome utente:</target>
 
 <source>Password:</source>
-<target></target>
+<target>Password:</target>
 
 <source>&Show password</source>
-<target></target>
+<target>&Mostra password</target>
 
 <source>Directory on server:</source>
-<target></target>
-
-
+<target>Directory su server:</target>
 
 <source>Start synchronization now?</source>
 <target>Avviare la sincronizzazione ora?</target>
@@ -1034,7 +1040,7 @@ Il comando è attivato se:
 <target>&Non mostrare più questo avviso</target>
 
 <source>Arrange folder pair</source>
-<target></target>
+<target>Disporre coppia di cartelle</target>
 
 <source>Items found:</source>
 <target>Oggetti trovati:</target>
@@ -1169,7 +1175,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Ringraziamenti per la traduzione:</target>
 
 <source>SSH File Transfer Protocol</source>
-<target></target>
+<target>Protocollo di trasferimento SSH</target>
 
 <source>Save as Batch Job</source>
 <target>Salva come Processo Batch</target>
@@ -1184,7 +1190,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Selezionare Intervallo di Tempo</target>
 
 <source>&Preferences</source>
-<target></target>
+<target>&Preferenze</target>
 
 <source>Main Bar</source>
 <target>Barra Principale</target>
@@ -1313,7 +1319,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>No&n salvare</target>
 
 <source>Remove entry from list</source>
-<target></target>
+<target>Togliere voce dalla lista</target>
 
 <source>Synchronization Settings</source>
 <target>Impostazioni di Sincronizzazione</target>
@@ -1367,7 +1373,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Mostra file filtrati o temporaneamente esclusi</target>
 
 <source>Save as default</source>
-<target></target>
+<target>Salva come predefinito</target>
 
 <source>Filter</source>
 <target>Filtro</target>
@@ -1379,10 +1385,10 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Impossibile trovare %x</target>
 
 <source>Move up</source>
-<target></target>
+<target>Sposta su</target>
 
 <source>Move down</source>
-<target></target>
+<target>Sposta giù</target>
 
 <source>Comma-separated values</source>
 <target>Valori separati da virgole</target>
@@ -1460,7 +1466,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Preferenze</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
-<target></target>
+<target>Copia DACL, SACL, Proprietario, Gruppo</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integra applicazioni esterne nel menu contestuale. Sono disponibili le seguenti macro:</target>
@@ -1559,7 +1565,7 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Impossibile registrarsi per ricevere i messaggi di sistema.</target>
 
 <source>Unable to register device notifications for %x.</source>
-<target></target>
+<target>Impossibile registrare le notifiche di dispositivo per %x.</target>
 
 <source>Cannot monitor directory %x.</source>
 <target>Impossibile monitorare la directory %x.</target>
@@ -1580,13 +1586,13 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Impossibile leggere i permessi di %x.</target>
 
 <source>Cannot copy permissions from %x to %y.</source>
-<target></target>
+<target>Non è possibile copiare i permessi da %x per %y.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Impossibile trovare la funzione di sistema %x.</target>
 
 <source>Cannot copy attributes from %x to %y.</source>
-<target></target>
+<target>Non è possibile copiare gli attributi da %x per %y.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Impossibile copiare il file %x in %y.</target>
@@ -1640,10 +1646,10 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <target>Controllo cestino non riuscito per la cartella %x.</target>
 
 <source>The following XML elements could not be read:</source>
-<target></target>
+<target>I seguenti elementi XML non possono essere letti:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target></target>
+<target>File di configurazione %x incompleta. Gli elementi mancanti saranno impostati sui valori predefiniti.</target>
 
 <source>Prepare installation</source>
 <target>Preparare l'installazione</target>

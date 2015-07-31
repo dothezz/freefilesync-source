@@ -319,7 +319,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                         case ConfirmationButton::CANCEL:
                             throw AbortMonitoring(SHOW_GUI);
                     }
-                boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted
+                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
             }
         }
 

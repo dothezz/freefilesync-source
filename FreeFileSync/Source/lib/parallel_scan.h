@@ -48,7 +48,7 @@ struct DirectoryValue
 {
     DirContainer dirCont;
     //relative names (or empty string for root) for directories that could not be read (completely), e.g. access denied, or temporal network drop
-    std::map<Zstring, std::wstring, LessFilePath> failedDirReads;  //with corresponding error message
+    std::map<Zstring, std::wstring, LessFilePath> failedDirReads; //with corresponding error message
 
     //relative names (never empty) for failure to read single file/dir/symlink with corresponding error message
     std::map<Zstring, std::wstring, LessFilePath> failedItemReads;

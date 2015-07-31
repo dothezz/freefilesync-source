@@ -1,6 +1,6 @@
 <header>
 	<language>Norsk</language>
-	<translator>bjorn96</translator>
+	<translator>enter your name here</translator>
 	<locale>nb_NO</locale>
 	<image>flag_norway.png</image>
 	<plural_count>2</plural_count>
@@ -77,16 +77,16 @@
 <target>Syntaks:</target>
 
 <source>global config file:</source>
-<target>Global konfigureringsfil</target>
+<target>Global konfigureringsfil:</target>
 
 <source>config files:</source>
-<target>Konfigurer filer</target>
+<target>Konfigurer filer:</target>
 
 <source>directory</source>
 <target>mappe</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Sti til en alternativ GlobalSettings.xml fil</target>
+<target>Sti til en alternativ GlobalSettings.xml fil.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Vilkårlig antall FreeFileSync .ffs_gui og/eller .ffs_batch indstillingsfiler.</target>
@@ -110,7 +110,7 @@
 <target>Den tilsvarende mappe betraktes som tom.</target>
 
 <source>The following folder paths are dependent from each other:</source>
-<target>De følgende mappebaner er avhengige av hverandre</target>
+<target>De følgende mappebaner er avhengige av hverandre:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Filen %x har en ugyldig dato.</target>

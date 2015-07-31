@@ -131,9 +131,9 @@ template <bool ascending, SelectedSide side> inline
 bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
-        return false;  //empty rows always last
+        return false; //empty rows always last
     else if (b.isEmpty<side>())
-        return true;  //empty rows always last
+        return true; //empty rows always last
 
     const FilePair* fileObjA = dynamic_cast<const FilePair*>(&a);
     const FilePair* fileObjB = dynamic_cast<const FilePair*>(&b);
@@ -144,7 +144,7 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
     if (!fileObjA && !linkObjA)
         return false; //directories last
     else if (!fileObjB && !linkObjB)
-        return true;  //directories last
+        return true; //directories last
 
     const std::int64_t dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
     const std::int64_t dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
@@ -158,14 +158,14 @@ template <bool ascending, SelectedSide side> inline
 bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
-        return false;  //empty rows always last
+        return false; //empty rows always last
     else if (b.isEmpty<side>())
-        return true;  //empty rows always last
+        return true; //empty rows always last
 
     if (dynamic_cast<const DirPair*>(&a))
         return false; //directories last
     else if (dynamic_cast<const DirPair*>(&b))
-        return true;  //directories last
+        return true; //directories last
 
     auto getExtension = [&](const FileSystemObject& fsObj) -> Zstring
     {

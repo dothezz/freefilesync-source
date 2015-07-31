@@ -3,7 +3,7 @@
 
 namespace zen
 {
-const wchar_t ffsVersion[] = L"7.2"; //internal linkage!
+const wchar_t ffsVersion[] = L"7.3"; //internal linkage!
 const wchar_t FFS_VERSION_SEPERATOR = L'.';
 }
 

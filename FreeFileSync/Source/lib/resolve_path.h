@@ -21,12 +21,12 @@ namespace zen
 	=> may block for slow USB sticks and idle HDDs
 	=> not thread-safe, see ::GetFullPathName()!
 */
-Zstring getResolvedDirectoryPath(const Zstring& dirpassPhrase); //noexcept
+Zstring getResolvedDirectoryPath(const Zstring& folderPathPhrase); //noexcept
 
 //macro substitution only
 Zstring expandMacros(const Zstring& text);
 
-std::vector<Zstring> getDirectoryAliases(const Zstring& dirpassPhrase); //may block for slow USB sticks when resolving [<volume name>]
+std::vector<Zstring> getDirectoryAliases(const Zstring& folderPathPhrase); //may block for slow USB sticks when resolving [<volume name>]
 
 #ifdef ZEN_WIN
     //*blocks* if network is not reachable or when showing login prompt dialog!

@@ -10,6 +10,7 @@
 #include <functional>
 #include "file_hierarchy.h"
 #include "lib/soft_filter.h"
+#include "process_callback.h"
 
 namespace zen
 {
@@ -41,33 +42,27 @@ void applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom, std
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)
 
-
-//manual deletion of files on main grid
-std::pair<std::wstring, int> deleteFromGridAndHDPreview(        //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
+std::pair<std::wstring, int> getSelectedItemsAsString( //returns string with item names and total count of selected(!) items, NOT total files/dirs!
     const std::vector<FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
     const std::vector<FileSystemObject*>& selectionRight); //
 
-struct DeleteFilesHandler
-{
-    virtual ~DeleteFilesHandler() {}
+//manual copy to alternate folder:
+void copyToAlternateFolder(const std::vector<FileSystemObject*>& rowsToCopyOnLeft,  //all pointers need to be bound!
+                           const std::vector<FileSystemObject*>& rowsToCopyOnRight, //
+                           const Zstring& targetFolderPathPhrase,
+                           bool keepRelPaths,
+                           bool overwriteIfExists,
+                           ProcessCallback& callback);
 
-    enum Response
-    {
-        IGNORE_ERROR = 10,
-        RETRY
-    };
-    virtual Response reportError  (const std::wstring& msg) = 0;
-    virtual void     reportWarning(const std::wstring& msg, bool& warningActive) = 0;
-    virtual void     reportStatus (const std::wstring& msg) = 0;
-};
+//manual deletion of files on main grid
 void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                          const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                          FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                          const std::vector<DirectionConfig>& directCfgs,
                          bool useRecycleBin,
-                         DeleteFilesHandler& statusHandler,
                          //global warnings:
-                         bool& warningRecyclerMissing);
+                         bool& warningRecyclerMissing,
+                         ProcessCallback& callback);
 }
 
 #endif //ALGORITHM_H_34218518475321452548

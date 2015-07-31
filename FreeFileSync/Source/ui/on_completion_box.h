@@ -51,8 +51,8 @@ private:
 
     void setValueAndUpdateList(const std::wstring& value);
 
-    std::vector<Zstring>* history_;
-    size_t historyMax_;
+    std::vector<Zstring>* history_ = nullptr;
+    size_t historyMax_ = 0;
 
     const std::vector<std::pair<std::wstring, Zstring>> defaultCommands;
 };

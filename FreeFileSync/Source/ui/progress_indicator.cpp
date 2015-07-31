@@ -253,15 +253,16 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
         }
         break;
 
+        case ProcessCallback::PHASE_SYNCHRONIZING:
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         {
-            auto objectsCurrent = syncStat_->getObjectsCurrent(ProcessCallback::PHASE_COMPARING_CONTENT);
-            auto objectsTotal   = syncStat_->getObjectsTotal  (ProcessCallback::PHASE_COMPARING_CONTENT);
-            auto dataCurrent    = syncStat_->getDataCurrent   (ProcessCallback::PHASE_COMPARING_CONTENT);
-            auto dataTotal      = syncStat_->getDataTotal     (ProcessCallback::PHASE_COMPARING_CONTENT);
+            const int itemsCurrent         = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+            const int itemsTotal           = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
+            const std::int64_t dataCurrent = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            const std::int64_t dataTotal   = syncStat_->getDataTotal     (syncStat_->currentPhase());
 
             //add both data + obj-count, to handle "deletion-only" cases
-            const double fraction = dataTotal + objectsTotal == 0 ? 0 : std::max(0.0, 1.0 * (dataCurrent + objectsCurrent) / (dataTotal + objectsTotal));
+            const double fraction = dataTotal + itemsTotal == 0 ? 0 : std::max(0.0, 1.0 * (dataCurrent + itemsCurrent) / (dataTotal + itemsTotal));
 
             //dialog caption, taskbar
             setTitle(fractionToString(fraction) + wxT(" - ") + _("Comparing content..."));
@@ -275,7 +276,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
 
             //remaining objects and bytes for file comparison
-            setText(*m_staticTextItemsRemaining, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextItemsRemaining, toGuiString(itemsTotal - itemsCurrent), &layoutChanged);
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
 
             //remaining time and speed: only visible during binary comparison
@@ -286,7 +287,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
                     timeLastSpeedEstimateMs = timeNowMs;
 
                     if (numeric::dist(binCompStartMs, timeNowMs) >= 1000) //discard stats for first second: probably messy
-                        perf->addSample(objectsCurrent, dataCurrent, timeNowMs);
+                        perf->addSample(itemsCurrent, dataCurrent, timeNowMs);
 
                     //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
                     //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
@@ -299,10 +300,6 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
                 }
         }
         break;
-
-        case ProcessCallback::PHASE_SYNCHRONIZING:
-            assert(false);
-            break;
     }
 
     //time elapsed
@@ -728,7 +725,7 @@ private:
             includedTypes |= TYPE_INFO;
 
         msgView->updateView(includedTypes); //update MVC "model"
-        m_gridMessages->Refresh();   //update MVC "view"
+        m_gridMessages->Refresh();          //update MVC "view"
     }
 
     void onGridButtonEvent(wxKeyEvent& event)
@@ -1209,7 +1206,9 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 {
     static_assert(IsSameType<TopLevelDialog, wxFrame >::value ||
                   IsSameType<TopLevelDialog, wxDialog>::value, "");
+#ifndef ZEN_MAC
     assert((IsSameType<TopLevelDialog, wxFrame>::value == !parentFrame));
+#endif
 
     //finish construction of this dialog:
     this->SetMinSize(wxSize(470, 280)); //== minimum size! no idea why SetMinSize() is not used...
@@ -1268,7 +1267,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     curveDataBytes        = std::make_shared<CurveDataStatistics>();
     curveDataItems        = std::make_shared<CurveDataStatistics>();
 
-    const int xLabelHeight = this->GetCharHeight() + 2 * 1/*border*/; //use same height for both graphs to make sure they stretch evenly
+    const int xLabelHeight = this->GetCharHeight() + 2 * 1 /*border*/; //use same height for both graphs to make sure they stretch evenly
     const int yLabelWidth  = 70;
     pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().
                                          setLabelX(Graph2D::X_LABEL_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
@@ -1694,7 +1693,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             {
                 wxTheApp->Yield(); //receive UI message that end pause OR forceful termination!
                 //*first* refresh GUI (removing flicker) before sleeping!
-                boost::this_thread::sleep_for(boost::chrono::milliseconds(UI_UPDATE_INTERVAL)); //throw boost::thread_interrupted
+                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
             }
             //after SyncProgressDialogImpl::OnClose() called wxWindow::Destroy() on OS X this instance is instantly toast!
             if (wereDead)
@@ -1868,10 +1867,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         case ProcessCallback::PHASE_SYNCHRONIZING:
         {
-            const int   itemsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
-            const int   itemsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
-            const std::int64_t dataCurrent  = syncStat_->getDataCurrent   (syncStat_->currentPhase());
-            const std::int64_t dataTotal    = syncStat_->getDataTotal     (syncStat_->currentPhase());
+            const int itemsCurrent         = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+            const int itemsTotal           = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
+            const std::int64_t dataCurrent = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            const std::int64_t dataTotal   = syncStat_->getDataTotal     (syncStat_->currentPhase());
             assert(dataCurrent <= dataTotal);
 
             //set overall speed (instead of current speed)
@@ -2140,9 +2139,19 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          std::vector<Zstring>& onCompletionHistory)
 {
     if (parentWindow) //sync from GUI
+    {
+        //due to usual "wxBugs", wxDialog on OS X does not float on its parent; wxFrame OTOH does => hack!
+        //https://groups.google.com/forum/#!topic/wx-users/J5SjjLaBOQE
+#ifdef ZEN_MAC
+        return new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE | wxFRAME_FLOAT_ON_PARENT,
+        [&](wxFrame& progDlg) { return parentWindow; },
+        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
+#else
         return new SyncProgressDialogImpl<wxDialog>(wxDEFAULT_DIALOG_STYLE | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER,
         [&](wxDialog& progDlg) { return parentWindow; },
-    abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
+        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
+#endif
+    }
     else //FFS batch job
     {
         auto dlg = new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE,

@@ -6,7 +6,7 @@
 
 #include "parallel_scan.h"
 #include <zen/file_error.h>
-#include <zen/thread.h> //includes <boost/thread.hpp>
+#include <zen/thread.h>
 #include <zen/scope_guard.h>
 #include <zen/fixed_list.h>
 #include "db_file.h"
@@ -156,19 +156,15 @@ typedef Zbase<wchar_t, StorageRefCountThreadSafe> BasicWString; //thread-safe st
 class AsyncCallback //actor pattern
 {
 public:
-    AsyncCallback() : notifyingThreadID(0),
-        textScanning(_("Scanning:")),
-        itemsScanned(0),
-        activeWorker(0) {}
-
-    FillBufferCallback::HandleError reportError(const std::wstring& msg, size_t retryNumber) //blocking call: context of worker thread
+    //blocking call: context of worker thread
+    FillBufferCallback::HandleError reportError(const std::wstring& msg, size_t retryNumber) //throw ThreadInterruption
     {
-        boost::unique_lock<boost::mutex> dummy(lockErrorInfo);
-        conditionCanReportError.wait(dummy, [this] { return !errorInfo && !errorResponse; }); //throw boost::thread_interrupted
+        std::unique_lock<std::mutex> dummy(lockErrorInfo);
+        interruptibleWait(conditionCanReportError, dummy, [this] { return !errorInfo && !errorResponse; }); //throw ThreadInterruption
 
-        errorInfo = make_unique<std::pair<BasicWString, size_t>>(BasicWString(msg), retryNumber);
+        errorInfo = make_unique<std::pair<BasicWString, size_t>>(copyStringTo<BasicWString>(msg), retryNumber);
 
-        conditionGotResponse.wait(dummy, [this] { return static_cast<bool>(errorResponse); }); //throw boost::thread_interrupted
+        interruptibleWait(conditionGotResponse, dummy, [this] { return static_cast<bool>(errorResponse); }); //throw ThreadInterruption
 
         FillBufferCallback::HandleError rv = *errorResponse;
 
@@ -183,7 +179,7 @@ public:
 
     void processErrors(FillBufferCallback& callback) //context of main thread, call repreatedly
     {
-        boost::unique_lock<boost::mutex> dummy(lockErrorInfo);
+        std::unique_lock<std::mutex> dummy(lockErrorInfo);
         if (errorInfo.get() && !errorResponse.get())
         {
             FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorInfo->first), errorInfo->second); //throw!
@@ -203,7 +199,7 @@ public:
     {
         if (threadID != notifyingThreadID) return; //only one thread at a time may report status
 
-        boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
+        std::lock_guard<std::mutex> dummy(lockCurrentStatus);
         currentFile = copyStringTo<BasicWString>(filepath);
     }
 
@@ -211,7 +207,7 @@ public:
     {
         std::wstring filepath;
         {
-            boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
+            std::lock_guard<std::mutex> dummy(lockCurrentStatus);
             filepath = copyStringTo<std::wstring>(currentFile);
         }
 
@@ -238,23 +234,23 @@ public:
 
 private:
     //---- error handling ----
-    boost::mutex lockErrorInfo;
-    boost::condition_variable conditionCanReportError;
-    boost::condition_variable conditionGotResponse;
+    std::mutex lockErrorInfo;
+    std::condition_variable conditionCanReportError;
+    std::condition_variable conditionGotResponse;
     std::unique_ptr<std::pair<BasicWString, size_t>> errorInfo; //error message + retry number
     std::unique_ptr<FillBufferCallback::HandleError> errorResponse;
 
     //---- status updates ----
-    std::atomic<int> notifyingThreadID; //CAVEAT: do NOT use boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
+    std::atomic<int> notifyingThreadID { 0 }; //CAVEAT: do NOT use boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
 
-    boost::mutex lockCurrentStatus; //use a different lock for current file: continue traversing while some thread may process an error
+    std::mutex lockCurrentStatus; //use a different lock for current file: continue traversing while some thread may process an error
     BasicWString currentFile;
 
-    const BasicWString textScanning; //this one is (currently) not shared and could be made a std::wstring, but we stay consistent and use thread-safe variables in this class only!
+    const BasicWString textScanning { copyStringTo<BasicWString>(_("Scanning:")) }; //this one is (currently) not shared and could be made a std::wstring, but we stay consistent and use thread-safe variables in this class only!
 
     //---- status updates II (lock free) ----
-    std::atomic<int> itemsScanned;
-    std::atomic<int> activeWorker;
+    std::atomic<int> itemsScanned{ 0 }; //std:atomic is uninitialized by default!
+    std::atomic<int> activeWorker{ 0 }; //
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -299,12 +295,12 @@ public:
         relNameParentPf_(relNameParentPf),
         output_(output) {}
 
-    virtual void                               onFile   (const FileInfo&    fi) override;
-    virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override;
-    virtual HandleLink                         onSymlink(const SymlinkInfo& li) override;
+    virtual void                               onFile   (const FileInfo&    fi) override; //
+    virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override; //throw ThreadInterruption
+    virtual HandleLink                         onSymlink(const SymlinkInfo& li) override; //
 
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                           override;
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)   override;
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                           override; //throw ThreadInterruption
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)   override; //
 
 private:
     TraverserShared& cfg;
@@ -313,9 +309,9 @@ private:
 };
 
 
-void DirCallback::onFile(const FileInfo& fi)
+void DirCallback::onFile(const FileInfo& fi) //throw ThreadInterruption
 {
-    boost::this_thread::interruption_point();
+    interruptionPoint(); //throw ThreadInterruption
 
     const Zstring fileNameShort(fi.shortName);
 
@@ -352,9 +348,9 @@ void DirCallback::onFile(const FileInfo& fi)
 }
 
 
-std::unique_ptr<ABF::TraverserCallback> DirCallback::onDir(const DirInfo& di)
+std::unique_ptr<ABF::TraverserCallback> DirCallback::onDir(const DirInfo& di) //throw ThreadInterruption
 {
-    boost::this_thread::interruption_point();
+    interruptionPoint(); //throw ThreadInterruption
 
     const Zstring& relDirPath = relNameParentPf_ + di.shortName;
 
@@ -378,9 +374,9 @@ std::unique_ptr<ABF::TraverserCallback> DirCallback::onDir(const DirInfo& di)
 }
 
 
-DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
+DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si) //throw ThreadInterruption
 {
-    boost::this_thread::interruption_point();
+    interruptionPoint(); //throw ThreadInterruption
 
     const Zstring& relLinkPath = relNameParentPf_ + si.shortName;
 
@@ -419,10 +415,9 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si)
 }
 
 
-DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, size_t retryNumber)
+DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, size_t retryNumber) //throw ThreadInterruption
 {
-    //AsyncCallback::reportError() blocks while implementing boost::this_thread::interruption_point()
-    switch (cfg.acb_.reportError(msg, retryNumber))
+    switch (cfg.acb_.reportError(msg, retryNumber)) //throw ThreadInterruption
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedDirReads_[beforeLast(relNameParentPf_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)] = msg;
@@ -436,10 +431,9 @@ DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, si
 }
 
 
-DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName)
+DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) //throw ThreadInterruption
 {
-    //AsyncCallback::reportError() blocks while implementing boost::this_thread::interruption_point()
-    switch (cfg.acb_.reportError(msg, retryNumber))
+    switch (cfg.acb_.reportError(msg, retryNumber)) //throw ThreadInterruption
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedItemReads_[relNameParentPf_ + shortName] =  msg;
@@ -466,7 +460,7 @@ public:
         dirKey_(dirKey),
         dirOutput_(dirOutput) {}
 
-    void operator()() //thread entry
+    void operator()() const //thread entry
     {
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker(););
@@ -507,13 +501,13 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
 {
     buf.clear();
 
-    FixedList<boost::thread> worker; //note: we cannot use std::vector<boost::thread>: compiler error on GCC 4.7, probably a boost screw-up
+    FixedList<InterruptibleThread> worker;
 
     zen::ScopeGuard guardWorker = zen::makeGuard([&]
     {
-        for (boost::thread& wt : worker)
+        for (InterruptibleThread& wt : worker)
             wt.interrupt(); //interrupt all at once first, then join
-        for (boost::thread& wt : worker)
+        for (InterruptibleThread& wt : worker)
             if (wt.joinable()) //= precondition of thread::join(), which throws an exception if violated!
                 wt.join();     //in this context it is possible a thread is *not* joinable anymore due to the thread::try_join_for() below!
     });
@@ -531,7 +525,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
     }
 
     //wait until done
-    for (boost::thread& wt : worker)
+    for (InterruptibleThread& wt : worker)
     {
         do
         {
@@ -541,7 +535,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
             //process errors
             acb->processErrors(callback);
         }
-        while (!wt.try_join_for(boost::chrono::milliseconds(updateInterval)));
+        while (!wt.tryJoinFor(std::chrono::milliseconds(updateInterval)));
 
         acb->incrementNotifyingThreadId(); //process info messages of one thread at a time only
     }

@@ -10,6 +10,8 @@
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
+#include "lib/status_handler_impl.h"
+#include "fs/concrete.h"
 
 using namespace zen;
 //using namespace std::rel_ops;
@@ -1081,10 +1083,10 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom
 
 //############################################################################################################
 
-std::pair<std::wstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
-                                                             const std::vector<FileSystemObject*>& selectionRight)
+std::pair<std::wstring, int> zen::getSelectedItemsAsString(const std::vector<FileSystemObject*>& selectionLeft,
+                                                           const std::vector<FileSystemObject*>& selectionRight)
 {
-    //don't use wxString! its imprudent linear allocation strategy brings perf down to a crawl!
+    //don't use wxString! its rather dumb linear allocation strategy brings perf down to a crawl!
     std::wstring fileList; //
     int totalDelCount = 0;
 
@@ -1108,38 +1110,278 @@ std::pair<std::wstring, int> zen::deleteFromGridAndHDPreview(const std::vector<F
 
 namespace
 {
-template <typename Function> inline
-bool tryReportingError(Function cmd, DeleteFilesHandler& handler) //throw X?; return "true" on success, "false" if error was ignored
+struct FSObjectLambdaVisitor : public FSObjectVisitor
 {
-    for (;;)
+    static void visit(FileSystemObject& fsObj,
+                      const std::function<void(const DirPair&     dirObj )>& onDir,
+                      const std::function<void(const FilePair&    fileObj)>& onFile,
+                      const std::function<void(const SymlinkPair& linkObj)>& onSymlink)
+    {
+        FSObjectLambdaVisitor visitor(onDir, onFile, onSymlink);
+        fsObj.accept(visitor);
+    }
+
+private:
+    FSObjectLambdaVisitor(const std::function<void(const DirPair&     dirObj )>& onDir,
+                          const std::function<void(const FilePair&    fileObj)>& onFile,
+                          const std::function<void(const SymlinkPair& linkObj)>& onSymlink) : onDir_(onDir), onFile_(onFile), onSymlink_(onSymlink) {}
+
+    void visit(const DirPair&     dirObj ) override { if (onDir_)     onDir_    (dirObj ); }
+    void visit(const FilePair&    fileObj) override { if (onFile_)    onFile_   (fileObj); }
+    void visit(const SymlinkPair& linkObj) override { if (onSymlink_) onSymlink_(linkObj); }
+
+    const std::function<void(const DirPair&     dirObj )> onDir_;
+    const std::function<void(const FilePair&    fileObj)> onFile_;
+    const std::function<void(const SymlinkPair& linkObj)> onSymlink_;
+};
+
+
+template <SelectedSide side>
+void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
+                               ABF& abfTarget,
+                               bool keepRelPaths,
+                               bool overwriteIfExists,
+                               ProcessCallback& callback)
+{
+    auto notifyItemCopy = [&](const std::wstring& statusText, const std::wstring& displayPath)
+    {
+        callback.reportInfo(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
+    };
+
+    const std::wstring txtCreatingFolder(_("Creating folder %x"       ));
+    const std::wstring txtCreatingFile  (_("Creating file %x"         ));
+    const std::wstring txtCreatingLink  (_("Creating symbolic link %x"));
+
+    auto copyItem = [&](FileSystemObject& fsObj, const Zstring& relPath) //throw FileError
+    {
+        const AbstractPathRef targetPath = abfTarget.getAbstractPath(relPath);
+
+        const std::function<void()> deleteTargetItem = [&]
+        {
+            if (overwriteIfExists)
+                try
+                {
+                    //file or (broken) file-symlink:
+                    ABF::removeFile(targetPath); //throw FileError
+                }
+                catch (FileError&)
+                {
+                    //folder or folder-symlink:
+                    if (ABF::folderExists(targetPath)) //directory or dir-symlink
+                        ABF::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
+                    else
+                        throw;
+                }
+        };
+
+        FSObjectLambdaVisitor::visit(fsObj,
+                                     [&](const DirPair& dirObj)
+        {
+            StatisticsReporter statReporter(1, 0, callback);
+            notifyItemCopy(txtCreatingFolder, ABF::getDisplayPath(targetPath));
+
+            try
+            {
+                //deleteTargetItem(); -> never delete pre-existing folders!!! => might delete child items we just copied!
+                ABF::copyNewFolder(dirObj.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
+            }
+            catch (const FileError&) { if (!ABF::folderExists(targetPath)) throw; } //might already exist: see creation of intermediate directories below
+            statReporter.reportDelta(1, 0);
+
+            statReporter.reportFinished();
+        },
+
+        [&](const FilePair& fileObj)
+        {
+            StatisticsReporter statReporter(1, fileObj.getFileSize<side>(), callback);
+            notifyItemCopy(txtCreatingFile, ABF::getDisplayPath(targetPath));
+
+            auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            ABF::copyFileTransactional(fileObj.getAbstractPath<side>(), targetPath, //throw FileError, ErrorFileLocked
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, onNotifyCopyStatus);
+            statReporter.reportDelta(1, 0);
+
+            statReporter.reportFinished();
+        },
+
+        [&](const SymlinkPair& linkObj)
+        {
+            StatisticsReporter statReporter(1, 0, callback);
+            notifyItemCopy(txtCreatingLink, ABF::getDisplayPath(targetPath));
+
+            deleteTargetItem();
+            ABF::copySymlink(linkObj.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
+            statReporter.reportDelta(1, 0);
+
+            statReporter.reportFinished();
+        });
+    };
+
+    for (FileSystemObject* fsObj : rowsToCopy)
+        tryReportingError([&]
+    {
+        const Zstring& relPath = keepRelPaths ? fsObj->getRelativePath<side>() : fsObj->getItemName<side>();
         try
         {
-            cmd(); //throw FileError
-            return true;
+            copyItem(*fsObj, relPath); //throw FileError
         }
-        catch (FileError& error)
+        catch (FileError&)
         {
-            switch (handler.reportError(error.toString())) //throw X?
+            //create intermediate directories if missing
+            const AbstractPathRef targetParentPath = abfTarget.getAbstractPath(beforeLast(relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
+            if (!ABF::somethingExists(targetParentPath)) //->(minor) file system race condition!
             {
-                case DeleteFilesHandler::IGNORE_ERROR:
-                    return false;
-                case DeleteFilesHandler::RETRY:
-                    break; //continue with loop
-                default:
-                    assert(false);
-                    break;
+                ABF::createFolderRecursively(targetParentPath); //throw FileError
+                //retry: this should work now!
+                copyItem(*fsObj, relPath); //throw FileError
             }
+            else
+                throw;
         }
+    }, callback); //throw X?
+}
+}
+
+
+void zen::copyToAlternateFolder(const std::vector<FileSystemObject*>& rowsToCopyOnLeft,
+                                const std::vector<FileSystemObject*>& rowsToCopyOnRight,
+                                const Zstring& targetFolderPathPhrase,
+                                bool keepRelPaths,
+                                bool overwriteIfExists,
+                                ProcessCallback& callback)
+{
+    std::vector<FileSystemObject*> itemSelectionLeft  = rowsToCopyOnLeft;
+    std::vector<FileSystemObject*> itemSelectionRight = rowsToCopyOnRight;
+    vector_remove_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); });
+    vector_remove_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
+
+    const int itemCount = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
+    std::int64_t dataToProcess = 0;
+
+    for (FileSystemObject* fsObj : itemSelectionLeft)
+        FSObjectLambdaVisitor::visit(*fsObj, nullptr /*onDir*/,
+        [&](const FilePair& fileObj) {dataToProcess += static_cast<std::int64_t>(fileObj.getFileSize<LEFT_SIDE>()); }, nullptr /*onSymlink*/);
+
+    for (FileSystemObject* fsObj : itemSelectionRight)
+        FSObjectLambdaVisitor::visit(*fsObj, nullptr /*onDir*/,
+        [&](const FilePair& fileObj) {dataToProcess += static_cast<std::int64_t>(fileObj.getFileSize<RIGHT_SIDE>()); }, nullptr /*onSymlink*/);
+
+    callback.initNewPhase(itemCount, dataToProcess, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
+
+    std::unique_ptr<ABF> abfTarget = createAbstractBaseFolder(targetFolderPathPhrase);
+
+    copyToAlternateFolderFrom<LEFT_SIDE >(itemSelectionLeft,  *abfTarget, keepRelPaths, overwriteIfExists, callback);
+    copyToAlternateFolderFrom<RIGHT_SIDE>(itemSelectionRight, *abfTarget, keepRelPaths, overwriteIfExists, callback);
+}
+
+//############################################################################################################
+
+namespace
+{
+template <SelectedSide side>
+void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
+                                bool useRecycleBin,
+                                ProcessCallback& callback)
+{
+    auto notifyItemDeletion = [&](const std::wstring& statusText, const std::wstring& displayPath)
+    {
+        callback.reportInfo(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
+    };
+
+    std::wstring txtRemovingFile;
+    std::wstring txtRemovingDirectory;
+    std::wstring txtRemovingSymlink;
+
+    if (useRecycleBin)
+    {
+        txtRemovingFile      = _("Moving file %x to the recycle bin");
+        txtRemovingDirectory = _("Moving folder %x to the recycle bin");
+        txtRemovingSymlink   = _("Moving symbolic link %x to the recycle bin");
+    }
+    else
+    {
+        txtRemovingFile      = _("Deleting file %x");
+        txtRemovingDirectory = _("Deleting folder %x");
+        txtRemovingSymlink   = _("Deleting symbolic link %x");
+    }
+
+
+    for (FileSystemObject* fsObj : rowsToDelete) //all pointers are required(!) to be bound
+        tryReportingError([&]
+    {
+        StatisticsReporter statReporter(1, 0, callback);
+
+        if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
+        {
+            FSObjectLambdaVisitor::visit(*fsObj,
+            [&](const DirPair& dirObj)
+            {
+                if (useRecycleBin)
+                {
+                    notifyItemDeletion(txtRemovingDirectory, ABF::getDisplayPath(dirObj.getAbstractPath<side>()));
+                    ABF::recycleItemDirectly(dirObj.getAbstractPath<side>()); //throw FileError
+                    statReporter.reportDelta(1, 0);
+                }
+                else
+                {
+                    auto onBeforeFileDeletion = [&](const std::wstring& displayPath)
+                    {
+                        statReporter.reportDelta(1, 0);
+                        notifyItemDeletion(txtRemovingFile, displayPath);
+                    };
+                    auto onBeforeDirDeletion = [&](const std::wstring& displayPath)
+                    {
+                        statReporter.reportDelta(1, 0);
+                        notifyItemDeletion(txtRemovingDirectory, displayPath);
+                    };
+
+                    ABF::removeFolderRecursively(dirObj.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+                }
+            },
+
+            [&](const FilePair& fileObj)
+            {
+                notifyItemDeletion(txtRemovingFile, ABF::getDisplayPath(fileObj.getAbstractPath<side>()));
+
+                if (useRecycleBin)
+                    ABF::recycleItemDirectly(fileObj.getAbstractPath<side>()); //throw FileError
+                else
+                    ABF::removeFile(fileObj.getAbstractPath<side>()); //throw FileError
+                statReporter.reportDelta(1, 0);
+            },
+
+            [&](const SymlinkPair& linkObj)
+            {
+                notifyItemDeletion(txtRemovingSymlink, ABF::getDisplayPath(linkObj.getAbstractPath<side>()));
+
+                if (useRecycleBin)
+                    ABF::recycleItemDirectly(linkObj.getAbstractPath<side>()); //throw FileError
+                else
+                {
+                    if (ABF::folderExists(linkObj.getAbstractPath<side>())) //dir symlink
+                        ABF::removeFolderSimple(linkObj.getAbstractPath<side>()); //throw FileError
+                    else //file symlink, broken symlink
+                        ABF::removeFile(linkObj.getAbstractPath<side>()); //throw FileError
+                }
+                statReporter.reportDelta(1, 0);
+            });
+
+            fsObj->removeObject<side>(); //if directory: removes recursively!
+        }
+
+        statReporter.reportFinished();
+
+    }, callback); //throw X?
 }
 
 
 template <SelectedSide side>
-void categorize(const std::set<FileSystemObject*>& rowsIn,
+void categorize(const std::vector<FileSystemObject*>& rows,
                 std::vector<FileSystemObject*>& deletePermanent,
                 std::vector<FileSystemObject*>& deleteRecyler,
                 bool useRecycleBin,
                 std::map<const ABF*, bool, ABF::LessItemPath>& recyclerSupported,
-                DeleteFilesHandler& callback)
+                ProcessCallback& callback)
 {
     auto hasRecycler = [&](const ABF& baseFolder) -> bool
     {
@@ -1149,6 +1391,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
 
         const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x",
         fmtPath(ABF::getDisplayPath(baseFolder.getAbstractPath())));
+
         bool recSupported = false;
         tryReportingError([&]{
             recSupported = baseFolder.supportsRecycleBin([&] { callback.reportStatus(msg); /*may throw*/ }); //throw FileError
@@ -1158,7 +1401,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
         return recSupported;
     };
 
-    for (FileSystemObject* row : rowsIn)
+    for (FileSystemObject* row : rows)
         if (!row->isEmpty<side>())
         {
             if (useRecycleBin && hasRecycler(row->root().getABF<side>())) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
@@ -1167,111 +1410,16 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
                 deletePermanent.push_back(row);
         }
 }
-
-
-template <SelectedSide side>
-struct ItemDeleter : public FSObjectVisitor //throw FileError, but nothrow constructor!!!
-{
-    ItemDeleter(bool useRecycleBin, DeleteFilesHandler& handler) :
-        handler_(handler), useRecycleBin_(useRecycleBin)
-    {
-        if (useRecycleBin_)
-        {
-            txtRemovingFile      = _("Moving file %x to the recycle bin"         );
-            txtRemovingDirectory = _("Moving folder %x to the recycle bin"       );
-            txtRemovingSymlink   = _("Moving symbolic link %x to the recycle bin");
-        }
-        else
-        {
-            txtRemovingFile      = _("Deleting file %x"         );
-            txtRemovingDirectory = _("Deleting folder %x"       );
-            txtRemovingSymlink   = _("Deleting symbolic link %x");
-        }
-    }
-
-    void visit(const FilePair& fileObj) override
-    {
-        notifyFileDeletion(ABF::getDisplayPath(fileObj.getAbstractPath<side>()));
-
-        if (useRecycleBin_)
-            ABF::recycleItemDirectly(fileObj.getAbstractPath<side>()); //throw FileError
-        else
-            ABF::removeFile(fileObj.getAbstractPath<side>()); //throw FileError
-    }
-
-    void visit(const SymlinkPair& linkObj) override
-    {
-        notifySymlinkDeletion(ABF::getDisplayPath(linkObj.getAbstractPath<side>()));
-
-        if (useRecycleBin_)
-            ABF::recycleItemDirectly(linkObj.getAbstractPath<side>()); //throw FileError
-        else
-        {
-            if (ABF::dirExists(linkObj.getAbstractPath<side>())) //dir symlink
-                ABF::removeFolderSimple(linkObj.getAbstractPath<side>()); //throw FileError
-            else //file symlink, broken symlink
-                ABF::removeFile(linkObj.getAbstractPath<side>()); //throw FileError
-        }
-    }
-
-    void visit(const DirPair& dirObj) override
-    {
-        notifyDirectoryDeletion(ABF::getDisplayPath(dirObj.getAbstractPath<side>())); //notfied twice; see below -> no big deal
-
-        if (useRecycleBin_)
-            ABF::recycleItemDirectly(dirObj.getAbstractPath<side>()); //throw FileError
-        else
-        {
-            auto onBeforeFileDeletion = [&](const std::wstring& displayPath) { this->notifyFileDeletion     (displayPath); }; //without "this->" GCC 4.7.2 runtime crash on Debian
-            auto onBeforeDirDeletion  = [&](const std::wstring& displayPath) { this->notifyDirectoryDeletion(displayPath); };
-
-            ABF::removeFolderRecursively(dirObj.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
-        }
-    }
-
-private:
-    void notifyFileDeletion     (const std::wstring& displayPath) { notifyItemDeletion(txtRemovingFile     , displayPath); }
-    void notifyDirectoryDeletion(const std::wstring& displayPath) { notifyItemDeletion(txtRemovingDirectory, displayPath); }
-    void notifySymlinkDeletion  (const std::wstring& displayPath) { notifyItemDeletion(txtRemovingSymlink  , displayPath); }
-
-    void notifyItemDeletion(const std::wstring& statusText, const std::wstring& displayPath)
-    {
-        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
-    }
-
-    DeleteFilesHandler& handler_;
-    const bool useRecycleBin_;
-
-    std::wstring txtRemovingFile;
-    std::wstring txtRemovingDirectory;
-    std::wstring txtRemovingSymlink;
-};
-
-
-template <SelectedSide side>
-void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
-                                bool useRecycleBin,
-                                DeleteFilesHandler& handler)
-{
-    ItemDeleter<side> deleter(useRecycleBin, handler);
-
-    for (FileSystemObject* fsObj : ptrList) //all pointers are required(!) to be bound
-        if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
-            tryReportingError([&]
-        {
-            fsObj->accept(deleter); //throw FileError
-            fsObj->removeObject<side>(); //if directory: removes recursively!
-        }, handler); //throw X?
 }
-}
+
 
 void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                               const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                               FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                               const std::vector<DirectionConfig>& directCfgs,
                               bool useRecycleBin,
-                              DeleteFilesHandler& statusHandler,
-                              bool& warningRecyclerMissing)
+                              bool& warningRecyclerMissing,
+                              ProcessCallback& callback)
 {
     if (folderCmp.empty())
         return;
@@ -1283,26 +1431,32 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
         baseDirCfgs[&** it] = directCfgs[it - folderCmp.begin()];
 
-    std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
-    std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
+    std::vector<FileSystemObject*> deleteLeft  = rowsToDeleteOnLeft;
+    std::vector<FileSystemObject*> deleteRight = rowsToDeleteOnRight;
 
-    set_remove_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //still needed?
-    set_remove_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //
+    vector_remove_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //needed?
+    vector_remove_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //yes, for correct stats:
+
+    const int itemCount = static_cast<int>(deleteLeft.size() + deleteRight.size());
+    callback.initNewPhase(itemCount, 0, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
     //ensure cleanup: redetermination of sync-directions and removal of invalid rows
-    auto updateDirection = [&]()
+    auto updateDirection = [&]
     {
         //update sync direction: we cannot do a full redetermination since the user may already have entered manual changes
-        std::set<FileSystemObject*> deletedTotal = deleteLeft;
-        deletedTotal.insert(deleteRight.begin(), deleteRight.end());
+        std::vector<FileSystemObject*> rowsToDelete;
+        vector_append(rowsToDelete, deleteLeft);
+        vector_append(rowsToDelete, deleteRight);
+        removeDuplicates(rowsToDelete);
 
-        for (auto it = deletedTotal.begin(); it != deletedTotal.end(); ++it)
+        for (auto it = rowsToDelete.begin(); it != rowsToDelete.end(); ++it)
         {
             FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
 
             if (fsObj.isEmpty<LEFT_SIDE>() != fsObj.isEmpty<RIGHT_SIDE>()) //make sure objects exists on one side only
             {
                 auto cfgIter = baseDirCfgs.find(&fsObj.root());
+                assert(cfgIter != baseDirCfgs.end());
                 if (cfgIter != baseDirCfgs.end())
                 {
                     SyncDirection newDir = SyncDirection::NONE;
@@ -1317,8 +1471,6 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
                     setSyncDirectionRec(newDir, fsObj); //set new direction (recursively)
                 }
-                else
-                    assert(!"this should not happen!");
             }
         }
 
@@ -1334,8 +1486,8 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteRecylerRight;
 
     std::map<const ABF*, bool, ABF::LessItemPath> recyclerSupported;
-    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, recyclerSupported, statusHandler);
-    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, recyclerSupported, statusHandler);
+    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, recyclerSupported, callback);
+    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, recyclerSupported, callback);
 
     //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
     if (useRecycleBin &&
@@ -1347,12 +1499,12 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
             if (!item.second)
                 msg += L"\n" + ABF::getDisplayPath(item.first->getAbstractPath());
 
-        statusHandler.reportWarning(msg, warningRecyclerMissing); //throw?
+        callback.reportWarning(msg, warningRecyclerMissing); //throw?
     }
 
-    deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteRecylerLeft,   true,  statusHandler);
-    deleteFromGridAndHDOneSide<LEFT_SIDE>(deletePermanentLeft, false, statusHandler);
+    deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteRecylerLeft,   true,  callback);
+    deleteFromGridAndHDOneSide<LEFT_SIDE>(deletePermanentLeft, false, callback);
 
-    deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRecylerRight,   true,  statusHandler);
-    deleteFromGridAndHDOneSide<RIGHT_SIDE>(deletePermanentRight, false, statusHandler);
+    deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRecylerRight,   true,  callback);
+    deleteFromGridAndHDOneSide<RIGHT_SIDE>(deletePermanentRight, false, callback);
 }

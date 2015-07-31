@@ -22,22 +22,10 @@ struct ImageHolder //prepare conversion to wxImage as much as possible while sta
         rgb(static_cast<unsigned char*>(::malloc(width * height * 3))),
         alpha(withAlpha ? static_cast<unsigned char*>(::malloc(width * height)) : nullptr) {}
 
-    ImageHolder           (const ImageHolder&) = delete; //move semantics only!
+    ImageHolder           (ImageHolder&& tmp) = default; //
+    ImageHolder& operator=(ImageHolder&& tmp) = default; //move semantics only!
+    ImageHolder           (const ImageHolder&) = delete; //
     ImageHolder& operator=(const ImageHolder&) = delete; //
-
-    ImageHolder(ImageHolder&& tmp) : width(tmp.width), //= default in C++14
-        height(tmp.height),
-        rgb(tmp.rgb.release()),
-        alpha(tmp.alpha.release()) {}
-
-    ImageHolder& operator=(ImageHolder&& tmp) //= default in C++14
-    {
-        std::swap(width,  tmp.width);
-        std::swap(height, tmp.height);
-        std::swap(rgb,    tmp.rgb);
-        std::swap(alpha,  tmp.alpha);
-        return *this;
-    }
 
     explicit operator bool() const { return rgb.get() != nullptr; }
 

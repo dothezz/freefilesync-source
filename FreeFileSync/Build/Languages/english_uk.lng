@@ -7,6 +7,33 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Please enter a target folder.</source>
+<target></target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target></target>
+
+<source>Copy to...</source>
+<target></target>
+
+<source>Copy items</source>
+<target></target>
+
+<source>&Copy</source>
+<target></target>
+
+<source>&Overwrite existing files</source>
+<target></target>
+
+<source>&Keep relative paths</source>
+<target></target>
+
+<source>Port:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -22,8 +49,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setting default synchronisation directions: Old files will be overwritten with newer files.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Checking recycle bin availability for folder %x...</target>
+<source>Creating folder %x</source>
+<target>Creating folder %x</target>
+
+<source>Creating file %x</source>
+<target>Creating file %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Creating symbolic link %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Moving file %x to the recycle bin</target>
@@ -42,6 +75,9 @@
 
 <source>Deleting symbolic link %x</source>
 <target>Deleting symbolic link %x</target>
+
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Checking recycle bin availability for folder %x...</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</target>
@@ -345,9 +381,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Detecting abandoned lock...</target>
 
-<source>Creating file %x</source>
-<target>Creating file %x</target>
-
 <source>Saving file %x...</source>
 <target>Saving file %x...</target>
 
@@ -556,12 +589,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>Removing old versions...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Creating symbolic link %x</target>
-
-<source>Creating folder %x</source>
-<target>Creating folder %x</target>
 
 <source>Updating file %x</source>
 <target>Updating file %x</target>
@@ -797,8 +824,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>&Actions</target>
 
-<source>&Options</source>
-<target>&Options</target>
+<source>&Preferences</source>
+<target>&Preferences</target>
 
 <source>&Language</source>
 <target>&Language</target>
@@ -1189,8 +1216,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select Time Span</source>
 <target>Select Time Span</target>
 
-<source>&Preferences</source>
-<target>&Preferences</target>
+<source>&Options</source>
+<target>&Options</target>
 
 <source>Main Bar</source>
 <target>Main Bar</target>
@@ -1461,9 +1488,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Preferences</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Copy DACL, SACL, Owner, Group</target>

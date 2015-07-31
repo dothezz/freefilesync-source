@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "custom_grid.h"
+#include <set>
 #include <wx/dc.h>
 #include <wx/settings.h>
 #include <zen/i18n.h>
@@ -517,28 +518,29 @@ private:
 
                 const IconInfo ii = getIconInfo(row);
 
-                wxBitmap fileIcon = [&]
+                wxBitmap fileIcon;
+                switch (ii.type)
                 {
-                    switch (ii.type)
-                    {
-                        case IconInfo::FOLDER:
-                            return iconMgr_->getGenericDirIcon();
+                    case IconInfo::FOLDER:
+                        fileIcon = iconMgr_->getGenericDirIcon();
+                        break;
 
-                        case IconInfo::ICON_PATH:
-                            if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.fsObj->template getAbstractPath<side>()))
-                                return *tmpIco;
-
+                    case IconInfo::ICON_PATH:
+                        if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.fsObj->template getAbstractPath<side>()))
+                            fileIcon = *tmpIco;
+                        else
+                        {
                             setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
                             //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
                             //see repaint behavior of ::ScrollWindow() function!
-                            return iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
-                        //return iconMgr_->getGenericFileIcon();
+                            fileIcon = iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
+                        }
+                        break;																							 //return iconMgr_->getGenericFileIcon();
 
-                        case IconInfo::EMPTY:
-                            break;
-                    }
-                    return wxBitmap();
-                }();
+                    case IconInfo::EMPTY:
+                        break;
+                }
+
 
                 if (fileIcon.IsOk())
                 {
@@ -655,11 +657,11 @@ private:
             ICON_PATH,
         };
         IconType type;
-        const FileSystemObject* fsObj;  //only set if type != EMPTY
+        const FileSystemObject* fsObj; //only set if type != EMPTY
         bool drawAsLink;
     };
 
-    IconInfo getIconInfo(size_t row) const  //return ICON_FILE_FOLDER if row points to a folder
+    IconInfo getIconInfo(size_t row) const //return ICON_FILE_FOLDER if row points to a folder
     {
         IconInfo out = {};
 
