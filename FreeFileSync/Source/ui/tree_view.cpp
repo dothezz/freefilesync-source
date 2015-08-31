@@ -148,10 +148,10 @@ void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
 }
 
 
-std::wstring impl::getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight)
+std::wstring zen::getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight)
 {
     const wchar_t sep = L'/';
-    std::wstring fmtPathL = replaceCpy(displayPathLeft,  L'\\', sep); //treat slash, back-slash the same
+    std::wstring fmtPathL = replaceCpy(displayPathLeft,  L'\\', sep); //treat slash, backslash the same
     std::wstring fmtPathR = replaceCpy(displayPathRight, L'\\', sep); //
     if (!startsWith(fmtPathL, sep)) fmtPathL = sep + fmtPathL;
     if (!startsWith(fmtPathR, sep)) fmtPathR = sep + fmtPathR;
@@ -427,8 +427,8 @@ void TreeView::updateView(Predicate pred)
         else
         {
             root.baseDirObj = baseObj;
-            root.displayName = impl::getShortDisplayNameForFolderPair(ABF::getDisplayPath(baseObj->getABF<LEFT_SIDE >().getAbstractPath()),
-                                                                      ABF::getDisplayPath(baseObj->getABF<RIGHT_SIDE>().getAbstractPath()));
+            root.displayName = getShortDisplayNameForFolderPair(ABF::getDisplayPath(baseObj->getABF<LEFT_SIDE >().getAbstractPath()),
+                                                                ABF::getDisplayPath(baseObj->getABF<RIGHT_SIDE>().getAbstractPath()));
 
             this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
         }
@@ -661,7 +661,7 @@ void TreeView::setData(FolderComparison& newData)
     folderCmp = newData;
 
     //remove truly empty folder pairs as early as this: we want to distinguish single/multiple folder pair cases by looking at "folderCmp"
-    vector_remove_if(folderCmp, [](const std::shared_ptr<BaseDirPair>& baseObj)
+    erase_if(folderCmp, [](const std::shared_ptr<BaseDirPair>& baseObj)
     {
         return baseObj->getABF<LEFT_SIDE >().emptyBaseFolderPath() &&
                baseObj->getABF<RIGHT_SIDE>().emptyBaseFolderPath();

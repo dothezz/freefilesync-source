@@ -29,8 +29,8 @@ namespace zen
     bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
 #endif
 
-Zstring getResolvedFilePath(const Zstring& linkPath); //throw FileError; Win: requires Vista or later!
-Zstring getSymlinkTargetRaw(const Zstring& linkPath); //throw FileError
+Zstring getResolvedSymlinkPath(const Zstring& linkPath); //throw FileError; Win: requires Vista or later!
+Zstring getSymlinkTargetRaw   (const Zstring& linkPath); //throw FileError
 }
 
 
@@ -153,7 +153,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
 }
 
 
-Zstring getResolvedFilePath_impl(const Zstring& linkPath) //throw FileError
+Zstring getResolvedSymlinkPath_impl(const Zstring& linkPath) //throw FileError
 {
     using namespace zen;
 #ifdef ZEN_WIN
@@ -211,7 +211,7 @@ inline
 Zstring getSymlinkTargetRaw(const Zstring& linkPath) { return getSymlinkRawTargetString_impl(linkPath); }
 
 inline
-Zstring getResolvedFilePath(const Zstring& linkPath) { return getResolvedFilePath_impl(linkPath); }
+Zstring getResolvedSymlinkPath(const Zstring& linkPath) { return getResolvedSymlinkPath_impl(linkPath); }
 
 #ifdef ZEN_WIN
 /*

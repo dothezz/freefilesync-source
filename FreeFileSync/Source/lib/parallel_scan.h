@@ -13,6 +13,7 @@
 #include "../structures.h"
 #include "../file_hierarchy.h"
 
+
 namespace zen
 {
 struct DirectoryKey

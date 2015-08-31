@@ -13,6 +13,7 @@
 #include <wx+/file_drop.h>
 #include "folder_history_box.h"
 
+
 namespace zen
 {
 //handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxButton, and wxComboBox/wxTextCtrl
@@ -33,7 +34,7 @@ class FolderSelector: public wxEvtHandler
 public:
     FolderSelector(wxWindow&         dropWindow,
                    wxButton&         selectFolderButton,
-                   wxButton&         selectSftpButton,
+                   wxButton&         selectAltFolderButton,
                    FolderHistoryBox& folderComboBox,
                    wxStaticText*     staticText,   //optional
                    wxWindow*         dropWindow2); //
@@ -48,16 +49,16 @@ public:
 private:
     virtual bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) { return true; }; //return true if drop should be processed
 
-    void onMouseWheel    (wxMouseEvent& event);
-    void onFilesDropped  (FileDropEvent& event);
-    void onEditFolderPath(wxCommandEvent& event);
-    void onSelectFolder  (wxCommandEvent& event);
-    void onSelectSftp    (wxCommandEvent& event);
+    void onMouseWheel     (wxMouseEvent&   event);
+    void onFilesDropped   (FileDropEvent& event);
+    void onEditFolderPath (wxCommandEvent& event);
+    void onSelectFolder   (wxCommandEvent& event);
+    void onSelectAltFolder(wxCommandEvent& event);
 
     wxWindow&         dropWindow_;
     wxWindow*         dropWindow2_ = nullptr;
     wxButton&         selectFolderButton_;
-    wxButton&         selectSftpButton_;
+    wxButton&         selectAltFolderButton_;
     FolderHistoryBox& folderComboBox_;
     wxStaticText*     staticText_ = nullptr; //optional
     FolderSelector* siblingSelector = nullptr;

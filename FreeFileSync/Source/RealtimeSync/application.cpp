@@ -20,7 +20,7 @@
 #include "../lib/return_codes.h"
 #include "../lib/error_log.h"
 #include "../lib/help_provider.h"
-
+#include "../lib/resolve_path.h"
 
 #ifdef ZEN_WIN
     #include <zen/win_ver.h>
@@ -113,21 +113,21 @@ void Application::onEnterEventLoop(wxEvent& event)
     std::vector<Zstring> commandArgs;
     for (int i = 1; i < argc; ++i)
     {
-        Zstring filepath = toZ(argv[i]);
+        Zstring filePath = getResolvedFilePath(toZ(argv[i]));
 
-        if (!fileExists(filepath)) //be a little tolerant
+        if (!fileExists(filePath)) //be a little tolerant
         {
-            if (fileExists(filepath + Zstr(".ffs_real")))
-                filepath += Zstr(".ffs_real");
-            else if (fileExists(filepath + Zstr(".ffs_batch")))
-                filepath += Zstr(".ffs_batch");
+            if (fileExists(filePath + Zstr(".ffs_real")))
+                filePath += Zstr(".ffs_real");
+            else if (fileExists(filePath + Zstr(".ffs_batch")))
+                filePath += Zstr(".ffs_batch");
             else
             {
-                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filepath))));
+                showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filePath))));
                 return;
             }
         }
-        commandArgs.push_back(filepath);
+        commandArgs.push_back(filePath);
     }
 
     Zstring cfgFilename;

@@ -51,7 +51,7 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
     if (auto prov = grid.getDataProvider())
     {
         std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig();
-        vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+        erase_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
         if (!colAttr.empty())
         {
             const ContainsMatch<respectCase> containsMatch(searchString);

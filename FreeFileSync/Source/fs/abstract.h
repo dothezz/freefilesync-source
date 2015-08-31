@@ -13,6 +13,7 @@
 #include <zen/optional.h>
 #include "../lib/icon_holder.h"
 
+
 namespace zen
 {
 struct AbstractBaseFolder;

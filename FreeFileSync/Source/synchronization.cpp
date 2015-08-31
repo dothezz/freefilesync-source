@@ -252,11 +252,8 @@ void SyncStatistics::processDir(const DirPair& dirObj)
 std::vector<zen::FolderPairSyncCfg> zen::extractSyncCfg(const MainConfiguration& mainCfg)
 {
     //merge first and additional pairs
-    std::vector<FolderPairEnh> allPairs;
-    allPairs.push_back(mainCfg.firstPair);
-    allPairs.insert(allPairs.end(),
-                    mainCfg.additionalPairs.begin(), //add additional pairs
-                    mainCfg.additionalPairs.end());
+    std::vector<FolderPairEnh> allPairs = { mainCfg.firstPair };
+    append(allPairs, mainCfg.additionalPairs);
 
     std::vector<FolderPairSyncCfg> output;
 

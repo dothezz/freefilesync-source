@@ -11,6 +11,7 @@
 #include "../lib/process_xml.h"
 #include "../synchronization.h"
 
+
 namespace zen
 {
 //parent window, optional: support correct dialog placement above parent on multiple monitor systems

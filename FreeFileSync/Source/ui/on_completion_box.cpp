@@ -97,28 +97,25 @@ OnCompletionBox::OnCompletionBox(wxWindow* parent,
 
 void OnCompletionBox::addItemHistory()
 {
-    if (history_)
-    {
-        const Zstring command = trimCpy(getValue());
+    const Zstring command = trimCpy(getValue());
 
-        if (command == utfCvrtTo<Zstring>(separationLine) || //do not add sep. line
-            command == utfCvrtTo<Zstring>(cmdTxtCloseProgressDlg) || //do not add special command
-            command.empty())
+    if (command == utfCvrtTo<Zstring>(separationLine) || //do not add sep. line
+        command == utfCvrtTo<Zstring>(cmdTxtCloseProgressDlg) || //do not add special command
+        command.empty())
+        return;
+
+    //do not add built-in commands to history
+    for (const auto& item : defaultCommands)
+        if (command == utfCvrtTo<Zstring>(item.first) ||
+            ::EqualFilePath()(command, item.second))
             return;
 
-        //do not add built-in commands to history
-        for (const auto& item : defaultCommands)
-            if (command == utfCvrtTo<Zstring>(item.first) ||
-                ::EqualFilePath()(command, item.second))
-                return;
+    erase_if(history_, [&](const Zstring& item) { return ::EqualFilePath()(command, item); });
 
-        vector_remove_if(*history_, [&](const Zstring& item) { return ::EqualFilePath()(command, item); });
+    history_.insert(history_.begin(), command);
 
-        history_->insert(history_->begin(), command);
-
-        if (history_->size() > historyMax_)
-            history_->resize(historyMax_);
-    }
+    if (history_.size() > historyMax_)
+        history_.resize(historyMax_);
 }
 
 
@@ -159,12 +156,12 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
         items.push_back(item.first);
 
     //3. history elements
-    if (history_ && !history_->empty())
+    if (!history_.empty())
     {
         items.push_back(separationLine);
-        for (const Zstring& hist : *history_)
+        for (const Zstring& hist : history_)
             items.push_back(utfCvrtTo<std::wstring>(hist));
-        std::sort(items.end() - history_->size(), items.end());
+        std::sort(items.end() - history_.size(), items.end());
     }
 
     //attention: if the target value is not part of the dropdown list, SetValue() will look for a string that *starts with* this value:
@@ -219,7 +216,9 @@ void OnCompletionBox::OnUpdateList(wxEvent& event)
 
 void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
 {
-    switch (event.GetKeyCode())
+    const int keyCode = event.GetKeyCode();
+
+    switch (keyCode)
     {
         case WXK_DELETE:
         case WXK_NUMPAD_DELETE:
@@ -233,14 +232,14 @@ void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
             {
                 const auto selValue = utfCvrtTo<Zstring>(GetString(pos));
 
-                if (history_ && std::find(history_->begin(), history_->end(), selValue) != history_->end()) //only history elements may be deleted
+                if (std::find(history_.begin(), history_.end(), selValue) != history_.end()) //only history elements may be deleted
                 {
                     //save old (selected) value: deletion seems to have influence on this
                     const wxString currentVal = this->GetValue();
                     //this->SetSelection(wxNOT_FOUND);
 
                     //delete selected row
-                    vector_remove_if(*history_, [&](const Zstring& item) { return item == selValue; });
+                    erase_if(history_, [&](const Zstring& item) { return item == selValue; });
 
                     SetString(pos, wxString()); //in contrast to Delete(), this one does not kill the drop-down list and gives a nice visual feedback!
                     //Delete(pos);
@@ -263,5 +262,24 @@ void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
         case WXK_NUMPAD_PAGEDOWN:
             return; //swallow -> using these keys gives a weird effect due to this weird control
     }
+
+#ifdef ZEN_MAC
+    //copy/paste is broken on wxCocoa: http://trac.wxwidgets.org/ticket/14953 => implement manually:
+    assert(CanCopy() && CanPaste() && CanCut());
+    if (event.ControlDown())
+        switch (keyCode)
+        {
+            case 'C': //Command + C
+                Copy();
+                return;
+            case 'V': //Command + V
+                Paste();
+                return;
+            case 'X': //Command + X
+                Cut();
+                return;
+        }
+#endif
+
     event.Skip();
 }

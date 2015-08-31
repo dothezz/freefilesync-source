@@ -39,7 +39,7 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        folderSelector_(*this, *m_buttonSelectDir, *m_txtCtrlDirectory, nullptr /*staticText*/)
+        folderSelector_(*this, *m_buttonSelectFolder, *m_txtCtrlDirectory, nullptr /*staticText*/)
     {
 #ifdef ZEN_LINUX
         //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
@@ -92,7 +92,7 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
-    dirpathFirst = zen::make_unique<FolderSelector2>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
+    dirpathFirst = zen::make_unique<FolderSelector2>(*m_panelMainFolder, *m_buttonSelectFolderMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -188,7 +188,7 @@ const Zstring& MainDialog::lastConfigFileName()
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    zen::displayHelpEntry(L"html/RealtimeSync.html", this);
+    zen::displayHelpEntry(L"html/realtimesync.html", this);
 }
 
 

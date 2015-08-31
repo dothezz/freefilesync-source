@@ -30,7 +30,7 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
     std::set<Zstring, LessFilePath> folderPaths; //make unique
     for (const Zstring& phrase : std::set<Zstring, LessFilePath>(folderPathPhrases.begin(), folderPathPhrases.end()))
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
-        folderPaths.insert(getResolvedDirectoryPath(phrase));
+        folderPaths.insert(getResolvedFilePath(phrase));
 
     return std::vector<Zstring>(folderPaths.begin(), folderPaths.end());
 }
@@ -116,7 +116,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
                 std::vector<DirWatcher::Entry> changedItems = watcher.getChanges([&] { onRefreshGui(false); /*may throw!*/ }); //throw FileError
 
                 //remove to be ignored changes
-                vector_remove_if(changedItems, [](const DirWatcher::Entry& e)
+                erase_if(changedItems, [](const DirWatcher::Entry& e)
                 {
                     return
 #ifdef ZEN_MAC
@@ -152,7 +152,7 @@ void waitForMissingDirs(const std::vector<Zstring>& folderPathPhrases, //throw F
     for (;;)
     {
         bool allExisting = true;
-        //support specifying volume by name => call getResolvedDirectoryPath() repeatedly
+        //support specifying volume by name => call getResolvedFilePath() repeatedly
         for (const Zstring& folderPathFmt : getFormattedDirs(folderPathPhrases)) //throw FileError
         {
             auto ftDirExisting = runAsync([=]() -> bool

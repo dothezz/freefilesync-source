@@ -10,6 +10,7 @@
 #include <wx/window.h>
 #include "../lib/process_xml.h"
 
+
 namespace zen
 {
 //show and let user customize batch settings (without saving)

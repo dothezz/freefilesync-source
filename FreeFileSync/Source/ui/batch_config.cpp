@@ -46,7 +46,7 @@ private:
     void OnErrorPopup  (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
     void OnErrorIgnore (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
     void OnErrorStop   (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
-    void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
+    void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/schedule-a-batch-job.html", this); }
 
     void OnToggleGenerateLogfile(wxCommandEvent& event) override { updateGui(); }
     void OnToggleLogfilesLimit  (wxCommandEvent& event) override { updateGui(); }
@@ -56,7 +56,9 @@ private:
     void setConfig(const XmlBatchConfig& batchCfg);
     XmlBatchConfig getConfig() const;
 
-    XmlBatchConfig& batchCfgOutRef; //output only!
+    XmlBatchConfig&       batchCfgOutRef; //output only!
+    std::vector<Zstring>& onCompletionHistoryOut; //
+
     XmlBatchConfig localBatchCfg; //a mixture of settings some of which have OWNERSHIP WITHIN GUI CONTROLS! use getConfig() to resolve
 
     std::unique_ptr<FolderSelector> logfileDir; //always bound, solve circular compile-time dependency
@@ -69,7 +71,8 @@ BatchDialog::BatchDialog(wxWindow* parent,
                          std::vector<Zstring>& onCompletionHistory,
                          size_t onCompletionHistoryMax) :
     BatchDlgGenerated(parent),
-    batchCfgOutRef(batchCfg)
+    batchCfgOutRef(batchCfg),
+    onCompletionHistoryOut(onCompletionHistory)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -79,11 +82,11 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
 
-    m_comboBoxOnCompletion->initHistory(onCompletionHistory, onCompletionHistoryMax);
+    m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistoryMax);
 
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogfileDir, *m_bpButtonSelectSftp, *m_logfileDir, nullptr /*staticText*/, nullptr /*wxWindow*/);
+    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogFolder, *m_bpButtonSelectAltLogFolder, *m_logFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
     setConfig(batchCfg);
 
@@ -165,6 +168,7 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     batchCfgOutRef = getConfig();
     m_comboBoxOnCompletion->addItemHistory(); //a good place to commit current "on completion" history item
+    onCompletionHistoryOut = m_comboBoxOnCompletion->getHistory();
     EndModal(BUTTON_SAVE_AS);
 }
 }

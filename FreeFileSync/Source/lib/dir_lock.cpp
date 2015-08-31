@@ -681,8 +681,8 @@ private:
 
     void tidyUp() //remove obsolete entries
     {
-        map_remove_if(guidToLock, [ ](const GuidToLockMap::value_type& v) { return !v.second.lock(); });
-        map_remove_if(fileToGuid, [&](const FileToGuidMap::value_type& v) { return guidToLock.find(v.second) == guidToLock.end(); });
+        erase_if(guidToLock, [ ](const GuidToLockMap::value_type& v) { return !v.second.lock(); });
+        erase_if(fileToGuid, [&](const FileToGuidMap::value_type& v) { return guidToLock.find(v.second) == guidToLock.end(); });
     }
 
     FileToGuidMap fileToGuid; //lockname |-> GUID; locks can be referenced by a lockfilepath or alternatively a GUID

@@ -124,7 +124,7 @@ void preAllocateSpaceBestEffort(FileHandle fh, const std::uint64_t streamSize, c
                                0,           //off_t offset
                                streamSize); //off_t len
     if (rv != 0)
-        return; //may fail with "not supported", unlike posix_fallocate
+        return; //may fail with EOPNOTSUPP, unlike posix_fallocate
 
 #elif defined ZEN_MAC
     struct ::fstore store = {};
@@ -325,7 +325,7 @@ private:
     void setModTimeSymlink(const Zstring& itemPathImpl, std::int64_t modificationTime) const override //throw FileError
     { zen::setFileTime(itemPathImpl, modificationTime, ProcSymlink::DIRECT); } //throw FileError
 
-    AbstractPathRef getResolvedSymlinkPath(const Zstring& itemPathImpl) const override { return makeAbstractItem(*this, getResolvedFilePath(itemPathImpl)); } //throw FileError
+    AbstractPathRef getResolvedSymlinkPath(const Zstring& itemPathImpl) const override { return makeAbstractItem(*this, zen::getResolvedSymlinkPath(itemPathImpl)); } //throw FileError
 
     Zstring getSymlinkContentBuffer(const Zstring& itemPathImpl) const override { return getSymlinkTargetRaw(itemPathImpl); } //throw FileError
 
@@ -560,7 +560,7 @@ void RecycleSessionNative::tryCleanup(const std::function<void (const std::wstri
 }
 
 
-//coordinate changes with getResolvedDirectoryPath()!
+//coordinate changes with getResolvedFilePath()!
 bool zen::acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase) //noexcept
 {
     Zstring path = folderPathPhrase;
@@ -602,6 +602,6 @@ bool zen::acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase) //noexc
 
 std::unique_ptr<AbstractBaseFolder> zen::createBaseFolderNative(const Zstring& folderPathPhrase) //noexcept
 {
-    return make_unique<NativeBaseFolder>(getResolvedDirectoryPath(folderPathPhrase));
+    return make_unique<NativeBaseFolder>(getResolvedFilePath(folderPathPhrase));
     warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
 }

@@ -246,7 +246,7 @@ private:
 rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname)
 {
     std::vector<Zstring> dirNamesNonFmt = config.directories;
-    vector_remove_if(dirNamesNonFmt, [](const Zstring& str) -> bool { return trimCpy(str).empty(); }); //remove empty entries WITHOUT formatting paths yet!
+    erase_if(dirNamesNonFmt, [](const Zstring& str) -> bool { return trimCpy(str).empty(); }); //remove empty entries WITHOUT formatting paths yet!
 
     if (dirNamesNonFmt.empty())
     {

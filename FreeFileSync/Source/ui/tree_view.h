@@ -13,6 +13,7 @@
 #include "column_attr.h"
 #include "../file_hierarchy.h"
 
+
 namespace zen
 {
 //tree view of FolderComparison
@@ -183,10 +184,7 @@ private:
 };
 
 
-namespace impl //declare for unit tests:
-{
-std::wstring getShortDisplayNameForFolderPair(const std::wstring& dirPathLeft, const std::wstring& dirPathRight);
-}
+std::wstring getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight);
 
 
 namespace treeview

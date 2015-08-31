@@ -13,6 +13,7 @@
 #include "../structures.h"
 #include "../fs/abstract.h"
 
+
 namespace zen
 {
 //e.g. move C:\Source\subdir\Sample.txt -> D:\Revisions\subdir\Sample.txt 2012-05-15 131513.txt

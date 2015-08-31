@@ -14,6 +14,7 @@
 #include <wx/bitmap.h>
 #include "../fs/abstract.h"
 
+
 namespace zen
 {
 class IconBuffer

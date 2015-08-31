@@ -11,6 +11,7 @@
 #include <zen/file_error.h>
 #include "../fs/abstract.h"
 
+
 namespace zen
 {
 bool filesHaveSameContent(const AbstractPathRef& filePath1, //throw FileError

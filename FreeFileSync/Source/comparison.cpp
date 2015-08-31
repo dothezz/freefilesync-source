@@ -21,11 +21,8 @@ using namespace zen;
 std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance)
 {
     //merge first and additional pairs
-    std::vector<FolderPairEnh> allPairs;
-    allPairs.push_back(mainCfg.firstPair);
-    allPairs.insert(allPairs.end(),
-                    mainCfg.additionalPairs.begin(), //add additional pairs
-                    mainCfg.additionalPairs.end());
+    std::vector<FolderPairEnh> allPairs = { mainCfg.firstPair };
+    append(allPairs, mainCfg.additionalPairs);
 
     std::vector<FolderPairCfg> output;
     std::transform(allPairs.begin(), allPairs.end(), std::back_inserter(output),
@@ -750,11 +747,11 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
         //mix failedDirReads with failedItemReads:
         //mark directory errors already at directory-level (instead for child items only) to show on GUI! See "MergeSides"
         //=> minor pessimization for "excludefilterFailedRead" which needlessly excludes parent folders, too
-        if (bufValueLeft ) set_append(failedReads, bufValueLeft ->failedDirReads);
-        if (bufValueRight) set_append(failedReads, bufValueRight->failedDirReads);
+        if (bufValueLeft ) append(failedReads, bufValueLeft ->failedDirReads);
+        if (bufValueRight) append(failedReads, bufValueRight->failedDirReads);
 
-        if (bufValueLeft ) set_append(failedReads, bufValueLeft ->failedItemReads);
-        if (bufValueRight) set_append(failedReads, bufValueRight->failedItemReads);
+        if (bufValueLeft ) append(failedReads, bufValueLeft ->failedItemReads);
+        if (bufValueRight) append(failedReads, bufValueRight->failedItemReads);
     }
 
     Zstring excludefilterFailedRead;

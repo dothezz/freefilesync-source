@@ -139,9 +139,9 @@ private:
     void restoreStatusInformation();                  //called automatically after a few seconds
 
     //events
-    void onGridButtonEventL(wxKeyEvent& event);
-    void onGridButtonEventC(wxKeyEvent& event);
-    void onGridButtonEventR(wxKeyEvent& event);
+    void onGridButtonEventL(wxKeyEvent& event) { onGridButtonEvent(event, *m_gridMainL,  true); }
+    void onGridButtonEventC(wxKeyEvent& event) { onGridButtonEvent(event, *m_gridMainC,  true); }
+    void onGridButtonEventR(wxKeyEvent& event) { onGridButtonEvent(event, *m_gridMainR, false); }
     void onGridButtonEvent (wxKeyEvent& event, zen::Grid& grid, bool leftSide);
 
     void onTreeButtonEvent (wxKeyEvent& event);
@@ -214,11 +214,11 @@ private:
     void OnSwapSides            (wxCommandEvent& event) override;
     void OnClose                (wxCloseEvent&   event) override;
 
-    void OnCmpSettings    (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON); }
-    void OnConfigureFilter(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER    ); }
-    void OnSyncSettings   (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC      ); }
+    void OnCmpSettings    (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON, -1); }
+    void OnConfigureFilter(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER    , -1); }
+    void OnSyncSettings   (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC      , -1); }
 
-    void showConfigDialog(zen::SyncConfigPanel panelToShow);
+    void showConfigDialog(zen::SyncConfigPanel panelToShow, int localPairIndexToShow);
 
     void filterExtension(const Zstring& extension, bool include);
     void filterShortname(const zen::FileSystemObject& fsObj, bool include);
@@ -229,6 +229,14 @@ private:
     void OnTopFolderPairRemove(wxCommandEvent& event) override;
     void OnRemoveFolderPair   (wxCommandEvent& event);
     void OnShowFolderPairOptions(wxCommandEvent& event);
+
+    void OnTopLocalCompCfg  (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON, 0); }
+    void OnTopLocalSyncCfg  (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC,       0); }
+    void OnTopLocalFilterCfg(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER,     0); }
+
+    void OnLocalCompCfg  (wxCommandEvent& event);
+    void OnLocalSyncCfg  (wxCommandEvent& event);
+    void OnLocalFilterCfg(wxCommandEvent& event);
 
     void onTopFolderPairKeyEvent(wxKeyEvent& event);
     void onAddFolderPairKeyEvent(wxKeyEvent& event);

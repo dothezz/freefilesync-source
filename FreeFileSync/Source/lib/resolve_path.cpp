@@ -522,24 +522,24 @@ std::vector<Zstring> zen::getDirectoryAliases(const Zstring& folderPathPhrase)
 
 
 //coordinate changes with acceptsFolderPathPhraseNative()!
-Zstring zen::getResolvedDirectoryPath(const Zstring& folderPathPhrase) //noexcept
+Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
 {
-    Zstring dirpath = folderPathPhrase;
+    Zstring path = pathPhrase;
 
-    dirpath = expandMacros(dirpath); //expand before trimming!
+    path = expandMacros(path); //expand before trimming!
 
     //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
-    trim(dirpath, true, false);
-    while (endsWith(dirpath, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
-        dirpath.resize(dirpath.size() - 1);
+    trim(path, true, false);
+    while (endsWith(path, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+        path.resize(path.size() - 1);
 
 #ifdef ZEN_WIN
-    dirpath = removeLongPathPrefix(dirpath);
+    path = removeLongPathPrefix(path);
 #endif
 
-    dirpath = expandVolumeName(dirpath); //may block for slow USB sticks and idle HDDs!
+    path = expandVolumeName(path); //may block for slow USB sticks and idle HDDs!
 
-    if (dirpath.empty()) //an empty string would later be resolved as "\"; this is not desired
+    if (path.empty()) //an empty string would later be resolved as "\"; this is not desired
         return Zstring();
     /*
     need to resolve relative paths:
@@ -551,7 +551,7 @@ Zstring zen::getResolvedDirectoryPath(const Zstring& folderPathPhrase) //noexcep
     WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
-    dirpath = resolveRelativePath(dirpath);
+    path = resolveRelativePath(path);
 
     auto isVolumeRoot = [](const Zstring& path)
     {
@@ -563,11 +563,11 @@ Zstring zen::getResolvedDirectoryPath(const Zstring& folderPathPhrase) //noexcep
     };
 
     //remove trailing slash, unless volume root:
-    if (endsWith(dirpath, FILE_NAME_SEPARATOR))
-        if (!isVolumeRoot(dirpath))
-            dirpath = beforeLast(dirpath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+    if (endsWith(path, FILE_NAME_SEPARATOR))
+        if (!isVolumeRoot(path))
+            path = beforeLast(path, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 
-    return dirpath;
+    return path;
 }
 
 

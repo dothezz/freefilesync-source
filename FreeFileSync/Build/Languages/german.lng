@@ -7,6 +7,9 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>SFTP folder</source>
+<target>SFTP-Ordner</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -372,9 +375,6 @@ Tatsächlich: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Die Verzeichnissperre für %x kann nicht gesetzt werden.</target>
 
-<source>Scanning:</source>
-<target>Suche Dateien:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -383,6 +383,9 @@ Tatsächlich: %y bytes
 <pluralform>1 Thread</pluralform>
 <pluralform>%x Threads</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Suche Dateien:</target>
 
 <source>/sec</source>
 <target>/sek</target>
@@ -764,11 +767,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Paste</source>
 <target>Einfügen</target>
 
-<source>Local Synchronization Settings</source>
-<target>Lokale Synchronisationseinstellungen</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Der ausgewählte Ordner %x kann nicht mit FreeFileSync verwendet werden.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Der ausgewählte Ordner %x kann nicht mit FreeFileSync verwendet werden. Bitte wählen Sie einen Ordner auf einem lokalen Dateisystem, Netzwerk oder MTP Gerät.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Bitte wählen Sie einen Ordner auf einem lokalen Dateisystem, Netzwerk oder MTP Gerät.</target>
 
 <source>&New</source>
 <target>&Neu</target>
@@ -886,6 +889,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Total bytes to copy</source>
 <target>Gesamtmenge der zu kopierenden Daten</target>
+
+<source>Folder pair:</source>
+<target>Ordnerpaar:</target>
 
 <source>Use local settings:</source>
 <target>Verwende lokale Einstellungen:</target>
@@ -1009,6 +1015,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Ordnerpaar anordnen</target>
+
 <source>Enter your SFTP login details:</source>
 <target>SFTP Anmeldedaten eingeben:</target>
 
@@ -1041,9 +1050,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>&Don't show this dialog again</source>
 <target>&Diesen Dialog nicht mehr anzeigen</target>
-
-<source>Arrange folder pair</source>
-<target>Ordnerpaar anordnen</target>
 
 <source>Items found:</source>
 <target>Gefundene Elemente:</target>
@@ -1339,9 +1345,6 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Remove entry from list</source>
 <target>Eintrag aus Liste entfernen</target>
 
-<source>Synchronization Settings</source>
-<target>Synchronisationseinstellungen</target>
-
 <source>Clear filter</source>
 <target>Filter löschen</target>
 
@@ -1528,6 +1531,15 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Configure your own synchronization rules.</source>
 <target>Eigene Synchronisationsregeln definieren.</target>
 
+<source>Synchronization Settings</source>
+<target>Synchronisationseinstellungen</target>
+
+<source>Comparison</source>
+<target>Vergleich</target>
+
+<source>Synchronization</source>
+<target>Synchronisation</target>
+
 <source>Today</source>
 <target>Heute</target>
 
@@ -1564,11 +1576,11 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Append a time stamp to each file name</source>
 <target>Einen Zeitstempel an jeden Dateinamen anhängen</target>
 
-<source>Comparison</source>
-<target>Vergleich</target>
+<source>Main config</source>
+<target>Hauptkonfiguration</target>
 
-<source>Synchronization</source>
-<target>Synchronisation</target>
+<source>empty</source>
+<target>leer</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>

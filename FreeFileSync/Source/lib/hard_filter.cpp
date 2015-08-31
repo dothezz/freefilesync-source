@@ -35,8 +35,11 @@ const Zstring asteriskSepAsterisk = asteriskSep + asterisk;
 
 void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& masksFileFolder, std::vector<Zstring>& masksFolder)
 {
-#if defined ZEN_WIN || defined ZEN_MAC
-    const Zstring& filterFmt= makeUpperCopy(filterPhrase); //Windows does NOT distinguish between upper/lower-case
+#if defined ZEN_WIN
+    const Zstring& filterFmt = replaceCpy(makeUpperCopy(filterPhrase), L'/', FILE_NAME_SEPARATOR);
+    //Windows does NOT distinguish between upper/lower-case, or between slash and backslash
+#elif defined ZEN_MAC
+    const Zstring& filterFmt = makeUpperCopy(filterPhrase);
 #elif defined ZEN_LINUX
     const Zstring& filterFmt = filterPhrase; //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif

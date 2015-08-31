@@ -1522,8 +1522,8 @@ void Grid::onKeyDown(wxKeyEvent& event)
         case WXK_NUMPAD_HOME:
             if (event.ShiftDown())
                 selectWithCursorTo(0);
-            else if (event.ControlDown())
-                moveCursorTo(0);
+            //else if (event.ControlDown())
+            //    ;
             else
                 moveCursorTo(0);
             return;
@@ -1532,8 +1532,8 @@ void Grid::onKeyDown(wxKeyEvent& event)
         case WXK_NUMPAD_END:
             if (event.ShiftDown())
                 selectWithCursorTo(rowCount - 1);
-            else if (event.ControlDown())
-                moveCursorTo(rowCount - 1);
+            //else if (event.ControlDown())
+            //    ;
             else
                 moveCursorTo(rowCount - 1);
             return;
@@ -1542,8 +1542,8 @@ void Grid::onKeyDown(wxKeyEvent& event)
         case WXK_NUMPAD_PAGEUP:
             if (event.ShiftDown())
                 selectWithCursorTo(cursorRow - GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
-            else if (event.ControlDown())
-                ;
+            //else if (event.ControlDown())
+            //    ;
             else
                 moveCursorTo(cursorRow - GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
             return;
@@ -1552,8 +1552,8 @@ void Grid::onKeyDown(wxKeyEvent& event)
         case WXK_NUMPAD_PAGEDOWN:
             if (event.ShiftDown())
                 selectWithCursorTo(cursorRow + GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
-            else if (event.ControlDown())
-                ;
+            //else if (event.ControlDown())
+            //    ;
             else
                 moveCursorTo(cursorRow + GetClientSize().GetHeight() / rowLabelWin_->getRowHeight());
             return;

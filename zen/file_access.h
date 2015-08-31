@@ -12,6 +12,7 @@
 #include "file_error.h"
 #include "file_id_def.h"
 
+
 namespace zen
 {
 bool fileExists     (const Zstring& filePath); //noexcept; check whether file      or file-symlink exists

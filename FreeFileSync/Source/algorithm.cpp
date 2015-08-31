@@ -1252,8 +1252,8 @@ void zen::copyToAlternateFolder(const std::vector<FileSystemObject*>& rowsToCopy
 {
     std::vector<FileSystemObject*> itemSelectionLeft  = rowsToCopyOnLeft;
     std::vector<FileSystemObject*> itemSelectionRight = rowsToCopyOnRight;
-    vector_remove_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); });
-    vector_remove_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
+    erase_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); });
+    erase_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
 
     const int itemCount = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
     std::int64_t dataToProcess = 0;
@@ -1434,8 +1434,8 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteLeft  = rowsToDeleteOnLeft;
     std::vector<FileSystemObject*> deleteRight = rowsToDeleteOnRight;
 
-    vector_remove_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //needed?
-    vector_remove_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //yes, for correct stats:
+    erase_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //needed?
+    erase_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //yes, for correct stats:
 
     const int itemCount = static_cast<int>(deleteLeft.size() + deleteRight.size());
     callback.initNewPhase(itemCount, 0, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
@@ -1445,8 +1445,8 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     {
         //update sync direction: we cannot do a full redetermination since the user may already have entered manual changes
         std::vector<FileSystemObject*> rowsToDelete;
-        vector_append(rowsToDelete, deleteLeft);
-        vector_append(rowsToDelete, deleteRight);
+        append(rowsToDelete, deleteLeft);
+        append(rowsToDelete, deleteRight);
         removeDuplicates(rowsToDelete);
 
         for (auto it = rowsToDelete.begin(); it != rowsToDelete.end(); ++it)

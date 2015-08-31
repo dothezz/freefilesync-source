@@ -12,6 +12,7 @@
 #include "lib/soft_filter.h"
 #include "process_callback.h"
 
+
 namespace zen
 {
 void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);

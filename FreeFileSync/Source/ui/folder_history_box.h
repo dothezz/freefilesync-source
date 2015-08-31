@@ -41,7 +41,7 @@ public:
         const Zstring nameTmp = zen::trimCpy(dirpath);
 
         //insert new folder or put it to the front if already existing
-        zen::vector_remove_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilePath()(item, nameTmp); });
+        zen::erase_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilePath()(item, nameTmp); });
 
         dirpaths_.insert(dirpaths_.begin(), nameTmp);
 
@@ -49,7 +49,7 @@ public:
             dirpaths_.resize(maxSize_);
     }
 
-    void delItem(const Zstring& dirpath) { zen::vector_remove_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilePath()(item, dirpath); }); }
+    void delItem(const Zstring& dirpath) { zen::erase_if(dirpaths_, [&](const Zstring& item) { return ::EqualFilePath()(item, dirpath); }); }
 
 private:
     size_t maxSize_;

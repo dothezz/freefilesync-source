@@ -430,7 +430,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 
             fp.localFilter = mergeFilterConfig(mainCfg.globalFilter, fp.localFilter);
         }
-        vector_append(fpMerged, fpTmp);
+        append(fpMerged, fpTmp);
     }
 
     if (fpMerged.empty())

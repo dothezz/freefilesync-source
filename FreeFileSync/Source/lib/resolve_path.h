@@ -13,15 +13,15 @@
 namespace zen
 {
 /*
-	- trim whitespace
 	- expand macros
+	- trim whitespace
 	- expand volume path by name
 	- convert relative paths into absolute
 
 	=> may block for slow USB sticks and idle HDDs
 	=> not thread-safe, see ::GetFullPathName()!
 */
-Zstring getResolvedDirectoryPath(const Zstring& folderPathPhrase); //noexcept
+Zstring getResolvedFilePath(const Zstring& pathPhrase); //noexcept
 
 //macro substitution only
 Zstring expandMacros(const Zstring& text);
@@ -33,6 +33,5 @@ std::vector<Zstring> getDirectoryAliases(const Zstring& folderPathPhrase); //may
     void loginNetworkShare(const Zstring& dirpath, bool allowUserInteraction); //noexcept; user interaction: show OS password prompt
 #endif
 }
-
 
 #endif //RESOLVE_PATH_H_INCLUDED_817402834713454

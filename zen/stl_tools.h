@@ -7,35 +7,41 @@
 #ifndef STL_TOOLS_HEADER_84567184321434
 #define STL_TOOLS_HEADER_84567184321434
 
+#include <set>
+#include <map>
+#include <vector>
 #include <memory>
 #include <algorithm>
 #include "type_tools.h"
 
-
 //enhancements for <algorithm>
 namespace zen
 {
-//idomatic remove selected elements from container
-template <class V, class Predicate>
-void vector_remove_if(V& vec, Predicate p);
+//erase selected elements from any container:
+template <class T, class Alloc, class Predicate>
+void erase_if(std::vector<T, Alloc>& v, Predicate p);
 
-template <class V, class W>
-void vector_append(V& vec, const W& vec2);
+template <class T, class LessType, class Alloc, class Predicate>
+void erase_if(std::set<T, LessType, Alloc>& s, Predicate p);
 
-template <class V>
-void removeDuplicates(V& v);
+template <class KeyType, class ValueType, class LessType, class Alloc, class Predicate>
+void erase_if(std::map<KeyType, ValueType, LessType, Alloc>& m, Predicate p);
 
-template <class V, class W>
-void set_append(V& s, const W& s2);
+//append STL containers
+template <class T, class Alloc, class C>
+void append(std::vector<T, Alloc>& v, const C& c);
 
-template <class S, class Predicate>
-void set_remove_if(S& set, Predicate p);
+template <class T, class LessType, class Alloc, class C>
+void append(std::set<T, LessType, Alloc>& s, const C& c);
 
-template <class M, class Predicate>
-void map_remove_if(M& map, Predicate p);
+template <class KeyType, class ValueType, class LessType, class Alloc, class C>
+void append(std::map<KeyType, ValueType, LessType, Alloc>& m, const C& c);
 
 template <class M, class K, class V>
 V& map_add_or_update(M& map, const K& key, const V& value); //efficient add or update without "default-constructible" requirement (Effective STL, item 24)
+
+template <class T, class Alloc>
+void removeDuplicates(std::vector<T, Alloc>& v);
 
 //binary search returning an iterator
 template <class ForwardIterator, class T, typename CompLess>
@@ -67,52 +73,45 @@ std::unique_ptr<T> make_unique(Args&& ... args) { return std::unique_ptr<T>(new 
 
 //######################## implementation ########################
 
-template <class V, class Predicate> inline
-void vector_remove_if(V& vec, Predicate p)
+template <class T, class Alloc, class Predicate> inline
+void erase_if(std::vector<T, Alloc>& v, Predicate p)
 {
-    static_assert(IsSameType<typename std::iterator_traits<typename V::iterator>::iterator_category, std::random_access_iterator_tag>::value, "poor man's check for vector");
-    vec.erase(std::remove_if(vec.begin(), vec.end(), p), vec.end());
+    v.erase(std::remove_if(v.begin(), v.end(), p), v.end());
 }
 
 
-template <class V> inline
-void removeDuplicates(V& v)
+namespace impl
 {
-    std::sort(v.begin(), v.end());
-    v.erase(std::unique(v.begin(), v.end()), v.end());
-}
-
-
-template <class V, class W> inline
-void vector_append(V& vec, const W& vec2)
-{
-    vec.insert(vec.end(), vec2.begin(), vec2.end());
-}
-
-
-template <class V, class W> inline
-void set_append(V& s, const W& s2)
-{
-    s.insert(s2.begin(), s2.end());
-}
-
-
 template <class S, class Predicate> inline
-void set_remove_if(S& set, Predicate p)
+void set_or_map_erase_if(S& s, Predicate p)
 {
-    //function compiles and fails (if we're lucky) not before runtime for std::vector!!!
-    static_assert(!IsSameType<typename std::iterator_traits<typename S::iterator>::iterator_category, std::random_access_iterator_tag>::value, "poor man's check for non-vector");
-
-    for (auto iter = set.begin(); iter != set.end();)
+    for (auto iter = s.begin(); iter != s.end();)
         if (p(*iter))
-            set.erase(iter++);
+            s.erase(iter++);
         else
             ++iter;
 }
+}
 
 
-template <class M, class Predicate> inline
-void map_remove_if(M& map, Predicate p) { set_remove_if(map, p); }
+template <class T, class LessType, class Alloc, class Predicate> inline
+void erase_if(std::set<T, LessType, Alloc>& s, Predicate p) { impl::set_or_map_erase_if(s, p); } //don't make this any more generic! e.g. must not compile for std::vector!!!
+
+
+template <class KeyType, class ValueType, class LessType, class Alloc, class Predicate> inline
+void erase_if(std::map<KeyType, ValueType, LessType, Alloc>& m, Predicate p) { impl::set_or_map_erase_if(m, p); }
+
+
+template <class T, class Alloc, class C> inline
+void append(std::vector<T, Alloc>& v, const C& c) { v.insert(v.end(), c.begin(), c.end()); }
+
+
+template <class T, class LessType, class Alloc, class C> inline
+void append(std::set<T, LessType, Alloc>& s, const C& c) { s.insert(c.begin(), c.end()); }
+
+
+template <class KeyType, class ValueType, class LessType, class Alloc, class C> inline
+void append(std::map<KeyType, ValueType, LessType, Alloc>& m, const C& c) { m.insert(c.begin(), c.end()); }
 
 
 template <class M, class K, class V> inline
@@ -126,6 +125,14 @@ V& map_add_or_update(M& map, const K& key, const V& value) //efficient add or up
     }
     else
         return map.insert(iter, typename M::value_type(key, value))->second;
+}
+
+
+template <class T, class Alloc> inline
+void removeDuplicates(std::vector<T, Alloc>& v)
+{
+    std::sort(v.begin(), v.end());
+    v.erase(std::unique(v.begin(), v.end()), v.end());
 }
 
 
@@ -190,8 +197,7 @@ bool equal(InputIterator1 first1, InputIterator1 last1,
 
 
 #if defined _MSC_VER && _MSC_VER <= 1600
-    //VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11
-    static_assert(false, "");
+    static_assert(false, "VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11");
 #endif
 }
 

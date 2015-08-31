@@ -22,6 +22,7 @@
 #include "lib/help_provider.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
+#include "lib/resolve_path.h"
 
 #ifdef ZEN_WIN
     #include <zen/win_ver.h>
@@ -283,8 +284,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     auto equalNoCase = [](const Zstring& lhs, const Zstring& rhs) { return utfCvrtTo<wxString>(lhs).CmpNoCase(utfCvrtTo<wxString>(rhs)) == 0; };
 
     //parse command line arguments
-    std::vector<Zstring> leftDirs;
-    std::vector<Zstring> rightDirs;
+    std::vector<Zstring> dirPathPhrasesLeft;
+    std::vector<Zstring> dirPathPhrasesRight;
     std::vector<std::pair<Zstring, XmlType>> configFiles; //XmlType: batch or GUI files only
     Opt<Zstring> globalConfigFile;
     bool openForEdit = false;
@@ -316,7 +317,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                     notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), _("Syntax error"));
                     return;
                 }
-                leftDirs.push_back(*it);
+                dirPathPhrasesLeft.push_back(*it);
             }
             else if (equalNoCase(*it, optionRightDir))
             {
@@ -325,41 +326,42 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                     notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), _("Syntax error"));
                     return;
                 }
-                rightDirs.push_back(*it);
+                dirPathPhrasesRight.push_back(*it);
             }
             else
             {
-                Zstring filepath = *it;
-                if (!fileExists(filepath)) //...be a little tolerant
+                Zstring filePath = getResolvedFilePath(*it);
+
+                if (!fileExists(filePath)) //...be a little tolerant
                 {
-                    if (fileExists(filepath + Zstr(".ffs_batch")))
-                        filepath += Zstr(".ffs_batch");
-                    else if (fileExists(filepath + Zstr(".ffs_gui")))
-                        filepath += Zstr(".ffs_gui");
-                    else if (fileExists(filepath + Zstr(".xml")))
-                        filepath += Zstr(".xml");
+                    if (fileExists(filePath + Zstr(".ffs_batch")))
+                        filePath += Zstr(".ffs_batch");
+                    else if (fileExists(filePath + Zstr(".ffs_gui")))
+                        filePath += Zstr(".ffs_gui");
+                    else if (fileExists(filePath + Zstr(".xml")))
+                        filePath += Zstr(".xml");
                     else
                     {
-                        notifyError(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filepath)), std::wstring());
+                        notifyError(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filePath)), std::wstring());
                         return;
                     }
                 }
 
                 try
                 {
-                    switch (getXmlType(filepath)) //throw FileError
+                    switch (getXmlType(filePath)) //throw FileError
                     {
                         case XML_TYPE_GUI:
-                            configFiles.emplace_back(filepath, XML_TYPE_GUI);
+                            configFiles.emplace_back(filePath, XML_TYPE_GUI);
                             break;
                         case XML_TYPE_BATCH:
-                            configFiles.emplace_back(filepath, XML_TYPE_BATCH);
+                            configFiles.emplace_back(filePath, XML_TYPE_BATCH);
                             break;
                         case XML_TYPE_GLOBAL:
-                            globalConfigFile = filepath;
+                            globalConfigFile = filePath;
                             break;
                         case XML_TYPE_OTHER:
-                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)), std::wstring());
+                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filePath)), std::wstring());
                             return;
                     }
                 }
@@ -371,7 +373,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
     }
 
-    if (leftDirs.size() != rightDirs.size())
+    if (dirPathPhrasesLeft.size() != dirPathPhrasesRight.size())
     {
         notifyError(_("Unequal number of left and right directories specified."), _("Syntax error"));
         return;
@@ -386,7 +388,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     auto replaceDirectories = [&](MainConfiguration& mainCfg)
     {
-        if (!leftDirs.empty())
+        if (!dirPathPhrasesLeft.empty())
         {
             //check if config at folder-pair level is present: this probably doesn't make sense when replacing/adding the user-specified directories
             if (hasNonDefaultConfig(mainCfg.firstPair) || std::any_of(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(), hasNonDefaultConfig))
@@ -396,14 +398,14 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
 
             mainCfg.additionalPairs.clear();
-            for (size_t i = 0; i < leftDirs.size(); ++i)
+            for (size_t i = 0; i < dirPathPhrasesLeft.size(); ++i)
                 if (i == 0)
                 {
-                    mainCfg.firstPair.folderPathPhraseLeft_  = leftDirs [0];
-                    mainCfg.firstPair.folderPathPhraseRight_ = rightDirs[0];
+                    mainCfg.firstPair.folderPathPhraseLeft_  = dirPathPhrasesLeft [0];
+                    mainCfg.firstPair.folderPathPhraseRight_ = dirPathPhrasesRight[0];
                 }
                 else
-                    mainCfg.additionalPairs.emplace_back(leftDirs[i], rightDirs[i],
+                    mainCfg.additionalPairs.emplace_back(dirPathPhrasesLeft[i], dirPathPhrasesRight[i],
                                                          nullptr, nullptr, FilterConfig());
         }
         return true;
@@ -416,7 +418,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     if (configFiles.empty())
     {
         //gui mode: default startup
-        if (leftDirs.empty())
+        if (dirPathPhrasesLeft.empty())
             runGuiMode(globalConfigFilePath);
         //gui mode: default config with given directories
         else
@@ -483,7 +485,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     //gui mode: merged configs
     else
     {
-        if (!leftDirs.empty())
+        if (!dirPathPhrasesLeft.empty())
         {
             notifyError(_("Directories cannot be set for more than one configuration file."), _("Syntax error"));
             return;

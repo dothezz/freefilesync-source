@@ -538,7 +538,7 @@ private:
             }
 
         //delete removed items (= "in-sync") from database
-        map_remove_if(dbFiles, [&](const InSyncDir::FileList::value_type& v) -> bool
+        erase_if(dbFiles, [&](const InSyncDir::FileList::value_type& v) -> bool
         {
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
@@ -576,7 +576,7 @@ private:
             }
 
         //delete removed items (= "in-sync") from database
-        map_remove_if(dbLinks, [&](const InSyncDir::LinkList::value_type& v) -> bool
+        erase_if(dbLinks, [&](const InSyncDir::LinkList::value_type& v) -> bool
         {
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
@@ -647,7 +647,7 @@ private:
                 }
 
         //delete removed items (= "in-sync") from database
-        map_remove_if(dbDirs, [&](const InSyncDir::DirList::value_type& v) -> bool
+        erase_if(dbDirs, [&](const InSyncDir::DirList::value_type& v) -> bool
         {
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;

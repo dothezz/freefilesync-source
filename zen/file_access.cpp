@@ -435,29 +435,34 @@ void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //thro
         if (lastError == ERROR_NOT_SAME_DEVICE)
             throw ErrorDifferentVolume(errorMsg, errorDescr);
          if (lastError == ERROR_ALREADY_EXISTS || //-> used on Win7 x64
-                 lastError == ERROR_FILE_EXISTS)      //-> used by XP???
+             lastError == ERROR_FILE_EXISTS)      //-> used by XP???
             throw ErrorTargetExisting(errorMsg, errorDescr);
         throw FileError(errorMsg, errorDescr);
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
 	//rename() will never fail with EEXIST, but always overwrite!
-	//=> OS X: no solution
 	//=> Linux: renameat2() with RENAME_NOREPLACE -> still new, probably buggy
-	const bool alreadyExists = somethingExists(pathTarget); //we have to let go of atomicity!
+	//=> OS X: no solution
 
-    if (alreadyExists || ::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
-    {
-        const int lastError = alreadyExists ? EEXIST : errno; //copy before directly or indirectly making other system calls!
+	auto throwException = [&](int ec)
+	{
         const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtPath(pathSource)), L"%y", L"\n" + fmtPath(pathTarget));
-        const std::wstring errorDescr = formatSystemError(L"rename", lastError);
+        const std::wstring errorDescr = formatSystemError(L"rename", ec);
 
-        if (lastError == EXDEV)
+        if (ec == EXDEV)
             throw ErrorDifferentVolume(errorMsg, errorDescr);
-         if (lastError == EEXIST)
+         if (ec == EEXIST)
             throw ErrorTargetExisting(errorMsg, errorDescr); 
         throw FileError(errorMsg, errorDescr);
-    }
+	};
+
+	if (!EqualFilePath()(pathSource, pathTarget)) //OS X: changing file name case is not an "already exists" error!
+		if (somethingExists(pathTarget))
+			throwException(EEXIST);
+
+    if (::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
+		throwException(errno);
 #endif
 }
 
@@ -1084,9 +1089,9 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
     //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
     //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
-    //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks! getResolvedFilePath() requires Vista or later!
-    const Zstring sourceResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(sourcePath) ? getResolvedFilePath(sourcePath) : sourcePath; //throw FileError
-    const Zstring targetResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(targetPath) ? getResolvedFilePath(targetPath) : targetPath; //
+    //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks! getResolvedSymlinkPath() requires Vista or later!
+    const Zstring sourceResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(sourcePath) ? getResolvedSymlinkPath(sourcePath) : sourcePath; //throw FileError
+    const Zstring targetResolved = procSl == ProcSymlink::FOLLOW && symlinkExists(targetPath) ? getResolvedSymlinkPath(targetPath) : targetPath; //
 
     //setting privileges requires admin rights!
     try

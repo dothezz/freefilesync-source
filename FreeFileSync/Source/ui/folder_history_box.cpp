@@ -107,6 +107,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirpath)
 void FolderHistoryBox::OnKeyEvent(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
+
     if (keyCode == WXK_DELETE ||
         keyCode == WXK_NUMPAD_DELETE)
     {
@@ -130,5 +131,24 @@ void FolderHistoryBox::OnKeyEvent(wxKeyEvent& event)
             return; //eat up key event
         }
     }
+
+#ifdef ZEN_MAC
+    //copy/paste is broken on wxCocoa: http://trac.wxwidgets.org/ticket/14953 => implement manually:
+    assert(CanCopy() && CanPaste() && CanCut());
+    if (event.ControlDown())
+        switch (keyCode)
+        {
+            case 'C': //Command + C
+                Copy();
+                return;
+            case 'V': //Command + V
+                Paste();
+                return;
+            case 'X': //Command + X
+                Cut();
+                return;
+        }
+#endif
+
     event.Skip();
 }

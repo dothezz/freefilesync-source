@@ -291,9 +291,9 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
 
     m_bitmapCopyTo->SetBitmap(getResourceImage(L"copy_to"));
 
-    targetFolder = make_unique<FolderSelector>(*this, *m_buttonSelectFolder, *m_bpButtonSelectSftp, *m_directoryTarget, nullptr /*staticText*/, nullptr /*wxWindow*/);
+    targetFolder = make_unique<FolderSelector>(*this, *m_buttonSelectTargetFolder, *m_bpButtonSelectAltTargetFolder, *m_targetFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
-    m_directoryTarget->init(folderHistory_);
+    m_targetFolderPath->init(folderHistory_);
 
 #ifndef __WXGTK__  //wxWidgets holds portability promise by supporting multi-line controls...not
     m_textCtrlFileList->SetMaxLength(0); //allow large entries!
@@ -335,7 +335,7 @@ void CopyToDialog::OnOK(wxCommandEvent& event)
     {
         showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().setMainInstructions(_("Please enter a target folder.")));
         //don't show error icon to follow "Windows' encouraging tone"
-        m_directoryTarget->SetFocus();
+        m_targetFolderPath->SetFocus();
         return;
     }
     //-------------------------------------------------------------
@@ -605,7 +605,7 @@ private:
     void OnClose       (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnAddRow      (wxCommandEvent& event) override;
     void OnRemoveRow   (wxCommandEvent& event) override;
-    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/External Applications.html", this); }
+    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/external-applications.html", this); }
     void onResize(wxSizeEvent& event);
     void updateGui();
 
@@ -759,7 +759,7 @@ void OptionsDlg::OnDefault(wxCommandEvent& event)
 void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
 {
     auto extAppTmp = extApp;
-    vector_remove_if(extAppTmp, [](decltype(extAppTmp[0])& entry) { return entry.first.empty() && entry.second.empty(); });
+    erase_if(extAppTmp, [](decltype(extAppTmp[0])& entry) { return entry.first.empty() && entry.second.empty(); });
 
     extAppTmp.resize(extAppTmp.size() + 1); //append empty row to facilitate insertions
 

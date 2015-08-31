@@ -93,10 +93,43 @@ public:
     }
 
 private:
-    long long startTime = wxGetUTCTimeMillis().GetValue();
+    long long startTime = wxGetUTCTimeMillis().GetValue(); //alas no a steady clock, but something's got to give!
     bool    paused = false;
     int64_t elapsedUntilPause = 0;
 };
+
+
+std::wstring getDialogPhaseText(const Statistics* syncStat, bool paused, SyncProgressDialog::SyncResult finalResult)
+{
+    if (syncStat) //sync running
+    {
+        if (paused)
+            return _("Paused");
+        else
+            switch (syncStat->currentPhase())
+            {
+                case ProcessCallback::PHASE_NONE:
+                    return _("Initializing..."); //dialog is shown *before* sync starts, so this text may be visible!
+                case ProcessCallback::PHASE_SCANNING:
+                    return _("Scanning...");
+                case ProcessCallback::PHASE_COMPARING_CONTENT:
+                    return _("Comparing content...");
+                case ProcessCallback::PHASE_SYNCHRONIZING:
+                    return _("Synchronizing...");
+            }
+    }
+    else //sync finished
+        switch (finalResult)
+        {
+            case SyncProgressDialog::RESULT_ABORTED:
+                return _("Stopped");
+            case SyncProgressDialog::RESULT_FINISHED_WITH_ERROR:
+            case SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS:
+            case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
+                return _("Completed");
+        }
+    return std::wstring();
+}
 }
 
 
@@ -244,7 +277,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             const wxString& scannedObjects = toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
 
             //dialog caption, taskbar
-            setTitle(scannedObjects + L" - " + _("Scanning..."));
+            setTitle(scannedObjects + L" - " + getDialogPhaseText(syncStat_, false /*paused*/, SyncProgressDialog::RESULT_ABORTED));
             if (taskbar_.get()) //support Windows 7 taskbar
                 taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
 
@@ -265,7 +298,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             const double fraction = dataTotal + itemsTotal == 0 ? 0 : std::max(0.0, 1.0 * (dataCurrent + itemsCurrent) / (dataTotal + itemsTotal));
 
             //dialog caption, taskbar
-            setTitle(fractionToString(fraction) + wxT(" - ") + _("Comparing content..."));
+            setTitle(fractionToString(fraction) + wxT(" - ") + getDialogPhaseText(syncStat_, false /*paused*/, SyncProgressDialog::RESULT_ABORTED));
             if (taskbar_.get())
             {
                 taskbar_->setProgress(fraction);
@@ -844,7 +877,7 @@ private:
             if (auto prov = m_gridMessages->getDataProvider())
             {
                 std::vector<Grid::ColumnAttribute> colAttr = m_gridMessages->getColumnConfig();
-                vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+                erase_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
                 if (!colAttr.empty())
                     for (size_t row : m_gridMessages->getSelectedRows())
                     {
@@ -1152,20 +1185,20 @@ private:
 
     std::function<void()> notifyWindowTerminate_; //call once in OnClose(), NOT in destructor which is called far too late somewhere in wxWidgets main loop!
 
-    bool wereDead; //set after wxWindow::Delete(), which equals "delete this" on OS X!
+    bool wereDead = false; //set after wxWindow::Delete(), which equals "delete this" on OS X!
 
     //status variables
     const Statistics* syncStat_;                  //
     AbortCallback*    abortCb_;                   //valid only while sync is running
-    bool paused_; //valid only while sync is running
-    SyncResult finalResult; //set after sync
+    bool paused_ = false; //valid only while sync is running
+    SyncResult finalResult = RESULT_ABORTED; //set after sync
 
     //remaining time
     std::unique_ptr<PerfCheck> perf;
-    int64_t timeLastSpeedEstimateMs;     //used for calculating intervals between collecting perf samples
+    int64_t timeLastSpeedEstimateMs = -1000000; //used for calculating intervals between collecting perf samples
 
     //help calculate total speed
-    int64_t phaseStartMs; //begin of current phase in [ms]
+    int64_t phaseStartMs = 0; //begin of current phase in [ms]
 
     std::shared_ptr<CurveDataStatistics   > curveDataBytes;
     std::shared_ptr<CurveDataStatistics   > curveDataItems;
@@ -1196,13 +1229,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     jobName_  (jobName),
     parentFrame_(parentFrame),
     notifyWindowTerminate_(notifyWindowTerminate),
-    wereDead(false),
     syncStat_ (&syncStat),
-    abortCb_  (&abortCb),
-    paused_   (false),
-    finalResult(RESULT_ABORTED), //dummy value
-    timeLastSpeedEstimateMs    (-1000000), //some big number
-    phaseStartMs(0)
+    abortCb_  (&abortCb)
 {
     static_assert(IsSameType<TopLevelDialog, wxFrame >::value ||
                   IsSameType<TopLevelDialog, wxDialog>::value, "");
@@ -1312,7 +1340,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(colCurveAreaItems, colCurveAreaItemsRim));
 
     //allow changing the "on completion" command
-    pnl.m_comboBoxOnCompletion->initHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later
+    pnl.m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later
     pnl.m_comboBoxOnCompletion->setValue(onCompletion);
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks
@@ -1406,7 +1434,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
 
     //start new measurement
     perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
-    timeLastSpeedEstimateMs     = -1000000; //some big number
+    timeLastSpeedEstimateMs = -1000000; //some big number
 
     phaseStartMs = timeElapsed.timeMs();
 
@@ -1465,39 +1493,6 @@ Zorder evaluateZorder(const wxWindow& top, const wxWindow& bottom)
     return ZORDER_INDEFINITE;
 }
 #endif
-
-
-std::wstring getDialogPhaseText(const Statistics* syncStat, bool paused, SyncProgressDialog::SyncResult finalResult)
-{
-    if (syncStat) //sync running
-    {
-        if (paused)
-            return _("Paused");
-        else
-            switch (syncStat->currentPhase())
-            {
-                case ProcessCallback::PHASE_NONE:
-                    return _("Initializing..."); //dialog is shown *before* sync starts, so this text may be visible!
-                case ProcessCallback::PHASE_SCANNING:
-                    return _("Scanning...");
-                case ProcessCallback::PHASE_COMPARING_CONTENT:
-                    return _("Comparing content...");
-                case ProcessCallback::PHASE_SYNCHRONIZING:
-                    return _("Synchronizing...");
-            }
-    }
-    else //sync finished
-        switch (finalResult)
-        {
-            case SyncProgressDialog::RESULT_ABORTED:
-                return _("Stopped");
-            case SyncProgressDialog::RESULT_FINISHED_WITH_ERROR:
-            case SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS:
-            case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
-                return _("Completed");
-        }
-    return std::wstring();
-}
 }
 
 

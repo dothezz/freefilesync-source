@@ -12,6 +12,7 @@
 #include <functional>
 #include "file_error.h"
 
+
 namespace zen
 {
 //Windows: ReadDirectoryChangesW http://msdn.microsoft.com/en-us/library/aa365465(v=vs.85).aspx

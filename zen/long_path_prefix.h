@@ -10,6 +10,7 @@
 #include "win.h"
 #include "zstring.h"
 
+
 namespace zen
 {
 //handle filepaths longer-equal 260 (== MAX_PATH) characters by applying \\?\-prefix; see: http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath

@@ -10,6 +10,7 @@
 #include <zen/file_error.h>
 #include "../file_hierarchy.h"
 
+
 namespace zen
 {
 const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
