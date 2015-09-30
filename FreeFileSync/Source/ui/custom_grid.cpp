@@ -146,7 +146,7 @@ struct IconManager
         //fileIcon       (IconBuffer::genericFileIcon(sz)),
         dirIcon        (IconBuffer::genericDirIcon (sz)),
         linkOverlayIcon(IconBuffer::linkOverlayIcon(sz)),
-        iconUpdater(make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
+        iconUpdater(std::make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
 
     void startIconUpdater();
     IconBuffer& refIconBuffer() { return iconBuffer; }
@@ -535,7 +535,7 @@ private:
                             //see repaint behavior of ::ScrollWindow() function!
                             fileIcon = iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
                         }
-                        break;																							 //return iconMgr_->getGenericFileIcon();
+                        break;                                                                                           //return iconMgr_->getGenericFileIcon();
 
                     case IconInfo::EMPTY:
                         break;
@@ -568,7 +568,7 @@ private:
 
         std::unique_ptr<wxDCTextColourChanger> dummy3;
         if (getRowDisplayType(row) != DISP_TYPE_NORMAL)
-            dummy3 = make_unique<wxDCTextColourChanger>(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+            dummy3 = std::make_unique<wxDCTextColourChanger>(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
 
         //draw text
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_SIZE && refGrid().GetLayoutDirection() != wxLayout_RightToLeft)
@@ -831,7 +831,7 @@ public:
         if (row < refGrid().getRowCount())
         {
             refGrid().clearSelection(DENY_GRID_EVENT); //don't emit event, prevent recursion!
-            dragSelection = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(colType)));
+            dragSelection = std::make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(colType)));
             toolTip.hide(); //handle custom tooltip
         }
     }
@@ -905,7 +905,7 @@ public:
             {
                 if (highlight) refreshHighlight(highlight->row_); //refresh old highlight
 
-                highlight = make_unique<MouseHighlight>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(*ct)));
+                highlight = std::make_unique<MouseHighlight>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(*ct)));
 
                 refreshHighlight(highlight->row_);
 

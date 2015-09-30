@@ -13,6 +13,7 @@
 #include <memory>
 #include <algorithm>
 #include "type_tools.h"
+#include "build_info.h"
 
 //enhancements for <algorithm>
 namespace zen
@@ -59,12 +60,19 @@ template <class InputIterator1, class InputIterator2>
 bool equal(InputIterator1 first1, InputIterator1 last1,
            InputIterator2 first2, InputIterator2 last2);
 
-//until std::make_unique is available in GCC:
-template <class T, class... Args> inline
-std::unique_ptr<T> make_unique(Args&& ... args) { return std::unique_ptr<T>(new T(std::forward<Args>(args)...)); }
+size_t hashBytes(const unsigned char* ptr, size_t len);
 
 
-
+//support for custom string classes in std::unordered_set/map
+struct StringHash
+{
+    template <class String>
+    size_t operator()(const String& str) const
+    {
+        const auto* strFirst = strBegin(str);
+        return hashBytes(reinterpret_cast<const unsigned char*>(strFirst), strLength(str) * sizeof(strFirst[0]));
+    }
+};
 
 
 
@@ -199,6 +207,28 @@ bool equal(InputIterator1 first1, InputIterator1 last1,
 #if defined _MSC_VER && _MSC_VER <= 1600
     static_assert(false, "VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11");
 #endif
+
+
+inline
+size_t hashBytes(const unsigned char* ptr, size_t len)
+{
+    //http://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+#ifdef ZEN_BUILD_32BIT
+    const size_t basis = 2166136261U;
+    const size_t prime = 16777619U;
+#elif defined ZEN_BUILD_64BIT
+    const size_t basis = 14695981039346656037ULL;
+    const size_t prime = 1099511628211ULL;
+#endif
+
+    size_t val = basis;
+    for (size_t i = 0; i < len; ++i)
+    {
+        val ^= static_cast<size_t>(ptr[i]);
+        val *= prime;
+    }
+    return val;
+}
 }
 
 #endif //STL_TOOLS_HEADER_84567184321434

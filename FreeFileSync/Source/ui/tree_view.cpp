@@ -681,7 +681,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             case TreeView::TYPE_ROOT:
             {
                 const auto& root = *static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
-                return zen::make_unique<TreeView::RootNode>(percent, root.bytesGross, root.itemCountGross, getStatus(row), *root.baseDirObj, root.displayName);
+                return std::make_unique<TreeView::RootNode>(percent, root.bytesGross, root.itemCountGross, getStatus(row), *root.baseDirObj, root.displayName);
             }
             break;
 
@@ -689,7 +689,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             {
                 const auto* dir = static_cast<const TreeView::DirNodeImpl*>(flatTree[row].node_);
                 if (auto dirObj = dynamic_cast<DirPair*>(FileSystemObject::retrieve(dir->objId)))
-                    return zen::make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
+                    return std::make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
             }
             break;
 
@@ -710,7 +710,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
                         if (lastViewFilterPred(fsObj))
                             filesAndLinks.push_back(&fsObj);
 
-                    return zen::make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
+                    return std::make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
                 }
             }
             break;

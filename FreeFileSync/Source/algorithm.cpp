@@ -7,6 +7,7 @@
 #include "algorithm.h"
 #include <set>
 #include <unordered_map>
+#include <zen/perf.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
@@ -219,7 +220,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
     switch (compareVar)
     {
         case CMP_BY_TIME_SIZE:
-            if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+            if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is certainly "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
                 sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, optTimeShiftHours);
@@ -311,64 +312,90 @@ bool stillInSync(const InSyncDir& dbDir)
 class DetectMovedFiles
 {
 public:
-    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) { DetectMovedFiles(baseDirectory, dbContainer); }
+    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbFolder) { DetectMovedFiles(baseDirectory, dbFolder); }
 
 private:
-    DetectMovedFiles(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) :
+    DetectMovedFiles(BaseDirPair& baseDirectory, const InSyncDir& dbFolder) :
         cmpVar           (baseDirectory.getCompVariant()),
         fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
         optTimeShiftHours(baseDirectory.getTimeShift())
     {
-        recurse(baseDirectory);
+        recurse(baseDirectory, &dbFolder);
 
-        if (!exLeftOnly.empty() && !exRightOnly.empty())
-            detectFilePairs(dbContainer);
+        if ((!exLeftOnlyById .empty() || !exLeftOnlyByPath .empty()) &&
+            (!exRightOnlyById.empty() || !exRightOnlyByPath.empty()))
+            detectMovePairs(dbFolder);
     }
 
-    void recurse(HierarchyObject& hierObj)
+    void recurse(HierarchyObject& hierObj, const InSyncDir* dbFolder)
     {
         for (FilePair& fileObj : hierObj.refSubFiles())
         {
+            auto getDbFileEntry = [&]() -> const InSyncFile* //evaluate lazily!
+            {
+                if (dbFolder)
+                {
+                    auto it = dbFolder->files.find(fileObj.getPairShortName());
+                    if (it != dbFolder->files.end())
+                        return &it->second;
+                }
+                return nullptr;
+            };
+
             const CompareFilesResult cat = fileObj.getCategory();
 
             if (cat == FILE_LEFT_SIDE_ONLY)
             {
-                if (!fileObj.getFileId<LEFT_SIDE>().empty())
+                if (const InSyncFile* dbFile = getDbFileEntry())
+                    exLeftOnlyByPath.emplace(dbFile, &fileObj);
+                else if (!fileObj.getFileId<LEFT_SIDE>().empty())
                 {
-                    auto rv = exLeftOnly.emplace(fileObj.getFileId<LEFT_SIDE>(), &fileObj);
-                    assert(rv.second);
-                    if (!rv.second) //duplicate file ID! NTFS hard links?
+                    auto rv = exLeftOnlyById.emplace(fileObj.getFileId<LEFT_SIDE>(), &fileObj);
+                    if (!rv.second) //duplicate file ID! NTFS hard link/symlink?
                         rv.first->second = nullptr;
                 }
             }
             else if (cat == FILE_RIGHT_SIDE_ONLY)
             {
-                if (!fileObj.getFileId<RIGHT_SIDE>().empty())
+                if (const InSyncFile* dbFile = getDbFileEntry())
+                    exRightOnlyByPath.emplace(dbFile, &fileObj);
+                else if (!fileObj.getFileId<RIGHT_SIDE>().empty())
                 {
-                    auto rv = exRightOnly.emplace(fileObj.getFileId<RIGHT_SIDE>(), &fileObj);
-                    assert(rv.second);
-                    if (!rv.second) //duplicate file ID! NTFS hard links?
+                    auto rv = exRightOnlyById.emplace(fileObj.getFileId<RIGHT_SIDE>(), &fileObj);
+                    if (!rv.second) //duplicate file ID! NTFS hard link/symlink?
                         rv.first->second = nullptr;
                 }
             }
         }
+
         for (DirPair& dirObj : hierObj.refSubDirs())
-            recurse(dirObj);
+        {
+            const InSyncDir* dbSubFolder = nullptr; //try to find corresponding database entry
+            if (dbFolder)
+            {
+                auto it = dbFolder->dirs.find(dirObj.getPairShortName());
+                if (it != dbFolder->dirs.end())
+                    dbSubFolder = &it->second;
+            }
+
+            recurse(dirObj, dbSubFolder);
+        }
     }
 
-    void detectFilePairs(const InSyncDir& container) const
+    void detectMovePairs(const InSyncDir& container) const
     {
         for (auto& dbFile : container.files)
             findAndSetMovePair(dbFile.second);
 
         for (auto& dbDir : container.dirs)
-            detectFilePairs(dbDir.second);
+            detectMovePairs(dbDir.second);
     }
 
-    static bool sameSizeAndDateLeft(const FilePair& fsObj, const InSyncFile& dbEntry)
+    template <SelectedSide side>
+    static bool sameSizeAndDate(const FilePair& fileObj, const InSyncFile& dbFile)
     {
-        return fsObj.getFileSize<LEFT_SIDE>() == dbEntry.fileSize &&
-               sameFileTime(fsObj.getLastWriteTime<LEFT_SIDE>(), dbEntry.left.lastWriteTimeRaw, 2, 0);
+        return fileObj.getFileSize<side>() == dbFile.fileSize &&
+               sameFileTime(fileObj.getLastWriteTime<side>(), getDescriptor<side>(dbFile).lastWriteTimeRaw, 2, 0);
         //- respect 2 second FAT/FAT32 precision!
         //- a "optTimeShiftHours" != 0 may lead to false positive move detections => let's be conservative and not allow it
         //  (time shift is only ever required during FAT DST switches)
@@ -376,47 +403,56 @@ private:
         //PS: *never* allow 2 sec tolerance as container predicate!!
         // => no strict weak ordering relation! reason: no transitivity of equivalence!
     }
-    static bool sameSizeAndDateRight(const FilePair& fsObj, const InSyncFile& dbEntry)
+
+    template <SelectedSide side>
+    static FilePair* getAssocFilePair(const InSyncFile& dbFile,
+                                      const std::unordered_map<ABF::FileId, FilePair*, StringHash>& exOneSideById,
+                                      const std::unordered_map<const InSyncFile*, FilePair*>& exOneSideByPath)
     {
-        return fsObj.getFileSize<RIGHT_SIDE>() == dbEntry.fileSize &&
-               sameFileTime(fsObj.getLastWriteTime<RIGHT_SIDE>(), dbEntry.right.lastWriteTimeRaw, 2, 0);
+        {
+            auto it = exOneSideByPath.find(&dbFile);
+            if (it != exOneSideByPath.end())
+                return it->second; //if there is an association by path, don't care if there is also an association by id,
+            //even if the association by path doesn't match time and size while the association by id does!
+            //- there doesn't seem to be (any?) value in allowing this!
+            //- note: exOneSideById isn't filled in this case, see recurse()
+        }
+
+        const ABF::FileId fileId = getDescriptor<side>(dbFile).fileId;
+        if (!fileId.empty())
+        {
+            auto it = exOneSideById.find(fileId);
+            if (it != exOneSideById.end())
+                return it->second; //= nullptr, if duplicate ID!
+        }
+        return nullptr;
     }
 
-    void findAndSetMovePair(const InSyncFile& dbEntry) const
+    void findAndSetMovePair(const InSyncFile& dbFile) const
     {
-        const ABF::FileId idLeft  = dbEntry.left .fileId;
-        const ABF::FileId idRight = dbEntry.right.fileId;
-
-        if (!idLeft .empty() &&
-            !idRight.empty() &&
-            stillInSync(dbEntry, cmpVar, fileTimeTolerance, optTimeShiftHours))
-        {
-            auto itL = exLeftOnly.find(idLeft);
-            if (itL != exLeftOnly.end())
-                if (FilePair* fileLeftOnly = itL->second) //= nullptr, if duplicate ID!
-                    if (sameSizeAndDateLeft(*fileLeftOnly, dbEntry))
-                    {
-                        auto itR = exRightOnly.find(idRight);
-                        if (itR != exRightOnly.end())
-                            if (FilePair* fileRightOnly = itR->second) //= nullptr, if duplicate ID!
-                                if (sameSizeAndDateRight(*fileRightOnly, dbEntry))
-                                    if (fileLeftOnly ->getMoveRef() == nullptr && //the db may contain duplicate file ids on left or right side: e.g. consider aliasing through symlinks
-                                        fileRightOnly->getMoveRef() == nullptr)   //=> should not be a problem (same id, size, date => alias!) but don't let a row participate in two move pairs!
-                                    {
-                                        fileLeftOnly ->setMoveRef(fileRightOnly->getId()); //found a pair, mark it!
-                                        fileRightOnly->setMoveRef(fileLeftOnly ->getId()); //
-                                    }
-                    }
-        }
+        if (stillInSync(dbFile, cmpVar, fileTimeTolerance, optTimeShiftHours))
+            if (FilePair* fileLeftOnly = getAssocFilePair<LEFT_SIDE>(dbFile, exLeftOnlyById, exLeftOnlyByPath))
+                if (sameSizeAndDate<LEFT_SIDE>(*fileLeftOnly, dbFile))
+                    if (FilePair* fileRightOnly = getAssocFilePair<RIGHT_SIDE>(dbFile, exRightOnlyById, exRightOnlyByPath))
+                        if (sameSizeAndDate<RIGHT_SIDE>(*fileRightOnly, dbFile))
+                            if (fileLeftOnly ->getMoveRef() == nullptr && //don't let a row participate in two move pairs!
+                                fileRightOnly->getMoveRef() == nullptr)   //
+                            {
+                                fileLeftOnly ->setMoveRef(fileRightOnly->getId()); //found a pair, mark it!
+                                fileRightOnly->setMoveRef(fileLeftOnly ->getId()); //
+                            }
     }
 
     const CompareVariant cmpVar;
     const int fileTimeTolerance;
     const unsigned int optTimeShiftHours;
 
-    std::map<ABF::FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
-    std::map<ABF::FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
+    std::unordered_map<ABF::FileId, FilePair*, StringHash> exLeftOnlyById;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
+    std::unordered_map<ABF::FileId, FilePair*, StringHash> exRightOnlyById; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
+    //MSVC: std::unordered_map: about twice as fast as std::map for 1 million items!
 
+    std::unordered_map<const InSyncFile*, FilePair*> exLeftOnlyByPath; //MSVC: only 4% faster than std::map for 1 million items!
+    std::unordered_map<const InSyncFile*, FilePair*> exRightOnlyByPath;
     /*
     detect renamed files:
 
@@ -430,19 +466,17 @@ private:
     Algorithm:
     ----------
     DB-file left  <--- (name, size, date) --->  DB-file right
-       |                                             |
-       |  (file ID, size, date)                      |  (file ID, size, date)
-      \|/                                           \|/
+          |                                          |
+          |  (file ID, size, date)                   |  (file ID, size, date)
+          |            or                            |            or
+          |  (file path, size, date)                 |  (file path, size, date)
+         \|/                                        \|/
     file left only                             file right only
 
        FAT caveat: File Ids are generally not stable when file is either moved or renamed!
        => 1. Move/rename operations on FAT cannot be detected reliably.
        => 2. database generally contains wrong file ID on FAT after renaming from .ffs_tmp files => correct file Ids in database only after next sync
        => 3. even exFAT screws up (but less than FAT) and changes IDs after file move. Did they learn nothing from the past?
-
-    Possible refinement
-    -------------------
-    If the file ID is wrong (FAT) or not available, we could at least allow direct association by name, instead of breaking the chain completely: support NTFS -> FAT
     */
 };
 
@@ -451,10 +485,10 @@ private:
 class RedetermineTwoWay
 {
 public:
-    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) { RedetermineTwoWay(baseDirectory, dbContainer); }
+    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbFolder) { RedetermineTwoWay(baseDirectory, dbFolder); }
 
 private:
-    RedetermineTwoWay(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) :
+    RedetermineTwoWay(BaseDirPair& baseDirectory, const InSyncDir& dbFolder) :
         txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
         txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
         txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
@@ -465,20 +499,20 @@ private:
         //-> considering filter not relevant:
         //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
 
-        recurse(baseDirectory, &dbContainer);
+        recurse(baseDirectory, &dbFolder);
     }
 
-    void recurse(HierarchyObject& hierObj, const InSyncDir* dbContainer) const
+    void recurse(HierarchyObject& hierObj, const InSyncDir* dbFolder) const
     {
         for (FilePair& fileObj : hierObj.refSubFiles())
-            processFile(fileObj, dbContainer);
+            processFile(fileObj, dbFolder);
         for (SymlinkPair& linkObj : hierObj.refSubLinks())
-            processSymlink(linkObj, dbContainer);
+            processSymlink(linkObj, dbFolder);
         for (DirPair& dirObj : hierObj.refSubDirs())
-            processDir(dirObj, dbContainer);
+            processDir(dirObj, dbFolder);
     }
 
-    void processFile(FilePair& fileObj, const InSyncDir* dbContainer) const
+    void processFile(FilePair& fileObj, const InSyncDir* dbFolder) const
     {
         const CompareFilesResult cat = fileObj.getCategory();
         if (cat == FILE_EQUAL)
@@ -493,10 +527,10 @@ private:
 
         //try to find corresponding database entry
         const InSyncDir::FileList::value_type* dbEntry = nullptr;
-        if (dbContainer)
+        if (dbFolder)
         {
-            auto it = dbContainer->files.find(fileObj.getPairShortName());
-            if (it != dbContainer->files.end())
+            auto it = dbFolder->files.find(fileObj.getPairShortName());
+            if (it != dbFolder->files.end())
                 dbEntry = &*it;
         }
 
@@ -521,7 +555,7 @@ private:
         }
     }
 
-    void processSymlink(SymlinkPair& linkObj, const InSyncDir* dbContainer) const
+    void processSymlink(SymlinkPair& linkObj, const InSyncDir* dbFolder) const
     {
         const CompareSymlinkResult cat = linkObj.getLinkCategory();
         if (cat == SYMLINK_EQUAL)
@@ -529,10 +563,10 @@ private:
 
         //try to find corresponding database entry
         const InSyncDir::LinkList::value_type* dbEntry = nullptr;
-        if (dbContainer)
+        if (dbFolder)
         {
-            auto it = dbContainer->symlinks.find(linkObj.getPairShortName());
-            if (it != dbContainer->symlinks.end())
+            auto it = dbFolder->symlinks.find(linkObj.getPairShortName());
+            if (it != dbFolder->symlinks.end())
                 dbEntry = &*it;
         }
 
@@ -557,7 +591,7 @@ private:
         }
     }
 
-    void processDir(DirPair& dirObj, const InSyncDir* dbContainer) const
+    void processDir(DirPair& dirObj, const InSyncDir* dbFolder) const
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
@@ -570,10 +604,10 @@ private:
 
         //try to find corresponding database entry
         const InSyncDir::DirList::value_type* dbEntry = nullptr;
-        if (dbContainer)
+        if (dbFolder)
         {
-            auto it = dbContainer->dirs.find(dirObj.getPairShortName());
-            if (it != dbContainer->dirs.end())
+            auto it = dbFolder->dirs.find(dirObj.getPairShortName());
+            if (it != dbFolder->dirs.end())
                 dbEntry = &*it;
         }
 
@@ -860,13 +894,13 @@ private:
 
     void processDir(DirPair& dirObj) const
     {
-        bool subObjMightMatch = true;
-        const bool filterPassed = filterProc.passDirFilter(dirObj.getPairRelativePath(), &subObjMightMatch);
+        bool childItemMightMatch = true;
+        const bool filterPassed = filterProc.passDirFilter(dirObj.getPairRelativePath(), &childItemMightMatch);
 
         if (Eval<strategy>::process(dirObj))
             dirObj.setActive(filterPassed);
 
-        if (!subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
+        if (!childItemMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
         {
             inOrExcludeAllRows<false>(dirObj); //exclude all files dirs in subfolders => incompatible with STRATEGY_OR!
             return;

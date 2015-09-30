@@ -323,21 +323,21 @@ private:
     ColLabelWin* colLabelWin_;
     MainWin*     mainWin_;
 
-    ScrollBarStatus showScrollbarX;
-    ScrollBarStatus showScrollbarY;
+    ScrollBarStatus showScrollbarX = SB_SHOW_AUTOMATIC;
+    ScrollBarStatus showScrollbarY = SB_SHOW_AUTOMATIC;
 
-    int colLabelHeight;
-    bool drawRowLabel;
+    int colLabelHeight = 0;
+    bool drawRowLabel = true;
 
     std::shared_ptr<GridData> dataView_;
     Selection selection;
-    bool allowColumnMove;
-    bool allowColumnResize;
+    bool allowColumnMove   = true;
+    bool allowColumnResize = true;
 
     std::vector<VisibleColumn> visibleCols; //individual widths, type and total column count
     std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
 
-    size_t rowCountOld; //at the time of last Grid::Refresh()
+    size_t rowCountOld = 0; //at the time of last Grid::Refresh()
 };
 }
 

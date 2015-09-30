@@ -264,7 +264,7 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
         //    localTimeFmt->tm_hour = 0; //0-23
         //    const time_t timeFrom = ::mktime(localTimeFmt);
 
-        //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
+        //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday   0-6
         //    // +6 == -1 in Z_7
 
         //    return std::int64_t(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;

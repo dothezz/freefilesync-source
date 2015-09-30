@@ -367,31 +367,31 @@ private:
         size_t fileCount = readNumber<std::uint32_t>(inputBoth);
         while (fileCount-- != 0)
         {
-            const Zstring shortName = readUtf8(inputBoth);
+            const Zstring itemName = readUtf8(inputBoth);
             const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
             const std::uint64_t fileSize = readNumber<std::uint64_t>(inputBoth);
             const InSyncDescrFile dataL = readFile(inputLeft);
             const InSyncDescrFile dataR = readFile(inputRight);
-            container.addFile(shortName, dataL, dataR, cmpVar, fileSize);
+            container.addFile(itemName, dataL, dataR, cmpVar, fileSize);
         }
 
         size_t linkCount = readNumber<std::uint32_t>(inputBoth);
         while (linkCount-- != 0)
         {
-            const Zstring shortName = readUtf8(inputBoth);
+            const Zstring itemName = readUtf8(inputBoth);
             const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
             InSyncDescrLink dataL = readLink(inputLeft);
             InSyncDescrLink dataR = readLink(inputRight);
-            container.addSymlink(shortName, dataL, dataR, cmpVar);
+            container.addSymlink(itemName, dataL, dataR, cmpVar);
         }
 
         size_t dirCount = readNumber<std::uint32_t>(inputBoth);
         while (dirCount-- != 0)
         {
-            const Zstring shortName = readUtf8(inputBoth);
-            auto status = static_cast<InSyncDir::InSyncStatus>(readNumber<std::int32_t>(inputBoth));
+            const Zstring itemName = readUtf8(inputBoth);
+            const auto status = static_cast<InSyncDir::InSyncStatus>(readNumber<std::int32_t>(inputBoth));
 
-            InSyncDir& subDir = container.addDir(shortName, status);
+            InSyncDir& subDir = container.addDir(itemName, status);
             recurse(subDir);
         }
     }
@@ -401,7 +401,7 @@ private:
     InSyncDescrFile readFile(MemStreamIn& input) const
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        auto lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
+        const auto lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
 
         ABF::FileId fileId;
         warn_static("remove after migration! 2015-05-02")
@@ -424,7 +424,7 @@ private:
 
     static InSyncDescrLink readLink(MemStreamIn& input)
     {
-        auto lastWriteTimeRaw = readNumber<std::int64_t>(input);
+        const auto lastWriteTimeRaw = readNumber<std::int64_t>(input);
         return InSyncDescrLink(lastWriteTimeRaw);
     }
 
@@ -470,7 +470,7 @@ private:
         if (!rv.second)
         {
 #if defined ZEN_WIN || defined ZEN_MAC //caveat: key must be updated, if there is a change in short name case!!!
-            if (rv.first->first != key)
+            if (rv.first->first != key) //=> conceptually case-sensitivity should be part of "value", not "key"
             {
                 map.erase(rv.first);
                 return map.emplace(key, value).first->second;
@@ -504,7 +504,7 @@ private:
         */
     }
 
-    void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelativeNamePf, InSyncDir::FileList& dbFiles)
+    void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelPathPf, InSyncDir::FileList& dbFiles)
     {
         std::unordered_set<const InSyncFile*> toPreserve; //referencing fixed-in-memory std::map elements
 
@@ -543,13 +543,13 @@ private:
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
             //all items not existing in "currentFiles" have either been deleted meanwhile or been excluded via filter:
-            const Zstring& shortName = v.first;
-            return filter_.passFileFilter(parentRelativeNamePf + shortName);
+            const Zstring& itemRelPath = parentRelPathPf + v.first;
+            return filter_.passFileFilter(itemRelPath);
             //note: items subject to traveral errors are also excluded by this file filter here! see comparison.cpp, modified file filter for read errors
         });
     }
 
-    void process(const HierarchyObject::SubLinkVec& currentLinks, const Zstring& parentRelativeNamePf, InSyncDir::LinkList& dbLinks)
+    void process(const HierarchyObject::SubLinkVec& currentLinks, const Zstring& parentRelPathPf, InSyncDir::LinkList& dbLinks)
     {
         std::unordered_set<const InSyncSymlink*> toPreserve;
 
@@ -581,12 +581,12 @@ private:
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
             //all items not existing in "currentLinks" have either been deleted meanwhile or been excluded via filter:
-            const Zstring& shortName = v.first;
-            return filter_.passFileFilter(parentRelativeNamePf + shortName);
+            const Zstring& itemRelPath = parentRelPathPf + v.first;
+            return filter_.passFileFilter(itemRelPath);
         });
     }
 
-    void process(const HierarchyObject::SubDirVec& currentDirs, const Zstring& parentRelativeNamePf, InSyncDir::DirList& dbDirs)
+    void process(const HierarchyObject::SubDirVec& currentDirs, const Zstring& parentRelPathPf, InSyncDir::DirList& dbDirs)
     {
         std::unordered_set<const InSyncDir*> toPreserve;
 
@@ -628,7 +628,7 @@ private:
                         //reuse last "in-sync" if available or insert strawman entry (do not try to update and thereby remove child elements!!!)
                         InSyncDir& dir = dbDirs.emplace(dirObj.getPairShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN)).first->second;
                         toPreserve.insert(&dir);
-                        recurse(dirObj, dir); //unconditional recursion without filter check! => no problem since "subObjMightMatch" is optional!!!
+                        recurse(dirObj, dir); //unconditional recursion without filter check! => no problem since "childItemMightMatch" is optional!!!
                     }
                     break;
 
@@ -647,19 +647,38 @@ private:
                 }
 
         //delete removed items (= "in-sync") from database
-        erase_if(dbDirs, [&](const InSyncDir::DirList::value_type& v) -> bool
+        erase_if(dbDirs, [&](InSyncDir::DirList::value_type& v) -> bool
         {
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
-            const Zstring& shortName = v.first;
-            return filter_.passDirFilter(parentRelativeNamePf + shortName, nullptr);
+
+            const Zstring& itemRelPath = parentRelPathPf + v.first;
             //if directory is not included in "currentDirs", it is either not existing anymore, in which case it should be deleted from database
             //or it was excluded via filter and the database entry should be preserved
 
-            warn_static("insufficient for *.txt-include filters! -> e.g. "
-            "1. *.txt-include, both sides in sync, txt-fiels in subfolder"
-            "2. delete all subfolders externally "
-            "3. sync => db should be updated == entries removed for .txt; mabye even for deleted subfolders!?!")
+            bool childItemMightMatch = true;
+            const bool passFilter = filter_.passDirFilter(itemRelPath, &childItemMightMatch);
+            if (!passFilter && childItemMightMatch)
+                dbSetEmptyState(v.second, appendSeparator(itemRelPath)); //child items might match, e.g. *.txt include filter!
+            return passFilter;
+        });
+    }
+
+    //delete all entries for removed folder (= "in-sync") from database
+    void dbSetEmptyState(InSyncDir& dir, const Zstring& parentRelPathPf)
+    {
+        erase_if(dir.files,    [&](const InSyncDir::FileList::value_type& v) { return filter_.passFileFilter(parentRelPathPf + v.first); });
+        erase_if(dir.symlinks, [&](const InSyncDir::LinkList::value_type& v) { return filter_.passFileFilter(parentRelPathPf + v.first); });
+
+        erase_if(dir.dirs, [&](InSyncDir::DirList::value_type& v)
+        {
+            const Zstring& itemRelPath = parentRelPathPf + v.first;
+
+            bool childItemMightMatch = true;
+            const bool passFilter = filter_.passDirFilter(itemRelPath, &childItemMightMatch);
+            if (!passFilter && childItemMightMatch)
+                dbSetEmptyState(v.second, appendSeparator(itemRelPath));
+            return passFilter;
         });
     }
 

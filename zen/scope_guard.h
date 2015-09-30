@@ -17,13 +17,13 @@ namespace zen
 //Scope Guard
 /*
     zen::ScopeGuard lockAio = zen::makeGuard([&] { ::CloseHandle(hDir); });
-		...
-	lockAio.dismiss();
+        ...
+    lockAio.dismiss();
 */
 
 //Scope Exit
 /*
-	ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
 */
 
 class ScopeGuardBase
@@ -32,7 +32,7 @@ public:
     void dismiss() { dismissed_ = true; }
 
 protected:
-    ScopeGuardBase() : dismissed_(false) {}
+    ScopeGuardBase() {}
     ScopeGuardBase(ScopeGuardBase&& other) : dismissed_(other.dismissed_) { other.dismiss(); } //take over responsibility
     ~ScopeGuardBase() {} //[!] protected non-virtual base class destructor
 
@@ -42,7 +42,7 @@ private:
     ScopeGuardBase           (const ScopeGuardBase&) = delete;
     ScopeGuardBase& operator=(const ScopeGuardBase&) = delete;
 
-    bool dismissed_;
+    bool dismissed_ = false;
 };
 
 

@@ -41,7 +41,7 @@ DirectoryStatus checkFolderExistenceUpdating(const std::set<const ABF*, ABF::Les
     for (const ABF* baseFolder : baseFolders)
         if (!baseFolder->emptyBaseFolderPath()) //skip empty dirs
         {
-            AbstractPathRef folderPath = baseFolder->getAbstractPath(Zstring());
+            AbstractPathRef folderPath = baseFolder->getAbstractPath();
 
             std::function<void()> connectFolder /*throw FileError*/ = baseFolder->getAsyncConnectFolder(allowUserInteraction); //noexcept
             std::function<bool()> dirExists     /*throw FileError*/ = ABF::getAsyncCheckFolderExists(folderPath); //noexcept
@@ -62,7 +62,7 @@ DirectoryStatus checkFolderExistenceUpdating(const std::set<const ABF*, ABF::Les
 
     for (auto& fi : futureInfo)
     {
-        const std::wstring& displayPathFmt = fmtPath(ABF::getDisplayPath(fi.first->getAbstractPath(Zstring())));
+        const std::wstring& displayPathFmt = fmtPath(ABF::getDisplayPath(fi.first->getAbstractPath()));
 
         procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", displayPathFmt)); //may throw!
 

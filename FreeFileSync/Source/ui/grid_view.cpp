@@ -522,7 +522,7 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
     viewRef.clear();
     rowPositions.clear();
     rowPositionsFirstChild.clear();
-    currentSort = make_unique<SortInfo>(type, onLeft, ascending);
+    currentSort = std::make_unique<SortInfo>(type, onLeft, ascending);
 
     switch (type)
     {

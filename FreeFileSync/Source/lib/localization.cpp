@@ -108,7 +108,7 @@ FFSTranslation::FFSTranslation(const Zstring& filepath, wxLanguage languageId) :
         transMappingPl.emplace(std::make_pair(engSingular, engPlural), plFormsWide);
     }
 
-    pluralParser = zen::make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
+    pluralParser = std::make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
 }
 
 
@@ -191,7 +191,7 @@ ExistingTranslations::ExistingTranslations()
             assert(!lngHeader.flagFile      .empty());
             /*
             There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
-            Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
+            Fortunately locales can be also entered as description. => use "Chinese (Traditional)" which works fine.
             */
             if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(lngHeader.localeName)))
             {
@@ -385,7 +385,7 @@ public:
     void init(wxLanguage lng)
     {
         locale.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
-        locale = zen::make_unique<wxLocale>();
+        locale = std::make_unique<wxLocale>();
 
         const wxLanguageInfo* sysLngInfo = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
         const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(lng);
@@ -445,7 +445,7 @@ void zen::setLanguage(int language) //throw FileError
     else
         try
         {
-            zen::setTranslator(zen::make_unique<FFSTranslation>(utfCvrtTo<Zstring>(languageFile), static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
+            zen::setTranslator(std::make_unique<FFSTranslation>(utfCvrtTo<Zstring>(languageFile), static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {

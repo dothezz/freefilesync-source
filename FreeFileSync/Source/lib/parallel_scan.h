@@ -75,7 +75,7 @@ public:
 void fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
                 std::map<DirectoryKey, DirectoryValue>& buf, //out
                 FillBufferCallback& callback,
-                size_t updateInterval); //unit: [ms]
+                size_t updateIntervalMs); //unit: [ms]
 }
 
 #endif // PARALLEL_SCAN_H_INCLUDED

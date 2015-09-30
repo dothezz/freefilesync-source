@@ -41,7 +41,7 @@ IMPLEMENT_APP(Application)
 
 #ifdef _MSC_VER
 //catch CRT floating point errors: http://msdn.microsoft.com/en-us/library/k3backsw.aspx
-int _matherr(struct _exception* except)
+int _matherr(_Inout_ struct _exception* except)
 {
     assert(false);
     return 0; //use default action
@@ -598,7 +598,6 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
 
     try //begin of synchronization process (all in one try-catch block)
     {
-
         const TimeComp timeStamp = localTime();
 
         const SwitchToGui switchBatchToGui(globalConfigFile, globalCfg, referenceFile, batchCfg); //prepare potential operational switch
@@ -635,19 +634,17 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         std::unique_ptr<LockHolder> dirLocks;
 
         //COMPARE DIRECTORIES
-        FolderComparison folderCmp;
-        compare(globalCfg.optDialogs,
-                allowPwPrompt,
-                globalCfg.runWithBackgroundPriority,
-                globalCfg.createLockFile,
-                dirLocks,
-                cmpConfig,
-                folderCmp,
-                statusHandler);
+        FolderComparison cmpResult = compare(globalCfg.optDialogs,
+                                             allowPwPrompt, //allowUserInteraction
+                                             globalCfg.runWithBackgroundPriority,
+                                             globalCfg.createLockFile,
+                                             dirLocks,
+                                             cmpConfig,
+                                             statusHandler);
 
         //START SYNCHRONIZATION
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
-        if (syncProcessCfg.size() != folderCmp.size())
+        if (syncProcessCfg.size() != cmpResult.size())
             throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         synchronize(timeStamp,
@@ -658,7 +655,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                     globalCfg.failsafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
                     syncProcessCfg,
-                    folderCmp,
+                    cmpResult,
                     statusHandler);
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler

@@ -51,14 +51,13 @@ struct FolderPairCfg
 std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance); //fill FolderPairCfg and resolve folder pairs
 
 //FFS core routine:
-void compare(xmlAccess::OptionalDialogs& warnings,
-             bool allowUserInteraction,
-             bool runWithBackgroundPriority,
-             bool createDirLocks,
-             std::unique_ptr<LockHolder>& dirLocks, //out
-             const std::vector<FolderPairCfg>& cfgList,
-             FolderComparison& output, //out
-             ProcessCallback& callback);
+FolderComparison compare(xmlAccess::OptionalDialogs& warnings,
+                         bool allowUserInteraction,
+                         bool runWithBackgroundPriority,
+                         bool createDirLocks,
+                         std::unique_ptr<LockHolder>& dirLocks, //out
+                         const std::vector<FolderPairCfg>& cfgList,
+                         ProcessCallback& callback);
 }
 
 #endif // COMPARISON_H_INCLUDED

@@ -1,3 +1,21 @@
+FreeFileSync 7.5 [2015-10-01]
+-----------------------------
+Detect moved files on source even for targets with no (SFTP) or unstable (FAT) file id support
+Improved performance for detection of moved files by over 50%
+Added folder picker to select SFTP paths
+Support additional SFTP ciphers by building upon OpenSSL backend
+Added 10-seconds time out when SFTP command is hanging indefinitely
+Work around unexpected SFTP session termination on Synology servers
+Fixed various libssh2 and OpenSSL memory leaks
+Fixed FreeFileSync taskbar link reuse (Windows 7)
+Avoid last error code being overwritten by certain C runtimes before evaluation
+Run online update check asynchronously (Windows)
+Check source item existence before cleaning target during versioning (Linux, OS X)
+Check folder recursion limit to catch stack overflows
+Doubled potential folder traversal recursion depth (Windows)
+Consider child elements of excluded folders during database clean up
+
+
 FreeFileSync 7.4 [2015-09-01]
 -----------------------------
 Switch between all folder pair configurations directly in the sync config dialog

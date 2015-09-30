@@ -59,7 +59,7 @@ struct ResolvedFolderPair
 struct ResolvedBaseFolders
 {
     std::vector<ResolvedFolderPair> resolvedPairs;
-    std::set<const ABF*, ABF::LessItemPath> existingBaseFolders; //references resolvedPairs variable!!!
+    std::set<const ABF*, ABF::LessItemPath> existingBaseFolders; //references "resolvedPairs" variable!!!
 };
 
 
@@ -188,9 +188,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, Pro
     class CbImpl : public FillBufferCallback
     {
     public:
-        CbImpl(ProcessCallback& pcb) :
-            callback_(pcb),
-            itemsReported(0) {}
+        CbImpl(ProcessCallback& pcb) : callback_(pcb) {}
 
         void reportStatus(const std::wstring& statusMsg, int itemsTotal) override
         {
@@ -218,7 +216,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, Pro
 
     private:
         ProcessCallback& callback_;
-        int itemsReported;
+        int itemsReported = 0;
     } cb(callback);
 
     fillBuffer(keysToRead, //in
@@ -708,10 +706,12 @@ void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filter
 
     //remove superfluous directories:
     //   this does not invalidate "std::vector<FilePair*>& undefinedFiles", since we delete folders only
-    //	 and there is no side-effect for memory positions of FilePair and SymlinkPair thanks to zen::FixedList!
+    //   and there is no side-effect for memory positions of FilePair and SymlinkPair thanks to zen::FixedList!
+    static_assert(IsSameType<FixedList<DirPair>, HierarchyObject::SubDirVec>::value, "");
+
     hierObj.refSubDirs().remove_if([&](DirPair& dirObj)
     {
-        const bool included = filterProc.passDirFilter(dirObj.getPairRelativePath(), nullptr); //subObjMightMatch is false, child items were already excluded during scanning
+        const bool included = filterProc.passDirFilter(dirObj.getPairRelativePath(), nullptr); //childItemMightMatch is false, child items were already excluded during scanning
 
         if (!included) //falsify only! (e.g. might already be inactive due to read error!)
             dirObj.setActive(false);
@@ -792,21 +792,20 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const ResolvedF
 }
 
 
-void zen::compare(xmlAccess::OptionalDialogs& warnings,
-                  bool allowUserInteraction,
-                  bool runWithBackgroundPriority,
-                  bool createDirLocks,
-                  std::unique_ptr<LockHolder>& dirLocks,
-                  const std::vector<FolderPairCfg>& cfgList,
-                  FolderComparison& output,
-                  ProcessCallback& callback)
+FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
+                              bool allowUserInteraction,
+                              bool runWithBackgroundPriority,
+                              bool createDirLocks,
+                              std::unique_ptr<LockHolder>& dirLocks,
+                              const std::vector<FolderPairCfg>& cfgList,
+                              ProcessCallback& callback)
 {
     //specify process and resource handling priorities
     std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
     if (runWithBackgroundPriority)
         try
         {
-            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+            backgroundPrio = std::make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
         }
         catch (const FileError& e) //not an error in this context
         {
@@ -817,7 +816,7 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
     std::unique_ptr<PreventStandby> noStandby;
     try
     {
-        noStandby = make_unique<PreventStandby>(); //throw FileError
+        noStandby = std::make_unique<PreventStandby>(); //throw FileError
     }
     catch (const FileError& e) //not an error in this context
     {
@@ -860,7 +859,7 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
             if (Opt<Zstring> folderPath = ABF::getNativeItemPath(baseFolder->getAbstractPath())) //restrict directory locking to native paths until further
                 dirPathsExisting.insert(*folderPath);
 
-        dirLocks = zen::make_unique<LockHolder>(dirPathsExisting, warnings.warningDirectoryLockFailed, callback);
+        dirLocks = std::make_unique<LockHolder>(dirPathsExisting, warnings.warningDirectoryLockFailed, callback);
     }
 
     try
@@ -876,7 +875,7 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
                 dirsToRead.emplace(*w.first.abfRight, w.second.filter.nameFilter, w.second.handleSymlinks);
         }
 
-        FolderComparison outputTmp; //write to output as a transaction!
+        FolderComparison output;
 
         //reduce peak memory by restricting lifetime of ComparisonBuffer to have ended when loading potentially huge InSyncDir instance in redetermineSyncDirection()
         {
@@ -903,26 +902,26 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
                 switch (w.second.compareVar)
                 {
                     case CMP_BY_TIME_SIZE:
-                        outputTmp.push_back(cmpBuff.compareByTimeSize(w.first, w.second));
+                        output.push_back(cmpBuff.compareByTimeSize(w.first, w.second));
                         break;
                     case CMP_BY_CONTENT:
                         assert(!outputByContent.empty());
                         if (!outputByContent.empty())
                         {
-                            outputTmp.push_back(outputByContent.front());
+                            output.push_back(outputByContent.front());
                             outputByContent.pop_front();
                         }
                         break;
                 }
         }
 
-        assert(outputTmp.size() == cfgList.size());
+        assert(output.size() == cfgList.size());
 
         //--------- set initial sync-direction --------------------------------------------------
 
-        for (auto j = begin(outputTmp); j != end(outputTmp); ++j)
+        for (auto j = begin(output); j != end(output); ++j)
         {
-            const FolderPairCfg& fpCfg = cfgList[j - outputTmp.begin()];
+            const FolderPairCfg& fpCfg = cfgList[j - output.begin()];
 
             callback.reportStatus(_("Calculating sync directions..."));
             callback.forceUiRefresh();
@@ -932,14 +931,13 @@ void zen::compare(xmlAccess::OptionalDialogs& warnings,
             [&](std::int64_t bytesDelta) { callback.requestUiRefresh(); });//throw X
         }
 
-        //output is written only if everything was processed correctly
-        //note: output mustn't change during this process to be in sync with GUI grid view!!!
-        outputTmp.swap(output);
+        return output;
     }
     catch (const std::bad_alloc& e)
     {
         callback.reportFatalError(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         //we need to maintain the "output.size() == cfgList.size()" contract in ALL cases! => abort
         callback.abortProcessNow(); //throw X
+        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
     }
 }

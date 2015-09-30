@@ -131,7 +131,7 @@ private:
 
         std::unique_ptr<FilterConfig>& filterCfgOnClipboard = getFilterCfgOnClipboardRef();
 
-        auto copyFilter  = [&] { filterCfgOnClipboard = make_unique<FilterConfig>(this->localFilter); };
+        auto copyFilter  = [&] { filterCfgOnClipboard = std::make_unique<FilterConfig>(this->localFilter); };
         auto pasteFilter = [&]
         {
             if (filterCfgOnClipboard)

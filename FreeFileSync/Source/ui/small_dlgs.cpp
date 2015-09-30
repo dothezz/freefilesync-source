@@ -29,6 +29,7 @@
 #include "../version/version.h"
 
 #ifdef ZEN_WIN_VISTA_AND_LATER
+    #include "sftp_folder_picker.h"
     #include "../fs/sftp.h"
 #endif
 #ifdef ZEN_WIN
@@ -94,8 +95,12 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 #error what is going on?
 #endif
 
-    build += zen::is64BitBuild ? L" x64" : L" x86";
-    static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
+    build +=
+#ifdef ZEN_BUILD_32BIT
+        L" x86";
+#elif defined ZEN_BUILD_64BIT
+        L" x64";
+#endif
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
 
@@ -157,7 +162,11 @@ private:
     void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnToggleShowPassword(wxCommandEvent& event) override;
+    void OnBrowseSftpFolder  (wxCommandEvent& event) override;
 
+    std::pair<SftpLoginInfo, Zstring> getSftpLogin() const;
+
+    //output-only parameters:
     Zstring& folderPathPhraseOut;
 };
 
@@ -175,7 +184,7 @@ SftpSetupDlg::SftpSetupDlg(wxWindow* parent, Zstring& folderPathPhrase) : SftpSe
 
     if (acceptsFolderPathPhraseSftp(folderPathPhrase)) //noexcept
     {
-        auto res = getResolvedSftpPath(folderPathPhrase); //noexcept
+        const auto res = getResolvedSftpPath(folderPathPhrase); //noexcept
         const SftpLoginInfo login         = res.first;
         const Zstring       serverRelPath = res.second;
 
@@ -212,7 +221,7 @@ void SftpSetupDlg::OnToggleShowPassword(wxCommandEvent& event)
 }
 
 
-void SftpSetupDlg::OnOkay(wxCommandEvent& event)
+std::pair<SftpLoginInfo, Zstring /*host-relative path*/> SftpSetupDlg::getSftpLogin() const
 {
     SftpLoginInfo login = {};
     login.server   = utfCvrtTo<Zstring>(m_textCtrlServer  ->GetValue());
@@ -222,11 +231,30 @@ void SftpSetupDlg::OnOkay(wxCommandEvent& event)
 
     Zstring serverRelPath = utfCvrtTo<Zstring>(m_textCtrlServerPath->GetValue());
 
-    trim(login.server);
-    trim(login.username);
-    trim(serverRelPath);
+    return std::make_pair(login, serverRelPath); //noexcept
+}
 
-    folderPathPhraseOut = assembleSftpFolderPathPhrase(login, serverRelPath); //noexcept
+
+void SftpSetupDlg::OnBrowseSftpFolder(wxCommandEvent& event)
+{
+    const auto res = getSftpLogin();
+    const SftpLoginInfo login         = res.first;
+    Zstring             serverRelPath = res.second;
+
+    if (showSftpFolderPicker(this, login, serverRelPath) == ReturnSftpPicker::BUTTON_OKAY)
+    {
+        m_textCtrlServerPath->ChangeValue(utfCvrtTo<wxString>(serverRelPath));
+    }
+}
+
+
+void SftpSetupDlg::OnOkay(wxCommandEvent& event)
+{
+    const auto res = getSftpLogin();
+    const SftpLoginInfo login         = res.first;
+    const Zstring       serverRelPath = res.second;
+
+    folderPathPhraseOut = condenseToSftpFolderPathPhrase(login, serverRelPath); //noexcept
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -236,7 +264,6 @@ ReturnSmallDlg::ButtonPressed zen::showSftpSetupDialog(wxWindow* parent, Zstring
 {
     SftpSetupDlg setupDlg(parent, folderPathPhrase);
     return static_cast<ReturnSmallDlg::ButtonPressed>(setupDlg.ShowModal());
-
 }
 #endif
 
@@ -258,12 +285,13 @@ private:
     void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
-    Zstring& outLastUsedPath;
-    bool& outKeepRelPaths;
-    bool& outOverwriteIfExists;
-
     std::unique_ptr<FolderSelector> targetFolder; //always bound
     std::shared_ptr<FolderHistory> folderHistory_;
+
+    //output-only parameters:
+    Zstring& lastUsedPathOut;
+    bool& keepRelPathsOut;
+    bool& overwriteIfExistsOut;
 };
 
 
@@ -275,10 +303,10 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
                            bool& keepRelPaths,
                            bool& overwriteIfExists) :
     CopyToDlgGenerated(parent),
-    outLastUsedPath(lastUsedPath),
-    outKeepRelPaths(keepRelPaths),
-    outOverwriteIfExists(overwriteIfExists),
-    folderHistory_(folderHistory)
+    folderHistory_(folderHistory),
+    lastUsedPathOut(lastUsedPath),
+    keepRelPathsOut(keepRelPaths),
+    overwriteIfExistsOut(overwriteIfExists)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -291,7 +319,7 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
 
     m_bitmapCopyTo->SetBitmap(getResourceImage(L"copy_to"));
 
-    targetFolder = make_unique<FolderSelector>(*this, *m_buttonSelectTargetFolder, *m_bpButtonSelectAltTargetFolder, *m_targetFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
+    targetFolder = std::make_unique<FolderSelector>(*this, *m_buttonSelectTargetFolder, *m_bpButtonSelectAltTargetFolder, *m_targetFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
     m_targetFolderPath->init(folderHistory_);
 
@@ -340,11 +368,11 @@ void CopyToDialog::OnOK(wxCommandEvent& event)
     }
     //-------------------------------------------------------------
 
-    outLastUsedPath      = targetFolder->getPath();
-    outKeepRelPaths      = m_checkBoxKeepRelPath->GetValue();
-    outOverwriteIfExists = m_checkBoxOverwriteIfExists->GetValue();
+    lastUsedPathOut      = targetFolder->getPath();
+    keepRelPathsOut      = m_checkBoxKeepRelPath->GetValue();
+    overwriteIfExistsOut = m_checkBoxOverwriteIfExists->GetValue();
 
-    folderHistory_->addItem(outLastUsedPath);
+    folderHistory_->addItem(lastUsedPathOut);
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -389,8 +417,10 @@ private:
 
     const std::vector<zen::FileSystemObject*>& rowsToDeleteOnLeft;
     const std::vector<zen::FileSystemObject*>& rowsToDeleteOnRight;
-    bool& outRefuseRecycleBin;
     const TickVal tickCountStartup;
+
+    //output-only parameters:
+    bool& useRecycleBinOut;
 };
 
 
@@ -401,8 +431,8 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     DeleteDlgGenerated(parent),
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
-    outRefuseRecycleBin(useRecycleBin),
-    tickCountStartup(getTicks())
+    tickCountStartup(getTicks()),
+    useRecycleBinOut(useRecycleBin)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -477,7 +507,7 @@ void DeleteDialog::OnOK(wxCommandEvent& event)
         if (dist(tickCountStartup, now) * 1000 / tps < 50)
             return;
 
-    outRefuseRecycleBin = m_checkBoxUseRecycler->GetValue();
+    useRecycleBinOut = m_checkBoxUseRecycler->GetValue();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -512,7 +542,8 @@ private:
     void OnCancel   (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnClose    (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
-    bool& m_dontShowAgain;
+    //output-only parameters:
+    bool& dontShowAgainOut;
 };
 
 
@@ -521,7 +552,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
                                          const SyncStatistics& st,
                                          bool& dontShowAgain) :
     SyncConfirmationDlgGenerated(parent),
-    m_dontShowAgain(dontShowAgain)
+    dontShowAgainOut(dontShowAgain)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -573,7 +604,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
 
 void SyncConfirmationDlg::OnStartSync(wxCommandEvent& event)
 {
-    m_dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    dontShowAgainOut = m_checkBoxDontShowAgain->GetValue();
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
@@ -614,14 +645,16 @@ private:
     void setExtApp(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp() const;
 
-    xmlAccess::XmlGlobalSettings& settings;
     std::map<std::wstring, std::wstring> descriptionTransToEng; //"translated description" -> "english" mapping for external application config
+
+    //output-only parameters:
+    xmlAccess::XmlGlobalSettings& globalSettingsOut;
 };
 
 
 OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings) :
     OptionsDlgGenerated(parent),
-    settings(globalSettings)
+    globalSettingsOut(globalSettings)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -710,15 +743,15 @@ void OptionsDlg::updateGui()
 
 void OptionsDlg::OnOkay(wxCommandEvent& event)
 {
-    //write settings only when okay-button is pressed!
-    settings.failsafeFileCopy    = m_checkBoxFailSafe->GetValue();
-    settings.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
-    settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
+    //write settings only when okay-button is pressed (except hidden dialog reset)!
+    globalSettingsOut.failsafeFileCopy    = m_checkBoxFailSafe->GetValue();
+    globalSettingsOut.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
+    globalSettingsOut.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
 
-    settings.automaticRetryCount = m_spinCtrlAutoRetryCount->GetValue();
-    settings.automaticRetryDelay = m_spinCtrlAutoRetryDelay->GetValue();
+    globalSettingsOut.automaticRetryCount = m_spinCtrlAutoRetryCount->GetValue();
+    globalSettingsOut.automaticRetryDelay = m_spinCtrlAutoRetryDelay->GetValue();
 
-    settings.gui.externelApplications = getExtApp();
+    globalSettingsOut.gui.externelApplications = getExtApp();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -731,7 +764,7 @@ void OptionsDlg::OnResetDialogs(wxCommandEvent& event)
                                    _("&Show")))
     {
         case ConfirmationButton::DO_IT:
-            settings.optDialogs.resetDialogs();
+            globalSettingsOut.optDialogs = xmlAccess::OptionalDialogs();
             break;
         case ConfirmationButton::CANCEL:
             break;
@@ -862,27 +895,16 @@ private:
             m_calendarFrom->SetDate(m_calendarTo->GetDate());
     }
 
-    std::int64_t& timeFrom_;
-    std::int64_t& timeTo_;
+    //output-only parameters:
+    std::int64_t& timeFromOut;
+    std::int64_t& timeToOut;
 };
-
-
-wxDateTime utcToLocalDateTime(time_t utcTime)
-{
-    //wxDateTime models local(!) time (in contrast to what documentation says), but this constructor takes time_t UTC
-    return wxDateTime(utcTime);
-}
-
-time_t localDateTimeToUtc(const wxDateTime& localTime)
-{
-    return localTime.GetTicks();
-}
 
 
 SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo) :
     SelectTimespanDlgGenerated(parent),
-    timeFrom_(timeFrom),
-    timeTo_(timeTo)
+    timeFromOut(timeFrom),
+    timeToOut(timeTo)
 {
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -908,13 +930,17 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, s
     m_calendarTo  ->SetWindowStyleFlag(style);
 
     //set default values
-    if (timeTo_ == 0)
-        timeTo_ = wxGetUTCTime(); //
-    if (timeFrom_ == 0)
-        timeFrom_ = timeTo_ - 7 * 24 * 3600; //default time span: one week from "now"
+    std::int64_t timeFromTmp = timeFrom;
+    std::int64_t timeToTmp   = timeTo;
 
-    m_calendarFrom->SetDate(utcToLocalDateTime(timeFrom_));
-    m_calendarTo  ->SetDate(utcToLocalDateTime(timeTo_));
+    if (timeToTmp == 0)
+        timeToTmp = std::time(nullptr); //
+    if (timeFromTmp == 0)
+        timeFromTmp = timeToTmp - 7 * 24 * 3600; //default time span: one week from "now"
+
+    //wxDateTime models local(!) time (in contrast to what documentation says), but it has a constructor taking time_t UTC
+    m_calendarFrom->SetDate(static_cast<time_t>(timeFromTmp));
+    m_calendarTo  ->SetDate(static_cast<time_t>(timeToTmp  ));
 
 #if wxCHECK_VERSION(2, 9, 5)
     //doesn't seem to be a problem here:
@@ -940,12 +966,12 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 
     //align to full days
     from.ResetTime();
-    to += wxTimeSpan::Day();
     to.ResetTime(); //reset local(!) time
+    to += wxTimeSpan::Day();
     to -= wxTimeSpan::Second(); //go back to end of previous day
 
-    timeFrom_ = localDateTimeToUtc(from);
-    timeTo_   = localDateTimeToUtc(to);
+    timeFromOut = from.GetTicks();
+    timeToOut   = to  .GetTicks();
 
     /*
     {

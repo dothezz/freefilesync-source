@@ -30,9 +30,9 @@ Zstring ntPathToWin32Path(const Zstring& path); //noexcept
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#NT_Namespaces
 
 As used by GetModuleFileNameEx() and symlinks (FSCTL_GET_REPARSE_POINT):
-	E.g.:
-	\??\C:\folder -> C:\folder
-	\SystemRoot   -> C:\Windows
+    E.g.:
+    \??\C:\folder -> C:\folder
+    \SystemRoot   -> C:\Windows
 */
 }
 

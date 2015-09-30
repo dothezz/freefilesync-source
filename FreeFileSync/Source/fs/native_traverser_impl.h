@@ -71,14 +71,14 @@ private:
 
         DIR* dirObj = ::opendir(dirPath.c_str()); //directory must NOT end with path separator, except "/"
         if (!dirObj)
-            throwFileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtPath(dirPath)), L"opendir", getLastError());
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open directory %x."), L"%x", fmtPath(dirPath)), L"opendir");
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
 
         for (;;)
         {
             struct ::dirent* dirEntry = nullptr;
             if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                throwFileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r", getLastError());
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r");
             //don't retry but restart dir traversal on error! http://blogs.msdn.com/b/oldnewthing/archive/2014/06/12/10533529.aspx
 
             if (!dirEntry) //no more items
@@ -98,7 +98,7 @@ private:
             if (!tryReportingItemError([&]
         {
             if (::lstat(itemPath.c_str(), &statData) != 0) //lstat() does not resolve symlinks
-                    throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itemPath)), L"lstat", getLastError());
+                    THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itemPath)), L"lstat");
             }, sink, itemName))
             continue; //ignore error: skip file
 
@@ -116,7 +116,7 @@ private:
                         bool validLink = tryReportingItemError([&]
                         {
                             if (::stat(itemPath.c_str(), &statDataTrg) != 0)
-                                throwFileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtPath(itemPath)), L"stat", getLastError());
+                                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtPath(itemPath)), L"stat");
                         }, sink, itemName);
 
                         if (validLink)

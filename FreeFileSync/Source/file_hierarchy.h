@@ -114,22 +114,22 @@ struct DirContainer
     LinkList links; //non-followed symlinks
 
     //convenience
-    DirContainer& addSubDir(const Zstring& shortName)
+    DirContainer& addSubDir(const Zstring& itemName)
     {
-        return dirs[shortName]; //value default-construction is okay here
-        //return dirs.emplace(shortName, DirContainer()).first->second;
+        return dirs[itemName]; //value default-construction is okay here
+        //return dirs.emplace(itemName, DirContainer()).first->second;
     }
 
-    void addSubFile(const Zstring& shortName, const FileDescriptor& fileData)
+    void addSubFile(const Zstring& itemName, const FileDescriptor& fileData)
     {
-        auto rv = files.emplace(shortName, fileData);
+        auto rv = files.emplace(itemName, fileData);
         if (!rv.second) //update entry if already existing (e.g. during folder traverser "retry")
             rv.first->second = fileData;
     }
 
-    void addSubLink(const Zstring& shortName, const LinkDescriptor& linkData)
+    void addSubLink(const Zstring& itemName, const LinkDescriptor& linkData)
     {
-        auto rv = links.emplace(shortName, linkData);
+        auto rv = links.emplace(itemName, linkData);
         if (!rv.second)
             rv.first->second = linkData;
     }
@@ -373,7 +373,7 @@ public:
     std::wstring getCatExtraDescription() const; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
 
     //sync settings
-    SyncDirection getSyncDir() const;
+    SyncDirection getSyncDir() const { return syncDir_; }
     void setSyncDir(SyncDirection newDir);
     void setSyncDirConflict(const std::wstring& description); //set syncDir = SyncDirection::NONE + fill conflict description
 
@@ -405,8 +405,6 @@ protected:
                      HierarchyObject& parentObj,
                      CompareFilesResult defaultCmpResult) :
         cmpResult(defaultCmpResult),
-        selectedForSynchronization(true),
-        syncDir_(SyncDirection::NONE),
         shortNameLeft_(shortNameLeft),
         shortNameRight_(shortNameRight),
         //shortNameRight_(shortNameRight == shortNameLeft ? shortNameLeft : shortNameRight), -> strangely doesn't seem to shrink peak memory consumption at all!
@@ -434,10 +432,10 @@ private:
     std::unique_ptr<std::wstring> cmpResultDescr; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
     CompareFilesResult cmpResult; //although this uses 4 bytes there is currently *no* space wasted in class layout!
 
-    bool selectedForSynchronization;
+    bool selectedForSynchronization = true;
 
     //Note: we model *four* states with following two variables => "syncDirectionConflict is empty or syncDir == NONE" is a class invariant!!!
-    SyncDirection syncDir_; //1 byte: optimize memory layout!
+    SyncDirection syncDir_ = SyncDirection::NONE; //1 byte: optimize memory layout!
     std::unique_ptr<std::wstring> syncDirectionConflict; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
 
@@ -463,9 +461,7 @@ public:
             HierarchyObject& parentObj,
             CompareDirResult defaultCmpResult) :
         FileSystemObject(shortNameLeft, shortNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
-        HierarchyObject(getPairRelativePath() + FILE_NAME_SEPARATOR, parentObj.getRoot()),
-        syncOpBuffered(SO_DO_NOTHING),
-        haveBufferedSyncOp(false) {}
+        HierarchyObject(getPairRelativePath() + FILE_NAME_SEPARATOR, parentObj.getRoot())  {}
 
     SyncOperation getSyncOperation() const override;
 
@@ -477,8 +473,8 @@ private:
     void removeObjectR() override;
     void notifySyncCfgChanged() override { haveBufferedSyncOp = false; FileSystemObject::notifySyncCfgChanged(); HierarchyObject::notifySyncCfgChanged(); }
 
-    mutable SyncOperation syncOpBuffered; //determining sync-op for directory may be expensive as it depends on child-objects -> buffer it
-    mutable bool haveBufferedSyncOp;      //
+    mutable SyncOperation syncOpBuffered = SO_DO_NOTHING; //determining sync-op for directory may be expensive as it depends on child-objects -> buffer it
+    mutable bool haveBufferedSyncOp      = false;         //
 };
 
 //------------------------------------------------------------------
@@ -498,8 +494,7 @@ public:
              HierarchyObject& parentObj) :
         FileSystemObject(shortNameLeft, shortNameRight, parentObj, defaultCmpResult),
         dataLeft(left),
-        dataRight(right),
-        moveFileRef(nullptr) {}
+        dataRight(right) {}
 
     template <SelectedSide side> std::int64_t getLastWriteTime() const;
     template <SelectedSide side> std::uint64_t     getFileSize() const;
@@ -534,7 +529,7 @@ private:
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
 
-    ObjectId moveFileRef; //optional, filled by redetermineSyncDirection()
+    ObjectId moveFileRef = nullptr; //optional, filled by redetermineSyncDirection()
 };
 
 //------------------------------------------------------------------
@@ -633,16 +628,9 @@ inline
 std::wstring FileSystemObject::getCatExtraDescription() const
 {
     assert(getCategory() == FILE_CONFLICT || getCategory() == FILE_DIFFERENT_METADATA);
-    if (cmpResultDescr) //avoid ternary-WTF!
+    if (cmpResultDescr) //avoid ternary-WTF! (implicit copy-constructor call!!!!!!)
         return *cmpResultDescr;
     return std::wstring();
-}
-
-
-inline
-SyncDirection FileSystemObject::getSyncDir() const
-{
-    return syncDir_;
 }
 
 
@@ -660,7 +648,7 @@ inline
 void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 {
     syncDir_ = SyncDirection::NONE;
-    syncDirectionConflict = zen::make_unique<std::wstring>(description);
+    syncDirectionConflict = std::make_unique<std::wstring>(description);
 
     notifySyncCfgChanged();
 }
@@ -670,7 +658,7 @@ inline
 std::wstring FileSystemObject::getSyncOpConflict() const
 {
     assert(getSyncOperation() == SO_UNRESOLVED_CONFLICT);
-    if (syncDirectionConflict) //avoid ternary-WTF!
+    if (syncDirectionConflict) //avoid ternary-WTF! (implicit copy-constructor call!!!!!!)
         return *syncDirectionConflict;
     return std::wstring();
 }
@@ -715,7 +703,7 @@ const Zstring& FileSystemObject::getItemName() const
 template <SelectedSide side> inline
 Zstring FileSystemObject::getRelativePath() const
 {
-    if (isEmpty<side>()) //avoid ternary-WTF!
+    if (isEmpty<side>()) //avoid ternary-WTF! (implicit copy-constructor call!!!!!!)
         return Zstring();
     return parent_.getPairRelativePathPf() + getItemName<side>();
 }
@@ -796,14 +784,14 @@ inline
 void FileSystemObject::setCategoryConflict(const std::wstring& description)
 {
     cmpResult = FILE_CONFLICT;
-    cmpResultDescr = zen::make_unique<std::wstring>(description);
+    cmpResultDescr = std::make_unique<std::wstring>(description);
 }
 
 inline
 void FileSystemObject::setCategoryDiffMetadata(const std::wstring& description)
 {
     cmpResult = FILE_DIFFERENT_METADATA;
-    cmpResultDescr = zen::make_unique<std::wstring>(description);
+    cmpResultDescr = std::make_unique<std::wstring>(description);
 }
 
 inline

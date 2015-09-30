@@ -66,7 +66,7 @@ struct InSyncDir
 
     //------------------------------------------------------------------
     typedef std::map<Zstring, InSyncDir,     LessFilePath> DirList;  //
-    typedef std::map<Zstring, InSyncFile,    LessFilePath> FileList; // key: shortName
+    typedef std::map<Zstring, InSyncFile,    LessFilePath> FileList; // key: file name
     typedef std::map<Zstring, InSyncSymlink, LessFilePath> LinkList; //
     //------------------------------------------------------------------
 

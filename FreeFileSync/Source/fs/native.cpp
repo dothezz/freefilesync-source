@@ -16,13 +16,34 @@
 #include "../lib/icon_loader.h"
 #include "native_traverser_impl.h"
 
-#if defined ZEN_LINUX || defined ZEN_MAC
+#ifdef ZEN_WIN
+    #include <zen/com_tools.h>
+
+#elif defined ZEN_LINUX || defined ZEN_MAC
     #include <fcntl.h> //fallocate, fcntl
 #endif
 
 
 namespace
 {
+#ifdef ZEN_WIN
+    //manage COM-cleanup at per-thread-scope:
+    thread_local std::unique_ptr<ComInitializer> nativeComInitThread;
+#endif
+
+
+void initComForThread() //throw FileError
+{
+#ifdef ZEN_WIN
+    try
+    {
+        if (!nativeComInitThread) nativeComInitThread = std::make_unique<ComInitializer>(); //throw SysError
+    }
+    catch (const SysError& e) { throw FileError(e.toString()); } //there's little value in giving additional/misleading context info => just convert SysError to FileError
+#endif
+}
+
+
 class RecycleSessionNative : public AbstractBaseFolder::RecycleSession
 {
 public:
@@ -50,12 +71,12 @@ void evalAttributeByHandle(FileHandle fh, const Zstring& filePath, Function eval
 #ifdef ZEN_WIN
     BY_HANDLE_FILE_INFORMATION fileInfo = {};
     if (!::GetFileInformationByHandle(fh, &fileInfo))
-        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filePath)), L"GetFileInformationByHandle", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filePath)), L"GetFileInformationByHandle");
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     if (::fstat(fh, &fileInfo) != 0)
-        throwFileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filePath)), L"fstat", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filePath)), L"fstat");
 #endif
     evalFileInfo(fileInfo);
 }
@@ -109,13 +130,13 @@ void preAllocateSpaceBestEffort(FileHandle fh, const std::uint64_t streamSize, c
                             fileSize,    //__in       LARGE_INTEGER liDistanceToMove,
                             nullptr,     //__out_opt  PLARGE_INTEGER lpNewFilePointer,
                             FILE_BEGIN)) //__in       DWORD dwMoveMethod
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetFilePointerEx", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetFilePointerEx");
 
     if (!::SetEndOfFile(fh))
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetEndOfFile", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetEndOfFile");
 
     if (!::SetFilePointerEx(fh, {}, nullptr, FILE_BEGIN))
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetFilePointerEx", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"SetFilePointerEx");
 
 #elif defined ZEN_LINUX
     //don't use potentially inefficient ::posix_fallocate!
@@ -143,7 +164,7 @@ void preAllocateSpaceBestEffort(FileHandle fh, const std::uint64_t streamSize, c
     //https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/ftruncate.2.html
     //=> file is extended with zeros, file offset is not changed
     if (::ftruncate(fh, streamSize) != 0)
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"ftruncate", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(displayPath)), L"ftruncate");
 
     //F_PREALLOCATE + ftruncate seems optimal: http://adityaramesh.com/io_benchmark/
 #endif
@@ -220,14 +241,35 @@ public:
 
     NativeBaseFolder(const Zstring& baseDirPathIn) : baseDirPath(baseDirPathIn) {}
 
+    static Zstring getItemPathImplForRecycler(const AbstractPathRef& ap)
+    {
+        if (typeid(getAbf(ap)) != typeid(NativeBaseFolder))
+            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        return getItemPathImpl(ap);
+    }
+
+private:
+    Zstring getInitPathPhrase() const override /*noexcept*/ { return baseDirPath; }
+
+    //copy this instance for life-time management and safe access on any method by a different thread:
+    std::unique_ptr<AbstractBaseFolder> createIndependentCopy() const override //noexcept
+    {
+        return std::make_unique<NativeBaseFolder>(baseDirPath); //safe: Zstring uses atomic ref-count
+    }
+
     bool emptyBaseFolderPath() const override { return baseDirPath.empty(); }
 
-    std::uint64_t getFreeDiskSpace() const override { return zen::getFreeDiskSpace(baseDirPath); } //throw FileError, returns 0 if not available
+    std::uint64_t getFreeDiskSpace() const override //throw FileError, returns 0 if not available
+    {
+        initComForThread(); //throw FileError
+        return zen::getFreeDiskSpace(baseDirPath); //throw FileError
+    }
 
     //----------------------------------------------------------------------------------------------------------------
     bool supportsRecycleBin(const std::function<void ()>& onUpdateGui) const override //throw FileError
     {
 #ifdef ZEN_WIN
+        initComForThread(); //throw FileError
         return recycleBinExists(baseDirPath, onUpdateGui); //throw FileError
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
@@ -237,29 +279,17 @@ public:
 
     std::unique_ptr<RecycleSession> createRecyclerSession() const override //throw FileError, return value must be bound!
     {
+        initComForThread(); //throw FileError
         assert(supportsRecycleBin(nullptr));
-        return make_unique<RecycleSessionNative>(appendSeparator(baseDirPath));
+        return std::make_unique<RecycleSessionNative>(appendSeparator(baseDirPath));
     }
 
-    static Zstring getItemPathImplForRecycler(const AbstractPathRef& ap)
-    {
-        if (typeid(getAbf(ap)) != typeid(NativeBaseFolder))
-            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
-        return getItemPathImpl(ap);
-    }
-
-private:
     bool isNativeFileSystem() const override { return true; }
 
-    Zstring getInitPathPhrase() const override /*noexcept*/ { return baseDirPath; }
-
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     std::wstring getDisplayPath(const Zstring& itemPathImpl) const override { return utfCvrtTo<std::wstring>(itemPathImpl); }
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     Zstring appendRelPathToItemPathImpl(const Zstring& itemPathImpl, const Zstring& relPath) const override { return appendPaths(itemPathImpl, relPath, FILE_NAME_SEPARATOR); }
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     Zstring getBasePathImpl() const override { return baseDirPath; }
 
     //used during folder creation if parent folder is missing
@@ -310,50 +340,81 @@ private:
     //----------------------------------------------------------------------------------------------------------------
 
     //should provide for single ATOMIC folder creation!
-    void createFolderSimple(const Zstring& itemPathImpl) const override
-    { copyNewDirectory(Zstring(), itemPathImpl, false /*copyFilePermissions*/); } //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    void createFolderSimple(const Zstring& itemPathImpl) const override //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    {
+        initComForThread(); //throw FileError
+        copyNewDirectory(Zstring(), itemPathImpl, false /*copyFilePermissions*/);
+    }
 
-    void removeFolderSimple(const Zstring& itemPathImpl) const override { zen::removeDirectorySimple(itemPathImpl); } //throw FileError
+    void removeFolderSimple(const Zstring& itemPathImpl) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::removeDirectorySimple(itemPathImpl); //throw FileError
+    }
 
-    bool removeFile(const Zstring& itemPathImpl) const override { return zen::removeFile(itemPathImpl); } //throw FileError
+    bool removeFile(const Zstring& itemPathImpl) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        return zen::removeFile(itemPathImpl); //throw FileError
+    }
 
     //----------------------------------------------------------------------------------------------------------------
 
     void setModTime(const Zstring& itemPathImpl, std::int64_t modificationTime) const override //throw FileError, follows symlinks
-    { zen::setFileTime(itemPathImpl, modificationTime, ProcSymlink::FOLLOW); } //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::setFileTime(itemPathImpl, modificationTime, ProcSymlink::FOLLOW); //throw FileError
+    }
 
     void setModTimeSymlink(const Zstring& itemPathImpl, std::int64_t modificationTime) const override //throw FileError
-    { zen::setFileTime(itemPathImpl, modificationTime, ProcSymlink::DIRECT); } //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::setFileTime(itemPathImpl, modificationTime, ProcSymlink::DIRECT); //throw FileError
+    }
 
-    AbstractPathRef getResolvedSymlinkPath(const Zstring& itemPathImpl) const override { return makeAbstractItem(*this, zen::getResolvedSymlinkPath(itemPathImpl)); } //throw FileError
+    AbstractPathRef getResolvedSymlinkPath(const Zstring& itemPathImpl) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        return makeAbstractItem(*this, zen::getResolvedSymlinkPath(itemPathImpl)); //throw FileError
+    }
 
-    Zstring getSymlinkContentBuffer(const Zstring& itemPathImpl) const override { return getSymlinkTargetRaw(itemPathImpl); } //throw FileError
+    Zstring getSymlinkContentBuffer(const Zstring& itemPathImpl) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        return getSymlinkTargetRaw(itemPathImpl); //throw FileError
+    }
 
-    void recycleItemDirectly(const Zstring& itemPathImpl) const override { zen::recycleOrDelete(itemPathImpl); } //throw FileError
+    void recycleItemDirectly(const Zstring& itemPathImpl) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::recycleOrDelete(itemPathImpl); //throw FileError
+    }
 
     //----------------------------------------------------------------------------------------------------------------
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
     IconLoader getAsyncIconLoader(const Zstring& itemPathImpl) const override //noexcept!
     {
-        //COM should already have been initialized by icon buffer
         IconLoader wl = {};
-        wl.getFileIcon       = [itemPathImpl](int pixelSize) { return getFileIcon      (itemPathImpl, pixelSize); }; //noexcept!
-        wl.getThumbnailImage = [itemPathImpl](int pixelSize) { return getThumbnailImage(itemPathImpl, pixelSize); }; //
-        return wl;
-    }
-
-    //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
-    std::function<void()> /*throw FileError*/ getAsyncConnectFolder(bool allowUserInteraction) const override //noexcept
-    {
-        const Zstring dirPath = baseDirPath; //help lambda capture syntax...
-
-        return [dirPath, allowUserInteraction]()
+        wl.getFileIcon = [itemPathImpl](int pixelSize) //noexcept!
         {
-#ifdef ZEN_WIN
-            //login to network share, if necessary
-            loginNetworkShare(dirPath, allowUserInteraction);
-#endif
+            try
+            {
+                initComForThread(); //throw FileError
+                return getFileIcon(itemPathImpl, pixelSize);
+            }
+            catch (FileError&) { assert(false); return ImageHolder(); }
         };
+
+        wl.getThumbnailImage = [itemPathImpl](int pixelSize) //noexcept!
+        {
+            try
+            {
+                initComForThread(); //throw FileError
+                return getThumbnailImage(itemPathImpl, pixelSize);
+            }
+            catch (FileError&) { assert(false); return ImageHolder(); }
+        };
+        return wl;
     }
 
     //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
@@ -361,28 +422,67 @@ private:
     {
         warn_static("finish file error detection")
 
-        return [itemPathImpl] { return zen::dirExists(itemPathImpl); };
+        return [itemPathImpl]
+        {
+            initComForThread(); //throw FileError
+            return zen::dirExists(itemPathImpl);
+        };
     }
+
+    //- THREAD-SAFETY: must be thread-safe like an int! => no dangling references to this instance!
+    std::function<void()> /*throw FileError*/ getAsyncConnectFolder(bool allowUserInteraction) const override //noexcept
+    {
+        warn_static("clean-up/remove/re-think the getAsyncConnectFolder() function")
+
+        const Zstring dirPath = baseDirPath; //help lambda capture syntax...
+
+        return [dirPath, allowUserInteraction]()
+        {
+#ifdef ZEN_WIN
+            initComForThread(); //throw FileError
+
+            //login to network share, if necessary
+            loginNetworkShare(dirPath, allowUserInteraction);
+#endif
+        };
+    }
+
     //----------------------------------------------------------------------------------------------------------------
     //return value always bound:
-    std::unique_ptr<InputStream > getInputStream (const Zstring& itemPathImpl) const override { return make_unique<InputStreamNative >(itemPathImpl); } //throw FileError, ErrorFileLocked
+    std::unique_ptr<InputStream > getInputStream (const Zstring& itemPathImpl) const override //throw FileError, ErrorFileLocked
+    {
+        initComForThread(); //throw FileError
+        return std::make_unique<InputStreamNative >(itemPathImpl); //throw FileError, ErrorFileLocked
+    }
+
     std::unique_ptr<OutputStream> getOutputStream(const Zstring& itemPathImpl,  //throw FileError, ErrorTargetExisting
                                                   const std::uint64_t* streamSize,                     //optional
                                                   const std::int64_t* modificationTime) const override //
     {
+        initComForThread(); //throw FileError
+
         //AbstractBaseFolder::OutputStream takes ownership and deletes on errors!!!! => transactionally create output stream first!!
         auto&& fop = FileOutput(itemPathImpl, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
-        return make_unique<OutputStreamNative>(std::move(fop), makeAbstractItem(*this, itemPathImpl), streamSize, modificationTime); //throw FileError
+        return std::make_unique<OutputStreamNative>(std::move(fop), makeAbstractItem(*this, itemPathImpl), streamSize, modificationTime); //throw FileError
     }
+
     //----------------------------------------------------------------------------------------------------------------
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
-    void traverseFolder(const Zstring& itemPathImpl, TraverserCallback& sink) const override { DirTraverser::execute(itemPathImpl, sink); }
+    void traverseFolder(const Zstring& itemPathImpl, TraverserCallback& sink) const override //noexcept
+    {
+#ifdef ZEN_WIN
+        if (!tryReportingDirError([&] { initComForThread(); /*throw FileError*/ }, sink))
+            return;
+#endif
+        DirTraverser::execute(itemPathImpl, sink); //noexcept
+    }
     //----------------------------------------------------------------------------------------------------------------
 
     //symlink handling: follow link!
     FileAttribAfterCopy copyFileForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                                const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const override //may be nullptr; throw X!
     {
+        initComForThread(); //throw FileError
+
         const InSyncAttributes attrNew = copyNewFile(itemPathImplSource, getItemPathImpl(apTarget), //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                                      copyFilePermissions, onNotifyCopyStatus); //may be nullptr; throw X!
         FileAttribAfterCopy attrOut = {};
@@ -394,16 +494,29 @@ private:
     }
 
     //symlink handling: follow link!
-    void copyNewFolderForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget, bool copyFilePermissions) const override
-    { zen::copyNewDirectory(itemPathImplSource, getItemPathImpl(apTarget), copyFilePermissions); } //throw FileError
+    void copyNewFolderForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget, bool copyFilePermissions) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::copyNewDirectory(itemPathImplSource, getItemPathImpl(apTarget), copyFilePermissions);
+    }
 
-    void copySymlinkForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget, bool copyFilePermissions) const override
-    { zen::copySymlink(itemPathImplSource, getItemPathImpl(apTarget), copyFilePermissions); } //throw FileError
+    void copySymlinkForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget, bool copyFilePermissions) const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        zen::copySymlink(itemPathImplSource, getItemPathImpl(apTarget), copyFilePermissions); //throw FileError
+    }
 
-    void renameItemForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget) const override
-    { zen::renameFile(itemPathImplSource, getItemPathImpl(apTarget));} //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
+    void renameItemForSameAbfType(const Zstring& itemPathImplSource, const AbstractPathRef& apTarget) const override //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
+    {
+        initComForThread(); //throw FileError
+        zen::renameFile(itemPathImplSource, getItemPathImpl(apTarget)); //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
+    }
 
-    bool supportsPermissions() const override {  return zen::supportsPermissions(baseDirPath); } //throw FileError
+    bool supportsPermissions() const override //throw FileError
+    {
+        initComForThread(); //throw FileError
+        return zen::supportsPermissions(baseDirPath);
+    }
 
     const Zstring baseDirPath;
 };
@@ -602,6 +715,6 @@ bool zen::acceptsFolderPathPhraseNative(const Zstring& folderPathPhrase) //noexc
 
 std::unique_ptr<AbstractBaseFolder> zen::createBaseFolderNative(const Zstring& folderPathPhrase) //noexcept
 {
-    return make_unique<NativeBaseFolder>(getResolvedFilePath(folderPathPhrase));
+    return std::make_unique<NativeBaseFolder>(getResolvedFilePath(folderPathPhrase));
     warn_static("get volume by name for idle HDD! => call async getFormattedDirectoryPath, but currently not thread-safe")
 }

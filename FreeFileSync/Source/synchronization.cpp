@@ -340,7 +340,7 @@ private:
     {
         assert(deletionPolicy_ == DELETE_TO_VERSIONING);
         if (!versioner.get())
-            versioner = zen::make_unique<FileVersioner>(std::move(versioningFolder), versioningStyle_, timeStamp_); //throw FileError
+            versioner = std::make_unique<FileVersioner>(std::move(versioningFolder), versioningStyle_, timeStamp_); //throw FileError
         return *versioner;
     };
 
@@ -1201,7 +1201,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation 
             catch (FileError&)
             {
                 warn_static("still an error if base dir is missing!")
-                //	const Zstring basedir = beforeLast(fileObj.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
+                //  const Zstring basedir = beforeLast(fileObj.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
                 //if (!dirExists(basedir) ||
 
 
@@ -1635,20 +1635,20 @@ void verifyFiles(const AbstractPathRef& sourcePath, const AbstractPathRef& targe
                                                    FILE_ATTRIBUTE_NORMAL, //_In_      DWORD dwFlagsAndAttributes,
                                                    nullptr);              //_In_opt_  HANDLE hTemplateFile
             if (fileHandle == INVALID_HANDLE_VALUE)
-                throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"CreateFile", getLastError());
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"CreateFile");
             ZEN_ON_SCOPE_EXIT(::CloseHandle(fileHandle));
 
             if (!::FlushFileBuffers(fileHandle))
-                throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"FlushFileBuffers", getLastError());
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"FlushFileBuffers");
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
             const int fileHandle = ::open(nativeTargetPath->c_str(), O_WRONLY);
             if (fileHandle == -1)
-                throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"open", getLastError());
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"open");
             ZEN_ON_SCOPE_EXIT(::close(fileHandle));
 
             if (::fsync(fileHandle) != 0)
-                throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"fsync", getLastError());
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"fsync");
 #endif
         } //close file handles!
 
@@ -1763,9 +1763,9 @@ bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //n
                 temporaryNetworkDrop = true;
 
                 //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
-                //	1. deletion handling: recycler       -> no, temp directory created only at first deletion
-                //	2. deletion handling: versioning     -> "
-                //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
+                //  1. deletion handling: recycler       -> no, temp directory created only at first deletion
+                //  2. deletion handling: versioning     -> "
+                //  3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
             }
         }, callback); //throw X?
         return !errMsg && !temporaryNetworkDrop;
@@ -1806,7 +1806,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     if (runWithBackgroundPriority)
         try
         {
-            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+            backgroundPrio = std::make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
         }
         catch (const FileError& e) //not an error in this context
         {
@@ -1817,7 +1817,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     std::unique_ptr<PreventStandby> noStandby;
     try
     {
-        noStandby = make_unique<PreventStandby>(); //throw FileError
+        noStandby = std::make_unique<PreventStandby>(); //throw FileError
     }
     catch (const FileError& e) //not an error in this context
     {
@@ -2129,7 +2129,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     //shadow copy buffer: per sync-instance, not folder pair
     std::unique_ptr<shadow::ShadowCopy> shadowCopyHandler;
     if (copyLockedFiles)
-        shadowCopyHandler = make_unique<shadow::ShadowCopy>();
+        shadowCopyHandler = std::make_unique<shadow::ShadowCopy>();
 #endif
 
     try

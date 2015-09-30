@@ -222,7 +222,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticline5 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizerMain->Add( m_staticline5, 0, wxEXPAND, 5 );
 
-    m_buttonStart = new zen::BitmapTextButton( this, wxID_OK, _("&Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_buttonStart = new zen::BitmapTextButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonStart->SetDefault();
     m_buttonStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 

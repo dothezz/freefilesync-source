@@ -8,18 +8,27 @@
 #define VERSION_CHECK_HEADER_324872374893274983275
 
 #include <functional>
+#include <memory>
 #include <wx/window.h>
 
 
 namespace zen
 {
-void checkForUpdateNow(wxWindow* parent, wxString& lastOnlineVersion);
-void checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, wxString& lastOnlineVersion, const std::function<void()>& onBeforeInternetAccess); //-1: check never
+bool updateCheckActive(time_t lastUpdateCheck);
+void disableUpdateCheck(time_t& lastUpdateCheck);
+bool haveNewerVersionOnline(const std::wstring& onlineVersion);
 
-bool updateCheckActive(long lastUpdateCheck);
-void disableUpdateCheck(long& lastUpdateCheck);
+void checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion);
 
-bool isNewerFreeFileSyncVersion(const wxString& onlineVersion);
+//periodic update check:
+bool runPeriodicUpdateCheckNow(time_t lastUpdateCheck);
+
+//long-runing part of the check: thread-safe => run asynchronously
+struct UpdateCheckResult;
+std::shared_ptr<UpdateCheckResult> retrieveOnlineVersion();
+
+//eval on gui thread:
+void evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResult* result);
 }
 
 #endif //VERSION_CHECK_HEADER_324872374893274983275

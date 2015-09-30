@@ -71,7 +71,7 @@ private:
     {
         if (!chmHlp)
         {
-            chmHlp = make_unique<wxCHMHelpController>();
+            chmHlp = std::make_unique<wxCHMHelpController>();
             chmHlp->Initialize(utfCvrtTo<wxString>(zen::getResourceDir()) + L"FreeFileSync.chm");
         }
     }

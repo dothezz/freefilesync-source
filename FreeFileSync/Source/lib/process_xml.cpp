@@ -79,23 +79,6 @@ Zstring xmlAccess::getGlobalConfigFile()
 }
 
 
-void xmlAccess::OptionalDialogs::resetDialogs()
-{
-    warningDependentFolders        = true;
-    warningFolderPairRaceCondition = true;
-    warningSignificantDifference   = true;
-    warningNotEnoughDiskSpace      = true;
-    warningUnresolvedConflicts     = true;
-    warningDatabaseError           = true;
-    warningRecyclerMissing         = true;
-    warningInputFieldEmpty         = true;
-    warningDirectoryLockFailed     = true;
-    popupOnConfigChange            = true;
-    confirmSyncStart               = true;
-    confirmExternalCommandMassInvoke = true;
-}
-
-
 xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg) //noexcept
 {
     XmlGuiConfig output;

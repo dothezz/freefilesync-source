@@ -108,9 +108,9 @@ private:
             wchar_t buffer[MAX_PATH] = {};
             if (SUCCEEDED(::SHGetFolderPath(nullptr,                        //__in   HWND hwndOwner,
                                             csidl | CSIDL_FLAG_DONT_VERIFY, //__in   int nFolder,
-                                            nullptr,				        //__in   HANDLE hToken,
+                                            nullptr,                        //__in   HANDLE hToken,
                                             0 /* == SHGFP_TYPE_CURRENT*/,   //__in   DWORD dwFlags,
-                                            buffer)))					  	//__out  LPTSTR pszPath
+                                            buffer)))                       //__out  LPTSTR pszPath
             {
                 Zstring dirpath = buffer;
                 if (!dirpath.empty())
@@ -183,21 +183,21 @@ private:
         addFolderId(FOLDERID_QuickLaunch,     L"csidl_QuickLaunch");     // C:\Users\<user>\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch
 
         /*
-        CSIDL_APPDATA				covered by %AppData%
-        CSIDL_LOCAL_APPDATA			covered by %LocalAppData% -> not on XP!
-        CSIDL_COMMON_APPDATA		covered by %ProgramData%  -> not on XP!
-        CSIDL_PROFILE				covered by %UserProfile%
-        CSIDL_WINDOWS				covered by %WinDir%
-        CSIDL_SYSTEM				covered by %WinDir%
-        CSIDL_SYSTEMX86				covered by %WinDir%
-        CSIDL_PROGRAM_FILES			covered by %ProgramFiles%
-        CSIDL_PROGRAM_FILES_COMMON	covered by %CommonProgramFiles%
-        CSIDL_PROGRAM_FILESX86			covered by %ProgramFiles(x86)%       -> not on XP!
-        CSIDL_PROGRAM_FILES_COMMONX86	covered by %CommonProgramFiles(x86)% -> not on XP!
-        CSIDL_ADMINTOOLS			not relevant?
-        CSIDL_COMMON_ADMINTOOLS		not relevant?
+        CSIDL_APPDATA               covered by %AppData%
+        CSIDL_LOCAL_APPDATA         covered by %LocalAppData% -> not on XP!
+        CSIDL_COMMON_APPDATA        covered by %ProgramData%  -> not on XP!
+        CSIDL_PROFILE               covered by %UserProfile%
+        CSIDL_WINDOWS               covered by %WinDir%
+        CSIDL_SYSTEM                covered by %WinDir%
+        CSIDL_SYSTEMX86             covered by %WinDir%
+        CSIDL_PROGRAM_FILES         covered by %ProgramFiles%
+        CSIDL_PROGRAM_FILES_COMMON  covered by %CommonProgramFiles%
+        CSIDL_PROGRAM_FILESX86          covered by %ProgramFiles(x86)%       -> not on XP!
+        CSIDL_PROGRAM_FILES_COMMONX86   covered by %CommonProgramFiles(x86)% -> not on XP!
+        CSIDL_ADMINTOOLS            not relevant?
+        CSIDL_COMMON_ADMINTOOLS     not relevant?
 
-        FOLDERID_Public				covered by %Public%
+        FOLDERID_Public             covered by %Public%
         */
         return output;
     }
@@ -351,7 +351,7 @@ Opt<Zstring> getPathByVolumenName(const Zstring& volumeName) //return no value o
                 nullptr,     //__out      LPTSTR  lpFileSystemNameBuffer,
                 0))          //__in       DWORD nFileSystemNameSize
                     if (EqualFilePath()(volumeName, &volName[0]))
-                        return zen::make_unique<Zstring>(path);
+                        return std::make_unique<Zstring>(path);
                 return nullptr;
             });
         }
@@ -553,12 +553,12 @@ Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
      */
     path = resolveRelativePath(path);
 
-    auto isVolumeRoot = [](const Zstring& path)
+    auto isVolumeRoot = [](const Zstring& dirPath)
     {
 #ifdef ZEN_WIN
-        return path.size() == 3 && isAlpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+        return dirPath.size() == 3 && isAlpha(dirPath[0]) && dirPath[1] == L':' && dirPath[2] == L'\\';
 #elif defined ZEN_LINUX || defined ZEN_MAC
-        return path == "/";
+        return dirPath == "/";
 #endif
     };
 
@@ -577,23 +577,23 @@ void zen::loginNetworkShare(const Zstring& dirpathOrig, bool allowUserInteractio
     /*
     ATTENTION: it is not safe to retrieve UNC path via ::WNetGetConnection() for every type of network share:
 
-    network type				 |::WNetGetConnection rv   | lpRemoteName				     | existing UNC path
+    network type                 |::WNetGetConnection rv   | lpRemoteName                    | existing UNC path
     -----------------------------|-------------------------|---------------------------------|----------------
-    inactive local network share | ERROR_CONNECTION_UNAVAIL| \\192.168.1.27\new2			 | YES
-    WebDrive					 | NO_ERROR				   | \\Webdrive-ZenJu\GNU		     | NO
-    Box.net (WebDav)			 | NO_ERROR				   | \\www.box.net\DavWWWRoot\dav    | YES
-    NetDrive					 | ERROR_NOT_CONNECTED     | <empty>						 | NO
+    inactive local network share | ERROR_CONNECTION_UNAVAIL| \\192.168.1.27\new2             | YES
+    WebDrive                     | NO_ERROR                | \\Webdrive-ZenJu\GNU            | NO
+    Box.net (WebDav)             | NO_ERROR                | \\www.box.net\DavWWWRoot\dav    | YES
+    NetDrive                     | ERROR_NOT_CONNECTED     | <empty>                         | NO
     ____________________________________________________________________________________________________________
 
     Windows Login Prompt Naming Conventions:
-    	network share:	\\<server>\<share>	e.g. \\WIN-XP\folder or \\192.168.1.50\folder
-    	user account:	<Domain>\<user>		e.g. WIN-XP\Zenju    or 192.168.1.50\Zenju
+        network share:  \\<server>\<share>  e.g. \\WIN-XP\folder or \\192.168.1.50\folder
+        user account:   <Domain>\<user>     e.g. WIN-XP\Zenju    or 192.168.1.50\Zenju
 
     Windows Command Line:
     - list *all* active network connections, including deviceless ones which are hidden in Explorer:
-    		net use
+            net use
     - delete active connection:
-    		net use /delete \\server\share
+            net use /delete \\server\share
     ____________________________________________________________________________________________________________
 
     Scenario: XP-shared folder is accessed by Win 7 over LAN with access limited to a certain user
@@ -611,11 +611,11 @@ void zen::loginNetworkShare(const Zstring& dirpathOrig, bool allowUserInteractio
                                         nullptr, //__in  LPCTSTR lpPassword,
                                         nullptr, //__in  LPCTSTR lpUsername,
                                         0);      //__in  DWORD dwFlags
-        //53L	ERROR_BAD_NETPATH		The network path was not found.
+        //53L   ERROR_BAD_NETPATH       The network path was not found.
         //67L   ERROR_BAD_NET_NAME
-        //86L	ERROR_INVALID_PASSWORD
-        //1219L	ERROR_SESSION_CREDENTIAL_CONFLICT	Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
-        //1326L	ERROR_LOGON_FAILURE	Logon failure: unknown user name or bad password.
+        //86L   ERROR_INVALID_PASSWORD
+        //1219L ERROR_SESSION_CREDENTIAL_CONFLICT   Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
+        //1326L ERROR_LOGON_FAILURE Logon failure: unknown user name or bad password.
         //1236L ERROR_CONNECTION_ABORTED
         if (somethingExists(trgRes.lpRemoteName)) //blocks!
             return; //success: connection usable! -> don't care about "rv"
@@ -630,8 +630,8 @@ void zen::loginNetworkShare(const Zstring& dirpathOrig, bool allowUserInteractio
         {
             //avoid problem II.)
             DWORD rv2= ::WNetCancelConnection2(trgRes.lpRemoteName, //_In_  LPCTSTR lpName,
-                                               0,					  //_In_  DWORD dwFlags,
-                                               true);				  //_In_  BOOL fForce
+                                               0,                     //_In_  DWORD dwFlags,
+                                               true);                 //_In_  BOOL fForce
             //2250L ERROR_NOT_CONNECTED
 
             //enforce login prompt

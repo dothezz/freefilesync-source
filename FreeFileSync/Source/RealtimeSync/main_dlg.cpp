@@ -39,14 +39,7 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        folderSelector_(*this, *m_buttonSelectFolder, *m_txtCtrlDirectory, nullptr /*staticText*/)
-    {
-#ifdef ZEN_LINUX
-        //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
-        if (GtkWidget* widget = m_txtCtrlDirectory->GetConnectWidget())
-            ::gtk_drag_dest_unset(widget);
-#endif
-    }
+        folderSelector_(*this, *m_buttonSelectFolder, *m_txtCtrlDirectory, nullptr /*staticText*/) {}
 
     void setPath(const Zstring& dirpath) { folderSelector_.setPath(dirpath); }
     Zstring getPath() const { return folderSelector_.getPath(); }
@@ -70,12 +63,6 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
 #endif
 
-#ifdef ZEN_LINUX
-    //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
-    if (GtkWidget* widget = m_txtCtrlDirectoryMain->GetConnectWidget())
-        ::gtk_drag_dest_unset(widget);
-#endif
-
     SetIcon(getRtsIcon()); //set application icon
 
     setRelativeFontSize(*m_buttonStart, 1.5);
@@ -87,12 +74,11 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_remove"));
     setBitmapTextLabel(*m_buttonStart, getResourceImage(L"startRts").ConvertToImage(), m_buttonStart->GetLabel(), 5, 8);
 
-
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
-    dirpathFirst = zen::make_unique<FolderSelector2>(*m_panelMainFolder, *m_buttonSelectFolderMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
+    dirpathFirst = std::make_unique<FolderSelector2>(*m_panelMainFolder, *m_buttonSelectFolderMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath);
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -142,8 +128,6 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     //drag and drop .ffs_real and .ffs_batch on main dialog
     setupFileDrop(*m_panelMain);
     m_panelMain->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onFilesDropped), nullptr, this);
-
-    timerForAsyncTasks.Connect(wxEVT_TIMER, wxEventHandler(MainDialog::onProcessAsyncTasks), nullptr, this);
 }
 
 
@@ -170,15 +154,6 @@ void MainDialog::onQueryEndSession()
 }
 
 
-void MainDialog::onProcessAsyncTasks(wxEvent& event)
-{
-    //schedule and run long-running tasks asynchronously
-    asyncTasks.evalResults(); //process results on GUI queue
-    if (asyncTasks.empty())
-        timerForAsyncTasks.Stop();
-}
-
-
 const Zstring& MainDialog::lastConfigFileName()
 {
     static Zstring instance = zen::getConfigDir() + Zstr("LastRun.ffs_real");
@@ -200,8 +175,12 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 #error what is going on?
 #endif
 
-    build += zen::is64BitBuild ? L" x64" : L" x86";
-    static_assert(zen::is32BitBuild || zen::is64BitBuild, "");
+    build +=
+#ifdef ZEN_BUILD_32BIT
+        L" x86";
+#elif defined ZEN_BUILD_64BIT
+        L" x64";
+#endif
 
     showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
                            setTitle(_("About")).
@@ -495,7 +474,7 @@ void MainDialog::removeAddFolder(size_t pos)
         //the deferred deletion it is expected to do (and which is implemented correctly on Windows and Linux)
         //http://bb10.com/python-wxpython-devel/2012-09/msg00004.html
         //=> since we're in a mouse button callback of a sub-component of "pairToDelete" we need to delay deletion ourselves:
-        processAsync2([] {}, [pairToDelete] { pairToDelete->Destroy(); });
+        guiQueue.processAsync([] {}, [pairToDelete] { pairToDelete->Destroy(); });
 
         //set size of scrolled window
         const size_t additionalRows = std::min(dirpathsExtra.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown

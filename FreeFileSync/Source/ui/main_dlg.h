@@ -8,10 +8,10 @@
 #define MAINDIALOG_H_891048132454564
 
 #include <map>
-#include <set>
+#include <list>
 #include <stack>
 #include <memory>
-#include <zen/async_task.h>
+#include <wx+/async_task.h>
 #include <wx+/file_drop.h>
 #include <wx/aui/aui.h>
 #include "gui_generated.h"
@@ -122,14 +122,6 @@ private:
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
     void openExternalApplication(const wxString& commandline, const std::vector<zen::FileSystemObject*>& selection, bool leftSide); //selection may be empty
-
-    //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
-    void onProcessAsyncTasks(wxEvent& event);
-
-    template <class Fun, class Fun2>
-    void processAsync(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
-    template <class Fun, class Fun2>
-    void processAsync2(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add2(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
 
     //status bar supports one of the following two states at a time:
     void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, std::uint64_t filesizeLeftView, std::uint64_t filesizeRightView);
@@ -324,21 +316,19 @@ private:
 
     wxString defaultPerspective;
 
-    std::int64_t manualTimeSpanFrom;
-    std::int64_t manualTimeSpanTo; //buffer manual time span selection at session level
+    std::int64_t manualTimeSpanFrom = 0;
+    std::int64_t manualTimeSpanTo   = 0; //buffer manual time span selection at session level
 
     std::shared_ptr<FolderHistory> folderHistoryLeft;  //shared by all wxComboBox dropdown controls
     std::shared_ptr<FolderHistory> folderHistoryRight; //always bound!
 
-    //schedule and run long-running tasks asynchronously, but process results on GUI queue
-    zen::AsyncTasks asyncTasks;
-    wxTimer timerForAsyncTasks; //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
+    zen::AsyncGuiQueue guiQueue; //schedule and run long-running tasks asynchronously, but process results on GUI queue
 
     std::unique_ptr<zen::FilterConfig> filterCfgOnClipboard; //copy/paste of filter config
 
-    wxWindow* focusWindowAfterSearch; //used to restore focus after search panel is closed
+    wxWindow* focusWindowAfterSearch = nullptr; //used to restore focus after search panel is closed
 
-    bool localKeyEventsEnabled;
+    bool localKeyEventsEnabled = true;
 };
 
 #endif //MAINDIALOG_H_891048132454564

@@ -63,8 +63,7 @@ bool impl::isMatchingVersion(const Zstring& shortname, const Zstring& shortnameV
 
 
 /*
-- handle not existing source
-- create target super directories if missing
+create target super directories if missing
 */
 void FileVersioner::moveItemToVersioning(const AbstractPathRef& itemPath, const Zstring& relativePath, //throw FileError
                                          const std::function<void(const AbstractPathRef& sourcePath, const AbstractPathRef& targetPath)>& moveItem) //move source -> target; may throw FileError
@@ -94,11 +93,8 @@ void FileVersioner::moveItemToVersioning(const AbstractPathRef& itemPath, const 
     {
         moveItem(itemPath, versionedItemPath); //throw FileError
     }
-    catch (FileError&) //expected to fail if target directory is not yet existing!
+    catch (const FileError&) //expected to fail if target directory is not yet existing!
     {
-        if (!ABF::somethingExists(itemPath)) //missing source file is not an error (however a directory as source when a file is expected, *is* an error!)
-            return; //object *not* processed
-
         //create intermediate directories if missing
         const AbstractPathRef versionedParentPath = versioningFolder_->getAbstractPath(beforeLast(versionedRelPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
         if (!ABF::somethingExists(versionedParentPath)) //->(minor) file system race condition!
@@ -116,7 +112,7 @@ void FileVersioner::moveItemToVersioning(const AbstractPathRef& itemPath, const 
 namespace
 {
 //move source to target across volumes
-//no need to check if: - super-directories of target exist - source exists: done by moveItemToVersioning()
+//no need to check if super-directories of target exist: done by moveItemToVersioning()
 //if target already exists, it is overwritten, even if it is a different type, e.g. a directory!
 template <class Function>
 void moveItem(const AbstractPathRef& sourcePath, //throw FileError
@@ -125,48 +121,55 @@ void moveItem(const AbstractPathRef& sourcePath, //throw FileError
 {
     assert(ABF::fileExists(sourcePath) || ABF::symlinkExists(sourcePath) || !ABF::somethingExists(sourcePath)); //we process files and symlinks only
 
-    auto removeTarget = [&]
-    {
-        try
-        {
-            //file or (broken) file-symlink:
-            ABF::removeFile(targetPath); //throw FileError
-        }
-        catch (FileError&)
-        {
-            //folder or folder-symlink:
-            if (ABF::folderExists(targetPath)) //directory or dir-symlink
-            {
-                assert(ABF::symlinkExists(targetPath)); //we do not expect targetPath to be a directory in general (but possible!)
-                ABF::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
-            }
-            else
-                throw;
-        }
-    };
-
     //first try to move directly without copying
     try
     {
         ABF::renameItem(sourcePath, targetPath); //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
         return; //great, we get away cheaply!
     }
-    //if moving failed, treat as error (except when it tried to move to a different volume: in this case we will copy the file)
-    catch (const ErrorDifferentVolume&)
+    catch (const FileError&)
     {
-        removeTarget(); //throw FileError
-        copyDelete();   //
-    }
-    catch (const ErrorTargetExisting&)
-    {
-        removeTarget(); //throw FileError
-        try
+        //missing source item is not an error => check BEFORE calling removeTarget()!
+        if (!ABF::somethingExists(sourcePath))
+            return; //object *not* processed
+
+        auto removeTarget = [&]
         {
-            ABF::renameItem(sourcePath, targetPath); //throw FileError, (ErrorTargetExisting), ErrorDifferentVolume
-        }
+            try
+            {
+                //file or (broken) file-symlink:
+                ABF::removeFile(targetPath); //throw FileError
+            }
+            catch (FileError&)
+            {
+                //folder or folder-symlink:
+                if (ABF::folderExists(targetPath)) //directory or dir-symlink
+                {
+                    assert(ABF::symlinkExists(targetPath)); //we do not expect targetPath to be a directory in general (but possible!)
+                    ABF::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
+                }
+                else
+                    throw;
+            }
+        };
+
+        try { throw; }
         catch (const ErrorDifferentVolume&)
         {
-            copyDelete(); //throw FileError
+            removeTarget(); //throw FileError
+            copyDelete();   //
+        }
+        catch (const ErrorTargetExisting&)
+        {
+            removeTarget(); //throw FileError
+            try
+            {
+                ABF::renameItem(sourcePath, targetPath); //throw FileError, (ErrorTargetExisting), ErrorDifferentVolume
+            }
+            catch (const ErrorDifferentVolume&)
+            {
+                copyDelete(); //throw FileError
+            }
         }
     }
 }
@@ -235,25 +238,25 @@ struct FlatTraverserCallback: public ABF::TraverserCallback
 {
     FlatTraverserCallback(const AbstractPathRef& folderPath) : folderPath_(folderPath) {}
 
-    void                               onFile   (const FileInfo&    fi) override { fileNames_  .push_back(fi.shortName); }
-    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.shortName); return nullptr; }
-    HandleLink                         onSymlink(const SymlinkInfo& si) override
-    {
-        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
-            folderLinkNames_.push_back(si.shortName);
-        else //file symlink, broken symlink
-            fileLinkNames_.push_back(si.shortName);
-        return TraverserCallback::LINK_SKIP;
-    }
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { throw FileError(msg); }
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { throw FileError(msg); }
-
     const std::vector<Zstring>& refFileNames      () const { return fileNames_; }
     const std::vector<Zstring>& refFolderNames    () const { return folderNames_; }
     const std::vector<Zstring>& refFileLinkNames  () const { return fileLinkNames_; }
     const std::vector<Zstring>& refFolderLinkNames() const { return folderLinkNames_; }
 
 private:
+    void                               onFile   (const FileInfo&    fi) override { fileNames_  .push_back(fi.itemName); }
+    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.itemName); return nullptr; }
+    HandleLink                         onSymlink(const SymlinkInfo& si) override
+    {
+        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.itemName))) //dir symlink
+            folderLinkNames_.push_back(si.itemName);
+        else //file symlink, broken symlink
+            fileLinkNames_.push_back(si.itemName);
+        return TraverserCallback::LINK_SKIP;
+    }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { throw FileError(msg); }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { throw FileError(msg); }
+
     const AbstractPathRef folderPath_;
     std::vector<Zstring> fileNames_;
     std::vector<Zstring> folderNames_;

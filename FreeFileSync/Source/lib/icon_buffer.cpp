@@ -14,6 +14,7 @@
 
 #ifdef ZEN_WIN
     #include <zen/win_ver.h>
+    #include <zen/com_tools.h>
 #endif
 
 using namespace zen;
@@ -38,8 +39,7 @@ wxBitmap extractWxBitmap(ImageHolder&& ih)
 {
     assert(std::this_thread::get_id() == mainThreadId);
 #ifndef NDEBUG
-    auto check = [&] { assert(!ih); }; //work around V120_XP compilation issue
-    ZEN_ON_SCOPE_EXIT(check());
+    ZEN_ON_SCOPE_EXIT(assert(!ih));
 #endif
 
     if (!ih.getRgb())
@@ -107,12 +107,12 @@ ImageHolder getDisplayIcon(const ABF::IconLoader& iconLoader, const Zstring& tem
     if (!hasStandardIconExtension(templateName)) //"pricey" extensions are stored with full path and are read from disk, while cheap ones require just the extension
 #endif
         if (iconLoader.getFileIcon)
-            if (ImageHolder img = iconLoader.getFileIcon(IconBuffer::getSize(sz)))
-                return img;
+            if (ImageHolder ih = iconLoader.getFileIcon(IconBuffer::getSize(sz)))
+                return ih;
 
     //3. fallbacks
-    if (ImageHolder img = getIconByTemplatePath(templateName, IconBuffer::getSize(sz)))
-        return img;
+    if (ImageHolder ih = getIconByTemplatePath(templateName, IconBuffer::getSize(sz)))
+        return ih;
 
     return genericFileIcon(IconBuffer::getSize(sz));
 }
@@ -209,7 +209,7 @@ public:
         IconData& idata = refData(it);
         if (idata.iconRaw) //if not yet converted...
         {
-            idata.iconFmt = make_unique<wxBitmap>(extractWxBitmap(std::move(idata.iconRaw))); //convert in main thread!
+            idata.iconFmt = std::make_unique<wxBitmap>(extractWxBitmap(std::move(idata.iconRaw))); //convert in main thread!
             assert(!idata.iconRaw);
         }
         return idata.iconFmt ? *idata.iconFmt : wxNullBitmap; //idata.iconRaw may be inserted as empty from worker thread!
@@ -231,7 +231,7 @@ public:
     }
 
     //must be called by main thread only! => ~wxBitmap() is NOT thread-safe!
-    //call at an appropriate time, e.g.	after Workload::setWorkload()
+    //call at an appropriate time, e.g. after Workload::setWorkload()
     void limitSize()
     {
         assert(std::this_thread::get_id() == mainThreadId);
@@ -251,7 +251,7 @@ private:
 #ifdef __clang__ //workaround libc++ limitation for incomplete types: http://llvm.org/bugs/show_bug.cgi?id=17701
     typedef std::map<AbstractPathRef::ItemId, std::unique_ptr<IconData>> FileIconMap;
     static IconData& refData(FileIconMap::iterator it) { return *(it->second); }
-    static std::unique_ptr<IconData> makeValueObject() { return make_unique<IconData>(); }
+    static std::unique_ptr<IconData> makeValueObject() { return std::make_unique<IconData>(); }
 #else
     typedef std::map<AbstractPathRef::ItemId, IconData> FileIconMap;
     IconData& refData(FileIconMap::iterator it) { return it->second; }
@@ -365,17 +365,17 @@ public:
     RunOnStartup()
     {
 #ifdef ZEN_WIN
-        //thumbnail.h prerequisites: 1. initialize COM, 2. initialize system image list
+        //icon_loader.h/file_icon_win.h prerequisites: 1. initialize COM, 2. initialize system image list
         typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);
         const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660)); //MS requires and documents this magic number
         assert(fileIconInit);
         if (fileIconInit)
             fileIconInit(true); //MSDN: "TRUE to restore the system image cache from disk; FALSE otherwise."
         /*
-        	"FileIconInit's "fRestoreCache" parameter determines whether or not it loads the 48-or-so "standard" shell icons. If FALSE is specified,
-        	it only loads a very minimal set of icons. [...] SHGetFileInfo internally call FileIconInit(FALSE), so if you want
-        	your copy of the system image list to contain the standard icons,  you should call FileIconInit(TRUE) at startup."
-        		- Jim Barry, MVP (Windows SDK)
+            "FileIconInit's "fRestoreCache" parameter determines whether or not it loads the 48-or-so "standard" shell icons. If FALSE is specified,
+            it only loads a very minimal set of icons. [...] SHGetFileInfo internally call FileIconInit(FALSE), so if you want
+            your copy of the system image list to contain the standard icons,  you should call FileIconInit(TRUE) at startup."
+                - Jim Barry, MVP (Windows SDK)
         */
 #endif
     }
@@ -385,25 +385,27 @@ public:
 void WorkerThread::operator()() const //thread entry
 {
 #ifdef ZEN_WIN
-    //1. Initialize COM
-    if (FAILED(::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) //may return S_FALSE, which is NO failure, see MSDN
+    try
     {
-        assert(false);
-        return;
-    }
-    ZEN_ON_SCOPE_EXIT(::CoUninitialize());
+        //1. Initialize COM here due to the icon_loader.h dependency only, but NOT due to native.h, mtp.h's internal COM usage => this is not our responsibility!
+        ComInitializer ci; //throw SysError
 #endif
 
-    for (;;)
-    {
-        interruptionPoint(); //throw ThreadInterruption
+        for (;;)
+        {
+            interruptionPoint(); //throw ThreadInterruption
 
-        //start work: blocks until next icon to load is retrieved:
-        const WorkItem workItem = workload_->extractNextFile(); //throw ThreadInterruption
+            //start work: blocks until next icon to load is retrieved:
+            const WorkItem workItem = workload_->extractNextFile(); //throw ThreadInterruption
 
-        if (!buffer_->hasIcon(workItem.id_)) //perf: workload may contain duplicate entries?
-            buffer_->insert(workItem.id_, getDisplayIcon(workItem.iconLoader_, workItem.fileName_, iconSizeType));
+            if (!buffer_->hasIcon(workItem.id_)) //perf: workload may contain duplicate entries?
+                buffer_->insert(workItem.id_, getDisplayIcon(workItem.iconLoader_, workItem.fileName_, iconSizeType));
+        }
+
+#ifdef ZEN_WIN
     }
+    catch (SysError&) { assert(false); }
+#endif
 }
 
 //#########################  redirect to impl  #####################################################
@@ -421,7 +423,7 @@ struct IconBuffer::Pimpl
 };
 
 
-IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()), iconSizeType(sz)
+IconBuffer::IconBuffer(IconSize sz) : pimpl(std::make_unique<Pimpl>()), iconSizeType(sz)
 {
     pimpl->worker = InterruptibleThread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
@@ -502,7 +504,13 @@ void IconBuffer::setWorkload(const std::vector<AbstractPathRef>& load)
 
 wxBitmap IconBuffer::getIconByExtension(const Zstring& filePath)
 {
-    const Zstring& extension = getFileExtension(filePath);
+    //comparison of ItemIds is currently case-sensitive:
+#if defined ZEN_WIN || defined ZEN_MAC
+    const Zstring& extension = makeUpperCopy(getFileExtension(filePath));
+#elif defined ZEN_LINUX
+    const Zstring& extension =               getFileExtension(filePath);
+#endif
+
     const AbstractPathRef::ItemId extId(nullptr, extension);
 
     if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(extId))
@@ -510,6 +518,7 @@ wxBitmap IconBuffer::getIconByExtension(const Zstring& filePath)
 
     const Zstring& templateName(extension.empty() ? Zstr("file") : Zstr("file.") + extension);
     //don't pass actual file name to getIconByTemplatePath(), e.g. "AUTHORS" has own mime type on Linux!!!
+    //=> we want to buffer by extension only to minimize buffer-misses!
     pimpl->buffer->insert(extId, getIconByTemplatePath(templateName, IconBuffer::getSize(iconSizeType)));
 
     Opt<wxBitmap> ico = pimpl->buffer->retrieve(extId);

@@ -40,6 +40,9 @@ struct AbstractBaseFolder
 {
     virtual Zstring getInitPathPhrase() const = 0; //noexcept
 
+    //copy this instance for life-time management and safe access on any method by a different thread:
+    virtual std::unique_ptr<AbstractBaseFolder> createIndependentCopy() const = 0; //noexcept
+
     static std::wstring getDisplayPath(const AbstractPathRef& ap) { return ap.abf->getDisplayPath(ap.itemPathImpl); }
 
     static Zstring getFileShortName(const AbstractPathRef& ap) { return ap.abf->getFileShortName(ap.itemPathImpl); }
@@ -94,6 +97,7 @@ struct AbstractBaseFolder
     static Zstring getSymlinkContentBuffer(const AbstractPathRef& ap) { return ap.abf->getSymlinkContentBuffer(ap.itemPathImpl); } //throw FileError
 
     //----------------------------------------------------------------------------------------------------------------
+
     struct IconLoader
     {
         std::function<ImageHolder(int pixelSize)> getThumbnailImage; //optional, noexcept!
@@ -127,6 +131,7 @@ struct AbstractBaseFolder
 
     //TRANSACTIONAL output stream! => call finalize when done!
     //- takes ownership and deletes on errors!!!! => transactionally create output stream first if not existing!!
+    //- AbstractPathRef member => implicit contract: ABF instance needs to out-live OutputStream!
     struct OutputStream
     {
         virtual ~OutputStream();
@@ -164,13 +169,13 @@ struct AbstractBaseFolder
 
         struct SymlinkInfo
         {
-            const Zchar* shortName;
+            const Zstring& itemName;
             std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
         };
 
         struct FileInfo
         {
-            const Zchar*  shortName;
+            const Zstring& itemName;
             std::uint64_t fileSize;      //unit: bytes!
             std::int64_t  lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
             const FileId  id;            //optional: empty if not supported!
@@ -179,7 +184,7 @@ struct AbstractBaseFolder
 
         struct DirInfo
         {
-            const Zchar* shortName;
+            const Zstring& itemName;
         };
 
         enum HandleLink
@@ -200,10 +205,9 @@ struct AbstractBaseFolder
         //nullptr: ignore directory, non-nullptr: traverse into, using the (new) callback
 
         virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data at current level as incomplete!
-        virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) = 0; //failed to get data for single file/dir/symlink only!
+        virtual HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) = 0; //failed to get data for single file/dir/symlink only!
     };
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     //- client needs to handle duplicate file reports! (FilePlusTraverser fallback, retrying to read directory contents, ...)
     static void traverseFolder(const AbstractPathRef& ap, TraverserCallback& sink) { ap.abf->traverseFolder(ap.itemPathImpl, sink); }
     //----------------------------------------------------------------------------------------------------------------
@@ -244,8 +248,15 @@ struct AbstractBaseFolder
 
     virtual ~AbstractBaseFolder() {}
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
-    AbstractPathRef getAbstractPath(const Zstring& relPath) const { return AbstractPathRef(*this, appendRelPathToItemPathImpl(getBasePathImpl(), relPath)); }
+    AbstractPathRef getAbstractPath(const Zstring& relPath) const
+    {
+#ifdef ZEN_WIN
+        assert(!contains(relPath, L"/")); //relPath is expected to use FILE_NAME_SEPARATOR!
+#endif
+        assert(relPath.empty() || (!startsWith(relPath, FILE_NAME_SEPARATOR) && !endsWith(relPath, FILE_NAME_SEPARATOR)));
+
+        return AbstractPathRef(*this, appendRelPathToItemPathImpl(getBasePathImpl(), relPath));
+    }
     AbstractPathRef getAbstractPath()                       const { return AbstractPathRef(*this, getBasePathImpl()); }
 
     //limitation: zen::Opt requires default-constructibility => we need to use std::unique_ptr:
@@ -283,13 +294,10 @@ protected: //grant derived classes access to AbstractPathRef:
 private:
     virtual bool isNativeFileSystem() const { return false; };
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     virtual std::wstring getDisplayPath(const Zstring& itemPathImpl) const = 0;
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     virtual Zstring appendRelPathToItemPathImpl(const Zstring& itemPathImpl, const Zstring& relPath) const = 0;
 
-    //- THREAD-SAFETY: expect accesses from multiple threads to the same instance => synchronize internally!!!
     virtual Zstring getBasePathImpl() const = 0;
 
     //used during folder creation if parent folder is missing
@@ -336,7 +344,7 @@ private:
                                                           const std::uint64_t* streamSize,                 //optional
                                                           const std::int64_t* modificationTime) const = 0; //
     //----------------------------------------------------------------------------------------------------------------
-    virtual void traverseFolder(const Zstring& itemPathImpl, TraverserCallback& sink) const = 0;
+    virtual void traverseFolder(const Zstring& itemPathImpl, TraverserCallback& sink) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
 
     //symlink handling: follow link!
@@ -376,7 +384,7 @@ bool tryReportingDirError(Command cmd, AbstractBaseFolder::TraverserCallback& ca
 
 
 template <class Command> inline //function object expecting to throw FileError if operation fails
-bool tryReportingItemError(Command cmd, AbstractBaseFolder::TraverserCallback& callback, const Zchar* shortName) //return "true" on success, "false" if error was ignored
+bool tryReportingItemError(Command cmd, AbstractBaseFolder::TraverserCallback& callback, const Zstring& itemName) //return "true" on success, "false" if error was ignored
 {
     for (size_t retryNumber = 0;; ++retryNumber)
         try
@@ -386,7 +394,7 @@ bool tryReportingItemError(Command cmd, AbstractBaseFolder::TraverserCallback& c
         }
         catch (const FileError& e)
         {
-            switch (callback.reportItemError(e.toString(), retryNumber, shortName))
+            switch (callback.reportItemError(e.toString(), retryNumber, itemName))
             {
                 case AbstractBaseFolder::TraverserCallback::ON_ERROR_RETRY:
                     break;
@@ -409,6 +417,7 @@ struct AbstractPathRef::ItemId
     ItemId(const AbstractBaseFolder* abfIn, const Zstring& itemPathImplIn) : abf(abfIn), itemPathImpl(itemPathImplIn) {}
 
     inline friend bool operator<(const ItemId& lhs, const ItemId& rhs) { return lhs.abf != rhs.abf ? lhs.abf < rhs.abf : lhs.itemPathImpl < rhs.itemPathImpl; }
+    //don't treat itemPathImpl like regular file path => no case-insensitive comparison on Windows/OS X!
 
 private:
     const void* abf;
@@ -488,7 +497,7 @@ AbstractBaseFolder::OutputStream::~OutputStream()
 {
     if (!finalizeSucceeded) //transactional output stream! => clean up!
         try { removeFile(filePath_); /*throw FileError*/ }
-        catch (FileError&) { assert(false); }
+        catch (FileError& e) { (void)e; assert(false); }
 }
 
 

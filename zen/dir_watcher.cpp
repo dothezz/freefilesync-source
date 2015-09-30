@@ -121,7 +121,7 @@ public:
         std::lock_guard<std::mutex> dummy(lockAccess);
 
         ErrorInfo newInfo = { copyStringTo<BasicWString>(msg), copyStringTo<BasicWString>(description), errorCode };
-        errorInfo = make_unique<ErrorInfo>(newInfo);
+        errorInfo = std::make_unique<ErrorInfo>(newInfo);
     }
 
 private:
@@ -159,7 +159,7 @@ public:
                             FILE_FLAG_OVERLAPPED, //_In_      DWORD dwFlagsAndAttributes,
                             nullptr);             //_In_opt_  HANDLE hTemplateFile
         if (hDir == INVALID_HANDLE_VALUE)
-            throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(directory)), L"CreateFile", getLastError());
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(directory)), L"CreateFile");
 
         //end of constructor, no need to start managing "hDir"
     }
@@ -193,7 +193,7 @@ public:
                                               nullptr); //__in_opt  LPCTSTR lpName
             if (overlapped.hEvent == nullptr)
             {
-                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                const DWORD ec = ::GetLastError(); //copy before directly/indirectly making other system calls!
                 return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"CreateEvent", ec), ec);
             }
             ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
@@ -213,7 +213,7 @@ public:
                                          &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                          nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
             {
-                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                const DWORD ec = ::GetLastError(); //copy before directly/indirectly making other system calls!
                 return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"ReadDirectoryChangesW", ec), ec);
             }
 
@@ -239,7 +239,7 @@ public:
                                           &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
                                           false))        //__in   BOOL bWait
             {
-                const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+                const DWORD ec = ::GetLastError(); //copy before directly/indirectly making other system calls!
                 if (ec != ERROR_IO_INCOMPLETE)
                     return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(dirpathPf)), formatSystemError(L"GetOverlappedResult", ec), ec);
 
@@ -327,12 +327,12 @@ struct DirWatcher::Pimpl
 
 DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
     baseDirPath(dirPath),
-    pimpl_(zen::make_unique<Pimpl>())
+    pimpl_(std::make_unique<Pimpl>())
 {
     pimpl_->shared = std::make_shared<SharedData>();
 
     ReadChangesAsync reader(dirPath, pimpl_->shared); //throw FileError
-    pimpl_->volRemoval = zen::make_unique<HandleVolumeRemoval>(reader.getDirHandle(), dirPath, pimpl_->worker); //throw FileError
+    pimpl_->volRemoval = std::make_unique<HandleVolumeRemoval>(reader.getDirHandle(), dirPath, pimpl_->worker); //throw FileError
     pimpl_->worker = InterruptibleThread(std::move(reader));
 }
 
@@ -384,7 +384,7 @@ struct DirWatcher::Pimpl
 
 DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
     baseDirPath(dirPath),
-    pimpl_(zen::make_unique<Pimpl>())
+    pimpl_(std::make_unique<Pimpl>())
 {
     //get all subdirectories
     std::vector<Zstring> fullDirList { baseDirPath };
@@ -405,7 +405,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
     //init
     pimpl_->notifDescr  = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"inotify_init", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"inotify_init");
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -417,7 +417,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"fcntl", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"fcntl");
 
     //add watches
     for (const Zstring& subDirPath : fullDirList)
@@ -425,17 +425,17 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
         int wd = ::inotify_add_watch(pimpl_->notifDescr, subDirPath.c_str(),
                                      IN_ONLYDIR     | //"Only watch pathname if it is a directory."
                                      IN_DONT_FOLLOW | //don't follow symbolic links
-                                     IN_CREATE   	|
-                                     IN_MODIFY 	    |
+                                     IN_CREATE      |
+                                     IN_MODIFY      |
                                      IN_CLOSE_WRITE |
-                                     IN_DELETE 	    |
+                                     IN_DELETE      |
                                      IN_DELETE_SELF |
                                      IN_MOVED_FROM  |
                                      IN_MOVED_TO    |
                                      IN_MOVE_SELF);
         if (wd == -1)
         {
-            const auto ec = getLastError();
+            const ErrorCode ec = getLastError(); //copy before directly/indirectly making other system calls!
             if (ec == ENOSPC) //fix misleading system message "No space left on device"
                 throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(subDirPath)),
                                 formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
@@ -473,7 +473,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throwFileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"read", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(baseDirPath)), L"read");
     }
 
     std::vector<Entry> output;
@@ -565,7 +565,7 @@ struct DirWatcher::Pimpl
 
 DirWatcher::DirWatcher(const Zstring& dirPath) :
     baseDirPath(dirPath),
-    pimpl_(zen::make_unique<Pimpl>())
+    pimpl_(std::make_unique<Pimpl>())
 {
     CFStringRef dirpathCf = osx::createCFString(baseDirPath.c_str()); //returns nullptr on error
     if (!dirpathCf)

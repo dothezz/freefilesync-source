@@ -80,7 +80,7 @@ private:
     const size_t automaticRetryCount_;
     const size_t automaticRetryDelay_;
     const std::wstring jobName_;
-    const int64_t startTime_; //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
+    const time_t startTime_; //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
 };
 
 

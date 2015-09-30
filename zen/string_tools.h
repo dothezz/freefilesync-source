@@ -18,7 +18,7 @@
 #include "stl_tools.h"
 #include "string_traits.h"
 
- 
+
 //enhance arbitray string class with useful non-member functions:
 namespace zen
 {
@@ -444,9 +444,9 @@ S numberTo(const Num& number, Int2Type<NUM_TYPE_FLOATING_POINT>)
 
 /*
 perf: integer to string: (executed 10 mio. times)
-	std::stringstream - 14796 ms
-	std::sprintf      -  3086 ms
-	formatInteger     -   778 ms
+    std::stringstream - 14796 ms
+    std::sprintf      -  3086 ms
+    formatInteger     -   778 ms
 */
 
 template <class OutputIterator, class Num> inline

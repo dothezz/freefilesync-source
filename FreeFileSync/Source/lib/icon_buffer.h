@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef ICONBUFFER_H_INCLUDED
-#define ICONBUFFER_H_INCLUDED
+#ifndef ICONBUFFER_H_INCLUDED_8425703245726394256
+#define ICONBUFFER_H_INCLUDED_8425703245726394256
 
 #include <vector>
 #include <memory>
@@ -53,4 +53,4 @@ private:
 bool hasLinkExtension(const Zstring& filepath);
 }
 
-#endif // ICONBUFFER_H_INCLUDED
+#endif //ICONBUFFER_H_INCLUDED_8425703245726394256

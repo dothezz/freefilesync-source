@@ -121,7 +121,7 @@ FileInput::FileInput(const Zstring& filepath) : //throw FileError, ErrorFileLock
         //begin of "regular" error reporting
         if (fileHandle == INVALID_HANDLE_VALUE)
         {
-            const DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+            const DWORD ec = ::GetLastError(); //copy before directly/indirectly making other system calls!
             const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filepath));
             std::wstring errorDescr = formatSystemError(L"CreateFile", ec);
 
@@ -145,7 +145,7 @@ FileInput::FileInput(const Zstring& filepath) : //throw FileError, ErrorFileLock
     //don't use O_DIRECT: http://yarchive.net/comp/linux/o_direct.html
     fileHandle = ::open(filepath.c_str(), O_RDONLY);
     if (fileHandle == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
-        throwFileError(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filepath)), L"open", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filepath)), L"open");
 #endif
 
     //------------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ FileInput::FileInput(const Zstring& filepath) : //throw FileError, ErrorFileLock
 #ifdef ZEN_LINUX //handle still un-owned => need constructor guard
     //optimize read-ahead on input file:
     if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
-        throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filepath)), L"posix_fadvise", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filepath)), L"posix_fadvise");
 
 #elif defined ZEN_MAC
     //"dtruss" doesn't show use of "fcntl() F_RDAHEAD/F_RDADVISE" for "cp")
@@ -197,7 +197,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError; retu
                         static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
                         &bytesRead, //__out_opt    LPDWORD lpNumberOfBytesRead,
                         nullptr))   //__inout_opt  LPOVERLAPPED lpOverlapped
-            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"ReadFile", getLastError());
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"ReadFile");
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
         ssize_t bytesRead = 0;
@@ -208,7 +208,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError; retu
         while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
 
         if (bytesRead < 0)
-            throwFileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"read", getLastError());
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"read");
 #endif
         if (bytesRead == 0) //"zero indicates end of file"
             return bytesReadTotal;
@@ -262,7 +262,7 @@ FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw Fil
     fileHandle = createHandle(FILE_ATTRIBUTE_NORMAL);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
-        DWORD ec = ::GetLastError(); //copy before directly or indirectly making other system calls!
+        DWORD ec = ::GetLastError(); //copy before directly/indirectly making other system calls!
 
         //CREATE_ALWAYS fails with ERROR_ACCESS_DENIED if the existing file is hidden or "system" http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
         if (ec == ERROR_ACCESS_DENIED && dwCreationDisposition == CREATE_ALWAYS)
@@ -352,10 +352,10 @@ void FileOutput::close() //throw FileError
 
 #ifdef ZEN_WIN
     if (!::CloseHandle(fileHandle))
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"CloseHandle", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"CloseHandle");
 #elif defined ZEN_LINUX || defined ZEN_MAC
     if (::close(fileHandle) != 0)
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"close", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"close");
 #endif
 }
 
@@ -369,7 +369,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
                      static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,
                      &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
                      nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
-        throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"WriteFile", getLastError());
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"WriteFile");
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"WriteFile: incomplete write."); //user should never see this
@@ -389,7 +389,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
             if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
                 errno = ENOSPC;
 
-            throwFileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write", getLastError());
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write");
         }
         if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write: buffer overflow."); //user should never see this

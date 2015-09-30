@@ -24,13 +24,6 @@ using namespace xmlAccess;
 
 namespace
 {
-enum ButtonPressed
-{
-    BUTTON_CANCEL,
-    BUTTON_SAVE_AS
-};
-
-
 class BatchDialog : public BatchDlgGenerated
 {
 public:
@@ -40,8 +33,8 @@ public:
                 size_t onCompletionHistoryMax);
 
 private:
-    void OnClose       (wxCloseEvent&   event) override { EndModal(BUTTON_CANCEL); }
-    void OnCancel      (wxCommandEvent& event) override { EndModal(BUTTON_CANCEL); }
+    void OnClose       (wxCloseEvent&   event) override { EndModal(ReturnBatchConfig::BUTTON_CANCEL); }
+    void OnCancel      (wxCommandEvent& event) override { EndModal(ReturnBatchConfig::BUTTON_CANCEL); }
     void OnSaveBatchJob(wxCommandEvent& event) override;
     void OnErrorPopup  (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
     void OnErrorIgnore (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
@@ -86,7 +79,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogFolder, *m_bpButtonSelectAltLogFolder, *m_logFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
+    logfileDir = std::make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogFolder, *m_bpButtonSelectAltLogFolder, *m_logFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
     setConfig(batchCfg);
 
@@ -169,16 +162,16 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
     batchCfgOutRef = getConfig();
     m_comboBoxOnCompletion->addItemHistory(); //a good place to commit current "on completion" history item
     onCompletionHistoryOut = m_comboBoxOnCompletion->getHistory();
-    EndModal(BUTTON_SAVE_AS);
+    EndModal(ReturnBatchConfig::BUTTON_SAVE_AS);
 }
 }
 
 
-bool zen::customizeBatchConfig(wxWindow* parent,
-                               xmlAccess::XmlBatchConfig& batchCfg, //in/out
-                               std::vector<Zstring>& onCompletionHistory,
-                               size_t onCompletionHistoryMax)
+ReturnBatchConfig::ButtonPressed zen::customizeBatchConfig(wxWindow* parent,
+                                                           xmlAccess::XmlBatchConfig& batchCfg, //in/out
+                                                           std::vector<Zstring>& onCompletionHistory,
+                                                           size_t onCompletionHistoryMax)
 {
     BatchDialog batchDlg(parent, batchCfg, onCompletionHistory, onCompletionHistoryMax);
-    return static_cast<ButtonPressed>(batchDlg.ShowModal()) == BUTTON_SAVE_AS;
+    return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
 }

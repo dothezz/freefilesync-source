@@ -124,10 +124,10 @@ ABF::FileAttribAfterCopy ABF::copyFileTransactional(const AbstractPathRef& apSou
     {
         /*
            Note: non-transactional file copy solves at least four problems:
-            	-> skydrive - doesn't allow for .ffs_tmp extension and returns ERROR_INVALID_PARAMETER
-            	-> network renaming issues
-            	-> allow for true delete before copy to handle low disk space problems
-            	-> higher performance on non-buffered drives (e.g. usb sticks)
+                -> skydrive - doesn't allow for .ffs_tmp extension and returns ERROR_INVALID_PARAMETER
+                -> network renaming issues
+                -> allow for true delete before copy to handle low disk space problems
+                -> higher performance on non-buffered drives (e.g. usb sticks)
         */
         if (onDeleteTargetFile)
             onDeleteTargetFile();
@@ -166,18 +166,18 @@ struct FlatTraverserCallback: public ABF::TraverserCallback
 {
     FlatTraverserCallback(const AbstractPathRef& folderPath) : folderPath_(folderPath) {}
 
-    void                               onFile   (const FileInfo&    fi) override { fileNames_  .push_back(fi.shortName); }
-    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.shortName); return nullptr; }
+    void                               onFile   (const FileInfo&    fi) override { fileNames_  .push_back(fi.itemName); }
+    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { folderNames_.push_back(di.itemName); return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override
     {
-        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.shortName))) //dir symlink
-            folderLinkNames_.push_back(si.shortName);
+        if (ABF::folderExists(ABF::appendRelPath(folderPath_, si.itemName))) //dir symlink
+            folderLinkNames_.push_back(si.itemName);
         else //file symlink, broken symlink
-            fileNames_.push_back(si.shortName);
+            fileNames_.push_back(si.itemName);
         return TraverserCallback::LINK_SKIP;
     }
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { throw FileError(msg); }
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { throw FileError(msg); }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { throw FileError(msg); }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { throw FileError(msg); }
 
     const std::vector<Zstring>& refFileNames      () const { return fileNames_; }
     const std::vector<Zstring>& refFolderNames    () const { return folderNames_; }
@@ -198,7 +198,7 @@ void removeFolderRecursivelyImpl(const AbstractPathRef& folderPath, //throw File
     assert(!ABF::symlinkExists(folderPath)); //[!] no symlinks in this context!!!
     assert(ABF::folderExists(folderPath));   //Do NOT traverse into it deleting contained files!!!
 
-    FlatTraverserCallback ft(folderPath); //traverse source directory one level deep
+    FlatTraverserCallback ft(folderPath); //deferred recursion => save stack space and allow deletion of extremely deep hierarchies!
     ABF::traverseFolder(folderPath, ft); //throw FileError
 
     for (const Zstring& fileName : ft.refFileNames())
@@ -219,7 +219,6 @@ void removeFolderRecursivelyImpl(const AbstractPathRef& folderPath, //throw File
         ABF::removeFolderSimple(linkPath); //throw FileError
     }
 
-    //remove folders recursively:
     for (const Zstring& folderName : ft.refFolderNames())
         removeFolderRecursivelyImpl(ABF::appendRelPath(folderPath, folderName), //throw FileError
                                     onBeforeFileDeletion, onBeforeFolderDeletion);

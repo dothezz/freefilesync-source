@@ -62,12 +62,14 @@ bool shellExecuteImpl(Function fillExecInfo, ExecutionType type)
 
 void shellExecute(const void* /*PCIDLIST_ABSOLUTE*/ shellItemPidl, const std::wstring& displayPath, ExecutionType type) //throw FileError
 {
-    if (!shellExecuteImpl([&](SHELLEXECUTEINFO& execInfo)
-{
-    execInfo.fMask |= SEE_MASK_IDLIST;
-    execInfo.lpIDList = const_cast<void*>(shellItemPidl); //lpIDList is documented as PCIDLIST_ABSOLUTE!
-    }, type)) //throw FileError
-    throwFileError(_("Incorrect command line:") + L"\n" + fmtPath(displayPath), L"ShellExecuteEx", ::GetLastError());
+    auto fillExecInfo = [&](SHELLEXECUTEINFO& execInfo)
+    {
+        execInfo.fMask |= SEE_MASK_IDLIST;
+        execInfo.lpIDList = const_cast<void*>(shellItemPidl); //lpIDList is documented as PCIDLIST_ABSOLUTE!
+    };
+
+    if (!shellExecuteImpl(fillExecInfo , type)) //throw FileError
+        THROW_LAST_FILE_ERROR(_("Incorrect command line:") + L"\n" + fmtPath(displayPath), L"ShellExecuteEx");
 }
 #endif
 
@@ -97,12 +99,14 @@ void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
                          (iter->empty() || std::any_of(iter->begin(), iter->end(), &isWhiteSpace<wchar_t>) ? L"\"" + *iter + L"\"" : *iter);
     }
 
-    if (!shellExecuteImpl([&](SHELLEXECUTEINFO& execInfo)
-{
-    execInfo.lpFile       = filepath.c_str();
+    auto fillExecInfo = [&](SHELLEXECUTEINFO& execInfo)
+    {
+        execInfo.lpFile       = filepath.c_str();
         execInfo.lpParameters = arguments.c_str();
-    }, type))
-    throwFileError(_("Incorrect command line:") + L"\nFile: " + fmtPath(filepath) + L"\nArg: " + copyStringTo<std::wstring>(arguments), L"ShellExecuteEx", ::GetLastError());
+    };
+
+    if (!shellExecuteImpl(fillExecInfo, type))
+        THROW_LAST_FILE_ERROR(_("Incorrect command line:") + L"\nFile: " + fmtPath(filepath) + L"\nArg: " + copyStringTo<std::wstring>(arguments), L"ShellExecuteEx");
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
     /*

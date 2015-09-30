@@ -198,7 +198,7 @@ private:
             length  (static_cast<std::uint32_t>(len)),
             capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "the types are always lock-free"
 
-		std::atomic<unsigned int> refCount { 1 }; //std:atomic is uninitialized by default!
+        std::atomic<unsigned int> refCount { 1 }; //std:atomic is uninitialized by default!
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
     };
@@ -211,9 +211,9 @@ private:
 
 //perf note: interestingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
-template <class Char,  							                        //Character Type
+template <class Char,                                                   //Character Type
           template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
-          class AP = AllocatorOptimalSpeed>				                //Allocator Policy
+          class AP = AllocatorOptimalSpeed>                             //Allocator Policy
 class Zbase : public SP<Char, AP>
 {
 public:
@@ -222,10 +222,10 @@ public:
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
     Zbase(Zbase&& tmp) noexcept;
-    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error!
-    
-//allow explicit construction from different string type, prevent ambiguity via SFINAE
-//template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
+    //explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error! //-> non-standard extension!!!
+
+    //allow explicit construction from different string type, prevent ambiguity via SFINAE
+    //template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
 
     ~Zbase();
 
@@ -275,7 +275,7 @@ public:
     Zbase& operator+=(const Char* other);
     Zbase& operator+=(Char ch);
 
-    static const size_t	npos = static_cast<size_t>(-1);
+    static const size_t npos = static_cast<size_t>(-1);
 
 private:
     Zbase            (int) = delete; //
@@ -307,8 +307,8 @@ template <class Char, template <class, class> class SP, class AP> inline Zbase<C
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Char*                rhs) { return std::move(lhs += rhs); } //lhs, is an l-value parameter...
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs,       Char                 rhs) { return std::move(lhs += rhs); } //and not a local variable => no copy elision
 
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(&lhs, 1) += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs    ) += rhs; }
 
 
 
@@ -329,15 +329,6 @@ Zbase<Char, SP, AP>::Zbase()
     //resist the temptation to avoid this allocation by referening a static global: NO performance advantage, MT issues!
     rawStr    = this->create(0);
     rawStr[0] = 0;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(Char source)
-{
-    rawStr    = this->create(1);
-    rawStr[0] = source;
-    rawStr[1] = 0;
 }
 
 

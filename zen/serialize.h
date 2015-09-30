@@ -67,7 +67,7 @@ template <class BinContainer> BinContainer loadBinStream(const Zstring& filepath
 -----------------------------
 struct BinInputStream
 {
-	size_t read(void* data, size_t len); //return "len" bytes unless end of stream!
+    size_t read(void* data, size_t len); //return "len" bytes unless end of stream!
 };
 
 ------------------------------

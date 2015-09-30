@@ -209,9 +209,9 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
                            GlobalSyncConfig& globalCfg,
                            size_t onCompletionHistoryMax) :
     ConfigDlgGenerated(parent),
+    versioningFolder(*m_panelVersioning, *m_buttonSelectVersioningFolder, *m_bpButtonSelectAltFolder, *m_versioningFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/),
     globalCfgOut(globalCfg),
     folderPairConfigOut(folderPairConfig),
-    versioningFolder(*m_panelVersioning, *m_buttonSelectVersioningFolder, *m_bpButtonSelectAltFolder, *m_versioningFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/),
     globalCfg_(globalCfg),
     folderPairConfig_(folderPairConfig),
     onCompletionHistoryMax_(onCompletionHistoryMax)
@@ -226,7 +226,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     //fill image list to cope with wxNotebook image setting design desaster...
     const int imageListSize = getResourceImage(L"cfg_compare_small").GetHeight();
     assert(imageListSize == 16); //Windows default size for panel caption
-    auto imgList = make_unique<wxImageList>(imageListSize, imageListSize);
+    auto imgList = std::make_unique<wxImageList>(imageListSize, imageListSize);
 
     auto addToImageList = [&](const wxBitmap& bmp)
     {
@@ -235,13 +235,13 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
         imgList->Add(bmp);
         imgList->Add(greyScale(bmp));
     };
-    //make sure to add images in same sequence as ConfigTypeImage enum!!!
+    //add images in same sequence like ConfigTypeImage enum!!!
     addToImageList(getResourceImage(L"cfg_compare_small"));
     addToImageList(getResourceImage(L"filter_small"     ));
     addToImageList(getResourceImage(L"cfg_sync_small"   ));
     assert(imgList->GetImageCount() == static_cast<int>(ConfigTypeImage::SYNC_GREY) + 1);
 
-    m_notebook->AssignImageList(imgList.release()); //notebook takes ownership
+    m_notebook->AssignImageList(imgList.release()); //pass ownership
 
     m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::COMPARISON), _("Comparison")      + L" (F6)");
     m_notebook->SetPageText(static_cast<size_t>(SyncConfigPanel::FILTER    ), _("Filter")          + L" (F7)");

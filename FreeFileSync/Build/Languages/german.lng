@@ -7,9 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>SFTP folder</source>
-<target>SFTP-Ordner</target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -497,8 +494,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 - neue Ordner erscheinen (z.B. Anschluss eines USB Sticks)
 </target>
 
-<source>&Start</source>
-<target>&Start</target>
+<source>Start</source>
+<target>Start</target>
 
 <source>About</source>
 <target>Über</target>
@@ -683,30 +680,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Serious Error</source>
 <target>Schwerer Fehler</target>
 
-<source>Check for Program Updates</source>
-<target>Suche nach neuer Programmversion</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Eine neue Version von FreeFileSync ist verfügbar:</target>
-
-<source>Download now?</source>
-<target>Jetzt herunterladen?</target>
-
-<source>&Download</source>
-<target>Zum &Download</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync ist auf dem neuesten Stand.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Es kann keine Verbindung zu www.freefilesync.org aufgebaut werden.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Möchten Sie manuell prüfen?</target>
-
-<source>&Check</source>
-<target>&Prüfen</target>
-
 <source>Symlink</source>
 <target>Symlink</target>
 
@@ -772,6 +745,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Bitte wählen Sie einen Ordner auf einem lokalen Dateisystem, Netzwerk oder MTP Gerät.</target>
+
+<source>SFTP folder</source>
+<target>SFTP-Ordner</target>
+
+<source>Select SFTP folder</source>
+<target>SFTP-Ordner auswählen</target>
+
+<source>Select alternative folder type</source>
+<target>Alternativen Ordnertyp auswählen</target>
 
 <source>&New</source>
 <target>&Neu</target>
@@ -841,9 +823,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Remove folder pair</source>
 <target>Ordnerpaar entfernen</target>
-
-<source>Select SFTP folder</source>
-<target>SFTP-Ordner auswählen</target>
 
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
@@ -1042,6 +1021,12 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Directory on server:</source>
 <target>Verzeichnis auf Server:</target>
 
+<source>Select a directory on the server:</source>
+<target>Verzeichnis auf dem Server auswählen:</target>
+
+<source>Select Folder</source>
+<target>Ordner auswählen</target>
+
 <source>Start synchronization now?</source>
 <target>Synchronisation jetzt starten?</target>
 
@@ -1107,9 +1092,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>&Overwrite existing files</source>
 <target>&Existierende Dateien überschreiben</target>
-
-<source>&Copy</source>
-<target>&Kopieren</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Die folgenden Einstellungen werden für alle Synchronisationsaufgaben verwendet.</target>
@@ -1230,6 +1212,12 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Overview</source>
 <target>Übersicht</target>
+
+<source>&Download</source>
+<target>Zum &Download</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Eine neue Version von FreeFileSync ist verfügbar:</target>
 
 <source>Confirm</source>
 <target>Bestätigen</target>
@@ -1432,26 +1420,26 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Shut down</source>
 <target>Herunterfahren</target>
 
-<source>Scanning...</source>
-<target>Suche Dateien...</target>
-
-<source>Comparing content...</source>
-<target>Vergleiche Dateiinhalt...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Alle auswählen</target>
-
 <source>Paused</source>
 <target>Angehalten</target>
 
 <source>Initializing...</source>
 <target>Initialisiere...</target>
 
+<source>Scanning...</source>
+<target>Suche Dateien...</target>
+
+<source>Comparing content...</source>
+<target>Vergleiche Dateiinhalt...</target>
+
 <source>Completed</source>
 <target>Fertig</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Alle auswählen</target>
 
 <source>&Continue</source>
 <target>&Fortfahren</target>
@@ -1461,6 +1449,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Log</source>
 <target>Protokoll</target>
+
+<source>Loading...</source>
+<target>Lade...</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1599,6 +1590,24 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Percentage</source>
 <target>Prozent</target>
+
+<source>Check for Program Updates</source>
+<target>Suche nach neuer Programmversion</target>
+
+<source>Download now?</source>
+<target>Jetzt herunterladen?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync ist auf dem neuesten Stand.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Es kann keine Verbindung zu www.freefilesync.org aufgebaut werden.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Möchten Sie manuell prüfen?</target>
+
+<source>&Check</source>
+<target>&Prüfen</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Die Registrierung zum Empfang von Systemmeldungen ist fehlgeschlagen.</target>

@@ -246,7 +246,7 @@ StatusHandlerFloatingDialog::StatusHandlerFloatingDialog(wxFrame* parentDlg,
             automaticRetryCount_(automaticRetryCount),
             automaticRetryDelay_(automaticRetryDelay),
             jobName_(jobName),
-startTime_(wxGetUTCTimeMillis().GetValue()) {}
+startTime_(std::time(nullptr)) {}
 
 
 StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
@@ -314,7 +314,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
         jobName_, finalStatus,
         getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
         getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
-        (wxGetUTCTimeMillis().GetValue() - startTime_) / 1000
+        std::time(nullptr) - startTime_
     };
 
     //----------------- write results into LastSyncs.log------------------------

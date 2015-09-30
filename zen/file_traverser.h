@@ -16,7 +16,6 @@ namespace zen
 {
 struct FileInfo
 {
-    const Zchar* shortName;
     const Zstring& fullPath;
     std::uint64_t fileSize;     //[bytes]
     std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
@@ -24,13 +23,11 @@ struct FileInfo
 
 struct DirInfo
 {
-    const Zchar* shortName;
     const Zstring& fullPath;
 };
 
 struct SymlinkInfo
 {
-    const Zchar* shortName;
     const Zstring& fullPath;
     std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
 };

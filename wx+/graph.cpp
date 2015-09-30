@@ -453,7 +453,7 @@ void Graph2D::onPaintEvent(wxPaintEvent& event)
 
 void Graph2D::OnMouseLeftDown(wxMouseEvent& event)
 {
-    activeSel = zen::make_unique<MouseSelection>(*this, event.GetPosition());
+    activeSel = std::make_unique<MouseSelection>(*this, event.GetPosition());
 
     if (!event.ControlDown())
         oldSel.clear();

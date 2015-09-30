@@ -16,21 +16,21 @@ namespace zen
 /*
 IsStringLike<>::value:
     IsStringLike<const wchar_t*>::value; //equals "true"
-	IsStringLike<const int*>    ::value; //equals "false"
+    IsStringLike<const int*>    ::value; //equals "false"
 
 GetCharType<>::Type:
-	GetCharType<std::wstring>::Type  //equals wchar_t
-	GetCharType<wchar_t[5]>  ::Type  //equals wchar_t
+    GetCharType<std::wstring>::Type  //equals wchar_t
+    GetCharType<wchar_t[5]>  ::Type  //equals wchar_t
 
 strLength():
-	strLength(str);   //equals str.length()
-	strLength(array); //equals cStringLength(array)
+    strLength(str);   //equals str.length()
+    strLength(array); //equals cStringLength(array)
 
 strBegin():         -> not null-terminated! -> may be nullptr if length is 0!
-	std::wstring str(L"dummy");
-	char array[] = "dummy";
-	strBegin(str);   //returns str.c_str()
-	strBegin(array); //returns array
+    std::wstring str(L"dummy");
+    char array[] = "dummy";
+    strBegin(str);   //returns str.c_str()
+    strBegin(array); //returns array
 */
 
 //reference a sub-string for consumption by zen string_tools

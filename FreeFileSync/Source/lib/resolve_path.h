@@ -13,13 +13,13 @@
 namespace zen
 {
 /*
-	- expand macros
-	- trim whitespace
-	- expand volume path by name
-	- convert relative paths into absolute
+    - expand macros
+    - trim whitespace
+    - expand volume path by name
+    - convert relative paths into absolute
 
-	=> may block for slow USB sticks and idle HDDs
-	=> not thread-safe, see ::GetFullPathName()!
+    => may block for slow USB sticks and idle HDDs
+    => not thread-safe, see ::GetFullPathName()!
 */
 Zstring getResolvedFilePath(const Zstring& pathPhrase); //noexcept
 

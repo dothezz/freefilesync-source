@@ -162,9 +162,9 @@ void drawTextLabelFitting(wxDC& dc, const wxString& text, const wxRect& rect, in
     wxDC::GetMultiLineTextExtent() is implemented in terms of wxDC::GetTextExtent()
 
     average total times:
-    							Windows Linux
-    single wxDC::DrawText()		 7탎     50탎
-    wxDC::DrawLabel() +			10탎     90탎
+                                Windows Linux
+    single wxDC::DrawText()      7탎     50탎
+    wxDC::DrawLabel() +         10탎     90탎
     repeated GetTextExtent()
     */
 
@@ -581,8 +581,7 @@ public:
         wnd_(wnd),
         colFrom_(colFrom),
         colTo_(colFrom),
-        clientPosX_(clientPosX),
-        singleClick_(true) { wnd_.CaptureMouse(); }
+        clientPosX_(clientPosX) { wnd_.CaptureMouse(); }
     ~ColumnMove() { if (wnd_.HasCapture()) wnd_.ReleaseMouse(); }
 
     size_t  getColumnFrom() const { return colFrom_; }
@@ -597,7 +596,7 @@ private:
     const size_t colFrom_;
     size_t colTo_;
     const int clientPosX_;
-    bool singleClick_;
+    bool singleClick_ = true;
 };
 }
 
@@ -695,10 +694,10 @@ private:
             {
                 if (!event.LeftDClick()) //double-clicks never seem to arrive here; why is this checked at all???
                     if (Opt<int> colWidth = refParent().getColWidth(action->col))
-                        activeResizing = make_unique<ColumnResizing>(*this, action->col, *colWidth, event.GetPosition().x);
+                        activeResizing = std::make_unique<ColumnResizing>(*this, action->col, *colWidth, event.GetPosition().x);
             }
             else //a move or single click
-                activeMove = make_unique<ColumnMove>(*this, action->col, event.GetPosition().x);
+                activeMove = std::make_unique<ColumnMove>(*this, action->col, event.GetPosition().x);
         }
         event.Skip();
     }
@@ -792,7 +791,7 @@ private:
         {
             if (const Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition()))
             {
-                highlightCol = make_unique<size_t>(action->col);
+                highlightCol = std::make_unique<size_t>(action->col);
 
                 if (action->wantResize)
                     SetCursor(wxCURSOR_SIZEWE); //set window-local only! :)
@@ -863,11 +862,8 @@ public:
             RowLabelWin& rowLabelWin,
             ColLabelWin& colLabelWin) : SubWindow(parent),
         rowLabelWin_(rowLabelWin),
-        colLabelWin_(colLabelWin),
-        cursorRow(0),
-        selectionAnchor(0),
-        gridUpdatePending(false)
-    {
+        colLabelWin_(colLabelWin)
+	{
         Connect(EVENT_GRID_HAS_SCROLLED, wxEventHandler(MainWin::onRequestWindowUpdate), nullptr, this);
     }
 
@@ -994,15 +990,15 @@ private:
             if (!event.RightDown() || !refParent().isSelected(row)) //do NOT start a new selection if user right-clicks on a selected area!
             {
                 if (event.ControlDown())
-                    activeSelection = make_unique<MouseSelection>(*this, row, !refParent().isSelected(row));
+                    activeSelection = std::make_unique<MouseSelection>(*this, row, !refParent().isSelected(row));
                 else if (event.ShiftDown())
                 {
-                    activeSelection = make_unique<MouseSelection>(*this, selectionAnchor, true);
+                    activeSelection = std::make_unique<MouseSelection>(*this, selectionAnchor, true);
                     refParent().clearSelection(ALLOW_GRID_EVENT);
                 }
                 else
                 {
-                    activeSelection = make_unique<MouseSelection>(*this, row, true);
+                    activeSelection = std::make_unique<MouseSelection>(*this, row, true);
                     refParent().clearSelection(ALLOW_GRID_EVENT);
                 }
             }
@@ -1096,9 +1092,7 @@ private:
     {
     public:
         MouseSelection(MainWin& wnd, size_t rowStart, bool positiveSelect) :
-            wnd_(wnd), rowStart_(rowStart), rowCurrent_(rowStart), positiveSelect_(positiveSelect), toScrollX(0), toScrollY(0),
-            tickCountLast(getTicks()),
-            ticksPerSec_(ticksPerSec())
+            wnd_(wnd), rowStart_(rowStart), rowCurrent_(rowStart), positiveSelect_(positiveSelect)
         {
             wnd_.CaptureMouse();
             timer.Connect(wxEVT_TIMER, wxEventHandler(MouseSelection::onTimer), nullptr, this);
@@ -1121,8 +1115,7 @@ private:
                 tickCountLast = now;
             }
 
-            wxMouseState mouseState = wxGetMouseState();
-            const wxPoint clientPos = wnd_.ScreenToClient(wxPoint(mouseState.GetX(), mouseState.GetY()));
+            const wxPoint clientPos = wnd_.ScreenToClient(wxGetMousePosition());
             const wxSize clientSize = wnd_.GetClientSize();
             assert(wnd_.GetClientAreaOrigin() == wxPoint());
 
@@ -1183,10 +1176,10 @@ private:
         ptrdiff_t rowCurrent_;
         const bool positiveSelect_;
         wxTimer timer;
-        double toScrollX; //count outstanding scroll units to scroll while dragging mouse
-        double toScrollY; //
-        TickVal tickCountLast;
-        const std::int64_t ticksPerSec_;
+        double toScrollX = 0; //count outstanding scroll units to scroll while dragging mouse
+        double toScrollY = 0; //
+        TickVal tickCountLast = getTicks();
+        const std::int64_t ticksPerSec_ = ticksPerSec();
     };
 
     void ScrollWindow(int dx, int dy, const wxRect* rect) override
@@ -1224,9 +1217,9 @@ private:
 
     std::unique_ptr<MouseSelection> activeSelection; //bound while user is selecting with mouse
 
-    ptrdiff_t cursorRow;
-    size_t selectionAnchor;
-    bool gridUpdatePending;
+    ptrdiff_t cursorRow = 0;
+    size_t selectionAnchor = 0;
+    bool gridUpdatePending = false;
 };
 
 //----------------------------------------------------------------------------------------------------------------
@@ -1237,14 +1230,7 @@ Grid::Grid(wxWindow* parent,
            const wxPoint& pos,
            const wxSize& size,
            long style,
-           const wxString& name) : wxScrolledWindow(parent, id, pos, size, style | wxWANTS_CHARS, name),
-    showScrollbarX(SB_SHOW_AUTOMATIC),
-    showScrollbarY(SB_SHOW_AUTOMATIC),
-    colLabelHeight(0), //dummy init
-    drawRowLabel(true),
-    allowColumnMove(true),
-    allowColumnResize(true),
-    rowCountOld(0)
+           const wxString& name) : wxScrolledWindow(parent, id, pos, size, style | wxWANTS_CHARS, name)
 {
     cornerWin_   = new CornerWin  (*this); //
     rowLabelWin_ = new RowLabelWin(*this); //owership handled by "this"
@@ -1278,24 +1264,24 @@ void Grid::updateWindowSizes(bool updateScrollbar)
 {
     /* We have to deal with TWO nasty circular dependencies:
     1.
-    	rowLabelWidth
-    	    /|\
-    	mainWin::client width
-    	    /|\
-    	SetScrollbars -> show/hide horizontal scrollbar depending on client width
-    	    /|\
-    	mainWin::client height -> possibly trimmed by horizontal scrollbars
-    	    /|\
-    	rowLabelWidth
+        rowLabelWidth
+            /|\
+        mainWin::client width
+            /|\
+        SetScrollbars -> show/hide horizontal scrollbar depending on client width
+            /|\
+        mainWin::client height -> possibly trimmed by horizontal scrollbars
+            /|\
+        rowLabelWidth
 
     2.
-    	mainWin_->GetClientSize()
-    	    /|\
-    	SetScrollbars -> show/hide scrollbars depending on whether client size is big enough
-    	    /|\
-    	GetClientSize(); -> possibly trimmed by scrollbars
-    	    /|\
-    	mainWin_->GetClientSize()  -> also trimmed, since it's a sub-window!
+        mainWin_->GetClientSize()
+            /|\
+        SetScrollbars -> show/hide scrollbars depending on whether client size is big enough
+            /|\
+        GetClientSize(); -> possibly trimmed by scrollbars
+            /|\
+        mainWin_->GetClientSize()  -> also trimmed, since it's a sub-window!
     */
 
     //break this vicious circle:
@@ -1379,27 +1365,27 @@ void Grid::updateWindowSizes(bool updateScrollbar)
             ------------------------  \|/    |
             |                   |  |         |
             ------------------------        \|/
-            	gw := gross width
-            	nw := net width := gross width - sb size
-            	gh := gross height
-            	nh := net height := gross height - sb size
+                gw := gross width
+                nw := net width := gross width - sb size
+                gh := gross height
+                nh := net height := gross height - sb size
 
             There are 6 cases that can occur:
             ---------------------------------
-            	lw := logical width
-            	lh := logical height
+                lw := logical width
+                lh := logical height
 
             1. lw <= gw && lh <= gh  => no scrollbars needed
 
             2. lw > gw  && lh > gh   => need both scrollbars
 
             3. lh > gh
-            	4.1 lw <= nw         => need vertical scrollbar only
-            	4.2 nw < lw <= gw    => need both scrollbars
+                4.1 lw <= nw         => need vertical scrollbar only
+                4.2 nw < lw <= gw    => need both scrollbars
 
             4. lw > gw
-            	3.1 lh <= nh         => need horizontal scrollbar only
-            	3.2 nh < lh <= gh    => need both scrollbars
+                3.1 lh <= nh         => need horizontal scrollbar only
+                3.2 nh < lh <= gh    => need both scrollbars
             */
         }
     }
@@ -2051,11 +2037,11 @@ void Grid::scrollTo(size_t row)
 }
 
 
-    bool Grid::Enable(bool enable) 
-	{  
-		Refresh(); 
-		return wxScrolledWindow::Enable(enable); 
-	}
+bool Grid::Enable(bool enable)
+{
+    Refresh();
+    return wxScrolledWindow::Enable(enable);
+}
 
 
 size_t Grid::getGridCursor() const

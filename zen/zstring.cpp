@@ -21,8 +21,8 @@ using namespace zen;
 /*
 Perf test: compare strings 10 mio times; 64 bit build
 -----------------------------------------------------
-	string a = "Fjk84$%kgfj$%T\\\\Gffg\\gsdgf\\fgsx----------d-"
-	string b = "fjK84$%kgfj$%T\\\\gfFg\\gsdgf\\fgSy----------dfdf"
+    string a = "Fjk84$%kgfj$%T\\\\Gffg\\gsdgf\\fgsx----------d-"
+    string b = "fjK84$%kgfj$%T\\\\gfFg\\gsdgf\\fgSy----------dfdf"
 
 Windows (UTF16 wchar_t)
   4 ns | wcscmp
@@ -125,8 +125,7 @@ Zstring makeUpperCopy(const Zstring& str)
     if (len == 0) //LCMapString does not allow input sizes of 0!
         return str;
 
-    Zstring output;
-    output.resize(len);
+    Zstring output = str;
 
     //LOCALE_INVARIANT is NOT available with Windows 2000 -> ok
 

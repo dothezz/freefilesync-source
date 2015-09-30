@@ -194,7 +194,7 @@ public:
 
 //########################################################################################################
 
-Taskbar::Taskbar(const wxFrame& window) : pimpl_(zen::make_unique<Pimpl>(window)) {} //throw TaskbarNotAvailable
+Taskbar::Taskbar(const wxFrame& window) : pimpl_(std::make_unique<Pimpl>(window)) {} //throw TaskbarNotAvailable
 Taskbar::~Taskbar() {}
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }

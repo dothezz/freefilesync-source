@@ -25,7 +25,7 @@ public:
     InterruptibleThread& operator=(InterruptibleThread&& tmp) = default;
 
     template <class Function>
-    InterruptibleThread(Function f);
+    InterruptibleThread(Function&& f);
 
     bool joinable () const { return stdThread.joinable(); }
     void interrupt();
@@ -62,8 +62,8 @@ void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime); //th
 
 /*
 std::async replacement without crappy semantics:
-	1. guaranteed to run asynchronously
-	2. does not follow C++11 [futures.async], Paragraph 5, where std::future waits for thread in destructor
+    1. guaranteed to run asynchronously
+    2. does not follow C++11 [futures.async], Paragraph 5, where std::future waits for thread in destructor
 
 Example:
         Zstring dirpath = ...
@@ -72,7 +72,7 @@ Example:
             //dir exising
 */
 template <class Function>
-auto runAsync(Function fun) -> std::future<decltype(fun())>;
+auto runAsync(Function&& fun) -> std::future<decltype(fun())>;
 
 //wait for all with a time limit: return true if *all* results are available!
 template<class InputIterator, class Duration>
@@ -90,7 +90,7 @@ public:
     GetFirstResult();
 
     template <class Fun>
-    void addJob(Fun f); //f must return a std::unique_ptr<T> containing a value if successful
+    void addJob(Fun&& f); //f must return a std::unique_ptr<T> containing a value if successful
 
     template <class Duration>
     bool timedWait(const Duration& duration) const; //true: "get()" is ready, false: time elapsed
@@ -139,15 +139,35 @@ private:
 
 //###################### implementation ######################
 
+namespace impl
+{
 template <class Function> inline
-auto runAsync(Function fun) -> std::future<decltype(fun())>
+auto runAsync(Function&& fun, TrueType /*copy-constructible*/) -> std::future<decltype(fun())>
 {
     typedef decltype(fun()) ResultType;
 
-    std::packaged_task<ResultType()> pt(std::move(fun));
+    //note: std::packaged_task does NOT support move-only function objects!
+    std::packaged_task<ResultType()> pt(std::forward<Function>(fun));
     auto fut = pt.get_future();
     std::thread(std::move(pt)).detach(); //we have to explicitly detach since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
     return fut;
+}
+
+
+template <class Function> inline
+auto runAsync(Function&& fun, FalseType /*copy-constructible*/) -> std::future<decltype(fun())>
+{
+    //support move-only function objects!
+    auto sharedFun = std::make_shared<Function>(std::forward<Function>(fun));
+    return runAsync([sharedFun]() { return (*sharedFun)(); }, TrueType());
+}
+}
+
+
+template <class Function> inline
+auto runAsync(Function&& fun) -> std::future<decltype(fun())>
+{
+    return impl::runAsync(std::forward<Function>(fun), StaticBool<std::is_copy_constructible<Function>::value>());
 }
 
 
@@ -166,12 +186,6 @@ template <class T>
 class GetFirstResult<T>::AsyncResult
 {
 public:
-    AsyncResult() :
-#ifndef NDEBUG
-        returnedResult(false),
-#endif
-        jobsFinished(0) {}
-
     //context: worker threads
     void reportFinished(std::unique_ptr<T>&& result)
     {
@@ -208,11 +222,11 @@ private:
     bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished >= jobsTotal); } //call while locked!
 
 #ifndef NDEBUG
-    bool returnedResult;
+    bool returnedResult = false;
 #endif
 
     std::mutex lockResult;
-    size_t jobsFinished;        //
+    size_t jobsFinished = 0;    //
     std::unique_ptr<T> result_; //our condition is: "have result" or "jobsFinished == jobsTotal"
     std::condition_variable conditionJobDone;
 };
@@ -225,9 +239,9 @@ GetFirstResult<T>::GetFirstResult() : asyncResult_(std::make_shared<AsyncResult>
 
 template <class T>
 template <class Fun> inline
-void GetFirstResult<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
+void GetFirstResult<T>::addJob(Fun&& f) //f must return a std::unique_ptr<T> containing a value on success
 {
-    std::thread t([asyncResult = this->asyncResult_, f = std::move(f)] { asyncResult->reportFinished(f()); });
+    std::thread t([asyncResult = this->asyncResult_, f = std::forward<Fun>(f)] { asyncResult->reportFinished(f()); });
     ++jobsTotal_;
     t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
 }
@@ -367,12 +381,12 @@ void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime) //thr
 
 
 template <class Function> inline
-InterruptibleThread::InterruptibleThread(Function f) : intStatus_(std::make_shared<InterruptionStatus>())
+InterruptibleThread::InterruptibleThread(Function&& f) : intStatus_(std::make_shared<InterruptionStatus>())
 {
     std::promise<void> pFinished;
     threadCompleted = pFinished.get_future();
 
-    stdThread = std::thread([f = std::move(f),
+    stdThread = std::thread([f = std::forward<Function>(f),
                              intStatus = this->intStatus_,
                              pFinished = std::move(pFinished)]() mutable
     {

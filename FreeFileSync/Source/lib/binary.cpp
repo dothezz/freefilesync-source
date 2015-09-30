@@ -16,8 +16,8 @@ namespace
 {
 /*
 1. there seems to be no perf improvement possible when using file mappings instad of ::ReadFile() calls on Windows:
-	=> buffered   access: same perf
-	=> unbuffered access: same perf on USB stick, file mapping 30% slower on local disk
+    => buffered   access: same perf
+    => unbuffered access: same perf on USB stick, file mapping 30% slower on local disk
 
 2. Tests on Win7 x64 show that buffer size does NOT matter if files are located on different physical disks!
 Impact of buffer size when files are on same disk:

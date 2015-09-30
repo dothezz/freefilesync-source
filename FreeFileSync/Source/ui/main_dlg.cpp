@@ -401,7 +401,7 @@ void MainDialog::create(const Zstring& globalConfigFile)
     GetFirstResult<FalseType> firstMissingDir;
 
     for (const Zstring& filepath : filepaths)
-        firstMissingDir.addJob([filepath] { return filepath.empty() /*ever empty??*/ || !fileExists(filepath) ? make_unique<FalseType>() : nullptr; });
+        firstMissingDir.addJob([filepath] { return filepath.empty() /*ever empty??*/ || !fileExists(filepath) ? std::make_unique<FalseType>() : nullptr; });
 
     //potentially slow network access: give all checks 500ms to finish
     const bool allFilesExist = firstMissingDir.timedWait(std::chrono::milliseconds(500)) && //false: time elapsed
@@ -490,12 +490,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
     globalConfigFile_(globalConfigFile),
-    manualTimeSpanFrom(0),
-    manualTimeSpanTo  (0),
     folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
-    folderHistoryRight(std::make_shared<FolderHistory>()), //
-    focusWindowAfterSearch(nullptr),
-    localKeyEventsEnabled(true)
+    folderHistoryRight(std::make_shared<FolderHistory>())  //
 {
     m_folderPathLeft ->init(folderHistoryLeft);
     m_folderPathRight->init(folderHistoryRight);
@@ -542,7 +538,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     auiMgr.SetManagedWindow(this);
     auiMgr.SetFlags(wxAUI_MGR_DEFAULT | wxAUI_MGR_LIVE_RESIZE);
 
-    compareStatus = make_unique<CompareProgressDialog>(*this); //integrate the compare status panel (in hidden state)
+    compareStatus = std::make_unique<CompareProgressDialog>(*this); //integrate the compare status panel (in hidden state)
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelCenter,
@@ -705,7 +701,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     }
 
     //show FreeFileSync update reminder
-    if (!globalSettings.gui.lastOnlineVersion.empty() && isNewerFreeFileSyncVersion(globalSettings.gui.lastOnlineVersion))
+    if (!globalSettings.gui.lastOnlineVersion.empty() && haveNewerVersionOnline(globalSettings.gui.lastOnlineVersion))
     {
         auto menu = new wxMenu();
         wxMenuItem* newItem = new wxMenuItem(menu, wxID_ANY, _("&Download"));
@@ -718,7 +714,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     zen::setMainWindow(this);
 
     //init handling of first folder pair
-    firstFolderPair = make_unique<FolderPairFirst>(*this);
+    firstFolderPair = std::make_unique<FolderPairFirst>(*this);
 
     initViewFilterButtons();
 
@@ -744,8 +740,6 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     //drag & drop on navi panel
     setupFileDrop(*m_gridNavi);
     m_gridNavi->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onNaviPanelFilesDropped), nullptr, this);
-
-    timerForAsyncTasks.Connect(wxEVT_TIMER, wxEventHandler(MainDialog::onProcessAsyncTasks), nullptr, this);
 
     //Connect(wxEVT_SIZE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
     //Connect(wxEVT_MOVE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
@@ -836,7 +830,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                         return nullptr;
                 }
                 catch (FileError&) {}
-                return make_unique<FalseType>();
+                return std::make_unique<FalseType>();
             });
 
             const bool startComparisonNow = !firstMissingDir.timedWait(std::chrono::milliseconds(500)) || //= no result yet   => start comparison anyway!
@@ -875,8 +869,8 @@ MainDialog::~MainDialog()
 
 #ifdef ZEN_MAC
     //more (non-portable) wxWidgets crap: wxListBox leaks wxClientData, both of the following functions fail to clean up:
-    //	src/common/ctrlsub.cpp:: wxItemContainer::~wxItemContainer() -> empty function body!!!
-    //	src/osx/listbox_osx.cpp: wxListBox::~wxListBox()
+    //  src/common/ctrlsub.cpp:: wxItemContainer::~wxItemContainer() -> empty function body!!!
+    //  src/osx/listbox_osx.cpp: wxListBox::~wxListBox()
     //=> finally a manual wxItemContainer::Clear() will render itself useful:
     m_listBoxHistory->Clear();
 #endif
@@ -1513,8 +1507,8 @@ void MainDialog::flashStatusInformation(const wxString& text)
     m_panelStatusBar->Layout();
     //if (needLayoutUpdate) auiMgr.Update(); -> not needed here, this is called anyway in updateGui()
 
-    processAsync2([] { std::this_thread::sleep_for(std::chrono::milliseconds(2500)); },
-                  [this] { this->restoreStatusInformation(); });
+    guiQueue.processAsync([] { std::this_thread::sleep_for(std::chrono::milliseconds(2500)); },
+                          [this] { this->restoreStatusInformation(); });
 }
 
 
@@ -1537,15 +1531,6 @@ void MainDialog::restoreStatusInformation()
             m_panelStatusBar->Layout();
         }
     }
-}
-
-
-void MainDialog::onProcessAsyncTasks(wxEvent& event)
-{
-    //schedule and run long-running tasks asynchronously
-    asyncTasks.evalResults(); //process results on GUI queue
-    if (asyncTasks.empty())
-        timerForAsyncTasks.Stop();
 }
 
 
@@ -2679,7 +2664,7 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filep
         return missingFiles;
     };
 
-    processAsync(getMissingFilesAsync, [this](const std::vector<Zstring>& files) { removeCfgHistoryItems(files); });
+    guiQueue.processAsync(getMissingFilesAsync, [this](const std::vector<Zstring>& files) { removeCfgHistoryItems(files); });
 }
 
 
@@ -2881,10 +2866,10 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
     else
     {
         //let user update batch config: this should change batch-exclusive settings only, else the "setLastUsedConfig" below would be somewhat of a lie
-        if (!customizeBatchConfig(this,
-                                  batchCfg, //in/out
-                                  globalCfg.gui.onCompletionHistory,
-                                  globalCfg.gui.onCompletionHistoryMax))
+        if (customizeBatchConfig(this,
+                                 batchCfg, //in/out
+                                 globalCfg.gui.onCompletionHistory,
+                                 globalCfg.gui.onCompletionHistoryMax) != ReturnBatchConfig::BUTTON_SAVE_AS)
             return false;
 
         Zstring defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : Zstr("BatchRun.ffs_batch");
@@ -3448,7 +3433,7 @@ void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
         updateGlobalFilterButton(); //refresh global filter icon
         applyFilterConfig(); //re-apply filter
     };
-    auto copyFilter  = [&] { filterCfgOnClipboard = make_unique<FilterConfig>(currentCfg.mainCfg.globalFilter); };
+    auto copyFilter  = [&] { filterCfgOnClipboard = std::make_unique<FilterConfig>(currentCfg.mainCfg.globalFilter); };
     auto pasteFilter = [&]
     {
         if (filterCfgOnClipboard)
@@ -3490,7 +3475,7 @@ inline
 wxBitmap buttonPressed(const std::string& name)
 {
     wxBitmap background = getResourceImage(L"buttonPressed");
-    return mirrorIfRtl(layOver(getResourceImage(utfCvrtTo<wxString>(name)), background));
+    return mirrorIfRtl(layOver(background, getResourceImage(utfCvrtTo<wxString>(name))));
 }
 
 
@@ -3539,23 +3524,23 @@ void MainDialog::setViewFilterDefault()
     auto setButton = [](ToggleButton* tb, bool value) { tb->setActive(value); };
 
     const auto& def = globalCfg.gui.viewFilterDefault;
-    setButton(m_bpButtonShowExcluded,	def.excluded);
-    setButton(m_bpButtonShowEqual,		def.equal);
-    setButton(m_bpButtonShowConflict,	def.conflict);
+    setButton(m_bpButtonShowExcluded,   def.excluded);
+    setButton(m_bpButtonShowEqual,      def.equal);
+    setButton(m_bpButtonShowConflict,   def.conflict);
 
-    setButton(m_bpButtonShowLeftOnly,	def.leftOnly);
-    setButton(m_bpButtonShowRightOnly,	def.rightOnly);
-    setButton(m_bpButtonShowLeftNewer,	def.leftNewer);
-    setButton(m_bpButtonShowRightNewer,	def.rightNewer);
-    setButton(m_bpButtonShowDifferent,	def.different);
+    setButton(m_bpButtonShowLeftOnly,   def.leftOnly);
+    setButton(m_bpButtonShowRightOnly,  def.rightOnly);
+    setButton(m_bpButtonShowLeftNewer,  def.leftNewer);
+    setButton(m_bpButtonShowRightNewer, def.rightNewer);
+    setButton(m_bpButtonShowDifferent,  def.different);
 
-    setButton(m_bpButtonShowCreateLeft,	def.createLeft);
+    setButton(m_bpButtonShowCreateLeft, def.createLeft);
     setButton(m_bpButtonShowCreateRight,def.createRight);
-    setButton(m_bpButtonShowUpdateLeft,	def.updateLeft);
+    setButton(m_bpButtonShowUpdateLeft, def.updateLeft);
     setButton(m_bpButtonShowUpdateRight,def.updateRight);
-    setButton(m_bpButtonShowDeleteLeft,	def.deleteLeft);
+    setButton(m_bpButtonShowDeleteLeft, def.deleteLeft);
     setButton(m_bpButtonShowDeleteRight,def.deleteRight);
-    setButton(m_bpButtonShowDoNothing,	def.doNothing);
+    setButton(m_bpButtonShowDoNothing,  def.doNothing);
 }
 
 
@@ -3647,14 +3632,13 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         std::unique_ptr<LockHolder> dirLocks;
 
         //COMPARE DIRECTORIES
-        compare(globalCfg.optDialogs,
-                true, //allow pw prompt
-                globalCfg.runWithBackgroundPriority,
-                globalCfg.createLockFile,
-                dirLocks,
-                cmpConfig,
-                folderCmp,
-                statusHandler); //throw GuiAbortProcess
+        folderCmp = compare(globalCfg.optDialogs,
+                            true, //allowUserInteraction
+                            globalCfg.runWithBackgroundPriority,
+                            globalCfg.createLockFile,
+                            dirLocks,
+                            cmpConfig,
+                            statusHandler); //throw GuiAbortProcess
     }
     catch (GuiAbortProcess&)
     {
@@ -3849,7 +3833,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     if (Opt<Zstring> nativeFolderPath = ABF::getNativeItemPath(it->getABF<RIGHT_SIDE >().getAbstractPath()))
                         dirPathsExisting.insert(*nativeFolderPath);
             }
-            dirLocks = zen::make_unique<LockHolder>(dirPathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
+            dirLocks = std::make_unique<LockHolder>(dirPathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -4579,7 +4563,7 @@ void MainDialog::removeAddFolderPair(size_t pos)
         //the deferred deletion it is expected to do (and which is implemented correctly on Windows and Linux)
         //http://bb10.com/python-wxpython-devel/2012-09/msg00004.html
         //=> since we're in a mouse button callback of a sub-component of "panel" we need to delay deletion ourselves:
-        processAsync2([] {}, [panel] { panel->Destroy(); });
+        guiQueue.processAsync([] {}, [panel] { panel->Destroy(); });
 
         updateGuiForFolderPair();
         clearGrid(pos + 1); //+ GUI update
@@ -4704,7 +4688,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             //main grid: write rows one after the other instead of creating one big string: memory allocation might fail; think 1 million rows!
             /*
             performance test case "export 600.000 rows" to CSV:
-            aproach 1. assemble single temporary string, then write file:	4.6s
+            aproach 1. assemble single temporary string, then write file:   4.6s
             aproach 2. write to buffered file output directly for each row: 6.4s
             */
             const size_t rowCount = m_gridMainL->getRowCount();
@@ -4763,10 +4747,16 @@ void MainDialog::OnMenuCheckVersionAutomatically(wxCommandEvent& event)
     if (updateCheckActive(globalCfg.gui.lastUpdateCheck))
         disableUpdateCheck(globalCfg.gui.lastUpdateCheck);
     else
-        globalCfg.gui.lastUpdateCheck = 0; //reset to GlobalSetting.xml default value!
+        globalCfg.gui.lastUpdateCheck = 0; //reset to GlobalSettings.xml default value!
 
     m_menuItemCheckVersionAuto->Check(updateCheckActive(globalCfg.gui.lastUpdateCheck));
-    zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, [&] { flashStatusInformation(_("Searching for program updates...")); });
+
+    if (runPeriodicUpdateCheckNow(globalCfg.gui.lastUpdateCheck))
+    {
+        flashStatusInformation(_("Searching for program updates..."));
+        //synchronous update check is sufficient here:
+        evalPeriodicUpdateCheck(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, retrieveOnlineVersion().get());
+    }
 }
 
 
@@ -4776,7 +4766,16 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), nullptr, this);
 
     if (manualProgramUpdateRequired())
-        zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, [&] { flashStatusInformation(_("Searching for program updates...")); });
+        if (runPeriodicUpdateCheckNow(globalCfg.gui.lastUpdateCheck))
+        {
+            flashStatusInformation(_("Searching for program updates..."));
+
+            guiQueue.processAsync([] { return retrieveOnlineVersion(); },
+                                  [this] (std::shared_ptr<UpdateCheckResult>&& result)
+            {
+                evalPeriodicUpdateCheck(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, result.get());
+            });
+        }
 }
 
 

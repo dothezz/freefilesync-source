@@ -157,7 +157,7 @@ void FolderSelector::onMouseWheel(wxMouseEvent& event)
                 evtHandler->AddPendingEvent(event);
                 break;
             }
-    //	event.Skip();
+    //  event.Skip();
 }
 
 

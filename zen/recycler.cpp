@@ -172,18 +172,18 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
 
 
 #ifdef ZEN_WIN
-bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>& onUpdateGui) //throw FileError
+bool zen::recycleBinExists(const Zstring& dirPath, const std::function<void ()>& onUpdateGui) //throw FileError
 {
 #ifdef ZEN_WIN_VISTA_AND_LATER
-    return vista::supportsRecycleBin(dirpath); //throw FileError
+    return vista::supportsRecycleBin(dirPath); //throw FileError
 
 #else
     //excessive runtime if recycle bin exists, is full and drive is slow:
-    auto ft = runAsync([dirpath]()
+    auto ft = runAsync([dirPath]()
     {
         SHQUERYRBINFO recInfo = {};
         recInfo.cbSize = sizeof(recInfo);
-        return ::SHQueryRecycleBin(dirpath.c_str(), //__in_opt  LPCTSTR pszRootPath,
+        return ::SHQueryRecycleBin(dirPath.c_str(), //__in_opt  LPCTSTR pszRootPath,
                                    &recInfo);       //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
     });
 
@@ -197,7 +197,7 @@ bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>&
     //1. ::SHQueryRecycleBin() is excessive: traverses whole $Recycle.Bin directory tree each time!!!! But it's safe and correct.
 
     //2. we can't simply buffer the ::SHQueryRecycleBin() based on volume serial number:
-    //	"subst S:\ C:\" => GetVolumeInformation() returns same serial for C:\ and S:\, but S:\ does not support recycle bin!
+    //  "subst S:\ C:\" => GetVolumeInformation() returns same serial for C:\ and S:\, but S:\ does not support recycle bin!
 
     //3. we would prefer to use CLSID_RecycleBinManager beginning with Vista... if only this interface were documented!!!
 
@@ -210,7 +210,7 @@ bool zen::recycleBinExists(const Zstring& dirpath, const std::function<void ()>&
     /*
         Zstring rootPathPf = appendSeparator(&buffer[0]);
 
-    	const bool canUseFastCheckForRecycler = winXpOrLater();
+        const bool canUseFastCheckForRecycler = winXpOrLater();
         if (!canUseFastCheckForRecycler) //== "checkForRecycleBin"
             return STATUS_REC_UNKNOWN;
 

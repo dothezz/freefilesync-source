@@ -47,11 +47,12 @@ using namespace zen;
 
 namespace
 {
-const int GAUGE_FULL_RANGE = 50000;
-
 //window size used for statistics in milliseconds
 const int WINDOW_REMAINING_TIME_MS = 60000; //USB memory stick scenario can have drop outs of 40 seconds => 60 sec. window size handles it
 const int WINDOW_BYTES_PER_SEC     =  5000; //
+
+const int GAUGE_FULL_RANGE = 50000;
+
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
 //https://sourceforge.net/p/freefilesync/discussion/help/thread/5d62339e
@@ -93,7 +94,7 @@ public:
     }
 
 private:
-    long long startTime = wxGetUTCTimeMillis().GetValue(); //alas no a steady clock, but something's got to give!
+    wxLongLong_t startTime = wxGetUTCTimeMillis().GetValue(); //alas not a steady clock, but something's got to give!
     bool    paused = false;
     int64_t elapsedUntilPause = 0;
 };
@@ -149,23 +150,21 @@ private:
     wxString titleTextBackup;
 
     StopWatch timeElapsed;
-    int64_t binCompStartMs; //begin of binary comparison phase in [ms]
+    int64_t binCompStartMs = 0; //begin of binary comparison phase in [ms]
 
-    const Statistics* syncStat_; //only bound while sync is running
+    const Statistics* syncStat_ = nullptr; //only bound while sync is running
 
     std::unique_ptr<Taskbar> taskbar_;
     std::unique_ptr<PerfCheck> perf; //estimate remaining time
 
-    int64_t timeLastSpeedEstimateMs; //used for calculating intervals between showing and collecting perf samples
+    int64_t timeLastSpeedEstimateMs = -1000000; //used for calculating intervals between showing and collecting perf samples
+    //initial value: just some big number
 };
 
 
 CompareProgressDialog::Pimpl::Pimpl(wxFrame& parentWindow) :
     CompareProgressDlgGenerated(&parentWindow),
-    parentWindow_(parentWindow),
-    binCompStartMs(0),
-    syncStat_(nullptr),
-    timeLastSpeedEstimateMs(-1000000) //some big number
+    parentWindow_(parentWindow)
 {
     //make sure that standard height matches PHASE_COMPARING_CONTENT statistics layout
     m_staticTextItemsFoundLabel->Hide();
@@ -186,7 +185,7 @@ void CompareProgressDialog::Pimpl::init(const Statistics& syncStat)
 
     try //try to get access to Windows 7/Ubuntu taskbar
     {
-        taskbar_ = make_unique<Taskbar>(parentWindow_);
+        taskbar_ = std::make_unique<Taskbar>(parentWindow_);
     }
     catch (const TaskbarNotAvailable&) {}
 
@@ -228,7 +227,7 @@ void CompareProgressDialog::Pimpl::teardown()
 void CompareProgressDialog::Pimpl::switchToCompareBytewise()
 {
     //start to measure perf
-    perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
+    perf = std::make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
     timeLastSpeedEstimateMs   = -1000000; //some big number
 
     binCompStartMs = timeElapsed.timeMs();
@@ -400,7 +399,7 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
 inline
 wxBitmap getImageButtonPressed(const wchar_t* name)
 {
-    return layOver(getResourceImage(name), getResourceImage(L"log button pressed"));
+    return layOver(getResourceImage(L"log button pressed"), getResourceImage(name));
 }
 
 
@@ -779,9 +778,9 @@ private:
         //else
         //switch (keyCode)
         //{
-        //	case WXK_RETURN:
-        //	case WXK_NUMPAD_ENTER:
-        //		return;
+        //  case WXK_RETURN:
+        //  case WXK_NUMPAD_ENTER:
+        //      return;
         //}
 
         event.Skip(); //unknown keypress: propagate
@@ -1001,7 +1000,7 @@ private:
 
     static const size_t MAX_BUFFER_SIZE = 2500000; //sizeof(single node) worst case ~ 3 * 8 byte ptr + 16 byte key/value = 40 byte
 
-    std::map<int64_t, double> samples; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
+    std::map <int64_t, double> samples; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
     std::pair<int64_t, double> lastSample; //artificial most current record at the end of samples to visualize current time!
 };
 
@@ -1009,8 +1008,6 @@ private:
 class CurveDataRectangleArea : public CurveData
 {
 public:
-    CurveDataRectangleArea() : x_(), y_() {}
-
     void setValue (double x, double y) { x_ = x; y_ = y; }
     void setValueX(double x)           { x_ = x; }
     double getValueX() const { return x_; }
@@ -1025,8 +1022,8 @@ private:
         points.emplace_back(x_,  0);
     }
 
-    double x_; //time elapsed in seconds
-    double y_; //items/bytes processed
+    double x_ = 0; //time elapsed in seconds
+    double y_ = 0; //items/bytes processed
 };
 
 
@@ -1118,8 +1115,8 @@ template <class TopLevelDialog> //can be a wxFrame or wxDialog
 class SyncProgressDialogImpl : public TopLevelDialog, public SyncProgressDialog
 /*we need derivation, not composition!
       1. SyncProgressDialogImpl IS a wxFrame/wxDialog
-	  2. implement virtual ~wxFrame()
-	  3. event handling below assumes lifetime is larger-equal than wxFrame's
+      2. implement virtual ~wxFrame()
+      3. event handling below assumes lifetime is larger-equal than wxFrame's
 */
 {
 public:
@@ -1274,7 +1271,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     if (wxFrame* frame = getTaskbarFrame(*this))
         try //try to get access to Windows 7/Ubuntu taskbar
         {
-            taskbar_ = make_unique<Taskbar>(*frame); //throw TaskbarNotAvailable
+            taskbar_ = std::make_unique<Taskbar>(*frame); //throw TaskbarNotAvailable
         }
         catch (const TaskbarNotAvailable&) {}
 
@@ -1433,7 +1430,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
     notifyProgressChange(); //make sure graphs get initial values
 
     //start new measurement
-    perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
+    perf = std::make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
     timeLastSpeedEstimateMs = -1000000; //some big number
 
     phaseStartMs = timeElapsed.timeMs();
@@ -2034,28 +2031,28 @@ template <class TopLevelDialog>
 void SyncProgressDialogImpl<TopLevelDialog>::OnIconize(wxIconizeEvent& event)
 {
     /*
-    	propagate progress dialog minimize/maximize to parent
-    	-----------------------------------------------------
+        propagate progress dialog minimize/maximize to parent
+        -----------------------------------------------------
         Fedora/Debian/Ubuntu:
-    		- wxDialog cannot be minimized
-    		- worse, wxGTK sends stray iconize events *after* wxDialog::Destroy()
-    		- worse, on Fedora an iconize event is issued directly after calling Close()
-    		- worse, even wxDialog::Hide() causes iconize event!
-    			=> nothing to do
-    	SUSE:
-    		- wxDialog can be minimized (it just vanishes!) and in general also minimizes parent: except for our progress wxDialog!!!
-    		- worse, wxDialog::Hide() causes iconize event
-    		- probably the same issues with stray iconize events like Fedora/Debian/Ubuntu
-    		- minimize button is always shown, even if wxMINIMIZE_BOX is omitted!
-    			=> nothing to do
-    	Mac OS X:
-    		- wxDialog can be minimized and automatically minimizes parent
-    		- no iconize events seen by wxWidgets!
-    			=> nothing to do
-    	Windows:
-    		- wxDialog can be minimized but does not also minimize parent
-    		- iconize events only seen for manual minimize
-    			=> propagate event to parent
+            - wxDialog cannot be minimized
+            - worse, wxGTK sends stray iconize events *after* wxDialog::Destroy()
+            - worse, on Fedora an iconize event is issued directly after calling Close()
+            - worse, even wxDialog::Hide() causes iconize event!
+                => nothing to do
+        SUSE:
+            - wxDialog can be minimized (it just vanishes!) and in general also minimizes parent: except for our progress wxDialog!!!
+            - worse, wxDialog::Hide() causes iconize event
+            - probably the same issues with stray iconize events like Fedora/Debian/Ubuntu
+            - minimize button is always shown, even if wxMINIMIZE_BOX is omitted!
+                => nothing to do
+        Mac OS X:
+            - wxDialog can be minimized and automatically minimizes parent
+            - no iconize events seen by wxWidgets!
+                => nothing to do
+        Windows:
+            - wxDialog can be minimized but does not also minimize parent
+            - iconize events only seen for manual minimize
+                => propagate event to parent
     */
 #ifdef ZEN_WIN
     if (parentFrame_)
@@ -2071,7 +2068,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
 {
     if (!trayIcon.get())
     {
-        trayIcon = make_unique<FfsTrayIcon>([this] { this->resumeFromSystray(); }); //FfsTrayIcon lifetime is a subset of "this"'s lifetime!
+        trayIcon = std::make_unique<FfsTrayIcon>([this] { this->resumeFromSystray(); }); //FfsTrayIcon lifetime is a subset of "this"'s lifetime!
         //we may destroy FfsTrayIcon even while in the FfsTrayIcon callback!!!!
 
         updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused

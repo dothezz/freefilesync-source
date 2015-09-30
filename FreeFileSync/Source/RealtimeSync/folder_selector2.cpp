@@ -15,6 +15,9 @@
 #include "../lib/resolve_path.h"
 #ifdef ZEN_WIN_VISTA_AND_LATER
     #include "../ui/ifile_dialog.h"
+
+#elif defined ZEN_LINUX
+    #include <gtk/gtk.h>
 #endif
 
 using namespace zen;
@@ -48,6 +51,12 @@ FolderSelector2::FolderSelector2(wxWindow&     dropWindow,
     folderPathCtrl_(folderPathCtrl),
     staticText_(staticText)
 {
+#ifdef ZEN_LINUX
+    //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"; see folder_history_box.cpp
+    if (GtkWidget* widget = folderPathCtrl.GetConnectWidget())
+        ::gtk_drag_dest_unset(widget);
+#endif
+
     //prepare drag & drop
     setupFileDrop(dropWindow_);
     dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector2::onFilesDropped), nullptr, this);
@@ -83,7 +92,7 @@ void FolderSelector2::onMouseWheel(wxMouseEvent& event)
                 evtHandler->AddPendingEvent(event);
                 break;
             }
-    //	event.Skip();
+    //  event.Skip();
 }
 
 

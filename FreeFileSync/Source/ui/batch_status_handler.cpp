@@ -70,16 +70,16 @@ struct LogTraverserCallback: public ABF::TraverserCallback
 
     void onFile(const FileInfo& fi) override
     {
-        if (pathStartsWith(fi.shortName, prefix_) && pathEndsWith(fi.shortName, Zstr(".log")))
-            logFileNames_.push_back(fi.shortName);
+        if (pathStartsWith(fi.itemName, prefix_) && pathEndsWith(fi.itemName, Zstr(".log")))
+            logFileNames_.push_back(fi.itemName);
 
         if (onUpdateStatus_)
             onUpdateStatus_();
     }
     std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                         override { assert(false); return ON_ERROR_IGNORE; } //errors are not critical in this context
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zchar* shortName) override { assert(false); return ON_ERROR_IGNORE; } //
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { assert(false); return ON_ERROR_IGNORE; } //errors are not critical in this context
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { assert(false); return ON_ERROR_IGNORE; } //
 
 private:
     std::vector<Zstring>& logFileNames_; //out
@@ -145,7 +145,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, onCompletion, onCompletionHistory)),
             jobName_(jobName),
             timeStamp_(timeStamp),
-            startTime_(wxGetUTCTimeMillis().GetValue()),
+            startTime_(std::time(nullptr)),
             logFolderPathPhrase_(logFolderPathPhrase)
 {
     //ATTENTION: "progressDlg" is an unmanaged resource!!! However, at this point we already consider construction complete! =>
@@ -154,7 +154,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     //...
 
     //if (logFile)
-    //	::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename()));
+    //  ::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename()));
 
     constructorGuard.dismiss();
 }
@@ -243,7 +243,7 @@ BatchStatusHandler::~BatchStatusHandler()
         finalStatusMsg,
         getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
         getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
-        (wxGetUTCTimeMillis().GetValue() - startTime_) / 1000
+        std::time(nullptr) - startTime_
     };
 
     //----------------- write results into user-specified logfile ------------------------

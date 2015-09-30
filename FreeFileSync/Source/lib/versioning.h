@@ -19,13 +19,13 @@ namespace zen
 //e.g. move C:\Source\subdir\Sample.txt -> D:\Revisions\subdir\Sample.txt 2012-05-15 131513.txt
 //scheme: <revisions directory>\<relpath>\<filename>.<ext> YYYY-MM-DD HHMMSS.<ext>
 /*
-	- ignores missing source files/dirs
-	- creates missing intermediate directories
-	- does not create empty directories
-	- handles symlinks
-	- replaces already existing target files/dirs (supports retry)
-		=> (unlikely) risk of data loss for naming convention "versioning":
-		race-condition if two FFS instances start at the very same second OR multiple folder pairs process the same filepath!!
+    - ignores missing source files/dirs
+    - creates missing intermediate directories
+    - does not create empty directories
+    - handles symlinks
+    - replaces already existing target files/dirs (supports retry)
+        => (unlikely) risk of data loss for naming convention "versioning":
+        race-condition if two FFS instances start at the very same second OR multiple folder pairs process the same filepath!!
 */
 
 class FileVersioner

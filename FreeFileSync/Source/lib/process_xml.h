@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef PROCESSXML_H_INCLUDED
-#define PROCESSXML_H_INCLUDED
+#ifndef PROCESSXML_H_INCLUDED_28345825704254262435
+#define PROCESSXML_H_INCLUDED_28345825704254262435
 
 #include <zen/xml_io.h>
 #include <wx/gdicmn.h>
@@ -47,14 +47,10 @@ typedef std::vector<std::pair<Description, Commandline>> ExternalApps;
 //---------------------------------------------------------------------
 struct XmlGuiConfig
 {
-    XmlGuiConfig() :
-        handleError(ON_GUIERROR_POPUP),
-        highlightSyncAction(true) {} //initialize values
-
     zen::MainConfiguration mainCfg;
 
-    OnGuiError handleError; //reaction on error situation during synchronization
-    bool highlightSyncAction;
+    OnGuiError handleError = ON_GUIERROR_POPUP; //reaction on error situation during synchronization
+    bool highlightSyncAction = true;
 };
 
 
@@ -69,38 +65,29 @@ bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 
 struct XmlBatchConfig
 {
-    XmlBatchConfig() :
-        runMinimized(false),
-        logfilesCountLimit(-1),
-        handleError(ON_ERROR_POPUP) {}
-
     zen::MainConfiguration mainCfg;
 
-    bool runMinimized;
+    bool runMinimized = false;
     Zstring logFolderPathPhrase;
-    int logfilesCountLimit; //max logfiles; 0 := don't save logfiles; < 0 := no limit
-    OnError handleError;    //reaction on error situation during synchronization
+    int logfilesCountLimit = -1; //max logfiles; 0 := don't save logfiles; < 0 := no limit
+    OnError handleError = ON_ERROR_POPUP; //reaction on error situation during synchronization
 };
 
 
 struct OptionalDialogs
 {
-    OptionalDialogs() { resetDialogs();}
-
-    void resetDialogs();
-
-    bool warningDependentFolders;
-    bool warningFolderPairRaceCondition;
-    bool warningSignificantDifference;
-    bool warningNotEnoughDiskSpace;
-    bool warningUnresolvedConflicts;
-    bool warningDatabaseError;
-    bool warningRecyclerMissing;
-    bool warningInputFieldEmpty;
-    bool warningDirectoryLockFailed;
-    bool popupOnConfigChange;
-    bool confirmSyncStart;
-    bool confirmExternalCommandMassInvoke;
+    bool warningDependentFolders        = true;
+    bool warningFolderPairRaceCondition = true;
+    bool warningSignificantDifference   = true;
+    bool warningNotEnoughDiskSpace      = true;
+    bool warningUnresolvedConflicts     = true;
+    bool warningDatabaseError           = true;
+    bool warningRecyclerMissing         = true;
+    bool warningInputFieldEmpty         = true;
+    bool warningDirectoryLockFailed     = true;
+    bool popupOnConfigChange            = true;
+    bool confirmSyncStart               = true;
+    bool confirmExternalCommandMassInvoke = true;
 };
 
 
@@ -114,50 +101,46 @@ enum FileIconSize
 
 struct ViewFilterDefault
 {
-    ViewFilterDefault() : equal(false), conflict(true), excluded(true)
-    {
-        leftOnly = rightOnly = leftNewer = rightNewer = different = true;
-        createLeft = createRight = updateLeft = updateRight = deleteLeft = deleteRight = doNothing = true;
-    }
-    bool equal;    //
-    bool conflict; //shared
-    bool excluded; //
-    bool leftOnly, rightOnly, leftNewer, rightNewer, different; //category view
-    bool createLeft, createRight, updateLeft, updateRight, deleteLeft, deleteRight, doNothing; //action view
+    //shared
+    bool equal    = false;
+    bool conflict = true;
+    bool excluded = false;
+    //category view
+    bool leftOnly   = true;
+    bool rightOnly  = true;
+    bool leftNewer  = true;
+    bool rightNewer = true;
+    bool different  = true;
+    //action view
+    bool createLeft  = true;
+    bool createRight = true;
+    bool updateLeft  = true;
+    bool updateRight = true;
+    bool deleteLeft  = true;
+    bool deleteRight = true;
+    bool doNothing   = true;
 };
 
 Zstring getGlobalConfigFile();
 
 struct XmlGlobalSettings
 {
+    XmlGlobalSettings() {} //clang needs this
+
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
-    XmlGlobalSettings() :
-        programLanguage(zen::retrieveSystemLanguage()),
-        failsafeFileCopy(true),
-        copyLockedFiles(false), //safer default: avoid copies of partially written files
-        copyFilePermissions(false),
-        automaticRetryCount(0),
-        automaticRetryDelay(5),
-        fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-        runWithBackgroundPriority(false),
-        createLockFile(true),
-        verifyFileCopy(false),
-        lastSyncsLogFileSizeMax(100000) //maximum size for LastSyncs.log: use a human-readable number
-    {}
+    int programLanguage = zen::retrieveSystemLanguage();
+    bool failsafeFileCopy = true;
+    bool copyLockedFiles  = false; //safer default: avoid copies of partially written files
+    bool copyFilePermissions = false;
+    size_t automaticRetryCount = 0;
+    size_t automaticRetryDelay = 5; //unit: [sec]
 
-    int programLanguage;
-    bool failsafeFileCopy;
-    bool copyLockedFiles;
-    bool copyFilePermissions;
-    size_t automaticRetryCount;
-    size_t automaticRetryDelay; //unit: [sec]
-
-    int fileTimeTolerance; //max. allowed file time deviation; < 0 means unlimited tolerance
-    bool runWithBackgroundPriority;
-    bool createLockFile;
-    bool verifyFileCopy; //verify copied files
-    size_t lastSyncsLogFileSizeMax;
+    int fileTimeTolerance = 2; //max. allowed file time deviation; < 0 means unlimited tolerance; default 2s: FAT vs NTFS
+    bool runWithBackgroundPriority = false;
+    bool createLockFile = true;
+    bool verifyFileCopy = false;
+    size_t lastSyncsLogFileSizeMax = 100000; //maximum size for LastSyncs.log: use a human-readable number
 
     OptionalDialogs optDialogs;
 
@@ -232,7 +215,7 @@ struct XmlGlobalSettings
 #endif
         struct
         {
-            bool    keepRelPaths = true;
+            bool    keepRelPaths      = true;
             bool    overwriteIfExists = false;
             Zstring lastUsedPath;
             std::vector<Zstring> folderHistory;
@@ -249,8 +232,8 @@ struct XmlGlobalSettings
         bool showIcons = true;
         FileIconSize iconSize = ICON_SIZE_SMALL;
 
-        long lastUpdateCheck = 0; //time of last update check
-        wxString lastOnlineVersion;
+        time_t lastUpdateCheck = 0; //number of seconds since 00:00 hours, Jan 1, 1970 UTC
+        std::wstring lastOnlineVersion;
 
         ViewFilterDefault viewFilterDefault;
         wxString guiPerspectiveLast; //used by wxAuiManager
@@ -279,4 +262,4 @@ XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg, const XmlBatchCon
 std::wstring extractJobName(const Zstring& configFilename);
 }
 
-#endif // PROCESSXML_H_INCLUDED
+#endif //PROCESSXML_H_INCLUDED_28345825704254262435

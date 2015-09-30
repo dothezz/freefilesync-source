@@ -19,13 +19,13 @@ namespace zen
 //handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxButton, and wxComboBox/wxTextCtrl
 /*
 Reasons NOT to use wxDirPickerCtrl, but wxButton instead:
-	- Crash on GTK 2: http://favapps.wordpress.com/2012/06/11/freefilesync-crash-in-linux-when-syncing-solved/
-	- still uses outdated ::SHBrowseForFolder() (even on Windows 7)
-	- selection dialog remembers size, but NOT position => if user enlarges window, the next time he opens the dialog it may leap out of visible screen
-	- hard-codes "Browse" button label
+    - Crash on GTK 2: http://favapps.wordpress.com/2012/06/11/freefilesync-crash-in-linux-when-syncing-solved/
+    - still uses outdated ::SHBrowseForFolder() (even on Windows 7)
+    - selection dialog remembers size, but NOT position => if user enlarges window, the next time he opens the dialog it may leap out of visible screen
+    - hard-codes "Browse" button label
 */
 
-extern const wxEventType EVENT_ON_FOLDER_SELECTED;	  //directory is changed by the user (except manual type-in)
+extern const wxEventType EVENT_ON_FOLDER_SELECTED;    //directory is changed by the user (except manual type-in)
 extern const wxEventType EVENT_ON_FOLDER_MANUAL_EDIT; //manual type-in
 //example: wnd.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
 

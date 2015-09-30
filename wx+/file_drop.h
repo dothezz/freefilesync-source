@@ -28,8 +28,8 @@ namespace zen
 
 /*
 1. setup a window to emit EVENT_DROP_FILE:
-	- simple file system paths:        setupFileDrop
-	- any shell paths with validation: setupShellItemDrop
+    - simple file system paths:        setupFileDrop
+    - any shell paths with validation: setupShellItemDrop
 
 2. register events:
 wnd.Connect   (EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), nullptr, this);
