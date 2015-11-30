@@ -22,25 +22,16 @@
 #include "../lib/help_provider.h"
 #include "../lib/resolve_path.h"
 
-#ifdef ZEN_WIN
-    #include <zen/win_ver.h>
-    #include <zen/dll.h>
-    #include "../lib/app_user_mode_id.h"
-
-#elif defined ZEN_LINUX
     #include <gtk/gtk.h>
-#endif
 
 using namespace zen;
 
 
 IMPLEMENT_APP(Application);
 
+
 namespace
 {
-#ifdef _MSC_VER
-void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
-#endif
 
 const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 }
@@ -48,22 +39,7 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-#ifdef ZEN_WIN
-#ifdef _MSC_VER
-    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
-#endif
-    //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
-    //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
-    ::SetErrorMode(SEM_FAILCRITICALERRORS);
-
-    setAppUserModeId(L"RealtimeSync", L"Zenju.RealtimeSync"); //noexcept
-    //consider: RealtimeSync.exe, RealtimeSync_Win32.exe, RealtimeSync_x64.exe
-
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
-
-#elif defined ZEN_LINUX
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
-#endif
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
@@ -90,6 +66,7 @@ int Application::OnExit()
 {
     uninitializeHelp();
     releaseWxLocale();
+    cleanupResourceImages();
     return wxApp::OnExit();
 }
 
@@ -100,8 +77,8 @@ void Application::onEnterEventLoop(wxEvent& event)
 
     try
     {
-        int lid = xmlAccess::getProgramLanguage();
-        setLanguage(lid); //throw FileError
+        wxLanguage lngId = xmlAccess::getProgramLanguage();
+        setLanguage(lngId); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -140,30 +117,17 @@ void Application::onEnterEventLoop(wxEvent& event)
 
 int Application::OnRun()
 {
-
-    auto processException = [](const std::wstring& msg)
-    {
-        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        logError(utfCvrtTo<std::string>(msg));
-        wxSafeShowMessage(_("An exception occurred"), msg);
-    };
-
     try
     {
         wxApp::OnRun();
     }
-    catch (const std::exception& e) //catch all STL exceptions
+    catch (const std::bad_alloc& e) //the only kind of exception we don't want crash dumps for
     {
-        processException(utfCvrtTo<std::wstring>(e.what()));
+        logFatalError(e.what()); //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
+        wxSafeShowMessage(L"RealtimeSync - " + _("An exception occurred"), e.what());
         return FFS_RC_EXCEPTION;
     }
-    /* -> let it crash and create mini dump!!!
-    catch (...)
-    {
-        processException(L"Unknown error.");
-        return FFS_RC_EXCEPTION;
-    }
-    */
+    //catch (...) -> let it crash and create mini dump!!!
 
     return FFS_RC_SUCCESS; //program's return code
 }

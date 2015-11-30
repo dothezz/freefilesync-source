@@ -42,20 +42,23 @@ class GlobalResources
 public:
     static GlobalResources& instance()
     {
-#if defined _MSC_VER && _MSC_VER < 1900
-#error function scope static initialization is not yet thread-safe!
-#endif
         static GlobalResources inst;
         return inst;
     }
 
     void init(const Zstring& filepath);
+	void cleanup()
+	{ 
+		bitmaps.clear(); 
+		anims.clear(); 
+	}
 
     const wxBitmap&    getImage    (const wxString& name) const;
     const wxAnimation& getAnimation(const wxString& name) const;
 
 private:
     GlobalResources() {}
+	~GlobalResources() { assert(bitmaps.empty() && anims.empty()); } //don't leave wxWidgets objects for static destruction!
     GlobalResources           (const GlobalResources&) = delete;
     GlobalResources& operator=(const GlobalResources&) = delete;
 
@@ -127,6 +130,7 @@ const wxAnimation& GlobalResources::getAnimation(const wxString& name) const
 
 
 void zen::initResourceImages(const Zstring& filepath) { GlobalResources::instance().init(filepath); }
+void zen::cleanupResourceImages() { GlobalResources::instance().cleanup(); }
 
 const wxBitmap& zen::getResourceImage(const wxString& name) { return GlobalResources::instance().getImage(name); }
 

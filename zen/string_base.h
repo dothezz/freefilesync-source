@@ -148,19 +148,12 @@ protected:
         return ptr;
     }
 
-#ifdef NDEBUG
     void destroy(Char* ptr)
-#else
-    void destroy(Char*& ptr)
-#endif
     {
         assert(ptr != reinterpret_cast<Char*>(0x1)); //detect double-deletion
 
         if (!ptr) //support "destroy(nullptr)"
         {
-#ifndef NDEBUG
-            ptr = reinterpret_cast<Char*>(0x1);
-#endif
             return;
         }
 
@@ -170,9 +163,6 @@ protected:
         {
             d->~Descriptor();
             this->deallocate(d);
-#ifndef NDEBUG
-            ptr = reinterpret_cast<Char*>(0x1);
-#endif
         }
     }
 

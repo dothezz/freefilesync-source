@@ -9,26 +9,15 @@
 
 #include "file_error.h"
 
-#ifdef ZEN_WIN
-    #include "win.h" //includes "windows.h"
-#endif
 
 
 namespace zen
 {
-#ifdef ZEN_WIN
-    static const char LINE_BREAK[] = "\r\n";
-#elif defined ZEN_LINUX || defined ZEN_MAC
     static const char LINE_BREAK[] = "\n"; //since OS X apple uses newline, too
-#endif
 
 //OS-buffered file IO optimized for sequential read/write accesses + better error reporting + long path support + following symlinks
 
-#ifdef ZEN_WIN
-    typedef HANDLE FileHandle;
-#elif defined ZEN_LINUX || defined ZEN_MAC
     typedef int FileHandle;
-#endif
 
 class FileBase
 {

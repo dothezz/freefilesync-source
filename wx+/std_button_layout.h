@@ -68,22 +68,10 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
     detach(buttonsTmp.btnNo);
     detach(buttonsTmp.btnCancel);
 
-#if defined ZEN_WIN
-    //Windows User Experience Interaction Guidelines: http://msdn.microsoft.com/en-us/library/windows/desktop/aa511453.aspx#sizing
-    const int spaceH    = 6;  //OK
-    const int spaceRimH = 10; //OK
-    const int spaceRimV = 8;  //compromise; consider additional top row from static line; exact values: top 8, bottom 9
-#elif defined ZEN_LINUX
     //GNOME Human Interface Guidelines: https://developer.gnome.org/hig-book/3.2/hig-book.html#alert-spacing
     const int spaceH    = 6;  //OK
     const int spaceRimH = 12; //OK
     const int spaceRimV = 12; //OK
-#elif defined ZEN_MAC
-    //OS X Human Interface Guidelines: http://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/AppleHIGuidelines/Windows/Windows.html
-    const int spaceH    = 14; //OK
-    const int spaceRimH = 24; //OK
-    const int spaceRimV = 14; //OK
-#endif
 
     bool settingFirstButton = true;
     auto attach = [&](wxButton* btn)
@@ -91,10 +79,8 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
         if (btn)
         {
             assert(btn->GetMinSize().GetHeight() == -1); //let OS or this routine do the sizing! note: OS X does not allow changing the (visible!) button height!
-#if defined ZEN_WIN || defined ZEN_LINUX
             const int defaultHeight = wxButton::GetDefaultSize().GetHeight(); //buffered by wxWidgets
             btn->SetMinSize(wxSize(-1, std::max(defaultHeight, 30))); //default button height is much too small => increase!
-#endif
 
             if (settingFirstButton)
                 settingFirstButton = false;
@@ -119,25 +105,10 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
         }
 
     sizer.Add(spaceRimH, 0);
-#if defined ZEN_WIN
-    attach(buttonsTmp.btnYes);
-    attach(buttonsTmp.btnNo);
-    attach(buttonsTmp.btnCancel);
-
-#elif defined ZEN_LINUX
     attach(buttonsTmp.btnNo);
     attach(buttonsTmp.btnCancel);
     attach(buttonsTmp.btnYes);
 
-#elif defined ZEN_MAC
-    if (buttonsTmp.btnNo)
-    {
-        attach(buttonsTmp.btnNo);
-        sizer.Add(83 - spaceH, 0); //OS X Human Interface Guidelines: "position it at least 24 pixels away from the “safe” buttons" -> however 83 is used in practice!
-    }
-    attach(buttonsTmp.btnCancel);
-    attach(buttonsTmp.btnYes);
-#endif
     sizer.Add(spaceRimH, 0);
 
     assert(buttonsTmp.btnCancel || buttonsTmp.btnYes); //OS X: there should be at least one button following the gap after the "dangerous" no-button

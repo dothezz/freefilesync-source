@@ -99,7 +99,7 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
         }
 
         //fill yellow remainder
-        fillRange(genImage, startFillPixel, pixelCount, wxColour(240, 200, 0));
+        fillRange(genImage, startFillPixel, pixelCount, wxColor(240, 200, 0));
 
         buffer.second.CopyFromBitmap(wxBitmap(genImage));
     }
@@ -143,9 +143,6 @@ private:
         //wxWidgets font mess-up:
         //1. font must be set *before* wxMenu::Append()!
         //2. don't use defaultItem->GetFont(); making it bold creates a huge font size for some reason
-#ifdef ZEN_WIN //no wxMenuItem::SetFont() on Linux and OS X: wasn't wxWidgets supposed to be *portable* at some point in time?????
-        defaultItem->SetFont(wxNORMAL_FONT->Bold()); //make default selection bold/align with double-click
-#endif
         contextMenu->Append(defaultItem);
 
         //event handling
@@ -188,11 +185,7 @@ private:
 FfsTrayIcon::FfsTrayIcon(const std::function<void()>& onRequestResume) :
     trayIcon(new TaskBarImpl(onRequestResume)),
     activeFraction(1), //show FFS logo by default
-#if defined ZEN_WIN || defined ZEN_MAC //16x16 seems to be the only size that is shown correctly on OS X
-    logo(getResourceImage(L"FFS_tray_16x16").ConvertToImage())
-#elif defined ZEN_LINUX
     logo(getResourceImage(L"FFS_tray_24x24").ConvertToImage())
-#endif
 {
     trayIcon->SetIcon(generateProgressIcon(logo, activeFraction), L"FreeFileSync");
 }

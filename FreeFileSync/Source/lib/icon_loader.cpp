@@ -7,25 +7,15 @@
 #include "icon_loader.h"
 #include <zen/scope_guard.h>
 
-#ifdef ZEN_WIN
-    #include <zen/dll.h>
-    #include <zen/win_ver.h>
-    #include "file_icon_win.h"
-
-#elif defined ZEN_LINUX
     #include <gtk/gtk.h>
     #include <sys/stat.h>
 
-#elif defined ZEN_MAC
-    #include "file_icon_osx.h"
-#endif
 
 using namespace zen;
 
 
 namespace
 {
-#ifdef ZEN_LINUX
 ImageHolder copyToImageHolder(const GdkPixbuf* pixbuf)
 {
     //see: https://developer.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-The-GdkPixbuf-Structure.html
@@ -83,41 +73,8 @@ ImageHolder copyToImageHolder(const GdkPixbuf* pixbuf)
     }
     return ImageHolder();
 }
-#endif
 
 
-#ifdef ZEN_WIN
-IconSizeType getThumbSizeType(int pixelSize)
-{
-    //coordinate with IconBuffer::getSize()!
-    if (pixelSize >= 256) return ICON_SIZE_256;
-    if (pixelSize >= 128) return ICON_SIZE_128;
-    if (pixelSize >=  48) return ICON_SIZE_48;
-    if (pixelSize >=  32) return ICON_SIZE_32;
-    return ICON_SIZE_16;
-}
-
-
-ImageHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, int pixelSize)
-{
-    //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
-    SHFILEINFO fileInfo = {}; //initialize hIcon
-    DWORD_PTR imgList = ::SHGetFileInfo(::wcslen(pszPath) == 0 ? L"dummy" : pszPath, //Windows 7 doesn't like this parameter to be an empty string!
-                                        dwFileAttributes,
-                                        &fileInfo,
-                                        sizeof(fileInfo),
-                                        SHGFI_USEFILEATTRIBUTES | //== no disk access: http://blogs.msdn.com/b/oldnewthing/archive/2004/06/01/145428.aspx
-                                        SHGFI_SYSICONINDEX);
-    if (!imgList) //not owned: no need for IUnknown::Release()!
-        return ImageHolder();
-
-    if (ImageHolder img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
-        return img;
-
-    return ImageHolder();
-}
-
-#elif defined ZEN_LINUX
 ImageHolder imageHolderFromGicon(GIcon* gicon, int pixelSize)
 {
     if (gicon)
@@ -133,17 +90,11 @@ ImageHolder imageHolderFromGicon(GIcon* gicon, int pixelSize)
             }
     return ImageHolder();
 }
-#endif
 }
 
 
 ImageHolder zen::getIconByTemplatePath(const Zstring& templatePath, int pixelSize)
 {
-#ifdef ZEN_WIN
-    //no read-access to disk! determine icon by extension
-    return getIconByAttribute(templatePath.c_str(), FILE_ATTRIBUTE_NORMAL, pixelSize);
-
-#elif defined ZEN_LINUX
     //uses full file name, e.g. "AUTHORS" has own mime type on Linux:
     if (gchar* contentType = ::g_content_type_guess(templatePath.c_str(), //const gchar* filename,
                                                     nullptr,              //const guchar* data,
@@ -159,23 +110,12 @@ ImageHolder zen::getIconByTemplatePath(const Zstring& templatePath, int pixelSiz
     }
     return ImageHolder();
 
-#elif defined ZEN_MAC
-    try
-    {
-        return osx::getIconByExtension(getFileExtension(templatePath).c_str(), pixelSize); //throw SysError
-    }
-    catch (SysError&) { return ImageHolder(); }
-#endif
 }
 
 
 ImageHolder zen::genericFileIcon(int pixelSize)
 {
     //we're called by getDisplayIcon()! -> avoid endless recursion!
-#ifdef ZEN_WIN
-    return getIconByAttribute(L"", FILE_ATTRIBUTE_NORMAL, pixelSize);
-
-#elif defined ZEN_LINUX
     if (GIcon* fileIcon = ::g_content_type_get_icon("text/plain"))
     {
         ZEN_ON_SCOPE_EXIT(::g_object_unref(fileIcon));
@@ -183,22 +123,11 @@ ImageHolder zen::genericFileIcon(int pixelSize)
     }
     return ImageHolder();
 
-#elif defined ZEN_MAC
-    try
-    {
-        return osx::getDefaultFileIcon(pixelSize); //throw SysError
-    }
-    catch (SysError&) { return ImageHolder(); }
-#endif
 }
 
 
 ImageHolder zen::genericDirIcon(int pixelSize)
 {
-#ifdef ZEN_WIN
-    return getIconByAttribute(L"", FILE_ATTRIBUTE_DIRECTORY, pixelSize);
-
-#elif defined ZEN_LINUX
     if (GIcon* dirIcon = ::g_content_type_get_icon("inode/directory")) //should contain fallback to GTK_STOCK_DIRECTORY ("gtk-directory")
     {
         ZEN_ON_SCOPE_EXIT(::g_object_unref(dirIcon));
@@ -206,43 +135,12 @@ ImageHolder zen::genericDirIcon(int pixelSize)
     }
     return ImageHolder();
 
-#elif defined ZEN_MAC
-    try
-    {
-        return osx::getDefaultFolderIcon(pixelSize); //throw SysError
-    }
-    catch (SysError&) { return ImageHolder(); }
-#endif
 }
 
 
 ImageHolder zen::getFileIcon(const Zstring& filePath, int pixelSize)
 {
     //2. retrieve file icons
-#ifdef ZEN_WIN
-    SHFILEINFO fileInfo = {};
-    if (DWORD_PTR imgList = ::SHGetFileInfo(filePath.c_str(), //_In_     LPCTSTR pszPath, -> note: ::SHGetFileInfo() can't handle \\?\-prefix!
-                                            0,                //DWORD dwFileAttributes,
-                                            &fileInfo,        //_Inout_  SHFILEINFO *psfi,
-                                            sizeof(fileInfo), //UINT cbFileInfo,
-                                            SHGFI_SYSICONINDEX /*| SHGFI_ATTRIBUTES*/)) //UINT uFlags
-    {
-        (void)imgList;
-        //imgList->Release(); //empiric study: crash on XP if we release this! Seems we do not own it... -> also no GDI leak on Win7 -> okay
-        //another comment on http://msdn.microsoft.com/en-us/library/bb762179(v=VS.85).aspx describes exact same behavior on Win7/XP
-
-        //Quote: "The IImageList pointer type, such as that returned in the ppv parameter, can be cast as an HIMAGELIST as needed;
-        //        for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
-        //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
-
-        //Check for link icon type (= shell links and symlinks): SHGetFileInfo + SHGFI_ATTRIBUTES:
-        //const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
-
-        if (ImageHolder img = getIconByIndex(fileInfo.iIcon, getThumbSizeType(pixelSize)))
-            return img;
-    }
-
-#elif defined ZEN_LINUX
     GFile* file = ::g_file_new_for_path(filePath.c_str()); //documented to "never fail"
     ZEN_ON_SCOPE_EXIT(::g_object_unref(file));
 
@@ -254,24 +152,12 @@ ImageHolder zen::getFileIcon(const Zstring& filePath, int pixelSize)
     }
     //need fallback: icon lookup may fail because some icons are currently not present on system
 
-#elif defined ZEN_MAC
-    try
-    {
-        return osx::getFileIcon(filePath.c_str(), pixelSize); //throw SysError
-    }
-    catch (SysError&) { assert(false); }
-#endif
     return ImageHolder();
 }
 
 
 ImageHolder zen::getThumbnailImage(const Zstring& filePath, int pixelSize) //return null icon on failure
 {
-#ifdef ZEN_WIN
-    if (ImageHolder img = getThumbnail(filePath.c_str(), pixelSize))
-        return img;
-
-#elif defined ZEN_LINUX
     struct ::stat fileInfo = {};
     if (::stat(filePath.c_str(), &fileInfo) == 0)
         if (!S_ISFIFO(fileInfo.st_mode)) //skip named pipes: else gdk_pixbuf_get_file_info() would hang forever!
@@ -301,12 +187,5 @@ ImageHolder zen::getThumbnailImage(const Zstring& filePath, int pixelSize) //ret
             }
         }
 
-#elif defined ZEN_MAC
-    try
-    {
-        return osx::getThumbnail(filePath.c_str(), pixelSize); //throw SysError
-    }
-    catch (SysError&) {}
-#endif
     return ImageHolder();
 }

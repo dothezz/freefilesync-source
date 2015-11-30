@@ -35,12 +35,6 @@
 #include "on_completion_box.h"
 #include "app_icon.h"
 
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-
-#elif defined ZEN_MAC
-    #include <ApplicationServices/ApplicationServices.h>
-#endif
 
 using namespace zen;
 
@@ -52,6 +46,8 @@ const int WINDOW_REMAINING_TIME_MS = 60000; //USB memory stick scenario can have
 const int WINDOW_BYTES_PER_SEC     =  5000; //
 
 const int GAUGE_FULL_RANGE = 50000;
+
+inline wxColor getColorGridLine() { return { 192, 192, 192 }; } //light grey
 
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
@@ -560,14 +556,12 @@ public:
         return std::wstring();
     }
 
-    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected, HoverArea rowHover) override
     {
         wxRect rectTmp = rect;
 
         //-------------- draw item separation line -----------------
-        const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
-
-        wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
+        wxDCPenChanger dummy2(dc, wxPen(getColorGridLine(), 1, wxSOLID));
         const bool drawBottomLine = [&] //don't separate multi-line messages
         {
             if (msgView_)
@@ -1231,9 +1225,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 {
     static_assert(IsSameType<TopLevelDialog, wxFrame >::value ||
                   IsSameType<TopLevelDialog, wxDialog>::value, "");
-#ifndef ZEN_MAC
     assert((IsSameType<TopLevelDialog, wxFrame>::value == !parentFrame));
-#endif
 
     //finish construction of this dialog:
     this->SetMinSize(wxSize(470, 280)); //== minimum size! no idea why SetMinSize() is not used...
@@ -1250,9 +1242,6 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_buttonStop ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnCancel), NULL, this);
     pnl.m_bpButtonMinimizeToTray->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnMinimizeToTray), NULL, this);
 
-#ifdef ZEN_WIN
-    new MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
 
     assert(pnl.m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
@@ -1350,11 +1339,6 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     if (showProgress)
     {
         this->Show();
-#ifdef ZEN_MAC
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider non-silent batch mode)
-        ::SetFrontProcess(&psn);
-#endif
         pnl.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
 
         //clear gui flicker, remove dummy texts: window must be visible to make this work!
@@ -1374,11 +1358,6 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
 
         //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
         parentFrame_->Show();
-#ifdef ZEN_MAC
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider GUI mode with "close progress dialog")
-        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
-#endif
         //if (parentFrame_->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
         //    parentFrame_->Iconize(false);
     }
@@ -1465,31 +1444,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::notifyProgressChange() //noexcept!
 
 namespace
 {
-#ifdef ZEN_WIN
-enum Zorder
-{
-    ZORDER_CORRECT,
-    ZORDER_WRONG,
-    ZORDER_INDEFINITE,
-};
-
-Zorder evaluateZorder(const wxWindow& top, const wxWindow& bottom)
-{
-    HWND hTop    = static_cast<HWND>(top   .GetHWND());
-    HWND hBottom = static_cast<HWND>(bottom.GetHWND());
-    assert(hTop && hBottom);
-
-    for (HWND hAbove = hBottom; hAbove; hAbove = ::GetNextWindow(hAbove, GW_HWNDPREV)) //GW_HWNDPREV means "to foreground"
-        if (hAbove == hTop)
-            return ZORDER_CORRECT;
-
-    for (HWND hAbove = hTop; hAbove; hAbove = ::GetNextWindow(hAbove, GW_HWNDPREV))
-        if (hAbove == hBottom)
-            return ZORDER_WRONG;
-
-    return ZORDER_INDEFINITE;
-}
-#endif
 }
 
 
@@ -1649,21 +1603,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         //pnl.m_panelTimeElapsed->Layout(); -> needed?
     }
 
-#ifdef ZEN_WIN
-    //workaround Windows 7 bug messing up z-order after temporary application hangs: https://sourceforge.net/tracker/index.php?func=detail&aid=3376523&group_id=234430&atid=1093080
-    //2013-07: This is still needed no matter if wxDialog or wxPanel is used!
-    if (parentFrame_)
-        if (evaluateZorder(*this, *parentFrame_) == ZORDER_WRONG)
-        {
-            HWND hProgress = static_cast<HWND>(this->GetHWND());
-            if (::IsWindowVisible(hProgress))
-            {
-                ::ShowWindow(hProgress, SW_HIDE); //make Windows recalculate z-order
-                ::ShowWindow(hProgress, SW_SHOW); //
-                //::BringWindowToTop(hProgress); -> untested: better alternative?
-            }
-        }
-#endif
 
     if (allowYield)
     {
@@ -1836,11 +1775,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
-#if (defined __WXGTK__ || defined __WXOSX__)
     //In wxWidgets 2.9.3 upwards, the wxWindow::Reparent() below fails on GTK and OS X if window is frozen! http://forums.codeblocks.org/index.php?topic=13388.45
-#else
-    wxWindowUpdateLocker dummy(this); //badly needed on Windows
-#endif
 
     paused_ = false; //you never know?
 
@@ -1922,9 +1857,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     //show and prepare final statistics
     pnl.m_notebookResult->Show();
 
-#if defined ZEN_WIN || defined ZEN_LINUX
     pnl.m_staticlineFooter->Hide(); //win: m_notebookResult already has a window frame
-#endif
 
     //hide remaining time
     pnl.m_panelTimeRemaining->Hide();
@@ -2054,11 +1987,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnIconize(wxIconizeEvent& event)
             - iconize events only seen for manual minimize
                 => propagate event to parent
     */
-#ifdef ZEN_WIN
-    if (parentFrame_)
-        if (parentFrame_->IsIconized() != event.IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
-            parentFrame_->Iconize(event.IsIconized());
-#endif
     event.Skip();
 }
 
@@ -2076,13 +2004,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
         this->Hide();
         if (parentFrame_)
             parentFrame_->Hide();
-#ifdef ZEN_MAC
-        //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
-        wxTheApp->Yield(true /*onlyIfNeeded -> avoid recursive yield*/); //required to complete TransformProcessType: else a subsequent modal dialog will be erroneously hidden!
-        //-> Yield not needed here since we continue the event loop afterwards!
-#endif
     }
 }
 
@@ -2111,11 +2032,6 @@ void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
         updateDialogStatus(); //restore Windows 7 task bar status   (e.g. required in pause mode)
         updateGuiInt(false);  //restore Windows 7 task bar progress (e.g. required in pause mode)
 
-#ifdef ZEN_MAC
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
-#endif
     }
 }
 
@@ -2134,15 +2050,9 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
     {
         //due to usual "wxBugs", wxDialog on OS X does not float on its parent; wxFrame OTOH does => hack!
         //https://groups.google.com/forum/#!topic/wx-users/J5SjjLaBOQE
-#ifdef ZEN_MAC
-        return new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE | wxFRAME_FLOAT_ON_PARENT,
-        [&](wxFrame& progDlg) { return parentWindow; },
-        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
-#else
         return new SyncProgressDialogImpl<wxDialog>(wxDEFAULT_DIALOG_STYLE | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER,
         [&](wxDialog& progDlg) { return parentWindow; },
         abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
-#endif
     }
     else //FFS batch job
     {

@@ -9,14 +9,8 @@
 
 #include "file_error.h"
 
-#ifdef ZEN_WIN
-    #include "scope_guard.h"
-    #include "win.h" //includes "windows.h"
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     #include "thread.h"
     #include <stdlib.h> //::system()
-#endif
 
 
 namespace zen
@@ -31,84 +25,10 @@ enum ExecutionType
 
 namespace
 {
-#ifdef ZEN_WIN
-template <class Function>
-bool shellExecuteImpl(Function fillExecInfo, ExecutionType type)
-{
-    SHELLEXECUTEINFO execInfo = {};
-    execInfo.cbSize = sizeof(execInfo);
-    execInfo.lpVerb = nullptr;
-    execInfo.nShow  = SW_SHOWNORMAL;
-    execInfo.fMask  = type == EXEC_TYPE_SYNC ? (SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC) : 0;
-    //don't use SEE_MASK_ASYNCOK -> different async mode than the default which returns successful despite errors!
-    execInfo.fMask |= SEE_MASK_FLAG_NO_UI; //::ShellExecuteEx() shows a non-blocking pop-up dialog on errors -> we want a blocking one
-    //for the record, SEE_MASK_UNICODE does nothing: http://blogs.msdn.com/b/oldnewthing/archive/2014/02/27/10503519.aspx
-
-    fillExecInfo(execInfo);
-
-    if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
-        return false;
-
-    if (execInfo.hProcess)
-    {
-        ZEN_ON_SCOPE_EXIT(::CloseHandle(execInfo.hProcess));
-
-        if (type == EXEC_TYPE_SYNC)
-            ::WaitForSingleObject(execInfo.hProcess, INFINITE);
-    }
-    return true;
-}
-
-
-void shellExecute(const void* /*PCIDLIST_ABSOLUTE*/ shellItemPidl, const std::wstring& displayPath, ExecutionType type) //throw FileError
-{
-    auto fillExecInfo = [&](SHELLEXECUTEINFO& execInfo)
-    {
-        execInfo.fMask |= SEE_MASK_IDLIST;
-        execInfo.lpIDList = const_cast<void*>(shellItemPidl); //lpIDList is documented as PCIDLIST_ABSOLUTE!
-    };
-
-    if (!shellExecuteImpl(fillExecInfo , type)) //throw FileError
-        THROW_LAST_FILE_ERROR(_("Incorrect command line:") + L"\n" + fmtPath(displayPath), L"ShellExecuteEx");
-}
-#endif
 
 
 void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
 {
-#ifdef ZEN_WIN
-    //parse commandline
-    Zstring commandTmp = command;
-    trim(commandTmp, true, false); //CommandLineToArgvW() does not like leading spaces
-
-    std::vector<Zstring> argv;
-    int argc = 0;
-    if (LPWSTR* tmp = ::CommandLineToArgvW(commandTmp.c_str(), &argc))
-    {
-        ZEN_ON_SCOPE_EXIT(::LocalFree(tmp));
-        std::copy(tmp, tmp + argc, std::back_inserter(argv));
-    }
-
-    Zstring filepath;
-    Zstring arguments;
-    if (!argv.empty())
-    {
-        filepath = argv[0];
-        for (auto it = argv.begin() + 1; it != argv.end(); ++it)
-            arguments += (it != argv.begin() ? L" " : L"") +
-                         (it->empty() || std::any_of(it->begin(), it->end(), &isWhiteSpace<wchar_t>) ? L"\"" + *it + L"\"" : *it);
-    }
-
-    auto fillExecInfo = [&](SHELLEXECUTEINFO& execInfo)
-    {
-        execInfo.lpFile       = filepath.c_str();
-        execInfo.lpParameters = arguments.c_str();
-    };
-
-    if (!shellExecuteImpl(fillExecInfo, type))
-        THROW_LAST_FILE_ERROR(_("Incorrect command line:") + L"\nFile: " + fmtPath(filepath) + L"\nArg: " + copyStringTo<std::wstring>(arguments), L"ShellExecuteEx");
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     /*
     we cannot use wxExecute due to various issues:
     - screws up encoding on OS X for non-ASCII characters
@@ -125,7 +45,6 @@ void shellExecute(const Zstring& command, ExecutionType type) //throw FileError
     }
     else
         runAsync([=] { int rv = ::system(command.c_str()); (void)rv; });
-#endif
 }
 }
 }

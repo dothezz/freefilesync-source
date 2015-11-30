@@ -8,14 +8,7 @@
 #define DEPRECATE_H_234897087787348
 
 //compiler macros: http://predef.sourceforge.net/precomp.html
-#ifdef __GNUC__
     #define ZEN_DEPRECATE __attribute__ ((deprecated))
 
-#elif defined _MSC_VER
-    #define ZEN_DEPRECATE __declspec(deprecated)
-
-#else
-    #error add your platform here!
-#endif
 
 #endif //DEPRECATE_H_234897087787348

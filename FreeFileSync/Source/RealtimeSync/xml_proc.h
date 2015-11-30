@@ -10,16 +10,15 @@
 #include <vector>
 #include <zen/xml_io.h>
 #include <zen/zstring.h>
-
+#include <wx/language.h>
 
 namespace xmlAccess
 {
 struct XmlRealConfig
 {
-    XmlRealConfig() : delay(10) {}
     std::vector<Zstring> directories;
     Zstring commandline;
-    unsigned int delay;
+    unsigned int delay = 10;
 };
 
 void readConfig(const Zstring& filepath, XmlRealConfig& config, std::wstring& warningMsg); //throw FileError
@@ -29,7 +28,7 @@ void writeConfig(const XmlRealConfig& config, const Zstring& filepath); //throw 
 //reuse (some of) FreeFileSync's xml files
 void readRealOrBatchConfig(const Zstring& filepath, xmlAccess::XmlRealConfig& config, std::wstring& warningMsg); //throw FileError
 
-int getProgramLanguage();
+wxLanguage getProgramLanguage();
 }
 
 #endif //XML_PROC_H_0813748158321813490

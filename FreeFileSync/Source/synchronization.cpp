@@ -15,14 +15,8 @@
 #include "fs/concrete.h"
 #include "fs/native.h"
 
-#ifdef ZEN_WIN
-    #include <zen/long_path_prefix.h>
-    #include "lib/shadow.h"
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     #include <unistd.h> //fsync
     #include <fcntl.h>  //open
-#endif
 
 using namespace zen;
 
@@ -619,15 +613,9 @@ public:
                           bool verifyCopiedFiles,
                           bool copyFilePermissions,
                           bool transactionalFileCopy,
-#ifdef ZEN_WIN
-                          shadow::ShadowCopy* shadowCopyHandler,
-#endif
                           DeletionHandling& delHandlingLeft,
                           DeletionHandling& delHandlingRight) :
         procCallback_(procCallback),
-#ifdef ZEN_WIN
-        shadowCopyHandler_(shadowCopyHandler),
-#endif
         delHandlingLeft_(delHandlingLeft),
         delHandlingRight_(delHandlingRight),
         verifyCopiedFiles_(verifyCopiedFiles),
@@ -699,9 +687,6 @@ private:
     DeletionHandling& getDelHandling();
 
     ProcessCallback& procCallback_;
-#ifdef ZEN_WIN
-    shadow::ShadowCopy* shadowCopyHandler_; //optional!
-#endif
     DeletionHandling& delHandlingLeft_;
     DeletionHandling& delHandlingRight_;
 
@@ -1609,23 +1594,6 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
         // => it seems OS buffered are not invalidated by this: snake oil???
         if (Opt<Zstring> nativeTargetPath = AFS::getNativeItemPath(targetPath))
         {
-#ifdef ZEN_WIN
-            const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(*nativeTargetPath).c_str(), //_In_      LPCTSTR lpFileName,
-                                                   GENERIC_WRITE |        //_In_      DWORD dwDesiredAccess,
-                                                   GENERIC_READ,          //=> request read-access, too, just like "copy /v" command
-                                                   FILE_SHARE_READ | FILE_SHARE_DELETE,     //_In_      DWORD dwShareMode,
-                                                   nullptr,               //_In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-                                                   OPEN_EXISTING,         //_In_      DWORD dwCreationDisposition,
-                                                   FILE_ATTRIBUTE_NORMAL, //_In_      DWORD dwFlagsAndAttributes,
-                                                   nullptr);              //_In_opt_  HANDLE hTemplateFile
-            if (fileHandle == INVALID_HANDLE_VALUE)
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"CreateFile");
-            ZEN_ON_SCOPE_EXIT(::CloseHandle(fileHandle));
-
-            if (!::FlushFileBuffers(fileHandle))
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"FlushFileBuffers");
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
             const int fileHandle = ::open(nativeTargetPath->c_str(), O_WRONLY);
             if (fileHandle == -1)
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"open");
@@ -1633,7 +1601,6 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
 
             if (::fsync(fileHandle) != 0)
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"fsync");
-#endif
         } //close file handles!
 
         if (onUpdateStatus) onUpdateStatus(0);
@@ -1676,38 +1643,7 @@ AFS::FileAttribAfterCopy SynchronizeFolderPair::copyFileWithCallback(const Abstr
         return newAttr;
     };
 
-#ifdef ZEN_WIN
-    try
-    {
-        return copyOperation(sourcePath);
-    }
-    catch (ErrorFileLocked& e1)
-    {
-        if (shadowCopyHandler_) //if file is locked (try to) use Windows Volume Shadow Copy Service:
-            if (Opt<Zstring> nativeSourcePath = AFS::getNativeItemPath(sourcePath))
-            {
-                Zstring nativeShadowPath; //contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
-                try
-                {
-                    nativeShadowPath = shadowCopyHandler_->makeShadowCopy(*nativeSourcePath, //throw FileError
-                                                                          [&](const Zstring& volumeName)
-                    {
-                        procCallback_.reportStatus(replaceCpy(_("Creating a Volume Shadow Copy for %x..."), L"%x", fmtPath(volumeName)));
-                    });
-                }
-                catch (const FileError& e2) //enhance error message
-                {
-                    throw FileError(e1.toString(), e2.toString());
-                }
-
-                //now try again
-                return copyOperation(createItemPathNative(nativeShadowPath));
-            }
-        throw;
-    }
-#else
     return copyOperation(sourcePath);
-#endif
 }
 
 //###########################################################################################
@@ -2015,7 +1951,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                         freeSpace < minSpaceNeeded)
                         diskSpaceMissing.emplace_back(baseFolderPath, std::make_pair(minSpaceNeeded, freeSpace));
                 }
-                catch (FileError&) { assert(false); } //for warning only => no need for tryReportingError()
+                catch (FileError&) {} //for warning only => no need for tryReportingError()
         };
         const std::pair<std::int64_t, std::int64_t> spaceNeeded = MinimumDiskSpaceNeeded::calculate(*j);
         checkSpace(j->getAbstractPath<LEFT_SIDE >(), spaceNeeded.first);
@@ -2120,12 +2056,6 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     //-------------------end of basic checks------------------------------------------
 
-#ifdef ZEN_WIN
-    //shadow copy buffer: per sync-instance, not folder pair
-    std::unique_ptr<shadow::ShadowCopy> shadowCopyHandler;
-    if (copyLockedFiles)
-        shadowCopyHandler = std::make_unique<shadow::ShadowCopy>();
-#endif
 
     try
     {
@@ -2160,13 +2090,15 @@ void zen::synchronize(const TimeComp& timeStamp,
             //execute synchronization recursively
 
             //update synchronization database in case of errors:
-            ZEN_ON_SCOPE_FAIL(try
+            ZEN_ON_SCOPE_FAIL
+            (
+                try
             {
                 if (folderPairCfg.saveSyncDB_)
                     zen::saveLastSynchronousState(*j, nullptr);
             } //throw FileError
             catch (FileError&) {}
-                             );
+            );
 
             if (jobType[folderIndex] == FolderPairJobType::PROCESS)
             {
@@ -2212,9 +2144,6 @@ void zen::synchronize(const TimeComp& timeStamp,
 
 
                 SynchronizeFolderPair syncFP(callback, verifyCopiedFiles, copyPermissionsFp, transactionalFileCopy,
-#ifdef ZEN_WIN
-                                             shadowCopyHandler.get(),
-#endif
                                              delHandlerL, delHandlerR);
                 syncFP.startSync(*j);
 

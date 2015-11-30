@@ -46,9 +46,6 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     static AbstractPath appendRelPath(const AbstractPath& ap, const Zstring& relPath)
     {
-#ifdef ZEN_WIN
-        assert(!contains(relPath, L"/")); //relPath is expected to use FILE_NAME_SEPARATOR!
-#endif
         assert(relPath.empty() || (!startsWith(relPath, FILE_NAME_SEPARATOR) && !endsWith(relPath, FILE_NAME_SEPARATOR)));
         return AbstractPath(ap.afs, ap.afs->appendRelPathToItemPathImpl(ap.itemPathImpl, relPath));
     }

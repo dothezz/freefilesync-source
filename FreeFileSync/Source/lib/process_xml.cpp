@@ -10,6 +10,8 @@
 #include <zen/file_access.h>
 #include <zen/file_io.h>
 #include <zen/xml_io.h>
+#include <zen/optional.h>
+#include <wx/intl.h>
 #include "ffs_paths.h"
 
 using namespace zen;
@@ -19,9 +21,9 @@ using namespace std::rel_ops;
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
-const int XML_FORMAT_VER_GLOBAL    = 1;
-const int XML_FORMAT_VER_FFS_GUI   = 4; //for FFS 6.8
-const int XML_FORMAT_VER_FFS_BATCH = 4; //
+const int XML_FORMAT_VER_GLOBAL    = 2; //
+const int XML_FORMAT_VER_FFS_GUI   = 5; //for FFS 7.7
+const int XML_FORMAT_VER_FFS_BATCH = 5; //
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -140,18 +142,44 @@ Zstring mergeFilterLines(const std::vector<Zstring>& filterLines)
 }
 }
 
-
 namespace zen
 {
+template <> inline
+void writeText(const wxLanguage& value, std::string& output)
+{
+    //use description as unique wxLanguage identifier, see localization.cpp
+    //=> handle changes to wxLanguage enum between wxWidgets versions
+    if (const wxLanguageInfo* lngInfo = wxLocale::GetLanguageInfo(value))
+        output = utfCvrtTo<std::string>(lngInfo->Description);
+    else
+    {
+        assert(false);
+        output = "English (U.S.)";
+    }
+    return;
+}
+
+template <> inline
+bool readText(const std::string& input, wxLanguage& value)
+{
+    if (const wxLanguageInfo* lngInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(input)))
+    {
+        value = static_cast<wxLanguage>(lngInfo->Language);
+        return true;
+    }
+    return false;
+}
+
+
 template <> inline
 void writeText(const CompareVariant& value, std::string& output)
 {
     switch (value)
     {
-        case zen::CMP_BY_TIME_SIZE:
+        case CMP_BY_TIME_SIZE:
             output = "TimeAndSize";
             break;
-        case zen::CMP_BY_CONTENT:
+        case CMP_BY_CONTENT:
             output = "Content";
             break;
     }
@@ -162,9 +190,9 @@ bool readText(const std::string& input, CompareVariant& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "TimeAndSize")
-        value = zen::CMP_BY_TIME_SIZE;
+        value = CMP_BY_TIME_SIZE;
     else if (tmp == "Content")
-        value = zen::CMP_BY_CONTENT;
+        value = CMP_BY_CONTENT;
     else
         return false;
     return true;
@@ -370,25 +398,25 @@ void writeText(const ColumnTypeRim& value, std::string& output)
 {
     switch (value)
     {
-        case COL_TYPE_BASE_DIRECTORY:
+        case ColumnTypeRim::BASE_DIRECTORY:
             output = "Base";
             break;
-        case COL_TYPE_FULL_PATH:
+        case ColumnTypeRim::FULL_PATH:
             output = "Full";
             break;
-        case COL_TYPE_REL_FOLDER:
+        case ColumnTypeRim::REL_FOLDER:
             output = "Rel";
             break;
-        case COL_TYPE_FILENAME:
+        case ColumnTypeRim::FILENAME:
             output = "Name";
             break;
-        case COL_TYPE_SIZE:
+        case ColumnTypeRim::SIZE:
             output = "Size";
             break;
-        case COL_TYPE_DATE:
+        case ColumnTypeRim::DATE:
             output = "Date";
             break;
-        case COL_TYPE_EXTENSION:
+        case ColumnTypeRim::EXTENSION:
             output = "Ext";
             break;
     }
@@ -399,19 +427,19 @@ bool readText(const std::string& input, ColumnTypeRim& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "Base")
-        value = COL_TYPE_BASE_DIRECTORY;
+        value = ColumnTypeRim::BASE_DIRECTORY;
     else if (tmp == "Full")
-        value = COL_TYPE_FULL_PATH;
+        value = ColumnTypeRim::FULL_PATH;
     else if (tmp == "Rel")
-        value = COL_TYPE_REL_FOLDER;
+        value = ColumnTypeRim::REL_FOLDER;
     else if (tmp == "Name")
-        value = COL_TYPE_FILENAME;
+        value = ColumnTypeRim::FILENAME;
     else if (tmp == "Size")
-        value = COL_TYPE_SIZE;
+        value = ColumnTypeRim::SIZE;
     else if (tmp == "Date")
-        value = COL_TYPE_DATE;
+        value = ColumnTypeRim::DATE;
     else if (tmp == "Ext")
-        value = COL_TYPE_EXTENSION;
+        value = ColumnTypeRim::EXTENSION;
     else
         return false;
     return true;
@@ -423,13 +451,13 @@ void writeText(const ColumnTypeNavi& value, std::string& output)
 {
     switch (value)
     {
-        case COL_TYPE_NAVI_BYTES:
+        case ColumnTypeNavi::BYTES:
             output = "Bytes";
             break;
-        case COL_TYPE_NAVI_DIRECTORY:
+        case ColumnTypeNavi::DIRECTORY:
             output = "Tree";
             break;
-        case COL_TYPE_NAVI_ITEM_COUNT:
+        case ColumnTypeNavi::ITEM_COUNT:
             output = "Count";
             break;
     }
@@ -440,11 +468,11 @@ bool readText(const std::string& input, ColumnTypeNavi& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "Bytes")
-        value = COL_TYPE_NAVI_BYTES;
+        value = ColumnTypeNavi::BYTES;
     else if (tmp == "Tree")
-        value = COL_TYPE_NAVI_DIRECTORY;
+        value = ColumnTypeNavi::DIRECTORY;
     else if (tmp == "Count")
-        value = COL_TYPE_NAVI_ITEM_COUNT;
+        value = ColumnTypeNavi::ITEM_COUNT;
     else
         return false;
     return true;
@@ -702,24 +730,41 @@ void writeStruc(const ViewFilterDefault& value, XmlElement& output)
     actView.attribute("DeleteRight", value.deleteRight);
     actView.attribute("DoNothing"  , value.doNothing);
 }
+}
 
 
-template <> inline
-bool readStruc(const XmlElement& input, ConfigHistoryItem& value)
+namespace
 {
-    XmlIn in(input);
-    bool rv1 = in(value.configFile);
-    //bool rv2 = in.attribute("LastUsed", value.lastUseTime);
-    return rv1 /*&& rv2*/;
+
+
+Zstring substituteFreeFileSyncDriveLetter(const Zstring& cfgFilePath)
+{
+    return cfgFilePath;
+}
+
+
+Zstring resolveFreeFileSyncDriveMacro(const Zstring& cfgFilePhrase)
+{
+    return cfgFilePhrase;
+}
+}
+
+
+namespace zen
+{
+//FFS portable: use special syntax for config file paths: e.g. "ffs_drive:\SyncJob.ffs_gui"
+template <> inline
+bool readText(const std::string& input, ConfigFileItem& value)
+{
+    value.filePath_ = resolveFreeFileSyncDriveMacro(utfCvrtTo<Zstring>(input));
+    return true;
 }
 
 
 template <> inline
-void writeStruc(const ConfigHistoryItem& value, XmlElement& output)
+void writeText(const ConfigFileItem& value, std::string& output)
 {
-    XmlOut out(output);
-    out(value.configFile);
-    //out.attribute("LastUsed", value.lastUseTime);
+    output = utfCvrtTo<std::string>(substituteFreeFileSyncDriveLetter(value.filePath_));
 }
 }
 
@@ -728,9 +773,22 @@ namespace
 {
 void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
-    in["Variant"  ](cmpConfig.compareVar);
-    in["TimeShift"](cmpConfig.optTimeShiftHours);
-    in["Symlinks" ](cmpConfig.handleSymlinks);
+    in["Variant" ](cmpConfig.compareVar);
+    in["Symlinks"](cmpConfig.handleSymlinks);
+
+    warn_static("remove old parameter after migration! 2015-11-05")
+    if (in["TimeShift"])
+    {
+        std::wstring timeShiftPhrase;
+        if (in["TimeShift"](timeShiftPhrase))
+            cmpConfig.ignoreTimeShiftMinutes = fromTimeShiftPhrase(timeShiftPhrase);
+    }
+    else
+    {
+        std::wstring timeShiftPhrase;
+        if (in["IgnoreTimeShift"](timeShiftPhrase))
+            cmpConfig.ignoreTimeShiftMinutes = fromTimeShiftPhrase(timeShiftPhrase);
+    }
 }
 
 
@@ -884,7 +942,12 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 {
     XmlIn inShared = in["Shared"];
 
-    inShared["Language"].attribute("Id", config.programLanguage);
+    warn_static("remove old parameter after migration! 2015-11-07")
+    int langId = 0;
+    if (inShared["Language"] && inShared["Language"].get()->getAttribute("Id", langId))
+        config.programLanguage = static_cast<wxLanguage>(langId);
+    else
+        inShared["Language"].attribute("Name", config.programLanguage);
 
     inShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
     inShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
@@ -1124,9 +1187,9 @@ namespace
 {
 void writeConfig(const CompConfig& cmpConfig, XmlOut& out)
 {
-    out["Variant"  ](cmpConfig.compareVar);
-    out["TimeShift"](cmpConfig.optTimeShiftHours);
-    out["Symlinks" ](cmpConfig.handleSymlinks);
+    out["Variant" ](cmpConfig.compareVar);
+    out["Symlinks"](cmpConfig.handleSymlinks);
+    out["IgnoreTimeShift"](toTimeShiftPhrase(cmpConfig.ignoreTimeShiftMinutes));
 }
 
 
@@ -1269,7 +1332,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 {
     XmlOut outShared = out["Shared"];
 
-    outShared["Language"].attribute("Id", config.programLanguage);
+    outShared["Language"].attribute("Name", config.programLanguage);
 
     outShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
     outShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);

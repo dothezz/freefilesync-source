@@ -12,7 +12,6 @@
 #include "localization.h"
 #include "../structures.h"
 #include "../ui/column_attr.h"
-#include "../ui/folder_history_types.h"
 
 
 namespace xmlAccess
@@ -122,6 +121,16 @@ struct ViewFilterDefault
     bool doNothing   = true;
 };
 
+
+struct ConfigFileItem
+{
+    ConfigFileItem() {}
+    explicit ConfigFileItem(const Zstring& filePath) : filePath_(filePath) {}
+    Zstring filePath_;
+    //add support? -> time_t lastSyncTime
+};
+
+
 Zstring getGlobalConfigFile();
 
 struct XmlGlobalSettings
@@ -130,7 +139,7 @@ struct XmlGlobalSettings
 
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
-    int programLanguage = zen::retrieveSystemLanguage();
+    wxLanguage programLanguage = zen::getSystemLanguage();
     bool failsafeFileCopy = true;
     bool copyLockedFiles  = false; //safer default: avoid copies of partially written files
     bool copyFilePermissions = false;
@@ -152,19 +161,9 @@ struct XmlGlobalSettings
         {
             //default external apps will be translated "on the fly"!!!
             //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
-#ifdef ZEN_WIN
-            externelApplications.emplace_back(L"Show in Explorer",              L"explorer /select, \"%item_path%\"");
-            externelApplications.emplace_back(L"Open with default application", L"\"%item_path%\"");
-            //mark for extraction: _("Show in Explorer")
-            //mark for extraction: _("Open with default application")
-#elif defined ZEN_LINUX
             externelApplications.emplace_back(L"Browse directory",              L"xdg-open \"%item_folder%\"");
             externelApplications.emplace_back(L"Open with default application", L"xdg-open \"%item_path%\"");
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
-#elif defined ZEN_MAC
-            externelApplications.emplace_back(L"Browse directory",              L"open -R \"%item_path%\"");
-            externelApplications.emplace_back(L"Open with default application", L"open \"%item_path%\"");
-#endif
         }
 
         wxPoint dlgPos;
@@ -185,10 +184,10 @@ struct XmlGlobalSettings
 
         ExternalApps externelApplications;
 
-        std::vector<zen::ConfigHistoryItem> cfgFileHistory;
+        std::vector<ConfigFileItem> cfgFileHistory;
         size_t cfgFileHistMax = 30;
 
-        std::vector<Zstring> lastUsedConfigFiles;
+        std::vector<ConfigFileItem> lastUsedConfigFiles;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
@@ -197,23 +196,8 @@ struct XmlGlobalSettings
         std::vector<Zstring> onCompletionHistory;
         size_t onCompletionHistoryMax = 8;
 
-#ifdef ZEN_WIN
-        Zstring defaultExclusionFilter = Zstr("\\System Volume Information\\") Zstr("\n")
-                                         Zstr("\\$Recycle.Bin\\")              Zstr("\n")
-                                         Zstr("\\RECYCLER\\")                  Zstr("\n")
-                                         Zstr("\\RECYCLED\\")                  Zstr("\n")
-                                         Zstr("*\\desktop.ini")                Zstr("\n")
-                                         Zstr("*\\thumbs.db");
-#elif defined ZEN_LINUX
         Zstring defaultExclusionFilter = Zstr("/.Trash-*/") Zstr("\n")
                                          Zstr("/.recycle/");
-#elif defined ZEN_MAC
-        Zstring defaultExclusionFilter = Zstr("/.fseventsd/")      Zstr("\n")
-                                         Zstr("/.Spotlight-V100/") Zstr("\n")
-                                         Zstr("/.Trashes/")        Zstr("\n")
-                                         Zstr("*/.DS_Store")       Zstr("\n")
-                                         Zstr("*/._.*");
-#endif
         struct
         {
             bool    keepRelPaths      = true;

@@ -44,11 +44,18 @@
 
 	<ol>
 		<li><p>
-				In FreeFileSync's comparison settings you can enter a full-hour time shift to ignore during comparison:
-				If you need to handle differences due to daylight saving time enter a one hour shift. If the differences are caused by changing the time zone 
-				enter a larger shift as needed.
+				In FreeFileSync's comparison settings you can enter one or more time shifts to ignore during comparison:
+				If you need to handle differences due to daylight saving time enter a single one hour shift. If the differences are caused by changing the time zone 
+				enter an appropriate shift as needed.
+				<br>
 			</p>
 			<img src="../images/ignore-time-shift.png" alt="Ignore daylight saving time shift"><br>
+			<br>
+			<div class="box-outer"><div class="bluebox"><div class="box-inner">
+				<b>Note</b><br>
+				File times have to be equal or differ by exactly the time shift entered to be considered the same. 
+				Therefore the time shift setting should not be confused with a time interval or tolerance.
+			</div></div></div>
 			<br>
 		
 		<li>Alternatively you can avoid the problem in first place by only synchronizing from FAT to FAT or NTFS to NTFS file systems.

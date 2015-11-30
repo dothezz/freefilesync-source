@@ -11,39 +11,39 @@
 
 namespace zen
 {
-enum ColumnTypeRim
+enum class ColumnTypeRim
 {
-    COL_TYPE_FULL_PATH,
-    COL_TYPE_BASE_DIRECTORY,
-    COL_TYPE_REL_FOLDER,
-    COL_TYPE_FILENAME,
-    COL_TYPE_SIZE,
-    COL_TYPE_DATE,
-    COL_TYPE_EXTENSION
+    FULL_PATH,
+    BASE_DIRECTORY,
+    REL_FOLDER,
+    FILENAME,
+    SIZE,
+    DATE,
+    EXTENSION
 };
 
 struct ColumnAttributeRim
 {
-    ColumnAttributeRim() : type_(COL_TYPE_BASE_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
+    ColumnAttributeRim() {}
     ColumnAttributeRim(ColumnTypeRim type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
-    ColumnTypeRim type_;
-    int           offset_;
-    int           stretch_;
-    bool          visible_;
+    ColumnTypeRim type_    = ColumnTypeRim::FULL_PATH;
+    int           offset_  = 0;
+    int           stretch_ = 0;;
+    bool          visible_ = false;
 };
 
 inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.emplace_back(COL_TYPE_FULL_PATH,      250, 0, false);
-    attr.emplace_back(COL_TYPE_BASE_DIRECTORY, 200, 0, false);
-    attr.emplace_back(COL_TYPE_REL_FOLDER,    -280, 1, true); //stretch to full width and substract sum of fixed size widths!
-    attr.emplace_back(COL_TYPE_FILENAME,       200, 0, true);
-    attr.emplace_back(COL_TYPE_DATE,           112, 0, false);
-    attr.emplace_back(COL_TYPE_SIZE,            80, 0, true);
-    attr.emplace_back(COL_TYPE_EXTENSION,       60, 0, false);
+    attr.emplace_back(ColumnTypeRim::FULL_PATH,      250, 0, false);
+    attr.emplace_back(ColumnTypeRim::BASE_DIRECTORY, 200, 0, false);
+    attr.emplace_back(ColumnTypeRim::REL_FOLDER,    -280, 1, true); //stretch to full width and substract sum of fixed size widths!
+    attr.emplace_back(ColumnTypeRim::FILENAME,       200, 0, true);
+    attr.emplace_back(ColumnTypeRim::DATE,           112, 0, false);
+    attr.emplace_back(ColumnTypeRim::SIZE,            80, 0, true);
+    attr.emplace_back(ColumnTypeRim::EXTENSION,       60, 0, false);
     return attr;
 }
 
@@ -51,58 +51,58 @@ inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.emplace_back(COL_TYPE_FULL_PATH,      250, 0, false);
-    attr.emplace_back(COL_TYPE_BASE_DIRECTORY, 200, 0, false);
-    attr.emplace_back(COL_TYPE_REL_FOLDER  ,  -280, 1, false); //already shown on left side
-    attr.emplace_back(COL_TYPE_FILENAME,       200, 0, true);
-    attr.emplace_back(COL_TYPE_DATE,           112, 0, false);
-    attr.emplace_back(COL_TYPE_SIZE,            80, 0, true);
-    attr.emplace_back(COL_TYPE_EXTENSION,       60, 0, false);
+    attr.emplace_back(ColumnTypeRim::FULL_PATH,      250, 0, false);
+    attr.emplace_back(ColumnTypeRim::BASE_DIRECTORY, 200, 0, false);
+    attr.emplace_back(ColumnTypeRim::REL_FOLDER  ,  -280, 1, false); //already shown on left side
+    attr.emplace_back(ColumnTypeRim::FILENAME,       200, 0, true);
+    attr.emplace_back(ColumnTypeRim::DATE,           112, 0, false);
+    attr.emplace_back(ColumnTypeRim::SIZE,            80, 0, true);
+    attr.emplace_back(ColumnTypeRim::EXTENSION,       60, 0, false);
     return attr;
 }
 
 //------------------------------------------------------------------
 
-enum ColumnTypeMiddle
+enum class ColumnTypeCenter
 {
-    COL_TYPE_CHECKBOX,
-    COL_TYPE_CMP_CATEGORY,
-    COL_TYPE_SYNC_ACTION,
+    CHECKBOX,
+    CMP_CATEGORY,
+    SYNC_ACTION,
 };
 
 //------------------------------------------------------------------
 
-enum ColumnTypeNavi
+enum class ColumnTypeNavi
 {
-    COL_TYPE_NAVI_BYTES,
-    COL_TYPE_NAVI_DIRECTORY,
-    COL_TYPE_NAVI_ITEM_COUNT
+    BYTES,
+    DIRECTORY,
+    ITEM_COUNT
 };
 
 
 struct ColumnAttributeNavi
 {
-    ColumnAttributeNavi() : type_(COL_TYPE_NAVI_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
+    ColumnAttributeNavi() {}
     ColumnAttributeNavi(ColumnTypeNavi type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
-    ColumnTypeNavi type_;
-    int            offset_;
-    int            stretch_;
-    bool           visible_;
+    ColumnTypeNavi type_    = ColumnTypeNavi::DIRECTORY;
+    int            offset_  = 0;
+    int            stretch_ = 0;;
+    bool           visible_ = false;
 };
 
 
 const bool defaultValueShowPercentage = true;
-const ColumnTypeNavi defaultValueLastSortColumn = COL_TYPE_NAVI_BYTES; //remember sort on navigation panel
+const ColumnTypeNavi defaultValueLastSortColumn = ColumnTypeNavi::BYTES; //remember sort on navigation panel
 const bool defaultValueLastSortAscending = false;                      //
 
 inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
     std::vector<ColumnAttributeNavi> attr;
-    attr.emplace_back(COL_TYPE_NAVI_DIRECTORY, -120, 1, true); //stretch to full width and substract sum of fixed size widths
-    attr.emplace_back(COL_TYPE_NAVI_ITEM_COUNT,  60, 0, true);
-    attr.emplace_back(COL_TYPE_NAVI_BYTES,       60, 0, true); //GTK needs a few pixels width more
+    attr.emplace_back(ColumnTypeNavi::DIRECTORY, -120, 1, true); //stretch to full width and substract sum of fixed size widths
+    attr.emplace_back(ColumnTypeNavi::ITEM_COUNT,  60, 0, true);
+    attr.emplace_back(ColumnTypeNavi::BYTES,       60, 0, true); //GTK needs a few pixels width more
     return attr;
 }
 }

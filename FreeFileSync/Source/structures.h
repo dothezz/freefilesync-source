@@ -167,19 +167,23 @@ struct CompConfig
 {
     CompareVariant compareVar = CMP_BY_TIME_SIZE;
     SymLinkHandling handleSymlinks = SYMLINK_EXCLUDE;
-    unsigned int optTimeShiftHours = 0; //if != 0: treat modification times with this offset as equal
+    std::vector<unsigned int> ignoreTimeShiftMinutes; //treat modification times with these offsets as equal
 };
 
 inline
 bool operator==(const CompConfig& lhs, const CompConfig& rhs)
 {
-    return lhs.compareVar        == rhs.compareVar &&
-           lhs.handleSymlinks    == rhs.handleSymlinks &&
-           lhs.optTimeShiftHours == rhs.optTimeShiftHours;
+    return lhs.compareVar             == rhs.compareVar &&
+           lhs.handleSymlinks         == rhs.handleSymlinks &&
+           lhs.ignoreTimeShiftMinutes == rhs.ignoreTimeShiftMinutes;
 }
 
 inline
 bool effectivelyEqual(const CompConfig& lhs, const CompConfig& rhs) { return lhs == rhs; } //no change in behavior
+
+//convert "ignoreTimeShiftMinutes" into compact format:
+std::vector<unsigned int> fromTimeShiftPhrase(const std::wstring& timeShiftPhrase);
+std::wstring              toTimeShiftPhrase  (const std::vector<unsigned int>& ignoreTimeShiftMinutes);
 
 
 enum DeletionPolicy

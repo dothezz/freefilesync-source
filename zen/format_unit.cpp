@@ -12,15 +12,8 @@
 #include <ctime>
 #include <cstdio>
 
-#ifdef ZEN_WIN
-    #include "int64.h"
-    #include "win.h" //includes "windows.h"
-    #include "win_ver.h"
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     #include <clocale> //thousands separator
     #include "utf.h"   //
-#endif
 
 using namespace zen;
 
@@ -160,109 +153,10 @@ std::wstring zen::fractionToString(double fraction)
 }
 
 
-#ifdef ZEN_WIN
-namespace
-{
-bool getUserSetting(LCTYPE lt, UINT& setting)
-{
-    return ::GetLocaleInfo(LOCALE_USER_DEFAULT,                  //__in   LCID Locale,
-                           lt | LOCALE_RETURN_NUMBER,            //__in   LCTYPE LCType,
-                           reinterpret_cast<LPTSTR>(&setting),   //__out  LPTSTR lpLCData,
-                           sizeof(setting) / sizeof(TCHAR)) > 0; //__in   int cchData
-}
-
-
-bool getUserSetting(LCTYPE lt, std::wstring& setting)
-{
-    int bufferSize = ::GetLocaleInfo(LOCALE_USER_DEFAULT, lt, nullptr, 0);
-    if (bufferSize > 0)
-    {
-        std::vector<wchar_t> buffer(bufferSize);
-        if (::GetLocaleInfo(LOCALE_USER_DEFAULT, //__in   LCID Locale,
-                            lt,                  //__in   LCTYPE LCType,
-                            &buffer[0],          //__out  LPTSTR lpLCData,
-                            bufferSize) > 0)     //__in   int cchData
-        {
-            setting = &buffer[0]; //GetLocaleInfo() returns char count *including* 0-termination!
-            return true;
-        }
-    }
-    return false;
-}
-
-class IntegerFormat
-{
-public:
-    static const NUMBERFMT& get() { return getInst().fmt; }
-    static bool isValid() { return getInst().valid_; }
-
-private:
-    static const IntegerFormat& getInst()
-    {
-#if defined _MSC_VER && _MSC_VER < 1900
-#error function scope static initialization is not yet thread-safe!
-#endif
-        static IntegerFormat inst;
-        return inst;
-    }
-
-    IntegerFormat()
-    {
-        //all we want is default NUMBERFMT, but set NumDigits to 0
-        fmt.NumDigits = 0;
-
-        //what a disgrace:
-        std::wstring grouping;
-        if (getUserSetting(LOCALE_ILZERO,     fmt.LeadingZero) &&
-            getUserSetting(LOCALE_SGROUPING,  grouping)        &&
-            getUserSetting(LOCALE_SDECIMAL,   decimalSep)      &&
-            getUserSetting(LOCALE_STHOUSAND,  thousandSep)     &&
-            getUserSetting(LOCALE_INEGNUMBER, fmt.NegativeOrder))
-        {
-            fmt.lpDecimalSep  = &decimalSep[0]; //not used
-            fmt.lpThousandSep = &thousandSep[0];
-
-            //convert LOCALE_SGROUPING to Grouping: http://blogs.msdn.com/b/oldnewthing/archive/2006/04/18/578251.aspx
-            replace(grouping, L';', L"");
-            if (endsWith(grouping, L'0'))
-                grouping.pop_back();
-            else
-                grouping += L'0';
-            fmt.Grouping = stringTo<UINT>(grouping);
-            valid_ = true;
-        }
-    }
-
-    NUMBERFMT fmt = {};
-    std::wstring thousandSep;
-    std::wstring decimalSep;
-    bool valid_ = false;
-};
-}
-#endif
 
 
 std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 {
-#ifdef ZEN_WIN
-    if (IntegerFormat::isValid())
-    {
-        int bufferSize = ::GetNumberFormat(LOCALE_USER_DEFAULT, 0, number.c_str(), &IntegerFormat::get(), nullptr, 0);
-        if (bufferSize > 0)
-        {
-            std::vector<wchar_t> buffer(bufferSize);
-            if (::GetNumberFormat(LOCALE_USER_DEFAULT,   //__in       LCID Locale,
-                                  0,                     //__in       DWORD dwFlags,
-                                  number.c_str(),        //__in       LPCTSTR lpValue,
-                                  &IntegerFormat::get(), //__in_opt   const NUMBERFMT *lpFormat,
-                                  &buffer[0],            //__out_opt  LPTSTR lpNumberStr,
-                                  bufferSize) > 0)       //__in       int cchNumber
-                return &buffer[0]; //GetNumberFormat() returns char count *including* 0-termination!
-        }
-    }
-    return number;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     //we have to include thousands separator ourselves; this doesn't work for all countries (e.g india), but is better than nothing
 
     //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
@@ -284,7 +178,6 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
         output.insert(i, thousandSep);
     }
     return output;
-#endif
 }
 
 
@@ -292,52 +185,7 @@ std::wstring zen::utcToLocalTimeString(std::int64_t utcTime)
 {
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 
-#ifdef ZEN_WIN
-    FILETIME lastWriteTimeUtc = timetToFileTime(utcTime); //convert ansi C time to FILETIME
-
-    SYSTEMTIME systemTimeLocal = {};
-
-#if defined _MSC_VER && _MSC_VER < 1900
-#error function scope static initialization is not yet thread-safe!
-#endif
-    static const bool useNewLocalTimeCalculation = zen::vistaOrLater();
-
-    //http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx
-    if (useNewLocalTimeCalculation) //DST conversion  like in Windows 7: NTFS stays fixed, but FAT jumps by one hour
-    {
-        SYSTEMTIME systemTimeUtc = {};
-        if (!::FileTimeToSystemTime(&lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
-                                    &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
-            return errorMsg();
-
-        if (!::SystemTimeToTzSpecificLocalTime(nullptr,           //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
-                                               &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
-                                               &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
-            return errorMsg();
-    }
-    else //DST conversion like in Windows 2000 and XP: FAT times stay fixed, while NTFS jumps
-    {
-        FILETIME fileTimeLocal = {};
-        if (!::FileTimeToLocalFileTime(&lastWriteTimeUtc, //_In_   const FILETIME *lpFileTime,
-                                       &fileTimeLocal))   //_Out_  LPFILETIME lpLocalFileTime
-            return errorMsg();
-
-        if (!::FileTimeToSystemTime(&fileTimeLocal,    //__in   const FILETIME *lpFileTime,
-                                    &systemTimeLocal)) //__out  LPSYSTEMTIME lpSystemTime
-            return errorMsg();
-    }
-
-    zen::TimeComp loc;
-    loc.year   = systemTimeLocal.wYear;
-    loc.month  = systemTimeLocal.wMonth;
-    loc.day    = systemTimeLocal.wDay;
-    loc.hour   = systemTimeLocal.wHour;
-    loc.minute = systemTimeLocal.wMinute;
-    loc.second = systemTimeLocal.wSecond;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     zen::TimeComp loc = zen::localTime(utcTime);
-#endif
 
     std::wstring dateString = formatTime<std::wstring>(L"%x  %X", loc);
     return !dateString.empty() ? dateString : errorMsg();

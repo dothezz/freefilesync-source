@@ -65,8 +65,8 @@ private:
     friend class PanelMoveWindow;
 
     //configuration load/save
-    void setLastUsedConfig(const Zstring& filepath, const xmlAccess::XmlGuiConfig& guiConfig);
-    void setLastUsedConfig(const std::vector<Zstring>& filepaths, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const Zstring& cfgFilePath, const xmlAccess::XmlGuiConfig& guiConfig) { setLastUsedConfig(std::vector<Zstring>({ cfgFilePath }), guiConfig); }
+    void setLastUsedConfig(const std::vector<Zstring>& cfgFilePaths, const xmlAccess::XmlGuiConfig& guiConfig);
 
     xmlAccess::XmlGuiConfig getConfig() const;
     void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<Zstring>& referenceFiles);
@@ -169,14 +169,14 @@ private:
     void onGridDoubleClickR(zen::GridClickEvent& event);
     void onGridDoubleClickRim(size_t row, bool leftSide);
 
-    void onGridLabelLeftClickC(zen::GridClickEvent& event);
-    void onGridLabelLeftClickL(zen::GridClickEvent& event);
-    void onGridLabelLeftClickR(zen::GridClickEvent& event);
+    void onGridLabelLeftClickL(zen::GridLabelClickEvent& event);
+    void onGridLabelLeftClickC(zen::GridLabelClickEvent& event);
+    void onGridLabelLeftClickR(zen::GridLabelClickEvent& event);
     void onGridLabelLeftClick(bool onLeft, zen::ColumnTypeRim type);
 
-    void onGridLabelContextL(zen::GridClickEvent& event);
-    void onGridLabelContextC(zen::GridClickEvent& event);
-    void onGridLabelContextR(zen::GridClickEvent& event);
+    void onGridLabelContextL(zen::GridLabelClickEvent& event);
+    void onGridLabelContextC(zen::GridLabelClickEvent& event);
+    void onGridLabelContextR(zen::GridLabelClickEvent& event);
     void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
 
     void OnToggleViewType  (wxCommandEvent& event) override;
@@ -260,13 +260,12 @@ private:
 
     void OnMenuLanguageSwitch(wxCommandEvent& event);
 
-    void switchProgramLanguage(int langID);
+    void switchProgramLanguage(wxLanguage langId);
 
     void clearGrid(ptrdiff_t pos = -1);
 
     typedef int MenuItemID;
-    typedef int LanguageID;
-    std::map<MenuItemID, LanguageID> languageMenuItemMap; //needed to attach menu item events
+    std::map<MenuItemID, wxLanguage> languageMenuItemMap; //needed to attach menu item events
 
     //***********************************************
     //application variables are stored here:

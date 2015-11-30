@@ -14,6 +14,7 @@
 namespace zen
 {
 void initResourceImages(const Zstring& filepath); //pass resources .zip file at application startup
+void cleanupResourceImages();
 
 const wxBitmap&    getResourceImage    (const wxString& name);
 const wxAnimation& getResourceAnimation(const wxString& name);

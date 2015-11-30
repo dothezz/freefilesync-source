@@ -7,13 +7,7 @@
 #ifndef HELP_PROVIDER_H_85930427583421563126
 #define HELP_PROVIDER_H_85930427583421563126
 
-#ifdef ZEN_WIN
-    #include <zen/zstring.h>
-    #include <wx/msw/helpchm.h>
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     #include <wx/html/helpctrl.h>
-#endif
 
 #include "ffs_paths.h"
 
@@ -35,51 +29,6 @@ void uninitializeHelp(); //clean up gracefully during app shutdown: leaving this
 namespace impl
 {
 //finish wxWidgets' job:
-#ifdef ZEN_WIN
-class FfsHelpController
-{
-public:
-    static FfsHelpController& getInstance()
-    {
-        static FfsHelpController inst; //external linkage, despite inline definition!
-        return inst;
-    }
-
-    void openSection(const wxString& section, wxWindow* parent)
-    {
-        init();
-        if (section.empty())
-            chmHlp->DisplayContents();
-        else
-            chmHlp->DisplaySection(replaceCpy(section, L'/', utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)));
-    }
-
-    void uninitialize()
-    {
-        if (chmHlp)
-        {
-            chmHlp->Quit(); //don't let help windows open while app is shut down! => crash on Win 8.1!
-            chmHlp.reset();
-        }
-    }
-
-private:
-    FfsHelpController() {}
-    ~FfsHelpController() { assert(!chmHlp); }
-
-    void init() //don't put in constructor: not needed if only uninitialize() is ever called!
-    {
-        if (!chmHlp)
-        {
-            chmHlp = std::make_unique<wxCHMHelpController>();
-            chmHlp->Initialize(utfCvrtTo<wxString>(zen::getResourceDir()) + L"FreeFileSync.chm");
-        }
-    }
-
-    std::unique_ptr<wxCHMHelpController> chmHlp;
-};
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
 class FfsHelpController
 {
 public:
@@ -101,7 +50,6 @@ public:
         //               avoids ESC key not being recognized by help dialog (but by parent dialog instead)
     }
 };
-#endif
 }
 
 

@@ -179,18 +179,18 @@ public:
     {
     public:
         CurveAttributes() {} //required by GCC
-        CurveAttributes& setColor     (const wxColour& col) { color = col; autoColor = false; return *this; }
-        CurveAttributes& fillCurveArea(const wxColour& col) { fillColor = col; drawCurveArea = true; return *this; }
+        CurveAttributes& setColor     (const wxColor& col) { color = col; autoColor = false; return *this; }
+        CurveAttributes& fillCurveArea(const wxColor& col) { fillColor = col; drawCurveArea = true; return *this; }
         CurveAttributes& setLineWidth(size_t width) { lineWidth = static_cast<int>(width); return *this; }
 
     private:
         friend class Graph2D;
 
         bool autoColor = true;
-        wxColour color;
+        wxColor color;
 
         bool drawCurveArea = false;
-        wxColour fillColor;
+        wxColor fillColor;
 
         int lineWidth = 2;
     };
@@ -239,16 +239,14 @@ public:
 
         MainAttributes& setAutoSize() { minXauto = maxXauto = minYauto = maxYauto = true; return *this; }
 
-        static const std::shared_ptr<LabelFormatter> defaultFormat;
-
-        MainAttributes& setLabelX(PosLabelX posX, size_t height = 25, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
+        MainAttributes& setLabelX(PosLabelX posX, size_t height = 25, std::shared_ptr<LabelFormatter> newLabelFmt = std::make_shared<DecimalNumberFormatter>())
         {
             labelposX    = posX;
             xLabelHeight = static_cast<int>(height);
             labelFmtX    = newLabelFmt;
             return *this;
         }
-        MainAttributes& setLabelY(PosLabelY posY, size_t width = 60, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
+        MainAttributes& setLabelY(PosLabelY posY, size_t width = 60, std::shared_ptr<LabelFormatter> newLabelFmt = std::make_shared<DecimalNumberFormatter>())
         {
             labelposY    = posY;
             yLabelWidth  = static_cast<int>(width);
@@ -258,7 +256,7 @@ public:
 
         MainAttributes& setCornerText(const wxString& txt, PosCorner pos) { cornerTexts[pos] = txt; return *this; }
 
-        MainAttributes& setBackgroundColor(const wxColour& col) { backgroundColor = col; return *this; }
+        MainAttributes& setBackgroundColor(const wxColor& col) { backgroundColor = col; return *this; }
 
         MainAttributes& setSelectionMode(SelMode mode) { mouseSelMode = mode; return *this; }
 
@@ -285,7 +283,7 @@ public:
 
         std::map<PosCorner, wxString> cornerTexts;
 
-        wxColour backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+        wxColor backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
         SelMode mouseSelMode = SELECT_RECTANGLE;
     };
     void setAttributes(const MainAttributes& newAttr) { attr = newAttr; Refresh(); }

@@ -99,7 +99,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
         uniqueFolders.insert(fp.folderPathPhraseRight_);
     }
 
-    uniqueFolders.erase(Zstring());
+    erase_if(uniqueFolders, [](const Zstring& str) { return trimCpy(str).empty(); });
 
     xmlAccess::XmlRealConfig output;
     output.directories.assign(uniqueFolders.begin(), uniqueFolders.end());
@@ -125,7 +125,7 @@ void xmlAccess::readRealOrBatchConfig(const Zstring& filepath, xmlAccess::XmlRea
 }
 
 
-int xmlAccess::getProgramLanguage()
+wxLanguage xmlAccess::getProgramLanguage()
 {
     xmlAccess::XmlGlobalSettings settings;
     std::wstring warningMsg;
@@ -133,7 +133,7 @@ int xmlAccess::getProgramLanguage()
     {
         xmlAccess::readConfig(getGlobalConfigFile(), settings, warningMsg); //throw FileError
     }
-    catch (const FileError&) {} //user default language if error occurred
+    catch (const FileError&) {} //use default language if error occurred
 
     return settings.programLanguage;
 }

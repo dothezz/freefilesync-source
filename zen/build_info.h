@@ -11,20 +11,11 @@ namespace zen
 {
 //determine build info: defines ZEN_BUILD_32BIT or ZEN_BUILD_64BIT
 
-#ifdef ZEN_WIN
-    #ifdef _WIN64
-        #define ZEN_BUILD_64BIT
-    #else
-        #define ZEN_BUILD_32BIT
-    #endif
-
-#else
     #ifdef __LP64__
         #define ZEN_BUILD_64BIT
     #else
         #define ZEN_BUILD_32BIT
     #endif
-#endif
 
 #ifdef ZEN_BUILD_32BIT
     static_assert(sizeof(void*) == 4, "");

@@ -237,9 +237,9 @@ public:
                    const HardFilter::FilterRef& filter,
                    CompareVariant cmpVar,
                    int fileTimeTolerance,
-                   unsigned int optTimeShiftHours) :
+                   const std::vector<unsigned int>& ignoreTimeShiftMinutes) :
         HierarchyObject(Zstring(), *this),
-        filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance), optTimeShiftHours_(optTimeShiftHours),
+        filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance), ignoreTimeShiftMinutes_(ignoreTimeShiftMinutes),
         dirExistsLeft_ (dirExistsLeft),
         dirExistsRight_(dirExistsRight),
         folderPathLeft_(folderPathLeft),
@@ -256,7 +256,7 @@ public:
     const HardFilter&   getFilter() const { return *filter_; }
     CompareVariant getCompVariant() const { return cmpVar_; }
     int  getFileTimeTolerance() const { return fileTimeTolerance_; }
-    unsigned int getTimeShift() const { return optTimeShiftHours_; }
+    const std::vector<unsigned int>& getIgnoredTimeShift() const { return ignoreTimeShiftMinutes_; }
 
     void flip() override;
 
@@ -264,7 +264,7 @@ private:
     const HardFilter::FilterRef filter_; //filter used while scanning directory: represents sub-view of actual files!
     const CompareVariant cmpVar_;
     const int fileTimeTolerance_;
-    const unsigned int optTimeShiftHours_;
+    const std::vector<unsigned int> ignoreTimeShiftMinutes_;
 
     bool dirExistsLeft_;
     bool dirExistsRight_;

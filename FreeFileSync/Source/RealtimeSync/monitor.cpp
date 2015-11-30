@@ -29,10 +29,17 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
 {
     std::set<Zstring, LessFilePath> folderPaths; //make unique
     for (const Zstring& phrase : std::set<Zstring, LessFilePath>(folderPathPhrases.begin(), folderPathPhrases.end()))
+    {
+        if (pathStartsWith(trimCpy(phrase), Zstr("ftp:")) ||
+            pathStartsWith(trimCpy(phrase), Zstr("sftp:")) ||
+            pathStartsWith(trimCpy(phrase), Zstr("mtp:")))
+            throw FileError(_("The following path does not support directory monitoring:") + L"\n\n" + fmtPath(phrase));
+
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
         folderPaths.insert(getResolvedFilePath(phrase));
+    }
 
-    return std::vector<Zstring>(folderPaths.begin(), folderPaths.end());
+	return { folderPaths.begin(), folderPaths.end() };
 }
 
 
@@ -59,7 +66,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
 {
     const std::vector<Zstring> folderPathsFmt = getFormattedDirs(folderPathPhrases); //throw FileError
     if (folderPathsFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
-        throw zen::FileError(_("A folder input field is empty.")); //should have been checked by caller!
+        throw FileError(_("A folder input field is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
@@ -119,10 +126,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
                 erase_if(changedItems, [](const DirWatcher::Entry& e)
                 {
                     return
-#ifdef ZEN_MAC
-                        pathEndsWith(e.filepath_, Zstr("/.DS_Store")) ||
-#endif
-                        pathEndsWith(e.filepath_, Zstr(".ffs_tmp"))  ||
+                        //pathEndsWith(e.filepath_, Zstr(".ffs_tmp"))  ||
                         pathEndsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
                         pathEndsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
@@ -155,12 +159,8 @@ void waitForMissingDirs(const std::vector<Zstring>& folderPathPhrases, //throw F
         //support specifying volume by name => call getResolvedFilePath() repeatedly
         for (const Zstring& folderPathFmt : getFormattedDirs(folderPathPhrases)) //throw FileError
         {
-            auto ftDirExisting = runAsync([=]() -> bool
+            auto ftDirExisting = runAsync([=]
             {
-#ifdef ZEN_WIN
-                //1. login to network share, if necessary -> we probably do NOT want multiple concurrent runs: GUI!?
-                loginNetworkShare(folderPathFmt, false); //login networks shares, no PW prompt -> is this really RTS's job?
-#endif
                 //2. check dir existence
                 return zen::dirExists(folderPathFmt);
             });
@@ -269,7 +269,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& folderPathPhrases, unsi
         {
             execMonitoring(); //throw FileError
         }
-        catch (const zen::FileError& e)
+        catch (const FileError& e)
         {
             callback.reportError(e.toString());
         }

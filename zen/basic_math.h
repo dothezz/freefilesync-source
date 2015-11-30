@@ -38,7 +38,7 @@ template <class T>
 T clampCpy(const T& val, const T& minVal, const T& maxVal);
 
 template <class T, class InputIterator> //precondition: range must be sorted!
-auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type;
+auto nearMatch(const T& val, InputIterator first, InputIterator last);
 
 template <class T>
 bool isNull(T value);
@@ -195,10 +195,10 @@ std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, Input
 */
 
 template <class T, class InputIterator> inline
-auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type
+auto nearMatch(const T& val, InputIterator first, InputIterator last)
 {
     if (first == last)
-        return 0;
+        return static_cast<decltype(*first)>(0);
 
     assert(std::is_sorted(first, last));
     InputIterator it = std::lower_bound(first, last, val);

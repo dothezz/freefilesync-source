@@ -29,10 +29,6 @@ Zstring expandMacros(const Zstring& text);
 
 std::vector<Zstring> getDirectoryAliases(const Zstring& folderPathPhrase); //may block for slow USB sticks when resolving [<volume name>]
 
-#ifdef ZEN_WIN
-    //*blocks* if network is not reachable or when showing login prompt dialog!
-    void loginNetworkShare(const Zstring& dirpath, bool allowUserInteraction); //noexcept; user interaction: show OS password prompt
-#endif
 }
 
 #endif //RESOLVE_PATH_H_817402834713454

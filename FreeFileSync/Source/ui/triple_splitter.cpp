@@ -19,19 +19,17 @@ const int SASH_SIZE = 10;
 const double SASH_GRAVITY = 0.5; //value within [0, 1]; 1 := resize left only, 0 := resize right only
 const int CHILD_WINDOW_MIN_SIZE = 50; //min. size of managed windows
 
-const wxColor COLOR_SASH_GRADIENT_FROM = wxColour(192, 192, 192); //light grey
-const wxColor COLOR_SASH_GRADIENT_TO = *wxWHITE;
+//let's NOT create wxWidgets objects statically:
+inline wxColor getColorSashGradientFrom() { return { 192, 192, 192 }; } //light grey
+inline wxColor getColorSashGradientTo  () { return *wxWHITE; }
 }
+
 
 TripleSplitter::TripleSplitter(wxWindow* parent,
                                wxWindowID id,
                                const wxPoint& pos,
                                const wxSize& size,
-                               long style) : wxWindow(parent, id, pos, size, style | wxTAB_TRAVERSAL), //tab between windows
-    centerOffset(0),
-    windowL(nullptr),
-    windowC(nullptr),
-    windowR(nullptr)
+                               long style) : wxWindow(parent, id, pos, size, style | wxTAB_TRAVERSAL) //tab between windows
 {
     Connect(wxEVT_PAINT,            wxPaintEventHandler(TripleSplitter::onPaintEvent     ), nullptr, this);
     Connect(wxEVT_SIZE,             wxSizeEventHandler (TripleSplitter::onSizeEvent      ), nullptr, this);
@@ -139,11 +137,11 @@ void TripleSplitter::drawSash(wxDC& dc)
     {
         const int sash2ndHalf = 3;
         rect.width -= sash2ndHalf;
-        dc.GradientFillLinear(rect, COLOR_SASH_GRADIENT_FROM, COLOR_SASH_GRADIENT_TO, wxEAST);
+        dc.GradientFillLinear(rect, getColorSashGradientFrom(), getColorSashGradientTo(), wxEAST);
 
         rect.x += rect.width;
         rect.width = sash2ndHalf;
-        dc.GradientFillLinear(rect, COLOR_SASH_GRADIENT_FROM, COLOR_SASH_GRADIENT_TO, wxWEST);
+        dc.GradientFillLinear(rect, getColorSashGradientFrom(), getColorSashGradientTo(), wxWEST);
 
         static_assert(SASH_SIZE > sash2ndHalf, "");
     };

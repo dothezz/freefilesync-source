@@ -38,11 +38,8 @@ struct ResultType
 };
 
 //Herb Sutter's signedness conversion helpers: http://herbsutter.com/2013/06/13/gotw-93-solution-auto-variables-part-2/
-template<class T> inline
-typename std::make_signed<T>::type makeSigned(T t) { return static_cast<std::make_signed_t<T>>(t); }
-
-template<class T> inline
-typename std::make_unsigned<T>::type makeUnsigned(T t) { return static_cast<std::make_unsigned_t<T>>(t); }
+template<class T> inline auto makeSigned  (T t) { return static_cast<std::make_signed_t  <T>>(t); }
+template<class T> inline auto makeUnsigned(T t) { return static_cast<std::make_unsigned_t<T>>(t); }
 
 //################# Built-in Types  ########################
 //Example: "IsSignedInt<int>::value" evaluates to "true"
@@ -62,7 +59,7 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 
 /*  Detect data or function members of a class by name: ZEN_INIT_DETECT_MEMBER + HasMember_
     Example: 1. ZEN_INIT_DETECT_MEMBER(c_str);
-             2. HasMember_c_str<T>::value     -> use as boolean
+             2. HasMember_c_str<T>::value     -> use boolean
 */
 
 /*  Detect data or function members of a class by name *and* type: ZEN_INIT_DETECT_MEMBER2 + HasMember_

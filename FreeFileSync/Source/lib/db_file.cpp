@@ -8,10 +8,6 @@
 #include <zen/guid.h>
 #include <wx+/zlib_wrap.h>
 
-#ifdef ZEN_WIN
-    #include <zen/win.h> //includes "windows.h"
-    #include <zen/long_path_prefix.h>
-#endif
 
 using namespace zen;
 
@@ -42,11 +38,7 @@ AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
-#ifdef ZEN_WIN
-    const Zstring dbName = Zstr("sync");
-#elif defined ZEN_LINUX || defined ZEN_MAC
     const Zstring dbName = Zstr(".sync"); //files beginning with dots are hidden e.g. in Nautilus
-#endif
     const Zstring dbFileName = dbName + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 
     return AFS::appendRelPath(baseFolder.getAbstractPath<side>(), dbFileName);
@@ -87,10 +79,6 @@ void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const 
         //commit and close stream
     }
 
-#ifdef ZEN_WIN
-    if (Opt<Zstring> nativeFilePath = AFS::getNativeItemPath(dbPath))
-        ::SetFileAttributes(applyLongPathPrefix(*nativeFilePath).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
-#endif
 }
 
 
@@ -469,13 +457,6 @@ private:
         auto rv = map.emplace(key, value);
         if (!rv.second)
         {
-#if defined ZEN_WIN || defined ZEN_MAC //caveat: key must be updated, if there is a change in short name case!!!
-            if (rv.first->first != key) //=> conceptually case-sensitivity should be part of "value", not "key"
-            {
-                map.erase(rv.first);
-                return map.emplace(key, value).first->second;
-            }
-#endif
             rv.first->second = value;
         }
         return rv.first->second;
@@ -603,15 +584,6 @@ private:
                         auto insertResult = dbFolders.emplace(key, InSyncFolder(InSyncFolder::DIR_STATUS_IN_SYNC)); //get or create
                         auto it = insertResult.first;
 
-#if defined ZEN_WIN || defined ZEN_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
-                        const bool alreadyExisting = !insertResult.second;
-                        if (alreadyExisting && it->first != key)
-                        {
-                            auto oldValue = std::move(it->second);
-                            dbFolders.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
-                            it = dbFolders.emplace(key, std::move(oldValue)).first;
-                        }
-#endif
                         InSyncFolder& dbFolder = it->second;
                         dbFolder.status = InSyncFolder::DIR_STATUS_IN_SYNC; //update immediate directory entry
                         toPreserve.insert(&dbFolder);

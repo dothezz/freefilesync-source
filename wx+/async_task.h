@@ -46,10 +46,6 @@ public:
     bool resultReady   () const override { return isReady(asyncResult_); }
     void evaluateResult()       override
     {
-#ifndef NDEBUG
-        assert(resultReady() && !resultEvaluated_);
-        resultEvaluated_ = true;
-#endif
         evalResult(IsSameType<ResultType, void>());
     }
 
@@ -59,9 +55,6 @@ private:
 
     std::future<ResultType> asyncResult_;
     Fun evalOnGui_; //keep "evalOnGui" strictly separated from async thread: in particular do not copy in thread!
-#ifndef NDEBUG
-    bool resultEvaluated_ = false;
-#endif
 };
 
 

@@ -6,10 +6,6 @@
 
 #include "concrete.h"
 #include "native.h"
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    #include "mtp.h"
-    #include "sftp.h"
-#endif
 
 using namespace zen;
 
@@ -21,13 +17,6 @@ AbstractPath zen::createAbstractPath(const Zstring& itemPathPhrase) //noexcept
         return createItemPathNative(itemPathPhrase); //noexcept
 
     //then the rest:
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    if (acceptsItemPathPhraseMtp(itemPathPhrase)) //noexcept
-        return createItemPathMtp(itemPathPhrase); //noexcept
-
-    if (acceptsItemPathPhraseSftp(itemPathPhrase)) //noexcept
-        return createItemPathSftp(itemPathPhrase); //noexcept
-#endif
 
     //no idea? => native!
     return createItemPathNative(itemPathPhrase);

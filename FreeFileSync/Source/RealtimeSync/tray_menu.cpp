@@ -25,6 +25,8 @@ using namespace zen;
 
 namespace
 {
+const int RETRY_AFTER_ERROR_INTERVAL = 15; //unit: [s]
+
 const std::int64_t TICKS_UPDATE_INTERVAL = rts::UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
 TickVal lastExec = getTicks();
 
@@ -58,11 +60,7 @@ public:
         mode(TRAY_MODE_ACTIVE),
         iconFlashStatusLast(false),
         jobName_(jobname),
-#if defined ZEN_WIN || defined ZEN_MAC //16x16 seems to be the only size that is shown correctly on OS X
-        trayBmp(getResourceImage(L"RTS_tray_16x16")) //use a 16x16 bitmap
-#elif defined ZEN_LINUX
         trayBmp(getResourceImage(L"RTS_tray_24x24")) //use a 24x24 bitmap for perfect fit
-#endif
     {
         Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxEventHandler(TrayIconObject::OnDoubleClick), nullptr, this);
         setMode(mode);
@@ -137,9 +135,6 @@ private:
                 defaultItem = new wxMenuItem(contextMenu, CONTEXT_SHOW_ERROR, _("&Show error"));
                 break;
         }
-#ifdef ZEN_WIN //no wxMenuItem::SetFont() on Linux and OS X: wasn't wxWidgets supposed to be *portable* at some point in time?????
-        defaultItem->SetFont(wxNORMAL_FONT->Bold());
-#endif
         contextMenu->Append(defaultItem);
 
         contextMenu->AppendSeparator();
@@ -246,7 +241,7 @@ private:
 rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname)
 {
     std::vector<Zstring> dirNamesNonFmt = config.directories;
-    erase_if(dirNamesNonFmt, [](const Zstring& str) -> bool { return trimCpy(str).empty(); }); //remove empty entries WITHOUT formatting paths yet!
+    erase_if(dirNamesNonFmt, [](const Zstring& str) { return trimCpy(str).empty(); }); //remove empty entries WITHOUT formatting paths yet!
 
     if (dirNamesNonFmt.empty())
     {
@@ -305,8 +300,8 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
             trayIcon.clearShowErrorRequested();
 
             //wait for some time, then return to retry
-            static_assert(15 * 1000 % UI_UPDATE_INTERVAL == 0, "");
-            for (int i = 0; i < 15 * 1000 / UI_UPDATE_INTERVAL; ++i)
+            static_assert(RETRY_AFTER_ERROR_INTERVAL * 1000 % UI_UPDATE_INTERVAL == 0, "");
+            for (int i = 0; i < RETRY_AFTER_ERROR_INTERVAL * 1000 / UI_UPDATE_INTERVAL; ++i)
             {
                 trayIcon.doUiRefreshNow(); //throw AbortMonitoring
 

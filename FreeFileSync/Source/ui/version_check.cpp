@@ -12,25 +12,12 @@
 #include <zen/build_info.h>
 #include <zen/basic_math.h>
 #include <zen/thread.h> //std::thread::id
-//#include <wx/timer.h>
-//#include <wx/utils.h>
 #include <wx+/popup_dlg.h>
 #include "version_id.h"
 
-#ifdef ZEN_WIN
-    #include <zen/win.h> //tame wininet include
-    #include <zen/win_ver.h>
-#include <zen/com_tools.h>
-    #include <wininet.h>
 
-#elif defined ZEN_MAC
-    #include <CoreServices/CoreServices.h> //Gestalt()
-#endif
-
-#if defined ZEN_LINUX || defined ZEN_MAC
     #include <wx/protocol/http.h>
     #include <wx/app.h>
-#endif
 
 
 using namespace zen;
@@ -38,29 +25,12 @@ using namespace zen;
 
 namespace
 {
-#ifndef ZEN_WIN
-    #ifndef NDEBUG
-        const std::thread::id mainThreadId = std::this_thread::get_id();
-    #endif
-#endif
 
 
 std::wstring getIso639Language()
 {
     //respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
 
-#ifdef ZEN_WIN //use a more reliable function than wxWidgets:
-    const int bufSize = 10;
-    wchar_t buf[bufSize] = {};
-    int rv = ::GetLocaleInfo(LOCALE_USER_DEFAULT,   //_In_       LCID Locale,
-                             LOCALE_SISO639LANGNAME,//_In_       LCTYPE LCType,
-                             buf,                   //_Out_opt_  LPTSTR lpLCData,
-                             bufSize);              //_In_       int cchData
-    if (0 < rv && rv < bufSize)
-        return buf; //MSDN: "This can be a 3-letter code for languages that don't have a 2-letter code"!
-    assert(false);
-    return std::wstring();
-#else
     assert(std::this_thread::get_id() == mainThreadId);
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
@@ -69,7 +39,6 @@ std::wstring getIso639Language()
 
     assert(beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL).size() == 2);
     return beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL);
-#endif
 }
 
 
@@ -77,18 +46,6 @@ std::wstring getIso3166Country()
 {
     //respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
 
-#ifdef ZEN_WIN //use a more reliable function than wxWidgets:
-    const int bufSize = 10;
-    wchar_t buf[bufSize] = {};
-    int rv = ::GetLocaleInfo(LOCALE_USER_DEFAULT,    //_In_       LCID Locale,
-                             LOCALE_SISO3166CTRYNAME,//_In_       LCTYPE LCType,
-                             buf,                    //_Out_opt_  LPTSTR lpLCData,
-                             bufSize);               //_In_       int cchData
-    if (0 < rv && rv < bufSize)
-        return buf; //MSDN: "This can also return a number, such as "029" for Caribbean."!
-    assert(false);
-    return std::wstring();
-#else
     assert(std::this_thread::get_id() == mainThreadId);
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
@@ -96,7 +53,6 @@ std::wstring getIso3166Country()
         return std::wstring();
 
     return afterLast(localeName, L"_", IF_MISSING_RETURN_NONE);
-#endif
 }
 
 
@@ -107,12 +63,6 @@ std::wstring getUserAgentName()
 
     std::wstring agentName = std::wstring(L"FreeFileSync (") + zen::ffsVersion;
 
-#ifdef ZEN_WIN
-    agentName += L" Windows";
-    const auto osvMajor = getOsVersion().major;
-    const auto osvMinor = getOsVersion().minor;
-
-#elif defined ZEN_LINUX
     assert(std::this_thread::get_id() == mainThreadId);
 
     const wxLinuxDistributionInfo distribInfo = wxGetLinuxDistributionInfo();
@@ -125,25 +75,13 @@ std::wstring getUserAgentName()
     const int osvMinor = stringTo<int>(digits[1]);
     agentName += L" Linux";
 
-#elif defined ZEN_MAC
-    agentName += L" Mac";
-    SInt32 osvMajor = 0;
-    SInt32 osvMinor = 0;
-    ::Gestalt(gestaltSystemVersionMajor, &osvMajor);
-    ::Gestalt(gestaltSystemVersionMinor, &osvMinor);
-#endif
     agentName += L" " + numberTo<std::wstring>(osvMajor) + L"." + numberTo<std::wstring>(osvMinor);
 
     agentName +=
-#ifdef ZEN_WIN
-        running64BitWindows() ? L" 64" : L" 32";
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
 #ifdef ZEN_BUILD_32BIT
         L" 32";
 #elif defined ZEN_BUILD_64BIT
         L" 64";
-#endif
 #endif
 
     const std::wstring isoLang    = getIso639Language();
@@ -158,78 +96,6 @@ std::wstring getUserAgentName()
 
 class InternetConnectionError {};
 
-#ifdef ZEN_WIN
-//WinInet: 1. uses IE proxy settings! :) 2. follows HTTP redirects by default 3. swallows HTTPS
-std::string readBytesFromUrl(const wchar_t* url) //throw InternetConnectionError
-{
-    //::InternetAttemptConnect(0) -> not working as expected: succeeds even when there is no internet connection!
-
-    HINTERNET hInternet = ::InternetOpen(getUserAgentName().c_str(),   //_In_  LPCTSTR lpszAgent,
-                                         INTERNET_OPEN_TYPE_PRECONFIG, //_In_  DWORD dwAccessType,
-                                         nullptr,   //_In_  LPCTSTR lpszProxyName,
-                                         nullptr,   //_In_  LPCTSTR lpszProxyBypass,
-                                         0);        //_In_  DWORD dwFlags
-    if (!hInternet)
-        throw InternetConnectionError();
-    ZEN_ON_SCOPE_EXIT(::InternetCloseHandle(hInternet));
-
-    HINTERNET hRequest = ::InternetOpenUrl(hInternet, //_In_  HINTERNET hInternet,
-                                           url,       //_In_  LPCTSTR lpszUrl,
-                                           nullptr,   //_In_  LPCTSTR lpszHeaders,
-                                           0,         //_In_  DWORD dwHeadersLength,
-                                           INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_UI, //_In_  DWORD dwFlags,
-                                           0);        //_In_  DWORD_PTR dwContext
-    if (!hRequest) //fails with ERROR_INTERNET_NAME_NOT_RESOLVED if server not found => the server-relative part is checked by HTTP_QUERY_STATUS_CODE below!!!
-        throw InternetConnectionError();
-    ZEN_ON_SCOPE_EXIT(::InternetCloseHandle(hRequest));
-
-    DWORD statusCode = 0;
-    DWORD bufferLength = sizeof(statusCode);
-    if (!::HttpQueryInfo(hRequest,      //_In_     HINTERNET hRequest,
-                         HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, //_In_     DWORD dwInfoLevel,
-                         &statusCode,   //_Inout_  LPVOID lpvBuffer,
-                         &bufferLength, //_Inout_  LPDWORD lpdwBufferLength,
-                         nullptr))      //_Inout_  LPDWORD lpdwIndex
-        throw InternetConnectionError();
-
-    if (statusCode != HTTP_STATUS_OK)
-        throw InternetConnectionError(); //e.g. 404 - HTTP_STATUS_NOT_FOUND
-
-    std::string buffer;
-    const DWORD blockSize = 64 * 1024;
-    //internet says "HttpQueryInfo() + HTTP_QUERY_CONTENT_LENGTH" not supported by all http servers...
-    for (;;)
-    {
-        buffer.resize(buffer.size() + blockSize);
-
-        DWORD bytesRead = 0;
-        if (!::InternetReadFile(hRequest,    //_In_   HINTERNET hFile,
-                                &*(buffer.begin() + buffer.size() - blockSize),  //_Out_  LPVOID lpBuffer,
-                                blockSize,   //_In_   DWORD dwNumberOfBytesToRead,
-                                &bytesRead)) //_Out_  LPDWORD lpdwNumberOfBytesRead
-            throw InternetConnectionError();
-
-        if (bytesRead < blockSize)
-            buffer.resize(buffer.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
-
-        if (bytesRead == 0)
-            return buffer;
-    }
-}
-
-
-inline
-bool internetIsAlive() //noexcept
-{
-    try
-    {
-        readBytesFromUrl(L"http://www.google.com/"); //throw InternetConnectionError
-        return true;
-    }
-    catch (const InternetConnectionError&) { return false; }
-}
-
-#else
 std::string readBytesFromUrl(const wxString& url, int level = 0) //throw InternetConnectionError
 {
     assert(std::this_thread::get_id() == mainThreadId);
@@ -302,7 +168,6 @@ bool internetIsAlive() //noexcept
            rs == 200; //HTTP_STATUS_OK
     //attention: http://www.google.com/ might redirect to "https" => don't follow, just return "true"!!!
 }
-#endif
 
 
 enum GetVerResult
@@ -421,7 +286,6 @@ bool zen::shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
 {
     if (updateCheckActive(lastUpdateCheck))
     {
-        static_assert(sizeof(time_t) >= 8, "Still using 32-bit time_t? WTF!!");
         const time_t now = std::time(nullptr);
         return numeric::dist(now, lastUpdateCheck) >= 7 * 24 * 3600; //check weekly
     }
@@ -431,40 +295,19 @@ bool zen::shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
 
 struct zen::UpdateCheckResult
 {
-#ifdef ZEN_WIN
-    GetVerResult versionStatus = GET_VER_PAGE_NOT_FOUND;
-    std::wstring onlineVersion;
-#endif
 };
 
 
 std::shared_ptr<UpdateCheckResult> zen::retrieveOnlineVersion()
 {
-#ifdef ZEN_WIN
-    try
-    {
-        ComInitializer ci; //throw SysError
-
-        auto result = std::make_shared<UpdateCheckResult>();
-        result->versionStatus = getOnlineVersion(result->onlineVersion); //access is thread-safe on Windows only!
-        return result;
-    }
-    catch (SysError&) { assert(false); return nullptr; }
-#else
     return nullptr;
-#endif
 }
 
 
 void zen::evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResult* result)
 {
-#ifdef ZEN_WIN
-    const GetVerResult versionStatus = result->versionStatus;
-    const std::wstring onlineVersion = result->onlineVersion;
-#else
     std::wstring onlineVersion;
     const GetVerResult versionStatus = getOnlineVersion(onlineVersion);
-#endif
 
     switch (versionStatus)
     {

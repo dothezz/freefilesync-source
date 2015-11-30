@@ -1,3 +1,21 @@
+FreeFileSync 7.7 [2015-12-01]
+-----------------------------
+Support variable drive letters for config history when using FreeFileSync portable
+Skip non-storage functional objects at MTP device level
+Log and show error messages without hanging when running as a service
+Navigate between sync settings panels with arrow keys
+Fixed volume shadow copy file path generation
+Handle integer overflows when comparing file times
+Ignore more than one file time shift
+Reworked grid to support mouse highlight areas
+Allow minute precision for file time shifts
+Warn about unsupported MTP and SFTP paths in RealtimeSync
+Strip superfluous mode parameters when creating a directory (Linux, OS X)
+Correctly detect system language for English UK
+Store program language by name to handle changing ids
+Fixed crash during application exit after using SFTP
+
+
 FreeFileSync 7.6 [2015-11-01]
 -----------------------------
 Create missing synchronization base folders only on demand

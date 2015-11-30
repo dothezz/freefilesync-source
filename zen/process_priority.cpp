@@ -7,45 +7,10 @@
 #include "process_priority.h"
 #include "i18n.h"
 
-#ifdef ZEN_WIN
-    #include "win.h" //includes "windows.h"
-#endif
 
 using namespace zen;
 
 
-#ifdef ZEN_WIN
-struct PreventStandby::Pimpl {};
-
-PreventStandby::PreventStandby()
-{
-    if (::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED) == 0)
-        throw FileError(_("Unable to suspend system sleep mode.")); //no GetLastError() support?
-}
-
-
-PreventStandby::~PreventStandby()
-{
-    ::SetThreadExecutionState(ES_CONTINUOUS);
-}
-
-
-struct ScheduleForBackgroundProcessing::Pimpl {};
-
-
-ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing()
-{
-    if (!::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_BEGIN)) //this call lowers CPU priority, too!!
-        THROW_LAST_FILE_ERROR(_("Cannot change process I/O priorities."), L"SetPriorityClass");
-}
-
-
-ScheduleForBackgroundProcessing::~ScheduleForBackgroundProcessing()
-{
-    ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_END);
-}
-
-#elif defined ZEN_LINUX
 struct PreventStandby::Pimpl {};
 PreventStandby::PreventStandby() {}
 PreventStandby::~PreventStandby() {}
@@ -87,4 +52,3 @@ private:
     const int oldIoPrio;
 };
 */
-#endif

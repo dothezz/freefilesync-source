@@ -11,11 +11,7 @@
 #include "tick_count.h"
 #include "scope_guard.h"
 
-#ifdef ZEN_WIN
-    #include <sstream>
-#else
     #include <iostream>
-#endif
 
 
 //############# two macros for quick performance measurements ###############
@@ -79,13 +75,7 @@ public:
         if (wasRunning) pause(); //don't include call to MessageBox()!
         ZEN_ON_SCOPE_EXIT(if (wasRunning) resume());
 
-#ifdef ZEN_WIN
-        std::wostringstream ss;
-        ss << timeMs() << L" ms";
-        ::MessageBox(nullptr, ss.str().c_str(), L"Timer", MB_OK);
-#else
         std::clog << "Perf: duration: " << timeMs() << " ms\n";
-#endif
         resultShown = true;
     }
 

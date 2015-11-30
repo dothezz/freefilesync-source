@@ -196,13 +196,6 @@ bool isValid(const std::tm& t)
 template <class CharType> inline
 size_t strftimeWrap(CharType* buffer, size_t bufferSize, const CharType* format, const std::tm* timeptr)
 {
-#if defined _MSC_VER && !defined NDEBUG
-    //there's no way around: application init must register an invalid parameter handler that does nothing !!!
-    //=> strftime will abort with 0 and set errno to EINVAL instead of CRASHING THE APPLICATION!
-    _invalid_parameter_handler oldHandler = _set_invalid_parameter_handler(nullptr);
-    assert(oldHandler);
-    _set_invalid_parameter_handler(oldHandler);
-#endif
 
     return strftimeWrap_impl(buffer, bufferSize, format, timeptr);
 }
@@ -238,11 +231,7 @@ TimeComp localTime(time_t utc)
 {
     std::tm lt = {};
 
-#ifdef ZEN_WIN //use thread-safe variants of std::localtime()!
-    if (::localtime_s(&lt, &utc) != 0)
-#else
     if (::localtime_r(&utc, &lt) == nullptr)
-#endif
         return TimeComp();
 
     return implementation::toZenTimeComponents(lt);

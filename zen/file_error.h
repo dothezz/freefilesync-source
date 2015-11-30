@@ -39,20 +39,8 @@ DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 //CAVEAT: thread-local Win32 error code is easily overwritten => evaluate *before* making any (indirect) system calls:
 //-> MinGW + Win XP: "throw" statement allocates memory to hold the exception object => error code is cleared
 //-> VC 2015, Debug: std::wstring allocator internally calls ::FlsGetValue()         => error code is cleared
-#ifdef _MSC_VER
-#define THROW_LAST_FILE_ERROR(msg, functionName)                           \
-    do                                                                     \
-    {                                                                      \
-        const ErrorCode ecInternal = getLastError();                       \
-        throw FileError(msg, formatSystemError(functionName, ecInternal)); \
-        \
-        __pragma(warning(suppress: 4127)) /*"conditional expression is constant"*/ \
-    } while (false)
-
-#else //same thing witout "__pragma":
 #define THROW_LAST_FILE_ERROR(msg, functionName)                           \
     do { const ErrorCode ecInternal = getLastError(); throw FileError(msg, formatSystemError(functionName, ecInternal)); } while (false)
-#endif
 
 //----------- facilitate usage of std::wstring for error messages --------------------
 

@@ -12,10 +12,6 @@
 #include <wx+/image_resources.h>
 #include "icon_loader.h"
 
-#ifdef ZEN_WIN
-    #include <zen/win_ver.h>
-    #include <zen/com_tools.h>
-#endif
 
 using namespace zen;
 using AFS = AbstractFileSystem;
@@ -25,22 +21,13 @@ namespace
 {
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer: must be big enough to hold visible icons + preload buffer! Consider OS limit on GDI resources (wxBitmap)!!!
 
-#ifndef NDEBUG
-    const std::thread::id mainThreadId = std::this_thread::get_id();
-#endif
 
-#ifdef ZEN_WIN
-    const bool wereVistaOrLater = vistaOrLater();
-#endif
 
 
 //destroys raw icon! Call from GUI thread only!
 wxBitmap extractWxBitmap(ImageHolder&& ih)
 {
     assert(std::this_thread::get_id() == mainThreadId);
-#ifndef NDEBUG
-    ZEN_ON_SCOPE_EXIT(assert(!ih));
-#endif
 
     if (!ih.getRgb())
         return wxNullBitmap;
@@ -52,25 +39,6 @@ wxBitmap extractWxBitmap(ImageHolder&& ih)
 }
 
 
-#ifdef ZEN_WIN
-const std::set<Zstring, LessFilePath> linkExt { L"lnk", L"pif", L"url", L"website" };
-
-
-//test for extension for non-thumbnail icons that can have a stock icon which does not have to be physically read from disc
-inline
-bool hasStandardIconExtension(const Zstring& filePath)
-{
-    static const std::set<Zstring, LessFilePath> customIconExt { L"ani", L"cur", L"exe", L"ico", L"msc", L"scr" }; //function-scope statics are not (yet) thread-safe in VC12
-#if defined _MSC_VER && _MSC_VER < 1900
-#error function scope static initialization is not yet thread-safe!
-#endif
-
-    const Zstring extension(getFileExtension(filePath));
-
-    return customIconExt.find(extension) == customIconExt.end() &&
-           linkExt.find(extension) == linkExt.end();
-}
-#endif
 }
 
 //################################################################################################################################################
@@ -93,10 +61,6 @@ ImageHolder getDisplayIcon(const AbstractPath& itemPath, IconBuffer::IconSize sz
     const Zstring& templateName = AFS::getFileShortName(itemPath);
 
     //2. retrieve file icons
-#ifdef ZEN_WIN
-    //result will be buffered with full path, not extension; this is okay: failure to load thumbnail is independent from extension in general!
-    if (!hasStandardIconExtension(templateName)) //perf: no need for physical disk access for standard icons
-#endif
         if (ImageHolder ih = AFS::getFileIcon(itemPath, IconBuffer::getSize(sz)))
             return ih;
 
@@ -335,39 +299,17 @@ private:
 };
 
 
-class RunOnStartup
+class InitFileIconCacheOnStartup
 {
 public:
-    RunOnStartup()
+    InitFileIconCacheOnStartup()
     {
-#ifdef ZEN_WIN
-        //icon_loader.h/file_icon_win.h prerequisites: 1. initialize COM, 2. initialize system image list
-        typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);
-        const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660)); //MS requires and documents this magic number
-        assert(fileIconInit);
-        if (fileIconInit)
-            fileIconInit(true); //MSDN: "TRUE to restore the system image cache from disk; FALSE otherwise."
-        /*
-            "FileIconInit's "fRestoreCache" parameter determines whether or not it loads the 48-or-so "standard" shell icons. If FALSE is specified,
-            it only loads a very minimal set of icons. [...] SHGetFileInfo internally call FileIconInit(FALSE), so if you want
-            your copy of the system image list to contain the standard icons,  you should call FileIconInit(TRUE) at startup."
-                - Jim Barry, MVP (Windows SDK)
-        */
-#endif
     }
 } dummy;
 
 
 void WorkerThread::operator()() const //thread entry
 {
-#ifdef ZEN_WIN
-    setCurrentThreadName("Icon Buffer Worker");
-
-    try
-    {
-        //1. Initialize COM here due to the icon_loader.h dependency only, but NOT due to native.h, mtp.h's internal COM usage => this is not our responsibility!
-        ComInitializer ci; //throw SysError
-#endif
 
         for (;;)
         {
@@ -380,10 +322,6 @@ void WorkerThread::operator()() const //thread entry
                 buffer_->insert(itemPath, getDisplayIcon(itemPath, iconSizeType));
         }
 
-#ifdef ZEN_WIN
-    }
-    catch (SysError&) { assert(false); }
-#endif
 }
 
 //#########################  redirect to impl  #####################################################
@@ -420,15 +358,8 @@ int IconBuffer::getSize(IconSize sz)
     switch (sz)
     {
         case IconBuffer::SIZE_SMALL:
-#if defined ZEN_WIN || defined ZEN_MAC
-            return 16;
-#elif defined ZEN_LINUX
             return 24;
-#endif
         case IconBuffer::SIZE_MEDIUM:
-#ifdef ZEN_WIN
-            if (!wereVistaOrLater) return 32; //48x48 doesn't look sharp on XP
-#endif
             return 48;
 
         case IconBuffer::SIZE_LARGE:
@@ -441,24 +372,12 @@ int IconBuffer::getSize(IconSize sz)
 
 bool IconBuffer::readyForRetrieval(const AbstractPath& filePath)
 {
-#ifdef ZEN_WIN
-    if (iconSizeType == IconBuffer::SIZE_SMALL)
-        if (hasStandardIconExtension(AFS::getFileShortName(filePath)))
-            return true;
-#endif
     return pimpl->buffer->hasIcon(filePath);
 }
 
 
 Opt<wxBitmap> IconBuffer::retrieveFileIcon(const AbstractPath& filePath)
 {
-#ifdef ZEN_WIN
-    //perf: let's read icons which don't need file access right away! No async delay justified!
-    const Zstring fileName = AFS::getFileShortName(filePath);
-    if (iconSizeType == IconBuffer::SIZE_SMALL) //non-thumbnail view, we need file type icons only!
-        if (hasStandardIconExtension(fileName))
-            return this->getIconByExtension(fileName); //buffered!!!
-#endif
 
     if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(filePath))
         return ico;
@@ -528,15 +447,7 @@ wxBitmap IconBuffer::linkOverlayIcon(IconSize sz)
 
 bool zen::hasLinkExtension(const Zstring& filepath)
 {
-#ifdef ZEN_WIN
-    const Zstring& extension = getFileExtension(filepath);
-    return linkExt.find(extension) != linkExt.end();
-
-#elif defined ZEN_LINUX
     const Zstring& extension = getFileExtension(filepath);
     return extension == "desktop";
 
-#elif defined ZEN_MAC
-    return false; //alias files already get their arrow icon via "NSWorkspace::iconForFile"
-#endif
 }

@@ -15,8 +15,7 @@ namespace zen
 class Tooltip
 {
 public:
-    Tooltip(wxWindow& parent) : //parent needs to live at least as long as this instance!
-        tipWindow(nullptr), parent_(parent) {}
+    Tooltip(wxWindow& parent) : parent_(parent) {} //parent needs to live at least as long as this instance!
 
     void show(const wxString& text,
               wxPoint mousePos, //absolute screen coordinates
@@ -25,7 +24,7 @@ public:
 
 private:
     class TooltipDialogGenerated;
-    TooltipDialogGenerated* tipWindow;
+    TooltipDialogGenerated* tipWindow = nullptr;
     wxWindow& parent_;
 };
 }

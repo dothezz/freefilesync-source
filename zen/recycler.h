@@ -38,14 +38,6 @@ Already included in package "gtk+-2.0"!
 bool recycleOrDelete(const Zstring& itemPath); //throw FileError, return "true" if file/dir was actually deleted
 
 
-#ifdef ZEN_WIN
-//Win XP: can take a long time if recycle bin is full and drive is slow!!! => buffer result!
-//Vista and later: dirPath must exist for a valid check!
-bool recycleBinExists(const Zstring& dirPath, const std::function<void ()>& onUpdateGui); //throw FileError
-
-void recycleOrDelete(const std::vector<Zstring>& filePaths, //throw FileError, return "true" if file/dir was actually deleted
-                     const std::function<void (const std::wstring& displayPath)>& onRecycleItem); //optional; currentItem may be empty
-#endif
 }
 
 #endif //RECYCLER_H_18345067341545

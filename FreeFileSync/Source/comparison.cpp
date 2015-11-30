@@ -32,7 +32,7 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
         fileTimeTolerance,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->optTimeShiftHours : mainCfg.cmpConfig.optTimeShiftHours,
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->ignoreTimeShiftMinutes : mainCfg.cmpConfig.ignoreTimeShiftMinutes,
 
         normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
 
@@ -275,11 +275,11 @@ std::wstring getDescrDiffMetaDate(const FileOrLinkPair& file)
 
 //-----------------------------------------------------------------------------
 
-void categorizeSymlinkByTime(SymlinkPair& symlink, int fileTimeTolerance, unsigned int optTimeShiftHours)
+void categorizeSymlinkByTime(SymlinkPair& symlink)
 {
     //categorize symlinks that exist on both sides
     switch (compareFileTime(symlink.getLastWriteTime<LEFT_SIDE>(),
-                            symlink.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance, optTimeShiftHours))
+                            symlink.getLastWriteTime<RIGHT_SIDE>(), symlink.base().getFileTimeTolerance(), symlink.base().getIgnoredTimeShift()))
     {
         case TimeResult::EQUAL:
             //Caveat:
@@ -320,13 +320,13 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
 
     //finish symlink categorization
     for (SymlinkPair* symlink : uncategorizedLinks)
-        categorizeSymlinkByTime(*symlink, fpConfig.fileTimeTolerance, fpConfig.optTimeShiftHours);
+        categorizeSymlinkByTime(*symlink);
 
     //categorize files that exist on both sides
     for (FilePair* file : uncategorizedFiles)
     {
         switch (compareFileTime(file->getLastWriteTime<LEFT_SIDE>(),
-                                file->getLastWriteTime<RIGHT_SIDE>(), fpConfig.fileTimeTolerance, fpConfig.optTimeShiftHours))
+                                file->getLastWriteTime<RIGHT_SIDE>(), fpConfig.fileTimeTolerance, fpConfig.ignoreTimeShiftMinutes))
         {
             case TimeResult::EQUAL:
                 //Caveat:
@@ -365,7 +365,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
 }
 
 
-void categorizeSymlinkByContent(SymlinkPair& symlink, int fileTimeTolerance, unsigned int optTimeShiftHours, ProcessCallback& callback)
+void categorizeSymlinkByContent(SymlinkPair& symlink, ProcessCallback& callback)
 {
     //categorize symlinks that exist on both sides
     Zstring targetPathRawL;
@@ -385,11 +385,6 @@ void categorizeSymlinkByContent(SymlinkPair& symlink, int fileTimeTolerance, uns
     else
     {
         if (targetPathRawL == targetPathRawR
-#ifdef ZEN_WIN //type of symbolic link is relevant for Windows only
-            &&
-            AFS::folderExists(symlink.getAbstractPath<LEFT_SIDE >()) == //check if dir-symlink
-            AFS::folderExists(symlink.getAbstractPath<RIGHT_SIDE>())    //
-#endif
            )
         {
             //Caveat:
@@ -400,7 +395,7 @@ void categorizeSymlinkByContent(SymlinkPair& symlink, int fileTimeTolerance, uns
             if (symlink.getItemName<LEFT_SIDE>() != symlink.getItemName<RIGHT_SIDE>())
                 symlink.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(symlink));
             else if (!sameFileTime(symlink.getLastWriteTime<LEFT_SIDE>(),
-                                   symlink.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance, optTimeShiftHours))
+                                   symlink.getLastWriteTime<RIGHT_SIDE>(), symlink.base().getFileTimeTolerance(), symlink.base().getIgnoredTimeShift()))
                 symlink.setCategoryDiffMetadata(getDescrDiffMetaDate(symlink));
             else
                 symlink.setCategory<FILE_EQUAL>();
@@ -447,7 +442,7 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
 
         //finish symlink categorization
         for (SymlinkPair* symlink : uncategorizedLinks)
-            categorizeSymlinkByContent(*symlink, w.second.fileTimeTolerance, w.second.optTimeShiftHours, callback_);
+            categorizeSymlinkByContent(*symlink, callback_);
     }
 
     //finish categorization...
@@ -499,7 +494,7 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
                 if (file->getItemName<LEFT_SIDE>() != file->getItemName<RIGHT_SIDE>())
                     file->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*file));
                 else if (!sameFileTime(file->getLastWriteTime<LEFT_SIDE>(),
-                                       file->getLastWriteTime<RIGHT_SIDE>(), file->base().getFileTimeTolerance(), file->base().getTimeShift()))
+                                       file->getLastWriteTime<RIGHT_SIDE>(), file->base().getFileTimeTolerance(), file->base().getIgnoredTimeShift()))
                     file->setCategoryDiffMetadata(getDescrDiffMetaDate(*file));
                 else
                     file->setCategory<FILE_EQUAL>();
@@ -593,8 +588,6 @@ void MergeSides::fillOneSide(const FolderContainer& folderCont, const std::wstri
 template <class MapType, class ProcessLeftOnly, class ProcessRightOnly, class ProcessBoth> inline
 void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnly lo, ProcessRightOnly ro, ProcessBoth bo)
 {
-    const auto lessKey = typename MapType::key_compare();
-
     auto itL = mapLeft .begin();
     auto itR = mapRight.begin();
 
@@ -603,6 +596,8 @@ void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnl
 
     if (itL == mapLeft .end()) return finishRight();
     if (itR == mapRight.end()) return finishLeft ();
+
+    const auto lessKey = typename MapType::key_compare();
 
     for (;;)
         if (lessKey(itL->first, itR->first))
@@ -630,7 +625,7 @@ void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnl
 
 void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer& rhs, const std::wstring* errorMsg, HierarchyObject& output)
 {
-    typedef const FolderContainer::FileList::value_type FileData;
+    using FileData = const FolderContainer::FileList::value_type;
 
     linearMerge(lhs.files, rhs.files,
     [&](const FileData& fileLeft ) { FilePair& newItem = output.addSubFile<LEFT_SIDE >(fileLeft .first, fileLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
@@ -649,7 +644,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
     });
 
     //-----------------------------------------------------------------------------------------------
-    typedef const FolderContainer::SymlinkList::value_type SymlinkData;
+    using SymlinkData = const FolderContainer::SymlinkList::value_type;
 
     linearMerge(lhs.symlinks, rhs.symlinks,
     [&](const SymlinkData& symlinkLeft ) { SymlinkPair& newItem = output.addSubLink<LEFT_SIDE >(symlinkLeft .first, symlinkLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
@@ -667,7 +662,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
     });
 
     //-----------------------------------------------------------------------------------------------
-    typedef const FolderContainer::FolderList::value_type FolderData;
+    using FolderData = const FolderContainer::FolderList::value_type;
 
     linearMerge(lhs.folders, rhs.folders,
                 [&](const FolderData& dirLeft) //left only
@@ -768,7 +763,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::performComparison(const Resolv
                                                                               fpCfg.filter.nameFilter->copyFilterAddingExclusion(excludefilterFailedRead),
                                                                               fpCfg.compareVar,
                                                                               fpCfg.fileTimeTolerance,
-                                                                              fpCfg.optTimeShiftHours);
+                                                                              fpCfg.ignoreTimeShiftMinutes);
 
     //PERF_START;
     FolderContainer emptyFolderCont; //WTF!!! => using a temporary in the ternary conditional would implicitly call the FolderContainer copy-constructor!!!!!!

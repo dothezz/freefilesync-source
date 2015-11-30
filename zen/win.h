@@ -12,10 +12,6 @@
 #endif
 
 //------------------------------------------------------
-#ifdef __WXMSW__ //we have wxWidgets
-    #include <wx/msw/wrapwin.h> //includes "windows.h"
-    //------------------------------------------------------
-#else
     //#define WIN32_LEAN_AND_MEAN
 
     #ifndef NOMINMAX
@@ -27,7 +23,6 @@
     #endif
 
     #include <windows.h>
-#endif
 //------------------------------------------------------
 
 #endif //WIN_H_8701570183560183247891346363457

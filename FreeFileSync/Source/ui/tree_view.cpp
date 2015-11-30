@@ -158,10 +158,6 @@ std::wstring zen::getShortDisplayNameForFolderPair(const std::wstring& displayPa
     const wchar_t sep = L'/';
     std::wstring fmtPathL = displayPathLeft;
     std::wstring fmtPathR = displayPathRight;
-#ifdef ZEN_WIN
-    replace(fmtPathL, L'\\', sep); //treat slash, backslash the same
-    replace(fmtPathR, L'\\', sep); //
-#endif
     if (!startsWith(fmtPathL, sep)) fmtPathL = sep + fmtPathL;
     if (!startsWith(fmtPathR, sep)) fmtPathR = sep + fmtPathR;
 
@@ -192,11 +188,7 @@ std::wstring zen::getShortDisplayNameForFolderPair(const std::wstring& displayPa
 
     auto getLastComponent = [sep](const std::wstring& displayPath) -> std::wstring
     {
-#ifdef ZEN_WIN
-        const std::wstring fmtPath = replaceCpy(displayPath, L'\\', sep);
-#else
         const std::wstring fmtPath = displayPath;
-#endif
         auto itEnd = fmtPath.end();
         if (endsWith(fmtPath, sep)) //preserve trailing separator, support "C:\"
             --itEnd;
@@ -297,15 +289,15 @@ void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi colu
 
     switch (columnType)
     {
-        case COL_TYPE_NAVI_BYTES:
+        case ColumnTypeNavi::BYTES:
             std::sort(items.begin(), items.end(), makeSortDirection(lessBytes, Int2Type<ascending>()));
             break;
 
-        case COL_TYPE_NAVI_DIRECTORY:
+        case ColumnTypeNavi::DIRECTORY:
             std::sort(items.begin(), items.end(), LessShortName<ascending>());
             break;
 
-        case COL_TYPE_NAVI_ITEM_COUNT:
+        case ColumnTypeNavi::ITEM_COUNT:
             std::sort(items.begin(), items.end(), makeSortDirection(lessCount, Int2Type<ascending>()));
             break;
     }
@@ -465,11 +457,11 @@ bool TreeView::getDefaultSortDirection(ColumnTypeNavi colType)
 {
     switch (colType)
     {
-        case COL_TYPE_NAVI_BYTES:
+        case ColumnTypeNavi::BYTES:
             return false;
-        case COL_TYPE_NAVI_DIRECTORY:
+        case ColumnTypeNavi::DIRECTORY:
             return true;
-        case COL_TYPE_NAVI_ITEM_COUNT:
+        case ColumnTypeNavi::ITEM_COUNT:
             return false;
     }
     assert(false);
@@ -735,31 +727,49 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
 
 namespace
 {
-const wxColour COLOR_LEVEL0(0xcc, 0xcc, 0xff);
-const wxColour COLOR_LEVEL1(0xcc, 0xff, 0xcc);
-const wxColour COLOR_LEVEL2(0xff, 0xff, 0x99);
+//let's NOT create wxWidgets objects statically:
+inline wxColor getColorPercentBorder    () { return { 198, 198, 198 }; }
+inline wxColor getColorPercentBackground() { return { 0xf8, 0xf8, 0xf8 }; }
 
-const wxColour COLOR_LEVEL3(0xcc, 0xcc, 0xcc);
-const wxColour COLOR_LEVEL4(0xff, 0xcc, 0xff);
-const wxColour COLOR_LEVEL5(0x99, 0xff, 0xcc);
-
-const wxColour COLOR_LEVEL6(0xcc, 0xcc, 0x99);
-const wxColour COLOR_LEVEL7(0xff, 0xcc, 0xcc);
-const wxColour COLOR_LEVEL8(0xcc, 0xff, 0x99);
-
-const wxColour COLOR_LEVEL9 (0xff, 0xff, 0xcc);
-const wxColour COLOR_LEVEL10(0xcc, 0xff, 0xff);
-const wxColour COLOR_LEVEL11(0xff, 0xcc, 0x99);
-
-const wxColour COLOR_PERCENTAGE_BORDER    (198, 198, 198);
-const wxColour COLOR_PERCENTAGE_BACKGROUND(0xf8, 0xf8, 0xf8);
-
-//const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = wxColor( 89, 255,  99); //green: HSV: 88, 255, 172
-//const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = wxColor(225, 255, 227); //       HSV: 88, 255, 240
-const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = getColorSelectionGradientFrom();
-const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = getColorSelectionGradientTo  ();
+inline wxColor getColorTreeSelectionGradientFrom() { return getColorSelectionGradientFrom(); }
+inline wxColor getColorTreeSelectionGradientTo  () { return getColorSelectionGradientTo  (); }
 
 const int iconSizeSmall = IconBuffer::getSize(IconBuffer::SIZE_SMALL);
+
+
+wxColor getColorForLevel(size_t level)
+{
+    switch (level % 12)
+    {
+        case 0:
+            return { 0xcc, 0xcc, 0xff };
+        case 1:
+            return { 0xcc, 0xff, 0xcc };
+        case 2:
+            return { 0xff, 0xff, 0x99 };
+        case 3:
+            return { 0xcc, 0xcc, 0xcc };
+        case 4:
+            return { 0xff, 0xcc, 0xff };
+        case 5:
+            return { 0x99, 0xff, 0xcc };
+        case 6:
+            return { 0xcc, 0xcc, 0x99 };
+        case 7:
+            return { 0xff, 0xcc, 0xcc };
+        case 8:
+            return { 0xcc, 0xff, 0x99 };
+        case 9:
+            return { 0xff, 0xff, 0xcc };
+        case 10:
+            return { 0xcc, 0xff, 0xff };
+        case 11:
+            return { 0xff, 0xcc, 0x99 };
+    }
+    assert(false);
+    return *wxBLACK;
+}
+
 
 class GridDataNavi : private wxEvtHandler, public GridData
 {
@@ -768,14 +778,14 @@ public:
         rootBmp(getResourceImage(L"rootFolder").ConvertToImage().Scale(iconSizeSmall, iconSizeSmall, wxIMAGE_QUALITY_HIGH)),
         widthNodeIcon(iconSizeSmall),
         widthLevelStep(widthNodeIcon),
-        widthNodeStatus(getResourceImage(L"nodeExpanded").GetWidth()),
+        widthNodeStatus(getResourceImage(L"node_expanded").GetWidth()),
         grid_(grid)
     {
         grid.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(GridDataNavi::onKeyDown), nullptr, this);
-        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOWN,       GridClickEventHandler(GridDataNavi::onMouseLeft          ), nullptr, this);
-        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOUBLE,     GridClickEventHandler(GridDataNavi::onMouseLeftDouble    ), nullptr, this);
-        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, GridClickEventHandler(GridDataNavi::onGridLabelContext), nullptr, this );
-        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_LEFT,  GridClickEventHandler(GridDataNavi::onGridLabelLeftClick ), nullptr, this );
+        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOWN,       GridClickEventHandler     (GridDataNavi::onMouseLeft         ), nullptr, this);
+        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOUBLE,     GridClickEventHandler     (GridDataNavi::onMouseLeftDouble   ), nullptr, this);
+        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, GridLabelClickEventHandler(GridDataNavi::onGridLabelContext  ), nullptr, this);
+        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_LEFT,  GridLabelClickEventHandler(GridDataNavi::onGridLabelLeftClick), nullptr, this);
     }
 
     void setShowPercentage(bool value) { showPercentBar = value; grid_.Refresh(); }
@@ -788,11 +798,11 @@ private:
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
-            case COL_TYPE_NAVI_BYTES:
-            case COL_TYPE_NAVI_ITEM_COUNT:
+            case ColumnTypeNavi::BYTES:
+            case ColumnTypeNavi::ITEM_COUNT:
                 break;
 
-            case COL_TYPE_NAVI_DIRECTORY:
+            case ColumnTypeNavi::DIRECTORY:
                 if (treeDataView_)
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
@@ -817,10 +827,10 @@ private:
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                 switch (static_cast<ColumnTypeNavi>(colType))
                 {
-                    case COL_TYPE_NAVI_BYTES:
+                    case ColumnTypeNavi::BYTES:
                         return filesizeToShortString(node->bytes_);
 
-                    case COL_TYPE_NAVI_DIRECTORY:
+                    case ColumnTypeNavi::DIRECTORY:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                             return root->displayName_;
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
@@ -829,7 +839,7 @@ private:
                             return _("Files");
                         break;
 
-                    case COL_TYPE_NAVI_ITEM_COUNT:
+                    case ColumnTypeNavi::ITEM_COUNT:
                         return toGuiString(node->itemCount_);
                 }
         }
@@ -859,12 +869,17 @@ private:
 
     static const int GAP_SIZE = 2;
 
+    enum class HoverAreaNavi
+    {
+        NODE,
+    };
+
     void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected) override
     {
         if (enabled)
         {
             if (selected)
-                dc.GradientFillLinear(rect, COLOR_TREE_SELECTION_GRADIENT_FROM, COLOR_TREE_SELECTION_GRADIENT_TO, wxEAST);
+                dc.GradientFillLinear(rect, getColorTreeSelectionGradientFrom(), getColorTreeSelectionGradientTo(), wxEAST);
             //ignore focus
             else
                 clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -873,7 +888,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected) override
+    void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected, HoverArea rowHover) override
     {
         //wxRect rectTmp= drawCellBorder(dc, rect);
         wxRect rectTmp = rect;
@@ -882,9 +897,9 @@ private:
         //   ________________________________________________________________________________
         //  | space | gap | percentage bar | 2 x gap | node status | gap |icon | gap | rest |
         //   --------------------------------------------------------------------------------
-        // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
+        // -> synchronize renderCell() <-> getBestSize() <-> getRowMouseHover()
 
-        if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_DIRECTORY && treeDataView_)
+        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::DIRECTORY && treeDataView_)
         {
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
             {
@@ -907,45 +922,16 @@ private:
                     //percentage bar
                     if (showPercentBar)
                     {
-                        const wxColour brushCol = [&]() -> wxColour
-                        {
-                            switch (node->level_ % 12)
-                            {
-                                case 0:
-                                    return COLOR_LEVEL0;
-                                case 1:
-                                    return COLOR_LEVEL1;
-                                case 2:
-                                    return COLOR_LEVEL2;
-                                case 3:
-                                    return COLOR_LEVEL3;
-                                case 4:
-                                    return COLOR_LEVEL4;
-                                case 5:
-                                    return COLOR_LEVEL5;
-                                case 6:
-                                    return COLOR_LEVEL6;
-                                case 7:
-                                    return COLOR_LEVEL7;
-                                case 8:
-                                    return COLOR_LEVEL8;
-                                case 9:
-                                    return COLOR_LEVEL9;
-                                case 10:
-                                    return COLOR_LEVEL10;
-                                default:
-                                    return COLOR_LEVEL11;
-                            }
-                        }();
 
                         const wxRect areaPerc(rectTmp.x, rectTmp.y + 2, WIDTH_PERCENTAGE_BAR, rectTmp.height - 4);
                         {
                             //clear background
-                            wxDCPenChanger   dummy (dc, COLOR_PERCENTAGE_BORDER);
-                            wxDCBrushChanger dummy2(dc, COLOR_PERCENTAGE_BACKGROUND);
+                            wxDCPenChanger   dummy (dc, getColorPercentBorder());
+                            wxDCBrushChanger dummy2(dc, getColorPercentBackground());
                             dc.DrawRectangle(areaPerc);
 
                             //inner area
+                            const wxColor brushCol = getColorForLevel(node->level_);
                             dc.SetPen  (brushCol);
                             dc.SetBrush(brushCol);
 
@@ -976,13 +962,14 @@ private:
                             drawBitmapRtlMirror(dc, bmp, rectStat, wxALIGN_CENTER, buffer);
                         };
 
+                        const bool drawMouseHover = static_cast<HoverAreaNavi>(rowHover) == HoverAreaNavi::NODE;
                         switch (node->status_)
                         {
                             case TreeView::STATUS_EXPANDED:
-                                drawStatus(L"nodeExpanded");
+                                drawStatus(drawMouseHover ? L"node_expanded_hover" : L"node_expanded");
                                 break;
                             case TreeView::STATUS_REDUCED:
-                                drawStatus(L"nodeReduced");
+                                drawStatus(drawMouseHover ? L"node_reduced_hover" : L"node_reduced");
                                 break;
                             case TreeView::STATUS_EMPTY:
                                 break;
@@ -1005,12 +992,10 @@ private:
                             else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
                                 nodeIcon = fileIcon;
 
-                            if (isActive)
-                                drawBitmapRtlNoMirror(dc, nodeIcon, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                            if (!isActive)
+                                nodeIcon = wxBitmap(nodeIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)); //treat all channels equally!
 
-                            else
-                                drawBitmapRtlNoMirror(dc, wxBitmap(nodeIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
-                                                      rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                            drawBitmapRtlNoMirror(dc, nodeIcon, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
 
                             rectTmp.x     += widthNodeIcon + GAP_SIZE;
                             rectTmp.width -= widthNodeIcon + GAP_SIZE;
@@ -1027,8 +1012,8 @@ private:
             int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 
             //have file size and item count right-justified (but don't change for RTL languages)
-            if ((static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_BYTES ||
-                 static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_ITEM_COUNT) && grid_.GetLayoutDirection() != wxLayout_RightToLeft)
+            if ((static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::BYTES ||
+                 static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::ITEM_COUNT) && grid_.GetLayoutDirection() != wxLayout_RightToLeft)
             {
                 rectTmp.width -= 2 * GAP_SIZE;
                 alignment = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
@@ -1045,9 +1030,9 @@ private:
 
     int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
-        // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
+        // -> synchronize renderCell() <-> getBestSize() <-> getRowMouseHover()
 
-        if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_DIRECTORY && treeDataView_)
+        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::DIRECTORY && treeDataView_)
         {
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                 return node->level_ * widthLevelStep + GAP_SIZE + (showPercentBar ? WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE : 0) + widthNodeStatus + GAP_SIZE
@@ -1061,15 +1046,40 @@ private:
                    2 * GAP_SIZE; //include gap from right!
     }
 
+    HoverArea getRowMouseHover(size_t row, ColumnType colType, int cellRelativePosX, int cellWidth) override
+    {
+        switch (static_cast<ColumnTypeNavi>(colType))
+        {
+            case ColumnTypeNavi::BYTES:
+            case ColumnTypeNavi::ITEM_COUNT:
+                break;
+
+            case ColumnTypeNavi::DIRECTORY:
+                if (treeDataView_)
+                    if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
+                    {
+                        const int tolerance = 2;
+                        const int nodeStatusXFirst = -tolerance + static_cast<int>(node->level_) * widthLevelStep + GAP_SIZE + (showPercentBar ? WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE : 0);
+                        const int nodeStatusXLast  = (nodeStatusXFirst + tolerance) + widthNodeStatus + tolerance;
+                        // -> synchronize renderCell() <-> getBestSize() <-> getRowMouseHover()
+
+                        if (nodeStatusXFirst <= cellRelativePosX && cellRelativePosX < nodeStatusXLast)
+                            return static_cast<HoverArea>(HoverAreaNavi::NODE);
+                    }
+                break;
+        }
+        return HoverArea::NONE;
+    }
+
     std::wstring getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
-            case COL_TYPE_NAVI_BYTES:
+            case ColumnTypeNavi::BYTES:
                 return _("Size");
-            case COL_TYPE_NAVI_DIRECTORY:
+            case ColumnTypeNavi::DIRECTORY:
                 return _("Name");
-            case COL_TYPE_NAVI_ITEM_COUNT:
+            case ColumnTypeNavi::ITEM_COUNT:
                 return _("Items");
         }
         return std::wstring();
@@ -1077,37 +1087,20 @@ private:
 
     void onMouseLeft(GridClickEvent& event)
     {
-        if (treeDataView_)
+        switch (static_cast<HoverAreaNavi>(event.hoverArea_))
         {
-            bool clickOnNodeStatus = false;
-            if (static_cast<ColumnTypeNavi>(event.colType_) == COL_TYPE_NAVI_DIRECTORY)
-                if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(event.row_))
-                {
-                    const int absX = grid_.CalcUnscrolledPosition(event.GetPosition()).x;
-                    const wxRect cellArea = grid_.getCellArea(event.row_, event.colType_);
-                    if (cellArea.width > 0 && cellArea.height > 0)
+            case HoverAreaNavi::NODE:
+                if (treeDataView_)
+                    switch (treeDataView_->getStatus(event.row_))
                     {
-                        const int tolerance = 1;
-                        const int xNodeStatusFirst = -tolerance + cellArea.x + static_cast<int>(node->level_) * widthLevelStep + GAP_SIZE + (showPercentBar ? WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE : 0);
-                        const int xNodeStatusLast  = (xNodeStatusFirst + tolerance) + widthNodeStatus + tolerance;
-                        // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
-
-                        if (xNodeStatusFirst <= absX && absX < xNodeStatusLast)
-                            clickOnNodeStatus = true;
+                        case TreeView::STATUS_EXPANDED:
+                            return reduceNode(event.row_);
+                        case TreeView::STATUS_REDUCED:
+                            return expandNode(event.row_);
+                        case TreeView::STATUS_EMPTY:
+                            break;
                     }
-                }
-            //--------------------------------------------------------------------------------------------------
-
-            if (clickOnNodeStatus)
-                switch (treeDataView_->getStatus(event.row_))
-                {
-                    case TreeView::STATUS_EXPANDED:
-                        return reduceNode(event.row_);
-                    case TreeView::STATUS_REDUCED:
-                        return expandNode(event.row_);
-                    case TreeView::STATUS_EMPTY:
-                        break;
-                }
+                break;
         }
         event.Skip();
     }
@@ -1132,20 +1125,16 @@ private:
         int keyCode = event.GetKeyCode();
         if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
         {
-            if (keyCode == WXK_LEFT)
+            if (keyCode == WXK_LEFT || keyCode == WXK_NUMPAD_LEFT)
                 keyCode = WXK_RIGHT;
-            else if (keyCode == WXK_RIGHT)
+            else if (keyCode == WXK_RIGHT || keyCode == WXK_NUMPAD_RIGHT)
                 keyCode = WXK_LEFT;
-            else if (keyCode == WXK_NUMPAD_LEFT)
-                keyCode = WXK_NUMPAD_RIGHT;
-            else if (keyCode == WXK_NUMPAD_RIGHT)
-                keyCode = WXK_NUMPAD_LEFT;
         }
 
         const size_t rowCount = grid_.getRowCount();
         if (rowCount == 0) return;
 
-        size_t row = grid_.getGridCursor();
+        const size_t row = grid_.getGridCursor();
         if (event.ShiftDown())
             ;
         else if (event.ControlDown())
@@ -1191,21 +1180,21 @@ private:
         event.Skip();
     }
 
-    void onGridLabelContext(GridClickEvent& event)
+    void onGridLabelContext(GridLabelClickEvent& event)
     {
         ContextMenu menu;
 
         //--------------------------------------------------------------------------------------------------------
         menu.addCheckBox(_("Percentage"), [this] { setShowPercentage(!getShowPercentage()); }, getShowPercentage());
         //--------------------------------------------------------------------------------------------------------
-        auto toggleColumn = [&](const Grid::ColumnAttribute& ca)
+        auto toggleColumn = [&](ColumnType ct)
         {
             auto colAttr = grid_.getColumnConfig();
 
-            for (auto it = colAttr.begin(); it != colAttr.end(); ++it)
-                if (it->type_ == ca.type_)
+            for (Grid::ColumnAttribute& ca : colAttr)
+                if (ca.type_ == ct)
                 {
-                    it->visible_ = !ca.visible_;
+                    ca.visible_ = !ca.visible_;
                     grid_.setColumnConfig(colAttr);
                     return;
                 }
@@ -1213,8 +1202,8 @@ private:
 
         for (const Grid::ColumnAttribute& ca : grid_.getColumnConfig())
         {
-            menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn]() { toggleColumn(ca); },
-            ca.visible_, ca.type_ != static_cast<ColumnType>(COL_TYPE_NAVI_DIRECTORY)); //do not allow user to hide file name column!
+            menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn] { toggleColumn(ca.type_); },
+            ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeNavi::DIRECTORY)); //do not allow user to hide file name column!
         }
         //--------------------------------------------------------------------------------------------------------
         menu.addSeparator();
@@ -1231,7 +1220,7 @@ private:
         //event.Skip();
     }
 
-    void onGridLabelLeftClick(GridClickEvent& event)
+    void onGridLabelLeftClick(GridLabelClickEvent& event)
     {
         if (treeDataView_)
         {
@@ -1328,12 +1317,9 @@ std::vector<ColumnAttributeNavi> makeConsistent(const std::vector<ColumnAttribut
 
 std::vector<Grid::ColumnAttribute> treeview::convertConfig(const std::vector<ColumnAttributeNavi>& attribs)
 {
-    const auto& attribClean = makeConsistent(attribs);
-
     std::vector<Grid::ColumnAttribute> output;
-    std::transform(attribClean.begin(), attribClean.end(), std::back_inserter(output),
-    [&](const ColumnAttributeNavi& ca) { return Grid::ColumnAttribute(static_cast<ColumnType>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
-
+    for (const ColumnAttributeNavi& ca : makeConsistent(attribs))
+        output.emplace_back(static_cast<ColumnType>(ca.type_), ca.offset_, ca.stretch_, ca.visible_);
     return output;
 }
 
@@ -1341,9 +1327,7 @@ std::vector<Grid::ColumnAttribute> treeview::convertConfig(const std::vector<Col
 std::vector<ColumnAttributeNavi> treeview::convertConfig(const std::vector<Grid::ColumnAttribute>& attribs)
 {
     std::vector<ColumnAttributeNavi> output;
-
-    std::transform(attribs.begin(), attribs.end(), std::back_inserter(output),
-    [&](const Grid::ColumnAttribute& ca) { return ColumnAttributeNavi(static_cast<ColumnTypeNavi>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
-
+    for (const Grid::ColumnAttribute& ca : attribs)
+        output.emplace_back(static_cast<ColumnTypeNavi>(ca.type_), ca.offset_, ca.stretch_, ca.visible_);
     return makeConsistent(output);
 }

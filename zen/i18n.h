@@ -14,11 +14,6 @@
 #include "format_unit.h"
 
 //minimal layer enabling text translation - without platform/library dependencies!
-#ifdef __WXMSW__ //we have wxWidgets
-    #ifndef WXINTL_NO_GETTEXT_MACRO
-        #error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
-    #endif
-#endif
 
 #define ZEN_TRANS_CONCAT_SUB(X, Y) X ## Y
 #define _(s) zen::implementation::translate(ZEN_TRANS_CONCAT_SUB(L, s))
@@ -99,7 +94,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 
 
 inline
-std::unique_ptr<const TranslationHandler>& globalHandler()
+std::unique_ptr<const TranslationHandler>& globalTranslationHandler()
 {
     static std::unique_ptr<const TranslationHandler> inst; //external linkage even in header!
     return inst;
@@ -108,11 +103,11 @@ std::unique_ptr<const TranslationHandler>& globalHandler()
 
 
 inline
-void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler) { implementation::globalHandler() = std::move(newHandler); }
+void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler) { implementation::globalTranslationHandler() = std::move(newHandler); }
 
 
 inline
-const TranslationHandler* getTranslator() { return implementation::globalHandler().get(); }
+const TranslationHandler* getTranslator() { return implementation::globalTranslationHandler().get(); }
 }
 
 #endif //I18_N_H_3843489325044253425456

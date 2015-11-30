@@ -50,7 +50,7 @@ void convertToVanillaImage(wxImage& img); //add alpha channel if missing + remov
 
 //wxColor gradient(const wxColor& from, const wxColor& to, double fraction); //maps fraction within [0, 1] to an intermediate color
 
-//wxColour hsvColor(double h, double s, double v); //h within [0, 360), s, v within [0, 1]
+//wxColor hsvColor(double h, double s, double v); //h within [0, 360), s, v within [0, 1]
 
 
 
@@ -208,7 +208,7 @@ wxColor gradient(const wxColor& from, const wxColor& to, double fraction)
 
 /*
 inline
-wxColour hsvColor(double h, double s, double v) //h within [0, 360), s, v within [0, 1]
+wxColor hsvColor(double h, double s, double v) //h within [0, 360), s, v within [0, 1]
 {
     //http://de.wikipedia.org/wiki/HSV-Farbraum
 
@@ -238,17 +238,17 @@ wxColour hsvColor(double h, double s, double v) //h within [0, 360), s, v within
     switch (h_i)
     {
         case 0:
-            return wxColour(vi, t, p);
+            return wxColor(vi, t, p);
         case 1:
-            return wxColour(q, vi, p);
+            return wxColor(q, vi, p);
         case 2:
-            return wxColour(p, vi, t);
+            return wxColor(p, vi, t);
         case 3:
-            return wxColour(p, q, vi);
+            return wxColor(p, q, vi);
         case 4:
-            return wxColour(t, p, vi);
+            return wxColor(t, p, vi);
         case 5:
-            return wxColour(vi, p, q);
+            return wxColor(vi, p, q);
     }
     assert(false);
     return *wxBLACK;

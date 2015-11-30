@@ -53,10 +53,8 @@ struct Statistics
 class StatusHandler : public ProcessCallback, public AbortCallback, public Statistics
 {
 public:
-    StatusHandler() : currentPhase_(PHASE_NONE),
-        numbersCurrent_(4), //init with phase count
-        numbersTotal_  (4), //
-        abortRequested(false) {}
+    StatusHandler() : numbersCurrent_(4),   //init with phase count
+        numbersTotal_  (4) {} //
 
 protected:
     //implement parts of ProcessCallback
@@ -80,8 +78,8 @@ protected:
             forceUiRefresh();
     }
 
-    void reportStatus(const std::wstring& text) override { if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ }
-    void reportInfo  (const std::wstring& text) override { if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
+    void reportStatus(const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ }
+    void reportInfo  (const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
 
     //implement AbortCallback
     void requestAbortion() override
@@ -132,12 +130,12 @@ private:
 
     static std::pair<int, std::int64_t>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, std::int64_t>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
 
-    Phase currentPhase_;
+    Phase currentPhase_ = PHASE_NONE;
     StatNumbers numbersCurrent_;
     StatNumbers numbersTotal_;
     std::wstring statusText_;
 
-    bool abortRequested;
+    bool abortRequested = false;
 };
 }
 

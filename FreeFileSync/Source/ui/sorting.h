@@ -20,7 +20,7 @@ struct CompileTimeReminder : public FSObjectVisitor
     void visit(const FilePair&    file   ) override {}
     void visit(const SymlinkPair& symlink) override {}
     void visit(const FolderPair&  folder ) override {}
-} checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file when needed
+} checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file if ever needed
 }
 
 

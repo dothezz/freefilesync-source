@@ -26,10 +26,6 @@ void setText(wxTextCtrl& control, const wxString& newText, bool* additionalLayou
 inline
 void setText(wxStaticText& control, wxString newText, bool* additionalLayoutChange = nullptr)
 {
-#ifdef ZEN_WIN
-    //wxStaticText handles ampersands incorrectly: https://sourceforge.net/p/freefilesync/bugs/279/
-    replace(newText, L'&', L"&&");
-#endif
 
     const wxString& label = control.GetLabel(); //perf: don't call twice!
     if (additionalLayoutChange && !*additionalLayoutChange)

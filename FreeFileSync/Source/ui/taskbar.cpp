@@ -6,103 +6,15 @@
 
 #include "taskbar.h"
 
-#ifdef ZEN_WIN
-    #include <zen/dll.h>
-    #include <zen/win_ver.h>
-    #include <zen/stl_tools.h>
-    #include "../dll/Taskbar_Seven/taskbar.h"
-
-#elif defined HAVE_UBUNTU_UNITY
+#if   defined HAVE_UBUNTU_UNITY
     #include <unity/unity/unity.h>
 
-#elif defined ZEN_MAC
-    #include <zen/basic_math.h>
-    #include <zen/string_tools.h>
-    #include "osx_dock.h"
 #endif
 
 using namespace zen;
 
 
-#ifdef ZEN_WIN
-using namespace tbseven;
-
-
-class Taskbar::Pimpl //throw TaskbarNotAvailable
-{
-public:
-    Pimpl(const wxFrame& window) : assocWindow(window.GetHWND())
-    {
-        if (!win7OrLater()) //check *before* trying to load DLL
-            throw TaskbarNotAvailable();
-
-        freeString_  = DllFun<FunType_freeString >(getDllName(), funName_freeString);
-        setStatus_   = DllFun<FunType_setStatus  >(getDllName(), funName_setStatus);
-        setProgress_ = DllFun<FunType_setProgress>(getDllName(), funName_setProgress);
-
-        if (!assocWindow || !freeString_ || !setStatus_ || !setProgress_)
-            throw TaskbarNotAvailable();
-    }
-
-    ~Pimpl()
-    {
-        const wchar_t* errorMsg = nullptr;
-        setStatus_(assocWindow, tbseven::STATUS_NOPROGRESS, errorMsg);
-        if (errorMsg)
-        {
-            ZEN_ON_SCOPE_EXIT(freeString_(errorMsg));
-            assert(false);
-        }
-    }
-
-    void setStatus(Status status)
-    {
-        TaskBarStatus tbSevenStatus = tbseven::STATUS_NORMAL;
-        switch (status)
-        {
-            case Taskbar::STATUS_INDETERMINATE:
-                tbSevenStatus = tbseven::STATUS_INDETERMINATE;
-                break;
-            case Taskbar::STATUS_NORMAL:
-                tbSevenStatus = tbseven::STATUS_NORMAL;
-                break;
-            case Taskbar::STATUS_ERROR:
-                tbSevenStatus = tbseven::STATUS_ERROR;
-                break;
-            case Taskbar::STATUS_PAUSED:
-                tbSevenStatus = tbseven::STATUS_PAUSED;
-                break;
-        }
-
-        const wchar_t* errorMsg = nullptr;
-        setStatus_(assocWindow, tbSevenStatus, errorMsg);
-        if (errorMsg)
-        {
-            ZEN_ON_SCOPE_EXIT(freeString_(errorMsg));
-            assert(false);
-        }
-    }
-
-    void setProgress(double fraction)
-    {
-        const wchar_t* errorMsg = nullptr;
-        setProgress_(assocWindow, fraction * 100000, 100000, errorMsg);
-        if (errorMsg)
-        {
-            ZEN_ON_SCOPE_EXIT(freeString_(errorMsg));
-            assert(false);
-        }
-    }
-
-private:
-    void* const assocWindow; //HWND
-
-    DllFun<FunType_freeString>  freeString_;
-    DllFun<FunType_setStatus>   setStatus_;
-    DllFun<FunType_setProgress> setProgress_;
-};
-
-#elif defined HAVE_UBUNTU_UNITY //Ubuntu unity
+#if   defined HAVE_UBUNTU_UNITY //Ubuntu unity
 namespace
 {
 const char FFS_DESKTOP_FILE[] = "freefilesync.desktop";
@@ -153,34 +65,6 @@ public:
 private:
     UnityLauncherEntry* tbEntry;
 };
-
-#elif defined ZEN_MAC
-class Taskbar::Pimpl
-{
-public:
-    Pimpl(const wxFrame& window) {}
-
-    ~Pimpl() { setDockText(""); }
-
-    void setStatus(Status status) {}
-
-    void setProgress(double fraction)
-    {
-        //no decimal places to make output less noisy
-        setDockText((numberTo<std::string>(numeric::round(fraction * 100.0)) + '%').c_str()); //no need to internationalize fraction!?
-    }
-
-private:
-    void setDockText(const char* str)
-    {
-        try
-        {
-            osx::dockIconSetText(str); //throw SysError
-        }
-        catch (const zen::SysError&) { assert(false); }
-    }
-};
-
 
 #else //no taskbar support
 class Taskbar::Pimpl

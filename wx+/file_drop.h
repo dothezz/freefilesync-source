@@ -15,9 +15,6 @@
 #include <wx/event.h>
 #include <wx/dnd.h>
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    #include <zen/win.h>
-#endif
 
 
 namespace zen
@@ -81,47 +78,6 @@ typedef void (wxEvtHandler::*FileDropEventFunction)(FileDropEvent&);
 
 
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-using DragDropValidator = bool (*)(const std::vector<Zstring>& shellItemPaths); //plain static function => no lifetime management needed!
-using DragDropConsumer  = std::function<void (const std::vector<Zstring>& shellItemPaths)>;
-
-namespace impl
-{
-void registerDragDrop(HWND hwnd, const DragDropValidator& acceptDrop, const DragDropConsumer& onDrop);
-void unregisterDragDrop(HWND hwnd);
-
-class DragDropCleanupWindow : private wxWindow
-{
-public:
-    DragDropCleanupWindow(wxWindow& dropWindow) : wxWindow(&dropWindow, wxID_ANY), dropHwnd(dropWindow.GetHWND())
-    {
-        Hide(); //this is just a dummy window so that its parent can have ownership
-        Disable();
-    }
-    ~DragDropCleanupWindow() { impl::unregisterDragDrop(dropHwnd); }
-
-private:
-    HWND dropHwnd;
-};
-}
-
-
-inline
-void setupShellItemDrop(wxWindow& dropWindow, const DragDropValidator& acceptDrop)
-{
-    auto onDrop = [&dropWindow](const std::vector<Zstring>& shellItemPaths)
-    {
-        //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
-        if (wxEvtHandler* handler = dropWindow.GetEventHandler())
-            handler->AddPendingEvent(FileDropEvent(shellItemPaths));
-    };
-
-    impl::registerDragDrop(static_cast<HWND>(dropWindow.GetHWND()), acceptDrop, onDrop);
-
-    //make sure clean-up is tied to dropWindow life-time:
-    new impl::DragDropCleanupWindow(dropWindow); //ownership passed to "dropWindow"
-}
-#endif
 
 
 namespace impl

@@ -493,9 +493,6 @@ public:
 
     void operator()() //thread entry
     {
-#ifdef ZEN_WIN
-        setCurrentThreadName("Folder Traverser");
-#endif
 
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker());
@@ -525,7 +522,8 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
 
     FixedList<InterruptibleThread> worker;
 
-    ZEN_ON_SCOPE_FAIL(
+    ZEN_ON_SCOPE_FAIL
+    (
         for (InterruptibleThread& wt : worker)
         wt.interrupt(); //interrupt all at once first, then join
         for (InterruptibleThread& wt : worker)

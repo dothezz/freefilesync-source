@@ -54,9 +54,6 @@ ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlo
 
 ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    ReturnSmallDlg::ButtonPressed showSftpSetupDialog(wxWindow* parent, Zstring& folderPathPhrase);
-#endif
 }
 
 #endif //SMALL_DLGS_H_8321790875018750245

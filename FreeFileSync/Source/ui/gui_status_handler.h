@@ -41,7 +41,7 @@ private:
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
 
     MainDialog& mainDlg;
-    bool ignoreErrors;
+    bool ignoreErrors = false;
 };
 
 

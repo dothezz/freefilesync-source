@@ -9,33 +9,24 @@
 
 #include <vector>
 #include <zen/file_error.h>
+#include <wx/language.h>
 
 namespace zen
 {
-class ExistingTranslations
+struct TranslationInfo
 {
-public:
-    struct Entry
-    {
-        int languageID;
-        std::wstring languageName;
-        std::wstring languageFile;
-        std::wstring translatorName;
-        std::wstring languageFlag;
-    };
-    static const std::vector<Entry>& get();
-
-private:
-    ExistingTranslations();
-    ExistingTranslations           (const ExistingTranslations&) = delete;
-    ExistingTranslations& operator=(const ExistingTranslations&) = delete;
-    std::vector<Entry> locMapping;
+    wxLanguage languageID = wxLANGUAGE_UNKNOWN;
+    std::wstring languageName;
+    std::wstring languageFile;
+    std::wstring translatorName;
+    std::wstring languageFlag;
 };
+const std::vector<TranslationInfo>& getExistingTranslations();
 
 
-void setLanguage(int language); //throw FileError
-int getLanguage();
-int retrieveSystemLanguage();
+void setLanguage(wxLanguage lng); //throw FileError
+wxLanguage getLanguage();
+wxLanguage getSystemLanguage();
 
 void releaseWxLocale(); //wxLocale crashes miserably on wxGTK when destructor runs during global cleanup => call in wxApp::OnExit
 //"You should delete all wxWidgets object that you created by the time OnExit finishes. In particular, do not destroy them from application class' destructor!"

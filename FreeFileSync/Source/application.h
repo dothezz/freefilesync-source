@@ -15,20 +15,17 @@
 
 class Application : public wxApp
 {
-public:
-    Application() : returnCode(zen::FFS_RC_SUCCESS) {}
-
 private:
     bool OnInit() override;
-    int  OnExit() override;
     int  OnRun() override;
+    int  OnExit() override;
     bool OnExceptionInMainLoop() override { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 
     void onEnterEventLoop(wxEvent& event);
     void onQueryEndSession(wxEvent& event);
     void launch(const std::vector<Zstring>& commandArgs);
 
-    zen::FfsReturnCode returnCode;
+    zen::FfsReturnCode returnCode = zen::FFS_RC_SUCCESS;
 };
 
 #endif //APPLICATION_H_081568741942010985702395

@@ -13,6 +13,8 @@ namespace zen
 {
 bool acceptsItemPathPhraseNative (const Zstring& itemPathPhrase); //noexcept
 AbstractPath createItemPathNative(const Zstring& itemPathPhrase); //noexcept
+
+AbstractPath createItemPathNativeNoFormatting(const Zstring& nativePath); //noexcept
 }
 
 #endif //FS_NATIVE_183247018532434563465

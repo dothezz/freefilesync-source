@@ -24,14 +24,7 @@
 #include "lib/error_log.h"
 #include "lib/resolve_path.h"
 
-#ifdef ZEN_WIN
-    #include <zen/win_ver.h>
-    #include <zen/dll.h>
-    #include "lib/app_user_mode_id.h"
-
-#elif defined ZEN_LINUX
     #include <gtk/gtk.h>
-#endif
 
 using namespace zen;
 using namespace xmlAccess;
@@ -39,88 +32,18 @@ using namespace xmlAccess;
 
 IMPLEMENT_APP(Application)
 
-#ifdef _MSC_VER
-//catch CRT floating point errors: http://msdn.microsoft.com/en-us/library/k3backsw.aspx
-int _matherr(_Inout_ struct _exception* except)
-{
-    assert(false);
-    return 0; //use default action
-}
-#endif
+
 
 
 namespace
 {
-#ifdef ZEN_WIN
-void enableCrashingOnCrashes() //should be needed for 32-bit code only: http://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work
-{
-    typedef BOOL (WINAPI* GetProcessUserModeExceptionPolicyFun)(LPDWORD lpFlags);
-    typedef BOOL (WINAPI* SetProcessUserModeExceptionPolicyFun)(  DWORD dwFlags);
-    const DWORD EXCEPTION_SWALLOWING = 0x1;
-
-    const SysDllFun<GetProcessUserModeExceptionPolicyFun> getProcessUserModeExceptionPolicy(L"kernel32.dll", "GetProcessUserModeExceptionPolicy");
-    const SysDllFun<SetProcessUserModeExceptionPolicyFun> setProcessUserModeExceptionPolicy(L"kernel32.dll", "SetProcessUserModeExceptionPolicy");
-    if (getProcessUserModeExceptionPolicy && setProcessUserModeExceptionPolicy) //available since Windows 7 SP1
-    {
-        DWORD dwFlags = 0;
-        if (getProcessUserModeExceptionPolicy(&dwFlags) && (dwFlags & EXCEPTION_SWALLOWING))
-            setProcessUserModeExceptionPolicy(dwFlags & ~EXCEPTION_SWALLOWING);
-    }
-}
-
-#ifdef _MSC_VER
-void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
-#endif
-#endif
 
 
 std::vector<Zstring> getCommandlineArgs(const wxApp& app)
 {
     std::vector<Zstring> args;
-#ifdef ZEN_WIN
-    //we do the job ourselves! both wxWidgets and ::CommandLineToArgvW() parse "C:\" "D:\" as single line C:\" D:\"
-    //-> "solution": we just don't support protected quotation mark!
-    Zstring cmdLine = ::GetCommandLine(); //only way to get a unicode commandline
-    while (endsWith(cmdLine, L' ')) //may end with space
-        cmdLine.resize(cmdLine.size() - 1);
-
-    auto iterStart = cmdLine.end(); //end() means: no token
-    for (auto it = cmdLine.begin(); it != cmdLine.end(); ++it)
-        if (*it == L' ') //space commits token
-        {
-            if (iterStart != cmdLine.end())
-            {
-                args.emplace_back(iterStart, it);
-                iterStart = cmdLine.end(); //expect consecutive blanks!
-            }
-        }
-        else
-        {
-            //start new token
-            if (iterStart == cmdLine.end())
-                iterStart = it;
-
-            if (*it == L'\"')
-            {
-                it = std::find(it + 1, cmdLine.end(), L'\"');
-                if (it == cmdLine.end())
-                    break;
-            }
-        }
-    if (iterStart != cmdLine.end())
-        args.emplace_back(iterStart, cmdLine.end());
-
-    if (!args.empty())
-        args.erase(args.begin()); //remove first argument which is exe path by convention: http://blogs.msdn.com/b/oldnewthing/archive/2006/05/15/597984.aspx
-
-    for (Zstring& str : args)
-        if (str.size() >= 2 && startsWith(str, L'\"') && endsWith(str, L'\"'))
-            str = Zstring(str.c_str() + 1, str.size() - 2);
-
-#else
     for (int i = 1; i < app.argc; ++i) //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
         args.push_back(toZ(wxString(app.argv[i]))); //so we are forced to use this pitiful excuse for a range construction!!
-#endif
     return args;
 }
 
@@ -131,24 +54,8 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-#ifdef ZEN_WIN
-    enableCrashingOnCrashes();
-#ifdef _MSC_VER
-    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
-#endif
-    //Quote: "Best practice is that all applications call the process-wide ::SetErrorMode() function with a parameter of
-    //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
-    ::SetErrorMode(SEM_FAILCRITICALERRORS);
-
-    setAppUserModeId(L"FreeFileSync", L"Zenju.FreeFileSync"); //noexcept
-    //consider: FreeFileSync.exe, FreeFileSync_Win32.exe, FreeFileSync_x64.exe
-
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
-
-#elif defined ZEN_LINUX
     ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
-#endif
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
@@ -175,6 +82,7 @@ int Application::OnExit()
 {
     uninitializeHelp();
     releaseWxLocale();
+    cleanupResourceImages();
     return wxApp::OnExit();
 }
 
@@ -189,59 +97,23 @@ void Application::onEnterEventLoop(wxEvent& event)
 }
 
 
-#ifdef ZEN_MAC
-    /*
-    wxWidgets initialization sequence on OS X is a mess:
-    ----------------------------------------------------
-    1. double click FFS app bundle or execute from command line without arguments
-    OnInit()
-    OnRun()
-    onEnterEventLoop()
-    MacNewFile()
-
-    2. double-click .ffs_gui file
-    OnInit()
-    OnRun()
-    onEnterEventLoop()
-    MacOpenFiles()
-
-    3. start from command line with .ffs_gui file as first argument
-    OnInit()
-    OnRun()
-    MacOpenFiles() -> WTF!?
-    onEnterEventLoop()
-    MacNewFile()   -> yes, wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/14558
-
-    => solution: map Apple events to regular command line via launcher
-    */
-#endif
 
 
 int Application::OnRun()
 {
-    auto processException = [](const std::wstring& msg)
-    {
-        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        logError(utfCvrtTo<std::string>(msg));
-        wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), msg);
-    };
-
     try
     {
         wxApp::OnRun();
     }
-    catch (const std::exception& e) //catch all STL exceptions
+    catch (const std::bad_alloc& e) //the only kind of exception we don't want crash dumps for
     {
-        processException(utfCvrtTo<std::wstring>(e.what()));
+        logFatalError(e.what()); //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
+
+        wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), e.what());
         return FFS_RC_EXCEPTION;
     }
-    /* -> let it crash and create mini dump!!!
-    catch (...)
-    {
-        processException(L"Unknown error.");
-        return FFS_RC_EXCEPTION;
-    }
-    */
+    //catch (...) -> let it crash and create mini dump!!!
+
     return returnCode;
 }
 
@@ -275,9 +147,16 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     }
     catch (const FileError&) { assert(false); }
 
-    auto notifyError = [&](const std::wstring& msg, const std::wstring& title)
+    auto notifyFatalError = [&](const std::wstring& msg, const std::wstring& title)
     {
-        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(title).setDetailInstructions(msg));
+        auto titleTmp = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + L" - " + title;
+
+        //error handling strategy unknown and no sync log output available at this point! => show message box
+
+        logFatalError(utfCvrtTo<std::string>(msg));
+
+        wxSafeShowMessage(title, msg);
+
         raiseReturnCode(returnCode, FFS_RC_ABORTED);
     };
 
@@ -312,7 +191,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             {
                 if (++it == commandArgs.end())
                 {
-                    notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), _("Syntax error"));
+                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), _("Syntax error"));
                     return;
                 }
                 dirPathPhrasesLeft.push_back(*it);
@@ -321,7 +200,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             {
                 if (++it == commandArgs.end())
                 {
-                    notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), _("Syntax error"));
+                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), _("Syntax error"));
                     return;
                 }
                 dirPathPhrasesRight.push_back(*it);
@@ -340,7 +219,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         filePath += Zstr(".xml");
                     else
                     {
-                        notifyError(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filePath)), std::wstring());
+                        notifyFatalError(replaceCpy(_("Cannot find file %x."), L"%x", fmtPath(filePath)), _("Error"));
                         return;
                     }
                 }
@@ -359,13 +238,13 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                             globalConfigFile = filePath;
                             break;
                         case XML_TYPE_OTHER:
-                            notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filePath)), std::wstring());
+                            notifyFatalError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filePath)), _("Error"));
                             return;
                     }
                 }
                 catch (const FileError& e)
                 {
-                    notifyError(e.toString(), std::wstring());
+                    notifyFatalError(e.toString(), _("Error"));
                     return;
                 }
             }
@@ -373,7 +252,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     if (dirPathPhrasesLeft.size() != dirPathPhrasesRight.size())
     {
-        notifyError(_("Unequal number of left and right directories specified."), _("Syntax error"));
+        notifyFatalError(_("Unequal number of left and right directories specified."), _("Syntax error"));
         return;
     }
 
@@ -391,7 +270,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //check if config at folder-pair level is present: this probably doesn't make sense when replacing/adding the user-specified directories
             if (hasNonDefaultConfig(mainCfg.firstPair) || std::any_of(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(), hasNonDefaultConfig))
             {
-                notifyError(_("The config file must not contain settings at directory pair level when directories are set via command line."), _("Syntax error"));
+                notifyFatalError(_("The config file must not contain settings at directory pair level when directories are set via command line."), _("Syntax error"));
                 return false;
             }
 
@@ -447,7 +326,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             catch (const FileError& e)
             {
-                notifyError(e.toString(), std::wstring());
+                notifyFatalError(e.toString(), _("Error"));
                 return;
             }
             if (!replaceDirectories(batchCfg.mainCfg))
@@ -469,7 +348,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             catch (const FileError& e)
             {
-                notifyError(e.toString(), std::wstring());
+                notifyFatalError(e.toString(), _("Error"));
                 return;
             }
             if (!replaceDirectories(guiCfg.mainCfg))
@@ -485,7 +364,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     {
         if (!dirPathPhrasesLeft.empty())
         {
-            notifyError(_("Directories cannot be set for more than one configuration file."), _("Syntax error"));
+            notifyFatalError(_("Directories cannot be set for more than one configuration file."), _("Syntax error"));
             return;
         }
 
@@ -505,7 +384,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         }
         catch (const FileError& e)
         {
-            notifyError(e.toString(), std::wstring());
+            notifyFatalError(e.toString(), _("Error"));
             return;
         }
         runGuiMode(globalConfigFilePath, guiCfg, filepaths, !openForEdit);
@@ -530,11 +409,7 @@ void showSyntaxHelp()
     showNotificationDialog(nullptr, DialogInfoType::INFO, PopupDialogCfg().
                            setTitle(_("Command line")).
                            setDetailInstructions(_("Syntax:") + L"\n\n" +
-#ifdef ZEN_WIN
-                                                 L"FreeFileSync.exe " + L"\n" +
-#elif defined ZEN_LINUX || defined ZEN_MAC
                                                  L"./FreeFileSync " + L"\n" +
-#endif
                                                  L"    [" + _("global config file:") + L" GlobalSettings.xml]" + L"\n" +
                                                  L"    [" + _("config files:") + L" *.ffs_gui/*.ffs_batch]" + L"\n" +
                                                  L"    [-LeftDir " + _("directory") + L"] [-RightDir " + _("directory") + L"]" + L"\n" +
@@ -561,7 +436,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         if (batchCfg.handleError == ON_ERROR_POPUP)
             showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(msg));
         else //"exit" or "ignore"
-            logError(utfCvrtTo<std::string>(msg));
+            logFatalError(utfCvrtTo<std::string>(msg));
 
         raiseReturnCode(returnCode, rc);
     };

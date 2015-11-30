@@ -465,15 +465,15 @@ bool GridView::getDefaultSortDirection(ColumnTypeRim type) //true: ascending; fa
 {
     switch (type)
     {
-        case COL_TYPE_SIZE:
-        case COL_TYPE_DATE:
+        case ColumnTypeRim::SIZE:
+        case ColumnTypeRim::DATE:
             return false;
 
-        case COL_TYPE_BASE_DIRECTORY:
-        case COL_TYPE_FULL_PATH:
-        case COL_TYPE_REL_FOLDER:
-        case COL_TYPE_FILENAME:
-        case COL_TYPE_EXTENSION:
+        case ColumnTypeRim::BASE_DIRECTORY:
+        case ColumnTypeRim::FULL_PATH:
+        case ColumnTypeRim::REL_FOLDER:
+        case ColumnTypeRim::FILENAME:
+        case ColumnTypeRim::EXTENSION:
             return true;
     }
     assert(false);
@@ -490,35 +490,35 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
 
     switch (type)
     {
-        case COL_TYPE_FULL_PATH:
+        case ColumnTypeRim::FULL_PATH:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, RIGHT_SIDE>());
             break;
-        case COL_TYPE_REL_FOLDER:
+        case ColumnTypeRim::REL_FOLDER:
             if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<true>());
             else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<false>());
             break;
-        case COL_TYPE_FILENAME:
+        case ColumnTypeRim::FILENAME:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>());
             break;
-        case COL_TYPE_SIZE:
+        case ColumnTypeRim::SIZE:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, RIGHT_SIDE>());
             break;
-        case COL_TYPE_DATE:
+        case ColumnTypeRim::DATE:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, RIGHT_SIDE>());
             break;
-        case COL_TYPE_EXTENSION:
+        case ColumnTypeRim::EXTENSION:
             if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >());
@@ -532,7 +532,7 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
         //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
         //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
         //    break;
-        case COL_TYPE_BASE_DIRECTORY:
+        case ColumnTypeRim::BASE_DIRECTORY:
             if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex < b.folderIndex; });
             else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex > b.folderIndex; });
             break;

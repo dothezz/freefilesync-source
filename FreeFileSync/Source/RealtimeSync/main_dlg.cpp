@@ -21,15 +21,7 @@
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
 
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-
-#elif defined ZEN_LINUX
     #include <gtk/gtk.h>
-#elif defined ZEN_MAC
-    #include <ApplicationServices/ApplicationServices.h>
-    #include <wx/app.h>
-#endif
 
 using namespace zen;
 
@@ -58,10 +50,6 @@ void MainDialog::create(const Zstring& cfgFile)
 MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     : MainDlgGenerated(dlg)
 {
-#ifdef ZEN_WIN
-    new MouseMoveWindow(*this); //ownership passed to "this"
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     SetIcon(getRtsIcon()); //set application icon
 
@@ -117,12 +105,6 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     {
         m_buttonStart->SetFocus(); //don't "steal" focus if program is running from sys-tray"
         Show();
-#ifdef ZEN_MAC
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon, even if we're not an application bundle
-        ::SetFrontProcess(&psn);
-        //if the executable is not yet in a bundle or if it is called through a launcher, we need to set focus manually:
-#endif
     }
 
     //drag and drop .ffs_real and .ffs_batch on main dialog
@@ -203,12 +185,6 @@ void MainDialog::OnKeyPressed(wxKeyEvent& event)
 void MainDialog::OnStart(wxCommandEvent& event)
 {
     Hide();
-#ifdef ZEN_MAC
-    //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
-    ProcessSerialNumber psn = { 0, kCurrentProcess };
-    ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
-    wxTheApp->Yield(); //required to complete TransformProcessType: else a subsequent modal dialog will be erroneously hidden!
-#endif
 
     xmlAccess::XmlRealConfig currentCfg = getConfiguration();
 
@@ -223,10 +199,6 @@ void MainDialog::OnStart(wxCommandEvent& event)
     }
 
     Show(); //don't show for EXIT_APP
-#ifdef ZEN_MAC
-    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
-    ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
-#endif
     Raise();
 }
 
@@ -399,11 +371,7 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 }
 
 
-#ifdef ZEN_WIN
-    static const size_t MAX_ADD_FOLDERS = 8;
-#elif defined ZEN_LINUX || defined ZEN_MAC
     static const size_t MAX_ADD_FOLDERS = 6;
-#endif
 
 
 void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront)
@@ -411,9 +379,6 @@ void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront
     if (newFolders.size() == 0)
         return;
 
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     int folderHeight = 0;
     for (const Zstring& dirpath : newFolders)
@@ -458,9 +423,6 @@ void MainDialog::addFolder(const std::vector<Zstring>& newFolders, bool addFront
 
 void MainDialog::removeAddFolder(size_t pos)
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     if (pos < dirpathsExtra.size())
     {
@@ -496,9 +458,6 @@ void MainDialog::removeAddFolder(size_t pos)
 
 void MainDialog::clearAddFolders()
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     bSizerFolders->Clear(true);
     dirpathsExtra.clear();

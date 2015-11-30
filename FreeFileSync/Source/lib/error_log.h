@@ -16,7 +16,7 @@
 namespace zen
 {
 //write error message to a file (even with corrupted stack)- call in desperate situations when no other means of error handling is available
-void logError(const std::string& msg); //throw()
+void logFatalError(const std::string& msg); //throw()
 
 
 
@@ -28,7 +28,7 @@ void logError(const std::string& msg); //throw()
 
 //##################### implementation ############################
 inline
-void logError(const std::string& msg) //throw()
+void logFatalError(const std::string& msg) //throw()
 {
     assert(false); //this is stuff we like to debug
     const std::string logEntry = "[" + formatTime<std::string>(FORMAT_DATE) + " "+ formatTime<std::string>(FORMAT_TIME) + "] " + msg;

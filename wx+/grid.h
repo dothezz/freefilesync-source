@@ -18,13 +18,10 @@
 
 namespace zen
 {
-typedef enum { DUMMY_COLUMN_TYPE = static_cast<unsigned int>(-1) } ColumnType;
+enum class ColumnType { NONE = -1 }; //user-defiend column type
+enum class HoverArea  { NONE = -1 }; //user-defined area for mouse selections for a given row (may span multiple columns or split a single column into multiple areas)
 
-//----- events ------------------------------------------------------------------------
-extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_LEFT;  //generates: GridClickEvent
-extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_RIGHT; //
-extern const wxEventType EVENT_GRID_COL_RESIZE;   //generates: GridColumnResizeEvent
-
+//------------------------ events ------------------------------------------------
 extern const wxEventType EVENT_GRID_MOUSE_LEFT_DOUBLE; //
 extern const wxEventType EVENT_GRID_MOUSE_LEFT_DOWN;   //
 extern const wxEventType EVENT_GRID_MOUSE_LEFT_UP;     //generates: GridClickEvent
@@ -34,16 +31,43 @@ extern const wxEventType EVENT_GRID_MOUSE_RIGHT_UP;    //
 extern const wxEventType EVENT_GRID_SELECT_RANGE; //generates: GridRangeSelectEvent
 //NOTE: neither first nor second row need to match EVENT_GRID_MOUSE_LEFT_DOWN/EVENT_GRID_MOUSE_LEFT_UP: user holding SHIFT; moving out of window...
 
+extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_LEFT;  //generates: GridLabelClickEvent
+extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_RIGHT; //
+extern const wxEventType EVENT_GRID_COL_RESIZE; //generates: GridColumnResizeEvent
+
 //example: wnd.Connect(EVENT_GRID_COL_LABEL_LEFT_CLICK, GridClickEventHandler(MyDlg::OnLeftClick), nullptr, this);
 
 struct GridClickEvent : public wxMouseEvent
 {
-    GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, ColumnType colType) : wxMouseEvent(me), row_(row), colType_(colType) { SetEventType(et); }
+    GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, HoverArea hoverArea) :
+        wxMouseEvent(me), row_(row), hoverArea_(hoverArea) { SetEventType(et); }
     wxEvent* Clone() const override { return new GridClickEvent(*this); }
 
     const ptrdiff_t row_; //-1 for invalid position, >= rowCount if out of range
-    const ColumnType colType_; //may be DUMMY_COLUMN_TYPE
+    const HoverArea hoverArea_; //may be HoverArea::NONE
 };
+
+struct GridRangeSelectEvent : public wxCommandEvent
+{
+    GridRangeSelectEvent(size_t rowFirst, size_t rowLast, bool positive, const GridClickEvent* mouseInitiated) :
+        wxCommandEvent(EVENT_GRID_SELECT_RANGE), rowFirst_(rowFirst), rowLast_(rowLast), positive_(positive),
+        mouseInitiated_(mouseInitiated ? *mouseInitiated : Opt<GridClickEvent>()) { assert(rowFirst <= rowLast); }
+    wxEvent* Clone() const override { return new GridRangeSelectEvent(*this); }
+
+    const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
+    const size_t rowLast_;
+    const bool   positive_; //"false" when clearing selection!
+    Opt<GridClickEvent> mouseInitiated_; //filled unless selection was performed via keyboard shortcuts or is result of Grid::clearSelection()
+};
+
+struct GridLabelClickEvent : public wxMouseEvent
+{
+    GridLabelClickEvent(wxEventType et, const wxMouseEvent& me, ColumnType colType) : wxMouseEvent(me), colType_(colType) { SetEventType(et); }
+    wxEvent* Clone() const override { return new GridLabelClickEvent(*this); }
+
+    const ColumnType colType_; //may be ColumnType::NONE
+};
+
 
 struct GridColumnResizeEvent : public wxCommandEvent
 {
@@ -54,28 +78,16 @@ struct GridColumnResizeEvent : public wxCommandEvent
     const int        offset_;
 };
 
-struct GridRangeSelectEvent : public wxCommandEvent
-{
-    GridRangeSelectEvent(size_t rowFirst, size_t rowLast, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), positive_(positive), rowFirst_(rowFirst), rowLast_(rowLast) { assert(rowFirst <= rowLast); }
-    wxEvent* Clone() const override { return new GridRangeSelectEvent(*this); }
+using GridClickEventFunction        = void (wxEvtHandler::*)(GridClickEvent&);
+using GridRangeSelectEventFunction  = void (wxEvtHandler::*)(GridRangeSelectEvent&);
+using GridLabelClickEventFunction   = void (wxEvtHandler::*)(GridLabelClickEvent&);
+using GridColumnResizeEventFunction = void (wxEvtHandler::*)(GridColumnResizeEvent&);
 
-    const bool   positive_; //"false" when clearing selection!
-    const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
-    const size_t rowLast_;
-};
+#define GridClickEventHandler(func)       (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridClickEventFunction, &func)
+#define GridRangeSelectEventHandler(func) (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridRangeSelectEventFunction, &func)
+#define GridLabelClickEventHandler(func)  (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridLabelClickEventFunction, &func)
+#define GridColumnResizeEventHandler(func)(wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridColumnResizeEventFunction, &func)
 
-typedef void (wxEvtHandler::*GridClickEventFunction       )(GridClickEvent&);
-typedef void (wxEvtHandler::*GridColumnResizeEventFunction)(GridColumnResizeEvent&);
-typedef void (wxEvtHandler::*GridRangeSelectEventFunction )(GridRangeSelectEvent&);
-
-#define GridClickEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridClickEventFunction, &func)
-
-#define GridColumnResizeEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridColumnResizeEventFunction, &func)
-
-#define GridRangeSelectEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GridRangeSelectEventFunction, &func)
 //------------------------------------------------------------------------------------------------------------
 class Grid;
 wxColor getColorSelectionGradientFrom();
@@ -90,12 +102,13 @@ public:
 
     virtual size_t getRowCount() const = 0;
 
-    //grid area
+    //cell area
     virtual std::wstring getValue(size_t row, ColumnType colType) const = 0;
     virtual void         renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row,                     bool enabled, bool selected); //default implementation
-    virtual void         renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected); //
-    virtual int          getBestSize       (wxDC& dc, size_t row, ColumnType colType                                                 ); //must correspond to renderCell()!
+    virtual void         renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected, HoverArea rowHover);
+    virtual int          getBestSize       (wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
     virtual std::wstring getToolTip        (size_t row, ColumnType colType) const { return std::wstring(); }
+    virtual HoverArea    getRowMouseHover(size_t row, ColumnType colType, int cellRelativePosX, int cellWidth) { return HoverArea::NONE; }
 
     //label area
     virtual std::wstring getColumnLabel(ColumnType colType) const = 0;
@@ -105,14 +118,15 @@ public:
     static const int COLUMN_GAP_LEFT; //for left-aligned text
 
 protected: //optional helper routines
-    static wxRect drawCellBorder  (wxDC& dc, const wxRect& rect); //returns inner rectangle
-    static void drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor);
-    static void drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, bool enabled, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+    static wxRect drawCellBorder    (wxDC& dc, const wxRect& rect); //returns inner rectangle
+    static void   drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor);
+    static void   drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, bool enabled, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 
-    static wxRect drawColumnLabelBorder  (wxDC& dc, const wxRect& rect); //returns inner rectangle
-    static void drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool highlighted);
-    static void drawColumnLabelText      (wxDC& dc, const wxRect& rect, const std::wstring& text);
+    static wxRect drawColumnLabelBorder    (wxDC& dc, const wxRect& rect); //returns inner rectangle
+    static void   drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool highlighted);
+    static void   drawColumnLabelText      (wxDC& dc, const wxRect& rect, const std::wstring& text);
 };
+
 
 enum GridEventPolicy
 {
@@ -179,9 +193,16 @@ public:
     const wxWindow& getMainWin() const;
 
     ptrdiff_t getRowAtPos(int posY) const; //return -1 for invalid position, >= rowCount if out of range; absolute coordinates!
-    Opt<ColumnType> getColumnAtPos(int posX) const;
 
-    wxRect getCellArea(size_t row, ColumnType colType) const; //returns empty rect if column not found; absolute coordinates!
+    struct ColumnPosInfo
+    {
+        ColumnType colType; //ColumnType::NONE no column at x position!
+        int cellRelativePosX;
+        int colWidth;
+    };
+    ColumnPosInfo getColumnAtPos(int posX) const; //absolute position!
+
+    void refreshCell(size_t row, ColumnType colType);
 
     void enableColumnMove  (bool value) { allowColumnMove   = value; }
     void enableColumnResize(bool value) { allowColumnResize = value; }
@@ -211,9 +232,6 @@ private:
 
     wxSize GetSizeAvailableForScrollTarget(const wxSize& size) override; //required since wxWidgets 2.9 if SetTargetWindow() is used
 
-#if defined ZEN_WIN || defined ZEN_MAC
-    void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh) override; //get rid of scrollbars, but preserve scrolling behavior!
-#endif
 
     int getBestColumnSize(size_t col) const; //return -1 on error
 
@@ -231,7 +249,7 @@ private:
     public:
         void init(size_t rowCount) { rowSelectionValue.resize(rowCount); clear(); }
 
-        size_t size() const { return rowSelectionValue.size(); }
+        size_t maxSize() const { return rowSelectionValue.size(); }
 
         std::vector<size_t> get() const
         {
@@ -294,7 +312,7 @@ private:
 
     wxRect getColumnLabelArea(ColumnType colType) const; //returns empty rect if column not found
 
-    void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive = true); //select inclusive range [rowFrom, rowTo] + notify event!
+    void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive, const GridClickEvent* mouseInitiated); //select inclusive range [rowFrom, rowTo] + notify event!
 
     bool isSelected(size_t row) const { return selection.isSelected(row); }
 
@@ -307,7 +325,7 @@ private:
     void moveColumn(size_t colFrom, size_t colTo);
     ptrdiff_t clientPosToMoveTargetColumn(const wxPoint& pos) const; //return < 0 on error
 
-    Opt<ColumnType> colToType(size_t col) const;
+    ColumnType colToType(size_t col) const; //returns ColumnType::NONE on error
 
     /*
     Visual layout:

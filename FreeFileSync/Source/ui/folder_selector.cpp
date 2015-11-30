@@ -17,20 +17,11 @@
 #include "../fs/native.h"
 #include "../lib/icon_buffer.h"
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    #include "small_dlgs.h"
-    #include "ifile_dialog.h"
-    #include "../fs/mtp.h"
-#endif
 
-#ifdef ZEN_LINUX
     //    #include <gtk/gtk.h>
-#endif
 
 using namespace zen;
-#ifndef ZEN_WIN_VISTA_AND_LATER
     using AFS = AbstractFileSystem;
-#endif
 
 
 namespace
@@ -54,31 +45,6 @@ void setFolderPathPhrase(const Zstring& folderPathPhrase, FolderHistoryBox* comb
     }
 }
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-bool acceptShellItemPaths(const std::vector<Zstring>& shellItemPaths)
-{
-    //accept files or folders from:
-    //- file system paths
-    //- MTP paths
-
-    if (shellItemPaths.empty()) return false;
-    return acceptsItemPathPhraseNative(shellItemPaths[0]) || //
-           acceptsItemPathPhraseMtp   (shellItemPaths[0]);   //noexcept
-}
-
-
-bool onIFileDialogAcceptFolder(HWND wnd, const Zstring& shellFolderPath)
-{
-    if (acceptShellItemPaths({ shellFolderPath })) //noexcept
-        return true;
-
-    const std::wstring msg = replaceCpy(_("The selected folder %x cannot be used with FreeFileSync."), L"%x", fmtPath(shellFolderPath)) + L"\n\n" +
-                             _("Please select a folder on a local file system, network or an MTP device.");
-    ::MessageBox(wnd, msg.c_str(), (_("Select a folder")).c_str(), MB_ICONWARNING);
-    //showNotificationDialog would not support HWND parent
-    return false;
-}
-#endif
 }
 
 //##############################################################################################################
@@ -102,23 +68,14 @@ FolderSelector::FolderSelector(wxWindow&         dropWindow,
 {
     auto setupDragDrop = [&](wxWindow& dropWin)
     {
-#ifdef ZEN_WIN_VISTA_AND_LATER
-        setupShellItemDrop(dropWin, acceptShellItemPaths);
-#else
         setupFileDrop(dropWin);
-#endif
         dropWin.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
     };
 
     setupDragDrop(dropWindow_);
     if (dropWindow2_) setupDragDrop(*dropWindow2_);
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    //selectAltFolderButton_.SetBitmapLabel(getResourceImage(L"button_arrow_right"));
-    selectAltFolderButton_.SetBitmapLabel(getResourceImage(L"sftp_small"));
-#else
     selectAltFolderButton_.Hide();
-#endif
 
     //keep dirPicker and dirpath synchronous
     folderComboBox_       .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel     ), nullptr, this);
@@ -178,10 +135,6 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
                 Zstring parentShellPath = beforeLast(shellItemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
                 if (!parentShellPath.empty())
                 {
-#ifdef ZEN_WIN
-                    if (endsWith(parentShellPath, L":")) //volume root
-                        parentShellPath += FILE_NAME_SEPARATOR;
-#endif
                     const AbstractPath parentPath = createAbstractPath(parentShellPath);
                     if (AFS::folderExists(parentPath))
                         return AFS::getInitPathPhrase(parentPath);
@@ -220,9 +173,6 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
 {
     //make sure default folder exists: don't let folder picker hang on non-existing network share!
     Zstring defaultFolderPath;
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    std::shared_ptr<const void> /*PCIDLIST_ABSOLUTE*/ defaultFolderPidl;
-#endif
     {
         auto folderExistsTimed = [](const AbstractPath& folderPath)
         {
@@ -238,37 +188,9 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
                 if (Opt<Zstring> nativeFolderPath = AFS::getNativeItemPath(folderPath))
                     defaultFolderPath = *nativeFolderPath;
         }
-#ifdef ZEN_WIN_VISTA_AND_LATER
-        else if (acceptsItemPathPhraseMtp(folderPathPhrase)) //noexcept
-        {
-            const AbstractPath folderPath = createItemPathMtp(folderPathPhrase);
-            if (folderExistsTimed(folderPath))
-                defaultFolderPidl = geMtpItemAbsolutePidl(folderPath);
-        }
-#endif
     }
 
     //wxDirDialog internally uses lame-looking SHBrowseForFolder(); we better use IFileDialog() instead! (remembers size and position!)
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    Zstring newFolderPathPhrase;
-    try
-    {
-        //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
-        const GUID guid = { 0x31f94a00, 0x92b4, 0xa040, { 0x8d, 0xc2, 0xc, 0xa5, 0xef, 0x59, 0x6e, 0x3b } };
-
-        const std::pair<Zstring, bool> rv = ifile::showFolderPicker(static_cast<HWND>(selectFolderButton_.GetHWND()),
-                                                                    defaultFolderPath,
-                                                                    defaultFolderPidl.get(),
-                                                                    &guid,
-                                                                    onIFileDialogAcceptFolder); //throw FileError
-        if (!rv.second) //cancelled
-            return;
-
-        //make sure FFS-specific explicit MTP-syntax is applied!
-        newFolderPathPhrase = AFS::getInitPathPhrase(createAbstractPath(rv.first)); //noexcept
-    }
-    catch (const FileError& e) { showNotificationDialog(&dropWindow_, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); return; }
-#else
     wxDirDialog dirPicker(&selectFolderButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
 
     //-> following doesn't seem to do anything at all! still "Show hidden" is available as a context menu option:
@@ -277,7 +199,6 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
     if (dirPicker.ShowModal() != wxID_OK)
         return;
     const Zstring newFolderPathPhrase = toZ(dirPicker.GetPath());
-#endif
 
     setFolderPathPhrase(newFolderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
 
@@ -289,23 +210,6 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
 
 void FolderSelector::onSelectAltFolder(wxCommandEvent& event)
 {
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    //ContextMenu menu;
-    //const wxBitmap nativeFolderIcon = IconBuffer::genericDirIcon(IconBuffer::SIZE_SMALL);
-    //menu.addItem(_("SFTP folder"), selectSftp, &getResourceImage(L"sftp_small"));
-    //menu.popup(selectAltFolderButton_);
-    //Change all tooltips from _("Select SFTP folder") -> _("Select alternative folder type")
-
-    Zstring folderPathPhrase = getPath();
-    if (showSftpSetupDialog(&selectAltFolderButton_, folderPathPhrase) != ReturnSmallDlg::BUTTON_OKAY)
-        return;
-
-    setFolderPathPhrase(folderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
-
-    //notify action invoked by user
-    wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);
-    ProcessEvent(dummy);
-#endif
 }
 
 

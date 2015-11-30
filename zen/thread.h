@@ -12,9 +12,6 @@
 #include "scope_guard.h"
 #include "type_traits.h"
 #include "optional.h"
-#ifdef ZEN_WIN
-#include "win.h"
-#endif
 
 
 namespace zen
@@ -62,9 +59,6 @@ void interruptibleWait(std::condition_variable& cv, std::unique_lock<std::mutex>
 template <class Rep, class Period>
 void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime); //throw ThreadInterruption
 
-#ifdef ZEN_WIN
-void setCurrentThreadName(const char* threadName);
-#endif
 //------------------------------------------------------------------------------------------
 
 /*
@@ -218,19 +212,12 @@ public:
         std::unique_lock<std::mutex> dummy(lockResult);
         conditionJobDone.wait(dummy, [&] { return this->jobDone(jobsTotal); });
 
-#ifndef NDEBUG
-        assert(!returnedResult);
-        returnedResult = true;
-#endif
         return std::move(result_);
     }
 
 private:
     bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished >= jobsTotal); } //call while locked!
 
-#ifndef NDEBUG
-    bool returnedResult = false;
-#endif
 
     std::mutex lockResult;
     size_t jobsFinished = 0; //
@@ -265,13 +252,7 @@ Opt<T> GetFirstResult<T>::get() const { return asyncResult_->getResult(jobsTotal
 //------------------------------------------------------------------------------------------
 
 //thread_local with non-POD seems to cause memory leaks on VS 14 => pointer only is fine:
-#ifdef _MSC_VER
-    #define ZEN_THREAD_LOCAL_SPECIFIER __declspec(thread)
-#elif defined __GNUC__ || defined __clang__
     #define ZEN_THREAD_LOCAL_SPECIFIER __thread
-#else
-    #error "Game over!"
-#endif
 
 
 class ThreadInterruption {};
@@ -415,37 +396,6 @@ inline
 void InterruptibleThread::interrupt() { intStatus_->interrupt(); }
 
 
-#ifdef ZEN_WIN
-//https://randomascii.wordpress.com/2015/10/26/thread-naming-in-windows-time-for-something-better/
-
-#pragma pack(push,8)
-struct THREADNAME_INFO
-{
-   DWORD dwType; // Must be 0x1000.
-   LPCSTR szName; // Pointer to name (in user addr space).
-   DWORD dwThreadID; // Thread ID (-1=caller thread).
-   DWORD dwFlags; // Reserved for future use, must be zero.
-};
-#pragma pack(pop)
-
-
-inline
-void setCurrentThreadName(const char* threadName)
-{
-const DWORD MS_VC_EXCEPTION = 0x406D1388;
-
-THREADNAME_INFO info = {};
-   info.dwType = 0x1000;
-   info.szName = threadName;
-   info.dwThreadID = GetCurrentThreadId();
-
-   __try
-   {
-      ::RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), reinterpret_cast<ULONG_PTR*>(&info));
-   }
-   __except(EXCEPTION_EXECUTE_HANDLER){}
-}
-#endif
 }
 
 #endif //THREAD_H_7896323423432235246427

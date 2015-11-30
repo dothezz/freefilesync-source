@@ -42,9 +42,9 @@ namespace zen { class TripleSplitter; }
 #include <wx/listbox.h>
 #include <wx/frame.h>
 #include <wx/tglbtn.h>
-#include <wx/spinctrl.h>
-#include <wx/hyperlink.h>
 #include <wx/radiobut.h>
+#include <wx/hyperlink.h>
+#include <wx/spinctrl.h>
 #include <wx/choice.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
@@ -102,7 +102,7 @@ protected:
     wxStaticText* m_staticTextResolvedPathL;
     wxBitmapButton* m_bpButtonAddPair;
     wxButton* m_buttonSelectFolderLeft;
-    wxPanel* m_panelTopMiddle;
+    wxPanel* m_panelTopCenter;
     wxBitmapButton* m_bpButtonSwapSides;
     wxStaticText* m_staticTextResolvedPathR;
     wxButton* m_buttonSelectFolderRight;
@@ -125,7 +125,7 @@ protected:
     wxStaticText* m_staticTextStatusLeftFiles;
     wxStaticText* m_staticTextStatusLeftBytes;
     wxStaticLine* m_staticline9;
-    wxStaticText* m_staticTextStatusMiddle;
+    wxStaticText* m_staticTextStatusCenter;
     wxBoxSizer* bSizerStatusRight;
     wxStaticLine* m_staticline10;
     wxBoxSizer* bSizerStatusRightDirectories;
@@ -276,14 +276,16 @@ protected:
     wxStaticLine* m_staticline42;
     wxTextCtrl* m_textCtrlCompVarDescription;
     wxStaticLine* m_staticline33;
-    wxCheckBox* m_checkBoxTimeShift;
-    wxSpinCtrl* m_spinCtrlTimeShift;
-    wxHyperlinkCtrl* m_hyperlink241;
-    wxStaticLine* m_staticline44;
     wxCheckBox* m_checkBoxSymlinksInclude;
     wxRadioButton* m_radioBtnSymlinksFollow;
     wxRadioButton* m_radioBtnSymlinksDirect;
     wxHyperlinkCtrl* m_hyperlink24;
+    wxStaticLine* m_staticline44;
+    wxStaticText* m_staticText112;
+    wxTextCtrl* m_textCtrlTimeShift;
+    wxStaticText* m_staticText1381;
+    wxStaticText* m_staticText13811;
+    wxHyperlinkCtrl* m_hyperlink241;
     wxStaticLine* m_staticline441;
     wxStaticLine* m_staticline331;
     wxPanel* m_panelFilterSettingsHolder;
@@ -380,6 +382,7 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void onListBoxKeyEvent( wxKeyEvent& event ) { event.Skip(); }
     virtual void OnSelectFolderPair( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleLocalCompSettings( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnTimeSizeDouble( wxMouseEvent& event ) { event.Skip(); }
@@ -387,8 +390,9 @@ protected:
     virtual void OnContentDouble( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnContent( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnChangeCompOption( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnHelpTimeShift( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnHelpComparisonSettings( wxHyperlinkEvent& event ) { event.Skip(); }
+    virtual void onlTimeShiftKeyDown( wxKeyEvent& event ) { event.Skip(); }
+    virtual void OnHelpTimeShift( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnChangeFilterOption( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnHelpShowExamples( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnFilterReset( wxCommandEvent& event ) { event.Skip(); }

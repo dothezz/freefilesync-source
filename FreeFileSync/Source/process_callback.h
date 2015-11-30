@@ -46,8 +46,8 @@ struct ProcessCallback
             6. directory deletion: may contain more items than scanned by FFS (excluded by filter) or less (contains followed symlinks)
             7. delete directory to recycler: no matter how many child-elements exist, this is only 1 item to process!
             8. user-defined deletion directory on different volume: full file copy required (instead of move)
-            9. Binary file comparison: short-circuit behavior if files differ
-            10. Error during file copy, retry: bytes were copied => increases total workload!
+            9. Binary file comparison: short-circuit behavior after first difference is found
+           10. Error during file copy, retry: bytes were copied => increases total workload!
     */
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()

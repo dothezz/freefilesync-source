@@ -205,9 +205,6 @@ bool equal(InputIterator1 first1, InputIterator1 last1,
 }
 
 
-#if defined _MSC_VER && _MSC_VER <= 1600
-    static_assert(false, "VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11");
-#endif
 
 
 inline

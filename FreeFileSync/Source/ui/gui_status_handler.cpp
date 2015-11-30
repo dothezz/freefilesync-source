@@ -20,14 +20,9 @@ using namespace zen;
 using namespace xmlAccess;
 
 
-StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) :
-    mainDlg(dlg),
-    ignoreErrors(false)
+StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : mainDlg(dlg)
 {
     {
-#ifdef ZEN_WIN
-        wxWindowUpdateLocker dummy(&mainDlg); //leads to GUI corruption problems on Linux/OS X!
-#endif
         mainDlg.compareStatus->init(*this); //clear old values before showing panel
 
         //------------------------------------------------------------------
@@ -55,7 +50,7 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) :
 
         wxAuiPaneInfoArray& paneArray = mainDlg.auiMgr.GetAllPanes();
 
-        const bool statusRowTaken = [&]() -> bool
+        const bool statusRowTaken = [&]
         {
             for (size_t i = 0; i < paneArray.size(); ++i)
             {
@@ -134,9 +129,6 @@ void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t da
         case PHASE_SYNCHRONIZING:
         case PHASE_COMPARING_CONTENT:
         {
-#ifdef ZEN_WIN
-            wxWindowUpdateLocker dummy(&mainDlg); //leads to GUI corruption problems on Linux/OS X!
-#endif
             mainDlg.compareStatus->switchToCompareBytewise();
             mainDlg.Layout();  //show progress bar...
             mainDlg.Refresh(); //remove distortion...
@@ -151,7 +143,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t da
 ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::wstring& errorMessage, size_t retryNumber)
 {
     //no need to implement auto-retry here: 1. user is watching 2. comparison is fast
-    //=> similar behavior like "ignoreErrors" which does not honor sync settings
+    //=> similar behavior like "ignoreErrors" which is also not used for the comparison phase in GUI mode
 
     if (ignoreErrors)
         return ProcessCallback::IGNORE_ERROR;

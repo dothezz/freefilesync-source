@@ -28,13 +28,6 @@
 #include "../lib/hard_filter.h"
 #include "../version/version.h"
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-    #include "sftp_folder_picker.h"
-    #include "../fs/sftp.h"
-#endif
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-#endif
 
 using namespace zen;
 
@@ -68,25 +61,22 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //m_animCtrlWink->Play();
 
     //create language credits
-    for (const ExistingTranslations::Entry& trans : ExistingTranslations::get())
+    for (const TranslationInfo& ti : getExistingTranslations())
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, getResourceImage(trans.languageFlag), wxDefaultPosition, wxSize(-1, 11), 0);
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, getResourceImage(ti.languageFlag), wxDefaultPosition, wxSize(-1, 11), 0);
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER);
 
         //translator name
-        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, trans.translatorName, wxDefaultPosition, wxDefaultSize, 0);
+        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, ti.translatorName, wxDefaultPosition, wxDefaultSize, 0);
         staticTextTranslator->Wrap(-1);
         fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
 
-        staticBitmapFlag    ->SetToolTip(trans.languageName);
-        staticTextTranslator->SetToolTip(trans.languageName);
+        staticBitmapFlag    ->SetToolTip(ti.languageName);
+        staticTextTranslator->SetToolTip(ti.languageName);
     }
     fgSizerTranslators->Fit(m_scrolledWindowTranslators);
 
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //-> put *after* creating credits
-#endif
 
     //build information
     wxString build = __TDATE__;
@@ -151,121 +141,6 @@ void zen::showAboutDialog(wxWindow* parent)
 
 //########################################################################################
 
-#ifdef ZEN_WIN_VISTA_AND_LATER
-class SftpSetupDlg : public SftpSetupDlgGenerated
-{
-public:
-    SftpSetupDlg(wxWindow* parent, Zstring& folderPathPhrase);
-
-private:
-    void OnOkay  (wxCommandEvent& event) override;
-    void OnCancel(wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnToggleShowPassword(wxCommandEvent& event) override;
-    void OnBrowseSftpFolder  (wxCommandEvent& event) override;
-
-    std::pair<SftpLoginInfo, Zstring> getSftpLogin() const;
-
-    //output-only parameters:
-    Zstring& folderPathPhraseOut;
-};
-
-
-SftpSetupDlg::SftpSetupDlg(wxWindow* parent, Zstring& folderPathPhrase) : SftpSetupDlgGenerated(parent), folderPathPhraseOut(folderPathPhrase)
-{
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this);
-#endif
-    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
-
-    m_bitmapSftp->SetBitmap(getResourceImage(L"sftp"));
-    m_checkBoxShowPassword->SetValue(false);
-    m_textCtrlPasswordVisible->Hide();
-
-    if (acceptsItemPathPhraseSftp(folderPathPhrase)) //noexcept
-    {
-        const auto res = getResolvedSftpPath(folderPathPhrase); //noexcept
-        const SftpLoginInfo login         = res.first;
-        const Zstring       serverRelPath = res.second;
-
-        m_textCtrlServer        ->ChangeValue(utfCvrtTo<wxString>(login.server));
-        if (login.port > 0)
-            m_textCtrlPort->ChangeValue(numberTo<wxString>(login.port));
-        m_textCtrlUserName      ->ChangeValue(utfCvrtTo<wxString>(login.username));
-        m_textCtrlPasswordHidden->ChangeValue(utfCvrtTo<wxString>(login.password));
-        m_textCtrlServerPath    ->ChangeValue(utfCvrtTo<wxString>(serverRelPath));
-    }
-
-    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
-
-    m_buttonOkay->SetFocus();
-}
-
-
-void SftpSetupDlg::OnToggleShowPassword(wxCommandEvent& event)
-{
-    if (m_checkBoxShowPassword->GetValue())
-    {
-        m_textCtrlPasswordHidden ->Hide();
-        m_textCtrlPasswordVisible->Show();
-        m_textCtrlPasswordVisible->ChangeValue(m_textCtrlPasswordHidden->GetValue());
-    }
-    else
-    {
-        m_textCtrlPasswordVisible->Hide();
-        m_textCtrlPasswordHidden ->Show();
-        m_textCtrlPasswordHidden->ChangeValue(m_textCtrlPasswordVisible->GetValue());
-    }
-    Layout(); //needed! hidden items are not considered during resize
-}
-
-
-std::pair<SftpLoginInfo, Zstring /*host-relative path*/> SftpSetupDlg::getSftpLogin() const
-{
-    SftpLoginInfo login;
-    login.server   = utfCvrtTo<Zstring>(m_textCtrlServer  ->GetValue());
-    login.port     = stringTo<int>     (m_textCtrlPort    ->GetValue()); //0 if empty
-    login.username = utfCvrtTo<Zstring>(m_textCtrlUserName->GetValue());
-    login.password = utfCvrtTo<Zstring>((m_checkBoxShowPassword->GetValue() ? m_textCtrlPasswordVisible : m_textCtrlPasswordHidden)->GetValue());
-
-    Zstring serverRelPath = utfCvrtTo<Zstring>(m_textCtrlServerPath->GetValue());
-
-    return std::make_pair(login, serverRelPath); //noexcept
-}
-
-
-void SftpSetupDlg::OnBrowseSftpFolder(wxCommandEvent& event)
-{
-    const auto res = getSftpLogin();
-    const SftpLoginInfo login         = res.first;
-    Zstring             serverRelPath = res.second;
-
-    if (showSftpFolderPicker(this, login, serverRelPath) == ReturnSftpPicker::BUTTON_OKAY)
-    {
-        m_textCtrlServerPath->ChangeValue(utfCvrtTo<wxString>(serverRelPath));
-    }
-}
-
-
-void SftpSetupDlg::OnOkay(wxCommandEvent& event)
-{
-    const auto res = getSftpLogin();
-    const SftpLoginInfo login         = res.first;
-    const Zstring       serverRelPath = res.second;
-
-    folderPathPhraseOut = condenseToSftpFolderPathPhrase(login, serverRelPath); //noexcept
-
-    EndModal(ReturnSmallDlg::BUTTON_OKAY);
-}
-
-
-ReturnSmallDlg::ButtonPressed zen::showSftpSetupDialog(wxWindow* parent, Zstring& folderPathPhrase)
-{
-    SftpSetupDlg setupDlg(parent, folderPathPhrase);
-    return static_cast<ReturnSmallDlg::ButtonPressed>(setupDlg.ShowModal());
-}
-#endif
 
 //########################################################################################
 
@@ -308,10 +183,6 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
     keepRelPathsOut(keepRelPaths),
     overwriteIfExistsOut(overwriteIfExists)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
 
@@ -323,9 +194,6 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
 
     m_targetFolderPath->init(folderHistory_);
 
-#ifndef __WXGTK__  //wxWidgets holds portability promise by supporting multi-line controls...not
-    m_textCtrlFileList->SetMaxLength(0); //allow large entries!
-#endif
     /*
     There is a nasty bug on wxGTK under Ubuntu: If a multi-line wxTextCtrl contains so many lines that scrollbars are shown,
     it re-enables all windows that are supposed to be disabled during the current modal loop!
@@ -434,18 +302,12 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     tickCountStartup(getTicks()),
     useRecycleBinOut(useRecycleBin)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
 
     setMainInstructionFont(*m_staticTextHeader);
 
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
 
-#ifndef __WXGTK__  //wxWidgets holds portability promise by supporting multi-line controls...not
-    m_textCtrlFileList->SetMaxLength(0); //allow large entries!
-#endif
 
     updateGui();
 
@@ -460,9 +322,6 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
 void DeleteDialog::updateGui()
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     const std::pair<std::wstring, int> delInfo = zen::getSelectedItemsAsString(rowsToDeleteOnLeft,
                                                                                rowsToDeleteOnRight);
@@ -554,9 +413,6 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
     SyncConfirmationDlgGenerated(parent),
     dontShowAgainOut(dontShowAgain)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
 
     setMainInstructionFont(*m_staticTextHeader);
@@ -656,14 +512,8 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
     OptionsDlgGenerated(parent),
     globalSettingsOut(globalSettings)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
-#ifdef ZEN_MAC
-    SetTitle(replaceCpy(_("&Preferences"), L"&", L"")); //follow OS conventions
-#endif
 
     //setMainInstructionFont(*m_staticTextHeader);
 
@@ -685,11 +535,7 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
 
     updateGui();
 
-#ifdef ZEN_WIN
-    m_checkBoxCopyPermissions->SetLabel(_("Copy DACL, SACL, Owner, Group"));
-#elif defined ZEN_LINUX || defined ZEN_MAC
     bSizerLockedFiles->Show(false);
-#endif
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
                              L"%item_path%    \t" + _("- full file or folder name") + L"\n" +
@@ -837,9 +683,6 @@ xmlAccess::ExternalApps OptionsDlg::getExtApp() const
 
 void OptionsDlg::OnAddRow(wxCommandEvent& event)
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
     if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
@@ -853,9 +696,6 @@ void OptionsDlg::OnRemoveRow(wxCommandEvent& event)
 {
     if (m_gridCustomCommand->GetNumberRows() > 0)
     {
-#ifdef ZEN_WIN
-        wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
         const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
         if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
@@ -906,24 +746,10 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, s
     timeFromOut(timeFrom),
     timeToOut(timeTo)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     long style = wxCAL_SHOW_HOLIDAYS | wxCAL_SHOW_SURROUNDING_WEEKS;
 
-#ifdef ZEN_WIN
-    DWORD firstDayOfWeek = 0;
-    if (::GetLocaleInfo(LOCALE_USER_DEFAULT,     //__in   LCID Locale,
-                        LOCALE_IFIRSTDAYOFWEEK | // first day of week specifier, 0-6, 0=Monday, 6=Sunday
-                        LOCALE_RETURN_NUMBER,    //__in   LCTYPE LCType,
-                        reinterpret_cast<LPTSTR>(&firstDayOfWeek),     //__out  LPTSTR lpLCData,
-                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) > 0 && //__in   int cchData
-        firstDayOfWeek == 6)
-        style |= wxCAL_SUNDAY_FIRST;
-    else //default
-#endif
         style |= wxCAL_MONDAY_FIRST;
 
     m_calendarFrom->SetWindowStyleFlag(style);

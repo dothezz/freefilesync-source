@@ -23,7 +23,7 @@ struct FolderPairCfg
                   CompareVariant cmpVar,
                   SymLinkHandling handleSymlinksIn,
                   int fileTimeToleranceIn,
-                  unsigned int optTimeShiftHoursIn,
+                  const std::vector<unsigned int>& ignoreTimeShiftMinutesIn,
                   const NormalizedFilter& filterIn,
                   const DirectionConfig& directCfg) :
         folderPathPhraseLeft_ (folderPathPhraseLeft),
@@ -31,7 +31,7 @@ struct FolderPairCfg
         compareVar(cmpVar),
         handleSymlinks(handleSymlinksIn),
         fileTimeTolerance(fileTimeToleranceIn),
-        optTimeShiftHours(optTimeShiftHoursIn),
+        ignoreTimeShiftMinutes(ignoreTimeShiftMinutesIn),
         filter(filterIn),
         directionCfg(directCfg) {}
 
@@ -41,7 +41,7 @@ struct FolderPairCfg
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;
     int fileTimeTolerance;
-    unsigned int optTimeShiftHours;
+    std::vector<unsigned int> ignoreTimeShiftMinutes;
 
     NormalizedFilter filter;
 

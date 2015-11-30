@@ -22,9 +22,6 @@
 #include "../lib/help_provider.h"
 #include "../lib/norm_filter.h"
 
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-#endif
 
 using namespace zen;
 using namespace xmlAccess;
@@ -51,6 +48,7 @@ private:
     void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
 
     void onLocalKeyEvent(wxKeyEvent& event);
+    void onListBoxKeyEvent(wxKeyEvent& event) override;
     void OnSelectFolderPair(wxCommandEvent& event) override;
 
     enum class ConfigTypeImage
@@ -73,6 +71,7 @@ private:
     void OnTimeSizeDouble         (wxMouseEvent&   event) override;
     void OnContentDouble          (wxMouseEvent&   event) override;
     void OnChangeCompOption       (wxCommandEvent& event) override { updateCompGui(); }
+    void onlTimeShiftKeyDown      (wxKeyEvent& event) override;
 
     std::shared_ptr<const CompConfig> getCompConfig() const;
     void setCompConfig(std::shared_ptr<const CompConfig> compCfg);
@@ -216,9 +215,6 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     folderPairConfig_(folderPairConfig),
     onCompletionHistoryMax_(onCompletionHistoryMax)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     SetTitle(_("Synchronization Settings"));
@@ -258,10 +254,6 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
 
     //------------- filter panel --------------------------
 
-#ifndef __WXGTK__  //wxWidgets breaks portability promise once again
-    m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
-    m_textCtrlExclude->SetMaxLength(0); //
-#endif
     assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
 
     m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
@@ -367,6 +359,56 @@ void ConfigDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events witho
 }
 
 
+void ConfigDialog::onListBoxKeyEvent(wxKeyEvent& event)
+{
+    int keyCode = event.GetKeyCode();
+    if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
+    {
+        if (keyCode == WXK_LEFT || keyCode == WXK_NUMPAD_LEFT)
+            keyCode = WXK_RIGHT;
+        else if (keyCode == WXK_RIGHT || keyCode == WXK_NUMPAD_RIGHT)
+            keyCode = WXK_LEFT;
+    }
+
+    switch (keyCode)
+    {
+        case WXK_LEFT:
+        case WXK_NUMPAD_LEFT:
+            switch (static_cast<SyncConfigPanel>(m_notebook->GetSelection()))
+            {
+                case SyncConfigPanel::COMPARISON:
+                    break;
+                case SyncConfigPanel::FILTER:
+                    m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::COMPARISON));
+                    break;
+                case SyncConfigPanel::SYNC:
+                    m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::FILTER));
+                    break;
+            }
+            m_listBoxFolderPair->SetFocus(); //needed! wxNotebook::ChangeSelection() leads to focus change!
+            return; //handled!
+
+        case WXK_RIGHT:
+        case WXK_NUMPAD_RIGHT:
+            switch (static_cast<SyncConfigPanel>(m_notebook->GetSelection()))
+            {
+                case SyncConfigPanel::COMPARISON:
+                    m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::FILTER));
+                    break;
+                case SyncConfigPanel::FILTER:
+                    m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
+                    break;
+                case SyncConfigPanel::SYNC:
+                    break;
+            }
+            m_listBoxFolderPair->SetFocus();
+            return; //handled!
+    }
+
+    event.Skip();
+}
+
+
 void ConfigDialog::OnSelectFolderPair(wxCommandEvent& event)
 {
     assert(!m_listBoxFolderPair->HasMultipleSelection()); //single-choice!
@@ -401,6 +443,18 @@ void ConfigDialog::OnContentDouble(wxMouseEvent& event)
 }
 
 
+void ConfigDialog::onlTimeShiftKeyDown(wxKeyEvent& event)
+{
+    const int keyCode = event.GetKeyCode();
+
+    //ignore invalid input: basically only numeric keys + navigation + text edit keys should be allowed, but let's not hard-code too much...
+    if ('A' <= keyCode && keyCode <= 'Z')
+        return;
+
+    event.Skip();
+}
+
+
 std::shared_ptr<const CompConfig> ConfigDialog::getCompConfig() const
 {
     if (!m_checkBoxUseLocalCmpOptions->GetValue())
@@ -409,7 +463,7 @@ std::shared_ptr<const CompConfig> ConfigDialog::getCompConfig() const
     CompConfig compCfg;
     compCfg.compareVar = localCmpVar;
     compCfg.handleSymlinks = !m_checkBoxSymlinksInclude->GetValue() ? SYMLINK_EXCLUDE : m_radioBtnSymlinksDirect->GetValue() ? SYMLINK_DIRECT : SYMLINK_FOLLOW;
-    compCfg.optTimeShiftHours = m_checkBoxTimeShift->GetValue() ? m_spinCtrlTimeShift->GetValue() : 0;
+    compCfg.ignoreTimeShiftMinutes = fromTimeShiftPhrase(copyStringTo<std::wstring>(m_textCtrlTimeShift->GetValue()));
 
     return std::make_shared<const CompConfig>(compCfg);
 }
@@ -440,8 +494,7 @@ void ConfigDialog::setCompConfig(std::shared_ptr<const CompConfig> compCfg)
             break;
     }
 
-    m_checkBoxTimeShift->SetValue(compCfg->optTimeShiftHours != 0);
-    m_spinCtrlTimeShift->SetValue(compCfg->optTimeShiftHours == 0 ? 1 : compCfg->optTimeShiftHours);
+    m_textCtrlTimeShift->ChangeValue(toTimeShiftPhrase(compCfg->ignoreTimeShiftMinutes));
 
     updateCompGui();
 }
@@ -482,8 +535,6 @@ void ConfigDialog::updateCompGui()
 
     //active variant description:
     setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
-
-    m_spinCtrlTimeShift->Enable(m_checkBoxTimeShift->GetValue());
 
     m_radioBtnSymlinksDirect->Enable(m_checkBoxSymlinksInclude->GetValue());
     m_radioBtnSymlinksFollow->Enable(m_checkBoxSymlinksInclude->GetValue());
@@ -806,16 +857,6 @@ void ConfigDialog::setSyncConfig(std::shared_ptr<const SyncConfig> syncCfg)
 
 void ConfigDialog::updateSyncGui()
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-    wxWindowUpdateLocker dummy2(m_panelVersioning);
-    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
-    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
-    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
-    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
-    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
-    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
-#endif
 
     m_panelSyncSettings->Enable(m_checkBoxUseLocalSyncOptions->GetValue());
 

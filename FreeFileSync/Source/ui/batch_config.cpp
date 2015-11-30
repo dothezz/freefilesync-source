@@ -14,9 +14,6 @@
 #include "../ui/on_completion_box.h"
 #include "../lib/help_provider.h"
 
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-#endif
 
 using namespace zen;
 using namespace xmlAccess;
@@ -67,10 +64,6 @@ BatchDialog::BatchDialog(wxWindow* parent,
     batchCfgOutRef(batchCfg),
     onCompletionHistoryOut(onCompletionHistory)
 {
-#ifdef ZEN_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
@@ -119,9 +112,6 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
 
 void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
 {
-#ifdef ZEN_WIN
-    wxWindowUpdateLocker dummy(this); //leads to GUI corruption problems on Linux/OS X!
-#endif
 
     localBatchCfg = batchCfg; //contains some parameters not owned by GUI controls
 

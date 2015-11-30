@@ -194,7 +194,7 @@ const InSyncDescrFile& getDescriptor<RIGHT_SIDE>(const InSyncFile& dbFile) { ret
 
 
 template <SelectedSide side> inline
-bool matchesDbEntry(const FilePair& file, const InSyncFolder::FileList::value_type* dbFile, unsigned int optTimeShiftHours)
+bool matchesDbEntry(const FilePair& file, const InSyncFolder::FileList::value_type* dbFile, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     if (file.isEmpty<side>())
         return !dbFile;
@@ -207,7 +207,7 @@ bool matchesDbEntry(const FilePair& file, const InSyncFolder::FileList::value_ty
     return file.getItemName<side>() == shortNameDb && //detect changes in case (windows)
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
            //we're not interested in "fileTimeTolerance" here!
-           sameFileTime(file.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, optTimeShiftHours) &&
+           sameFileTime(file.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, ignoreTimeShiftMinutes) &&
            file.getFileSize<side>() == dbFile->second.fileSize;
     //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
 }
@@ -215,7 +215,7 @@ bool matchesDbEntry(const FilePair& file, const InSyncFolder::FileList::value_ty
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTimeTolerance, unsigned int optTimeShiftHours)
+bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTimeTolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     switch (compareVar)
     {
@@ -223,7 +223,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
             if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is certainly "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, optTimeShiftHours);
+                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -245,7 +245,7 @@ const InSyncDescrLink& getDescriptor<RIGHT_SIDE>(const InSyncSymlink& dbLink) { 
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool matchesDbEntry(const SymlinkPair& symlink, const InSyncFolder::SymlinkList::value_type* dbSymlink, unsigned int optTimeShiftHours)
+bool matchesDbEntry(const SymlinkPair& symlink, const InSyncFolder::SymlinkList::value_type* dbSymlink, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     if (symlink.isEmpty<side>())
         return !dbSymlink;
@@ -257,13 +257,13 @@ bool matchesDbEntry(const SymlinkPair& symlink, const InSyncFolder::SymlinkList:
 
     return symlink.getItemName<side>() == shortNameDb &&
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
-           sameFileTime(symlink.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, optTimeShiftHours);
+           sameFileTime(symlink.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, ignoreTimeShiftMinutes);
 }
 
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fileTimeTolerance, unsigned int optTimeShiftHours)
+bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fileTimeTolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     switch (compareVar)
     {
@@ -271,7 +271,7 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
             if (dbLink.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, optTimeShiftHours);
+                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -318,7 +318,7 @@ private:
     DetectMovedFiles(BaseFolderPair& baseFolder, const InSyncFolder& dbFolder) :
         cmpVar           (baseFolder.getCompVariant()),
         fileTimeTolerance(baseFolder.getFileTimeTolerance()),
-        optTimeShiftHours(baseFolder.getTimeShift())
+        ignoreTimeShiftMinutes(baseFolder.getIgnoredTimeShift())
     {
         recurse(baseFolder, &dbFolder);
 
@@ -395,9 +395,9 @@ private:
     static bool sameSizeAndDate(const FilePair& file, const InSyncFile& dbFile)
     {
         return file.getFileSize<side>() == dbFile.fileSize &&
-               sameFileTime(file.getLastWriteTime<side>(), getDescriptor<side>(dbFile).lastWriteTimeRaw, 2, 0);
+               sameFileTime(file.getLastWriteTime<side>(), getDescriptor<side>(dbFile).lastWriteTimeRaw, 2, {});
         //- respect 2 second FAT/FAT32 precision!
-        //- a "optTimeShiftHours" != 0 may lead to false positive move detections => let's be conservative and not allow it
+        //- "ignoreTimeShiftMinutes" may lead to false positive move detections => let's be conservative and not allow it
         //  (time shift is only ever required during FAT DST switches)
 
         //PS: *never* allow 2 sec tolerance as container predicate!!
@@ -430,7 +430,7 @@ private:
 
     void findAndSetMovePair(const InSyncFile& dbFile) const
     {
-        if (stillInSync(dbFile, cmpVar, fileTimeTolerance, optTimeShiftHours))
+        if (stillInSync(dbFile, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
             if (FilePair* fileLeftOnly = getAssocFilePair<LEFT_SIDE>(dbFile, exLeftOnlyById, exLeftOnlyByPath))
                 if (sameSizeAndDate<LEFT_SIDE>(*fileLeftOnly, dbFile))
                     if (FilePair* fileRightOnly = getAssocFilePair<RIGHT_SIDE>(dbFile, exRightOnlyById, exRightOnlyByPath))
@@ -445,7 +445,7 @@ private:
 
     const CompareVariant cmpVar;
     const int fileTimeTolerance;
-    const unsigned int optTimeShiftHours;
+    const std::vector<unsigned int> ignoreTimeShiftMinutes;
 
     std::unordered_map<AFS::FileId, FilePair*, StringHash> exLeftOnlyById;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
     std::unordered_map<AFS::FileId, FilePair*, StringHash> exRightOnlyById; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
@@ -492,9 +492,9 @@ private:
         txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
         txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
         txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
-        cmpVar           (baseFolder.getCompVariant()),
-        fileTimeTolerance(baseFolder.getFileTimeTolerance()),
-        optTimeShiftHours(baseFolder.getTimeShift())
+        cmpVar                (baseFolder.getCompVariant()),
+        fileTimeTolerance     (baseFolder.getFileTimeTolerance()),
+        ignoreTimeShiftMinutes(baseFolder.getIgnoredTimeShift())
     {
         //-> considering filter not relevant:
         //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
@@ -535,13 +535,13 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(file, dbEntry, optTimeShiftHours);
-        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(file, dbEntry, optTimeShiftHours);
+        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(file, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, optTimeShiftHours))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
                 file.setSyncDirConflict(txtDbNotInSync);
             else
                 file.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -571,13 +571,13 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(symlink, dbEntry, optTimeShiftHours);
-        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(symlink, dbEntry, optTimeShiftHours);
+        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(symlink, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, optTimeShiftHours))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
                 symlink.setSyncDirConflict(txtDbNotInSync);
             else
                 symlink.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -643,7 +643,7 @@ private:
 
     const CompareVariant cmpVar;
     const int fileTimeTolerance;
-    const unsigned int optTimeShiftHours;
+    const std::vector<unsigned int> ignoreTimeShiftMinutes;
 };
 }
 

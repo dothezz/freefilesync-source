@@ -78,11 +78,11 @@ private:
     class SashMove;
     std::unique_ptr<SashMove> activeMove;
 
-    int centerOffset; //offset to add after "gravity" stretching
+    int centerOffset = 0; //offset to add after "gravity" stretching
 
-    wxWindow* windowL;
-    wxWindow* windowC;
-    wxWindow* windowR;
+    wxWindow* windowL = nullptr;
+    wxWindow* windowC = nullptr;
+    wxWindow* windowR = nullptr;
 };
 }
 

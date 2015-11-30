@@ -43,9 +43,6 @@ public:
         this->Layout();
         bSizer158->Fit(this);
 
-#ifdef ZEN_WIN //prevent window from stealing focus!
-        Disable(); //= dark/grey text and image on Linux; no visible difference on OS X
-#endif
     }
 
     wxStaticText* m_staticTextMain;
@@ -93,12 +90,8 @@ void Tooltip::hide()
 {
     if (tipWindow)
     {
-#ifdef ZEN_LINUX
         //on wxGTK the tooltip is sometimes not shown again after it was hidden: e.g. drag-selection on middle grid
         tipWindow->Destroy(); //apply brute force:
         tipWindow = nullptr;  //
-#else
-        tipWindow->Hide();
-#endif
     }
 }

@@ -14,20 +14,11 @@ Usage:
     warn_static("my message")
 */
 
-#ifdef _MSC_VER
-#define STATIC_WARNING_MAKE_STRINGIZE_SUB(NUM)   #NUM
-#define STATIC_WARNING_MAKE_STRINGIZE(NUM) STATIC_WARNING_MAKE_STRINGIZE_SUB(NUM)
-
-#define warn_static(TXT) \
-    __pragma(message(__FILE__ "(" STATIC_WARNING_MAKE_STRINGIZE(__LINE__) "): Warning: " ## TXT))
-
-#elif defined __GNUC__
 #define STATIC_WARNING_CONCAT_SUB(X, Y) X ## Y
 #define STATIC_WARNING_CONCAT(X, Y) STATIC_WARNING_CONCAT_SUB(X, Y)
 
 #define warn_static(TXT) \
     typedef int STATIC_WARNING_87903124 __attribute__ ((deprecated)); \
     enum { STATIC_WARNING_CONCAT(warn_static_dummy_value, __LINE__) = sizeof(STATIC_WARNING_87903124) };
-#endif
 
 #endif //WARN_STATIC_H_08724567834560832745

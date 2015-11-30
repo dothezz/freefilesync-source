@@ -10,9 +10,6 @@
 #include <algorithm>
 #include <zen/stl_tools.h>
 #include <zen/utf.h>
-#ifdef ZEN_WIN
-    #include <zen/win_ver.h>
-#endif
 
 using namespace zen;
 
@@ -30,32 +27,11 @@ std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/c
 
     auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.emplace_back(name, value); };
 
-#ifdef ZEN_WIN
-    if (zen::vistaOrLater())
-    {
-        addEntry(_("Log off"  ), Zstr("shutdown /l"));
-        addEntry(_("Standby"  ), Zstr("rundll32.exe powrprof.dll,SetSuspendState Sleep")); //suspend/Suspend to RAM/sleep
-        addEntry(_("Shut down"), Zstr("shutdown /s /t 60"));
-    }
-    else //XP
-    {
-        addEntry(_("Log off"  ), Zstr("shutdown -l"));
-        addEntry(_("Standby"  ), Zstr("rundll32.exe powrprof.dll,SetSuspendState")); //this triggers standby OR hibernate, depending on whether hibernate setting is active!
-        addEntry(_("Shut down"), Zstr("shutdown -s -t 60"));
-        //no suspend on XP?
-    }
-
-#elif defined ZEN_LINUX
     addEntry(_("Log off"  ), Zstr("gnome-session-quit")); //alternative requiring admin: sudo killall Xorg
     addEntry(_("Standby"  ), Zstr("sudo pm-suspend"));
     addEntry(_("Shut down"), Zstr("dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown"));
     //alternative requiring admin: sudo shutdown -h 1
 
-#elif defined ZEN_MAC
-    addEntry(_("Log off"  ), Zstr("osascript -e \'tell application \"System Events\" to log out\'"));
-    addEntry(_("Standby"  ), Zstr("osascript -e \'tell application \"System Events\" to sleep\'"));
-    addEntry(_("Shut down"), Zstr("osascript -e \'tell application \"System Events\" to shut down\'"));
-#endif
     return output;
 }
 
@@ -263,23 +239,6 @@ void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
             return; //swallow -> using these keys gives a weird effect due to this weird control
     }
 
-#ifdef ZEN_MAC
-    //copy/paste is broken on wxCocoa: http://trac.wxwidgets.org/ticket/14953 => implement manually:
-    assert(CanCopy() && CanPaste() && CanCut());
-    if (event.ControlDown())
-        switch (keyCode)
-        {
-            case 'C': //Command + C
-                Copy();
-                return;
-            case 'V': //Command + V
-                Paste();
-                return;
-            case 'X': //Command + X
-                Cut();
-                return;
-        }
-#endif
 
     event.Skip();
 }

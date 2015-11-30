@@ -12,23 +12,14 @@
 #include "i18n.h"
 #include "scope_guard.h"
 
-#ifdef ZEN_WIN
-    #include "win.h" //includes "windows.h"
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     #include <cstring>
     #include <cerrno>
-#endif
 
 
 namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
-#ifdef ZEN_WIN
-    typedef DWORD ErrorCode;
-#elif defined ZEN_LINUX || defined ZEN_MAC
     typedef int ErrorCode;
-#endif
 
 ErrorCode getLastError();
 
@@ -58,11 +49,7 @@ private:
 inline
 ErrorCode getLastError()
 {
-#ifdef ZEN_WIN
-    return ::GetLastError();
-#elif defined ZEN_LINUX || defined ZEN_MAC
     return errno; //don't use "::", errno is a macro!
-#endif
 }
 
 
@@ -74,25 +61,9 @@ std::wstring formatSystemErrorRaw(ErrorCode ec) //return empty string on error
     const ErrorCode currentError = getLastError(); //not necessarily == lastError
 
     std::wstring errorMsg;
-#ifdef ZEN_WIN
-    ZEN_ON_SCOPE_EXIT(::SetLastError(currentError)); //this function must not change active system error variable!
-
-    LPWSTR buffer = nullptr;
-    if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
-                        FORMAT_MESSAGE_MAX_WIDTH_MASK |
-                        FORMAT_MESSAGE_IGNORE_INSERTS | //important: without this flag ::FormatMessage() will fail if message contains placeholders
-                        FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, ec, 0, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr) != 0)
-        if (buffer) //"don't trust nobody"
-        {
-            ZEN_ON_SCOPE_EXIT(::LocalFree(buffer));
-            errorMsg = buffer;
-        }
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
     ZEN_ON_SCOPE_EXIT(errno = currentError);
 
     errorMsg = utfCvrtTo<std::wstring>(::strerror(ec));
-#endif
     trim(errorMsg); //Windows messages seem to end with a blank...
 
     return errorMsg;

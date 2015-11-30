@@ -20,9 +20,7 @@ namespace zen
 class TreeView
 {
 public:
-    TreeView() :
-        sortColumn(defaultValueLastSortColumn),
-        sortAscending(defaultValueLastSortAscending) {}
+    TreeView() {}
 
     void setData(FolderComparison& newData); //set data, taking (partial) ownership
 
@@ -109,20 +107,13 @@ private:
 
     struct Container
     {
-        Container() :
-            bytesGross(),
-            bytesNet(),
-            itemCountGross(),
-            itemCountNet(),
-            firstFileId(nullptr) {}
-
-        std::uint64_t bytesGross;
-        std::uint64_t bytesNet; //bytes for files on view in this directory only
-        int itemCountGross;
-        int itemCountNet; //number of files on view for in this directory only
+        std::uint64_t bytesGross = 0;
+        std::uint64_t bytesNet   = 0; //bytes for files on view in this directory only
+        int itemCountGross = 0;
+        int itemCountNet   = 0; //number of files on view for in this directory only
 
         std::vector<DirNodeImpl> subDirs;
-        FileSystemObject::ObjectId firstFileId; //weak pointer to first FilePair or SymlinkPair
+        FileSystemObject::ObjectId firstFileId = nullptr; //weak pointer to first FilePair or SymlinkPair
         //- "compress" algorithm may hide file nodes for directories with a single included file, i.e. itemCountGross == itemCountNet == 1
         //- a HierarchyObject* would be a better fit, but we need weak pointer semantics!
         //- a std::vector<FileSystemObject::ObjectId> would be a better design, but we don't want a second memory structure as large as custom grid!
@@ -130,13 +121,11 @@ private:
 
     struct DirNodeImpl : public Container
     {
-        DirNodeImpl() : objId(nullptr) {}
-        FileSystemObject::ObjectId objId; //weak pointer to FolderPair
+        FileSystemObject::ObjectId objId = nullptr; //weak pointer to FolderPair
     };
 
     struct RootNodeImpl : public Container
     {
-        RootNodeImpl() {}
         std::shared_ptr<BaseFolderPair> baseFolder;
         std::wstring displayName;
     };
@@ -153,7 +142,7 @@ private:
         TreeLine(unsigned int level, int percent, const Container* node, enum NodeType type) : level_(level), percent_(percent), node_(node), type_(type) {}
 
         unsigned int level_;
-        int percent_;      //[0, 100]
+        int percent_; //[0, 100]
         const Container* node_; //
         NodeType type_;         //we increase size of "flatTree" using C-style types rather than have a polymorphic "folderCmpView"
     };
@@ -179,8 +168,8 @@ private:
                     |                         */
     std::vector<std::shared_ptr<BaseFolderPair>> folderCmp; //full raw data
 
-    ColumnTypeNavi sortColumn;
-    bool sortAscending;
+    ColumnTypeNavi sortColumn = defaultValueLastSortColumn;
+    bool sortAscending        = defaultValueLastSortAscending;
 };
 
 

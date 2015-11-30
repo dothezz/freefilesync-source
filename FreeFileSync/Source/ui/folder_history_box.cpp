@@ -9,9 +9,7 @@
 #include <zen/scope_guard.h>
 #include <wx+/string_conv.h>
 #include "../lib/resolve_path.h"
-#ifdef ZEN_LINUX
     #include <gtk/gtk.h>
-#endif
 
 using namespace zen;
 
@@ -34,20 +32,13 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
 
     Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FolderHistoryBox::OnKeyEvent), nullptr, this);
 
-#if defined ZEN_WIN
-    //on Win, this mouse click event only fires, when clicking on the small down arrow, NOT when clicking on the text field
-    //thanks to wxWidgets' non-portability it's exactly the converse on Linux!
-    Connect(wxEVT_LEFT_DOWN, wxEventHandler(FolderHistoryBox::OnRequireHistoryUpdate), nullptr, this);
-#elif defined ZEN_LINUX || defined ZEN_MAC
     /*
     we can't attach to wxEVT_COMMAND_TEXT_UPDATED, since setValueAndUpdateList() will implicitly emit wxEVT_COMMAND_TEXT_UPDATED again when calling Clear()!
     => Crash on Suse/X11/wxWidgets 2.9.4 on startup (setting a flag to guard against recursion does not work, still crash)
 
     On OS X attaching to wxEVT_LEFT_DOWN leads to occasional crashes, especially when double-clicking
     */
-#endif
 
-#ifdef ZEN_LINUX
     //file drag and drop directly into the text control unhelpfully inserts in format "file://..<cr><nl>"
     //1. this format's implementation is a mess: http://www.lephpfacile.com/manuel-php-gtk/tutorials.filednd.urilist.php
     //2. even if we handle "drag-data-received" for "text/uri-list" this doesn't consider logic in dirname.cpp
@@ -55,7 +46,6 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     //=> all drops are nicely propagated as regular file drop events like they should have been in the first place!
     if (GtkWidget* widget = GetConnectWidget())
         ::gtk_drag_dest_unset(widget);
-#endif
 }
 
 
@@ -132,23 +122,6 @@ void FolderHistoryBox::OnKeyEvent(wxKeyEvent& event)
         }
     }
 
-#ifdef ZEN_MAC
-    //copy/paste is broken on wxCocoa: http://trac.wxwidgets.org/ticket/14953 => implement manually:
-    assert(CanCopy() && CanPaste() && CanCut());
-    if (event.ControlDown())
-        switch (keyCode)
-        {
-            case 'C': //Command + C
-                Copy();
-                return;
-            case 'V': //Command + V
-                Paste();
-                return;
-            case 'X': //Command + X
-                Cut();
-                return;
-        }
-#endif
 
     event.Skip();
 }

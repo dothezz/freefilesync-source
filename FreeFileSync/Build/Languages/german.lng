@@ -7,17 +7,8 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Das FreeFileSync Installationsprogramm für Spender hat sein Installationslimit erreicht. Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
-
-<source>Thanks for your donation and support!</source>
-<target>Danke für Ihre Spende und Unterstützung!</target>
-
-<source>%x is not a regular directory name.</source>
-<target>%x ist kein regulärer Verzeichnisname.</target>
-
-<source>If you ignore this error the folders are considered empty. Missing folders are created automatically when needed.</source>
-<target>Wird dieser Fehler ignoriert, werden die Ordner als leer angesehen. Fehlende Ordner werden bei Bedarf automatisch erstellt.</target>
+<source>List of file time offsets to consider equal</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
@@ -120,6 +111,9 @@
 
 <source>Cannot find the following folders:</source>
 <target>Die folgenden Ordner wurden nicht gefunden:</target>
+
+<source>If you ignore this error the folders are considered empty. Missing folders are created automatically when needed.</source>
+<target>Wird dieser Fehler ignoriert, werden die Ordner als leer angesehen. Fehlende Ordner werden bei Bedarf automatisch erstellt.</target>
 
 <source>A folder input field is empty.</source>
 <target>Ein Ordnereingabefeld ist leer.</target>
@@ -893,15 +887,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Identify equal files by comparing the file content.</source>
 <target>Erkenne gleiche Dateien durch Vergleich des Dateiinhaltes.</target>
 
-<source>&Ignore time shift (in hours)</source>
-<target>&Zeitversatz ignorieren (in Stunden)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Dateizeiten mit angegebenem Versatz als gleich ansehen</target>
-
-<source>Handle daylight saving time</source>
-<target>Sommerzeit berücksichtigen</target>
-
 <source>Include &symbolic links:</source>
 <target>Symbolische &Verknüpfungen einschließen:</target>
 
@@ -913,6 +898,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>More information</source>
 <target>Mehr Information</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Zeitversatz ignorieren [hh:mm]</target>
+
+<source>Example:</source>
+<target>Beispiel:</target>
+
+<source>Handle daylight saving time</source>
+<target>Sommerzeit berücksichtigen</target>
 
 <source>Local settings:</source>
 <target>Lokale Einstellungen:</target>
@@ -1014,9 +1008,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Port:</source>
 <target>Port:</target>
-
-<source>Examples:</source>
-<target>Beispiele:</target>
 
 <source>User name:</source>
 <target>Benutzername:</target>
@@ -1645,6 +1636,9 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Die Berechtigungen können nicht von %x nach %y kopiert werden.</target>
 
+<source>%x is not a regular directory name.</source>
+<target>%x ist kein regulärer Verzeichnisname.</target>
+
 <source>Cannot find system function %x.</source>
 <target>Die Systemfunktion %x wurde nicht gefunden.</target>
 
@@ -1776,4 +1770,10 @@ Dadurch wird ein konsistenter Datenstand auch im schweren Fehlerfall garantiert.
 
 <source>Edit with FreeFileSync</source>
 <target>Mit FreeFileSync editieren</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Danke für Ihre Spende und Unterstützung!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Das FreeFileSync Installationsprogramm für Spender hat sein Installationslimit erreicht. Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
 

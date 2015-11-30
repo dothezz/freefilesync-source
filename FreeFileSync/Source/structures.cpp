@@ -15,6 +15,42 @@
 using namespace zen;
 
 
+std::vector<unsigned int> zen::fromTimeShiftPhrase(const std::wstring& timeShiftPhrase)
+{
+    std::wstring tmp = replaceCpy(timeShiftPhrase, L';', L','); //harmonize , and ;
+    replace(tmp, L'-', L""); //there is no negative shift => treat as positive!
+
+    std::set<unsigned int> minutes;
+    for (const std::wstring& part : split(tmp, L','))
+    {
+        if (contains(part, L':'))
+            minutes.insert(stringTo<unsigned int>(beforeFirst(part, L':', IF_MISSING_RETURN_NONE)) * 60 +
+                           stringTo<unsigned int>(afterFirst (part, L':', IF_MISSING_RETURN_NONE)));
+        else
+            minutes.insert(stringTo<unsigned int>(part) * 60);
+    }
+    minutes.erase(0);
+
+    return { minutes.begin(), minutes.end() };
+}
+
+
+std::wstring zen::toTimeShiftPhrase(const std::vector<unsigned int>& ignoreTimeShiftMinutes)
+{
+    std::wstring phrase;
+    for (auto it = ignoreTimeShiftMinutes.begin(); it != ignoreTimeShiftMinutes.end(); ++it)
+    {
+        if (it != ignoreTimeShiftMinutes.begin())
+            phrase += L", ";
+
+        phrase += numberTo<std::wstring>(*it / 60);
+        if (*it % 60 != 0)
+            phrase += L':' + printNumber<std::wstring>(L"%02d", static_cast<int>(*it % 60));
+    }
+    return phrase;
+}
+
+
 std::wstring zen::getVariantName(CompareVariant var)
 {
     switch (var)

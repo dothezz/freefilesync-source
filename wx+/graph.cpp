@@ -19,9 +19,6 @@ using namespace zen;
 
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
-//for some buggy reason MSVC isn't able to use a temporary as a default argument
-const std::shared_ptr<LabelFormatter> Graph2D::MainAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>();
-
 
 double zen::nextNiceNumber(double blockSize) //round to next number which is a convenient to read block size
 {
@@ -48,25 +45,25 @@ wxColor getDefaultColor(size_t pos)
     switch (pos % 10)
     {
         case 0:
-            return wxColor(0, 69, 134); //blue
+			return { 0, 69, 134 }; //blue
         case 1:
-            return wxColor(255, 66, 14); //red
+            return { 255, 66, 14 }; //red
         case 2:
-            return wxColor(255, 211, 32); //yellow
+            return { 255, 211, 32 }; //yellow
         case 3:
-            return wxColor(87, 157, 28); //green
+            return { 87, 157, 28 }; //green
         case 4:
-            return wxColor(126, 0, 33); //royal
+            return { 126, 0, 33 }; //royal
         case 5:
-            return wxColor(131, 202, 255); //light blue
+            return { 131, 202, 255 }; //light blue
         case 6:
-            return wxColor(49, 64, 4); //dark green
+            return { 49, 64, 4 }; //dark green
         case 7:
-            return wxColor(174, 207, 0); //light green
+            return { 174, 207, 0 }; //light green
         case 8:
-            return wxColor(75, 31, 111); //purple
+            return { 75, 31, 111 }; //purple
         case 9:
-            return wxColor(255, 149, 14); //orange
+            return { 255, 149, 14 }; //orange
     }
     assert(false);
     return *wxBLACK;
@@ -574,7 +571,7 @@ void Graph2D::render(wxDC& dc) const
 
     {
         //paint graph background (excluding label area)
-        wxDCPenChanger   dummy (dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
+        wxDCPenChanger   dummy (dc, wxColor(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
         wxDCBrushChanger dummy2(dc, attr.backgroundColor);
         //accessibility: consider system text and background colors; small drawback: color of graphs is NOT connected to the background! => responsibility of client to use correct colors
 

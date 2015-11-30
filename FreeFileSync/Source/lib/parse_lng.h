@@ -198,8 +198,8 @@ public:
 
     static const TokenMap& getList()
     {
-        static KnownTokens inst;
-        return inst.tokens;
+        static const TokenMap tokens = getTokens();
+        return tokens;
     }
 
     static std::string text(Token::Type t)
@@ -209,8 +209,9 @@ public:
     }
 
 private:
-    KnownTokens()
+    static TokenMap getTokens()
     {
+        TokenMap tokens;
         //header information
         tokens.emplace(Token::TK_HEADER_BEGIN,       "<header>");
         tokens.emplace(Token::TK_HEADER_END,         "</header>");
@@ -234,8 +235,8 @@ private:
         tokens.emplace(Token::TK_TRG_END,      "</target>");
         tokens.emplace(Token::TK_PLURAL_BEGIN, "<pluralform>");
         tokens.emplace(Token::TK_PLURAL_END,   "</pluralform>");
+        return tokens;
     }
-    TokenMap tokens;
 };
 
 

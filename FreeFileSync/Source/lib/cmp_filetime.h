@@ -10,32 +10,45 @@
 #include <ctime>
 #include <algorithm>
 
+
 namespace zen
 {
-//---------------------------------------------------------------------------------------------------------------
 inline
-bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, unsigned int optTimeShiftHours)
+bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
-    if (tolerance < 0) //= unlimited tolerance by convention!
+    if (tolerance < 0) //:= unlimited tolerance by convention!
         return true;
 
     if (lhs < rhs)
         std::swap(lhs, rhs);
 
-    if (lhs - rhs <= tolerance)
+    if (rhs > std::numeric_limits<std::int64_t>::max() - tolerance) //protect against overflow!
         return true;
 
-    if (optTimeShiftHours > 0)
-    {
-        const int shiftSec = static_cast<int>(optTimeShiftHours) * 3600;
-        if (rhs <= std::numeric_limits<std::int64_t>::max() - shiftSec) //protect against integer overflow!
-        {
-            const std::int64_t low  = std::min(rhs + shiftSec, lhs);
-            const std::int64_t high = std::max(rhs + shiftSec, lhs);
+    if (lhs <= rhs + tolerance)
+        return true;
 
-            if (high - low <= tolerance)
-                return true;
-        }
+    for (unsigned int minutes : ignoreTimeShiftMinutes)
+    {
+        assert(minutes > 0);
+        const int shiftSec = static_cast<int>(minutes) * 60;
+
+        std::int64_t low  = rhs;
+        std::int64_t high = lhs;
+
+        if (low <= std::numeric_limits<std::int64_t>::max() - shiftSec) //protect against overflow!
+            low += shiftSec;
+        else
+            high -= shiftSec;
+
+        if (high < low)
+            std::swap(high, low);
+
+        if (low > std::numeric_limits<std::int64_t>::max() - tolerance) //protect against overflow!
+            return true;
+
+        if (high <= low + tolerance)
+            return true;
     }
 
     return false;
@@ -54,16 +67,13 @@ enum class TimeResult
 
 
 inline
-TimeResult compareFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, unsigned int optTimeShiftHours)
+TimeResult compareFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
-#if defined _MSC_VER && _MSC_VER < 1900
-#error function scope static initialization is not yet thread-safe!
-#endif
 
     //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
     static const std::int64_t oneYearFromNow = std::time(nullptr) + 365 * 24 * 3600;
 
-    if (sameFileTime(lhs, rhs, tolerance, optTimeShiftHours)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
+    if (sameFileTime(lhs, rhs, tolerance, ignoreTimeShiftMinutes)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
         return TimeResult::EQUAL;
 
     //check for erroneous dates

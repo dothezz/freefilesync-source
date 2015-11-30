@@ -11,9 +11,6 @@
 #include <wx+/image_resources.h>
 #include "popup_dlg_generated.h"
 
-#ifdef ZEN_WIN
-    #include <wx+/mouse_move_dlg.h>
-#endif
 
 using namespace zen;
 
@@ -64,11 +61,7 @@ void setBestInitialSize(wxTextCtrl& ctrl, const wxString& text, wxSize maxSize)
         it = itEnd + 1;
     }
 
-#if defined ZEN_WIN || defined ZEN_LINUX
     const int rowGap = 0;
-#elif defined ZEN_MAC
-    const int rowGap = 1;
-#endif
     const wxSize bestSize(bestWidth + scrollbarWidth, std::min(rowCount * (rowHeight + rowGap), maxSize.y));
     ctrl.SetMinSize(bestSize); //alas, SetMinClientSize() is just not working!
 }
@@ -82,9 +75,6 @@ public:
         PopupDialogGenerated(parent),
         checkBoxValue_(cfg.checkBoxValue)
     {
-#ifdef ZEN_WIN
-        new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
         wxString titleTmp = cfg.title;
         switch (type)
         {

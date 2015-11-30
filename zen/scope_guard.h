@@ -14,16 +14,8 @@
 //best of Zen, Loki and C++17
 
 
-#ifdef ZEN_WIN
-inline int getUncaughtExceptionCount() { return std::uncaught_exceptions(); }
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
 //std::uncaught_exceptions() currently unsupported on GCC and Clang => clean up ASAP
-#ifdef ZEN_LINUX
     static_assert(__GNUC__ < 5 || (__GNUC__ == 5 && (__GNUC_MINOR__ < 2 || (__GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ <= 1))), "check std::uncaught_exceptions support");
-#else
-    static_assert(__clang_major__ < 7 || (__clang_major__ == 7 && __clang_minor__ <= 0), "check std::uncaught_exceptions support");
-#endif
 
 namespace __cxxabiv1
 {
@@ -35,7 +27,6 @@ inline int getUncaughtExceptionCount()
 {
     return *(reinterpret_cast<unsigned int*>(static_cast<char*>(static_cast<void*>(__cxxabiv1::__cxa_get_globals())) + sizeof(void*)));
 }
-#endif
 
 
 namespace zen
@@ -73,9 +64,6 @@ public:
 
     ~ScopeGuard() noexcept(runMode != ScopeGuardRunMode::ON_SUCCESS)
     {
-#ifdef _MSC_VER
-		#pragma warning(suppress: 4127) //"conditional expression is constant"
-#endif
         if (!dismissed)
         {
             if (runMode != ScopeGuardRunMode::ON_EXIT)

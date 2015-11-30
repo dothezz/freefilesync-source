@@ -1,11 +1,26 @@
 <header>
 	<language>English (UK)</language>
 	<translator>Robert Readman</translator>
-	<locale>en_GB</locale>
+	<locale>English (U.K.)</locale>
 	<image>flag_england.png</image>
 	<plural_count>2</plural_count>
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
+
+<source>Thanks for your donation and support!</source>
+<target></target>
+
+<source>%x is not a regular directory name.</source>
+<target></target>
+
+<source>empty</source>
+<target></target>
+
+<source>Main config</source>
+<target></target>
 
 <source>Please enter a target folder.</source>
 <target></target>
@@ -16,13 +31,13 @@
 </source>
 <target></target>
 
+<source>Loading...</source>
+<target></target>
+
 <source>Copy to...</source>
 <target></target>
 
 <source>Copy items</source>
-<target></target>
-
-<source>&Copy</source>
 <target></target>
 
 <source>&Overwrite existing files</source>
@@ -31,7 +46,43 @@
 <source>&Keep relative paths</source>
 <target></target>
 
+<source>Select Folder</source>
+<target></target>
+
+<source>Select a directory on the server:</source>
+<target></target>
+
 <source>Port:</source>
+<target></target>
+
+<source>Example:</source>
+<target></target>
+
+<source>List of file time offsets to consider equal</source>
+<target></target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target></target>
+
+<source>Folder pair:</source>
+<target></target>
+
+<source>Select alternative folder type</source>
+<target></target>
+
+<source>SFTP folder</source>
+<target></target>
+
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target></target>
+
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target></target>
+
+<source>Start</source>
+<target></target>
+
+<source>If you ignore this error the folders are considered empty. Missing folders are created automatically when needed.</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -135,9 +186,6 @@
 
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
-
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronisation.</target>
 
 <source>A folder input field is empty.</source>
 <target>A folder input field is empty.</target>
@@ -282,9 +330,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Cannot find device %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Cannot determine free disk space for %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Cannot create directory %x.</target>
 
@@ -303,11 +348,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Cannot resolve symbolic link %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Unable to move %x to the recycle bin.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Cannot open directory %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Cannot determine free disk space for %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Unable to move %x to the recycle bin.</target>
 
 <source>Incorrect command line:</source>
 <target>Incorrect command line:</target>
@@ -399,9 +447,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Cannot set directory lock for %x.</target>
 
-<source>Scanning:</source>
-<target>Scanning:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -410,6 +455,9 @@ Actual: %y bytes
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Scanning:</target>
 
 <source>/sec</source>
 <target>/sec</target>
@@ -520,9 +568,6 @@ The command is triggered if:
 - files or subfolders change
 - new folders arrive (e.g. USB stick insert)
 </target>
-
-<source>&Start</source>
-<target>&Start</target>
 
 <source>About</source>
 <target>About</target>
@@ -707,30 +752,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Serious Error</target>
 
-<source>Check for Program Updates</source>
-<target>Check for Program Updates</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>A new version of FreeFileSync is available:</target>
-
-<source>Download now?</source>
-<target>Download now?</target>
-
-<source>&Download</source>
-<target>&Download</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync is up to date.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Unable to connect to www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Cannot find current FreeFileSync version number online. Do you want to check manually?</target>
-
-<source>&Check</source>
-<target>&Check</target>
-
 <source>Symlink</source>
 <target>Symlink</target>
 
@@ -791,11 +812,8 @@ The command is triggered if:
 <source>Paste</source>
 <target>Paste</target>
 
-<source>Local Synchronization Settings</source>
-<target>Local Synchronisation Settings</target>
-
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</target>
+<source>Select SFTP folder</source>
+<target>Select SFTP folder</target>
 
 <source>&New</source>
 <target>&New</target>
@@ -866,9 +884,6 @@ The command is triggered if:
 <source>Remove folder pair</source>
 <target>Remove folder pair</target>
 
-<source>Select SFTP folder</source>
-<target>Select SFTP folder</target>
-
 <source>Swap sides</source>
 <target>Swap sides</target>
 
@@ -926,15 +941,6 @@ The command is triggered if:
 <source>Identify equal files by comparing the file content.</source>
 <target>Identify equal files by comparing the file content.</target>
 
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignore time shift (in hours)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Consider file times with specified offset as equal</target>
-
-<source>Handle daylight saving time</source>
-<target>Handle daylight saving time</target>
-
 <source>Include &symbolic links:</source>
 <target>Include &symbolic links:</target>
 
@@ -946,6 +952,9 @@ The command is triggered if:
 
 <source>More information</source>
 <target>More information</target>
+
+<source>Handle daylight saving time</source>
+<target>Handle daylight saving time</target>
 
 <source>Local settings:</source>
 <target>Local settings:</target>
@@ -1036,14 +1045,14 @@ The command is triggered if:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Arrange folder pair</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Enter your SFTP login details:</target>
 
 <source>Server name or IP address:</source>
 <target>Server name or IP address:</target>
-
-<source>Examples:</source>
-<target>Examples:</target>
 
 <source>User name:</source>
 <target>User name:</target>
@@ -1065,9 +1074,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>&Don't show this dialogue again</target>
-
-<source>Arrange folder pair</source>
-<target>Arrange folder pair</target>
 
 <source>Items found:</source>
 <target>Elements found:</target>
@@ -1237,6 +1243,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Overview</target>
 
+<source>&Download</source>
+<target>&Download</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>A new version of FreeFileSync is available:</target>
+
 <source>Confirm</source>
 <target>Confirm</target>
 
@@ -1348,9 +1360,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Remove entry from list</source>
 <target>Remove entry from list</target>
 
-<source>Synchronization Settings</source>
-<target>Synchronisation Settings</target>
-
 <source>Clear filter</source>
 <target>Clear filter</target>
 
@@ -1438,26 +1447,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Shut down</target>
 
-<source>Scanning...</source>
-<target>Scanning...</target>
-
-<source>Comparing content...</source>
-<target>Comparing content...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Select all</target>
-
 <source>Paused</source>
 <target>Paused</target>
 
 <source>Initializing...</source>
 <target>Initialising...</target>
 
+<source>Scanning...</source>
+<target>Scanning...</target>
+
+<source>Comparing content...</source>
+<target>Comparing content...</target>
+
 <source>Completed</source>
 <target>Completed</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Select all</target>
 
 <source>&Continue</source>
 <target>&Continue</target>
@@ -1525,6 +1534,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configure your own synchronization rules.</source>
 <target>Configure your own synchronisation rules.</target>
 
+<source>Synchronization Settings</source>
+<target>Synchronisation Settings</target>
+
+<source>Comparison</source>
+<target>Comparison</target>
+
+<source>Synchronization</source>
+<target>Synchronisation</target>
+
 <source>Today</source>
 <target>Today</target>
 
@@ -1561,12 +1579,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Append a time stamp to each file name</target>
 
-<source>Comparison</source>
-<target>Comparison</target>
-
-<source>Synchronization</source>
-<target>Synchronisation</target>
-
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
 
@@ -1584,6 +1596,24 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Percentage</target>
+
+<source>Check for Program Updates</source>
+<target>Check for Program Updates</target>
+
+<source>Download now?</source>
+<target>Download now?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync is up to date.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Unable to connect to www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Cannot find current FreeFileSync version number online. Do you want to check manually?</target>
+
+<source>&Check</source>
+<target>&Check</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Unable to register to receive system messages.</target>

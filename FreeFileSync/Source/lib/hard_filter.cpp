@@ -26,7 +26,7 @@ bool zen::operator<(const HardFilter& lhs, const HardFilter& rhs)
 
 namespace
 {
-//constructing them in addFilterEntry becomes perf issue for large filter lists
+//constructing these in addFilterEntry becomes perf issue for large filter lists:
 const Zstring asterisk            = Zstr("*");
 const Zstring sepAsterisk         = FILE_NAME_SEPARATOR + asterisk;
 const Zstring asteriskSep         = asterisk + FILE_NAME_SEPARATOR;
@@ -35,14 +35,7 @@ const Zstring asteriskSepAsterisk = asteriskSep + asterisk;
 
 void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& masksFileFolder, std::vector<Zstring>& masksFolder)
 {
-#if defined ZEN_WIN
-    const Zstring& filterFmt = replaceCpy(makeUpperCopy(filterPhrase), L'/', FILE_NAME_SEPARATOR);
-    //Windows does NOT distinguish between upper/lower-case, or between slash and backslash
-#elif defined ZEN_MAC
-    const Zstring& filterFmt = makeUpperCopy(filterPhrase);
-#elif defined ZEN_LINUX
     const Zstring& filterFmt = filterPhrase; //Linux DOES distinguish between upper/lower-case: nothing to do here
-#endif
     /*
       phrase  | action
     +---------+--------
@@ -268,11 +261,7 @@ void NameFilter::addExclusion(const Zstring& excludePhrase)
 
 bool NameFilter::passFileFilter(const Zstring& relFilePath) const
 {
-#if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
-    const Zstring& pathFmt = makeUpperCopy(relFilePath);
-#elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& pathFmt = relFilePath; //nothing to do here
-#endif
 
     if (matchesMask<AnyMatch         >(pathFmt, excludeMasksFileFolder) || //either full match on file or partial match on any parent folder
         matchesMask<ParentFolderMatch>(pathFmt, excludeMasksFolder))       //partial match on any parent folder only
@@ -287,11 +276,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirPath, bool* childItemMightMa
 {
     assert(!childItemMightMatch || *childItemMightMatch == true); //check correct usage
 
-#if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
-    const Zstring& pathFmt = makeUpperCopy(relDirPath);
-#elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& pathFmt = relDirPath; //nothing to do here
-#endif
 
     if (matchesMask<AnyMatch>(pathFmt, excludeMasksFileFolder) ||
         matchesMask<AnyMatch>(pathFmt, excludeMasksFolder))
@@ -341,8 +326,8 @@ bool NameFilter::isNull(const Zstring& includePhrase, const Zstring& excludePhra
 
 bool NameFilter::isNull() const
 {
-    static NameFilter output(Zstr("*"), Zstring());
-    return *this == output;
+    static NameFilter nullInstance(Zstr("*"), Zstring());
+    return *this == nullInstance;
 }
 
 
