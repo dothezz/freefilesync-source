@@ -531,9 +531,11 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getHandle(), &sourceInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(sourceFile)), L"fstat");
-
-    const int fdTarget = ::open(targetFile.c_str(), O_WRONLY | O_CREAT | O_EXCL,
-                                sourceInfo.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO)); //analog to "cp" which copies "mode" (considering umask) by default
+	 
+    const mode_t mode = sourceInfo.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO); //analog to "cp" which copies "mode" (considering umask) by default
+	//it seems we don't need S_IWUSR, not even for the setFileTime() below! (tested with source file having different user/group!)
+    
+    const int fdTarget = ::open(targetFile.c_str(), O_WRONLY | O_CREAT | O_EXCL, mode);
     //=> need copyItemPermissions() only for "chown" and umask-agnostic permissions
     if (fdTarget == -1)
     {

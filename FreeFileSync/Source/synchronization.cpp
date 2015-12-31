@@ -1656,7 +1656,13 @@ bool baseFolderDrop(BaseFolderPair& baseFolder, ProcessCallback& callback)
     if (baseFolder.isExisting<side>())
         if (Opt<std::wstring> errMsg = tryReportingError([&]
     {
-        if (!folderExistsNonBlocking(folderPath, false, callback))
+        const FolderStatus status = getFolderStatusNonBlocking({ folderPath }, false /*allowUserInteraction*/, callback);
+
+            static_assert(IsSameType<decltype(status.failedChecks.begin()->second), FileError>::value, "");
+            if (!status.failedChecks.empty())
+                throw status.failedChecks.begin()->second;
+
+            if (status.existing.find(folderPath) == status.existing.end())
                 throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtPath(AFS::getDisplayPath(folderPath))));
             //should really be logged as a "fatal error" if ignored by the user...
         }, callback)) //throw X?

@@ -70,13 +70,13 @@ public:
         menu->Append(newItem);
     }
 
-    void popup(wxWindow& wnd) //show popup menu + process lambdas
+    void popup(wxWindow& wnd, const wxPoint& pos = wxDefaultPosition) //show popup menu + process lambdas
     {
         //eventually all events from submenu items will be received by this menu
         for (const auto& item : commandList)
             menu->Connect(item.first, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ContextMenu::onSelection), new GenericCommand(item.second) /*pass ownership*/, this);
 
-        wnd.PopupMenu(menu.get());
+        wnd.PopupMenu(menu.get(), pos);
         wxTheApp->ProcessPendingEvents(); //make sure lambdas are evaluated before going out of scope;
         //although all events seem to be processed within wxWindows::PopupMenu, we shouldn't trust wxWidgets in this regard
     }

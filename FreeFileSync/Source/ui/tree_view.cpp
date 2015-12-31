@@ -1203,7 +1203,7 @@ private:
         for (const Grid::ColumnAttribute& ca : grid_.getColumnConfig())
         {
             menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn] { toggleColumn(ca.type_); },
-            ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeNavi::DIRECTORY)); //do not allow user to hide file name column!
+                             ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeNavi::DIRECTORY)); //do not allow user to hide file name column!
         }
         //--------------------------------------------------------------------------------------------------------
         menu.addSeparator();

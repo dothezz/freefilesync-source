@@ -114,7 +114,7 @@
 	<p>
 		The command line usually starts a synchronization task using FreeFileSync which naturally leads to additional file change notifications.
 		Therefore the RealtimeSync change detection has to be deactivated to not go into an endless loop.
-		On the other hand it is not likely that changes happen in first place since RealtimeSync runs the command line only after a user-specified idle time has passed.
+		On the other hand it is not likely that changes (other than those from FreeFileSync) happen in first place since RealtimeSync runs the command line only after a user-specified idle time has passed.
 		This makes sure the monitored folders are not in heavy use. In any case, files changed during the execution of FreeFileSync will be synchronized the next time FreeFileSync runs.
 	</p>
 </body>

@@ -471,8 +471,13 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     //set icons for this dialog
     SetIcon(getFfsIcon()); //set application icon
 
-    m_bpButtonCmpConfig  ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
-    m_bpButtonSyncConfig ->SetBitmapLabel(getResourceImage(L"cfg_sync"));
+    m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
+    m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
+
+    m_bpButtonCmpContext   ->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
+    m_bpButtonFilterContext->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
+    m_bpButtonSyncContext  ->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
+
     m_bpButtonNew        ->SetBitmapLabel(getResourceImage(L"new"));
     m_bpButtonOpen       ->SetBitmapLabel(getResourceImage(L"load"));
     m_bpButtonSaveAs     ->SetBitmapLabel(getResourceImage(L"sync"));
@@ -594,6 +599,9 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_bpButtonCmpConfig ->SetToolTip(replaceCpy(_("C&omparison settings"),      L"&", L"") + L" (F6)"); //
     m_bpButtonSyncConfig->SetToolTip(replaceCpy(_("S&ynchronization settings"), L"&", L"") + L" (F8)"); //
     m_buttonSync        ->SetToolTip(replaceCpy(_("Start &synchronization"),    L"&", L"") + L" (F9)"); //
+
+    m_bpButtonCmpContext ->SetToolTip(m_bpButtonCmpConfig ->GetToolTipText());
+    m_bpButtonSyncContext->SetToolTip(m_bpButtonSyncConfig->GetToolTipText());
 
     gridDataView = std::make_shared<GridView>();
     treeDataView = std::make_shared<TreeView>();
@@ -874,10 +882,10 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     else
         Center();
 
-        if (globalSettings.gui.isMaximized)
+    if (globalSettings.gui.isMaximized)
+    {
             Maximize(true);
-
-    //Maximize(globalSettings.gui.isMaximized);
+    }
 
     //set column attributes
     m_gridMainL   ->setColumnConfig(gridview::convertConfig(globalSettings.gui.columnAttribLeft));
@@ -994,10 +1002,12 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     if (IsIconized())
         Iconize(false);
 
-    globalSettings.gui.isMaximized = IsMaximized(); //evaluate AFTER uniconizing!
-    if (globalSettings.gui.isMaximized)
-        Maximize(false);
-
+    globalSettings.gui.isMaximized = false;
+	if (IsMaximized()) //evaluate AFTER uniconizing!
+		{
+			globalSettings.gui.isMaximized = true;
+			Maximize(false);
+		}
 
     globalSettings.gui.dlgSize = GetClientSize();
     globalSettings.gui.dlgPos  = GetPosition();
@@ -1484,6 +1494,9 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_panelConfig        ->Disable();
     m_gridNavi           ->Disable();
     m_panelSearch        ->Disable();
+    m_bpButtonCmpContext   ->Disable();
+    m_bpButtonFilterContext->Disable();
+    m_bpButtonSyncContext  ->Disable();
 
     if (enableAbort)
     {
@@ -1525,6 +1538,9 @@ void MainDialog::enableAllElements()
     m_panelConfig        ->Enable();
     m_gridNavi           ->Enable();
     m_panelSearch        ->Enable();
+    m_bpButtonCmpContext   ->Enable();
+    m_bpButtonFilterContext->Enable();
+    m_bpButtonSyncContext  ->Enable();
 
     //show compare button
     m_buttonCancel->Disable();
@@ -2404,7 +2420,7 @@ void MainDialog::OnContextSetLayout(wxMouseEvent& event)
 }
 
 
-void MainDialog::OnCompSettingsContext(wxMouseEvent& event)
+void MainDialog::OnCompSettingsContext(wxEvent& event)
 {
     ContextMenu menu;
 
@@ -2419,11 +2435,13 @@ void MainDialog::OnCompSettingsContext(wxMouseEvent& event)
     menu.addRadio(getVariantName(CMP_BY_TIME_SIZE), [&] { setVariant(CMP_BY_TIME_SIZE); }, currentVar == CMP_BY_TIME_SIZE);
     menu.addRadio(getVariantName(CMP_BY_CONTENT  ), [&] { setVariant(CMP_BY_CONTENT);   }, currentVar == CMP_BY_CONTENT);
 
-    menu.popup(*this);
+    wxPoint pos = m_bpButtonCmpContext->GetPosition();
+    pos.x += m_bpButtonCmpContext->GetSize().GetWidth();
+    menu.popup(*m_panelTopButtons, pos);
 }
 
 
-void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
+void MainDialog::OnSyncSettingsContext(wxEvent& event)
 {
     ContextMenu menu;
 
@@ -2440,7 +2458,9 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
     menu.addRadio(getVariantName(DirectionConfig::UPDATE), [&] { setVariant(DirectionConfig::UPDATE); }, currentVar == DirectionConfig::UPDATE);
     menu.addRadio(getVariantName(DirectionConfig::CUSTOM), [&] { setVariant(DirectionConfig::CUSTOM); }, currentVar == DirectionConfig::CUSTOM);
 
-    menu.popup(*this);
+    wxPoint pos = m_bpButtonSyncContext->GetPosition();
+    pos.x += m_bpButtonSyncContext->GetSize().GetWidth();
+    menu.popup(*m_panelTopButtons, pos);
 }
 
 
@@ -3327,7 +3347,7 @@ void MainDialog::showConfigDialog(SyncConfigPanel panelToShow, int localPairInde
 }
 
 
-void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
+void MainDialog::OnGlobalFilterContext(wxEvent& event)
 {
     auto clearFilter = [&]
     {
@@ -3351,7 +3371,10 @@ void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
     menu.addSeparator();
     menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
     menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);
-    menu.popup(*this);
+
+    wxPoint pos = m_bpButtonFilterContext->GetPosition();
+    pos.x += m_bpButtonFilterContext->GetSize().GetWidth();
+    menu.popup(*m_panelTopButtons, pos);
 }
 
 
@@ -3496,7 +3519,9 @@ void MainDialog::updateGlobalFilterButton()
         setImage(*m_bpButtonFilter, greyScale(getResourceImage(L"filter")));
         status = _("None");
     }
+
     m_bpButtonFilter->SetToolTip(_("Filter") + L" (F7) (" + status + L")");
+    m_bpButtonFilterContext->SetToolTip(m_bpButtonFilter->GetToolTipText());
 }
 
 
@@ -4223,7 +4248,7 @@ void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
 }
 
 
-void MainDialog::OnShowFolderPairOptions(wxCommandEvent& event)
+void MainDialog::OnShowFolderPairOptions(wxEvent& event)
 {
 
     const wxObject* const eventObj = event.GetEventObject(); //find folder pair originating the event
@@ -4237,8 +4262,10 @@ void MainDialog::OnShowFolderPairOptions(wxCommandEvent& event)
             menu.addSeparator();
             menu.addItem(_("Move up"  ) + L"\tAlt+Page Up"  , [this, pos] { moveAddFolderPairUp(pos);     }, &getResourceImage(L"move_up_small"));
             menu.addItem(_("Move down") + L"\tAlt+Page Down", [this, pos] { moveAddFolderPairUp(pos + 1); }, &getResourceImage(L"move_down_small"), pos + 1 < makeSigned(additionalFolderPairs.size()));
-            menu.popup(*this);
 
+            wxPoint ctxPos = (*it)->m_bpButtonFolderPairOptions->GetPosition();
+            ctxPos.x += (*it)->m_bpButtonFolderPairOptions->GetSize().GetWidth();
+            menu.popup(*(*it)->m_panelLeft, ctxPos);
             break;
         }
 }
@@ -4387,8 +4414,8 @@ void MainDialog::insertAddFolderPair(const std::vector<FolderPairEnh>& newPairs,
         additionalFolderPairs.insert(additionalFolderPairs.begin() + pos, newPair);
 
         //register events
-        newPair->m_bpButtonFolderPairOptions->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnShowFolderPairOptions), nullptr, this);
-        newPair->m_bpButtonFolderPairOptions->Connect(wxEVT_RIGHT_DOWN,             wxCommandEventHandler(MainDialog::OnShowFolderPairOptions), nullptr, this);
+        newPair->m_bpButtonFolderPairOptions->Connect(wxEVT_COMMAND_BUTTON_CLICKED,        wxEventHandler(MainDialog::OnShowFolderPairOptions), nullptr, this);
+        newPair->m_bpButtonFolderPairOptions->Connect(wxEVT_RIGHT_DOWN,                    wxEventHandler(MainDialog::OnShowFolderPairOptions), nullptr, this);
         newPair->m_bpButtonRemovePair       ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolderPair     ), nullptr, this);
         static_cast<FolderPairPanelGenerated*>(newPair)->Connect(wxEVT_CHAR_HOOK,       wxKeyEventHandler(MainDialog::onAddFolderPairKeyEvent), nullptr, this);
 

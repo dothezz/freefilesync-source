@@ -16,6 +16,8 @@
 
 namespace zen
 {
+const int FOLDER_EXISTENCE_CHECK_TIMEOUT = 20; //unit: [s]; consider CD-ROM insert or hard disk spin up time from sleep
+
 namespace
 {
 //directory existence checking may hang for non-existent network drives => run asynchronously and update UI!
@@ -49,7 +51,7 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
         }));
 
     //don't wait (almost) endlessly like Win32 would on non-existing network shares:
-    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(20); //consider CD-ROM insert or hard disk spin up time from sleep
+    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(FOLDER_EXISTENCE_CHECK_TIMEOUT);
 
     for (auto& fi : futureInfo)
     {
@@ -79,14 +81,6 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
 
     return output;
 }
-}
-
-inline //also silences Clang "unused function"
-bool folderExistsNonBlocking(const AbstractPath& folderPath, bool allowUserInteraction, ProcessCallback& procCallback)
-{
-    std::set<AbstractPath, AFS::LessAbstractPath> folderPaths{ folderPath};
-    const FolderStatus status = getFolderStatusNonBlocking(folderPaths, allowUserInteraction, procCallback);
-    return status.existing.find(folderPath) != status.existing.end();
 }
 }
 

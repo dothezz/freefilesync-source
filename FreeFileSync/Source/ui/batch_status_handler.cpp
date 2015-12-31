@@ -135,7 +135,6 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        std::vector<Zstring>& onCompletionHistory) :
     switchBatchToGui_(switchBatchToGui),
     showFinalResults(showProgress), //=> exit immediately or wait when finished
-    switchToGuiRequested(false),
     logfilesCountLimit_(logfilesCountLimit),
     lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
     handleError_(handleError),

@@ -79,6 +79,9 @@
 <source>The selected folder %x cannot be used with FreeFileSync.</source>
 <target></target>
 
+<source>The following path does not support directory monitoring:</source>
+<target></target>
+
 <source>Start</source>
 <target></target>
 
@@ -144,6 +147,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Cannot find file %x.</target>
+
+<source>Error</source>
+<target>Error</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>File %x does not contain a valid configuration.</target>
@@ -586,9 +592,6 @@ The command is triggered if:
 
 <source>Waiting until all directories are available...</source>
 <target>Waiting until all directories are available...</target>
-
-<source>Error</source>
-<target>Error</target>
 
 <source>&Restore</source>
 <target>&Restore</target>

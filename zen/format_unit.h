@@ -9,6 +9,7 @@
 
 #include <string>
 #include <cstdint>
+#include "optional.h"
 #include "string_tools.h"
 
 
@@ -24,8 +25,6 @@ std::wstring formatThreeDigitPrecision(double value); //(unless value is too lar
 
 template <class NumberType>
 std::wstring toGuiString(NumberType number); //format integer number including thousands separator
-
-
 
 
 

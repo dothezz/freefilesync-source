@@ -10,6 +10,9 @@
 <source>List of file time offsets to consider equal</source>
 <target></target>
 
+<source>The following path does not support directory monitoring:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -69,6 +72,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Die Datei %x wurde nicht gefunden.</target>
+
+<source>Error</source>
+<target>Fehler</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Die Datei %x enthält keine gültige Konfiguration.</target>
@@ -517,9 +523,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Waiting until all directories are available...</source>
 <target>Warte bis alle Verzeichnisse verfügbar sind...</target>
-
-<source>Error</source>
-<target>Fehler</target>
 
 <source>&Restore</source>
 <target>&Wiederherstellen</target>

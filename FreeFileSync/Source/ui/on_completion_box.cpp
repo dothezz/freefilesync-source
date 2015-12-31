@@ -27,10 +27,10 @@ std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/c
 
     auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.emplace_back(name, value); };
 
-    addEntry(_("Log off"  ), Zstr("gnome-session-quit")); //alternative requiring admin: sudo killall Xorg
-    addEntry(_("Standby"  ), Zstr("sudo pm-suspend"));
-    addEntry(_("Shut down"), Zstr("dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown"));
-    //alternative requiring admin: sudo shutdown -h 1
+    addEntry(_("Log off"  ), Zstr("gnome-session-quit --no-prompt")); //alternative requiring admin: sudo killall Xorg
+    //alternative without admin: dbus-send --session --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Logout uint32:1
+    addEntry(_("Standby"  ), Zstr("systemctl suspend"));  //alternative requiring admin: sudo pm-suspend
+    addEntry(_("Shut down"), Zstr("systemctl poweroff")); //alternative requiring admin: sudo shutdown -h 1
 
     return output;
 }

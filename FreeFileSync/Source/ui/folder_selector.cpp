@@ -82,7 +82,7 @@ FolderSelector::FolderSelector(wxWindow&         dropWindow,
     folderComboBox_       .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onEditFolderPath ), nullptr, this);
     selectFolderButton_   .Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder   ), nullptr, this);
     selectAltFolderButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
-    selectAltFolderButton_.Connect(wxEVT_RIGHT_DOWN,             wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
+    //selectAltFolderButton_.Connect(wxEVT_RIGHT_DOWN,             wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
 }
 
 
@@ -97,7 +97,7 @@ FolderSelector::~FolderSelector()
     folderComboBox_       .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onEditFolderPath ), nullptr, this);
     selectFolderButton_   .Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectFolder   ), nullptr, this);
     selectAltFolderButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
-    selectAltFolderButton_.Disconnect(wxEVT_RIGHT_DOWN,             wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
+    //selectAltFolderButton_.Disconnect(wxEVT_RIGHT_DOWN,             wxCommandEventHandler(FolderSelector::onSelectAltFolder), nullptr, this);
 }
 
 

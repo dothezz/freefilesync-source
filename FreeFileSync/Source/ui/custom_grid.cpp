@@ -67,9 +67,9 @@ std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(const Grid& grid) //returns range
         const ptrdiff_t rowFrom  = grid.getRowAtPos(topLeft.y); //return -1 for invalid position, rowCount if out of range
         const ptrdiff_t rowTo    = grid.getRowAtPos(bottom.y);
         if (rowFrom >= 0 && rowTo >= 0)
-			return std::make_pair(rowFrom, std::min(rowTo + 1, rowCount));
+            return std::make_pair(rowFrom, std::min(rowTo + 1, rowCount));
     }
-	assert(false);
+    assert(false);
     return std::make_pair(0, 0);
 }
 
@@ -511,7 +511,7 @@ private:
                             //see repaint behavior of ::ScrollWindow() function!
                             fileIcon = iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
                         }
-                        break;                                                                                           
+                        break;
 
                     case IconInfo::EMPTY:
                         break;
@@ -596,7 +596,7 @@ private:
             case ColumnTypeRim::EXTENSION:
                 return _("Extension");
         }
-		//assert(false); may be ColumnType::NONE
+        //assert(false); may be ColumnType::NONE
         return std::wstring();
     }
 
@@ -778,7 +778,7 @@ private:
     }
 
     std::unordered_set<const FileSystemObject*> markedFilesAndLinks_; //mark files/symlinks directly within a container
-    std::unordered_set<const HierarchyObject *> markedContainer_;     //mark full container including all child-objects
+    std::unordered_set<const HierarchyObject*> markedContainer_;      //mark full container including all child-objects
     //DO NOT DEREFERENCE!!!! NOT GUARANTEED TO BE VALID!!!
 };
 
@@ -849,7 +849,7 @@ public:
         wxPoint clientPos = refGrid().getMainWin().ScreenToClient(wxGetMousePosition());
         onMouseMovement(clientPos);
     }
-	 
+
     void onMouseMovement(const wxPoint& clientPos)
     {
         //manage block highlighting and custom tooltip
@@ -975,7 +975,8 @@ private:
                         drawHighlightBackground(*fsObj, getBackGroundColorSyncAction(fsObj));
 
                     //synchronization preview
-                    switch (static_cast<HoverAreaCenter>(rowHover))
+                    const auto rowHoverCenter = rowHover == HoverArea::NONE ? HoverAreaCenter::CHECK_BOX : static_cast<HoverAreaCenter>(rowHover);
+                    switch (rowHoverCenter)
                     {
                         case HoverAreaCenter::DIR_LEFT:
                             drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
@@ -986,9 +987,7 @@ private:
                         case HoverAreaCenter::DIR_RIGHT:
                             drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
                             break;
-
                         case HoverAreaCenter::CHECK_BOX:
-                        default: //HoverArea::NONE
                             if (highlightSyncAction_)
                                 drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->getSyncOperation()), rect, wxALIGN_CENTER, buffer);
                             else if (fsObj->getSyncOperation() != SO_EQUAL) //don't show = in both middle columns
@@ -1041,7 +1040,6 @@ private:
             case ColumnTypeCenter::SYNC_ACTION:
                 return _("Action")   + L" (F10)";
         }
-		assert(false);
         return std::wstring();
     }
 
@@ -1748,7 +1746,7 @@ wxBitmap zen::getSyncOpImage(SyncOperation syncOp)
         case SO_UNRESOLVED_CONFLICT:
             return getResourceImage(L"cat_conflict_small");
     }
-	assert(false);
+    assert(false);
     return wxNullBitmap;
 }
 
@@ -1773,6 +1771,6 @@ wxBitmap zen::getCmpResultImage(CompareFilesResult cmpResult)
         case FILE_CONFLICT:
             return getResourceImage(L"cat_conflict_small");
     }
-	assert(false);
+    assert(false);
     return wxNullBitmap;
 }

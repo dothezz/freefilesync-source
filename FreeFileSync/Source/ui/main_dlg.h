@@ -140,9 +140,17 @@ private:
     void OnContextSetLayout(wxMouseEvent& event);
     void onLocalKeyEvent   (wxKeyEvent& event);
 
-    void OnCompSettingsContext (wxMouseEvent& event) override;
-    void OnSyncSettingsContext (wxMouseEvent& event) override;
-    void OnGlobalFilterContext (wxMouseEvent& event) override;
+    void OnCompSettingsContext(wxMouseEvent&   event) override { OnCompSettingsContext(static_cast<wxEvent&>(event)); }
+    void OnCompSettingsContext(wxCommandEvent& event) override { OnCompSettingsContext(static_cast<wxEvent&>(event)); }
+    void OnSyncSettingsContext(wxMouseEvent&   event) override { OnSyncSettingsContext(static_cast<wxEvent&>(event)); }
+    void OnSyncSettingsContext(wxCommandEvent& event) override { OnSyncSettingsContext(static_cast<wxEvent&>(event)); }
+    void OnGlobalFilterContext(wxMouseEvent&   event) override { OnGlobalFilterContext(static_cast<wxEvent&>(event)); }
+    void OnGlobalFilterContext(wxCommandEvent& event) override { OnGlobalFilterContext(static_cast<wxEvent&>(event)); }
+
+    void OnCompSettingsContext(wxEvent& event);
+    void OnSyncSettingsContext(wxEvent& event);
+    void OnGlobalFilterContext(wxEvent& event);
+
     void OnViewButtonRightClick(wxMouseEvent& event) override;
 
     void applyCompareConfig(bool setDefaultViewType);
@@ -220,7 +228,7 @@ private:
     void OnTopFolderPairAdd   (wxCommandEvent& event) override;
     void OnTopFolderPairRemove(wxCommandEvent& event) override;
     void OnRemoveFolderPair   (wxCommandEvent& event);
-    void OnShowFolderPairOptions(wxCommandEvent& event);
+    void OnShowFolderPairOptions(wxEvent& event);
 
     void OnTopLocalCompCfg  (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON, 0); }
     void OnTopLocalSyncCfg  (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC,       0); }

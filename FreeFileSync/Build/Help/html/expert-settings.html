@@ -59,10 +59,10 @@
 	<p>
 		<b>LockDirectoriesDuringSync:</b><br>
 		In order to avoid race conditions of multiple FreeFileSync instances
-		writing to the same folder at the same time, accesses are serialized
-		by lock files (<span class="file-path">sync.ffs_lock</span>).
-		This allows to operate FreeFileSync with an arbitrary number of users
-		in a network out of the box.
+		writing to the same folder at the same time, synchronization tasks are serialized
+		with lock files (<span class="file-path">sync.ffs_lock</span>).
+		This is primarily intended for network synchronization scenarios where
+		multiple users may run FreeFileSync concurrently against a common network folder.
 	</p>
 
 	<p>
@@ -73,7 +73,7 @@
 		corrupted prior to copying and corruption is not hidden by
 		deceptively reading valid data from various buffers in the
 		application and hardware stack.<br>
-		<a rel="nofollow" target="_blank" href="http://blogs.msdn.com/b/oldnewthing/archive/2012/09/19/10350645.aspx">Does
+		<a rel="nofollow" target="_blank" href="https://blogs.msdn.microsoft.com/oldnewthing/20120919-00/?p=6563/">Does
 		the CopyFile function verify that the data reached its final destination successfully?</a>
 	</p>
 

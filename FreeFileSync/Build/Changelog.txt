@@ -1,3 +1,19 @@
+FreeFileSync 7.8 [2016-01-01]
+-----------------------------
+Correctly resolve environment variables containing MTP paths
+Support at and colon characters in SFTP user name
+New context buttons for quick sync config changes
+Report specific error during folder existence check when starting sync
+Fail lately when traversing available MTP devices
+Correctly handle SFTP time-out error when checking folder existence
+Updated on completion command lines for log off/standby/shut down (Linux)
+Support HTML POST redirection for update checks
+Calculate UTC file times like Windows Explorer for MTP devices
+Don't reuse timed-out SFTP sessions with thread affinity
+Workaround SFTP session hang after unsupported statvfs command
+Updated OpenSSL to 1.0.2e
+
+
 FreeFileSync 7.7 [2015-12-01]
 -----------------------------
 Support variable drive letters for config history when using FreeFileSync portable

@@ -55,7 +55,7 @@ private:
 
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool showFinalResults;
-    bool switchToGuiRequested;
+    bool switchToGuiRequested = false;
     const int logfilesCountLimit_;
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnError handleError_;

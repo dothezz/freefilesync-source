@@ -78,7 +78,12 @@ protected:
             forceUiRefresh();
     }
 
-    void reportStatus(const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ }
+    void reportStatus(const std::wstring& text) override
+    {
+        //assert(!text.empty()); -> possible, start of parallel scan
+        if (!abortRequested) statusText_ = text;
+        requestUiRefresh(); /*throw X */
+    }
     void reportInfo  (const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
 
     //implement AbortCallback

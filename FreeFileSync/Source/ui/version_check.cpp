@@ -11,11 +11,12 @@
 #include <zen/scope_guard.h>
 #include <zen/build_info.h>
 #include <zen/basic_math.h>
-#include <zen/thread.h> //std::thread::id
+#include <zen/file_error.h>
 #include <wx+/popup_dlg.h>
 #include "version_id.h"
 
 
+    #include <zen/thread.h> //std::thread::id
     #include <wx/protocol/http.h>
     #include <wx/app.h>
 
@@ -56,13 +57,14 @@ std::wstring getIso3166Country()
 }
 
 
-std::wstring getUserAgentName()
+std::string geHttpPostParameters() //must be in application/x-www-form-urlencoded format!!!
 {
-    //1. coordinate with on_check_latest_version.php
+    //1. coordinate with get_latest_version_number.php
     //2. respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
 
-    std::wstring agentName = std::wstring(L"FreeFileSync (") + zen::ffsVersion;
+    std::string params = "ffs_version=" + utfCvrtTo<std::string>(zen::ffsVersion);
 
+    params += "&os_name=Linux";
     assert(std::this_thread::get_id() == mainThreadId);
 
     const wxLinuxDistributionInfo distribInfo = wxGetLinuxDistributionInfo();
@@ -73,68 +75,70 @@ std::wstring getUserAgentName()
 
     const int osvMajor = stringTo<int>(digits[0]);
     const int osvMinor = stringTo<int>(digits[1]);
-    agentName += L" Linux";
 
-    agentName += L" " + numberTo<std::wstring>(osvMajor) + L"." + numberTo<std::wstring>(osvMinor);
+    params += "&os_version=" + numberTo<std::string>(osvMajor) + "." + numberTo<std::string>(osvMinor);
 
-    agentName +=
+    params +=
 #ifdef ZEN_BUILD_32BIT
-        L" 32";
+        "&os_arch=32";
 #elif defined ZEN_BUILD_64BIT
-        L" 64";
+        "&os_arch=64";
 #endif
 
-    const std::wstring isoLang    = getIso639Language();
-    const std::wstring isoCountry = getIso3166Country();
-    agentName += L" " + (!isoLang   .empty() ? isoLang    : L"zz");
-    agentName += L" " + (!isoCountry.empty() ? isoCountry : L"ZZ");
+    const std::string isoLang    = utfCvrtTo<std::string>(getIso639Language());
+    const std::string isoCountry = utfCvrtTo<std::string>(getIso3166Country());
+    params += "&language=" + (!isoLang   .empty() ? isoLang    : "zz");
+    params += "&country="  + (!isoCountry.empty() ? isoCountry : "ZZ");
 
-    agentName += L")";
-    return agentName;
+    return params;
 }
 
 
-class InternetConnectionError {};
-
-std::string readBytesFromUrl(const wxString& url, int level = 0) //throw InternetConnectionError
+std::string sendHttpRequestImpl(const std::wstring& url, //throw FileError
+                                const std::string* postParams, //issue POST if bound, GET otherwise
+                                int level = 0)
 {
+    assert(!startsWith(url, L"https:")); //not supported by wxHTTP!
+    std::wstring urlFmt = url;
+    if (startsWith(urlFmt, L"http://"))
+        urlFmt = afterFirst(urlFmt, L"://", IF_MISSING_RETURN_NONE);
+    const std::wstring server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
+    const std::wstring page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
+
     assert(std::this_thread::get_id() == mainThreadId);
     assert(wxApp::IsMainLoopRunning());
 
-    wxString urlFmt = url;
-    assert(!startsWith(urlFmt, L"https:")); //not supported by wxHTTP!
-    if (startsWith(urlFmt, L"http://"))
-        urlFmt = afterFirst(urlFmt, L"://", IF_MISSING_RETURN_NONE);
-    const wxString server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
-    const wxString page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
-
     wxHTTP webAccess;
-    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
-    webAccess.SetHeader(L"USER-AGENT", getUserAgentName());
-
-    webAccess.SetTimeout(5 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
+    webAccess.SetHeader(L"User-Agent", L"FFS-Update-Check");
+    webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
 
     if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        throw InternetConnectionError();
+        throw FileError(_("Internet access failed."), L"wxHTTP::Connect");
+
+    if (postParams)
+        if (!webAccess.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
+            throw FileError(_("Internet access failed."), L"wxHTTP::SetPostText");
 
     std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //must be deleted BEFORE webAccess is closed
-    const int rs = webAccess.GetResponse();
+    const int sc = webAccess.GetResponse();
 
-    if (rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
-        rs == 302 ||
-        rs == 303 ||
-        rs == 307 ||
-        rs == 308)
+    //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
+    if (sc / 100 == 3) //e.g. 301, 302, 303, 307... we're not too greedy since we check location, too!
+    {
         if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
         {
-            const wxString newUrl = webAccess.GetHeader(L"Location");
+            const std::wstring newUrl(webAccess.GetHeader(L"Location"));
             if (!newUrl.empty())
-                return readBytesFromUrl(newUrl, level + 1);
+                return sendHttpRequestImpl(newUrl, postParams, level + 1);
         }
+        throw FileError(_("Internet access failed."), L"Unresolvable redirect.");
+    }
 
-    if (rs != 200 || //HTTP_STATUS_OK
-        !httpStream || webAccess.GetError() != wxPROTO_NOERR)
-        throw InternetConnectionError();
+    if (sc != 200) //HTTP_STATUS_OK
+        throw FileError(_("Internet access failed."), replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
+
+    if (!httpStream || webAccess.GetError() != wxPROTO_NOERR)
+        throw FileError(_("Internet access failed."), L"wxHTTP::GetError");
 
     std::string buffer;
     int newValue = 0;
@@ -144,36 +148,43 @@ std::string readBytesFromUrl(const wxString& url, int level = 0) //throw Interne
 }
 
 
-inline
 bool internetIsAlive() //noexcept
 {
     const wxString server = L"www.google.com";
     const wxString page   = L"/";
 
     wxHTTP webAccess;
-    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
-    webAccess.SetTimeout(5 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
+    webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
 
     if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
         return false;
 
     std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //call before checking wxHTTP::GetResponse()
-    const int rs = webAccess.GetResponse();
-
-    return rs == 301 || //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
-           rs == 302 ||
-           rs == 303 ||
-           rs == 307 ||
-           rs == 308 ||
-           rs == 200; //HTTP_STATUS_OK
+    const int sc = webAccess.GetResponse();
     //attention: http://www.google.com/ might redirect to "https" => don't follow, just return "true"!!!
+    return sc / 100 == 2 || //e.g. 200
+           sc / 100 == 3;   //e.g. 301, 302, 303, 307... when in doubt, consider internet alive!
+}
+
+#if 0 //not needed yet: -Wunused-function on OS X
+inline
+std::string sendHttpGet(const std::wstring& url) //throw FileError
+{
+    return sendHttpRequestImpl(url, nullptr); //throw FileError
+}
+#endif
+
+inline
+std::string sendHttpPost(const std::wstring& url, const std::string& postParams) //throw FileError
+{
+    return sendHttpRequestImpl(url, &postParams); //throw FileError
 }
 
 
 enum GetVerResult
 {
     GET_VER_SUCCESS,
-    GET_VER_NO_CONNECTION, //no internet connection or homepage down?
+    GET_VER_NO_CONNECTION, //no internet connection?
     GET_VER_PAGE_NOT_FOUND //version file seems to have moved! => trigger an update!
 };
 
@@ -182,13 +193,13 @@ GetVerResult getOnlineVersion(std::wstring& version)
 {
     try
     {
-        //harmonize with wxHTTP: latest_version.txt must not use https!!!
-        const std::string buffer = readBytesFromUrl(L"http://www.freefilesync.org/latest_version.txt"); //throw InternetConnectionError
+        //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
+        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", geHttpPostParameters()); //throw FileError
         version = utfCvrtTo<std::wstring>(buffer);
         trim(version); //Windows: remove trailing blank and newline
         return version.empty() ? GET_VER_PAGE_NOT_FOUND : GET_VER_SUCCESS; //empty version possible??
     }
-    catch (const InternetConnectionError&)
+    catch (const FileError&)
     {
         return internetIsAlive() ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
     }

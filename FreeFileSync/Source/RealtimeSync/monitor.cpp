@@ -22,7 +22,7 @@ using namespace zen;
 
 namespace
 {
-const int CHECK_DIR_INTERVAL = 1; //unit: [s]
+const int CHECK_FOLDER_INTERVAL = 1; //unit: [s]
 
 
 std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhrases) //throw FileError
@@ -39,7 +39,7 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
         folderPaths.insert(getResolvedFilePath(phrase));
     }
 
-	return { folderPaths.begin(), folderPaths.end() };
+    return { folderPaths.begin(), folderPaths.end() };
 }
 
 
@@ -93,7 +93,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
         }
     }
 
-    const std::int64_t TICKS_DIR_CHECK_INTERVAL = CHECK_DIR_INTERVAL * ticksPerSec(); //0 on error
+    const std::int64_t TICKS_DIR_CHECK_INTERVAL = CHECK_FOLDER_INTERVAL * ticksPerSec(); //0 on error
     TickVal lastCheck = getTicks(); //0 on error
     while (true)
     {
@@ -172,8 +172,8 @@ void waitForMissingDirs(const std::vector<Zstring>& folderPathPhrases, //throw F
                 allExisting = false;
                 //wait some time...
                 const int refreshInterval = rts::UI_UPDATE_INTERVAL / 2;
-                static_assert(CHECK_DIR_INTERVAL * 1000 % refreshInterval == 0, "");
-                for (int i = 0; i < CHECK_DIR_INTERVAL * 1000 / refreshInterval; ++i)
+                static_assert(CHECK_FOLDER_INTERVAL * 1000 % refreshInterval == 0, "");
+                for (int i = 0; i < CHECK_FOLDER_INTERVAL * 1000 / refreshInterval; ++i)
                 {
                     onRefreshGui(folderPathFmt); //may throw!
                     std::this_thread::sleep_for(std::chrono::milliseconds(refreshInterval));

@@ -33,7 +33,7 @@ class FFSTranslation : public TranslationHandler
 public:
     FFSTranslation(const Zstring& lngFilePath, wxLanguage langId); //throw lngfile::ParsingError, parse_plural::ParsingError
 
-    wxLanguage langId() const { return langId_; }
+    wxLanguage getLangId() const { return langId_; }
 
     std::wstring translate(const std::wstring& text) const override
     {
@@ -136,7 +136,7 @@ std::vector<TranslationInfo> loadTranslations()
     //search language files available
     std::vector<Zstring> lngFiles;
 
-    traverseFolder(zen::getResourceDir() + Zstr("Languages"), [&](const FileInfo& fi)
+    traverseFolder(zen::getResourceDir() + Zstr("Languages"), [&](const zen::FileInfo& fi) //FileInfo is ambiguous on OS X
     {
         if (pathEndsWith(fi.fullPath, Zstr(".lng")))
             lngFiles.push_back(fi.fullPath);
@@ -435,7 +435,7 @@ void zen::setLanguage(wxLanguage lng) //throw FileError
 wxLanguage zen::getLanguage()
 {
     const FFSTranslation* loc = dynamic_cast<const FFSTranslation*>(zen::getTranslator());
-    return loc ? loc->langId() : wxLANGUAGE_ENGLISH_US;
+    return loc ? loc->getLangId() : wxLANGUAGE_ENGLISH_US;
 }
 
 

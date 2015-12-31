@@ -8,7 +8,7 @@
 #include "basic_math.h"
 #include "i18n.h"
 #include "time.h"
-#include <cwchar>  //swprintf
+#include <cwchar> //swprintf
 #include <ctime>
 #include <cstdio>
 
@@ -190,3 +190,5 @@ std::wstring zen::utcToLocalTimeString(std::int64_t utcTime)
     std::wstring dateString = formatTime<std::wstring>(L"%x  %X", loc);
     return !dateString.empty() ? dateString : errorMsg();
 }
+
+

@@ -916,7 +916,7 @@ Komenda jest wykonywana gdy:
 <target>Uwzględniaj dowiązania &symboliczne:</target>
 
 <source>&Follow</source>
-<target>&Podąrzaj</target>
+<target>&Podążaj</target>
 
 <source>&Direct</source>
 <target>&Bezpośrednio</target>
