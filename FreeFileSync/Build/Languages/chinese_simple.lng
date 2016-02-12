@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>正在为文件夹 %x 检测回收站可用性...</target>
+<source>Creating folder %x</source>
+<target>正创建文件夹 %x</target>
+
+<source>Creating file %x</source>
+<target>正在创建文件 %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>正在创建符号连接 %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>移动文件 %x 到回收站</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>正在删除符号连接 %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>正在为文件夹 %x 检测回收站可用性...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>对于如下的文件夹回收站不可用. 文件将被永久性删除:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>无法找到文件 %x.</target>
+
+<source>Error</source>
+<target>错误</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>文件 %x 并未包含合法的配置.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>无法找到如下文件夹:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>你可忽略此错误而将每个文件夹视为空. 这些文件夹将会在同步过程中被自动创建.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>如果你忽略这个错误, 文件夹将被认为是空的. 在需要的时候丢失的文件夹将会被自动创建.</target>
 
 <source>A folder input field is empty.</source>
 <target>有一个文件夹输入框为空.</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>无法找到设备 %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>无法确定 %x 上的可用磁盘空间.</target>
-
 <source>Cannot create directory %x.</source>
 <target>无法创建目录 %x.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>无法解决符号连接 %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>无法将 %x 移动到回收站.</target>
-
 <source>Cannot open directory %x.</source>
 <target>无法打开目录 %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>无法确定 %x 上的可用磁盘空间.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>无法将 %x 移动到回收站.</target>
 
 <source>Incorrect command line:</source>
 <target>不正确的命令行:</target>
@@ -343,9 +355,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>正在检测被遗弃的锁定...</target>
 
-<source>Creating file %x</source>
-<target>正在创建文件 %x</target>
-
 <source>Saving file %x...</source>
 <target>正在保存文件 %x...</target>
 
@@ -364,9 +373,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>无法为 %x 设置目录锁定.</target>
 
-<source>Scanning:</source>
-<target>扫描中:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -374,6 +380,9 @@ Actual: %y bytes
 <target>
 <pluralform>%x 线程</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>扫描中:</target>
 
 <source>/sec</source>
 <target>/秒</target>
@@ -485,8 +494,8 @@ The command is triggered if:
 - 新文件夹到达(例如U盘插入)
 </target>
 
-<source>&Start</source>
-<target>开始(&S)</target>
+<source>Start</source>
+<target>开始</target>
 
 <source>About</source>
 <target>关于</target>
@@ -500,14 +509,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>自动同步</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>如下路径并不支持目录监视:</target>
+
 <source>Directory monitoring active</source>
 <target>目录监视激活</target>
 
 <source>Waiting until all directories are available...</source>
 <target>正在等待直到所有目录都可用...</target>
-
-<source>Error</source>
-<target>错误</target>
 
 <source>&Restore</source>
 <target>恢复(&R)</target>
@@ -521,11 +530,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>重试(&R)</target>
 
+<source>File time and size</source>
+<target>文件时间和大小</target>
+
 <source>File content</source>
 <target>文件内容</target>
 
-<source>File time and size</source>
-<target>文件时间和大小</target>
+<source>File size</source>
+<target>文件大小</target>
 
 <source>Two way</source>
 <target>双向</target>
@@ -553,12 +565,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>移除旧版本...</target>
-
-<source>Creating symbolic link %x</source>
-<target>正在创建符号连接 %x</target>
-
-<source>Creating folder %x</source>
-<target>正创建文件夹 %x</target>
 
 <source>Updating file %x</source>
 <target>正在更新文件 %x</target>
@@ -676,30 +682,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>严重错误</target>
 
-<source>Check for Program Updates</source>
-<target>检查程序的更新</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>已经有新版本的FreeFileSync可用:</target>
-
-<source>Download now?</source>
-<target>立即下载?</target>
-
-<source>&Download</source>
-<target>下载(&D)</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync 已是最新.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>无法连接到www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>无法在线找到当前FreeFileSync版本号. 你要手动检查吗?</target>
-
-<source>&Check</source>
-<target>检查(&C)</target>
-
 <source>Symlink</source>
 <target>符号连接</target>
 
@@ -760,11 +742,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>粘贴</target>
 
-<source>Local Synchronization Settings</source>
-<target>本地同步设置</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>所选定的文件夹 %x 不能由FreeFileSync使用.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>已选择的文件夹 %x 无法用于FreeFileSync. 请选择在本地文件系统, 网络或MTP设备上的文件夹.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>请选择在本地文件系统, 网络或MTP设备上的文件夹.</target>
+
+<source>SFTP folder</source>
+<target>SFTP文件夹</target>
+
+<source>Select SFTP folder</source>
+<target>选择SFTP文件夹</target>
+
+<source>Select alternative folder type</source>
+<target>选择替代的文件夹类型</target>
 
 <source>&New</source>
 <target>新建(&N)</target>
@@ -793,8 +784,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>动作(&A)</target>
 
-<source>&Options</source>
-<target>选项(&O)</target>
+<source>&Preferences</source>
+<target>首选项(&P)</target>
 
 <source>&Language</source>
 <target>切换语言(&L)</target>
@@ -834,9 +825,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>移除文件夹对</target>
-
-<source>Select SFTP folder</source>
-<target>选择SFTP文件夹</target>
 
 <source>Swap sides</source>
 <target>两侧互换</target>
@@ -883,26 +871,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>要复制的总字节数</target>
 
+<source>Folder pair:</source>
+<target>文件夹对:</target>
+
 <source>Use local settings:</source>
 <target>使用本地设置:</target>
 
 <source>Select a variant:</source>
 <target>选择一个变化:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>以比较修改时间和文件大小来识别相同文件.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>以比较文件内容来识别相同的文件.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>忽略时间转换(以小时为单位)(&I)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>将文件时间有指定的偏移时视为相等</target>
-
-<source>Handle daylight saving time</source>
-<target>处理夏令时</target>
 
 <source>Include &symbolic links:</source>
 <target>包括符号连接(&S):</target>
@@ -915,6 +891,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>更多信息</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>忽略时间偏移[时:分](&I)</target>
+
+<source>List of file time offsets to ignore</source>
+<target>要忽略的文件时间偏移列表</target>
+
+<source>Example:</source>
+<target>例如:</target>
+
+<source>Handle daylight saving time</source>
+<target>处理夏令时</target>
 
 <source>Local settings:</source>
 <target>本地设置:</target>
@@ -1005,14 +993,17 @@ The command is triggered if:
 <source>OK</source>
 <target>确定</target>
 
+<source>Arrange folder pair</source>
+<target>排列文件夹对</target>
+
 <source>Enter your SFTP login details:</source>
 <target>输入你的SFTP登录详情:</target>
 
 <source>Server name or IP address:</source>
 <target>服务器名称或IP地址:</target>
 
-<source>Examples:</source>
-<target>例如:</target>
+<source>Port:</source>
+<target>端口:</target>
 
 <source>User name:</source>
 <target>用户名:</target>
@@ -1026,6 +1017,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>服务器上的目录:</target>
 
+<source>Select a directory on the server:</source>
+<target>选择一个服务器上的目录:</target>
+
+<source>Select Folder</source>
+<target>选择文件夹</target>
+
 <source>Start synchronization now?</source>
 <target>现在开始同步吗?</target>
 
@@ -1034,9 +1031,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>不要再显示这个对话框(&D)</target>
-
-<source>Arrange folder pair</source>
-<target>排列文件夹对</target>
 
 <source>Items found:</source>
 <target>已找到的项目:</target>
@@ -1088,6 +1082,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>我如何计划一个批处理作业?</target>
+
+<source>&Keep relative paths</source>
+<target>保持相对路径(&K)</target>
+
+<source>&Overwrite existing files</source>
+<target>覆盖已存在文件(&O)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>如下的设置使用于所有同步作业.</target>
@@ -1176,14 +1176,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>删除项目</target>
 
+<source>Copy items</source>
+<target>复制项目</target>
+
 <source>Options</source>
 <target>选项</target>
 
 <source>Select Time Span</source>
 <target>选择时间跨度</target>
 
-<source>&Preferences</source>
-<target>首选项(&P)</target>
+<source>&Options</source>
+<target>选项(&O)</target>
 
 <source>Main Bar</source>
 <target>主工具栏</target>
@@ -1202,6 +1205,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>摘要</target>
+
+<source>&Download</source>
+<target>下载(&D)</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>已经有新版本的FreeFileSync可用:</target>
 
 <source>Confirm</source>
 <target>确认</target>
@@ -1259,8 +1268,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>暂时排除</target>
 
-<source>Delete</source>
-<target>删除</target>
+<source>&Copy to...</source>
+<target>复制到(&C)...</target>
+
+<source>&Delete</source>
+<target>删除(&D)</target>
 
 <source>Include all</source>
 <target>包括所有</target>
@@ -1309,9 +1321,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>从列表中移除此项</target>
-
-<source>Synchronization Settings</source>
-<target>同步设置</target>
 
 <source>Clear filter</source>
 <target>清除过滤器</target>
@@ -1400,26 +1409,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>关机</target>
 
-<source>Scanning...</source>
-<target>正扫描...</target>
-
-<source>Comparing content...</source>
-<target>正在比较文件内容...</target>
-
-<source>Info</source>
-<target>信息</target>
-
-<source>Select all</source>
-<target>选择全部</target>
-
 <source>Paused</source>
 <target>已暂停</target>
 
 <source>Initializing...</source>
 <target>正在初始化...</target>
 
+<source>Scanning...</source>
+<target>正扫描...</target>
+
+<source>Comparing content...</source>
+<target>正在比较文件内容...</target>
+
 <source>Completed</source>
 <target>完成</target>
+
+<source>Info</source>
+<target>信息</target>
+
+<source>Select all</source>
+<target>选择全部</target>
 
 <source>&Continue</source>
 <target>继续(&C)</target>
@@ -1429,6 +1438,20 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>日志</target>
+
+<source>Loading...</source>
+<target>正在载入...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>复制如下的 %x 个项目到另一个文件夹?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>请输入一下目录文件夹.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1448,9 +1471,6 @@ This guarantees a consistent state even in case of a serious error.
 <target>
 <pluralform>是否真的要删除如下 %x 个项目?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>首选项</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>复制DACL, SACL, 所有者, 群组</target>
@@ -1476,6 +1496,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>显示(&S)</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>以比较修改时间和文件大小来识别相同文件.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>以比较文件内容来识别相同的文件.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>以比较文件大小来识别相同的文件.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>
 
@@ -1487,6 +1516,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>配置你自己的同步规则.</target>
+
+<source>Synchronization Settings</source>
+<target>同步设置</target>
+
+<source>Comparison</source>
+<target>比较</target>
+
+<source>Synchronization</source>
+<target>同步</target>
 
 <source>Today</source>
 <target>今天</target>
@@ -1524,11 +1562,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>添加一个时间戳到每个文件名</target>
 
-<source>Comparison</source>
-<target>比较</target>
+<source>Main config</source>
+<target>主配置</target>
 
-<source>Synchronization</source>
-<target>同步</target>
+<source>empty</source>
+<target>空</target>
 
 <source>Leave as unresolved conflict</source>
 <target>遗留为未解决的冲突</target>
@@ -1547,6 +1585,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>百分比</target>
+
+<source>Internet access failed.</source>
+<target>因特网接入失败.</target>
+
+<source>Check for Program Updates</source>
+<target>检查程序的更新</target>
+
+<source>Download now?</source>
+<target>立即下载?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync 已是最新.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>无法连接到www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>无法在线找到当前FreeFileSync版本号. 你要手动检查吗?</target>
+
+<source>&Check</source>
+<target>检查(&C)</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>无法注册以接收系统信息.</target>
@@ -1574,6 +1633,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>无法从 %x 复制权限到 %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x 不是一个正规的目录名.</target>
 
 <source>Cannot find system function %x.</source>
 <target>无法找到系统功能 %x.</target>
@@ -1698,9 +1760,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync同步数据库</target>
 
-<source>RealtimeSync Configuration</source>
-<target>实时同步配置</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync配置</target>
 
 <source>Edit with FreeFileSync</source>
 <target>使用FreeFileSync编辑</target>
+
+<source>Thanks for your donation and support!</source>
+<target>谢谢你的捐助和支持!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>这个用于捐赠者的FreeFileSync安装程序已经达到了安装次数的限制. 是否从FreeFileSync主页下载普通版本?</target>
 

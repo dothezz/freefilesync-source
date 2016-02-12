@@ -1705,8 +1705,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync Synkronisering</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync konfigurering</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync konfigurering</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Rediger med FreeFileSync</target>

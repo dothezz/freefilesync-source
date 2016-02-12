@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nustatomos numatytos suvienodinimo kryptys: Seni failai bus perrašyti naujesniais failais.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Tikrinamas šiukšliadėžės prieinamumas aplankui %x...</target>
+<source>Creating folder %x</source>
+<target>Kuriamas aplankas %x</target>
+
+<source>Creating file %x</source>
+<target>Kuriamas failas %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Kuriama simbolinė nuoroda %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>%x failas perkeliamas į šiukšliadėžę</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Trinama simbolinė nuoroda %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Tikrinamas šiukšliadėžės prieinamumas aplankui %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Šiuklšliadėžė šiems aplankams yra nepasiekiama. Failai bus negrįžtamai ištrinti:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Negalima surasti failo %x.</target>
+
+<source>Error</source>
+<target>Klaida</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Failas %x neturi tinkamų nustatymų.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nepavyksta rasti šių aplankų:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Jei žinote, kad kiekvienas katalogas yra tuščias, šią klaidą galite ignoruoti. Katalogai bus automatiškai sukurti suvienodinimo metu.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Jeigu ignoruosite šią klaidą aplankas bus laikomas tuščiu. Trūkstami aplankai, kai reikės bus sukurti.</target>
 
 <source>A folder input field is empty.</source>
 <target>Aplanko įvesties laukas yra tuščias.</target>
@@ -246,9 +258,6 @@ Esamas: %y baitai
 <source>Cannot find device %x.</source>
 <target>Negalima surasti įrenginio %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Negalima nustatyti laisvos disko dalies %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Nepavyksta sukurti katalogo %x.</target>
 
@@ -267,11 +276,14 @@ Esamas: %y baitai
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nepavyko rasti simbolinės nuorodos %x reikšmės.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x į šiukšliadėžę perkelti nepavyko.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Nepavyksta atversti direktorijos %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Negalima nustatyti laisvos disko dalies %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x į šiukšliadėžę perkelti nepavyko.</target>
 
 <source>Incorrect command line:</source>
 <target>Netaisyklinga Komandinė eilutė:</target>
@@ -347,9 +359,6 @@ Esamas: %y baitai
 <source>Detecting abandoned lock...</source>
 <target>Aptiktas paliktas užraktas...</target>
 
-<source>Creating file %x</source>
-<target>Kuriamas failas %x</target>
-
 <source>Saving file %x...</source>
 <target>Išsaugomas failas %x...</target>
 
@@ -368,9 +377,6 @@ Esamas: %y baitai
 <source>Cannot set directory lock for %x.</source>
 <target>Nepavyksta nustatyti katalogo užrakto %x.</target>
 
-<source>Scanning:</source>
-<target>Nuskaitoma:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -380,6 +386,9 @@ Esamas: %y baitai
 <pluralform>%x srautai</pluralform>
 <pluralform>%x srautų</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Nuskaitoma:</target>
 
 <source>/sec</source>
 <target>/sek.</target>
@@ -491,8 +500,8 @@ Komanda inicijuojama jei:
 - atsiranda nauji aplankai (pvz.: įkišamas USB raktas)
 </target>
 
-<source>&Start</source>
-<target>&Pradėti</target>
+<source>Start</source>
+<target>Pradėti</target>
 
 <source>About</source>
 <target>Apie</target>
@@ -506,14 +515,14 @@ Komanda inicijuojama jei:
 <source>Automated Synchronization</source>
 <target>Automatinis Suvienodinimas</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Ši nuoroda nepalaiko katalogo stebėjimo:</target>
+
 <source>Directory monitoring active</source>
 <target>Katalogų stebėjimas yra aktyvus</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Laukiama kol katalogai bus prieinami...</target>
-
-<source>Error</source>
-<target>Klaida</target>
 
 <source>&Restore</source>
 <target>&Atstatyti</target>
@@ -527,11 +536,14 @@ Komanda inicijuojama jei:
 <source>&Retry</source>
 <target>&Bandyti vėl</target>
 
+<source>File time and size</source>
+<target>Failo laiką ir dydį</target>
+
 <source>File content</source>
 <target>Failo turinį</target>
 
-<source>File time and size</source>
-<target>Failo laiką ir dydį</target>
+<source>File size</source>
+<target>Failo dydis</target>
 
 <source>Two way</source>
 <target>Dvipusis</target>
@@ -559,12 +571,6 @@ Komanda inicijuojama jei:
 
 <source>Removing old versions...</source>
 <target>Šalinamos senos versijos...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Kuriama simbolinė nuoroda %x</target>
-
-<source>Creating folder %x</source>
-<target>Kuriamas aplankas %x</target>
 
 <source>Updating file %x</source>
 <target>Atnaujinamas failas %x</target>
@@ -684,30 +690,6 @@ Komanda inicijuojama jei:
 <source>Serious Error</source>
 <target>Rimta klaida</target>
 
-<source>Check for Program Updates</source>
-<target>Tikrinti programos atnaujinimus</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Yra nauja FreeFileSync versija:</target>
-
-<source>Download now?</source>
-<target>Atsiųsti dabar?</target>
-
-<source>&Download</source>
-<target>&Atsisiųsti</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync yra naujausia.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nepavyko prisijungti prie www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Dabartinės FreeFileSync versijos numeris internete nerastas. Ar norėtumėte patikrinti rankiniu būdu?</target>
-
-<source>&Check</source>
-<target>&Tikrinti</target>
-
 <source>Symlink</source>
 <target>Simbolinė nuoroda</target>
 
@@ -768,11 +750,20 @@ Komanda inicijuojama jei:
 <source>Paste</source>
 <target>Įklijuoti</target>
 
-<source>Local Synchronization Settings</source>
-<target>Vietiniai Suvienodinimo Parametrai</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>FreeFileSync negali naudoti pažymėto %x aplanko.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>FreeFileSync negali naudoti pasirinkto aplanko %x. Prašome pasirinkti aplanką vietinėje failų sistemoje, tinkle arba MTP įrenginį.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Prašome pasirinkti aplanką vietinėje failų sistemoje, tinkle arba MTP įrenginyje.</target>
+
+<source>SFTP folder</source>
+<target>SFTP aplankas</target>
+
+<source>Select SFTP folder</source>
+<target>Pasirinkti SFTP aplanką</target>
+
+<source>Select alternative folder type</source>
+<target>Pažymėti alternatyvų aplanko tipą</target>
 
 <source>&New</source>
 <target>&Naujas</target>
@@ -801,8 +792,8 @@ Komanda inicijuojama jei:
 <source>&Actions</source>
 <target>&Veiksmai</target>
 
-<source>&Options</source>
-<target>&Parinktys</target>
+<source>&Preferences</source>
+<target>&Pirmenybės</target>
 
 <source>&Language</source>
 <target>&Kalba</target>
@@ -842,9 +833,6 @@ Komanda inicijuojama jei:
 
 <source>Remove folder pair</source>
 <target>Pašalinti aplankų porą</target>
-
-<source>Select SFTP folder</source>
-<target>Pasirinkti SFTP aplanką</target>
 
 <source>Swap sides</source>
 <target>Sukeisti puses</target>
@@ -891,26 +879,14 @@ Komanda inicijuojama jei:
 <source>Total bytes to copy</source>
 <target>Viso baitų kopijuoti</target>
 
+<source>Folder pair:</source>
+<target>Aplanko pora:</target>
+
 <source>Use local settings:</source>
 <target>Naudoti vietinius nustatymus:</target>
 
 <source>Select a variant:</source>
 <target>Pasirinkti variantą:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Sutapatinti vienodus failus lyginant failų modifikavimo laiką ir dydį.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Sutapatinti vienodus failus lyginant failų turinį.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignoruoti laiko skirtumą (valandomis)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Failai su tam tikra paklaida skaitomi kaip lygūs</target>
-
-<source>Handle daylight saving time</source>
-<target>Naudoti vasaros laiką</target>
 
 <source>Include &symbolic links:</source>
 <target>Pridėti &simbolines nuorodas:</target>
@@ -923,6 +899,18 @@ Komanda inicijuojama jei:
 
 <source>More information</source>
 <target>Daugiau informacijos</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ignoruoti laiko nuokrypį [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Parinkti failo ignoruojamo laiko nuokrypį</target>
+
+<source>Example:</source>
+<target>Pavyzdys:</target>
+
+<source>Handle daylight saving time</source>
+<target>Naudoti vasaros laiką</target>
 
 <source>Local settings:</source>
 <target>Vietiniai nustatymai:</target>
@@ -1013,14 +1001,17 @@ Komanda inicijuojama jei:
 <source>OK</source>
 <target>Gerai</target>
 
+<source>Arrange folder pair</source>
+<target>Sulygiuoti pagal aplanko porą</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Įveskite jūsų SFTP prisijungimo duomenis:</target>
 
 <source>Server name or IP address:</source>
 <target>Serverio vardas arba IP adresas:</target>
 
-<source>Examples:</source>
-<target>Pavyzdžiai:</target>
+<source>Port:</source>
+<target>Jungtis:</target>
 
 <source>User name:</source>
 <target>Vartotojo vardas:</target>
@@ -1034,6 +1025,12 @@ Komanda inicijuojama jei:
 <source>Directory on server:</source>
 <target>Katalogas serveryje:</target>
 
+<source>Select a directory on the server:</source>
+<target>Pažymėti katalogą serveryje:</target>
+
+<source>Select Folder</source>
+<target>Pažymėti Aplanką</target>
+
 <source>Start synchronization now?</source>
 <target>Dabar pradėti suvienodinimą?</target>
 
@@ -1042,9 +1039,6 @@ Komanda inicijuojama jei:
 
 <source>&Don't show this dialog again</source>
 <target>&Nerodyti pakartotinai šio dialogo lango</target>
-
-<source>Arrange folder pair</source>
-<target>Sulygiuoti pagal aplanko porą</target>
 
 <source>Items found:</source>
 <target>Rasta elementų:</target>
@@ -1096,6 +1090,12 @@ Komanda inicijuojama jei:
 
 <source>How can I schedule a batch job?</source>
 <target>Kaip aš galiu užduočių paketą įtraukti į tvarkaraštį?</target>
+
+<source>&Keep relative paths</source>
+<target>&Laikyti panašias kelius</target>
+
+<source>&Overwrite existing files</source>
+<target>&Pakeisti esamus failus</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Sekantys parametrai yra naudojami visiems suvienodinimo darbams.</target>
@@ -1187,14 +1187,17 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Delete Items</source>
 <target>Pašalinti elementai</target>
 
+<source>Copy items</source>
+<target>Kopijuoti elementus</target>
+
 <source>Options</source>
 <target>Parinktys</target>
 
 <source>Select Time Span</source>
 <target>Pasirinkti laiko atkarpą</target>
 
-<source>&Preferences</source>
-<target>&Pirmenybės</target>
+<source>&Options</source>
+<target>&Parinktys</target>
 
 <source>Main Bar</source>
 <target>Pagrindinė įrankinė</target>
@@ -1213,6 +1216,12 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Overview</source>
 <target>Apžvalga</target>
+
+<source>&Download</source>
+<target>&Atsisiųsti</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Yra nauja FreeFileSync versija:</target>
 
 <source>Confirm</source>
 <target>Patvirtinti</target>
@@ -1278,8 +1287,11 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Exclude temporarily</source>
 <target>Neįtraukti laikinai</target>
 
-<source>Delete</source>
-<target>Trinti</target>
+<source>&Copy to...</source>
+<target>&Kopijuoti į...</target>
+
+<source>&Delete</source>
+<target>&Ištrinti</target>
 
 <source>Include all</source>
 <target>Įtraukti visus</target>
@@ -1328,9 +1340,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Remove entry from list</source>
 <target>Pašalinti įrašą iš sarašo</target>
-
-<source>Synchronization Settings</source>
-<target>Suvienodinimo parametrai</target>
 
 <source>Clear filter</source>
 <target>Panaikinti filtrą</target>
@@ -1419,26 +1428,26 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Shut down</source>
 <target>Išjungti kompiuterį</target>
 
-<source>Scanning...</source>
-<target>Tikrinama...</target>
-
-<source>Comparing content...</source>
-<target>Palyginimo turinys...</target>
-
-<source>Info</source>
-<target>Informacija</target>
-
-<source>Select all</source>
-<target>Pažymėti visus</target>
-
 <source>Paused</source>
 <target>Pristabdyta</target>
 
 <source>Initializing...</source>
 <target>Pradedama...</target>
 
+<source>Scanning...</source>
+<target>Tikrinama...</target>
+
+<source>Comparing content...</source>
+<target>Palyginimo turinys...</target>
+
 <source>Completed</source>
 <target>Baigta</target>
+
+<source>Info</source>
+<target>Informacija</target>
+
+<source>Select all</source>
+<target>Pažymėti visus</target>
 
 <source>&Continue</source>
 <target>&Tęsti</target>
@@ -1448,6 +1457,22 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Log</source>
 <target>Žurnalas</target>
+
+<source>Loading...</source>
+<target>Įkraunama...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Ar kopijuoti šį %x elementą į kitą aplanką?</pluralform>
+<pluralform>Ar kopijuoti šiuos %x elementus į kitą aplanką?</pluralform>
+<pluralform>Ar kopijuoti šiuos %x elementų į kitą aplanką?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Prašome įvesti tikslinį aplanko vardą.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1471,9 +1496,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <pluralform>Ar tikrai norite ištrinti šiuos %x elementus?</pluralform>
 <pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Pirmenybės</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Kopijuoti DACL, SACL, Owner, Group</target>
@@ -1499,6 +1521,15 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>&Show</source>
 <target>&Rodyti</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Sutapatinti vienodus failus lyginant failų modifikavimo laiką ir dydį.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Sutapatinti vienodus failus lyginant failų turinį.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Identifikuoti vienodus failus, palyginant jų dydį.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Nustatyti ir vykdyti pokyčius abiejose pusėse. Trynimai, perkėlimai ir konfliktai yra aptinkami automatiškai naudojant duomenų bazę.</target>
 
@@ -1510,6 +1541,15 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Configure your own synchronization rules.</source>
 <target>Nustatyti Jūsų pačių suvienodinimo taisykles.</target>
+
+<source>Synchronization Settings</source>
+<target>Suvienodinimo parametrai</target>
+
+<source>Comparison</source>
+<target>Palyginimas</target>
+
+<source>Synchronization</source>
+<target>Suvienodinimas</target>
 
 <source>Today</source>
 <target>Šiandien</target>
@@ -1547,11 +1587,11 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Append a time stamp to each file name</source>
 <target>Pridėti laiko žymę prie kiekvieno failo pavadinimo</target>
 
-<source>Comparison</source>
-<target>Palyginimas</target>
+<source>Main config</source>
+<target>Pagrindiniia parametrai</target>
 
-<source>Synchronization</source>
-<target>Suvienodinimas</target>
+<source>empty</source>
+<target>tuščias</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Palikti kaip neišpręstą konfliktą</target>
@@ -1570,6 +1610,27 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Percentage</source>
 <target>Procentai</target>
+
+<source>Internet access failed.</source>
+<target>Interneto prieiga nepasiekiama.</target>
+
+<source>Check for Program Updates</source>
+<target>Tikrinti programos atnaujinimus</target>
+
+<source>Download now?</source>
+<target>Atsiųsti dabar?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync yra naujausia.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Nepavyko prisijungti prie www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Dabartinės FreeFileSync versijos numeris internete nerastas. Ar norėtumėte patikrinti rankiniu būdu?</target>
+
+<source>&Check</source>
+<target>&Tikrinti</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nepavyko aktyvuoti sisteminių žinučių gavimo funkciją.</target>
@@ -1597,6 +1658,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Nepavyko nukopijuoti leidimų iš %x į %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x nėra reguliarus katalogo vardas.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nepavyksta rasti sisteminės funkcijos %x.</target>
@@ -1727,9 +1791,15 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync Suvienodinimo duomenų bazė</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Realaus laiko suvienodinimo konfiguracija</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync Nustatymai</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Koreguoti su FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Ačių už jūsų aukas ir palaikymą!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Šis FreeFileSync remėjų diegiamasis failas pasiekė savo ribą. Ar dabar parsisiųsti standartinę versiją iš FreeFileSync internetinio puslapio?</target>
 

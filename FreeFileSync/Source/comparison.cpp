@@ -64,6 +64,7 @@ struct ResolvedBaseFolders
 
 
 ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgList,
+                                          int folderAccessTimeout,
                                           bool allowUserInteraction,
                                           ProcessCallback& callback)
 {
@@ -86,7 +87,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
             output.resolvedPairs.emplace_back(folderPathLeft, folderPathRight);
         }
 
-        const FolderStatus status = getFolderStatusNonBlocking(uniqueBaseFolders, allowUserInteraction, callback); //re-check *all* directories on each try!
+        const FolderStatus status = getFolderStatusNonBlocking(uniqueBaseFolders, folderAccessTimeout, allowUserInteraction, callback); //re-check *all* directories on each try!
         output.existingBaseFolders = status.existing;
 
         if (!status.missing.empty() || !status.failedChecks.empty())
@@ -100,7 +101,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
                 errorMsg += L"\n" + AFS::getDisplayPath(fc.first);
 
             errorMsg += L"\n\n";
-            errorMsg +=  _("If you ignore this error the folders are considered empty. Missing folders are created automatically when needed.");
+            errorMsg +=  _("If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.");
 
             if (!status.failedChecks.empty())
             {
@@ -167,6 +168,7 @@ public:
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedSymlinks are appended!
     std::shared_ptr<BaseFolderPair> compareByTimeSize(const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const;
+    std::shared_ptr<BaseFolderPair> compareBySize    (const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const;
     std::list<std::shared_ptr<BaseFolderPair>> compareByContent(const std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>>& workLoad) const;
 
 private:
@@ -332,7 +334,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
                 //Caveat:
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncFolder's mapping tables use short name as a key! see db_file.cpp
                 //2. FILE_EQUAL is expected to mean identical file sizes! See InSyncFile
-                //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
+                //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::setSyncedTo() in file_hierarchy.h
                 if (file->getFileSize<LEFT_SIDE>() == file->getFileSize<RIGHT_SIDE>())
                 {
                     if (file->getItemName<LEFT_SIDE>() == file->getItemName<RIGHT_SIDE>())
@@ -389,20 +391,53 @@ void categorizeSymlinkByContent(SymlinkPair& symlink, ProcessCallback& callback)
         {
             //Caveat:
             //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncFolder's mapping tables use short name as a key! see db_file.cpp
-            //2. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
+            //2. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::setSyncedTo() in file_hierarchy.h
 
             //symlinks have same "content"
             if (symlink.getItemName<LEFT_SIDE>() != symlink.getItemName<RIGHT_SIDE>())
                 symlink.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(symlink));
-            else if (!sameFileTime(symlink.getLastWriteTime<LEFT_SIDE>(),
-                                   symlink.getLastWriteTime<RIGHT_SIDE>(), symlink.base().getFileTimeTolerance(), symlink.base().getIgnoredTimeShift()))
-                symlink.setCategoryDiffMetadata(getDescrDiffMetaDate(symlink));
+            //else if (!sameFileTime(symlink.getLastWriteTime<LEFT_SIDE>(),
+            //                       symlink.getLastWriteTime<RIGHT_SIDE>(), symlink.base().getFileTimeTolerance(), symlink.base().getIgnoredTimeShift()))
+            //    symlink.setCategoryDiffMetadata(getDescrDiffMetaDate(symlink));
             else
                 symlink.setCategory<FILE_EQUAL>();
         }
         else
             symlink.setCategory<FILE_DIFFERENT_CONTENT>();
     }
+}
+
+
+std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareBySize(const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const
+{
+    //do basis scan and retrieve files existing on both sides as "compareCandidates"
+    std::vector<FilePair*> uncategorizedFiles;
+    std::vector<SymlinkPair*> uncategorizedLinks;
+    std::shared_ptr<BaseFolderPair> output = performComparison(fp, fpConfig, uncategorizedFiles, uncategorizedLinks);
+
+    //finish symlink categorization
+    for (SymlinkPair* symlink : uncategorizedLinks)
+        categorizeSymlinkByContent(*symlink, callback_); //"compare by size" has the semantics of a quick content-comparison!
+    //harmonize with algorithm.cpp, stillInSync()!
+
+    //categorize files that exist on both sides
+    for (FilePair* file : uncategorizedFiles)
+    {
+        //Caveat:
+        //1. FILE_EQUAL may only be set if short names match in case: InSyncFolder's mapping tables use short name as a key! see db_file.cpp
+        //2. FILE_EQUAL is expected to mean identical file sizes! See InSyncFile
+        //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::setSyncedTo() in file_hierarchy.h
+        if (file->getFileSize<LEFT_SIDE>() == file->getFileSize<RIGHT_SIDE>())
+        {
+            if (file->getItemName<LEFT_SIDE>() == file->getItemName<RIGHT_SIDE>())
+                file->setCategory<FILE_EQUAL>();
+            else
+                file->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*file));
+        }
+        else
+            file->setCategory<FILE_DIFFERENT_CONTENT>();
+    }
+    return output;
 }
 
 
@@ -490,12 +525,14 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
                 //Caveat:
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncFolder's mapping tables use short name as a key! see db_file.cpp
                 //2. FILE_EQUAL is expected to mean identical file sizes! See InSyncFile
-                //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::syncTo() in file_hierarchy.cpp
+                //3. harmonize with "bool stillInSync()" in algorithm.cpp, FilePair::setSyncedTo() in file_hierarchy.h
                 if (file->getItemName<LEFT_SIDE>() != file->getItemName<RIGHT_SIDE>())
                     file->setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(*file));
+#if 0 //don't synchronize modtime only see SynchronizeFolderPair::synchronizeFileInt(), SO_COPY_METADATA_TO_*
                 else if (!sameFileTime(file->getLastWriteTime<LEFT_SIDE>(),
                                        file->getLastWriteTime<RIGHT_SIDE>(), file->base().getFileTimeTolerance(), file->base().getIgnoredTimeShift()))
                     file->setCategoryDiffMetadata(getDescrDiffMetaDate(*file));
+#endif
                 else
                     file->setCategory<FILE_EQUAL>();
             }
@@ -790,6 +827,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::performComparison(const Resolv
 FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
                               bool allowUserInteraction,
                               bool runWithBackgroundPriority,
+                              int folderAccessTimeout,
                               bool createDirLocks,
                               std::unique_ptr<LockHolder>& dirLocks,
                               const std::vector<FolderPairCfg>& cfgList,
@@ -827,7 +865,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
     //-------------------some basic checks:------------------------------------------
 
-    const ResolvedBaseFolders& resInfo = initializeBaseFolders(cfgList, allowUserInteraction, callback);
+    const ResolvedBaseFolders& resInfo = initializeBaseFolders(cfgList, folderAccessTimeout, allowUserInteraction, callback);
 
     //directory existence only checked *once* to avoid race conditions!
     if (resInfo.resolvedPairs.size() != cfgList.size())
@@ -885,6 +923,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
                 switch (w.second.compareVar)
                 {
                     case CMP_BY_TIME_SIZE:
+                    case CMP_BY_SIZE:
                         break;
                     case CMP_BY_CONTENT:
                         workLoadByContent.push_back(w);
@@ -899,6 +938,9 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
                     case CMP_BY_TIME_SIZE:
                         output.push_back(cmpBuff.compareByTimeSize(w.first, w.second));
                         break;
+                    case CMP_BY_SIZE:
+                        output.push_back(cmpBuff.compareBySize(w.first, w.second));
+                        break;
                     case CMP_BY_CONTENT:
                         assert(!outputByContent.empty());
                         if (!outputByContent.empty())
@@ -909,7 +951,6 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
                         break;
                 }
         }
-
         assert(output.size() == cfgList.size());
 
         //--------- set initial sync-direction --------------------------------------------------

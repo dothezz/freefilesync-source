@@ -26,6 +26,11 @@
 using namespace zen;
 
 
+namespace
+{
+}
+
+
 class DirectoryPanel : public FolderGenerated
 {
 public:
@@ -108,8 +113,8 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     }
 
     //drag and drop .ffs_real and .ffs_batch on main dialog
-    setupFileDrop(*m_panelMain);
-    m_panelMain->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onFilesDropped), nullptr, this);
+    setupFileDrop(*this);
+    Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onFilesDropped), nullptr, this);
 }
 
 
@@ -166,7 +171,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 
     showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
                            setTitle(_("About")).
-                           setMainInstructions(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build)));
+                           setMainInstructions(L"RealTimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build)));
 }
 
 
@@ -215,7 +220,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
                             //OS X really needs dir/file separated like this:
                             utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
-                            wxString(L"RealtimeSync (*.ffs_real)|*.ffs_real") + L"|" +_("All files") + L" (*.*)|*",
+                            wxString(L"RealTimeSync (*.ffs_real)|*.ffs_real") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (filePicker.ShowModal() != wxID_OK)
         return;
@@ -264,7 +269,7 @@ void MainDialog::setLastUsedConfig(const Zstring& filepath)
     //set title
     if (filepath == lastConfigFileName())
     {
-        SetTitle(L"RealtimeSync - " + _("Automated Synchronization"));
+        SetTitle(L"RealTimeSync - " + _("Automated Synchronization"));
         currentConfigFileName.clear();
     }
     else
@@ -281,7 +286,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
                             wxString(),
                             utfCvrtTo<wxString>(beforeLast(currentConfigFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             wxString(),
-                            wxString(L"RealtimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
+                            wxString(L"RealTimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)
         loadConfig(utfCvrtTo<Zstring>(filePicker.GetPath()));

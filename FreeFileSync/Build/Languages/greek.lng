@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Έλεγχος της διαθεσιμότητας του κάδου ανακύκλωσης για τον υποκατάλογο %x...</target>
+<source>Creating folder %x</source>
+<target>Δημιουργία του υποκαταλόγου %x</target>
+
+<source>Creating file %x</source>
+<target>Δημιουργία του αρχείου %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Δημιουργία του συμβολικού δεσμού %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Μεταφορά του αρχείου %x στον κάδο ανακύκλωσης</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Διαγραφή του συμβολικού δεσμού %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Έλεγχος της διαθεσιμότητας του κάδου ανακύκλωσης για τον υποκατάλογο %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Ο κάδος ανακύκλωσης δεν είναι διαθέσιμος για τους ακόλουθους υποκαταλόγους. Τα αρχεία θα διαγραφούν μόνιμα:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Το αρχείο %x δεν μπορεί να βρεθεί.</target>
+
+<source>Error</source>
+<target>Σφάλματα</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Το αρχείο %x δεν περιέχει μια έγκυρη διάταξη.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Μπορείτε να αγνοήσετε αυτό το σφάλμα, για να αντιμετωπίσετε κάθε υποκατάλογο ως κενό. Οι υποκατάλογοι θα δημιουργηθούν αυτόματα κατά τη διάρκεια του συγχρονισμού.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Αν αγνοήσετε αυτό το σφάλμα, οι υποκατάλογοι θα θεωρηθούν κενοί. Οι υποκατάλογοι που λείπουν θα δημιουργηθούν αυτόματα εφόσον χρειάζεται.</target>
 
 <source>A folder input field is empty.</source>
 <target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Η συσχευή %x δεν μπορεί να βρεθεί.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Δεν μπορεί να υπολογιστεί ο ελεύθερος χώρος του δίσκου %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Δεν μπορεί να δημιουργηθεί ο υποκατάλογος %x.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ο συμβολικός δεσμός %x δεν μπορεί να επιλυθεί.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Δεν ήταν δυνατή η μεταφορά του %x στον κάδο ανακύκλωσης.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Δεν είναι δυνατό το άνοιγμα του υποκαταλόγου %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Δεν μπορεί να υπολογιστεί ο ελεύθερος χώρος του δίσκου %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Δεν ήταν δυνατή η μεταφορά του %x στον κάδο ανακύκλωσης.</target>
 
 <source>Incorrect command line:</source>
 <target>Εσφαλμένη γραμμή εντολών:</target>
@@ -345,9 +357,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Ανίχνευση κλειδώματος που εγκαταλείφθηκε...</target>
 
-<source>Creating file %x</source>
-<target>Δημιουργία του αρχείου %x</target>
-
 <source>Saving file %x...</source>
 <target>Αποθήκευση του αρχείου %x...</target>
 
@@ -366,9 +375,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Ο υποκατάλογος για το %x δεν μπορεί να κλειδωθεί.</target>
 
-<source>Scanning:</source>
-<target>Ανίχνευση:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Actual: %y bytes
 <pluralform>1 νήμα</pluralform>
 <pluralform>%x νήματα</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Ανίχνευση:</target>
 
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
@@ -397,7 +406,7 @@ Actual: %y bytes
 <target>Δεν είναι δυνατή η πρόσβαση στην Υπηρεσία Σκιώδους Αντίγραφου Τόμου.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Χρησιμοποιήστε την 64-μπιτη έκδοση του FreeFileSync για να δημιουργήσετε σκιώδη αντίγραφα σε αυτόν τον υπολογιστή.</target>
+<target>Παρακαλούμε χρησιμοποιήστε την 64-μπιτη έκδοση του FreeFileSync για να δημιουργήσετε σκιώδη αντίγραφα σε αυτόν τον υπολογιστή.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Δεν μπορεί να προσδιοριστεί το όνομα τόμου για το %x.</target>
@@ -488,14 +497,14 @@ The command is triggered if:
 -παρουσιαστούν νέοι υποκατάλογοι (π.χ. εισαχθεί ένα φλασάκι USB)
 </target>
 
-<source>&Start</source>
-<target>Έ&ναρξη</target>
+<source>Start</source>
+<target>Έναρξη</target>
 
 <source>About</source>
 <target>Σχετικά με το...</target>
 
 <source>Build: %x</source>
-<target>Δημιουργήθηκε : %x</target>
+<target>Δημιουργήθηκε: %x</target>
 
 <source>All files</source>
 <target>Όλα τα αρχεία</target>
@@ -503,14 +512,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Αυτοματοποιημένος Συγχρονισμός</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Η παρακάτω διαδρομή δεν υποστηρίζει παρακολούθηση υποκαταλόγων:</target>
+
 <source>Directory monitoring active</source>
 <target>Η παρακολούθηση των υποκαταλόγων είναι ενεργή</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Αναμονή μέχρι να είναι διαθέσιμοι όλοι οι υποκατάλογοι...</target>
-
-<source>Error</source>
-<target>Σφάλματα</target>
 
 <source>&Restore</source>
 <target>&Επαναφορά</target>
@@ -524,11 +533,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&Επανάληψη</target>
 
+<source>File time and size</source>
+<target>Ημερομηνία και μέγεθος αρχείων</target>
+
 <source>File content</source>
 <target>Περιεχόμενο αρχείων</target>
 
-<source>File time and size</source>
-<target>Ημερομηνία και μέγεθος αρχείων</target>
+<source>File size</source>
+<target>Μέγεθος αρχείων</target>
 
 <source>Two way</source>
 <target>Διπλής κατεύθυνσης</target>
@@ -556,12 +568,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>Διαγραφή παλιών εκδόσεων...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Δημιουργία του συμβολικού δεσμού %x</target>
-
-<source>Creating folder %x</source>
-<target>Δημιουργία του υποκαταλόγου %x</target>
 
 <source>Updating file %x</source>
 <target>Ενημέρωση του αρχείου %x</target>
@@ -594,7 +600,7 @@ The command is triggered if:
 <target>Ο υποκατάλογος %x δε βρέθηκε.</target>
 
 <source>Please enter a target folder for versioning.</source>
-<target>Παρακαλώ εισάγετε έναν υποκατάλογο για αποθήκευση εκδόσεων.</target>
+<target>Παρακαλούμε εισάγετε έναν υποκατάλογο για αποθήκευση εκδόσεων.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Τα ακόλουθα στοιχεία έχουν ανεπίλυτες διενέξεις και δε θα συγχρονιστούν:</target>
@@ -680,30 +686,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Σοβαρό Σφάλμα</target>
 
-<source>Check for Program Updates</source>
-<target>Έλεγχος για ενημερώσεις του προγράμματος</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
-
-<source>Download now?</source>
-<target>Λήψη τώρα;</target>
-
-<source>&Download</source>
-<target>&Λήψη</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>Το FreeFileSync είναι ενημερωμένο.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Αδυναμία επικοινωνίας με το www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Ο αριθμός της τρέχουσας έκδοσης του FreeFileSync δεν βρέθηκε στο δίκτυο. Θέλετε να το ελέγξετε εσείς;</target>
-
-<source>&Check</source>
-<target>Έλε&γχος</target>
-
 <source>Symlink</source>
 <target>Συμβολικός δεσμός</target>
 
@@ -764,11 +746,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>Επικόλληση</target>
 
-<source>Local Synchronization Settings</source>
-<target>Τοπικές Ρυθμίσεις Συγχρονισμού</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Ο επιλεγμένος υποκατάλογος %x δεν μπορεί να χρησιμοποιηθεί από το FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Ο επιλεγμένος υποκατάλογος %x δεν μπορεί να χρησιμοποιηθεί από το FreeFileSync. Παρακαλούμε επιλέξτε έναν υποκατάλογο στο τοπικό σύστημα αρχείων, δίκτυο ή σε μια συσκευή MTP.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Παρακαλούμε επιλέξτε έναν υποκατάλογο σε ένα τοπικό σύστημα αρχείων, στο δίκτυο ή σε μια συσκευή MTP.</target>
+
+<source>SFTP folder</source>
+<target>Υποκατάλογος SFTP</target>
+
+<source>Select SFTP folder</source>
+<target>Επιλογή υποκαταλόγου SFTP</target>
+
+<source>Select alternative folder type</source>
+<target>Επιλογή εναλλακτικού τύπου υποκαταλόγου</target>
 
 <source>&New</source>
 <target>&Δημιουργία</target>
@@ -797,8 +788,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>Ε&νέργειες</target>
 
-<source>&Options</source>
-<target>&Επιλογές</target>
+<source>&Preferences</source>
+<target>&Προτιμήσεις</target>
 
 <source>&Language</source>
 <target>&Γλώσσα</target>
@@ -838,9 +829,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Διαγραφή του ζεύγους υποκαταλόγων</target>
-
-<source>Select SFTP folder</source>
-<target>Επιλογή υποκαταλόγου SFTP</target>
 
 <source>Swap sides</source>
 <target>Ανταλλαγή πλευρών</target>
@@ -887,38 +875,38 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Συνολικός αριθμός bytes προς αντιγραφή</target>
 
+<source>Folder pair:</source>
+<target>Ζεύγος υποκαταλόγων:</target>
+
 <source>Use local settings:</source>
 <target>Χρήση τοπικών ρυθμίσεων:</target>
 
 <source>Select a variant:</source>
 <target>Επιλογή μεθόδου:</target>
 
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του χρόνου τροποποίησης και του μεγέθους.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του περιεχομένου τους.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Παράβλεψη χρονικής διαφοράς (σε ώρες)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Αρχεία με τη συγκεκριμένη χρονική διαφορά θα θεωρούνται ίδια</target>
-
-<source>Handle daylight saving time</source>
-<target>Διαχείριση θερινής ώρας</target>
-
 <source>Include &symbolic links:</source>
 <target>Συμπερίληψη των &συμβολικών δεσμών:</target>
 
 <source>&Follow</source>
-<target><Α&κολούθηση</target>
+<target>Α&κολούθηση</target>
 
 <source>&Direct</source>
 <target>Άμε&ση αξιολόγηση</target>
 
 <source>More information</source>
 <target>Περισσότερες πληροφορίες</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Αγνόηση χρονικής μετατόπισης [ωω:λλ]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Λίστα των χρονικών μετατοπίσεων που θα αγνοηθούν</target>
+
+<source>Example:</source>
+<target>Παράδειγμα:</target>
+
+<source>Handle daylight saving time</source>
+<target>Διαχείριση θερινής ώρας</target>
 
 <source>Local settings:</source>
 <target>Τοπικές ρυθμίσεις:</target>
@@ -1009,14 +997,17 @@ The command is triggered if:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Οργάνωση του ζεύγους υποκαταλόγων:</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Εισάγετε τα στοιχεία σύνδεσης SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>Όνομα του διακομιστή ή διεύθυνση IP:</target>
 
-<source>Examples:</source>
-<target>Παραδείγματα:</target>
+<source>Port:</source>
+<target>Θύρα:</target>
 
 <source>User name:</source>
 <target>Όνομα χρήστη:</target>
@@ -1030,6 +1021,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>Υποκατάλογος στον διακομιστή:</target>
 
+<source>Select a directory on the server:</source>
+<target>Επιλογή ενός υποκαταλόγου στον διακομιστή:</target>
+
+<source>Select Folder</source>
+<target>Επιλογή Υποκαταλόγου</target>
+
 <source>Start synchronization now?</source>
 <target>Να ξεκινήσει ο συγχρονισμός τώρα;</target>
 
@@ -1038,9 +1035,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>&Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
-
-<source>Arrange folder pair</source>
-<target>Οργάνωση του ζεύγους υποκαταλόγων:</target>
 
 <source>Items found:</source>
 <target>Βρέθηκαν στοιχεία:</target>
@@ -1092,6 +1086,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Πώς μπορώ να προγραμματίσω μια εργασία με δέσμη ενεργειών;</target>
+
+<source>&Keep relative paths</source>
+<target>&Διατήρηση των σχετικών διαδρομών</target>
+
+<source>&Overwrite existing files</source>
+<target>&Αντικατάσταση των υπαρχόντων αρχείων</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Οι ακόλουθες ρυθμίσεις χρησιμοποιούνται για όλες τις εργασίες συγχρονισμού.</target>
@@ -1183,14 +1183,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Διαγραφή Στοιχείων</target>
 
+<source>Copy items</source>
+<target>Αντιγραφή στοιχείων</target>
+
 <source>Options</source>
 <target>Επιλογές</target>
 
 <source>Select Time Span</source>
 <target>Επιλογή Χρονικού Εύρους</target>
 
-<source>&Preferences</source>
-<target>&Προτιμήσεις</target>
+<source>&Options</source>
+<target>&Επιλογές</target>
 
 <source>Main Bar</source>
 <target>Κύρια Γραμμή</target>
@@ -1209,6 +1212,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Σύνοψη</target>
+
+<source>&Download</source>
+<target>&Λήψη</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
 
 <source>Confirm</source>
 <target>Επιβεβαίωση</target>
@@ -1270,8 +1279,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Προσωρινή εξαίρεση</target>
 
-<source>Delete</source>
-<target>Διαγραφή</target>
+<source>&Copy to...</source>
+<target>&Αντιγραφή σε...</target>
+
+<source>&Delete</source>
+<target>&Διαγραφή</target>
 
 <source>Include all</source>
 <target>Συμπερίληψη όλων</target>
@@ -1320,9 +1332,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>Αφαίρεση καταχώρησης από τον κατάλογο</target>
-
-<source>Synchronization Settings</source>
-<target>Ρυθμίσεις συγχρονισμού</target>
 
 <source>Clear filter</source>
 <target>Καθαρισμός φίλτρου</target>
@@ -1411,26 +1420,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Τερματισμός λειτουργίας</target>
 
-<source>Scanning...</source>
-<target>Ανίχνευση...</target>
-
-<source>Comparing content...</source>
-<target>Σύγκριση του περιεχομένου...</target>
-
-<source>Info</source>
-<target>Πληροφορίες</target>
-
-<source>Select all</source>
-<target>Επιλογή όλων</target>
-
 <source>Paused</source>
 <target>Σε παύση</target>
 
 <source>Initializing...</source>
 <target>Αρχικοποίηση...</target>
 
+<source>Scanning...</source>
+<target>Ανίχνευση...</target>
+
+<source>Comparing content...</source>
+<target>Σύγκριση του περιεχομένου...</target>
+
 <source>Completed</source>
 <target>Ολοκληρώθηκε</target>
+
+<source>Info</source>
+<target>Πληροφορίες</target>
+
+<source>Select all</source>
+<target>Επιλογή όλων</target>
 
 <source>&Continue</source>
 <target>&Συνέχεια</target>
@@ -1440,6 +1449,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>Καταγραφή</target>
+
+<source>Loading...</source>
+<target>Φόρτωση...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Αντιγραφή του ακόλουθου στοιχείου σε άλλον υποκατάλογο;</pluralform>
+<pluralform>Αντιγραφή του ακόλουθων %x στοιχείων σε άλλον υποκατάλογο;</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Παρακαλούμε επιλέξτε έναν υποκατάλογο-στόχο.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
 <pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Προτιμήσεις</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Αντιγραφή των DACL, SACL, Κατόχου, Ομάδας</target>
@@ -1489,6 +1510,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&Εμφάνιση</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του χρόνου τροποποίησης και του μεγέθους.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του περιεχομένου τους.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του μεγέθους τους.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
 
@@ -1500,6 +1530,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
+
+<source>Synchronization Settings</source>
+<target>Ρυθμίσεις συγχρονισμού</target>
+
+<source>Comparison</source>
+<target>Σύγκριση</target>
+
+<source>Synchronization</source>
+<target>Συγχρονισμός</target>
 
 <source>Today</source>
 <target>Σήμερα</target>
@@ -1537,11 +1576,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Προσάρτηση χρονικής σήμανσης στο όνομα κάθε αρχείου</target>
 
-<source>Comparison</source>
-<target>Σύγκριση</target>
+<source>Main config</source>
+<target>Κύρια διάταξη</target>
 
-<source>Synchronization</source>
-<target>Συγχρονισμός</target>
+<source>empty</source>
+<target>κενό</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
@@ -1560,6 +1599,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Ποσοστό</target>
+
+<source>Internet access failed.</source>
+<target>Απέτυχε η πρόσβαση στο Internet.</target>
+
+<source>Check for Program Updates</source>
+<target>Έλεγχος για ενημερώσεις του προγράμματος</target>
+
+<source>Download now?</source>
+<target>Λήψη τώρα;</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>Το FreeFileSync είναι ενημερωμένο.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Αδυναμία επικοινωνίας με το www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Ο αριθμός της τρέχουσας έκδοσης του FreeFileSync δεν βρέθηκε στο δίκτυο. Θέλετε να το ελέγξετε εσείς;</target>
+
+<source>&Check</source>
+<target>Έλε&γχος</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Δεν μπορεί να καταχωρηθεί η λήψη μηνυμάτων συστήματος.</target>
@@ -1587,6 +1647,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Δεν μπορούν να αντιγραφούν οι άδειες προσπέλασης του %x στο %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>Το %x δεν είναι ένα κανονικό όνομα υποκαταλόγου.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Δεν ανευρίσκεται η λειτουργία συστήματος %x.</target>
@@ -1714,9 +1777,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>Βάση Δεδομένων Συγχρονισμού του FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Ρυθμίσεις του RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>Ρυθμίσεις του RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Επεξεργασία με FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Ευχαριστούμε για τη δωρεά και την υποστήριξή σας!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Αυτό το πρόγραμμα εγκατάστασης του FreeFileSync για υποστηρικτές έχει λήξει. Θέλετε να κατεβάσετε την κανονική έκδοση από τη σελίδα του FreeFileSync;</target>
 

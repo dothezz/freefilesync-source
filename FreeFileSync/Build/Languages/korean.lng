@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>기본값 동기화 방향 설정: 이전 파일들은 보다 최신 파일들로 덮어 쓰여집니다.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>폴더 %x을(를) 위한 휴지통 가용성 여부 확인 중...</target>
+<source>Creating folder %x</source>
+<target>폴더 %x 생성 중</target>
+
+<source>Creating file %x</source>
+<target>파일 %x 생성 중</target>
+
+<source>Creating symbolic link %x</source>
+<target>심볼릭 링크 %x 생성 중</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>파일 %x을(를) 휴지통으로 이동 중</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>심볼릭 링크 %x 삭제 중</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>폴더 %x을(를) 위한 휴지통 가용성 여부 확인 중...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>다음 폴더들을 위해 휴지통을 사용할 수 없습니다. 대신 파일들을 영구 삭제합니다:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>파일 %x을(를) 찾을  수 없습니다.</target>
+
+<source>Error</source>
+<target>오류</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>파일 %x 의 구성이 유효하지 않습니다.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>각 폴더를 비어있는 상태로 간주할 경우 이 오류는 무시될 수 있습니다. 폴더들은 동기화가 진행되는 동안 자동 생성됩니다.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>이 오류를 무시하면 폴더가 비어 있는 것으로 간주됩니다. 필요한 경우 누락 된 폴더가 자동으로 생성됩니다.</target>
 
 <source>A folder input field is empty.</source>
 <target>폴더 입력 필드 하나가 비어 있습니다.</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>장치 %x을(를) 찾을 수 없습니다.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>%x에 대한 사용 가능한 디스크 공간을 확인할 수 없습니다.</target>
-
 <source>Cannot create directory %x.</source>
 <target>디렉토리 %x을(를) 생성할 수 없습니다.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>심볼릭 링크 %x을(를) 해결할 수 없습니다.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>휴지통으로 %x을(를) 이동할 수 없습니다.</target>
-
 <source>Cannot open directory %x.</source>
 <target>디렉토리 %x을(를) 열 수 없습니다.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>%x에 대한 사용 가능한 디스크 공간을 확인할 수 없습니다.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>휴지통으로 %x을(를) 이동할 수 없습니다.</target>
 
 <source>Incorrect command line:</source>
 <target>부정확한 명령줄:</target>
@@ -343,9 +355,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>방치된 잠금 탐색 중...</target>
 
-<source>Creating file %x</source>
-<target>파일 %x 생성 중</target>
-
 <source>Saving file %x...</source>
 <target>파일 %x 저장 중...</target>
 
@@ -364,9 +373,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>%x 에 대한 디렉토리 잠금을 설정할 수 없습니다.</target>
 
-<source>Scanning:</source>
-<target>스캔 중:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -374,6 +380,9 @@ Actual: %y bytes
 <target>
 <pluralform>%x 스레드</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>스캔 중:</target>
 
 <source>/sec</source>
 <target>/초</target>
@@ -442,7 +451,7 @@ Actual: %y bytes
 <target>사용:</target>
 
 <source>1. Select folders to watch.</source>
-<target>1. 열어 볼 폴더를 선택하세요.</target>
+<target>1. 감시할 폴더를 선택하세요.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. 명령줄을 입력하세요.</target>
@@ -454,7 +463,7 @@ Actual: %y bytes
 <target>시작하려면 .ffs_batch file을 가져 오십시오.</target>
 
 <source>Folders to watch:</source>
-<target>열어 볼 폴더:</target>
+<target>감시할 폴더:</target>
 
 <source>Add folder</source>
 <target>폴더 추가</target>
@@ -485,8 +494,8 @@ The command is triggered if:
 - 새 폴더가 생겼을 시 (예: USB 스틱 삽입)
 </target>
 
-<source>&Start</source>
-<target>시작(&S)</target>
+<source>Start</source>
+<target>시작</target>
 
 <source>About</source>
 <target>상세 정보</target>
@@ -500,14 +509,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>자동 동기화</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>다음 경로는 디렉토리 모니터링을 지원하지 않습니다:</target>
+
 <source>Directory monitoring active</source>
 <target>디렉토리 모니터링 활성화</target>
 
 <source>Waiting until all directories are available...</source>
 <target>모든 디렉토리가 사용 가능할 때까지 대기 중...</target>
-
-<source>Error</source>
-<target>오류</target>
 
 <source>&Restore</source>
 <target>복원(&R)</target>
@@ -521,11 +530,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>다시 시도(&R)</target>
 
+<source>File time and size</source>
+<target>파일 시간 및 크기</target>
+
 <source>File content</source>
 <target>파일 내용</target>
 
-<source>File time and size</source>
-<target>파일 시간 및 크기</target>
+<source>File size</source>
+<target>파일 크기</target>
 
 <source>Two way</source>
 <target>양측 방향 (Two Way)</target>
@@ -553,12 +565,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>구 버전 삭제 중...</target>
-
-<source>Creating symbolic link %x</source>
-<target>심볼릭 링크 %x 생성 중</target>
-
-<source>Creating folder %x</source>
-<target>폴더 %x 생성 중</target>
 
 <source>Updating file %x</source>
 <target>파일 %x 업데이트 중</target>
@@ -676,30 +682,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>심각한 오류</target>
 
-<source>Check for Program Updates</source>
-<target>프로그램 업데이트 확인</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>새로운 버전의 FreeFileSync가 나왔습니다:</target>
-
-<source>Download now?</source>
-<target>지금 다운로드 하시겠습니까?</target>
-
-<source>&Download</source>
-<target>다운로드(&D)</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync는 현재 최신버전 상태입니다.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org.에 접속할 수 없습니다.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>현재 사용 중인 FreeFileSync 버전 번호를 온라인에서 찾을 수 없습니다. 수동으로 확인해 보시겠습니까?</target>
-
-<source>&Check</source>
-<target>체크(&C)</target>
-
 <source>Symlink</source>
 <target>심링크</target>
 
@@ -760,11 +742,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>붙여넣기</target>
 
-<source>Local Synchronization Settings</source>
-<target>로컬 동기화 설정</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>선택된 폴더 %x은(는) FreeFileSync와 함께 사용할 수 없습니다.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>선택하신 폴더 %x은(는) FreeFileSync와 함께 사용할 수 없습니다. 로컬 파일 시스템, 네트워크 또는 MTP 장치 폴더를 선택하십시오.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>로컬 파일 시스템, 네트워크 또는 MTP 장치에서의 폴더 하나를 선택하십시오.</target>
+
+<source>SFTP folder</source>
+<target>SFTP 폴더</target>
+
+<source>Select SFTP folder</source>
+<target>SFTP 폴더 선택</target>
+
+<source>Select alternative folder type</source>
+<target>다른 폴더 유형 선택</target>
 
 <source>&New</source>
 <target>새로 만들기(&N)</target>
@@ -793,8 +784,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>실행(&A)</target>
 
-<source>&Options</source>
-<target>옵션(&O)</target>
+<source>&Preferences</source>
+<target>환경설정(&P)</target>
 
 <source>&Language</source>
 <target>언어 선택(&L)</target>
@@ -834,9 +825,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>폴더 페어 제거</target>
-
-<source>Select SFTP folder</source>
-<target>SFTP 폴더 선택</target>
 
 <source>Swap sides</source>
 <target>양측 위치 바꾸기</target>
@@ -883,26 +871,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>복사할 전체 바이트 크기</target>
 
+<source>Folder pair:</source>
+<target>폴더 페어:</target>
+
 <source>Use local settings:</source>
 <target>로컬 설정 사용:</target>
 
 <source>Select a variant:</source>
 <target>베어리언트 선택:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>수정 시간 및 크기를 비교하여 동일한 파일을 식별.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>파일 내용을 비교하여 동일한 파일을 식별.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>타임 쉬프트 무시(&I) [시간 단위]</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>특정 오프셋 파일 시간은 동일한 것으로 간주</target>
-
-<source>Handle daylight saving time</source>
-<target>서머타임 설정</target>
 
 <source>Include &symbolic links:</source>
 <target>심볼릭 링크 포함(&s):</target>
@@ -915,6 +891,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>상세 정보</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>타임 쉬프트 무시(&I) [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>무시할 파일 시간 오프셋 목록</target>
+
+<source>Example:</source>
+<target>예시:</target>
+
+<source>Handle daylight saving time</source>
+<target>서머타임 설정</target>
 
 <source>Local settings:</source>
 <target>로컬 설정:</target>
@@ -1005,14 +993,17 @@ The command is triggered if:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>폴더 페어 정렬</target>
+
 <source>Enter your SFTP login details:</source>
 <target>귀하의 SFTP 로그인 정보 입력:</target>
 
 <source>Server name or IP address:</source>
 <target>서버 이름 또는 IP 주소:</target>
 
-<source>Examples:</source>
-<target>예시:</target>
+<source>Port:</source>
+<target>포트:</target>
 
 <source>User name:</source>
 <target>사용자 이름:</target>
@@ -1026,6 +1017,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>서버 디렉토리:</target>
 
+<source>Select a directory on the server:</source>
+<target>서버 디렉토리 선택:</target>
+
+<source>Select Folder</source>
+<target>폴더 선택</target>
+
 <source>Start synchronization now?</source>
 <target>지금 동기화를 시작하시겠습니까?</target>
 
@@ -1034,9 +1031,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>이 대화 창을 다시 표시 안 함(&D)</target>
-
-<source>Arrange folder pair</source>
-<target>폴더 페어 정렬</target>
 
 <source>Items found:</source>
 <target>발견된 항목:</target>
@@ -1088,6 +1082,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>일괄 작업 예약 방법은?</target>
+
+<source>&Keep relative paths</source>
+<target>상대 경로 유지(&K)</target>
+
+<source>&Overwrite existing files</source>
+<target>기존 파일 덮어쓰기(&O)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>다음 설정은 모든 동기화 작업에 사용됩니다.</target>
@@ -1179,14 +1179,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>항목 삭제</target>
 
+<source>Copy items</source>
+<target>항목 복사</target>
+
 <source>Options</source>
 <target>옵션</target>
 
 <source>Select Time Span</source>
 <target>시간간격(타임스팬) 선택</target>
 
-<source>&Preferences</source>
-<target>환경설정(&P)</target>
+<source>&Options</source>
+<target>옵션(&O)</target>
 
 <source>Main Bar</source>
 <target>메인 바</target>
@@ -1205,6 +1208,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>개요</target>
+
+<source>&Download</source>
+<target>다운로드(&D)</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>FreeFileSync 신규 버전이 나왔습니다:</target>
 
 <source>Confirm</source>
 <target>확인</target>
@@ -1262,8 +1271,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>임시 제외</target>
 
-<source>Delete</source>
-<target>삭제</target>
+<source>&Copy to...</source>
+<target>다른 경로로 복사(&C)...</target>
+
+<source>&Delete</source>
+<target>삭제(&D)</target>
 
 <source>Include all</source>
 <target>모두 포함</target>
@@ -1312,9 +1324,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>목록에서 입력항목 제거</target>
-
-<source>Synchronization Settings</source>
-<target>동기화 설정</target>
 
 <source>Clear filter</source>
 <target>필터 제거</target>
@@ -1403,26 +1412,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>종료</target>
 
-<source>Scanning...</source>
-<target>스캔 중...</target>
-
-<source>Comparing content...</source>
-<target>내용 비교 중...</target>
-
-<source>Info</source>
-<target>정보</target>
-
-<source>Select all</source>
-<target>모두 선택</target>
-
 <source>Paused</source>
 <target>일시정지 중</target>
 
 <source>Initializing...</source>
 <target>초기화 작업 중...</target>
 
+<source>Scanning...</source>
+<target>스캔 중...</target>
+
+<source>Comparing content...</source>
+<target>내용 비교 중...</target>
+
 <source>Completed</source>
 <target>완료</target>
+
+<source>Info</source>
+<target>정보</target>
+
+<source>Select all</source>
+<target>모두 선택</target>
 
 <source>&Continue</source>
 <target>계속(&C)</target>
@@ -1433,12 +1442,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>로그</target>
 
+<source>Loading...</source>
+<target>로드 중...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>다음 %x 항목을 다른 폴더로 복사하시겠습니까?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>대상 폴더를 입력하십시오.</target>
+
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>다음 %x 항목을 정말로 휴지통으로 이동하기를 원하십니까?</pluralform>
+<pluralform>다음 %x 항목을 정말로 휴지통으로 이동하시겠습니까?</pluralform>
 </target>
 
 <source>Move</source>
@@ -1449,11 +1472,8 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
+<pluralform>정말로 다음 %x 항목을 삭제하시겠습니까?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>환경설정</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>DACL, SACL, 소유자, 그룹 복사</target>
@@ -1479,6 +1499,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>표시/보이기(&S)</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>수정 시간 및 크기를 비교하여 동일한 파일을 식별합니다.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>파일 내용을 비교하여 동일한 파일을 식별합니다.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>파일 크기를 비교하여 동일한 파일을 식별합니다.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>양측 변경사항을 확인하고 전달. 삭제, 이동 및 충돌은 데이터베이스를 통해 자동으로 감지됩니다.</target>
 
@@ -1486,10 +1515,19 @@ This guarantees a consistent state even in case of a serious error.
 <target>좌측 폴더의 미러 백업을 만듭니다. 우측 폴더는 좌측 폴더와 완전히 일치하게 됩니다.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사.</target>
+<target>신규 또는 업데이트 된 파일을 우측 폴더로 복사합니다.</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>개인 동기화 규칙 설정.</target>
+<target>개인 동기화 규칙을 설정합니다.</target>
+
+<source>Synchronization Settings</source>
+<target>동기화 설정</target>
+
+<source>Comparison</source>
+<target>비  교</target>
+
+<source>Synchronization</source>
+<target>동 기 화</target>
 
 <source>Today</source>
 <target>오늘</target>
@@ -1527,11 +1565,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>각 파일 이름마다 타임 스탬프 추가</target>
 
-<source>Comparison</source>
-<target>비  교</target>
+<source>Main config</source>
+<target>주요 설정</target>
 
-<source>Synchronization</source>
-<target>동 기 화</target>
+<source>empty</source>
+<target>빈 폴더</target>
 
 <source>Leave as unresolved conflict</source>
 <target>미해결 충돌로 놔두기</target>
@@ -1550,6 +1588,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>퍼센티지(%)</target>
+
+<source>Internet access failed.</source>
+<target>인터넷 접속에 실패했습니다.</target>
+
+<source>Check for Program Updates</source>
+<target>프로그램 업데이트 확인</target>
+
+<source>Download now?</source>
+<target>지금 다운로드 하시겠습니까?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync는 현재 최신버전 상태입니다.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>www.freefilesync.org.에 접속할 수 없습니다.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>현재 사용 중인 FreeFileSync 버전 번호를 온라인에서 찾을 수 없습니다. 수동으로 확인해 보시겠습니까?</target>
+
+<source>&Check</source>
+<target>체크(&C)</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>시스템 메시지 수신을 위한 등록을 할 수 없습니다.</target>
@@ -1577,6 +1636,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>%x에서 %y(으)로의 권한을 복사할 수 없습니다.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x(은)는 일반 디렉토리 이름이 아닙니다.</target>
 
 <source>Cannot find system function %x.</source>
 <target>시스템 함수 %x을(를) 찾을 수 없습니다.</target>
@@ -1701,9 +1763,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync 동기화 데이터베이스</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync (실시간 동기화) 환경설정</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync 환경설정</target>
 
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync로 편집</target>
+
+<source>Thanks for your donation and support!</source>
+<target>귀하의 기부와 지원에 감사드립니다!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>기부자용 FreeFileSync 인스톨러가 설치 제한에 도달했습니다. FreeFileSync 홈페이지에서 일반 버전을 다운로드 하시겠습니까?</target>
 

@@ -7,87 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
-
-<source>Thanks for your donation and support!</source>
-<target></target>
-
-<source>%x is not a regular directory name.</source>
-<target></target>
-
-<source>empty</source>
-<target></target>
-
-<source>Main config</source>
-<target></target>
-
-<source>Please enter a target folder.</source>
-<target></target>
-
-<source>
-<pluralform>Copy the following item to another folder?</pluralform>
-<pluralform>Copy the following %x items to another folder?</pluralform>
-</source>
-<target></target>
-
-<source>Loading...</source>
-<target></target>
-
-<source>Copy to...</source>
-<target></target>
-
-<source>Copy items</source>
-<target></target>
-
-<source>&Overwrite existing files</source>
-<target></target>
-
-<source>&Keep relative paths</source>
-<target></target>
-
-<source>Select Folder</source>
-<target></target>
-
-<source>Select a directory on the server:</source>
-<target></target>
-
-<source>Port:</source>
-<target></target>
-
-<source>Example:</source>
-<target></target>
-
-<source>List of file time offsets to consider equal</source>
-<target></target>
-
-<source>&Ignore time shift [hh:mm]</source>
-<target></target>
-
-<source>Folder pair:</source>
-<target></target>
-
-<source>Select alternative folder type</source>
-<target></target>
-
-<source>SFTP folder</source>
-<target></target>
-
-<source>Please select a folder on a local file system, network or an MTP device.</source>
-<target></target>
-
-<source>The selected folder %x cannot be used with FreeFileSync.</source>
-<target></target>
-
-<source>The following path does not support directory monitoring:</source>
-<target></target>
-
-<source>Start</source>
-<target></target>
-
-<source>If you ignore this error the folders are considered empty. Missing folders are created automatically when needed.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -192,6 +111,9 @@
 
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
+
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</target>
 
 <source>A folder input field is empty.</source>
 <target>A folder input field is empty.</target>
@@ -575,6 +497,9 @@ The command is triggered if:
 - new folders arrive (e.g. USB stick insert)
 </target>
 
+<source>Start</source>
+<target>Start</target>
+
 <source>About</source>
 <target>About</target>
 
@@ -586,6 +511,9 @@ The command is triggered if:
 
 <source>Automated Synchronization</source>
 <target>Automated Synchronisation</target>
+
+<source>The following path does not support directory monitoring:</source>
+<target>The following path does not support directory monitoring:</target>
 
 <source>Directory monitoring active</source>
 <target>Directory monitoring active</target>
@@ -605,11 +533,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&Retry</target>
 
+<source>File time and size</source>
+<target>File time and size</target>
+
 <source>File content</source>
 <target>File content</target>
 
-<source>File time and size</source>
-<target>File time and size</target>
+<source>File size</source>
+<target>File size</target>
 
 <source>Two way</source>
 <target>Two way</target>
@@ -815,8 +746,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>Paste</target>
 
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>The selected folder %x cannot be used with FreeFileSync.</target>
+
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Please select a folder on a local file system, network or an MTP device.</target>
+
+<source>SFTP folder</source>
+<target>SFTP folder</target>
+
 <source>Select SFTP folder</source>
 <target>Select SFTP folder</target>
+
+<source>Select alternative folder type</source>
+<target>Select alternative folder type</target>
 
 <source>&New</source>
 <target>&New</target>
@@ -932,17 +875,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Total bytes to copy</target>
 
+<source>Folder pair:</source>
+<target>Folder pair:</target>
+
 <source>Use local settings:</source>
 <target>Use local settings:</target>
 
 <source>Select a variant:</source>
 <target>Select a variant:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Identify equal files by comparing modification time and size.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Identify equal files by comparing the file content.</target>
 
 <source>Include &symbolic links:</source>
 <target>Include &symbolic links:</target>
@@ -955,6 +895,15 @@ The command is triggered if:
 
 <source>More information</source>
 <target>More information</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ignore time shift [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>List of file time offsets to ignore</target>
+
+<source>Example:</source>
+<target>Example:</target>
 
 <source>Handle daylight saving time</source>
 <target>Handle daylight saving time</target>
@@ -1057,6 +1006,9 @@ The command is triggered if:
 <source>Server name or IP address:</source>
 <target>Server name or IP address:</target>
 
+<source>Port:</source>
+<target>Port:</target>
+
 <source>User name:</source>
 <target>User name:</target>
 
@@ -1068,6 +1020,12 @@ The command is triggered if:
 
 <source>Directory on server:</source>
 <target>Directory on server:</target>
+
+<source>Select a directory on the server:</source>
+<target>Select a directory on the server:</target>
+
+<source>Select Folder</source>
+<target>Select Folder</target>
 
 <source>Start synchronization now?</source>
 <target>Start synchronisation now?</target>
@@ -1128,6 +1086,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>How can I schedule a batch job?</target>
+
+<source>&Keep relative paths</source>
+<target>&Keep relative paths</target>
+
+<source>&Overwrite existing files</source>
+<target>&Overwrite existing files</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>The following settings are used for all synchronisation jobs.</target>
@@ -1218,6 +1182,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Delete Items</source>
 <target>Delete Items</target>
+
+<source>Copy items</source>
+<target>Copy items</target>
 
 <source>Options</source>
 <target>Options</target>
@@ -1312,8 +1279,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Exclude temporarily</target>
 
-<source>Delete</source>
-<target>Delete</target>
+<source>&Copy to...</source>
+<target>&Copy to...</target>
+
+<source>&Delete</source>
+<target>&Delete</target>
 
 <source>Include all</source>
 <target>Include all</target>
@@ -1480,6 +1450,21 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Log</target>
 
+<source>Loading...</source>
+<target>Loading...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Please enter a target folder.</target>
+
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1524,6 +1509,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Show</target>
+
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identify equal files by comparing modification time and size.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Identify equal files by comparing the file content.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Identify equal files by comparing their file size.</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
@@ -1582,6 +1576,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Append a time stamp to each file name</target>
 
+<source>Main config</source>
+<target>Main config</target>
+
+<source>empty</source>
+<target>empty</target>
+
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
 
@@ -1599,6 +1599,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Percentage</target>
+
+<source>Internet access failed.</source>
+<target>Internet access failed.</target>
 
 <source>Check for Program Updates</source>
 <target>Check for Program Updates</target>
@@ -1644,6 +1647,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Cannot copy permissions from %x to %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x is not a regular directory name.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Cannot find system function %x.</target>
@@ -1771,9 +1777,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync Synchronisation Database</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync Configuration</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync Configuration</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Edit with FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Thanks for your donation and support!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</target>
 

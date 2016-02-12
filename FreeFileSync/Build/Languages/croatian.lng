@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Postavljam zadani sinkronizacijski smjer: Stare datoteke će biti prepisane novim datotekama.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Provjeravanje dosupnosti kante za smeće za mapu %x...</target>
+<source>Creating folder %x</source>
+<target>Kreiranje mape %x</target>
+
+<source>Creating file %x</source>
+<target>Izrađujem datoteku %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Izrađujem simboličnu poveznicu %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Premještnje datoteke %x u koš za smeće</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Brisanje simboličnog linka %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Provjeravanje dosupnosti kante za smeće za mapu %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Koš za smeće nije dostupna za sljedeće mape. Zbog toga će datoteke biti trajno obrisane:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Nije moguće pronaći datoteku %x.</target>
+
+<source>Error</source>
+<target>Greška</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Datoteka %x ne sadrži valjane postavke.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Ne mogu pronaći slijedeće mape:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Možete ignorirati ovu pogrešku i smatrati da je svaka mapa kao prazna. Mape se tada stvaraju automatski tokom sinkronizacije.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ukoliko zanemarite ovu pogrešku mape će se smatrati praznima. Nedostajuće mape se stvaraju automatski po potrebi.</target>
 
 <source>A folder input field is empty.</source>
 <target>Polje za odabir mape je prazno.</target>
@@ -246,9 +258,6 @@ Stvarno: %y bajta
 <source>Cannot find device %x.</source>
 <target>Nije moguće pronaći uređaj %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Nije moguće izračunati slobodan prostor diska za %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Ne mogu izraditi mapu %x.</target>
 
@@ -267,11 +276,14 @@ Stvarno: %y bajta
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ne mogu odrediti simboličnu poveznicu %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Nije moguće premjestiti %x u koš za smeće.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Ne mogu otvoriti mapu %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Nije moguće izračunati slobodan prostor diska za %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Nije moguće premjestiti %x u koš za smeće.</target>
 
 <source>Incorrect command line:</source>
 <target>Netočna naredbena linija:</target>
@@ -347,9 +359,6 @@ Stvarno: %y bajta
 <source>Detecting abandoned lock...</source>
 <target>Pronalazim napušteni ključ...</target>
 
-<source>Creating file %x</source>
-<target>Izrađujem datoteku %x</target>
-
 <source>Saving file %x...</source>
 <target>Spremanje datoteke %x...</target>
 
@@ -368,9 +377,6 @@ Stvarno: %y bajta
 <source>Cannot set directory lock for %x.</source>
 <target>Ne mogu zaključiti mapu za %x.</target>
 
-<source>Scanning:</source>
-<target>Pretražujem:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -380,6 +386,9 @@ Stvarno: %y bajta
 <pluralform>%x niti</pluralform>
 <pluralform>%x niti</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Pretražujem:</target>
 
 <source>/sec</source>
 <target>/sek</target>
@@ -491,8 +500,8 @@ Naredba će biti pokrenuta ako se:
 - pojave nove mape (npr. umetanje USB stika)
 </target>
 
-<source>&Start</source>
-<target>&Započni</target>
+<source>Start</source>
+<target>Započni</target>
 
 <source>About</source>
 <target>O programu</target>
@@ -506,14 +515,14 @@ Naredba će biti pokrenuta ako se:
 <source>Automated Synchronization</source>
 <target>Automatska Sinkronizacija</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Slijedeća putanja ne podržava nadzor nad mapama:</target>
+
 <source>Directory monitoring active</source>
 <target>Nadzor direktorija je aktivan</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Čekanje na dostupnost svih direktorija...</target>
-
-<source>Error</source>
-<target>Greška</target>
 
 <source>&Restore</source>
 <target>&Vrati</target>
@@ -527,11 +536,14 @@ Naredba će biti pokrenuta ako se:
 <source>&Retry</source>
 <target>&Ponovi</target>
 
+<source>File time and size</source>
+<target>Vrijeme i veličina datoteke</target>
+
 <source>File content</source>
 <target>Sadržaj datoteke</target>
 
-<source>File time and size</source>
-<target>Vrijeme i veličina datoteke</target>
+<source>File size</source>
+<target>Veličina datoteke</target>
 
 <source>Two way</source>
 <target>Dvosmjerno</target>
@@ -559,12 +571,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Removing old versions...</source>
 <target>Uklanjanje starije verzije...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Izrađujem simboličnu poveznicu %x</target>
-
-<source>Creating folder %x</source>
-<target>Kreiranje mape %x</target>
 
 <source>Updating file %x</source>
 <target>Ažuriram datoteku %x</target>
@@ -618,7 +624,7 @@ Naredba će biti pokrenuta ako se:
 <target>Višestruki parovi mapa zapisuju u zajedničku podmapu. Molimo provjerite vaše postavke.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>Par sinkroniziranja mapa:</target>
+<target>Mape sinkronizacije::</target>
 
 <source>Generating database...</source>
 <target>Izrađivanje baze podataka...</target>
@@ -684,30 +690,6 @@ Naredba će biti pokrenuta ako se:
 <source>Serious Error</source>
 <target>Ozbiljna Pogreška</target>
 
-<source>Check for Program Updates</source>
-<target>Provjeri za nadogradnje programa</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Nova verzija FreeFileSync je dostupna:</target>
-
-<source>Download now?</source>
-<target>Preuzeti sada?</target>
-
-<source>&Download</source>
-<target>&Preuzmi</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync je ažuran.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nije moguće povezivanje s www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Ne mogu pronaći trenutnu verziju FreeFileSync-a online. Da li želite ručno potražiti?</target>
-
-<source>&Check</source>
-<target>&Provjeri</target>
-
 <source>Symlink</source>
 <target>Poveznica simbola</target>
 
@@ -768,11 +750,20 @@ Naredba će biti pokrenuta ako se:
 <source>Paste</source>
 <target>Zalijepi</target>
 
-<source>Local Synchronization Settings</source>
-<target>Lokalne Sinkronizacijske Postavke</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Odabrana mapa %x ne može biti korištena u FreeFileSync-u.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Odabrana mapa %x ne može biti korištena u FreeFileSync-u. Molimo odaberite mapu na lokalnom disku, mreži ili MTP uređaju.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Molimo odaberite mapu na lokalnom disku, mreži ili MTP uređaju.</target>
+
+<source>SFTP folder</source>
+<target>SFTP mapa</target>
+
+<source>Select SFTP folder</source>
+<target>Odaberite SFTP mapu</target>
+
+<source>Select alternative folder type</source>
+<target>Odaberite alternativni tip mape</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -801,8 +792,8 @@ Naredba će biti pokrenuta ako se:
 <source>&Actions</source>
 <target>&Akcije</target>
 
-<source>&Options</source>
-<target>&Opcije</target>
+<source>&Preferences</source>
+<target>&Perfomanse</target>
 
 <source>&Language</source>
 <target>&Jezik</target>
@@ -842,9 +833,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Remove folder pair</source>
 <target>Ukloni ovu mapu</target>
-
-<source>Select SFTP folder</source>
-<target>Odaberite SFTP mapu</target>
 
 <source>Swap sides</source>
 <target>Zamjeni strane</target>
@@ -891,26 +879,14 @@ Naredba će biti pokrenuta ako se:
 <source>Total bytes to copy</source>
 <target>Ukupno bajta za kopirati</target>
 
+<source>Folder pair:</source>
+<target>Par mapa:</target>
+
 <source>Use local settings:</source>
 <target>Koristi lokalne postavke:</target>
 
 <source>Select a variant:</source>
 <target>Odaberi opciju:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Ustanovi jednake datoteke uspoređujući vrijeme izmjene i veličinu.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Ustanovi jednake datoteke uspoređujući sadržaj datoteke.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignoriraj vremenski pomak (u satima)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Smatraj vrijeme datoteke u ovom razmaku istima</target>
-
-<source>Handle daylight saving time</source>
-<target>Upravljaj ljetnim računanjem vremena</target>
 
 <source>Include &symbolic links:</source>
 <target>Koristi &simbolične poveznice:</target>
@@ -923,6 +899,18 @@ Naredba će biti pokrenuta ako se:
 
 <source>More information</source>
 <target>Više informacija</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Zanemari vremenski pomak [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Popis u vremenskim razlikama datoteka za ignorirati</target>
+
+<source>Example:</source>
+<target>Primjer:</target>
+
+<source>Handle daylight saving time</source>
+<target>Upravljaj ljetnim računanjem vremena</target>
 
 <source>Local settings:</source>
 <target>Lokalne postavke:</target>
@@ -1013,14 +1001,17 @@ Naredba će biti pokrenuta ako se:
 <source>OK</source>
 <target>U redu</target>
 
+<source>Arrange folder pair</source>
+<target>Rasporedi par mapa</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Unesite SFTP pristupne podatke:</target>
 
 <source>Server name or IP address:</source>
 <target>Naziv servera ili IP adresa:</target>
 
-<source>Examples:</source>
-<target>Primjeri:</target>
+<source>Port:</source>
+<target>Port:</target>
 
 <source>User name:</source>
 <target>Korisničko ime:</target>
@@ -1034,6 +1025,12 @@ Naredba će biti pokrenuta ako se:
 <source>Directory on server:</source>
 <target>Mapa na serveru:</target>
 
+<source>Select a directory on the server:</source>
+<target>Odaberi mapu na serveru:</target>
+
+<source>Select Folder</source>
+<target>Odaberi mapu</target>
+
 <source>Start synchronization now?</source>
 <target>Započeti sinkronizaciju sada?</target>
 
@@ -1042,9 +1039,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>&Don't show this dialog again</source>
 <target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
-
-<source>Arrange folder pair</source>
-<target>Rasporedi par mapa</target>
 
 <source>Items found:</source>
 <target>Pronađene stavke:</target>
@@ -1096,6 +1090,12 @@ Naredba će biti pokrenuta ako se:
 
 <source>How can I schedule a batch job?</source>
 <target>Kako zakazati slijedni zadatak?</target>
+
+<source>&Keep relative paths</source>
+<target>&Zadrži relativne putanje</target>
+
+<source>&Overwrite existing files</source>
+<target>&Prepiši postojeće datoteke</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Ove postavke se koriste za sve sinkronizacijske zadatke.</target>
@@ -1187,14 +1187,17 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Delete Items</source>
 <target>Izbriši stavke</target>
 
+<source>Copy items</source>
+<target>Kopiraj stavke</target>
+
 <source>Options</source>
 <target>Opcije</target>
 
 <source>Select Time Span</source>
 <target>Odaberite vremenski raspon</target>
 
-<source>&Preferences</source>
-<target>&Perfomanse</target>
+<source>&Options</source>
+<target>&Opcije</target>
 
 <source>Main Bar</source>
 <target>Glavna traka</target>
@@ -1213,6 +1216,12 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Overview</source>
 <target>Pregled</target>
+
+<source>&Download</source>
+<target>&Preuzmi</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Nova verzija FreeFileSync je dostupna:</target>
 
 <source>Confirm</source>
 <target>Potvrdi</target>
@@ -1278,8 +1287,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Exclude temporarily</source>
 <target>Izuzmi privremeno</target>
 
-<source>Delete</source>
-<target>Izbriši</target>
+<source>&Copy to...</source>
+<target>&Kopiraj na...</target>
+
+<source>&Delete</source>
+<target>&Izbriši</target>
 
 <source>Include all</source>
 <target>Uključi sve</target>
@@ -1328,9 +1340,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Remove entry from list</source>
 <target>Ukloni stavku iz liste</target>
-
-<source>Synchronization Settings</source>
-<target>Postavke Sinkronizacije</target>
 
 <source>Clear filter</source>
 <target>Očisti filter</target>
@@ -1419,26 +1428,26 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Shut down</source>
 <target>Isključi računalo</target>
 
-<source>Scanning...</source>
-<target>Tražim...</target>
-
-<source>Comparing content...</source>
-<target>Uspoređujem sadržaj...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Odaberi sve</target>
-
 <source>Paused</source>
 <target>Pauzirano</target>
 
 <source>Initializing...</source>
 <target>Započinjem...</target>
 
+<source>Scanning...</source>
+<target>Tražim...</target>
+
+<source>Comparing content...</source>
+<target>Uspoređujem sadržaj...</target>
+
 <source>Completed</source>
 <target>Dovršeno</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Odaberi sve</target>
 
 <source>&Continue</source>
 <target>&Nastavi</target>
@@ -1448,6 +1457,22 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Log</source>
 <target>Izvješće</target>
+
+<source>Loading...</source>
+<target>Učitavam...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Kopirati navedenu %x stavku u drugu mapu?</pluralform>
+<pluralform>Kopirati slijedeće %x stavke u drugu mapu?</pluralform>
+<pluralform>Kopirati slijedećih %x stavki u drugu mapu?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Molim unesite odredišnu mapu.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1471,9 +1496,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <pluralform>Da li zaista želite obristi sljedeće %x stavke?</pluralform>
 <pluralform>Da li zaista želite obristi sljedećih %x stavki?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Prioriteti</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Kopiraj DACL, SACL, Vlasnika, Grupu</target>
@@ -1499,6 +1521,15 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>&Show</source>
 <target>&Prikaži</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Ustanovi jednake datoteke uspoređujući vrijeme izmjene i veličinu.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Ustanovi jednake datoteke uspoređujući sadržaj datoteke.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Prepoznaj jednake datoteke uspoređujući njihovu veličinu.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Pronađi i izvrši izmjene na obje strane. Izbrisano, premješteno te sukobi se otkriju automatski pomoću baze podataka.</target>
 
@@ -1510,6 +1541,15 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Configure your own synchronization rules.</source>
 <target>Postavite vaša vlastita sinkronizacijska pravila.</target>
+
+<source>Synchronization Settings</source>
+<target>Postavke Sinkronizacije</target>
+
+<source>Comparison</source>
+<target>Usporedba</target>
+
+<source>Synchronization</source>
+<target>Sinkronizacija</target>
 
 <source>Today</source>
 <target>Danas</target>
@@ -1547,11 +1587,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Append a time stamp to each file name</source>
 <target>Dodijeli vremensku oznaku za svaki naziv datoteke</target>
 
-<source>Comparison</source>
-<target>Usporedba</target>
+<source>Main config</source>
+<target>Glavne postavke</target>
 
-<source>Synchronization</source>
-<target>Sinkronizacija</target>
+<source>empty</source>
+<target>prazno</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ostavi kao neriješeni konflikt</target>
@@ -1570,6 +1610,27 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Percentage</source>
 <target>Postotak</target>
+
+<source>Internet access failed.</source>
+<target>Mrežna veza nije dostupna.</target>
+
+<source>Check for Program Updates</source>
+<target>Provjeri za nadogradnje programa</target>
+
+<source>Download now?</source>
+<target>Preuzeti sada?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync je ažuran.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Nije moguće povezivanje s www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Ne mogu pronaći trenutnu verziju FreeFileSync-a online. Da li želite ručno potražiti?</target>
+
+<source>&Check</source>
+<target>&Provjeri</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nije moguće registriranje za primanje sistemskih poruka.</target>
@@ -1597,6 +1658,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Nije moguće kopiranje dozvola za %x prema %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x nije ispravan naziv mape.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Ne mogu pronaći sistemsku funkciju %x.</target>
@@ -1727,9 +1791,15 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync sinkronizacijska baza podataka</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync postavke</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync postavke</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Uredi pomoću FreeFileSynca</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Hvala na donaciji i podršci!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Ovaj FreeFileSync instalacijski paket za donatore je prekoračio broj instalacija. Preuzeti normalnu verziju s FreeFileSync stranice sada?</target>
 

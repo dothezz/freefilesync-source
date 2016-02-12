@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>בחר ברירת מחדל של סנכרון: קבצים ישנים ידרסו ע"י קבצים חדשים יותר.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>בודק זמינות סל מחזור עבור תיקייה %x...</target>
+<source>Creating folder %x</source>
+<target>יוצר תיקייה %x</target>
+
+<source>Creating file %x</source>
+<target>יוצר קובץ %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>יוצר קישור סימבולי %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>מעביר קובץ %x לסל המיחזור</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>מוחק קישור סימבולי %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>בודק זמינות סל מחזור עבור תיקייה %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>סל המיחזור אינו זמין עבור התיקיות הבאות. הקבצים יימחקו לחלוטין:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>לא מוצא קובץ %x.</target>
+
+<source>Error</source>
+<target>שגיאה</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>קובץ %x אינו כולל תצורה תקינה.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>לא יכול למצוא את התיקיות הבאות:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>אפשר להתעלם משגיאה זו ולהחשיב כל תיקיה כריקה. התיקיות יווצרו אוטומטית בזמן הסינכרון.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>אם תתעלם משגיאה זו התיקיות תיחשבנה ריקות. תיקיות חסרות נוצרות באופן אוטומטי בעת הצורך.</target>
 
 <source>A folder input field is empty.</source>
 <target>שדה קלט תיקייה ריק.</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>לא מוצא התקן %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>לא ניתן לקבוע שטח דיסק פנוי עבור %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>לא יכול ליצור מחיצה %x.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>לא יכול לפענח את הקישור הסימבולי %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>לא יכול להעביר את %x לסל המחזור.</target>
-
 <source>Cannot open directory %x.</source>
 <target>לא יכול לפתוח מחיצה %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>לא ניתן לקבוע שטח דיסק פנוי עבור %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>לא יכול להעביר את %x לסל המחזור.</target>
 
 <source>Incorrect command line:</source>
 <target>שורת פקודה לא תקינה:</target>
@@ -345,9 +357,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>מגלה נעילה נטושה...</target>
 
-<source>Creating file %x</source>
-<target>יוצר קובץ %x</target>
-
 <source>Saving file %x...</source>
 <target>שומר קובץ %x...</target>
 
@@ -366,9 +375,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>לא ניתן לנעול מחיצה עבור %x.</target>
 
-<source>Scanning:</source>
-<target>סורק:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Actual: %y bytes
 <pluralform>תהליך 1</pluralform>
 <pluralform>%x תהליכים</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>סורק:</target>
 
 <source>/sec</source>
 <target>/שנ</target>
@@ -488,8 +497,8 @@ The command is triggered if:
 - תיקיות חדשות מופיעות (לדוגמה התקן USB מוכנס)
 </target>
 
-<source>&Start</source>
-<target>&התחל</target>
+<source>Start</source>
+<target>התחל</target>
 
 <source>About</source>
 <target>אודות</target>
@@ -503,14 +512,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>סנכרון אוטומטי</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>הנתיב הבא אינו תומך בניטור מחיצה:</target>
+
 <source>Directory monitoring active</source>
 <target>ניטור מחיצות פעיל</target>
 
 <source>Waiting until all directories are available...</source>
 <target>מחכה עד שכל המחיצות יהיו זמינות...</target>
-
-<source>Error</source>
-<target>שגיאה</target>
 
 <source>&Restore</source>
 <target>&טען מחדש</target>
@@ -524,11 +533,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&נסה שנית</target>
 
+<source>File time and size</source>
+<target>זמן וגודל קובץ</target>
+
 <source>File content</source>
 <target>תכולת הקובץ</target>
 
-<source>File time and size</source>
-<target>זמן וגודל קובץ</target>
+<source>File size</source>
+<target>גודל קובץ</target>
 
 <source>Two way</source>
 <target>דו כווני</target>
@@ -556,12 +568,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>מסיר גרסאות ישנות...</target>
-
-<source>Creating symbolic link %x</source>
-<target>יוצר קישור סימבולי %x</target>
-
-<source>Creating folder %x</source>
-<target>יוצר תיקייה %x</target>
 
 <source>Updating file %x</source>
 <target>מעדכן קובץ %x</target>
@@ -680,30 +686,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>שגיאה חמורה</target>
 
-<source>Check for Program Updates</source>
-<target>בדוק קיום עדכוני תוכנה</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>גירסה חדשה של FreeFileSync זמינה:</target>
-
-<source>Download now?</source>
-<target>הורד עכשיו?</target>
-
-<source>&Download</source>
-<target>&הורד</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync מעודכן לגירסה האחרונה.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>אין תקשורת אל www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>לא מוצא מספר גירסה עדכנית של FreeFileSync באופן מכוון. האם אתה רוצה לבדוק באופן ידני?</target>
-
-<source>&Check</source>
-<target>&בדוק</target>
-
 <source>Symlink</source>
 <target>קשור סימבולי</target>
 
@@ -764,11 +746,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>הדבק</target>
 
-<source>Local Synchronization Settings</source>
-<target>הגדרות סינכרון מקומיות</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>התיקייה הנבחרת %x אינה יכולה להיות בשימוש עם FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>התיקייה שנבחרה %x אינה ניתנת לשחמוש עם FreeFileSync. אנא בחר תיקייה במערכת קבצים מקומית, רשת או התקן MTP.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>אנא בחר תיקייה במערכת הקבצים המקומית, ברשת או בהתקן MTP.</target>
+
+<source>SFTP folder</source>
+<target>תיקיית SFTP</target>
+
+<source>Select SFTP folder</source>
+<target>בחר תיקיית SFTP</target>
+
+<source>Select alternative folder type</source>
+<target>בחר סוג תיקייה חלופי</target>
 
 <source>&New</source>
 <target>&חדש</target>
@@ -797,8 +788,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>&פעולות</target>
 
-<source>&Options</source>
-<target>&אפשרויות</target>
+<source>&Preferences</source>
+<target>&העדפות</target>
 
 <source>&Language</source>
 <target>&שפה</target>
@@ -838,9 +829,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>הסר זוג תיקיות</target>
-
-<source>Select SFTP folder</source>
-<target>בחר תיקיית SFTP</target>
 
 <source>Swap sides</source>
 <target>החלף צדדים</target>
@@ -887,26 +875,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>סה"כ בתים להעתיק</target>
 
+<source>Folder pair:</source>
+<target>זוג תיקיות:</target>
+
 <source>Use local settings:</source>
 <target>השתמש בהגדרות מקומיות:</target>
 
 <source>Select a variant:</source>
 <target>בחר גירסה:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>זהה קבצים זהים באמצעות השוואת תג הזמן והגודל.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>זהה קבצים זהים באמצעות השוואת תוכן.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&התעלם מסטיית זמן (בשעות)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>החשב זמני קובץ עם תזוזת זמן שנקבעה כשווים</target>
-
-<source>Handle daylight saving time</source>
-<target>התמודד עם שעון קיץ</target>
 
 <source>Include &symbolic links:</source>
 <target>כלול &קישורים סימבוליים:</target>
@@ -919,6 +895,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>מידע נוסף</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&התעלם מהזזת זמן [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>רשימת סטיות זמני קבצים להתעלם</target>
+
+<source>Example:</source>
+<target>דוגמה:</target>
+
+<source>Handle daylight saving time</source>
+<target>התמודד עם שעון קיץ</target>
 
 <source>Local settings:</source>
 <target>הגדרות מקומיות:</target>
@@ -1009,14 +997,17 @@ The command is triggered if:
 <source>OK</source>
 <target>אשר</target>
 
+<source>Arrange folder pair</source>
+<target>סדר זוג תיקיות</target>
+
 <source>Enter your SFTP login details:</source>
 <target>הכנס את נתוני הכניסה שלך ל-SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>שם שרת או כתובת IP:</target>
 
-<source>Examples:</source>
-<target>דוגמאות:</target>
+<source>Port:</source>
+<target>יציאה:</target>
 
 <source>User name:</source>
 <target>שם משתמש:</target>
@@ -1030,6 +1021,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>מחיצה על שרת:</target>
 
+<source>Select a directory on the server:</source>
+<target>בחר מחיצה על השרת:</target>
+
+<source>Select Folder</source>
+<target>בחר מחיצה</target>
+
 <source>Start synchronization now?</source>
 <target>האם להתחיל סנכרון עכשיו?</target>
 
@@ -1038,9 +1035,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>&אל תראה דושיח זה שנית</target>
-
-<source>Arrange folder pair</source>
-<target>סדר זוג תיקיות</target>
 
 <source>Items found:</source>
 <target>אלמנטים נמצאו:</target>
@@ -1092,6 +1086,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>כיצד לתזמן משימת אצווה?</target>
+
+<source>&Keep relative paths</source>
+<target>&שמור נתיבים יחסיים</target>
+
+<source>&Overwrite existing files</source>
+<target>&דרוס קבצים קיימים</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>ההגדרות הבאות משמשות לכל משימות הסנכרון.</target>
@@ -1183,14 +1183,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>מחק פריטים</target>
 
+<source>Copy items</source>
+<target>העתק פריטים</target>
+
 <source>Options</source>
 <target>אפשרויות</target>
 
 <source>Select Time Span</source>
 <target>בחר טווח זמן</target>
 
-<source>&Preferences</source>
-<target>&העדפות</target>
+<source>&Options</source>
+<target>&אפשרויות</target>
 
 <source>Main Bar</source>
 <target>סרגל ראשי</target>
@@ -1209,6 +1212,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>מבט כללי</target>
+
+<source>&Download</source>
+<target>&הורד</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>גירסה חדשה של FreeFileSync זמינה:</target>
 
 <source>Confirm</source>
 <target>אשר</target>
@@ -1270,8 +1279,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>אל תכלול זמנית</target>
 
-<source>Delete</source>
-<target>מחק</target>
+<source>&Copy to...</source>
+<target>&העתק אל...</target>
+
+<source>&Delete</source>
+<target>&מחק</target>
 
 <source>Include all</source>
 <target>הכלל הכל</target>
@@ -1320,9 +1332,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>הסר פריט מרשימה</target>
-
-<source>Synchronization Settings</source>
-<target>הגדרות סנכרון</target>
 
 <source>Clear filter</source>
 <target>נקה מסנן</target>
@@ -1411,26 +1420,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>כבה מחשב</target>
 
-<source>Scanning...</source>
-<target>סורק...</target>
-
-<source>Comparing content...</source>
-<target>משווה תכולה...</target>
-
-<source>Info</source>
-<target>מידע</target>
-
-<source>Select all</source>
-<target>בחר הכל</target>
-
 <source>Paused</source>
 <target>עצור</target>
 
 <source>Initializing...</source>
 <target>מאתחל ...</target>
 
+<source>Scanning...</source>
+<target>סורק...</target>
+
+<source>Comparing content...</source>
+<target>משווה תכולה...</target>
+
 <source>Completed</source>
 <target>הושלם</target>
+
+<source>Info</source>
+<target>מידע</target>
+
+<source>Select all</source>
+<target>בחר הכל</target>
 
 <source>&Continue</source>
 <target>&המשך</target>
@@ -1440,6 +1449,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>יומן</target>
+
+<source>Loading...</source>
+<target>טוען...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>העתק את הפריט לתיקייה אחרת?</pluralform>
+<pluralform>העתק את הפריט %x לתיקייה אחרת?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>אנא הזן תיקיית יעד.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>האם ברצונך למחוק את הפריט הבא?</pluralform>
 <pluralform>האם ברצונך למחוק את הפריטים %x הבאים?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>העדפות</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>העתק DACL, SACL, Owner, Group</target>
@@ -1489,6 +1510,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&הראה</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>זהה קבצים זהים באמצעות השוואת תג הזמן והגודל.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>זהה קבצים זהים באמצעות השוואת תוכן.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>זהה קבצים זהים באמצעות השוואת גודל קובץ.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>זהה והפץ שינויים בשני הצדדים. מחיקות העברות וסתירות מתגלים באופן אוטומטי באמצעות מסד נתונים.</target>
 
@@ -1500,6 +1530,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>סדר את כללי הסנכרון שלך.</target>
+
+<source>Synchronization Settings</source>
+<target>הגדרות סנכרון</target>
+
+<source>Comparison</source>
+<target>השוואה</target>
+
+<source>Synchronization</source>
+<target>סינכרון</target>
 
 <source>Today</source>
 <target>היום</target>
@@ -1537,11 +1576,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>הוסף חתימת זמן לכל שם קובץ</target>
 
-<source>Comparison</source>
-<target>השוואה</target>
+<source>Main config</source>
+<target>תצורה ראשית</target>
 
-<source>Synchronization</source>
-<target>סינכרון</target>
+<source>empty</source>
+<target>empty</target>
 
 <source>Leave as unresolved conflict</source>
 <target>השאר כקונפליקט לא מטופל</target>
@@ -1560,6 +1599,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>אחוז</target>
+
+<source>Internet access failed.</source>
+<target>גישה לאינטרנט נכשלה.</target>
+
+<source>Check for Program Updates</source>
+<target>בדוק קיום עדכוני תוכנה</target>
+
+<source>Download now?</source>
+<target>הורד עכשיו?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync מעודכן לגירסה האחרונה.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>אין תקשורת אל www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>לא מוצא מספר גירסה עדכנית של FreeFileSync באופן מכוון. האם אתה רוצה לבדוק באופן ידני?</target>
+
+<source>&Check</source>
+<target>&בדוק</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>לא ניתן להרשם לקבלת הודעות מערכת.</target>
@@ -1587,6 +1647,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>לא יכול להעתיק הרשאות מ- %x אל %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x אינו שם של מחיצה רגילה.</target>
 
 <source>Cannot find system function %x.</source>
 <target>לא יכול למצוא פונקצית מערכת %x.</target>
@@ -1714,9 +1777,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>בסיס נתוני סינכרון של FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>תצורת RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>תצורת RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>ערוך עם FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>תודה עבור תרומתך ותמיכתך!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>קובץ התקנת FreeFileSync לתורמים הגיע למגבלת ההתקנות. האם להוריד את הגירסה הרגילה של קובץ ההתקנה מאתר הבית של FreeFileSync כעת?</target>
 

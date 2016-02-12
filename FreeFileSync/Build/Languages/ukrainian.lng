@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Налаштування напрямку синхронізації за замовчуванням: Старі файли будуть замінені новішими файлами.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Перевірка доступності Корзини для папки %x...</target>
+<source>Creating folder %x</source>
+<target>Створення папки %x</target>
+
+<source>Creating file %x</source>
+<target>Створення файлу %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Створення символьного посилання %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Переміщення файлу %x до Корзини</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Вилучення символьного посилання %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Перевірка доступності Корзини для папки %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Корзина не доступна для таких папок. Файли замість цього будуть видалені назавжди:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Неможливо знайти файл %x.</target>
+
+<source>Error</source>
+<target>Помилка</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Файл %x не містить правильної конфігурації.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Не вдається знайти такі папки:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Ви можете ігнорувати цю помилку, вважаючи кожну папку порожньою. Папки будуть автоматично створені під час синхронізації.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Якщо ви проігноруєте цю помилку папки будуть вважатися порожніми. Відсутні папки створюються автоматично, коли це необхідно.</target>
 
 <source>A folder input field is empty.</source>
 <target>Порожнє поле папки.</target>
@@ -140,7 +152,7 @@
 <target>Створення списку файлів...</target>
 
 <source>Starting comparison</source>
-<target>Початок порівняння</target>
+<target>Запустити порівняння</target>
 
 <source>Calculating sync directions...</source>
 <target>Встановлення напрямку синхронізації...</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Не вдається знайти пристрій %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Не вдається визначити об'єм вільного місця для %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Не вдається створити папку %x.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Не вдається вирішити символьне посилання %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Не вдається перемістити %x до Корзини.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Не вдається відкрити папку %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Не вдається визначити об'єм вільного місця для %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Не вдається перемістити %x до Корзини.</target>
 
 <source>Incorrect command line:</source>
 <target>Неправильний командний рядок:</target>
@@ -347,9 +359,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Виявлено покинуте блокування...</target>
 
-<source>Creating file %x</source>
-<target>Створення файлу %x</target>
-
 <source>Saving file %x...</source>
 <target>Збереження файлу %x...</target>
 
@@ -368,9 +377,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Не вдається встановити блокування папки %x.</target>
 
-<source>Scanning:</source>
-<target>Сканування:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -380,6 +386,9 @@ Actual: %y bytes
 <pluralform>%x потоки виконання</pluralform>
 <pluralform>%x потоків виконання</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Сканування:</target>
 
 <source>/sec</source>
 <target>/сек</target>
@@ -454,10 +463,10 @@ Actual: %y bytes
 <target>2. Введіть рядок команди.</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. Натисніть 'Старт'.</target>
+<target>3. Натисніть 'Запуск'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Щоб розпочати імпортуйте .ffs_batch файл.</target>
+<target>Щоб запустити імпортуйте .ffs_batch файл.</target>
 
 <source>Folders to watch:</source>
 <target>Папки для спостереження:</target>
@@ -491,8 +500,8 @@ The command is triggered if:
 - з'явилися нові папки (наприклад, підключений USB флеш-носій)
 </target>
 
-<source>&Start</source>
-<target>&Старт</target>
+<source>Start</source>
+<target>Запуск</target>
 
 <source>About</source>
 <target>Про</target>
@@ -506,14 +515,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Автоматична Синхронізація</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Наступний шлях не підтримує моніторинг папок:</target>
+
 <source>Directory monitoring active</source>
 <target>Моніторинг папок активний</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Очікування доступності всіх папок...</target>
-
-<source>Error</source>
-<target>Помилка</target>
 
 <source>&Restore</source>
 <target>Від&новити</target>
@@ -527,11 +536,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&Повторити</target>
 
+<source>File time and size</source>
+<target>Дата та розмір файлу</target>
+
 <source>File content</source>
 <target>Вміст файлу</target>
 
-<source>File time and size</source>
-<target>Дата та розмір файлу</target>
+<source>File size</source>
+<target>Розмір файлу</target>
 
 <source>Two way</source>
 <target>Обидва напрямки</target>
@@ -559,12 +571,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>Видалення старих версій...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Створення символьного посилання %x</target>
-
-<source>Creating folder %x</source>
-<target>Створення папки %x</target>
 
 <source>Updating file %x</source>
 <target>Оновлення файлу %x</target>
@@ -684,30 +690,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Серйозна помилка</target>
 
-<source>Check for Program Updates</source>
-<target>Перевірка Оновлень Програми</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Доступна нова версія FreeFileSync:</target>
-
-<source>Download now?</source>
-<target>Завантажити зараз?</target>
-
-<source>&Download</source>
-<target>&Завантажити</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>У Вас найновіша версія FreeFileSync.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Не вдалось підключитись до www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Не вдається знайти номер поточної версії FreeFileSync он-лайн. Бажаєте перевірити вручну?</target>
-
-<source>&Check</source>
-<target>&Перевірити</target>
-
 <source>Symlink</source>
 <target>Символьне посилання</target>
 
@@ -768,11 +750,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>Вставити</target>
 
-<source>Local Synchronization Settings</source>
-<target>Налаштування Локальної Синхронізації</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Вибрана папка %x не може бути використана з FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Вибрана папка %x не може бути використана з FreeFileSync. Будь ласка, виберіть папку з локальної файлової системи, мережі чи MTP пристрою.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Будь ласка, виберіть папку на локальній файловій системі, в мережі чи на MTP пристрої.</target>
+
+<source>SFTP folder</source>
+<target>SFTP папка</target>
+
+<source>Select SFTP folder</source>
+<target>Вибрати SFTP папку</target>
+
+<source>Select alternative folder type</source>
+<target>Виберіть альтернативний тип папки</target>
 
 <source>&New</source>
 <target>&Створити</target>
@@ -801,8 +792,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>Ді&ї</target>
 
-<source>&Options</source>
-<target>&Опції</target>
+<source>&Preferences</source>
+<target>&Уподобання</target>
 
 <source>&Language</source>
 <target>&Мова</target>
@@ -842,9 +833,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Вилучити пару папок</target>
-
-<source>Select SFTP folder</source>
-<target>Вибрати SFTP папку</target>
 
 <source>Swap sides</source>
 <target>Поміняти місцями</target>
@@ -891,26 +879,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Всього скопіювати байтів</target>
 
+<source>Folder pair:</source>
+<target>Пара папок:</target>
+
 <source>Use local settings:</source>
 <target>Використати локальні налаштування:</target>
 
 <source>Select a variant:</source>
 <target>Виберіть варіант:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Визначити однакові файли порівнюючи час модифікації та розмір.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Визначати однакові файли порівнюючи їх вміст.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ігнорувати зсув часу (в годинах)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Враховувати час файлів зі вказаним зсувом рівним</target>
-
-<source>Handle daylight saving time</source>
-<target>Перехід на літній час вручну</target>
 
 <source>Include &symbolic links:</source>
 <target>Включити &символьні посилання:</target>
@@ -923,6 +899,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>Додаткова інформація</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ігнорувати зсув у часі [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Список ігнорованих файлових зсувів у часі</target>
+
+<source>Example:</source>
+<target>Приклад:</target>
+
+<source>Handle daylight saving time</source>
+<target>Перехід на літній час вручну</target>
 
 <source>Local settings:</source>
 <target>Локальні налаштування:</target>
@@ -1013,14 +1001,17 @@ The command is triggered if:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Упорядкувати пару папок</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Введіть дані для входу SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>Ім'я серверу чи IP адреса:</target>
 
-<source>Examples:</source>
-<target>Приклади:</target>
+<source>Port:</source>
+<target>Порт:</target>
 
 <source>User name:</source>
 <target>Ім'я користувача:</target>
@@ -1034,17 +1025,20 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>Папка на сервері:</target>
 
+<source>Select a directory on the server:</source>
+<target>Вибрати папку на сервері:</target>
+
+<source>Select Folder</source>
+<target>Вибрати Папку</target>
+
 <source>Start synchronization now?</source>
-<target>Розпочати синхронізацію?</target>
+<target>Запустити синхронізацію зараз?</target>
 
 <source>Variant:</source>
 <target>Варіант:</target>
 
 <source>&Don't show this dialog again</source>
 <target>Більше &не показувати цей діалог</target>
-
-<source>Arrange folder pair</source>
-<target>Упорядкувати пару папок</target>
 
 <source>Items found:</source>
 <target>Елементів знайдено:</target>
@@ -1074,7 +1068,7 @@ The command is triggered if:
 <target>Зупинити</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>Створити пакетний файл для автоматичної синхронізації. Щоб розпочати двічі клацніть цей файл або заплануйте в планувальнику завдань: %x</target>
+<target>Створити пакетний файл для автоматичної синхронізації. Щоб запустити двічі клацніть цей файл або заплануйте в планувальнику завдань: %x</target>
 
 <source>&Stop</source>
 <target>&Зупинити</target>
@@ -1096,6 +1090,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Як можна запланувати пакетне завдання?</target>
+
+<source>&Keep relative paths</source>
+<target>&Зберегти відносні шляхи</target>
+
+<source>&Overwrite existing files</source>
+<target>&Перезаписати існуючі файли</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Наступні налаштування використовуються для всіх завдань синхронізації.</target>
@@ -1187,14 +1187,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Вилучити Елементи</target>
 
+<source>Copy items</source>
+<target>Копіювати елементи</target>
+
 <source>Options</source>
 <target>Опції</target>
 
 <source>Select Time Span</source>
 <target>Виберіть Інтервал Часу</target>
 
-<source>&Preferences</source>
-<target>&Уподобання</target>
+<source>&Options</source>
+<target>&Опції</target>
 
 <source>Main Bar</source>
 <target>Головна панель</target>
@@ -1213,6 +1216,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Огляд</target>
+
+<source>&Download</source>
+<target>&Завантажити</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Доступна нова версія FreeFileSync:</target>
 
 <source>Confirm</source>
 <target>Підтвердити</target>
@@ -1278,8 +1287,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Виключити тимчасово</target>
 
-<source>Delete</source>
-<target>Видалити</target>
+<source>&Copy to...</source>
+<target>&Копіювати до...</target>
+
+<source>&Delete</source>
+<target>Ви&далити</target>
 
 <source>Include all</source>
 <target>Включити всі</target>
@@ -1328,9 +1340,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>Видалити запис зі списку</target>
-
-<source>Synchronization Settings</source>
-<target>Налаштування Синхронізації</target>
 
 <source>Clear filter</source>
 <target>Очистити фільтр</target>
@@ -1419,26 +1428,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Вимкнути комп'ютер</target>
 
-<source>Scanning...</source>
-<target>Сканування...</target>
-
-<source>Comparing content...</source>
-<target>Порівнювання вмісту...</target>
-
-<source>Info</source>
-<target>Інформація</target>
-
-<source>Select all</source>
-<target>Виділити все</target>
-
 <source>Paused</source>
 <target>Призупинено</target>
 
 <source>Initializing...</source>
 <target>Ініціалізація...</target>
 
+<source>Scanning...</source>
+<target>Сканування...</target>
+
+<source>Comparing content...</source>
+<target>Порівнювання вмісту...</target>
+
 <source>Completed</source>
 <target>Завершено</target>
+
+<source>Info</source>
+<target>Інформація</target>
+
+<source>Select all</source>
+<target>Виділити все</target>
 
 <source>&Continue</source>
 <target>&Продовжити</target>
@@ -1448,6 +1457,22 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>Лог</target>
+
+<source>Loading...</source>
+<target>Завантаження...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Копіювати цей %x єлемент у іншу папку?</pluralform>
+<pluralform>Копіювати ці %x елементи у іншу папку?</pluralform>
+<pluralform>Копіювати ці %x елементів у іншу папку?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Будь ласка, введіть цільову папку.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1471,9 +1496,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Ви дійсно хочете вилучити ці %x елементи?</pluralform>
 <pluralform>Ви дійсно хочете вилучити ці %x елементів?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Уподобання</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Скопіювати DACL, SACL, власника, групу</target>
@@ -1499,6 +1521,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&Показати</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Визначити однакові файли порівнюючи час модифікації та розмір.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Визначати однакові файли порівнюючи їх вміст.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Визначати однакові файли порівнюючи їх розмір.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Виявити та поширити зміни на обидві сторони. Видалення, перейменування та конфлікти визначаються автоматично використовуючи базу даних.</target>
 
@@ -1510,6 +1541,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Налаштувати власні правила синхронізації.</target>
+
+<source>Synchronization Settings</source>
+<target>Налаштування Синхронізації</target>
+
+<source>Comparison</source>
+<target>Порівняння</target>
+
+<source>Synchronization</source>
+<target>Синхронізація</target>
 
 <source>Today</source>
 <target>Сьогодні</target>
@@ -1547,11 +1587,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Приєднати відмітку часу до кожної назви файлу</target>
 
-<source>Comparison</source>
-<target>Порівняння</target>
+<source>Main config</source>
+<target>Головна конфігурація</target>
 
-<source>Synchronization</source>
-<target>Синхронізація</target>
+<source>empty</source>
+<target>пусто</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Залишити як невирішений конфлікт</target>
@@ -1570,6 +1610,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Проценти</target>
+
+<source>Internet access failed.</source>
+<target>Немає доступу до Internet.</target>
+
+<source>Check for Program Updates</source>
+<target>Перевірка Оновлень Програми</target>
+
+<source>Download now?</source>
+<target>Завантажити зараз?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>У Вас найновіша версія FreeFileSync.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Не вдалось підключитись до www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Не вдається знайти номер поточної версії FreeFileSync он-лайн. Бажаєте перевірити вручну?</target>
+
+<source>&Check</source>
+<target>&Перевірити</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Не вдається зареєструватися для отримання системних повідомлень.</target>
@@ -1597,6 +1658,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Не вдається скопіювати права доступу з %x до %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x не є звичайним іменем папки.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Не вдається знайти системну функцію %x.</target>
@@ -1727,9 +1791,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>База даних синхронізації FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Конфігурація RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>Конфігурація RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Редагувати за допомогою FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Спасибі за пожертвування та підтримку!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Цей FreeFileSync інсталятор для донорів досяг свого ліміту встановлень. Завантажити звичайну версію з домашньої сторінки FreeFileSync зараз?</target>
 

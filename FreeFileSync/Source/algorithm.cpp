@@ -222,13 +222,16 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
         case CMP_BY_TIME_SIZE:
             if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is certainly "good enough" for CMP_BY_TIME_SIZE!
 
-            return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
+            //case-sensitive short name match is a database invariant!
+            return sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
             return dbFile.cmpVar == CMP_BY_CONTENT;
-            //in contrast to comparison, we don't care about modification time here!
+        //in contrast to comparison, we don't care about modification time here!
+
+        case CMP_BY_SIZE: //file size/case-sensitive short name always matches on both sides for an "in-sync" database entry
+            return true;
     }
     assert(false);
     return false;
@@ -268,15 +271,16 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
     switch (compareVar)
     {
         case CMP_BY_TIME_SIZE:
-            if (dbLink.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+            if (dbLink.cmpVar == CMP_BY_CONTENT || dbLink.cmpVar == CMP_BY_SIZE)
+                return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
-            return //case-sensitive short name match is a database invariant!
-                sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
+            //case-sensitive short name match is a database invariant!
+            return sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CMP_BY_CONTENT:
+        case CMP_BY_SIZE: //== categorized by content! see comparison.cpp, ComparisonBuffer::compareBySize()
             //case-sensitive short name match is a database invariant!
-            return dbLink.cmpVar == CMP_BY_CONTENT;
-            //in contrast to comparison, we don't care about modification time here!
+            return dbLink.cmpVar == CMP_BY_CONTENT || dbLink.cmpVar == CMP_BY_SIZE;
     }
     assert(false);
     return false;
@@ -396,7 +400,7 @@ private:
     {
         return file.getFileSize<side>() == dbFile.fileSize &&
                sameFileTime(file.getLastWriteTime<side>(), getDescriptor<side>(dbFile).lastWriteTimeRaw, 2, {});
-        //- respect 2 second FAT/FAT32 precision!
+        //- respect 2 second FAT/FAT32 precision! not user-configurable!
         //- "ignoreTimeShiftMinutes" may lead to false positive move detections => let's be conservative and not allow it
         //  (time shift is only ever required during FAT DST switches)
 
@@ -540,7 +544,7 @@ private:
 
         if (changeOnLeft != changeOnRight)
         {
-            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            //if database entry not in sync according to current settings! -> set direction based on sync status only!
             if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
                 file.setSyncDirConflict(txtDbNotInSync);
             else
@@ -576,7 +580,7 @@ private:
 
         if (changeOnLeft != changeOnRight)
         {
-            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            //if database entry not in sync according to current settings! -> set direction based on sync status only!
             if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
                 symlink.setSyncDirConflict(txtDbNotInSync);
             else
@@ -619,7 +623,7 @@ private:
 
             if (changeOnLeft != changeOnRight)
             {
-                //if database entry not in sync according to current settings! -> do not set direction based on async status!
+                //if database entry not in sync according to current settings! -> set direction based on sync status only!
                 if (dbEntry && !stillInSync(dbEntry->second))
                     folder.setSyncDirConflict(txtDbNotInSync);
                 else

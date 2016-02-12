@@ -7,15 +7,6 @@
 	<plural_definition>n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5</plural_definition>
 </header>
 
-<source>empty</source>
-<target></target>
-
-<source>Main config</source>
-<target></target>
-
-<source>Folder pair:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>كلا الجانبين قد تغير منذ المزامنة الأخيرة.</target>
 
@@ -76,6 +67,9 @@
 <source>Cannot find file %x.</source>
 <target>لا يمكن العثور على المجلد %x.</target>
 
+<source>Error</source>
+<target>خطأ</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>لا يحتوي الملف %x تكويناً صحيحاً.</target>
 
@@ -118,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>بإمكانك إهمال هذا الخطأ لاعتبار كل مجلد على أنه مجلد فارغ. سيتم إنشاء المجلدات تلقائياً خلال المزامنة.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>إذا تجاهلت هذا الخطأ سيتم اعتبار المجلدات فارغة. يتم إنشاء المجلدات المفقودة تلقائيا عند الحاجة.</target>
 
 <source>A folder input field is empty.</source>
 <target>حقل إدخال خاص بمجلد فارغ.</target>
@@ -264,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>لا يمكن العثور على الجهاز %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>لا يمكن تحديد مساحة القرص الحرة لـ %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>لا يمكن إنشاء المسار %x.</target>
 
@@ -285,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>لا يمكن حل الارتباط الرمزي  %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>تعذر نقل %x إلى سلة المحذوفات.</target>
-
 <source>Cannot open directory %x.</source>
 <target>لا يمكن فتح المسار %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>لا يمكن تحديد مساحة القرص الحرة لـ %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>تعذر نقل %x إلى سلة المحذوفات.</target>
 
 <source>Incorrect command line:</source>
 <target>سطر أوامر خاطئ:</target>
@@ -515,8 +509,8 @@ The command is triggered if:
 -ظهور مجلدات جديدة (مثال: إدخال USB stick)
 </target>
 
-<source>&Start</source>
-<target>&ابدأ</target>
+<source>Start</source>
+<target>بدء</target>
 
 <source>About</source>
 <target>حول</target>
@@ -530,14 +524,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>مزامنة تلقائية</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>المسار التالي لا يدعم مراقبة الدليل:</target>
+
 <source>Directory monitoring active</source>
 <target>مراقبة المسارات فعالة</target>
 
 <source>Waiting until all directories are available...</source>
 <target>انتظر حتى توفر جميع المسارات...</target>
-
-<source>Error</source>
-<target>خطأ</target>
 
 <source>&Restore</source>
 <target>&استعادة</target>
@@ -551,11 +545,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>إ&عادة المحاولة</target>
 
+<source>File time and size</source>
+<target>تاريخ الملف و حجمه</target>
+
 <source>File content</source>
 <target>محتوى الملف</target>
 
-<source>File time and size</source>
-<target>تاريخ الملف و حجمه</target>
+<source>File size</source>
+<target>حجم الملف</target>
 
 <source>Two way</source>
 <target>بالاتجاهين</target>
@@ -704,30 +701,6 @@ The command is triggered if:
 
 <source>Serious Error</source>
 <target>خطأ فادح</target>
-
-<source>Check for Program Updates</source>
-<target>تفقد وجود تحديثات للبرنامج</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>يتوفر إصدار جديد من FreeFileSync:</target>
-
-<source>Download now?</source>
-<target>تنزيل الآن؟</target>
-
-<source>&Download</source>
-<target>&تنزيل</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>البرنامج هو الأحدث حتى الآن.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>تعذر الاتصال بـ www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
-
-<source>&Check</source>
-<target>&تحقق</target>
 
 <source>Symlink</source>
 <target>ارتباط-رمزي</target>
@@ -918,26 +891,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>إجمالي عدد الـ bytes التي سيتم نسخها</target>
 
+<source>Folder pair:</source>
+<target>زوج المجلدات:</target>
+
 <source>Use local settings:</source>
 <target>استخدام الإعدادات المحلية:</target>
 
 <source>Select a variant:</source>
 <target>اختيار بديل:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>التعرف على الملفات المتساوية عن طريق مقارنة التاريخ و الحجم.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>التعرف على الملفات المتساوية عن طريق مقارنة محتوى الملف.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&تجاهل تبديل الوقت (بالساعات)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>اعتبار الملفات ذات الفارق الزمني المحدد و كأنها متساوية</target>
-
-<source>Handle daylight saving time</source>
-<target>تعامل مع التوقيت الصيفي</target>
 
 <source>Include &symbolic links:</source>
 <target>تضمين &الروابط الرمزية:</target>
@@ -950,6 +911,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>المزيد من المعلومات</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&تجاهل تغيير الوقت [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>قائمة إزاحات وقت للملفات ليتم تجاهلها</target>
+
+<source>Example:</source>
+<target>مثال:</target>
+
+<source>Handle daylight saving time</source>
+<target>تعامل مع التوقيت الصيفي</target>
 
 <source>Local settings:</source>
 <target>الإعدادات المحلية:</target>
@@ -1052,9 +1025,6 @@ The command is triggered if:
 <source>Port:</source>
 <target>المنفذ:</target>
 
-<source>Examples:</source>
-<target>أمثلة:</target>
-
 <source>User name:</source>
 <target>اسم المستخدم:</target>
 
@@ -1066,6 +1036,12 @@ The command is triggered if:
 
 <source>Directory on server:</source>
 <target>المسار على الخادم:</target>
+
+<source>Select a directory on the server:</source>
+<target>تحديد دليل على الخادم:</target>
+
+<source>Select Folder</source>
+<target>اختر مجلد</target>
 
 <source>Start synchronization now?</source>
 <target>بدأ المزامنة الآن؟</target>
@@ -1132,9 +1108,6 @@ The command is triggered if:
 
 <source>&Overwrite existing files</source>
 <target>&الكتابة فوق الملفات الموجودة</target>
-
-<source>&Copy</source>
-<target>&نسخ</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة.</target>
@@ -1256,6 +1229,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>نظرة عامة</target>
 
+<source>&Download</source>
+<target>&تنزيل</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>يتوفر إصدار جديد من FreeFileSync:</target>
+
 <source>Confirm</source>
 <target>تأكيد</target>
 
@@ -1332,11 +1311,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>استبعاد مؤقتاً</target>
 
-<source>Copy to...</source>
-<target>نسخ إلى...</target>
+<source>&Copy to...</source>
+<target>&نسخ إلى...</target>
 
-<source>Delete</source>
-<target>حذف</target>
+<source>&Delete</source>
+<target>&حذف</target>
 
 <source>Include all</source>
 <target>شمول الكل</target>
@@ -1503,6 +1482,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>السجل</target>
 
+<source>Loading...</source>
+<target>تحميل...</target>
+
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
 <pluralform>Copy the following %x items to another folder?</pluralform>
@@ -1572,6 +1554,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&إظهار</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>التعرف على الملفات المتساوية عن طريق مقارنة التاريخ و الحجم.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>التعرف على الملفات المتساوية عن طريق مقارنة محتوى الملف.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>تحديد الملفات المتساوية بمقارنة حجم الملف لها.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة باستخدام قواعد البيانات.</target>
 
@@ -1629,6 +1620,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>إلحاق ختم زمني بكل اسم ملف</target>
 
+<source>Main config</source>
+<target>التكوين الرئيسي</target>
+
+<source>empty</source>
+<target>فارغ</target>
+
 <source>Leave as unresolved conflict</source>
 <target>ترك كاختلافات من دون حل</target>
 
@@ -1646,6 +1643,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>النسبة المئوية</target>
+
+<source>Internet access failed.</source>
+<target>فشل الوصول إلى الإنترنت.</target>
+
+<source>Check for Program Updates</source>
+<target>تفقد وجود تحديثات للبرنامج</target>
+
+<source>Download now?</source>
+<target>تنزيل الآن؟</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>البرنامج هو الأحدث حتى الآن.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>تعذر الاتصال بـ www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
+
+<source>&Check</source>
+<target>&تحقق</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>تعذر التسجيل لاستقبال رسائل النظام.</target>
@@ -1673,6 +1691,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>لا يمكن نسخ الأذونات من %x إلى %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x ليس اسم دليل اعتيادي.</target>
 
 <source>Cannot find system function %x.</source>
 <target>لا يمكن العثور على وظيفة نظام %x.</target>
@@ -1812,9 +1833,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>قاعدة بيانات المزامنة الخاصة بـ FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>تضبيطات RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>تضبيطات RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>تعديل بواسطة FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>شكرا على تبرعك ودعمك !</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>مثبت FreeFileSync للمنبرعين هذا وصل حدود التثبيت. هل تريد تحميل النسخة الاعتيادة من الصفحة الرئيسية لـ FreeFileSync الآن ؟</target>
 

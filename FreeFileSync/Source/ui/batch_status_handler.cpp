@@ -122,6 +122,7 @@ void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jo
 
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const std::wstring& jobName,
+                                       const Zstring& soundFileSyncComplete,
                                        const TimeComp& timeStamp,
                                        const Zstring& logFolderPathPhrase, //may be empty
                                        int logfilesCountLimit,
@@ -141,7 +142,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     returnCode_(returnCode),
     automaticRetryCount_(automaticRetryCount),
     automaticRetryDelay_(automaticRetryDelay),
-    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, onCompletion, onCompletionHistory)),
+    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory)),
             jobName_(jobName),
             timeStamp_(timeStamp),
             startTime_(std::time(nullptr)),

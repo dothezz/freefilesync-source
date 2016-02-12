@@ -1241,11 +1241,12 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
             //respect differences in case of source object:
             const AbstractPath targetPathLogical = AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>());
 
-            const AbstractPath targetPathResolved = file.isFollowedSymlink<sideTrg>() ? //follow link when updating file rather than delete it and replace with regular file!!!
-                                                    AFS::getResolvedSymlinkPath(file.getAbstractPath<sideTrg>()) : //throw FileError
-                                                    targetPathLogical; //respect differences in case of source object
+            AbstractPath targetPathResolvedOld = file.getAbstractPath<sideTrg>(); //support change in case when syncing to case-sensitive SFTP on Windows!
+            AbstractPath targetPathResolvedNew = targetPathLogical;
+            if (file.isFollowedSymlink<sideTrg>()) //follow link when updating file rather than delete it and replace with regular file!!!
+                targetPathResolvedOld = targetPathResolvedNew = AFS::getResolvedSymlinkPath(file.getAbstractPath<sideTrg>()); //throw FileError
 
-            reportInfo(txtOverwritingFile, AFS::getDisplayPath(targetPathResolved));
+            reportInfo(txtOverwritingFile, AFS::getDisplayPath(targetPathResolvedOld));
 
             if (file.isFollowedSymlink<sideTrg>()) //since we follow the link, we need to sync case sensitivity of the link manually!
                 if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
@@ -1257,9 +1258,9 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
             auto onDeleteTargetFile = [&] //delete target at appropriate time
             {
-                reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), AFS::getDisplayPath(targetPathResolved));
+                reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), AFS::getDisplayPath(targetPathResolvedOld));
 
-                this->getDelHandling<sideTrg>().removeFileWithCallback(targetPathResolved, file.getPairRelativePath(), [] {}, onNotifyCopyStatus); //throw FileError;
+                this->getDelHandling<sideTrg>().removeFileWithCallback(targetPathResolvedOld, file.getPairRelativePath(), [] {}, onNotifyCopyStatus); //throw FileError;
                 //no (logical) item count update desired - but total byte count may change, e.g. move(copy) deleted file to versioning dir
 
                 //file.removeObject<sideTrg>(); -> doesn't make sense for isFollowedSymlink(); "file, sideTrg" evaluated below!
@@ -1267,11 +1268,11 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 //if fail-safe file copy is active, then the next operation will be a simple "rename"
                 //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated!
                 if (!transactionalFileCopy_)
-                    reportStatus(txtOverwritingFile, AFS::getDisplayPath(targetPathResolved)); //restore status text copy file
+                    reportStatus(txtOverwritingFile, AFS::getDisplayPath(targetPathResolvedOld)); //restore status text copy file
             };
 
             const AFS::FileAttribAfterCopy newAttr = copyFileWithCallback(file.getAbstractPath<sideSrc>(),
-                                                                          targetPathResolved,
+                                                                          targetPathResolvedNew,
                                                                           onDeleteTargetFile,
                                                                           onNotifyCopyStatus); //throw FileError
             statReporter.reportDelta(1, 0); //we model "delete + copy" as ONE logical operation
@@ -1299,15 +1300,18 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
                                 AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>()));
 
+#if 0 //changing file time without copying content is not justified after CMP_BY_SIZE finds "equal" files! similar issue with CMP_BY_TIME_SIZE and FileTimeTolerance == -1
+            //Bonus: some devices don't support setting (precise) file times anyway, e.g. FAT or MTP!
             if (file.getLastWriteTime<sideTrg>() != file.getLastWriteTime<sideSrc>())
                 //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
                 //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
                 AFS::setModTime(file.getAbstractPath<sideTrg>(), file.getLastWriteTime<sideSrc>()); //throw FileError
+#endif
 
             //-> both sides *should* be completely equal now...
             assert(file.getFileSize<sideTrg>() == file.getFileSize<sideSrc>());
             file.setSyncedTo<sideTrg>(file.getItemName<sideSrc>(), file.getFileSize<sideSrc>(),
-                                      file.getLastWriteTime<sideSrc>(), //target time set from source
+                                      file.getLastWriteTime<sideTrg>(),
                                       file.getLastWriteTime<sideSrc>(),
                                       file.getFileId       <sideTrg>(),
                                       file.getFileId       <sideSrc>(),
@@ -1442,14 +1446,14 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
                 AFS::renameItem(symlink.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
                                 AFS::appendRelPath(symlink.base().getAbstractPath<sideTrg>(), symlink.getRelativePath<sideSrc>()));
 
-            if (symlink.getLastWriteTime<sideTrg>() != symlink.getLastWriteTime<sideSrc>())
-                //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
-                //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
-                AFS::setModTimeSymlink(symlink.getAbstractPath<sideTrg>(), symlink.getLastWriteTime<sideSrc>()); //throw FileError
+            //if (symlink.getLastWriteTime<sideTrg>() != symlink.getLastWriteTime<sideSrc>())
+            //    //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
+            //    //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
+            //    AFS::setModTimeSymlink(symlink.getAbstractPath<sideTrg>(), symlink.getLastWriteTime<sideSrc>()); //throw FileError
 
             //-> both sides *should* be completely equal now...
             symlink.setSyncedTo<sideTrg>(symlink.getItemName<sideSrc>(),
-                                         symlink.getLastWriteTime<sideSrc>(), //target time set from source
+                                         symlink.getLastWriteTime<sideTrg>(), //target time set from source
                                          symlink.getLastWriteTime<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0);
@@ -1649,14 +1653,14 @@ AFS::FileAttribAfterCopy SynchronizeFolderPair::copyFileWithCallback(const Abstr
 //###########################################################################################
 
 template <SelectedSide side>
-bool baseFolderDrop(BaseFolderPair& baseFolder, ProcessCallback& callback)
+bool baseFolderDrop(BaseFolderPair& baseFolder, int folderAccessTimeout, ProcessCallback& callback)
 {
     const AbstractPath folderPath = baseFolder.getAbstractPath<side>();
 
     if (baseFolder.isExisting<side>())
         if (Opt<std::wstring> errMsg = tryReportingError([&]
     {
-        const FolderStatus status = getFolderStatusNonBlocking({ folderPath }, false /*allowUserInteraction*/, callback);
+        const FolderStatus status = getFolderStatusNonBlocking({ folderPath }, folderAccessTimeout, false /*allowUserInteraction*/, callback);
 
             static_assert(IsSameType<decltype(status.failedChecks.begin()->second), FileError>::value, "");
             if (!status.failedChecks.empty())
@@ -1739,6 +1743,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                       bool copyFilePermissions,
                       bool transactionalFileCopy,
                       bool runWithBackgroundPriority,
+                      int folderAccessTimeout,
                       const std::vector<FolderPairSyncCfg>& syncConfig,
                       FolderComparison& folderCmp,
                       ProcessCallback& callback)
@@ -1896,8 +1901,8 @@ void zen::synchronize(const TimeComp& timeStamp,
         //check for network drops after comparison
         // - convenience: exit sync right here instead of showing tons of errors during file copy
         // - early failure! there's no point in evaluating subsequent warnings
-        if (baseFolderDrop<LEFT_SIDE >(*j, callback) ||
-            baseFolderDrop<RIGHT_SIDE>(*j, callback))
+        if (baseFolderDrop<LEFT_SIDE >(*j, folderAccessTimeout, callback) ||
+            baseFolderDrop<RIGHT_SIDE>(*j, folderAccessTimeout, callback))
         {
             jobType[folderIndex] = FolderPairJobType::SKIP;
             continue;
@@ -2082,8 +2087,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             //------------------------------------------------------------------------------------------
 
             //checking a second time: (a long time may have passed since the intro checks!)
-            if (baseFolderDrop<LEFT_SIDE >(*j, callback) ||
-                baseFolderDrop<RIGHT_SIDE>(*j, callback))
+            if (baseFolderDrop<LEFT_SIDE >(*j, folderAccessTimeout, callback) ||
+                baseFolderDrop<RIGHT_SIDE>(*j, folderAccessTimeout, callback))
                 continue;
 
             //create base folders if not yet existing

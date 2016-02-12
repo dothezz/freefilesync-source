@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Kontrollerar papperskorgens tillgänglighet för %x...</target>
+<source>Creating folder %x</source>
+<target>Skapar mappen %x</target>
+
+<source>Creating file %x</source>
+<target>Skapar fil %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Skapar den symboliska länken %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Flyttar %x till papperskorgen</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Tar bort den symboliska länken %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Kontrollerar papperskorgens tillgänglighet för %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Papperskorgen är inte tillgänglig för följande mappar. Filerna kommer istället att tas bort permanent:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Kan inte hitta filen %x.</target>
+
+<source>Error</source>
+<target>Fel</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Filen %x innehåller ingen giltig konfiguration.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Kan inte hitta följande mappar:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Du kan bortse från detta fel, och betrakta varje mapp som tom. Mapparna kommer då att skapas automatiskt, under synkroniseringen.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Om du ignorerar detta fel, kommer mapparna att betraktas som tomma. Saknade mappar skapas automatiskt, vid behov.</target>
 
 <source>A folder input field is empty.</source>
 <target>Ett inmatningsfält är tomt.</target>
@@ -246,9 +258,6 @@ Aktuell: %y byte
 <source>Cannot find device %x.</source>
 <target>Kan inte hitta enheten  %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Kan inte avgöra ledigt utrymme på %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Kan inte skapa mappen %x.</target>
 
@@ -267,11 +276,14 @@ Aktuell: %y byte
 <source>Cannot resolve symbolic link %x.</source>
 <target>Den symboliska länken %x kan inte matchas.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Kan inte att flytta %x till papperskorgen.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Kan inte öppna %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Kan inte avgöra ledigt utrymme på %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Kan inte att flytta %x till papperskorgen.</target>
 
 <source>Incorrect command line:</source>
 <target>Felaktig kommandorad:</target>
@@ -345,9 +357,6 @@ Aktuell: %y byte
 <source>Detecting abandoned lock...</source>
 <target>Söker övergivna lås...</target>
 
-<source>Creating file %x</source>
-<target>Skapar fil %x</target>
-
 <source>Saving file %x...</source>
 <target>Sparar %x...</target>
 
@@ -366,9 +375,6 @@ Aktuell: %y byte
 <source>Cannot set directory lock for %x.</source>
 <target>Kan inte låsa %x.</target>
 
-<source>Scanning:</source>
-<target>Skannar:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Aktuell: %y byte
 <pluralform>1 tråd</pluralform>
 <pluralform>%x trådar</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Skannar:</target>
 
 <source>/sec</source>
 <target>/s</target>
@@ -488,8 +497,8 @@ Kommandot triggas om:
 - nya mappar upptäcks (ex. USB-minne ansluts)
 </target>
 
-<source>&Start</source>
-<target>&Start</target>
+<source>Start</source>
+<target>Starta</target>
 
 <source>About</source>
 <target>Om</target>
@@ -503,14 +512,14 @@ Kommandot triggas om:
 <source>Automated Synchronization</source>
 <target>Automatiserad synkronisering</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Följande sökväg stöder inte mappövervakning:</target>
+
 <source>Directory monitoring active</source>
 <target>Mappövervakning aktiv</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Väntar på att samtliga mappar skall bli tillgängliga...</target>
-
-<source>Error</source>
-<target>Fel</target>
 
 <source>&Restore</source>
 <target>&Återställ</target>
@@ -524,11 +533,14 @@ Kommandot triggas om:
 <source>&Retry</source>
 <target>&Försök igen</target>
 
+<source>File time and size</source>
+<target>Tidsstämpling och storlek</target>
+
 <source>File content</source>
 <target>Filinnehåll</target>
 
-<source>File time and size</source>
-<target>Tidsstämpling och storlek</target>
+<source>File size</source>
+<target>Filstorlek</target>
 
 <source>Two way</source>
 <target>Tvåvägs</target>
@@ -556,12 +568,6 @@ Kommandot triggas om:
 
 <source>Removing old versions...</source>
 <target>Tar bort gamla versioner...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Skapar den symboliska länken %x</target>
-
-<source>Creating folder %x</source>
-<target>Skapar mappen %x</target>
 
 <source>Updating file %x</source>
 <target>Uppdaterar %x</target>
@@ -680,30 +686,6 @@ Kommandot triggas om:
 <source>Serious Error</source>
 <target>Allvarligt fel</target>
 
-<source>Check for Program Updates</source>
-<target>Sök efter programuppdateringar</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Det finns en ny version av FreeFileSync:</target>
-
-<source>Download now?</source>
-<target>Ladda ner nu?</target>
-
-<source>&Download</source>
-<target>&Ladda ner</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync är uppdaterad.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Kan inte ansluta till www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Kan inte hitta aktuellt versionsnummer online. Vill du kontrollera manuellt?</target>
-
-<source>&Check</source>
-<target>&Kontrollera</target>
-
 <source>Symlink</source>
 <target>Symboliska länkar</target>
 
@@ -764,11 +746,20 @@ Kommandot triggas om:
 <source>Paste</source>
 <target>Klistra in</target>
 
-<source>Local Synchronization Settings</source>
-<target>Lokala synkroniseringsinställningar</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Den valda mappen %x kan inte användas med FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Den valda mappen %x, kan inte användas med FreeFileSync.Välj en mapp på ett lokalt filsystem, nätverk eller en MTP-enhet.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Välj en mapp på i ett lokalt filsystem, nätverk eller en MTP-enhet.</target>
+
+<source>SFTP folder</source>
+<target>SFTP-mapp</target>
+
+<source>Select SFTP folder</source>
+<target>Välj SFTP-mapp</target>
+
+<source>Select alternative folder type</source>
+<target>Välj alternativ mapptyp</target>
 
 <source>&New</source>
 <target>&Nytt</target>
@@ -797,8 +788,8 @@ Kommandot triggas om:
 <source>&Actions</source>
 <target>&Åtgärder</target>
 
-<source>&Options</source>
-<target>&Alternativ</target>
+<source>&Preferences</source>
+<target>&Inställningar</target>
 
 <source>&Language</source>
 <target>&Språk</target>
@@ -838,9 +829,6 @@ Kommandot triggas om:
 
 <source>Remove folder pair</source>
 <target>Ta bort katalogpar</target>
-
-<source>Select SFTP folder</source>
-<target>Välj SFTP-mapp</target>
 
 <source>Swap sides</source>
 <target>Byt sida</target>
@@ -887,26 +875,14 @@ Kommandot triggas om:
 <source>Total bytes to copy</source>
 <target>Byte att kopiera</target>
 
+<source>Folder pair:</source>
+<target>Katalogpar:</target>
+
 <source>Use local settings:</source>
 <target>Använd lokala inställningar:</target>
 
 <source>Select a variant:</source>
 <target>Välj ett alternativ:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Identifiera likadana filer genom att jämföra tidsstämpling och filstorlek.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Identifiera likadana filer genom att jämföra filinnehåll.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignorera tidsförskjutning (i timmar)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Betrakta filtider med specificerad förskjutning som lika</target>
-
-<source>Handle daylight saving time</source>
-<target>Hantera sommartid</target>
 
 <source>Include &symbolic links:</source>
 <target>Inkludera &symboliska länkar:</target>
@@ -919,6 +895,18 @@ Kommandot triggas om:
 
 <source>More information</source>
 <target>Mer information</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ignorera tidsändring [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Lista över filtidsförskjutningar att ignorera</target>
+
+<source>Example:</source>
+<target>Exempel:</target>
+
+<source>Handle daylight saving time</source>
+<target>Hantera sommartid</target>
 
 <source>Local settings:</source>
 <target>Lokala inställningar:</target>
@@ -1009,14 +997,17 @@ Kommandot triggas om:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Arrangera katalogpar</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Ange dina SFTP-inloggningsuppgifter:</target>
 
 <source>Server name or IP address:</source>
 <target>Servernamn eller IP-adress:</target>
 
-<source>Examples:</source>
-<target>Exempel:</target>
+<source>Port:</source>
+<target>Port:</target>
 
 <source>User name:</source>
 <target>Användarnamn:</target>
@@ -1030,6 +1021,12 @@ Kommandot triggas om:
 <source>Directory on server:</source>
 <target>Målmapp på servern:</target>
 
+<source>Select a directory on the server:</source>
+<target>Välj en mapp på servern:</target>
+
+<source>Select Folder</source>
+<target>Välj mapp</target>
+
 <source>Start synchronization now?</source>
 <target>Vill du starta synkroniseringen nu?</target>
 
@@ -1038,9 +1035,6 @@ Kommandot triggas om:
 
 <source>&Don't show this dialog again</source>
 <target>&Visa inte den här dialogen igen</target>
-
-<source>Arrange folder pair</source>
-<target>Arrangera katalogpar</target>
 
 <source>Items found:</source>
 <target>Funna poster:</target>
@@ -1092,6 +1086,12 @@ Kommandot triggas om:
 
 <source>How can I schedule a batch job?</source>
 <target>Hur schemalägger jag en batch-fil?</target>
+
+<source>&Keep relative paths</source>
+<target>&Bevara relativa sökvägar</target>
+
+<source>&Overwrite existing files</source>
+<target>&Skriv över befintliga filer</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Följande inställningar används för all synkronisering.</target>
@@ -1183,14 +1183,17 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Delete Items</source>
 <target>Ta bort objekt</target>
 
+<source>Copy items</source>
+<target>Kopiera objekt</target>
+
 <source>Options</source>
 <target>Alternativ</target>
 
 <source>Select Time Span</source>
 <target>Välj tidsrymd</target>
 
-<source>&Preferences</source>
-<target>&Inställningar</target>
+<source>&Options</source>
+<target>&Alternativ</target>
 
 <source>Main Bar</source>
 <target>Primärt verktygsfält</target>
@@ -1209,6 +1212,12 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Overview</source>
 <target>Översikt</target>
+
+<source>&Download</source>
+<target>&Ladda ner</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Det finns en ny version av FreeFileSync:</target>
 
 <source>Confirm</source>
 <target>Bekräfta</target>
@@ -1270,8 +1279,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Exclude temporarily</source>
 <target>Undanta tillfälligt</target>
 
-<source>Delete</source>
-<target>Ta bort</target>
+<source>&Copy to...</source>
+<target>&Kopiera till...</target>
+
+<source>&Delete</source>
+<target>&Ta bort</target>
 
 <source>Include all</source>
 <target>Inkludera alla</target>
@@ -1320,9 +1332,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Remove entry from list</source>
 <target>Ta bort post från listan</target>
-
-<source>Synchronization Settings</source>
-<target>Synkroniseringsinställningar</target>
 
 <source>Clear filter</source>
 <target>Rensa filter</target>
@@ -1411,26 +1420,26 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Shut down</source>
 <target>Stäng av datorn</target>
 
-<source>Scanning...</source>
-<target>Skannar...</target>
-
-<source>Comparing content...</source>
-<target>Jämför innehåll...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Markera alla</target>
-
 <source>Paused</source>
 <target>Pausad</target>
 
 <source>Initializing...</source>
 <target>Initierar...</target>
 
+<source>Scanning...</source>
+<target>Skannar...</target>
+
+<source>Comparing content...</source>
+<target>Jämför innehåll...</target>
+
 <source>Completed</source>
 <target>Slutförd</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Markera alla</target>
 
 <source>&Continue</source>
 <target>&Fortsätt</target>
@@ -1440,6 +1449,21 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Log</source>
 <target>Logg</target>
+
+<source>Loading...</source>
+<target>Läser in...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Vill du kopiera följande objekt till en annan mapp?</pluralform>
+<pluralform>Vill du kopiera följande %x objekt till en annan mapp?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Ange en målmapp.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <pluralform>Vill du verkligen ta bort följande objekt?</pluralform>
 <pluralform>Vill du verkligen ta bort följande %x objekt?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Inställningar</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Kopiera DACL, SACL, Ägare, Grupp</target>
@@ -1489,6 +1510,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>&Show</source>
 <target>&Visa</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identifiera likadana filer genom att jämföra tidsstämpling och filstorlek.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Identifiera likadana filer genom att jämföra filinnehåll.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Identifiera likadana filer genom att jämföra filstorlek.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
 
@@ -1500,6 +1530,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurera dina egna synkroniseringsregler.</target>
+
+<source>Synchronization Settings</source>
+<target>Synkroniseringsinställningar</target>
+
+<source>Comparison</source>
+<target>Jämförelse</target>
+
+<source>Synchronization</source>
+<target>Synkronisering</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1537,11 +1576,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Append a time stamp to each file name</source>
 <target>Lägg till en tidsstämpel till varje filnamn</target>
 
-<source>Comparison</source>
-<target>Jämförelse</target>
+<source>Main config</source>
+<target>Huvudkonfiguration</target>
 
-<source>Synchronization</source>
-<target>Synkronisering</target>
+<source>empty</source>
+<target>tom</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ignorera konflikt</target>
@@ -1560,6 +1599,27 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Percentage</source>
 <target>Procent</target>
+
+<source>Internet access failed.</source>
+<target>Internetåtkomst misslyckades.</target>
+
+<source>Check for Program Updates</source>
+<target>Sök efter programuppdateringar</target>
+
+<source>Download now?</source>
+<target>Ladda ner nu?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync är uppdaterad.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Kan inte ansluta till www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Kan inte hitta aktuellt versionsnummer online. Vill du kontrollera manuellt?</target>
+
+<source>&Check</source>
+<target>&Kontrollera</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Det gick inte att registrera mottagning av systemmeddelanden.</target>
@@ -1587,6 +1647,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Kan inte kopiera rättigheter från %x till %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x är inte ett vanligt mappnamn.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan inte hitta systemfunktion %x.</target>
@@ -1714,9 +1777,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync Synkroniseringsdatabas</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync Konfiguration</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync Konfiguration</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Redigera med FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Tack för donationen och ditt stöd!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Denna FreeFileSync-installerare för donatorer, har nått sin installationsgräns. Vill du ladda ner den vanliga versionen från FreeFileSyncs hemsida nu?</target>
 

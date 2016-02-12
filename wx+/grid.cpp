@@ -987,16 +987,17 @@ private:
         if (wxWindow::FindFocus() != this) //doesn't seem to happen automatically for right mouse button
             SetFocus();
 
-        const wxPoint    absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
-        const ptrdiff_t     row = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
-        const ColumnPosInfo cpi = refParent().getColumnAtPos(absPos.x); //returns ColumnType::NONE if no column at x position!
-        assert(row >= 0);
-        if (row >= 0)
-            if (auto prov = refParent().getDataProvider())
-            {
-                const HoverArea rowHover = prov->getRowMouseHover(row, cpi.colType, cpi.cellRelativePosX, cpi.colWidth);
-                GridClickEvent mouseEvent(event.RightDown() ? EVENT_GRID_MOUSE_RIGHT_DOWN : EVENT_GRID_MOUSE_LEFT_DOWN, event, row, rowHover);
+        if (auto prov = refParent().getDataProvider())
+        {
+            const wxPoint    absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
+            const ptrdiff_t     row = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
+            const ColumnPosInfo cpi = refParent().getColumnAtPos(absPos.x); //returns ColumnType::NONE if no column at x position!
+            const HoverArea rowHover = prov->getRowMouseHover(row, cpi.colType, cpi.cellRelativePosX, cpi.colWidth);
+            //row < 0 possible!!! Pressing "Menu key" simulates Mouse Right Down + Up at position 0xffff/0xffff!
 
+            GridClickEvent mouseEvent(event.RightDown() ? EVENT_GRID_MOUSE_RIGHT_DOWN : EVENT_GRID_MOUSE_LEFT_DOWN, event, row, rowHover);
+
+            if (row >= 0)
                 if (!event.RightDown() || !refParent().isSelected(row)) //do NOT start a new selection if user right-clicks on a selected area!
                 {
                     if (event.ControlDown())
@@ -1012,12 +1013,12 @@ private:
                         refParent().clearSelection(ALLOW_GRID_EVENT);
                     }
                 }
-                //notify event *after* potential "clearSelection(true)" above: a client should first receive a GridRangeSelectEvent for clearing the grid, if necessary,
-                //then GridClickEvent and the associated GridRangeSelectEvent one after the other
-                sendEventNow(mouseEvent);
+            //notify event *after* potential "clearSelection(true)" above: a client should first receive a GridRangeSelectEvent for clearing the grid, if necessary,
+            //then GridClickEvent and the associated GridRangeSelectEvent one after the other
+            sendEventNow(mouseEvent);
 
-                Refresh();
-            }
+            Refresh();
+        }
         event.Skip(); //allow changing focus
     }
 
@@ -1090,7 +1091,7 @@ private:
             const std::wstring toolTip = [&]
             {
                 if (cpi.colType != ColumnType::NONE && 0 <= row && row < rowCount)
-                        return prov->getToolTip(row, cpi.colType);
+                    return prov->getToolTip(row, cpi.colType);
                 return std::wstring();
             }();
             setToolTip(toolTip); //show even during mouse selection!

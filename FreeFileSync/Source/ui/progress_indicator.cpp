@@ -1122,6 +1122,7 @@ public:
                            wxFrame* parentFrame,
                            bool showProgress,
                            const wxString& jobName,
+                           const Zstring& soundFileSyncComplete,
                            const Zstring& onCompletion,
                            std::vector<Zstring>& onCompletionHistory);
     ~SyncProgressDialogImpl() override;
@@ -1170,6 +1171,7 @@ private:
     SyncProgressPanelGenerated& pnl; //wxPanel containing the GUI controls of *this
 
     const wxString jobName_;
+    const Zstring soundFileSyncComplete_;
     StopWatch timeElapsed;
 
     wxFrame* parentFrame_; //optional
@@ -1213,11 +1215,13 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
                                                                wxFrame* parentFrame,
                                                                bool showProgress,
                                                                const wxString& jobName,
+                                                               const Zstring& soundFileSyncComplete,
                                                                const Zstring& onCompletion,
                                                                std::vector<Zstring>& onCompletionHistory) :
     TopLevelDialog(parentFrame, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, style), //title is overwritten anyway in setExternalStatus()
     pnl(*new SyncProgressPanelGenerated(this)), //ownership passed to "this"
     jobName_  (jobName),
+    soundFileSyncComplete_(soundFileSyncComplete),
     parentFrame_(parentFrame),
     notifyWindowTerminate_(notifyWindowTerminate),
     syncStat_ (&syncStat),
@@ -1898,12 +1902,13 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         case SyncProgressDialog::RESULT_FINISHED_WITH_ERROR:
         case SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS:
         case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
-        {
-            const Zstring soundFile = getResourceDir() + Zstr("Sync_Complete.wav");
-            if (fileExists(soundFile))
-                wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
-        }
-        break;
+            if (!soundFileSyncComplete_.empty())
+            {
+                const Zstring soundFile = getResourceDir() + soundFileSyncComplete_;
+                if (fileExists(soundFile))
+                    wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+            }
+            break;
     }
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;) note: resumeFromSystray() also calls Raise()!
@@ -2043,6 +2048,7 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          wxFrame* parentWindow, //may be nullptr
                                          bool showProgress,
                                          const wxString& jobName,
+                                         const Zstring& soundFileSyncComplete,
                                          const Zstring& onCompletion,
                                          std::vector<Zstring>& onCompletionHistory)
 {
@@ -2052,13 +2058,13 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
         //https://groups.google.com/forum/#!topic/wx-users/J5SjjLaBOQE
         return new SyncProgressDialogImpl<wxDialog>(wxDEFAULT_DIALOG_STYLE | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER,
         [&](wxDialog& progDlg) { return parentWindow; },
-        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
+        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory);
     }
     else //FFS batch job
     {
         auto dlg = new SyncProgressDialogImpl<wxFrame>(wxDEFAULT_FRAME_STYLE,
         [](wxFrame& progDlg) { return &progDlg; },
-        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, onCompletion, onCompletionHistory);
+        abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory);
 
         //only top level windows should have an icon:
         dlg->SetIcon(getFfsIcon());

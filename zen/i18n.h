@@ -23,7 +23,7 @@
 
 namespace zen
 {
-//implement handler to enable program wide localizations:
+//implement handler to enable program-wide localizations:
 struct TranslationHandler
 {
     //THREAD-SAFETY: "const" member must model thread-safe access!
@@ -39,7 +39,7 @@ private:
     TranslationHandler& operator=(const TranslationHandler&) = delete;
 };
 
-void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler = nullptr); //take ownership
+void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler); //take ownership
 const TranslationHandler* getTranslator();
 
 
@@ -94,20 +94,41 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 
 
 inline
-std::unique_ptr<const TranslationHandler>& globalTranslationHandler()
+const TranslationHandler*& getTranslationInstance()
 {
-    static std::unique_ptr<const TranslationHandler> inst; //external linkage even in header!
+    //avoid static destruction order fiasco: there may be accesses to "getTranslator()" during process shutdown e.g. show message in debug_minidump.cpp!
+	//=> use POD instead of a std::unique_ptr<>!!!
+    static const TranslationHandler* inst = nullptr; //external linkage even in header!
     return inst;
 }
+
+
+struct CleanUpTranslationHandler
+{
+    ~CleanUpTranslationHandler()
+    {
+        const TranslationHandler*& handler = getTranslationInstance();
+		assert(!handler); //clean up at a better time rather than during static destruction! potential MT issues!?
+        delete handler;
+        handler = nullptr; //getTranslator() may be called even after static objects of this translation unit are destroyed!
+    }
+};
 }
 
 
 inline
-void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler) { implementation::globalTranslationHandler() = std::move(newHandler); }
+void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler)
+{
+    static implementation::CleanUpTranslationHandler cuth; //external linkage even in header!
+
+    const TranslationHandler*& handler = implementation::getTranslationInstance();
+    delete handler;
+    handler = newHandler.release();
+}
 
 
 inline
-const TranslationHandler* getTranslator() { return implementation::globalTranslationHandler().get(); }
+const TranslationHandler* getTranslator() { return implementation::getTranslationInstance(); }
 }
 
 #endif //I18_N_H_3843489325044253425456

@@ -338,7 +338,7 @@ void DeleteDialog::updateGui()
         header = _P("Do you really want to delete the following item?",
                     "Do you really want to delete the following %x items?", delInfo.second);
         m_bitmapDeleteType->SetBitmap(getResourceImage(L"delete_permanently"));
-        m_buttonOK->SetLabel(_("Delete"));
+        m_buttonOK->SetLabel(replaceCpy(_("&Delete"), L"&", L""));
     }
     m_staticTextHeader->SetLabel(header);
     m_staticTextHeader->Wrap(460); //needs to be reapplied after SetLabel()

@@ -66,10 +66,12 @@ private:
     void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"html/daylight-saving-time.html", this); }
 
     void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    void OnTimeSize               (wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    void OnContent                (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    void OnTimeSizeDouble         (wxMouseEvent&   event) override;
-    void OnContentDouble          (wxMouseEvent&   event) override;
+    void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); } //
+    void OnCompByContent          (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); } //affects sync settings, too!
+    void OnCompBySize             (wxCommandEvent& event) override { localCmpVar = CMP_BY_SIZE;      updateCompGui(); updateSyncGui(); } //
+    void OnCompByTimeSizeDouble   (wxMouseEvent&   event) override;
+    void OnCompBySizeDouble       (wxMouseEvent&   event) override;
+    void OnCompByContentDouble    (wxMouseEvent&   event) override;
     void OnChangeCompOption       (wxCommandEvent& event) override { updateCompGui(); }
     void onlTimeShiftKeyDown      (wxKeyEvent& event) override;
 
@@ -177,6 +179,8 @@ std::wstring getCompVariantDescription(CompareVariant var)
             return _("Identify equal files by comparing modification time and size.");
         case CMP_BY_CONTENT:
             return _("Identify equal files by comparing the file content.");
+        case CMP_BY_SIZE:
+            return _("Identify equal files by comparing their file size.");
     }
     assert(false);
     return _("Error");
@@ -246,12 +250,17 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_notebook->ChangeSelection(static_cast<size_t>(panelToShow));
 
     //------------- comparison panel ----------------------
-    setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
-    setRelativeFontSize(*m_toggleBtnContent,  1.25);
+    setRelativeFontSize(*m_toggleBtnByTimeSize, 1.25);
+    setRelativeFontSize(*m_toggleBtnBySize,     1.25);
+    setRelativeFontSize(*m_toggleBtnByContent,  1.25);
 
-    m_toggleBtnTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
-    m_toggleBtnContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
+    m_toggleBtnByTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
+    m_toggleBtnByContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
+    m_toggleBtnBySize    ->SetToolTip(getCompVariantDescription(CMP_BY_SIZE));
 
+    m_bitmapByTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
+    m_bitmapByContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
+    m_bitmapBySize    ->SetToolTip(getCompVariantDescription(CMP_BY_SIZE));
     //------------- filter panel --------------------------
 
     assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
@@ -427,18 +436,26 @@ void ConfigDialog::OnSelectFolderPair(wxCommandEvent& event)
 }
 
 
-void ConfigDialog::OnTimeSizeDouble(wxMouseEvent& event)
+void ConfigDialog::OnCompByTimeSizeDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
-    OnTimeSize(dummy);
+    OnCompByTimeSize(dummy);
     OnOkay(dummy);
 }
 
 
-void ConfigDialog::OnContentDouble(wxMouseEvent& event)
+void ConfigDialog::OnCompBySizeDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
-    OnContent(dummy);
+    OnCompBySize(dummy);
+    OnOkay(dummy);
+}
+
+
+void ConfigDialog::OnCompByContentDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnCompByContent(dummy);
     OnOkay(dummy);
 }
 
@@ -508,17 +525,21 @@ void ConfigDialog::updateCompGui()
                              static_cast<int>(m_checkBoxUseLocalCmpOptions->GetValue() ? ConfigTypeImage::COMPARISON : ConfigTypeImage::COMPARISON_GREY));
 
     //update toggle buttons -> they have no parameter-ownership at all!
-    m_toggleBtnTimeSize->SetValue(false);
-    m_toggleBtnContent ->SetValue(false);
+    m_toggleBtnByTimeSize->SetValue(false);
+    m_toggleBtnBySize    ->SetValue(false);
+    m_toggleBtnByContent ->SetValue(false);
 
     if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
         switch (localCmpVar)
         {
             case CMP_BY_TIME_SIZE:
-                m_toggleBtnTimeSize->SetValue(true);
+                m_toggleBtnByTimeSize->SetValue(true);
                 break;
             case CMP_BY_CONTENT:
-                m_toggleBtnContent->SetValue(true);
+                m_toggleBtnByContent->SetValue(true);
+                break;
+            case CMP_BY_SIZE:
+                m_toggleBtnBySize->SetValue(true);
                 break;
         }
 
@@ -530,8 +551,9 @@ void ConfigDialog::updateCompGui()
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
-    setBitmap(*m_bitmapByTime,    localCmpVar == CMP_BY_TIME_SIZE, getResourceImage(L"clock"));
-    setBitmap(*m_bitmapByContent, localCmpVar == CMP_BY_CONTENT,   getResourceImage(L"cmpByContent"));
+    setBitmap(*m_bitmapByTimeSize, localCmpVar == CMP_BY_TIME_SIZE, getResourceImage(L"file-time"));
+    setBitmap(*m_bitmapByContent,  localCmpVar == CMP_BY_CONTENT,   getResourceImage(L"file-content"));
+    setBitmap(*m_bitmapBySize,     localCmpVar == CMP_BY_SIZE,      getResourceImage(L"file-size"));
 
     //active variant description:
     setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
@@ -604,8 +626,8 @@ void ConfigDialog::updateFilterGui()
     };
     setStatusBitmap(*m_bitmapInclude,    L"filter_include", !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter));
     setStatusBitmap(*m_bitmapExclude,    L"filter_exclude", !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter));
-    setStatusBitmap(*m_bitmapFilterDate, L"clock", activeCfg.unitTimeSpan != UTIME_NONE);
-    setStatusBitmap(*m_bitmapFilterSize, L"size",  activeCfg.unitSizeMin  != USIZE_NONE || activeCfg.unitSizeMax != USIZE_NONE);
+    setStatusBitmap(*m_bitmapFilterDate, L"file-time", activeCfg.unitTimeSpan != UTIME_NONE);
+    setStatusBitmap(*m_bitmapFilterSize, L"file-size",  activeCfg.unitSizeMin  != USIZE_NONE || activeCfg.unitSizeMax != USIZE_NONE);
 
     m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
@@ -894,13 +916,13 @@ void ConfigDialog::updateSyncGui()
     {
         const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ? localCmpVar : globalCfg_.cmpConfig.compareVar;
 
-        m_bitmapDifferent  ->Show(activeCmpVar != CMP_BY_TIME_SIZE);
-        m_bpButtonDifferent->Show(activeCmpVar != CMP_BY_TIME_SIZE);
-
         m_bitmapLeftNewer   ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
         m_bpButtonLeftNewer ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
         m_bitmapRightNewer  ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
         m_bpButtonRightNewer->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+
+        m_bitmapDifferent  ->Show(activeCmpVar == CMP_BY_CONTENT || activeCmpVar == CMP_BY_SIZE);
+        m_bpButtonDifferent->Show(activeCmpVar == CMP_BY_CONTENT || activeCmpVar == CMP_BY_SIZE);
     }
 
     //active variant description:

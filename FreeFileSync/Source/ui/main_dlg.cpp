@@ -83,6 +83,16 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
             return true;
     return false;
 }
+
+
+bool acceptDialogFileDrop(const std::vector<Zstring>& shellItemPaths)
+{
+    return std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
+    {
+        return pathEndsWith(shellItemPath, Zstr(".ffs_gui")) ||
+               pathEndsWith(shellItemPath, Zstr(".ffs_batch"));
+    });
+}
 }
 
 
@@ -99,34 +109,14 @@ public:
         FolderSelector(dropWindow1, selectFolderButton, selectSftpButton, dirpath, staticText, dropWindow2),
         mainDlg_(mainDlg) {}
 
-    bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) override
+    bool shouldSetDroppedPaths(const std::vector<Zstring>& shellItemPaths) override
     {
-        if (std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
-    {
-        using namespace xmlAccess;
-        try
-        {
-            switch (getXmlType(shellItemPath)) //throw FileError
-                {
-                    case XML_TYPE_GUI:
-                    case XML_TYPE_BATCH:
-                        return true;
-                    case XML_TYPE_GLOBAL:
-                    case XML_TYPE_OTHER:
-                        break;
-                }
-            }
-            catch (const FileError&) {}
-
-            return false;
-        }))
+        if (acceptDialogFileDrop(shellItemPaths))
         {
             mainDlg_.loadConfiguration(shellItemPaths);
             return false;
         }
-
-        //=> return true: change directory selection via drag and drop
-        return true;
+        return true; //=> return true: change directory selection via drag and drop
     }
 
 private:
@@ -699,9 +689,9 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     //enable dialog-specific key local events
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::onLocalKeyEvent), nullptr, this);
 
-    //drag & drop on navi panel
-    setupFileDrop(*m_gridNavi);
-    m_gridNavi->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onNaviPanelFilesDropped), nullptr, this);
+    //drag and drop .ffs_gui and .ffs_batch on main dialog
+    setupFileDrop(*this);
+    Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onDialogFilesDropped), nullptr, this);
 
     //Connect(wxEVT_SIZE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
     //Connect(wxEVT_MOVE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
@@ -855,47 +845,47 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     //set dialog size and position:
     // - width/height are invalid if the window is minimized (eg x,y == -32000; height = 28, width = 160)
     // - multi-monitor setups: dialog may be placed on second monitor which is currently turned off
-    if (globalSettings.gui.dlgSize.GetWidth () > 0 &&
-        globalSettings.gui.dlgSize.GetHeight() > 0)
+    if (globalSettings.gui.mainDlg.dlgSize.GetWidth () > 0 &&
+        globalSettings.gui.mainDlg.dlgSize.GetHeight() > 0)
     {
         //calculate how much of the dialog will be visible on screen
-        const int dialogAreaTotal = globalSettings.gui.dlgSize.GetWidth() * globalSettings.gui.dlgSize.GetHeight();
+        const int dialogAreaTotal = globalSettings.gui.mainDlg.dlgSize.GetWidth() * globalSettings.gui.mainDlg.dlgSize.GetHeight();
         int dialogAreaVisible = 0;
 
         const int monitorCount = wxDisplay::GetCount();
         for (int i = 0; i < monitorCount; ++i)
         {
-            wxRect intersection = wxDisplay(i).GetClientArea().Intersect(wxRect(globalSettings.gui.dlgPos, globalSettings.gui.dlgSize));
+            wxRect intersection = wxDisplay(i).GetClientArea().Intersect(wxRect(globalSettings.gui.mainDlg.dlgPos, globalSettings.gui.mainDlg.dlgSize));
             dialogAreaVisible = std::max(dialogAreaVisible, intersection.GetWidth() * intersection.GetHeight());
         }
 
         //wxGTK's wxWindow::SetSize seems unreliable and behaves like a wxWindow::SetClientSize
         //=> use wxWindow::SetClientSize instead (for the record: no such issue on Windows/OS X)
-        SetClientSize(globalSettings.gui.dlgSize);
+        SetClientSize(globalSettings.gui.mainDlg.dlgSize);
 
         if (dialogAreaVisible > 0.1 * dialogAreaTotal  //at least 10% of the dialog should be visible!
            )
-            SetPosition(globalSettings.gui.dlgPos);
+            SetPosition(globalSettings.gui.mainDlg.dlgPos);
         else
             Center();
     }
     else
         Center();
 
-    if (globalSettings.gui.isMaximized)
+    if (globalSettings.gui.mainDlg.isMaximized)
     {
             Maximize(true);
     }
 
     //set column attributes
-    m_gridMainL   ->setColumnConfig(gridview::convertConfig(globalSettings.gui.columnAttribLeft));
-    m_gridMainR   ->setColumnConfig(gridview::convertConfig(globalSettings.gui.columnAttribRight));
-    m_splitterMain->setSashOffset(globalSettings.gui.sashOffset);
+    m_gridMainL   ->setColumnConfig(gridview::convertConfig(globalSettings.gui.mainDlg.columnAttribLeft));
+    m_gridMainR   ->setColumnConfig(gridview::convertConfig(globalSettings.gui.mainDlg.columnAttribRight));
+    m_splitterMain->setSashOffset(globalSettings.gui.mainDlg.sashOffset);
 
-    m_gridNavi->setColumnConfig(treeview::convertConfig(globalSettings.gui.columnAttribNavi));
-    treeview::setShowPercentage(*m_gridNavi, globalSettings.gui.showPercentBar);
+    m_gridNavi->setColumnConfig(treeview::convertConfig(globalSettings.gui.mainDlg.columnAttribNavi));
+    treeview::setShowPercentage(*m_gridNavi, globalSettings.gui.mainDlg.showPercentBar);
 
-    treeDataView->setSortDirection(globalSettings.gui.naviLastSortColumn, globalSettings.gui.naviLastSortAscending);
+    treeDataView->setSortDirection(globalSettings.gui.mainDlg.naviLastSortColumn, globalSettings.gui.mainDlg.naviLastSortAscending);
 
     //--------------------------------------------------------------------------------
     //load list of last used configuration files
@@ -916,10 +906,10 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     *folderHistoryRight = FolderHistory(globalSettings.gui.folderHistoryRight, globalSettings.gui.folderHistMax);
 
     //show/hide file icons
-    gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalSettings.gui.showIcons, convert(globalSettings.gui.iconSize));
+    gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalSettings.gui.mainDlg.showIcons, convert(globalSettings.gui.mainDlg.iconSize));
 
     //------------------------------------------------------------------------------------------------
-    m_checkBoxMatchCase->SetValue(globalCfg.gui.textSearchRespectCase);
+    m_checkBoxMatchCase->SetValue(globalCfg.gui.mainDlg.textSearchRespectCase);
 
     //wxAuiManager erroneously loads panel captions, we don't want that
     typedef std::vector<std::pair<wxString, wxString>> CaptionNameMapping;
@@ -928,7 +918,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     for (size_t i = 0; i < paneArray.size(); ++i)
         captionNameMap.emplace_back(paneArray[i].caption, paneArray[i].name);
 
-    auiMgr.LoadPerspective(globalSettings.gui.guiPerspectiveLast);
+    auiMgr.LoadPerspective(globalSettings.gui.mainDlg.guiPerspectiveLast);
 
     //restore original captions
     for (const auto& item : captionNameMap)
@@ -954,16 +944,16 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     globalSettings.programLanguage = getLanguage();
 
     //retrieve column attributes
-    globalSettings.gui.columnAttribLeft  = gridview::convertConfig(m_gridMainL->getColumnConfig());
-    globalSettings.gui.columnAttribRight = gridview::convertConfig(m_gridMainR->getColumnConfig());
-    globalSettings.gui.sashOffset        = m_splitterMain->getSashOffset();
+    globalSettings.gui.mainDlg.columnAttribLeft  = gridview::convertConfig(m_gridMainL->getColumnConfig());
+    globalSettings.gui.mainDlg.columnAttribRight = gridview::convertConfig(m_gridMainR->getColumnConfig());
+    globalSettings.gui.mainDlg.sashOffset        = m_splitterMain->getSashOffset();
 
-    globalSettings.gui.columnAttribNavi = treeview::convertConfig(m_gridNavi->getColumnConfig());
-    globalSettings.gui.showPercentBar   = treeview::getShowPercentage(*m_gridNavi);
+    globalSettings.gui.mainDlg.columnAttribNavi = treeview::convertConfig(m_gridNavi->getColumnConfig());
+    globalSettings.gui.mainDlg.showPercentBar   = treeview::getShowPercentage(*m_gridNavi);
 
     const std::pair<ColumnTypeNavi, bool> sortInfo = treeDataView->getSortDirection();
-    globalSettings.gui.naviLastSortColumn    = sortInfo.first;
-    globalSettings.gui.naviLastSortAscending = sortInfo.second;
+    globalSettings.gui.mainDlg.naviLastSortColumn    = sortInfo.first;
+    globalSettings.gui.mainDlg.naviLastSortAscending = sortInfo.second;
 
     //--------------------------------------------------------------------------------
     //write list of last used configuration files
@@ -993,32 +983,32 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     globalSettings.gui.folderHistoryLeft  = folderHistoryLeft ->getList();
     globalSettings.gui.folderHistoryRight = folderHistoryRight->getList();
 
-    globalSettings.gui.textSearchRespectCase = m_checkBoxMatchCase->GetValue();
+    globalSettings.gui.mainDlg.textSearchRespectCase = m_checkBoxMatchCase->GetValue();
 
-    globalSettings.gui.guiPerspectiveLast = auiMgr.SavePerspective();
+    globalSettings.gui.mainDlg.guiPerspectiveLast = auiMgr.SavePerspective();
 
     //we need to portably retrieve non-iconized, non-maximized size and position (non-portable: GetWindowPlacement())
     //call *after* wxAuiManager::SavePerspective()!
     if (IsIconized())
         Iconize(false);
 
-    globalSettings.gui.isMaximized = false;
-	if (IsMaximized()) //evaluate AFTER uniconizing!
-		{
-			globalSettings.gui.isMaximized = true;
-			Maximize(false);
-		}
+    globalSettings.gui.mainDlg.isMaximized = false;
+    if (IsMaximized()) //evaluate AFTER uniconizing!
+    {
+        globalSettings.gui.mainDlg.isMaximized = true;
+        Maximize(false);
+    }
 
-    globalSettings.gui.dlgSize = GetClientSize();
-    globalSettings.gui.dlgPos  = GetPosition();
+    globalSettings.gui.mainDlg.dlgSize = GetClientSize();
+    globalSettings.gui.mainDlg.dlgPos  = GetPosition();
 
     //wxGTK: returns full screen size and strange position (65/-4)
     //OS X 10.9 (but NO issue on 10.11!) returns full screen size and strange position (0/-22)
-    if (globalSettings.gui.isMaximized)
-        if (globalSettings.gui.dlgPos.y < 0)
+    if (globalSettings.gui.mainDlg.isMaximized)
+        if (globalSettings.gui.mainDlg.dlgPos.y < 0)
         {
-            globalSettings.gui.dlgSize = wxSize();
-            globalSettings.gui.dlgPos  = wxPoint();
+            globalSettings.gui.mainDlg.dlgSize = wxSize();
+            globalSettings.gui.mainDlg.dlgPos  = wxPoint();
         }
 
     return globalSettings;
@@ -1170,11 +1160,11 @@ void MainDialog::copyToAlternateFolder(const std::vector<zen::FileSystemObject*>
 
     if (zen::showCopyToDialog(this,
                               itemSelectionLeft, itemSelectionRight,
-                              globalCfg.gui.copyToCfg.lastUsedPath,
-                              globalCfg.gui.copyToCfg.folderHistory,
-                              globalCfg.gui.copyToCfg.historySizeMax,
-                              globalCfg.gui.copyToCfg.keepRelPaths,
-                              globalCfg.gui.copyToCfg.overwriteIfExists) != ReturnSmallDlg::BUTTON_OKAY)
+                              globalCfg.gui.mainDlg.copyToCfg.lastUsedPath,
+                              globalCfg.gui.mainDlg.copyToCfg.folderHistory,
+                              globalCfg.gui.mainDlg.copyToCfg.historySizeMax,
+                              globalCfg.gui.mainDlg.copyToCfg.keepRelPaths,
+                              globalCfg.gui.mainDlg.copyToCfg.overwriteIfExists) != ReturnSmallDlg::BUTTON_OKAY)
         return;
 
     try
@@ -1186,9 +1176,9 @@ void MainDialog::copyToAlternateFolder(const std::vector<zen::FileSystemObject*>
         StatusHandlerTemporaryPanel statusHandler(*this); //handle status display and error messages
 
         zen::copyToAlternateFolder(itemSelectionLeft, itemSelectionRight,
-                                   globalCfg.gui.copyToCfg.lastUsedPath,
-                                   globalCfg.gui.copyToCfg.keepRelPaths,
-                                   globalCfg.gui.copyToCfg.overwriteIfExists,
+                                   globalCfg.gui.mainDlg.copyToCfg.lastUsedPath,
+                                   globalCfg.gui.mainDlg.copyToCfg.keepRelPaths,
+                                   globalCfg.gui.mainDlg.copyToCfg.overwriteIfExists,
                                    statusHandler);
 
         //"clearSelection" not needed/desired
@@ -1214,7 +1204,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
 
     if (zen::showDeleteDialog(this,
                               itemSelectionLeft, itemSelectionRight,
-                              globalCfg.gui.manualDeletionUseRecycler) != ReturnSmallDlg::BUTTON_OKAY)
+                              globalCfg.gui.mainDlg.manualDeletionUseRecycler) != ReturnSmallDlg::BUTTON_OKAY)
         return;
 
     disableAllElements(true); //StatusHandlerTemporaryPanel will internally process Window messages, so avoid unexpected callbacks!
@@ -1229,7 +1219,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
         zen::deleteFromGridAndHD(itemSelectionLeft, itemSelectionRight,
                                  folderCmp,
                                  extractDirectionCfg(getConfig().mainCfg),
-                                 globalCfg.gui.manualDeletionUseRecycler,
+                                 globalCfg.gui.mainDlg.manualDeletionUseRecycler,
                                  globalCfg.optDialogs.warningRecyclerMissing,
                                  statusHandler);
 
@@ -2017,13 +2007,13 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
 
     //menu.addSeparator();
 
-    //menu.addItem(_("Copy to...") + L"\tCtrl+T", [&] { copyToAlternateFolder(selection, selection); }, nullptr, haveNonEmptyItems);
+    //menu.addItem(_("&Copy to...") + L"\tCtrl+T", [&] { copyToAlternateFolder(selection, selection); }, nullptr, haveNonEmptyItems);
 
     //----------------------------------------------------------------------------------------------------
 
     menu.addSeparator();
 
-    menu.addItem(_("Delete") + L"\tDel", [&] { deleteSelectedFiles(selection, selection); }, nullptr, haveNonEmptyItems);
+    menu.addItem(_("&Delete") + L"\tDel", [&] { deleteSelectedFiles(selection, selection); }, nullptr, haveNonEmptyItems);
 
     menu.popup(*this);
 }
@@ -2184,14 +2174,14 @@ void MainDialog::onMainGridContextRim(bool leftSide)
 
     menu.addSeparator();
 
-    menu.addItem(_("Copy to...") + L"\tCtrl+T", [&] { copyToAlternateFolder(itemSelectionLeft, itemSelectionRight); }, nullptr,
+    menu.addItem(_("&Copy to...") + L"\tCtrl+T", [&] { copyToAlternateFolder(itemSelectionLeft, itemSelectionRight); }, nullptr,
                  !itemSelectionLeft.empty() || !itemSelectionRight.empty());
 
     //----------------------------------------------------------------------------------------------------
 
     menu.addSeparator();
 
-    menu.addItem(_("Delete") + L"\tDel", [&] { deleteSelectedFiles(itemSelectionLeft, itemSelectionRight); }, nullptr,
+    menu.addItem(_("&Delete") + L"\tDel", [&] { deleteSelectedFiles(itemSelectionLeft, itemSelectionRight); }, nullptr,
                  !itemSelectionLeft.empty() || !itemSelectionRight.empty());
 
     menu.popup(*this);
@@ -2337,20 +2327,20 @@ void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::v
     menu.addSeparator();
     menu.addCheckBox(_("Show icons:"), [&]
     {
-        globalCfg.gui.showIcons = !globalCfg.gui.showIcons;
-        gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalCfg.gui.showIcons, convert(globalCfg.gui.iconSize));
+        globalCfg.gui.mainDlg.showIcons = !globalCfg.gui.mainDlg.showIcons;
+        gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalCfg.gui.mainDlg.showIcons, convert(globalCfg.gui.mainDlg.iconSize));
 
-    }, globalCfg.gui.showIcons);
+    }, globalCfg.gui.mainDlg.showIcons);
 
     auto setIconSize = [&](xmlAccess::FileIconSize sz)
     {
-        globalCfg.gui.iconSize = sz;
-        gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalCfg.gui.showIcons, convert(sz));
+        globalCfg.gui.mainDlg.iconSize = sz;
+        gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalCfg.gui.mainDlg.showIcons, convert(sz));
     };
     auto addSizeEntry = [&](const wxString& label, xmlAccess::FileIconSize sz)
     {
         auto setIconSize2 = setIconSize; //bring into scope
-        menu.addRadio(label, [sz, setIconSize2] { setIconSize2(sz); }, globalCfg.gui.iconSize == sz, globalCfg.gui.showIcons);
+        menu.addRadio(label, [sz, setIconSize2] { setIconSize2(sz); }, globalCfg.gui.mainDlg.iconSize == sz, globalCfg.gui.mainDlg.showIcons);
     };
     addSizeEntry(L"    " + _("Small" ), xmlAccess::ICON_SIZE_SMALL );
     addSizeEntry(L"    " + _("Medium"), xmlAccess::ICON_SIZE_MEDIUM);
@@ -2430,10 +2420,21 @@ void MainDialog::OnCompSettingsContext(wxEvent& event)
         applyCompareConfig(true /*setDefaultViewType*/);
     };
 
-    auto currentVar = getConfig().mainCfg.cmpConfig.compareVar;
+    const CompareVariant activeCmpVar = getConfig().mainCfg.cmpConfig.compareVar;
 
-    menu.addRadio(getVariantName(CMP_BY_TIME_SIZE), [&] { setVariant(CMP_BY_TIME_SIZE); }, currentVar == CMP_BY_TIME_SIZE);
-    menu.addRadio(getVariantName(CMP_BY_CONTENT  ), [&] { setVariant(CMP_BY_CONTENT);   }, currentVar == CMP_BY_CONTENT);
+    auto addVariantItem = [&](CompareVariant cmpVar, const wchar_t* iconName)
+    {
+        const wxBitmap& iconNormal = getResourceImage(iconName);
+        const wxBitmap  iconGrey   = greyScale(iconNormal);
+        menu.addItem(getVariantName(cmpVar), [&setVariant, cmpVar] { setVariant(cmpVar); }, activeCmpVar == cmpVar ? &iconNormal : &iconGrey);
+    };
+    addVariantItem(CMP_BY_TIME_SIZE, L"file-time-small");
+    addVariantItem(CMP_BY_CONTENT,   L"file-content-small");
+    addVariantItem(CMP_BY_SIZE,      L"file-size-small");
+
+    //menu.addRadio(getVariantName(CMP_BY_TIME_SIZE), [&] { setVariant(CMP_BY_TIME_SIZE); }, activeCmpVar == CMP_BY_TIME_SIZE);
+    //menu.addRadio(getVariantName(CMP_BY_CONTENT  ), [&] { setVariant(CMP_BY_CONTENT);   }, activeCmpVar == CMP_BY_CONTENT);
+    //menu.addRadio(getVariantName(CMP_BY_SIZE     ), [&] { setVariant(CMP_BY_SIZE);      }, activeCmpVar == CMP_BY_SIZE);
 
     wxPoint pos = m_bpButtonCmpContext->GetPosition();
     pos.x += m_bpButtonCmpContext->GetSize().GetWidth();
@@ -2464,10 +2465,10 @@ void MainDialog::OnSyncSettingsContext(wxEvent& event)
 }
 
 
-void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
+void MainDialog::onDialogFilesDropped(FileDropEvent& event)
 {
     loadConfiguration(event.getPaths());
-    event.Skip();
+    //event.Skip();
 }
 
 
@@ -3022,7 +3023,7 @@ bool MainDialog::loadConfiguration(const std::vector<Zstring>& filepaths)
     }
 
     setConfig(newGuiCfg, filepaths);
-    //flashStatusInformation(("Configuration loaded")); -> irrelevant!?
+    //flashStatusInformation("Configuration loaded"); -> irrelevant!?
     return true;
 }
 
@@ -3448,7 +3449,7 @@ void MainDialog::setViewFilterDefault()
 {
     auto setButton = [](ToggleButton* tb, bool value) { tb->setActive(value); };
 
-    const auto& def = globalCfg.gui.viewFilterDefault;
+    const auto& def = globalCfg.gui.mainDlg.viewFilterDefault;
     setButton(m_bpButtonShowExcluded,   def.excluded);
     setButton(m_bpButtonShowEqual,      def.equal);
     setButton(m_bpButtonShowConflict,   def.conflict);
@@ -3479,7 +3480,7 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
 
     auto saveDefault = [&]
     {
-        auto& def = globalCfg.gui.viewFilterDefault;
+        auto& def = globalCfg.gui.mainDlg.viewFilterDefault;
         setButtonDefault(m_bpButtonShowExcluded,   def.excluded);
         setButtonDefault(m_bpButtonShowEqual,      def.equal);
         setButtonDefault(m_bpButtonShowConflict,   def.conflict);
@@ -3560,6 +3561,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         folderCmp = compare(globalCfg.optDialogs,
                             true, //allowUserInteraction
                             globalCfg.runWithBackgroundPriority,
+                            globalCfg.folderAccessTimeout,
                             globalCfg.createLockFile,
                             dirLocks,
                             cmpConfig,
@@ -3685,8 +3687,10 @@ void MainDialog::applyCompareConfig(bool setDefaultViewType)
         switch (currentCfg.mainCfg.cmpConfig.compareVar)
         {
             case CMP_BY_TIME_SIZE:
+            case CMP_BY_SIZE:
                 setViewTypeSyncAction(true);
                 break;
+
             case CMP_BY_CONTENT:
                 setViewTypeSyncAction(false);
                 break;
@@ -3738,6 +3742,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                                                   globalCfg.automaticRetryCount,
                                                   globalCfg.automaticRetryDelay,
                                                   xmlAccess::extractJobName(activeCfgFilename),
+                                                  globalCfg.soundFileSyncComplete,
                                                   guiCfg.mainCfg.onCompletion,
                                                   globalCfg.gui.onCompletionHistory);
 
@@ -3774,6 +3779,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     globalCfg.copyFilePermissions,
                     globalCfg.failsafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
+                    globalCfg.folderAccessTimeout,
                     syncProcessCfg,
                     folderCmp,
                     statusHandler);
@@ -4364,7 +4370,7 @@ void MainDialog::updateGuiForFolderPair()
     {
         const int pairHeight = additionalFolderPairs[0]->GetSize().GetHeight();
         addPairMinimalHeight = std::min<double>(1.5, additionalFolderPairs.size()) * pairHeight; //have 1.5 * height indicate that more folders are there
-        addPairOptimalHeight = std::min<double>(globalCfg.gui.maxFolderPairsVisible - 1 + 0.5, //subtract first/main folder pair and add 0.5 to indicate additional folders
+        addPairOptimalHeight = std::min<double>(globalCfg.gui.mainDlg.maxFolderPairsVisible - 1 + 0.5, //subtract first/main folder pair and add 0.5 to indicate additional folders
                                                 additionalFolderPairs.size()) * pairHeight;
 
         addPairOptimalHeight = std::max(addPairOptimalHeight, addPairMinimalHeight); //implicitly handle corrupted values for "maxFolderPairsVisible"

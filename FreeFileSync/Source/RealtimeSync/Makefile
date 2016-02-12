@@ -1,4 +1,4 @@
-APPNAME = RealtimeSync
+APPNAME = RealTimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
@@ -41,13 +41,13 @@ OBJECT_LIST=$(CPP_LIST:%.cpp=../../Obj/RTS_GCC_Make_Release/ffs/src/rts/%.o)
 
 all: launchpad
 
-launchpad: RealtimeSync
+launchpad: RealTimeSync
 
 ../../Obj/RTS_GCC_Make_Release/ffs/src/rts/%.o : %.cpp
 	mkdir -p $(dir $@)
 	g++ $(CXXFLAGS) -c $< -o $@
 
-RealtimeSync: $(OBJECT_LIST)
+RealTimeSync: $(OBJECT_LIST)
 	g++ -o ../../Build/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:

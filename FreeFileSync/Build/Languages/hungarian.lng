@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Alapértelmezett szinkronizálási irányok beállítása: a régebbi fájlokat írja felül az újabbakkal.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>A Lomtár elérhetőségének ellenőrzése %x könyvtár vonatkozásában...</target>
+<source>Creating folder %x</source>
+<target>%x könyvtár létrehozása</target>
+
+<source>Creating file %x</source>
+<target>%x fájl létrehozása</target>
+
+<source>Creating symbolic link %x</source>
+<target>%x szimbolikus hivatkozás létrehozása</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>%x fájlt a Lomtárba mozgatja</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>%x szimbolikus hivatkozás törlése</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>A Lomtár elérhetőségének ellenőrzése %x könyvtár vonatkozásában...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>A Lomtár nem elérhető a következő könyvtárak esetében. A fájlok ezért véglegesen törlődnek:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Nem található a %x fájl.</target>
+
+<source>Error</source>
+<target>Hiba</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>%x fájl nem tartalmaz érvényes beállításokat.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>A következő könyvtárak nem találhatóak:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Figyelmen kívül hagyhatod ezt a hibát, ezzel üresnek tekintve minden egyes könyvtárat. A könyvtárak ekkor automatikusan létrejönnek a szinkronizálás folyamán.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ha figyelmen kívül ezt a hibajelzést, a könyvtárak üresnek minősülnek. Az hiányzó könyvárak automatikusan jönnek létre ha szükséges.</target>
 
 <source>A folder input field is empty.</source>
 <target>A könyvtár beviteli mező üres.</target>
@@ -246,9 +258,6 @@ Jelenlegi: %y bájt
 <source>Cannot find device %x.</source>
 <target>%x eszköz nem található.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>%x-en nem lehet a szabad tárterületet meghatározni.</target>
-
 <source>Cannot create directory %x.</source>
 <target>%x könyvtár létrehozása nem sikerült.</target>
 
@@ -267,11 +276,14 @@ Jelenlegi: %y bájt
 <source>Cannot resolve symbolic link %x.</source>
 <target>%x szimbolikus hivatkozás feloldása nem sikerült.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x nem helyezhető a Lomtárba.</target>
-
 <source>Cannot open directory %x.</source>
 <target>%x könyvtár megnyitása nem sikerült.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>%x-en nem lehet a szabad tárterületet meghatározni.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x nem helyezhető a Lomtárba.</target>
 
 <source>Incorrect command line:</source>
 <target>Hibás parancssor:</target>
@@ -345,9 +357,6 @@ Jelenlegi: %y bájt
 <source>Detecting abandoned lock...</source>
 <target>Elhagyott zárolást érzékel...</target>
 
-<source>Creating file %x</source>
-<target>%x fájl létrehozása</target>
-
 <source>Saving file %x...</source>
 <target>%x fájl mentése...</target>
 
@@ -358,16 +367,13 @@ Jelenlegi: %y bájt
 <target>Hátralévő elemek száma:</target>
 
 <source>Total time:</source>
-<target>Összes időszükségelet:</target>
+<target>Összes időszükséglet:</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Hiba történt a feldolgozás közben: %x fájl, %y sor, %z oszlop.</target>
 
 <source>Cannot set directory lock for %x.</source>
 <target>Nem sikerült zárolni a(z) %x könyvtárat.</target>
-
-<source>Scanning:</source>
-<target>Vizsgálat:</target>
 
 <source>
 <pluralform>1 thread</pluralform>
@@ -377,6 +383,9 @@ Jelenlegi: %y bájt
 <pluralform>1 szál</pluralform>
 <pluralform>%x szál</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Vizsgálat:</target>
 
 <source>/sec</source>
 <target>/másodperc</target>
@@ -488,8 +497,8 @@ A parancs végrehajtódik, ha:
 - új könyvtárak jelennek meg (pl. USB-kulcs csatlakoztatása)
 </target>
 
-<source>&Start</source>
-<target>&Start</target>
+<source>Start</source>
+<target>Indítás</target>
 
 <source>About</source>
 <target>A programról</target>
@@ -503,14 +512,14 @@ A parancs végrehajtódik, ha:
 <source>Automated Synchronization</source>
 <target>Automatizált szinkronizálás</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>A következő útvonal nem támogatja a könyvtár-monitorozást:</target>
+
 <source>Directory monitoring active</source>
 <target>A könyvtár figyelés aktív</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Várakozik, amíg az összes könyvtár elérhetővé válik...</target>
-
-<source>Error</source>
-<target>Hiba</target>
 
 <source>&Restore</source>
 <target>&Visszaállít</target>
@@ -524,11 +533,14 @@ A parancs végrehajtódik, ha:
 <source>&Retry</source>
 <target>&Ismét</target>
 
+<source>File time and size</source>
+<target>Fájl dátuma és mérete</target>
+
 <source>File content</source>
 <target>Fájl tartalma</target>
 
-<source>File time and size</source>
-<target>Fájl dátuma és mérete</target>
+<source>File size</source>
+<target>Fájl mérete</target>
 
 <source>Two way</source>
 <target>Kétirányú</target>
@@ -556,12 +568,6 @@ A parancs végrehajtódik, ha:
 
 <source>Removing old versions...</source>
 <target>Régi verziók eltávolítása...</target>
-
-<source>Creating symbolic link %x</source>
-<target>%x szimbolikus hivatkozás létrehozása</target>
-
-<source>Creating folder %x</source>
-<target>%x könyvtár létrehozása</target>
 
 <source>Updating file %x</source>
 <target>%x fájl frissítése</target>
@@ -680,30 +686,6 @@ A parancs végrehajtódik, ha:
 <source>Serious Error</source>
 <target>Komoly hiba</target>
 
-<source>Check for Program Updates</source>
-<target>Program-frissítések ellenőrzése</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Elérhető a FreeFileSync új verziója:</target>
-
-<source>Download now?</source>
-<target>Letöltsem most?</target>
-
-<source>&Download</source>
-<target>&Letölt</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>A FreeFileSync naprakész.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nem lehet csatlakozni a www.freefilesync.org-hoz.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Nem lehet online megtalálni a jelenlegi FreeFileSync verziószámot. Meg akarod keresni manuálisan?</target>
-
-<source>&Check</source>
-<target>&Ellenőriz</target>
-
 <source>Symlink</source>
 <target>Symlink</target>
 
@@ -764,11 +746,20 @@ A parancs végrehajtódik, ha:
 <source>Paste</source>
 <target>Beilleszt</target>
 
-<source>Local Synchronization Settings</source>
-<target>Helyi Szinkronizálási Beállítások</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>A kiválasztott %x könyvtárat nem lehet a FreeFileSync-kel használni.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>A választott %x könyvtárat nem lehet a FreeFileSyc-kel használni. Válasszon egy könyvtárat a helyi fájlrendszerben, hálózaton vagy egy MTP-t használó eszközön.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Kérem válasszon egy könyvtárat a helyi fájlrendszerben, a hálózaton vagy egy MTP eszközön.</target>
+
+<source>SFTP folder</source>
+<target>SFTP könyvtár</target>
+
+<source>Select SFTP folder</source>
+<target>Válasszon SFTP könyvtárat</target>
+
+<source>Select alternative folder type</source>
+<target>Válasszon alternatív könyvtár-típust</target>
 
 <source>&New</source>
 <target>&Új</target>
@@ -797,8 +788,8 @@ A parancs végrehajtódik, ha:
 <source>&Actions</source>
 <target>&Műveletek</target>
 
-<source>&Options</source>
-<target>&Beállítások</target>
+<source>&Preferences</source>
+<target>&Preferenciák</target>
 
 <source>&Language</source>
 <target>&Nyelv</target>
@@ -838,9 +829,6 @@ A parancs végrehajtódik, ha:
 
 <source>Remove folder pair</source>
 <target>Távolítsa el a könyvtár-párt</target>
-
-<source>Select SFTP folder</source>
-<target>Válassza ki az SFTP könyvtárat</target>
 
 <source>Swap sides</source>
 <target>Cserélje fel az oldalakat</target>
@@ -887,26 +875,14 @@ A parancs végrehajtódik, ha:
 <source>Total bytes to copy</source>
 <target>Összesen másolandó bájtok</target>
 
+<source>Folder pair:</source>
+<target>Könyvtár-pár:</target>
+
 <source>Use local settings:</source>
 <target>Használja a helyi beállításokat:</target>
 
 <source>Select a variant:</source>
 <target>Válasszon egy változatot:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Módosítási idő és méret összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Tartalom összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>Óra időeltolást hagyjon f&igyelmen kívül</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>A meghatározott eltolású fájlidőket egyenlőnek tekinti</target>
-
-<source>Handle daylight saving time</source>
-<target>Kezelje a nyári időszámítás különbségét</target>
 
 <source>Include &symbolic links:</source>
 <target>Tartalmazza a &szimbolikus linkeket:</target>
@@ -919,6 +895,18 @@ A parancs végrehajtódik, ha:
 
 <source>More information</source>
 <target>További információ</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>Hagyja figyelmen kívül az &időeltolódást [óó:pp]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>A figyelmen kívül hagyandó fájl időpont-eltolások listája</target>
+
+<source>Example:</source>
+<target>Példa:</target>
+
+<source>Handle daylight saving time</source>
+<target>Kezelje a nyári időszámítás különbségét</target>
 
 <source>Local settings:</source>
 <target>Helyi beállítások:</target>
@@ -1009,14 +997,17 @@ A parancs végrehajtódik, ha:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Rendezze a könyvtár-párt</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Adja meg SFTP bejelentkezésének részletei:</target>
 
 <source>Server name or IP address:</source>
 <target>Szerver neve vagy IP címe:</target>
 
-<source>Examples:</source>
-<target>Példák:</target>
+<source>Port:</source>
+<target>Port:</target>
 
 <source>User name:</source>
 <target>Felhasználó név:</target>
@@ -1030,6 +1021,12 @@ A parancs végrehajtódik, ha:
 <source>Directory on server:</source>
 <target>Könyvtár az alábbi szerveren:</target>
 
+<source>Select a directory on the server:</source>
+<target>Válasszon egy könyvtárat szerveren:</target>
+
+<source>Select Folder</source>
+<target>Könyvtár kiválasztása</target>
+
 <source>Start synchronization now?</source>
 <target>Megkezdje a szinkronizálást?</target>
 
@@ -1038,9 +1035,6 @@ A parancs végrehajtódik, ha:
 
 <source>&Don't show this dialog again</source>
 <target>&Ne mutassa ismételten ezt a párbeszédablakot</target>
-
-<source>Arrange folder pair</source>
-<target>Rendezze a könyvtár-párt</target>
 
 <source>Items found:</source>
 <target>Talált elemek száma:</target>
@@ -1092,6 +1086,12 @@ A parancs végrehajtódik, ha:
 
 <source>How can I schedule a batch job?</source>
 <target>Hogyan tudok kötegelt feldolgozást ütemezni?</target>
+
+<source>&Keep relative paths</source>
+<target>&Tartsa meg a relatív útvonalat</target>
+
+<source>&Overwrite existing files</source>
+<target>&Felülírja a létező fájlokat</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>A következő beállítások minden szinkronizálási feladatnál használja.</target>
@@ -1183,14 +1183,17 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Delete Items</source>
 <target>Törölje az elemeket</target>
 
+<source>Copy items</source>
+<target>Másolja az elemeket</target>
+
 <source>Options</source>
 <target>Beállítások</target>
 
 <source>Select Time Span</source>
 <target>Válassza ki az idősávot (időtartamot)</target>
 
-<source>&Preferences</source>
-<target>&Preferenciák</target>
+<source>&Options</source>
+<target>&Beállítások</target>
 
 <source>Main Bar</source>
 <target>Fő sáv</target>
@@ -1209,6 +1212,12 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Overview</source>
 <target>Áttekintés</target>
+
+<source>&Download</source>
+<target>&Letölt</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Elérhető a FreeFileSync új verziója:</target>
 
 <source>Confirm</source>
 <target>Jóváhagy</target>
@@ -1270,8 +1279,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Exclude temporarily</source>
 <target>Zárja ki ideiglenesen</target>
 
-<source>Delete</source>
-<target>Töröl</target>
+<source>&Copy to...</source>
+<target>&Másolja oda...</target>
+
+<source>&Delete</source>
+<target>&Törölje</target>
 
 <source>Include all</source>
 <target>Csatolja az összest</target>
@@ -1320,9 +1332,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Remove entry from list</source>
 <target>Törölje a bejegyzést a listáról</target>
-
-<source>Synchronization Settings</source>
-<target>Szinkronizálási beállítások</target>
 
 <source>Clear filter</source>
 <target>Törölje a szűrőt</target>
@@ -1411,26 +1420,26 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Shut down</source>
 <target>Leállítja a gépet</target>
 
-<source>Scanning...</source>
-<target>Vizsgálat folyamatban...</target>
-
-<source>Comparing content...</source>
-<target>Tartalom összehasonlítása...</target>
-
-<source>Info</source>
-<target>Információ</target>
-
-<source>Select all</source>
-<target>Összeset kiválasztja</target>
-
 <source>Paused</source>
 <target>Megállítva</target>
 
 <source>Initializing...</source>
 <target>Inicializálás...</target>
 
+<source>Scanning...</source>
+<target>Vizsgálat folyamatban...</target>
+
+<source>Comparing content...</source>
+<target>Tartalom összehasonlítása...</target>
+
 <source>Completed</source>
 <target>Befejeződött</target>
+
+<source>Info</source>
+<target>Információ</target>
+
+<source>Select all</source>
+<target>Összeset kiválasztja</target>
 
 <source>&Continue</source>
 <target>&Folytat</target>
@@ -1440,6 +1449,21 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Log</source>
 <target>Napló</target>
+
+<source>Loading...</source>
+<target>Tölti...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Másolja a következő elemet egy másik könyvtárba?</pluralform>
+<pluralform>Másolja a következő %x elemet egy másik könyvtárba?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Adja meg a célkönyvárat.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <pluralform>Valóban törölni akarod a következő elemet?</pluralform>
 <pluralform>Valóban törölni akarod a következő %x elemet?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Beállítások</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Másolja át DACL-t, SACL-t, tulajdonost és csoportot</target>
@@ -1489,6 +1510,15 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>&Show</source>
 <target>&Mutat</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Módosítási idő és méret összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Tartalom összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>A fájlméret összehasonlítása alapján azonosítsa az azonos fájlokat.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Változások keresése és bemutatása mindkét oldalon. A törléseket, mozgatásokat és ütközéseket automatikusan ismeri fel egy adatbázis segítségével.</target>
 
@@ -1500,6 +1530,15 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Configure your own synchronization rules.</source>
 <target>Állítsa be a saját szinkronizálási szabályait.</target>
+
+<source>Synchronization Settings</source>
+<target>Szinkronizálási beállítások</target>
+
+<source>Comparison</source>
+<target>Összehasonlítás</target>
+
+<source>Synchronization</source>
+<target>Szinkronizálás</target>
 
 <source>Today</source>
 <target>Mai</target>
@@ -1537,11 +1576,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Append a time stamp to each file name</source>
 <target>Minden fájlnévhez adjon egy-egy időbélyeget</target>
 
-<source>Comparison</source>
-<target>Összehasonlítás</target>
+<source>Main config</source>
+<target>Alapbeállítások</target>
 
-<source>Synchronization</source>
-<target>Szinkronizálás</target>
+<source>empty</source>
+<target>üres</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Hagyja feloldatlan ütközésként</target>
@@ -1560,6 +1599,27 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Percentage</source>
 <target>Százalék</target>
+
+<source>Internet access failed.</source>
+<target>Nem sikerült az internet hozzáférés.</target>
+
+<source>Check for Program Updates</source>
+<target>Program-frissítések ellenőrzése</target>
+
+<source>Download now?</source>
+<target>Letöltsem most?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>A FreeFileSync naprakész.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Nem lehet csatlakozni a www.freefilesync.org-hoz.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Nem lehet online megtalálni a jelenlegi FreeFileSync verziószámot. Meg akarod keresni manuálisan?</target>
+
+<source>&Check</source>
+<target>&Ellenőriz</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nem tud regisztrálni hogy megkapja a rendszerüzeneteket.</target>
@@ -1587,6 +1647,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Nem lehet az jogosultságokat %x-ből %y-ba másolni.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x nem megfelelő könyvtárnév.</target>
 
 <source>Cannot find system function %x.</source>
 <target>%x rendszerfunkció nem elérhető.</target>
@@ -1714,9 +1777,15 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync szinkronizációs adatbázis</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync konfigurálása</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync konfigurálása</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Szerkesztés FreeFileSync-kel</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Köszönöm az adományt és támogatást!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Ez az adományozók számára biztosított FreeFileSync telepítőcsomag elérte a megengedett telepítési számot. Letöltse most a normál verziót a FreeFileSync honlapjáról?</target>
 

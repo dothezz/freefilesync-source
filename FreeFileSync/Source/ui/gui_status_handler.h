@@ -55,6 +55,7 @@ public:
                                 size_t automaticRetryCount,
                                 size_t automaticRetryDelay,
                                 const std::wstring& jobName,
+                                const Zstring& soundFileSyncComplete,
                                 const Zstring& onCompletion,
                                 std::vector<Zstring>& onCompletionHistory);
     ~StatusHandlerFloatingDialog();

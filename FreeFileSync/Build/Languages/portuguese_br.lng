@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Configurando direções padrões de sincronização: Arquivos antigos serão substituídos por arquivos mais novos.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Verificando a disponibilidade da lixeira para a pasta %x...</target>
+<source>Creating folder %x</source>
+<target>Criando pasta %x</target>
+
+<source>Creating file %x</source>
+<target>Criando arquivo %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Criando link simbólico %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Movendo arquivo %x para a Lixeira</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Apagando link simbólico %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Verificando a disponibilidade da lixeira para a pasta %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>A Lixeira não está disponível para as seguintes pastas. Os arquivos serão apagados permanentemente:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Não foi possível encontrar o arquivo %x.</target>
+
+<source>Error</source>
+<target>Erro</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>O arquivo %x não contém uma configuração válida.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Não foi possível localizar as seguintes pastas:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Você pode ignorar este erro para considerar cada pasta como vazia. As pastas serão criadas automaticamentes durante a sincronização.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Se você ignorar este erro, as pastas serão consideradas como vazias. Pastas faltantes serão criadas automaticamente quando necessárias.</target>
 
 <source>A folder input field is empty.</source>
 <target>Um campo de entrada de pasta está vazio.</target>
@@ -246,9 +258,6 @@ Atual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Não foi possível encontrar o dispositivo %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Não foi possível determinar o espaço livre em disco para %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Não foi possível criar o diretório %x.</target>
 
@@ -267,11 +276,14 @@ Atual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Não foi possível resolver o link simbólico %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Não foi possível mover %x para a Lixeira.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Não foi possível abrir o diretório %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Não foi possível determinar o espaço livre em disco para %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Não foi possível mover %x para a Lixeira.</target>
 
 <source>Incorrect command line:</source>
 <target>Linha de comando incorreta:</target>
@@ -345,9 +357,6 @@ Atual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Detectando travamento abandonado...</target>
 
-<source>Creating file %x</source>
-<target>Criando arquivo %x</target>
-
 <source>Saving file %x...</source>
 <target>Salvando arquivo %x...</target>
 
@@ -366,9 +375,6 @@ Atual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Não foi possível travar o diretório %x.</target>
 
-<source>Scanning:</source>
-<target>Pesquisando:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Atual: %y bytes
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Pesquisando:</target>
 
 <source>/sec</source>
 <target>/seg</target>
@@ -488,8 +497,8 @@ O comando é disparado se:
 - novas pastas aparecem (p. ex. Pen drive inserido)
 </target>
 
-<source>&Start</source>
-<target>&Iniciar</target>
+<source>Start</source>
+<target>Iniciar</target>
 
 <source>About</source>
 <target>Sobre</target>
@@ -503,14 +512,14 @@ O comando é disparado se:
 <source>Automated Synchronization</source>
 <target>Sincronização Automatizada</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>O seguinte caminho não suporta monitoramento de diretório:</target>
+
 <source>Directory monitoring active</source>
 <target>Monitoramento de diretórios ativado</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Aguardando até todos os diretórios estarem disponíveis...</target>
-
-<source>Error</source>
-<target>Erro</target>
 
 <source>&Restore</source>
 <target>&Restaurar</target>
@@ -524,11 +533,14 @@ O comando é disparado se:
 <source>&Retry</source>
 <target>&Tentar Novamente</target>
 
+<source>File time and size</source>
+<target>Data e tamanho do arquivo</target>
+
 <source>File content</source>
 <target>Conteúdo do arquivo</target>
 
-<source>File time and size</source>
-<target>Data e tamanho do arquivo</target>
+<source>File size</source>
+<target>Tamanho do arquivo</target>
 
 <source>Two way</source>
 <target>Dois sentidos</target>
@@ -556,12 +568,6 @@ O comando é disparado se:
 
 <source>Removing old versions...</source>
 <target>Removendo versões antigas...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Criando link simbólico %x</target>
-
-<source>Creating folder %x</source>
-<target>Criando pasta %x</target>
 
 <source>Updating file %x</source>
 <target>Atualizando arquivo %x...</target>
@@ -680,30 +686,6 @@ O comando é disparado se:
 <source>Serious Error</source>
 <target>Erro Grave</target>
 
-<source>Check for Program Updates</source>
-<target>Verificar se existem atualizações</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Uma nova versão do FreeFileSync está disponível:</target>
-
-<source>Download now?</source>
-<target>Baixar agora?</target>
-
-<source>&Download</source>
-<target>&Baixar</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync está atualizado.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Não foi possível conectar a www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Não foi possível encontrar a versão atual do FreeFileSync online. Deseja verificar manualmente?</target>
-
-<source>&Check</source>
-<target>&Verificar</target>
-
 <source>Symlink</source>
 <target>Link Simbólico</target>
 
@@ -764,11 +746,20 @@ O comando é disparado se:
 <source>Paste</source>
 <target>Colar</target>
 
-<source>Local Synchronization Settings</source>
-<target>Configurações de Sincronização Local</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>A pasta selecionada %x não pode ser usada com o FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>A pasta %x selecionada não pode ser usada com o FreeFileSync. Por favor, selecione uma pasta em seu sistema de arquivos local, na rede ou em um dispositivo MTP.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Por favor, selecione uma pasta em um sistema de arquivos local, de rede ou de um dispositivo MTP.</target>
+
+<source>SFTP folder</source>
+<target>Pasta SFTP</target>
+
+<source>Select SFTP folder</source>
+<target>Selecionar pasta SFTP</target>
+
+<source>Select alternative folder type</source>
+<target>Selecionar tipo alternativo de pasta</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -797,8 +788,8 @@ O comando é disparado se:
 <source>&Actions</source>
 <target>A&ções</target>
 
-<source>&Options</source>
-<target>&Opções</target>
+<source>&Preferences</source>
+<target>&Preferências</target>
 
 <source>&Language</source>
 <target>&Idioma</target>
@@ -838,9 +829,6 @@ O comando é disparado se:
 
 <source>Remove folder pair</source>
 <target>Remover par de pastas</target>
-
-<source>Select SFTP folder</source>
-<target>Selecionar pasta SFTP</target>
 
 <source>Swap sides</source>
 <target>Inverter lados</target>
@@ -887,26 +875,14 @@ O comando é disparado se:
 <source>Total bytes to copy</source>
 <target>Bytes totais a serem copiados</target>
 
+<source>Folder pair:</source>
+<target>Par de pastas:</target>
+
 <source>Use local settings:</source>
 <target>Usar configurações locais:</target>
 
 <source>Select a variant:</source>
 <target>Selecione uma variante:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Identifica arquivos iguais comparando modificações na data e no tamanho.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Identifica arquivos iguais comparando o conteúdo do arquivo.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignorar mudança de horário (em horas)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Considera horário de arquivos com uma diferença especificada como iguais</target>
-
-<source>Handle daylight saving time</source>
-<target>Como lidar com horário de verão</target>
 
 <source>Include &symbolic links:</source>
 <target>Incluir &links simbólicos:</target>
@@ -919,6 +895,18 @@ O comando é disparado se:
 
 <source>More information</source>
 <target>Mais informações</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ignorar mudança de tempo [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Lista de diferença de tempo nos arquivos para ignorar</target>
+
+<source>Example:</source>
+<target>Exemplo:</target>
+
+<source>Handle daylight saving time</source>
+<target>Como lidar com horário de verão</target>
 
 <source>Local settings:</source>
 <target>Configurações locais:</target>
@@ -1009,14 +997,17 @@ O comando é disparado se:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Organizar par de pastas</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Entre com seus detalhes de login do SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>Nome do servidor ou endereço IP:</target>
 
-<source>Examples:</source>
-<target>Exemplos:</target>
+<source>Port:</source>
+<target>Porta:</target>
 
 <source>User name:</source>
 <target>Nome do usuário:</target>
@@ -1030,6 +1021,12 @@ O comando é disparado se:
 <source>Directory on server:</source>
 <target>Diretório no servidor:</target>
 
+<source>Select a directory on the server:</source>
+<target>Selecione um diretório no servidor:</target>
+
+<source>Select Folder</source>
+<target>Selecionar Pasta</target>
+
 <source>Start synchronization now?</source>
 <target>Iniciar sincronização agora?</target>
 
@@ -1038,9 +1035,6 @@ O comando é disparado se:
 
 <source>&Don't show this dialog again</source>
 <target>&Não mostrar este diálogo novamente</target>
-
-<source>Arrange folder pair</source>
-<target>Organizar par de pastas</target>
 
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
@@ -1092,6 +1086,12 @@ O comando é disparado se:
 
 <source>How can I schedule a batch job?</source>
 <target>Como posso agendar uma tarefa em lote?</target>
+
+<source>&Keep relative paths</source>
+<target>&Manter caminhos relativos</target>
+
+<source>&Overwrite existing files</source>
+<target>&Sobrescrever arquivos existentes</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>As seguintes configurações são utilizadas para todas as tarefas de sincronização.</target>
@@ -1183,14 +1183,17 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Delete Items</source>
 <target>Apagar Itens</target>
 
+<source>Copy items</source>
+<target>Copiar itens</target>
+
 <source>Options</source>
 <target>Opções</target>
 
 <source>Select Time Span</source>
 <target>Selecionar Intervalo de Tempo</target>
 
-<source>&Preferences</source>
-<target>&Preferências</target>
+<source>&Options</source>
+<target>&Opções</target>
 
 <source>Main Bar</source>
 <target>Barra Principal</target>
@@ -1209,6 +1212,12 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Overview</source>
 <target>Parâmetros</target>
+
+<source>&Download</source>
+<target>&Baixar</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Uma nova versão do FreeFileSync está disponível:</target>
 
 <source>Confirm</source>
 <target>Confirmar</target>
@@ -1270,8 +1279,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Exclude temporarily</source>
 <target>Excluir temporariamente</target>
 
-<source>Delete</source>
-<target>Apagar</target>
+<source>&Copy to...</source>
+<target>&Copiar para...</target>
+
+<source>&Delete</source>
+<target>&Apagar</target>
 
 <source>Include all</source>
 <target>Incluir todos</target>
@@ -1320,9 +1332,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Remove entry from list</source>
 <target>Remover entrada da lista</target>
-
-<source>Synchronization Settings</source>
-<target>Configurações de Sincronização</target>
 
 <source>Clear filter</source>
 <target>Limpar filtro</target>
@@ -1411,26 +1420,26 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Shut down</source>
 <target>Desligar</target>
 
-<source>Scanning...</source>
-<target>Pesquisando...</target>
-
-<source>Comparing content...</source>
-<target>Comparando conteúdo...</target>
-
-<source>Info</source>
-<target>Informações</target>
-
-<source>Select all</source>
-<target>Seleciona todos</target>
-
 <source>Paused</source>
 <target>Pausado</target>
 
 <source>Initializing...</source>
 <target>Inicializando...</target>
 
+<source>Scanning...</source>
+<target>Pesquisando...</target>
+
+<source>Comparing content...</source>
+<target>Comparando conteúdo...</target>
+
 <source>Completed</source>
 <target>Finalizado</target>
+
+<source>Info</source>
+<target>Informações</target>
+
+<source>Select all</source>
+<target>Seleciona todos</target>
 
 <source>&Continue</source>
 <target>&Continuar</target>
@@ -1440,6 +1449,21 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Log</source>
 <target>Log</target>
+
+<source>Loading...</source>
+<target>Carregando...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Copiar o seguinte item para outra pasta?</pluralform>
+<pluralform>Copiar os seguintes %x itens para outra pasta?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Por favor, entre com uma pasta de destino.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <pluralform>Você realmente deseja apagar o seguinte item?</pluralform>
 <pluralform>Você realmente deseja apagar os seguintes %x itens?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Preferências</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Copiar DACL, SACL, Proprietário, Grupo</target>
@@ -1489,6 +1510,15 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>&Show</source>
 <target>&Mostrar</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identifica arquivos iguais comparando modificações na data e no tamanho.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Identifica arquivos iguais comparando o conteúdo do arquivo.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Identifica arquivos iguais comparando os seus tamanhos.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identifica e propaga as mudanças em ambos os lados. Arquivos e pastas apagados e/ou movidos e conflitos são detectados automaticamente usando um banco de dados.</target>
 
@@ -1500,6 +1530,15 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Configure your own synchronization rules.</source>
 <target>Configure as suas próprias regras de sincronização.</target>
+
+<source>Synchronization Settings</source>
+<target>Configurações de Sincronização</target>
+
+<source>Comparison</source>
+<target>Comparação</target>
+
+<source>Synchronization</source>
+<target>Sincronização</target>
 
 <source>Today</source>
 <target>Hoje</target>
@@ -1537,11 +1576,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Append a time stamp to each file name</source>
 <target>Coloca uma estampa de tempo para cada nome de arquivo</target>
 
-<source>Comparison</source>
-<target>Comparação</target>
+<source>Main config</source>
+<target>Config. principal</target>
 
-<source>Synchronization</source>
-<target>Sincronização</target>
+<source>empty</source>
+<target>vazio</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Deixar como conflito não resolvido</target>
@@ -1560,6 +1599,27 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Percentage</source>
 <target>Percentual</target>
+
+<source>Internet access failed.</source>
+<target>Acesso à internet falhou.</target>
+
+<source>Check for Program Updates</source>
+<target>Verificar se existem atualizações</target>
+
+<source>Download now?</source>
+<target>Baixar agora?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync está atualizado.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Não foi possível conectar a www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Não foi possível encontrar a versão atual do FreeFileSync online. Deseja verificar manualmente?</target>
+
+<source>&Check</source>
+<target>&Verificar</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Não foi possível registrar para receber mensagens do sistema.</target>
@@ -1587,6 +1647,9 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Não foi possível copiar as permissões de %x para %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x não é um nome de diretório regular.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Não foi possível localizar a função de sistema %x.</target>
@@ -1714,9 +1777,15 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>FreeFileSync Synchronization Database</source>
 <target>Banco de dados de sincronização do FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Configuração do RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>Configuração do RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Editar com FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Obrigado pela sua doação e suporte!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Este instalador do FreeFileSync para doadores atingiu seu limite de instalação. Baixar a versão regular da página do FreeFileSync agora?</target>
 

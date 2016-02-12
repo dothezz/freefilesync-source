@@ -16,11 +16,11 @@ inline
 wxIcon getRtsIcon()
 {
     //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes => check on all platforms!
-    assert(getResourceImage(L"RealtimeSync").GetWidth () == getResourceImage(L"RealtimeSync").GetHeight() &&
-           getResourceImage(L"RealtimeSync").GetWidth() % 128 == 0);
+    assert(getResourceImage(L"RealTimeSync").GetWidth () == getResourceImage(L"RealTimeSync").GetHeight() &&
+           getResourceImage(L"RealTimeSync").GetWidth() % 128 == 0);
     //attention: make sure to not implicitly call "instance()" again => deadlock on Linux
     wxIcon icon;
-    icon.CopyFromBitmap(getResourceImage(L"RealtimeSync")); //use big logo bitmap for better quality
+    icon.CopyFromBitmap(getResourceImage(L"RealTimeSync")); //use big logo bitmap for better quality
     return icon;
 
 }

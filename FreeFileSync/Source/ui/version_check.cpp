@@ -271,12 +271,12 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
 
         case GET_VER_NO_CONNECTION:
             showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
-                                   setTitle(("Check for Program Updates")).
+                                   setTitle(_("Check for Program Updates")).
                                    setMainInstructions(_("Unable to connect to www.freefilesync.org.")));
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
-            lastOnlineVersion = L"unknown";
+            lastOnlineVersion = L"Unknown";
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
@@ -346,7 +346,7 @@ void zen::evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std
             break; //ignore this error
 
         case GET_VER_PAGE_NOT_FOUND:
-            lastOnlineVersion = L"unknown";
+            lastOnlineVersion = L"Unknown";
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),

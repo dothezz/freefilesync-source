@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Standaardwaarden instellen voor synchronisatierichtingen: oude bestanden worden overschreven door nieuwere.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Controleer beschikbaarheid voor de prullenbak map %x...</target>
+<source>Creating folder %x</source>
+<target>Map %x maken</target>
+
+<source>Creating file %x</source>
+<target>Bestand %x maken</target>
+
+<source>Creating symbolic link %x</source>
+<target>Symbolische link %x maken</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Verplaatsen van bestand %x naar de prullenbak</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Symbolische koppeling %x verwijderen</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Controleer beschikbaarheid voor de prullenbak map %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>De prullenbak is niet beschikbaar voor de volgende mappen. De bestanden worden permanent verwijderd:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Kan bestand %x niet vinden.</target>
+
+<source>Error</source>
+<target>Fout</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Het bestand %x bevat geen geldige configuratie.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>De volgende mappen konden niet worden gevonden:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Deze fout kan worden genegeerd, om de mappen als leeg te zien en de folders automatisch te creëren wanneer u synchroniseert.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Indien u deze fout negeert zullen de mappen als leeg beschouwd worden. Ontbrekende mappen worden indien nodig automatisch aangemaakt.</target>
 
 <source>A folder input field is empty.</source>
 <target>Invoerveld van een map is leeg.</target>
@@ -246,9 +258,6 @@ Werkelijk: %y bytes
 <source>Cannot find device %x.</source>
 <target>Kan apparaat %x niet vinden.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Kan de vrije schijfruimte voor %x niet bepalen.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Kan de map %x niet maken.</target>
 
@@ -267,11 +276,14 @@ Werkelijk: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan de symbolische koppeling %x niet oplossen.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Niet in staat om %x naar de prullenbak te verplaatsen.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Kan de folder %x niet openen.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Kan de vrije schijfruimte voor %x niet bepalen.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Niet in staat om %x naar de prullenbak te verplaatsen.</target>
 
 <source>Incorrect command line:</source>
 <target>Onjuiste opdrachtregel:</target>
@@ -345,9 +357,6 @@ Werkelijk: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Opsporen van verlaten vergrendeling...</target>
 
-<source>Creating file %x</source>
-<target>Bestand %x maken</target>
-
 <source>Saving file %x...</source>
 <target>Opslaan van bestand %x...</target>
 
@@ -366,9 +375,6 @@ Werkelijk: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>De mapvergrendeling voor %x kan niet ingesteld worden.</target>
 
-<source>Scanning:</source>
-<target>Scannen:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Werkelijk: %y bytes
 <pluralform>1 Thread</pluralform>
 <pluralform>%x Threads</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Scannen:</target>
 
 <source>/sec</source>
 <target>/sec</target>
@@ -488,8 +497,8 @@ De opdracht wordt geactiveerd als:
 - nieuwe mappen verschijnen (b.v. USB-stick wordt geplaatst)
 </target>
 
-<source>&Start</source>
-<target>&Start</target>
+<source>Start</source>
+<target>Start</target>
 
 <source>About</source>
 <target>Over</target>
@@ -503,14 +512,14 @@ De opdracht wordt geactiveerd als:
 <source>Automated Synchronization</source>
 <target>Automatische synchronisatie</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Het volgende pad ondersteunt geen map bewaking:</target>
+
 <source>Directory monitoring active</source>
 <target>Directory controle actief</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Wacht totdat alle directories beschikbaar zijn...</target>
-
-<source>Error</source>
-<target>Fout</target>
 
 <source>&Restore</source>
 <target>&Herstellen</target>
@@ -524,11 +533,14 @@ De opdracht wordt geactiveerd als:
 <source>&Retry</source>
 <target>&Probeer opnieuw</target>
 
+<source>File time and size</source>
+<target>Datum en grootte bestand</target>
+
 <source>File content</source>
 <target>Bestandsinhoud</target>
 
-<source>File time and size</source>
-<target>Datum en grootte bestand</target>
+<source>File size</source>
+<target>Bestandsgrootte</target>
 
 <source>Two way</source>
 <target>Twee richtingen</target>
@@ -556,12 +568,6 @@ De opdracht wordt geactiveerd als:
 
 <source>Removing old versions...</source>
 <target>Verwijderen van oude versies...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Symbolische link %x maken</target>
-
-<source>Creating folder %x</source>
-<target>Map %x maken</target>
 
 <source>Updating file %x</source>
 <target>File %x bijwerken</target>
@@ -680,30 +686,6 @@ De opdracht wordt geactiveerd als:
 <source>Serious Error</source>
 <target>Ernstige fout</target>
 
-<source>Check for Program Updates</source>
-<target>Controleer voor programma-updates</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
-
-<source>Download now?</source>
-<target>Nu downloaden?</target>
-
-<source>&Download</source>
-<target>&Downloaden</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync is actueel.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Kan geen verbinding maken met www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Kan online niet het actuele FreeFileSync versienummer vinden. Wilt u handmatig controleren?</target>
-
-<source>&Check</source>
-<target>&Controleren</target>
-
 <source>Symlink</source>
 <target>Symlink</target>
 
@@ -764,11 +746,20 @@ De opdracht wordt geactiveerd als:
 <source>Paste</source>
 <target>Plakken</target>
 
-<source>Local Synchronization Settings</source>
-<target>Lokale synchronisatie-instellingen</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>De geselecteerde map %x kan niet worden gebruikt met FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>De geselecteerde map %x kan niet worden gebruikt met FreeFileSync. Selecteer een map op een lokaal bestandssysteem, netwerk of een MTP-apparaat.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Selecteer een map op een lokaal bestandssysteem, netwerk of een MTP-apparaat.</target>
+
+<source>SFTP folder</source>
+<target>SFTP map</target>
+
+<source>Select SFTP folder</source>
+<target>Selecteer SFTP map</target>
+
+<source>Select alternative folder type</source>
+<target>Selecteer alternatieve map type</target>
 
 <source>&New</source>
 <target>&Nieuw</target>
@@ -797,8 +788,8 @@ De opdracht wordt geactiveerd als:
 <source>&Actions</source>
 <target>&Acties</target>
 
-<source>&Options</source>
-<target>&Opties</target>
+<source>&Preferences</source>
+<target>&Voorkeuren</target>
 
 <source>&Language</source>
 <target>&Taal</target>
@@ -838,9 +829,6 @@ De opdracht wordt geactiveerd als:
 
 <source>Remove folder pair</source>
 <target>Verwijder map-paar</target>
-
-<source>Select SFTP folder</source>
-<target>Selecteer SFTP map</target>
 
 <source>Swap sides</source>
 <target>Verwisselen van zijden</target>
@@ -887,26 +875,14 @@ De opdracht wordt geactiveerd als:
 <source>Total bytes to copy</source>
 <target>Totaal aantal te kopieëren bytes</target>
 
+<source>Folder pair:</source>
+<target>Mappaar:</target>
+
 <source>Use local settings:</source>
 <target>Gebruik lokale instellingen:</target>
 
 <source>Select a variant:</source>
 <target>Selecteer een variant:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Identificeer gelijke bestanden door het vergelijken van wijzigingen in tijd en grootte.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Identificeer gelijke bestanden door het vergelijken van de bestandsinhoud.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Negeer tijdsverschuiving (in uren)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Overweeg bestand-tijden met gespecificeerde verspringing als gelijkwaardig te beschouwen</target>
-
-<source>Handle daylight saving time</source>
-<target>Zomertijd gebruiken</target>
 
 <source>Include &symbolic links:</source>
 <target>Inclusief &symbolische links:</target>
@@ -919,6 +895,18 @@ De opdracht wordt geactiveerd als:
 
 <source>More information</source>
 <target>Meer informatie</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Negeer tijdsverschuiving [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Lijst van bestandstijdverschuivingen om te negeren</target>
+
+<source>Example:</source>
+<target>Voorbeeld:</target>
+
+<source>Handle daylight saving time</source>
+<target>Zomertijd gebruiken</target>
 
 <source>Local settings:</source>
 <target>Lokale instellingen:</target>
@@ -1009,14 +997,17 @@ De opdracht wordt geactiveerd als:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Rangschik folder-paar</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Vul uw SFTP login gegevens in:</target>
 
 <source>Server name or IP address:</source>
 <target>Servernaam of IP-adres:</target>
 
-<source>Examples:</source>
-<target>Voorbeelden:</target>
+<source>Port:</source>
+<target>Poort:</target>
 
 <source>User name:</source>
 <target>Gebruikersnaam:</target>
@@ -1030,6 +1021,12 @@ De opdracht wordt geactiveerd als:
 <source>Directory on server:</source>
 <target>Map op de server:</target>
 
+<source>Select a directory on the server:</source>
+<target>Selecteer een map op de server:</target>
+
+<source>Select Folder</source>
+<target>Selecteer map</target>
+
 <source>Start synchronization now?</source>
 <target>Synchronisatie nu starten?</target>
 
@@ -1038,9 +1035,6 @@ De opdracht wordt geactiveerd als:
 
 <source>&Don't show this dialog again</source>
 <target>&Dit dialoogvenster niet opnieuw weergeven</target>
-
-<source>Arrange folder pair</source>
-<target>Rangschik folder-paar</target>
 
 <source>Items found:</source>
 <target>Gevonden objecten:</target>
@@ -1092,6 +1086,12 @@ De opdracht wordt geactiveerd als:
 
 <source>How can I schedule a batch job?</source>
 <target>Hoe kan ik een batchverwerking plannen?</target>
+
+<source>&Keep relative paths</source>
+<target>&Houd relatieve paden</target>
+
+<source>&Overwrite existing files</source>
+<target>&Overschrijf bestaande bestanden</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>De volgende instellingen worden gebruikt voor alle synchronisatie opdrachten.</target>
@@ -1183,14 +1183,17 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Delete Items</source>
 <target>Items verwijderen</target>
 
+<source>Copy items</source>
+<target>Kopieer items</target>
+
 <source>Options</source>
 <target>Opties</target>
 
 <source>Select Time Span</source>
 <target>Selecteer tijdsduur</target>
 
-<source>&Preferences</source>
-<target>&Voorkeuren</target>
+<source>&Options</source>
+<target>&Opties</target>
 
 <source>Main Bar</source>
 <target>Hoofd balk</target>
@@ -1209,6 +1212,12 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Overview</source>
 <target>Overzicht</target>
+
+<source>&Download</source>
+<target>&Downloaden</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
 
 <source>Confirm</source>
 <target>Bevestigen</target>
@@ -1270,8 +1279,11 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Exclude temporarily</source>
 <target>Tijdelijk uitsluiten</target>
 
-<source>Delete</source>
-<target>Verwijderen</target>
+<source>&Copy to...</source>
+<target>&Kopiëren naar...</target>
+
+<source>&Delete</source>
+<target>&Verwijderen</target>
 
 <source>Include all</source>
 <target>Omvat alle</target>
@@ -1320,9 +1332,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Remove entry from list</source>
 <target>Vermelding verwijderen uit de lijst</target>
-
-<source>Synchronization Settings</source>
-<target>Synchronisatie-instellingen</target>
 
 <source>Clear filter</source>
 <target>Filter wissen</target>
@@ -1411,26 +1420,26 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Shut down</source>
 <target>Afsluiten</target>
 
-<source>Scanning...</source>
-<target>Scannen...</target>
-
-<source>Comparing content...</source>
-<target>Inhoud vergelijken...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Alles selecteren</target>
-
 <source>Paused</source>
 <target>Onderbroken</target>
 
 <source>Initializing...</source>
 <target>Initialiseren...</target>
 
+<source>Scanning...</source>
+<target>Scannen...</target>
+
+<source>Comparing content...</source>
+<target>Inhoud vergelijken...</target>
+
 <source>Completed</source>
 <target>Voltooid</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Alles selecteren</target>
 
 <source>&Continue</source>
 <target>&Doorgaan</target>
@@ -1440,6 +1449,21 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Log</source>
 <target>Logboek</target>
+
+<source>Loading...</source>
+<target>Laden...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Kopieer het volgende item naar een andere map?</pluralform>
+<pluralform>Kopieer de volgende %x items naar een andere map?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Selecteer een doelmap.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <pluralform>Wilt u het volgende item echt verwijderen?</pluralform>
 <pluralform>Wilt u de volgende %x items echt verwijderen?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Voorkeuren</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Kopiëren DACL, SACL, Eigenaar, Groep</target>
@@ -1489,6 +1510,15 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>&Show</source>
 <target>&Toon</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Identificeer gelijke bestanden door het vergelijken van wijzigingen in tijd en grootte.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Identificeer gelijke bestanden door het vergelijken van de bestandsinhoud.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Identificeer gelijke bestanden door de bestandsgrootte te vergelijken.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Identificeren en doorgeven van veranderingen aan beide kanten. Verwijderingen, verplaatsingen en conflicten worden automatisch gedetecteerd met behulp van een database.</target>
 
@@ -1500,6 +1530,15 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Configure your own synchronization rules.</source>
 <target>Configureer uw eigen synchronisatie regels.</target>
+
+<source>Synchronization Settings</source>
+<target>Synchronisatie-instellingen</target>
+
+<source>Comparison</source>
+<target>Vergelijking</target>
+
+<source>Synchronization</source>
+<target>Synchronisatie</target>
 
 <source>Today</source>
 <target>Vandaag</target>
@@ -1537,11 +1576,11 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Append a time stamp to each file name</source>
 <target>Aan elke bestandsnaam een tijdstempel toevoegen</target>
 
-<source>Comparison</source>
-<target>Vergelijking</target>
+<source>Main config</source>
+<target>Hoofd configuratie</target>
 
-<source>Synchronization</source>
-<target>Synchronisatie</target>
+<source>empty</source>
+<target>leeg</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Laten als onopgelost conflicht</target>
@@ -1560,6 +1599,27 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Percentage</source>
 <target>Percentage</target>
+
+<source>Internet access failed.</source>
+<target>Internettoegang is mislukt.</target>
+
+<source>Check for Program Updates</source>
+<target>Controleer voor programma-updates</target>
+
+<source>Download now?</source>
+<target>Nu downloaden?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync is actueel.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Kan geen verbinding maken met www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Kan online niet het actuele FreeFileSync versienummer vinden. Wilt u handmatig controleren?</target>
+
+<source>&Check</source>
+<target>&Controleren</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Niet in staat om de ontvangen systeemberichten te registreren.</target>
@@ -1587,6 +1647,9 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Kan de toegangsrechten van %x niet kopiëren naar %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x is niet een normale mapnaam.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan de systeemfunctie %x niet vinden.</target>
@@ -1714,9 +1777,15 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync synchronisatie database</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync configuratie</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync configuratie</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Bewerken met FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Bedankt voor uw donatie en ondersteuning!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Dit FreeFileSync installatieprogramma voor donateurs heeft zijn installatielimiet bereikt. Download de reguliere versie van de FreeFileSync startpagina nu?</target>
 

@@ -3,31 +3,31 @@
 <head>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="base.css" >
-	<title>RealtimeSync - Automated Synchronization</title>
+	<title>RealTimeSync - Automated Synchronization</title>
 </head>
 
 <body>
 	<h1 style="text-align: center">
-		<img src="../images/RTS-logo.png" alt="RealtimeSync"><br>
+		<img src="../images/realtimesync-logo.png" alt="RealTimeSync"><br>
 		<i><span style="font-weight: normal">Automated Synchronization</span></i>
 	</h1>
 
 	<p>
-		The primary purpose of RealtimeSync is to execute a command line each time it <b>detects changes</b> in one of the monitored directories
+		The primary purpose of RealTimeSync is to execute a command line each time it <b>detects changes</b> in one of the monitored directories
 		or when a <b>directory becomes available</b> (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.
 	</p>
 	<br>
 	
 	<h2>Example: <span style="font-weight:normal">Real time synchronization - in combination with FreeFileSync</span></h2>
 	<p>
-		Start RealtimeSync.exe located in FreeFileSync's installation directory and 
+		Start RealTimeSync.exe located in FreeFileSync's installation directory and 
 		enter all folders you want to monitor. Instead of doing this manually you can import a ffs_batch
 		file via <b>Menu &rarr; File &rarr; Open</b>. This not only extracts all directories relevant for synchronization
 		but also sets up the command line to execute the ffs_batch file each time changes are detected.
 		Now press <b>Start</b> to begin monitoring.
 	</p>
 	<div style="margin-left: 1.3cm">
-		<img src="../images/RealtimeSync.png" alt="RealtimeSync main window">
+		<img src="../images/realtimesync-main-window.png" alt="RealTimeSync main window">
 	</div>
 	<br>
 
@@ -38,14 +38,14 @@
 				sure it does not show any popup windows. See notes in <a href="command-line.html">Command Line Usage</a>.
 				<br>&nbsp;
 				
-			<li>RealtimeSync will skip showing the main dialog and begin monitoring immediately if 
+			<li>RealTimeSync will skip showing the main dialog and begin monitoring immediately if 
 				you pass a ffs_real configuration file <b>or</b> a FreeFileSync ffs_batch file as first 
-				command line argument to RealtimeSync.exe. This helps you integrate RealtimeSync into your operating system's auto start:<br>				
-				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealtimeSync.exe&quot; &quot;D:\Backup Projects.ffs_real&quot;</div>
-				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealtimeSync.exe&quot; &quot;D:\Backup Projects.ffs_batch&quot;</div>
+				command line argument to RealTimeSync.exe. This helps you integrate RealTimeSync into your operating system's auto start:<br>				
+				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_real&quot;</div>
+				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_batch&quot;</div>
 				<br>
 	
-			<li>RealtimeSync is not tied to starting FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
+			<li>RealTimeSync is not tied to starting FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
 		</ul>
 	</div></div></div>
 	<br>
@@ -58,17 +58,17 @@
 		But instead of hard coding the USB drive letter <span class="file-path">H:\</span> (which may change occasionally), 
 		refer to the USB stick via its <a href="variable-drive-letters.html">volume name</a> instead.<br>
 		<br>
-		Configure RealtimeSync as follows:<br>
+		Configure RealTimeSync as follows:<br>
 	</p>
 	<div style="display:inline-block; margin-left: 1.3cm; text-align: center;">
-		<img src="../images/monitor-usb-insert.png" alt="Monitor USB stick insert"><br>
+		<img src="../images/realtimesync-monitor-usb.png" alt="Monitor USB stick insert"><br>
 		
 		<i>"Backup" is the volume name of the USB stick in our example.</i>
 	</div>
 
 	<p>
-		Whenever directory <span class="file-path">H:\Data</span> becomes available, RealtimeSync executes the command line which starts the batch job located
-		on the stick. RealtimeSync will also trigger each time files are modified in <span class="file-path">H:\Data</span>.
+		Whenever directory <span class="file-path">H:\Data</span> becomes available, RealTimeSync executes the command line which starts the batch job located
+		on the stick. RealTimeSync will also trigger each time files are modified in <span class="file-path">H:\Data</span>.
 	</p>
 
 	<div class="box-outer"><div class="bluebox"><div class="box-inner">
@@ -98,7 +98,7 @@
 
 	<div class="box-outer"><div class="bluebox"><div class="box-inner">
 		<b>Note</b><br>
-		When RealtimeSync executes a Windows batch file (bat or cmd) a black console window is shown. You can hide it using the Visual Basic script
+		When RealTimeSync executes a Windows batch file (bat or cmd) a black console window is shown. You can hide it using the Visual Basic script
 		<span class="file-path">HideConsole.vbs</span> located in FreeFileSync's installation directory:
 		<br><br>
 		<div class="command-line">wscript &quot;C:\Program files\FreeFileSync\HideConsole.vbs&quot; C:\MyBatchFile.cmd</div>
@@ -109,12 +109,12 @@
 	<h2>Limitations:</h2>
 	<ul>
 		<li>If multiple changes happen at the same time, only the path of the first file is written to variable <b><span class="command-line">%changed_file%</span></b>.
-		<li>While RealtimeSync is executing the command line, monitoring for changed files is deliberately inactive.
+		<li>While RealTimeSync is executing the command line, monitoring for changed files is deliberately inactive.
 	</ul>
 	<p>
 		The command line usually starts a synchronization task using FreeFileSync which naturally leads to additional file change notifications.
-		Therefore the RealtimeSync change detection has to be deactivated to not go into an endless loop.
-		On the other hand it is not likely that changes (other than those from FreeFileSync) happen in first place since RealtimeSync runs the command line only after a user-specified idle time has passed.
+		Therefore the RealTimeSync change detection has to be deactivated to not go into an endless loop.
+		On the other hand it is not likely that changes (other than those from FreeFileSync) happen in first place since RealTimeSync runs the command line only after a user-specified idle time has passed.
 		This makes sure the monitored folders are not in heavy use. In any case, files changed during the execution of FreeFileSync will be synchronized the next time FreeFileSync runs.
 	</p>
 </body>

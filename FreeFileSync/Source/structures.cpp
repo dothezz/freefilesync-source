@@ -55,10 +55,12 @@ std::wstring zen::getVariantName(CompareVariant var)
 {
     switch (var)
     {
-        case CMP_BY_CONTENT:
-            return _("File content");
         case CMP_BY_TIME_SIZE:
             return _("File time and size");
+        case CMP_BY_CONTENT:
+            return _("File content");
+        case CMP_BY_SIZE:
+            return _("File size");
     }
     assert(false);
     return _("Error");

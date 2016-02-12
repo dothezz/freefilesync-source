@@ -54,6 +54,7 @@ std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg, i
 FolderComparison compare(xmlAccess::OptionalDialogs& warnings,
                          bool allowUserInteraction,
                          bool runWithBackgroundPriority,
+                         int folderAccessTimeout,
                          bool createDirLocks,
                          std::unique_ptr<LockHolder>& dirLocks, //out
                          const std::vector<FolderPairCfg>& cfgList,

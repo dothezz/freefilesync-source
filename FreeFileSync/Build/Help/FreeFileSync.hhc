@@ -73,7 +73,7 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="RealtimeSync">
+		<param name="Name" value="RealTimeSync">
 		<param name="Local" value="html\realtimesync.html">
 		<param name="ImageNumber" value="2">
 		</OBJECT>

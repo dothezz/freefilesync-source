@@ -165,7 +165,7 @@ private:
 
     void onNaviSelection(zen::GridRangeSelectEvent& event);
 
-    void onNaviPanelFilesDropped(zen::FileDropEvent& event);
+    void onDialogFilesDropped(zen::FileDropEvent& event);
 
     void onDirSelected(wxCommandEvent& event);
     void onDirManualCorrection(wxCommandEvent& event);

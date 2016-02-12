@@ -16,8 +16,6 @@
 
 namespace zen
 {
-const int FOLDER_EXISTENCE_CHECK_TIMEOUT = 20; //unit: [s]; consider CD-ROM insert or hard disk spin up time from sleep
-
 namespace
 {
 //directory existence checking may hang for non-existent network drives => run asynchronously and update UI!
@@ -31,7 +29,7 @@ struct FolderStatus
     std::map<AbstractPath, FileError, AFS::LessAbstractPath> failedChecks;
 };
 
-FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAbstractPath>& folderPaths, bool allowUserInteraction, ProcessCallback& procCallback)
+FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAbstractPath>& folderPaths, int folderAccessTimeout, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     using namespace zen;
 
@@ -51,7 +49,7 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
         }));
 
     //don't wait (almost) endlessly like Win32 would on non-existing network shares:
-    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(FOLDER_EXISTENCE_CHECK_TIMEOUT);
+    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + std::chrono::seconds(folderAccessTimeout);
 
     for (auto& fi : futureInfo)
     {

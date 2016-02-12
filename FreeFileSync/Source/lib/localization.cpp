@@ -388,6 +388,8 @@ const std::vector<TranslationInfo>& zen::getExistingTranslations()
 void zen::releaseWxLocale()
 {
     wxWidgetsLocale::getInstance().release();
+    zen::setTranslator(nullptr); //good place for clean up rather than some time during static destruction: there might be dependencies
+    //e.g. crash handler on some thread may show a message box!
 }
 
 
@@ -408,7 +410,7 @@ void zen::setLanguage(wxLanguage lng) //throw FileError
 
     //load language file into buffer
     if (languageFile.empty()) //if languageFile is empty, texts will be english by default
-        zen::setTranslator();
+        zen::setTranslator(nullptr);
     else
         try
         {

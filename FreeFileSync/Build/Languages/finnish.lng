@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Asetetaan oletussuunta täsmäykselle: vanhat tiedostot korvataan uudemilla tiedostoilla.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Tarkistetaan hakemisto %x:n käyttöoikeus Roskakoriin ...</target>
+<source>Creating folder %x</source>
+<target>Luodaan hakemisto %x</target>
+
+<source>Creating file %x</source>
+<target>Luodaan tiedosto %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Luodaan pikakuvake %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Siirretään tiedosto %x Roskakoriin</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Pistetaan pikakuvake %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Tarkistetaan hakemisto %x:n käyttöoikeus Roskakoriin ...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Roskakori ei ole käytettävissä näiden hakemistojen osalta. Tiedostot poistetaan sen sijaan lopullisesti:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Tiedosto %x ei löydy.</target>
+
+<source>Error</source>
+<target>Virhe</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Tiedosto %x ei sisällä kelvollista kokoonpanoa.</target>
@@ -92,7 +104,7 @@
 <target>Vapaa määrä FreeFileSync .ffs_gui ja/tai .ffs_batch määrittelytiedostoja.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>Vapaa määrä eri hakemistopareja yhdessä tietyssä määrittelyssä.</target>
+<target>Vapaa määrä eri hakemistopareja yhdelle tietylle määrittelylle.</target>
 
 <source>Open configuration for editing without executing it.</source>
 <target>Avaa määrittely muutoksia varten, sitä suorittamatta.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Seuraavia hakemistoja ei löydy:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Voit ohittaa virheen olettamalla hakemistot tyhjiksi. Nämä hakemistot luodaan automaattisesti täsmäyksen aikana.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ellet huomioi tätä virhettä hakemistot huomioidaan tyhjinä. Puuttuvat hakemistot luodaan tarvittaessa.</target>
 
 <source>A folder input field is empty.</source>
 <target>Hakemiston syötekenttä on tyhjä.</target>
@@ -246,9 +258,6 @@ Todellinen: %y tavua
 <source>Cannot find device %x.</source>
 <target>Laite %x ei löydy.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>%x:n vaapaan tilan määrittely ei onnistu.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Hakemistoa %x ei voitu luoda.</target>
 
@@ -267,11 +276,14 @@ Todellinen: %y tavua
 <source>Cannot resolve symbolic link %x.</source>
 <target>Pikakuvike %x on virheellinen.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x:n siirto Roskakoriin epäonnistui.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Hakemistoa %x ei voi avata.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>%x:n vaapaan tilan määrittely ei onnistu.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x:n siirto Roskakoriin epäonnistui.</target>
 
 <source>Incorrect command line:</source>
 <target>Virheellinen komento:</target>
@@ -345,9 +357,6 @@ Todellinen: %y tavua
 <source>Detecting abandoned lock...</source>
 <target>Hylätyn lukituksen etsintä...</target>
 
-<source>Creating file %x</source>
-<target>Luodaan tiedosto %x</target>
-
 <source>Saving file %x...</source>
 <target>Tallennetaan tiedostoa %x...</target>
 
@@ -366,9 +375,6 @@ Todellinen: %y tavua
 <source>Cannot set directory lock for %x.</source>
 <target>Hakemiston %x lukitus ei onnistu.</target>
 
-<source>Scanning:</source>
-<target>Skannaus:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Todellinen: %y tavua
 <pluralform>1 säije</pluralform>
 <pluralform>%x säijettä</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Skannaus:</target>
 
 <source>/sec</source>
 <target>/s</target>
@@ -488,8 +497,8 @@ Käsky suoritetaan jos:
 - uusi hakemisto ilmestyy (esim. muistitikku liitetään)
 </target>
 
-<source>&Start</source>
-<target>&Käynnistä</target>
+<source>Start</source>
+<target>Aloita</target>
 
 <source>About</source>
 <target>Ohje</target>
@@ -503,14 +512,14 @@ Käsky suoritetaan jos:
 <source>Automated Synchronization</source>
 <target>Automaattinen täsmäys</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Polku ei tue hakemiston monitorointia:</target>
+
 <source>Directory monitoring active</source>
 <target>Hakemistovalvonta päällä</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Odota kunnes kaikki hakemistot ovat saatavilla...</target>
-
-<source>Error</source>
-<target>Virhe</target>
 
 <source>&Restore</source>
 <target>&Palauta</target>
@@ -524,11 +533,14 @@ Käsky suoritetaan jos:
 <source>&Retry</source>
 <target>&Uudestaan</target>
 
+<source>File time and size</source>
+<target>Tiedoston aika ja koko</target>
+
 <source>File content</source>
 <target>Tiedoston sisältö</target>
 
-<source>File time and size</source>
-<target>Tiedoston aika ja koko</target>
+<source>File size</source>
+<target>Tiedostokoko</target>
 
 <source>Two way</source>
 <target>Kaksisuuntainen</target>
@@ -556,12 +568,6 @@ Käsky suoritetaan jos:
 
 <source>Removing old versions...</source>
 <target>Vanhat versiot poistetaan...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Luodaan pikakuvake %x</target>
-
-<source>Creating folder %x</source>
-<target>Luodaan hakemisto %x</target>
 
 <source>Updating file %x</source>
 <target>Tiedostoa %x päivitetään</target>
@@ -680,30 +686,6 @@ Käsky suoritetaan jos:
 <source>Serious Error</source>
 <target>Vakava virhe</target>
 
-<source>Check for Program Updates</source>
-<target>Etsi ohjelmaan päivitystä</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>FreeFileSyncin uusi versio on saatavilla:</target>
-
-<source>Download now?</source>
-<target>Ladataanko nyt?</target>
-
-<source>&Download</source>
-<target>&Lataa</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync on ajan tasalla.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Ei yhteyttä www.freefilesync.org:iin.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Nykyistä FreeFileSyncin versiota ei löydy verkosta. Suoritetaanko manuaalinen haku?</target>
-
-<source>&Check</source>
-<target>&Tarkista</target>
-
 <source>Symlink</source>
 <target>Pikakuvake</target>
 
@@ -717,7 +699,7 @@ Käsky suoritetaan jos:
 <target>Nimi</target>
 
 <source>Relative folder</source>
-<target>Suhteellinen hakemisto</target>
+<target>Suhteellinen kansio</target>
 
 <source>Base folder</source>
 <target>Juurihakemisto</target>
@@ -764,11 +746,20 @@ Käsky suoritetaan jos:
 <source>Paste</source>
 <target>Liitä</target>
 
-<source>Local Synchronization Settings</source>
-<target>Täsmäytyksen paikalliset asetukset</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Kansio %x ei toimi FreeFileSync:n kanssa.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Valittu kansio %x ei ole yhteensopiva FreeFileSync:n kanssa. Valitse paikallinenhakemisto, verkko tai mobiili laitteen hakemisto.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Valitse kansio joka on paikallinen, verkossa tai MTP laitteella.</target>
+
+<source>SFTP folder</source>
+<target>SFTP kansio</target>
+
+<source>Select SFTP folder</source>
+<target>Valitse SFTP hakemisto</target>
+
+<source>Select alternative folder type</source>
+<target>Valitse toinen hakemistotyyppi</target>
 
 <source>&New</source>
 <target>&Uusi</target>
@@ -786,7 +777,7 @@ Käsky suoritetaan jos:
 <target>&Vertailu asetukset</target>
 
 <source>&Filter settings</source>
-<target>&Suodattin asetukset</target>
+<target>&Suodin asetukset</target>
 
 <source>S&ynchronization settings</source>
 <target>&Täsmäytyksen asetukset</target>
@@ -797,8 +788,8 @@ Käsky suoritetaan jos:
 <source>&Actions</source>
 <target>&Toinnot</target>
 
-<source>&Options</source>
-<target>&Asetukset</target>
+<source>&Preferences</source>
+<target>&Ominaisuudet</target>
 
 <source>&Language</source>
 <target>&Kieli</target>
@@ -838,9 +829,6 @@ Käsky suoritetaan jos:
 
 <source>Remove folder pair</source>
 <target>Poista hakemistopari</target>
-
-<source>Select SFTP folder</source>
-<target>Valitse SFTP hakemisto</target>
 
 <source>Swap sides</source>
 <target>Puoltenvaihto</target>
@@ -887,26 +875,14 @@ Käsky suoritetaan jos:
 <source>Total bytes to copy</source>
 <target>Kopioitava määrä tavuja</target>
 
+<source>Folder pair:</source>
+<target>Hakemistopari:</target>
+
 <source>Use local settings:</source>
 <target>Käytä paikallisia asetuksia:</target>
 
 <source>Select a variant:</source>
 <target>Valitse vaihtoehto:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Tunnista identtiset tiedostot aikaleimoja ja kokoa vertailemalla.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Tunnista identtiset tiedostot sisältöä vertailemalla.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Älä huomioi aikaeroa (tunteja)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Oleta tiedostoja tietyllä aikasiirtymällä olevan vastaavia</target>
-
-<source>Handle daylight saving time</source>
-<target>Käsittele kesäaika</target>
 
 <source>Include &symbolic links:</source>
 <target>Sisällytä &pikalinkit:</target>
@@ -919,6 +895,18 @@ Käsky suoritetaan jos:
 
 <source>More information</source>
 <target>Lisää tietoa</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Jätä aikasiirtymä huomiotta [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Aikasiirtymät joita ei huomioida</target>
+
+<source>Example:</source>
+<target>Esim.:</target>
+
+<source>Handle daylight saving time</source>
+<target>Käsittele kesäaika</target>
 
 <source>Local settings:</source>
 <target>Paikalliset aseukset:</target>
@@ -1009,14 +997,17 @@ Käsky suoritetaan jos:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Järjestä hakemistoparit</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Anna SFTP kirjautumis tietosi:</target>
 
 <source>Server name or IP address:</source>
 <target>Palvelimen nimi ja IP:</target>
 
-<source>Examples:</source>
-<target>Malli:</target>
+<source>Port:</source>
+<target>Portti:</target>
 
 <source>User name:</source>
 <target>Käyttäjä:</target>
@@ -1030,6 +1021,12 @@ Käsky suoritetaan jos:
 <source>Directory on server:</source>
 <target>Palvelimen hakemisto:</target>
 
+<source>Select a directory on the server:</source>
+<target>Valitse palvelimelta hakemisto:</target>
+
+<source>Select Folder</source>
+<target>Valitse kansio</target>
+
 <source>Start synchronization now?</source>
 <target>Käynnistetäänkö täsmäytys?</target>
 
@@ -1038,9 +1035,6 @@ Käsky suoritetaan jos:
 
 <source>&Don't show this dialog again</source>
 <target>&Älä näytä tätä ruutua uudestaan</target>
-
-<source>Arrange folder pair</source>
-<target>Järjestä hakemistoparit</target>
 
 <source>Items found:</source>
 <target>Osioita löytyi:</target>
@@ -1092,6 +1086,12 @@ Käsky suoritetaan jos:
 
 <source>How can I schedule a batch job?</source>
 <target>Miten ajastan eräajon?</target>
+
+<source>&Keep relative paths</source>
+<target>&Säilytä suhteelliset polut</target>
+
+<source>&Overwrite existing files</source>
+<target>&Ylikirjoita olemassa olevat tiedostot</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Näitä asetuksia käytetään kaikkiin täsmäyksiin.</target>
@@ -1183,14 +1183,17 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Delete Items</source>
 <target>Poista kohteet</target>
 
+<source>Copy items</source>
+<target>Monista kohteet</target>
+
 <source>Options</source>
 <target>Asetukset</target>
 
 <source>Select Time Span</source>
 <target>Valitse aikajakso</target>
 
-<source>&Preferences</source>
-<target>&Ominaisuudet</target>
+<source>&Options</source>
+<target>&Asetukset</target>
 
 <source>Main Bar</source>
 <target>Pääpalkki</target>
@@ -1209,6 +1212,12 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Overview</source>
 <target>Yleiskatsaus</target>
+
+<source>&Download</source>
+<target>&Lataa</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>FreeFileSyncin uusi versio on saatavilla:</target>
 
 <source>Confirm</source>
 <target>Vahvista</target>
@@ -1270,8 +1279,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Exclude temporarily</source>
 <target>Suodat tilapäisesti</target>
 
-<source>Delete</source>
-<target>Poista</target>
+<source>&Copy to...</source>
+<target>&Monista...</target>
+
+<source>&Delete</source>
+<target>&Poista</target>
 
 <source>Include all</source>
 <target>Valitse kaikki</target>
@@ -1320,9 +1332,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Remove entry from list</source>
 <target>Poista valittu määrittely listalta</target>
-
-<source>Synchronization Settings</source>
-<target>Täsmäyksen asetukset</target>
 
 <source>Clear filter</source>
 <target>Nollaa suodin</target>
@@ -1411,26 +1420,26 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Shut down</source>
 <target>Sulje</target>
 
-<source>Scanning...</source>
-<target>Tiedostoja haetaan...</target>
-
-<source>Comparing content...</source>
-<target>Sisältöä vertaillaan...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Valitse kaikki</target>
-
 <source>Paused</source>
 <target>Pysäytetty</target>
 
 <source>Initializing...</source>
 <target>Alustetaan...</target>
 
+<source>Scanning...</source>
+<target>Tiedostoja haetaan...</target>
+
+<source>Comparing content...</source>
+<target>Sisältöä vertaillaan...</target>
+
 <source>Completed</source>
 <target>Valmis</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Valitse kaikki</target>
 
 <source>&Continue</source>
 <target>&Jatka</target>
@@ -1440,6 +1449,21 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Log</source>
 <target>Loki</target>
+
+<source>Loading...</source>
+<target>Lataan...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Monistetaanko kohde toiseen kansioon?</pluralform>
+<pluralform>Monista %x kohteet toiseen kansioon?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Kerro kohde kansio.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <pluralform>Haluatko todella poistaa tämän kohteen?</pluralform>
 <pluralform>Haluatko todella poistaa nämä %x kohdetta?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Ominaisuudet</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Monista DACL, SACL, omistaja, ryhmä</target>
@@ -1489,6 +1510,15 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>&Show</source>
 <target>&Näytä</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Tunnista identtiset tiedostot aikaleimoja ja kokoa vertailemalla.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Tunnista identtiset tiedostot sisältöä vertailemalla.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Löydä vastaavat tiedostot tiedostokoon mukaan.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Löydä ja monista muutokset molemmille puolille. Poistot, siirrot ja eroavuudet tunnistetaan tietokannan avulla.</target>
 
@@ -1500,6 +1530,15 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Configure your own synchronization rules.</source>
 <target>Määritä omat täsmäyssäännöt.</target>
+
+<source>Synchronization Settings</source>
+<target>Täsmäyksen asetukset</target>
+
+<source>Comparison</source>
+<target>Vertailu</target>
+
+<source>Synchronization</source>
+<target>Täsmäytys</target>
 
 <source>Today</source>
 <target>Tänään</target>
@@ -1537,11 +1576,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Append a time stamp to each file name</source>
 <target>Lisää tiedostoihin aikaleimat</target>
 
-<source>Comparison</source>
-<target>Vertailu</target>
+<source>Main config</source>
+<target>Pääasetus</target>
 
-<source>Synchronization</source>
-<target>Täsmäytys</target>
+<source>empty</source>
+<target>tyhjä</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Jätä ratkaisemattomana ristiriitana</target>
@@ -1560,6 +1599,27 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Percentage</source>
 <target>Prosenttia</target>
+
+<source>Internet access failed.</source>
+<target>Ei pääsyä internettiin.</target>
+
+<source>Check for Program Updates</source>
+<target>Etsi ohjelmaan päivitystä</target>
+
+<source>Download now?</source>
+<target>Ladataanko nyt?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync on ajan tasalla.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Ei yhteyttä www.freefilesync.org:iin.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Nykyistä FreeFileSyncin versiota ei löydy verkosta. Suoritetaanko manuaalinen haku?</target>
+
+<source>&Check</source>
+<target>&Tarkista</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Kirjautuminen järjestelmäviestien vastaanottamiseksi ei onnistu.</target>
@@ -1587,6 +1647,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Oikeuksien monistus %x:ltä %y:lle ei onnistu.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x on epämääräinen hakemisto nimi.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Järjestelmäfunktiota %x ei löydy.</target>
@@ -1714,9 +1777,15 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync täsmäytyksen tietokanta</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync määrittelyt</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync määrittelyt</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Muokkaa FreeFileSync:llä</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Kiitän tuesta ja lahjoituksista!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Tämä lahjoittajien version FreeFileSync:n latauskerrat on käytetty. Ladataanko normi versio FreeFileSync kotisivulta?</target>
 

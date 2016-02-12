@@ -45,11 +45,11 @@
 	<br>
 	<br>
 
-	<h2>I. Compare by File time and size</h2>
-
-	<p>This variant considers two files with the same name as equal when both modification 
-	time <b>and</b> file size match. The following categories are distinguished:</p>
-
+	<h2>I. Compare by file time and size</h2>
+	<p>
+		This variant considers two files with the same name as equal when both modification 
+		time <b>and</b> file size match. The following categories are distinguished:
+	</p>
 	<ol style="list-style: upper-roman">
 		<li><b>file exists on one side only</b>
 			<ul>
@@ -72,15 +72,13 @@
 			</ol>
 	</ol>
 	<br>
-
-	<h2>II. Compare by File content</h2>
-
+	
+	<h2>II. Compare by file content</h2>
 	<p>
 		Two files with the same name are marked as equal if and only if they have
 		the same content. This option is more useful for consistency checks
 		rather than backup operations since a bitwise comparison can be slow.
 	</p>
-
 	<ol style="list-style: upper-roman">
 		<li><b>file exists on one side only</b>
 			<ul>
@@ -92,6 +90,28 @@
 			<ul>
 				<li>equal
 				<li>different content
+			</ul>
+	</ol>
+	<br>
+	
+	<h2>III. Compare by file size</h2>
+	<p>
+		Two files with the same name are considered equal if they have
+		the same file size.
+		Since it's possible for files with the same size to have different content, this variant should only be used when file modification times are not
+		available or reliable, e.g. in certain MTP and FTP synchronization scenarios.
+	</p>
+	<ol style="list-style: upper-roman">
+		<li><b>file exists on one side only</b>
+			<ul>
+				<li>left only
+				<li>right only
+			</ul>
+			
+		<li><b>file exists on both sides</b>
+			<ul>
+				<li>equal
+				<li>different size
 			</ul>
 	</ol>
 </body>

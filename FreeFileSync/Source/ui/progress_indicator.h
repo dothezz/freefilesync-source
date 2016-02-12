@@ -73,6 +73,7 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          wxFrame* parentWindow, //may be nullptr
                                          bool showProgress,
                                          const wxString& jobName,
+                                         const Zstring& soundFileSyncComplete,
                                          const Zstring& onCompletion,
                                          std::vector<Zstring>& onCompletionHistory); //changing parameter!
 //DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after processHasFinished() or closeWindowDirectly()

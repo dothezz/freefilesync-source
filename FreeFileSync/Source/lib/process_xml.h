@@ -147,10 +147,12 @@ struct XmlGlobalSettings
     size_t automaticRetryDelay = 5; //unit: [sec]
 
     int fileTimeTolerance = 2; //max. allowed file time deviation; < 0 means unlimited tolerance; default 2s: FAT vs NTFS
+    int folderAccessTimeout = 20;  //unit: [s]; consider CD-ROM insert or hard disk spin up time from sleep
     bool runWithBackgroundPriority = false;
     bool createLockFile = true;
     bool verifyFileCopy = false;
     size_t lastSyncsLogFileSizeMax = 100000; //maximum size for LastSyncs.log: use a human-readable number
+    Zstring soundFileSyncComplete = Zstr("gong.wav");
 
     OptionalDialogs optDialogs;
 
@@ -166,28 +168,49 @@ struct XmlGlobalSettings
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
         }
 
-        wxPoint dlgPos;
-        wxSize dlgSize;
-        bool isMaximized = false;
-        int sashOffset = 0;
+        struct
+        {
+            wxPoint dlgPos;
+            wxSize dlgSize;
+            bool isMaximized = false;
 
-        int maxFolderPairsVisible = 6;
+            struct
+            {
+                bool keepRelPaths      = true;
+                bool overwriteIfExists = false;
+                Zstring lastUsedPath;
+                std::vector<Zstring> folderHistory;
+                size_t  historySizeMax = 15;
+            } copyToCfg;
 
-        std::vector<zen::ColumnAttributeNavi> columnAttribNavi  = zen::getDefaultColumnAttributesNavi(); //compressed view/navigation
-        std::vector<zen::ColumnAttributeRim>  columnAttribLeft  = zen::getDefaultColumnAttributesLeft();
-        std::vector<zen::ColumnAttributeRim>  columnAttribRight = zen::getDefaultColumnAttributesRight();
+            bool manualDeletionUseRecycler = true;
+            bool textSearchRespectCase = false; //good default for Linux, too!
+            int maxFolderPairsVisible = 6;
 
-        zen::ColumnTypeNavi naviLastSortColumn = zen::defaultValueLastSortColumn; //remember sort on navigation panel
-        bool naviLastSortAscending             = zen::defaultValueLastSortAscending; //
+            bool showPercentBar = zen::defaultValueShowPercentage; //in navigation panel
+            bool naviLastSortAscending             = zen::defaultValueLastSortAscending; //
+            zen::ColumnTypeNavi naviLastSortColumn = zen::defaultValueLastSortColumn; //remember sort on navigation panel
 
-        bool showPercentBar = zen::defaultValueShowPercentage; //in navigation panel
+            std::vector<zen::ColumnAttributeNavi> columnAttribNavi = zen::getDefaultColumnAttributesNavi(); //compressed view/navigation
 
-        ExternalApps externelApplications;
+            bool showIcons = true;
+            FileIconSize iconSize = ICON_SIZE_SMALL;
+            int sashOffset = 0;
+
+            std::vector<zen::ColumnAttributeRim>  columnAttribLeft  = zen::getDefaultColumnAttributesLeft();
+            std::vector<zen::ColumnAttributeRim>  columnAttribRight = zen::getDefaultColumnAttributesRight();
+
+            ViewFilterDefault viewFilterDefault;
+            wxString guiPerspectiveLast; //used by wxAuiManager
+        } mainDlg;
+
+        Zstring defaultExclusionFilter = Zstr("/.Trash-*/") Zstr("\n")
+                                         Zstr("/.recycle/");
+
+        std::vector<ConfigFileItem> lastUsedConfigFiles;
 
         std::vector<ConfigFileItem> cfgFileHistory;
         size_t cfgFileHistMax = 30;
-
-        std::vector<ConfigFileItem> lastUsedConfigFiles;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
@@ -196,33 +219,11 @@ struct XmlGlobalSettings
         std::vector<Zstring> onCompletionHistory;
         size_t onCompletionHistoryMax = 8;
 
-        Zstring defaultExclusionFilter = Zstr("/.Trash-*/") Zstr("\n")
-                                         Zstr("/.recycle/");
-        struct
-        {
-            bool    keepRelPaths      = true;
-            bool    overwriteIfExists = false;
-            Zstring lastUsedPath;
-            std::vector<Zstring> folderHistory;
-            size_t  historySizeMax = 15;
-        } copyToCfg;
-
-        bool manualDeletionUseRecycler = true;
-
-        bool textSearchRespectCase = false; //good default for Linux, too!
-
-        bool showIcons = true;
-        FileIconSize iconSize = ICON_SIZE_SMALL;
+        ExternalApps externelApplications;
 
         time_t lastUpdateCheck = 0; //number of seconds since 00:00 hours, Jan 1, 1970 UTC
         std::wstring lastOnlineVersion;
-
-        ViewFilterDefault viewFilterDefault;
-        wxString guiPerspectiveLast; //used by wxAuiManager
     } gui;
-
-    //---------------------------------------------------------------------
-    //struct Batch
 };
 
 //read/write specific config types

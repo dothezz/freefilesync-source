@@ -38,7 +38,7 @@ bool zen::manualProgramUpdateRequired()
 
 Zstring zen::getResourceDir()
 {
-    //make independent from wxWidgets global variable "appname"; support being called by RealtimeSync
+    //make independent from wxWidgets global variable "appname"; support being called by RealTimeSync
     auto appName = wxTheApp->GetAppName();
     wxTheApp->SetAppName(L"FreeFileSync");
     ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
@@ -52,7 +52,7 @@ Zstring zen::getResourceDir()
 
 Zstring zen::getConfigDir()
 {
-    //make independent from wxWidgets global variable "appname"; support being called by RealtimeSync
+    //make independent from wxWidgets global variable "appname"; support being called by RealTimeSync
     auto appName = wxTheApp->GetAppName();
     wxTheApp->SetAppName(L"FreeFileSync");
     ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
@@ -71,7 +71,7 @@ Zstring zen::getConfigDir()
 }
 
 
-//this function is called by RealtimeSync!!!
+//this function is called by RealTimeSync!!!
 Zstring zen::getFreeFileSyncLauncherPath()
 {
     return getExecutableDir() + Zstr("FreeFileSync");

@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Постављам подразумеване синхронизацијске смерове: Старе датотеке биће замењене новијим датотекама.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Проверавам доступност Корпе за смеће за фолдер %x...</target>
+<source>Creating folder %x</source>
+<target>Креирам фолдер %x</target>
+
+<source>Creating file %x</source>
+<target>Правим датотеку %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Креирам симболичну везу %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Премештам датотеку %x у Корпи за смеће</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Брисање симболичне везе %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Проверавам доступност Корпе за смеће за фолдер %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Корпа за смеће није доступна за следеће фолдере. Уместо тога датотеке биће обрисане трајно:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Не могу пронаћи датотеку %x.</target>
+
+<source>Error</source>
+<target>Грешка</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Датотека %x не садржи валидну конфигурацију.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Не могу пронаћи следеће фолдере:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Можете игнорисати ову грешку да би сматрали сваки фолдер празним. Фолдери ће бити креирани аутоматски током синхронизације.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ако игноришете ову грешку фолдери ће се сматрати празним. Недостајући фолдери креираће се аутоматски по потреби.</target>
 
 <source>A folder input field is empty.</source>
 <target>Поље за одабир фолдера је празно.</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Не могу пронаћи уређај %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Не могу одредити слободан простор на диску за %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Не могу креирати фолдер %x.</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Не могу разрешити симболичну везу %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Није могуће преместити %x у Корпи за смеће.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Не могу отворити фолдер %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Не могу одредити слободан простор на диску за %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Није могуће преместити %x у Корпи за смеће.</target>
 
 <source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
@@ -347,9 +359,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Детекција обустављеног закључавања...</target>
 
-<source>Creating file %x</source>
-<target>Правим датотеку %x</target>
-
 <source>Saving file %x...</source>
 <target>Уписујем датотеку %x...</target>
 
@@ -368,9 +377,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Не могу закључати фолдер %x.</target>
 
-<source>Scanning:</source>
-<target>Претражујем:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -380,6 +386,9 @@ Actual: %y bytes
 <pluralform>%x нити</pluralform>
 <pluralform>%x нити</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Претражујем:</target>
 
 <source>/sec</source>
 <target>/сек</target>
@@ -491,8 +500,8 @@ The command is triggered if:
 - нови фолдери појаве (нпр. укључење USB стика)
 </target>
 
-<source>&Start</source>
-<target>&Покрени</target>
+<source>Start</source>
+<target>Почетак</target>
 
 <source>About</source>
 <target>О програму</target>
@@ -506,14 +515,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Аутоматска синхронизација</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Следећа путања не подржава надгледање фолдера:</target>
+
 <source>Directory monitoring active</source>
 <target>Активно надгледање фолдера</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Чекање да сви фолдери буду доступни...</target>
-
-<source>Error</source>
-<target>Грешка</target>
 
 <source>&Restore</source>
 <target>&Врати</target>
@@ -527,11 +536,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&Понови</target>
 
+<source>File time and size</source>
+<target>Време и величина датотеке</target>
+
 <source>File content</source>
 <target>Садржај датотеке</target>
 
-<source>File time and size</source>
-<target>Време и величина датотеке</target>
+<source>File size</source>
+<target>Величина датотеке</target>
 
 <source>Two way</source>
 <target>Двосмерно</target>
@@ -559,12 +571,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>Уклањам старије верзије...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Креирам симболичну везу %x</target>
-
-<source>Creating folder %x</source>
-<target>Креирам фолдер %x</target>
 
 <source>Updating file %x</source>
 <target>Ажурирам датотеку %x</target>
@@ -684,30 +690,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Озбиљна грешка</target>
 
-<source>Check for Program Updates</source>
-<target>Провери постојање надоградње програма</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Нова верзија FreeFileSync је доступна:</target>
-
-<source>Download now?</source>
-<target>Преузети сада?</target>
-
-<source>&Download</source>
-<target>&Преузми</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync је ажуриран.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Не може се успоставити веза са www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Да ли желите да проверите ручно?</target>
-
-<source>&Check</source>
-<target>&Провера</target>
-
 <source>Symlink</source>
 <target>Сим-веза</target>
 
@@ -768,11 +750,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>Залепи</target>
 
-<source>Local Synchronization Settings</source>
-<target>Локална подешавања синхронизације</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Одабрани фолдер %x не може бити коришћен од стране FreeFileSync-а.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Одабрани фолдер %x не може бити коришћен од стране FreeFileSync-а. Молимо одаберите фолдер на локалном систему, мрежи или на MTP уређају.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Молимо одаберите фолдер на локалном систему, мрежи или на MTP уређају.</target>
+
+<source>SFTP folder</source>
+<target>SFTP фолдер</target>
+
+<source>Select SFTP folder</source>
+<target>Одаберите SFTP фолдер</target>
+
+<source>Select alternative folder type</source>
+<target>Одаберите алтернативни тип фолдера</target>
 
 <source>&New</source>
 <target>&Ново</target>
@@ -801,8 +792,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>&Акције</target>
 
-<source>&Options</source>
-<target>&Опције</target>
+<source>&Preferences</source>
+<target>&Преференце</target>
 
 <source>&Language</source>
 <target>&Језик</target>
@@ -842,9 +833,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Уклони фолдер пар</target>
-
-<source>Select SFTP folder</source>
-<target>Одаберите SFTP фолдер</target>
 
 <source>Swap sides</source>
 <target>Замени стране</target>
@@ -891,26 +879,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Укупно бајтова за копирање</target>
 
+<source>Folder pair:</source>
+<target>Фолдерски пар:</target>
+
 <source>Use local settings:</source>
 <target>Употреби локална подешавања:</target>
 
 <source>Select a variant:</source>
 <target>Одаберите варијанту:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Идентификуј једнаке датотеке упоређивањем времена промена и величина.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Идентификуј једнаке датотеке упоређивањем садржаја датотека.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Игнориши временски помак (у сатима)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Сматрај времена датотека са задатим помаком као једнака</target>
-
-<source>Handle daylight saving time</source>
-<target>Руковођење сезонским рачунањем времена</target>
 
 <source>Include &symbolic links:</source>
 <target>Укључи &симболичне везе:</target>
@@ -923,6 +899,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>Више информација</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Игнориши временски помак [чч:мм]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Листа помака времена датотека која се игнорише</target>
+
+<source>Example:</source>
+<target>Пример:</target>
+
+<source>Handle daylight saving time</source>
+<target>Руковођење сезонским рачунањем времена</target>
 
 <source>Local settings:</source>
 <target>Локална подешавања:</target>
@@ -1013,14 +1001,17 @@ The command is triggered if:
 <source>OK</source>
 <target>У реду</target>
 
+<source>Arrange folder pair</source>
+<target>Поређај фолдерски пар</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Унесите ваше SFTP податке логовања:</target>
 
 <source>Server name or IP address:</source>
 <target>Име сервера или IP адресу:</target>
 
-<source>Examples:</source>
-<target>Примери:</target>
+<source>Port:</source>
+<target>Порт:</target>
 
 <source>User name:</source>
 <target>Корисничко име:</target>
@@ -1034,6 +1025,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>Фолдер на серверу:</target>
 
+<source>Select a directory on the server:</source>
+<target>Одаберите фолдер на серверу:</target>
+
+<source>Select Folder</source>
+<target>Одаберите фолдер</target>
+
 <source>Start synchronization now?</source>
 <target>Почни синхронизацију сада?</target>
 
@@ -1042,9 +1039,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>&Не приказуј овај диалог поновно</target>
-
-<source>Arrange folder pair</source>
-<target>Поређај фолдерски пар</target>
 
 <source>Items found:</source>
 <target>Пронађене ставке:</target>
@@ -1096,6 +1090,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Како могу заказати беч задатак?</target>
+
+<source>&Keep relative paths</source>
+<target>&Задржи релативне путање</target>
+
+<source>&Overwrite existing files</source>
+<target>&Замени постојеће датотеке</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
@@ -1187,14 +1187,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Избриши ставке</target>
 
+<source>Copy items</source>
+<target>Копирај ставке</target>
+
 <source>Options</source>
 <target>Опције</target>
 
 <source>Select Time Span</source>
 <target>Изаберите временски распон</target>
 
-<source>&Preferences</source>
-<target>&Преференце</target>
+<source>&Options</source>
+<target>&Опције</target>
 
 <source>Main Bar</source>
 <target>Главна трака</target>
@@ -1213,6 +1216,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Преглед</target>
+
+<source>&Download</source>
+<target>&Преузми</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Нова верзија FreeFileSync је доступна:</target>
 
 <source>Confirm</source>
 <target>Потврди</target>
@@ -1278,8 +1287,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Тренутно искључи</target>
 
-<source>Delete</source>
-<target>Избриши</target>
+<source>&Copy to...</source>
+<target>&Копирај у...</target>
+
+<source>&Delete</source>
+<target>&Обриши</target>
 
 <source>Include all</source>
 <target>Укључи све</target>
@@ -1328,9 +1340,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>Уклони унос из листе</target>
-
-<source>Synchronization Settings</source>
-<target>Подешавања синхронизације</target>
 
 <source>Clear filter</source>
 <target>Обриши филтер</target>
@@ -1419,26 +1428,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Искључи рачунар</target>
 
-<source>Scanning...</source>
-<target>Прегледавање...</target>
-
-<source>Comparing content...</source>
-<target>Упоређујем садржај...</target>
-
-<source>Info</source>
-<target>Инфо</target>
-
-<source>Select all</source>
-<target>Одабери све</target>
-
 <source>Paused</source>
 <target>Паузирано</target>
 
 <source>Initializing...</source>
 <target>Покретање...</target>
 
+<source>Scanning...</source>
+<target>Прегледавање...</target>
+
+<source>Comparing content...</source>
+<target>Упоређујем садржај...</target>
+
 <source>Completed</source>
 <target>Завршено</target>
+
+<source>Info</source>
+<target>Инфо</target>
+
+<source>Select all</source>
+<target>Одабери све</target>
 
 <source>&Continue</source>
 <target>&Настави</target>
@@ -1448,6 +1457,22 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>Лог</target>
+
+<source>Loading...</source>
+<target>Учитавање...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Копирати следећу %x ставку у други фолдер?</pluralform>
+<pluralform>Копирати следеће %x ставке у други фолдер?</pluralform>
+<pluralform>Копирати следећих %x ставки у други фолдер?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Молим унесите одредишни фолдер.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1471,9 +1496,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Да ли стварно желите да обришете следеће %x ставке?</pluralform>
 <pluralform>Да ли стварно желите да обришете следећих %x ставки?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Преференце</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Копирај DACL, SACL, Власника, Групу</target>
@@ -1499,6 +1521,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&Прикажи</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Идентификуј једнаке датотеке упоређивањем времена промена и величина.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Идентификуј једнаке датотеке упоређивањем садржаја датотека.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Идентификуј једнаке датотеке упоређивајући њихове величине.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Пронађи и изврши промене на обе стране. Брисања, премештања и конфликти се откривају аутоматски употребом базе података.</target>
 
@@ -1510,6 +1541,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Конфигуришите ваша властита синхронизациона правила.</target>
+
+<source>Synchronization Settings</source>
+<target>Подешавања синхронизације</target>
+
+<source>Comparison</source>
+<target>Упоређење</target>
+
+<source>Synchronization</source>
+<target>Синхронизација</target>
 
 <source>Today</source>
 <target>Данас</target>
@@ -1547,11 +1587,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Додај временску ознаку за свако име датотеке</target>
 
-<source>Comparison</source>
-<target>Упоређење</target>
+<source>Main config</source>
+<target>Основна конфигурација</target>
 
-<source>Synchronization</source>
-<target>Синхронизација</target>
+<source>empty</source>
+<target>безимени</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Остави као неразрешени конфликт</target>
@@ -1570,6 +1610,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Проценат</target>
+
+<source>Internet access failed.</source>
+<target>Приступ интернету није успео.</target>
+
+<source>Check for Program Updates</source>
+<target>Провери постојање надоградње програма</target>
+
+<source>Download now?</source>
+<target>Преузети сада?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync је ажуриран.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Не може се успоставити веза са www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Да ли желите да проверите ручно?</target>
+
+<source>&Check</source>
+<target>&Провера</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Није могућа регистрација примања системских порука.</target>
@@ -1597,6 +1658,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Не могу копирати овлашћења од %x у %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x није регуларно име фолдера.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Не могу пронаћи системску функцију %x.</target>
@@ -1727,9 +1791,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>База података FreeFileSync синхронизације</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Конфигурација RealtimeSync-а</target>
+<source>RealTimeSync Configuration</source>
+<target>Конфигурација RealTimeSync-а</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Уреди са FreeFileSync-ом</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Хвала за вашу донацију и подршку!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Ова FreeFileSync инсталација за донаторе достигла је своју границу инсталисања. Преузети регуларну верзију са веб странице FreeFileSync-а?</target>
 

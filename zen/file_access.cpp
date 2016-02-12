@@ -586,10 +586,10 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
 }
 
 /*
-               ------------------
-               |File Copy Layers|
-               ------------------
-                  copyNewFile
+                ------------------
+                |File Copy Layers|
+                ------------------
+                   copyNewFile
                         |
                copyFileOsSpecific (solve 8.3 issue on Windows)
                         |

@@ -182,6 +182,9 @@ void writeText(const CompareVariant& value, std::string& output)
         case CMP_BY_CONTENT:
             output = "Content";
             break;
+        case CMP_BY_SIZE:
+            output = "Size";
+            break;
     }
 }
 
@@ -193,6 +196,8 @@ bool readText(const std::string& input, CompareVariant& value)
         value = CMP_BY_TIME_SIZE;
     else if (tmp == "Content")
         value = CMP_BY_CONTENT;
+    else if (tmp == "Size")
+        value = CMP_BY_SIZE;
     else
         return false;
     return true;
@@ -940,27 +945,33 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
 
 void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 {
-    XmlIn inShared = in["Shared"];
+    XmlIn inGeneral = in["General"];
+
+    warn_static("remove old parameter after migration! 2016-01-18")
+    if (in["Shared"])
+        inGeneral = in["Shared"];
 
     warn_static("remove old parameter after migration! 2015-11-07")
     int langId = 0;
-    if (inShared["Language"] && inShared["Language"].get()->getAttribute("Id", langId))
+    if (inGeneral["Language"] && inGeneral["Language"].get()->getAttribute("Id", langId))
         config.programLanguage = static_cast<wxLanguage>(langId);
     else
-        inShared["Language"].attribute("Name", config.programLanguage);
+        inGeneral["Language"].attribute("Name", config.programLanguage);
 
-    inShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
-    inShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
-    inShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
-    inShared["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
-    inShared["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
-    inShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
-    inShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
-    inShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
-    inShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    inShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    inGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
+    inGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
+    inGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    inGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
+    inGeneral["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    inGeneral["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
+    inGeneral["FolderAccessTimeout"      ].attribute("Seconds", config.folderAccessTimeout);
+    inGeneral["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
+    inGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
+    inGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
+    inGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    inGeneral["NotificationSound"        ].attribute("SyncComplete", config.soundFileSyncComplete);
 
-    XmlIn inOpt = inShared["OptionalDialogs"];
+    XmlIn inOpt = inGeneral["OptionalDialogs"];
     inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
     inOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
     inOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
@@ -979,52 +990,52 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     XmlIn inWnd = inGui["MainDialog"];
 
     //read application window size and position
-    inWnd.attribute("Width",     config.gui.dlgSize.x);
-    inWnd.attribute("Height",    config.gui.dlgSize.y);
-    inWnd.attribute("PosX",      config.gui.dlgPos.x);
-    inWnd.attribute("PosY",      config.gui.dlgPos.y);
-    inWnd.attribute("Maximized", config.gui.isMaximized);
+    inWnd.attribute("Width",     config.gui.mainDlg.dlgSize.x);
+    inWnd.attribute("Height",    config.gui.mainDlg.dlgSize.y);
+    inWnd.attribute("PosX",      config.gui.mainDlg.dlgPos.x);
+    inWnd.attribute("PosY",      config.gui.mainDlg.dlgPos.y);
+    inWnd.attribute("Maximized", config.gui.mainDlg.isMaximized);
 
     XmlIn inCopyTo = inWnd["ManualCopyTo"];
-    inCopyTo.attribute("KeepRelativePaths", config.gui.copyToCfg.keepRelPaths);
-    inCopyTo.attribute("OverwriteIfExists", config.gui.copyToCfg.overwriteIfExists);
+    inCopyTo.attribute("KeepRelativePaths", config.gui.mainDlg.copyToCfg.keepRelPaths);
+    inCopyTo.attribute("OverwriteIfExists", config.gui.mainDlg.copyToCfg.overwriteIfExists);
 
     XmlIn inCopyToHistory = inCopyTo["FolderHistory"];
-    inCopyToHistory(config.gui.copyToCfg.folderHistory);
-    inCopyToHistory.attribute("LastUsedPath" , config.gui.copyToCfg.lastUsedPath);
-    inCopyToHistory.attribute("MaxSize"      , config.gui.copyToCfg.historySizeMax);
+    inCopyToHistory(config.gui.mainDlg.copyToCfg.folderHistory);
+    inCopyToHistory.attribute("LastUsedPath" , config.gui.mainDlg.copyToCfg.lastUsedPath);
+    inCopyToHistory.attribute("MaxSize"      , config.gui.mainDlg.copyToCfg.historySizeMax);
 
     XmlIn inManualDel = inWnd["ManualDeletion"];
-    inManualDel.attribute("UseRecycler", config.gui.manualDeletionUseRecycler);
+    inManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);
 
-    inWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
-    inWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);
+    inWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.mainDlg.textSearchRespectCase);
+    inWnd["FolderPairsVisible" ].attribute("Max",     config.gui.mainDlg.maxFolderPairsVisible);
 
     //###########################################################
 
     XmlIn inOverview = inWnd["OverviewPanel"];
-    inOverview.attribute("ShowPercentage", config.gui.showPercentBar);
-    inOverview.attribute("SortByColumn",   config.gui.naviLastSortColumn);
-    inOverview.attribute("SortAscending",  config.gui.naviLastSortAscending);
+    inOverview.attribute("ShowPercentage", config.gui.mainDlg.showPercentBar);
+    inOverview.attribute("SortByColumn",   config.gui.mainDlg.naviLastSortColumn);
+    inOverview.attribute("SortAscending",  config.gui.mainDlg.naviLastSortAscending);
 
     //read column attributes
     XmlIn inColNavi = inOverview["Columns"];
-    inColNavi(config.gui.columnAttribNavi);
+    inColNavi(config.gui.mainDlg.columnAttribNavi);
 
     XmlIn inMainGrid = inWnd["MainGrid"];
-    inMainGrid.attribute("ShowIcons",  config.gui.showIcons);
-    inMainGrid.attribute("IconSize",   config.gui.iconSize);
-    inMainGrid.attribute("SashOffset", config.gui.sashOffset);
+    inMainGrid.attribute("ShowIcons",  config.gui.mainDlg.showIcons);
+    inMainGrid.attribute("IconSize",   config.gui.mainDlg.iconSize);
+    inMainGrid.attribute("SashOffset", config.gui.mainDlg.sashOffset);
 
     XmlIn inColLeft = inMainGrid["ColumnsLeft"];
-    inColLeft(config.gui.columnAttribLeft);
+    inColLeft(config.gui.mainDlg.columnAttribLeft);
 
     XmlIn inColRight = inMainGrid["ColumnsRight"];
-    inColRight(config.gui.columnAttribRight);
+    inColRight(config.gui.mainDlg.columnAttribRight);
     //###########################################################
 
-    inWnd["DefaultView" ](config.gui.viewFilterDefault);
-    inWnd["Perspective4"](config.gui.guiPerspectiveLast);
+    inWnd["DefaultViewFilter"](config.gui.mainDlg.viewFilterDefault);
+    inWnd["Perspective4"](config.gui.mainDlg.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1330,22 +1341,24 @@ void writeConfig(const XmlBatchConfig& config, XmlOut& out)
 
 void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 {
-    XmlOut outShared = out["Shared"];
+    XmlOut outGeneral = out["General"];
 
-    outShared["Language"].attribute("Name", config.programLanguage);
+    outGeneral["Language"].attribute("Name", config.programLanguage);
 
-    outShared["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
-    outShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
-    outShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
-    outShared["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
-    outShared["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
-    outShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
-    outShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
-    outShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
-    outShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    outShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    outGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
+    outGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
+    outGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    outGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
+    outGeneral["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    outGeneral["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
+    outGeneral["FolderAccessTimeout"      ].attribute("Seconds", config.folderAccessTimeout);
+    outGeneral["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
+    outGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
+    outGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
+    outGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    outGeneral["NotificationSound"        ].attribute("SyncComplete", config.soundFileSyncComplete);
 
-    XmlOut outOpt = outShared["OptionalDialogs"];
+    XmlOut outOpt = outGeneral["OptionalDialogs"];
     outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
     outOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
     outOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
@@ -1364,52 +1377,52 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     XmlOut outWnd = outGui["MainDialog"];
 
     //write application window size and position
-    outWnd.attribute("Width",     config.gui.dlgSize.x);
-    outWnd.attribute("Height",    config.gui.dlgSize.y);
-    outWnd.attribute("PosX",      config.gui.dlgPos.x);
-    outWnd.attribute("PosY",      config.gui.dlgPos.y);
-    outWnd.attribute("Maximized", config.gui.isMaximized);
+    outWnd.attribute("Width",     config.gui.mainDlg.dlgSize.x);
+    outWnd.attribute("Height",    config.gui.mainDlg.dlgSize.y);
+    outWnd.attribute("PosX",      config.gui.mainDlg.dlgPos.x);
+    outWnd.attribute("PosY",      config.gui.mainDlg.dlgPos.y);
+    outWnd.attribute("Maximized", config.gui.mainDlg.isMaximized);
 
     XmlOut outCopyTo = outWnd["ManualCopyTo"];
-    outCopyTo.attribute("KeepRelativePaths", config.gui.copyToCfg.keepRelPaths);
-    outCopyTo.attribute("OverwriteIfExists", config.gui.copyToCfg.overwriteIfExists);
+    outCopyTo.attribute("KeepRelativePaths", config.gui.mainDlg.copyToCfg.keepRelPaths);
+    outCopyTo.attribute("OverwriteIfExists", config.gui.mainDlg.copyToCfg.overwriteIfExists);
 
     XmlOut outCopyToHistory = outCopyTo["FolderHistory"];
-    outCopyToHistory(config.gui.copyToCfg.folderHistory);
-    outCopyToHistory.attribute("LastUsedPath" , config.gui.copyToCfg.lastUsedPath);
-    outCopyToHistory.attribute("MaxSize"      , config.gui.copyToCfg.historySizeMax);
+    outCopyToHistory(config.gui.mainDlg.copyToCfg.folderHistory);
+    outCopyToHistory.attribute("LastUsedPath" , config.gui.mainDlg.copyToCfg.lastUsedPath);
+    outCopyToHistory.attribute("MaxSize"      , config.gui.mainDlg.copyToCfg.historySizeMax);
 
     XmlOut outManualDel = outWnd["ManualDeletion"];
-    outManualDel.attribute("UseRecycler", config.gui.manualDeletionUseRecycler);
+    outManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);
 
-    outWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
-    outWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);
+    outWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.mainDlg.textSearchRespectCase);
+    outWnd["FolderPairsVisible" ].attribute("Max",     config.gui.mainDlg.maxFolderPairsVisible);
 
     //###########################################################
 
     XmlOut outOverview = outWnd["OverviewPanel"];
-    outOverview.attribute("ShowPercentage", config.gui.showPercentBar);
-    outOverview.attribute("SortByColumn",   config.gui.naviLastSortColumn);
-    outOverview.attribute("SortAscending",  config.gui.naviLastSortAscending);
+    outOverview.attribute("ShowPercentage", config.gui.mainDlg.showPercentBar);
+    outOverview.attribute("SortByColumn",   config.gui.mainDlg.naviLastSortColumn);
+    outOverview.attribute("SortAscending",  config.gui.mainDlg.naviLastSortAscending);
 
     //write column attributes
     XmlOut outColNavi = outOverview["Columns"];
-    outColNavi(config.gui.columnAttribNavi);
+    outColNavi(config.gui.mainDlg.columnAttribNavi);
 
     XmlOut outMainGrid = outWnd["MainGrid"];
-    outMainGrid.attribute("ShowIcons",  config.gui.showIcons);
-    outMainGrid.attribute("IconSize",   config.gui.iconSize);
-    outMainGrid.attribute("SashOffset", config.gui.sashOffset);
+    outMainGrid.attribute("ShowIcons",  config.gui.mainDlg.showIcons);
+    outMainGrid.attribute("IconSize",   config.gui.mainDlg.iconSize);
+    outMainGrid.attribute("SashOffset", config.gui.mainDlg.sashOffset);
 
     XmlOut outColLeft = outMainGrid["ColumnsLeft"];
-    outColLeft(config.gui.columnAttribLeft);
+    outColLeft(config.gui.mainDlg.columnAttribLeft);
 
     XmlOut outColRight = outMainGrid["ColumnsRight"];
-    outColRight(config.gui.columnAttribRight);
+    outColRight(config.gui.mainDlg.columnAttribRight);
     //###########################################################
 
-    outWnd["DefaultView" ](config.gui.viewFilterDefault);
-    outWnd["Perspective4"](config.gui.guiPerspectiveLast);
+    outWnd["DefaultViewFilter"](config.gui.mainDlg.viewFilterDefault);
+    outWnd["Perspective4"](config.gui.mainDlg.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 

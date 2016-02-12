@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Kontrola Koše na složku %x ...</target>
+<source>Creating folder %x</source>
+<target>Vytváření adresáře %x</target>
+
+<source>Creating file %x</source>
+<target>Vytváření souboru %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Vytváření symbolického odkazu %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Přesouvání souboru %x do Koše</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Mazání symbolického odkazu %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Kontrola Koše na složku %x ...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Nelze použít Koš pro následující složky. Soubory tak budou odstraněny permanentně:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Nelze najít soubor %x.</target>
+
+<source>Error</source>
+<target>Chyba</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Soubor %x neobsahuje platnou konfiguraci.</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nelze najít následující složky:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Tuto chybu můžete přeskočit a považovat neexistující složku za prázdnou. Složka pak bude vytvořena při synchronizaci automaticky.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Pokud přeskočíte tuto chybu, složka bude považována za prázdnou. Chybějící složky pak budou automaticky vytvořeny.</target>
 
 <source>A folder input field is empty.</source>
 <target>Není zadána vstupní složka.</target>
@@ -246,9 +258,6 @@ Aktuálně: %y b
 <source>Cannot find device %x.</source>
 <target>Nelze nalézt zařízení %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Nelze zjistit volné místo na disku %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Nelze vytvořit adresář %x.</target>
 
@@ -267,11 +276,14 @@ Aktuálně: %y b
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nelze najít odkaz zástupce %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Není možné přesunout %x do Koše.</target>
-
 <source>Cannot open directory %x.</source>
 <target>Nelze otevřít adresář %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Nelze zjistit volné místo na disku %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Není možné přesunout %x do Koše.</target>
 
 <source>Incorrect command line:</source>
 <target>Neplatný příkaz:</target>
@@ -347,9 +359,6 @@ Aktuálně: %y b
 <source>Detecting abandoned lock...</source>
 <target>Prověřování uzamčení...</target>
 
-<source>Creating file %x</source>
-<target>Vytváření souboru %x</target>
-
 <source>Saving file %x...</source>
 <target>Ukládání souboru %x...</target>
 
@@ -368,9 +377,6 @@ Aktuálně: %y b
 <source>Cannot set directory lock for %x.</source>
 <target>Nelze nastavit zámek adresáře %x.</target>
 
-<source>Scanning:</source>
-<target>Zpracováváno:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -380,6 +386,9 @@ Aktuálně: %y b
 <pluralform>%x procesy</pluralform>
 <pluralform>%x procesů</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Zpracováváno:</target>
 
 <source>/sec</source>
 <target>/s</target>
@@ -491,8 +500,8 @@ Příkaz je spuštěn když:
 - je zjištěna nová složka (např. vložením USB disku)
 </target>
 
-<source>&Start</source>
-<target>&Start</target>
+<source>Start</source>
+<target>Start</target>
 
 <source>About</source>
 <target>O programu</target>
@@ -506,14 +515,14 @@ Příkaz je spuštěn když:
 <source>Automated Synchronization</source>
 <target>Automatická synchronizace</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Následující cesta nepodporuje sledování adresářů:</target>
+
 <source>Directory monitoring active</source>
 <target>Sledování adresářů je aktivní</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Čekání na nedostupné adresáře...</target>
-
-<source>Error</source>
-<target>Chyba</target>
 
 <source>&Restore</source>
 <target>&Obnovit</target>
@@ -527,11 +536,14 @@ Příkaz je spuštěn když:
 <source>&Retry</source>
 <target>&Opakovat</target>
 
+<source>File time and size</source>
+<target>Podle velikosti a data souboru</target>
+
 <source>File content</source>
 <target>Podle obsahu souboru</target>
 
-<source>File time and size</source>
-<target>Podle velikosti a data souboru</target>
+<source>File size</source>
+<target>Podle velikosti souboru</target>
 
 <source>Two way</source>
 <target>Databáze</target>
@@ -559,12 +571,6 @@ Příkaz je spuštěn když:
 
 <source>Removing old versions...</source>
 <target>Odstraňování starých verzí...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Vytváření symbolického odkazu %x</target>
-
-<source>Creating folder %x</source>
-<target>Vytváření adresáře %x</target>
 
 <source>Updating file %x</source>
 <target>Aktualizace souboru %x</target>
@@ -684,30 +690,6 @@ Příkaz je spuštěn když:
 <source>Serious Error</source>
 <target>Závažná chyba</target>
 
-<source>Check for Program Updates</source>
-<target>Hledání aktualizací programu</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Je dostupná novější verze FreeFileSync:</target>
-
-<source>Download now?</source>
-<target>Stáhnout nyní?</target>
-
-<source>&Download</source>
-<target>&Stahování</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync je aktuální.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Není možné se připojit k www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Současná verze FreeFileSync nebyla nalezena online! Chcete verzi zkontrolovat ručně?</target>
-
-<source>&Check</source>
-<target>&Kontrola</target>
-
 <source>Symlink</source>
 <target>Symlink</target>
 
@@ -768,11 +750,20 @@ Příkaz je spuštěn když:
 <source>Paste</source>
 <target>Vložit</target>
 
-<source>Local Synchronization Settings</source>
-<target>Nastavení porovnání</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Vybranou složku %x nelze použít pro FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Vybranou složku %x nelze použít pro FreeFileSync. Prosím vyberte složku na místním souborovém systému, síti nebo multimediální zařízení.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Prosím vyberte složku na místním souborovém systému, síti nebo multimediální zařízení.</target>
+
+<source>SFTP folder</source>
+<target>SFTP složka</target>
+
+<source>Select SFTP folder</source>
+<target>Vyberte SFTP složku</target>
+
+<source>Select alternative folder type</source>
+<target>Vyberte typ složky</target>
 
 <source>&New</source>
 <target>&Nový</target>
@@ -801,8 +792,8 @@ Příkaz je spuštěn když:
 <source>&Actions</source>
 <target>&Akce</target>
 
-<source>&Options</source>
-<target>Nastavení &programu</target>
+<source>&Preferences</source>
+<target>&Předvolby...</target>
 
 <source>&Language</source>
 <target>&Jazyk</target>
@@ -842,9 +833,6 @@ Příkaz je spuštěn když:
 
 <source>Remove folder pair</source>
 <target>Odstranit dvojici adresářů</target>
-
-<source>Select SFTP folder</source>
-<target>Vyberte SFTP složku</target>
 
 <source>Swap sides</source>
 <target>Změna stran</target>
@@ -891,26 +879,14 @@ Příkaz je spuštěn když:
 <source>Total bytes to copy</source>
 <target>Celkový objem dat</target>
 
+<source>Folder pair:</source>
+<target>Dvojice složek:</target>
+
 <source>Use local settings:</source>
 <target>Použít nastavení:</target>
 
 <source>Select a variant:</source>
 <target>Výběr varianty:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Rozpoznat shodné soubory porovnáním jejich data změny a velikosti.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Rozpoznat shodné soubory porovnáním jejich obsahu.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Ignorovat časový posun (v hodinách)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Považovat časy souborů s daným posunem jako stejné</target>
-
-<source>Handle daylight saving time</source>
-<target>Používat letní čas</target>
 
 <source>Include &symbolic links:</source>
 <target>&Symbolické odkazy:</target>
@@ -923,6 +899,18 @@ Příkaz je spuštěn když:
 
 <source>More information</source>
 <target>Více informací</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Ignorovat časový posun [hh:mm]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Seznam ignorovaných časových posunů souborů</target>
+
+<source>Example:</source>
+<target>Příklad:</target>
+
+<source>Handle daylight saving time</source>
+<target>Používat letní čas</target>
 
 <source>Local settings:</source>
 <target>Nastavení:</target>
@@ -1013,14 +1001,17 @@ Příkaz je spuštěn když:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Uspořádat složky</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Zadejte přihlašovací údaje k SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>Jméno sevru nebo jeho IP adresa:</target>
 
-<source>Examples:</source>
-<target>Například:</target>
+<source>Port:</source>
+<target>Port:</target>
 
 <source>User name:</source>
 <target>Uživatelské jméno:</target>
@@ -1034,6 +1025,12 @@ Příkaz je spuštěn když:
 <source>Directory on server:</source>
 <target>Adresář na servru:</target>
 
+<source>Select a directory on the server:</source>
+<target>Výběr adresáře na servru:</target>
+
+<source>Select Folder</source>
+<target>Výběr složky</target>
+
 <source>Start synchronization now?</source>
 <target>Začít synchronizovat nyní?</target>
 
@@ -1042,9 +1039,6 @@ Příkaz je spuštěn když:
 
 <source>&Don't show this dialog again</source>
 <target>Tento dialog již &nezobrazovat</target>
-
-<source>Arrange folder pair</source>
-<target>Uspořádat složky</target>
 
 <source>Items found:</source>
 <target>Nalezeno položek:</target>
@@ -1096,6 +1090,12 @@ Příkaz je spuštěn když:
 
 <source>How can I schedule a batch job?</source>
 <target>Jak nastavit spouštění dávky?</target>
+
+<source>&Keep relative paths</source>
+<target>&Zachovat relativní cesty</target>
+
+<source>&Overwrite existing files</source>
+<target>&Přepsat existující soubory</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Toto nastavení je platné pro všechny synchronizační úlohy.</target>
@@ -1184,14 +1184,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Smazané položky</target>
 
+<source>Copy items</source>
+<target>Kopírované položky</target>
+
 <source>Options</source>
 <target>Nastavení programu</target>
 
 <source>Select Time Span</source>
 <target>Časové rozmezí</target>
 
-<source>&Preferences</source>
-<target>&Předvolby...</target>
+<source>&Options</source>
+<target>Nastavení &programu</target>
 
 <source>Main Bar</source>
 <target>Hlavní lišta</target>
@@ -1210,6 +1213,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Přehled</target>
+
+<source>&Download</source>
+<target>&Stahování</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Je dostupná novější verze FreeFileSync:</target>
 
 <source>Confirm</source>
 <target>Potvrdit</target>
@@ -1275,8 +1284,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Vynechat dočasně</target>
 
-<source>Delete</source>
-<target>Smazat</target>
+<source>&Copy to...</source>
+<target>&Kopírovat do...</target>
+
+<source>&Delete</source>
+<target>&Smazat</target>
 
 <source>Include all</source>
 <target>Zahrnout vše</target>
@@ -1325,9 +1337,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>Odstranit položku ze seznamu</target>
-
-<source>Synchronization Settings</source>
-<target>Nastavení synchronizace</target>
 
 <source>Clear filter</source>
 <target>Vymazat filtr</target>
@@ -1416,26 +1425,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Vypnout počítač</target>
 
-<source>Scanning...</source>
-<target>Zpracovávání...</target>
-
-<source>Comparing content...</source>
-<target>Porovnávání obsahu...</target>
-
-<source>Info</source>
-<target>Info</target>
-
-<source>Select all</source>
-<target>Vybrat vše</target>
-
 <source>Paused</source>
 <target>Pauza</target>
 
 <source>Initializing...</source>
 <target>Inicializace...</target>
 
+<source>Scanning...</source>
+<target>Zpracovávání...</target>
+
+<source>Comparing content...</source>
+<target>Porovnávání obsahu...</target>
+
 <source>Completed</source>
 <target>Hotovo</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Select all</source>
+<target>Vybrat vše</target>
 
 <source>&Continue</source>
 <target>&Pokračovat</target>
@@ -1445,6 +1454,22 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>Záznam zpracování</target>
+
+<source>Loading...</source>
+<target>Načítání...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Kopírovat následující položku do jiné složy?</pluralform>
+<pluralform>Kopírovat následující %x položky do jiné složkyr?</pluralform>
+<pluralform>Kopírovat následujících %x položek do jiné složkyr?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Prosím zadejte cílovou složku.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1468,9 +1493,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
 <pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Předvolby</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Kopírovat DACL, SACL, Owner, Group</target>
@@ -1496,6 +1518,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&Zobrazit</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Rozpoznat shodné soubory porovnáním jejich data změny a velikosti.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Rozpoznat shodné soubory porovnáním jejich obsahu.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Rozpoznat stejné soubory porovnáním jejich velikosti.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>
 
@@ -1507,6 +1538,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Nastavení vlastních pravidel synchronizace.</target>
+
+<source>Synchronization Settings</source>
+<target>Nastavení synchronizace</target>
+
+<source>Comparison</source>
+<target>Porovnání</target>
+
+<source>Synchronization</source>
+<target>Synchronizace</target>
 
 <source>Today</source>
 <target>Dnes</target>
@@ -1544,11 +1584,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Přidat časovou značku ke jménu souboru</target>
 
-<source>Comparison</source>
-<target>Porovnání</target>
+<source>Main config</source>
+<target>Hlavní nastavení</target>
 
-<source>Synchronization</source>
-<target>Synchronizace</target>
+<source>empty</source>
+<target>nezadáno</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ponechat jako nevyřešený konflikt</target>
@@ -1567,6 +1607,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Procentní podíl</target>
+
+<source>Internet access failed.</source>
+<target>Není přístup k internetu.</target>
+
+<source>Check for Program Updates</source>
+<target>Hledání aktualizací programu</target>
+
+<source>Download now?</source>
+<target>Stáhnout nyní?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync je aktuální.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Není možné se připojit k www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Současná verze FreeFileSync nebyla nalezena online! Chcete verzi zkontrolovat ručně?</target>
+
+<source>&Check</source>
+<target>&Kontrola</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nepodařilo se zaregistrovat k odběru systémových zpráv.</target>
@@ -1594,6 +1655,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Nelze kopírovat oprávnění z %x do %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x není platným názvem adresáře.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nelze najít systémovou funkci %x.</target>
@@ -1724,9 +1788,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>Synchronizační databáze FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Nastavení RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>Nastavení RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Upravit v FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Děkuji za Vaše příspěvky a podporu!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Tento instalátor pro přispěvovatele FreeFileSync dosáhl maximální počet instalací. Stáhnout verzi FreeFiileSync z domovské stránky?</target>
 

@@ -34,12 +34,11 @@ typedef std::map<SingularPluralPair, PluralForms> TranslationPluralMap; //(sing/
 
 struct TransHeader
 {
-    TransHeader() : pluralCount(0) {}
     std::string languageName;     //display name: "English (UK)"
     std::string translatorName;   //"Zenju"
     std::string localeName;       //ISO 639 language code + ISO 3166 country code, e.g. "en_GB", or "en_US"
     std::string flagFile;         //"england.png"
-    int pluralCount;              //2
+    int pluralCount = 0;          //2
     std::string pluralDefinition; //"n == 1 ? 0 : 1"
 };
 

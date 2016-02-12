@@ -481,6 +481,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
                                          extractJobName(referenceFile),
+                                         globalCfg.soundFileSyncComplete,
                                          timeStamp,
                                          batchCfg.logFolderPathPhrase,
                                          batchCfg.logfilesCountLimit,
@@ -513,6 +514,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         FolderComparison cmpResult = compare(globalCfg.optDialogs,
                                              allowPwPrompt, //allowUserInteraction
                                              globalCfg.runWithBackgroundPriority,
+                                             globalCfg.folderAccessTimeout,
                                              globalCfg.createLockFile,
                                              dirLocks,
                                              cmpConfig,
@@ -530,6 +532,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                     globalCfg.copyFilePermissions,
                     globalCfg.failsafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
+                    globalCfg.folderAccessTimeout,
                     syncProcessCfg,
                     cmpResult,
                     statusHandler);

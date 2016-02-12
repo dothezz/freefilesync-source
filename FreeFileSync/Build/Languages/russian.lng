@@ -22,11 +22,17 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>
 Настройка направления синхронизации по умолчанию:
-Старые файлы будут заменены более новыми файлами.
+Старые файлы будут перезаписаны более новыми файлами.
 </target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Проверка доступности "Корзины" для папки %x...</target>
+<source>Creating folder %x</source>
+<target>Создание папки %x</target>
+
+<source>Creating file %x</source>
+<target>Создание файла %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Создание символьной ссылки %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Перемещение файла %x в "Корзину"</target>
@@ -46,6 +52,9 @@
 <source>Deleting symbolic link %x</source>
 <target>Удаление символьной ссылки %x</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Проверка доступности "Корзины" для папки %x...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Для этого пути "Корзина" недоступна! Файлы будут удалены безвозвратно:</target>
 
@@ -60,6 +69,9 @@
 
 <source>Cannot find file %x.</source>
 <target>Невозможно найти файл %x.</target>
+
+<source>Error</source>
+<target>Ошибка</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Файл %x не содержит действительной конфигурации.</target>
@@ -103,8 +115,8 @@
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Вы можете проигнорировать эту ошибку, приняв каждую папку за пустую. При этом папки будут созданы автоматически во время синхронизации.</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Если вы игнорируете эту ошибку, то папки выше будут рассматриваться как пустые. Недостающие папки создаются автоматически, когда это необходимо.</target>
 
 <source>A folder input field is empty.</source>
 <target>Поле ввода папки пустое.</target>
@@ -249,9 +261,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>Невозможно найти устройство %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Невозможно определить свободное место на диске для %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Невозможно создать папку %x.</target>
 
@@ -270,11 +279,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Невозможно разрешить символьную ссылку %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Невозможно переместить %x в "Корзину".</target>
-
 <source>Cannot open directory %x.</source>
 <target>Невозможно открыть папку %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Невозможно определить свободное место на диске для %x.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>Невозможно переместить %x в "Корзину".</target>
 
 <source>Incorrect command line:</source>
 <target>Неверная командная строка:</target>
@@ -350,9 +362,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>Обнаружение заброшенной блокировки...</target>
 
-<source>Creating file %x</source>
-<target>Создание файла %x</target>
-
 <source>Saving file %x...</source>
 <target>Сохранение файла %x...</target>
 
@@ -371,9 +380,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>Невозможно установить блокировку папки для %x.</target>
 
-<source>Scanning:</source>
-<target>Сканирую:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -383,6 +389,9 @@ Actual: %y bytes
 <pluralform>%x потока</pluralform>
 <pluralform>%x потоков</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>Сканирую:</target>
 
 <source>/sec</source>
 <target>/с</target>
@@ -494,8 +503,8 @@ The command is triggered if:
 - появились новые папки (например, подключение переносного носителя)
 </target>
 
-<source>&Start</source>
-<target>&Старт</target>
+<source>Start</source>
+<target>Старт</target>
 
 <source>About</source>
 <target>О программе</target>
@@ -509,14 +518,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Автоматическая синхронизация</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>Следующий путь не поддерживает мониторинг папок:</target>
+
 <source>Directory monitoring active</source>
 <target>Слежение за папками активировано</target>
 
 <source>Waiting until all directories are available...</source>
 <target>Ожидать, пока все папки станут доступны...</target>
-
-<source>Error</source>
-<target>Ошибка</target>
 
 <source>&Restore</source>
 <target>&Восстановить</target>
@@ -530,11 +539,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>&Повторить</target>
 
+<source>File time and size</source>
+<target>Дата и размер файла</target>
+
 <source>File content</source>
 <target>Содержимое файла</target>
 
-<source>File time and size</source>
-<target>Дата и размер файла</target>
+<source>File size</source>
+<target>Размер файла</target>
 
 <source>Two way</source>
 <target>В обе стороны</target>
@@ -562,12 +574,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>Удаление старых версий...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Создание символьной ссылки %x</target>
-
-<source>Creating folder %x</source>
-<target>Создание папки %x</target>
 
 <source>Updating file %x</source>
 <target>Обновление файла %x</target>
@@ -687,30 +693,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Серьезная ошибка</target>
 
-<source>Check for Program Updates</source>
-<target>Проверка обновления программы</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>Доступна новая версия FreeFileSync:</target>
-
-<source>Download now?</source>
-<target>Загрузить сейчас?</target>
-
-<source>&Download</source>
-<target>&Загрузить</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>У Вас самая последняя версия FreeFileSync.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Невозможно соединиться с www.freefilesync.org.</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Невозможно найти номер текущей версии FreeFileSync онлайн! Вы хотите проверить вручную?</target>
-
-<source>&Check</source>
-<target>&Проверить</target>
-
 <source>Symlink</source>
 <target>Символьная ссылка</target>
 
@@ -771,11 +753,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>Вставить</target>
 
-<source>Local Synchronization Settings</source>
-<target>Локальные настройки синхронизации</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>Выделенная папка %x не может быть использована с FreeFileSync.</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>Выбранная папка %x не может быть использована с FreeFileSync. Пожалуйста, выберите папку в локальной файловой системе, сетевую папку или MTP устройство.</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>Пожалуйста, выберите папку в локальной файловой системе, сети или MTP устройстве.</target>
+
+<source>SFTP folder</source>
+<target>Папка SFTP</target>
+
+<source>Select SFTP folder</source>
+<target>Выберите папку SFTP</target>
+
+<source>Select alternative folder type</source>
+<target>Выберете альтернативный тип папки</target>
 
 <source>&New</source>
 <target>&Новая</target>
@@ -804,8 +795,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>&Действия</target>
 
-<source>&Options</source>
-<target>&Настройки</target>
+<source>&Preferences</source>
+<target>&Предпочтения</target>
 
 <source>&Language</source>
 <target>&Язык</target>
@@ -845,9 +836,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Удалить пару папок</target>
-
-<source>Select SFTP folder</source>
-<target>Выберите папку SFTP</target>
 
 <source>Swap sides</source>
 <target>Поменять направление</target>
@@ -894,26 +882,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>Всего байт для копирования</target>
 
+<source>Folder pair:</source>
+<target>Пара папок:</target>
+
 <source>Use local settings:</source>
 <target>Использовать локальные настройки:</target>
 
 <source>Select a variant:</source>
 <target>Выберите вариант:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>Определять одинаковые файлы путем сравнения времени изменения и размера.</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>Определять одинаковые файлы путем сравнения содержания файла.</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>&Игнорировать временной сдвиг (в часах)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>Считать время файлов с указанным смещением равным</target>
-
-<source>Handle daylight saving time</source>
-<target>Ручной переход на летнее время</target>
 
 <source>Include &symbolic links:</source>
 <target>Включая &символьные ссылки:</target>
@@ -926,6 +902,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>Больше информации</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>&Игнорировать временной сдвиг [чч:мм]</target>
+
+<source>List of file time offsets to ignore</source>
+<target>Список временных сдвигов файлов для игнорирования</target>
+
+<source>Example:</source>
+<target>Пример:</target>
+
+<source>Handle daylight saving time</source>
+<target>Ручной переход на летнее время</target>
 
 <source>Local settings:</source>
 <target>Локальные настройки:</target>
@@ -1016,14 +1004,17 @@ The command is triggered if:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target>Упорядочить пару папок</target>
+
 <source>Enter your SFTP login details:</source>
 <target>Введите свои регистрационные данные SFTP:</target>
 
 <source>Server name or IP address:</source>
 <target>Имя сервера или IP адрес:</target>
 
-<source>Examples:</source>
-<target>Пример:</target>
+<source>Port:</source>
+<target>Порт:</target>
 
 <source>User name:</source>
 <target>Имя пользователя:</target>
@@ -1035,7 +1026,13 @@ The command is triggered if:
 <target>&Показать пароль</target>
 
 <source>Directory on server:</source>
-<target>Каталог на сервере:</target>
+<target>Папка на сервере:</target>
+
+<source>Select a directory on the server:</source>
+<target>Выберете папку на сервере:</target>
+
+<source>Select Folder</source>
+<target>Выберете папку</target>
 
 <source>Start synchronization now?</source>
 <target>Начать синхронизацию сейчас?</target>
@@ -1045,9 +1042,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>Больше &не показывать это окно</target>
-
-<source>Arrange folder pair</source>
-<target>Упорядочить пару папок</target>
 
 <source>Items found:</source>
 <target>Элементов найдено:</target>
@@ -1103,6 +1097,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>Как запланировать пакетное задание?</target>
+
+<source>&Keep relative paths</source>
+<target>&Сохранить относительные пути</target>
+
+<source>&Overwrite existing files</source>
+<target>&Перезаписать существующие файлы</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следующие настройки используются для всех заданий синхронизации.</target>
@@ -1194,14 +1194,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>Удаление элементов</target>
 
+<source>Copy items</source>
+<target>Копирование элементов</target>
+
 <source>Options</source>
 <target>Настройки</target>
 
 <source>Select Time Span</source>
 <target>Выбор промежутка времени</target>
 
-<source>&Preferences</source>
-<target>&Предпочтения</target>
+<source>&Options</source>
+<target>&Настройки</target>
 
 <source>Main Bar</source>
 <target>Главная панель</target>
@@ -1220,6 +1223,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Главная</target>
+
+<source>&Download</source>
+<target>&Загрузить</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>Доступна новая версия FreeFileSync:</target>
 
 <source>Confirm</source>
 <target>Подтвердить</target>
@@ -1285,8 +1294,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Временно исключить</target>
 
-<source>Delete</source>
-<target>Удалить</target>
+<source>&Copy to...</source>
+<target>&Копировать в...</target>
+
+<source>&Delete</source>
+<target>&Удалить...</target>
 
 <source>Include all</source>
 <target>Включить все</target>
@@ -1335,9 +1347,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>Удалить запись из листа</target>
-
-<source>Synchronization Settings</source>
-<target>Настройки синхронизации</target>
 
 <source>Clear filter</source>
 <target>Очистить фильтр</target>
@@ -1426,26 +1435,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>Выключить компьютер</target>
 
-<source>Scanning...</source>
-<target>Сканирование...</target>
-
-<source>Comparing content...</source>
-<target>Сравнение содержания...</target>
-
-<source>Info</source>
-<target>Информация</target>
-
-<source>Select all</source>
-<target>Выделить все</target>
-
 <source>Paused</source>
 <target>Пауза</target>
 
 <source>Initializing...</source>
 <target>Инициализация...</target>
 
+<source>Scanning...</source>
+<target>Сканирование...</target>
+
+<source>Comparing content...</source>
+<target>Сравнение содержания...</target>
+
 <source>Completed</source>
 <target>Завершено</target>
+
+<source>Info</source>
+<target>Информация</target>
+
+<source>Select all</source>
+<target>Выделить все</target>
 
 <source>&Continue</source>
 <target>&Продолжить</target>
@@ -1455,6 +1464,22 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>Лог (журнал)</target>
+
+<source>Loading...</source>
+<target>Загрузка...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>Скопировать следующий %x элемент в другую папку?</pluralform>
+<pluralform>Скопировать следующие %x элемента в другую папку?</pluralform>
+<pluralform>Скопировать следующие %x элементов в другую папку?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>Пожалуйста, укажите папку назначения.</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1478,9 +1503,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Вы точно хотите удалить следующие %x элемента?</pluralform>
 <pluralform>Вы точно хотите удалить следующие %x элементов?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>Предпочтения</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>Копировать DACL, SACL, владелец, группа</target>
@@ -1509,6 +1531,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>&Показать</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>Определять одинаковые файлы путем сравнения времени изменения и размера.</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>Определять одинаковые файлы путем сравнения содержания файла.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>Определять одинаковые файлы путем сравнения размера файла.</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Выявять и распространять изменения на обе стороны. Удаленные, перемещенные и конфликтующие файлы определяются автоматически с использованием базы данных.</target>
 
@@ -1520,6 +1551,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>Настроить свои собственные правила синхронизации.</target>
+
+<source>Synchronization Settings</source>
+<target>Настройки синхронизации</target>
+
+<source>Comparison</source>
+<target>Сравнение</target>
+
+<source>Synchronization</source>
+<target>Синхронизация</target>
 
 <source>Today</source>
 <target>сегодня</target>
@@ -1557,11 +1597,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
 
-<source>Comparison</source>
-<target>Сравнение</target>
+<source>Main config</source>
+<target>Главная конфигурация</target>
 
-<source>Synchronization</source>
-<target>Синхронизация</target>
+<source>empty</source>
+<target>(папки не выбраны)</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Оставить как нерешенный конфликт</target>
@@ -1580,6 +1620,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>Проценты</target>
+
+<source>Internet access failed.</source>
+<target>Отсутствует доступ в Интернет.</target>
+
+<source>Check for Program Updates</source>
+<target>Проверка обновления программы</target>
+
+<source>Download now?</source>
+<target>Загрузить сейчас?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>У Вас самая последняя версия FreeFileSync.</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>Невозможно соединиться с www.freefilesync.org.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Невозможно найти номер текущей версии FreeFileSync онлайн! Вы хотите проверить вручную?</target>
+
+<source>&Check</source>
+<target>&Проверить</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Невозможно зарегистрироваться для получения системных сообщений.</target>
@@ -1607,6 +1668,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>Невозможно скопировать разрешения от %x к %y.</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x не является обычным именем папки.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Невозможно найти системную функцию %x.</target>
@@ -1737,9 +1801,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>База данных синхронизации FreeFileSync</target>
 
-<source>RealtimeSync Configuration</source>
-<target>Конфигурация RealtimeSync</target>
+<source>RealTimeSync Configuration</source>
+<target>Конфигурация RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Редактировать с помощью FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target>Спасибо за Ваше пожертвование и поддержку!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>Для этого установщика FreeFileSync для доноров был превышен лимит установок. Скачать обычную версию с домашней страницы FreeFileSync сейчас?</target>
 

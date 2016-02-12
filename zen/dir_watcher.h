@@ -50,10 +50,10 @@ public:
 
     struct Entry
     {
-        Entry() : action_(ACTION_CREATE) {}
+        Entry() {}
         Entry(ActionType action, const Zstring& filepath) : action_(action), filepath_(filepath) {}
 
-        ActionType action_;
+        ActionType action_ = ACTION_CREATE;
         Zstring filepath_;
     };
 

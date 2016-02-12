@@ -16,7 +16,8 @@ namespace zen
 enum CompareVariant
 {
     CMP_BY_TIME_SIZE,
-    CMP_BY_CONTENT
+    CMP_BY_CONTENT,
+    CMP_BY_SIZE
 };
 
 std::wstring getVariantName(CompareVariant var);
@@ -44,8 +45,8 @@ enum CompareFilesResult
     FILE_RIGHT_SIDE_ONLY,
     FILE_LEFT_NEWER,  //CMP_BY_TIME_SIZE only!
     FILE_RIGHT_NEWER, //
-    FILE_DIFFERENT_CONTENT, //CMP_BY_CONTENT only!
-    FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case, modification time
+    FILE_DIFFERENT_CONTENT, //CMP_BY_CONTENT, CMP_BY_SIZE only!
+    FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case
     FILE_CONFLICT
 };
 //attention make sure these /|\  \|/ three enums match!!!
@@ -106,7 +107,7 @@ struct DirectionSet
     SyncDirection exRightSideOnly = SyncDirection::LEFT;
     SyncDirection leftNewer       = SyncDirection::RIGHT; //CMP_BY_TIME_SIZE only!
     SyncDirection rightNewer      = SyncDirection::LEFT;  //
-    SyncDirection different       = SyncDirection::NONE; //CMP_BY_CONTENT only!
+    SyncDirection different       = SyncDirection::NONE; //CMP_BY_CONTENT, CMP_BY_SIZE only!
     SyncDirection conflict        = SyncDirection::NONE;
 };
 

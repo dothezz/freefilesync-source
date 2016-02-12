@@ -125,7 +125,7 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
     if (itemPaths.empty())
         return;
 
-    if (canSetDroppedShellPaths(itemPaths))
+    if (shouldSetDroppedPaths(itemPaths))
     {
         auto fmtShellPath = [](const Zstring& shellItemPath)
         {
@@ -154,8 +154,8 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
         wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);
         ProcessEvent(dummy);
     }
-    else
-        event.Skip(); //let other handlers try -> are there any??
+
+    //event.Skip(); //let other handlers try -> are there any??
 }
 
 

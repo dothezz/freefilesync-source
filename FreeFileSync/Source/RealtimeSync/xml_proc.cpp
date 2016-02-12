@@ -116,7 +116,7 @@ void xmlAccess::readRealOrBatchConfig(const Zstring& filepath, xmlAccess::XmlRea
     if (getXmlType(filepath) != XML_TYPE_BATCH) //throw FileError
         return readConfig(filepath, config, warningMsg); //throw FileError
 
-    //convert batch config to RealtimeSync config
+    //convert batch config to RealTimeSync config
     XmlBatchConfig batchCfg;
     readConfig(filepath, batchCfg, warningMsg); //throw FileError
     //<- redirect batch config warnings

@@ -26,6 +26,7 @@ class BatchStatusHandler : public zen::StatusHandler //throw BatchAbortProcess
 public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
                        const std::wstring& jobName, //should not be empty for a batch job!
+                       const Zstring& soundFileSyncComplete,
                        const zen::TimeComp& timeStamp,
                        const Zstring& logFolderPathPhrase,
                        int logfilesCountLimit, //0: logging inactive; < 0: no limit

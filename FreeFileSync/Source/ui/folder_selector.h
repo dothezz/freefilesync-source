@@ -47,7 +47,7 @@ public:
     void setPath(const Zstring& folderPathPhrase);
 
 private:
-    virtual bool canSetDroppedShellPaths(const std::vector<Zstring>& shellItemPaths) { return true; } //return true if drop should be processed
+    virtual bool shouldSetDroppedPaths(const std::vector<Zstring>& shellItemPaths) { return true; } //return true if drop should be processed
 
     void onMouseWheel     (wxMouseEvent&   event);
     void onFilesDropped   (FileDropEvent& event);

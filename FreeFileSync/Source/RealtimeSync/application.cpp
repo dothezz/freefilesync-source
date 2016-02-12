@@ -44,7 +44,7 @@ bool Application::OnInit()
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 
-    SetAppName(L"RealtimeSync");
+    SetAppName(L"RealTimeSync");
 
     initResourceImages(getResourceDir() + Zstr("Resources.zip"));
 
@@ -124,7 +124,7 @@ int Application::OnRun()
     catch (const std::bad_alloc& e) //the only kind of exception we don't want crash dumps for
     {
         logFatalError(e.what()); //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        wxSafeShowMessage(L"RealtimeSync - " + _("An exception occurred"), e.what());
+        wxSafeShowMessage(L"RealTimeSync - " + _("An exception occurred"), e.what());
         return FFS_RC_EXCEPTION;
     }
     //catch (...) -> let it crash and create mini dump!!!

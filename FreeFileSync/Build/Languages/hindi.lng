@@ -22,8 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>डिफ़ॉल्ट सिंक्रनाइज़ेशन दिशाएँ सेट हो रही हैं: पुराने फ़ाइल्स नए फ़ाइल्स से अधिलेखित होंगे।</target>
 
-<source>Checking recycle bin availability for folder %x...</source>
-<target>%x फ़ोल्डर के लिए रीसायकल बिन की उपलब्धता की जाँच हो रही है...</target>
+<source>Creating folder %x</source>
+<target>फ़ोल्डर %x बनाया हा रहा है</target>
+
+<source>Creating file %x</source>
+<target>फ़ाइल %x बनाई जा रही है</target>
+
+<source>Creating symbolic link %x</source>
+<target>प्रतीकात्मक कड़ी %x बनाया जा रहा है</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>%x फ़ाइल को रीसायकल बिन में ले जाया जा रहा है</target>
@@ -43,6 +49,9 @@
 <source>Deleting symbolic link %x</source>
 <target>%x प्रतीकात्मक कड़ी हटाया जा रहा है</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>%x फ़ोल्डर के लिए रीसायकल बिन की उपलब्धता की जाँच हो रही है...</target>
+
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>रीसायकल बिन निम्न फ़ोलडर्स के लिए उपलब्ध नहीं है। फ़ाइल्स को स्थायी रूप से हटाया जाएगा:</target>
 
@@ -57,6 +66,9 @@
 
 <source>Cannot find file %x.</source>
 <target>फ़ाइल %x नहीं मिली।</target>
+
+<source>Error</source>
+<target>त्रुटि</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>%x फ़ाइल में वैध कॉन्फ़िगरेशन नहीं है।</target>
@@ -100,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>निम्न फ़ोलडर्स नहीं मिले:</target>
 
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>हर फ़ोल्डर को खाली समझकर आप इस त्रुटि को अनदेखा कर सकते हो। फिर सिंक्रनाइज़ेशन के दौरान फ़ोलडर्स अपने आप बनेंगे।</target>
+<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>यदि आप इस त्रुटी को अनदेखा करते हैं तो निर्देशिकाओं को खाली समझा जाएगा। लापता निर्देशिकाएं आवश्यकता नुसार स्वचालित रूप से बनाए जाते हैं।</target>
 
 <source>A folder input field is empty.</source>
 <target>कोई फ़ोल्डर इनपुट प्रविष्टि खाली है।</target>
@@ -246,9 +258,6 @@ Actual: %y bytes
 <source>Cannot find device %x.</source>
 <target>डिवाइस %x नहीं मिला।</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>%x के लिए खाली डिस्क जगह निर्धारित नहीं कर सकते।</target>
-
 <source>Cannot create directory %x.</source>
 <target>%x निर्देशिका बना नहीं सकते।</target>
 
@@ -267,11 +276,14 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>सिंबॉलिक लिंक %x को हल नहीं कर सकते।</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x को रीसायकल बिन ले जाने में असमर्थ।</target>
-
 <source>Cannot open directory %x.</source>
 <target>निर्देशिका %x खोल नहीं सकते।</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>%x के लिए खाली डिस्क जगह निर्धारित नहीं कर सकते।</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x को रीसायकल बिन ले जाने में असमर्थ।</target>
 
 <source>Incorrect command line:</source>
 <target>अनुचित आदेश-पंक्ति:</target>
@@ -345,9 +357,6 @@ Actual: %y bytes
 <source>Detecting abandoned lock...</source>
 <target>अपसर्जित अवरोध पता लगाया जा रहा है...</target>
 
-<source>Creating file %x</source>
-<target>फ़ाइल %x बनाई जा रही है</target>
-
 <source>Saving file %x...</source>
 <target>फ़ाइल %x सहेजी जा रही है...</target>
 
@@ -366,9 +375,6 @@ Actual: %y bytes
 <source>Cannot set directory lock for %x.</source>
 <target>%x के लिए निर्देशिका अवरोध सेट नहीं कर सकते।</target>
 
-<source>Scanning:</source>
-<target>स्कैनिंग:</target>
-
 <source>
 <pluralform>1 thread</pluralform>
 <pluralform>%x threads</pluralform>
@@ -377,6 +383,9 @@ Actual: %y bytes
 <pluralform>1 थ्रेड</pluralform>
 <pluralform>%x थ्रेड्स</pluralform>
 </target>
+
+<source>Scanning:</source>
+<target>स्कैनिंग:</target>
 
 <source>/sec</source>
 <target>/सेकंड</target>
@@ -451,7 +460,7 @@ Actual: %y bytes
 <target>2. आदेश-पंक्ति प्रविष्ट करें।</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. 'प्रारंभ' दबाएं.</target>
+<target>3. 'प्रारंभ' दबाएं।</target>
 
 <source>To get started just import a .ffs_batch file.</source>
 <target>प्रारंभ करने के लिए केवल कोई .ffs_batch फ़ाइल आयात करें।</target>
@@ -488,8 +497,8 @@ The command is triggered if:
 - नए फ़ोलडर्स आए (उदा. USB स्टिक डालने पर)
 </target>
 
-<source>&Start</source>
-<target>प्रारंभ (&S)</target>
+<source>Start</source>
+<target>प्रारंभ</target>
 
 <source>About</source>
 <target>बारे में</target>
@@ -503,14 +512,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>स्वचालित सिंक्रनाइज़ेशन</target>
 
+<source>The following path does not support directory monitoring:</source>
+<target>निम्न पथ निर्देशिका निगरानी का समर्थन नहीं करता:</target>
+
 <source>Directory monitoring active</source>
 <target>निर्देशिका निगरानी सक्रिय</target>
 
 <source>Waiting until all directories are available...</source>
 <target>सब निर्देशिकाएँ उपलब्ध होने की प्रतिक्षा में...</target>
-
-<source>Error</source>
-<target>त्रुटि</target>
 
 <source>&Restore</source>
 <target>पुनर्स्थापित करें (&R)</target>
@@ -524,11 +533,14 @@ The command is triggered if:
 <source>&Retry</source>
 <target>पुनः प्रयास (&R)</target>
 
+<source>File time and size</source>
+<target>फ़ाइल समय और आकार</target>
+
 <source>File content</source>
 <target>फ़ाइल सामग्री</target>
 
-<source>File time and size</source>
-<target>फ़ाइल समय और आकार</target>
+<source>File size</source>
+<target>फ़ाइल आकार</target>
 
 <source>Two way</source>
 <target>दुतरफा</target>
@@ -556,12 +568,6 @@ The command is triggered if:
 
 <source>Removing old versions...</source>
 <target>पुराने संस्करणों को हटाया जा रहा है...</target>
-
-<source>Creating symbolic link %x</source>
-<target>प्रतीकात्मक कड़ी %x बनाया जा रहा है</target>
-
-<source>Creating folder %x</source>
-<target>फ़ोल्डर %x बनाया हा रहा है</target>
 
 <source>Updating file %x</source>
 <target>फ़ाइल %x अद्यतित हो रही है</target>
@@ -680,30 +686,6 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>गंभीर त्रुटि</target>
 
-<source>Check for Program Updates</source>
-<target>प्रोग्राम अद्यतनों के लिए जाँच करें</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>FreeFileSync का नया संस्करण उपलब्ध है:</target>
-
-<source>Download now?</source>
-<target>अभी डाउनलोड करें?</target>
-
-<source>&Download</source>
-<target>डाउनलोड (&D)</target>
-
-<source>FreeFileSync is up to date.</source>
-<target>FreeFileSync नवीनतम है।</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org से जुड़ने में असमर्थ।</target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>वर्तमान FreeFileSync संस्करण संख्या ऑनलाइन नहीं मिल सकती. क्या आप मैन्युअल रूप से जाँच करना चाहते हैं?</target>
-
-<source>&Check</source>
-<target>जाँच करें (&C)</target>
-
 <source>Symlink</source>
 <target>सिमलिंक</target>
 
@@ -764,11 +746,20 @@ The command is triggered if:
 <source>Paste</source>
 <target>चिपकाएं</target>
 
-<source>Local Synchronization Settings</source>
-<target>स्थानीय सिंक्रनाइज़ेशन सेटिंग्स</target>
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target>चुनी निर्देशिका %x FreeFileSync के साथ उपयोग नहीं की जा सकती।</target>
 
-<source>The selected folder %x cannot be used with FreeFileSync. Please select a folder on a local file system, network or an MTP device.</source>
-<target>चुना फ़ोल्डर %x FreeFileSync के साथ प्रयोग नहीं किया जा सकता। कृपया स्थानीय फ़ाइल सिस्टम, नेट्वर्क या किसी MTP डिवाइस से फ़ोल्डर चुनें।</target>
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target>स्थानीय फ़ाइल सिस्टम, नेटवर्क या MTP डिव्हाइस पर कोई निर्देशिका चुनें।</target>
+
+<source>SFTP folder</source>
+<target>SFTP फ़ोल्डर</target>
+
+<source>Select SFTP folder</source>
+<target>SFTP फ़ोल्डर चुनें</target>
+
+<source>Select alternative folder type</source>
+<target>वैकल्पिक फ़ोल्डर प्रकार चुनें</target>
 
 <source>&New</source>
 <target>नया (&N)</target>
@@ -797,8 +788,8 @@ The command is triggered if:
 <source>&Actions</source>
 <target>क्रियाएँ (&A)</target>
 
-<source>&Options</source>
-<target>विकल्प (&O)</target>
+<source>&Preferences</source>
+<target>प्राथमिकताएँ (&P)</target>
 
 <source>&Language</source>
 <target>भाषा (&L)</target>
@@ -838,9 +829,6 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>फ़ोल्डर जोडा निकालें</target>
-
-<source>Select SFTP folder</source>
-<target>SFTP फ़ोल्डर चुनें</target>
 
 <source>Swap sides</source>
 <target>पक्ष गमागम करें</target>
@@ -887,26 +875,14 @@ The command is triggered if:
 <source>Total bytes to copy</source>
 <target>कॉपी करने के लिए कुल बाइट्स</target>
 
+<source>Folder pair:</source>
+<target>फ़ोल्डर जोडा:</target>
+
 <source>Use local settings:</source>
 <target>स्थानीय सेटिंग्स का उपयोग करें:</target>
 
 <source>Select a variant:</source>
 <target>प्रकार चुने:</target>
-
-<source>Identify equal files by comparing modification time and size.</source>
-<target>समान फ़ाइल्स पहचानने के लिए संशोधन समय और आकार की तुलना करें।</target>
-
-<source>Identify equal files by comparing the file content.</source>
-<target>समान फ़ाइल्स पहचानने के लिए फ़ाइल सामग्री की तुलना करें।</target>
-
-<source>&Ignore time shift (in hours)</source>
-<target>समय बदलाव (घंटों में) को अनदेखा करें (&I)</target>
-
-<source>Consider file times with specified offset as equal</source>
-<target>निर्दिष्ट खसका में फ़ाइल समयों को समान समझें</target>
-
-<source>Handle daylight saving time</source>
-<target>दिवालोक बचत समय (डेलाईट सेविंग टाइम) प्रहस्तन करें</target>
 
 <source>Include &symbolic links:</source>
 <target>प्रतीकात्मक कड़ीयाँ शामिल करें (&s):</target>
@@ -919,6 +895,18 @@ The command is triggered if:
 
 <source>More information</source>
 <target>अधिक जानकारी</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target>समय शिफ़्ट अनदेखा करें [hh:mm] (&I)</target>
+
+<source>List of file time offsets to ignore</source>
+<target>उपेक्षित फ़ाइल समय ऑफ़्सेट्स की सूची</target>
+
+<source>Example:</source>
+<target>उदाहरण:</target>
+
+<source>Handle daylight saving time</source>
+<target>दिवालोक बचत समय (डेलाईट सेविंग टाइम) प्रहस्तन करें</target>
 
 <source>Local settings:</source>
 <target>स्थानीय सेटिंग्स:</target>
@@ -1009,14 +997,17 @@ The command is triggered if:
 <source>OK</source>
 <target>ठीक</target>
 
+<source>Arrange folder pair</source>
+<target>फ़ोल्डर जोडा व्यवस्थित करें</target>
+
 <source>Enter your SFTP login details:</source>
 <target>आपके SFTP लॉगइन विवरण प्रविष्ट करें:</target>
 
 <source>Server name or IP address:</source>
 <target>सर्वर नाम या IP पता:</target>
 
-<source>Examples:</source>
-<target>उदाहरण:</target>
+<source>Port:</source>
+<target>पोर्ट:</target>
 
 <source>User name:</source>
 <target>उपयोगकर्ता नाम:</target>
@@ -1030,6 +1021,12 @@ The command is triggered if:
 <source>Directory on server:</source>
 <target>सर्वर पर निर्देशिका:</target>
 
+<source>Select a directory on the server:</source>
+<target>सर्वर पर कोई निर्देशिका चुनें:</target>
+
+<source>Select Folder</source>
+<target>फ़ोल्डर चुनें</target>
+
 <source>Start synchronization now?</source>
 <target>अब सिंक्रनाइज़ेशन शुरू करें?</target>
 
@@ -1038,9 +1035,6 @@ The command is triggered if:
 
 <source>&Don't show this dialog again</source>
 <target>यह संवाद बॉक्स दोबारा न दिखाएं (&D)</target>
-
-<source>Arrange folder pair</source>
-<target>फ़ोल्डर जोडा व्यवस्थित करें</target>
 
 <source>Items found:</source>
 <target>आइटम बरामद:</target>
@@ -1092,6 +1086,12 @@ The command is triggered if:
 
 <source>How can I schedule a batch job?</source>
 <target>मैं कोई बॅच कार्य कैसे अनुसूचित करूँ?</target>
+
+<source>&Keep relative paths</source>
+<target>सापेक्ष पथों को बनाए रखें (&K)</target>
+
+<source>&Overwrite existing files</source>
+<target>मौजूद फ़ाइल्स अधिलेखित करें (&O)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>सभी सिंक्रनाइज़ेशन कार्यों के लिए निम्न सेटिंग्स का उपयोग किया जाता है।</target>
@@ -1183,14 +1183,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Delete Items</source>
 <target>आइटम हटाएं</target>
 
+<source>Copy items</source>
+<target>आइटम्स प्रतिलिपित करें</target>
+
 <source>Options</source>
 <target>विकल्प</target>
 
 <source>Select Time Span</source>
 <target>समय अवधि चुनें</target>
 
-<source>&Preferences</source>
-<target>प्राथमिकताएँ (&P)</target>
+<source>&Options</source>
+<target>विकल्प (&O)</target>
 
 <source>Main Bar</source>
 <target>मुख्य पट्टी</target>
@@ -1209,6 +1212,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>अवलोकन</target>
+
+<source>&Download</source>
+<target>डाउनलोड (&D)</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target>FreeFileSync का नया संस्करण उपलब्ध है:</target>
 
 <source>Confirm</source>
 <target>पुष्टि करें</target>
@@ -1270,8 +1279,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>अस्थायी रूप से अपवर्जित करें</target>
 
-<source>Delete</source>
-<target>हटाएं</target>
+<source>&Copy to...</source>
+<target>यहाँ प्रतिलिपित करें (&C)...</target>
+
+<source>&Delete</source>
+<target>हटाएं (&D)</target>
 
 <source>Include all</source>
 <target>सभी शामिल करें</target>
@@ -1320,9 +1332,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Remove entry from list</source>
 <target>सूचि से प्रविष्टि निकालें</target>
-
-<source>Synchronization Settings</source>
-<target>सिंक्रनाइज़ेशन सेटिंग्स</target>
 
 <source>Clear filter</source>
 <target>फ़िल्टर हटाएं</target>
@@ -1411,26 +1420,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Shut down</source>
 <target>बंद करें</target>
 
-<source>Scanning...</source>
-<target>स्कैनिंग...</target>
-
-<source>Comparing content...</source>
-<target>सामग्री की तुलना हो रही है...</target>
-
-<source>Info</source>
-<target>जानकारी</target>
-
-<source>Select all</source>
-<target>सभी चुने</target>
-
 <source>Paused</source>
 <target>ठहरा</target>
 
 <source>Initializing...</source>
 <target>प्रारंभ हो रहा है...</target>
 
+<source>Scanning...</source>
+<target>स्कैनिंग...</target>
+
+<source>Comparing content...</source>
+<target>सामग्री की तुलना हो रही है...</target>
+
 <source>Completed</source>
 <target>पूर्ण हुआ</target>
+
+<source>Info</source>
+<target>जानकारी</target>
+
+<source>Select all</source>
+<target>सभी चुने</target>
 
 <source>&Continue</source>
 <target>जारी रखें (&C)</target>
@@ -1440,6 +1449,21 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Log</source>
 <target>लॉग</target>
+
+<source>Loading...</source>
+<target>लोड हो रहा है...</target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target>
+<pluralform>निम्न आइटम अन्य निर्देशिका में प्र्तिलिपित करें?</pluralform>
+<pluralform>निम्न %x आइटम्स अन्य निर्देशिका में प्र्तिलिपित करें?</pluralform>
+</target>
+
+<source>Please enter a target folder.</source>
+<target>कृपया कोई गंतव्य निर्देशिका प्रविष्ट करें।</target>
 
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
@@ -1461,9 +1485,6 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>क्या आप वाकई निम्न आइटम हटाना चाहते हैं?</pluralform>
 <pluralform>क्या आप वाकई निम्न %x आइटम्स हटाना चाहते हैं?</pluralform>
 </target>
-
-<source>Preferences</source>
-<target>प्राथमिकताएँ</target>
 
 <source>Copy DACL, SACL, Owner, Group</source>
 <target>DACL, SACL, स्वामी, समूह प्रतिलिपित करें</target>
@@ -1489,6 +1510,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Show</source>
 <target>दिखाएं (&S)</target>
 
+<source>Identify equal files by comparing modification time and size.</source>
+<target>समान फ़ाइल्स पहचानने के लिए संशोधन समय और आकार की तुलना करें।</target>
+
+<source>Identify equal files by comparing the file content.</source>
+<target>समान फ़ाइल्स पहचानने के लिए फ़ाइल सामग्री की तुलना करें।</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target>समान फ़ाइल्स पहचानने के लिए फ़ाइल आकार की तुलना करें।</target>
+
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>दोनों तरफ़ के परिवर्तन पहचानें और प्रसारित करें। हटाए गए, ले जाए गए और विरोधों का स्वचालित रूप से डेटाबेस के उपयोग से पता लगाया जाता है।</target>
 
@@ -1500,6 +1530,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configure your own synchronization rules.</source>
 <target>अपने खुद के सिंक्रनाइज़ेशन नियम कॉन्फ़िगर करें।</target>
+
+<source>Synchronization Settings</source>
+<target>सिंक्रनाइज़ेशन सेटिंग्स</target>
+
+<source>Comparison</source>
+<target>तुलना</target>
+
+<source>Synchronization</source>
+<target>सिंक्रनाइज़ेशन</target>
 
 <source>Today</source>
 <target>आज</target>
@@ -1537,11 +1576,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>प्रत्येक फ़ाइल नाम को समय मोहर जोडें</target>
 
-<source>Comparison</source>
-<target>तुलना</target>
+<source>Main config</source>
+<target>मुख्य कॉन्फ़िग</target>
 
-<source>Synchronization</source>
-<target>सिंक्रनाइज़ेशन</target>
+<source>empty</source>
+<target>रीता</target>
 
 <source>Leave as unresolved conflict</source>
 <target>हल नहीं किये गए विरोध के रूप में छोड़ दें</target>
@@ -1560,6 +1599,27 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Percentage</source>
 <target>प्रतिशत</target>
+
+<source>Internet access failed.</source>
+<target>इंटरनेट पहुँच विफल।</target>
+
+<source>Check for Program Updates</source>
+<target>प्रोग्राम अद्यतनों के लिए जाँच करें</target>
+
+<source>Download now?</source>
+<target>अभी डाउनलोड करें?</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync नवीनतम है।</target>
+
+<source>Unable to connect to www.freefilesync.org.</source>
+<target>www.freefilesync.org से जुड़ने में असमर्थ।</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>वर्तमान FreeFileSync संस्करण संख्या ऑनलाइन नहीं मिल सकती. क्या आप मैन्युअल रूप से जाँच करना चाहते हैं?</target>
+
+<source>&Check</source>
+<target>जाँच करें (&C)</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>सिस्टम संदेशों को प्राप्त करने के लिए पंजीकृत करने में असमर्थ।</target>
@@ -1587,6 +1647,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy permissions from %x to %y.</source>
 <target>%x से %y अनुमतियां प्रतिलिपित नहीं कर सकते।</target>
+
+<source>%x is not a regular directory name.</source>
+<target>%x कोई नियमित निर्देशिका नाम नहीं है।</target>
 
 <source>Cannot find system function %x.</source>
 <target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
@@ -1649,7 +1712,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>निम्न XML तत्वों को पढा नहीं जा सका:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target>कॉन्फ़िगरेशन फ़ाइल %x अधूरी है। गुम तत्व उनके डिफ़ॉल्ट मानों से सेट होंगे।</target>
+<target>कॉन्फ़िगरेशन फ़ाइल %x अधूरी है। लापता तत्व उनके डिफ़ॉल्ट मानों से सेट होंगे।</target>
 
 <source>Prepare installation</source>
 <target>स्थापना तैयारी</target>
@@ -1714,9 +1777,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync Synchronization Database</source>
 <target>FreeFileSync सिंक्रनाइज़ेशन डेटाबेस</target>
 
-<source>RealtimeSync Configuration</source>
-<target>RealtimeSync कॉन्फ़िगरेशन</target>
+<source>RealTimeSync Configuration</source>
+<target>RealTimeSync कॉन्फ़िगरेशन</target>
 
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync के साथ संपादित करें</target>
+
+<source>Thanks for your donation and support!</source>
+<target>आपके दान और समर्थन के लिए धन्यवाद!</target>
+
+<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
+<target>यह दाताओं का FreeFileSync installer अपनी स्थापना सीमा तक पहूँचा है। नियमित संस्करण FreeFileSync मुख प्र्ष्ठ से डाउनलोड करें?</target>
 
