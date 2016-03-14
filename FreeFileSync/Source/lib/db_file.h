@@ -95,10 +95,10 @@ struct InSyncFolder
 DEFINE_NEW_FILE_ERROR(FileErrorDatabaseNotExisting);
 
 std::shared_ptr<InSyncFolder> loadLastSynchronousState(const BaseFolderPair& baseDirObj, //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
-                                                       const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
+                                                       const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 
 void saveLastSynchronousState(const BaseFolderPair& baseDirObj, //throw FileError
-                              const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
+                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 }
 
 #endif //DB_FILE_H_834275398588021574

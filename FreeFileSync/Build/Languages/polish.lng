@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Aktualizuj atrybuty po prawej stronie</target>
 
-<source>Cannot read file %x.</source>
-<target>Nie można odczytać pliku %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nie można zapisać uprawnień %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operacja nie jest wspierana dla różnych typów katalogów.</target>
+
+<source>Cannot write file %x.</source>
+<target>Nie można zapisać pliku %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Niespodziewany rozmiar strumienia danych.
 Oczekiwany: %x bajtów
 Przesłany: %y bajtów
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Nie można zapisać uprawnień %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operacja nie jest wspierana dla różnych typów katalogów.</target>
-
-<source>Cannot write file %x.</source>
-<target>Nie można zapisać pliku %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Nie można skopiować linku symbolicznego %x do %y.</target>
@@ -254,6 +251,9 @@ Przesłany: %y bajtów
 
 <source>Cannot open file %x.</source>
 <target>Nie można otworzyć pliku %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Nie można odczytać pliku %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Nie można odnaleźć urządzenia %x.</target>
@@ -1626,8 +1626,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Nie można połączyć się z www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Nie można znaleźć obecnej wersji FreeFileSync. Czy chcesz sprawdzić ręcznie?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>S&prawdź</target>
@@ -1665,11 +1665,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Cannot find system function %x.</source>
 <target>Nie można odnaleźć funkcji systemowej %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Nie można skopiować atrybutów z %x do %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Nie można skopiować pliku %x do %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Nie można skopiować atrybutów z %x do %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Element typu %x nie jest wspierany:</target>
@@ -1800,6 +1800,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Thanks for your donation and support!</source>
 <target>Dziękujemy za wsparcie i dotacje!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Ta wersja instalatora FreeFileSync osiągneła swój limit instalacji. Pobrać zwykłą wersję ze strony FreeFileSync?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

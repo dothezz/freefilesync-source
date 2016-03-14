@@ -46,14 +46,14 @@ bool operator<(const DiskInfo& lhs, const DiskInfo& rhs)
 }
 
 
-DiskInfo retrieveDiskInfo(const Zstring& pathName)
+DiskInfo retrieveDiskInfo(const Zstring& itemPath)
 {
     std::vector<wchar_t> volName(std::max(pathName.size(), static_cast<size_t>(10000)));
 
     DiskInfo output;
 
     //full pathName need not yet exist!
-    if (!::GetVolumePathName(pathName.c_str(),  //__in   LPCTSTR lpszFileName,
+    if (!::GetVolumePathName(itemPath.c_str(),  //__in   LPCTSTR lpszFileName,
                              &volName[0],       //__out  LPTSTR lpszVolumePathName,
                              static_cast<DWORD>(volName.size()))) //__in   DWORD cchBufferLength
         return output;
@@ -73,7 +73,7 @@ DiskInfo retrieveDiskInfo(const Zstring& pathName)
     //format into form: "\\.\C:"
     Zstring volnameFmt = rootPathName;
     if (endsWith(volnameFmt, FILE_NAME_SEPARATOR))
-        volnameFmt.resize(volnameFmt.size() - 1);
+        volnameFmt.pop_back();
     volnameFmt = L"\\\\.\\" + volnameFmt;
 
     HANDLE hVolume = ::CreateFile(volnameFmt.c_str(),

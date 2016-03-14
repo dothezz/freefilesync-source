@@ -1,5 +1,27 @@
-FreeFileSync 7.9
+FreeFileSync 8.0
 ----------------
+Fine-tuned buffer sizes for 70% improved SFTP stream I/O speed 
+Support incomplete read/write operations while maximizing buffer saturation
+Automatically check consistency of FreeFileSync installation
+Fixed crash when using SFTP on CPUs without SSE2 support
+Improved GUI responsiveness during SFTP I/O
+Disabled automatic quote substitution for file filter (OS X)
+Work around invalid parameter error on FAT drives for broken create times
+Avoid filter mismatches by using precomposed UTF (OS X)
+Fixed main dialog close button not being disabled during sync (OS X)
+Don't create AppleDouble files if extended attributes are unsupported (OS X)
+Set content format metadata when copying to an MTP device
+Fixed F-keys not working in sync config dialog (Linux)
+Revert to default button margin values (Linux)
+Fixed crash when thumbnail loading fails on MTP device
+Fixed main grids not scrolling in parallel during mouse selection
+Revert to default scaling for non-dpi-aware apps
+Integrate FreeFileSync online manual
+Added Slovak translation
+
+
+FreeFileSync 7.9 [2016-02-13]
+-----------------------------
 New comparison variant: compare by file size
 Buffer SFTP read/write accesses for optimal packet sizes
 Configure folder access time out via GlobalSettings.xml

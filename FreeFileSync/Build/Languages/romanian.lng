@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Actualizează atributele în partea dreaptă</target>
 
-<source>Cannot read file %x.</source>
-<target>Nu pot citi fila %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nu pot scrie permisiunile lui %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operație nesuportată pentru tipuri diferite de dosare bază (rădăcină).</target>
+
+<source>Cannot write file %x.</source>
+<target>Nu pot scrie fila %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Mărime neașteptată a fluxului de date.
 Așteptată: %x baiți
 Actuală: %y baiți
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Nu pot scrie permisiunile lui %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operație nesuportată pentru tipuri diferite de dosare bază (rădăcină).</target>
-
-<source>Cannot write file %x.</source>
-<target>Nu pot scrie fila %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Nu pot copia legătura simbolică %x în %y.</target>
@@ -254,6 +251,9 @@ Actuală: %y baiți
 
 <source>Cannot open file %x.</source>
 <target>Nu pot deschide fila %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Nu pot citi fila %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Nu pot găsi dispozitivul %x.</target>
@@ -1626,8 +1626,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Nu pot face conectarea la www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Nu pot afla numărul versiunii FreeFileSync disponibile acum pe internet. Vrei să-l cauți manual?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Verifică</target>
@@ -1665,11 +1665,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Cannot find system function %x.</source>
 <target>Nu pot găsi funcția de sistem %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Nu pot copia atributele de pe %x pe %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Nu pot copia fila %x în %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Nu pot copia atributele de pe %x pe %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Tipul de element %x nu e suportat:</target>
@@ -1800,6 +1800,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Thanks for your donation and support!</source>
 <target>Mulțumiri pentru donația și sprijinul tău!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Acest instalator FreeFileSync pentru donatori și-a atins limita de instalări permise. Descarci acum versiunea obișnuită de pe situl FreeFileSync?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

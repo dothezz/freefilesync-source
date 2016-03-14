@@ -62,8 +62,8 @@ private:
     };
 
     //------------- comparison panel ----------------------
-    void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/comparison-settings.html" , this); }
-    void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"html/daylight-saving-time.html", this); }
+    void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"comparison-settings" , this); }
+    void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"daylight-saving-time", this); }
 
     void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
     void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); } //
@@ -83,7 +83,7 @@ private:
     CompareVariant localCmpVar = CMP_BY_TIME_SIZE;
 
     //------------- filter panel --------------------------
-    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/exclude-items.html", this); }
+    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"exclude-items", this); }
     void OnChangeFilterOption(wxCommandEvent& event) override { updateFilterGui(); }
     void OnFilterReset       (wxCommandEvent& event) override { setFilterConfig(FilterConfig()); }
 
@@ -125,7 +125,7 @@ private:
 
     void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
 
-    void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/versioning.html", this); }
+    void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning", this); }
 
     std::shared_ptr<const SyncConfig> getSyncConfig() const;
     void setSyncConfig(std::shared_ptr<const SyncConfig> syncCfg);
@@ -261,8 +261,8 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_bitmapByTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
     m_bitmapByContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
     m_bitmapBySize    ->SetToolTip(getCompVariantDescription(CMP_BY_SIZE));
-    //------------- filter panel --------------------------
 
+    //------------- filter panel --------------------------
     assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
 
     m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
@@ -340,7 +340,8 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     unselectFolderPairConfig();
     selectFolderPairConfig(localPairIndexToShow);
 
-    m_listBoxFolderPair->SetFocus(); //more useful and Enter is redirected to m_buttonOkay anyway!
+    //more useful and Enter is redirected to m_buttonOkay anyway:
+    (m_listBoxFolderPair->IsShown() ? static_cast<wxWindow*>(m_listBoxFolderPair) : m_notebook)->SetFocus();
 }
 
 
@@ -352,19 +353,18 @@ void ConfigDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events witho
     {
         case WXK_F6:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::COMPARISON));
-            m_listBoxFolderPair->SetFocus();
-            return; //handled!
+            break; //handled!
         case WXK_F7:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::FILTER));
-            m_listBoxFolderPair->SetFocus();
-            return;
+            break;
         case WXK_F8:
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));
-            m_listBoxFolderPair->SetFocus();
+            break;
+        default:
+            event.Skip();
             return;
     }
-
-    event.Skip();
+    (m_listBoxFolderPair->IsShown() ? static_cast<wxWindow*>(m_listBoxFolderPair) : m_notebook)->SetFocus(); //GTK ignores F-keys if focus is on hidden item!
 }
 
 

@@ -63,7 +63,7 @@ struct InSyncAttributes
 
 InSyncAttributes copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                              //accummulated delta != file size! consider ADS, sparse, compressed files
-                             const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus); //may be nullptr; throw X!
+                             const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //may be nullptr; throw X!
 }
 
 #endif //FILE_ACCESS_H_8017341345614857

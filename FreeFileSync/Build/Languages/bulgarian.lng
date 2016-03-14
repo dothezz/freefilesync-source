@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Актуализирай атрибутите на десния елемент</target>
 
-<source>Cannot read file %x.</source>
-<target>Не може да се прочете файл %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Не могат да се запишат правата за достъп на %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Операцията не се поддържа за различни типове основни папки.</target>
+
+<source>Cannot write file %x.</source>
+<target>Не може да се запише файл %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 Очаквани: %x байта
 Действителни: %y байта
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Не могат да се запишат правата за достъп на %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Операцията не се поддържа за различни типове основни папки.</target>
-
-<source>Cannot write file %x.</source>
-<target>Не може да се запише файл %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Не може да се копира символната връзка %x в %y.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Не може да се отвори файл %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Не може да се прочете файл %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Не е намерено устройство %x.</target>
@@ -1615,8 +1615,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Няма връзка със www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Номера на текущата версия на FreeFileSync не е открит онлайн. Ще опитате ли ръчно?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>Оп&итай</target>
@@ -1654,11 +1654,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>Не е намерена системната функция %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Не могат да се копират атрибутите от %x в %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Не може да се копира файл %x в %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Не могат да се копират атрибутите от %x в %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Типа на елемент %x не се поддържа:</target>
@@ -1786,6 +1786,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>Благодарности за Вашите дарения и подкрепа!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Този FreeFileSync-инсталатор за дарители изчерпа инсталационния си лимит. Ще свалите ли регулярната версия от страницата на FreeFileSync сега?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

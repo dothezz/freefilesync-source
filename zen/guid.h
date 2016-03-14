@@ -8,13 +8,10 @@
 #define GUID_H_80425780237502345
 
 #include <string>
-#include <boost/uuid/uuid.hpp>
 
     #pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <boost/uuid/uuid_generators.hpp>
-
     #pragma GCC diagnostic pop
 
 

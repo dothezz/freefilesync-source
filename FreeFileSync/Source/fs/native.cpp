@@ -72,11 +72,11 @@ struct InputStreamNative : public AbstractFileSystem::InputStream
 {
     InputStreamNative(const Zstring& filePath) : fi(filePath) {} //throw FileError, ErrorFileLocked
 
-    size_t read(void* buffer, size_t bytesToRead) override { return fi.read(buffer, bytesToRead); } //throw FileError; returns "bytesToRead", unless end of file!
+    size_t        getBlockSize()  const override { return fi.getBlockSize(); } //non-zero block size is AFS contract!
+    size_t        tryRead(void* buffer, size_t bytesToRead) override { return fi.tryRead(buffer, bytesToRead); } //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
     AFS::FileId   getFileId          () override; //throw FileError
     std::int64_t  getModificationTime() override; //throw FileError
     std::uint64_t getFileSize        () override; //throw FileError
-    size_t optimalBlockSize() const override { return fi.optimalBlockSize(); } //non-zero block size is AFS contract!
 
 private:
     const FileAttribs& getBufferedAttributes() //throw FileError
@@ -126,10 +126,9 @@ struct OutputStreamNative : public AbstractFileSystem::OutputStreamImpl
             preAllocateSpaceBestEffort(fo.getHandle(), *streamSize, fo.getFilePath()); //throw FileError
     }
 
-    size_t optimalBlockSize() const override { return fo.optimalBlockSize(); } //non-zero block size is AFS contract!
+    size_t getBlockSize() const override { return fo.getBlockSize(); } //non-zero block size is AFS contract!
 
-private:
-    void write(const void* buffer, size_t bytesToWrite) override { fo.write(buffer, bytesToWrite); } //throw FileError
+    size_t tryWrite(const void* buffer, size_t bytesToWrite) override { return fo.tryWrite(buffer, bytesToWrite); } //throw FileError; may return short! CONTRACT: bytesToWrite > 0
 
     AFS::FileId finalize(const std::function<void()>& onUpdateStatus) override //throw FileError
     {
@@ -151,10 +150,10 @@ private:
             //perspective (treated like external update), except for the inconvenience.
             //Support additional scenarios like writing to FTP on Linux? Keep strict handling for now.
         }
-
         return fileId;
     }
 
+private:
     FileOutput fo;
     Opt<std::int64_t> modTime_;
 };
@@ -169,7 +168,7 @@ public:
     static Zstring getItemPathImplForRecycler(const AbstractPath& ap)
     {
         if (typeid(getAfs(ap)) != typeid(NativeFileSystem))
-            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+            throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         return getItemPathImpl(ap);
     }
 

@@ -9,6 +9,7 @@
 
 #include <zen/basic_math.h>
 #include <wx/window.h>
+#include <zen/scope_guard.h>
 
 
 namespace zen

@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>تحديث السمات على اليسار</target>
 
-<source>Cannot read file %x.</source>
-<target>لا يمكن قراءة الملف  %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>لا يمكن كتابة أذونات %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>العملية غير مدعومة لأنواع المجلدات مختلفة الأساس.</target>
+
+<source>Cannot write file %x.</source>
+<target>لا يمكن كتابة الملف  %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 المتوقع: %x bytes
 الفعلي: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>لا يمكن كتابة أذونات %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>العملية غير مدعومة لأنواع المجلدات مختلفة الأساس.</target>
-
-<source>Cannot write file %x.</source>
-<target>لا يمكن كتابة الملف  %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>لا يمكن نسخ الرابط الرمزي من %x إلى %y.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>تعذر فتح الملف %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>لا يمكن قراءة الملف  %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>لا يمكن العثور على الجهاز %x.</target>
@@ -1659,8 +1659,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>تعذر الاتصال بـ www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>لم نستطع العثور على على رقم إصدار FreeFileSync على الشبكة. هل تريد التحقق يدوياً؟</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&تحقق</target>
@@ -1698,11 +1698,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>لا يمكن العثور على وظيفة نظام %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>لا يمكن نسخ السمات من %x إلى %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>لا يمكن نسخ الملف %x إلى %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>لا يمكن نسخ السمات من %x إلى %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>نوع العنصر %x غير مدعوم:</target>
@@ -1842,6 +1842,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>شكرا على تبرعك ودعمك !</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>مثبت FreeFileSync للمنبرعين هذا وصل حدود التثبيت. هل تريد تحميل النسخة الاعتيادة من الصفحة الرئيسية لـ FreeFileSync الآن ؟</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

@@ -14,6 +14,7 @@
 #include <zen/file_error.h>
 #include <wx+/popup_dlg.h>
 #include "version_id.h"
+#include "../lib/ffs_paths.h"
 
 
     #include <zen/thread.h> //std::thread::id
@@ -63,6 +64,9 @@ std::string geHttpPostParameters() //must be in application/x-www-form-urlencode
     //2. respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
 
     std::string params = "ffs_version=" + utfCvrtTo<std::string>(zen::ffsVersion);
+
+    params += "&ffs_type=";
+    params += isPortableVersion() ? "Portable" : "Local";
 
     params += "&os_name=Linux";
     assert(std::this_thread::get_id() == mainThreadId);
@@ -166,13 +170,15 @@ bool internetIsAlive() //noexcept
            sc / 100 == 3;   //e.g. 301, 302, 303, 307... when in doubt, consider internet alive!
 }
 
-#if 0 //not needed yet: -Wunused-function on OS X
+
+#if 0 //not needed yet: -Wunused-function on clang
 inline
 std::string sendHttpGet(const std::wstring& url) //throw FileError
 {
     return sendHttpRequestImpl(url, nullptr); //throw FileError
 }
 #endif
+
 
 inline
 std::string sendHttpPost(const std::wstring& url, const std::string& postParams) //throw FileError
@@ -279,7 +285,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
             lastOnlineVersion = L"Unknown";
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
-                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),
                                            _("&Check")))
             {
                 case ConfirmationButton::DO_IT:
@@ -349,7 +355,7 @@ void zen::evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std
             lastOnlineVersion = L"Unknown";
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
-                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. Do you want to check manually?")),
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),
                                            _("&Check")))
             {
                 case ConfirmationButton::DO_IT:

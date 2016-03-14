@@ -22,12 +22,12 @@ std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCf
 void redetermineSyncDirection(const DirectionConfig& directConfig,
                               BaseFolderPair& baseFolder,
                               const std::function<void(const std::wstring& msg)>& reportWarning,
-                              const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
+                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 
 void redetermineSyncDirection(const MainConfiguration& mainCfg,
                               FolderComparison& folderCmp,
                               const std::function<void(const std::wstring& msg)>& reportWarning,
-                              const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus);
+                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 

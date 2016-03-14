@@ -116,7 +116,7 @@ struct FolderContainer
     void addSubFile(const Zstring& itemName, const FileDescriptor& fileData)
     {
         auto rv = files.emplace(itemName, fileData);
-        if (!rv.second) //update entry if already existing (e.g. during folder traverser "retry")
+        if (!rv.second) //update entry if already existing (e.g. during folder traverser "retry") => does not handle different item name case (irrelvant!..)
             rv.first->second = fileData;
     }
 

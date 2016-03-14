@@ -60,7 +60,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
         //    }
 
         //prefer file-browser semantics over sync preview (=> always show useful numbers, even for SyncDirection::NONE)
-        //discussion: https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/ba6b6a33
+        //discussion: http://www.freefilesync.org/forum/viewtopic.php?t=1595
         return std::max(file.getFileSize<LEFT_SIDE>(), file.getFileSize<RIGHT_SIDE>());
     };
 

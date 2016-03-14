@@ -175,9 +175,9 @@ auto runAsync(Function&& fun)
 template<class InputIterator, class Duration> inline
 bool wait_for_all_timed(InputIterator first, InputIterator last, const Duration& duration)
 {
-    const std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now() + duration;
+    const std::chrono::steady_clock::time_point stopTime = std::chrono::steady_clock::now() + duration;
     for (; first != last; ++first)
-        if (first->wait_until(endTime) != std::future_status::ready)
+        if (first->wait_until(stopTime) != std::future_status::ready)
             return false; //time elapsed
     return true;
 }

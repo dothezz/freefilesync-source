@@ -7,7 +7,7 @@
 #include "main_dlg.h"
 #include <zen/format_unit.h>
 #include <zen/file_access.h>
-#include <zen/serialize.h>
+#include <zen/file_io.h>
 #include <zen/thread.h>
 #include <zen/shell_execute.h>
 #include <wx/clipbrd.h>
@@ -257,40 +257,6 @@ private:
 
 namespace
 {
-//workaround for wxWidgets bug failing to update menu item bitmaps (affects Windows- and Linux-build)
-void setMenuItemImage(wxMenuItem*& menuItem, const wxBitmap& bmp)
-{
-    assert(menuItem->GetKind() == wxITEM_NORMAL);
-
-    //support polling
-    if (isEqual(bmp, menuItem->GetBitmap()))
-        return;
-
-    if (wxMenu* menu = menuItem->GetMenu())
-    {
-        int pos = menu->GetMenuItems().IndexOf(menuItem);
-        if (pos != wxNOT_FOUND)
-        {
-            /*
-                menu->Remove(menuItem);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
-                menu->Insert(pos, menuItem);
-                */
-            const bool enabled = menuItem->IsEnabled();
-            wxMenuItem* newItem = new wxMenuItem(menu, menuItem->GetId(), menuItem->GetItemLabel());
-
-            newItem->SetBitmap(bmp);
-            bool isDestroyed = menu->Destroy(menuItem); //actual workaround
-            assert(isDestroyed);
-            (void)isDestroyed;
-            menuItem = menu->Insert(pos, newItem); //don't forget to update input item pointer!
-
-            if (!enabled)
-                menuItem->Enable(false); //do not enable BEFORE appending item! wxWidgets screws up for yet another crappy reason
-        }
-    }
-}
-
-
 const int TOP_BUTTON_OPTIMAL_WIDTH = 180;
 
 
@@ -464,9 +430,9 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_bpButtonCmpConfig ->SetBitmapLabel(getResourceImage(L"cfg_compare"));
     m_bpButtonSyncConfig->SetBitmapLabel(getResourceImage(L"cfg_sync"));
 
-    m_bpButtonCmpContext   ->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
-    m_bpButtonFilterContext->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
-    m_bpButtonSyncContext  ->SetBitmapLabel(getResourceImage(L"button_arrow_right"));
+    m_bpButtonCmpContext   ->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"button_arrow_right")));
+    m_bpButtonFilterContext->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"button_arrow_right")));
+    m_bpButtonSyncContext  ->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"button_arrow_right")));
 
     m_bpButtonNew        ->SetBitmapLabel(getResourceImage(L"new"));
     m_bpButtonOpen       ->SetBitmapLabel(getResourceImage(L"load"));
@@ -531,16 +497,19 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
     auiMgr.Update();
 
-    //give panel captions bold typeface
     if (wxAuiDockArt* artProvider = auiMgr.GetArtProvider())
     {
         wxFont font = artProvider->GetFont(wxAUI_DOCKART_CAPTION_FONT);
         font.SetWeight(wxFONTWEIGHT_BOLD);
         font.SetPointSize(wxNORMAL_FONT->GetPointSize()); //= larger than the wxAuiDockArt default; looks better on OS X
         artProvider->SetFont(wxAUI_DOCKART_CAPTION_FONT, font);
+        artProvider->SetMetric(wxAUI_DOCKART_CAPTION_SIZE, font.GetPixelSize().GetHeight() + 2 + 2);
 
-        //accessibility: fix wxAUI drawing black text on black background on high-contrast color schemes:
-        artProvider->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+        //- fix wxWidgets 3.1.0 insane color scheme
+        artProvider->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR,          wxColor(220, 220, 220)); //light grey
+        artProvider->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR, wxColor(220, 220, 220)); //
+        artProvider->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, *wxBLACK); //accessibility: always set both foreground AND background colors!
+        //wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) -> better than wxBLACK, but which background to use?
     }
 
     auiMgr.GetPane(m_gridNavi).MinSize(-1, -1); //we successfully tricked wxAuiManager into setting an initial Window size :> incomplete API anyone??
@@ -609,23 +578,21 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
         m_bitmapSmallFileRight     ->SetBitmap(bmpFile);
     }
 
-    //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
-    setMenuItemImage(m_menuItemNew, getResourceImage(L"new_small"));
+    m_menuItemNew        ->SetBitmap(getResourceImage(L"new_small"));
+    m_menuItemLoad       ->SetBitmap(getResourceImage(L"load_small"));
+    m_menuItemSave       ->SetBitmap(getResourceImage(L"save_small"));
+    m_menuItemSaveAsBatch->SetBitmap(getResourceImage(L"batch_small"));
 
-    setMenuItemImage(m_menuItemLoad, getResourceImage(L"load_small"));
-    setMenuItemImage(m_menuItemSave, getResourceImage(L"save_small"));
+    m_menuItemCompare     ->SetBitmap(getResourceImage(L"compare_small"));
+    m_menuItemCompSettings->SetBitmap(getResourceImage(L"cfg_compare_small"));
+    m_menuItemFilter      ->SetBitmap(getResourceImage(L"filter_small"));
+    m_menuItemSyncSettings->SetBitmap(getResourceImage(L"cfg_sync_small"));
+    m_menuItemSynchronize ->SetBitmap(getResourceImage(L"sync_small"));
 
-    setMenuItemImage(m_menuItemCompare,      getResourceImage(L"compare_small"));
-    setMenuItemImage(m_menuItemCompSettings, getResourceImage(L"cfg_compare_small"));
-    setMenuItemImage(m_menuItemFilter,       getResourceImage(L"filter_small"));
-    setMenuItemImage(m_menuItemSyncSettings, getResourceImage(L"cfg_sync_small"));
-    setMenuItemImage(m_menuItemSynchronize,  getResourceImage(L"sync_small"));
+    m_menuItemOptions     ->SetBitmap(getResourceImage(L"settings_small"));
 
-    setMenuItemImage(m_menuItemOptions,     getResourceImage(L"settings_small"));
-    setMenuItemImage(m_menuItemSaveAsBatch, getResourceImage(L"batch_small"));
-
-    setMenuItemImage(m_menuItemHelp,   getResourceImage(L"help_small"));
-    setMenuItemImage(m_menuItemAbout,  getResourceImage(L"about_small"));
+    m_menuItemHelp ->SetBitmap(getResourceImage(L"help_small"));
+    m_menuItemAbout->SetBitmap(getResourceImage(L"about_small"));
 
     if (!manualProgramUpdateRequired())
     {
@@ -1462,15 +1429,14 @@ void MainDialog::disableAllElements(bool enableAbort)
     //disables all elements (except abort button) that might receive user input during long-running processes:
     //when changing consider: comparison, synchronization, manual deletion
 
-    EnableCloseButton(false); //not allowed for synchronization! progress indicator is top window! -> not honored on OS X!
+    EnableCloseButton(false); //not allowed for synchronization! progress indicator is top window!
 
     //OS X: wxWidgets portability promise is again a mess: http://wxwidgets.10942.n7.nabble.com/Disable-panel-and-appropriate-children-windows-linux-macos-td35357.html
 
     localKeyEventsEnabled = false;
 
-    m_menubar1->EnableTop(0, false);
-    m_menubar1->EnableTop(1, false);
-    m_menubar1->EnableTop(2, false);
+    for (size_t pos = 0; pos < m_menubar1->GetMenuCount(); ++pos)
+        m_menubar1->EnableTop(pos, false);
     m_bpButtonCmpConfig  ->Disable();
     m_bpButtonFilter     ->Disable();
     m_bpButtonSyncConfig ->Disable();
@@ -1512,9 +1478,8 @@ void MainDialog::enableAllElements()
 
     localKeyEventsEnabled = true;
 
-    m_menubar1->EnableTop(0, true);
-    m_menubar1->EnableTop(1, true);
-    m_menubar1->EnableTop(2, true);
+    for (size_t pos = 0; pos < m_menubar1->GetMenuCount(); ++pos)
+        m_menubar1->EnableTop(pos, true);
     m_bpButtonCmpConfig  ->Enable();
     m_bpButtonFilter     ->Enable();
     m_bpButtonSyncConfig ->Enable();
@@ -3769,7 +3734,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         //START SYNCHRONIZATION
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(guiCfg.mainCfg);
         if (syncProcessCfg.size() != folderCmp.size())
-            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+            throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         //should never happen: sync button is deactivated if they are not in sync
 
         synchronize(localTime(),
@@ -4532,9 +4497,9 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     const char CSV_SEP = haveCommaAsDecimalSep ? ';' : ',';
 
-    auto fmtValue = [&](const wxString& val) -> Utf8String
+    auto fmtValue = [&](const wxString& val) -> std::string
     {
-        Utf8String&& tmp = utfCvrtTo<Utf8String>(val);
+        std::string&& tmp = utfCvrtTo<std::string>(val);
 
         if (contains(tmp, CSV_SEP))
             return '\"' + tmp + '\"';
@@ -4542,18 +4507,18 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             return tmp;
     };
 
-    Utf8String header; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
+    std::string header; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
     header += BYTE_ORDER_MARK_UTF8;
 
     //base folders
-    header += fmtValue(_("Folder Pairs")) + '\n' ;
+    header += fmtValue(_("Folder Pairs")) + LINE_BREAK;
     std::for_each(begin(folderCmp), end(folderCmp),
                   [&](BaseFolderPair& baseFolder)
     {
-        header += utfCvrtTo<Utf8String>(AFS::getDisplayPath(baseFolder.getAbstractPath<LEFT_SIDE >())) + CSV_SEP;
-        header += utfCvrtTo<Utf8String>(AFS::getDisplayPath(baseFolder.getAbstractPath<RIGHT_SIDE>())) + '\n';
+        header += utfCvrtTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath<LEFT_SIDE >())) + CSV_SEP;
+        header += utfCvrtTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath<RIGHT_SIDE>())) + LINE_BREAK;
     });
-    header += '\n';
+    header += LINE_BREAK;
 
     //write header
     auto provLeft   = m_gridMainL->getDataProvider();
@@ -4590,16 +4555,27 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             });
             header += fmtValue(provRight->getColumnLabel(colAttrRight.back().type_));
         }
-        header += '\n';
+        header += LINE_BREAK;
 
         try
         {
             //write file
-            FileOutput fileOut(filepath, zen::FileOutput::ACC_OVERWRITE); //throw FileError
+            FileOutput fileOut(filepath, FileOutput::ACC_OVERWRITE); //throw FileError
+            const size_t blockSize = fileOut.getBlockSize();
+            std::string buffer;
 
-            replace(header, '\n', LINE_BREAK);
-            fileOut.write(&*header.begin(), header.size()); //throw FileError
+            auto flushBlock = [&]
+            {
+                size_t bytesRemaining = buffer.size();
+                while (bytesRemaining >= blockSize)
+                {
+                    const size_t bytesWritten = fileOut.tryWrite(&*(buffer.end() - bytesRemaining), blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+                    bytesRemaining -= bytesWritten;
+                }
+                buffer.erase(buffer.begin(), buffer.end() - bytesRemaining);
+            };
 
+            buffer += header;
             //main grid: write rows one after the other instead of creating one big string: memory allocation might fail; think 1 million rows!
             /*
             performance test case "export 600.000 rows" to CSV:
@@ -4609,30 +4585,28 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             const size_t rowCount = m_gridMainL->getRowCount();
             for (size_t row = 0; row < rowCount; ++row)
             {
-                Utf8String tmp;
-
                 for (const Grid::ColumnAttribute& ca : colAttrLeft)
                 {
-                    tmp += fmtValue(provLeft->getValue(row, ca.type_));
-                    tmp += CSV_SEP;
+                    buffer += fmtValue(provLeft->getValue(row, ca.type_));
+                    buffer += CSV_SEP;
                 }
 
                 for (const Grid::ColumnAttribute& ca : colAttrCenter)
                 {
-                    tmp += fmtValue(provCenter->getValue(row, ca.type_));
-                    tmp += CSV_SEP;
+                    buffer += fmtValue(provCenter->getValue(row, ca.type_));
+                    buffer += CSV_SEP;
                 }
 
                 for (const Grid::ColumnAttribute& ca : colAttrRight)
                 {
-                    tmp += fmtValue(provRight->getValue(row, ca.type_));
-                    tmp += CSV_SEP;
+                    buffer += fmtValue(provRight->getValue(row, ca.type_));
+                    buffer += CSV_SEP;
                 }
-                tmp += '\n';
-
-                replace(tmp, '\n', LINE_BREAK);
-                fileOut.write(&*tmp.begin(), tmp.size()); //throw FileError
+                buffer += LINE_BREAK;
+                flushBlock(); //throw FileError
             }
+            unbufferedSave(buffer, fileOut, nullptr); //throw FileError
+            fileOut.close(); //throw FileError
 
             flashStatusInformation(_("File list exported"));
         }
@@ -4717,7 +4691,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    zen::displayHelpEntry(this);
+    zen::displayHelpEntry(L"freefilesync", this);
 }
 
 //#########################################################################################################

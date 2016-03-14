@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  5 2014)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -43,10 +43,10 @@ PopupDialogGenerated::PopupDialogGenerated( wxWindow* parent, wxWindowID id, con
     m_panel33->SetSizer( bSizer165 );
     m_panel33->Layout();
     bSizer165->Fit( m_panel33 );
-    bSizer24->Add( m_panel33, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+    bSizer24->Add( m_panel33, 1, wxEXPAND, 5 );
 
     m_staticline6 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer24->Add( m_staticline6, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer24->Add( m_staticline6, 0, wxEXPAND, 5 );
 
     wxBoxSizer* bSizer25;
     bSizer25 = new wxBoxSizer( wxVERTICAL );
@@ -69,7 +69,7 @@ PopupDialogGenerated::PopupDialogGenerated( wxWindow* parent, wxWindowID id, con
     bSizer25->Add( bSizerStdButtons, 0, wxALIGN_RIGHT, 5 );
 
 
-    bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+    bSizer24->Add( bSizer25, 0, wxEXPAND, 5 );
 
 
     this->SetSizer( bSizer24 );

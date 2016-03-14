@@ -621,7 +621,9 @@ void MergeSides::fillOneSide(const FolderContainer& folderCont, const std::wstri
 }
 
 
-//improve merge-perf by over 70% + more natural default sequence
+//perf: 70% faster than traversing over left and right containers + more natural default sequence
+//- 2 x lessKey vs 1 x cmpFilePath() => no significant difference
+//- simplify loop by placing the eob check at the beginning => slightly slower
 template <class MapType, class ProcessLeftOnly, class ProcessRightOnly, class ProcessBoth> inline
 void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnly lo, ProcessRightOnly ro, ProcessBoth bo)
 {
@@ -869,7 +871,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
     //directory existence only checked *once* to avoid race conditions!
     if (resInfo.resolvedPairs.size() != cfgList.size())
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     checkForIncompleteInput(resInfo.resolvedPairs, warnings.warningInputFieldEmpty,  callback);
     checkFolderDependency  (resInfo.resolvedPairs, warnings.warningDependentFolders, callback);
@@ -974,6 +976,6 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
         callback.reportFatalError(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         //we need to maintain the "output.size() == cfgList.size()" contract in ALL cases! => abort
         callback.abortProcessNow(); //throw X
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
     }
 }

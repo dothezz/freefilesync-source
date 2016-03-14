@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>右の属性を更新</target>
 
-<source>Cannot read file %x.</source>
-<target>ファイル %x を読み込めません.</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x のﾊﾟｰﾐｯｼｮﾝを書き込めません.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>別の基準フォルダタイプでは対応していない操作.</target>
+
+<source>Cannot write file %x.</source>
+<target>ファイル %x に書き込めません.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 予測された値: %x バイト
 実際の値: %y バイト
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>%x のﾊﾟｰﾐｯｼｮﾝを書き込めません.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>別の基準フォルダタイプでは対応していない操作.</target>
-
-<source>Cannot write file %x.</source>
-<target>ファイル %x に書き込めません.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>シンボリックリンク %x を %y にコピーできません.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>ファイル %x を開けません.</target>
+
+<source>Cannot read file %x.</source>
+<target>ファイル %x を読み込めません.</target>
 
 <source>Cannot find device %x.</source>
 <target>デバイス %x がみつかりません.</target>
@@ -1604,8 +1604,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>www.freefilesync.org に接続できません.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>現在の FreeFileSync バージョン番号を確認できませんでした、手動で確認しますか?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>チェック(&C)</target>
@@ -1643,11 +1643,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>システム関数 %x がみつかりません.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>属性 を %x から %y にコピーできません.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>%x から %y にコピーできません.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>属性 を %x から %y にコピーできません.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>項目 %x には対応していません:</target>
@@ -1772,6 +1772,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>あなたの寄付と支援に感謝します!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>このドナー用 FreeFileSync インストーラは、インストールの制限に達しました。 今すぐ FreeFileSync 公式サイトで正規版をダウンロードしますか?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

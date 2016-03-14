@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Update kenmerken aan de rechterzijde</target>
 
-<source>Cannot read file %x.</source>
-<target>Kan het bestand %x niet lezen.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Kan de aangegeven machtigingen van %x niet schrijven.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Deze bewerking wordt niet ondersteund voor verschillende basis maptypen.</target>
+
+<source>Cannot write file %x.</source>
+<target>Kan bestand %x niet schrijven.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Onverwachte grootte van de gegevensstroom.
 Verwacht: %x bytes
 Werkelijk: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Kan de aangegeven machtigingen van %x niet schrijven.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Deze bewerking wordt niet ondersteund voor verschillende basis maptypen.</target>
-
-<source>Cannot write file %x.</source>
-<target>Kan bestand %x niet schrijven.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan de symbolische koppeling %x niet kopiëren naar %y.</target>
@@ -254,6 +251,9 @@ Werkelijk: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Het bestand %x kan niet geopend worden.</target>
+
+<source>Cannot read file %x.</source>
+<target>Kan het bestand %x niet lezen.</target>
 
 <source>Cannot find device %x.</source>
 <target>Kan apparaat %x niet vinden.</target>
@@ -1615,8 +1615,8 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Kan geen verbinding maken met www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Kan online niet het actuele FreeFileSync versienummer vinden. Wilt u handmatig controleren?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Controleren</target>
@@ -1654,11 +1654,11 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Cannot find system function %x.</source>
 <target>Kan de systeemfunctie %x niet vinden.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Kan de attributen van %x niet kopiëren naar %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Kan bestand %x niet kopiëren naar %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Kan de attributen van %x niet kopiëren naar %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Dit itemtype %x wordt niet ondersteund:</target>
@@ -1786,6 +1786,9 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Thanks for your donation and support!</source>
 <target>Bedankt voor uw donatie en ondersteuning!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Dit FreeFileSync installatieprogramma voor donateurs heeft zijn installatielimiet bereikt. Download de reguliere versie van de FreeFileSync startpagina nu?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

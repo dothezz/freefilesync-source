@@ -97,7 +97,7 @@ inline
 const TranslationHandler*& getTranslationInstance()
 {
     //avoid static destruction order fiasco: there may be accesses to "getTranslator()" during process shutdown e.g. show message in debug_minidump.cpp!
-	//=> use POD instead of a std::unique_ptr<>!!!
+    //=> use POD instead of a std::unique_ptr<>!!!
     static const TranslationHandler* inst = nullptr; //external linkage even in header!
     return inst;
 }
@@ -108,7 +108,7 @@ struct CleanUpTranslationHandler
     ~CleanUpTranslationHandler()
     {
         const TranslationHandler*& handler = getTranslationInstance();
-		assert(!handler); //clean up at a better time rather than during static destruction! potential MT issues!?
+        assert(!handler); //clean up at a better time rather than during static destruction! potential MT issues!?
         delete handler;
         handler = nullptr; //getTranslator() may be called even after static objects of this translation unit are destroyed!
     }

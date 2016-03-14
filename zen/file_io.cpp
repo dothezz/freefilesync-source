@@ -82,33 +82,26 @@ FileInput::~FileInput()
 }
 
 
-size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError; returns actual number of bytes read
+size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; may return short, only 0 means EOF!
 {
-    size_t bytesReadTotal = 0;
+    if (bytesToRead == 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
-    while (bytesToRead > 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
+    ssize_t bytesRead = 0;
+    do
     {
-        ssize_t bytesRead = 0;
-        do
-        {
-            bytesRead = ::read(fileHandle, buffer, bytesToRead);
-        }
-        while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
-
-        if (bytesRead < 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"read");
-        if (bytesRead == 0) //"zero indicates end of file"
-            return bytesReadTotal;
-
-        if (static_cast<size_t>(bytesRead) > bytesToRead) //better safe than sorry
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"ReadFile: buffer overflow."); //user should never see this
-
-        //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead" => loop!
-        buffer = static_cast<char*>(buffer) + bytesRead; //suppress warning about pointer arithmetics on void*
-        bytesToRead -= bytesRead;
-        bytesReadTotal += bytesRead;
+        bytesRead = ::read(fileHandle, buffer, bytesToRead);
     }
-    return bytesReadTotal;
+    while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+
+    if (bytesRead < 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"read");
+    if (static_cast<size_t>(bytesRead) > bytesToRead) //better safe than sorry
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"ReadFile: buffer overflow."); //user should never see this
+
+    //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead" => loop!
+
+    return bytesRead; //"zero indicates end of file"
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -173,29 +166,28 @@ void FileOutput::close() //throw FileError
 }
 
 
-void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError
+size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw FileError; may return short! CONTRACT: bytesToWrite > 0
 {
-    while (bytesToWrite > 0)
+    if (bytesToWrite == 0)
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+
+    ssize_t bytesWritten = 0;
+    do
     {
-        ssize_t bytesWritten = 0;
-        do
-        {
-            bytesWritten = ::write(fileHandle, buffer, bytesToWrite);
-        }
-        while (bytesWritten < 0 && errno == EINTR);
-
-        if (bytesWritten <= 0)
-        {
-            if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
-                errno = ENOSPC;
-
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write");
-        }
-        if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write: buffer overflow."); //user should never see this
-
-        //if ::write() is interrupted (EINTR) right in the middle, it will return successfully with "bytesWritten < bytesToWrite"!
-        buffer = static_cast<const char*>(buffer) + bytesWritten; //suppress warning about pointer arithmetics on void*
-        bytesToWrite -= bytesWritten;
+        bytesWritten = ::write(fileHandle, buffer, bytesToWrite);
     }
+    while (bytesWritten < 0 && errno == EINTR);
+
+    if (bytesWritten <= 0)
+    {
+        if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
+            errno = ENOSPC;
+
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write");
+    }
+    if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"write: buffer overflow."); //user should never see this
+
+    //if ::write() is interrupted (EINTR) right in the middle, it will return successfully with "bytesWritten < bytesToWrite"!
+    return bytesWritten;
 }

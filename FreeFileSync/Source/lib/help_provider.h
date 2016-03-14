@@ -7,6 +7,14 @@
 #ifndef HELP_PROVIDER_H_85930427583421563126
 #define HELP_PROVIDER_H_85930427583421563126
 
+#if 1
+namespace zen
+{
+inline void displayHelpEntry(const wxString& topic, wxWindow* parent) { wxLaunchDefaultBrowser(L"http://www.freefilesync.org/manual.php?topic=" + topic); }
+inline void uninitializeHelp() {}
+}
+
+#else
     #include <wx/html/helpctrl.h>
 
 #include "ffs_paths.h"
@@ -14,9 +22,8 @@
 
 namespace zen
 {
-//use '/' as path separator!
 void displayHelpEntry(wxWindow* parent);
-void displayHelpEntry(const wxString& section, wxWindow* parent);
+void displayHelpEntry(const wxString& topic, wxWindow* parent);
 
 void uninitializeHelp(); //clean up gracefully during app shutdown: leaving this up to static destruction crashes on Win 8.1!
 
@@ -54,9 +61,9 @@ public:
 
 
 inline
-void displayHelpEntry(const wxString& section, wxWindow* parent)
+void displayHelpEntry(const wxString& topic, wxWindow* parent)
 {
-    impl::FfsHelpController::getInstance().openSection(section, parent);
+    impl::FfsHelpController::getInstance().openSection(L"html/" + topic + L".html", parent);
 }
 
 
@@ -73,5 +80,6 @@ void uninitializeHelp()
 
 }
 }
+#endif
 
 #endif //HELP_PROVIDER_H_85930427583421563126

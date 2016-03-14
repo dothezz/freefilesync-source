@@ -150,7 +150,7 @@ const Zstring& MainDialog::lastConfigFileName()
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    zen::displayHelpEntry(L"html/realtimesync.html", this);
+    zen::displayHelpEntry(L"realtimesync", this);
 }
 
 

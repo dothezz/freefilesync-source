@@ -36,7 +36,7 @@ private:
     void OnErrorPopup  (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
     void OnErrorIgnore (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
     void OnErrorStop   (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
-    void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/schedule-a-batch-job.html", this); }
+    void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"schedule-a-batch-job", this); }
 
     void OnToggleGenerateLogfile(wxCommandEvent& event) override { updateGui(); }
     void OnToggleLogfilesLimit  (wxCommandEvent& event) override { updateGui(); }

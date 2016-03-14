@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Attribútumok frissítése a jobb oldalon</target>
 
-<source>Cannot read file %x.</source>
-<target>%x fájl olvasása nem sikerült.</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x jogosultságait nem lehet felírni.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>A művelet nem támogatott különböző alapkönyvtártípusok esetén.</target>
+
+<source>Cannot write file %x.</source>
+<target>%x fájl írása nem sikerült.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Az adatfolyam mérete eltér a várttól
 Várt: %x bájt
 Jelenlegi: %y bájt
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>%x jogosultságait nem lehet felírni.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>A művelet nem támogatott különböző alapkönyvtártípusok esetén.</target>
-
-<source>Cannot write file %x.</source>
-<target>%x fájl írása nem sikerült.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>%x szimbolikus linket nem tudja %y-ba másolni.</target>
@@ -254,6 +251,9 @@ Jelenlegi: %y bájt
 
 <source>Cannot open file %x.</source>
 <target>%x fájl nem nyitható.</target>
+
+<source>Cannot read file %x.</source>
+<target>%x fájl olvasása nem sikerült.</target>
 
 <source>Cannot find device %x.</source>
 <target>%x eszköz nem található.</target>
@@ -1615,8 +1615,8 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Nem lehet csatlakozni a www.freefilesync.org-hoz.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Nem lehet online megtalálni a jelenlegi FreeFileSync verziószámot. Meg akarod keresni manuálisan?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Ellenőriz</target>
@@ -1654,11 +1654,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Cannot find system function %x.</source>
 <target>%x rendszerfunkció nem elérhető.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Nem lehet az attribútumokat %x-ből %y-ba másolni.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>%x fájl másolása a(z) %y fájlba nem sikerült.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Nem lehet az attribútumokat %x-ből %y-ba másolni.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>A(z) %x elem típusa nem támogatott:</target>
@@ -1786,6 +1786,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Thanks for your donation and support!</source>
 <target>Köszönöm az adományt és támogatást!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Ez az adományozók számára biztosított FreeFileSync telepítőcsomag elérte a megengedett telepítési számot. Letöltse most a normál verziót a FreeFileSync honlapjáról?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

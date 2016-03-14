@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>עדכן תכונות בצד שמאל</target>
 
-<source>Cannot read file %x.</source>
-<target>לא יכול לקרוא קובץ %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>לא יכול לכתוב הרשאות של %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>פעולה לא נתמכת עבור סוגים אחרים של תיקית בסיס.</target>
+
+<source>Cannot write file %x.</source>
+<target>לא יכול לכתוב קובץ %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 צפוי: %x בתים
 בפועל: %y בתים
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>לא יכול לכתוב הרשאות של %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>פעולה לא נתמכת עבור סוגים אחרים של תיקית בסיס.</target>
-
-<source>Cannot write file %x.</source>
-<target>לא יכול לכתוב קובץ %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>לא יכול להעתיק קישור סימבולי %x אל %y.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>לא יכול לפתוח קובץ %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>לא יכול לקרוא קובץ %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>לא מוצא התקן %x.</target>
@@ -1615,8 +1615,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>אין תקשורת אל www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>לא מוצא מספר גירסה עדכנית של FreeFileSync באופן מכוון. האם אתה רוצה לבדוק באופן ידני?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&בדוק</target>
@@ -1654,11 +1654,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>לא יכול למצוא פונקצית מערכת %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>לא יכול להעתיק תכונות מ- %x אל %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>לא יכול להעתיק קובץ %x  אל %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>לא יכול להעתיק תכונות מ- %x אל %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>סוג של פריט %x אינו נתמך:</target>
@@ -1786,6 +1786,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>תודה עבור תרומתך ותמיכתך!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>קובץ התקנת FreeFileSync לתורמים הגיע למגבלת ההתקנות. האם להוריד את הגירסה הרגילה של קובץ ההתקנה מאתר הבית של FreeFileSync כעת?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

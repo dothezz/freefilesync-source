@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Osvježi atribute desno</target>
 
-<source>Cannot read file %x.</source>
-<target>Ne mogu čitati datoteku %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Ne mogu zapisati dopuštenja za %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operacija nije podržana za različite bazne mape.</target>
+
+<source>Cannot write file %x.</source>
+<target>Ne mogu zapisati datoteku %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Neočekivana veličina podataka.
 Očekivano: %x bajta
 Stvarno: %y bajta
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Ne mogu zapisati dopuštenja za %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operacija nije podržana za različite bazne mape.</target>
-
-<source>Cannot write file %x.</source>
-<target>Ne mogu zapisati datoteku %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Ne može se kopirati simbolična poveznica %x prema %y.</target>
@@ -254,6 +251,9 @@ Stvarno: %y bajta
 
 <source>Cannot open file %x.</source>
 <target>Ne mogu otvoriti datoteku %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Ne mogu čitati datoteku %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Nije moguće pronaći uređaj %x.</target>
@@ -1626,8 +1626,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Nije moguće povezivanje s www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Ne mogu pronaći trenutnu verziju FreeFileSync-a online. Da li želite ručno potražiti?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Provjeri</target>
@@ -1665,11 +1665,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Cannot find system function %x.</source>
 <target>Ne mogu pronaći sistemsku funkciju %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Nije moguće kopiranje atributa od %x prema %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Ne mogu kopirati datoteku %x na %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Nije moguće kopiranje atributa od %x prema %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Vrsta stavke %x koji nije podržan:</target>
@@ -1800,6 +1800,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Thanks for your donation and support!</source>
 <target>Hvala na donaciji i podršci!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Ovaj FreeFileSync instalacijski paket za donatore je prekoračio broj instalacija. Preuzeti normalnu verziju s FreeFileSync stranice sada?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

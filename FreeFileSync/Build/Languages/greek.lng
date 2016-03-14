@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Ενημέρωση των στοιχείων στα δεξιά</target>
 
-<source>Cannot read file %x.</source>
-<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή των αδειών προσπέλασης του %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Η λειτουργία δεν υποστηρίζεται για διαφορετικούς τύπους βασικών υποκαταλόγων.</target>
+
+<source>Cannot write file %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 Αναμενόμενο: %x bytes
 Βρέθηκε: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή των αδειών προσπέλασης του %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Η λειτουργία δεν υποστηρίζεται για διαφορετικούς τύπους βασικών υποκαταλόγων.</target>
-
-<source>Cannot write file %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Αδυναμία αντιγραφής του συμβολικού δεσμού %x στο %y.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Δεν είναι δυνατό το άνοιγμα του αρχείου %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Η συσχευή %x δεν μπορεί να βρεθεί.</target>
@@ -1615,8 +1615,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Αδυναμία επικοινωνίας με το www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Ο αριθμός της τρέχουσας έκδοσης του FreeFileSync δεν βρέθηκε στο δίκτυο. Θέλετε να το ελέγξετε εσείς;</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>Έλε&γχος</target>
@@ -1654,11 +1654,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>Δεν ανευρίσκεται η λειτουργία συστήματος %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Δεν μπορούν να αντιγραφούν τα χαρακτηριστικά του %x στο %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Δεν μπορεί να αντιγραφεί το αρχείο %x στο %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Δεν μπορούν να αντιγραφούν τα χαρακτηριστικά του %x στο %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Ο τύπος του στοιχείου %x δεν υποστηρίζεται:</target>
@@ -1786,6 +1786,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>Ευχαριστούμε για τη δωρεά και την υποστήριξή σας!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Αυτό το πρόγραμμα εγκατάστασης του FreeFileSync για υποστηρικτές έχει λήξει. Θέλετε να κατεβάσετε την κανονική έκδοση από τη σελίδα του FreeFileSync;</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

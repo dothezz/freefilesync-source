@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Mise à jour des attributs à droite</target>
 
-<source>Cannot read file %x.</source>
-<target>Impossible de lire le fichier %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Impossible d'écrire les permissions de %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Opération non prise en charge pour dee dossiers de base de types différents.</target>
+
+<source>Cannot write file %x.</source>
+<target>Impossible d'écrire le fichier %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Le flux de données a une taille inattendue :
 Attendu : %x octets
 Trouvé : %y octets
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Impossible d'écrire les permissions de %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Opération non prise en charge pour dee dossiers de base de types différents.</target>
-
-<source>Cannot write file %x.</source>
-<target>Impossible d'écrire le fichier %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Impossible de copier le lien symbolique %x vers %y.</target>
@@ -254,6 +251,9 @@ Trouvé : %y octets
 
 <source>Cannot open file %x.</source>
 <target>Impossible d'ouvrir le fichier %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Impossible de lire le fichier %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Impossible de trouver le périphérique %x.</target>
@@ -1615,8 +1615,8 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Impossible de se connecter à www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Impossible de trouver en ligne une nouvelle version de FreeFileSync.Voulez-vous le faire manuellement ?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Contrôle</target>
@@ -1654,11 +1654,11 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Cannot find system function %x.</source>
 <target>Impossible de trouver la fonction système %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Impossible de copier les attributs de %x à %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Impossible de copier le fichier %x vers %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Impossible de copier les attributs de %x à %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Le type de l'élément %x n'est pas accepté :</target>
@@ -1786,6 +1786,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Thanks for your donation and support!</source>
 <target>Merci pour votre don et votre aide !</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Le programme d'installation pour les donateurs a atteint sa limite d'installations. Voulez-vous télécharger la version valide à partir du site de FreeFileSync ?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

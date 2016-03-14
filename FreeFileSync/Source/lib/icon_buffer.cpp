@@ -299,13 +299,6 @@ private:
 };
 
 
-class InitFileIconCacheOnStartup
-{
-public:
-    InitFileIconCacheOnStartup()
-    {
-    }
-} dummy;
 
 
 void WorkerThread::operator()() const //thread entry

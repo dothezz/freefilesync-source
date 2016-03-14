@@ -5,9 +5,8 @@
 // **************************************************************************
 
 #include "binary.h"
-#include <zen/tick_count.h>
 #include <vector>
-#include <zen/file_io.h>
+#include <zen/tick_count.h>
 
 using namespace zen;
 using AFS = AbstractFileSystem;
@@ -33,97 +32,127 @@ buffer  MB/s
 8192    56
 */
 
-class BufferSize
-{
-public:
-    BufferSize(size_t initialSize) : bufSize(initialSize) {}
-
-    void inc()
-    {
-        if (bufSize < BUFFER_SIZE_MAX)
-            bufSize *= 2;
-    }
-
-    void dec()
-    {
-        if (bufSize > BUFFER_SIZE_MIN)
-            bufSize /= 2;
-    }
-
-    size_t get() const { return bufSize; }
-
-private:
-    static const size_t BUFFER_SIZE_MIN   =            8 * 1024; //slow FTP transfer!
-    static const size_t BUFFER_SIZE_MAX   =  1024 * 1024 * 1024;
-
-    size_t bufSize;
-};
-
-
-inline
-void setMinSize(std::vector<char>& buffer, size_t minSize)
-{
-    if (buffer.size() < minSize) //this is similar to reserve(), but we need a "properly initialized" array here
-        buffer.resize(minSize);
-}
-
-
+const size_t BLOCK_SIZE_MAX =  16 * 1024 * 1024;
 const std::int64_t TICKS_PER_SEC = ticksPerSec();
-}
 
 
-bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath& filePath2, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
+struct StreamReader
 {
-    const std::unique_ptr<AFS::InputStream> inStream1 = AFS::getInputStream(filePath1); //throw FileError, (ErrorFileLocked)
-    const std::unique_ptr<AFS::InputStream> inStream2 = AFS::getInputStream(filePath2); //
+    StreamReader(const AbstractPath& filePath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress, size_t& unevenBytes) :
+        stream(AFS::getInputStream(filePath)), //throw FileError, (ErrorFileLocked)
+        defaultBlockSize(stream->getBlockSize()),
+        dynamicBlockSize(defaultBlockSize),
+        notifyProgress_(notifyProgress),
+        unevenBytes_(unevenBytes) {}
 
-    BufferSize dynamicBufSize(std::min(inStream1->optimalBlockSize(),
-                                       inStream2->optimalBlockSize()));
-
-    TickVal lastDelayViolation = getTicks();
-    std::vector<char> buf; //make this thread-local? => on noticeable perf advantage!
-
-    for (;;)
+    void appendChunk(std::vector<char>& buffer) //throw FileError
     {
-        const size_t bufSize = dynamicBufSize.get(); //save for reliable eof check below!!!
-        setMinSize(buf, 2 * bufSize);
-        char* buf1 = &buf[0];
-        char* buf2 = &buf[bufSize];
+        assert(!eof);
+        if (eof) return;
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = inStream1->read(buf1, bufSize); //throw FileError
-        const size_t length2 = inStream2->read(buf2, bufSize); //returns actual number of bytes read
-        //send progress updates immediately after reading to reliably allow speed calculations for our clients!
-        if (onUpdateStatus)
-            onUpdateStatus(std::max(length1, length2));
+        buffer.resize(buffer.size() + dynamicBlockSize);
+        const size_t bytesRead = stream->tryRead(&*(buffer.end() - dynamicBlockSize), dynamicBlockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        buffer.resize(buffer.size() - dynamicBlockSize + bytesRead); //caveat: unsigned arithmetics
 
-        if (length1 != length2 || ::memcmp(buf1, buf2, length1) != 0)
-            return false;
+        const TickVal stopTime = getTicks();
 
-        //-------- dynamically set buffer size to keep callback interval between 100 - 500ms ---------------------
+        //report bytes processed
+        if (notifyProgress_)
+        {
+            const size_t bytesToReport = (unevenBytes_ + bytesRead) / 2;
+            notifyProgress_(bytesToReport); //throw X!
+            unevenBytes_ = (unevenBytes_ + bytesRead) - bytesToReport * 2; //unsigned arithmetics!
+        }
+
+        if (bytesRead == 0)
+        {
+            eof = true;
+            return;
+        }
+
         if (TICKS_PER_SEC > 0)
         {
-            const TickVal now = getTicks();
+            size_t proposedBlockSize = 0;
+            const std::int64_t loopTimeMs = dist(startTime, stopTime) * 1000 / TICKS_PER_SEC; //unit: [ms]
 
-            const std::int64_t loopTime = dist(startTime, now) * 1000 / TICKS_PER_SEC; //unit: [ms]
-            if (loopTime < 100)
+            if (loopTimeMs >= 100)
+                lastDelayViolation = stopTime;
+
+            //avoid "flipping back": e.g. DVD-ROMs read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
+            if (dist(lastDelayViolation, stopTime) / TICKS_PER_SEC >= 2)
             {
-                if (dist(lastDelayViolation, now) / TICKS_PER_SEC > 2) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
-                {
-                    lastDelayViolation = now;
-                    dynamicBufSize.inc();
-                }
+                lastDelayViolation = stopTime;
+                proposedBlockSize = dynamicBlockSize * 2;
             }
-            else if (loopTime > 500)
-            {
-                lastDelayViolation = now;
-                dynamicBufSize.dec();
-            }
+            if (loopTimeMs > 500)
+                proposedBlockSize = dynamicBlockSize / 2;
+
+            if (defaultBlockSize <= proposedBlockSize && proposedBlockSize <= BLOCK_SIZE_MAX)
+                dynamicBlockSize = proposedBlockSize;
         }
-        //------------------------------------------------------------------------------------------------
-
-        if (length1 != bufSize) //end of file
-            return true;
     }
+
+    bool isEof() const { return eof; }
+
+private:
+    const std::unique_ptr<AFS::InputStream> stream;
+    const size_t defaultBlockSize;
+    size_t dynamicBlockSize;
+    const std::function<void(std::int64_t bytesDelta)> notifyProgress_;
+    size_t& unevenBytes_;
+    TickVal lastDelayViolation = getTicks();
+    bool eof = false;
+};
+}
+
+
+bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath& filePath2, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError
+{
+    size_t unevenBytes = 0;
+    StreamReader reader1(filePath1, notifyProgress, unevenBytes); //throw FileError, (ErrorFileLocked)
+    StreamReader reader2(filePath2, notifyProgress, unevenBytes); //
+
+    StreamReader* readerLow  = &reader1;
+    StreamReader* readerHigh = &reader2;
+
+    std::vector<char> bufferLow;
+    std::vector<char> bufferHigh;
+
+    for (;;)
+    {
+        const size_t bytesChecked = bufferLow.size();
+
+        readerLow->appendChunk(bufferLow); //throw FileError
+
+        if (bufferLow.size() > bufferHigh.size())
+        {
+            bufferLow.swap(bufferHigh);
+            std::swap(readerLow, readerHigh);
+        }
+
+        if (!std::equal(bufferLow. begin() + bytesChecked, bufferLow.end(),
+                        bufferHigh.begin() + bytesChecked))
+            return false;
+
+        if (readerLow->isEof())
+        {
+            if (bufferLow.size() < bufferHigh.size())
+                return false;
+            if (readerHigh->isEof())
+                break;
+            //bufferLow.swap(bufferHigh); not needed
+            std::swap(readerLow, readerHigh);
+        }
+
+        //don't let sliding buffer grow too large
+        bufferHigh.erase(bufferHigh.begin(), bufferHigh.begin() + bufferLow.size());
+        bufferLow.clear();
+    }
+
+    if (unevenBytes != 0)
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+
+    return true;
 }

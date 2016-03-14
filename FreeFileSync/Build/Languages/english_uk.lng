@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Update attributes on right</target>
 
-<source>Cannot read file %x.</source>
-<target>Cannot read file %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Cannot write permissions of %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operation not supported for different base folder types.</target>
+
+<source>Cannot write file %x.</source>
+<target>Cannot write file %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Unexpected size of data stream.
 Expected: %x bytes
 Actual: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Cannot write permissions of %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operation not supported for different base folder types.</target>
-
-<source>Cannot write file %x.</source>
-<target>Cannot write file %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Cannot copy symbolic link %x to %y.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Cannot open file %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Cannot read file %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Cannot find device %x.</target>
@@ -1615,8 +1615,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Unable to connect to www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Cannot find current FreeFileSync version number online. Do you want to check manually?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Check</target>
@@ -1654,11 +1654,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>Cannot find system function %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Cannot copy attributes from %x to %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Cannot copy file %x to %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Cannot copy attributes from %x to %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Type of item %x is not supported:</target>
@@ -1786,6 +1786,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>Thanks for your donation and support!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

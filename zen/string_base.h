@@ -256,6 +256,7 @@ public:
     void resize(size_t newSize, Char fillChar = 0);
     void swap(Zbase& other);
     void push_back(Char val) { operator+=(val); } //STL access
+    void pop_back();
 
     Zbase& operator=(const Zbase& source);
     Zbase& operator=(Zbase&& tmp) noexcept;
@@ -673,6 +674,16 @@ template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator+=(Char ch)
 {
     return append(&ch, 1);
+}
+
+
+template <class Char, template <class, class> class SP, class AP> inline
+void Zbase<Char, SP, AP>::pop_back()
+{
+    const size_t len = length();
+    assert(len > 0);
+    if (len > 0)
+        resize(len - 1);
 }
 }
 

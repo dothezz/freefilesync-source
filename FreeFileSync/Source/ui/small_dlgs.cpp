@@ -492,7 +492,7 @@ private:
     void OnClose       (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnAddRow      (wxCommandEvent& event) override;
     void OnRemoveRow   (wxCommandEvent& event) override;
-    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"html/external-applications.html", this); }
+    void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"external-applications", this); }
     void onResize(wxSizeEvent& event);
     void updateGui();
 
@@ -767,16 +767,6 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, s
     //wxDateTime models local(!) time (in contrast to what documentation says), but it has a constructor taking time_t UTC
     m_calendarFrom->SetDate(static_cast<time_t>(timeFromTmp));
     m_calendarTo  ->SetDate(static_cast<time_t>(timeToTmp  ));
-
-#if wxCHECK_VERSION(2, 9, 5)
-    //doesn't seem to be a problem here:
-#else
-    //wxDatePickerCtrl::BestSize() does not respect year field and trims it, both wxMSW/wxGTK - why isn't there anybody testing this wxWidgets stuff???
-    wxSize minSz = m_calendarFrom->GetBestSize();
-    minSz.x += 30;
-    m_calendarFrom->SetMinSize(minSz);
-    m_calendarTo  ->SetMinSize(minSz);
-#endif
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!

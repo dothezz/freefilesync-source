@@ -7,6 +7,15 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural_definition>
 </header>
 
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
+
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения.</target>
 
@@ -20,10 +29,7 @@
 <target>Запись в базе данных не находится в состоянии синхронизации, учитывая текущие настройки.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>
-Настройка направления синхронизации по умолчанию:
-Старые файлы будут перезаписаны более новыми файлами.
-</target>
+<target>Настройка направления синхронизации по умолчанию: Старые файлы будут перезаписаны более новыми файлами.</target>
 
 <source>Creating folder %x</source>
 <target>Создание папки %x</target>
@@ -217,8 +223,14 @@
 <source>Update attributes on right</source>
 <target>Обновление атрибутов справа</target>
 
-<source>Cannot read file %x.</source>
-<target>Невозможно прочитать файл %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Невозможно записать права доступа %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Операция не поддерживается для разных базовых типов папок.</target>
+
+<source>Cannot write file %x.</source>
+<target>Невозможно записать файл %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -230,15 +242,6 @@ Actual: %y bytes
 Ожидаемый: %x байт
 Фактический: %y байт
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Невозможно записать права доступа %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Операция не поддерживается для разных базовых типов папок.</target>
-
-<source>Cannot write file %x.</source>
-<target>Невозможно записать файл %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Невозможно скопировать символьную ссылку %x в %y.</target>
@@ -257,6 +260,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Невозможно открыть файл %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Невозможно прочитать файл %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Невозможно найти устройство %x.</target>
@@ -1071,11 +1077,7 @@ The command is triggered if:
 <target>Остановить</target>
 
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
-<target>
-Создать файл пакетного задания для автоматической синхронизации.
-Для запуска дважды кликните этот файл или запланируйте
-в планировщике задач: %x
-</target>
+<target>Создать файл пакетного задания для автоматической синхронизации. Для запуска дважды кликните этот файл или запланируйте в планировщике задач: %x</target>
 
 <source>&Stop</source>
 <target>&Остановить</target>
@@ -1508,10 +1510,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Копировать DACL, SACL, владелец, группа</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>
-Интегрируйте внешние приложения в контекстное меню.
-Доступны следующие команды:
-</target>
+<target>Интегрируйте внешние приложения в контекстное меню. Доступны следующие команды:</target>
 
 <source>- full file or folder name</source>
 <target>- полный путь файла или папки</target>
@@ -1636,9 +1635,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Невозможно соединиться с www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Невозможно найти номер текущей версии FreeFileSync онлайн! Вы хотите проверить вручную?</target>
-
 <source>&Check</source>
 <target>&Проверить</target>
 
@@ -1675,11 +1671,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>Невозможно найти системную функцию %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Невозможно скопировать атрибуты от %x к %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Невозможно скопировать файл %x в %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Невозможно скопировать атрибуты от %x к %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Тип элемента %x не поддерживается:</target>
@@ -1809,7 +1805,4 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Thanks for your donation and support!</source>
 <target>Спасибо за Ваше пожертвование и поддержку!</target>
-
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Для этого установщика FreeFileSync для доноров был превышен лимит установок. Скачать обычную версию с домашней страницы FreeFileSync сейчас?</target>
 

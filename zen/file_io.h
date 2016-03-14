@@ -8,6 +8,7 @@
 #define FILE_IO_H_89578342758342572345
 
 #include "file_error.h"
+#include "serialize.h"
 
 
 
@@ -43,9 +44,12 @@ public:
     FileInput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileInput();
 
-    size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns "bytesToRead", unless end of file!
+    //Windows: better use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632.aspx
+    //Linux: use st_blksize?
+    size_t getBlockSize() const { return 128 * 1024; }
+    size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
+
     FileHandle getHandle() { return fileHandle; }
-    size_t optimalBlockSize() const { return 128 * 1024; }
 
 private:
     FileHandle fileHandle;
@@ -64,17 +68,39 @@ public:
     FileOutput(const Zstring& filepath, AccessFlag access); //throw FileError, ErrorTargetExisting
     FileOutput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileOutput();
-    void close(); //throw FileError   -> optional, but good place to catch errors when closing stream!
-
-    void write(const void* buffer, size_t bytesToWrite); //throw FileError
-    FileHandle getHandle() { return fileHandle; }
-    size_t optimalBlockSize() const { return 128 * 1024; }
 
     FileOutput(FileOutput&& tmp);
+
+    size_t getBlockSize() const { return 128 * 1024; }
+    size_t tryWrite(const void* buffer, size_t bytesToWrite); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+
+    void close(); //throw FileError   -> optional, but good place to catch errors when closing stream!
+    FileHandle getHandle() { return fileHandle; }
 
 private:
     FileHandle fileHandle;
 };
+
+
+//native stream I/O convenience functions:
+
+template <class BinContainer> inline
+BinContainer loadBinContainer(const Zstring& filePath, //throw FileError
+                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
+{
+    FileInput streamIn(filePath); //throw FileError, ErrorFileLocked
+    return unbufferedLoad<BinContainer>(streamIn, notifyProgress); //throw FileError
+}
+
+
+template <class BinContainer> inline
+void saveBinContainer(const Zstring& filePath, const BinContainer& buffer, //throw FileError
+                      const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
+{
+    FileOutput fileOut(filePath, FileOutput::ACC_OVERWRITE); //
+    unbufferedSave(buffer, fileOut, notifyProgress);         //throw FileError
+    fileOut.close();                                         //
+}
 }
 
 #endif //FILE_IO_H_89578342758342572345

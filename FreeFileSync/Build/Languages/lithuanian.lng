@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Atnaujinti atributus dešinėje</target>
 
-<source>Cannot read file %x.</source>
-<target>Nepavyksta nuskaityti failo %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nepavyksta įrašyti leidimų %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Veiksmas yra nesuderinamas dėl skirtingų aplankų savybių.</target>
+
+<source>Cannot write file %x.</source>
+<target>Nepavyksta įrašyti failo %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Nenumatytas duomenų srautas.
 Numatytas: %x baitai
 Esamas: %y baitai
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Nepavyksta įrašyti leidimų %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Veiksmas yra nesuderinamas dėl skirtingų aplankų savybių.</target>
-
-<source>Cannot write file %x.</source>
-<target>Nepavyksta įrašyti failo %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Nepavyko nukopijuoti simbolinės nuorodos %x į %y.</target>
@@ -254,6 +251,9 @@ Esamas: %y baitai
 
 <source>Cannot open file %x.</source>
 <target>%x failo nepavyko atidaryti.</target>
+
+<source>Cannot read file %x.</source>
+<target>Nepavyksta nuskaityti failo %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Negalima surasti įrenginio %x.</target>
@@ -1626,8 +1626,8 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Nepavyko prisijungti prie www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Dabartinės FreeFileSync versijos numeris internete nerastas. Ar norėtumėte patikrinti rankiniu būdu?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Tikrinti</target>
@@ -1665,11 +1665,11 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Cannot find system function %x.</source>
 <target>Nepavyksta rasti sisteminės funkcijos %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Nepavyko nukopijuoti atributų iš %x į %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Nepavyksta nukopijuoti failų %x į %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Nepavyko nukopijuoti atributų iš %x į %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Elemento tipas %x nepalaikomas:</target>
@@ -1800,6 +1800,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Thanks for your donation and support!</source>
 <target>Ačių už jūsų aukas ir palaikymą!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Šis FreeFileSync remėjų diegiamasis failas pasiekė savo ribą. Ar dabar parsisiųsti standartinę versiją iš FreeFileSync internetinio puslapio?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

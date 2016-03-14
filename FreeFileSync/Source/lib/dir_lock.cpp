@@ -13,7 +13,7 @@
 #include <zen/guid.h>
 #include <zen/tick_count.h>
 #include <zen/file_access.h>
-#include <zen/serialize.h>
+#include <zen/file_io.h>
 #include <zen/optional.h>
 
     #include <fcntl.h>    //open()
@@ -81,16 +81,6 @@ private:
 };
 
 
-std::uint64_t getLockFileSize(const Zstring& filepath) //throw FileError
-{
-    struct ::stat fileInfo = {};
-    if (::stat(filepath.c_str(), &fileInfo) != 0) //follow symbolic links
-        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(filepath)), L"stat");
-
-    return fileInfo.st_size;
-}
-
-
 Zstring abandonedLockDeletionName(const Zstring& lockFilePath) //make sure to NOT change file ending!
 {
     const size_t pos = lockFilePath.rfind(FILE_NAME_SEPARATOR); //search from end
@@ -120,78 +110,8 @@ Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
 }
 
 
-class FromCurrentProcess {}; //tag
-
 struct LockInformation //throw FileError
 {
-    explicit LockInformation(FromCurrentProcess) :
-        lockId(zen::generateGUID()),
-        sessionId(), //dummy value
-        processId(::getpid()) //never fails
-    {
-        std::vector<char> buffer(10000);
-
-        if (::gethostname(&buffer[0], buffer.size()) != 0)
-            THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"gethostname");
-        computerName += "Linux."; //distinguish linux/windows lock files
-        computerName += &buffer[0];
-
-        if (::getdomainname(&buffer[0], buffer.size()) != 0)
-            THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"getdomainname");
-        computerName += ".";
-        computerName += &buffer[0];
-
-        const uid_t userIdNo = ::getuid(); //never fails
-        userId = numberTo<std::string>(userIdNo);
-
-        //the id alone is not very distinctive, e.g. often 1000 on Ubuntu => add name
-        buffer.resize(std::max<long>(buffer.size(), ::sysconf(_SC_GETPW_R_SIZE_MAX))); //::sysconf may return long(-1)
-        struct passwd buffer2 = {};
-        struct passwd* pwsEntry = nullptr;
-        if (::getpwuid_r(userIdNo, &buffer2, &buffer[0], buffer.size(), &pwsEntry) != 0) //getlogin() is deprecated and not working on Ubuntu at all!!!
-            THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"getpwuid_r");
-        if (!pwsEntry)
-            throw FileError(_("Cannot get process information."), L"no login found"); //should not happen?
-        userId += '(' + std::string(pwsEntry->pw_name) + ')'; //follow Linux naming convention "1000(zenju)"
-
-        Opt<SessionId> sessionIdTmp = getSessionId(processId); //throw FileError
-        if (!sessionIdTmp)
-            throw FileError(_("Cannot get process information."), L"no session id found"); //should not happen?
-        sessionId = *sessionIdTmp;
-    }
-
-    explicit LockInformation(MemStreamIn& stream) //throw UnexpectedEndOfStreamError
-    {
-        char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
-        readArray(stream, &tmp, sizeof(tmp));                           //file format header
-        const int lockFileVersion = readNumber<std::int32_t>(stream); //
-
-        if (!std::equal(std::begin(tmp), std::end(tmp), std::begin(LOCK_FORMAT_DESCR)) ||
-            lockFileVersion != LOCK_FORMAT_VER)
-            throw UnexpectedEndOfStreamError(); //well, not really...!?
-
-        lockId       = readContainer<std::string>(stream); //
-        computerName = readContainer<std::string>(stream); //UnexpectedEndOfStreamError
-        userId       = readContainer<std::string>(stream); //
-        sessionId    = static_cast<SessionId>(readNumber<std::uint64_t>(stream)); //[!] conversion
-        processId    = static_cast<ProcessId>(readNumber<std::uint64_t>(stream)); //[!] conversion
-    }
-
-    void toStream(MemStreamOut& stream) const //throw ()
-    {
-        writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
-        writeNumber<std::int32_t>(stream, LOCK_FORMAT_VER);
-
-        static_assert(sizeof(processId) <= sizeof(std::uint64_t), ""); //ensure cross-platform compatibility!
-        static_assert(sizeof(sessionId) <= sizeof(std::uint64_t), ""); //
-
-        writeContainer(stream, lockId);
-        writeContainer(stream, computerName);
-        writeContainer(stream, userId);
-        writeNumber<std::uint64_t>(stream, sessionId);
-        writeNumber<std::uint64_t>(stream, processId);
-    }
-
     std::string lockId; //16 byte GUID - a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
 
     //identify local computer
@@ -199,24 +119,99 @@ struct LockInformation //throw FileError
     std::string userId;
 
     //identify running process
-    SessionId sessionId; //Windows: parent process id; Linux/OS X: session of the process, NOT the user
-    ProcessId processId;
+    SessionId sessionId = 0; //Windows: parent process id; Linux/OS X: session of the process, NOT the user
+    ProcessId processId = 0;
 };
 
 
-//wxGetFullHostName() is a performance killer and can hang for some users, so don't touch!
+LockInformation getLockInfoFromCurrentProcess() //throw FileError
+{
+    LockInformation lockInfo = {};
+    lockInfo.lockId = zen::generateGUID();
+
+    //wxGetFullHostName() is a performance killer and can hang for some users, so don't touch!
+
+    lockInfo.processId = ::getpid(); //never fails
+
+    std::vector<char> buffer(10000);
+    if (::gethostname(&buffer[0], buffer.size()) != 0)
+        THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"gethostname");
+    lockInfo.computerName = "Linux."; //distinguish linux/windows lock files
+    lockInfo.computerName += &buffer[0];
+
+    if (::getdomainname(&buffer[0], buffer.size()) != 0)
+        THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"getdomainname");
+    lockInfo.computerName += ".";
+    lockInfo.computerName += &buffer[0];
+
+    const uid_t userIdNo = ::getuid(); //never fails
+
+    //the id alone is not very distinctive, e.g. often 1000 on Ubuntu => add name
+    buffer.resize(std::max<long>(buffer.size(), ::sysconf(_SC_GETPW_R_SIZE_MAX))); //::sysconf may return long(-1)
+    struct passwd buffer2 = {};
+    struct passwd* pwsEntry = nullptr;
+    if (::getpwuid_r(userIdNo, &buffer2, &buffer[0], buffer.size(), &pwsEntry) != 0) //getlogin() is deprecated and not working on Ubuntu at all!!!
+        THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"getpwuid_r");
+    if (!pwsEntry)
+        throw FileError(_("Cannot get process information."), L"no login found"); //should not happen?
+
+    lockInfo.userId = numberTo<std::string>(userIdNo) + "(" + pwsEntry->pw_name + ")"; //follow Linux naming convention "1000(zenju)"
+
+    Opt<SessionId> sessionIdTmp = getSessionId(lockInfo.processId); //throw FileError
+    if (!sessionIdTmp)
+        throw FileError(_("Cannot get process information."), L"no session id found"); //should not happen?
+    lockInfo.sessionId = *sessionIdTmp;
+
+    return lockInfo;
+}
+
+
+LockInformation unserialize(MemStreamIn& stream) //throw UnexpectedEndOfStreamError
+{
+    char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
+    readArray(stream, &tmp, sizeof(tmp));                         //file format header
+    const int lockFileVersion = readNumber<std::int32_t>(stream); //
+
+    if (!std::equal(std::begin(tmp), std::end(tmp), std::begin(LOCK_FORMAT_DESCR)) ||
+        lockFileVersion != LOCK_FORMAT_VER)
+        throw UnexpectedEndOfStreamError(); //well, not really...!?
+
+    LockInformation lockInfo = {};
+    lockInfo.lockId       = readContainer<std::string>(stream); //
+    lockInfo.computerName = readContainer<std::string>(stream); //UnexpectedEndOfStreamError
+    lockInfo.userId       = readContainer<std::string>(stream); //
+    lockInfo.sessionId    = static_cast<SessionId>(readNumber<std::uint64_t>(stream)); //[!] conversion
+    lockInfo.processId    = static_cast<ProcessId>(readNumber<std::uint64_t>(stream)); //[!] conversion
+    return lockInfo;
+}
+
+
+void serialize(const LockInformation& lockInfo, MemStreamOut& stream)
+{
+    writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
+    writeNumber<std::int32_t>(stream, LOCK_FORMAT_VER);
+
+    static_assert(sizeof(lockInfo.processId) <= sizeof(std::uint64_t), ""); //ensure cross-platform compatibility!
+    static_assert(sizeof(lockInfo.sessionId) <= sizeof(std::uint64_t), ""); //
+
+    writeContainer(stream, lockInfo.lockId);
+    writeContainer(stream, lockInfo.computerName);
+    writeContainer(stream, lockInfo.userId);
+    writeNumber<std::uint64_t>(stream, lockInfo.sessionId);
+    writeNumber<std::uint64_t>(stream, lockInfo.processId);
+}
 
 
 LockInformation retrieveLockInfo(const Zstring& lockFilePath) //throw FileError
 {
-    MemStreamIn streamIn = loadBinStream<ByteArray>(lockFilePath,  nullptr); //throw FileError
+    MemStreamIn memStreamIn = loadBinContainer<ByteArray>(lockFilePath,  nullptr); //throw FileError
     try
     {
-        return LockInformation(streamIn); //throw UnexpectedEndOfStreamError
+        return unserialize(memStreamIn); //throw UnexpectedEndOfStreamError
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(lockFilePath)), L"unexpected end of stream");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(lockFilePath)), L"Unexpected end of stream.");
     }
 }
 
@@ -238,7 +233,7 @@ enum ProcessStatus
 
 ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileError
 {
-    const LockInformation localInfo((FromCurrentProcess())); //throw FileError
+    const LockInformation localInfo = getLockInfoFromCurrentProcess(); //throw FileError
 
     if (lockInfo.computerName != localInfo.computerName ||
         lockInfo.userId != localInfo.userId) //another user may run a session right now!
@@ -295,7 +290,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
         for (;;)
         {
             const TickVal now = getTicks();
-            const std::uint64_t fileSizeNew = getLockFileSize(lockFilePath); //throw FileError
+            const std::uint64_t fileSizeNew = getFilesize(lockFilePath); //throw FileError
 
             if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !now.isValid())
                 throw FileError(L"System timer failed."); //no i18n: "should" never throw ;)
@@ -307,7 +302,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
             }
 
             if (lockOwnderDead || //no need to wait any longer...
-                dist(lastLifeSign, now) / TICKS_PER_SEC > DETECT_ABANDONED_INTERVAL)
+                dist(lastLifeSign, now) / TICKS_PER_SEC >= DETECT_ABANDONED_INTERVAL)
             {
                 DirLock dummy(abandonedLockDeletionName(lockFilePath), callback); //throw FileError
 
@@ -317,7 +312,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
                     if (retrieveLockId(lockFilePath) != originalLockId) //throw FileError -> since originalLockId is filled, we are not expecting errors!
                         return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
-                if (getLockFileSize(lockFilePath) != fileSizeOld) //throw FileError
+                if (getFilesize(lockFilePath) != fileSizeOld) //throw FileError
                     continue; //late life sign
 
                 removeFile(lockFilePath); //throw FileError
@@ -384,16 +379,11 @@ bool tryLock(const Zstring& lockFilePath) //throw FileError
     FileOutput fileOut(fileHandle, lockFilePath); //pass handle ownership
 
     //write housekeeping info: user, process info, lock GUID
-    ByteArray binStream = [&]
-    {
-        MemStreamOut streamOut;
-        LockInformation(FromCurrentProcess()).toStream(streamOut);
-        return streamOut.ref();
-    }();
+    MemStreamOut streamOut;
+    serialize(getLockInfoFromCurrentProcess(), streamOut);
 
-    if (!binStream.empty())
-        fileOut.write(&*binStream.begin(), binStream.size()); //throw FileError
-
+    unbufferedSave(streamOut.ref(), fileOut, nullptr); //throw FileError
+    fileOut.close();                                   //
     return true;
 }
 }

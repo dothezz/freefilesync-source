@@ -47,18 +47,18 @@ public:
     }
 
     void init(const Zstring& filepath);
-	void cleanup()
-	{ 
-		bitmaps.clear(); 
-		anims.clear(); 
-	}
+    void cleanup()
+    {
+        bitmaps.clear();
+        anims.clear();
+    }
 
     const wxBitmap&    getImage    (const wxString& name) const;
     const wxAnimation& getAnimation(const wxString& name) const;
 
 private:
     GlobalResources() {}
-	~GlobalResources() { assert(bitmaps.empty() && anims.empty()); } //don't leave wxWidgets objects for static destruction!
+    ~GlobalResources() { assert(bitmaps.empty() && anims.empty()); } //don't leave wxWidgets objects for static destruction!
     GlobalResources           (const GlobalResources&) = delete;
     GlobalResources& operator=(const GlobalResources&) = delete;
 

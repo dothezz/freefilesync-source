@@ -8,7 +8,7 @@
 #define ERROR_LOG_H_89734181783491324134
 
 #include <cassert>
-#include <zen/serialize.h>
+#include <zen/file_io.h>
 #include <zen/time.h>
 #include "ffs_paths.h"
 
@@ -34,7 +34,7 @@ void logFatalError(const std::string& msg) //throw()
     const std::string logEntry = "[" + formatTime<std::string>(FORMAT_DATE) + " "+ formatTime<std::string>(FORMAT_TIME) + "] " + msg;
     try
     {
-        saveBinStream(getConfigDir() + Zstr("LastError.log"), logEntry, nullptr); //throw FileError
+        saveBinContainer(getConfigDir() + Zstr("LastError.log"), logEntry, nullptr); //throw FileError
     }
     catch (const FileError&) {}
 }

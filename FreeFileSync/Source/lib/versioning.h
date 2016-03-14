@@ -39,7 +39,7 @@ public:
         timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)) //e.g. "2012-05-15 131513"
     {
         if (AbstractFileSystem::isNullPath(versioningFolderPath_))
-            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+            throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10,000!
             throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + utfCvrtTo<std::wstring>(timeStamp_) + L"\"");

@@ -127,10 +127,9 @@ double getAvgBrightness(const wxImage& img)
 inline
 void brighten(wxImage& img, int level)
 {
-    const int pixelCount = img.GetWidth() * img.GetHeight();
-    auto pixBegin = img.GetData();
-    if (pixBegin)
+    if (auto pixBegin = img.GetData())
     {
+        const int pixelCount = img.GetWidth() * img.GetHeight();
         auto pixEnd = pixBegin + 3 * pixelCount; //RGB
         if (level > 0)
             std::for_each(pixBegin, pixEnd, [&](unsigned char& c) { c = static_cast<unsigned char>(std::min(255, c + level)); });

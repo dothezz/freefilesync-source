@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Opdater attributter mod højre</target>
 
-<source>Cannot read file %x.</source>
-<target>Kan ikke læse filen %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Kan ikke skrive tilladelserne til %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Handlingen understøtter ikke forskellige typer hovedmapper.</target>
+
+<source>Cannot write file %x.</source>
+<target>Kan ikke oprette filen %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Uventet datastørrelse.
 Forventet: %x byte
 Aktuel: %y byte
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Kan ikke skrive tilladelserne til %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Handlingen understøtter ikke forskellige typer hovedmapper.</target>
-
-<source>Cannot write file %x.</source>
-<target>Kan ikke oprette filen %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan ikke kopiere symlink fra %x til %y.</target>
@@ -254,6 +251,9 @@ Aktuel: %y byte
 
 <source>Cannot open file %x.</source>
 <target>Filen %x kan ikke åbnes.</target>
+
+<source>Cannot read file %x.</source>
+<target>Kan ikke læse filen %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Kan ikke finde enheden %x.</target>
@@ -1615,8 +1615,8 @@ Sikrer processen ved alvorlige fejl.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Kan ikke kontakte www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Kunne ikke finde FreeFileSync's versionsnummer online. Vil du kontrollere manuelt?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Kontroller</target>
@@ -1654,11 +1654,11 @@ Sikrer processen ved alvorlige fejl.
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finde systemfunktionen %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Kan ikke kopiere attributter fra %x til %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Kan ikke kopiere filen %x til %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Kan ikke kopiere attributter fra %x til %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Filtypen %x understøttes ikke:</target>
@@ -1786,6 +1786,9 @@ Sikrer processen ved alvorlige fejl.
 <source>Thanks for your donation and support!</source>
 <target>Tak for støtten!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Antal FreeFileSync for donorer er opbrugt. Vil du downloade den normale version nu?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

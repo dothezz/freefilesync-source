@@ -1590,7 +1590,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
 //###########################################################################################
 
 //--------------------- data verification -------------------------
-void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)  //throw FileError
+void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress)  //throw FileError
 {
     try
     {
@@ -1607,9 +1607,9 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"fsync");
         } //close file handles!
 
-        if (onUpdateStatus) onUpdateStatus(0);
+        if (notifyProgress) notifyProgress(0);
 
-        if (!filesHaveSameContent(sourcePath, targetPath, onUpdateStatus)) //throw FileError
+        if (!filesHaveSameContent(sourcePath, targetPath, notifyProgress)) //throw FileError
             throw FileError(replaceCpy(replaceCpy(_("%x and %y have different content."),
                                                   L"%x", L"\n" + fmtPath(AFS::getDisplayPath(sourcePath))),
                                        L"%y", L"\n" + fmtPath(AFS::getDisplayPath(targetPath))));
@@ -1774,7 +1774,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     //PERF_START;
 
     if (syncConfig.size() != folderCmp.size())
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //aggregate basic information
     std::vector<SyncStatistics> folderPairStats;

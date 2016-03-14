@@ -77,6 +77,7 @@ template <class T, class S> T copyStringTo(S&& str);
 template <> inline
 bool isWhiteSpace(char ch)
 {
+	assert(ch != 0); //std C++ does not consider 0 as white space
     //caveat 1: std::isspace() takes an int, but expects an unsigned char
     //caveat 2: some parts of UTF-8 chars are erroneously seen as whitespace, e.g. the a0 from "\xec\x8b\xa0" (MSVC)
     return static_cast<unsigned char>(ch) < 128 &&
@@ -84,7 +85,11 @@ bool isWhiteSpace(char ch)
 }
 
 template <> inline
-bool isWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
+bool isWhiteSpace(wchar_t ch) 
+{
+	assert(ch != 0); //std C++ does not consider 0 as white space
+	return std::iswspace(ch) != 0; 
+}
 
 
 template <class Char> inline
@@ -402,7 +407,7 @@ template <class S, class T, class Num> inline
 S printNumber(const T& format, const Num& number) //format a single number using ::sprintf
 {
     static_assert(IsSameType<typename GetCharType<S>::Type, typename GetCharType<T>::Type>::value, "");
-	using CharType = typename GetCharType<S>::Type;
+    using CharType = typename GetCharType<S>::Type;
 
     const int BUFFER_SIZE = 128;
     CharType buffer[BUFFER_SIZE]; //zero-initialize?
@@ -426,7 +431,7 @@ enum NumberType
 template <class S, class Num> inline
 S numberTo(const Num& number, Int2Type<NUM_TYPE_OTHER>) //default number to string conversion using streams: convenient, but SLOW, SLOW, SLOW!!!! (~ factor of 20)
 {
-		using CharType = typename GetCharType<S>::Type;
+    using CharType = typename GetCharType<S>::Type;
 
     std::basic_ostringstream<CharType> ss;
     ss << number;
@@ -455,7 +460,7 @@ template <class OutputIterator, class Num> inline
 void formatNegativeInteger(Num n, OutputIterator& it)
 {
     assert(n < 0);
-		using CharType = typename std::iterator_traits<OutputIterator>::value_type;
+    using CharType = typename std::iterator_traits<OutputIterator>::value_type;
     do
     {
         const Num tmp = n / 10;
@@ -471,7 +476,7 @@ template <class OutputIterator, class Num> inline
 void formatPositiveInteger(Num n, OutputIterator& it)
 {
     assert(n >= 0);
-		using CharType = typename std::iterator_traits<OutputIterator>::value_type;
+    using CharType = typename std::iterator_traits<OutputIterator>::value_type;
     do
     {
         const Num tmp = n / 10;
@@ -487,7 +492,7 @@ S numberTo(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
 {
     using CharType = typename GetCharType<S>::Type;
     CharType buffer[2 + sizeof(Num) * 241 / 100]; //zero-initialize?
-   //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
+    //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
     //required chars (+ sign char): 1 + ceil(ln_10(256^sizeof(n) / 2 + 1))    -> divide by 2 for signed half-range; second +1 since one half starts with 1!
     // <= 1 + ceil(ln_10(256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) <= 2 + floor(sizeof(n) * 2.41)
 
@@ -506,7 +511,7 @@ S numberTo(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
 template <class S, class Num> inline
 S numberTo(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 {
-		using CharType = typename GetCharType<S>::Type;
+    using CharType = typename GetCharType<S>::Type;
     CharType buffer[1 + sizeof(Num) * 241 / 100]; //zero-initialize?
     //required chars: ceil(ln_10(256^sizeof(n))) =~ ceil(sizeof(n) * 2.4082) <= 1 + floor(sizeof(n) * 2.41)
 
@@ -522,7 +527,7 @@ S numberTo(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 template <class Num, class S> inline
 Num stringTo(const S& str, Int2Type<NUM_TYPE_OTHER>) //default string to number conversion using streams: convenient, but SLOW
 {
-		using CharType = typename GetCharType<S>::Type;
+    using CharType = typename GetCharType<S>::Type;
     Num number = 0;
     std::basic_istringstream<CharType>(copyStringTo<std::basic_string<CharType>>(str)) >> number;
     return number;
@@ -541,8 +546,8 @@ Num stringTo(const S& str, Int2Type<NUM_TYPE_FLOATING_POINT>)
 template <class Num, class S>
 Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to integers: slightly faster than std::atoi, but more importantly: generic
 {
-	using CharType = typename GetCharType<S>::Type;
-	
+    using CharType = typename GetCharType<S>::Type;
+
     const CharType* first = strBegin(str);
     const CharType* last  = first + strLength(str);
 
@@ -610,10 +615,10 @@ template <class S, class Num> inline
 S numberTo(const Num& number)
 {
     using TypeTag = Int2Type<
-    IsSignedInt  <Num>::value ? impl::NUM_TYPE_SIGNED_INT :
-    IsUnsignedInt<Num>::value ? impl::NUM_TYPE_UNSIGNED_INT :
-    IsFloat      <Num>::value ? impl::NUM_TYPE_FLOATING_POINT :
-    impl::NUM_TYPE_OTHER>;
+                    IsSignedInt  <Num>::value ? impl::NUM_TYPE_SIGNED_INT :
+                    IsUnsignedInt<Num>::value ? impl::NUM_TYPE_UNSIGNED_INT :
+                    IsFloat      <Num>::value ? impl::NUM_TYPE_FLOATING_POINT :
+                    impl::NUM_TYPE_OTHER>;
 
     return impl::numberTo<S>(number, TypeTag());
 }
@@ -623,10 +628,10 @@ template <class Num, class S> inline
 Num stringTo(const S& str)
 {
     using TypeTag = Int2Type<
-    IsSignedInt  <Num>::value ? impl::NUM_TYPE_SIGNED_INT :
-    IsUnsignedInt<Num>::value ? impl::NUM_TYPE_UNSIGNED_INT :
-    IsFloat      <Num>::value ? impl::NUM_TYPE_FLOATING_POINT :
-    impl::NUM_TYPE_OTHER>;
+                    IsSignedInt  <Num>::value ? impl::NUM_TYPE_SIGNED_INT :
+                    IsUnsignedInt<Num>::value ? impl::NUM_TYPE_UNSIGNED_INT :
+                    IsFloat      <Num>::value ? impl::NUM_TYPE_FLOATING_POINT :
+                    impl::NUM_TYPE_OTHER>;
 
     return impl::stringTo<Num>(str, TypeTag());
 }

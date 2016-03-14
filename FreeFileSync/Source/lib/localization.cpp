@@ -11,7 +11,7 @@
 #include <iterator>
 #include <zen/string_tools.h>
 #include <zen/file_traverser.h>
-#include <zen/serialize.h>
+#include <zen/file_io.h>
 #include <zen/i18n.h>
 #include <zen/format_unit.h>
 #include <wx/intl.h>
@@ -72,7 +72,7 @@ FFSTranslation::FFSTranslation(const Zstring& lngFilePath, wxLanguage langId) : 
     std::string inputStream;
     try
     {
-        inputStream = loadBinStream<std::string>(lngFilePath,  nullptr); //throw FileError
+        inputStream = loadBinContainer<std::string>(lngFilePath,  nullptr); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -146,7 +146,7 @@ std::vector<TranslationInfo> loadTranslations()
     {
         try
         {
-            const std::string stream = loadBinStream<std::string>(filepath,  nullptr); //throw FileError
+            const std::string stream = loadBinContainer<std::string>(filepath,  nullptr); //throw FileError
 
             lngfile::TransHeader lngHeader;
             lngfile::parseHeader(stream, lngHeader); //throw ParsingError
@@ -325,6 +325,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         //case wxLANGUAGE_PORTUGUESE:
         //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
         //case wxLANGUAGE_SCOTS_GAELIC:
+        //case wxLANGUAGE_SLOVAK:
         //case wxLANGUAGE_SLOVENIAN:
         //case wxLANGUAGE_TURKISH:
         //case wxLANGUAGE_UKRAINIAN:

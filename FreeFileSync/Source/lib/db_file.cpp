@@ -33,8 +33,8 @@ using MemStreamIn  = MemoryStreamIn <ByteArray>;
 template <SelectedSide side> inline
 AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile = false)
 {
-    //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity? are UTC file times really compatible?
-    //what about endianess!?
+    //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
+    //precomposed/decomposed UTF? are UTC file times really compatible? what about endianess!?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
@@ -46,7 +46,7 @@ AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile
 
 //#######################################################################################################################################
 
-void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
+void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError
 {
     //perf? instead of writing to a file stream directly, collect data into memory first, then write to file block-wise
     MemStreamOut memStreamOut;
@@ -70,31 +70,30 @@ void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const 
 
     //save memory stream to file (as a transaction!)
     {
-        MemoryStreamIn<ByteArray> memStreamIn(memStreamOut.ref());
-        const std::uint64_t streamSize = memStreamOut.ref().size();
-        const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath, &streamSize, nullptr /*modificationTime*/); //throw FileError, ErrorTargetExisting
-        if (onUpdateStatus) onUpdateStatus(0);
-        copyStream(memStreamIn, *fileStreamOut, fileStreamOut->optimalBlockSize(), onUpdateStatus); //throw FileError
-        fileStreamOut->finalize([&] { if (onUpdateStatus) onUpdateStatus(0); }); //throw FileError
+        const std::uint64_t bufferSize = memStreamOut.ref().size();
+        const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath, &bufferSize, nullptr /*modificationTime*/); //throw FileError, ErrorTargetExisting
+        if (notifyProgress) notifyProgress(0);
+        unbufferedSave(memStreamOut.ref(), *fileStreamOut, notifyProgress); //throw FileError
+        fileStreamOut->finalize([&] { if (notifyProgress) notifyProgress(0); }); //throw FileError
         //commit and close stream
     }
 
 }
 
 
-DbStreams loadStreams(const AbstractPath& dbPath, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError, FileErrorDatabaseNotExisting
+DbStreams loadStreams(const AbstractPath& dbPath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError, FileErrorDatabaseNotExisting
 {
     try
     {
         //load memory stream from file
-        MemoryStreamOut<ByteArray> memStreamOut;
+        ByteArray buffer;
         {
             const std::unique_ptr<AFS::InputStream> fileStreamIn = AFS::getInputStream(dbPath); //throw FileError, ErrorFileLocked
-            if (onUpdateStatus) onUpdateStatus(0);
-            copyStream(*fileStreamIn, memStreamOut, fileStreamIn->optimalBlockSize(), onUpdateStatus); //throw FileError
+            if (notifyProgress) notifyProgress(0);
+            buffer = unbufferedLoad<ByteArray>(*fileStreamIn,  notifyProgress); //throw FileError
         } //close file handle
 
-        MemStreamIn streamIn(memStreamOut.ref());
+        MemStreamIn streamIn(buffer);
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
@@ -130,7 +129,7 @@ DbStreams loadStreams(const AbstractPath& dbPath, const std::function<void(std::
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)));
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)), L"Unexpected end of stream.");
     }
     catch (const std::bad_alloc& e) //still required?
     {
@@ -331,7 +330,7 @@ public:
         }
         catch (const UnexpectedEndOfStreamError&)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR));
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"Unexpected end of stream.");
         }
         catch (const std::bad_alloc& e)
         {
@@ -662,7 +661,7 @@ private:
 //#######################################################################################################################################
 
 std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair& baseFolder, //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
-                                                            const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
+                                                            const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
     const AbstractPath dbPathLeft  = getDatabaseFilePath<LEFT_SIDE >(baseFolder);
     const AbstractPath dbPathRight = getDatabaseFilePath<RIGHT_SIDE>(baseFolder);
@@ -678,8 +677,8 @@ std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair
     }
 
     //read file data: list of session ID + DirInfo-stream
-    const DbStreams streamsLeft  = ::loadStreams(dbPathLeft,  onUpdateStatus); //throw FileError, FileErrorDatabaseNotExisting
-    const DbStreams streamsRight = ::loadStreams(dbPathRight, onUpdateStatus); //
+    const DbStreams streamsLeft  = ::loadStreams(dbPathLeft,  notifyProgress); //throw FileError, FileErrorDatabaseNotExisting
+    const DbStreams streamsRight = ::loadStreams(dbPathRight, notifyProgress); //
 
     //find associated session: there can be at most one session within intersection of left and right ids
     for (const auto& streamLeft : streamsLeft)
@@ -698,7 +697,7 @@ std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair
 }
 
 
-void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus) //throw FileError
+void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError
 {
     //transactional behaviour! write to tmp files first
     const AbstractPath dbPathLeft  = getDatabaseFilePath<LEFT_SIDE >(baseFolder);
@@ -716,12 +715,12 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
     DbStreams streamsRight;
 
     //std::function<void(std::int64_t bytesDelta)> onUpdateLoadStatus;
-    //if (onUpdateStatus)
-    //    onUpdateLoadStatus = [&](std::int64_t bytesDelta) { onUpdateStatus(0); };
+    //if (notifyProgress)
+    //    onUpdateLoadStatus = [&](std::int64_t bytesDelta) { notifyProgress(0); };
 
-    try { streamsLeft  = ::loadStreams(dbPathLeft, onUpdateStatus); }
+    try { streamsLeft  = ::loadStreams(dbPathLeft, notifyProgress); }
     catch (FileError&) {}
-    try { streamsRight = ::loadStreams(dbPathRight, onUpdateStatus); }
+    try { streamsRight = ::loadStreams(dbPathRight, notifyProgress); }
     catch (FileError&) {}
     //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
 
@@ -782,10 +781,10 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
     streamsRight[sessionID] = std::move(updatedStreamRight);
 
     //write (temp-) files as a transaction
-    saveStreams(streamsLeft,  dbPathLeftTmp,  onUpdateStatus); //throw FileError
-    saveStreams(streamsRight, dbPathRightTmp, onUpdateStatus); //
+    saveStreams(streamsLeft,  dbPathLeftTmp,  notifyProgress); //throw FileError
+    saveStreams(streamsRight, dbPathRightTmp, notifyProgress); //
 
-    //operation finished: rename temp files -> this should work transactionally:
+    //operation finished: rename temp files -> this should work (almost) transactionally:
     //if there were no write access, creation of temp files would have failed
     AFS::removeFile(dbPathLeft);                  //throw FileError
     AFS::renameItem(dbPathLeftTmp, dbPathLeft);   //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)

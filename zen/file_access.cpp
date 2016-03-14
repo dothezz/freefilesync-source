@@ -12,7 +12,7 @@
 #include "scope_guard.h"
 #include "symlink_target.h"
 #include "file_id_def.h"
-#include "serialize.h"
+#include "file_io.h"
 
     #include <sys/vfs.h> //statfs
     #include <sys/time.h> //lutimes
@@ -240,9 +240,26 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
 namespace
 {
 
-DEFINE_NEW_FILE_ERROR(ErrorLinuxFallbackToUtimes);
+void setWriteTimeFallback(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
+{
+    struct ::timeval writeTime[2] = {};
+    writeTime[0].tv_sec = ::time(nullptr); //access time (seconds)
+    writeTime[1].tv_sec = modTime;         //modification time (seconds)
 
-void setFileTimeRaw(const Zstring& filePath, const struct ::timespec& modTime, ProcSymlink procSl) //throw FileError, ErrorLinuxFallbackToUtimes
+    if (procSl == ProcSymlink::FOLLOW)
+    {
+        if (::utimes(filePath.c_str(), writeTime) != 0)
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"utimes");
+    }
+    else
+    {
+        if (::lutimes(filePath.c_str(), writeTime) != 0)
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"lutimes");
+    }
+}
+
+
+void setWriteTimeNative(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
 {
     /*
     [2013-05-01] sigh, we can't use utimensat() on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
@@ -251,15 +268,15 @@ void setFileTimeRaw(const Zstring& filePath, const struct ::timespec& modTime, P
     [2015-03-09]
      - cannot reproduce issues with NTFS and utimensat() on Ubuntu
      - utimensat() is supposed to obsolete utime/utimes and is also used by "cp" and "touch"
-     - solves utimes() EINVAL bug for certain CIFS/NTFS drives: https://sourceforge.net/p/freefilesync/discussion/help/thread/1ace042d/
+     - solves utimes() EINVAL bug for certain CIFS/NTFS drives: http://www.freefilesync.org/forum/viewtopic.php?t=387
         => don't use utimensat() directly, but open file descriptor manually, else EINVAL, again!
 
     => let's give utimensat another chance:
     */
     struct ::timespec newTimes[2] = {};
     newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs!!
-    //https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/218564cf/
-    newTimes[1] = modTime; //modification time
+    //http://www.freefilesync.org/forum/viewtopic.php?t=1701
+    newTimes[1].tv_sec = modTime; //modification time
 
     //=> using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     if (procSl == ProcSymlink::FOLLOW)
@@ -268,7 +285,7 @@ void setFileTimeRaw(const Zstring& filePath, const struct ::timespec& modTime, P
         if (fdFile == -1)
         {
             if (errno == EACCES) //bullshit, access denied even with 0777 permissions! => utimes should work!
-                throw ErrorLinuxFallbackToUtimes(L"");
+                return setWriteTimeFallback(filePath, modTime, procSl); //throw FileError
 
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"open");
         }
@@ -290,29 +307,7 @@ void setFileTimeRaw(const Zstring& filePath, const struct ::timespec& modTime, P
 
 void zen::setFileTime(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
 {
-    try
-    {
-        struct ::timespec writeTime = {};
-        writeTime.tv_sec = modTime;
-        setFileTimeRaw(filePath, writeTime, procSl); //throw FileError, ErrorLinuxFallbackToUtimes
-    }
-    catch (ErrorLinuxFallbackToUtimes&)
-    {
-        struct ::timeval writeTime[2] = {};
-        writeTime[0].tv_sec = ::time(nullptr); //access time (seconds)
-        writeTime[1].tv_sec = modTime;         //modification time (seconds)
-
-        if (procSl == ProcSymlink::FOLLOW)
-        {
-            if (::utimes(filePath.c_str(), writeTime) != 0)
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"utimes");
-        }
-        else
-        {
-            if (::lutimes(filePath.c_str(), writeTime) != 0)
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"lutimes");
-        }
-    }
+    setWriteTimeNative(filePath, modTime, procSl); //throw FileError
 
 }
 
@@ -512,7 +507,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     if (::lstat(sourceLink.c_str(), &sourceInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(sourceLink)), L"lstat");
 
-    setFileTime(targetLink, sourceInfo.st_mtime, ProcSymlink::DIRECT); //throw FileError
+    setWriteTimeNative(targetLink, sourceInfo.st_mtime, ProcSymlink::DIRECT); //throw FileError
 
 
     if (copyFilePermissions)
@@ -524,19 +519,20 @@ namespace
 {
 InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting
                                     const Zstring& targetFile,
-                                    const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
+                                    const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
     FileInput fileIn(sourceFile); //throw FileError
+    if (notifyProgress) notifyProgress(0); //throw X!
 
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getHandle(), &sourceInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(sourceFile)), L"fstat");
-	 
+
     const mode_t mode = sourceInfo.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO); //analog to "cp" which copies "mode" (considering umask) by default
-	//it seems we don't need S_IWUSR, not even for the setFileTime() below! (tested with source file having different user/group!)
-    
-    const int fdTarget = ::open(targetFile.c_str(), O_WRONLY | O_CREAT | O_EXCL, mode);
+    //it seems we don't need S_IWUSR, not even for the setFileTime() below! (tested with source file having different user/group!)
+
     //=> need copyItemPermissions() only for "chown" and umask-agnostic permissions
+    const int fdTarget = ::open(targetFile.c_str(), O_WRONLY | O_CREAT | O_EXCL, mode);
     if (fdTarget == -1)
     {
         const int ec = errno; //copy before making other system calls!
@@ -548,40 +544,35 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
 
         throw FileError(errorMsg, errorDescr);
     }
-    if (onUpdateCopyStatus) onUpdateCopyStatus(0); //throw X!
-
-    InSyncAttributes newAttrib;
     ZEN_ON_SCOPE_FAIL( try { removeFile(targetFile); }
     catch (FileError&) {} );
     //transactional behavior: place guard after ::open() and before lifetime of FileOutput:
     //=> don't delete file that existed previously!!!
-    {
-        FileOutput fileOut(fdTarget, targetFile); //pass ownership
-        if (onUpdateCopyStatus) onUpdateCopyStatus(0); //throw X!
+    FileOutput fileOut(fdTarget, targetFile); //pass ownership
+    if (notifyProgress) notifyProgress(0); //throw X!
 
-        copyStream(fileIn, fileOut, std::min(fileIn .optimalBlockSize(),
-                                             fileOut.optimalBlockSize()), onUpdateCopyStatus); //throw FileError, X
+    unbufferedStreamCopy(fileIn, fileOut, notifyProgress); //throw FileError, X
 
-        struct ::stat targetInfo = {};
-        if (::fstat(fileOut.getHandle(), &targetInfo) != 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(targetFile)), L"fstat");
+    struct ::stat targetInfo = {};
+    if (::fstat(fileOut.getHandle(), &targetInfo) != 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(targetFile)), L"fstat");
 
-        newAttrib.fileSize         = sourceInfo.st_size;
-        newAttrib.modificationTime = sourceInfo.st_mtime;
-        newAttrib.sourceFileId     = extractFileId(sourceInfo);
-        newAttrib.targetFileId     = extractFileId(targetInfo);
-
-
-        fileOut.close(); //throw FileError -> optional, but good place to catch errors when closing stream!
-    } //close output file handle before setting file time
+    //close output file handle before setting file time; also good place to catch errors when closing stream!
+    fileOut.close(); //throw FileError
+    if (notifyProgress) notifyProgress(0); //throw X!
 
     //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
     //this triggers bugs on samba shares where the modification time is set to current time instead.
     //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
     //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
-    //OS X:  https://sourceforge.net/p/freefilesync/discussion/help/thread/881357c0/
-    setFileTime(targetFile, sourceInfo.st_mtime, ProcSymlink::FOLLOW); //throw FileError
+    //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
+    setWriteTimeNative(targetFile, sourceInfo.st_mtime, ProcSymlink::FOLLOW); //throw FileError
 
+    InSyncAttributes newAttrib;
+    newAttrib.fileSize         = sourceInfo.st_size;
+    newAttrib.modificationTime = sourceInfo.st_mtime;
+    newAttrib.sourceFileId     = extractFileId(sourceInfo);
+    newAttrib.targetFileId     = extractFileId(targetInfo);
     return newAttrib;
 }
 
@@ -601,9 +592,9 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsBackupStream(::BackupRead/:
 
 
 InSyncAttributes zen::copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                  const std::function<void(std::int64_t bytesDelta)>& onUpdateCopyStatus)
+                                  const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
-    const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, onUpdateCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
     //at this point we know we created a new file, so it's fine to delete it for cleanup!
     ZEN_ON_SCOPE_FAIL(try { removeFile(targetFile); }

@@ -510,6 +510,10 @@ private:
                 !endsWith(translation, "...") &&
                 !endsWith(translation, "\xe2\x80\xa6")) //narrow ellipsis (spanish?)
                 throw ParsingError(L"Source text ends with an ellipsis \"...\", but translation does not", scn.posRow(), scn.posCol());
+
+            //if source is a one-liner, so should be the translation
+            if (!contains(original, '\n') && contains(translation, '\n'))
+                throw ParsingError(L"Source text is a one-liner, but translation consists of multiple lines", scn.posRow(), scn.posCol());
         }
     }
 
@@ -567,13 +571,17 @@ private:
                         throw ParsingError(zen::replaceCpy<std::wstring>(L"Placeholder %x missing in plural form source", L"%x", zen::utfCvrtTo<std::wstring>(placeholder)), scn.posRow(), scn.posCol());
 
                     //secondary placeholder is required for all plural forms
-                    if (!std::all_of(translation.begin(), translation.end(), [&](const std::string& pform) { return zen::contains(pform, placeholder); }))
+                    if (std::any_of(translation.begin(), translation.end(), [&](const std::string& pform) { return !zen::contains(pform, placeholder); }))
                     throw ParsingError(zen::replaceCpy<std::wstring>(L"Placeholder %x missing in plural form translation", L"%x", zen::utfCvrtTo<std::wstring>(placeholder)), scn.posRow(), scn.posCol());
                 }
             };
-
             checkSecondaryPlaceholder("%y");
             checkSecondaryPlaceholder("%z");
+
+            //if source is a one-liner, so should be the translation
+            if (!contains(original.first, '\n') && !contains(original.second, '\n') &&
+            std::any_of(translation.begin(), translation.end(), [&](const std::string& pform) { return contains(pform, '\n'); }))
+            throw ParsingError(L"Source text is a one-liner, but at least one plural form translation consists of multiple lines", scn.posRow(), scn.posCol());
         }
     }
 
@@ -619,7 +627,7 @@ void formatMultiLineText(std::string& text)
 {
     assert(!zen::contains(text, "\r\n"));
 
-    if (text.find('\n') != std::string::npos) //multiple lines
+    if (zen::contains(text, '\n')) //multiple lines
     {
         if (*text.begin() != '\n')
             text = '\n' + text;

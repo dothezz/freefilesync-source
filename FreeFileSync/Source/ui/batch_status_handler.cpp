@@ -35,7 +35,7 @@ std::pair<std::unique_ptr<AFS::OutputStream>, AbstractPath> prepareNewLogfile(co
     AFS::createFolderRecursively(logFolderPath); //throw FileError
 
     //const std::string colon = "\xcb\xb8"; //="modifier letter raised colon" => regular colon is forbidden in file names on Windows and OS X
-    //=> too many issues, most notably cmd.exe is not Unicode-awere: http://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/c559a5fb/
+    //=> too many issues, most notably cmd.exe is not Unicode-awere: http://www.freefilesync.org/forum/viewtopic.php?t=1679
 
     //assemble logfile name
     Zstring body = utfCvrtTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
@@ -188,7 +188,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 else
                     try
                     {
-                        //use EXEC_TYPE_ASYNC until there is reason not to: https://sourceforge.net/p/freefilesync/discussion/help/thread/828dca52
+                        //use EXEC_TYPE_ASYNC until there is reason not to: http://www.freefilesync.org/forum/viewtopic.php?t=31
                         tryReportingError([&] { shellExecute(expandMacros(finalCommand), EXEC_TYPE_ASYNC); }, //throw FileError
                                           *this); //throw X?
                     }
@@ -257,7 +257,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 AFS::OutputStream& logFileStream = *rv.first;
                 const AbstractPath logFilePath   = rv.second;
 
-                saveLogToFile(summary, errorLog, logFileStream, OnUpdateLogfileStatusNoThrow(*this, AFS::getDisplayPath(logFilePath))); //throw FileError
+                streamToLogFile(summary, errorLog, logFileStream, OnUpdateLogfileStatusNoThrow(*this, AFS::getDisplayPath(logFilePath))); //throw FileError
                 logFileStream.finalize([&] { try { requestUiRefresh(); } catch (...) {} }); //throw FileError
             }, *this); //throw X?
         }

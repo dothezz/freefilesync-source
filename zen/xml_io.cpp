@@ -7,35 +7,42 @@
 #include "xml_io.h"
 #include "file_access.h"
 #include "file_io.h"
-#include "serialize.h"
 
 using namespace zen;
 
 
 XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
 {
-    //can't simply use zen::loadBinStream() due to the short-circuit xml-validation below!
+    //can't simply use zen::unbufferedLoad) due to the short-circuit xml-validation below!
 
-    FileInput fileStreamIn(filepath); //throw FileError
-    MemoryStreamOut<std::string> memStreamOut;
+    FileInput fileIn(filepath); //throw FileError, ErrorFileLocked
+    const size_t blockSize = fileIn.getBlockSize();
+    const std::string xmlPrefix = "<?xml version=";
+    bool xmlPrefixChecked = false;
+
+    std::string buffer;
+    for (;;)
     {
+        buffer.resize(buffer.size() + blockSize);
+        const size_t bytesRead = fileIn.tryRead(&*(buffer.end() - blockSize), blockSize); //throw X; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        buffer.resize(buffer.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
+
         //quick test whether input is an XML: avoid loading large binary files up front!
-        const std::string xmlBegin = "<?xml version=";
-        std::vector<char> buf(xmlBegin.size() + strLength(BYTE_ORDER_MARK_UTF8));
+        if (!xmlPrefixChecked && buffer.size() >= xmlPrefix.size() + strLength(BYTE_ORDER_MARK_UTF8))
+        {
+            xmlPrefixChecked = true;
+            if (!startsWith(buffer, xmlPrefix) &&
+                !startsWith(buffer, BYTE_ORDER_MARK_UTF8 + xmlPrefix)) //allow BOM!
+                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
+        }
 
-        const size_t bytesRead = fileStreamIn.read(&buf[0], buf.size());
-        memStreamOut.write(&buf[0], bytesRead);
-
-        if (!startsWith(memStreamOut.ref(), xmlBegin) &&
-            !startsWith(memStreamOut.ref(), BYTE_ORDER_MARK_UTF8 + xmlBegin)) //allow BOM!
-            throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
+        if (bytesRead == 0) //end of file
+            break;
     }
-
-    copyStream(fileStreamIn, memStreamOut, fileStreamIn.optimalBlockSize(), nullptr); //throw FileError
 
     try
     {
-        return parse(memStreamOut.ref()); //throw XmlParsingError
+        return parse(buffer); //throw XmlParsingError
     }
     catch (const XmlParsingError& e)
     {
@@ -50,19 +57,18 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
 
 void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filepath) //throw FileError
 {
-    std::string stream = serialize(doc); //noexcept
+    const std::string stream = serialize(doc); //noexcept
 
     //only update xml file if there are real changes
     try
     {
         if (getFilesize(filepath) == stream.size()) //throw FileError
-            if (loadBinStream<std::string>(filepath, nullptr) == stream) //throw FileError
+            if (loadBinContainer<std::string>(filepath, nullptr) == stream) //throw FileError
                 return;
     }
     catch (FileError&) {}
 
-    FileOutput outputFile(filepath, FileOutput::ACC_OVERWRITE); //throw FileError
-    outputFile.write(stream.c_str(), stream.length());          //
+    saveBinContainer(filepath, stream, nullptr); //throw FileError
 }
 
 

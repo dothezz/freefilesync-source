@@ -7,8 +7,6 @@
 #ifndef BINARY_H_3941281398513241134
 #define BINARY_H_3941281398513241134
 
-#include <functional>
-#include <zen/file_error.h>
 #include "../fs/abstract.h"
 
 
@@ -16,7 +14,7 @@ namespace zen
 {
 bool filesHaveSameContent(const AbstractPath& filePath1, //throw FileError
                           const AbstractPath& filePath2,
-                          const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus); //may be nullptr
+                          const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //may be nullptr
 }
 
 #endif //BINARY_H_3941281398513241134

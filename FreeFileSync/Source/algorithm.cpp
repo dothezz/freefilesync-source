@@ -673,7 +673,7 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
                                    BaseFolderPair& baseFolder,
                                    const std::function<void(const std::wstring& msg)>& reportWarning,
-                                   const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
+                                   const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
     //try to load sync-database files
     std::shared_ptr<InSyncFolder> lastSyncState;
@@ -683,7 +683,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
             if (allItemsCategoryEqual(baseFolder))
                 return; //nothing to do: abort and don't even try to open db files
 
-            lastSyncState = loadLastSynchronousState(baseFolder, onUpdateStatus); //throw FileError, FileErrorDatabaseNotExisting
+            lastSyncState = loadLastSynchronousState(baseFolder, notifyProgress); //throw FileError, FileErrorDatabaseNotExisting
         }
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than confuse users
         catch (const FileError& e) //e.g. incompatible database version
@@ -714,7 +714,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
 void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
                                    FolderComparison& folderCmp,
                                    const std::function<void(const std::wstring& msg)>& reportWarning,
-                                   const std::function<void(std::int64_t bytesDelta)>& onUpdateStatus)
+                                   const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
     if (folderCmp.empty())
         return;
@@ -722,12 +722,12 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
     std::vector<DirectionConfig> directCfgs = extractDirectionCfg(mainCfg);
 
     if (folderCmp.size() != directCfgs.size())
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
     {
         const DirectionConfig& cfg = directCfgs[it - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **it, reportWarning, onUpdateStatus);
+        redetermineSyncDirection(cfg, **it, reportWarning, notifyProgress);
     }
 }
 
@@ -1028,7 +1028,7 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
     if (folderCmp.empty())
         return;
     else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
@@ -1460,7 +1460,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     if (folderCmp.empty())
         return;
     else if (folderCmp.size() != directCfgs.size())
-        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //build up mapping from base directory to corresponding direction config
     std::unordered_map<const BaseFolderPair*, DirectionConfig> baseFolderCfgs;

@@ -98,25 +98,33 @@ public:
     BufferedPaintDC(wxWindow& wnd, Opt<wxBitmap>& buffer) : buffer_(buffer), paintDc(&wnd)
     {
         const wxSize clientSize = wnd.GetClientSize();
-        if (!buffer_ || clientSize != wxSize(buffer->GetWidth(), buffer->GetHeight()))
-            buffer = wxBitmap(clientSize.GetWidth(), clientSize.GetHeight());
+        if (clientSize.GetWidth() > 0 && clientSize.GetHeight() > 0) //wxBitmap asserts this!! width may be 0; test case "Grid::CornerWin": compare both sides, then change config
+        {
+            if (!buffer_ || clientSize != wxSize(buffer->GetWidth(), buffer->GetHeight()))
+                buffer = wxBitmap(clientSize.GetWidth(), clientSize.GetHeight());
 
-        SelectObject(*buffer);
+            SelectObject(*buffer);
 
-        if (paintDc.IsOk() && paintDc.GetLayoutDirection() == wxLayout_RightToLeft)
-            SetLayoutDirection(wxLayout_RightToLeft);
+            if (paintDc.IsOk() && paintDc.GetLayoutDirection() == wxLayout_RightToLeft)
+                SetLayoutDirection(wxLayout_RightToLeft);
+        }
+        else
+            buffer = NoValue();
     }
 
     ~BufferedPaintDC()
     {
-        if (GetLayoutDirection() == wxLayout_RightToLeft)
+        if (buffer_)
         {
-            paintDc.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
-            SetLayoutDirection(wxLayout_LeftToRight);         //
-        }
+            if (GetLayoutDirection() == wxLayout_RightToLeft)
+            {
+                paintDc.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
+                SetLayoutDirection(wxLayout_LeftToRight);         //
+            }
 
-        const wxPoint origin = GetDeviceOrigin();
-        paintDc.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
+            const wxPoint origin = GetDeviceOrigin();
+            paintDc.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
+        }
     }
 
 private:

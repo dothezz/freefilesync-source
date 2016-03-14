@@ -7,6 +7,12 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
+
+<source>Consistency check failed for %x.</source>
+<target>Die Konsistenzprüfung für %x ist fehlgeschlagen.</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -214,8 +220,14 @@
 <source>Update attributes on right</source>
 <target>Aktualisiere Attribute des rechten Elements</target>
 
-<source>Cannot read file %x.</source>
-<target>Die Datei %x kann nicht gelesen werden.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
+
+<source>Cannot write file %x.</source>
+<target>Die Datei %x kann nicht geschrieben werden.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +239,6 @@ Unerwartete Größe des Datenstroms.
 Erwartet: %x bytes
 Tatsächlich: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
-
-<source>Cannot write file %x.</source>
-<target>Die Datei %x kann nicht geschrieben werden.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
@@ -254,6 +257,9 @@ Tatsächlich: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Die Datei %x kann nicht geöffnet werden.</target>
+
+<source>Cannot read file %x.</source>
+<target>Die Datei %x kann nicht gelesen werden.</target>
 
 <source>Cannot find device %x.</source>
 <target>Das Gerät %x wurde nicht gefunden.</target>
@@ -1615,11 +1621,14 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Es kann keine Verbindung zu www.freefilesync.org aufgebaut werden.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Möchten Sie manuell prüfen?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden. Wahrscheinlich ist eine neuere Version verfügbar. Jetzt manuell prüfen?</target>
 
 <source>&Check</source>
 <target>&Prüfen</target>
+
+<source>Cannot find system function %x.</source>
+<target>Die Systemfunktion %x wurde nicht gefunden.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Die Registrierung zum Empfang von Systemmeldungen ist fehlgeschlagen.</target>
@@ -1651,14 +1660,11 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>%x is not a regular directory name.</source>
 <target>%x ist kein regulärer Verzeichnisname.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Die Systemfunktion %x wurde nicht gefunden.</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Die Datei %x kann nicht nach %y kopiert werden.</target>
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Die Attribute können nicht von %x nach %y kopiert werden.</target>
-
-<source>Cannot copy file %x to %y.</source>
-<target>Die Datei %x kann nicht nach %y kopiert werden.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Der Typ des Elements %x wird nicht unterstützt:</target>
@@ -1786,6 +1792,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Thanks for your donation and support!</source>
 <target>Danke für Ihre Spende und Unterstützung!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Das FreeFileSync Installationsprogramm für Spender hat sein Installationslimit erreicht. Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target>Das FreeFileSync Installationsprogramm für Spender hat sein tägliches Installationslimit erreicht.</target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target>Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
 

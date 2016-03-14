@@ -1292,6 +1292,11 @@ public:
             grid.getMainWin().Connect(wxEVT_CHAR,     func, nullptr, this);
             grid.getMainWin().Connect(wxEVT_KEY_UP,   func, nullptr, this);
             grid.getMainWin().Connect(wxEVT_KEY_DOWN, func, nullptr, this);
+
+            grid.getMainWin().Connect(wxEVT_LEFT_DOWN,   func, nullptr, this);
+            grid.getMainWin().Connect(wxEVT_LEFT_DCLICK, func, nullptr, this);
+            grid.getMainWin().Connect(wxEVT_RIGHT_DOWN,  func, nullptr, this);
+            //grid.getMainWin().Connect(wxEVT_MOUSEWHEEL, func, nullptr, this); -> should be covered by wxEVT_SCROLLWIN_*
         };
         connectGridAccess(gridL_, wxEventHandler(GridEventManager::onGridAccessL)); //
         connectGridAccess(gridC_, wxEventHandler(GridEventManager::onGridAccessC)); //connect *after* onKeyDown() in order to receive callback *before*!!!

@@ -45,7 +45,7 @@ wxColor getDefaultColor(size_t pos)
     switch (pos % 10)
     {
         case 0:
-			return { 0, 69, 134 }; //blue
+            return { 0, 69, 134 }; //blue
         case 1:
             return { 255, 66, 14 }; //red
         case 2:

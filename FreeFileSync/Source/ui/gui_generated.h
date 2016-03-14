@@ -74,6 +74,7 @@ protected:
     wxMenuItem* m_menuItemSave;
     wxMenuItem* m_menuItemSaveAs;
     wxMenuItem* m_menuItemSaveAsBatch;
+    wxMenuItem* m_menuItem4;
     wxMenu* m_menu4;
     wxMenuItem* m_menuItemCompare;
     wxMenuItem* m_menuItemCompSettings;

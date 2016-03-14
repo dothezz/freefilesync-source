@@ -233,7 +233,7 @@ void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const std::wstr
                      /|\
                       |
      -----------------------------------
-    |            |           |          |
+    |           |            |          |
 CornerWin  RowLabelWin  ColLabelWin  MainWin
 
 */

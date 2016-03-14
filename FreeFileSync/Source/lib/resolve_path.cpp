@@ -241,7 +241,7 @@ Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
     //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
     trim(path, true, false);
     while (endsWith(path, Zstr(' '))) //don't remove any whitespace from right, e.g. 0xa0 may be used as part of folder name
-        path.resize(path.size() - 1);
+        path.pop_back();
 
 
     path = expandVolumeName(path); //may block for slow USB sticks and idle HDDs!

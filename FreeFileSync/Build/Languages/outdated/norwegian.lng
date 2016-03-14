@@ -92,7 +92,7 @@
 <target>Vilkårlig antall FreeFileSync .ffs_gui og/eller .ffs_batch indstillingsfiler.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>Et ubegrenset antall alternative kataloger for maksimalt én konfigurasjonsfil</target>
+<target>Et ubegrenset antall alternative kataloger for maksimalt én konfigurasjonsfil.</target>
 
 <source>Open configuration for editing without executing it.</source>
 <target></target>
@@ -125,7 +125,7 @@
 <target>Størrelse:</target>
 
 <source>Content comparison was skipped for excluded files %x.</source>
-<target>Innholdsanalyse er utelatt for ekskluderte filer %x</target>
+<target>Innholdsanalyse er utelatt for ekskluderte filer %x.</target>
 
 <source>Items differ in attributes only</source>
 <target>Enhetene har kun forskjellige attributter</target>
@@ -222,7 +222,7 @@ Actual: %y bytes
 <target>Kan ikke opprette filen %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>Kan ikke kopiere symolsk link %x til %y</target>
+<target>Kan ikke kopiere symolsk link %x til %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Kan ikke flytte filen %x til %y.</target>
@@ -258,7 +258,7 @@ Actual: %y bytes
 <target>Kan ikke oppdatere tidsendring på %x.</target>
 
 <source>Cannot determine final path for %x.</source>
-<target>Kan ikke bestemme endelig sti for %x</target>
+<target>Kan ikke bestemme endelig sti for %x.</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan ikke følge symlinken %x.</target>
@@ -327,7 +327,7 @@ Actual: %y bytes
 <target>Venter mens mappe låses:</target>
 
 <source>Lock owner:</source>
-<target>Låsens eier</target>
+<target>Låsens eier:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -390,7 +390,7 @@ Actual: %y bytes
 <target>Gjennomse mappe</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>VSS tjenesten er ikke tilgjengelig</target>
+<target>VSS tjenesten er ikke tilgjengelig.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Bruk FreeFileSync 64-bit til å lage VSS kopier på dette system.</target>
@@ -465,7 +465,7 @@ Actual: %y bytes
 <target><Søk</target>
 
 <source>Idle time (in seconds):</source>
-<target>PC ikke brukt i (sek)</target>
+<target>PC ikke brukt i (sek):</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tid mellom sist funnet endring og utførelse</target>
@@ -641,7 +641,7 @@ Kommandoen utføres hvis:
 <target>Synkronisering gjennomført</target>
 
 <source>Cleaning up old log files...</source>
-<target>Fjerner gamle loggfiler</target>
+<target>Fjerner gamle loggfiler...</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
 <target>Skift til FreeFileSyncs hovedvindu for at løse problemet.</target>

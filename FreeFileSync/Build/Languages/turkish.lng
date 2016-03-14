@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Sağdaki öznitelikler güncellensin</target>
 
-<source>Cannot read file %x.</source>
-<target>%x dosyası okunamadı.</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x izinleri yazılamadı.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Farklı temel klasör tipleri üzerindeki işlemler desteklenmiyor.</target>
+
+<source>Cannot write file %x.</source>
+<target>%x dosyası yazılamadı.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Veri akışının boyutu beklenenden farklı.
 Beklenen: %x bayt
 Gerçekleşen: %y bayt
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>%x izinleri yazılamadı.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Farklı temel klasör tipleri üzerindeki işlemler desteklenmiyor.</target>
-
-<source>Cannot write file %x.</source>
-<target>%x dosyası yazılamadı.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>%x sembolik bağlantısı %y hedefine kopyalanamadı.</target>
@@ -254,6 +251,9 @@ Gerçekleşen: %y bayt
 
 <source>Cannot open file %x.</source>
 <target>%x dosyası açılamadı.</target>
+
+<source>Cannot read file %x.</source>
+<target>%x dosyası okunamadı.</target>
 
 <source>Cannot find device %x.</source>
 <target>%x aygıtı bulunamadı.</target>
@@ -1615,8 +1615,8 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>www.freefilesync.org sitesine bağlanılamadı.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Geçerli FreeFileSync sürüm numarası çevrimiçi olarak bulunamadı. El ile denetlemek ister misiniz?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Denetle</target>
@@ -1654,11 +1654,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Cannot find system function %x.</source>
 <target>%x sistem işlevi bulunamadı.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Öznitelikler %x üzerinden %y üzerine kopyalanamadı.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>%x dosyası %y olarak kopyalanamadı.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Öznitelikler %x üzerinden %y üzerine kopyalanamadı.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>%x ögesi tipi desteklenmiyor:</target>
@@ -1786,6 +1786,9 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Thanks for your donation and support!</source>
 <target>Bağış ve destekleriniz için teşekkürler!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Bağışçılara özel bu FreeFileSync kopyası için yükleme sınırına ulaşıldı. FreeFileSync sayfasından normal sürümü indirmek ister misiniz?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

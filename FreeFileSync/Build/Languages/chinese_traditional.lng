@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>更新右邊的屬性</target>
 
-<source>Cannot read file %x.</source>
-<target>無法讀取檔案 %x。</target>
+<source>Cannot write permissions of %x.</source>
+<target>無法寫入 %x 的權限。</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>不支援不同基本資料夾類型的操作。</target>
+
+<source>Cannot write file %x.</source>
+<target>無法寫入檔案 %x。</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 預期：%x 位元組
 實際：%y 位元組
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>無法寫入 %x 的權限。</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>不支援不同基本資料夾類型的操作。</target>
-
-<source>Cannot write file %x.</source>
-<target>無法寫入檔案 %x。</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>無法複製符號連結 %x 到 %y。</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>無法開啟檔案 %x。</target>
+
+<source>Cannot read file %x.</source>
+<target>無法讀取檔案 %x。</target>
 
 <source>Cannot find device %x.</source>
 <target>找不到裝置 %x。</target>
@@ -1604,8 +1604,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>無法連接到www.freefilesync.org。</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>線上找不到目前FreeFileSync版號！是否要手動檢查？</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>檢查(&C)</target>
@@ -1643,11 +1643,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>找不到系統函數 %x。</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>無法從 %x 複製屬性到 %y。</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>無法從 %x 複製檔案到 %y。</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>無法從 %x 複製屬性到 %y。</target>
 
 <source>Type of item %x is not supported:</source>
 <target>項目類型 %x 不被支援：</target>
@@ -1772,6 +1772,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>感謝您的捐贈和支援！</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>捐贈者為此FreeFileSync安裝程式已達到其安裝限制。現在要從FreeFileSync首頁下載普通版嗎？</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

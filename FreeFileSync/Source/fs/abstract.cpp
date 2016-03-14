@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "abstract.h"
+#include <zen/serialize.h>
 
 using namespace zen;
 using AFS = AbstractFileSystem;
@@ -13,49 +14,26 @@ const Zchar* AFS::TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
 
 AFS::FileAttribAfterCopy AFS::copyFileAsStream(const Zstring& itemPathImplSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                               const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const
+                                               const std::function<void(std::int64_t bytesDelta)>& notifyProgress) const
 {
     auto streamIn = getInputStream(itemPathImplSource); //throw FileError, ErrorFileLocked
-    if (onNotifyCopyStatus) onNotifyCopyStatus(0); //throw X!
+    if (notifyProgress) notifyProgress(0); //throw X!
 
-    std::uint64_t      bytesWritten = 0;
     std::uint64_t      fileSizeExpected = streamIn->getFileSize        (); //throw FileError
     const std::int64_t modificationTime = streamIn->getModificationTime(); //throw FileError
     const FileId       sourceFileId     = streamIn->getFileId          (); //throw FileError
-    FileId             targetFileId;
 
     auto streamOut = getOutputStream(apTarget, &fileSizeExpected, &modificationTime); //throw FileError, ErrorTargetExisting
-    if (onNotifyCopyStatus) onNotifyCopyStatus(0); //throw X!
+    if (notifyProgress) notifyProgress(0); //throw X!
 
-    std::vector<char> buffer(std::min(streamIn ->optimalBlockSize(),
-                                      streamOut->optimalBlockSize()));
-    for (;;)
-    {
-        const size_t bytesRead = streamIn->read(&buffer[0], buffer.size()); //throw FileError
-        assert(bytesRead <= buffer.size());
+    unbufferedStreamCopy(*streamIn, *streamOut, notifyProgress); //throw FileError
 
-        streamOut->write(&buffer[0], bytesRead); //throw FileError
-        bytesWritten += bytesRead;
-
-        if (onNotifyCopyStatus)
-            onNotifyCopyStatus(bytesRead); //throw X!
-
-        if (bytesRead != buffer.size()) //end of file
-            break;
-    }
-
-    //important check: catches corrupt sftp download with libssh2!
-    if (bytesWritten != fileSizeExpected)
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getDisplayPath(itemPathImplSource))),
-                        replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
-                                              L"%x", numberTo<std::wstring>(fileSizeExpected)),
-                                   L"%y", numberTo<std::wstring>(bytesWritten)));
-
-    //modification time should be set here!
-    targetFileId = streamOut->finalize([&] { if (onNotifyCopyStatus) onNotifyCopyStatus(0); /*throw X*/ }); //throw FileError
+    const FileId targetFileId = streamOut->finalize([&] { if (notifyProgress) notifyProgress(0); /*throw X*/ }); //throw FileError
+    //- modification time should be set here!
+    //- checks if "expected == actual number of bytes written"
 
     AFS::FileAttribAfterCopy attr;
-    attr.fileSize         = bytesWritten;
+    attr.fileSize         = fileSizeExpected;
     attr.modificationTime = modificationTime;
     attr.sourceFileId     = sourceFileId;
     attr.targetFileId     = targetFileId;
@@ -67,20 +45,20 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
                                                     bool copyFilePermissions,
                                                     bool transactionalCopy,
                                                     const std::function<void()>& onDeleteTargetFile,
-                                                    const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus)
+                                                    const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
     auto copyFileBestEffort = [&](const AbstractPath& apTargetTmp)
     {
         //caveat: typeid returns static type for pointers, dynamic type for references!!!
         if (typeid(*apSource.afs) == typeid(*apTarget.afs))
-            return apSource.afs->copyFileForSameAfsType(apSource.itemPathImpl, apTargetTmp, copyFilePermissions, onNotifyCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+            return apSource.afs->copyFileForSameAfsType(apSource.itemPathImpl, apTargetTmp, copyFilePermissions, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
         //fall back to stream-based file copy:
         if (copyFilePermissions)
             throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(AFS::getDisplayPath(apTargetTmp))),
                             _("Operation not supported for different base folder types."));
 
-        return AFS::copyFileAsStream(apSource, apTargetTmp, onNotifyCopyStatus); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return AFS::copyFileAsStream(apSource, apTargetTmp, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     };
 
     if (transactionalCopy)
@@ -96,7 +74,7 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
             }
             catch (const ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
             {
-                if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. https://sourceforge.net/p/freefilesync/discussion/open-discussion/thread/36adac33
+                if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
                 apTargetTmp.itemPathImpl = apTarget.itemPathImpl + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
             }
 

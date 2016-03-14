@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Atualizar atributos à direita</target>
 
-<source>Cannot read file %x.</source>
-<target>Não foi possível ler o arquivo %x.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Não foi possível escrever as permissões de %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operação não suportada para tipos de pastas de base diferentes.</target>
+
+<source>Cannot write file %x.</source>
+<target>Não foi possível escrever o arquivo %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Tamanho inesperado do fluxo de dados.
 Esperado: %x bytes
 Atual: %y bytes
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Não foi possível escrever as permissões de %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operação não suportada para tipos de pastas de base diferentes.</target>
-
-<source>Cannot write file %x.</source>
-<target>Não foi possível escrever o arquivo %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Não foi possível copiar o link simbólico %x para %y.</target>
@@ -254,6 +251,9 @@ Atual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>Não foi possível abrir o arquivo %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Não foi possível ler o arquivo %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Não foi possível encontrar o dispositivo %x.</target>
@@ -1615,8 +1615,8 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Não foi possível conectar a www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Não foi possível encontrar a versão atual do FreeFileSync online. Deseja verificar manualmente?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Verificar</target>
@@ -1654,11 +1654,11 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Cannot find system function %x.</source>
 <target>Não foi possível localizar a função de sistema %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Não foi possível copiar os atributos de %x para %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Não foi possível copiar o arquivo %x para %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Não foi possível copiar os atributos de %x para %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Tipo de item %x não é suportado:</target>
@@ -1786,6 +1786,9 @@ Isto garante um estado consistente mesmo em caso de erro grave.
 <source>Thanks for your donation and support!</source>
 <target>Obrigado pela sua doação e suporte!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Este instalador do FreeFileSync para doadores atingiu seu limite de instalação. Baixar a versão regular da página do FreeFileSync agora?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

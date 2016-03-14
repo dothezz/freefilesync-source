@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>Uppdatera attribut på höger sida</target>
 
-<source>Cannot read file %x.</source>
-<target>Filen %x kan inte läsas in.</target>
+<source>Cannot write permissions of %x.</source>
+<target>Kan inte skriva behörigheter för %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Åtgärden stöder inte olika basmapptyper.</target>
+
+<source>Cannot write file %x.</source>
+<target>Filen %x kan inte skrivas.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Oväntad storlek på dataström.
 Förväntad: %x byte
 Aktuell: %y byte
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>Kan inte skriva behörigheter för %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Åtgärden stöder inte olika basmapptyper.</target>
-
-<source>Cannot write file %x.</source>
-<target>Filen %x kan inte skrivas.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan inte kopiera den symboliska länken %x till %y.</target>
@@ -254,6 +251,9 @@ Aktuell: %y byte
 
 <source>Cannot open file %x.</source>
 <target>Kan inte öppna %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Filen %x kan inte läsas in.</target>
 
 <source>Cannot find device %x.</source>
 <target>Kan inte hitta enheten  %x.</target>
@@ -1615,8 +1615,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>Kan inte ansluta till www.freefilesync.org.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>Kan inte hitta aktuellt versionsnummer online. Vill du kontrollera manuellt?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Kontrollera</target>
@@ -1654,11 +1654,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Cannot find system function %x.</source>
 <target>Kan inte hitta systemfunktion %x.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>Kan inte kopiera attribut från %x till %y.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Kan inte kopiera %x till %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>Kan inte kopiera attribut från %x till %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Objekttyp %x stöds ej:</target>
@@ -1786,6 +1786,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Thanks for your donation and support!</source>
 <target>Tack för donationen och ditt stöd!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>Denna FreeFileSync-installerare för donatorer, har nått sin installationsgräns. Vill du ladda ner den vanliga versionen från FreeFileSyncs hemsida nu?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

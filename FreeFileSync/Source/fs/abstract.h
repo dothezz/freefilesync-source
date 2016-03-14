@@ -110,18 +110,18 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     struct InputStream
     {
         virtual ~InputStream() {}
-        virtual size_t read(void* buffer, size_t bytesToRead) = 0; //throw FileError; returns "bytesToRead", unless end of file!
+        virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract! it's implementers job to always give a reasonable buffer size!
+        virtual size_t tryRead(void* buffer, size_t bytesToRead) = 0; //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
         virtual FileId        getFileId          () = 0; //throw FileError
         virtual std::int64_t  getModificationTime() = 0; //throw FileError
         virtual std::uint64_t getFileSize        () = 0; //throw FileError
-        virtual size_t optimalBlockSize() const = 0; //non-zero block size is AFS contract! it's implementers job to always give a reasonable buffer size!
     };
 
     struct OutputStreamImpl
     {
         virtual ~OutputStreamImpl() {}
-        virtual size_t optimalBlockSize() const = 0; //non-zero block size is AFS contract!
-        virtual void   write   (const void* buffer, size_t bytesToWrite    ) = 0; //throw FileError
+        virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract!
+        virtual size_t tryWrite(const void* data, size_t len) = 0; //throw FileError; may return short! CONTRACT: bytesToWrite > 0
         virtual FileId finalize(const std::function<void()>& onUpdateStatus) = 0; //throw FileError
     };
 
@@ -130,16 +130,16 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     {
         OutputStream(std::unique_ptr<OutputStreamImpl>&& outStream, const AbstractPath& filePath, const std::uint64_t* streamSize);
         ~OutputStream();
-        size_t optimalBlockSize() const { return outStream_->optimalBlockSize(); } //non-zero block size is AFS contract!
-        void write(const void* buffer, size_t bytesToWrite); //throw FileError
-        FileId finalize(const std::function<void()>& onUpdateStatus); //throw FileError
+        size_t getBlockSize() const { return outStream_->getBlockSize(); } //non-zero block size is AFS contract!
+        size_t tryWrite(const void* data, size_t len); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        FileId finalize  (const std::function<void()>& onUpdateStatus); //throw FileError
 
     private:
         std::unique_ptr<OutputStreamImpl> outStream_; //bound!
         const AbstractPath filePath_;
         bool finalizeSucceeded = false;
         Opt<std::uint64_t> bytesExpected;
-        std::uint64_t bytesWritten = 0;
+        std::uint64_t bytesWrittenTotal = 0;
     };
 
     //return value always bound:
@@ -212,8 +212,8 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     //symlink handling: dereference source
     static FileAttribAfterCopy copyFileAsStream(const AbstractPath& apSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                                 //accummulated delta != file size! consider ADS, sparse, compressed files
-                                                const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //may be nullptr; throw X!
-    { return apSource.afs->copyFileAsStream(apSource.itemPathImpl, apTarget, onNotifyCopyStatus); }
+                                                const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //may be nullptr; throw X!
+    { return apSource.afs->copyFileAsStream(apSource.itemPathImpl, apTarget, notifyProgress); }
 
 
     //Note: it MAY happen that copyFileTransactional() leaves temp files behind, e.g. temporary network drop.
@@ -226,7 +226,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
                                                      //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
                                                      //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
                                                      const std::function<void()>& onDeleteTargetFile,
-                                                     const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus);
+                                                     const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 
     static void copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
     static void copySymlink  (const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
@@ -262,7 +262,7 @@ protected: //grant derived classes access to AbstractPath:
     static Zstring                   getItemPathImpl(const AbstractPath& ap) { return ap.itemPathImpl; }
 
     FileAttribAfterCopy copyFileAsStream(const Zstring& itemPathImplSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                         const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const; //may be nullptr; throw X!
+                                         const std::function<void(std::int64_t bytesDelta)>& notifyProgress) const; //may be nullptr; throw X!
 
 private:
     virtual bool isNativeFileSystem() const { return false; }
@@ -319,7 +319,7 @@ private:
     //symlink handling: follow link!
     virtual FileAttribAfterCopy copyFileForSameAfsType(const Zstring& itemPathImplSource, const AbstractPath& apTarget, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                                        //accummulated delta != file size! consider ADS, sparse, compressed files
-                                                       const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const = 0; //may be nullptr; throw X!
+                                                       const std::function<void(std::int64_t bytesDelta)>& notifyProgress) const = 0; //may be nullptr; throw X!
 
     //symlink handling: follow link!
     virtual void copyNewFolderForSameAfsType(const Zstring& itemPathImplSource, const AbstractPath& apTarget, bool copyFilePermissions) const = 0; //throw FileError
@@ -456,7 +456,7 @@ AbstractFileSystem::OutputStream::OutputStream(std::unique_ptr<OutputStreamImpl>
 inline
 AbstractFileSystem::OutputStream::~OutputStream()
 {
-    //delete file on errors: => fail if already existing BEFORE creating OutputStream instance!!
+    //we delete the file on errors: => fail if already existing BEFORE creating OutputStream instance!!
 
     outStream_.reset(); //close file handle *before* remove!
 
@@ -467,24 +467,31 @@ AbstractFileSystem::OutputStream::~OutputStream()
 
 
 inline
-void AbstractFileSystem::OutputStream::write(const void* buffer, size_t bytesToWrite)
+size_t AbstractFileSystem::OutputStream::tryWrite(const void* data, size_t len) //throw FileError, CONTRACT: bytesToWrite > 0
 {
-    bytesWritten += bytesToWrite;
-    outStream_->write(buffer, bytesToWrite); //throw FileError
+    if (len == 0)
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+
+    const size_t bytesWritten = outStream_->tryWrite(data, len); //throw FileError; CONTRACT: bytesToWrite > 0
+    if (bytesWritten > len)
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+
+    bytesWrittenTotal += bytesWritten;
+    return bytesWritten;
 }
 
 
 inline
 AbstractFileSystem::FileId AbstractFileSystem::OutputStream::finalize(const std::function<void()>& onUpdateStatus) //throw FileError
 {
-    if (bytesExpected && bytesWritten != *bytesExpected)
+    //important check: catches corrupt sftp download with libssh2!
+    if (bytesExpected && *bytesExpected != bytesWrittenTotal)
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getDisplayPath(filePath_))),
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
                                               L"%x", numberTo<std::wstring>(*bytesExpected)),
-                                   L"%y", numberTo<std::wstring>(bytesWritten)));
+                                   L"%y", numberTo<std::wstring>(bytesWrittenTotal)));
 
-    const FileId fileId = outStream_->finalize(onUpdateStatus); //throw FileError
-
+    FileId fileId = outStream_->finalize(onUpdateStatus); //throw FileError
     finalizeSucceeded = true;
     return fileId;
 }

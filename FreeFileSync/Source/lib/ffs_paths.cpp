@@ -17,15 +17,18 @@ using namespace zen;
 namespace
 {
 inline
-Zstring getExecutableDir() //directory containing executable WITH path separator at end
+Zstring getExecutablePathPf() //directory containing executable WITH path separator at end
 {
     return appendSeparator(beforeLast(utfCvrtTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
 }
 
+}
 
 
-inline
-bool isPortableVersion() { return !endsWith(getExecutableDir(), "/bin/"); } //this check is a bit lame...
+bool zen::isPortableVersion()
+{
+    return !endsWith(getExecutablePathPf(), "/bin/");  //this check is a bit lame...
+
 }
 
 
@@ -44,7 +47,7 @@ Zstring zen::getResourceDir()
     ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
 
     if (isPortableVersion())
-        return getExecutableDir();
+        return getExecutablePathPf();
     else //use OS' standard paths
         return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
 }
@@ -58,7 +61,7 @@ Zstring zen::getConfigDir()
     ZEN_ON_SCOPE_EXIT(wxTheApp->SetAppName(appName));
 
     if (isPortableVersion())
-        return getExecutableDir();
+        return getExecutablePathPf();
     //use OS' standard paths
     Zstring configDirPath = toZ(wxStandardPathsBase::Get().GetUserDataDir());
     try
@@ -74,6 +77,6 @@ Zstring zen::getConfigDir()
 //this function is called by RealTimeSync!!!
 Zstring zen::getFreeFileSyncLauncherPath()
 {
-    return getExecutableDir() + Zstr("FreeFileSync");
+    return getExecutablePathPf() + Zstr("FreeFileSync");
 
 }

@@ -48,7 +48,7 @@ public:
 
     int getCount() const { return static_cast<int>(forms.size()); }
     bool isSingleNumberForm(int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].count == 1 : false; }
-    int getFirstNumber     (int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].firstNumber : -1; }
+    int  getFirstNumber    (int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].firstNumber : -1; }
 
 private:
     struct FormInfo

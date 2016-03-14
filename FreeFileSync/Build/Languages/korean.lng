@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>우측 속성 업데이트</target>
 
-<source>Cannot read file %x.</source>
-<target>파일 %x을(를) 읽을 수 없습니다.</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x의 권한을 쓸 수 없습니다.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>다른 기본 폴더 유형에 대해 지원되지 않는 동작.</target>
+
+<source>Cannot write file %x.</source>
+<target>파일 %x을(를) 쓸 수 없습니다.</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 예상 사이즈: %x 바이트
 실제 사이즈: %y 바이트
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>%x의 권한을 쓸 수 없습니다.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>다른 기본 폴더 유형에 대해 지원되지 않는 동작.</target>
-
-<source>Cannot write file %x.</source>
-<target>파일 %x을(를) 쓸 수 없습니다.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>심볼릭 링크 %x을(를) %y(으)로 복사할 수 없습니다.</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>파일 %x을(를) 열 수 없습니다.</target>
+
+<source>Cannot read file %x.</source>
+<target>파일 %x을(를) 읽을 수 없습니다.</target>
 
 <source>Cannot find device %x.</source>
 <target>장치 %x을(를) 찾을 수 없습니다.</target>
@@ -1604,8 +1604,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>www.freefilesync.org.에 접속할 수 없습니다.</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>현재 사용 중인 FreeFileSync 버전 번호를 온라인에서 찾을 수 없습니다. 수동으로 확인해 보시겠습니까?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>체크(&C)</target>
@@ -1643,11 +1643,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>시스템 함수 %x을(를) 찾을 수 없습니다.</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>%x에서 %y(으)로의 속성을 복사할 수 없습니다.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>파일 %x을(를) %y(으)로 복사할 수 없습니다.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>%x에서 %y(으)로의 속성을 복사할 수 없습니다.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>항목 %x의 형식은 지원되지 않습니다:</target>
@@ -1772,6 +1772,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>귀하의 기부와 지원에 감사드립니다!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>기부자용 FreeFileSync 인스톨러가 설치 제한에 도달했습니다. FreeFileSync 홈페이지에서 일반 버전을 다운로드 하시겠습니까?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

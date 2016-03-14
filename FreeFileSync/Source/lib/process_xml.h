@@ -210,7 +210,7 @@ struct XmlGlobalSettings
         std::vector<ConfigFileItem> lastUsedConfigFiles;
 
         std::vector<ConfigFileItem> cfgFileHistory;
-        size_t cfgFileHistMax = 30;
+        size_t cfgFileHistMax = 50;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;

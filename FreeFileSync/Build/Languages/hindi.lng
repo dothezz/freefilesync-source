@@ -214,8 +214,14 @@
 <source>Update attributes on right</source>
 <target>दाईं तरफ के गुण अद्यतन करें</target>
 
-<source>Cannot read file %x.</source>
-<target>फ़ाइल %x पढ़ने में असमर्थ।</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x की अनुमतियां लिख नहीं सकते।</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>भिन्न मूल फ़ोल्डर प्रकारों के लिए कार्यवाई समर्थित नहीं।</target>
+
+<source>Cannot write file %x.</source>
+<target>फ़ाइल %x लिखने में असमर्थ।</target>
 
 <source>
 Unexpected size of data stream.
@@ -227,15 +233,6 @@ Actual: %y bytes
 अपेक्षित: %x बाइट्स
 वास्तविक: %y बाइट्स
 </target>
-
-<source>Cannot write permissions of %x.</source>
-<target>%x की अनुमतियां लिख नहीं सकते।</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>भिन्न मूल फ़ोल्डर प्रकारों के लिए कार्यवाई समर्थित नहीं।</target>
-
-<source>Cannot write file %x.</source>
-<target>फ़ाइल %x लिखने में असमर्थ।</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>सिंबॉलिक लिंक %x से %y प्रतिलिपित नहीं कर सकते।</target>
@@ -254,6 +251,9 @@ Actual: %y bytes
 
 <source>Cannot open file %x.</source>
 <target>%x फ़ाइल को खोलने में असमर्थ।</target>
+
+<source>Cannot read file %x.</source>
+<target>फ़ाइल %x पढ़ने में असमर्थ।</target>
 
 <source>Cannot find device %x.</source>
 <target>डिवाइस %x नहीं मिला।</target>
@@ -1615,8 +1615,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Unable to connect to www.freefilesync.org.</source>
 <target>www.freefilesync.org से जुड़ने में असमर्थ।</target>
 
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target>वर्तमान FreeFileSync संस्करण संख्या ऑनलाइन नहीं मिल सकती. क्या आप मैन्युअल रूप से जाँच करना चाहते हैं?</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>जाँच करें (&C)</target>
@@ -1654,11 +1654,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot find system function %x.</source>
 <target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
 
-<source>Cannot copy attributes from %x to %y.</source>
-<target>%x से %y गुण प्रतिलिपित नहीं कर सकते।</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>फ़ाइल %x से %y प्रतिलिपित नहीं कर सकते।</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target>%x से %y गुण प्रतिलिपित नहीं कर सकते।</target>
 
 <source>Type of item %x is not supported:</source>
 <target>%x प्रकार का आइटम समर्थित नहीं है:</target>
@@ -1786,6 +1786,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Thanks for your donation and support!</source>
 <target>आपके दान और समर्थन के लिए धन्यवाद!</target>
 
-<source>This FreeFileSync installer for donors has reached its installation limit. Download the regular version from the FreeFileSync homepage now?</source>
-<target>यह दाताओं का FreeFileSync installer अपनी स्थापना सीमा तक पहूँचा है। नियमित संस्करण FreeFileSync मुख प्र्ष्ठ से डाउनलोड करें?</target>
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

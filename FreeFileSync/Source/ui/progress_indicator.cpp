@@ -51,7 +51,7 @@ inline wxColor getColorGridLine() { return { 192, 192, 192 }; } //light grey
 
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
-//https://sourceforge.net/p/freefilesync/discussion/help/thread/5d62339e
+//http://www.freefilesync.org/forum/viewtopic.php?t=1426
 
 class StopWatch
 {
