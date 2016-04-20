@@ -62,6 +62,7 @@ bool equal(InputIterator1 first1, InputIterator1 last1,
            InputIterator2 first2, InputIterator2 last2);
 
 size_t hashBytes(const unsigned char* ptr, size_t len);
+size_t hashBytesAppend(size_t hashVal, const unsigned char* ptr, size_t len);
 
 
 //support for custom string classes in std::unordered_set/map
@@ -213,20 +214,30 @@ size_t hashBytes(const unsigned char* ptr, size_t len)
     //http://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 #ifdef ZEN_BUILD_32BIT
     const size_t basis = 2166136261U;
-    const size_t prime = 16777619U;
 #elif defined ZEN_BUILD_64BIT
     const size_t basis = 14695981039346656037ULL;
+#endif
+	return hashBytesAppend(basis, ptr, len);
+}
+
+
+inline
+size_t hashBytesAppend(size_t hashVal, const unsigned char* ptr, size_t len)
+{
+#ifdef ZEN_BUILD_32BIT
+    const size_t prime = 16777619U;
+#elif defined ZEN_BUILD_64BIT
     const size_t prime = 1099511628211ULL;
 #endif
 
-    size_t val = basis;
     for (size_t i = 0; i < len; ++i)
     {
-        val ^= static_cast<size_t>(ptr[i]);
-        val *= prime;
+        hashVal ^= static_cast<size_t>(ptr[i]);
+        hashVal *= prime;
     }
-    return val;
+    return hashVal;
 }
+
 }
 
 #endif //STL_TOOLS_H_84567184321434

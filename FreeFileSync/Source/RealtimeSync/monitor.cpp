@@ -95,7 +95,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
 
     const std::int64_t TICKS_DIR_CHECK_INTERVAL = CHECK_FOLDER_INTERVAL * ticksPerSec(); //0 on error
     TickVal lastCheck = getTicks(); //0 on error
-    while (true)
+    for (;;)
     {
         const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
         {
@@ -223,12 +223,12 @@ void rts::monitorDirectories(const std::vector<Zstring>& folderPathPhrases, unsi
         //schedule initial execution (*after* all directories have arrived, which could take some time which we don't want to include)
         time_t nextExecDate = std::time(nullptr) + delay;
 
-        while (true) //loop over command invocations
+        for (;;) //loop over command invocations
         {
             DirWatcher::Entry lastChangeDetected;
             try
             {
-                while (true) //loop over detected changes
+                for (;;) //loop over detected changes
                 {
                     //wait for changes (and for all directories to become available)
                     WaitResult res = waitForChanges(folderPathPhrases, [&](bool readyForSync) //throw FileError, ExecCommandNowException
@@ -264,7 +264,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& folderPathPhrases, unsi
         }
     };
 
-    while (true)
+    for (;;)
         try
         {
             execMonitoring(); //throw FileError

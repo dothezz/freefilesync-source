@@ -50,13 +50,14 @@ void zen::traverseFolder(const Zstring& dirPath,
             //don't return "." and ".."
             const char* itemNameRaw = dirEntry->d_name;
 
-            if (itemNameRaw[0] == 0)
-                throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item with empty name.");
-
             if (itemNameRaw[0] == '.' &&
                 (itemNameRaw[1] == 0 || (itemNameRaw[1] == '.' && itemNameRaw[2] == 0)))
                 continue;
-            const Zstring& itemPath = appendSeparator(dirPath) + itemNameRaw;
+            const Zstring& itemName = itemNameRaw;
+            if (itemName.empty()) //checks result of osx::convertToPrecomposedUtf, too!
+                throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item with empty name.");
+
+            const Zstring& itemPath = appendSeparator(dirPath) + itemName;
 
             struct ::stat statData = {};
             try

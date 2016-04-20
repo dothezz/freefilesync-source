@@ -27,6 +27,7 @@
 #include <wx+/image_resources.h>
 #include <zen/file_access.h>
 #include <zen/thread.h>
+#include <wx+/rtl.h>
 #include "gui_generated.h"
 #include "../lib/ffs_paths.h"
 #include "../lib/perf_check.h"
@@ -583,7 +584,7 @@ public:
                 switch (static_cast<ColumnTypeMsg>(colType))
                 {
                     case COL_TYPE_MSG_TIME:
-                        drawCellText(dc, rectTmp, getValue(row, colType), true, wxALIGN_CENTER);
+                        drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_CENTER);
                         break;
 
                     case COL_TYPE_MSG_CATEGORY:
@@ -591,14 +592,14 @@ public:
                             switch (entry->type)
                             {
                                 case TYPE_INFO:
-                                    dc.DrawLabel(wxString(), getResourceImage(L"msg_info_small"), rectTmp, wxALIGN_CENTER);
+                                    drawBitmapRtlNoMirror(dc, getResourceImage(L"msg_info_small"), rectTmp, wxALIGN_CENTER);
                                     break;
                                 case TYPE_WARNING:
-                                    dc.DrawLabel(wxString(), getResourceImage(L"msg_warning_small"), rectTmp, wxALIGN_CENTER);
+                                    drawBitmapRtlNoMirror(dc, getResourceImage(L"msg_warning_small"), rectTmp, wxALIGN_CENTER);
                                     break;
                                 case TYPE_ERROR:
                                 case TYPE_FATAL_ERROR:
-                                    dc.DrawLabel(wxString(), getResourceImage(L"msg_error_small"), rectTmp, wxALIGN_CENTER);
+                                    drawBitmapRtlNoMirror(dc, getResourceImage(L"msg_error_small"), rectTmp, wxALIGN_CENTER);
                                     break;
                             }
                         break;
@@ -606,7 +607,7 @@ public:
                     case COL_TYPE_MSG_TEXT:
                         rectTmp.x     += COLUMN_GAP_LEFT;
                         rectTmp.width -= COLUMN_GAP_LEFT;
-                        drawCellText(dc, rectTmp, getValue(row, colType), true);
+                        drawCellText(dc, rectTmp, getValue(row, colType));
                         break;
                 }
     }

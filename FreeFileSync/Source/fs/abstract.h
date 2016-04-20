@@ -132,7 +132,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
         ~OutputStream();
         size_t getBlockSize() const { return outStream_->getBlockSize(); } //non-zero block size is AFS contract!
         size_t tryWrite(const void* data, size_t len); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-        FileId finalize  (const std::function<void()>& onUpdateStatus); //throw FileError
+        FileId finalize(const std::function<void()>& onUpdateStatus); //throw FileError
 
     private:
         std::unique_ptr<OutputStreamImpl> outStream_; //bound!

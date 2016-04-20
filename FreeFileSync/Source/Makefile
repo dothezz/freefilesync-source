@@ -83,6 +83,7 @@ CPP_LIST+=../../wx+/grid.cpp
 CPP_LIST+=../../wx+/image_tools.cpp
 CPP_LIST+=../../wx+/graph.cpp
 CPP_LIST+=../../wx+/tooltip.cpp
+CPP_LIST+=../../wx+/http.cpp
 CPP_LIST+=../../wx+/image_resources.cpp
 CPP_LIST+=../../wx+/popup_dlg.cpp
 CPP_LIST+=../../wx+/popup_dlg_generated.cpp
@@ -113,9 +114,10 @@ install:
 	mkdir -p $(APPSHAREDIR)
 	cp -R ../Build/Languages/ \
 	../Build/Help/ \
-	../Build/Sync_Complete.wav \
+	../Build/ding.wav \
+	../Build/gong.wav \
+	../Build/harp.wav \
 	../Build/Resources.zip \
-	../Build/styles.gtk_rc \
 	$(APPSHAREDIR)
 
 	mkdir -p $(DOCSHAREDIR)

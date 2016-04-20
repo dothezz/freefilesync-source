@@ -212,7 +212,7 @@
 <source>Saving file %x...</source>
 <target></target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target></target>
 
 <source>Failed to connect to SFTP server %x.</source>

@@ -11,6 +11,7 @@
 #include <list>
 #include <stack>
 #include <memory>
+//#include <zen/error_log.h>
 #include <wx+/async_task.h>
 #include <wx+/file_drop.h>
 #include <wx/aui/aui.h>
@@ -311,8 +312,6 @@ private:
 
     //compare status panel (hidden on start, shown when comparing)
     std::unique_ptr<CompareProgressDialog> compareStatus; //always bound
-
-    bool cleanedUp;
 
     //toggle to display configuration preview instead of comparison result:
     //for read access use: m_bpButtonViewTypeSyncAction->isActive()

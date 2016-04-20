@@ -332,7 +332,7 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>フォルダ %x を検索中...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>フォルダ %x 検索中にタイムアウト.</target>
 
 <source>Cannot get process information.</source>

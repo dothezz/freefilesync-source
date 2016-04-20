@@ -394,9 +394,9 @@ private:
         warn_static("remove after migration! 2015-05-02")
         if (streamVersion_ == 1)
         {
-            auto devId   = static_cast<DeviceId >(readNumber<std::uint64_t>(input)); //
+            auto devId   = static_cast<VolumeId >(readNumber<std::uint64_t>(input)); //
             auto fileIdx = static_cast<FileIndex>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
-            if (devId != 0 || fileIdx != 0)
+            if (devId != 0 && fileIdx != 0)
             {
                 fileId.append(reinterpret_cast<const char*>(&devId), sizeof(devId));
                 fileId.append(reinterpret_cast<const char*>(&fileIdx), sizeof(fileIdx));

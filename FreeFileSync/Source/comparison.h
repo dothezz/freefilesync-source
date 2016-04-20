@@ -22,7 +22,6 @@ struct FolderPairCfg
                   const Zstring& folderPathPhraseRight,
                   CompareVariant cmpVar,
                   SymLinkHandling handleSymlinksIn,
-                  int fileTimeToleranceIn,
                   const std::vector<unsigned int>& ignoreTimeShiftMinutesIn,
                   const NormalizedFilter& filterIn,
                   const DirectionConfig& directCfg) :
@@ -30,7 +29,6 @@ struct FolderPairCfg
         folderPathPhraseRight_(folderPathPhraseRight),
         compareVar(cmpVar),
         handleSymlinks(handleSymlinksIn),
-        fileTimeTolerance(fileTimeToleranceIn),
         ignoreTimeShiftMinutes(ignoreTimeShiftMinutesIn),
         filter(filterIn),
         directionCfg(directCfg) {}
@@ -40,7 +38,6 @@ struct FolderPairCfg
 
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;
-    int fileTimeTolerance;
     std::vector<unsigned int> ignoreTimeShiftMinutes;
 
     NormalizedFilter filter;
@@ -48,10 +45,14 @@ struct FolderPairCfg
     DirectionConfig directionCfg;
 };
 
-std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance); //fill FolderPairCfg and resolve folder pairs
+std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); //fill FolderPairCfg and resolve folder pairs
+
+//inform about (important) non-default global settings related to comparison and synchronization
+void logNonDefaultSettings(const xmlAccess::XmlGlobalSettings& currentSettings, ProcessCallback& callback);
 
 //FFS core routine:
 FolderComparison compare(xmlAccess::OptionalDialogs& warnings,
+                         int fileTimeTolerance,
                          bool allowUserInteraction,
                          bool runWithBackgroundPriority,
                          int folderAccessTimeout,

@@ -337,7 +337,7 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>البحث عن المجلد  %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>انقضت المهلة أثناء البحث عن مجلد %x.</target>
 
 <source>Cannot get process information.</source>

@@ -39,6 +39,7 @@ DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 //CAVEAT: thread-local Win32 error code is easily overwritten => evaluate *before* making any (indirect) system calls:
 //-> MinGW + Win XP: "throw" statement allocates memory to hold the exception object => error code is cleared
 //-> VC 2015, Debug: std::wstring allocator internally calls ::FlsGetValue()         => error code is cleared
+//      https://connect.microsoft.com/VisualStudio/feedback/details/1775690/calling-operator-new-may-set-lasterror-to-0
 #define THROW_LAST_FILE_ERROR(msg, functionName)                           \
     do { const ErrorCode ecInternal = getLastError(); throw FileError(msg, formatSystemError(functionName, ecInternal)); } while (false)
 

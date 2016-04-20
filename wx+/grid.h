@@ -102,7 +102,7 @@ public:
 
     virtual size_t getRowCount() const = 0;
 
-    //cell area
+    //cell area:
     virtual std::wstring getValue(size_t row, ColumnType colType) const = 0;
     virtual void         renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row,                     bool enabled, bool selected); //default implementation
     virtual void         renderCell        (wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected, HoverArea rowHover);
@@ -110,17 +110,17 @@ public:
     virtual std::wstring getToolTip        (size_t row, ColumnType colType) const { return std::wstring(); }
     virtual HoverArea    getRowMouseHover(size_t row, ColumnType colType, int cellRelativePosX, int cellWidth) { return HoverArea::NONE; }
 
-    //label area
+    //label area:
     virtual std::wstring getColumnLabel(ColumnType colType) const = 0;
     virtual void renderColumnLabel(Grid& grid, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted); //default implementation
     virtual std::wstring getToolTip(ColumnType colType) const { return std::wstring(); }
 
     static const int COLUMN_GAP_LEFT; //for left-aligned text
 
-protected: //optional helper routines
+    //optional helper routines:
+    static void   drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
     static wxRect drawCellBorder    (wxDC& dc, const wxRect& rect); //returns inner rectangle
     static void   drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor);
-    static void   drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, bool enabled, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 
     static wxRect drawColumnLabelBorder    (wxDC& dc, const wxRect& rect); //returns inner rectangle
     static void   drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool highlighted);

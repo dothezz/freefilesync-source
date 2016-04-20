@@ -958,7 +958,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     else
         inGeneral["Language"].attribute("Name", config.programLanguage);
 
-    inGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
+    inGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failSafeFileCopy);
     inGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     inGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
     inGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
@@ -969,7 +969,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     inGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
     inGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
-    inGeneral["NotificationSound"        ].attribute("SyncComplete", config.soundFileSyncComplete);
+    inGeneral["NotificationSound"        ].attribute("CompareFinished", config.soundFileCompareFinished);
+    inGeneral["NotificationSound"        ].attribute("SyncFinished"   , config.soundFileSyncFinished);
 
     XmlIn inOpt = inGeneral["OptionalDialogs"];
     inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
@@ -1345,7 +1346,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     outGeneral["Language"].attribute("Name", config.programLanguage);
 
-    outGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failsafeFileCopy);
+    outGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failSafeFileCopy);
     outGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     outGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
     outGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
@@ -1356,7 +1357,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     outGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
     outGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
-    outGeneral["NotificationSound"        ].attribute("SyncComplete", config.soundFileSyncComplete);
+    outGeneral["NotificationSound"        ].attribute("CompareFinished", config.soundFileCompareFinished);
+    outGeneral["NotificationSound"        ].attribute("SyncFinished"   , config.soundFileSyncFinished);
 
     XmlOut outOpt = outGeneral["OptionalDialogs"];
     outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);

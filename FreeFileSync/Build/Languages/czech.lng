@@ -334,7 +334,7 @@ Aktuálně: %y b
 <source>Searching for folder %x...</source>
 <target>Otevírání složky %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Vypršel časový limit pro nalezení adresáře %x.</target>
 
 <source>Cannot get process information.</source>

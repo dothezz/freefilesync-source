@@ -108,7 +108,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     const int BORDER_SIZE = 5;
     wxBitmap headerBmp(GetClientSize().GetWidth(), versionImage.GetHeight() + 2 * BORDER_SIZE, 24);
     //attention: *must* pass 24 bits, auto-determination fails on Windows high-contrast colors schemes!!!
-    //problem only manifests when calling wxDC::DrawBitmap
+    //problem only shows when calling wxDC::DrawBitmap
     {
         wxMemoryDC dc(headerBmp);
         dc.SetBackground(*wxWHITE_BRUSH);
@@ -524,7 +524,7 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
     m_bpButtonRemoveRow->SetBitmapLabel(getResourceImage(L"item_remove"));
     setBitmapTextLabel(*m_buttonResetDialogs, getResourceImage(L"reset_dialogs").ConvertToImage(), m_buttonResetDialogs->GetLabel());
 
-    m_checkBoxFailSafe       ->SetValue(globalSettings.failsafeFileCopy);
+    m_checkBoxFailSafe       ->SetValue(globalSettings.failSafeFileCopy);
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
 
@@ -590,7 +590,7 @@ void OptionsDlg::updateGui()
 void OptionsDlg::OnOkay(wxCommandEvent& event)
 {
     //write settings only when okay-button is pressed (except hidden dialog reset)!
-    globalSettingsOut.failsafeFileCopy    = m_checkBoxFailSafe->GetValue();
+    globalSettingsOut.failSafeFileCopy    = m_checkBoxFailSafe->GetValue();
     globalSettingsOut.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
     globalSettingsOut.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
 
@@ -622,7 +622,7 @@ void OptionsDlg::OnDefault(wxCommandEvent& event)
 {
     const xmlAccess::XmlGlobalSettings defaultCfg;
 
-    m_checkBoxFailSafe       ->SetValue(defaultCfg.failsafeFileCopy);
+    m_checkBoxFailSafe       ->SetValue(defaultCfg.failSafeFileCopy);
     m_checkBoxCopyLocked     ->SetValue(defaultCfg.copyLockedFiles);
     m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
 

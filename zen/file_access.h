@@ -15,6 +15,8 @@
 
 namespace zen
 {
+//note: certain functions require COM initialization! (vista_file_op.h)
+
 bool fileExists     (const Zstring& filePath); //noexcept; check whether file      or file-symlink exists
 bool dirExists      (const Zstring& dirPath ); //noexcept; check whether directory or dir-symlink exists
 bool symlinkExists  (const Zstring& linkPath); //noexcept; check whether a symbolic link exists
@@ -31,6 +33,7 @@ void setFileTime(const Zstring& filePath, std::int64_t modificationTime, ProcSym
 //symlink handling: always evaluate target
 std::uint64_t getFilesize(const Zstring& filePath); //throw FileError
 std::uint64_t getFreeDiskSpace(const Zstring& path); //throw FileError, returns 0 if not available
+VolumeId      getVolumeId(const Zstring& itemPath); //throw FileError
 
 bool removeFile(const Zstring& filePath); //throw FileError; return "false" if file is not existing
 

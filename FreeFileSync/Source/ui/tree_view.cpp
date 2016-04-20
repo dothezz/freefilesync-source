@@ -861,8 +861,7 @@ private:
             if (colType == static_cast<ColumnType>(sortInfo.first))
             {
                 const wxBitmap& marker = getResourceImage(sortInfo.second ? L"sortAscending" : L"sortDescending");
-                wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
-                dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
+                drawBitmapRtlNoMirror(dc, marker, rectInside, wxALIGN_CENTER_HORIZONTAL);
             }
         }
     }
@@ -942,7 +941,7 @@ private:
                         }
 
                         wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
-                        dc.DrawLabel(numberTo<wxString>(node->percent_) + L"%", areaPerc, wxALIGN_CENTER);
+                        drawCellText(dc, areaPerc, numberTo<std::wstring>(node->percent_) + L"%", wxALIGN_CENTER);
 
                         rectTmp.x     += WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE;
                         rectTmp.width -= WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE;
@@ -959,7 +958,7 @@ private:
 
                             //clearArea(dc, rectStat, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
                             clearArea(dc, rectStat, *wxWHITE); //accessibility: always set both foreground AND background colors!
-                            drawBitmapRtlMirror(dc, bmp, rectStat, wxALIGN_CENTER, buffer);
+                            drawBitmapRtlMirror(dc, bmp, rectStat, wxALIGN_CENTER, renderBuf);
                         };
 
                         const bool drawMouseHover = static_cast<HoverAreaNavi>(rowHover) == HoverAreaNavi::NODE;
@@ -995,13 +994,19 @@ private:
                             if (!isActive)
                                 nodeIcon = wxBitmap(nodeIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)); //treat all channels equally!
 
-                            drawBitmapRtlNoMirror(dc, nodeIcon, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                            drawBitmapRtlNoMirror(dc, nodeIcon, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 
                             rectTmp.x     += widthNodeIcon + GAP_SIZE;
                             rectTmp.width -= widthNodeIcon + GAP_SIZE;
 
                             if (rectTmp.width > 0)
-                                drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                            {
+                                wxDCTextColourChanger dummy(dc);
+                                if (!isActive)
+                                    dummy.Set(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+
+                                drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                            }
                         }
                     }
                 }
@@ -1024,7 +1029,7 @@ private:
                 rectTmp.width -= 2 * GAP_SIZE;
             }
 
-            drawCellText(dc, rectTmp, getValue(row, colType), true, alignment);
+            drawCellText(dc, rectTmp, getValue(row, colType), alignment);
         }
     }
 
@@ -1257,7 +1262,7 @@ private:
     const wxBitmap dirIcon  = IconBuffer::genericDirIcon (IconBuffer::SIZE_SMALL);
 
     const wxBitmap rootBmp;
-    Opt<wxBitmap> buffer; //avoid costs of recreating this temporal variable
+    Opt<wxBitmap> renderBuf; //avoid costs of recreating this temporal variable
     const int widthNodeIcon;
     const int widthLevelStep;
     const int widthNodeStatus;

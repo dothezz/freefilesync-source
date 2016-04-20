@@ -14,19 +14,25 @@
 
 namespace zen
 {
-bool updateCheckActive(time_t lastUpdateCheck);
+bool updateCheckActive (time_t  lastUpdateCheck);
 void disableUpdateCheck(time_t& lastUpdateCheck);
 bool haveNewerVersionOnline(const std::wstring& onlineVersion);
 
 //periodic update check:
 bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck);
 
-//long-runing part of the check: thread-safe => run asynchronously
-struct UpdateCheckResult;
-std::shared_ptr<UpdateCheckResult> retrieveOnlineVersion();
 
-//eval on main thread:
-void evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResult* result);
+struct UpdateCheckResultPrep;
+struct UpdateCheckResultAsync;
+
+//run on main thread:
+std::shared_ptr<UpdateCheckResultPrep> periodicUpdateCheckPrepare();
+//run on worker thread: (long-running part of the check)
+std::shared_ptr<UpdateCheckResultAsync> periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep);
+//run on main thread:
+void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResultAsync* resultAsync);
+
+//----------------------------------------------------------------------------
 
 //call from main thread:
 void checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion);

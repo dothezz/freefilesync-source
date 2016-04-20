@@ -86,7 +86,7 @@ void GridData::renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType c
 
     rectTmp.x     += COLUMN_GAP_LEFT;
     rectTmp.width -= COLUMN_GAP_LEFT;
-    drawCellText(dc, rectTmp, getValue(row, colType), true);
+    drawCellText(dc, rectTmp, getValue(row, colType));
 }
 
 
@@ -120,65 +120,71 @@ void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bo
 }
 
 
-namespace
+void GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment)
 {
-const wchar_t ELLIPSIS = L'\u2026'; //...
-
-template <class Function> inline
-std::wstring getTruncatedText(const std::wstring& text, Function textFits)
-{
-    if (textFits(text))
-        return text;
-
-    //unlike Windows 7 Explorer, we truncate UTF-16 correctly: e.g. CJK-Ideogramm encodes to TWO wchar_t: utfCvrtTo<std::wstring>("\xf0\xa4\xbd\x9c");
-    size_t low  = 0; //number of unicode chars!
-    size_t high = unicodeLength(text); //
-
-    for (;;)
-    {
-        const size_t middle = (low + high) / 2;
-
-        std::wstring candidate(strBegin(text), findUnicodePos(text, middle));
-        candidate += ELLIPSIS;
-
-        if (high - low <= 1)
-            return candidate;
-
-        if (textFits(candidate))
-            low = middle;
-        else
-            high = middle;
-    }
-}
-
-
-void drawTextLabelFitting(wxDC& dc, const std::wstring& text, const wxRect& rect, int alignment)
-{
-    RecursiveDcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
-
     /*
-    performance notes:
-    wxDC::DrawLabel() is implemented in terms of both wxDC::GetMultiLineTextExtent() and wxDC::DrawText()
-    wxDC::GetMultiLineTextExtent() is implemented in terms of wxDC::GetTextExtent()
-
-    average total times:
-                                Windows Linux
-    single wxDC::DrawText()      7탎     50탎
-    wxDC::DrawLabel() +         10탎     90탎
-    repeated GetTextExtent()
+    performance notes (Windows):
+    - wxDC::GetTextExtent() is by far the most expensive call (20x more expensive than wxDC::DrawText())
+    - wxDC::DrawLabel() is inefficiently implemented; internally calls: wxDC::GetMultiLineTextExtent(), wxDC::GetTextExtent(), wxDC::DrawText()
+    - wxDC::GetMultiLineTextExtent() calls wxDC::GetTextExtent()
+    - wxDC::DrawText also calls wxDC::GetTextExtent()!!
+    => wxDC::DrawLabel() boils down to 3(!) calls to wxDC::GetTextExtent()!!!
+    - wxDC::DrawLabel results in GetTextExtent() call even for empty strings!!!
+    => skip the wxDC::DrawLabel() cruft and directly call wxDC::DrawText!
     */
 
     //truncate large texts and add ellipsis
-    auto textFits = [&](const std::wstring& phrase) { return dc.GetTextExtent(phrase).GetWidth() <= rect.GetWidth(); };
-    dc.DrawLabel(getTruncatedText(text, textFits), rect, alignment);
-}
-}
+    assert(!contains(text, L"\n"));
+    const wchar_t ELLIPSIS = L'\u2026'; //"..."
 
+    std::wstring textTrunc = text;
+    wxSize extentTrunc = dc.GetTextExtent(textTrunc);
+    if (extentTrunc.GetWidth() > rect.width)
+    {
+        //unlike Windows 7 Explorer, we truncate UTF-16 correctly: e.g. CJK-Ideogramm encodes to TWO wchar_t: utfCvrtTo<std::wstring>("\xf0\xa4\xbd\x9c");
+        size_t low  = 0;                   //number of unicode chars!
+        size_t high = unicodeLength(text); //
+        if (high > 1)
+            for (;;)
+            {
+                const size_t middle = (low + high) / 2; //=> never 0 when "high - low > 1"
+                if (high - low <= 1)
+                {
+                    if (low == 0)
+                    {
+                        textTrunc   = ELLIPSIS;
+                        extentTrunc = dc.GetTextExtent(ELLIPSIS);
+                    }
+                    break;
+                }
 
-void GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& text, bool enabled, int alignment)
-{
-    wxDCTextColourChanger dummy(dc, enabled ? dc.GetTextForeground() : wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
-    drawTextLabelFitting(dc, text, rect, alignment);
+                const std::wstring& candidate = std::wstring(strBegin(text), findUnicodePos(text, middle)) + ELLIPSIS;
+                const wxSize extentCand = dc.GetTextExtent(candidate); //perf: most expensive call of this routine!
+
+                if (extentCand.GetWidth() <= rect.width)
+                {
+                    low = middle;
+                    textTrunc   = candidate;
+                    extentTrunc = extentCand;
+                }
+                else
+                    high = middle;
+            }
+    }
+
+    wxPoint pt = rect.GetTopLeft();
+    if (alignment & wxALIGN_RIGHT) //note: wxALIGN_LEFT == 0!
+        pt.x += rect.width - extentTrunc.GetWidth();
+    else if (alignment & wxALIGN_CENTER_HORIZONTAL)
+        pt.x += (rect.width - extentTrunc.GetWidth()) / 2;
+
+    if (alignment & wxALIGN_BOTTOM) //note: wxALIGN_TOP == 0!
+        pt.y += rect.height - extentTrunc.GetHeight();
+    else if (alignment & wxALIGN_CENTER_VERTICAL)
+        pt.y += (rect.height - extentTrunc.GetHeight()) / 2;
+
+    RecursiveDcClipper clip(dc, rect);
+    dc.DrawText(textTrunc, pt);
 }
 
 
@@ -224,7 +230,7 @@ void GridData::drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool high
 void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const std::wstring& text)
 {
     wxDCTextColourChanger dummy(dc, getColorLabelText()); //accessibility: always set both foreground AND background colors!
-    drawTextLabelFitting(dc, text, rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+    drawCellText(dc, rect, text, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 }
 
 //----------------------------------------------------------------------------------------------------------------
@@ -522,10 +528,8 @@ private:
         //label text
         wxRect textRect = rect;
         textRect.Deflate(1);
-        {
-            RecursiveDcClipper clip(dc, textRect); //wxDC::DrawLabel doesn't care about with, WTF?
-            dc.DrawLabel(formatRow(row), textRect, wxALIGN_CENTRE);
-        }
+
+        GridData::drawCellText(dc, textRect, formatRow(row), wxALIGN_CENTRE);
 
         //border lines
         {
@@ -1666,7 +1670,7 @@ void Grid::scrollDelta(int deltaX, int deltaY)
     scrollPosX = std::max(0, scrollPosX); //wxScrollHelper::Scroll() will exit prematurely if input happens to be "-1"!
     scrollPosY = std::max(0, scrollPosY); //
 
-    Scroll(scrollPosX, scrollPosY);
+    Scroll(scrollPosX, scrollPosY); //internally calls wxWindows::Update()!
     updateWindowSizes(); //may show horizontal scroll bar
 }
 
@@ -1973,7 +1977,7 @@ void Grid::makeRowVisible(size_t row)
         if (clientPosY < 0)
         {
             const int scrollPosY = labelRect.y / pixelsPerUnitY;
-            Scroll(scrollPosX, scrollPosY);
+            Scroll(scrollPosX, scrollPosY); //internally calls wxWindows::Update()!
             updateWindowSizes(); //may show horizontal scroll bar
         }
         else if (clientPosY + labelRect.height > rowLabelWin_->GetClientSize().GetHeight())
@@ -2035,7 +2039,7 @@ void Grid::scrollTo(size_t row)
 
             if (scrollPosYOld != scrollPosYNew) //support polling
             {
-                Scroll(scrollPosXOld, scrollPosYNew);
+                Scroll(scrollPosXOld, scrollPosYNew); //internally calls wxWindows::Update()!
                 updateWindowSizes(); //may show horizontal scroll bar
                 Refresh();
             }

@@ -481,7 +481,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
                                          extractJobName(referenceFile),
-                                         globalCfg.soundFileSyncComplete,
+                                         globalCfg.soundFileSyncFinished,
                                          timeStamp,
                                          batchCfg.logFolderPathPhrase,
                                          batchCfg.logfilesCountLimit,
@@ -494,7 +494,9 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                                          batchCfg.mainCfg.onCompletion,
                                          globalCfg.gui.onCompletionHistory);
 
-        const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg, globalCfg.fileTimeTolerance);
+        logNonDefaultSettings(globalCfg, statusHandler); //inform about (important) non-default global settings
+
+        const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
 
         bool allowPwPrompt = false;
         switch (batchCfg.handleError)
@@ -512,6 +514,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
 
         //COMPARE DIRECTORIES
         FolderComparison cmpResult = compare(globalCfg.optDialogs,
+                                             globalCfg.fileTimeTolerance,
                                              allowPwPrompt, //allowUserInteraction
                                              globalCfg.runWithBackgroundPriority,
                                              globalCfg.folderAccessTimeout,
@@ -530,7 +533,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,
-                    globalCfg.failsafeFileCopy,
+                    globalCfg.failSafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
                     globalCfg.folderAccessTimeout,
                     syncProcessCfg,

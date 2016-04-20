@@ -612,7 +612,7 @@ public:
     SynchronizeFolderPair(ProcessCallback& procCallback,
                           bool verifyCopiedFiles,
                           bool copyFilePermissions,
-                          bool transactionalFileCopy,
+                          bool failSafeFileCopy,
                           DeletionHandling& delHandlingLeft,
                           DeletionHandling& delHandlingRight) :
         procCallback_(procCallback),
@@ -620,16 +620,7 @@ public:
         delHandlingRight_(delHandlingRight),
         verifyCopiedFiles_(verifyCopiedFiles),
         copyFilePermissions_(copyFilePermissions),
-        transactionalFileCopy_(transactionalFileCopy),
-        txtCreatingFile     (_("Creating file %x"            )),
-        txtCreatingLink     (_("Creating symbolic link %x"   )),
-        txtCreatingFolder   (_("Creating folder %x"          )),
-        txtOverwritingFile  (_("Updating file %x"         )),
-        txtOverwritingLink  (_("Updating symbolic link %x")),
-        txtVerifying        (_("Verifying file %x"           )),
-        txtWritingAttributes(_("Updating attributes of %x"   )),
-        txtMovingFile       (_("Moving file %x to %y"))
-    {}
+        failSafeFileCopy_(failSafeFileCopy) {}
 
     void startSync(BaseFolderPair& baseFolder)
     {
@@ -692,17 +683,17 @@ private:
 
     const bool verifyCopiedFiles_;
     const bool copyFilePermissions_;
-    const bool transactionalFileCopy_;
+    const bool failSafeFileCopy_;
 
     //preload status texts
-    const std::wstring txtCreatingFile;
-    const std::wstring txtCreatingLink;
-    const std::wstring txtCreatingFolder;
-    const std::wstring txtOverwritingFile;
-    const std::wstring txtOverwritingLink;
-    const std::wstring txtVerifying;
-    const std::wstring txtWritingAttributes;
-    const std::wstring txtMovingFile;
+    const std::wstring txtCreatingFile     {_("Creating file %x"         )};
+    const std::wstring txtCreatingLink     {_("Creating symbolic link %x")};
+    const std::wstring txtCreatingFolder   {_("Creating folder %x"       )};
+    const std::wstring txtOverwritingFile  {_("Updating file %x"         )};
+    const std::wstring txtOverwritingLink  {_("Updating symbolic link %x")};
+    const std::wstring txtVerifying        {_("Verifying file %x"        )};
+    const std::wstring txtWritingAttributes{_("Updating attributes of %x")};
+    const std::wstring txtMovingFile       {_("Moving file %x to %y"     )};
 };
 
 //---------------------------------------------------------------------------------------------------------------
@@ -1267,7 +1258,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
                 //if fail-safe file copy is active, then the next operation will be a simple "rename"
                 //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated!
-                if (!transactionalFileCopy_)
+                if (!failSafeFileCopy_)
                     reportStatus(txtOverwritingFile, AFS::getDisplayPath(targetPathResolvedOld)); //restore status text copy file
             };
 
@@ -1630,7 +1621,7 @@ AFS::FileAttribAfterCopy SynchronizeFolderPair::copyFileWithCallback(const Abstr
     {
         AFS::FileAttribAfterCopy newAttr = AFS::copyFileTransactional(sourcePathTmp, targetPath, //throw FileError, ErrorFileLocked
                                                                       copyFilePermissions_,
-                                                                      transactionalFileCopy_,
+                                                                      failSafeFileCopy_,
                                                                       onDeleteTargetFile,
                                                                       onNotifyCopyStatus);
 
@@ -1741,36 +1732,13 @@ void zen::synchronize(const TimeComp& timeStamp,
                       bool verifyCopiedFiles,
                       bool copyLockedFiles,
                       bool copyFilePermissions,
-                      bool transactionalFileCopy,
+                      bool failSafeFileCopy,
                       bool runWithBackgroundPriority,
                       int folderAccessTimeout,
                       const std::vector<FolderPairSyncCfg>& syncConfig,
                       FolderComparison& folderCmp,
                       ProcessCallback& callback)
 {
-    //specify process and resource handling priorities
-    std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
-    if (runWithBackgroundPriority)
-        try
-        {
-            backgroundPrio = std::make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
-        }
-        catch (const FileError& e) //not an error in this context
-        {
-            callback.reportInfo(e.toString()); //may throw!
-        }
-
-    //prevent operating system going into sleep state
-    std::unique_ptr<PreventStandby> noStandby;
-    try
-    {
-        noStandby = std::make_unique<PreventStandby>(); //throw FileError
-    }
-    catch (const FileError& e) //not an error in this context
-    {
-        callback.reportInfo(e.toString()); //may throw!
-    }
-
     //PERF_START;
 
     if (syncConfig.size() != folderCmp.size())
@@ -1796,9 +1764,34 @@ void zen::synchronize(const TimeComp& timeStamp,
                               ProcessCallback::PHASE_SYNCHRONIZING);
     }
 
-    std::vector<FolderPairJobType> jobType(folderCmp.size(), FolderPairJobType::PROCESS); //folder pairs may be skipped after fatal errors were found
+    //-------------------------------------------------------------------------------
+
+    //specify process and resource handling priorities
+    std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
+    if (runWithBackgroundPriority)
+        try
+        {
+            backgroundPrio = std::make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+        }
+        catch (const FileError& e) //not an error in this context
+        {
+            callback.reportInfo(e.toString()); //may throw!
+        }
+
+    //prevent operating system going into sleep state
+    std::unique_ptr<PreventStandby> noStandby;
+    try
+    {
+        noStandby = std::make_unique<PreventStandby>(); //throw FileError
+    }
+    catch (const FileError& e) //not an error in this context
+    {
+        callback.reportInfo(e.toString()); //may throw!
+    }
 
     //-------------------execute basic checks all at once before starting sync--------------------------------------
+
+    std::vector<FolderPairJobType> jobType(folderCmp.size(), FolderPairJobType::PROCESS); //folder pairs may be skipped after fatal errors were found
 
     std::vector<SyncStatistics::ConflictInfo> unresolvedConflicts;
 
@@ -2154,7 +2147,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                                              callback);
 
 
-                SynchronizeFolderPair syncFP(callback, verifyCopiedFiles, copyPermissionsFp, transactionalFileCopy,
+                SynchronizeFolderPair syncFP(callback, verifyCopiedFiles, copyPermissionsFp, failSafeFileCopy,
                                              delHandlerL, delHandlerR);
                 syncFP.startSync(*j);
 

@@ -333,7 +333,7 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>फ़ोल्डर %x की खोज हो रही है...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>फ़ोल्डर %x की खोज करते हुए समय बाह्य हआ।</target>
 
 <source>Cannot get process information.</source>

@@ -90,6 +90,16 @@ std::uint64_t zen::getFreeDiskSpace(const Zstring& path) //throw FileError, retu
 }
 
 
+VolumeId zen::getVolumeId(const Zstring& itemPath) //throw FileError
+{
+    struct ::stat fileInfo = {};
+    if (::stat(itemPath.c_str(), &fileInfo) != 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itemPath)), L"stat");
+
+    return fileInfo.st_dev;
+}
+
+
 bool zen::removeFile(const Zstring& filePath) //throw FileError
 {
     const wchar_t functionName[] = L"unlink";

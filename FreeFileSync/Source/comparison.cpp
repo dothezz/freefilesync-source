@@ -18,7 +18,7 @@
 using namespace zen;
 
 
-std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg, int fileTimeTolerance)
+std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg)
 {
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs = { mainCfg.firstPair };
@@ -31,7 +31,6 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
         return FolderPairCfg(enhPair.folderPathPhraseLeft_, enhPair.folderPathPhraseRight_,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
-        fileTimeTolerance,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->ignoreTimeShiftMinutes : mainCfg.cmpConfig.ignoreTimeShiftMinutes,
 
         normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
@@ -164,7 +163,7 @@ void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, b
 class ComparisonBuffer
 {
 public:
-    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, ProcessCallback& callback);
+    ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int fileTimeTolerance, ProcessCallback& callback);
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedSymlinks are appended!
     std::shared_ptr<BaseFolderPair> compareByTimeSize(const ResolvedFolderPair& fp, const FolderPairCfg& fpConfig) const;
@@ -181,11 +180,13 @@ private:
                                                       std::vector<SymlinkPair*>& undefinedSymlinks) const;
 
     std::map<DirectoryKey, DirectoryValue> directoryBuffer; //contains only *existing* directories
+    const int fileTimeTolerance_;
     ProcessCallback& callback_;
 };
 
 
-ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, ProcessCallback& callback) : callback_(callback)
+ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int fileTimeTolerance, ProcessCallback& callback) :
+    fileTimeTolerance_(fileTimeTolerance), callback_(callback)
 {
     class CbImpl : public FillBufferCallback
     {
@@ -328,7 +329,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
     for (FilePair* file : uncategorizedFiles)
     {
         switch (compareFileTime(file->getLastWriteTime<LEFT_SIDE>(),
-                                file->getLastWriteTime<RIGHT_SIDE>(), fpConfig.fileTimeTolerance, fpConfig.ignoreTimeShiftMinutes))
+                                file->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance_, fpConfig.ignoreTimeShiftMinutes))
         {
             case TimeResult::EQUAL:
                 //Caveat:
@@ -801,7 +802,7 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::performComparison(const Resolv
                                                                               bufValueRight != nullptr,
                                                                               fpCfg.filter.nameFilter->copyFilterAddingExclusion(excludefilterFailedRead),
                                                                               fpCfg.compareVar,
-                                                                              fpCfg.fileTimeTolerance,
+                                                                              fileTimeTolerance_,
                                                                               fpCfg.ignoreTimeShiftMinutes);
 
     //PERF_START;
@@ -826,7 +827,42 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::performComparison(const Resolv
 }
 
 
+void zen::logNonDefaultSettings(const xmlAccess::XmlGlobalSettings& activeSettings, ProcessCallback& callback)
+{
+    const xmlAccess::XmlGlobalSettings defaultSettings;
+    std::wstring changedSettingsMsg;
+
+    if (activeSettings.failSafeFileCopy != defaultSettings.failSafeFileCopy)
+        changedSettingsMsg += L"\n    " + _("Fail-safe file copy") + L" - " + (activeSettings.failSafeFileCopy ? _("Enabled") : _("Disabled"));
+
+    if (activeSettings.copyLockedFiles != defaultSettings.copyLockedFiles)
+        changedSettingsMsg += L"\n    " + _("Copy locked files") + L" - " + (activeSettings.copyLockedFiles ? _("Enabled") : _("Disabled"));
+
+    if (activeSettings.copyFilePermissions != defaultSettings.copyFilePermissions)
+        changedSettingsMsg += L"\n    " + _("Copy file access permissions") + L" - " + (activeSettings.copyFilePermissions ? _("Enabled") : _("Disabled"));
+
+    if (activeSettings.fileTimeTolerance != defaultSettings.fileTimeTolerance)
+        changedSettingsMsg += L"\n    " + _("File time tolerance") + L" - " + numberTo<std::wstring>(activeSettings.fileTimeTolerance);
+
+    if (activeSettings.folderAccessTimeout != defaultSettings.folderAccessTimeout)
+        changedSettingsMsg += L"\n    " + _("Folder access timeout") + L" - " + numberTo<std::wstring>(activeSettings.folderAccessTimeout);
+
+    if (activeSettings.runWithBackgroundPriority != defaultSettings.runWithBackgroundPriority)
+        changedSettingsMsg += L"\n    " + _("Run with background priority") + L" - " + (activeSettings.runWithBackgroundPriority ? _("Enabled") : _("Disabled"));
+
+    if (activeSettings.createLockFile != defaultSettings.createLockFile)
+        changedSettingsMsg += L"\n    " + _("Lock directories during sync") + L" - " + (activeSettings.createLockFile ? _("Enabled") : _("Disabled"));
+
+    if (activeSettings.verifyFileCopy != defaultSettings.verifyFileCopy)
+        changedSettingsMsg += L"\n    " + _("Verify copied files") + L" - " + (activeSettings.verifyFileCopy ? _("Enabled") : _("Disabled"));
+
+    if (!changedSettingsMsg.empty())
+        callback.reportInfo(_("Using non-default global settings:") + changedSettingsMsg);
+}
+
+
 FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
+                              int fileTimeTolerance,
                               bool allowUserInteraction,
                               bool runWithBackgroundPriority,
                               int folderAccessTimeout,
@@ -835,6 +871,15 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
                               const std::vector<FolderPairCfg>& cfgList,
                               ProcessCallback& callback)
 {
+    //PERF_START;
+
+    //indicator at the very beginning of the log to make sense of "total time"
+    //init process: keep at beginning so that all gui elements are initialized properly
+    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //may throw; it's not known how many files will be scanned => -1 objects
+    //callback.reportInfo(_("Starting comparison")); -> still useful?
+
+    //-------------------------------------------------------------------------------
+
     //specify process and resource handling priorities
     std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
     if (runWithBackgroundPriority)
@@ -857,13 +902,6 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
     {
         callback.reportInfo(e.toString()); //may throw!
     }
-
-    //PERF_START;
-
-    callback.reportInfo(_("Starting comparison")); //indicator at the very beginning of the log to make sense of "total time"
-
-    //init process: keep at beginning so that all gui elements are initialized properly
-    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //may throw; it's not known how many files will be scanned => -1 objects
 
     //-------------------some basic checks:------------------------------------------
 
@@ -916,7 +954,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
         {
             //------------ traverse/read folders -----------------------------------------------------
             //PERF_START;
-            ComparisonBuffer cmpBuff(dirsToRead, callback);
+            ComparisonBuffer cmpBuff(dirsToRead, fileTimeTolerance, callback);
             //PERF_STOP;
 
             //process binary comparison as one junk

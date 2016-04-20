@@ -16,10 +16,19 @@ namespace zen
 {
 namespace impl { typedef struct ::stat StatDummy; } //sigh...
 
-typedef decltype(impl::StatDummy::st_dev) DeviceId;
-typedef decltype(impl::StatDummy::st_ino) FileIndex;
+using VolumeId  = decltype(impl::StatDummy::st_dev);
+using FileIndex = decltype(impl::StatDummy::st_ino);
 
-typedef std::pair<DeviceId, FileIndex> FileId;
+
+struct FileId  //always available on Linux, and *generally* available on Windows)
+{
+    FileId() {}
+    FileId(VolumeId volId, FileIndex fIdx) : volumeId(volId), fileIndex(fIdx) {}
+    VolumeId  volumeId  = 0;
+    FileIndex fileIndex = 0;
+};
+inline bool operator==(const FileId& lhs, const FileId& rhs) { return lhs.volumeId == rhs.volumeId && lhs.fileIndex == rhs.fileIndex; }
+
 
 inline
 FileId extractFileId(const struct ::stat& fileInfo)

@@ -334,7 +334,7 @@ Przesłany: %y bajtów
 <source>Searching for folder %x...</source>
 <target>Wyszukiwanie katalogu %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Przekroczono czas oczekiwania podczas szukania katalogu %x.</target>
 
 <source>Cannot get process information.</source>

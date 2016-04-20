@@ -28,20 +28,24 @@ public:
     ~StatusHandlerTemporaryPanel();
 
     void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
-    void forceUiRefresh() override;
 
+    void     reportInfo      (const std::wstring& text)                                override;
     Response reportError     (const std::wstring& text, size_t retryNumber)            override;
     void     reportFatalError(const std::wstring& errorMessage)                        override;
     void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
+    void forceUiRefresh() override;
     void abortProcessNow() override final; //throw GuiAbortProcess
+
+    zen::ErrorLog getErrorLog() const { return errorLog; }
 
 private:
     void OnKeyPressed(wxKeyEvent& event);
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
 
     MainDialog& mainDlg;
-    bool ignoreErrors = false;
+    xmlAccess::OnGuiError handleError_ = xmlAccess::ON_GUIERROR_POPUP;
+    zen::ErrorLog errorLog;
 };
 
 
@@ -62,13 +66,13 @@ public:
 
     void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
     void updateProcessedData(int objectsDelta, std::int64_t dataDelta               ) override;
-    void reportInfo         (const std::wstring& text                               ) override;
-    void forceUiRefresh     ()                                                        override;
 
+    void     reportInfo      (const std::wstring& text                               ) override;
     Response reportError     (const std::wstring& text, size_t retryNumber           ) override;
     void     reportFatalError(const std::wstring& errorMessage                       ) override;
     void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
+    void forceUiRefresh() override;
     void abortProcessNow() override final; //throw GuiAbortProcess
 
 private:
@@ -77,7 +81,7 @@ private:
     SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
-    zen::ErrorLog errorLog;
+    zen::ErrorLog errorLog_;
     const size_t automaticRetryCount_;
     const size_t automaticRetryDelay_;
     const std::wstring jobName_;

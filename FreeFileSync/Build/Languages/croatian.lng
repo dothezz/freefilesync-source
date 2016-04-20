@@ -334,7 +334,7 @@ Stvarno: %y bajta
 <source>Searching for folder %x...</source>
 <target>Tražim mapu %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Isteklo vrijeme traženja mape %x.</target>
 
 <source>Cannot get process information.</source>

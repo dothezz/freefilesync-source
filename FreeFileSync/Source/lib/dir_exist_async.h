@@ -74,7 +74,7 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
             catch (const FileError& e) { output.failedChecks.emplace(fi.first, e); }
         }
         else
-            output.failedChecks.emplace(fi.first, FileError(replaceCpy(_("Time out while searching for folder %x."), L"%x", displayPathFmt)));
+            output.failedChecks.emplace(fi.first, FileError(replaceCpy(_("Timeout while searching for folder %x."), L"%x", displayPathFmt)));
     }
 
     return output;

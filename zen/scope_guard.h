@@ -52,6 +52,47 @@ enum class ScopeGuardRunMode
 
 
 template <ScopeGuardRunMode runMode, typename F>
+struct ScopeGuardDestructor;
+
+//specialize scope guard destructor code and get rid of those pesky MSVC "4127 conditional expression is constant"
+template <typename F>
+struct ScopeGuardDestructor<ScopeGuardRunMode::ON_EXIT, F>
+{
+    static void run(F& fun, int exeptionCountOld)
+    {
+		(void)exeptionCountOld; //silence unused parameter warning
+        try { fun(); }
+        catch (...) { assert(false); } //consistency: don't expect exceptions for ON_EXIT even if "!failed"!
+    }
+};
+
+
+template <typename F>
+struct ScopeGuardDestructor<ScopeGuardRunMode::ON_SUCCESS, F>
+{
+    static void run(F& fun, int exeptionCountOld)
+    {
+        const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
+        if (!failed)
+            fun(); //throw X
+    }
+};
+
+
+template <typename F>
+struct ScopeGuardDestructor<ScopeGuardRunMode::ON_FAIL, F>
+{
+    static void run(F& fun, int exeptionCountOld)
+    {
+        const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
+        if (failed)
+            try { fun(); }
+            catch (...) { assert(false); }
+    }
+};
+
+
+template <ScopeGuardRunMode runMode, typename F>
 class ScopeGuard
 {
 public:
@@ -65,20 +106,7 @@ public:
     ~ScopeGuard() noexcept(runMode != ScopeGuardRunMode::ON_SUCCESS)
     {
         if (!dismissed)
-        {
-            if (runMode != ScopeGuardRunMode::ON_EXIT)
-            {
-                const bool failed = getUncaughtExceptionCount() > exeptionCount;
-                if ((runMode == ScopeGuardRunMode::ON_FAIL) != failed)
-                    return;
-            }
-
-            if (runMode == ScopeGuardRunMode::ON_SUCCESS)
-                fun_(); //throw X
-            else
-                try { fun_(); }
-                catch (...) { assert(false); } //consistency: don't expect exceptions for ON_EXIT even if "!failed"!
-        }
+            ScopeGuardDestructor<runMode, F>::run(fun_, exeptionCount);
     }
 
     void dismiss() { dismissed = true; }

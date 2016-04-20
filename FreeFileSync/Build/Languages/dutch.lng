@@ -333,7 +333,7 @@ Werkelijk: %y bytes
 <source>Searching for folder %x...</source>
 <target>Zoek naar map %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Time-out tijdens het zoeken naar de map %x.</target>
 
 <source>Cannot get process information.</source>

@@ -333,7 +333,7 @@ Todellinen: %y tavua
 <source>Searching for folder %x...</source>
 <target>Etsitään hakemistoa %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Aikaviive hakiessa hakemistoa %x.</target>
 
 <source>Cannot get process information.</source>

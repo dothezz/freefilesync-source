@@ -17,6 +17,8 @@
 
     #include <fcntl.h> //fallocate, fcntl
 
+using namespace zen;
+
 
 namespace
 {
@@ -356,7 +358,7 @@ private:
 
     void connectNetworkFolder(const Zstring& itemPathImpl, bool allowUserInteraction) const override //throw FileError
     {
-        warn_static("clean-up/remove/re-think the getAsyncConnectFolder() function")
+        warn_static("clean-up/remove/re-think connectNetworkFolder()")
 
     }
 

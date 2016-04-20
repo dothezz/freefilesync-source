@@ -90,7 +90,7 @@ void synchronize(const TimeComp& timeStamp,
                  bool verifyCopiedFiles,
                  bool copyLockedFiles,
                  bool copyFilePermissions,
-                 bool transactionalFileCopy,
+                 bool failSafeFileCopy,
                  bool runWithBackgroundPriority,
                  int folderAccessTimeout,
                  const std::vector<FolderPairSyncCfg>& syncConfig, //CONTRACT: syncConfig and folderCmp correspond row-wise!

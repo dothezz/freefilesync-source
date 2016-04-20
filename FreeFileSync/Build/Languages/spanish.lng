@@ -333,7 +333,7 @@ Reales: %y bytes
 <source>Searching for folder %x...</source>
 <target>Buscando carpeta %x…</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Tiempo agotado buscando la carpeta %x.</target>
 
 <source>Cannot get process information.</source>

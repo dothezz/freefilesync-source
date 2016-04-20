@@ -335,7 +335,7 @@ Dejansko: %y bajtov
 <source>Searching for folder %x...</source>
 <target>Iskanje mape %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Čas je potekel med iskanjem datoteke %x.</target>
 
 <source>Cannot get process information.</source>

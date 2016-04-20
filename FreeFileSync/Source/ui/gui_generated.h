@@ -74,7 +74,6 @@ protected:
     wxMenuItem* m_menuItemSave;
     wxMenuItem* m_menuItemSaveAs;
     wxMenuItem* m_menuItemSaveAsBatch;
-    wxMenuItem* m_menuItem4;
     wxMenu* m_menu4;
     wxMenuItem* m_menuItemCompare;
     wxMenuItem* m_menuItemCompSettings;
@@ -271,9 +270,10 @@ protected:
     wxListBox* m_listBoxFolderPair;
     wxNotebook* m_notebook;
     wxPanel* m_panelCompSettingsHolder;
-    wxBoxSizer* bSizerLocalCompSettings;
+    wxBoxSizer* bSizerHeaderCompSettings;
+    wxStaticText* m_staticTextMainCompSettings;
     wxCheckBox* m_checkBoxUseLocalCmpOptions;
-    wxStaticLine* m_staticline59;
+    wxStaticLine* m_staticlineCompHeader;
     wxPanel* m_panelComparisonSettings;
     wxStaticText* m_staticText91;
     wxStaticBitmap* m_bitmapByTimeSize;
@@ -298,9 +298,10 @@ protected:
     wxStaticLine* m_staticline441;
     wxStaticLine* m_staticline331;
     wxPanel* m_panelFilterSettingsHolder;
-    wxBoxSizer* bSizerLocalFilterSettings;
-    wxStaticText* m_staticText144;
-    wxStaticLine* m_staticline61;
+    wxBoxSizer* bSizerHeaderFilterSettings;
+    wxStaticText* m_staticTextMainFilterSettings;
+    wxStaticText* m_staticTextLocalFilterSettings;
+    wxStaticLine* m_staticlineFilterHeader;
     wxPanel* m_panelFilterSettings;
     wxStaticBitmap* m_bitmapInclude;
     wxStaticText* m_staticText78;
@@ -329,19 +330,17 @@ protected:
     wxStaticLine* m_staticline46;
     wxButton* m_buttonClear;
     wxPanel* m_panelSyncSettingsHolder;
-    wxBoxSizer* bSizerLocalSyncSettings;
+    wxBoxSizer* bSizerHeaderSyncSettings;
+    wxStaticText* m_staticTextMainSyncSettings;
     wxCheckBox* m_checkBoxUseLocalSyncOptions;
-    wxStaticLine* m_staticline60;
+    wxStaticLine* m_staticlineSyncHeader;
     wxPanel* m_panelSyncSettings;
     wxStaticText* m_staticText86;
     wxToggleButton* m_toggleBtnTwoWay;
     wxToggleButton* m_toggleBtnMirror;
     wxToggleButton* m_toggleBtnUpdate;
     wxToggleButton* m_toggleBtnCustom;
-    wxCheckBox* m_checkBoxDetectMove;
     wxStaticLine* m_staticline53;
-    wxTextCtrl* m_textCtrlSyncVarDescription;
-    wxStaticLine* m_staticline43;
     wxBoxSizer* bSizerSyncConfig;
     wxStaticText* m_staticText119;
     wxStaticText* m_staticText120;
@@ -359,28 +358,33 @@ protected:
     wxBitmapButton* m_bpButtonRightNewer;
     wxBitmapButton* m_bpButtonRightOnly;
     wxStaticBitmap* m_bitmapDatabase;
+    wxStaticLine* m_staticline431;
+    wxCheckBox* m_checkBoxDetectMove;
+    wxHyperlinkCtrl* m_hyperlink242;
+    wxStaticLine* m_staticline531;
+    wxTextCtrl* m_textCtrlSyncVarDescription;
     wxStaticLine* m_staticline54;
+    wxBoxSizer* bSizerDelHandling;
     wxStaticText* m_staticText87;
-    wxRadioButton* m_radioBtnPermanent;
-    wxRadioButton* m_radioBtnRecycler;
-    wxRadioButton* m_radioBtnVersioning;
-    wxBoxSizer* bSizerVersioning;
     wxBitmapButton* m_bpButtonDeletionType;
+    wxRadioButton* m_radioBtnRecycler;
+    wxRadioButton* m_radioBtnPermanent;
+    wxRadioButton* m_radioBtnVersioning;
     wxPanel* m_panelVersioning;
     FolderHistoryBox* m_versioningFolderPath;
     wxButton* m_buttonSelectVersioningFolder;
-    wxBoxSizer* bSizer192;
     wxStaticText* m_staticText93;
+    wxHyperlinkCtrl* m_hyperlink17;
+    wxBoxSizer* bSizer192;
     wxChoice* m_choiceVersioningStyle;
     wxStaticText* m_staticTextNamingCvtPart1;
     wxStaticText* m_staticTextNamingCvtPart2Bold;
     wxStaticText* m_staticTextNamingCvtPart3;
-    wxHyperlinkCtrl* m_hyperlink17;
-    wxBoxSizer* bSizerMiscConfig;
     wxStaticLine* m_staticline582;
+    wxBoxSizer* bSizerMiscConfig;
     wxStaticText* m_staticText88;
-    wxRadioButton* m_radioBtnIgnoreErrors;
     wxRadioButton* m_radioBtnPopupOnErrors;
+    wxRadioButton* m_radioBtnIgnoreErrors;
     wxStaticLine* m_staticline57;
     wxBoxSizer* bSizerOnCompletion;
     wxStaticText* m_staticText89;
@@ -416,21 +420,22 @@ protected:
     virtual void OnSyncUpdate( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSyncCustomDouble( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnSyncCustom( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnToggleDetectMovedFiles( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnExLeftSideOnly( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnLeftNewer( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnDifferent( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnConflict( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnRightNewer( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnExRightSideOnly( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDeletionPermanent( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDeletionRecycler( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDeletionVersioning( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleDetectMovedFiles( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnHelpDetectMovedFiles( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnToggleDeletionType( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnChangeSyncOption( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnDeletionRecycler( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnDeletionPermanent( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnDeletionVersioning( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnHelpVersioning( wxHyperlinkEvent& event ) { event.Skip(); }
-    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnChangeSyncOption( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 
@@ -721,13 +726,13 @@ protected:
     wxStaticLine* m_staticline18;
     wxPanel* m_panel35;
     wxStaticText* m_staticText82;
-    wxRadioButton* m_radioBtnIgnoreErrors;
     wxRadioButton* m_radioBtnPopupOnErrors;
+    wxRadioButton* m_radioBtnIgnoreErrors;
     wxRadioButton* m_radioBtnStopOnError;
     wxStaticLine* m_staticline26;
-    wxCheckBox* m_checkBoxRunMinimized;
     wxStaticText* m_staticText81;
     OnCompletionBox* m_comboBoxOnCompletion;
+    wxCheckBox* m_checkBoxRunMinimized;
     wxStaticLine* m_staticline25;
     wxCheckBox* m_checkBoxGenerateLogfile;
     wxPanel* m_panelLogfile;
@@ -742,8 +747,8 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnErrorStop( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleGenerateLogfile( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleLogfilesLimit( wxCommandEvent& event ) { event.Skip(); }

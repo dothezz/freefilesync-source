@@ -517,7 +517,6 @@ private:
                         break;
                 }
 
-
                 if (fileIcon.IsOk())
                 {
                     wxRect rectIcon = rectTmp;
@@ -526,10 +525,10 @@ private:
                     auto drawIcon = [&](const wxBitmap& icon)
                     {
                         if (isActive)
-                            drawBitmapRtlNoMirror(dc, icon, rectIcon, wxALIGN_CENTER, this->buffer); //without "this->" GCC 4.7.2 compiler crash on Debian
+                            drawBitmapRtlNoMirror(dc, icon, rectIcon, wxALIGN_CENTER);
                         else
                             drawBitmapRtlNoMirror(dc, wxBitmap(icon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
-                                                  rectIcon, wxALIGN_CENTER, this->buffer);
+                                                  rectIcon, wxALIGN_CENTER);
                     };
 
                     drawIcon(fileIcon);
@@ -542,22 +541,24 @@ private:
             rectTmp.width -= iconSize;
         }
 
-        std::unique_ptr<wxDCTextColourChanger> dummy3;
-        if (getRowDisplayType(row) != DisplayType::NORMAL)
-            dummy3 = std::make_unique<wxDCTextColourChanger>(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+        wxDCTextColourChanger dummy(dc);
+        if (!isActive)
+            dummy.Set(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+        else if (getRowDisplayType(row) != DisplayType::NORMAL)
+            dummy.Set(*wxBLACK); //accessibility: always set both foreground AND background colors!
 
         //draw text
         if (static_cast<ColumnTypeRim>(colType) == ColumnTypeRim::SIZE && refGrid().GetLayoutDirection() != wxLayout_RightToLeft)
         {
             //have file size right-justified (but don't change for RTL languages)
             rectTmp.width -= GAP_SIZE;
-            drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+            drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
         }
         else
         {
             rectTmp.x     += GAP_SIZE;
             rectTmp.width -= GAP_SIZE;
-            drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
         }
     }
 
@@ -618,8 +619,7 @@ private:
                 if (colType == static_cast<ColumnType>(sortInfo->type_) && (side == LEFT_SIDE) == sortInfo->onLeft_)
                 {
                     const wxBitmap& marker = getResourceImage(sortInfo->ascending_ ? L"sortAscending" : L"sortDescending");
-                    wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
-                    dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
+                    drawBitmapRtlNoMirror(dc, marker, rectInside, wxALIGN_CENTER_HORIZONTAL);
                 }
             }
         }
@@ -715,7 +715,7 @@ private:
 
 
     std::vector<char> failedLoads; //effectively a vector<bool> of size "number of rows"
-    Opt<wxBitmap> buffer; //avoid costs of recreating this temporal variable
+    Opt<wxBitmap> renderBuf; //avoid costs of recreating this temporal variable
 };
 
 
@@ -937,9 +937,9 @@ private:
                     const bool drawMouseHover = static_cast<HoverAreaCenter>(rowHover) == HoverAreaCenter::CHECK_BOX;
 
                     if (fsObj->isActive())
-                        drawBitmapRtlMirror(dc, getResourceImage(drawMouseHover ? L"checkbox_true_hover" : L"checkbox_true"), rect, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(drawMouseHover ? L"checkbox_true_hover" : L"checkbox_true"), rect, wxALIGN_CENTER, renderBuf);
                     else //default
-                        drawBitmapRtlMirror(dc, getResourceImage(drawMouseHover ?  L"checkbox_false_hover" : L"checkbox_false"), rect, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(drawMouseHover ?  L"checkbox_false_hover" : L"checkbox_false"), rect, wxALIGN_CENTER, renderBuf);
                 }
                 break;
 
@@ -957,14 +957,14 @@ private:
 
                         //wxWidgets screws up again and has wxALIGN_RIGHT off by one pixel! -> use wxALIGN_LEFT instead
                         const wxRect rectNotch(rectTmp.x + rectTmp.width - notch.GetWidth(), rectTmp.y, notch.GetWidth(), rectTmp.height);
-                        drawBitmapRtlMirror(dc, notch, rectNotch, wxALIGN_LEFT, buffer);
+                        drawBitmapRtlMirror(dc, notch, rectNotch, wxALIGN_LEFT, renderBuf);
                         rectTmp.width -= notch.GetWidth();
                     }
 
                     if (!highlightSyncAction_)
-                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rectTmp, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rectTmp, wxALIGN_CENTER, renderBuf);
                     else if (fsObj->getCategory() != FILE_EQUAL) //don't show = in both middle columns
-                        drawBitmapRtlMirror(dc, greyScale(getCmpResultImage(fsObj->getCategory())), rectTmp, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, greyScale(getCmpResultImage(fsObj->getCategory())), rectTmp, wxALIGN_CENTER, renderBuf);
                 }
                 break;
 
@@ -979,19 +979,19 @@ private:
                     switch (rowHoverCenter)
                     {
                         case HoverAreaCenter::DIR_LEFT:
-                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, renderBuf);
                             break;
                         case HoverAreaCenter::DIR_NONE:
-                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::NONE)), rect, wxALIGN_CENTER, buffer);
+                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::NONE)), rect, wxALIGN_CENTER, renderBuf);
                             break;
                         case HoverAreaCenter::DIR_RIGHT:
-                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
+                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, renderBuf);
                             break;
                         case HoverAreaCenter::CHECK_BOX:
                             if (highlightSyncAction_)
-                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->getSyncOperation()), rect, wxALIGN_CENTER, buffer);
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->getSyncOperation()), rect, wxALIGN_CENTER, renderBuf);
                             else if (fsObj->getSyncOperation() != SO_EQUAL) //don't show = in both middle columns
-                                drawBitmapRtlMirror(dc, greyScale(getSyncOpImage(fsObj->getSyncOperation())), rect, wxALIGN_CENTER, buffer);
+                                drawBitmapRtlMirror(dc, greyScale(getSyncOpImage(fsObj->getSyncOperation())), rect, wxALIGN_CENTER, renderBuf);
                             break;
                     }
                 }
@@ -1059,7 +1059,7 @@ private:
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
                 const wxBitmap& cmpIcon = getResourceImage(L"compare_small");
-                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? greyScale(cmpIcon) : cmpIcon, rectInside, wxALIGN_CENTER, buffer);
+                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? greyScale(cmpIcon) : cmpIcon, rectInside, wxALIGN_CENTER);
             }
             break;
 
@@ -1069,7 +1069,7 @@ private:
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
                 const wxBitmap& syncIcon = getResourceImage(L"sync_small");
-                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? syncIcon : greyScale(syncIcon), rectInside, wxALIGN_CENTER, buffer);
+                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? syncIcon : greyScale(syncIcon), rectInside, wxALIGN_CENTER);
             }
             break;
         }
@@ -1234,7 +1234,7 @@ private:
     bool highlightSyncAction_ = false;
     bool selectionInProgress = false;
 
-    Opt<wxBitmap> buffer; //avoid costs of recreating this temporal variable
+    Opt<wxBitmap> renderBuf; //avoid costs of recreating this temporal variable
     Tooltip toolTip;
     wxImage notch;
 };

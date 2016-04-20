@@ -12,14 +12,11 @@
 #include <zen/build_info.h>
 #include <zen/basic_math.h>
 #include <zen/file_error.h>
+#include <zen/thread.h> //std::thread::id
 #include <wx+/popup_dlg.h>
+#include <wx+/http.h>
 #include "version_id.h"
 #include "../lib/ffs_paths.h"
-
-
-    #include <zen/thread.h> //std::thread::id
-    #include <wx/protocol/http.h>
-    #include <wx/app.h>
 
 
 using namespace zen;
@@ -31,9 +28,7 @@ namespace
 
 std::wstring getIso639Language()
 {
-    //respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
-
-    assert(std::this_thread::get_id() == mainThreadId);
+    assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, consider wxWidgets usage
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
     if (localeName.empty())
@@ -46,9 +41,7 @@ std::wstring getIso639Language()
 
 std::wstring getIso3166Country()
 {
-    //respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
-
-    assert(std::this_thread::get_id() == mainThreadId);
+    assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, consider wxWidgets usage
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
     if (localeName.empty())
@@ -58,18 +51,17 @@ std::wstring getIso3166Country()
 }
 
 
-std::string geHttpPostParameters() //must be in application/x-www-form-urlencoded format!!!
+
+//coordinate with get_latest_version_number.php
+std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
 {
-    //1. coordinate with get_latest_version_number.php
-    //2. respect thread-safety for WinInetAccess => don't use wxWidgets in the Windows build here!!!
+    assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, e.g. consider wxWidgets usage in isPortableVersion()
+    std::vector<std::pair<std::string, std::string>> params;
 
-    std::string params = "ffs_version=" + utfCvrtTo<std::string>(zen::ffsVersion);
+    params.emplace_back("ffs_version", utfCvrtTo<std::string>(zen::ffsVersion));
+    params.emplace_back("ffs_type", isPortableVersion() ? "Portable" : "Local");
 
-    params += "&ffs_type=";
-    params += isPortableVersion() ? "Portable" : "Local";
-
-    params += "&os_name=Linux";
-    assert(std::this_thread::get_id() == mainThreadId);
+    params.emplace_back("os_name", "Linux");
 
     const wxLinuxDistributionInfo distribInfo = wxGetLinuxDistributionInfo();
     assert(contains(distribInfo.Release, L'.'));
@@ -80,110 +72,21 @@ std::string geHttpPostParameters() //must be in application/x-www-form-urlencode
     const int osvMajor = stringTo<int>(digits[0]);
     const int osvMinor = stringTo<int>(digits[1]);
 
-    params += "&os_version=" + numberTo<std::string>(osvMajor) + "." + numberTo<std::string>(osvMinor);
+    params.emplace_back("os_version", numberTo<std::string>(osvMajor) + "." + numberTo<std::string>(osvMinor));
 
-    params +=
 #ifdef ZEN_BUILD_32BIT
-        "&os_arch=32";
+    params.emplace_back("os_arch", "32");
 #elif defined ZEN_BUILD_64BIT
-        "&os_arch=64";
+    params.emplace_back("os_arch", "64");
 #endif
 
     const std::string isoLang    = utfCvrtTo<std::string>(getIso639Language());
     const std::string isoCountry = utfCvrtTo<std::string>(getIso3166Country());
-    params += "&language=" + (!isoLang   .empty() ? isoLang    : "zz");
-    params += "&country="  + (!isoCountry.empty() ? isoCountry : "ZZ");
+
+    params.emplace_back("language", !isoLang   .empty() ? isoLang    : "zz");
+    params.emplace_back("country" , !isoCountry.empty() ? isoCountry : "ZZ");
 
     return params;
-}
-
-
-std::string sendHttpRequestImpl(const std::wstring& url, //throw FileError
-                                const std::string* postParams, //issue POST if bound, GET otherwise
-                                int level = 0)
-{
-    assert(!startsWith(url, L"https:")); //not supported by wxHTTP!
-    std::wstring urlFmt = url;
-    if (startsWith(urlFmt, L"http://"))
-        urlFmt = afterFirst(urlFmt, L"://", IF_MISSING_RETURN_NONE);
-    const std::wstring server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
-    const std::wstring page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
-
-    assert(std::this_thread::get_id() == mainThreadId);
-    assert(wxApp::IsMainLoopRunning());
-
-    wxHTTP webAccess;
-    webAccess.SetHeader(L"User-Agent", L"FFS-Update-Check");
-    webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
-
-    if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        throw FileError(_("Internet access failed."), L"wxHTTP::Connect");
-
-    if (postParams)
-        if (!webAccess.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
-            throw FileError(_("Internet access failed."), L"wxHTTP::SetPostText");
-
-    std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //must be deleted BEFORE webAccess is closed
-    const int sc = webAccess.GetResponse();
-
-    //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
-    if (sc / 100 == 3) //e.g. 301, 302, 303, 307... we're not too greedy since we check location, too!
-    {
-        if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
-        {
-            const std::wstring newUrl(webAccess.GetHeader(L"Location"));
-            if (!newUrl.empty())
-                return sendHttpRequestImpl(newUrl, postParams, level + 1);
-        }
-        throw FileError(_("Internet access failed."), L"Unresolvable redirect.");
-    }
-
-    if (sc != 200) //HTTP_STATUS_OK
-        throw FileError(_("Internet access failed."), replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
-
-    if (!httpStream || webAccess.GetError() != wxPROTO_NOERR)
-        throw FileError(_("Internet access failed."), L"wxHTTP::GetError");
-
-    std::string buffer;
-    int newValue = 0;
-    while ((newValue = httpStream->GetC()) != wxEOF)
-        buffer.push_back(static_cast<char>(newValue));
-    return buffer;
-}
-
-
-bool internetIsAlive() //noexcept
-{
-    const wxString server = L"www.google.com";
-    const wxString page   = L"/";
-
-    wxHTTP webAccess;
-    webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
-
-    if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        return false;
-
-    std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //call before checking wxHTTP::GetResponse()
-    const int sc = webAccess.GetResponse();
-    //attention: http://www.google.com/ might redirect to "https" => don't follow, just return "true"!!!
-    return sc / 100 == 2 || //e.g. 200
-           sc / 100 == 3;   //e.g. 301, 302, 303, 307... when in doubt, consider internet alive!
-}
-
-
-#if 0 //not needed yet: -Wunused-function on clang
-inline
-std::string sendHttpGet(const std::wstring& url) //throw FileError
-{
-    return sendHttpRequestImpl(url, nullptr); //throw FileError
-}
-#endif
-
-
-inline
-std::string sendHttpPost(const std::wstring& url, const std::string& postParams) //throw FileError
-{
-    return sendHttpRequestImpl(url, &postParams); //throw FileError
 }
 
 
@@ -195,14 +98,14 @@ enum GetVerResult
 };
 
 //access is thread-safe on Windows (WinInet), but not on Linux/OS X (wxWidgets)
-GetVerResult getOnlineVersion(std::wstring& version)
+GetVerResult getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams, std::wstring& version)
 {
     try
     {
         //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
-        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", geHttpPostParameters()); //throw FileError
+        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", L"FFS-Update-Check", postParams); //throw FileError
         version = utfCvrtTo<std::wstring>(buffer);
-        trim(version); //Windows: remove trailing blank and newline
+        trim(version);
         return version.empty() ? GET_VER_PAGE_NOT_FOUND : GET_VER_SUCCESS; //empty version possible??
     }
     catch (const FileError&)
@@ -214,11 +117,10 @@ GetVerResult getOnlineVersion(std::wstring& version)
 
 std::vector<size_t> parseVersion(const std::wstring& version)
 {
-    std::vector<std::wstring> digits = split(version, FFS_VERSION_SEPARATOR);
-
-    std::vector<size_t> output;
-    std::transform(digits.begin(), digits.end(), std::back_inserter(output), [&](const std::wstring& d) { return stringTo<size_t>(d); });
-    return output;
+	std::vector<size_t> output;
+	for (const std::wstring& digit : split(version, FFS_VERSION_SEPARATOR))
+		output.push_back(stringTo<size_t>(digit));
+	return output;
 }
 }
 
@@ -251,7 +153,7 @@ void zen::disableUpdateCheck(time_t& lastUpdateCheck)
 void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
 {
     std::wstring onlineVersion;
-    switch (getOnlineVersion(onlineVersion))
+    switch (getOnlineVersion(geHttpPostParameters(), onlineVersion))
     {
         case GET_VER_SUCCESS:
             lastOnlineVersion = onlineVersion;
@@ -278,7 +180,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
         case GET_VER_NO_CONNECTION:
             showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                    setTitle(_("Check for Program Updates")).
-                                   setMainInstructions(_("Unable to connect to www.freefilesync.org.")));
+                                   setMainInstructions(replaceCpy(_("Unable to connect to %x."), L"%x", L"www.freefilesync.org.")));
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
@@ -310,21 +212,34 @@ bool zen::shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
 }
 
 
-struct zen::UpdateCheckResult
+struct zen::UpdateCheckResultPrep
 {
+    const std::vector<std::pair<std::string, std::string>> postParameters { geHttpPostParameters() };
 };
 
-
-std::shared_ptr<UpdateCheckResult> zen::retrieveOnlineVersion()
+//run on main thread:
+std::shared_ptr<UpdateCheckResultPrep> zen::periodicUpdateCheckPrepare()
 {
     return nullptr;
 }
 
 
-void zen::evalPeriodicUpdateCheck(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResult* result)
+struct zen::UpdateCheckResultAsync
+{
+};
+
+//run on worker thread:
+std::shared_ptr<UpdateCheckResultAsync> zen::periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep)
+{
+    return nullptr;
+}
+
+
+//run on main thread:
+void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResultAsync* resultAsync)
 {
     std::wstring onlineVersion;
-    const GetVerResult versionStatus = getOnlineVersion(onlineVersion);
+    const GetVerResult versionStatus = getOnlineVersion(geHttpPostParameters(), onlineVersion);
 
     switch (versionStatus)
     {

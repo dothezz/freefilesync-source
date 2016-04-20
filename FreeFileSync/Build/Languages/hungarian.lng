@@ -333,7 +333,7 @@ Jelenlegi: %y bájt
 <source>Searching for folder %x...</source>
 <target>%x könyvtár keresése...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Időtúllépés a %x könyvtár keresése folyamán.</target>
 
 <source>Cannot get process information.</source>

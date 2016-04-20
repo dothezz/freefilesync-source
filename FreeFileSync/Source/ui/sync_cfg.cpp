@@ -125,7 +125,8 @@ private:
 
     void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
 
-    void OnHelpVersioning(wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning", this); }
+    void OnHelpDetectMovedFiles(wxHyperlinkEvent& event) override { displayHelpEntry(L"synchronization-settings" , this); }
+    void OnHelpVersioning      (wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning", this); }
 
     std::shared_ptr<const SyncConfig> getSyncConfig() const;
     void setSyncConfig(std::shared_ptr<const SyncConfig> syncCfg);
@@ -310,7 +311,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
     //use spacer to keep dialog height stable, no matter if versioning options are visible
-    bSizerVersioning->Add(0, m_panelVersioning->GetSize().GetHeight());
+    bSizerDelHandling->Add(0, m_panelVersioning->GetSize().GetHeight());
 
     //-----------------------------------------------------
 
@@ -834,13 +835,13 @@ void toggleDeletionPolicy(DeletionPolicy& deletionPolicy)
     switch (deletionPolicy)
     {
         case DELETE_PERMANENTLY:
-            deletionPolicy = DELETE_TO_RECYCLER;
-            break;
-        case DELETE_TO_RECYCLER:
             deletionPolicy = DELETE_TO_VERSIONING;
             break;
-        case DELETE_TO_VERSIONING:
+        case DELETE_TO_RECYCLER:
             deletionPolicy = DELETE_PERMANENTLY;
+            break;
+        case DELETE_TO_VERSIONING:
+            deletionPolicy = DELETE_TO_RECYCLER;
             break;
     }
 }
@@ -1044,7 +1045,7 @@ void ConfigDialog::updateMiscGui()
 void ConfigDialog::selectFolderPairConfig(int newPairIndexToShow)
 {
     assert(selectedPairIndexToShow == EMPTY_PAIR_INDEX_SELECTED);
-    assert(newPairIndexToShow == -1 ||  makeUnsigned(newPairIndexToShow) < folderPairConfig_.size());
+    assert(newPairIndexToShow == -1 || makeUnsigned(newPairIndexToShow) < folderPairConfig_.size());
     numeric::clamp(newPairIndexToShow, -1, static_cast<int>(folderPairConfig_.size()) - 1);
 
     selectedPairIndexToShow = newPairIndexToShow;
@@ -1053,13 +1054,19 @@ void ConfigDialog::selectFolderPairConfig(int newPairIndexToShow)
     //show/hide controls that are only relevant for main/local config
     const bool mainConfigSelected = newPairIndexToShow < 0;
     //comparison panel:
-    bSizerLocalCompSettings->Show(!mainConfigSelected);
+    m_staticTextMainCompSettings->Show( mainConfigSelected && !folderPairConfig_.empty());
+    m_checkBoxUseLocalCmpOptions->Show(!mainConfigSelected && !folderPairConfig_.empty());
+    m_staticlineCompHeader->Show(!folderPairConfig_.empty());
     m_panelCompSettingsHolder->Layout(); //fix comp panel glitch on Win 7 125% font size
     //filter panel
-    bSizerLocalFilterSettings->Show(!mainConfigSelected);
+    m_staticTextMainFilterSettings ->Show( mainConfigSelected && !folderPairConfig_.empty());
+    m_staticTextLocalFilterSettings->Show(!mainConfigSelected && !folderPairConfig_.empty());
+    m_staticlineFilterHeader->Show(!folderPairConfig_.empty());
     m_panelFilterSettingsHolder->Layout();
     //sync panel:
-    bSizerLocalSyncSettings->Show(!mainConfigSelected);
+    m_staticTextMainSyncSettings ->Show( mainConfigSelected && !folderPairConfig_.empty());
+    m_checkBoxUseLocalSyncOptions->Show(!mainConfigSelected && !folderPairConfig_.empty());
+    m_staticlineSyncHeader->Show(!folderPairConfig_.empty());
     m_panelSyncSettingsHolder->Layout();
     //misc
     bSizerMiscConfig->Show(mainConfigSelected);

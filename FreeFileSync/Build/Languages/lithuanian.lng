@@ -334,7 +334,7 @@ Esamas: %y baitai
 <source>Searching for folder %x...</source>
 <target>Ieškoma aplanko %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Laikas baigėsi ieškant %x aplanko.</target>
 
 <source>Cannot get process information.</source>

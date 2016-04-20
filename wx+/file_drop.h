@@ -47,7 +47,7 @@ void MyDlg::OnFilesDropped(FileDropEvent& event);
 namespace impl
 {
 inline
-wxEventType createNewEventType()
+wxEventType getFileDropEventType()
 {
     //inline functions have external linkage by default => this static is also extern, i.e. program wide unique! but defined in a header... ;)
     static wxEventType dummy = wxNewEventType();
@@ -56,7 +56,7 @@ wxEventType createNewEventType()
 }
 
 //define new event type
-const wxEventType EVENT_DROP_FILE = impl::createNewEventType();
+const wxEventType EVENT_DROP_FILE = impl::getFileDropEventType();
 
 class FileDropEvent : public wxCommandEvent
 {

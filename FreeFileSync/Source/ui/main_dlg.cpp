@@ -565,8 +565,6 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     gridDataView = std::make_shared<GridView>();
     treeDataView = std::make_shared<TreeView>();
 
-    cleanedUp = false;
-
 
     {
         const wxBitmap& bmpFile = IconBuffer::genericFileIcon(IconBuffer::SIZE_SMALL);
@@ -879,8 +877,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     m_checkBoxMatchCase->SetValue(globalCfg.gui.mainDlg.textSearchRespectCase);
 
     //wxAuiManager erroneously loads panel captions, we don't want that
-    typedef std::vector<std::pair<wxString, wxString>> CaptionNameMapping;
-    CaptionNameMapping captionNameMap;
+    std::vector<std::pair<wxString, wxString>>captionNameMap;
     const wxAuiPaneInfoArray& paneArray = auiMgr.GetAllPanes();
     for (size_t i = 0; i < paneArray.size(); ++i)
         captionNameMap.emplace_back(paneArray[i].caption, paneArray[i].name);
@@ -1224,6 +1221,7 @@ AbstractPath getExistingParentFolder(const FileSystemObject& fsObj)
     return fsObj.base().getAbstractPath<side>();
 }
 }
+
 
 void MainDialog::openExternalApplication(const wxString& commandline, const std::vector<FileSystemObject*>& selection, bool leftSide)
 {
@@ -3517,13 +3515,14 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         //handle status display and error messages
         StatusHandlerTemporaryPanel statusHandler(*this);
 
-        const std::vector<zen::FolderPairCfg> cmpConfig = extractCompareCfg(getConfig().mainCfg, globalCfg.fileTimeTolerance);
+        const std::vector<zen::FolderPairCfg> cmpConfig = extractCompareCfg(getConfig().mainCfg);
 
         //GUI mode: place directory locks on directories isolated(!) during both comparison and synchronization
         std::unique_ptr<LockHolder> dirLocks;
 
         //COMPARE DIRECTORIES
         folderCmp = compare(globalCfg.optDialogs,
+                            globalCfg.fileTimeTolerance,
                             true, //allowUserInteraction
                             globalCfg.runWithBackgroundPriority,
                             globalCfg.folderAccessTimeout,
@@ -3548,10 +3547,13 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 
     m_gridNavi->clearSelection(ALLOW_GRID_EVENT);
 
-    //play (optional) sound notification after sync has completed (GUI and batch mode)
-    //const Zstring soundFile = zen::getResourceDir() + Zstr("Compare_Complete.wav");
-    //if (fileExists(soundFile))
-    //  wxSound::Play(toWx(soundFile), wxSOUND_ASYNC);
+    //play (optional) sound notification
+    if (!globalCfg.soundFileCompareFinished.empty())
+    {
+        const Zstring soundFile = getResourceDir() + globalCfg.soundFileCompareFinished;
+        if (fileExists(soundFile))
+            wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+    }
 
     //add to folder history after successful comparison only
     folderHistoryLeft ->addItem(toZ(m_folderPathLeft ->GetValue()));
@@ -3707,9 +3709,12 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                                                   globalCfg.automaticRetryCount,
                                                   globalCfg.automaticRetryDelay,
                                                   xmlAccess::extractJobName(activeCfgFilename),
-                                                  globalCfg.soundFileSyncComplete,
+                                                  globalCfg.soundFileSyncFinished,
                                                   guiCfg.mainCfg.onCompletion,
                                                   globalCfg.gui.onCompletionHistory);
+
+        //inform about (important) non-default global settings
+        logNonDefaultSettings(globalCfg, statusHandler); //let's report here rather than before comparison (user might have changed global settings in the meantime!)
 
         //wxBusyCursor dummy; -> redundant: progress already shown in progress dialog!
 
@@ -3742,7 +3747,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,
-                    globalCfg.failsafeFileCopy,
+                    globalCfg.failSafeFileCopy,
                     globalCfg.runWithBackgroundPriority,
                     globalCfg.folderAccessTimeout,
                     syncProcessCfg,
@@ -4643,7 +4648,7 @@ void MainDialog::OnMenuCheckVersionAutomatically(wxCommandEvent& event)
     {
         flashStatusInformation(_("Searching for program updates..."));
         //synchronous update check is sufficient here:
-        evalPeriodicUpdateCheck(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, retrieveOnlineVersion().get());
+        periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, periodicUpdateCheckRunAsync(periodicUpdateCheckPrepare().get()).get());
     }
 }
 
@@ -4658,10 +4663,12 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
         {
             flashStatusInformation(_("Searching for program updates..."));
 
-            guiQueue.processAsync([] { return retrieveOnlineVersion(); },
-                                  [this] (std::shared_ptr<UpdateCheckResult>&& result)
+            std::shared_ptr<UpdateCheckResultPrep> resultPrep = periodicUpdateCheckPrepare(); //run on main thread:
+
+            guiQueue.processAsync([resultPrep] { return periodicUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
+                                  [this] (std::shared_ptr<UpdateCheckResultAsync>&& resultAsync)
             {
-                evalPeriodicUpdateCheck(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, result.get());
+                periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion, resultAsync.get()); //run on main thread:
             });
         }
 }

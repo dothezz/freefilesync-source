@@ -332,7 +332,7 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>正在搜尋資料夾 %x…</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>搜尋資料夾 %x 時超時。</target>
 
 <source>Cannot get process information.</source>

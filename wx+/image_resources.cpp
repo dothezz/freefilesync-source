@@ -80,7 +80,7 @@ void GlobalResources::init(const Zstring& filepath)
         wxZipInputStream streamIn(input, wxConvUTF8);
         //do NOT rely on wxConvLocal! On failure shows unhelpful popup "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
-        while (true)
+        for (;;)
         {
             std::unique_ptr<wxZipEntry> entry(streamIn.GetNextEntry()); //take ownership!
             if (!entry)

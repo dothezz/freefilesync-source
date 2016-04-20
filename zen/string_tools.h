@@ -77,7 +77,7 @@ template <class T, class S> T copyStringTo(S&& str);
 template <> inline
 bool isWhiteSpace(char ch)
 {
-	assert(ch != 0); //std C++ does not consider 0 as white space
+    assert(ch != 0); //std C++ does not consider 0 as white space
     //caveat 1: std::isspace() takes an int, but expects an unsigned char
     //caveat 2: some parts of UTF-8 chars are erroneously seen as whitespace, e.g. the a0 from "\xec\x8b\xa0" (MSVC)
     return static_cast<unsigned char>(ch) < 128 &&
@@ -85,10 +85,10 @@ bool isWhiteSpace(char ch)
 }
 
 template <> inline
-bool isWhiteSpace(wchar_t ch) 
+bool isWhiteSpace(wchar_t ch)
 {
-	assert(ch != 0); //std C++ does not consider 0 as white space
-	return std::iswspace(ch) != 0; 
+    assert(ch != 0); //std C++ does not consider 0 as white space
+    return std::iswspace(ch) != 0;
 }
 
 

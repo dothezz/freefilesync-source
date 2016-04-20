@@ -84,7 +84,7 @@ protected:
         if (!abortRequested) statusText_ = text;
         requestUiRefresh(); /*throw X */
     }
-    void reportInfo  (const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
+    void reportInfo(const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
 
     //implement AbortCallback
     void requestAbortion() override

@@ -334,7 +334,7 @@ Aktuálne: %y b
 <source>Searching for folder %x...</source>
 <target>Vyhľadávanie priečinka %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Vypršal časový limit pre nájdenie priečinka %x.</target>
 
 <source>Cannot get process information.</source>

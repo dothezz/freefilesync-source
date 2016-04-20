@@ -334,7 +334,7 @@ Actuală: %y baiți
 <source>Searching for folder %x...</source>
 <target>Caut dosarul %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Timp expirat la căutarea dosarului %x.</target>
 
 <source>Cannot get process information.</source>

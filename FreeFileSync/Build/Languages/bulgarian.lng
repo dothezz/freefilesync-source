@@ -333,7 +333,7 @@ Actual: %y bytes
 <source>Searching for folder %x...</source>
 <target>Търсене на папка %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Изтекло време за търсене на папка %x.</target>
 
 <source>Cannot get process information.</source>

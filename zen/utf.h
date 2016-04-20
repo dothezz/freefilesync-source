@@ -238,7 +238,7 @@ void utf8ToCodePoint(CharIterator first, CharIterator last, Function writeOutput
 template <class CharString> inline
 size_t unicodeLength(const CharString& str, char) //utf8
 {
-    typedef typename GetCharType<CharString>::Type CharType;
+    using CharType = typename GetCharType<CharString>::Type;
 
     const CharType*       strFirst  = strBegin(str);
     const CharType* const strLast   = strFirst + strLength(str);
@@ -258,7 +258,7 @@ size_t unicodeLength(const CharString& str, char) //utf8
 template <class WideString> inline
 size_t unicodeLengthWide(const WideString& str, Int2Type<2>) //windows: utf16-wchar_t
 {
-    typedef typename GetCharType<WideString>::Type CharType;
+    using CharType = typename GetCharType<WideString>::Type;
 
     const CharType*       strFirst = strBegin(str);
     const CharType* const strLast  = strFirst + strLength(str);
@@ -302,7 +302,7 @@ namespace implementation
 template <class CharString> inline
 size_t findUnicodePos(const CharString& str, size_t unicodePos, char) //utf8-char
 {
-    typedef typename GetCharType<CharString>::Type CharType;
+    using CharType = typename GetCharType<CharString>::Type;
 
     const CharType* strFirst = strBegin(str);
     const size_t strLen = strLength(str);
@@ -326,7 +326,7 @@ size_t findUnicodePos(const CharString& str, size_t unicodePos, char) //utf8-cha
 template <class WideString> inline
 size_t findUnicodePosWide(const WideString& str, size_t unicodePos, Int2Type<2>) //windows: utf16-wchar_t
 {
-    typedef typename GetCharType<WideString>::Type CharType;
+    using CharType = typename GetCharType<WideString>::Type;
 
     const CharType* strFirst = strBegin(str);
     const size_t strLen = strLength(str);

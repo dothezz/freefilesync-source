@@ -140,32 +140,52 @@ void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t da
 }
 
 
+void StatusHandlerTemporaryPanel::reportInfo(const std::wstring& text)
+{
+    StatusHandler::reportInfo(text);
+    errorLog.logMsg(text, TYPE_INFO);
+}
+
+
 ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::wstring& errorMessage, size_t retryNumber)
 {
     //no need to implement auto-retry here: 1. user is watching 2. comparison is fast
     //=> similar behavior like "ignoreErrors" which is also not used for the comparison phase in GUI mode
 
-    if (ignoreErrors)
-        return ProcessCallback::IGNORE_ERROR;
+    //always, except for "retry":
+    auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
 
-    forceUiRefresh();
-
-    bool ignoreNextErrors = false;
-    switch (showConfirmationDialog3(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg3().
-                                    setDetailInstructions(errorMessage).
-                                    setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
-                                    _("&Ignore"), _("&Retry")))
+    switch (handleError_)
     {
-        case ConfirmationButton3::DO_IT: //ignore
-            ignoreErrors = ignoreNextErrors;
+        case ON_GUIERROR_POPUP:
+        {
+            forceUiRefresh();
+
+            bool ignoreNextErrors = false;
+            switch (showConfirmationDialog3(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg3().
+                                            setDetailInstructions(errorMessage).
+                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
+                                            _("&Ignore"), _("&Retry")))
+            {
+                case ConfirmationButton3::DO_IT: //ignore
+                    if (ignoreNextErrors) //falsify only
+                        handleError_ = ON_GUIERROR_IGNORE;
+                    return ProcessCallback::IGNORE_ERROR;
+
+                case ConfirmationButton3::DONT_DO_IT: //retry
+                    guardWriteLog.dismiss();
+                    errorLog.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
+                    return ProcessCallback::RETRY;
+
+                case ConfirmationButton3::CANCEL:
+                    abortProcessNow();
+                    break;
+            }
+        }
+        break;
+
+        case ON_GUIERROR_IGNORE:
             return ProcessCallback::IGNORE_ERROR;
-
-        case ConfirmationButton3::DONT_DO_IT: //retry
-            return ProcessCallback::RETRY;
-
-        case ConfirmationButton3::CANCEL:
-            abortProcessNow();
-            break;
     }
 
     assert(false);
@@ -175,6 +195,8 @@ ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::ws
 
 void StatusHandlerTemporaryPanel::reportFatalError(const std::wstring& errorMessage)
 {
+    errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
+
     forceUiRefresh();
     showNotificationDialog(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(_("Serious Error")).setDetailInstructions(errorMessage));
 }
@@ -182,24 +204,35 @@ void StatusHandlerTemporaryPanel::reportFatalError(const std::wstring& errorMess
 
 void StatusHandlerTemporaryPanel::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
-    if (!warningActive || ignoreErrors) //if errors are ignored, then warnings should also
+    errorLog.logMsg(warningMessage, TYPE_WARNING);
+
+    if (!warningActive) //if errors are ignored, then warnings should also
         return;
 
-    forceUiRefresh();
-
-    //show pop-up and ask user how to handle warning
-    bool dontWarnAgain = false;
-    switch (showConfirmationDialog(&mainDlg, DialogInfoType::WARNING,
-                                   PopupDialogCfg().setDetailInstructions(warningMessage).
-                                   setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
-                                   _("&Ignore")))
+    switch (handleError_)
     {
-        case ConfirmationButton::DO_IT:
-            warningActive = !dontWarnAgain;
-            break;
-        case ConfirmationButton::CANCEL:
-            abortProcessNow();
-            break;
+        case ON_GUIERROR_POPUP:
+        {
+            forceUiRefresh();
+
+            bool dontWarnAgain = false;
+            switch (showConfirmationDialog(&mainDlg, DialogInfoType::WARNING,
+                                           PopupDialogCfg().setDetailInstructions(warningMessage).
+                                           setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
+                                           _("&Ignore")))
+            {
+                case ConfirmationButton::DO_IT:
+                    warningActive = !dontWarnAgain;
+                    break;
+                case ConfirmationButton::CANCEL:
+                    abortProcessNow();
+                    break;
+            }
+        }
+        break;
+
+        case ON_GUIERROR_IGNORE:
+            break; //if errors are ignored, then warnings should also
     }
 }
 
@@ -210,16 +243,16 @@ void StatusHandlerTemporaryPanel::forceUiRefresh()
 }
 
 
-void StatusHandlerTemporaryPanel::OnAbortCompare(wxCommandEvent& event)
-{
-    requestAbortion();
-}
-
-
 void StatusHandlerTemporaryPanel::abortProcessNow()
 {
     requestAbortion(); //just make sure...
     throw GuiAbortProcess();
+}
+
+
+void StatusHandlerTemporaryPanel::OnAbortCompare(wxCommandEvent& event)
+{
+    requestAbortion();
 }
 
 //########################################################################################################
@@ -272,25 +305,25 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     }
     //------------ end of sync: begin of cleanup --------------------------------------
 
-    const int totalErrors   = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
-    const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
+    const int totalErrors   = errorLog_.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalWarnings = errorLog_.getItemCount(TYPE_WARNING);
 
     //finalize error log
     std::wstring finalStatus;
     if (abortIsRequested())
     {
         finalStatus = _("Synchronization stopped");
-        errorLog.logMsg(finalStatus, TYPE_ERROR);
+        errorLog_.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
         finalStatus = _("Synchronization completed with errors");
-        errorLog.logMsg(finalStatus, TYPE_ERROR);
+        errorLog_.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalWarnings > 0)
     {
         finalStatus = _("Synchronization completed with warnings");
-        errorLog.logMsg(finalStatus, TYPE_WARNING); //give status code same warning priority as display category!
+        errorLog_.logMsg(finalStatus, TYPE_WARNING); //give status code same warning priority as display category!
     }
     else
     {
@@ -299,7 +332,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
             finalStatus = _("Nothing to synchronize"); //even if "ignored conflicts" occurred!
         else
             finalStatus = _("Synchronization completed successfully");
-        errorLog.logMsg(finalStatus, TYPE_INFO);
+        errorLog_.logMsg(finalStatus, TYPE_INFO);
     }
 
     const SummaryInfo summary =
@@ -313,7 +346,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
+        saveToLastSyncsLog(summary, errorLog_, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
     }
     catch (FileError&) { assert(false); }
 
@@ -323,13 +356,13 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
         if (showFinalResults)
         {
             if (abortIsRequested())
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog); //enable okay and close events
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog_); //enable okay and close events
             else if (totalErrors > 0)
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog_);
             else if (totalWarnings > 0)
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog_);
             else
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog_);
         }
         else
             progressDlg->closeWindowDirectly();
@@ -369,7 +402,7 @@ void StatusHandlerFloatingDialog::updateProcessedData(int objectsDelta, std::int
 void StatusHandlerFloatingDialog::reportInfo(const std::wstring& text)
 {
     StatusHandler::reportInfo(text);
-    errorLog.logMsg(text, TYPE_INFO);
+    errorLog_.logMsg(text, TYPE_INFO);
 }
 
 
@@ -378,8 +411,8 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
     //auto-retry
     if (retryNumber < automaticRetryCount_)
     {
-        errorLog.logMsg(errorMessage + L"\n-> " +
-                        _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...", automaticRetryDelay_), TYPE_INFO);
+        errorLog_.logMsg(errorMessage + L"\n-> " +
+                         _P("Automatic retry in 1 second...", "Automatic retry in %x seconds...", automaticRetryDelay_), TYPE_INFO);
         //delay
         const int iterations = static_cast<int>(1000 * automaticRetryDelay_ / UI_UPDATE_INTERVAL); //always round down: don't allow for negative remaining time below
         for (int i = 0; i < iterations; ++i)
@@ -393,7 +426,7 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
 
 
     //always, except for "retry":
-    auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
+    auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog_.logMsg(errorMessage, TYPE_ERROR); });
 
     switch (handleError_)
     {
@@ -416,7 +449,7 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
 
                 case ConfirmationButton3::DONT_DO_IT: //retry
                     guardWriteLog.dismiss();
-                    errorLog.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
+                    errorLog_.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
                     return ProcessCallback::RETRY;
 
                 case ConfirmationButton3::CANCEL:
@@ -437,7 +470,7 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
 
 void StatusHandlerFloatingDialog::reportFatalError(const std::wstring& errorMessage)
 {
-    errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
+    errorLog_.logMsg(errorMessage, TYPE_FATAL_ERROR);
 
     switch (handleError_)
     {
@@ -473,7 +506,7 @@ void StatusHandlerFloatingDialog::reportFatalError(const std::wstring& errorMess
 
 void StatusHandlerFloatingDialog::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
-    errorLog.logMsg(warningMessage, TYPE_WARNING);
+    errorLog_.logMsg(warningMessage, TYPE_WARNING);
 
     if (!warningActive)
         return;

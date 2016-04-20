@@ -333,7 +333,7 @@ Attuale: %y byte
 <source>Searching for folder %x...</source>
 <target>Ricerca della cartella %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Pausa durante la ricerca per la cartella %x.</target>
 
 <source>Cannot get process information.</source>

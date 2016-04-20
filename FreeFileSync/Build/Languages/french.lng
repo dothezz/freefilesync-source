@@ -333,7 +333,7 @@ Trouvé : %y octets
 <source>Searching for folder %x...</source>
 <target>Recherche du dossier %x...</target>
 
-<source>Time out while searching for folder %x.</source>
+<source>Timeout while searching for folder %x.</source>
 <target>Timeout lors de la recherche du dossier %x.</target>
 
 <source>Cannot get process information.</source>

@@ -25,8 +25,8 @@ AFS::FileId convertToAbstractFileId(const zen::FileId& fid)
     if (fid == zen::FileId())
         return AFS::FileId();
 
-    AFS::FileId out(reinterpret_cast<const char*>(&fid.first), sizeof(fid.first));
-    out.append(reinterpret_cast<const char*>(&fid.second), sizeof(fid.second));
+    AFS::FileId out(reinterpret_cast<const char*>(&fid.volumeId), sizeof(fid.volumeId));
+    out.append(reinterpret_cast<const char*>(&fid.fileIndex), sizeof(fid.fileIndex));
     return out;
 }
 

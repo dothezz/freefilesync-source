@@ -140,7 +140,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
     wxLanguage programLanguage = zen::getSystemLanguage();
-    bool failsafeFileCopy = true;
+    bool failSafeFileCopy = true;
     bool copyLockedFiles  = false; //safer default: avoid copies of partially written files
     bool copyFilePermissions = false;
     size_t automaticRetryCount = 0;
@@ -152,7 +152,8 @@ struct XmlGlobalSettings
     bool createLockFile = true;
     bool verifyFileCopy = false;
     size_t lastSyncsLogFileSizeMax = 100000; //maximum size for LastSyncs.log: use a human-readable number
-    Zstring soundFileSyncComplete = Zstr("gong.wav");
+    Zstring soundFileCompareFinished;
+    Zstring soundFileSyncFinished= Zstr("gong.wav");
 
     OptionalDialogs optDialogs;
 
