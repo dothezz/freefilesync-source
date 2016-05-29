@@ -75,10 +75,10 @@ void FileVersioner::moveItemToVersioning(const AbstractPath& itemPath, const Zst
     Zstring versionedRelPath;
     switch (versioningStyle_)
     {
-        case VER_STYLE_REPLACE:
+        case VersioningStyle::REPLACE:
             versionedRelPath = relativePath;
             break;
-        case VER_STYLE_ADD_TIMESTAMP: //assemble time-stamped version name
+        case VersioningStyle::ADD_TIMESTAMP: //assemble time-stamped version name
             versionedRelPath = relativePath + Zstr(' ') + timeStamp_ + getDotExtension(relativePath);
             assert(impl::isMatchingVersion(afterLast(relativePath,     FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL),
                                            afterLast(versionedRelPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL))); //paranoid? no!

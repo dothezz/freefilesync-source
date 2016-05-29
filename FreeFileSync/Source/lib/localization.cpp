@@ -437,7 +437,8 @@ void zen::setLanguage(wxLanguage lng) //throw FileError
 
 wxLanguage zen::getLanguage()
 {
-    const FFSTranslation* loc = dynamic_cast<const FFSTranslation*>(zen::getTranslator());
+    std::shared_ptr<const TranslationHandler> t = zen::getTranslator();
+    const FFSTranslation* loc = dynamic_cast<const FFSTranslation*>(t.get());
     return loc ? loc->getLangId() : wxLANGUAGE_ENGLISH_US;
 }
 

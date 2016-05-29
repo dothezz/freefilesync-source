@@ -7,15 +7,6 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural_definition>
 </header>
 
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
-
-<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения.</target>
 
@@ -160,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Создание списка файлов...</target>
 
+<source>Fail-safe file copy</source>
+<target>Отказоустойчивое копирование файла</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Копирование заблокированных файлов</target>
+
+<source>Copy file access permissions</source>
+<target>Копирование прав доступа к файлам</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Начать сравнение</target>
 
@@ -300,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>Код ошибки %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Не удается соединиться с SFTP сервером %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -417,8 +441,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Невозможно получить доступ к службе Теневого Копирования Тома.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Пожалуйста, используйте 64-разрядную версию FreeFileSync для создания теневых копий на этой системе.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Невозможно определить имя тома для %x.</target>
@@ -592,6 +616,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>Обновление атрибутов %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Невозможно записать атрибуты файла %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x и %y имеют разное содержание.</target>
@@ -891,6 +918,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>Пара папок:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Использовать локальные настройки:</target>
 
@@ -951,6 +981,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>&Очистить</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Обнаружение направления синхронизации с помощью базы данных</target>
+
 <source>Detect moved files</source>
 <target>Обнаруживать перемещенные файлы</target>
 
@@ -965,23 +998,20 @@ The command is triggered if:
 - Обнаружение не доступно для первой синхронизации
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Обнаружение направления синхронизации с помощью базы данных</target>
-
 <source>Delete files:</source>
 <target>Удаление файлов:</target>
-
-<source>&Permanent</source>
-<target>&Удалять безвозвратно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Удалять или перезаписывать файлы, не помещая в "Корзину"</target>
 
 <source>&Recycle bin</source>
 <target>В "&Корзину"</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Делать резервную копию удаленных и перезаписанных файлов в "Корзине"</target>
+
+<source>&Permanent</source>
+<target>&Удалять безвозвратно</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Удалять или перезаписывать файлы, не помещая в "Корзину"</target>
 
 <source>&Versioning</source>
 <target>&Архивировать</target>
@@ -995,14 +1025,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обработка ошибкок:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Скрывать все ошибки и сообщения с предупреждениями</target>
-
 <source>&Pop-up</source>
 <target>&Всплывающие окна</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показывать всплывающие окна при ошибках и предупреждениях</target>
+
+<source>Hide all error and warning messages</source>
+<target>Скрывать все ошибки и сообщения с предупреждениями</target>
 
 <source>On completion:</source>
 <target>По завершению:</target>
@@ -1109,9 +1139,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следующие настройки используются для всех заданий синхронизации.</target>
 
-<source>Fail-safe file copy</source>
-<target>Отказоустойчивое копирование файла</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1124,17 +1151,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(рекомендовано)</target>
 
-<source>Copy locked files</source>
-<target>Копирование заблокированных файлов</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома.</target>
 
 <source>(requires administrator rights)</source>
 <target>(требуются права Администратора)</target>
-
-<source>Copy file access permissions</source>
-<target>Копирование прав доступа к файлам</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Передача прав доступа к файлам/папкам.</target>
@@ -1620,9 +1641,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Проценты</target>
 
-<source>Internet access failed.</source>
-<target>Отсутствует доступ в Интернет.</target>
-
 <source>Check for Program Updates</source>
 <target>Проверка обновления программы</target>
 
@@ -1632,14 +1650,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>У Вас самая последняя версия FreeFileSync.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Невозможно соединиться с www.freefilesync.org.</target>
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
 
 <source>&Check</source>
 <target>&Проверить</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Невозможно найти системную функцию %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Невозможно зарегистрироваться для получения системных сообщений.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не удалось зарегистрировать уведомления устройств для %x.</target>
@@ -1649,9 +1676,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Файл заблокирован другим процессом:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Невозможно записать атрибуты файла %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Невозможно прочитать контекст безопасности %x.</target>
@@ -1667,9 +1691,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x не является обычным именем папки.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Невозможно найти системную функцию %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Невозможно скопировать файл %x в %y.</target>
@@ -1733,6 +1754,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Файл конфигурации %x является неполным. Недостающие элементы будут установлены в значения по умолчанию.</target>
+
+<source>Internet access failed.</source>
+<target>Отсутствует доступ в Интернет.</target>
 
 <source>Prepare installation</source>
 <target>Подготовка установки</target>
@@ -1805,4 +1829,10 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Thanks for your donation and support!</source>
 <target>Спасибо за Ваше пожертвование и поддержку!</target>
+
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
 

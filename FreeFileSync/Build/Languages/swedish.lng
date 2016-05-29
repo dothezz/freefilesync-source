@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Skapar fillista...</target>
 
+<source>Fail-safe file copy</source>
+<target>Felsäker filkopiering</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopiera låsta filer</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiera filåtkomstbehörigheter</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Startar jämföelse</target>
 
@@ -291,8 +324,8 @@ Aktuell: %y byte
 <source>Error Code %x:</source>
 <target>Felkod %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Kunde inte ansluta till SFTP-server %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Aktuell: %y byte
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Kan inte komma åt tjänsten 'Volume Shadow Copy'.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Använd FreeFileSync 64-bitarsversion för att skapa skuggkopior på detta system.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan inte utläsa volymnamn för %x.</target>
@@ -580,6 +613,9 @@ Kommandot triggas om:
 
 <source>Updating attributes of %x</source>
 <target>Uppdaterar attribut för %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Kan inte skriva filattribut för %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x och %y har olika innehåll.</target>
@@ -878,6 +914,9 @@ Kommandot triggas om:
 <source>Folder pair:</source>
 <target>Katalogpar:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Använd lokala inställningar:</target>
 
@@ -938,6 +977,9 @@ Kommandot triggas om:
 <source>C&lear</source>
 <target>&Rensa</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
+
 <source>Detect moved files</source>
 <target>Hitta flyttade filer</target>
 
@@ -952,23 +994,20 @@ Kommandot triggas om:
 - Identifiering ej tillgänglig för första synkronisering
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
-
 <source>Delete files:</source>
 <target>Ta bort filer:</target>
-
-<source>&Permanent</source>
-<target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Ta bort eller skriv över permanent</target>
 
 <source>&Recycle bin</source>
 <target>&Papperskorgen</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Kopiera borttagna och överskrivna filer till papperskorgen</target>
+
+<source>&Permanent</source>
+<target>&Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Ta bort eller skriv över permanent</target>
 
 <source>&Versioning</source>
 <target>&Versionshantering</target>
@@ -982,14 +1021,14 @@ Kommandot triggas om:
 <source>Handle errors:</source>
 <target>Felhantering:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Visa inte fel- och varningsmeddelanden</target>
-
 <source>&Pop-up</source>
 <target>&Popup</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Visa popup vid fel och varningar</target>
+
+<source>Hide all error and warning messages</source>
+<target>Visa inte fel- och varningsmeddelanden</target>
 
 <source>On completion:</source>
 <target>Vid slutförd åtgärd:</target>
@@ -1096,9 +1135,6 @@ Kommandot triggas om:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Följande inställningar används för all synkronisering.</target>
 
-<source>Fail-safe file copy</source>
-<target>Felsäker filkopiering</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>(recommended)</source>
 <target>(rekommenderas)</target>
 
-<source>Copy locked files</source>
-<target>Kopiera låsta filer</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopierar delade eller låsta filer med hjälp av tjänsten 'Volume Shadow Copy'.</target>
 
 <source>(requires administrator rights)</source>
 <target>(kräver administratörsbehörighet)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiera filåtkomstbehörigheter</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Överför behörighetsinställningar.</target>
@@ -1600,9 +1630,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Percentage</source>
 <target>Procent</target>
 
-<source>Internet access failed.</source>
-<target>Internetåtkomst misslyckades.</target>
-
 <source>Check for Program Updates</source>
 <target>Sök efter programuppdateringar</target>
 
@@ -1612,17 +1639,23 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync är uppdaterad.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Kan inte ansluta till www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Kontrollera</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Kan inte hitta systemfunktion %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Det gick inte att registrera mottagning av systemmeddelanden.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Kunde inte registrera enhetsavisering för %x.</target>
@@ -1632,9 +1665,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>The file is locked by another process:</source>
 <target>Filen är låst av en annan process:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Kan inte skriva filattribut för %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Kan inte läsa säkerhetskontext för %x.</target>
@@ -1650,9 +1680,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>%x is not a regular directory name.</source>
 <target>%x är inte ett vanligt mappnamn.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Kan inte hitta systemfunktion %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Kan inte kopiera %x till %y.</target>
@@ -1713,6 +1740,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfigurationsfilen %x är inte komplett. De saknade elementen kommer att anges till standardvärdet.</target>
+
+<source>Internet access failed.</source>
+<target>Internetåtkomst misslyckades.</target>
 
 <source>Prepare installation</source>
 <target>Förbered installation</target>

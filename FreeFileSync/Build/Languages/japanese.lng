@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>ファイル一覧を作成中...</target>
 
+<source>Fail-safe file copy</source>
+<target>安全なファイルコピーを実施</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>ロックされたファイルをコピーする</target>
+
+<source>Copy file access permissions</source>
+<target>ファイルのアクセスパーミッションをコピーする</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>比較処理を開始中</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>エラーコード %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>SFTP サーバ %x への接続に失敗.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -402,8 +435,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>ボリュームシャドウコピーサービスにアクセス出来ません.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>FreeFileSync 64-bit 版を使用してこのシステムにシャドウコピーを作成してください.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x のボリューム名が決定されていません.</target>
@@ -577,6 +610,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>%x の属性を更新</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>%x のファイル属性を書き込めません.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x と %y の内容は異なります.</target>
@@ -874,6 +910,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>フォルダ ペア:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>ローカル設定を使用:</target>
 
@@ -934,6 +973,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>クリア(&L)</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>データベースファイルを利用して、同期の方向を検出します。</target>
+
 <source>Detect moved files</source>
 <target>移動済みのファイルを検出する</target>
 
@@ -948,23 +990,20 @@ The command is triggered if:
 - 最初の同期では検知できません
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>データベースファイルを利用して、同期の方向を検出します。</target>
-
 <source>Delete files:</source>
 <target>ファイルの削除:</target>
-
-<source>&Permanent</source>
-<target>完全消去(&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>ファイルを上書き/または完全に消去します</target>
 
 <source>&Recycle bin</source>
 <target>ゴミ箱(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>ファイルを削除/上書きする時に、ゴミ箱にバックアップをとる</target>
+
+<source>&Permanent</source>
+<target>完全消去(&P)</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>ファイルを上書き/または完全に消去します</target>
 
 <source>&Versioning</source>
 <target>バージョン管理(&V)</target>
@@ -978,14 +1017,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>エラーの取り扱い:</target>
 
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-
 <source>&Pop-up</source>
 <target>ポップアップ(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>エラーと警告をポップアップで表示</target>
+
+<source>Hide all error and warning messages</source>
+<target>すべてのエラーと警告メッセージを非表示</target>
 
 <source>On completion:</source>
 <target>完了時の動作:</target>
@@ -1092,9 +1131,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下の設定は、すべての同期ジョブで使用されます.</target>
 
-<source>Fail-safe file copy</source>
-<target>安全なファイルコピーを実施</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1107,17 +1143,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(推奨)</target>
 
-<source>Copy locked files</source>
-<target>ロックされたファイルをコピーする</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>共有、ロックされたファイルをボリュームシャドウコピーサービスを使用してコピー.</target>
 
 <source>(requires administrator rights)</source>
 <target>(管理者権限が必要)</target>
-
-<source>Copy file access permissions</source>
-<target>ファイルのアクセスパーミッションをコピーする</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>ファイルとフォルダのパーミッションを転送します.</target>
@@ -1589,9 +1619,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>パーセント</target>
 
-<source>Internet access failed.</source>
-<target>インターネットのアクセスに失敗.</target>
-
 <source>Check for Program Updates</source>
 <target>プログラムのアップデートを確認</target>
 
@@ -1601,17 +1628,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync は最新です.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org に接続できません.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>チェック(&C)</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>システム関数 %x がみつかりません.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>システム受信メッセージに登録できません.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x のデバイス通知を登録できません.</target>
@@ -1621,9 +1654,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>次のファイルは別のプロセスで使用中です:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>%x のファイル属性を書き込めません.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>%x のｾｷｭﾘﾃｨｺﾝﾃｷｽﾄを読み込めません.</target>
@@ -1639,9 +1669,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x は通常のディレクトリ名ではありません。</target>
-
-<source>Cannot find system function %x.</source>
-<target>システム関数 %x がみつかりません.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>%x から %y にコピーできません.</target>
@@ -1700,6 +1727,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>構成設定ファイル %x は不完全です。存在しない要素が既定値としてセットされています.</target>
 
+<source>Internet access failed.</source>
+<target>インターネットのアクセスに失敗.</target>
+
 <source>Prepare installation</source>
 <target>インストールの準備</target>
 
@@ -1722,7 +1752,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>設定の保存先 "%APPDATA%\FreeFileSync"</target>
 
 <source>Register FreeFileSync file extensions</source>
-<target>ファイル拡張子を登録</target>
+<target></target>
 
 <source>Create Explorer context menu entries</source>
 <target>エクスプローラのメニュー項目に統合</target>

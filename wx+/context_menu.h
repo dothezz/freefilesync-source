@@ -47,10 +47,10 @@ public:
         commandList[newItem->GetId()] = command;
     }
 
-    void addRadio(const wxString& label, const std::function<void()>& command, bool checked, bool enabled = true)
+    void addRadio(const wxString& label, const std::function<void()>& command, bool selected, bool enabled = true)
     {
         wxMenuItem* newItem = menu->AppendRadioItem(wxID_ANY, label);
-        newItem->Check(checked);
+        newItem->Check(selected);
         if (!enabled) newItem->Enable(false);
         commandList[newItem->GetId()] = command;
     }

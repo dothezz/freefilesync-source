@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Стварам листу датотека...</target>
 
+<source>Fail-safe file copy</source>
+<target>Копирање заштићено од грешака</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Копирај закључане датотеке</target>
+
+<source>Copy file access permissions</source>
+<target>Копирај овлашћења приступа датотекама</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Покретање упоређивања</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>Грешка број %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Није успело успостављање везе са SFTP сервером %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Не могу приступити Volume Shadow Copy сервису.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Молимо користите FreeFileSync 64-битну верзију за израду shadow копија на овом систему.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Не могу утврдити назив партиције за %x.</target>
@@ -583,6 +616,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>Обнављам атрибуте од %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Не могу уписати атрибуте од %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x и %y имају различит садржај.</target>
@@ -882,6 +918,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>Фолдерски пар:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Употреби локална подешавања:</target>
 
@@ -942,6 +981,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>О&бриши</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Уочи синхронизацијске смерове уз помоћ датотека базе</target>
+
 <source>Detect moved files</source>
 <target>Уочи премештене датотеке</target>
 
@@ -956,23 +998,20 @@ The command is triggered if:
 - Детекција није доступна за прву синхронизацију
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Уочи синхронизацијске смерове уз помоћ датотека базе</target>
-
 <source>Delete files:</source>
 <target>Обриши датотеке:</target>
-
-<source>&Permanent</source>
-<target>&Трајно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Трајно избриши или замени датотеке</target>
 
 <source>&Recycle bin</source>
 <target>&Корпа за смеће</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Направи резервне копије обрисаних и замењених датотека у Корпи за смеће</target>
+
+<source>&Permanent</source>
+<target>&Трајно</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Трајно избриши или замени датотеке</target>
 
 <source>&Versioning</source>
 <target>&Верзионирање</target>
@@ -986,14 +1025,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обрада грешака:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Сакриј све грешке и упозорења</target>
-
 <source>&Pop-up</source>
 <target>&Искачући прозор</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Прикажи искачући прозор при грешкама и упозорењима</target>
+
+<source>Hide all error and warning messages</source>
+<target>Сакриј све грешке и упозорења</target>
 
 <source>On completion:</source>
 <target>При завршетку:</target>
@@ -1100,9 +1139,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следећа подешавања се користе за све синхронизацијске задатке.</target>
 
-<source>Fail-safe file copy</source>
-<target>Копирање заштићено од грешака</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(препоручено)</target>
 
-<source>Copy locked files</source>
-<target>Копирај закључане датотеке</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копирај дељене или закључане датотеке користећи Volume Shadow Copy сервис.</target>
 
 <source>(requires administrator rights)</source>
 <target>(потребна администраторска права)</target>
-
-<source>Copy file access permissions</source>
-<target>Копирај овлашћења приступа датотекама</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Премести овлашћења приступа датотека и фолдера.</target>
@@ -1611,9 +1641,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Проценат</target>
 
-<source>Internet access failed.</source>
-<target>Приступ интернету није успео.</target>
-
 <source>Check for Program Updates</source>
 <target>Провери постојање надоградње програма</target>
 
@@ -1623,17 +1650,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync је ажуриран.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Не може се успоставити веза са www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Провера</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Не могу пронаћи системску функцију %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Није могућа регистрација примања системских порука.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не могу регистровати нотификацију уређаја за %x.</target>
@@ -1643,9 +1676,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Датотека је блокирана другим процесом:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Не могу уписати атрибуте од %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Не могу читати безбедносни садржај %x.</target>
@@ -1661,9 +1691,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x није регуларно име фолдера.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Не могу пронаћи системску функцију %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Не могу копирати датотеку %x на %y.</target>
@@ -1727,6 +1754,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Конфигурациона датотека %x није комплетна. Недостајући елементи биће постављени на њихове подразумеване вредности.</target>
+
+<source>Internet access failed.</source>
+<target>Приступ интернету није успео.</target>
 
 <source>Prepare installation</source>
 <target>Припремање инсталације</target>

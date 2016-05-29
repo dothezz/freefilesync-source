@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Generowanie listy plików...</target>
 
+<source>Fail-safe file copy</source>
+<target>Bezpieczne kopiowanie</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopiuj zablokowane pliki</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiuj uprawnienia plików</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Kompresowanie</target>
 
@@ -291,8 +324,8 @@ Przesłany: %y bajtów
 <source>Error Code %x:</source>
 <target>Kod błędu %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Błąd podczas łączenia z serwerem %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Przesłany: %y bajtów
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Nie można uzyskać dostępu do usługi Volume Shadow Copy.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Usługa shadow copy jest aktywna tylko w wersji 64 bitowej programu FreeFileSync.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Nie można określić nazwy dysku dla %x.</target>
@@ -583,6 +616,9 @@ Komenda jest wykonywana gdy:
 
 <source>Updating attributes of %x</source>
 <target>Aktualizowanie atrybutów %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nie można zapisać atrybutów %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x i %y mają różną zawartość.</target>
@@ -790,7 +826,7 @@ Komenda jest wykonywana gdy:
 <target>Rozpocznij &synchronizację</target>
 
 <source>&Actions</source>
-<target>&akcje</target>
+<target>&Akcje</target>
 
 <source>&Preferences</source>
 <target>&Ustawienia</target>
@@ -882,6 +918,9 @@ Komenda jest wykonywana gdy:
 <source>Folder pair:</source>
 <target>Para folderów:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Korzystaj z ustawień lokalnych:</target>
 
@@ -942,6 +981,9 @@ Komenda jest wykonywana gdy:
 <source>C&lear</source>
 <target>&Wyczyść</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
+
 <source>Detect moved files</source>
 <target>Wykryj przeniesione pliki</target>
 
@@ -956,23 +998,20 @@ Komenda jest wykonywana gdy:
 - Wykrywanie niedostępne podczas pierwszej synchronizacji
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
-
 <source>Delete files:</source>
 <target>Usuwanie plików:</target>
-
-<source>&Permanent</source>
-<target>&Permanentne</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Usuń lub nadpisz pliki na stałe</target>
 
 <source>&Recycle bin</source>
 <target>&Kosz systemowy</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Przechowuj pliki, które zostały usunięte lub nadpisane w koszu</target>
+
+<source>&Permanent</source>
+<target>&Permanentne</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Usuń lub nadpisz pliki na stałe</target>
 
 <source>&Versioning</source>
 <target>&Wersjonowanie</target>
@@ -986,14 +1025,14 @@ Komenda jest wykonywana gdy:
 <source>Handle errors:</source>
 <target>Obsługa błędów:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Pokazuj okna pop-up dla błędów i ostrzeżeń</target>
+
+<source>Hide all error and warning messages</source>
+<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
 
 <source>On completion:</source>
 <target>Po zakończeniu:</target>
@@ -1100,9 +1139,6 @@ Komenda jest wykonywana gdy:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Następujące ustawienia stosowane są do wszystkich zadań synchronizacji.</target>
 
-<source>Fail-safe file copy</source>
-<target>Bezpieczne kopiowanie</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>(recommended)</source>
 <target>(rekomendowane)</target>
 
-<source>Copy locked files</source>
-<target>Kopiuj zablokowane pliki</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiuj pliki współdzielone lub zablokowane używając usługi Volume Shadow Copy.</target>
 
 <source>(requires administrator rights)</source>
 <target>(wymagane uprawnienia administratora)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiuj uprawnienia plików</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>kopiuj uprawnienia plików i katalogów.</target>
@@ -1611,9 +1641,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Percentage</source>
 <target>Procentowo</target>
 
-<source>Internet access failed.</source>
-<target>Błąd połączenia Internetowego.</target>
-
 <source>Check for Program Updates</source>
 <target>Sprawdź dostępne aktualizacje.</target>
 
@@ -1623,17 +1650,23 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>FreeFileSync is up to date.</source>
 <target>Posiadasz aktualną wersję FreeFileSync.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nie można połączyć się z www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>S&prawdź</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Nie można odnaleźć funkcji systemowej %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Błąd podczas rejestrowania do odbioru komunikatów systemowych.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nie można zarejestrować powiadomień urządzenia dla %x.</target>
@@ -1643,9 +1676,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>The file is locked by another process:</source>
 <target>Plik jest zablokowany przez inny proces:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nie można zapisać atrybutów %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nie można odczytać ustawień bezpieczeństwa %x.</target>
@@ -1661,9 +1691,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>%x is not a regular directory name.</source>
 <target>%x nie jest zwykłą nazwą katalogu.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Nie można odnaleźć funkcji systemowej %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nie można skopiować pliku %x do %y.</target>
@@ -1727,6 +1754,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Plik konfiguracyjny %x jest niekompletny. Zostaną ustawione domyśle wartości dla brakujących elementów.</target>
+
+<source>Internet access failed.</source>
+<target>Błąd połączenia Internetowego.</target>
 
 <source>Prepare installation</source>
 <target>Przygotuj instalację</target>

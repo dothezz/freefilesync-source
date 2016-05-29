@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Opretter filliste...</target>
 
+<source>Fail-safe file copy</source>
+<target>Sikker filkopiering</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopier låste filer</target>
+
+<source>Copy file access permissions</source>
+<target>Kopier adgangstilladelser</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Starter analyse</target>
 
@@ -291,8 +324,8 @@ Aktuel: %y byte
 <source>Error Code %x:</source>
 <target>Fejlkode %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Kunne ikke kontakte SFTP serveren %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Aktuel: %y byte
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>VSS tjenesten er ikke tilgængelig.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Brug FreeFileSync 64-bit til at lave VSS kopier på dette system.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan ikke bestemme volumennavn for %x.</target>
@@ -581,6 +614,9 @@ Kommandoen udføres hvis:
 <source>Updating attributes of %x</source>
 <target>Opdaterer attributter for %x</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Kan ikke skrive filattributter til %x.</target>
+
 <source>%x and %y have different content.</source>
 <target>%x og %y har forskelligt indhold.</target>
 
@@ -666,7 +702,7 @@ Kommandoen udføres hvis:
 <target>&Skift</target>
 
 <source>Switching to FreeFileSync's main window</source>
-<target>Skifter til hovedvinduet</target>
+<target></target>
 
 <source>
 <pluralform>Automatic retry in 1 second...</pluralform>
@@ -878,6 +914,9 @@ Kommandoen udføres hvis:
 <source>Folder pair:</source>
 <target>Mappepar:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Brug lokale indstillinger:</target>
 
@@ -938,6 +977,9 @@ Kommandoen udføres hvis:
 <source>C&lear</source>
 <target>R&yd</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Genkend synkretninger ved hjælp af databasefiler</target>
+
 <source>Detect moved files</source>
 <target>Genkend flyttede filer</target>
 
@@ -952,23 +994,20 @@ Kommandoen udføres hvis:
 - Genkender ikke ved første synk
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Genkend synkretninger ved hjælp af databasefiler</target>
-
 <source>Delete files:</source>
 <target>Filsletning:</target>
-
-<source>&Permanent</source>
-<target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Slet eller overskriv filer permanent</target>
 
 <source>&Recycle bin</source>
 <target>&Papirkurv</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Flyt slettede og overskrevne filer til papirkurven</target>
+
+<source>&Permanent</source>
+<target>&Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Slet eller overskriv filer permanent</target>
 
 <source>&Versioning</source>
 <target>&Versionering</target>
@@ -982,14 +1021,14 @@ Kommandoen udføres hvis:
 <source>Handle errors:</source>
 <target>Fejlhåndtering:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Skjul fejlbeskeder og advarsler</target>
-
 <source>&Pop-up</source>
 <target>&Besked</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Vis fejlbeskeder og advarsler</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skjul fejlbeskeder og advarsler</target>
 
 <source>On completion:</source>
 <target>Ved gennemført:</target>
@@ -1096,9 +1135,6 @@ Kommandoen udføres hvis:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse indstillinger gælder alle synkroniseringer.</target>
 
-<source>Fail-safe file copy</source>
-<target>Sikker filkopiering</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Sikrer processen ved alvorlige fejl.
 <source>(recommended)</source>
 <target>(anbefalet)</target>
 
-<source>Copy locked files</source>
-<target>Kopier låste filer</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiér delte eller låste filer med VSS kopiering.</target>
 
 <source>(requires administrator rights)</source>
 <target>(administrator)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopier adgangstilladelser</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Overfør fil og mappetilladelser.</target>
@@ -1217,7 +1247,7 @@ Sikrer processen ved alvorlige fejl.
 <target>&Download</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target>Opdatering tilgængelig:</target>
+<target></target>
 
 <source>Confirm</source>
 <target>Bekræft</target>
@@ -1600,9 +1630,6 @@ Sikrer processen ved alvorlige fejl.
 <source>Percentage</source>
 <target>Procent</target>
 
-<source>Internet access failed.</source>
-<target>Ingen internetadgang.</target>
-
 <source>Check for Program Updates</source>
 <target>Søg efter opdatering</target>
 
@@ -1612,17 +1639,23 @@ Sikrer processen ved alvorlige fejl.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er opdateret.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Kan ikke kontakte www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Kontroller</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Kan ikke finde systemfunktionen %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Kunne ikke registrere modtagelse af systembeskeder.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Kan ikke registrere beskeder for %x.</target>
@@ -1632,9 +1665,6 @@ Sikrer processen ved alvorlige fejl.
 
 <source>The file is locked by another process:</source>
 <target>Filen er låst af en anden process:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Kan ikke skrive filattributter til %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Kan ikke læse sikkerhedsindstillinger på %x.</target>
@@ -1650,9 +1680,6 @@ Sikrer processen ved alvorlige fejl.
 
 <source>%x is not a regular directory name.</source>
 <target>%x er ikke et gyldigt mappenavn.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Kan ikke finde systemfunktionen %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Kan ikke kopiere filen %x til %y.</target>
@@ -1713,6 +1740,9 @@ Sikrer processen ved alvorlige fejl.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Indstillingsfilen %x er ikke komplet. Manglende elementer sættes til standard.</target>
+
+<source>Internet access failed.</source>
+<target>Ingen internetadgang.</target>
 
 <source>Prepare installation</source>
 <target>Forbereder installering</target>

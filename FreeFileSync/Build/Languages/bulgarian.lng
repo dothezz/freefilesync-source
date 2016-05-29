@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Създава се списък на файловете...</target>
 
+<source>Fail-safe file copy</source>
+<target>Надеждно копиране на файлове</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Копирай заключени файлове</target>
+
+<source>Copy file access permissions</source>
+<target>Копирай правата за достъп на файла</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Започва сравняване</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>Код на грешка %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Неуспешно свързване към SFTP-сървър %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Не може да се получи достъп до услуга Volume Shadow Copy.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Моля, ползвайте 64-битов FreeFileSync за създаване фонови копия на тази система.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Не може да се определи името на тома за %x.</target>
@@ -581,6 +614,9 @@ The command is triggered if:
 <source>Updating attributes of %x</source>
 <target>Актуализира атрибутите на %x</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Не могат да се запишат файловите атрибути на %x.</target>
+
 <source>%x and %y have different content.</source>
 <target>%x и %y имат различно съдържание.</target>
 
@@ -666,7 +702,7 @@ The command is triggered if:
 <target>Превкл&ючи</target>
 
 <source>Switching to FreeFileSync's main window</source>
-<target>Превключване към главното меню на FFS</target>
+<target>Превключване към главното меню на FreeFileSync</target>
 
 <source>
 <pluralform>Automatic retry in 1 second...</pluralform>
@@ -878,6 +914,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>Двойка папки:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Ползвай локални настройки:</target>
 
@@ -938,6 +977,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>И&зчисти</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Открий посоката на синхронизация чрез файловете на базата данни</target>
+
 <source>Detect moved files</source>
 <target>Откриване на преместени файлове</target>
 
@@ -952,23 +994,20 @@ The command is triggered if:
 - Няма откриване при първа синхронизация.
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Открий посоката на синхронизация чрез файловете на базата данни</target>
-
 <source>Delete files:</source>
 <target>Изтриване на файлове:</target>
-
-<source>&Permanent</source>
-<target>&Необратимо</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Изтрий или презапиши файловете необратимо</target>
 
 <source>&Recycle bin</source>
 <target>&Кошче</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Резервирай изтритите или презаписани файлове в кошчето</target>
+
+<source>&Permanent</source>
+<target>&Необратимо</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Изтрий или презапиши файловете необратимо</target>
 
 <source>&Versioning</source>
 <target>&Версифициране</target>
@@ -982,14 +1021,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обработка на грешки:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Скрий всички грешки и предупреждения</target>
-
 <source>&Pop-up</source>
 <target>&Попитай</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Питай при грешки или предупреждения</target>
+
+<source>Hide all error and warning messages</source>
+<target>Скрий всички грешки и предупреждения</target>
 
 <source>On completion:</source>
 <target>При завършване:</target>
@@ -1096,9 +1135,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Следните настройки се ползват от всички задачи за синхронизация.</target>
 
-<source>Fail-safe file copy</source>
-<target>Надеждно копиране на файлове</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(препоръчително)</target>
 
-<source>Copy locked files</source>
-<target>Копирай заключени файлове</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копирай споделени или заключени файлове с услугата Volume Shadow Copy.</target>
 
 <source>(requires administrator rights)</source>
 <target>(изисква администраторски права)</target>
-
-<source>Copy file access permissions</source>
-<target>Копирай правата за достъп на файла</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Прехвърли правата за достъп на файла и папката.</target>
@@ -1600,9 +1630,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Процент</target>
 
-<source>Internet access failed.</source>
-<target>Няма достъп до Интернет.</target>
-
 <source>Check for Program Updates</source>
 <target>Проверка за нова версия на програмата</target>
 
@@ -1612,17 +1639,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync вече е актуална.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Няма връзка със www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>Оп&итай</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Не е намерена системната функция %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Невъзможна регистрация за получаване на системни съобщения.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не се регистрират съобщенията на устройство %x.</target>
@@ -1632,9 +1665,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Файлът е заключен от друг процес:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Не могат да се запишат файловите атрибути на %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Не може да се прочете контекста за сигурност на %x.</target>
@@ -1650,9 +1680,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x не е регулярно име на директория.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Не е намерена системната функция %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Не може да се копира файл %x в %y.</target>
@@ -1713,6 +1740,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Конфигурационният файл %x е непълен. Ще бъдат зададени подразбирани стойности за липсващите елементи.</target>
+
+<source>Internet access failed.</source>
+<target>Няма достъп до Интернет.</target>
 
 <source>Prepare installation</source>
 <target>Подготовка за инсталиране</target>

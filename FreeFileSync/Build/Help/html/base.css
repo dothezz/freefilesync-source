@@ -4,7 +4,7 @@
 
 body
 {
-	font-family: Segoe UI, Verdana, Tahoma, sans-serif;
+	font-family: "Segoe UI", Verdana, Tahoma, sans-serif;
 	text-align:justify;
 }
 
@@ -62,7 +62,7 @@ table th
 
 .command-line
 {
-    font-family: Courier New, Courier, monospace;
+    font-family: "Courier New", Courier, monospace;
 	text-align: left;
 }
 
@@ -75,7 +75,7 @@ table th
 
 .file-path
 {
-    font-family: Consolas, Courier New, Courier, monospace;
+    font-family: Consolas, "Courier New", Courier, monospace;
 	text-align: left;
 }
 

@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Maak bestandslijst...</target>
 
+<source>Fail-safe file copy</source>
+<target>Fail-safe bestand kopieëren</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Vergrendelde bestanden kopieëren</target>
+
+<source>Copy file access permissions</source>
+<target>Toegangsmachtigingen om bestanden te kopieëren</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Start vergelijking</target>
 
@@ -291,8 +324,8 @@ Werkelijk: %y bytes
 <source>Error Code %x:</source>
 <target>Foutcode %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Kan geen verbinding maken met SFTP server %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Werkelijk: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Kan geen toegang krijgen tot de Volume Shadow Copy Service.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Gebruik FreeFileSync 64-bits versie voor het maken van schaduwkopieën op dit systeem.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan de volumenaam niet vaststellen voor %x.</target>
@@ -580,6 +613,9 @@ De opdracht wordt geactiveerd als:
 
 <source>Updating attributes of %x</source>
 <target>Kenmerken van %x bijwerken</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>De bestandskenmerken voor %x kunnen niet geschreven worden.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x en %y hebben verschillende inhoud.</target>
@@ -878,6 +914,9 @@ De opdracht wordt geactiveerd als:
 <source>Folder pair:</source>
 <target>Mappaar:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Gebruik lokale instellingen:</target>
 
@@ -938,6 +977,9 @@ De opdracht wordt geactiveerd als:
 <source>C&lear</source>
 <target>&Wissen</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detecteren van synchronisatie richtingen met behulp van databasebestanden</target>
+
 <source>Detect moved files</source>
 <target>Detecteren van verplaatste bestanden</target>
 
@@ -952,23 +994,20 @@ De opdracht wordt geactiveerd als:
 - Detectie niet beschikbaar voor de eerste synchronisatie
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detecteren van synchronisatie richtingen met behulp van databasebestanden</target>
-
 <source>Delete files:</source>
 <target>Bestanden verwijderen:</target>
-
-<source>&Permanent</source>
-<target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Bestanden permanent verwijderen of overschrijven</target>
 
 <source>&Recycle bin</source>
 <target>&Prullenbak</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Back-up de verwijderde en overschreven bestanden in de prullenbak</target>
+
+<source>&Permanent</source>
+<target>&Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Bestanden permanent verwijderen of overschrijven</target>
 
 <source>&Versioning</source>
 <target>&Versiebeheer</target>
@@ -982,14 +1021,14 @@ De opdracht wordt geactiveerd als:
 <source>Handle errors:</source>
 <target>Fouten afhandelen:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Verberg alle foutberichten en waarschuwingen</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Toon pop-up bij fouten of waarschuwingen</target>
+
+<source>Hide all error and warning messages</source>
+<target>Verberg alle foutberichten en waarschuwingen</target>
 
 <source>On completion:</source>
 <target>Na voltooiing:</target>
@@ -1096,9 +1135,6 @@ De opdracht wordt geactiveerd als:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>De volgende instellingen worden gebruikt voor alle synchronisatie opdrachten.</target>
 
-<source>Fail-safe file copy</source>
-<target>Fail-safe bestand kopieëren</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>(recommended)</source>
 <target>(aanbevolen)</target>
 
-<source>Copy locked files</source>
-<target>Vergrendelde bestanden kopieëren</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Gedeelde of vergrendelde bestanden met behulp van de Volume Schaduw copy-Service kopieëren.</target>
 
 <source>(requires administrator rights)</source>
 <target>(vereist beheerdersrechten)</target>
-
-<source>Copy file access permissions</source>
-<target>Toegangsmachtigingen om bestanden te kopieëren</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Overdracht van bestands- en mapmachtigingen.</target>
@@ -1600,9 +1630,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Percentage</source>
 <target>Percentage</target>
 
-<source>Internet access failed.</source>
-<target>Internettoegang is mislukt.</target>
-
 <source>Check for Program Updates</source>
 <target>Controleer voor programma-updates</target>
 
@@ -1612,17 +1639,23 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync is actueel.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Kan geen verbinding maken met www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Controleren</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Kan de systeemfunctie %x niet vinden.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Niet in staat om de ontvangen systeemberichten te registreren.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Niet in staat om apparaat meldingen te registreren voor %x.</target>
@@ -1632,9 +1665,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>The file is locked by another process:</source>
 <target>Het bestand is vergrendeld door een ander proces:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>De bestandskenmerken voor %x kunnen niet geschreven worden.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Kan de beveiligingscontext van %x niet lezen.</target>
@@ -1650,9 +1680,6 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>%x is not a regular directory name.</source>
 <target>%x is niet een normale mapnaam.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Kan de systeemfunctie %x niet vinden.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Kan bestand %x niet kopiëren naar %y.</target>
@@ -1713,6 +1740,9 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Configuratiebestand %x is onvolledig. De ontbrekende elementen worden ingesteld op hun standaardwaarden.</target>
+
+<source>Internet access failed.</source>
+<target>Internettoegang is mislukt.</target>
 
 <source>Prepare installation</source>
 <target>Installatie voorbereiden</target>

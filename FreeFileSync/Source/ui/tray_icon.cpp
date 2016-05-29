@@ -125,7 +125,7 @@ public:
 
         //Windows User Experience Guidelines: show the context menu rather than doing *nothing* on single left clicks; however:
         //MSDN: "Double-clicking the left mouse button actually generates a sequence of four messages: WM_LBUTTONDOWN, WM_LBUTTONUP, WM_LBUTTONDBLCLK, and WM_LBUTTONUP."
-        //Reference: http://msdn.microsoft.com/en-us/library/windows/desktop/ms645606%28v=vs.85%29.aspx
+        //Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms645606
         //=> the only way to distinguish single left click and double-click is to wait wxSystemSettings::GetMetric(wxSYS_DCLICK_MSEC) (480ms) which is way too long!
     }
 

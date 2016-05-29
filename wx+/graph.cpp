@@ -233,12 +233,13 @@ void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Grap
 
 //calculate intersection of polygon with half-plane
 template <class Function, class Function2>
-void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, Function isInside, Function2 getIntersection)
+void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, Function isInside, Function2 getIntersection, bool doPolygonCut)
 {
     assert(curvePoints.size() == oobMarker.size());
+
     if (curvePoints.size() != oobMarker.size() || curvePoints.empty()) return;
 
-    auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; }; //test if point is start of a OOB line
+    auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; }; //test if point is start of an OOB line
 
     std::vector<CurvePoint> curvePointsTmp;
     std::vector<char>       oobMarkerTmp;
@@ -256,13 +257,24 @@ void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarke
         if (isInside(curvePoints[index]) != pointInside)
         {
             pointInside = !pointInside;
-            const CurvePoint is = getIntersection(curvePoints[index - 1],
-                                                  curvePoints[index]); //getIntersection returns *it when delta is zero
+            const CurvePoint is = getIntersection(curvePoints[index - 1], curvePoints[index]); //getIntersection returns "to" when delta is zero
             savePoint(is, !pointInside || isMarkedOob(index - 1));
         }
         if (pointInside)
             savePoint(curvePoints[index], isMarkedOob(index));
     }
+
+    //make sure the output polygon area is correctly shaped if either begin or end points are cut
+    if (doPolygonCut) //note: impacts min/max height-calculations!
+        if (curvePoints.size() >= 3)
+            if (isInside(curvePoints.front()) != pointInside)
+            {
+                assert(!oobMarkerTmp.empty());
+                oobMarkerTmp.back() = true;
+
+                const CurvePoint is = getIntersection(curvePoints.back(), curvePoints.front());
+                savePoint(is, true);
+            }
 
     curvePointsTmp.swap(curvePoints);
     oobMarkerTmp  .swap(oobMarker);
@@ -297,24 +309,25 @@ private:
     const double y_;
 };
 
-void cutPointsOutsideX(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minX, double maxX)
+void cutPointsOutsideX(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minX, double maxX, bool doPolygonCut)
 {
-    assert(std::find(oobMarker.begin(), oobMarker.end(), true) == oobMarker.end());
-    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x >= minX; }, GetIntersectionX(minX));
-    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x <= maxX; }, GetIntersectionX(maxX));
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x >= minX; }, GetIntersectionX(minX), doPolygonCut);
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x <= maxX; }, GetIntersectionX(maxX), doPolygonCut);
 }
 
-void cutPointsOutsideY(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minY, double maxY)
+void cutPointsOutsideY(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minY, double maxY, bool doPolygonCut)
 {
-    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y >= minY; }, GetIntersectionY(minY));
-    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y <= maxY; }, GetIntersectionY(maxY));
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y >= minY; }, GetIntersectionY(minY), doPolygonCut);
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y <= maxY; }, GetIntersectionY(maxY), doPolygonCut);
 }
 }
 
 
-void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const
+std::vector<CurvePoint> ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth) const
 {
-    if (pixelWidth <= 1) return;
+    std::vector<CurvePoint> points;
+
+    if (pixelWidth <= 1) return points;
     const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
 
     const std::pair<double, double> rangeX = getRangeX();
@@ -322,7 +335,7 @@ void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, st
     const double screenLow  = cvrtX.realToScreen(std::max(rangeX.first,  minX)); //=> xLow >= 0
     const double screenHigh = cvrtX.realToScreen(std::min(rangeX.second, maxX)); //=> xHigh <= pixelWidth - 1
     //if double is larger than what int can represent => undefined behavior!
-    //=> convert to int not before checking value range!
+    //=> convert to int *after* checking value range!
     if (screenLow <= screenHigh)
     {
         const int posFrom = std::ceil (screenLow ); //do not step outside [minX, maxX] in loop below!
@@ -335,12 +348,14 @@ void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, st
             points.emplace_back(x, getValue(x));
         }
     }
+    return points;
 }
 
 
-void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const
+std::vector<CurvePoint> SparseCurveData::getPoints(double minX, double maxX, int pixelWidth) const
 {
-    if (pixelWidth <= 1) return;
+    std::vector<CurvePoint> points;
+    if (pixelWidth <= 1) return points;
     const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
     const std::pair<double, double> rangeX = getRangeX();
 
@@ -415,6 +430,7 @@ void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::v
             }
         }
     }
+    return points;
 }
 
 
@@ -423,8 +439,7 @@ Graph2D::Graph2D(wxWindow* parent,
                  const wxPoint& pos,
                  const wxSize& size,
                  long style,
-                 const wxString& name) : wxPanel(parent, winid, pos, size, style, name),
-    labelFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial")
+                 const wxString& name) : wxPanel(parent, winid, pos, size, style, name)
 {
     Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
     Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ), nullptr, this);
@@ -544,34 +559,34 @@ void Graph2D::render(wxDC& dc) const
 
     switch (attr.labelposX)
     {
-        case X_LABEL_TOP:
+        case LABEL_X_TOP:
             graphArea.y      += attr.xLabelHeight;
             graphArea.height -= attr.xLabelHeight;
             break;
-        case X_LABEL_BOTTOM:
+        case LABEL_X_BOTTOM:
             xLabelPosY += clientRect.height - attr.xLabelHeight;
             graphArea.height -= attr.xLabelHeight;
             break;
-        case X_LABEL_NONE:
+        case LABEL_X_NONE:
             break;
     }
     switch (attr.labelposY)
     {
-        case Y_LABEL_LEFT:
+        case LABEL_Y_LEFT:
             graphArea.x     += attr.yLabelWidth;
             graphArea.width -= attr.yLabelWidth;
             break;
-        case Y_LABEL_RIGHT:
+        case LABEL_Y_RIGHT:
             yLabelPosX += clientRect.width - attr.yLabelWidth;
             graphArea.width -= attr.yLabelWidth;
             break;
-        case Y_LABEL_NONE:
+        case LABEL_Y_NONE:
             break;
     }
 
     {
         //paint graph background (excluding label area)
-        wxDCPenChanger   dummy (dc, wxColor(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
+        wxDCPenChanger   dummy (dc, getBorderColor());
         wxDCBrushChanger dummy2(dc, attr.backgroundColor);
         //accessibility: consider system text and background colors; small drawback: color of graphs is NOT connected to the background! => responsibility of client to use correct colors
 
@@ -606,7 +621,7 @@ void Graph2D::render(wxDC& dc) const
     {
         int blockCountX = 0;
         //enlarge minX, maxX to a multiple of a "useful" block size
-        if (attr.labelposX != X_LABEL_NONE && attr.labelFmtX.get())
+        if (attr.labelposX != LABEL_X_NONE && attr.labelFmtX.get())
             blockCountX = widenRange(minX, maxX, //in/out
                                      graphArea.width,
                                      minimalBlockSizePx.GetWidth() * 7,
@@ -625,19 +640,22 @@ void Graph2D::render(wxDC& dc) const
                 std::vector<CurvePoint>& points = curvePoints[index];
                 auto&                    marker = oobMarker  [index];
 
-                curve->getPoints(minX, maxX, graphArea.width, points);
-
-                //cut points outside visible x-range now in order to calculate height of visible line fragments only!
+                points = curve->getPoints(minX, maxX, graphArea.width);
                 marker.resize(points.size()); //default value: false
-                cutPointsOutsideX(points, marker, minX, maxX);
-
-                if ((attr.minYauto || attr.maxYauto) && !points.empty())
+                if (!points.empty())
                 {
-                    auto itPair = std::minmax_element(points.begin(), points.end(), [](const CurvePoint& lhs, const CurvePoint& rhs) { return lhs.y < rhs.y; });
-                    if (attr.minYauto)
-                        minY = std::min(minY, itPair.first->y);
-                    if (attr.maxYauto)
-                        maxY = std::max(maxY, itPair.second->y);
+                    //cut points outside visible x-range now in order to calculate height of visible line fragments only!
+                    const bool doPolygonCut = curves_[index].second.fillMode == CurveAttributes::FILL_POLYGON; //impacts auto minY/maxY!!
+                    cutPointsOutsideX(points, marker, minX, maxX, doPolygonCut);
+
+                    if (attr.minYauto || attr.maxYauto)
+                    {
+                        auto itPair = std::minmax_element(points.begin(), points.end(), [](const CurvePoint& lhs, const CurvePoint& rhs) { return lhs.y < rhs.y; });
+                        if (attr.minYauto)
+                            minY = std::min(minY, itPair.first->y);
+                        if (attr.maxYauto)
+                            maxY = std::max(maxY, itPair.second->y);
+                    }
                 }
             }
 
@@ -645,7 +663,7 @@ void Graph2D::render(wxDC& dc) const
         {
             int blockCountY = 0;
             //enlarge minY, maxY to a multiple of a "useful" block size
-            if (attr.labelposY != Y_LABEL_NONE && attr.labelFmtY.get())
+            if (attr.labelposY != LABEL_Y_NONE && attr.labelFmtY.get())
                 blockCountY = widenRange(minY, maxY, //in/out
                                          graphArea.height,
                                          minimalBlockSizePx.GetHeight() * 3,
@@ -660,15 +678,29 @@ void Graph2D::render(wxDC& dc) const
 
             for (size_t index = 0; index < curves_.size(); ++index)
             {
+                auto& cp = curvePoints[index];
+
+                //add two artificial points to fill the curve area towards x-axis => do this before cutPointsOutsideY() to handle curve leaving upper bound
+                if (curves_[index].second.fillMode == CurveAttributes::FILL_CURVE)
+                    if (!cp.empty())
+                    {
+                        cp.emplace_back(CurvePoint(cp.back ().x, minY)); //add lower right and left corners
+                        cp.emplace_back(CurvePoint(cp.front().x, minY)); //[!] aliasing parameter not yet supported via emplace_back: VS bug! => make copy
+                        oobMarker[index].back() = true;
+                        oobMarker[index].push_back(true);
+                        oobMarker[index].push_back(true);
+                    }
+
                 //cut points outside visible y-range before calculating pixels:
                 //1. realToScreenRound() deforms out-of-range values!
                 //2. pixels that are grossly out of range can be a severe performance problem when drawing on the DC (Windows)
-                cutPointsOutsideY(curvePoints[index], oobMarker[index], minY, maxY);
+                const bool doPolygonCut = curves_[index].second.fillMode != CurveAttributes::FILL_NONE;
+                cutPointsOutsideY(cp, oobMarker[index], minY, maxY, doPolygonCut);
 
-                auto& points = drawPoints[index];
-                for (const CurvePoint& pt : curvePoints[index])
-                    points.push_back(wxPoint(cvrtX.realToScreenRound(pt.x),
-                                             cvrtY.realToScreenRound(pt.y)) + graphAreaOrigin);
+                auto& dp = drawPoints[index];
+                for (const CurvePoint& pt : cp)
+                    dp.push_back(wxPoint(cvrtX.realToScreenRound(pt.x),
+                                         cvrtY.realToScreenRound(pt.y)) + graphAreaOrigin);
             }
 
             //update active mouse selection
@@ -704,14 +736,11 @@ void Graph2D::render(wxDC& dc) const
             //#################### begin drawing ####################
             //1. draw colored area under curves
             for (auto it = curves_.begin(); it != curves_.end(); ++it)
-                if (it->second.drawCurveArea)
+                if (it->second.fillMode != CurveAttributes::FILL_NONE)
                 {
-                    std::vector<wxPoint> points = drawPoints[it - curves_.begin()];
-                    if (!points.empty())
+                    const std::vector<wxPoint>& points = drawPoints[it - curves_.begin()];
+                    if (points.size() >= 3)
                     {
-                        points.emplace_back(wxPoint(points.back ().x, graphArea.GetBottom())); //add lower right and left corners
-                        points.emplace_back(wxPoint(points.front().x, graphArea.GetBottom())); //[!] aliasing parameter not yet supported via emplace_back: VS bug! => make copy
-
                         wxDCBrushChanger dummy(dc, it->second.fillColor);
                         wxDCPenChanger  dummy2(dc, it->second.fillColor);
                         dc.DrawPolygon(static_cast<int>(points.size()), &points[0]);
@@ -725,7 +754,7 @@ void Graph2D::render(wxDC& dc) const
             {
                 //alpha channel not supported on wxMSW, so draw selection before curves
                 wxDCBrushChanger dummy(dc, wxColor(168, 202, 236)); //light blue
-                wxDCPenChanger  dummy2(dc, wxColor(51,  153, 255)); //dark blue
+                wxDCPenChanger  dummy2(dc, wxColor( 51, 153, 255)); //dark blue
 
                 auto shrink = [](double* low, double* high)
                 {
@@ -787,8 +816,8 @@ void Graph2D::render(wxDC& dc) const
                     wxDCPenChanger dummy(dc, wxPen(it->second.color, it->second.lineWidth));
 
                     const size_t index = it - curves_.begin();
-                    std::vector<wxPoint>& points = drawPoints[index]; //alas wxDC::DrawLines() is not const-correct!!!
-                    auto&                 marker = oobMarker [index];
+                    const std::vector<wxPoint>& points = drawPoints[index];
+                    const auto&                 marker = oobMarker [index];
                     assert(points.size() == marker.size());
 
                     //draw all parts of the curve except for the out-of-bounds fragments
@@ -796,7 +825,7 @@ void Graph2D::render(wxDC& dc) const
                     while (drawIndexFirst < points.size())
                     {
                         size_t drawIndexLast = std::find(marker.begin() + drawIndexFirst, marker.end(), true) - marker.begin();
-                        if (drawIndexLast < points.size()) ++ drawIndexLast;
+                        if (drawIndexLast < points.size()) ++drawIndexLast;
 
                         const int pointCount = static_cast<int>(drawIndexLast - drawIndexFirst);
                         if (pointCount > 0)

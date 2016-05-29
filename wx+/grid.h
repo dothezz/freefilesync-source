@@ -90,8 +90,6 @@ using GridColumnResizeEventFunction = void (wxEvtHandler::*)(GridColumnResizeEve
 
 //------------------------------------------------------------------------------------------------------------
 class Grid;
-wxColor getColorSelectionGradientFrom();
-wxColor getColorSelectionGradientTo();
 
 void clearArea(wxDC& dc, const wxRect& rect, const wxColor& col);
 
@@ -118,7 +116,7 @@ public:
     static const int COLUMN_GAP_LEFT; //for left-aligned text
 
     //optional helper routines:
-    static void   drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+    static wxSize drawCellText      (wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL); //returns text extent
     static wxRect drawCellBorder    (wxDC& dc, const wxRect& rect); //returns inner rectangle
     static void   drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bool selected, const wxColor& backgroundColor);
 
@@ -216,6 +214,9 @@ public:
     bool Enable(bool enable = true) override;
 
     //############################################################################################################
+
+static wxColor getColorSelectionGradientFrom();
+static wxColor getColorSelectionGradientTo();
 
 private:
     void onPaintEvent(wxPaintEvent& event);

@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Sukuriamas failų sąrašas...</target>
 
+<source>Fail-safe file copy</source>
+<target>Apsauginė failo kopija</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopijuoti užrakintus failus</target>
+
+<source>Copy file access permissions</source>
+<target>Kopijuoti failo leidimus</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Pradedamas palyginimas</target>
 
@@ -291,8 +324,8 @@ Esamas: %y baitai
 <source>Error Code %x:</source>
 <target>Klaidos kodas %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Nepavyko prisijungti prie SFTP serverio %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Esamas: %y baitai
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Duomenų Šešėlinės Kopijos Paslauga nepasiekiama.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Prašome naudoti 64-bit FreeFileSync versiją, kad sukurti šėšėlines kopijas šioje sistemoje.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Vietos vardo %x nustatyti nepavyko.</target>
@@ -583,6 +616,9 @@ Komanda inicijuojama jei:
 
 <source>Updating attributes of %x</source>
 <target>Atnaujinami atributai %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nepavyksta įrašyti atributų failui %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x ir %y turi skirtingą turinį.</target>
@@ -882,6 +918,9 @@ Komanda inicijuojama jei:
 <source>Folder pair:</source>
 <target>Aplanko pora:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Naudoti vietinius nustatymus:</target>
 
@@ -942,6 +981,9 @@ Komanda inicijuojama jei:
 <source>C&lear</source>
 <target>&Išvalyti</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Aptikti suvienodinimo kryptis, naudojant duomenų bazės failus</target>
+
 <source>Detect moved files</source>
 <target>Rasti perkeltus failus</target>
 
@@ -956,23 +998,20 @@ Komanda inicijuojama jei:
 - Pirmame suderinime aptikimas negalimas
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Aptikti suvienodinimo kryptis, naudojant duomenų bazės failus</target>
-
 <source>Delete files:</source>
 <target>Ištrinti failus:</target>
-
-<source>&Permanent</source>
-<target>&Pastovus</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Trinti ar perrašyti failus visam laikui</target>
 
 <source>&Recycle bin</source>
 <target>&Šiukšliadėžė</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Padaryti šiukšlių dėžėje esančių ištrintų ar perrašytų failų atsarginę kopiją</target>
+
+<source>&Permanent</source>
+<target>&Pastovus</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Trinti ar perrašyti failus visam laikui</target>
 
 <source>&Versioning</source>
 <target>&Atsarginės versijos kūrimas</target>
@@ -986,14 +1025,14 @@ Komanda inicijuojama jei:
 <source>Handle errors:</source>
 <target>Klaidų taisymas:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Slėpti visus klaidų ir perspėjimų pranešimus</target>
-
 <source>&Pop-up</source>
 <target>&Iškylančiame</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Rodyti pranešimą esant klaidoms ar perspėjimams</target>
+
+<source>Hide all error and warning messages</source>
+<target>Slėpti visus klaidų ir perspėjimų pranešimus</target>
 
 <source>On completion:</source>
 <target>Pasibaigus:</target>
@@ -1100,9 +1139,6 @@ Komanda inicijuojama jei:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Sekantys parametrai yra naudojami visiems suvienodinimo darbams.</target>
 
-<source>Fail-safe file copy</source>
-<target>Apsauginė failo kopija</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>(recommended)</source>
 <target>(rekomenduojama)</target>
 
-<source>Copy locked files</source>
-<target>Kopijuoti užrakintus failus</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopijuoti bendrintus arba užrakintus failus naudojant duomenų šešėlinės kopijos paslaugą.</target>
 
 <source>(requires administrator rights)</source>
 <target>(administratoriaus teisės būtinos)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopijuoti failo leidimus</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Failų ir aplankų perkėlimo leidimai.</target>
@@ -1611,9 +1641,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Percentage</source>
 <target>Procentai</target>
 
-<source>Internet access failed.</source>
-<target>Interneto prieiga nepasiekiama.</target>
-
 <source>Check for Program Updates</source>
 <target>Tikrinti programos atnaujinimus</target>
 
@@ -1623,17 +1650,23 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync yra naujausia.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nepavyko prisijungti prie www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Tikrinti</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Nepavyksta rasti sisteminės funkcijos %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nepavyko aktyvuoti sisteminių žinučių gavimo funkciją.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepavyko priregistruoti %x įrenginio pranešimų.</target>
@@ -1643,9 +1676,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>The file is locked by another process:</source>
 <target>Failas yra užrakintas kito procceso:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nepavyksta įrašyti atributų failui %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nepavyksta perskaityti %x saugumo konteksto.</target>
@@ -1661,9 +1691,6 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>%x is not a regular directory name.</source>
 <target>%x nėra reguliarus katalogo vardas.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Nepavyksta rasti sisteminės funkcijos %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nepavyksta nukopijuoti failų %x į %y.</target>
@@ -1727,6 +1754,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfiguracinis failas %x yra neužbaigtas. Trūkstamiems elementams bus priskirtos pradinės rekšmės.</target>
+
+<source>Internet access failed.</source>
+<target>Interneto prieiga nepasiekiama.</target>
 
 <source>Prepare installation</source>
 <target>Ruošiamasi įdiegimui</target>

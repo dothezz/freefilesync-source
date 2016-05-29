@@ -120,21 +120,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t da
 {
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
 
-    switch (currentPhase())
-    {
-        case PHASE_NONE:
-            assert(false);
-        case PHASE_SCANNING:
-            break;
-        case PHASE_SYNCHRONIZING:
-        case PHASE_COMPARING_CONTENT:
-        {
-            mainDlg.compareStatus->switchToCompareBytewise();
-            mainDlg.Layout();  //show progress bar...
-            mainDlg.Refresh(); //remove distortion...
-        }
-        break;
-    }
+	mainDlg.compareStatus->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
     forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
@@ -327,8 +313,8 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     }
     else
     {
-        if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
-            getDataTotal   (PHASE_SYNCHRONIZING) == 0)
+        if (getItemsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
+            getBytesTotal(PHASE_SYNCHRONIZING) == 0)
             finalStatus = _("Nothing to synchronize"); //even if "ignored conflicts" occurred!
         else
             finalStatus = _("Synchronization completed successfully");
@@ -338,8 +324,8 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     const SummaryInfo summary =
     {
         jobName_, finalStatus,
-        getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
-        getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
+        getItemsCurrent(PHASE_SYNCHRONIZING), getBytesCurrent(PHASE_SYNCHRONIZING),
+        getItemsTotal  (PHASE_SYNCHRONIZING), getBytesTotal  (PHASE_SYNCHRONIZING),
         std::time(nullptr) - startTime_
     };
 

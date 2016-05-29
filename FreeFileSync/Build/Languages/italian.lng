@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Generazione elenco file...</target>
 
+<source>Fail-safe file copy</source>
+<target>Copia file a prova di errore</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Copia file bloccati</target>
+
+<source>Copy file access permissions</source>
+<target>Copia permessi di accesso file</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Inizio confronto</target>
 
@@ -291,8 +324,8 @@ Attuale: %y byte
 <source>Error Code %x:</source>
 <target>Codice Errore %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Impossibile connettersi al server SFTP %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Attuale: %y byte
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Impossibile accedere al Volume Shadow Copy Service.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>E' necessario utilizzare FreeFileSync versione 64-bit per creare copie shadow su questo sistema.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Impossibile determinare nome del volume per %x.</target>
@@ -580,6 +613,9 @@ Il comando è attivato se:
 
 <source>Updating attributes of %x</source>
 <target>Aggiornamento attributi di %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Impossibile scrivere gli attributi del file %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x e %y hanno un contenuto diverso.</target>
@@ -878,6 +914,9 @@ Il comando è attivato se:
 <source>Folder pair:</source>
 <target>Coppia di cartelle:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Utilizza impostazioni locali:</target>
 
@@ -938,6 +977,9 @@ Il comando è attivato se:
 <source>C&lear</source>
 <target>Cance&lla</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Rileva indicazioni sincronizzazione con l'aiuto del file di database</target>
+
 <source>Detect moved files</source>
 <target>Rileva file spostati</target>
 
@@ -952,23 +994,20 @@ Il comando è attivato se:
 - Rilevazione non disponibile per prima sincronizzazione
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Rileva indicazioni sincronizzazione con l'aiuto del file di database</target>
-
 <source>Delete files:</source>
 <target>Eliminare i file:</target>
-
-<source>&Permanent</source>
-<target>&Permanente</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Elimina o sovrascrivi i file definitivamente</target>
 
 <source>&Recycle bin</source>
 <target>&Cestino</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Eseguire il back up dei file cancellati o sovrascritti nel cestino</target>
+
+<source>&Permanent</source>
+<target>&Permanente</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Elimina o sovrascrivi i file definitivamente</target>
 
 <source>&Versioning</source>
 <target>&Versione</target>
@@ -982,14 +1021,14 @@ Il comando è attivato se:
 <source>Handle errors:</source>
 <target>Gestire gli errori:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostra pop-up di errore o avviso</target>
+
+<source>Hide all error and warning messages</source>
+<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
 
 <source>On completion:</source>
 <target>Al termine:</target>
@@ -1096,9 +1135,6 @@ Il comando è attivato se:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Le seguenti impostazioni vengono utilizzate per tutti i processi di sincronizzazione.</target>
 
-<source>Fail-safe file copy</source>
-<target>Copia file a prova di errore</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>(recommended)</source>
 <target>(consigliato)</target>
 
-<source>Copy locked files</source>
-<target>Copia file bloccati</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Copiare file condivisi o bloccati con il Volume Shadow Copy Service.</target>
 
 <source>(requires administrator rights)</source>
 <target>(richiede i diritti di amministratore)</target>
-
-<source>Copy file access permissions</source>
-<target>Copia permessi di accesso file</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Trasferimento autorizzazioni di file e cartelle.</target>
@@ -1600,9 +1630,6 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>Percentage</source>
 <target>Percentuale</target>
 
-<source>Internet access failed.</source>
-<target>L'accesso a Internet non è riuscito.</target>
-
 <source>Check for Program Updates</source>
 <target>Controlla Aggiornamenti del Programma</target>
 
@@ -1612,17 +1639,23 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync è aggiornato.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Impossibile connettersi al www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Controllare</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Impossibile trovare la funzione di sistema %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Impossibile registrarsi per ricevere i messaggi di sistema.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Impossibile registrare le notifiche di dispositivo per %x.</target>
@@ -1632,9 +1665,6 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 
 <source>The file is locked by another process:</source>
 <target>Il file è bloccato da un altro processo:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Impossibile scrivere gli attributi del file %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Impossibile leggere il contesto di protezione di %x.</target>
@@ -1650,9 +1680,6 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 
 <source>%x is not a regular directory name.</source>
 <target>%x non è un nome di directory normale.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Impossibile trovare la funzione di sistema %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Impossibile copiare il file %x in %y.</target>
@@ -1713,6 +1740,9 @@ Questo garantisce uno stato consistente anche in caso di errore grave.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>File di configurazione %x incompleta. Gli elementi mancanti saranno impostati sui valori predefiniti.</target>
+
+<source>Internet access failed.</source>
+<target>L'accesso a Internet non è riuscito.</target>
 
 <source>Prepare installation</source>
 <target>Preparare l'installazione</target>

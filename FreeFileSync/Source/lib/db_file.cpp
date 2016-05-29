@@ -217,7 +217,7 @@ private:
         for (const auto& dbFile : container.files)
         {
             writeUtf8(outputBoth, dbFile.first);
-            writeNumber<std::int32_t >(outputBoth, dbFile.second.cmpVar);
+            writeNumber(outputBoth, static_cast<std::int32_t>(dbFile.second.cmpVar));
             writeNumber<std::uint64_t>(outputBoth, dbFile.second.fileSize);
 
             writeFile(outputLeft,  dbFile.second.left);
@@ -228,7 +228,7 @@ private:
         for (const auto& dbSymlink : container.symlinks)
         {
             writeUtf8(outputBoth, dbSymlink.first);
-            writeNumber<std::int32_t>(outputBoth, dbSymlink.second.cmpVar);
+            writeNumber(outputBoth, static_cast<std::int32_t>(dbSymlink.second.cmpVar));
 
             writeLink(outputLeft,  dbSymlink.second.left);
             writeLink(outputRight, dbSymlink.second.right);

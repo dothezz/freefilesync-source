@@ -16,7 +16,7 @@ namespace zen
 //------------------------------------------------------------------
 /*
 Semantics of HardFilter:
-1. using it creates a NEW folder hierarchy! -> must be considered by <Automatic>-mode!
+1. using it creates a NEW folder hierarchy! -> must be considered by <Two way> variant!
 2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
 
     class hierarchy:

@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Generez lista de file...</target>
 
+<source>Fail-safe file copy</source>
+<target>Copiază filele în modul protejat la eșec [fail-safe]</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Copiază filele partajate [shared] sau zăvorîte [locked]</target>
+
+<source>Copy file access permissions</source>
+<target>Copiază permisiunile de acces ale filelor</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Pornesc compararea</target>
 
@@ -291,8 +324,8 @@ Actuală: %y baiți
 <source>Error Code %x:</source>
 <target>Cod de Eroare %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Conectare eșuată la serverul SFTP %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Actuală: %y baiți
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Nu pot accesa Serviciul de Conservare a Volumelor [Volume Shadow Copy].</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Folosește versiunea pe 64-biți a FreeFileSync pentru a crea conservări (copii de rezervă) pe acest sistem.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Nu pot determina numele volumului pentru %x.</target>
@@ -583,6 +616,9 @@ Comanda este declanșată dacă:
 
 <source>Updating attributes of %x</source>
 <target>Actualizez atributele lui %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nu pot scrie atributele de filă ale lui %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x și %y au conținut diferit.</target>
@@ -882,6 +918,9 @@ Comanda este declanșată dacă:
 <source>Folder pair:</source>
 <target>Perechea de Dosare:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Folosește setările locale:</target>
 
@@ -942,6 +981,9 @@ Comanda este declanșată dacă:
 <source>C&lear</source>
 <target>C&urăță</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detectează direcțiile de sincronizare cu ajutorul filelor bază de date</target>
+
 <source>Detect moved files</source>
 <target>Detectează filele mutate</target>
 
@@ -956,23 +998,20 @@ Comanda este declanșată dacă:
 - Detectarea nu-i disponibilă la prima sincronizare
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detectează direcțiile de sincronizare cu ajutorul filelor bază de date</target>
-
 <source>Delete files:</source>
 <target>Ștergerea Filelor:</target>
-
-<source>&Permanent</source>
-<target>&Definitivă</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
 <source>&Recycle bin</source>
 <target>&Reciclator</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Conservă [back up] în Reciclator filele șterse sau suprascrise</target>
+
+<source>&Permanent</source>
+<target>&Definitivă</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
 <source>&Versioning</source>
 <target>&Versionare</target>
@@ -986,14 +1025,14 @@ Comanda este declanșată dacă:
 <source>Handle errors:</source>
 <target>Gestionarea Erorilor:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Mesajele de eroare și de avertizare nu sînt arătate</target>
-
 <source>&Pop-up</source>
 <target>&Popîc</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>În caz de erori sau avertizări este arătată o fereastră popîc [popup]</target>
+
+<source>Hide all error and warning messages</source>
+<target>Mesajele de eroare și de avertizare nu sînt arătate</target>
 
 <source>On completion:</source>
 <target>La terminare:</target>
@@ -1100,9 +1139,6 @@ Comanda este declanșată dacă:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Setările următoare sînt folosite pentru toate sarcinile de sincronizare.</target>
 
-<source>Fail-safe file copy</source>
-<target>Copiază filele în modul protejat la eșec [fail-safe]</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>(recommended)</source>
 <target>(recomandat)</target>
 
-<source>Copy locked files</source>
-<target>Copiază filele partajate [shared] sau zăvorîte [locked]</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Filele partajate sau zăvorîte sînt copiate folosind Serviciul de Conservare a Volumelor din Windows [Volume Shadow Copy].</target>
 
 <source>(requires administrator rights)</source>
 <target>(necesită drepturi de Administrator)</target>
-
-<source>Copy file access permissions</source>
-<target>Copiază permisiunile de acces ale filelor</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Sînt transferate și permisiunile de accesare NTFS ale filelor și dosarelor (Atenție: doar pentru utilizatorii avansați!).</target>
@@ -1221,7 +1251,7 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>&Descarcă</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target>Este disponibilă o versiune nouă a softului:</target>
+<target></target>
 
 <source>Confirm</source>
 <target>Confirmă</target>
@@ -1611,9 +1641,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Percentage</source>
 <target>Procent</target>
 
-<source>Internet access failed.</source>
-<target>Accesul la internet a eșuat.</target>
-
 <source>Check for Program Updates</source>
 <target>Caută Actualizări ale Programului</target>
 
@@ -1621,10 +1648,7 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>Vrei s-o descarci acum ?</target>
 
 <source>FreeFileSync is up to date.</source>
-<target>Ai deja ultima versiune a softului.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nu pot face conectarea la www.freefilesync.org.</target>
+<target></target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
@@ -1632,8 +1656,17 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>&Check</source>
 <target>&Verifică</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Nu pot găsi funcția de sistem %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nu pot înregistra softul pentru a primi mesaje de la sistemul de operare.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nu pot înregistra notificările dispozitivului pentru %x.</target>
@@ -1643,9 +1676,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>The file is locked by another process:</source>
 <target>Fila este zăvorîtă [locked] de alt proces:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nu pot scrie atributele de filă ale lui %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nu pot citi contextul de securitate pentru %x.</target>
@@ -1661,9 +1691,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>%x is not a regular directory name.</source>
 <target>%x nu este un nume regulamentar de dosar.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Nu pot găsi funcția de sistem %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nu pot copia fila %x în %y.</target>
@@ -1727,6 +1754,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Fila configurație %x este incompletă. Elementele lipsă vor fi setate la valorile implicite.</target>
+
+<source>Internet access failed.</source>
+<target>Accesul la internet a eșuat.</target>
 
 <source>Prepare installation</source>
 <target>Pregătirea Instalării</target>

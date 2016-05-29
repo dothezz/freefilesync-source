@@ -410,10 +410,10 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si) //throw Th
 
     switch (cfg.handleSymlinks_)
     {
-        case SYMLINK_EXCLUDE:
+        case SymLinkHandling::EXCLUDE:
             return LINK_SKIP;
 
-        case SYMLINK_DIRECT:
+        case SymLinkHandling::DIRECT:
             if (cfg.filter_->passFileFilter(linkRelPath)) //always use file filter: Link type may not be "stable" on Linux!
             {
                 output_.addSubLink(si.itemName, LinkDescriptor(si.lastWriteTime));
@@ -421,7 +421,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si) //throw Th
             }
             return LINK_SKIP;
 
-        case SYMLINK_FOLLOW:
+        case SymLinkHandling::FOLLOW:
             //filter symlinks before trying to follow them: handle user-excluded broken symlinks!
             //since we don't know yet what type the symlink will resolve to, only do this when both variants agree:
             if (!cfg.filter_->passFileFilter(linkRelPath))

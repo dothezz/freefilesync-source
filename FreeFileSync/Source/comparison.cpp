@@ -962,10 +962,10 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             for (const auto& w : totalWorkLoad)
                 switch (w.second.compareVar)
                 {
-                    case CMP_BY_TIME_SIZE:
-                    case CMP_BY_SIZE:
+                    case CompareVariant::TIME_SIZE:
+                    case CompareVariant::SIZE:
                         break;
-                    case CMP_BY_CONTENT:
+                    case CompareVariant::CONTENT:
                         workLoadByContent.push_back(w);
                         break;
                 }
@@ -975,13 +975,13 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             for (const auto& w : totalWorkLoad)
                 switch (w.second.compareVar)
                 {
-                    case CMP_BY_TIME_SIZE:
+                    case CompareVariant::TIME_SIZE:
                         output.push_back(cmpBuff.compareByTimeSize(w.first, w.second));
                         break;
-                    case CMP_BY_SIZE:
+                    case CompareVariant::SIZE:
                         output.push_back(cmpBuff.compareBySize(w.first, w.second));
                         break;
-                    case CMP_BY_CONTENT:
+                    case CompareVariant::CONTENT:
                         assert(!outputByContent.empty());
                         if (!outputByContent.empty())
                         {

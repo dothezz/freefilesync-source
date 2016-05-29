@@ -39,11 +39,11 @@ struct Statistics
 
     virtual ProcessCallback::Phase currentPhase() const = 0;
 
-    virtual int getObjectsCurrent(ProcessCallback::Phase phaseId) const = 0;
-    virtual int getObjectsTotal  (ProcessCallback::Phase phaseId) const = 0;
+    virtual int getItemsCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual int getItemsTotal  (ProcessCallback::Phase phaseId) const = 0;
 
-    virtual std::int64_t getDataCurrent(ProcessCallback::Phase phaseId) const = 0;
-    virtual std::int64_t getDataTotal  (ProcessCallback::Phase phaseId) const = 0;
+    virtual std::int64_t getBytesCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual std::int64_t getBytesTotal  (ProcessCallback::Phase phaseId) const = 0;
 
     virtual const std::wstring& currentStatusText() const = 0;
 };
@@ -96,18 +96,18 @@ protected:
     //implement Statistics
     Phase currentPhase() const override { return currentPhase_; }
 
-    int getObjectsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
-    int getObjectsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
+    int getItemsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
+    int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
 
-    std::int64_t getDataCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    std::int64_t getDataTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
+    std::int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
+    std::int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
 
     const std::wstring& currentStatusText() const override { return statusText_; }
 
     bool abortIsRequested() const { return abortRequested; }
 
 private:
-    typedef std::vector<std::pair<int, std::int64_t>> StatNumbers;
+    using StatNumbers = std::vector<std::pair<int, std::int64_t>>;
 
     void updateData(StatNumbers& num, int objectsDelta, std::int64_t dataDelta)
     {

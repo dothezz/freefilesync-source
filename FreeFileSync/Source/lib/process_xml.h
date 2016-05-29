@@ -40,9 +40,9 @@ enum OnGuiError
     ON_GUIERROR_IGNORE
 };
 
-typedef std::wstring Description;
-typedef std::wstring Commandline;
-typedef std::vector<std::pair<Description, Commandline>> ExternalApps;
+using Description = std::wstring;
+using Commandline = std::wstring;
+using ExternalApps = std::vector<std::pair<Description, Commandline>>;
 
 //---------------------------------------------------------------------
 struct XmlGuiConfig
@@ -76,17 +76,17 @@ struct XmlBatchConfig
 
 struct OptionalDialogs
 {
-    bool warningDependentFolders        = true;
-    bool warningFolderPairRaceCondition = true;
-    bool warningSignificantDifference   = true;
-    bool warningNotEnoughDiskSpace      = true;
-    bool warningUnresolvedConflicts     = true;
-    bool warningDatabaseError           = true;
-    bool warningRecyclerMissing         = true;
-    bool warningInputFieldEmpty         = true;
-    bool warningDirectoryLockFailed     = true;
-    bool popupOnConfigChange            = true;
-    bool confirmSyncStart               = true;
+    bool warningDependentFolders          = true;
+    bool warningFolderPairRaceCondition   = true;
+    bool warningSignificantDifference     = true;
+    bool warningNotEnoughDiskSpace        = true;
+    bool warningUnresolvedConflicts       = true;
+    bool warningDatabaseError             = true;
+    bool warningRecyclerMissing           = true;
+    bool warningInputFieldEmpty           = true;
+    bool warningDirectoryLockFailed       = true;
+    bool popupOnConfigChange              = true;
+    bool confirmSyncStart                 = true;
     bool confirmExternalCommandMassInvoke = true;
 };
 
@@ -135,7 +135,7 @@ Zstring getGlobalConfigFile();
 
 struct XmlGlobalSettings
 {
-    XmlGlobalSettings() {} //clang needs this
+    XmlGlobalSettings(); //clang needs this anyway
 
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
@@ -160,15 +160,6 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     struct Gui
     {
-        Gui()
-        {
-            //default external apps will be translated "on the fly"!!!
-            //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
-            externelApplications.emplace_back(L"Browse directory",              L"xdg-open \"%item_folder%\"");
-            externelApplications.emplace_back(L"Open with default application", L"xdg-open \"%item_path%\"");
-            //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
-        }
-
         struct
         {
             wxPoint dlgPos;
@@ -177,7 +168,7 @@ struct XmlGlobalSettings
 
             struct
             {
-                bool keepRelPaths      = true;
+                bool keepRelPaths      = false;
                 bool overwriteIfExists = false;
                 Zstring lastUsedPath;
                 std::vector<Zstring> folderHistory;
@@ -188,15 +179,18 @@ struct XmlGlobalSettings
             bool textSearchRespectCase = false; //good default for Linux, too!
             int maxFolderPairsVisible = 6;
 
-            bool showPercentBar = zen::defaultValueShowPercentage; //in navigation panel
-            bool naviLastSortAscending             = zen::defaultValueLastSortAscending; //
-            zen::ColumnTypeNavi naviLastSortColumn = zen::defaultValueLastSortColumn; //remember sort on navigation panel
+            bool naviGridShowPercentBar = zen::naviGridShowPercentageDefault; //in navigation panel
+            zen::ColumnTypeNavi naviGridLastSortColumn    = zen::naviGridLastSortColumnDefault;    //remember sort on navigation panel
+            bool                naviGridLastSortAscending = zen::naviGridLastSortAscendingDefault; //
 
             std::vector<zen::ColumnAttributeNavi> columnAttribNavi = zen::getDefaultColumnAttributesNavi(); //compressed view/navigation
 
             bool showIcons = true;
             FileIconSize iconSize = ICON_SIZE_SMALL;
             int sashOffset = 0;
+
+            zen::ItemPathFormat itemPathFormatLeftGrid  = zen::defaultItemPathFormatLeftGrid;
+            zen::ItemPathFormat itemPathFormatRightGrid = zen::defaultItemPathFormatRightGrid;
 
             std::vector<zen::ColumnAttributeRim>  columnAttribLeft  = zen::getDefaultColumnAttributesLeft();
             std::vector<zen::ColumnAttributeRim>  columnAttribRight = zen::getDefaultColumnAttributesRight();
@@ -220,7 +214,14 @@ struct XmlGlobalSettings
         std::vector<Zstring> onCompletionHistory;
         size_t onCompletionHistoryMax = 8;
 
-        ExternalApps externelApplications;
+        ExternalApps externelApplications
+        {
+            //default external apps will be translated "on the fly"!!!
+            //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
+            { L"Browse directory",              L"xdg-open \"%item_folder%\"" },
+            { L"Open with default application", L"xdg-open \"%item_path%\""   },
+            //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
+        };
 
         time_t lastUpdateCheck = 0; //number of seconds since 00:00 hours, Jan 1, 1970 UTC
         std::wstring lastOnlineVersion;

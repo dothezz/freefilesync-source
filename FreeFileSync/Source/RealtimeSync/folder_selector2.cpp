@@ -15,6 +15,7 @@
 #include "../lib/resolve_path.h"
     #include <gtk/gtk.h>
 
+
 using namespace zen;
 
 
@@ -144,7 +145,9 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
 
 Zstring FolderSelector2::getPath() const
 {
-    return toZ(folderPathCtrl_.GetValue());
+    Zstring path = utfCvrtTo<Zstring>(folderPathCtrl_.GetValue());
+
+    return path;
 }
 
 

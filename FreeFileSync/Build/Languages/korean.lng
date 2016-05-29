@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>파일 리스트 생성 중...</target>
 
+<source>Fail-safe file copy</source>
+<target>실패 - 안전 파일 복사</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>락 걸린 파일 복사</target>
+
+<source>Copy file access permissions</source>
+<target>파일 접근 권한 복사</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>비교 시작</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>오류 코드 %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>SFTP 서버 %x로의 연결 실패.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -402,8 +435,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Volume Shadow Copy Service에 접근할 수 없습니다.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>본 운영체제에서의 Shadow Copy 생성은 FreeFileSync 64-비트 버전을 사용하세요.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x 에 대한 볼륨 이름을 결정할 수 없습니다.</target>
@@ -577,6 +610,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>%x 속성 업데이트 중</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>%x의 파일 속성을 쓸 수 없습니다.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x와(과) %y의 콘텐츠가 다릅니다.</target>
@@ -874,6 +910,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>폴더 페어:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>로컬 설정 사용:</target>
 
@@ -934,6 +973,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>제거(&l)</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>데이터베이스 파일로 동기화 방향 감지</target>
+
 <source>Detect moved files</source>
 <target>이동 파일 탐지</target>
 
@@ -948,23 +990,20 @@ The command is triggered if:
 - 첫 번째 동기화를 위한 탐지기능 사용불가
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>데이터베이스 파일로 동기화 방향 감지</target>
-
 <source>Delete files:</source>
 <target>파일 삭제:</target>
-
-<source>&Permanent</source>
-<target>영구(&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>파일 영구 삭제 또는 덮어쓰기</target>
 
 <source>&Recycle bin</source>
 <target>휴지통(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>휴지통에 삭제되고 덮어 씌어진 파일 백업</target>
+
+<source>&Permanent</source>
+<target>영구(&P)</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>파일 영구 삭제 또는 덮어쓰기</target>
 
 <source>&Versioning</source>
 <target>버저닝(&V)</target>
@@ -978,14 +1017,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>오류 발생시:</target>
 
-<source>Hide all error and warning messages</source>
-<target>모든 오류/경고 메세지 숨기기</target>
-
 <source>&Pop-up</source>
 <target>팝업(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>오류 또는 경고에 대한 팝업 보이기</target>
+
+<source>Hide all error and warning messages</source>
+<target>모든 오류/경고 메세지 숨기기</target>
 
 <source>On completion:</source>
 <target>완료 시:</target>
@@ -1092,9 +1131,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>다음 설정은 모든 동기화 작업에 사용됩니다.</target>
 
-<source>Fail-safe file copy</source>
-<target>실패 - 안전 파일 복사</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1107,17 +1143,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(권장)</target>
 
-<source>Copy locked files</source>
-<target>락 걸린 파일 복사</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Volume Shadow Copy Service를 사용하여 공유 또는 잠긴 파일 복사.</target>
 
 <source>(requires administrator rights)</source>
 <target>(관리자 권한 필요)</target>
-
-<source>Copy file access permissions</source>
-<target>파일 접근 권한 복사</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>파일 및 폴더 권한 전송.</target>
@@ -1589,9 +1619,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>퍼센티지(%)</target>
 
-<source>Internet access failed.</source>
-<target>인터넷 접속에 실패했습니다.</target>
-
 <source>Check for Program Updates</source>
 <target>프로그램 업데이트 확인</target>
 
@@ -1601,17 +1628,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync는 현재 최신버전 상태입니다.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org.에 접속할 수 없습니다.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>체크(&C)</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>시스템 함수 %x을(를) 찾을 수 없습니다.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>시스템 메시지 수신을 위한 등록을 할 수 없습니다.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x에 대한 장치 알림 등록을 할 수 없습니다.</target>
@@ -1621,9 +1654,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>파일이 다른 프로세스에 의해 잠겨 있습니다:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>%x의 파일 속성을 쓸 수 없습니다.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>%x의 보안 컨텍스트를 읽을 수 없습니다.</target>
@@ -1639,9 +1669,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x(은)는 일반 디렉토리 이름이 아닙니다.</target>
-
-<source>Cannot find system function %x.</source>
-<target>시스템 함수 %x을(를) 찾을 수 없습니다.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>파일 %x을(를) %y(으)로 복사할 수 없습니다.</target>
@@ -1699,6 +1726,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>구성 파일 %x(이)가 불완전합니다. 누락된 요소는 기본 값으로 설정됩니다.</target>
+
+<source>Internet access failed.</source>
+<target>인터넷 접속에 실패했습니다.</target>
 
 <source>Prepare installation</source>
 <target>설치 준비</target>

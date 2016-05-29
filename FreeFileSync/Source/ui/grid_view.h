@@ -103,7 +103,7 @@ public:
     //sorting...
     bool static getDefaultSortDirection(zen::ColumnTypeRim type); //true: ascending; false: descending
 
-    void sortView(zen::ColumnTypeRim type, bool onLeft, bool ascending); //always call this method for sorting, never sort externally!
+    void sortView(zen::ColumnTypeRim type, zen::ItemPathFormat pathFmt, bool onLeft, bool ascending); //always call this method for sorting, never sort externally!
 
     struct SortInfo
     {

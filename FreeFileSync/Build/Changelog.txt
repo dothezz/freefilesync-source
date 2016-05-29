@@ -1,3 +1,19 @@
+FreeFileSync 8.2 [2016-05-30]
+-----------------------------
+Unified item path representation on main grid
+New progress indicator control for binary comparison
+Fixed crash on exit when accessing already destructed constant
+Fixed crash when FreeFileSync is still running during OS shutdown
+Fixed crash on startup due to missing root certificates
+Work around start up crash on Windows installations missing certain patches
+Fixed in-place progress panel height being trimmed
+Support drawing arbitrary polyons with graph control
+Apply Posix file name normalization (OS X)
+Normalize keyboard input encoding for all text fields (OS X)
+Report errors when cleaning up old log files
+Integrate external app WinMerge if installation is found
+
+
 FreeFileSync 8.1 [2016-04-21]
 -----------------------------
 Follow shell links during drag and drop on main dialog (Windows)

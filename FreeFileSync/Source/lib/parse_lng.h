@@ -25,12 +25,12 @@
 namespace lngfile
 {
 //singular forms
-typedef std::map <std::string, std::string> TranslationMap; //orig |-> translation
+using TranslationMap = std::map <std::string, std::string>; //orig |-> translation
 
 //plural forms
-typedef std::pair<std::string, std::string> SingularPluralPair; //1 house| n houses
-typedef std::vector<std::string> PluralForms; //1 dom | 2 domy | 5 domów
-typedef std::map<SingularPluralPair, PluralForms> TranslationPluralMap; //(sing/plu) |-> pluralforms
+using SingularPluralPair   = std::pair<std::string, std::string>; //1 house | %x houses
+using PluralForms          = std::vector<std::string>; //1 dom | 2 domy | %x domów
+using TranslationPluralMap = std::map<SingularPluralPair, PluralForms>; //(sing/plu) |-> pluralforms
 
 struct TransHeader
 {
@@ -193,7 +193,7 @@ struct Token
 class KnownTokens
 {
 public:
-    typedef std::map<Token::Type, std::string> TokenMap;
+    using TokenMap = std::map<Token::Type, std::string>;
 
     static const TokenMap& getList()
     {
@@ -457,7 +457,7 @@ private:
         using namespace zen;
 
         if (original.empty())
-            throw ParsingError(L"Source translation is empty", scn.posRow(), scn.posCol());
+            throw ParsingError(L"Translation source text is empty", scn.posRow(), scn.posCol());
 
         if (!translation.empty())
         {
@@ -514,6 +514,12 @@ private:
             //if source is a one-liner, so should be the translation
             if (!contains(original, '\n') && contains(translation, '\n'))
                 throw ParsingError(L"Source text is a one-liner, but translation consists of multiple lines", scn.posRow(), scn.posCol());
+
+            //check for correct FFS brand names
+            if (contains(original, "FreeFileSync") && !contains(translation, "FreeFileSync"))
+                throw ParsingError(L"Misspelled \"FreeFileSync\" in translation", scn.posRow(), scn.posCol());
+            if (contains(original, "RealTimeSync") && !contains(translation, "RealTimeSync"))
+                throw ParsingError(L"Misspelled \"RealTimeSync\" in translation", scn.posRow(), scn.posCol());
         }
     }
 
@@ -522,7 +528,7 @@ private:
         using namespace zen;
         //check the primary placeholder is existing at least for the second english text
         if (!contains(original.second, "%x"))
-            throw ParsingError(L"Plural form source does not contain %x placeholder", scn.posRow(), scn.posCol());
+            throw ParsingError(L"Plural form source text does not contain %x placeholder", scn.posRow(), scn.posCol());
 
         if (!translation.empty())
         {

@@ -21,6 +21,7 @@
     //    #include <gtk/gtk.h>
 
 using namespace zen;
+
     using AFS = AbstractFileSystem;
 
 
@@ -215,7 +216,9 @@ void FolderSelector::onSelectAltFolder(wxCommandEvent& event)
 
 Zstring FolderSelector::getPath() const
 {
-    return toZ(folderComboBox_.GetValue());
+    Zstring path = utfCvrtTo<Zstring>(folderComboBox_.GetValue());
+
+    return path;
 }
 
 

@@ -63,8 +63,7 @@ std::pair<std::unique_ptr<AFS::OutputStream>, AbstractPath> prepareNewLogfile(co
 
 struct LogTraverserCallback: public AFS::TraverserCallback
 {
-    LogTraverserCallback(std::vector<Zstring>& logFileNames, const Zstring& prefix, const std::function<void()>& onUpdateStatus) :
-        logFileNames_(logFileNames),
+    LogTraverserCallback(const Zstring& prefix, const std::function<void()>& onUpdateStatus) :
         prefix_(prefix),
         onUpdateStatus_(onUpdateStatus) {}
 
@@ -78,43 +77,57 @@ struct LogTraverserCallback: public AFS::TraverserCallback
     }
     std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { assert(false); return ON_ERROR_IGNORE; } //errors are not critical in this context
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { assert(false); return ON_ERROR_IGNORE; } //
+
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber                         ) override { setError(msg); return ON_ERROR_IGNORE; }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { setError(msg); return ON_ERROR_IGNORE; }
+
+    const std::vector<Zstring>& refFileNames() const { return logFileNames_; }
+    const Opt<FileError>& getLastError() const { return lastError_; }
 
 private:
-    std::vector<Zstring>& logFileNames_; //out
+    void setError(const std::wstring& msg) //implement late failure
+    {
+        if (!lastError_)
+            lastError_ = FileError(msg);
+    }
+
     const Zstring prefix_;
     const std::function<void()> onUpdateStatus_;
+    std::vector<Zstring> logFileNames_; //out
+    Opt<FileError> lastError_;
 };
 
 
-void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jobname, size_t maxCount, const std::function<void()>& onUpdateStatus) //noexcept
+void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jobname, size_t maxCount, const std::function<void()>& onUpdateStatus) //throw FileError
 {
-    std::vector<Zstring> logFileNames;
-    {
-        const Zstring prefix = utfCvrtTo<Zstring>(jobname);
-        LogTraverserCallback lt(logFileNames, prefix, onUpdateStatus); //traverse source directory one level deep
+    const Zstring prefix = utfCvrtTo<Zstring>(jobname);
 
-        AFS::traverseFolder(logFolderPath, lt);
+    LogTraverserCallback lt(prefix, onUpdateStatus); //traverse source directory one level deep
+    AFS::traverseFolder(logFolderPath, lt);
+
+    std::vector<Zstring> logFileNames = lt.refFileNames();
+    Opt<FileError> lastError = lt.getLastError();
+
+    if (logFileNames.size() > maxCount)
+    {
+        //delete oldest logfiles: take advantage of logfile naming convention to find them
+        std::nth_element(logFileNames.begin(), logFileNames.end() - maxCount, logFileNames.end(), LessFilePath());
+
+        std::for_each(logFileNames.begin(), logFileNames.end() - maxCount, [&](const Zstring& logFileName)
+        {
+            try
+            {
+                AFS::removeFile(AFS::appendRelPath(logFolderPath, logFileName)); //throw FileError
+            }
+            catch (const FileError& e) { if (!lastError) *lastError = e; };
+
+            if (onUpdateStatus)
+                onUpdateStatus();
+        });
     }
 
-    if (logFileNames.size() <= maxCount)
-        return;
-
-    //delete oldest logfiles: take advantage of logfile naming convention to find them
-    std::nth_element(logFileNames.begin(), logFileNames.end() - maxCount, logFileNames.end(), LessFilePath());
-
-    std::for_each(logFileNames.begin(), logFileNames.end() - maxCount, [&](const Zstring& logFileName)
-    {
-        try
-        {
-            AFS::removeFile(AFS::appendRelPath(logFolderPath, logFileName)); //throw FileError
-        }
-        catch (FileError&) { assert(false); };
-
-        if (onUpdateStatus)
-            onUpdateStatus();
-    });
+    if (lastError) //late failure!
+        throw* lastError;
 }
 }
 
@@ -227,8 +240,8 @@ BatchStatusHandler::~BatchStatusHandler()
     }
     else
     {
-        if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
-            getDataTotal   (PHASE_SYNCHRONIZING) == 0)
+        if (getItemsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
+            getBytesTotal(PHASE_SYNCHRONIZING) == 0)
             finalStatusMsg = _("Nothing to synchronize"); //even if "ignored conflicts" occurred!
         else
             finalStatusMsg = _("Synchronization completed successfully");
@@ -239,8 +252,8 @@ BatchStatusHandler::~BatchStatusHandler()
     {
         jobName_,
         finalStatusMsg,
-        getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
-        getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
+        getItemsCurrent(PHASE_SYNCHRONIZING), getBytesCurrent(PHASE_SYNCHRONIZING),
+        getItemsTotal  (PHASE_SYNCHRONIZING), getBytesTotal  (PHASE_SYNCHRONIZING),
         std::time(nullptr) - startTime_
     };
 
@@ -248,6 +261,8 @@ BatchStatusHandler::~BatchStatusHandler()
     //create not before destruction: 1. avoid issues with FFS trying to sync open log file 2. simplify transactional retry on failure 3. no need to rename log file to include status
     if (logfilesCountLimit_ != 0)
     {
+        auto requestUiRefreshNoThrow = [&] { try { requestUiRefresh();  /*throw X*/ } catch (...) {} };
+
         const AbstractPath logFolderPath = createAbstractPath(trimCpy(logFolderPathPhrase_).empty() ? getConfigDir() + Zstr("Logs") : logFolderPathPhrase_); //noexcept
         try
         {
@@ -258,7 +273,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 const AbstractPath logFilePath   = rv.second;
 
                 streamToLogFile(summary, errorLog, logFileStream, OnUpdateLogfileStatusNoThrow(*this, AFS::getDisplayPath(logFilePath))); //throw FileError
-                logFileStream.finalize([&] { try { requestUiRefresh(); } catch (...) {} }); //throw FileError
+                logFileStream.finalize(requestUiRefreshNoThrow); //throw FileError
             }, *this); //throw X?
         }
         catch (...) {}
@@ -267,7 +282,15 @@ BatchStatusHandler::~BatchStatusHandler()
         {
             try { reportStatus(_("Cleaning up old log files...")); }
             catch (...) {}
-            limitLogfileCount(logFolderPath, jobName_, logfilesCountLimit_, [&] { try { requestUiRefresh(); } catch (...) {} }); //noexcept
+
+            try
+            {
+                tryReportingError([&]
+                {
+                    limitLogfileCount(logFolderPath, jobName_, logfilesCountLimit_, requestUiRefreshNoThrow); //throw FileError
+                }, *this); //throw X?
+            }
+            catch (...) {}
         }
     }
     //----------------- write results into LastSyncs.log------------------------

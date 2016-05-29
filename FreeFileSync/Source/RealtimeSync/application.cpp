@@ -42,7 +42,7 @@ bool Application::OnInit()
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
-    wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
+    wxToolTip::SetAutoPop(7000); //https://msdn.microsoft.com/en-us/library/windows/desktop/aa511495
 
     SetAppName(L"RealTimeSync");
 
@@ -138,7 +138,6 @@ void Application::onQueryEndSession(wxEvent& event)
 {
     if (auto mainWin = dynamic_cast<MainDialog*>(GetTopWindow()))
         mainWin->onQueryEndSession();
-    OnExit(); //wxWidgets screws up again: http://trac.wxwidgets.org/ticket/3069
-    //wxEntryCleanup(); -> gives popup "dll init failed" on XP
-    std::exit(FFS_RC_SUCCESS); //Windows will terminate anyway: destruct global objects
+    //it's futile to try and clean up while the process is in full swing (CRASH!) => just terminate!
+    std::abort(); //on Windows calls ::ExitProcess() which can still internally process Window messages and crash!
 }

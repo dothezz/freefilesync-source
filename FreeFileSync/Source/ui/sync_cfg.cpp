@@ -66,9 +66,9 @@ private:
     void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"daylight-saving-time", this); }
 
     void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar = CMP_BY_TIME_SIZE; updateCompGui(); updateSyncGui(); } //
-    void OnCompByContent          (wxCommandEvent& event) override { localCmpVar = CMP_BY_CONTENT;   updateCompGui(); updateSyncGui(); } //affects sync settings, too!
-    void OnCompBySize             (wxCommandEvent& event) override { localCmpVar = CMP_BY_SIZE;      updateCompGui(); updateSyncGui(); } //
+    void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar = CompareVariant::TIME_SIZE; updateCompGui(); updateSyncGui(); } //
+    void OnCompByContent          (wxCommandEvent& event) override { localCmpVar = CompareVariant::CONTENT;   updateCompGui(); updateSyncGui(); } //affects sync settings, too!
+    void OnCompBySize             (wxCommandEvent& event) override { localCmpVar = CompareVariant::SIZE;      updateCompGui(); updateSyncGui(); } //
     void OnCompByTimeSizeDouble   (wxMouseEvent&   event) override;
     void OnCompBySizeDouble       (wxMouseEvent&   event) override;
     void OnCompByContentDouble    (wxMouseEvent&   event) override;
@@ -80,7 +80,7 @@ private:
 
     void updateCompGui();
 
-    CompareVariant localCmpVar = CMP_BY_TIME_SIZE;
+    CompareVariant localCmpVar = CompareVariant::TIME_SIZE;
 
     //------------- filter panel --------------------------
     void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"exclude-items", this); }
@@ -98,10 +98,10 @@ private:
     EnumDescrList<UnitSize> enumSizeDescr;
 
     //------------- synchronization panel -----------------
-    void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWOWAY; updateSyncGui(); }
-    void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR; updateSyncGui(); }
-    void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE; updateSyncGui(); }
-    void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM; updateSyncGui(); }
+    void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWO_WAY; updateSyncGui(); }
+    void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR;  updateSyncGui(); }
+    void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE;  updateSyncGui(); }
+    void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM;  updateSyncGui(); }
 
     void OnToggleLocalSyncSettings(wxCommandEvent& event) override { updateSyncGui(); }
     void OnToggleDetectMovedFiles (wxCommandEvent& event) override { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateSyncGui(); } //parameter NOT owned by checkbox!
@@ -119,9 +119,9 @@ private:
     void OnDifferent      (wxCommandEvent& event) override;
     void OnConflict       (wxCommandEvent& event) override;
 
-    void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DELETE_PERMANENTLY;   updateSyncGui(); }
-    void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DELETE_TO_RECYCLER;   updateSyncGui(); }
-    void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DELETE_TO_VERSIONING; updateSyncGui(); }
+    void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::PERMANENT;  updateSyncGui(); }
+    void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::RECYCLER;   updateSyncGui(); }
+    void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::VERSIONING; updateSyncGui(); }
 
     void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
 
@@ -145,7 +145,7 @@ private:
 
     //parameters with ownership NOT within GUI controls!
     DirectionConfig directionCfg;
-    DeletionPolicy handleDeletion = DELETE_TO_RECYCLER; //use Recycler, delete permanently or move to user-defined location
+    DeletionPolicy handleDeletion = DeletionPolicy::RECYCLER; //use Recycler, delete permanently or move to user-defined location
     OnGuiError onGuiError = ON_GUIERROR_POPUP;
 
     EnumDescrList<VersioningStyle> enumVersioningStyle;
@@ -176,11 +176,11 @@ std::wstring getCompVariantDescription(CompareVariant var)
 {
     switch (var)
     {
-        case CMP_BY_TIME_SIZE:
+        case CompareVariant::TIME_SIZE:
             return _("Identify equal files by comparing modification time and size.");
-        case CMP_BY_CONTENT:
+        case CompareVariant::CONTENT:
             return _("Identify equal files by comparing the file content.");
-        case CMP_BY_SIZE:
+        case CompareVariant::SIZE:
             return _("Identify equal files by comparing their file size.");
     }
     assert(false);
@@ -192,7 +192,7 @@ std::wstring getSyncVariantDescription(DirectionConfig::Variant var)
 {
     switch (var)
     {
-        case DirectionConfig::TWOWAY:
+        case DirectionConfig::TWO_WAY:
             return _("Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.");
         case DirectionConfig::MIRROR:
             return _("Create a mirror backup of the left folder by adapting the right folder to match.");
@@ -255,13 +255,13 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnBySize,     1.25);
     setRelativeFontSize(*m_toggleBtnByContent,  1.25);
 
-    m_toggleBtnByTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
-    m_toggleBtnByContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
-    m_toggleBtnBySize    ->SetToolTip(getCompVariantDescription(CMP_BY_SIZE));
+    m_toggleBtnByTimeSize->SetToolTip(getCompVariantDescription(CompareVariant::TIME_SIZE));
+    m_toggleBtnByContent ->SetToolTip(getCompVariantDescription(CompareVariant::CONTENT));
+    m_toggleBtnBySize    ->SetToolTip(getCompVariantDescription(CompareVariant::SIZE));
 
-    m_bitmapByTimeSize->SetToolTip(getCompVariantDescription(CMP_BY_TIME_SIZE));
-    m_bitmapByContent ->SetToolTip(getCompVariantDescription(CMP_BY_CONTENT));
-    m_bitmapBySize    ->SetToolTip(getCompVariantDescription(CMP_BY_SIZE));
+    m_bitmapByTimeSize->SetToolTip(getCompVariantDescription(CompareVariant::TIME_SIZE));
+    m_bitmapByContent ->SetToolTip(getCompVariantDescription(CompareVariant::CONTENT));
+    m_bitmapBySize    ->SetToolTip(getCompVariantDescription(CompareVariant::SIZE));
 
     //------------- filter panel --------------------------
     assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
@@ -270,26 +270,26 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
 
     enumTimeDescr.
-    add(UTIME_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
-    add(UTIME_TODAY,       _("Today")).
-    //    add(UTIME_THIS_WEEK,   _("This week")).
-    add(UTIME_THIS_MONTH,  _("This month")).
-    add(UTIME_THIS_YEAR,   _("This year")).
-    add(UTIME_LAST_X_DAYS, _("Last x days"));
+    add(UnitTime::NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
+    add(UnitTime::TODAY,       _("Today")).
+    //add(UnitTime::THIS_WEEK,   _("This week")).
+    add(UnitTime::THIS_MONTH,  _("This month")).
+    add(UnitTime::THIS_YEAR,   _("This year")).
+    add(UnitTime::LAST_X_DAYS, _("Last x days"));
 
     enumSizeDescr.
-    add(USIZE_NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
-    add(USIZE_BYTE, _("Byte")).
-    add(USIZE_KB,   _("KB")).
-    add(USIZE_MB,   _("MB"));
+    add(UnitSize::NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
+    add(UnitSize::BYTE, _("Byte")).
+    add(UnitSize::KB,   _("KB")).
+    add(UnitSize::MB,   _("MB"));
 
     //------------- synchronization panel -----------------
-    m_toggleBtnTwoWay->SetLabel(getVariantName(DirectionConfig::TWOWAY));
+    m_toggleBtnTwoWay->SetLabel(getVariantName(DirectionConfig::TWO_WAY));
     m_toggleBtnMirror->SetLabel(getVariantName(DirectionConfig::MIRROR));
     m_toggleBtnUpdate->SetLabel(getVariantName(DirectionConfig::UPDATE));
     m_toggleBtnCustom->SetLabel(getVariantName(DirectionConfig::CUSTOM));
 
-    m_toggleBtnTwoWay->SetToolTip(getSyncVariantDescription(DirectionConfig::TWOWAY));
+    m_toggleBtnTwoWay->SetToolTip(getSyncVariantDescription(DirectionConfig::TWO_WAY));
     m_toggleBtnMirror->SetToolTip(getSyncVariantDescription(DirectionConfig::MIRROR));
     m_toggleBtnUpdate->SetToolTip(getSyncVariantDescription(DirectionConfig::UPDATE));
     m_toggleBtnCustom->SetToolTip(getSyncVariantDescription(DirectionConfig::CUSTOM));
@@ -307,8 +307,8 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnCustom, 1.25);
 
     enumVersioningStyle.
-    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
-    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
+    add(VersioningStyle::REPLACE,       _("Replace"),    _("Move files and replace if existing")).
+    add(VersioningStyle::ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
     //use spacer to keep dialog height stable, no matter if versioning options are visible
     bSizerDelHandling->Add(0, m_panelVersioning->GetSize().GetHeight());
@@ -480,7 +480,7 @@ std::shared_ptr<const CompConfig> ConfigDialog::getCompConfig() const
 
     CompConfig compCfg;
     compCfg.compareVar = localCmpVar;
-    compCfg.handleSymlinks = !m_checkBoxSymlinksInclude->GetValue() ? SYMLINK_EXCLUDE : m_radioBtnSymlinksDirect->GetValue() ? SYMLINK_DIRECT : SYMLINK_FOLLOW;
+    compCfg.handleSymlinks = !m_checkBoxSymlinksInclude->GetValue() ? SymLinkHandling::EXCLUDE : m_radioBtnSymlinksDirect->GetValue() ? SymLinkHandling::DIRECT : SymLinkHandling::FOLLOW;
     compCfg.ignoreTimeShiftMinutes = fromTimeShiftPhrase(copyStringTo<std::wstring>(m_textCtrlTimeShift->GetValue()));
 
     return std::make_shared<const CompConfig>(compCfg);
@@ -498,15 +498,15 @@ void ConfigDialog::setCompConfig(std::shared_ptr<const CompConfig> compCfg)
 
     switch (compCfg->handleSymlinks)
     {
-        case SYMLINK_EXCLUDE:
+        case SymLinkHandling::EXCLUDE:
             m_checkBoxSymlinksInclude->SetValue(false);
             m_radioBtnSymlinksFollow ->SetValue(true);
             break;
-        case SYMLINK_FOLLOW:
+        case SymLinkHandling::FOLLOW:
             m_checkBoxSymlinksInclude->SetValue(true);
             m_radioBtnSymlinksFollow->SetValue(true);
             break;
-        case SYMLINK_DIRECT:
+        case SymLinkHandling::DIRECT:
             m_checkBoxSymlinksInclude->SetValue(true);
             m_radioBtnSymlinksDirect->SetValue(true);
             break;
@@ -533,13 +533,13 @@ void ConfigDialog::updateCompGui()
     if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
         switch (localCmpVar)
         {
-            case CMP_BY_TIME_SIZE:
+            case CompareVariant::TIME_SIZE:
                 m_toggleBtnByTimeSize->SetValue(true);
                 break;
-            case CMP_BY_CONTENT:
+            case CompareVariant::CONTENT:
                 m_toggleBtnByContent->SetValue(true);
                 break;
-            case CMP_BY_SIZE:
+            case CompareVariant::SIZE:
                 m_toggleBtnBySize->SetValue(true);
                 break;
         }
@@ -552,9 +552,9 @@ void ConfigDialog::updateCompGui()
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
-    setBitmap(*m_bitmapByTimeSize, localCmpVar == CMP_BY_TIME_SIZE, getResourceImage(L"file-time"));
-    setBitmap(*m_bitmapByContent,  localCmpVar == CMP_BY_CONTENT,   getResourceImage(L"file-content"));
-    setBitmap(*m_bitmapBySize,     localCmpVar == CMP_BY_SIZE,      getResourceImage(L"file-size"));
+    setBitmap(*m_bitmapByTimeSize, localCmpVar == CompareVariant::TIME_SIZE, getResourceImage(L"file-time"));
+    setBitmap(*m_bitmapByContent,  localCmpVar == CompareVariant::CONTENT,   getResourceImage(L"file-content"));
+    setBitmap(*m_bitmapBySize,     localCmpVar == CompareVariant::SIZE,      getResourceImage(L"file-size"));
 
     //active variant description:
     setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
@@ -583,8 +583,11 @@ void ConfigDialog::onFilterKeyEvent(wxKeyEvent& event)
 
 FilterConfig ConfigDialog::getFilterConfig() const
 {
-    return FilterConfig(utfCvrtTo<Zstring>(m_textCtrlInclude->GetValue()),
-                        utfCvrtTo<Zstring>(m_textCtrlExclude->GetValue()),
+    Zstring includeFilter = utfCvrtTo<Zstring>(m_textCtrlInclude->GetValue());
+    Zstring exludeFilter  = utfCvrtTo<Zstring>(m_textCtrlExclude->GetValue());
+
+
+    return FilterConfig(includeFilter, exludeFilter,
                         m_spinCtrlTimespan->GetValue(),
                         getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
                         m_spinCtrlMinSize->GetValue(),
@@ -627,12 +630,12 @@ void ConfigDialog::updateFilterGui()
     };
     setStatusBitmap(*m_bitmapInclude,    L"filter_include", !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter));
     setStatusBitmap(*m_bitmapExclude,    L"filter_exclude", !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter));
-    setStatusBitmap(*m_bitmapFilterDate, L"file-time", activeCfg.unitTimeSpan != UTIME_NONE);
-    setStatusBitmap(*m_bitmapFilterSize, L"file-size",  activeCfg.unitSizeMin  != USIZE_NONE || activeCfg.unitSizeMax != USIZE_NONE);
+    setStatusBitmap(*m_bitmapFilterDate, L"file-time", activeCfg.unitTimeSpan != UnitTime::NONE);
+    setStatusBitmap(*m_bitmapFilterSize, L"file-size",  activeCfg.unitSizeMin  != UnitSize::NONE || activeCfg.unitSizeMax != UnitSize::NONE);
 
-    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
-    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
-    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
+    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UnitTime::LAST_X_DAYS);
+    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != UnitSize::NONE);
+    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != UnitSize::NONE);
 
     m_buttonClear->Enable(!(activeCfg == FilterConfig()));
 }
@@ -691,7 +694,7 @@ void toggleCustomSyncConfig(DirectionConfig& directionCfg, SyncDirection& custSy
 {
     switch (directionCfg.var)
     {
-        case DirectionConfig::TWOWAY:
+        case DirectionConfig::TWO_WAY:
             assert(false);
             break;
         case DirectionConfig::MIRROR:
@@ -777,7 +780,7 @@ void updateSyncDirectionIcons(const DirectionConfig& directionCfg,
                               wxBitmapButton& buttonDifferent,
                               wxBitmapButton& buttonConflict)
 {
-    if (directionCfg.var != DirectionConfig::TWOWAY) //automatic mode needs no sync-directions
+    if (directionCfg.var != DirectionConfig::TWO_WAY) //automatic mode needs no sync-directions
     {
         auto updateButton = [](wxBitmapButton& button, SyncDirection dir,
                                const wchar_t* imgNameLeft, const wchar_t* imgNameNone, const wchar_t* imgNameRight,
@@ -834,14 +837,14 @@ void toggleDeletionPolicy(DeletionPolicy& deletionPolicy)
 {
     switch (deletionPolicy)
     {
-        case DELETE_PERMANENTLY:
-            deletionPolicy = DELETE_TO_VERSIONING;
+        case DeletionPolicy::PERMANENT:
+            deletionPolicy = DeletionPolicy::VERSIONING;
             break;
-        case DELETE_TO_RECYCLER:
-            deletionPolicy = DELETE_PERMANENTLY;
+        case DeletionPolicy::RECYCLER:
+            deletionPolicy = DeletionPolicy::PERMANENT;
             break;
-        case DELETE_TO_VERSIONING:
-            deletionPolicy = DELETE_TO_RECYCLER;
+        case DeletionPolicy::VERSIONING:
+            deletionPolicy = DeletionPolicy::RECYCLER;
             break;
     }
 }
@@ -908,22 +911,22 @@ void ConfigDialog::updateSyncGui()
     };
 
     //display only relevant sync options
-    m_bitmapDatabase     ->Show(directionCfg.var == DirectionConfig::TWOWAY);
-    fgSizerSyncDirections->Show(directionCfg.var != DirectionConfig::TWOWAY);
+    m_bitmapDatabase     ->Show(directionCfg.var == DirectionConfig::TWO_WAY);
+    fgSizerSyncDirections->Show(directionCfg.var != DirectionConfig::TWO_WAY);
 
-    if (directionCfg.var == DirectionConfig::TWOWAY)
+    if (directionCfg.var == DirectionConfig::TWO_WAY)
         setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
     else
     {
         const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ? localCmpVar : globalCfg_.cmpConfig.compareVar;
 
-        m_bitmapLeftNewer   ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
-        m_bpButtonLeftNewer ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
-        m_bitmapRightNewer  ->Show(activeCmpVar == CMP_BY_TIME_SIZE);
-        m_bpButtonRightNewer->Show(activeCmpVar == CMP_BY_TIME_SIZE);
+        m_bitmapLeftNewer   ->Show(activeCmpVar == CompareVariant::TIME_SIZE);
+        m_bpButtonLeftNewer ->Show(activeCmpVar == CompareVariant::TIME_SIZE);
+        m_bitmapRightNewer  ->Show(activeCmpVar == CompareVariant::TIME_SIZE);
+        m_bpButtonRightNewer->Show(activeCmpVar == CompareVariant::TIME_SIZE);
 
-        m_bitmapDifferent  ->Show(activeCmpVar == CMP_BY_CONTENT || activeCmpVar == CMP_BY_SIZE);
-        m_bpButtonDifferent->Show(activeCmpVar == CMP_BY_CONTENT || activeCmpVar == CMP_BY_SIZE);
+        m_bitmapDifferent  ->Show(activeCmpVar == CompareVariant::CONTENT || activeCmpVar == CompareVariant::SIZE);
+        m_bpButtonDifferent->Show(activeCmpVar == CompareVariant::CONTENT || activeCmpVar == CompareVariant::SIZE);
     }
 
     //active variant description:
@@ -938,7 +941,7 @@ void ConfigDialog::updateSyncGui()
     if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
         switch (directionCfg.var)
         {
-            case DirectionConfig::TWOWAY:
+            case DirectionConfig::TWO_WAY:
                 m_toggleBtnTwoWay->SetValue(true);
                 break;
             case DirectionConfig::MIRROR:
@@ -954,19 +957,19 @@ void ConfigDialog::updateSyncGui()
 
     switch (handleDeletion)
     {
-        case DELETE_PERMANENTLY:
+        case DeletionPolicy::PERMANENT:
             m_radioBtnPermanent->SetValue(true);
 
             m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_permanently"));
             m_bpButtonDeletionType->SetToolTip(_("Delete or overwrite files permanently"));
             break;
-        case DELETE_TO_RECYCLER:
+        case DeletionPolicy::RECYCLER:
             m_radioBtnRecycler->SetValue(true);
 
             m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_recycler"));
             m_bpButtonDeletionType->SetToolTip(_("Back up deleted and overwritten files in the recycle bin"));
             break;
-        case DELETE_TO_VERSIONING:
+        case DeletionPolicy::VERSIONING:
             m_radioBtnVersioning->SetValue(true);
 
             m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_versioning"));
@@ -976,7 +979,7 @@ void ConfigDialog::updateSyncGui()
     m_bpButtonDeletionType->SetBitmapDisabled(greyScale(m_bpButtonDeletionType->GetBitmap())); //fix wxWidgets' all-too-clever multi-state!
 
 
-    const bool versioningSelected = handleDeletion == DELETE_TO_VERSIONING;
+    const bool versioningSelected = handleDeletion == DeletionPolicy::VERSIONING;
     m_panelVersioning->Show(versioningSelected);
 
     if (versioningSelected)
@@ -986,13 +989,13 @@ void ConfigDialog::updateSyncGui()
         const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
         switch (getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle))
         {
-            case VER_STYLE_REPLACE:
+            case VersioningStyle::REPLACE:
                 setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc");
                 setText(*m_staticTextNamingCvtPart2Bold, L"");
                 setText(*m_staticTextNamingCvtPart3, L"");
                 break;
 
-            case VER_STYLE_ADD_TIMESTAMP:
+            case VersioningStyle::ADD_TIMESTAMP:
                 setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc ");
                 setText(*m_staticTextNamingCvtPart2Bold, _("YYYY-MM-DD hhmmss"));
                 setText(*m_staticTextNamingCvtPart3, L".doc");
@@ -1099,7 +1102,7 @@ bool ConfigDialog::unselectFolderPairConfig()
     //------- parameter validation (BEFORE writing output!) -------
 
     //check if user-defined directory for deletion was specified:
-    if (syncCfg && syncCfg->handleDeletion == zen::DELETE_TO_VERSIONING)
+    if (syncCfg && syncCfg->handleDeletion == DeletionPolicy::VERSIONING)
         if (trimCpy(syncCfg->versioningFolderPhrase).empty())
         {
             m_notebook->ChangeSelection(static_cast<size_t>(SyncConfigPanel::SYNC));

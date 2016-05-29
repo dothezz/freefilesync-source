@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Ustvarjam seznam datotek...</target>
 
+<source>Fail-safe file copy</source>
+<target>Kopiranje datotek varno pred odpovedjo</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopiraj zaklenjene datoteke</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiraj dovoljenja dostopov datoteke</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Začenjam primerjavo</target>
 
@@ -291,8 +324,8 @@ Dejansko: %y bajtov
 <source>Error Code %x:</source>
 <target>Koda napake %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Neuspešna povezava na SFTP server %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -411,8 +444,8 @@ Dejansko: %y bajtov
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Ne morem dostopati do Volume Shadov Copy servisa.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Prosim uporabite 64-bitno različico FreeFileSync za ustvarjanje senčnih kopij na tem sistemu.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Ne morem določiti ime nosilca za %x.</target>
@@ -586,6 +619,9 @@ Ukaz se sproži če:
 
 <source>Updating attributes of %x</source>
 <target>Posodabljam atribute od %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Ne morem zapisati datotečnih atributov od %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x in %y imata različno vsebino.</target>
@@ -886,6 +922,9 @@ Ukaz se sproži če:
 <source>Folder pair:</source>
 <target>Par map:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Uporabi lokalne nastavitve:</target>
 
@@ -946,6 +985,9 @@ Ukaz se sproži če:
 <source>C&lear</source>
 <target>&Počisti</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
+
 <source>Detect moved files</source>
 <target>Zaznaj premaknjene datoteke</target>
 
@@ -960,23 +1002,20 @@ Ukaz se sproži če:
 - Zaznavanje ni na voljo pri prvem sinhroniziranju
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Zaznaj smer sinhnorizacije s pomočjo datotek podatkovne baze</target>
-
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
-
-<source>&Permanent</source>
-<target>&Dokončno</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Trajno izbriši ali prepiši datoteke</target>
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Naredi varnostno kopijo izbrisanih in prepisanih datotek v koš</target>
+
+<source>&Permanent</source>
+<target>&Dokončno</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Trajno izbriši ali prepiši datoteke</target>
 
 <source>&Versioning</source>
 <target>&Verzioniranje</target>
@@ -990,14 +1029,14 @@ Ukaz se sproži če:
 <source>Handle errors:</source>
 <target>Upravljanje napak:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Skrij vsa obvestila o napakah in opozorilih</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Prikaži pojavne napaka ali opozorila</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skrij vsa obvestila o napakah in opozorilih</target>
 
 <source>On completion:</source>
 <target>Ob zaključku:</target>
@@ -1104,9 +1143,6 @@ Ukaz se sproži če:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Naslednje nastavitve se uporabljajo pri vseh sinhronizacijskih opravilih.</target>
 
-<source>Fail-safe file copy</source>
-<target>Kopiranje datotek varno pred odpovedjo</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1119,17 +1155,11 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <source>(recommended)</source>
 <target>(priporočeno)</target>
 
-<source>Copy locked files</source>
-<target>Kopiraj zaklenjene datoteke</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiraj zaklenjene in datoteke v skupni rabi s pomočjo Shadow Copy Service.</target>
 
 <source>(requires administrator rights)</source>
 <target>(zahteva pravice administratorja)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiraj dovoljenja dostopov datoteke</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Prenesi pravice datotek in map.</target>
@@ -1622,9 +1652,6 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <source>Percentage</source>
 <target>Odstotek</target>
 
-<source>Internet access failed.</source>
-<target>Neuspešna povezava na internet.</target>
-
 <source>Check for Program Updates</source>
 <target>Prevri obstoj nadgradnje programa</target>
 
@@ -1634,17 +1661,23 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je posodobljen.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Povezava na www.freefilesync.org ni mogoča.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Preveri</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Ne morem najti sistemske funkcije %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Ne morem se registrirati za prejem sistemskih sporočil.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Omogoči registracijo obvestil naprave za %x.</target>
@@ -1654,9 +1687,6 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 
 <source>The file is locked by another process:</source>
 <target>Datoteka je zaklenjena s strani drugega procesa:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Ne morem zapisati datotečnih atributov od %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Ne morem prebrati varnostnega konteksta od %x.</target>
@@ -1672,9 +1702,6 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 
 <source>%x is not a regular directory name.</source>
 <target>%x ni pravilno ime imenika.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Ne morem najti sistemske funkcije %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Ne morem kopirati datoteke %x v %y.</target>
@@ -1741,6 +1768,9 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Nastavitvena datoteka %x je nepopolna. Manjkajoči element bo nastavljen na privzete vrednosti.</target>
+
+<source>Internet access failed.</source>
+<target>Neuspešna povezava na internet.</target>
 
 <source>Prepare installation</source>
 <target>Pripravljam namestitev</target>

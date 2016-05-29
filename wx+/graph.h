@@ -24,8 +24,8 @@ namespace zen
 Example:
     //init graph (optional)
     m_panelGraph->setAttributes(Graph2D::MainAttributes().
-                                setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
-                                setLabelY(Graph2D::Y_LABEL_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
+                                setLabelX(Graph2D::LABEL_X_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
+                                setLabelY(Graph2D::LABEL_Y_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
     //set graph data
     std::shared_ptr<CurveData> curveDataBytes = ...
     m_panelGraph->setCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
@@ -47,8 +47,7 @@ struct CurveData
     virtual ~CurveData() {}
 
     virtual std::pair<double, double> getRangeX() const = 0;
-    virtual void getPoints(double minX, double maxX, int pixelWidth,
-                           std::vector<CurvePoint>& points) const = 0; //points outside the draw area are automatically trimmed!
+    virtual std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const = 0; //points outside the draw area are automatically trimmed!
 };
 
 //special curve types:
@@ -57,7 +56,7 @@ struct ContinuousCurveData : public CurveData
     virtual double getValue(double x) const = 0;
 
 private:
-    void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override;
+    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override;
 };
 
 struct SparseCurveData : public CurveData
@@ -68,7 +67,7 @@ struct SparseCurveData : public CurveData
     virtual Opt<CurvePoint> getGreaterEq(double x) const = 0;
 
 private:
-    void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const override;
+    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override;
     const bool addSteps_;
 };
 
@@ -158,7 +157,7 @@ private:
     SelectionBlock selBlock_;
 };
 
-typedef void (wxEvtHandler::*GraphSelectEventFunction)(GraphSelectEvent&);
+using GraphSelectEventFunction = void (wxEvtHandler::*)(GraphSelectEvent&);
 
 #define GraphSelectEventHandler(func) \
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GraphSelectEventFunction, &func)
@@ -180,7 +179,8 @@ public:
     public:
         CurveAttributes() {} //required by GCC
         CurveAttributes& setColor     (const wxColor& col) { color = col; autoColor = false; return *this; }
-        CurveAttributes& fillCurveArea(const wxColor& col) { fillColor = col; drawCurveArea = true; return *this; }
+        CurveAttributes& fillCurveArea  (const wxColor& col) { fillColor = col; fillMode = FILL_CURVE;   return *this; }
+        CurveAttributes& fillPolygonArea(const wxColor& col) { fillColor = col; fillMode = FILL_POLYGON; return *this; }
         CurveAttributes& setLineWidth(size_t width) { lineWidth = static_cast<int>(width); return *this; }
 
     private:
@@ -189,7 +189,14 @@ public:
         bool autoColor = true;
         wxColor color;
 
-        bool drawCurveArea = false;
+        enum FillMode
+        {
+            FILL_NONE,
+            FILL_CURVE,
+            FILL_POLYGON
+        };
+
+        FillMode fillMode = FILL_NONE;
         wxColor fillColor;
 
         int lineWidth = 2;
@@ -198,18 +205,20 @@ public:
     void setCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca = CurveAttributes());
     void addCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca = CurveAttributes());
 
+    static wxColor getBorderColor() { return { 130, 135, 144 }; } //medium grey, the same Win7 uses for other frame borders => not accessible! but no big deal...
+
     enum PosLabelY
     {
-        Y_LABEL_LEFT,
-        Y_LABEL_RIGHT,
-        Y_LABEL_NONE
+        LABEL_Y_LEFT,
+        LABEL_Y_RIGHT,
+        LABEL_Y_NONE
     };
 
     enum PosLabelX
     {
-        X_LABEL_TOP,
-        X_LABEL_BOTTOM,
-        X_LABEL_NONE
+        LABEL_X_TOP,
+        LABEL_X_BOTTOM,
+        LABEL_X_NONE
     };
 
     enum PosCorner
@@ -273,11 +282,11 @@ public:
         double minY = 0; //y-range to visualize
         double maxY = 0; //
 
-        PosLabelX labelposX = X_LABEL_BOTTOM;
+        PosLabelX labelposX = LABEL_X_BOTTOM;
         int xLabelHeight = 25;
         std::shared_ptr<LabelFormatter> labelFmtX = std::make_shared<DecimalNumberFormatter>();
 
-        PosLabelY labelposY = Y_LABEL_LEFT;
+        PosLabelY labelposY = LABEL_Y_LEFT;
         int yLabelWidth = 60;
         std::shared_ptr<LabelFormatter> labelFmtY = std::make_shared<DecimalNumberFormatter>();
 
@@ -334,9 +343,11 @@ private:
 
     Opt<wxBitmap> doubleBuffer;
 
-    typedef std::vector<std::pair<std::shared_ptr<CurveData>, CurveAttributes>> CurveList;
+    using CurveList = std::vector<std::pair<std::shared_ptr<CurveData>, CurveAttributes>>;
     CurveList curves_;
-    wxFont labelFont; //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
+
+    //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
+    const wxFont labelFont { wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial" };
 };
 }
 

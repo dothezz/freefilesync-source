@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Génération de la liste des fichiers...</target>
 
+<source>Fail-safe file copy</source>
+<target>Copie de fichiers sécurisé</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Copier les fichiers verrouillés</target>
+
+<source>Copy file access permissions</source>
+<target>Copie des droits d'accès aux fichiers</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Comparaison en cours</target>
 
@@ -291,8 +324,8 @@ Trouvé : %y octets
 <source>Error Code %x:</source>
 <target>Code erreur %x :</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Impossible de se connecter au server SFTP %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Trouvé : %y octets
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Impossible d'accéder au service Volume Shadow Copy.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Utilisez la version FreeFileSync 64-bit pour créer des "shadow copies" sur ce système.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Impossible de déterminer le nom du volume de %x.</target>
@@ -580,6 +613,9 @@ La commande est déclenchée si :
 
 <source>Updating attributes of %x</source>
 <target>Mise à jour des attributs de %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Impossible d'écrire les attributs de fichier de %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x et %y ont des contenus différents.</target>
@@ -878,6 +914,9 @@ La commande est déclenchée si :
 <source>Folder pair:</source>
 <target>Paire de dossiers :</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Utiliser les paramètres locaux :</target>
 
@@ -938,6 +977,9 @@ La commande est déclenchée si :
 <source>C&lear</source>
 <target>&Effacer</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Détection du sens de la synchronisation à l'aide de la base de données</target>
+
 <source>Detect moved files</source>
 <target>Détection des fichiers déplacés</target>
 
@@ -952,23 +994,20 @@ La commande est déclenchée si :
 - Détection impossible lors de la première synchronisation
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Détection du sens de la synchronisation à l'aide de la base de données</target>
-
 <source>Delete files:</source>
 <target>Supprimer les fichiers :</target>
-
-<source>&Permanent</source>
-<target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Supprimer ou écraser les fichiers définitivement</target>
 
 <source>&Recycle bin</source>
 <target>&Corbeille</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Sauvegarder les fichier détruits ou écrasés dans la Corbeille</target>
+
+<source>&Permanent</source>
+<target>&Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Supprimer ou écraser les fichiers définitivement</target>
 
 <source>&Versioning</source>
 <target>Gestion des &Versions</target>
@@ -982,14 +1021,14 @@ La commande est déclenchée si :
 <source>Handle errors:</source>
 <target>Gestion des erreurs :</target>
 
-<source>Hide all error and warning messages</source>
-<target>Masquer tous les messages d'erreurs et les avertissements</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Montrer les messages d'avertissement ou d'erreur</target>
+
+<source>Hide all error and warning messages</source>
+<target>Masquer tous les messages d'erreurs et les avertissements</target>
 
 <source>On completion:</source>
 <target>A la fin :</target>
@@ -1096,9 +1135,6 @@ La commande est déclenchée si :
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Les paramètres suivants sont utilisés lors de toutes les synchronisations.</target>
 
-<source>Fail-safe file copy</source>
-<target>Copie de fichiers sécurisé</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>(recommended)</source>
 <target>(recommandé)</target>
 
-<source>Copy locked files</source>
-<target>Copier les fichiers verrouillés</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Copie les fichiers partagés ou verrouillés à l'aide du Service Volume Shadow Copy.</target>
 
 <source>(requires administrator rights)</source>
 <target>(nécessite les droits administrateur)</target>
-
-<source>Copy file access permissions</source>
-<target>Copie des droits d'accès aux fichiers</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Transfert des autorisations des fichiers et dossiers.</target>
@@ -1600,9 +1630,6 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Percentage</source>
 <target>Pourcentage</target>
 
-<source>Internet access failed.</source>
-<target>Echec de l'accès Internet.</target>
-
 <source>Check for Program Updates</source>
 <target>Recherche des Mises à Jour</target>
 
@@ -1612,17 +1639,23 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync est à jour.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Impossible de se connecter à www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Contrôle</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Impossible de trouver la fonction système %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Impossible d'enregistrer la réception des messages système.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Impossible d'enregistrer les notifications de périphérique pour %x.</target>
@@ -1632,9 +1665,6 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>The file is locked by another process:</source>
 <target>Le fichier est verrouillé par un autre process :</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Impossible d'écrire les attributs de fichier de %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Impossible de lire les paramètres de sécurité de %x.</target>
@@ -1650,9 +1680,6 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>%x is not a regular directory name.</source>
 <target>%x n'est pas un nom de répertoire valise.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Impossible de trouver la fonction système %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Impossible de copier le fichier %x vers %y.</target>
@@ -1714,6 +1741,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Le fichier de configuration %x est incomplet. Les éléments manquants sont fixés à leur valeur par défaut.</target>
 
+<source>Internet access failed.</source>
+<target>Echec de l'accès Internet.</target>
+
 <source>Prepare installation</source>
 <target>Préparation de l'installation</target>
 
@@ -1736,7 +1766,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Enregistrer la configuration dans "%APPDATA%\FreeFileSync"</target>
 
 <source>Register FreeFileSync file extensions</source>
-<target>Enregistrer les extensions de fichier</target>
+<target></target>
 
 <source>Create Explorer context menu entries</source>
 <target>Créer les entrées du menu contextuel de l'Explorateur</target>
@@ -1763,10 +1793,10 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>le menu Démarrer</target>
 
 <source>Registering FreeFileSync file extensions</source>
-<target>Enregistrement des extensions de fichier</target>
+<target></target>
 
 <source>Unregistering FreeFileSync file extensions</source>
-<target>Suppression des extensions de fichier</target>
+<target></target>
 
 <source>FreeFileSync Configuration</source>
 <target>Configuration de FreeFileSync</target>

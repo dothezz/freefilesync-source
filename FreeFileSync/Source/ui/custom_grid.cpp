@@ -194,6 +194,8 @@ public:
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
 
+    void setItemPathForm(ItemPathFormat fmt) { itemPathFormat = fmt; }
+
     void updateNewAndGetUnbufferedIcons(std::vector<AbstractPath>& newLoad) //loads all not yet drawn icons
     {
         if (iconMgr_)
@@ -216,7 +218,7 @@ public:
                         if (iconMgr_->refIconBuffer().readyForRetrieval(ii.fsObj->template getAbstractPath<side>()))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
-                            refGrid().refreshCell(currentRow, static_cast<ColumnType>(ColumnTypeRim::FILENAME));
+                            refGrid().refreshCell(currentRow, static_cast<ColumnType>(ColumnTypeRim::ITEM_PATH));
                             setFailedLoad(currentRow, false);
                         }
                         else //not yet in buffer: mark for async. loading
@@ -275,7 +277,7 @@ protected:
         if (enabled)
         {
             if (selected)
-                dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
+                dc.GradientFillLinear(rect, Grid::getColorSelectionGradientFrom(), Grid::getColorSelectionGradientTo(), wxEAST);
             //ignore focus
             else
             {
@@ -368,7 +370,7 @@ private:
         {
             struct GetTextValue : public FSObjectVisitor
             {
-                GetTextValue(ColumnTypeRim ctr) : colType_(ctr)  {}
+                GetTextValue(ColumnTypeRim ctr, ItemPathFormat fmt) : colType_(ctr), itemPathFormat_(fmt) {}
 
                 void visit(const FilePair& file) override
                 {
@@ -376,14 +378,17 @@ private:
                     {
                         switch (colType_)
                         {
-                            case ColumnTypeRim::FULL_PATH:
-                                return file.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(file.getAbstractPath<side>());
-                            case ColumnTypeRim::FILENAME:
-                                return utfCvrtTo<std::wstring>(file.getItemName<side>());
-                            case ColumnTypeRim::REL_FOLDER:
-                                return utfCvrtTo<std::wstring>(beforeLast(file.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
-                            case ColumnTypeRim::BASE_DIRECTORY:
-                                return AFS::getDisplayPath(file.base().getAbstractPath<side>());
+                            case ColumnTypeRim::ITEM_PATH:
+                                switch (itemPathFormat_)
+                                {
+                                    case ItemPathFormat::FULL_PATH:
+                                        return file.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(file.getAbstractPath<side>());
+                                    case ItemPathFormat::RELATIVE_PATH:
+                                        return utfCvrtTo<std::wstring>(file.getRelativePath<side>());
+                                    case ItemPathFormat::ITEM_NAME:
+                                        return utfCvrtTo<std::wstring>(file.getItemName<side>());
+                                }
+                                break;
                             case ColumnTypeRim::SIZE:
                                 //return file.isEmpty<side>() ? std::wstring() : utfCvrtTo<std::wstring>(file.getFileId<side>()); // -> test file id
                                 return file.isEmpty<side>() ? std::wstring() : toGuiString(file.getFileSize<side>());
@@ -403,14 +408,17 @@ private:
                     {
                         switch (colType_)
                         {
-                            case ColumnTypeRim::FULL_PATH:
-                                return symlink.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(symlink.getAbstractPath<side>());
-                            case ColumnTypeRim::FILENAME:
-                                return utfCvrtTo<std::wstring>(symlink.getItemName<side>());
-                            case ColumnTypeRim::REL_FOLDER:
-                                return utfCvrtTo<std::wstring>(beforeLast(symlink.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
-                            case ColumnTypeRim::BASE_DIRECTORY:
-                                return AFS::getDisplayPath(symlink.base().getAbstractPath<side>());
+                            case ColumnTypeRim::ITEM_PATH:
+                                switch (itemPathFormat_)
+                                {
+                                    case ItemPathFormat::FULL_PATH:
+                                        return symlink.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(symlink.getAbstractPath<side>());
+                                    case ItemPathFormat::RELATIVE_PATH:
+                                        return utfCvrtTo<std::wstring>(symlink.getRelativePath<side>());
+                                    case ItemPathFormat::ITEM_NAME:
+                                        return utfCvrtTo<std::wstring>(symlink.getItemName<side>());
+                                }
+                                break;
                             case ColumnTypeRim::SIZE:
                                 return symlink.isEmpty<side>() ? std::wstring() : L"<" + _("Symlink") + L">";
                             case ColumnTypeRim::DATE:
@@ -429,14 +437,17 @@ private:
                     {
                         switch (colType_)
                         {
-                            case ColumnTypeRim::FULL_PATH:
-                                return folder.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(folder.getAbstractPath<side>());
-                            case ColumnTypeRim::FILENAME:
-                                return utfCvrtTo<std::wstring>(folder.getItemName<side>());
-                            case ColumnTypeRim::REL_FOLDER:
-                                return utfCvrtTo<std::wstring>(beforeLast(folder.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
-                            case ColumnTypeRim::BASE_DIRECTORY:
-                                return AFS::getDisplayPath(folder.base().getAbstractPath<side>());
+                            case ColumnTypeRim::ITEM_PATH:
+                                switch (itemPathFormat_)
+                                {
+                                    case ItemPathFormat::FULL_PATH:
+                                        return folder.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(folder.getAbstractPath<side>());
+                                    case ItemPathFormat::RELATIVE_PATH:
+                                        return utfCvrtTo<std::wstring>(folder.getRelativePath<side>());
+                                    case ItemPathFormat::ITEM_NAME:
+                                        return utfCvrtTo<std::wstring>(folder.getItemName<side>());
+                                }
+                                break;
                             case ColumnTypeRim::SIZE:
                                 return folder.isEmpty<side>() ? std::wstring() : L"<" + _("Folder") + L">";
                             case ColumnTypeRim::DATE:
@@ -449,8 +460,9 @@ private:
                     }();
                 }
                 const ColumnTypeRim colType_;
+                const ItemPathFormat itemPathFormat_;
                 std::wstring value; //out
-            } getVal(static_cast<ColumnTypeRim>(colType));
+            } getVal(static_cast<ColumnTypeRim>(colType), itemPathFormat);
             fsObj->accept(getVal);
             return getVal.value;
         }
@@ -462,7 +474,7 @@ private:
 
     void renderCell(wxDC& dc, const wxRect& rect, size_t row, ColumnType colType, bool enabled, bool selected, HoverArea rowHover) override
     {
-        wxRect rectTmp = rect;
+        //don't forget to harmonize with getBestSize()!!!
 
         const bool isActive = [&]
         {
@@ -471,125 +483,189 @@ private:
             return true;
         }();
 
-        //draw file icon
-        if (static_cast<ColumnTypeRim>(colType) == ColumnTypeRim::FILENAME &&
-            iconMgr_)
-        {
-            rectTmp.x     += GAP_SIZE;
-            rectTmp.width -= GAP_SIZE;
-
-            const int iconSize = iconMgr_->refIconBuffer().getSize();
-            if (rectTmp.GetWidth() >= iconSize)
-            {
-                //  Partitioning:
-                //   __________________________
-                //  | gap | icon | gap | text |
-                //   --------------------------
-
-                //whenever there's something new to render on screen, start up watching for failed icon drawing:
-                //=> ideally it would suffice to start watching only when scrolling grid or showing new grid content, but this solution is more robust
-                //and the icon updater will stop automatically when finished anyway
-                //Note: it's not sufficient to start up on failed icon loads only, since we support prefetching of not yet visible rows!!!
-                iconMgr_->startIconUpdater();
-
-                const IconInfo ii = getIconInfo(row);
-
-                wxBitmap fileIcon;
-                switch (ii.type)
-                {
-                    case IconInfo::FOLDER:
-                        fileIcon = iconMgr_->getGenericDirIcon();
-                        break;
-
-                    case IconInfo::ICON_PATH:
-                        if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.fsObj->template getAbstractPath<side>()))
-                            fileIcon = *tmpIco;
-                        else
-                        {
-                            setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
-                            //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
-                            //see repaint behavior of ::ScrollWindow() function!
-                            fileIcon = iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
-                        }
-                        break;
-
-                    case IconInfo::EMPTY:
-                        break;
-                }
-
-                if (fileIcon.IsOk())
-                {
-                    wxRect rectIcon = rectTmp;
-                    rectIcon.width = iconSize; //support small thumbnail centering
-
-                    auto drawIcon = [&](const wxBitmap& icon)
-                    {
-                        if (isActive)
-                            drawBitmapRtlNoMirror(dc, icon, rectIcon, wxALIGN_CENTER);
-                        else
-                            drawBitmapRtlNoMirror(dc, wxBitmap(icon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
-                                                  rectIcon, wxALIGN_CENTER);
-                    };
-
-                    drawIcon(fileIcon);
-
-                    if (ii.drawAsLink)
-                        drawIcon(iconMgr_->getLinkOverlayIcon());
-                }
-            }
-            rectTmp.x     += iconSize;
-            rectTmp.width -= iconSize;
-        }
-
         wxDCTextColourChanger dummy(dc);
         if (!isActive)
             dummy.Set(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
         else if (getRowDisplayType(row) != DisplayType::NORMAL)
             dummy.Set(*wxBLACK); //accessibility: always set both foreground AND background colors!
 
-        //draw text
-        if (static_cast<ColumnTypeRim>(colType) == ColumnTypeRim::SIZE && refGrid().GetLayoutDirection() != wxLayout_RightToLeft)
-        {
-            //have file size right-justified (but don't change for RTL languages)
-            rectTmp.width -= GAP_SIZE;
-            drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-        }
-        else
+        wxRect rectTmp = rect;
+
+        auto drawTextBlock = [&](const std::wstring& text)
         {
             rectTmp.x     += GAP_SIZE;
             rectTmp.width -= GAP_SIZE;
-            drawCellText(dc, rectTmp, getValue(row, colType), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            const wxSize extent = drawCellText(dc, rectTmp, text, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            rectTmp.x     += extent.GetWidth();
+            rectTmp.width -= extent.GetWidth();
+        };
+
+        const std::wstring cellValue = getValue(row, colType);
+
+        switch (static_cast<ColumnTypeRim>(colType))
+        {
+            case ColumnTypeRim::ITEM_PATH:
+            {
+                if (!iconMgr_)
+                    drawTextBlock(cellValue);
+                else
+                {
+                    auto it = cellValue.end();
+                    while (it != cellValue.begin()) //reverse iteration: 1. check 2. decrement 3. evaluate
+                    {
+                        --it;
+                        if (*it == '\\' || *it == '/')
+                        {
+                            ++it;
+                            break;
+                        }
+                    }
+                    const std::wstring pathPrefix(cellValue.begin(), it);
+                    const std::wstring itemName(it, cellValue.end());
+
+                    //  Partitioning:
+                    //   __________________________________________________
+                    //  | gap | path prefix | gap | icon | gap | item name |
+                    //   --------------------------------------------------
+                    if (!pathPrefix.empty())
+                        drawTextBlock(pathPrefix);
+
+                    //draw file icon
+                    rectTmp.x     += GAP_SIZE;
+                    rectTmp.width -= GAP_SIZE;
+
+                    const int iconSize = iconMgr_->refIconBuffer().getSize();
+                    if (rectTmp.GetWidth() >= iconSize)
+                    {
+                        //whenever there's something new to render on screen, start up watching for failed icon drawing:
+                        //=> ideally it would suffice to start watching only when scrolling grid or showing new grid content, but this solution is more robust
+                        //and the icon updater will stop automatically when finished anyway
+                        //Note: it's not sufficient to start up on failed icon loads only, since we support prefetching of not yet visible rows!!!
+                        iconMgr_->startIconUpdater();
+
+                        const IconInfo ii = getIconInfo(row);
+
+                        wxBitmap fileIcon;
+                        switch (ii.type)
+                        {
+                            case IconInfo::FOLDER:
+                                fileIcon = iconMgr_->getGenericDirIcon();
+                                break;
+
+                            case IconInfo::ICON_PATH:
+                                if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(ii.fsObj->template getAbstractPath<side>()))
+                                    fileIcon = *tmpIco;
+                                else
+                                {
+                                    setFailedLoad(row); //save status of failed icon load -> used for async. icon loading
+                                    //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
+                                    //see repaint behavior of ::ScrollWindow() function!
+                                    fileIcon = iconMgr_->refIconBuffer().getIconByExtension(ii.fsObj->template getItemName<side>()); //better than nothing
+                                }
+                                break;
+
+                            case IconInfo::EMPTY:
+                                break;
+                        }
+
+                        if (fileIcon.IsOk())
+                        {
+                            wxRect rectIcon = rectTmp;
+                            rectIcon.width = iconSize; //support small thumbnail centering
+
+                            auto drawIcon = [&](const wxBitmap& icon)
+                            {
+                                if (isActive)
+                                    drawBitmapRtlNoMirror(dc, icon, rectIcon, wxALIGN_CENTER);
+                                else
+                                    drawBitmapRtlNoMirror(dc, wxBitmap(icon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
+                                                          rectIcon, wxALIGN_CENTER);
+                            };
+
+                            drawIcon(fileIcon);
+
+                            if (ii.drawAsLink)
+                                drawIcon(iconMgr_->getLinkOverlayIcon());
+                        }
+                    }
+                    rectTmp.x     += iconSize;
+                    rectTmp.width -= iconSize;
+
+                    drawTextBlock(itemName);
+                }
+            }
+            break;
+
+            case ColumnTypeRim::SIZE:
+                if (refGrid().GetLayoutDirection() != wxLayout_RightToLeft)
+                {
+                    rectTmp.width -= GAP_SIZE; //have file size right-justified (but don't change for RTL languages)
+                    drawCellText(dc, rectTmp, cellValue, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+                }
+                else
+                    drawTextBlock(cellValue);
+                break;
+
+            case ColumnTypeRim::DATE:
+            case ColumnTypeRim::EXTENSION:
+                drawTextBlock(cellValue);
+                break;
         }
     }
 
     int getBestSize(wxDC& dc, size_t row, ColumnType colType) override
     {
         //  Partitioning:
-        //  _________________________________
-        //  | gap | icon | gap | text | gap |
-        //  ---------------------------------
+        //   ________________________________________________________
+        //  | gap | path prefix | gap | icon | gap | item name | gap |
+        //   --------------------------------------------------------
 
-        int bestSize = 0;
-        if (static_cast<ColumnTypeRim>(colType) == ColumnTypeRim::FILENAME && iconMgr_)
+        const std::wstring cellValue = getValue(row, colType);
+
+        if (static_cast<ColumnTypeRim>(colType) == ColumnTypeRim::ITEM_PATH && iconMgr_)
+        {
+            auto it = cellValue.end();
+            while (it != cellValue.begin()) //reverse iteration: 1. check 2. decrement 3. evaluate
+            {
+                --it;
+                if (*it == '\\' || *it == '/')
+                {
+                    ++it;
+                    break;
+                }
+            }
+            const std::wstring pathPrefix(cellValue.begin(), it);
+            const std::wstring itemName(it, cellValue.end());
+
+            int bestSize = 0;
+            if (!pathPrefix.empty())
+                bestSize += GAP_SIZE + dc.GetTextExtent(pathPrefix).GetWidth();
+
             bestSize += GAP_SIZE + iconMgr_->refIconBuffer().getSize();
-
-        bestSize += GAP_SIZE + dc.GetTextExtent(getValue(row, colType)).GetWidth() + GAP_SIZE;
-
-        return bestSize; // + 1 pix for cell border line -> not used anymore!
+            bestSize += GAP_SIZE + dc.GetTextExtent(itemName).GetWidth() + GAP_SIZE;
+            return bestSize;
+        }
+        else
+            return GAP_SIZE + dc.GetTextExtent(cellValue).GetWidth() + GAP_SIZE;
+        // + 1 pix for cell border line ? -> not used anymore!
     }
 
     std::wstring getColumnLabel(ColumnType colType) const override
     {
         switch (static_cast<ColumnTypeRim>(colType))
         {
-            case ColumnTypeRim::FULL_PATH:
-                return _("Full path");
-            case ColumnTypeRim::FILENAME:
-                return _("Name"); //= short name
-            case ColumnTypeRim::REL_FOLDER:
-                return _("Relative folder");
-            case ColumnTypeRim::BASE_DIRECTORY:
-                return _("Base folder");
+            case ColumnTypeRim::ITEM_PATH:
+                switch (itemPathFormat)
+                {
+                    case ItemPathFormat::FULL_PATH:
+                        return _("Full path");
+                    case ItemPathFormat::RELATIVE_PATH:
+                        return _("Relative path");
+                    case ItemPathFormat::ITEM_NAME:
+                        return _("Item name");
+                }
+                assert(false);
+                break;
             case ColumnTypeRim::SIZE:
                 return _("Size");
             case ColumnTypeRim::DATE:
@@ -712,7 +788,7 @@ private:
     }
 
     std::shared_ptr<IconManager> iconMgr_; //optional
-
+    ItemPathFormat itemPathFormat = ItemPathFormat::FULL_PATH;
 
     std::vector<char> failedLoads; //effectively a vector<bool> of size "number of rows"
     Opt<wxBitmap> renderBuf; //avoid costs of recreating this temporal variable
@@ -772,7 +848,7 @@ private:
             {
                 wxRect rectTmp = rect;
                 rectTmp.width /= 20;
-                dc.GradientFillLinear(rectTmp, getColorSelectionGradientFrom(), GridDataRim<LEFT_SIDE>::getBackGroundColor(row), wxEAST);
+                dc.GradientFillLinear(rectTmp, Grid::getColorSelectionGradientFrom(), GridDataRim<LEFT_SIDE>::getBackGroundColor(row), wxEAST);
             }
         }
     }
@@ -903,7 +979,7 @@ private:
         if (enabled)
         {
             if (selected)
-                dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
+                dc.GradientFillLinear(rect, Grid::getColorSelectionGradientFrom(), Grid::getColorSelectionGradientTo(), wxEAST);
             else
             {
                 if (const FileSystemObject* fsObj = getRawData(row))
@@ -1542,11 +1618,13 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
     const int widthAction   = 45;
     gridCenter.SetSize(widthCategory + widthCheckbox + widthAction, -1);
 
-    std::vector<Grid::ColumnAttribute> attribCenter;
-    attribCenter.emplace_back(static_cast<ColumnType>(ColumnTypeCenter::CHECKBOX    ), widthCheckbox, 0, true);
-    attribCenter.emplace_back(static_cast<ColumnType>(ColumnTypeCenter::CMP_CATEGORY), widthCategory, 0, true);
-    attribCenter.emplace_back(static_cast<ColumnType>(ColumnTypeCenter::SYNC_ACTION ), widthAction,   0, true);
-    gridCenter.setColumnConfig(attribCenter);
+    gridCenter.setColumnConfig(
+    {
+        { static_cast<ColumnType>(ColumnTypeCenter::CHECKBOX    ), widthCheckbox, 0, true },
+        { static_cast<ColumnType>(ColumnTypeCenter::CMP_CATEGORY), widthCategory, 0, true },
+        { static_cast<ColumnType>(ColumnTypeCenter::SYNC_ACTION ), widthAction,   0, true },
+    }
+    );
 }
 
 
@@ -1671,6 +1749,18 @@ void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, boo
     }
     else
         assert(false);
+}
+
+
+void gridview::setItemPathForm(Grid& grid, ItemPathFormat fmt)
+{
+    if (auto* provLeft  = dynamic_cast<GridDataLeft*>(grid.getDataProvider()))
+        provLeft->setItemPathForm(fmt);
+    else if (auto* provRight = dynamic_cast<GridDataRight*>(grid.getDataProvider()))
+        provRight->setItemPathForm(fmt);
+    else
+        assert(false);
+    grid.Refresh();
 }
 
 

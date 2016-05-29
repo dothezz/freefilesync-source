@@ -168,8 +168,8 @@ private:
                     |                         */
     std::vector<std::shared_ptr<BaseFolderPair>> folderCmp; //full raw data
 
-    ColumnTypeNavi sortColumn = defaultValueLastSortColumn;
-    bool sortAscending        = defaultValueLastSortAscending;
+    ColumnTypeNavi sortColumn = naviGridLastSortColumnDefault;
+    bool sortAscending        = naviGridLastSortAscendingDefault;
 };
 
 

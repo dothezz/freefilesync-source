@@ -13,20 +13,21 @@
 
 namespace zen
 {
-enum CompareVariant
+enum class CompareVariant
 {
-    CMP_BY_TIME_SIZE,
-    CMP_BY_CONTENT,
-    CMP_BY_SIZE
+    TIME_SIZE,
+    CONTENT,
+    SIZE
 };
 
 std::wstring getVariantName(CompareVariant var);
 
-enum SymLinkHandling
+
+enum class SymLinkHandling
 {
-    SYMLINK_EXCLUDE,
-    SYMLINK_DIRECT,
-    SYMLINK_FOLLOW
+    EXCLUDE,
+    DIRECT,
+    FOLLOW
 };
 
 
@@ -43,9 +44,9 @@ enum CompareFilesResult
     FILE_EQUAL,
     FILE_LEFT_SIDE_ONLY,
     FILE_RIGHT_SIDE_ONLY,
-    FILE_LEFT_NEWER,  //CMP_BY_TIME_SIZE only!
+    FILE_LEFT_NEWER,  //CompareVariant::TIME_SIZE only!
     FILE_RIGHT_NEWER, //
-    FILE_DIFFERENT_CONTENT, //CMP_BY_CONTENT, CMP_BY_SIZE only!
+    FILE_DIFFERENT_CONTENT, //CompareVariant::CONTENT, CompareVariant::SIZE only!
     FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case
     FILE_CONFLICT
 };
@@ -105,9 +106,9 @@ struct DirectionSet
 {
     SyncDirection exLeftSideOnly  = SyncDirection::RIGHT;
     SyncDirection exRightSideOnly = SyncDirection::LEFT;
-    SyncDirection leftNewer       = SyncDirection::RIGHT; //CMP_BY_TIME_SIZE only!
+    SyncDirection leftNewer       = SyncDirection::RIGHT; //CompareVariant::TIME_SIZE only!
     SyncDirection rightNewer      = SyncDirection::LEFT;  //
-    SyncDirection different       = SyncDirection::NONE; //CMP_BY_CONTENT, CMP_BY_SIZE only!
+    SyncDirection different       = SyncDirection::NONE; //CompareVariant::CONTENT, CompareVariant::SIZE only!
     SyncDirection conflict        = SyncDirection::NONE;
 };
 
@@ -128,15 +129,15 @@ struct DirectionConfig //technical representation of sync-config
 {
     enum Variant
     {
-        TWOWAY, //use sync-database to determine directions
-        MIRROR,    //predefined
-        UPDATE,    //
-        CUSTOM     //use custom directions
+        TWO_WAY, //use sync-database to determine directions
+        MIRROR, //predefined
+        UPDATE, //
+        CUSTOM //use custom directions
     };
 
-    Variant var = TWOWAY;
+    Variant var = TWO_WAY;
     DirectionSet custom; //sync directions for variant CUSTOM
-    bool detectMovedFiles = false; //dependent from Variant: e.g. always active for DirectionConfig::TWOWAY! => use functions below for evaluation!
+    bool detectMovedFiles = false; //dependent from Variant: e.g. always active for DirectionConfig::TWO_WAY! => use functions below for evaluation!
 };
 
 inline
@@ -151,23 +152,23 @@ bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
 bool detectMovedFilesSelectable(const DirectionConfig& cfg);
 bool detectMovedFilesEnabled   (const DirectionConfig& cfg);
 
-DirectionSet extractDirections(const DirectionConfig& cfg); //get sync directions: DON'T call for DirectionConfig::TWOWAY!
+DirectionSet extractDirections(const DirectionConfig& cfg); //get sync directions: DON'T call for DirectionConfig::TWO_WAY!
 
 std::wstring getVariantName(DirectionConfig::Variant var);
 
 inline
 bool effectivelyEqual(const DirectionConfig& lhs, const DirectionConfig& rhs)
 {
-    return (lhs.var == DirectionConfig::TWOWAY) == (rhs.var == DirectionConfig::TWOWAY) && //either both two-way or none
-           (lhs.var == DirectionConfig::TWOWAY || extractDirections(lhs) == extractDirections(rhs)) &&
+    return (lhs.var == DirectionConfig::TWO_WAY) == (rhs.var == DirectionConfig::TWO_WAY) && //either both two-way or none
+           (lhs.var == DirectionConfig::TWO_WAY || extractDirections(lhs) == extractDirections(rhs)) &&
            detectMovedFilesEnabled(lhs) == detectMovedFilesEnabled(rhs);
 }
 
 
 struct CompConfig
 {
-    CompareVariant compareVar = CMP_BY_TIME_SIZE;
-    SymLinkHandling handleSymlinks = SYMLINK_EXCLUDE;
+    CompareVariant compareVar = CompareVariant::TIME_SIZE;
+    SymLinkHandling handleSymlinks = SymLinkHandling::EXCLUDE;
     std::vector<unsigned int> ignoreTimeShiftMinutes; //treat modification times with these offsets as equal
 };
 
@@ -187,17 +188,17 @@ std::vector<unsigned int> fromTimeShiftPhrase(const std::wstring& timeShiftPhras
 std::wstring              toTimeShiftPhrase  (const std::vector<unsigned int>& ignoreTimeShiftMinutes);
 
 
-enum DeletionPolicy
+enum class DeletionPolicy
 {
-    DELETE_PERMANENTLY,
-    DELETE_TO_RECYCLER,
-    DELETE_TO_VERSIONING
+    PERMANENT,
+    RECYCLER,
+    VERSIONING
 };
 
-enum VersioningStyle
+enum class VersioningStyle
 {
-    VER_STYLE_REPLACE,
-    VER_STYLE_ADD_TIMESTAMP,
+    REPLACE,
+    ADD_TIMESTAMP,
 };
 
 struct SyncConfig
@@ -205,11 +206,11 @@ struct SyncConfig
     //sync direction settings
     DirectionConfig directionCfg;
 
-    DeletionPolicy handleDeletion = DELETE_TO_RECYCLER; //use Recycle, delete permanently or move to user-defined location
+    DeletionPolicy handleDeletion = DeletionPolicy::RECYCLER; //use Recycle, delete permanently or move to user-defined location
     //versioning options
-    VersioningStyle versioningStyle = VER_STYLE_REPLACE;
+    VersioningStyle versioningStyle = VersioningStyle::REPLACE;
     Zstring versioningFolderPhrase;
-    //int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
+    //int versionCountLimit; //max versions per file (DeletionPolicy::VERSIONING); < 0 := no limit
 };
 
 
@@ -229,28 +230,28 @@ bool effectivelyEqual(const SyncConfig& lhs, const SyncConfig& rhs)
 {
     return effectivelyEqual(lhs.directionCfg, rhs.directionCfg) &&
            lhs.handleDeletion == rhs.handleDeletion &&
-           (lhs.handleDeletion != DELETE_TO_VERSIONING || //only compare deletion directory if required!
+           (lhs.handleDeletion != DeletionPolicy::VERSIONING || //only compare deletion directory if required!
             (lhs.versioningStyle   == rhs.versioningStyle &&
              lhs.versioningFolderPhrase == rhs.versioningFolderPhrase));
 }
 
 
-enum UnitSize
+enum class UnitSize
 {
-    USIZE_NONE,
-    USIZE_BYTE,
-    USIZE_KB,
-    USIZE_MB
+    NONE,
+    BYTE,
+    KB,
+    MB
 };
 
-enum UnitTime
+enum class UnitTime
 {
-    UTIME_NONE,
-    UTIME_TODAY,
-    //    UTIME_THIS_WEEK,
-    UTIME_THIS_MONTH,
-    UTIME_THIS_YEAR,
-    UTIME_LAST_X_DAYS
+    NONE,
+    TODAY,
+    //THIS_WEEK,
+    THIS_MONTH,
+    THIS_YEAR,
+    LAST_X_DAYS
 };
 
 struct FilterConfig
@@ -275,7 +276,7 @@ struct FilterConfig
 
     /*
     Semantics of HardFilter:
-    1. using it creates a NEW folder hierarchy! -> must be considered by <Automatic>-mode! (fortunately it turns out, doing nothing already has perfect semantics :)
+    1. using it creates a NEW folder hierarchy! -> must be considered by <Two way> variant! (fortunately it turns out, doing nothing already has perfect semantics :)
     2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
     */
     Zstring includeFilter = Zstr("*");
@@ -285,16 +286,16 @@ struct FilterConfig
     Semantics of SoftFilter:
     1. It potentially may match only one side => it MUST NOT be applied while traversing a single folder to avoid mismatches
     2. => it is applied after traversing and just marks rows, (NO deletions after comparison are allowed)
-    3. => equivalent to a user temporarily (de-)selecting rows -> not relevant for <Automatic>-mode! ;)
+    3. => equivalent to a user temporarily (de-)selecting rows -> not relevant for <Two way> variant! ;)
     */
     size_t timeSpan = 0;
-    UnitTime unitTimeSpan = UTIME_NONE;
+    UnitTime unitTimeSpan = UnitTime::NONE;
 
     size_t sizeMin = 0;
-    UnitSize unitSizeMin = USIZE_NONE;
+    UnitSize unitSizeMin = UnitSize::NONE;
 
     size_t sizeMax = 0;
-    UnitSize unitSizeMax = USIZE_NONE;
+    UnitSize unitSizeMax = UnitSize::NONE;
 };
 
 inline

@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Vytváranie zoznamu súborov...</target>
 
+<source>Fail-safe file copy</source>
+<target>Bezpečné kopírovanie súborov</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopírovať zamknuté súbory</target>
+
+<source>Copy file access permissions</source>
+<target>Kopírovať prístupové oprávnenie súborov</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Spustiť porovnávania</target>
 
@@ -291,8 +324,8 @@ Aktuálne: %y b
 <source>Error Code %x:</source>
 <target>Chybový kód %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Nepodarilo sa pripojiť k SFTP servru %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Aktuálne: %y b
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Nie je prístup k službe Tieňové kópie.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Prosím použite FreeFileSync 64-bitovou verziu pre použitie služby Tieňové kópie.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>>Nie je možné zistiť názov jednotky pre %x.</target>
@@ -583,6 +616,9 @@ Príkaz bude spustení ak:
 
 <source>Updating attributes of %x</source>
 <target>Aktualizácia atribútov súboru %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nie je možné zapísať atribúty súboru %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x a %y majú odlišný obsah.</target>
@@ -882,6 +918,9 @@ Príkaz bude spustení ak:
 <source>Folder pair:</source>
 <target>Dvojica priečinkov:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Použiť lokálne nastavenie:</target>
 
@@ -942,6 +981,9 @@ Príkaz bude spustení ak:
 <source>C&lear</source>
 <target>Vy&mazať</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Určiť smer synchronizácie pomocou databázy</target>
+
 <source>Detect moved files</source>
 <target>Detekcia presunutých súborov</target>
 
@@ -956,23 +998,20 @@ Príkaz bude spustení ak:
 - Detekcia rozdielov je dostupná až po prvej synchronizácií
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Určiť smer synchronizácie pomocou databázy</target>
-
 <source>Delete files:</source>
 <target>Zmazanie súborov:</target>
-
-<source>&Permanent</source>
-<target>&Trvale</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Zmazať alebo prepísať súbory natrvalo</target>
 
 <source>&Recycle bin</source>
 <target>&Kôš</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Použiť Kôš pri zmazaní alebo prepisu súborov</target>
+
+<source>&Permanent</source>
+<target>&Trvale</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Zmazať alebo prepísať súbory natrvalo</target>
 
 <source>&Versioning</source>
 <target>&Archívovanie</target>
@@ -986,14 +1025,14 @@ Príkaz bude spustení ak:
 <source>Handle errors:</source>
 <target>Spracovanie chýb:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Skryť všetky chyby a varovania</target>
-
 <source>&Pop-up</source>
 <target>&Hlásenie</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Zobraziť hlásenie pri chybe alebo varovaní</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skryť všetky chyby a varovania</target>
 
 <source>On completion:</source>
 <target>Po dokončení:</target>
@@ -1100,9 +1139,6 @@ Príkaz bude spustení ak:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Toto nastavenie je platné pre všetky synchronizačné úlohy.</target>
 
-<source>Fail-safe file copy</source>
-<target>Bezpečné kopírovanie súborov</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1112,17 +1148,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(doporučené)</target>
 
-<source>Copy locked files</source>
-<target>Kopírovať zamknuté súbory</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopírovať zdielané alebo zamknuté súbory pomocou služby Tieňové kópie zväzkov.</target>
 
 <source>(requires administrator rights)</source>
 <target>(vyžaduje práva správcu)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopírovať prístupové oprávnenie súborov</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Preniesť prístupové oprávnenie súborov a priečinkov.</target>
@@ -1608,9 +1638,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Percentný podiel</target>
 
-<source>Internet access failed.</source>
-<target>Nie je prístup k internetu.</target>
-
 <source>Check for Program Updates</source>
 <target>Hľadanie aktualizácií programu</target>
 
@@ -1620,17 +1647,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je aktuálny.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nie je možné sa pripojiť k www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Kontrola</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Nie je možné nájsť systémovú funkciu %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nepodarilo sa registrovať k odberu systémových správ.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepodarilo sa registrovať správy zaiadenia %x.</target>
@@ -1640,9 +1673,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Súbor je uzamknutý iným procesom:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nie je možné zapísať atribúty súboru %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nie je možné načítať prístupové práva pre %x.</target>
@@ -1658,9 +1688,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x nie je platným názvom adresára.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Nie je možné nájsť systémovú funkciu %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nie je možné kopírovať súbor %x do %y.</target>
@@ -1724,6 +1751,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfiguračný súbor %x je nekompletný. Chybajúce položky budú nahradené predvolenými hodnotami.</target>
+
+<source>Internet access failed.</source>
+<target>Nie je prístup k internetu.</target>
 
 <source>Prepare installation</source>
 <target>Príprava inštalácie</target>

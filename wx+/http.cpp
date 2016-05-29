@@ -83,7 +83,7 @@ std::string urlencode(const std::string& str)
             out += c;
         else
         {
-            const char hexDigits[]= "0123456789ABCDEF";
+            const char hexDigits[] = "0123456789ABCDEF";
             out += '%';
             out += hexDigits[static_cast<unsigned char>(c) / 16];
             out += hexDigits[static_cast<unsigned char>(c) % 16];

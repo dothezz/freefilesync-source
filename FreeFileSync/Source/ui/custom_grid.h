@@ -20,12 +20,14 @@ namespace gridview
 {
 void init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std::shared_ptr<const GridView>& gridDataView);
 
-std::vector<Grid::ColumnAttribute> convertConfig(const std::vector<ColumnAttributeRim>& attribs); //+ make consistent
+std::vector<Grid::ColumnAttribute> convertConfig(const std::vector<   ColumnAttributeRim>& attribs); //+ make consistent
 std::vector<ColumnAttributeRim>    convertConfig(const std::vector<Grid::ColumnAttribute>& attribs); //
 
 void highlightSyncAction(Grid& gridCenter, bool value);
 
 void setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz);
+
+void setItemPathForm(Grid& grid, ItemPathFormat fmt); //only for left/right grid
 
 void refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight);
 

@@ -243,7 +243,7 @@ std::vector<zen::FolderPairSyncCfg> zen::extractSyncCfg(const MainConfiguration&
         SyncConfig syncCfg = fp.altSyncConfig.get() ? *fp.altSyncConfig : mainCfg.syncCfg;
 
         output.push_back(
-            FolderPairSyncCfg(syncCfg.directionCfg.var == DirectionConfig::TWOWAY || detectMovedFilesEnabled(syncCfg.directionCfg),
+            FolderPairSyncCfg(syncCfg.directionCfg.var == DirectionConfig::TWO_WAY || detectMovedFilesEnabled(syncCfg.directionCfg),
                               syncCfg.handleDeletion,
                               syncCfg.versioningStyle,
                               syncCfg.versioningFolderPhrase,
@@ -318,7 +318,7 @@ private:
 
     AFS::RecycleSession& getOrCreateRecyclerSession() //throw FileError => dont create in constructor!!!
     {
-        assert(deletionPolicy_ == DELETE_TO_RECYCLER);
+        assert(deletionPolicy_ == DeletionPolicy::RECYCLER);
         if (!recyclerSession.get())
             recyclerSession =  AFS::createRecyclerSession(baseFolderPath_); //throw FileError
         return *recyclerSession;
@@ -326,7 +326,7 @@ private:
 
     FileVersioner& getOrCreateVersioner() //throw FileError => dont create in constructor!!!
     {
-        assert(deletionPolicy_ == DELETE_TO_VERSIONING);
+        assert(deletionPolicy_ == DeletionPolicy::VERSIONING);
         if (!versioner.get())
             versioner = std::make_unique<FileVersioner>(versioningFolderPath, versioningStyle_, timeStamp_); //throw FileError
         return *versioner;
@@ -339,7 +339,7 @@ private:
     const AbstractPath baseFolderPath_;
     std::unique_ptr<AFS::RecycleSession> recyclerSession;
 
-    //used only for DELETE_TO_VERSIONING:
+    //used only for DeletionPolicy::VERSIONING:
     const AbstractPath versioningFolderPath;
     const VersioningStyle versioningStyle_;
     const TimeComp timeStamp_;
@@ -372,19 +372,19 @@ DeletionHandling::DeletionHandling(const AbstractPath& baseFolderPath,
 {
     switch (deletionPolicy_)
     {
-        case DELETE_PERMANENTLY:
+        case DeletionPolicy::PERMANENT:
             txtRemovingFile      = _("Deleting file %x"         );
             txtRemovingDirectory = _("Deleting folder %x"       );
             txtRemovingSymlink   = _("Deleting symbolic link %x");
             break;
 
-        case DELETE_TO_RECYCLER:
+        case DeletionPolicy::RECYCLER:
             txtRemovingFile      = _("Moving file %x to the recycle bin"         );
             txtRemovingDirectory = _("Moving folder %x to the recycle bin"       );
             txtRemovingSymlink   = _("Moving symbolic link %x to the recycle bin");
             break;
 
-        case DELETE_TO_VERSIONING:
+        case DeletionPolicy::VERSIONING:
             txtRemovingFile      = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
             txtRemovingDirectory = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
             txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
@@ -397,10 +397,10 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError; thr
 {
     switch (deletionPolicy_)
     {
-        case DELETE_PERMANENTLY:
+        case DeletionPolicy::PERMANENT:
             break;
 
-        case DELETE_TO_RECYCLER:
+        case DeletionPolicy::RECYCLER:
             if (recyclerSession.get())
             {
                 auto notifyDeletionStatus = [&](const std::wstring& displayPath)
@@ -419,7 +419,7 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError; thr
             }
             break;
 
-        case DELETE_TO_VERSIONING:
+        case DeletionPolicy::VERSIONING:
             //if (versioner.get())
             //{
             //    if (allowUserCallback)
@@ -443,7 +443,7 @@ void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
 {
     switch (deletionPolicy_)
     {
-        case DELETE_PERMANENTLY:
+        case DeletionPolicy::PERMANENT:
         {
             auto notifyDeletion = [&](const std::wstring& statusText, const std::wstring& displayPath)
             {
@@ -457,12 +457,12 @@ void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
         }
         break;
 
-        case DELETE_TO_RECYCLER:
+        case DeletionPolicy::RECYCLER:
             if (getOrCreateRecyclerSession().recycleItem(folderPath, relativePath)) //throw FileError; return true if item existed
                 onNotifyItemDeletion(); //moving to recycler is ONE logical operation, irrespective of the number of child elements!
             break;
 
-        case DELETE_TO_VERSIONING:
+        case DeletionPolicy::VERSIONING:
         {
             auto notifyMove = [&](const std::wstring& statusText, const std::wstring& displayPathFrom, const std::wstring& displayPathTo)
             {
@@ -492,15 +492,15 @@ void DeletionHandling::removeFileWithCallback(const AbstractPath& filePath,
     else
         switch (deletionPolicy_)
         {
-            case DELETE_PERMANENTLY:
+            case DeletionPolicy::PERMANENT:
                 deleted = AFS::removeFile(filePath); //throw FileError
                 break;
 
-            case DELETE_TO_RECYCLER:
+            case DeletionPolicy::RECYCLER:
                 deleted = getOrCreateRecyclerSession().recycleItem(filePath, relativePath); //throw FileError; return true if item existed
                 break;
 
-            case DELETE_TO_VERSIONING:
+            case DeletionPolicy::VERSIONING:
                 deleted = getOrCreateVersioner().revisionFile(filePath, relativePath, onNotifyCopyStatus); //throw FileError
                 break;
         }
@@ -521,9 +521,9 @@ void DeletionHandling::removeLinkWithCallback(const AbstractPath& linkPath, cons
 //------------------------------------------------------------------------------------------------------------
 
 /*
-  DELETE_PERMANENTLY:   deletion frees space
-  DELETE_TO_RECYCLER:   won't free space until recycler is full, but then frees space
-  DELETE_TO_VERSIONING: depends on whether versioning folder is on a different volume
+  DeletionPolicy::PERMANENT:  deletion frees space
+  DeletionPolicy::RECYCLER:   won't free space until recycler is full, but then frees space
+  DeletionPolicy::VERSIONING: depends on whether versioning folder is on a different volume
 -> if deleted item is a followed symlink, no space is freed
 -> created/updated/deleted item may be on a different volume than base directory: consider symlinks, junctions!
 
@@ -1291,7 +1291,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
                                 AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>()));
 
-#if 0 //changing file time without copying content is not justified after CMP_BY_SIZE finds "equal" files! similar issue with CMP_BY_TIME_SIZE and FileTimeTolerance == -1
+#if 0 //changing file time without copying content is not justified after CompareVariant::SIZE finds "equal" files! similar issue with CompareVariant::TIME_SIZE and FileTimeTolerance == -1
             //Bonus: some devices don't support setting (precise) file times anyway, e.g. FAT or MTP!
             if (file.getLastWriteTime<sideTrg>() != file.getLastWriteTime<sideSrc>())
                 //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
@@ -1826,7 +1826,7 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     std::vector<std::pair<AbstractPath, std::pair<std::int64_t, std::int64_t>>> diskSpaceMissing; //base folder / space required / space available
 
-    //status of base directories which are set to DELETE_TO_RECYCLER (and contain actual items to be deleted)
+    //status of base directories which are set to DeletionPolicy::RECYCLER (and contain actual items to be deleted)
     std::map<AbstractPath, bool, AFS::LessAbstractPath> recyclerSupported; //expensive to determine on Win XP => buffer + check recycle bin existence only once per base folder!
 
     //start checking folder pairs
@@ -1907,7 +1907,7 @@ void zen::synchronize(const TimeComp& timeStamp,
             if (!AFS::isNullPath(baseFolder))
                 //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
                 if (folderPairStat.deleteCount() > 0) //check deletions only... (respect filtered items!)
-                    //folderPairStat.conflictCount() == 0 && -> there COULD be conflicts for <automatic> if directory existence check fails, but loading sync.ffs_db succeeds
+                    //folderPairStat.conflictCount() == 0 && -> there COULD be conflicts for <Two way> variant if directory existence check fails, but loading sync.ffs_db succeeds
                     //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430 -> fixed, but still better not consider conflicts!
                     if (!wasExisting) //avoid race-condition: we need to evaluate existence status from time of comparison!
                     {
@@ -1924,7 +1924,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         }
 
         //check if user-defined directory for deletion was specified
-        if (folderPairCfg.handleDeletion == zen::DELETE_TO_VERSIONING &&
+        if (folderPairCfg.handleDeletion == DeletionPolicy::VERSIONING &&
             folderPairStat.updateCount() + folderPairStat.deleteCount() > 0)
         {
             if (trimCpy(folderPairCfg.versioningFolderPhrase).empty())
@@ -1980,7 +1980,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 }
         };
 
-        if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
+        if (folderPairCfg.handleDeletion == DeletionPolicy::RECYCLER)
         {
             if (folderPairStat.updateCount<LEFT_SIDE>() +
                 folderPairStat.deleteCount<LEFT_SIDE>() > 0)
@@ -2121,12 +2121,12 @@ void zen::synchronize(const TimeComp& timeStamp,
 
                 auto getEffectiveDeletionPolicy = [&](const AbstractPath& baseFolderPath) -> DeletionPolicy
                 {
-                    if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
+                    if (folderPairCfg.handleDeletion == DeletionPolicy::RECYCLER)
                     {
                         auto it = recyclerSupported.find(baseFolderPath);
                         if (it != recyclerSupported.end()) //buffer filled during intro checks (but only if deletions are expected)
                             if (!it->second)
-                                return DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
+                                return DeletionPolicy::PERMANENT; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
                     }
                     return folderPairCfg.handleDeletion;
                 };

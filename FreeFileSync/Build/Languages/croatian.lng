@@ -101,7 +101,7 @@
 <target>Putanja do alternativne GlobalSettings.xml datoteke.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>Bilo koji broj FreeFileSync . ffs_gui i/ili .ffs_batch konfiguracijskih datoteka.</target>
+<target>Bilo koji broj FreeFileSync .ffs_gui i/ili .ffs_batch konfiguracijskih datoteka.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Bilo koji broj alternativnih parova mapa za najmanje jednu config datoteku.</target>
@@ -150,6 +150,39 @@
 
 <source>Generating file list...</source>
 <target>Generiranje popisa datoteka...</target>
+
+<source>Fail-safe file copy</source>
+<target>Kopiranje zaštićeno od grešaka</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopiraj zaključane datoteke</target>
+
+<source>Copy file access permissions</source>
+<target>Kopiraj datotečna dopuštenja</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
 
 <source>Starting comparison</source>
 <target>Pokretanje usporedbe</target>
@@ -291,8 +324,8 @@ Stvarno: %y bajta
 <source>Error Code %x:</source>
 <target>Pogreška broj %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Neuspjelo povezivanje na SFTP server %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Stvarno: %y bajta
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Ne mogu pristupiti Voulme Shadow Copy servisu.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Molimo koristite FreeFileSync 64-bitnu verziju za izradu shadow kopija na ovom sustavu.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Ne mogu utvrditi naziv spremnika za %x.</target>
@@ -583,6 +616,9 @@ Naredba će biti pokrenuta ako se:
 
 <source>Updating attributes of %x</source>
 <target>Obnavljam atribute od %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Ne mogu zapisati svojstva od %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x. i %y imaju različit sadržaj.</target>
@@ -882,6 +918,9 @@ Naredba će biti pokrenuta ako se:
 <source>Folder pair:</source>
 <target>Par mapa:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Koristi lokalne postavke:</target>
 
@@ -942,6 +981,9 @@ Naredba će biti pokrenuta ako se:
 <source>C&lear</source>
 <target>O&čisti</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Otkrij putanju sinkronizacije pomoću baze podataka</target>
+
 <source>Detect moved files</source>
 <target>Otkrij premještene datoteke</target>
 
@@ -956,23 +998,20 @@ Naredba će biti pokrenuta ako se:
 - Otkrivanje nije dostupno za prvu sinkronizaciju
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Otkrij putanju sinkronizacije pomoću baze podataka</target>
-
 <source>Delete files:</source>
 <target>Izbriši datoteke:</target>
-
-<source>&Permanent</source>
-<target>&Trajno</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Trajno izbriši ili prepiši datoteke</target>
 
 <source>&Recycle bin</source>
 <target>&Koš za smeće</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Spremi izbrisane ili prepisane datoteke u koš za smeće</target>
+
+<source>&Permanent</source>
+<target>&Trajno</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Trajno izbriši ili prepiši datoteke</target>
 
 <source>&Versioning</source>
 <target>&Označavanje</target>
@@ -986,14 +1025,14 @@ Naredba će biti pokrenuta ako se:
 <source>Handle errors:</source>
 <target>Obradi pogreške:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Sakrij sve poruke za greške i upozorenja</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Prikaži skočni prozor pri greškama i upozorenjima</target>
+
+<source>Hide all error and warning messages</source>
+<target>Sakrij sve poruke za greške i upozorenja</target>
 
 <source>On completion:</source>
 <target>Pri dovršetku:</target>
@@ -1100,9 +1139,6 @@ Naredba će biti pokrenuta ako se:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Ove postavke se koriste za sve sinkronizacijske zadatke.</target>
 
-<source>Fail-safe file copy</source>
-<target>Kopiranje zaštićeno od grešaka</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>(recommended)</source>
 <target>(preporučeno)</target>
 
-<source>Copy locked files</source>
-<target>Kopiraj zaključane datoteke</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiraj djeljene ili zaključane datoteke pomoću Volume Shadow Copy servisa.</target>
 
 <source>(requires administrator rights)</source>
 <target>(zahtjeva administratorske ovlasti)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopiraj datotečna dopuštenja</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Prenesi dopuštenja za datoteke i mape.</target>
@@ -1611,9 +1641,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Percentage</source>
 <target>Postotak</target>
 
-<source>Internet access failed.</source>
-<target>Mrežna veza nije dostupna.</target>
-
 <source>Check for Program Updates</source>
 <target>Provjeri za nadogradnje programa</target>
 
@@ -1623,17 +1650,23 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je ažuran.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nije moguće povezivanje s www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Provjeri</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Ne mogu pronaći sistemsku funkciju %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nije moguće registriranje za primanje sistemskih poruka.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nije moguće registrirati prijavu uređaja za %x.</target>
@@ -1643,9 +1676,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>The file is locked by another process:</source>
 <target>Datoteku koristi drugi proces:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Ne mogu zapisati svojstva od %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Ne mogu čitati zaštićeni sadržaj %x.</target>
@@ -1661,9 +1691,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>%x is not a regular directory name.</source>
 <target>%x nije ispravan naziv mape.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Ne mogu pronaći sistemsku funkciju %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Ne mogu kopirati datoteku %x na %y.</target>
@@ -1727,6 +1754,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfiguracijska datoteka %x je nepotpuna. Nedostajući elementi će biti postavljeni na početne vrijednosti.</target>
+
+<source>Internet access failed.</source>
+<target>Mrežna veza nije dostupna.</target>
 
 <source>Prepare installation</source>
 <target>Pripremam instalaciju</target>

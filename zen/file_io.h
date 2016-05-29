@@ -44,7 +44,7 @@ public:
     FileInput(FileHandle handle, const Zstring& filepath); //takes ownership!
     ~FileInput();
 
-    //Windows: better use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632.aspx
+    //Windows: better use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632
     //Linux: use st_blksize?
     size_t getBlockSize() const { return 128 * 1024; }
     size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!

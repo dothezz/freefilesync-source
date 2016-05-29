@@ -461,8 +461,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelCenter,
-                   wxAuiPaneInfo().Name(L"PanelCenter").CenterPane().PaneBorder(false));
-
+                   wxAuiPaneInfo().Name(L"CenterPanel").CenterPane().PaneBorder(false));
     {
         //set comparison button label tentatively for m_panelTopButtons to receive final height:
         updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
@@ -473,27 +472,29 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                                           std::max(m_buttonCancel->GetSize().y, m_buttonCompare->GetSize().y)));
 
         auiMgr.AddPane(m_panelTopButtons,
-                       wxAuiPaneInfo().Name(L"PanelTop").Layer(2).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(TOP_BUTTON_OPTIMAL_WIDTH, m_panelTopButtons->GetSize().GetHeight()));
+                       wxAuiPaneInfo().Name(L"TopPanel").Layer(2).Top().Row(1).Caption(_("Main Bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(TOP_BUTTON_OPTIMAL_WIDTH, m_panelTopButtons->GetSize().GetHeight()));
         //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
         auiMgr.AddPane(compareStatus->getAsWindow(),
-                       wxAuiPaneInfo().Name(L"PanelProgress").Layer(2).Top().Row(2).CaptionVisible(false).PaneBorder(false).Hide());
+                       wxAuiPaneInfo().Name(L"ProgressPanel").Layer(2).Top().Row(2).CaptionVisible(false).PaneBorder(false).Hide()
+                       //wxAui does not consider the progress panel's wxRAISED_BORDER and set's too small a panel height! => use correct value from wxWindow::GetSize()
+                       .MinSize(200, compareStatus->getAsWindow()->GetSize().GetHeight())); //bonus: minimal height isn't a bad idea anyway
     }
 
     auiMgr.AddPane(m_panelDirectoryPairs,
-                   wxAuiPaneInfo().Name(L"PanelFolders").Layer(2).Top().Row(3).Caption(_("Folder Pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
+                   wxAuiPaneInfo().Name(L"FoldersPanel").Layer(2).Top().Row(3).Caption(_("Folder Pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
 
     auiMgr.AddPane(m_panelSearch,
-                   wxAuiPaneInfo().Name(L"PanelFind").Layer(2).Bottom().Row(2).Caption(_("Find")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(200, m_bpButtonHideSearch->GetSize().GetHeight()).Hide());
+                   wxAuiPaneInfo().Name(L"SearchPanel").Layer(2).Bottom().Row(2).Caption(_("Find")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(200, m_bpButtonHideSearch->GetSize().GetHeight()).Hide());
 
     auiMgr.AddPane(m_panelViewFilter,
-                   wxAuiPaneInfo().Name(L"PanelView").Layer(2).Bottom().Row(1).Caption(_("View Settings")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"ViewFilterPanel").Layer(2).Bottom().Row(1).Caption(_("View Settings")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(m_bpButtonViewTypeSyncAction->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelConfig,
-                   wxAuiPaneInfo().Name(L"PanelConfig").Layer(3).Left().Position(1).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"ConfigPanel").Layer(3).Left().Position(1).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_gridNavi,
-                   wxAuiPaneInfo().Name(L"PanelOverview").Layer(3).Left().Position(2).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
+                   wxAuiPaneInfo().Name(L"OverviewPanel").Layer(3).Left().Position(2).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
 
     auiMgr.Update();
 
@@ -848,9 +849,9 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     m_splitterMain->setSashOffset(globalSettings.gui.mainDlg.sashOffset);
 
     m_gridNavi->setColumnConfig(treeview::convertConfig(globalSettings.gui.mainDlg.columnAttribNavi));
-    treeview::setShowPercentage(*m_gridNavi, globalSettings.gui.mainDlg.showPercentBar);
+    treeview::setShowPercentage(*m_gridNavi, globalSettings.gui.mainDlg.naviGridShowPercentBar);
 
-    treeDataView->setSortDirection(globalSettings.gui.mainDlg.naviLastSortColumn, globalSettings.gui.mainDlg.naviLastSortAscending);
+    treeDataView->setSortDirection(globalSettings.gui.mainDlg.naviGridLastSortColumn, globalSettings.gui.mainDlg.naviGridLastSortAscending);
 
     //--------------------------------------------------------------------------------
     //load list of last used configuration files
@@ -872,6 +873,9 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
 
     //show/hide file icons
     gridview::setupIcons(*m_gridMainL, *m_gridMainC, *m_gridMainR, globalSettings.gui.mainDlg.showIcons, convert(globalSettings.gui.mainDlg.iconSize));
+
+    gridview::setItemPathForm(*m_gridMainL, globalSettings.gui.mainDlg.itemPathFormatLeftGrid);
+    gridview::setItemPathForm(*m_gridMainR, globalSettings.gui.mainDlg.itemPathFormatRightGrid);
 
     //------------------------------------------------------------------------------------------------
     m_checkBoxMatchCase->SetValue(globalCfg.gui.mainDlg.textSearchRespectCase);
@@ -912,12 +916,12 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     globalSettings.gui.mainDlg.columnAttribRight = gridview::convertConfig(m_gridMainR->getColumnConfig());
     globalSettings.gui.mainDlg.sashOffset        = m_splitterMain->getSashOffset();
 
-    globalSettings.gui.mainDlg.columnAttribNavi = treeview::convertConfig(m_gridNavi->getColumnConfig());
-    globalSettings.gui.mainDlg.showPercentBar   = treeview::getShowPercentage(*m_gridNavi);
+    globalSettings.gui.mainDlg.columnAttribNavi       = treeview::convertConfig(m_gridNavi->getColumnConfig());
+    globalSettings.gui.mainDlg.naviGridShowPercentBar = treeview::getShowPercentage(*m_gridNavi);
 
     const std::pair<ColumnTypeNavi, bool> sortInfo = treeDataView->getSortDirection();
-    globalSettings.gui.mainDlg.naviLastSortColumn    = sortInfo.first;
-    globalSettings.gui.mainDlg.naviLastSortAscending = sortInfo.second;
+    globalSettings.gui.mainDlg.naviGridLastSortColumn    = sortInfo.first;
+    globalSettings.gui.mainDlg.naviGridLastSortAscending = sortInfo.second;
 
     //--------------------------------------------------------------------------------
     //write list of last used configuration files
@@ -2247,17 +2251,17 @@ void MainDialog::onGridLabelContextC(GridLabelClickEvent& event)
 
 void MainDialog::onGridLabelContextL(GridLabelClickEvent& event)
 {
-    onGridLabelContext(*m_gridMainL, static_cast<ColumnTypeRim>(event.colType_), getDefaultColumnAttributesLeft());
+    onGridLabelContextRim(*m_gridMainL, static_cast<ColumnTypeRim>(event.colType_), true /*left*/);
 }
 
 
 void MainDialog::onGridLabelContextR(GridLabelClickEvent& event)
 {
-    onGridLabelContext(*m_gridMainR, static_cast<ColumnTypeRim>(event.colType_), getDefaultColumnAttributesRight());
+    onGridLabelContextRim(*m_gridMainR, static_cast<ColumnTypeRim>(event.colType_), false /*left*/);
 }
 
 
-void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::vector<ColumnAttributeRim>& defaultColumnAttributes)
+void MainDialog::onGridLabelContextRim(Grid& grid, ColumnTypeRim type, bool left)
 {
     ContextMenu menu;
 
@@ -2277,13 +2281,32 @@ void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::v
     if (const GridData* prov = grid.getDataProvider())
         for (const Grid::ColumnAttribute& ca : grid.getColumnConfig())
             menu.addCheckBox(prov->getColumnLabel(ca.type_), [ca, toggleColumn] { toggleColumn(ca.type_); },
-                             ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeRim::FILENAME)); //do not allow user to hide file name column!
+                             ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeRim::ITEM_PATH)); //do not allow user to hide this column!
     //----------------------------------------------------------------------------------------------
+    menu.addSeparator();
+
+    auto& itemPathFormat = left ? globalCfg.gui.mainDlg.itemPathFormatLeftGrid : globalCfg.gui.mainDlg.itemPathFormatRightGrid;
+
+    auto setItemPathFormat = [&](ItemPathFormat fmt)
+    {
+        itemPathFormat = fmt;
+        gridview::setItemPathForm(grid, fmt);
+    };
+    auto addFormatEntry = [&](const wxString& label, ItemPathFormat fmt)
+    {
+        menu.addRadio(label, [fmt, &setItemPathFormat] { setItemPathFormat(fmt); }, itemPathFormat == fmt);
+    };
+    addFormatEntry(_("Full path"    ), ItemPathFormat::FULL_PATH);
+    addFormatEntry(_("Relative path"), ItemPathFormat::RELATIVE_PATH);
+    addFormatEntry(_("Item name"    ), ItemPathFormat::ITEM_NAME);
+
+    //----------------------------------------------------------------------------------------------
+
     menu.addSeparator();
 
     auto setDefault = [&]
     {
-        grid.setColumnConfig(gridview::convertConfig(defaultColumnAttributes));
+        grid.setColumnConfig(gridview::convertConfig(left ? getDefaultColumnAttributesLeft() : getDefaultColumnAttributesRight()));
     };
     menu.addItem(_("&Default"), setDefault); //'&' -> reuse text from "default" buttons elsewhere
     //----------------------------------------------------------------------------------------------
@@ -2302,8 +2325,7 @@ void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::v
     };
     auto addSizeEntry = [&](const wxString& label, xmlAccess::FileIconSize sz)
     {
-        auto setIconSize2 = setIconSize; //bring into scope
-        menu.addRadio(label, [sz, setIconSize2] { setIconSize2(sz); }, globalCfg.gui.mainDlg.iconSize == sz, globalCfg.gui.mainDlg.showIcons);
+        menu.addRadio(label, [sz, &setIconSize] { setIconSize(sz); }, globalCfg.gui.mainDlg.iconSize == sz, globalCfg.gui.mainDlg.showIcons);
     };
     addSizeEntry(L"    " + _("Small" ), xmlAccess::ICON_SIZE_SMALL );
     addSizeEntry(L"    " + _("Medium"), xmlAccess::ICON_SIZE_MEDIUM);
@@ -2391,13 +2413,13 @@ void MainDialog::OnCompSettingsContext(wxEvent& event)
         const wxBitmap  iconGrey   = greyScale(iconNormal);
         menu.addItem(getVariantName(cmpVar), [&setVariant, cmpVar] { setVariant(cmpVar); }, activeCmpVar == cmpVar ? &iconNormal : &iconGrey);
     };
-    addVariantItem(CMP_BY_TIME_SIZE, L"file-time-small");
-    addVariantItem(CMP_BY_CONTENT,   L"file-content-small");
-    addVariantItem(CMP_BY_SIZE,      L"file-size-small");
+    addVariantItem(CompareVariant::TIME_SIZE, L"file-time-small");
+    addVariantItem(CompareVariant::CONTENT,   L"file-content-small");
+    addVariantItem(CompareVariant::SIZE,      L"file-size-small");
 
-    //menu.addRadio(getVariantName(CMP_BY_TIME_SIZE), [&] { setVariant(CMP_BY_TIME_SIZE); }, activeCmpVar == CMP_BY_TIME_SIZE);
-    //menu.addRadio(getVariantName(CMP_BY_CONTENT  ), [&] { setVariant(CMP_BY_CONTENT);   }, activeCmpVar == CMP_BY_CONTENT);
-    //menu.addRadio(getVariantName(CMP_BY_SIZE     ), [&] { setVariant(CMP_BY_SIZE);      }, activeCmpVar == CMP_BY_SIZE);
+    //menu.addRadio(getVariantName(CompareVariant::TIME_SIZE), [&] { setVariant(CompareVariant::TIME_SIZE); }, activeCmpVar == CompareVariant::TIME_SIZE);
+    //menu.addRadio(getVariantName(CompareVariant::CONTENT  ), [&] { setVariant(CompareVariant::CONTENT);   }, activeCmpVar == CompareVariant::CONTENT);
+    //menu.addRadio(getVariantName(CompareVariant::SIZE     ), [&] { setVariant(CompareVariant::SIZE);      }, activeCmpVar == CompareVariant::SIZE);
 
     wxPoint pos = m_bpButtonCmpContext->GetPosition();
     pos.x += m_bpButtonCmpContext->GetSize().GetWidth();
@@ -2417,10 +2439,10 @@ void MainDialog::OnSyncSettingsContext(wxEvent& event)
 
     const auto currentVar = getConfig().mainCfg.syncCfg.directionCfg.var;
 
-    menu.addRadio(getVariantName(DirectionConfig::TWOWAY), [&] { setVariant(DirectionConfig::TWOWAY); }, currentVar == DirectionConfig::TWOWAY);
-    menu.addRadio(getVariantName(DirectionConfig::MIRROR), [&] { setVariant(DirectionConfig::MIRROR); }, currentVar == DirectionConfig::MIRROR);
-    menu.addRadio(getVariantName(DirectionConfig::UPDATE), [&] { setVariant(DirectionConfig::UPDATE); }, currentVar == DirectionConfig::UPDATE);
-    menu.addRadio(getVariantName(DirectionConfig::CUSTOM), [&] { setVariant(DirectionConfig::CUSTOM); }, currentVar == DirectionConfig::CUSTOM);
+    menu.addRadio(getVariantName(DirectionConfig::TWO_WAY), [&] { setVariant(DirectionConfig::TWO_WAY); }, currentVar == DirectionConfig::TWO_WAY);
+    menu.addRadio(getVariantName(DirectionConfig::MIRROR),  [&] { setVariant(DirectionConfig::MIRROR);  }, currentVar == DirectionConfig::MIRROR);
+    menu.addRadio(getVariantName(DirectionConfig::UPDATE),  [&] { setVariant(DirectionConfig::UPDATE);  }, currentVar == DirectionConfig::UPDATE);
+    menu.addRadio(getVariantName(DirectionConfig::CUSTOM),  [&] { setVariant(DirectionConfig::CUSTOM);  }, currentVar == DirectionConfig::CUSTOM);
 
     wxPoint pos = m_bpButtonSyncContext->GetPosition();
     pos.x += m_bpButtonSyncContext->GetSize().GetWidth();
@@ -3043,7 +3065,6 @@ void MainDialog::OnClose(wxCloseEvent& event)
         if (cancelled)
         {
             //attention: this Veto() will NOT cancel system shutdown since saveOldConfig() blocks on modal dialog
-
             event.Veto();
             return;
         }
@@ -3653,12 +3674,12 @@ void MainDialog::applyCompareConfig(bool setDefaultViewType)
     if (setDefaultViewType)
         switch (currentCfg.mainCfg.cmpConfig.compareVar)
         {
-            case CMP_BY_TIME_SIZE:
-            case CMP_BY_SIZE:
+            case CompareVariant::TIME_SIZE:
+            case CompareVariant::SIZE:
                 setViewTypeSyncAction(true);
                 break;
 
-            case CMP_BY_CONTENT:
+            case CompareVariant::CONTENT:
                 setViewTypeSyncAction(false);
                 break;
         }
@@ -3799,7 +3820,9 @@ void MainDialog::onGridLabelLeftClick(bool onLeft, ColumnTypeRim type)
     if (sortInfo && sortInfo->onLeft_ == onLeft && sortInfo->type_ == type)
         sortAscending = !sortInfo->ascending_;
 
-    gridDataView->sortView(type, onLeft, sortAscending);
+    const ItemPathFormat itemPathFormat = onLeft ? globalCfg.gui.mainDlg.itemPathFormatLeftGrid : globalCfg.gui.mainDlg.itemPathFormatRightGrid;
+
+    gridDataView->sortView(type, itemPathFormat, onLeft, sortAscending);
 
     m_gridMainL->clearSelection(ALLOW_GRID_EVENT);
     m_gridMainC->clearSelection(ALLOW_GRID_EVENT);
@@ -4115,7 +4138,9 @@ void MainDialog::hideFindPanel()
 
 void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
 {
-    const wxString searchString = trimCpy(m_textCtrlSearchTxt->GetValue());
+    Zstring searchString = utfCvrtTo<Zstring>(trimCpy(m_textCtrlSearchTxt->GetValue()));
+
+
     if (searchString.empty())
         showFindPanel();
     else
@@ -4128,7 +4153,7 @@ void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
             std::swap(grid1, grid2); //select side to start search at grid cursor position
 
         wxBeginBusyCursor(wxHOURGLASS_CURSOR);
-        const std::pair<const Grid*, ptrdiff_t> result = findGridMatch(*grid1, *grid2, searchString,
+        const std::pair<const Grid*, ptrdiff_t> result = findGridMatch(*grid1, *grid2, utfCvrtTo<std::wstring>(searchString),
                                                                        m_checkBoxMatchCase->GetValue()); //parameter owned by GUI, *not* globalCfg structure! => we should better implement a getGlocalCfg()!
         wxEndBusyCursor();
 
@@ -4149,7 +4174,7 @@ void MainDialog::startFindNext() //F3 or ENTER in m_textCtrlSearchTxt
             showFindPanel();
             showNotificationDialog(this, DialogInfoType::INFO, PopupDialogCfg().
                                    setTitle(_("Find")).
-                                   setMainInstructions(replaceCpy(_("Cannot find %x"), L"%x", L"\"" + searchString + L"\"")));
+                                   setMainInstructions(replaceCpy(_("Cannot find %x"), L"%x", fmtPath(searchString))));
         }
     }
 }

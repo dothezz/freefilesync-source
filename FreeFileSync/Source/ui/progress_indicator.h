@@ -24,7 +24,8 @@ public:
     void init(const zen::Statistics& syncStat); //begin of sync: make visible, set pointer to "syncStat", initialize all status values
     void teardown(); //end of sync: hide again, clear pointer to "syncStat"
 
-    void switchToCompareBytewise();
+    void initNewPhase(); //call after "StatusHandler::initNewPhase"
+
     void updateStatusPanelNow();
 
 private:

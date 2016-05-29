@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Dosya listesi oluşturuluyor...</target>
 
+<source>Fail-safe file copy</source>
+<target>Dosyalar Hatasız Kopyalansın</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kilitli Dosyalar da Kopyalansın</target>
+
+<source>Copy file access permissions</source>
+<target>Dosya Erişim İzinleri de Kopyalansın</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Karşılaştırmaya başlanıyor</target>
 
@@ -291,8 +324,8 @@ Gerçekleşen: %y bayt
 <source>Error Code %x:</source>
 <target>Hata Kodu %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>%x SFTP sunucusuna bağlanılamadı.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Gerçekleşen: %y bayt
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Birim Gölge Hizmetine erişilemiyor.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Bu sistem üzerinde gölge kopyalar oluşturmak için FreeFileSync 64-bit sürümünü kullanın.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x için birim adı belirlenemedi.</target>
@@ -580,6 +613,9 @@ Komut şu durumlarda yürütülür:
 
 <source>Updating attributes of %x</source>
 <target>%x öznitelikleri güncelleniyor</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>%x dosya öznitelikleri yazılamadı.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x ve %y farklı içeriklere sahip.</target>
@@ -878,6 +914,9 @@ Komut şu durumlarda yürütülür:
 <source>Folder pair:</source>
 <target>Klasör Çifti:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Yerel Ayarlar Kullanılsın:</target>
 
@@ -938,6 +977,9 @@ Komut şu durumlarda yürütülür:
 <source>C&lear</source>
 <target>&Temizle</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Eşitleme yönleri veritabanı dosyalarının yardımı ile algılanır</target>
+
 <source>Detect moved files</source>
 <target>Taşınmış dosyalar algılansın</target>
 
@@ -952,23 +994,20 @@ Komut şu durumlarda yürütülür:
 - Algılama, ilk eşitleme sırasında kullanılamaz
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Eşitleme yönleri veritabanı dosyalarının yardımı ile algılanır</target>
-
 <source>Delete files:</source>
 <target>Dosya Silme İşlemi:</target>
-
-<source>&Permanent</source>
-<target>&Kalıcı Olarak Silinsin</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Dosyalar kalıcı olarak silinir ya da üzerine yazılır</target>
 
 <source>&Recycle bin</source>
 <target>Ge&ri Dönüşüm Kutusuna Atılsın</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Silinen ya da üzerine yazılan dosyalar geri dönüşüm kutusuna gönderilir</target>
+
+<source>&Permanent</source>
+<target>&Kalıcı Olarak Silinsin</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Dosyalar kalıcı olarak silinir ya da üzerine yazılır</target>
 
 <source>&Versioning</source>
 <target>Eski &Sürüm Olarak Saklansın</target>
@@ -982,14 +1021,14 @@ Komut şu durumlarda yürütülür:
 <source>Handle errors:</source>
 <target>Hata Durumunda:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Hiçbir hata ve uyarı iletisi görüntülenmez</target>
-
 <source>&Pop-up</source>
 <target>&Görüntüle</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Hata ya da uyarılar açılır pencerede görüntülenir</target>
+
+<source>Hide all error and warning messages</source>
+<target>Hiçbir hata ve uyarı iletisi görüntülenmez</target>
 
 <source>On completion:</source>
 <target>İşlem Tamamlandığında:</target>
@@ -1096,9 +1135,6 @@ Komut şu durumlarda yürütülür:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Aşağıdaki ayarlar tüm eşitleme işlemleri için geçerlidir.</target>
 
-<source>Fail-safe file copy</source>
-<target>Dosyalar Hatasız Kopyalansın</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>(recommended)</source>
 <target>(önerilir)</target>
 
-<source>Copy locked files</source>
-<target>Kilitli Dosyalar da Kopyalansın</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Paylaşılan ya da kilitlenmiş dosyalar Birim Gölge Hizmetini kullanılarak kopyalanır.</target>
 
 <source>(requires administrator rights)</source>
 <target>(yönetici hakları gereklidir)</target>
-
-<source>Copy file access permissions</source>
-<target>Dosya Erişim İzinleri de Kopyalansın</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Dosya ve klasör izinleri de aktarılır.</target>
@@ -1600,9 +1630,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>Percentage</source>
 <target>Yüzde</target>
 
-<source>Internet access failed.</source>
-<target>İnternet erişimi sağlanamadı.</target>
-
 <source>Check for Program Updates</source>
 <target>Güncelleme Denetimi</target>
 
@@ -1612,17 +1639,23 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync güncel.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org sitesine bağlanılamadı.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Denetle</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>%x sistem işlevi bulunamadı.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Sistem iletilerini alabilmek için gerekli kayıt eklenemedi.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x aygıtının bildirimleri için gerekli kayıt eklenemedi.</target>
@@ -1632,9 +1665,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>The file is locked by another process:</source>
 <target>Dosya başka bir işlem tarafından kilitlenmiş:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>%x dosya öznitelikleri yazılamadı.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>%x için güvenlik bağlamı okunamadı.</target>
@@ -1650,9 +1680,6 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>%x is not a regular directory name.</source>
 <target>%x geçerli bir klasör adı değil.</target>
-
-<source>Cannot find system function %x.</source>
-<target>%x sistem işlevi bulunamadı.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>%x dosyası %y olarak kopyalanamadı.</target>
@@ -1713,6 +1740,9 @@ Bu yöntem, ciddi bir hata oluşması durumunda bile işlemin tutarlı olarak ya
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>%x ayar dosyası tam değil. Eksik bileşenler için varsayılan değerler kullanılacak.</target>
+
+<source>Internet access failed.</source>
+<target>İnternet erişimi sağlanamadı.</target>
 
 <source>Prepare installation</source>
 <target>Yüklemeye hazırlanılıyor</target>

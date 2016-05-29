@@ -11,7 +11,7 @@
 #include <wx/frame.h>
 
 /*
-Windows 7; show progress in windows superbar via ITaskbarList3 Interface: http://msdn.microsoft.com/en-us/library/dd391692(VS.85).aspx
+Windows 7; show progress in windows superbar via ITaskbarList3 Interface: https://msdn.microsoft.com/en-us/library/dd391692
 
 Ubuntu: use Unity interface (optional)
 

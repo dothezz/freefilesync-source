@@ -219,18 +219,18 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
 {
     switch (compareVar)
     {
-        case CMP_BY_TIME_SIZE:
-            if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is certainly "good enough" for CMP_BY_TIME_SIZE!
+        case CompareVariant::TIME_SIZE:
+            if (dbFile.cmpVar == CompareVariant::CONTENT) return true; //special rule: this is certainly "good enough" for CompareVariant::TIME_SIZE!
 
             //case-sensitive short name match is a database invariant!
             return sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
-        case CMP_BY_CONTENT:
+        case CompareVariant::CONTENT:
             //case-sensitive short name match is a database invariant!
-            return dbFile.cmpVar == CMP_BY_CONTENT;
+            return dbFile.cmpVar == CompareVariant::CONTENT;
         //in contrast to comparison, we don't care about modification time here!
 
-        case CMP_BY_SIZE: //file size/case-sensitive short name always matches on both sides for an "in-sync" database entry
+        case CompareVariant::SIZE: //file size/case-sensitive short name always matches on both sides for an "in-sync" database entry
             return true;
     }
     assert(false);
@@ -270,17 +270,17 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
 {
     switch (compareVar)
     {
-        case CMP_BY_TIME_SIZE:
-            if (dbLink.cmpVar == CMP_BY_CONTENT || dbLink.cmpVar == CMP_BY_SIZE)
-                return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+        case CompareVariant::TIME_SIZE:
+            if (dbLink.cmpVar == CompareVariant::CONTENT || dbLink.cmpVar == CompareVariant::SIZE)
+                return true; //special rule: this is already "good enough" for CompareVariant::TIME_SIZE!
 
             //case-sensitive short name match is a database invariant!
             return sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
 
-        case CMP_BY_CONTENT:
-        case CMP_BY_SIZE: //== categorized by content! see comparison.cpp, ComparisonBuffer::compareBySize()
+        case CompareVariant::CONTENT:
+        case CompareVariant::SIZE: //== categorized by content! see comparison.cpp, ComparisonBuffer::compareBySize()
             //case-sensitive short name match is a database invariant!
-            return dbLink.cmpVar == CMP_BY_CONTENT || dbLink.cmpVar == CMP_BY_SIZE;
+            return dbLink.cmpVar == CompareVariant::CONTENT || dbLink.cmpVar == CompareVariant::SIZE;
     }
     assert(false);
     return false;
@@ -677,7 +677,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
 {
     //try to load sync-database files
     std::shared_ptr<InSyncFolder> lastSyncState;
-    if (dirCfg.var == DirectionConfig::TWOWAY || detectMovedFilesEnabled(dirCfg))
+    if (dirCfg.var == DirectionConfig::TWO_WAY || detectMovedFilesEnabled(dirCfg))
         try
         {
             if (allItemsCategoryEqual(baseFolder))
@@ -690,12 +690,12 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
         {
             if (reportWarning)
                 reportWarning(e.toString() +
-                              (dirCfg.var == DirectionConfig::TWOWAY ?
+                              (dirCfg.var == DirectionConfig::TWO_WAY ?
                                L" \n\n" + _("Setting default synchronization directions: Old files will be overwritten with newer files.") : std::wstring()));
         }
 
     //set sync directions
-    if (dirCfg.var == DirectionConfig::TWOWAY)
+    if (dirCfg.var == DirectionConfig::TWO_WAY)
     {
         if (lastSyncState)
             RedetermineTwoWay::execute(baseFolder, *lastSyncState);
@@ -1497,7 +1497,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                 {
                     SyncDirection newDir = SyncDirection::NONE;
 
-                    if (cfgIter->second.var == DirectionConfig::TWOWAY)
+                    if (cfgIter->second.var == DirectionConfig::TWO_WAY)
                         newDir = fsObj.isEmpty<LEFT_SIDE>() ? SyncDirection::RIGHT : SyncDirection::LEFT;
                     else
                     {

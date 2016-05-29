@@ -40,7 +40,7 @@ private:
 };
 
 void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler); //take ownership
-const TranslationHandler* getTranslator();
+std::shared_ptr<const TranslationHandler> getTranslator();
 
 
 
@@ -60,7 +60,7 @@ namespace implementation
 inline
 std::wstring translate(const std::wstring& text)
 {
-    if (const TranslationHandler* t = getTranslator())
+    if (std::shared_ptr<const TranslationHandler> t = getTranslator()) //std::shared_ptr => temporarily take (shared) ownership while using the interface!
         return t->translate(text);
 
     return text;
@@ -74,7 +74,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 {
     assert(contains(plural, L"%x"));
 
-    if (const TranslationHandler* t = getTranslator())
+    if (std::shared_ptr<const TranslationHandler> t = getTranslator())
     {
         std::wstring translation = t->translate(singular, plural, n);
         assert(!contains(translation, L"%x"));
@@ -94,11 +94,12 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 
 
 inline
-const TranslationHandler*& getTranslationInstance()
+std::shared_ptr<const TranslationHandler>*& getTranslationInstance()
 {
-    //avoid static destruction order fiasco: there may be accesses to "getTranslator()" during process shutdown e.g. show message in debug_minidump.cpp!
-    //=> use POD instead of a std::unique_ptr<>!!!
-    static const TranslationHandler* inst = nullptr; //external linkage even in header!
+    //avoid static destruction order fiasco: there may be accesses to "getTranslator()" during process shutdown
+	//e.g. show message in debug_minidump.cpp or some detached thread assembling an error message!
+    //=> use POD instead of a plain std::shared_ptr<>!!!
+    static std::shared_ptr<const TranslationHandler>* inst = nullptr; //external linkage even in header!
     return inst;
 }
 
@@ -107,28 +108,41 @@ struct CleanUpTranslationHandler
 {
     ~CleanUpTranslationHandler()
     {
-        const TranslationHandler*& handler = getTranslationInstance();
-        assert(!handler); //clean up at a better time rather than during static destruction! potential MT issues!?
+        std::shared_ptr<const TranslationHandler>*& handler = getTranslationInstance();
+        assert(!handler); //clean up at a better time rather than during static destruction! MT issues!
         delete handler;
         handler = nullptr; //getTranslator() may be called even after static objects of this translation unit are destroyed!
     }
 };
 }
 
+//setTranslator/getTranslator() operating on a global are obviously racy for MT usage
+//=> make them fast to cover the rare case of a language change and the not-so-rare case of language clean-up during shutdown
+//=> can't synchronize with std::mutex which is non-POD and again leads to global destruction order fiasco
+//=> return std::shared_ptr to let instance life time be handled by caller (MT!)
 
 inline
 void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler)
 {
     static implementation::CleanUpTranslationHandler cuth; //external linkage even in header!
 
-    const TranslationHandler*& handler = implementation::getTranslationInstance();
-    delete handler;
-    handler = newHandler.release();
+    std::shared_ptr<const TranslationHandler>*& handler = implementation::getTranslationInstance();
+	auto tmp = handler;
+	handler = nullptr;
+    delete tmp;
+	if (newHandler)
+		handler = new std::shared_ptr<const TranslationHandler>(std::move(newHandler));
 }
 
 
 inline
-const TranslationHandler* getTranslator() { return implementation::getTranslationInstance(); }
+std::shared_ptr<const TranslationHandler> getTranslator()
+{
+	std::shared_ptr<const TranslationHandler>*& handler = implementation::getTranslationInstance();
+	if (handler)
+		return *handler;
+	return nullptr;
+}
 }
 
 #endif //I18_N_H_3843489325044253425456

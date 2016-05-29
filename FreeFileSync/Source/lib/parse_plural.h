@@ -205,24 +205,7 @@ struct Token
 class Scanner
 {
 public:
-    Scanner(const std::string& stream) : stream_(stream), pos(stream_.begin())
-    {
-        tokens.emplace_back("?" , Token::TK_TERNARY_QUEST);
-        tokens.emplace_back(":" , Token::TK_TERNARY_COLON);
-        tokens.emplace_back("||", Token::TK_OR           );
-        tokens.emplace_back("&&", Token::TK_AND          );
-        tokens.emplace_back("==", Token::TK_EQUAL        );
-        tokens.emplace_back("!=", Token::TK_NOT_EQUAL    );
-        tokens.emplace_back("<=", Token::TK_LESS_EQUAL   );
-        tokens.emplace_back("<" , Token::TK_LESS         );
-        tokens.emplace_back(">=", Token::TK_GREATER_EQUAL);
-        tokens.emplace_back(">" , Token::TK_GREATER      );
-        tokens.emplace_back("%" , Token::TK_MODULUS      );
-        tokens.emplace_back("n" , Token::TK_VARIABLE_N   );
-        tokens.emplace_back("N" , Token::TK_VARIABLE_N   );
-        tokens.emplace_back("(" , Token::TK_BRACKET_LEFT );
-        tokens.emplace_back(")" , Token::TK_BRACKET_RIGHT);
-    }
+    Scanner(const std::string& stream) : stream_(stream), pos(stream_.begin()) {}
 
     Token nextToken()
     {
@@ -259,8 +242,25 @@ private:
         return std::equal(prefix.begin(), prefix.end(), pos);
     }
 
-    typedef std::vector<std::pair<std::string, Token::Type>> TokenList;
-    TokenList tokens;
+    using TokenList = std::vector<std::pair<std::string, Token::Type>>;
+    const TokenList tokens
+    {
+        { "?" , Token::TK_TERNARY_QUEST },
+        { ":" , Token::TK_TERNARY_COLON },
+        { "||", Token::TK_OR            },
+        { "&&", Token::TK_AND           },
+        { "==", Token::TK_EQUAL         },
+        { "!=", Token::TK_NOT_EQUAL     },
+        { "<=", Token::TK_LESS_EQUAL    },
+        { "<" , Token::TK_LESS          },
+        { ">=", Token::TK_GREATER_EQUAL },
+        { ">" , Token::TK_GREATER       },
+        { "%" , Token::TK_MODULUS       },
+        { "n" , Token::TK_VARIABLE_N    },
+        { "N" , Token::TK_VARIABLE_N    },
+        { "(" , Token::TK_BRACKET_LEFT  },
+        { ")" , Token::TK_BRACKET_RIGHT },
+    };
 
     const std::string stream_;
     std::string::const_iterator pos;

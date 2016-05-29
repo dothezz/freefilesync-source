@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>正在產生檔案清單…</target>
 
+<source>Fail-safe file copy</source>
+<target>故障保護檔案複製</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>複製被鎖定的檔案</target>
+
+<source>Copy file access permissions</source>
+<target>複製檔案系統權限</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>開始比對</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>錯誤代碼 %x：</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>無法連接到SFTP伺服器 %x。</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -402,8 +435,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>無法讀取卷影複製服務。</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>請在此系統上使用FreeFileSync 64位元版本來新建卷影副本。</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>無法確定卷名為 %x。</target>
@@ -577,6 +610,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>正在更新 %x 個屬性</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>無法寫入 %x 的檔案屬性。</target>
 
 <source>%x and %y have different content.</source>
 <target>%x 和 %y 擁有的內容不同。</target>
@@ -874,6 +910,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>配對資料夾：</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>使用本機設定：</target>
 
@@ -934,6 +973,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>清除(&l)</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>檢測同步方向和資料庫檔案的說明</target>
+
 <source>Detect moved files</source>
 <target>檢測被移動的檔案</target>
 
@@ -948,23 +990,20 @@ The command is triggered if:
 - 檢測不可用於首次同步
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>檢測同步方向和資料庫檔案的說明</target>
-
 <source>Delete files:</source>
 <target>刪除檔案：</target>
-
-<source>&Permanent</source>
-<target>常駐(&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>永久刪除或覆蓋檔案</target>
 
 <source>&Recycle bin</source>
 <target>資源回收筒(&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>在資源回收筒中刪除備份和覆蓋檔案</target>
+
+<source>&Permanent</source>
+<target>常駐(&P)</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>永久刪除或覆蓋檔案</target>
 
 <source>&Versioning</source>
 <target>版本控制(&V)</target>
@@ -978,14 +1017,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>錯誤處理：</target>
 
-<source>Hide all error and warning messages</source>
-<target>隱藏所有錯誤和警告訊息</target>
-
 <source>&Pop-up</source>
 <target>彈出(&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>在彈出視窗上顯示錯誤或警告訊息</target>
+
+<source>Hide all error and warning messages</source>
+<target>隱藏所有錯誤和警告訊息</target>
 
 <source>On completion:</source>
 <target>完成後：</target>
@@ -1092,9 +1131,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>以下設定用於所有同步作業。</target>
 
-<source>Fail-safe file copy</source>
-<target>故障保護檔案複製</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1107,17 +1143,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(建議)</target>
 
-<source>Copy locked files</source>
-<target>複製被鎖定的檔案</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>共用的副本或鎖定的檔案使用卷影複製服務。</target>
 
 <source>(requires administrator rights)</source>
 <target>(需要管理員權限)</target>
-
-<source>Copy file access permissions</source>
-<target>複製檔案系統權限</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>傳輸檔案和資料夾的權限。</target>
@@ -1589,9 +1619,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>百分比</target>
 
-<source>Internet access failed.</source>
-<target>網際網路連線失敗。</target>
-
 <source>Check for Program Updates</source>
 <target>檢查程式更新</target>
 
@@ -1601,17 +1628,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync已經是最新版本。</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>無法連接到www.freefilesync.org。</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>檢查(&C)</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>找不到系統函數 %x。</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>無法登錄接收系統訊息。</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x 無法註冊裝置通知。</target>
@@ -1621,9 +1654,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>檔案被另一個進程鎖定：</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>無法寫入 %x 的檔案屬性。</target>
 
 <source>Cannot read security context of %x.</source>
 <target>無法讀取 %x 的安全內容。</target>
@@ -1639,9 +1669,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x 不是一個常規目錄名稱。</target>
-
-<source>Cannot find system function %x.</source>
-<target>找不到系統函數 %x。</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>無法從 %x 複製檔案到 %y。</target>
@@ -1699,6 +1726,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>配置檔案 %x 是不完整的。缺少的元素將設定為其預設值。</target>
+
+<source>Internet access failed.</source>
+<target>網際網路連線失敗。</target>
 
 <source>Prepare installation</source>
 <target>準備安裝</target>

@@ -186,7 +186,7 @@ private:
     void onGridLabelContextL(zen::GridLabelClickEvent& event);
     void onGridLabelContextC(zen::GridLabelClickEvent& event);
     void onGridLabelContextR(zen::GridLabelClickEvent& event);
-    void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
+    void onGridLabelContextRim(zen::Grid& grid, zen::ColumnTypeRim type, bool left);
 
     void OnToggleViewType  (wxCommandEvent& event) override;
     void OnToggleViewButton(wxCommandEvent& event) override;

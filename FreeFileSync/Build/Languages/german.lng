@@ -29,7 +29,7 @@
 <target>Erstelle Datei %x</target>
 
 <source>Creating symbolic link %x</source>
-<target>Erstelle symbolischen Verknüpfung %x</target>
+<target>Erstelle symbolische Verknüpfung %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Verschiebe Datei %x in den Papierkorb</target>
@@ -438,8 +438,8 @@ Tatsächlich: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Auf den Volumenschattenkopiedienst kann nicht zugegriffen werden.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Bitte benutzen Sie die FreeFileSync 64-Bit Version, um Schattenkopien auf diesem System zu erstellen.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target>Bitte starten Sie die FreeFileSync 64-Bit Version, um Schattenkopien auf diesem System zu erstellen.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Der Laufwerksname für %x kann nicht bestimmt werden.</target>
@@ -606,7 +606,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>Aktualisiere Datei %x</target>
 
 <source>Updating symbolic link %x</source>
-<target>Aktualisiere symbolischen Verknüpfung %x</target>
+<target>Aktualisiere symbolische Verknüpfung %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifiziere Datei %x</target>
@@ -731,14 +731,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Full path</source>
 <target>Absoluter Pfad</target>
 
-<source>Name</source>
-<target>Name</target>
+<source>Relative path</source>
+<target>Relativer Pfad</target>
 
-<source>Relative folder</source>
-<target>Relativer Ordner</target>
-
-<source>Base folder</source>
-<target>Basisordner</target>
+<source>Item name</source>
+<target>Elementname</target>
 
 <source>Size</source>
 <target>Größe</target>
@@ -1083,6 +1080,12 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Time elapsed:</source>
 <target>Vergangene Zeit:</target>
+
+<source>Bytes:</source>
+<target>Bytes:</target>
+
+<source>Items:</source>
+<target>Elemente:</target>
 
 <source>Synchronizing...</source>
 <target>Synchronisiere...</target>
@@ -1624,14 +1627,14 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Files</source>
 <target>Dateien</target>
 
+<source>Name</source>
+<target>Name</target>
+
 <source>Items</source>
 <target>Elemente</target>
 
 <source>Percentage</source>
 <target>Prozent</target>
-
-<source>Internet access failed.</source>
-<target>Der Internetzugriff ist fehlgeschlagen.</target>
 
 <source>Check for Program Updates</source>
 <target>Suche nach neuer Programmversion</target>
@@ -1743,6 +1746,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Die Konfigurationsdatei %x ist unvollständig. Die fehlenden Elemente werden auf ihre Standardwerte gesetzt.</target>
+
+<source>Internet access failed.</source>
+<target>Der Internetzugriff ist fehlgeschlagen.</target>
 
 <source>Prepare installation</source>
 <target>Installation vorbereiten</target>

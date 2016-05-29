@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Створення списку файлів...</target>
 
+<source>Fail-safe file copy</source>
+<target>Відмовостійке копіювання файлів</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Копіювати заблоковані файли</target>
+
+<source>Copy file access permissions</source>
+<target>Копіювати права доступу до файлів</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Запустити порівняння</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>Код помилки %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Не вдається з'єднатися з SFTP сервером %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Не вдається отримати доступ до послуги Тіньового Копіювання Тому.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Будь ласка, використовуйте 64-розрядну версію FreeFileSync для створення тіньових копій у цій системі.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Не вдалося встановити ім'я тому для %x.</target>
@@ -583,6 +616,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>Оновлення атрибутів %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Не вдається записати атрибути файлу %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x і %y мають різний вміст.</target>
@@ -882,6 +918,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>Пара папок:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Використати локальні налаштування:</target>
 
@@ -942,6 +981,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>О&чистити</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
+
 <source>Detect moved files</source>
 <target>Виявляти переміщені файли</target>
 
@@ -956,23 +998,20 @@ The command is triggered if:
 - Визначення недоступне для першої синхронізації
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
-
 <source>Delete files:</source>
 <target>Вилучати файли:</target>
-
-<source>&Permanent</source>
-<target>&Безповоротно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Вилучати чи перезаписувати файли безповоротно</target>
 
 <source>&Recycle bin</source>
 <target>&Корзина</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Робити резервну копію вилучених та перезаписаних файлів в Корзині</target>
+
+<source>&Permanent</source>
+<target>&Безповоротно</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Вилучати чи перезаписувати файли безповоротно</target>
 
 <source>&Versioning</source>
 <target>&Управління версіями</target>
@@ -986,14 +1025,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Обробка помилок:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Приховати всі помилки і повідомлення з попередженнями</target>
-
 <source>&Pop-up</source>
 <target>&Спливаючі вікна</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показувати виринаючі вікна при помилках та попередженнях</target>
+
+<source>Hide all error and warning messages</source>
+<target>Приховати всі помилки і повідомлення з попередженнями</target>
 
 <source>On completion:</source>
 <target>Після завершення:</target>
@@ -1100,9 +1139,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Наступні налаштування використовуються для всіх завдань синхронізації.</target>
 
-<source>Fail-safe file copy</source>
-<target>Відмовостійке копіювання файлів</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1115,17 +1151,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(рекомендовано)</target>
 
-<source>Copy locked files</source>
-<target>Копіювати заблоковані файли</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копіювати спільні та заблоковані файли за допомогою сервісу Тіньового Копіювання Тому.</target>
 
 <source>(requires administrator rights)</source>
 <target>(потрібні права адміністратора)</target>
-
-<source>Copy file access permissions</source>
-<target>Копіювати права доступу до файлів</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Перенести права доступу файлів і папок.</target>
@@ -1611,9 +1641,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Проценти</target>
 
-<source>Internet access failed.</source>
-<target>Немає доступу до Internet.</target>
-
 <source>Check for Program Updates</source>
 <target>Перевірка Оновлень Програми</target>
 
@@ -1623,17 +1650,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>У Вас найновіша версія FreeFileSync.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Не вдалось підключитись до www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Перевірити</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Не вдається знайти системну функцію %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Не вдається зареєструватися для отримання системних повідомлень.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не вдається зареєструвати повідомлення пристрою для %x.</target>
@@ -1643,9 +1676,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Файл заблоковано іншим процесом:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Не вдається записати атрибути файлу %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Не вдається прочитати контекст безпеки %x.</target>
@@ -1661,9 +1691,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x не є звичайним іменем папки.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Не вдається знайти системну функцію %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Не вдається скопіювати файл %x до %y.</target>
@@ -1727,6 +1754,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Файл конфігурації %x неповний. Елементи, яких не вистачає, будуть заповнені значеннями за замовчуванням.</target>
+
+<source>Internet access failed.</source>
+<target>Немає доступу до Internet.</target>
 
 <source>Prepare installation</source>
 <target>Підготовка встановлення</target>

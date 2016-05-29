@@ -125,8 +125,6 @@ private:
 class Buffer
 {
 public:
-    Buffer() : firstInsertPos(iconList.end()), lastInsertPos(iconList.end()) {}
-
     //called by main and worker thread:
     bool hasIcon(const AbstractPath& filePath) const
     {
@@ -274,8 +272,8 @@ private:
 
     mutable std::mutex lockIconList;
     FileIconMap iconList; //shared resource; Zstring is thread-safe like an int
-    FileIconMap::iterator firstInsertPos;
-    FileIconMap::iterator lastInsertPos;
+    FileIconMap::iterator firstInsertPos = iconList.end();
+    FileIconMap::iterator lastInsertPos  = iconList.end();
 };
 
 //################################################################################################################################################

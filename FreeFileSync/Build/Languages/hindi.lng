@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>फ़ाइल सूची बनाई जा रही है...</target>
 
+<source>Fail-safe file copy</source>
+<target>सुरक्षित फ़ाइल प्रतिलिपि</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>अवरोधित फ़ाइल्स प्रतिलिपित करें</target>
+
+<source>Copy file access permissions</source>
+<target>फ़ाइल अभिगम अनुमतियाँ प्रतिलिपित करें</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>तुलना शुरू हो रही है</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>त्रुटि कोड %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>SFTP सर्वर %x को कनेक्ट करने में विफल।</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>वॉल्यूम शॅडो कॉपी सर्व्हिस अभिगम करने में असमर्थ।</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>इस सिस्टम पर शॅडो कॉपियां बनाने के लिए कृपया FreeFileSync 64-बिट संस्करण उपयोग करें।</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x के लिए वॉल्यूम नाम निर्धारण नहीं किया जा सकता।</target>
@@ -580,6 +613,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>%x के गुण अद्यतित हो रहे हैं</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>%x के फ़ाइल गुण लिख नहीं सकते।</target>
 
 <source>%x and %y have different content.</source>
 <target>%x और %y की सामग्री भिन्न है।</target>
@@ -878,6 +914,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>फ़ोल्डर जोडा:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>स्थानीय सेटिंग्स का उपयोग करें:</target>
 
@@ -938,6 +977,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>हटाएं (&l)</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>डेटाबेस फ़ाइल्स की मदद से सिंक्रनाइज़ेशन दिशाओं का पता लगाएं</target>
+
 <source>Detect moved files</source>
 <target>ले जाई गई फ़ाइल्स का पता लगाएं</target>
 
@@ -952,23 +994,20 @@ The command is triggered if:
 - पहले सिंक्रनाइज़ेशन के लिए खोज उपलब्ध नहीं
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>डेटाबेस फ़ाइल्स की मदद से सिंक्रनाइज़ेशन दिशाओं का पता लगाएं</target>
-
 <source>Delete files:</source>
 <target>फ़ाइल्स हटाएं:</target>
-
-<source>&Permanent</source>
-<target>स्थायी (&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>फ़ाइल्स स्थायी रूप से हटाएं या अधिलेखित करें</target>
 
 <source>&Recycle bin</source>
 <target>रीसायकल बिन (&R)</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>रीसायकल बिन में हटाई या अधिलेखित फ़ाइल्स बैक अप करें</target>
+
+<source>&Permanent</source>
+<target>स्थायी (&P)</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>फ़ाइल्स स्थायी रूप से हटाएं या अधिलेखित करें</target>
 
 <source>&Versioning</source>
 <target>संस्करण (&V)</target>
@@ -982,14 +1021,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>त्रुटियां प्रहस्तन करें:</target>
 
-<source>Hide all error and warning messages</source>
-<target>सभी त्रुटि और चेतावनी संदेशों को छुपाएं</target>
-
 <source>&Pop-up</source>
 <target>पॉप-अप (&P)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>त्रुटियों या चेतावनियों पर पॉप-अप दिखाएं</target>
+
+<source>Hide all error and warning messages</source>
+<target>सभी त्रुटि और चेतावनी संदेशों को छुपाएं</target>
 
 <source>On completion:</source>
 <target>समापन उपरांत:</target>
@@ -1096,9 +1135,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>सभी सिंक्रनाइज़ेशन कार्यों के लिए निम्न सेटिंग्स का उपयोग किया जाता है।</target>
 
-<source>Fail-safe file copy</source>
-<target>सुरक्षित फ़ाइल प्रतिलिपि</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(अनुशंसित)</target>
 
-<source>Copy locked files</source>
-<target>अवरोधित फ़ाइल्स प्रतिलिपित करें</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>साझा या अवरोधित फ़ाइल्स वॉल्यूम शॅडो कॉपी सर्व्हिस के उपयोग से प्रतिलिपित करें।</target>
 
 <source>(requires administrator rights)</source>
 <target>(प्रबंधक अधिकार आवश्यक)</target>
-
-<source>Copy file access permissions</source>
-<target>फ़ाइल अभिगम अनुमतियाँ प्रतिलिपित करें</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>फ़ाइल और फ़ोल्डर अनुमतियाँ स्थानांतर करें।</target>
@@ -1600,9 +1630,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>प्रतिशत</target>
 
-<source>Internet access failed.</source>
-<target>इंटरनेट पहुँच विफल।</target>
-
 <source>Check for Program Updates</source>
 <target>प्रोग्राम अद्यतनों के लिए जाँच करें</target>
 
@@ -1612,17 +1639,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync नवीनतम है।</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>www.freefilesync.org से जुड़ने में असमर्थ।</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>जाँच करें (&C)</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>सिस्टम संदेशों को प्राप्त करने के लिए पंजीकृत करने में असमर्थ।</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x के लिए डिवाइस सूचनाएँ पंजिकृत करने में असमर्थ।</target>
@@ -1632,9 +1665,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>फ़ाइल किसी अन्य प्रक्रिया द्वारा अवरोधित है:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>%x के फ़ाइल गुण लिख नहीं सकते।</target>
 
 <source>Cannot read security context of %x.</source>
 <target>%x का सुरक्षा संदर्भ पढ़ नहीं सकते।</target>
@@ -1650,9 +1680,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x कोई नियमित निर्देशिका नाम नहीं है।</target>
-
-<source>Cannot find system function %x.</source>
-<target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>फ़ाइल %x से %y प्रतिलिपित नहीं कर सकते।</target>
@@ -1713,6 +1740,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>कॉन्फ़िगरेशन फ़ाइल %x अधूरी है। लापता तत्व उनके डिफ़ॉल्ट मानों से सेट होंगे।</target>
+
+<source>Internet access failed.</source>
+<target>इंटरनेट पहुँच विफल।</target>
 
 <source>Prepare installation</source>
 <target>स्थापना तैयारी</target>

@@ -55,11 +55,11 @@ std::wstring zen::getVariantName(CompareVariant var)
 {
     switch (var)
     {
-        case CMP_BY_TIME_SIZE:
+        case CompareVariant::TIME_SIZE:
             return _("File time and size");
-        case CMP_BY_CONTENT:
+        case CompareVariant::CONTENT:
             return _("File content");
-        case CMP_BY_SIZE:
+        case CompareVariant::SIZE:
             return _("File size");
     }
     assert(false);
@@ -71,7 +71,7 @@ std::wstring zen::getVariantName(DirectionConfig::Variant var)
 {
     switch (var)
     {
-        case DirectionConfig::TWOWAY:
+        case DirectionConfig::TWO_WAY:
             return L"<- " + _("Two way") + L" ->";
         case DirectionConfig::MIRROR:
             return _("Mirror") + L" ->";
@@ -90,7 +90,7 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
     DirectionSet output;
     switch (cfg.var)
     {
-        case DirectionConfig::TWOWAY:
+        case DirectionConfig::TWO_WAY:
             throw std::logic_error("there are no predefined directions for automatic mode! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         case DirectionConfig::MIRROR:
@@ -121,7 +121,7 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
 
 bool zen::detectMovedFilesSelectable(const DirectionConfig& cfg)
 {
-    if (cfg.var == DirectionConfig::TWOWAY)
+    if (cfg.var == DirectionConfig::TWO_WAY)
         return false; //moved files are always detected since we have the database file anyway
 
     const DirectionSet tmp = zen::extractDirections(cfg);
@@ -134,7 +134,7 @@ bool zen::detectMovedFilesSelectable(const DirectionConfig& cfg)
 
 bool zen::detectMovedFilesEnabled(const DirectionConfig& cfg)
 {
-    return detectMovedFilesSelectable(cfg) ? cfg.detectMovedFiles : cfg.var == DirectionConfig::TWOWAY;
+    return detectMovedFilesSelectable(cfg) ? cfg.detectMovedFiles : cfg.var == DirectionConfig::TWO_WAY;
 }
 
 
@@ -286,16 +286,16 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
 
     switch (unit)
     {
-        case UTIME_NONE:
+        case UnitTime::NONE:
             return defaultVal;
 
-        case UTIME_TODAY:
+        case UnitTime::TODAY:
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
             return localToTimeT(locTimeStruc); //convert local time back to UTC
 
-        //case UTIME_THIS_WEEK:
+        //case UnitTime::THIS_WEEK:
         //{
         //    localTimeFmt->tm_sec  = 0; //0-61
         //    localTimeFmt->tm_min  = 0; //0-59
@@ -308,14 +308,14 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
         //    return std::int64_t(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
         //}
 
-        case UTIME_THIS_MONTH:
+        case UnitTime::THIS_MONTH:
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
             locTimeStruc.day    = 1; //1-31
             return localToTimeT(locTimeStruc);
 
-        case UTIME_THIS_YEAR:
+        case UnitTime::THIS_YEAR:
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
@@ -323,7 +323,7 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
             locTimeStruc.month  = 1; //1-12
             return localToTimeT(locTimeStruc);
 
-        case UTIME_LAST_X_DAYS:
+        case UnitTime::LAST_X_DAYS:
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
@@ -341,14 +341,14 @@ std::uint64_t resolve(size_t value, UnitSize unit, std::uint64_t defaultVal)
 
     switch (unit)
     {
-        case USIZE_NONE:
+        case UnitSize::NONE:
             return defaultVal;
-        case USIZE_BYTE:
+        case UnitSize::BYTE:
             return value;
-        case USIZE_KB:
+        case UnitSize::KB:
             return value > maxVal / 1024U ? maxVal : //prevent overflow!!!
                    1024U * value;
-        case USIZE_MB:
+        case UnitSize::MB:
             return value > maxVal / (1024 * 1024U) ? maxVal : //prevent overflow!!!
                    1024 * 1024U * value;
     }

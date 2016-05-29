@@ -40,7 +40,7 @@ private:
 
 template <bool respectCase>
 ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
-                  const wxString& searchString,
+                  const std::wstring& searchString,
                   size_t rowFirst, //specify area to search:
                   size_t rowLast)  // [rowFirst, rowLast)
 {
@@ -50,7 +50,7 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
         erase_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
         if (!colAttr.empty())
         {
-            const MatchFound<respectCase> matchFound(copyStringTo<std::wstring>(searchString));
+            const MatchFound<respectCase> matchFound(searchString);
 
             for (size_t row = rowFirst; row < rowLast; ++row)
                 for (auto iterCol = colAttr.begin(); iterCol != colAttr.end(); ++iterCol)
@@ -63,7 +63,7 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
 }
 
 
-std::pair<const Grid*, ptrdiff_t> zen::findGridMatch(const Grid& grid1, const Grid& grid2, const wxString& searchString, bool respectCase)
+std::pair<const Grid*, ptrdiff_t> zen::findGridMatch(const Grid& grid1, const Grid& grid2, const std::wstring& searchString, bool respectCase)
 {
     //PERF_START
 

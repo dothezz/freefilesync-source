@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Luodaan tiedostoluettelo...</target>
 
+<source>Fail-safe file copy</source>
+<target>Varmennettu tiedostokopiointi</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopioi lukitut tiedostot</target>
+
+<source>Copy file access permissions</source>
+<target>Kopioi tiedoston käyttöoikeudet</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Vertailu alkaa</target>
 
@@ -291,8 +324,8 @@ Todellinen: %y tavua
 <source>Error Code %x:</source>
 <target>Virhekoodi %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>SFTP palvelimeen %x ei saada yhteyttä.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Todellinen: %y tavua
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Volume Shadow Copy palvelu ei vastaa.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Tilannevedoksia varten käytä tässä järjestelmässä FreeFileSync 64-bittistä versiota.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Levyn %x tunnistus ei onnistu.</target>
@@ -580,6 +613,9 @@ Käsky suoritetaan jos:
 
 <source>Updating attributes of %x</source>
 <target>Päivitetään %x:n ominaisuuksia</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Tiedoston %x ominaisuuksia ei voitu tallentaa.</target>
 
 <source>%x and %y have different content.</source>
 <target>Eri sisältö %x:llä ja %y:llä.</target>
@@ -878,6 +914,9 @@ Käsky suoritetaan jos:
 <source>Folder pair:</source>
 <target>Hakemistopari:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Käytä paikallisia asetuksia:</target>
 
@@ -938,6 +977,9 @@ Käsky suoritetaan jos:
 <source>C&lear</source>
 <target>&Nollaa</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Tunnista tietokannan avulla täysmäyksen suuntaa</target>
+
 <source>Detect moved files</source>
 <target>Tunnista siirretyt tiedostot</target>
 
@@ -952,23 +994,20 @@ Käsky suoritetaan jos:
 - Tunnistus alkaa ensimmäisestä täsmäyksestä
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Tunnista tietokannan avulla täysmäyksen suuntaa</target>
-
 <source>Delete files:</source>
 <target>Poista tiedosto:</target>
-
-<source>&Permanent</source>
-<target>&Pysyvä</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Poista tai korvaa tiedostoja pysyvästi</target>
 
 <source>&Recycle bin</source>
 <target>&Roskakori</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Tallenna poistetut/korvatut tiedostot Roskakoriin</target>
+
+<source>&Permanent</source>
+<target>&Pysyvä</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Poista tai korvaa tiedostoja pysyvästi</target>
 
 <source>&Versioning</source>
 <target>&Versiointi</target>
@@ -982,14 +1021,14 @@ Käsky suoritetaan jos:
 <source>Handle errors:</source>
 <target>Hoida virheet:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Piilota kaikki virhe- ja varoitusviestit</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Näytä ponnahdusikkuna virheiden tai varoituksien kohdalla</target>
+
+<source>Hide all error and warning messages</source>
+<target>Piilota kaikki virhe- ja varoitusviestit</target>
 
 <source>On completion:</source>
 <target>Toimet kun valmis:</target>
@@ -1096,9 +1135,6 @@ Käsky suoritetaan jos:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Näitä asetuksia käytetään kaikkiin täsmäyksiin.</target>
 
-<source>Fail-safe file copy</source>
-<target>Varmennettu tiedostokopiointi</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>(recommended)</source>
 <target>(suositus)</target>
 
-<source>Copy locked files</source>
-<target>Kopioi lukitut tiedostot</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Jaettujen tai lukittujen tiedostojen kopiointi käyttäen Volume Shadow Copy Service.</target>
 
 <source>(requires administrator rights)</source>
 <target>(edellyttää pääkäyttäjän oikeuksia)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopioi tiedoston käyttöoikeudet</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Siirrä tiedostojen ja hakemistojen käyttöoikeudet.</target>
@@ -1600,9 +1630,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Percentage</source>
 <target>Prosenttia</target>
 
-<source>Internet access failed.</source>
-<target>Ei pääsyä internettiin.</target>
-
 <source>Check for Program Updates</source>
 <target>Etsi ohjelmaan päivitystä</target>
 
@@ -1612,17 +1639,23 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync on ajan tasalla.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Ei yhteyttä www.freefilesync.org:iin.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Tarkista</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Järjestelmäfunktiota %x ei löydy.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Kirjautuminen järjestelmäviestien vastaanottamiseksi ei onnistu.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x laiteviestien kirjaaminen ei onnistu.</target>
@@ -1632,9 +1665,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>The file is locked by another process:</source>
 <target>Tiedosto on toisen prosessin lukitsema:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Tiedoston %x ominaisuuksia ei voitu tallentaa.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Ei voi lukea %x:n suojauskontekstia.</target>
@@ -1650,9 +1680,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>%x is not a regular directory name.</source>
 <target>%x on epämääräinen hakemisto nimi.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Järjestelmäfunktiota %x ei löydy.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Tiedostoa %x ei voida kopioida kohtaan %y.</target>
@@ -1713,6 +1740,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Kokoonpanotiedosto %x ladattu vain osittain. Puuttuvat asetetaan oletusarvoihin.</target>
+
+<source>Internet access failed.</source>
+<target>Ei pääsyä internettiin.</target>
 
 <source>Prepare installation</source>
 <target>Alusta asennus</target>

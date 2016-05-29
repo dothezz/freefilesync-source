@@ -731,8 +731,8 @@ namespace
 inline wxColor getColorPercentBorder    () { return { 198, 198, 198 }; }
 inline wxColor getColorPercentBackground() { return { 0xf8, 0xf8, 0xf8 }; }
 
-inline wxColor getColorTreeSelectionGradientFrom() { return getColorSelectionGradientFrom(); }
-inline wxColor getColorTreeSelectionGradientTo  () { return getColorSelectionGradientTo  (); }
+inline wxColor getColorTreeSelectionGradientFrom() { return Grid::getColorSelectionGradientFrom(); }
+inline wxColor getColorTreeSelectionGradientTo  () { return Grid::getColorSelectionGradientTo  (); }
 
 const int iconSizeSmall = IconBuffer::getSize(IconBuffer::SIZE_SMALL);
 
@@ -1149,7 +1149,7 @@ private:
             {
                 case WXK_LEFT:
                 case WXK_NUMPAD_LEFT:
-                case WXK_NUMPAD_SUBTRACT: //http://msdn.microsoft.com/en-us/library/ms971323.aspx#atg_keyboardshortcuts_windows_shortcut_keys
+                case WXK_NUMPAD_SUBTRACT: //https://msdn.microsoft.com/en-us/library/ms971323#atg_keyboardshortcuts_windows_shortcut_keys
                     if (treeDataView_)
                         switch (treeDataView_->getStatus(row))
                         {
@@ -1215,7 +1215,7 @@ private:
 
         auto setDefaultColumns = [&]
         {
-            setShowPercentage(defaultValueShowPercentage);
+            setShowPercentage(naviGridShowPercentageDefault);
             grid_.setColumnConfig(treeview::convertConfig(getDefaultColumnAttributesNavi()));
         };
         menu.addItem(_("&Default"), setDefaultColumns); //'&' -> reuse text from "default" buttons elsewhere

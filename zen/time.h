@@ -154,7 +154,7 @@ struct GetFormat<FormatIsoDateTimeTag> //%Y-%m-%d %H:%M:%S - e.g. 2001-08-23 14:
 
 
 //strftime() craziness on invalid input:
-//  VS 2010: CRASH unless "_invalid_parameter_handler" is set: http://msdn.microsoft.com/en-us/library/ksazx244.aspx
+//  VS 2010: CRASH unless "_invalid_parameter_handler" is set: https://msdn.microsoft.com/en-us/library/ksazx244.aspx
 //  GCC: returns 0, apparently no crash. Still, considering some clib maintainer's comments, we should expect the worst!
 inline
 size_t strftimeWrap_impl(char* buffer, size_t bufferSize, const char* format, const std::tm* timeptr)

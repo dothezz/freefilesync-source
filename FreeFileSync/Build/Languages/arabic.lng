@@ -101,7 +101,7 @@
 <target>تحديد مسار مختلف لملف GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>أي عدد من ملفات خيارات FreeFileSyn أو\و _gui and/or .ffs_batch.</target>
+<target>أي عدد من ملفات خيارات FreeFileSync أو\و _gui and/or .ffs_batch.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد.</target>
@@ -150,6 +150,39 @@
 
 <source>Generating file list...</source>
 <target>إنشاء قائمة الملفات...</target>
+
+<source>Fail-safe file copy</source>
+<target>نسخ ملفات آمن من الفشل</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>نسخ الملفات المقفلة</target>
+
+<source>Copy file access permissions</source>
+<target>نسخ أذونات الوصول إلى الملف</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
 
 <source>Starting comparison</source>
 <target>بدأ عملية المقارنة</target>
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>خطأ رقم %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>فشل الاتصال بخادم SFTP %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -417,8 +450,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>لا يمكن الوصول إلى خدمة "نسخ الظل لوحدة التخزين".</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>الرجاء استخدام إصدار الـ 64-bit للبرنامج لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>تعذر تحديد اسم الوسط %x.</target>
@@ -592,6 +625,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>تحديث سمات %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>لا يمكن كتابة سمات الملف %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x و %y لديهما محتوى مختلف.</target>
@@ -894,6 +930,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>زوج المجلدات:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>استخدام الإعدادات المحلية:</target>
 
@@ -954,6 +993,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>إ&زالة</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
+
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
 
@@ -968,23 +1010,20 @@ The command is triggered if:
 - الاكتشاف غير متاح للمزامنة الأولى
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
-
 <source>Delete files:</source>
 <target>حذف الملفات:</target>
-
-<source>&Permanent</source>
-<target>&دائم</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>حذف أو الكتابة فوق الملفات بشكل دائم</target>
 
 <source>&Recycle bin</source>
 <target>&سلة المهملات</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>نسخ احتياطي للملفات المحذوفة و المستبدلة في سلة المهملات</target>
+
+<source>&Permanent</source>
+<target>&دائم</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>حذف أو الكتابة فوق الملفات بشكل دائم</target>
 
 <source>&Versioning</source>
 <target>ال&وسم حسب الإصدار</target>
@@ -998,14 +1037,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>التعامل مع الأخطاء:</target>
 
-<source>Hide all error and warning messages</source>
-<target>إخفاء جميع رسائل الأخطاء و التحذير</target>
-
 <source>&Pop-up</source>
 <target>&منبثق</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>إظهار إطارات منبثقة عند حصول أخطاء أو تحذيرات</target>
+
+<source>Hide all error and warning messages</source>
+<target>إخفاء جميع رسائل الأخطاء و التحذير</target>
 
 <source>On completion:</source>
 <target>عند الانتهاء:</target>
@@ -1112,9 +1151,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>هذه الإعدادات مستخدمة لجميع مهمات المزامنة.</target>
 
-<source>Fail-safe file copy</source>
-<target>نسخ ملفات آمن من الفشل</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1127,17 +1163,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(موصى به)</target>
 
-<source>Copy locked files</source>
-<target>نسخ الملفات المقفلة</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>نسخ الملفات المشتركة مع مستخدمين آخرين أو المقفولة باستخدام خدمة نسخ الظل الوسيط.</target>
 
 <source>(requires administrator rights)</source>
 <target>(بحاجة امتيازات المدير)</target>
-
-<source>Copy file access permissions</source>
-<target>نسخ أذونات الوصول إلى الملف</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>نقل أذونات الملفات و المجلدات.</target>
@@ -1644,9 +1674,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>النسبة المئوية</target>
 
-<source>Internet access failed.</source>
-<target>فشل الوصول إلى الإنترنت.</target>
-
 <source>Check for Program Updates</source>
 <target>تفقد وجود تحديثات للبرنامج</target>
 
@@ -1654,10 +1681,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>تنزيل الآن؟</target>
 
 <source>FreeFileSync is up to date.</source>
-<target>البرنامج هو الأحدث حتى الآن.</target>
-
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>تعذر الاتصال بـ www.freefilesync.org.</target>
+<target></target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
@@ -1665,8 +1689,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>&Check</source>
 <target>&تحقق</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>لا يمكن العثور على وظيفة نظام %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>تعذر التسجيل لاستقبال رسائل النظام.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>تعذر تسجيل تنبيهات الجهاز لـ %x.</target>
@@ -1676,9 +1709,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>الملف مقفول من قبل عملية أخرى:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>لا يمكن كتابة سمات الملف %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>لا يمكن قراءة سياق الأمان %x.</target>
@@ -1694,9 +1724,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x ليس اسم دليل اعتيادي.</target>
-
-<source>Cannot find system function %x.</source>
-<target>لا يمكن العثور على وظيفة نظام %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>لا يمكن نسخ الملف %x إلى %y.</target>
@@ -1770,6 +1797,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>ملف التكوين %x غير مكتمل. سيتم إعادة تعيين العناصر المفقودة إلى قيمها الافتراضية.</target>
 
+<source>Internet access failed.</source>
+<target>فشل الوصول إلى الإنترنت.</target>
+
 <source>Prepare installation</source>
 <target>الاستعداد للتثبيت</target>
 
@@ -1792,7 +1822,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>حفظ الإعدادات إلى ‏‪"%APPDATA%\FreeFileSync"</target>
 
 <source>Register FreeFileSync file extensions</source>
-<target>تسجيل لاحقةالملفات</target>
+<target></target>
 
 <source>Create Explorer context menu entries</source>
 <target>إنشاء مدخلات القوائم المحلية في متصفح الملفات</target>
@@ -1819,10 +1849,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>قائمة إبدأ</target>
 
 <source>Registering FreeFileSync file extensions</source>
-<target>تسجيل لاحقة الملفات</target>
+<target></target>
 
 <source>Unregistering FreeFileSync file extensions</source>
-<target>إلغاء تسجيل لاحقةالملفات</target>
+<target></target>
 
 <source>FreeFileSync Configuration</source>
 <target>تضبيطات FreeFileSync</target>

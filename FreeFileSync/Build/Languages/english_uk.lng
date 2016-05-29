@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Generating file list...</target>
 
+<source>Fail-safe file copy</source>
+<target>Fail-safe file copy</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Copy locked files</target>
+
+<source>Copy file access permissions</source>
+<target>Copy file access permissions</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Starting comparison</target>
 
@@ -291,8 +324,8 @@ Actual: %y bytes
 <source>Error Code %x:</source>
 <target>Error Code %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Failed to connect to SFTP server %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Actual: %y bytes
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Cannot access the Volume Shadow Copy Service.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Please use FreeFileSync 64-bit version to create shadow copies on this system.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Cannot determine volume name for %x.</target>
@@ -580,6 +613,9 @@ The command is triggered if:
 
 <source>Updating attributes of %x</source>
 <target>Updating attributes of %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Cannot write file attributes of %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x and %y have different content.</target>
@@ -878,6 +914,9 @@ The command is triggered if:
 <source>Folder pair:</source>
 <target>Folder pair:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Use local settings:</target>
 
@@ -938,6 +977,9 @@ The command is triggered if:
 <source>C&lear</source>
 <target>C&lear</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detect synchronisation directions with the help of database files</target>
+
 <source>Detect moved files</source>
 <target>Detect moved files</target>
 
@@ -952,23 +994,20 @@ The command is triggered if:
 - Detection not available for first sync
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detect synchronisation directions with the help of database files</target>
-
 <source>Delete files:</source>
 <target>Delete files:</target>
-
-<source>&Permanent</source>
-<target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Delete or overwrite files permanently</target>
 
 <source>&Recycle bin</source>
 <target>&Recycle bin</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Back up deleted and overwritten files in the recycle bin</target>
+
+<source>&Permanent</source>
+<target>&Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Delete or overwrite files permanently</target>
 
 <source>&Versioning</source>
 <target>&Versioning</target>
@@ -982,14 +1021,14 @@ The command is triggered if:
 <source>Handle errors:</source>
 <target>Handle errors:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Hide all error and warning messages</target>
-
 <source>&Pop-up</source>
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Show pop-up on errors or warnings</target>
+
+<source>Hide all error and warning messages</source>
+<target>Hide all error and warning messages</target>
 
 <source>On completion:</source>
 <target>On completion:</target>
@@ -1096,9 +1135,6 @@ The command is triggered if:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>The following settings are used for all synchronisation jobs.</target>
 
-<source>Fail-safe file copy</source>
-<target>Fail-safe file copy</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(recommended)</target>
 
-<source>Copy locked files</source>
-<target>Copy locked files</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Copy shared or locked files using the Volume Shadow Copy Service.</target>
 
 <source>(requires administrator rights)</source>
 <target>(requires administrator rights)</target>
-
-<source>Copy file access permissions</source>
-<target>Copy file access permissions</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Transfer file and folder permissions.</target>
@@ -1600,9 +1630,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Percentage</target>
 
-<source>Internet access failed.</source>
-<target>Internet access failed.</target>
-
 <source>Check for Program Updates</source>
 <target>Check for Program Updates</target>
 
@@ -1612,17 +1639,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync is up to date.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Unable to connect to www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Check</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Cannot find system function %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Unable to register to receive system messages.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Unable to register device notifications for %x.</target>
@@ -1632,9 +1665,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>The file is locked by another process:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Cannot write file attributes of %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Cannot read security context of %x.</target>
@@ -1650,9 +1680,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x is not a regular directory name.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Cannot find system function %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Cannot copy file %x to %y.</target>
@@ -1713,6 +1740,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Configuration file %x is incomplete. The missing elements will be set to their default values.</target>
+
+<source>Internet access failed.</source>
+<target>Internet access failed.</target>
 
 <source>Prepare installation</source>
 <target>Prepare installation</target>

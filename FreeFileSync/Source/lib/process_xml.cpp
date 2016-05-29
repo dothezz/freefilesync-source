@@ -14,9 +14,11 @@
 #include <wx/intl.h>
 #include "ffs_paths.h"
 
+
 using namespace zen;
 using namespace xmlAccess; //functionally needed for correct overload resolution!!!
 using namespace std::rel_ops;
+
 
 namespace
 {
@@ -71,6 +73,11 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
             assert(false);
             break;
     }
+}
+
+
+XmlGlobalSettings::XmlGlobalSettings() 
+{
 }
 
 //################################################################################################################
@@ -176,13 +183,13 @@ void writeText(const CompareVariant& value, std::string& output)
 {
     switch (value)
     {
-        case CMP_BY_TIME_SIZE:
+        case CompareVariant::TIME_SIZE:
             output = "TimeAndSize";
             break;
-        case CMP_BY_CONTENT:
+        case CompareVariant::CONTENT:
             output = "Content";
             break;
-        case CMP_BY_SIZE:
+        case CompareVariant::SIZE:
             output = "Size";
             break;
     }
@@ -193,11 +200,11 @@ bool readText(const std::string& input, CompareVariant& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "TimeAndSize")
-        value = CMP_BY_TIME_SIZE;
+        value = CompareVariant::TIME_SIZE;
     else if (tmp == "Content")
-        value = CMP_BY_CONTENT;
+        value = CompareVariant::CONTENT;
     else if (tmp == "Size")
-        value = CMP_BY_SIZE;
+        value = CompareVariant::SIZE;
     else
         return false;
     return true;
@@ -337,13 +344,13 @@ void writeText(const DeletionPolicy& value, std::string& output)
 {
     switch (value)
     {
-        case DELETE_PERMANENTLY:
+        case DeletionPolicy::PERMANENT:
             output = "Permanent";
             break;
-        case DELETE_TO_RECYCLER:
+        case DeletionPolicy::RECYCLER:
             output = "RecycleBin";
             break;
-        case DELETE_TO_VERSIONING:
+        case DeletionPolicy::VERSIONING:
             output = "Versioning";
             break;
     }
@@ -354,11 +361,11 @@ bool readText(const std::string& input, DeletionPolicy& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "Permanent")
-        value = DELETE_PERMANENTLY;
+        value = DeletionPolicy::PERMANENT;
     else if (tmp == "RecycleBin")
-        value = DELETE_TO_RECYCLER;
+        value = DeletionPolicy::RECYCLER;
     else if (tmp == "Versioning")
-        value = DELETE_TO_VERSIONING;
+        value = DeletionPolicy::VERSIONING;
     else
         return false;
     return true;
@@ -370,13 +377,13 @@ void writeText(const SymLinkHandling& value, std::string& output)
 {
     switch (value)
     {
-        case SYMLINK_EXCLUDE:
+        case SymLinkHandling::EXCLUDE:
             output = "Exclude";
             break;
-        case SYMLINK_DIRECT:
+        case SymLinkHandling::DIRECT:
             output = "Direct";
             break;
-        case SYMLINK_FOLLOW:
+        case SymLinkHandling::FOLLOW:
             output = "Follow";
             break;
     }
@@ -387,11 +394,11 @@ bool readText(const std::string& input, SymLinkHandling& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "Exclude")
-        value = SYMLINK_EXCLUDE;
+        value = SymLinkHandling::EXCLUDE;
     else if (tmp == "Direct")
-        value = SYMLINK_DIRECT;
+        value = SymLinkHandling::DIRECT;
     else if (tmp == "Follow")
-        value = SYMLINK_FOLLOW;
+        value = SymLinkHandling::FOLLOW;
     else
         return false;
     return true;
@@ -403,17 +410,8 @@ void writeText(const ColumnTypeRim& value, std::string& output)
 {
     switch (value)
     {
-        case ColumnTypeRim::BASE_DIRECTORY:
-            output = "Base";
-            break;
-        case ColumnTypeRim::FULL_PATH:
-            output = "Full";
-            break;
-        case ColumnTypeRim::REL_FOLDER:
-            output = "Rel";
-            break;
-        case ColumnTypeRim::FILENAME:
-            output = "Name";
+        case ColumnTypeRim::ITEM_PATH:
+            output = "Path";
             break;
         case ColumnTypeRim::SIZE:
             output = "Size";
@@ -431,20 +429,47 @@ template <> inline
 bool readText(const std::string& input, ColumnTypeRim& value)
 {
     const std::string tmp = trimCpy(input);
-    if (tmp == "Base")
-        value = ColumnTypeRim::BASE_DIRECTORY;
-    else if (tmp == "Full")
-        value = ColumnTypeRim::FULL_PATH;
-    else if (tmp == "Rel")
-        value = ColumnTypeRim::REL_FOLDER;
-    else if (tmp == "Name")
-        value = ColumnTypeRim::FILENAME;
+    if (tmp == "Path")
+        value = ColumnTypeRim::ITEM_PATH;
     else if (tmp == "Size")
         value = ColumnTypeRim::SIZE;
     else if (tmp == "Date")
         value = ColumnTypeRim::DATE;
     else if (tmp == "Ext")
         value = ColumnTypeRim::EXTENSION;
+    else
+        return false;
+    return true;
+}
+
+
+template <> inline
+void writeText(const ItemPathFormat& value, std::string& output)
+{
+    switch (value)
+    {
+        case ItemPathFormat::FULL_PATH:
+            output = "Full";
+            break;
+        case ItemPathFormat::RELATIVE_PATH:
+            output = "Relative";
+            break;
+        case ItemPathFormat::ITEM_NAME:
+            output = "Item";
+            break;
+    }
+}
+
+template <> inline
+bool readText(const std::string& input, ItemPathFormat& value)
+{
+    const std::string tmp = trimCpy(input);
+    if (tmp == "Full")
+        value = ItemPathFormat::FULL_PATH;
+    else if (tmp == "Relative")
+        value = ItemPathFormat::RELATIVE_PATH;
+    else if (tmp == "Item")
+        value = ItemPathFormat::ITEM_NAME;
     else
         return false;
     return true;
@@ -489,16 +514,16 @@ void writeText(const UnitSize& value, std::string& output)
 {
     switch (value)
     {
-        case USIZE_NONE:
+        case UnitSize::NONE:
             output = "None";
             break;
-        case USIZE_BYTE:
+        case UnitSize::BYTE:
             output = "Byte";
             break;
-        case USIZE_KB:
+        case UnitSize::KB:
             output = "KB";
             break;
-        case USIZE_MB:
+        case UnitSize::MB:
             output = "MB";
             break;
     }
@@ -509,13 +534,13 @@ bool readText(const std::string& input, UnitSize& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "None")
-        value = USIZE_NONE;
+        value = UnitSize::NONE;
     else if (tmp == "Byte")
-        value = USIZE_BYTE;
+        value = UnitSize::BYTE;
     else if (tmp == "KB")
-        value = USIZE_KB;
+        value = UnitSize::KB;
     else if (tmp == "MB")
-        value = USIZE_MB;
+        value = UnitSize::MB;
     else
         return false;
     return true;
@@ -526,19 +551,19 @@ void writeText(const UnitTime& value, std::string& output)
 {
     switch (value)
     {
-        case UTIME_NONE:
+        case UnitTime::NONE:
             output = "None";
             break;
-        case UTIME_TODAY:
+        case UnitTime::TODAY:
             output = "Today";
             break;
-        case UTIME_THIS_MONTH:
+        case UnitTime::THIS_MONTH:
             output = "Month";
             break;
-        case UTIME_THIS_YEAR:
+        case UnitTime::THIS_YEAR:
             output = "Year";
             break;
-        case UTIME_LAST_X_DAYS:
+        case UnitTime::LAST_X_DAYS:
             output = "x-days";
             break;
     }
@@ -549,15 +574,15 @@ bool readText(const std::string& input, UnitTime& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "None")
-        value = UTIME_NONE;
+        value = UnitTime::NONE;
     else if (tmp == "Today")
-        value = UTIME_TODAY;
+        value = UnitTime::TODAY;
     else if (tmp == "Month")
-        value = UTIME_THIS_MONTH;
+        value = UnitTime::THIS_MONTH;
     else if (tmp == "Year")
-        value = UTIME_THIS_YEAR;
+        value = UnitTime::THIS_YEAR;
     else if (tmp == "x-days")
-        value = UTIME_LAST_X_DAYS;
+        value = UnitTime::LAST_X_DAYS;
     else
         return false;
     return true;
@@ -568,10 +593,10 @@ void writeText(const VersioningStyle& value, std::string& output)
 {
     switch (value)
     {
-        case VER_STYLE_REPLACE:
+        case VersioningStyle::REPLACE:
             output = "Replace";
             break;
-        case VER_STYLE_ADD_TIMESTAMP:
+        case VersioningStyle::ADD_TIMESTAMP:
             output = "TimeStamp";
             break;
     }
@@ -582,9 +607,9 @@ bool readText(const std::string& input, VersioningStyle& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "Replace")
-        value = VER_STYLE_REPLACE;
+        value = VersioningStyle::REPLACE;
     else if (tmp == "TimeStamp")
-        value = VER_STYLE_ADD_TIMESTAMP;
+        value = VersioningStyle::ADD_TIMESTAMP;
     else
         return false;
     return true;
@@ -596,7 +621,7 @@ void writeText(const DirectionConfig::Variant& value, std::string& output)
 {
     switch (value)
     {
-        case DirectionConfig::TWOWAY:
+        case DirectionConfig::TWO_WAY:
             output = "TwoWay";
             break;
         case DirectionConfig::MIRROR:
@@ -616,7 +641,7 @@ bool readText(const std::string& input, DirectionConfig::Variant& value)
 {
     const std::string tmp = trimCpy(input);
     if (tmp == "TwoWay")
-        value = DirectionConfig::TWOWAY;
+        value = DirectionConfig::TWO_WAY;
     else if (tmp == "Mirror")
         value = DirectionConfig::MIRROR;
     else if (tmp == "Update")
@@ -1015,28 +1040,31 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //###########################################################
 
     XmlIn inOverview = inWnd["OverviewPanel"];
-    inOverview.attribute("ShowPercentage", config.gui.mainDlg.showPercentBar);
-    inOverview.attribute("SortByColumn",   config.gui.mainDlg.naviLastSortColumn);
-    inOverview.attribute("SortAscending",  config.gui.mainDlg.naviLastSortAscending);
+    inOverview.attribute("ShowPercentage", config.gui.mainDlg.naviGridShowPercentBar);
+    inOverview.attribute("SortByColumn",   config.gui.mainDlg.naviGridLastSortColumn);
+    inOverview.attribute("SortAscending",  config.gui.mainDlg.naviGridLastSortAscending);
 
     //read column attributes
     XmlIn inColNavi = inOverview["Columns"];
     inColNavi(config.gui.mainDlg.columnAttribNavi);
 
-    XmlIn inMainGrid = inWnd["MainGrid"];
+    XmlIn inMainGrid = inWnd["CenterPanel"];
     inMainGrid.attribute("ShowIcons",  config.gui.mainDlg.showIcons);
     inMainGrid.attribute("IconSize",   config.gui.mainDlg.iconSize);
     inMainGrid.attribute("SashOffset", config.gui.mainDlg.sashOffset);
 
     XmlIn inColLeft = inMainGrid["ColumnsLeft"];
+    inColLeft.attribute("PathFormat", config.gui.mainDlg.itemPathFormatLeftGrid);
     inColLeft(config.gui.mainDlg.columnAttribLeft);
 
     XmlIn inColRight = inMainGrid["ColumnsRight"];
+    inColRight.attribute("PathFormat", config.gui.mainDlg.itemPathFormatRightGrid);
     inColRight(config.gui.mainDlg.columnAttribRight);
+
     //###########################################################
 
     inWnd["DefaultViewFilter"](config.gui.mainDlg.viewFilterDefault);
-    inWnd["Perspective4"](config.gui.mainDlg.guiPerspectiveLast);
+    inWnd["Perspective5"](config.gui.mainDlg.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1056,7 +1084,18 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
 
     //external applications
-    inGui["ExternalApplications"](config.gui.externelApplications);
+    warn_static("remove old parameter after migration! 2016-05-28")
+    if (inGui["ExternalApplications"])
+	{
+		inGui["ExternalApplications"](config.gui.externelApplications);
+		if (config.gui.externelApplications.empty()) //who knows, let's repair some old failed data migrations
+			config.gui.externelApplications = XmlGlobalSettings().gui.externelApplications;
+		else
+		{
+		}
+	}
+	else
+		inGui["ExternalApps"](config.gui.externelApplications);
 
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
@@ -1094,7 +1133,7 @@ void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int curr
         //(try to) migrate old configuration if needed
         if (needsMigration(doc, currentXmlFormatVer))
             try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
-            catch (FileError&) { assert(false); }   //don't bother user!
+            catch (FileError&) { assert(false); } //don't bother user!
     }
     catch (const FileError& e)
     {
@@ -1403,28 +1442,31 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //###########################################################
 
     XmlOut outOverview = outWnd["OverviewPanel"];
-    outOverview.attribute("ShowPercentage", config.gui.mainDlg.showPercentBar);
-    outOverview.attribute("SortByColumn",   config.gui.mainDlg.naviLastSortColumn);
-    outOverview.attribute("SortAscending",  config.gui.mainDlg.naviLastSortAscending);
+    outOverview.attribute("ShowPercentage", config.gui.mainDlg.naviGridShowPercentBar);
+    outOverview.attribute("SortByColumn",   config.gui.mainDlg.naviGridLastSortColumn);
+    outOverview.attribute("SortAscending",  config.gui.mainDlg.naviGridLastSortAscending);
 
     //write column attributes
     XmlOut outColNavi = outOverview["Columns"];
     outColNavi(config.gui.mainDlg.columnAttribNavi);
 
-    XmlOut outMainGrid = outWnd["MainGrid"];
+    XmlOut outMainGrid = outWnd["CenterPanel"];
     outMainGrid.attribute("ShowIcons",  config.gui.mainDlg.showIcons);
     outMainGrid.attribute("IconSize",   config.gui.mainDlg.iconSize);
     outMainGrid.attribute("SashOffset", config.gui.mainDlg.sashOffset);
 
     XmlOut outColLeft = outMainGrid["ColumnsLeft"];
+    outColLeft.attribute("PathFormat", config.gui.mainDlg.itemPathFormatLeftGrid);
     outColLeft(config.gui.mainDlg.columnAttribLeft);
 
     XmlOut outColRight = outMainGrid["ColumnsRight"];
+    outColRight.attribute("PathFormat", config.gui.mainDlg.itemPathFormatRightGrid);
     outColRight(config.gui.mainDlg.columnAttribRight);
+
     //###########################################################
 
     outWnd["DefaultViewFilter"](config.gui.mainDlg.viewFilterDefault);
-    outWnd["Perspective4"](config.gui.mainDlg.guiPerspectiveLast);
+    outWnd["Perspective5"](config.gui.mainDlg.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 
@@ -1442,7 +1484,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
 
     //external applications
-    outGui["ExternalApplications"](config.gui.externelApplications);
+    outGui["ExternalApps"](config.gui.externelApplications);
 
     //last update check
     outGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);

@@ -75,7 +75,7 @@ public:
 
     void evalResults() //call from gui thread repreatedly
     {
-        if (!inRecursion) //prevent implicit recursion, e.g. if we're called from an idle event and spawn another one via the callback below
+        if (!inRecursion) //prevent implicit recursion, e.g. if we're called from an idle event and spawn another one within the callback below
         {
             inRecursion = true;
             ZEN_ON_SCOPE_EXIT(inRecursion = false);

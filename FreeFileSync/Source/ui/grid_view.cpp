@@ -469,10 +469,7 @@ bool GridView::getDefaultSortDirection(ColumnTypeRim type) //true: ascending; fa
         case ColumnTypeRim::DATE:
             return false;
 
-        case ColumnTypeRim::BASE_DIRECTORY:
-        case ColumnTypeRim::FULL_PATH:
-        case ColumnTypeRim::REL_FOLDER:
-        case ColumnTypeRim::FILENAME:
+        case ColumnTypeRim::ITEM_PATH:
         case ColumnTypeRim::EXTENSION:
             return true;
     }
@@ -481,7 +478,7 @@ bool GridView::getDefaultSortDirection(ColumnTypeRim type) //true: ascending; fa
 }
 
 
-void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
+void GridView::sortView(ColumnTypeRim type, ItemPathFormat pathFmt, bool onLeft, bool ascending)
 {
     viewRef.clear();
     rowPositions.clear();
@@ -490,22 +487,30 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
 
     switch (type)
     {
-        case ColumnTypeRim::FULL_PATH:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  LEFT_SIDE >());
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  RIGHT_SIDE>());
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, LEFT_SIDE >());
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, RIGHT_SIDE>());
+        case ColumnTypeRim::ITEM_PATH:
+            switch (pathFmt)
+            {
+                case ItemPathFormat::FULL_PATH:
+                    if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  LEFT_SIDE >());
+                    else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  RIGHT_SIDE>());
+                    else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, LEFT_SIDE >());
+                    else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, RIGHT_SIDE>());
+                    break;
+
+                case ItemPathFormat::RELATIVE_PATH:
+                    if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<true>());
+                    else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<false>());
+                    break;
+
+                case ItemPathFormat::ITEM_NAME:
+                    if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
+                    else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>());
+                    else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >());
+                    else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>());
+                    break;
+            }
             break;
-        case ColumnTypeRim::REL_FOLDER:
-            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<true>());
-            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<false>());
-            break;
-        case ColumnTypeRim::FILENAME:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>());
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >());
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>());
-            break;
+
         case ColumnTypeRim::SIZE:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >());
             else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>());
@@ -523,18 +528,6 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
             else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>());
             else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >());
             else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>());
-            break;
-        //case SORT_BY_CMP_RESULT:
-        //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >());
-        //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>());
-        //    break;
-        //case SORT_BY_SYNC_DIRECTION:
-        //    if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
-        //    else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
-        //    break;
-        case ColumnTypeRim::BASE_DIRECTORY:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex < b.folderIndex; });
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex > b.folderIndex; });
             break;
     }
 }

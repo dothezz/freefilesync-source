@@ -42,9 +42,9 @@ private:
                std::uint64_t sizeMax,
                bool matchesFolder);
 
-    std::int64_t timeFrom_; //unit: UTC, seconds
-    std::uint64_t sizeMin_; //unit: bytes
-    std::uint64_t sizeMax_; //unit: bytes
+    std::int64_t timeFrom_ = 0; //unit: UTC, seconds
+    std::uint64_t sizeMin_ = 0; //unit: bytes
+    std::uint64_t sizeMax_ = 0; //unit: bytes
     const bool matchesFolder_;
 };
 }
@@ -68,12 +68,9 @@ inline
 SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
                        size_t sizeMin,  UnitSize unitSizeMin,
                        size_t sizeMax,  UnitSize unitSizeMax) :
-    timeFrom_(),
-    sizeMin_ (),
-    sizeMax_ (),
-    matchesFolder_(unitTimeSpan == UTIME_NONE&&
-                   unitSizeMin  == USIZE_NONE&&
-                   unitSizeMax  == USIZE_NONE) //exclude folders if size or date filter is active: avoids creating empty folders if not needed!
+    matchesFolder_(unitTimeSpan == UnitTime::NONE &&
+                   unitSizeMin  == UnitSize::NONE &&
+                   unitSizeMax  == UnitSize::NONE) //exclude folders if size or date filter is active: avoids creating empty folders if not needed!
 {
     resolveUnits(timeSpan, unitTimeSpan,
                  sizeMin, unitSizeMin,

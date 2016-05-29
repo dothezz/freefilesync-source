@@ -51,7 +51,6 @@ std::wstring getIso3166Country()
 }
 
 
-
 //coordinate with get_latest_version_number.php
 std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
 {
@@ -117,10 +116,10 @@ GetVerResult getOnlineVersion(const std::vector<std::pair<std::string, std::stri
 
 std::vector<size_t> parseVersion(const std::wstring& version)
 {
-	std::vector<size_t> output;
-	for (const std::wstring& digit : split(version, FFS_VERSION_SEPARATOR))
-		output.push_back(stringTo<size_t>(digit));
-	return output;
+    std::vector<size_t> output;
+    for (const std::wstring& digit : split(version, FFS_VERSION_SEPARATOR))
+        output.push_back(stringTo<size_t>(digit));
+    return output;
 }
 }
 

@@ -24,8 +24,8 @@
 using namespace zen;
 
 
-wxColor zen::getColorSelectionGradientFrom() { return { 137, 172, 255 }; } //blue: HSL: 158, 255, 196   HSV: 222, 0.46, 1
-wxColor zen::getColorSelectionGradientTo  () { return { 225, 234, 255 }; } //      HSL: 158, 255, 240   HSV: 222, 0.12, 1
+wxColor Grid::getColorSelectionGradientFrom() { return { 137, 172, 255 }; } //blue: HSL: 158, 255, 196   HSV: 222, 0.46, 1
+wxColor Grid::getColorSelectionGradientTo  () { return { 225, 234, 255 }; } //      HSL: 158, 255, 240   HSV: 222, 0.12, 1
 
 const int GridData::COLUMN_GAP_LEFT = 4;
 
@@ -49,7 +49,7 @@ inline wxColor getColorLabelGradientFrom() { return wxSystemSettings::GetColour(
 inline wxColor getColorLabelGradientTo  () { return { 200, 200, 200 }; } //light grey
 
 inline wxColor getColorLabelGradientFocusFrom() { return getColorLabelGradientFrom(); }
-inline wxColor getColorLabelGradientFocusTo  () { return getColorSelectionGradientFrom(); }
+inline wxColor getColorLabelGradientFocusTo  () { return Grid::getColorSelectionGradientFrom(); }
 
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value like Explorer!
 const int DEFAULT_COL_LABEL_BORDER = 6; //top + bottom border in addition to label height
@@ -111,7 +111,7 @@ void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bo
     if (enabled)
     {
         if (selected)
-            dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
+            dc.GradientFillLinear(rect, Grid::getColorSelectionGradientFrom(), Grid::getColorSelectionGradientTo(), wxEAST);
         else
             clearArea(dc, rect, backgroundColor);
     }
@@ -120,7 +120,7 @@ void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bo
 }
 
 
-void GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment)
+wxSize GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& text, int alignment)
 {
     /*
     performance notes (Windows):
@@ -185,6 +185,7 @@ void GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& te
 
     RecursiveDcClipper clip(dc, rect);
     dc.DrawText(textTrunc, pt);
+	return extentTrunc;
 }
 
 

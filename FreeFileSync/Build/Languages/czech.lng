@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Vytváření seznamu souborů...</target>
 
+<source>Fail-safe file copy</source>
+<target>Bezpečné kopírování souborů</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Kopírovat zamčené soubory</target>
+
+<source>Copy file access permissions</source>
+<target>Kopírovat přístupová oprávnění k souborům</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Začátek porovnávání</target>
 
@@ -291,8 +324,8 @@ Aktuálně: %y b
 <source>Error Code %x:</source>
 <target>Chybový kód %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Nepodařilo se připojit k SFTP servru %x.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -408,8 +441,8 @@ Aktuálně: %y b
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Nepodařil se přístup ke službě Stínové kopie.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Prosím použijte FreeFileSync 64-bitovou verzi pro použití služby Stínové kopie.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>>Nelze zjistit jméno jednotky souboru %x.</target>
@@ -583,6 +616,9 @@ Příkaz je spuštěn když:
 
 <source>Updating attributes of %x</source>
 <target>Aktualizace atributů souboru %x</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nelze zapsat atributy souboru %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x a %y mají odlišný obsah.</target>
@@ -882,6 +918,9 @@ Příkaz je spuštěn když:
 <source>Folder pair:</source>
 <target>Dvojice složek:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Použít nastavení:</target>
 
@@ -942,6 +981,9 @@ Příkaz je spuštěn když:
 <source>C&lear</source>
 <target>Vy&mazat</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Určit směr synchronizace pomocí databáze</target>
+
 <source>Detect moved files</source>
 <target>Detekce přesunutých souborů</target>
 
@@ -956,23 +998,20 @@ Příkaz je spuštěn když:
 - Detekce rozdílů až po první synchronizaci
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Určit směr synchronizace pomocí databáze</target>
-
 <source>Delete files:</source>
 <target>Mazání souborů:</target>
-
-<source>&Permanent</source>
-<target>&Trvale</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Smazat nebo přepsat soubory trvale</target>
 
 <source>&Recycle bin</source>
 <target>&Koš</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Použít Koš při mazání nebo přepisu souborů</target>
+
+<source>&Permanent</source>
+<target>&Trvale</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Smazat nebo přepsat soubory trvale</target>
 
 <source>&Versioning</source>
 <target>&Verzování</target>
@@ -986,14 +1025,14 @@ Příkaz je spuštěn když:
 <source>Handle errors:</source>
 <target>Zpracování chyb:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Skrýt všechny chyby a varování</target>
-
 <source>&Pop-up</source>
 <target>&Hlášení</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Zobrazit hlášení při chybě nebo varování</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skrýt všechny chyby a varování</target>
 
 <source>On completion:</source>
 <target>Po dokončení:</target>
@@ -1100,9 +1139,6 @@ Příkaz je spuštěn když:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Toto nastavení je platné pro všechny synchronizační úlohy.</target>
 
-<source>Fail-safe file copy</source>
-<target>Bezpečné kopírování souborů</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1112,17 +1148,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>(recommended)</source>
 <target>(doporučeno)</target>
 
-<source>Copy locked files</source>
-<target>Kopírovat zamčené soubory</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopírovat sdílené nebo zamčené soubory pomocí služby Stínové kopie.</target>
 
 <source>(requires administrator rights)</source>
 <target>(vyžaduje administrátorská oprávnění)</target>
-
-<source>Copy file access permissions</source>
-<target>Kopírovat přístupová oprávnění k souborům</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Přenést přístupová oprávnění souborů a složek.</target>
@@ -1608,9 +1638,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Procentní podíl</target>
 
-<source>Internet access failed.</source>
-<target>Není přístup k internetu.</target>
-
 <source>Check for Program Updates</source>
 <target>Hledání aktualizací programu</target>
 
@@ -1620,17 +1647,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je aktuální.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Není možné se připojit k www.freefilesync.org.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Kontrola</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>Nelze najít systémovou funkci %x.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nepodařilo se zaregistrovat k odběru systémových zpráv.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepodařilo se zaregistrovat zprávy zařízení %x.</target>
@@ -1640,9 +1673,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>The file is locked by another process:</source>
 <target>Soubor je uzamčen jiným procesem:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nelze zapsat atributy souboru %x.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nelze číst přístupová práva pro %x.</target>
@@ -1658,9 +1688,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>%x is not a regular directory name.</source>
 <target>%x není platným názvem adresáře.</target>
-
-<source>Cannot find system function %x.</source>
-<target>Nelze najít systémovou funkci %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nelze kopírovat soubor %x do %y.</target>
@@ -1724,6 +1751,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfigurační soubor %x je nekompletní. Chybějicí položky budou nahrazeny výchozími hodnotami.</target>
+
+<source>Internet access failed.</source>
+<target>Není přístup k internetu.</target>
 
 <source>Prepare installation</source>
 <target>Příprava instalace</target>

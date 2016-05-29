@@ -151,6 +151,39 @@
 <source>Generating file list...</source>
 <target>Fájllista generálása...</target>
 
+<source>Fail-safe file copy</source>
+<target>Hibamentes fájlmásolás</target>
+
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
+<source>Copy locked files</source>
+<target>Másolja a zárolt fájlokat</target>
+
+<source>Copy file access permissions</source>
+<target>Másolja a fájl hozzáférési jogosultságokat</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
+
 <source>Starting comparison</source>
 <target>Kezdi az összehasonlítást</target>
 
@@ -291,8 +324,8 @@ Jelenlegi: %y bájt
 <source>Error Code %x:</source>
 <target>Hibakód %x:</target>
 
-<source>Failed to connect to SFTP server %x.</source>
-<target>Nem sikerült csatlakozni a(z) %x SFTP szerverhez.</target>
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -405,8 +438,8 @@ Jelenlegi: %y bájt
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Nem elérhető a Kötet Árnyék-másolat szolgáltatás.</target>
 
-<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Kérjük, használd a FreeFileSync 64 bites verzióját az árnyékmásolatok készítéséhez ezen a rendszeren.</target>
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x számára nem lehet a kötet-nevet meghatározni.</target>
@@ -580,6 +613,9 @@ A parancs végrehajtódik, ha:
 
 <source>Updating attributes of %x</source>
 <target>%x attribútumainak frissítése</target>
+
+<source>Cannot write file attributes of %x.</source>
+<target>Nem sikerült %x fájl attribútumainak írása.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x és %y tartalma különböző.</target>
@@ -878,6 +914,9 @@ A parancs végrehajtódik, ha:
 <source>Folder pair:</source>
 <target>Könyvtár-pár:</target>
 
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Használja a helyi beállításokat:</target>
 
@@ -938,6 +977,9 @@ A parancs végrehajtódik, ha:
 <source>C&lear</source>
 <target>&Töröl</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Érzékelje a szinkronizálási irányokat az adatbázis-fájlok segítségével</target>
+
 <source>Detect moved files</source>
 <target>Érzékelje a mozgatott fájlokat</target>
 
@@ -952,23 +994,20 @@ A parancs végrehajtódik, ha:
 - Az érzékelés az első szinkronizálásnál nem biztosított
 </target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Érzékelje a szinkronizálási irányokat az adatbázis-fájlok segítségével</target>
-
 <source>Delete files:</source>
 <target>Törölje a következő fájlokat:</target>
-
-<source>&Permanent</source>
-<target>&Állandó</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Törölje vagy írja felül véglegesen a fájlokat</target>
 
 <source>&Recycle bin</source>
 <target>Lomtá&r</target>
 
 <source>Back up deleted and overwritten files in the recycle bin</source>
 <target>Mentse a törölt és felülírt fájlokat a Lomtárba</target>
+
+<source>&Permanent</source>
+<target>&Állandó</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Törölje vagy írja felül véglegesen a fájlokat</target>
 
 <source>&Versioning</source>
 <target>&Verziókezelés</target>
@@ -982,14 +1021,14 @@ A parancs végrehajtódik, ha:
 <source>Handle errors:</source>
 <target>A következő hibák kezelése:</target>
 
-<source>Hide all error and warning messages</source>
-<target>Rejtse el az összes hibaüzenetet és figyelmeztetést</target>
-
 <source>&Pop-up</source>
 <target>&Párbeszédablak</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Hiba vagy figyelmeztetés esetén mutasson párbeszédablakot</target>
+
+<source>Hide all error and warning messages</source>
+<target>Rejtse el az összes hibaüzenetet és figyelmeztetést</target>
 
 <source>On completion:</source>
 <target>Végrehajtás alatt:</target>
@@ -1096,9 +1135,6 @@ A parancs végrehajtódik, ha:
 <source>The following settings are used for all synchronization jobs.</source>
 <target>A következő beállítások minden szinkronizálási feladatnál használja.</target>
 
-<source>Fail-safe file copy</source>
-<target>Hibamentes fájlmásolás</target>
-
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
@@ -1111,17 +1147,11 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>(recommended)</source>
 <target>(ajánlott)</target>
 
-<source>Copy locked files</source>
-<target>Másolja a zárolt fájlokat</target>
-
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Megosztott vagy zárolt fájlok másolása a Kötet-árnyékmásolat szolgáltatás használatával.</target>
 
 <source>(requires administrator rights)</source>
 <target>(rendszergazdai jogosultság szükséges)</target>
-
-<source>Copy file access permissions</source>
-<target>Másolja a fájl hozzáférési jogosultságokat</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Vigye át a fájl és könyvtár jogosultságokat.</target>
@@ -1600,9 +1630,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Percentage</source>
 <target>Százalék</target>
 
-<source>Internet access failed.</source>
-<target>Nem sikerült az internet hozzáférés.</target>
-
 <source>Check for Program Updates</source>
 <target>Program-frissítések ellenőrzése</target>
 
@@ -1612,17 +1639,23 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>FreeFileSync is up to date.</source>
 <target>A FreeFileSync naprakész.</target>
 
-<source>Unable to connect to www.freefilesync.org.</source>
-<target>Nem lehet csatlakozni a www.freefilesync.org-hoz.</target>
-
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
 <target></target>
 
 <source>&Check</source>
 <target>&Ellenőriz</target>
 
+<source>Consistency check failed for %x.</source>
+<target></target>
+
+<source>Cannot find system function %x.</source>
+<target>%x rendszerfunkció nem elérhető.</target>
+
 <source>Unable to register to receive system messages.</source>
 <target>Nem tud regisztrálni hogy megkapja a rendszerüzeneteket.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x-hez nem lehet eszköz-értesítéseket regisztrálni.</target>
@@ -1632,9 +1665,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>The file is locked by another process:</source>
 <target>A fájlt egy másik processz zárolta:</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nem sikerült %x fájl attribútumainak írása.</target>
 
 <source>Cannot read security context of %x.</source>
 <target>Nem sikerült a biztonsági környezet olvasása a következőnél: %x.</target>
@@ -1650,9 +1680,6 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>%x is not a regular directory name.</source>
 <target>%x nem megfelelő könyvtárnév.</target>
-
-<source>Cannot find system function %x.</source>
-<target>%x rendszerfunkció nem elérhető.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>%x fájl másolása a(z) %y fájlba nem sikerült.</target>
@@ -1713,6 +1740,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>A %x konfigurációs fájl nem teljes. A hiányzó elemeket az alapértelmezés szerinti értékekkel helyettesíti.</target>
+
+<source>Internet access failed.</source>
+<target>Nem sikerült az internet hozzáférés.</target>
 
 <source>Prepare installation</source>
 <target>Telepítés előkészítése</target>
