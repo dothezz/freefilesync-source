@@ -6,6 +6,7 @@
 
 #include "popup_dlg.h"
 #include <wx/app.h>
+#include <wx/display.h>
 #include <wx+/std_button_layout.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
@@ -94,6 +95,8 @@ public:
                 m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
                 break;
         }
+		if (cfg.icon.IsOk())
+			m_bitmapMsgType->SetBitmap(cfg.icon);
 
         if (titleTmp.empty())
             SetTitle(wxTheApp->GetAppDisplayName());
@@ -105,14 +108,19 @@ public:
                 SetTitle(wxTheApp->GetAppDisplayName() + L" - " + titleTmp);
         }
 
-        const wxSize maxSize(500, 380);
+		int maxWidth  = 500;
+		int maxHeight = 400; //try to determine better value based on actual display resolution:
+
+		int disPos = wxDisplay::GetFromWindow(parent); //window must be visible
+		if (disPos != wxNOT_FOUND)
+			maxHeight = wxDisplay(disPos).GetClientArea().GetHeight() *  2 / 3;
 
         assert(!cfg.textMain.empty() || !cfg.textDetail.empty());
         if (!cfg.textMain.empty())
         {
             setMainInstructionFont(*m_staticTextMain);
             m_staticTextMain->SetLabel(cfg.textMain);
-            m_staticTextMain->Wrap(maxSize.GetWidth()); //call *after* SetLabel()
+            m_staticTextMain->Wrap(maxWidth); //call *after* SetLabel()
         }
         else
             m_staticTextMain->Hide();
@@ -120,7 +128,7 @@ public:
         if (!cfg.textDetail.empty())
         {
             const wxString& text = L"\n" + cfg.textDetail + L"\n"; //add empty top/bottom lines *instead* of using border space!
-            setBestInitialSize(*m_textCtrlTextDetail, text, maxSize);
+            setBestInitialSize(*m_textCtrlTextDetail, text, wxSize(maxWidth, maxHeight));
             m_textCtrlTextDetail->ChangeValue(text);
         }
         else
@@ -195,6 +203,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+		Center(); //needs to be re-applied after a dialog size change!
     }
 };
 
@@ -213,6 +222,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+		Center(); //needs to be re-applied after a dialog size change!
     }
 };
 }
@@ -238,6 +248,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setNegative(m_buttonNegative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+		Center(); //needs to be re-applied after a dialog size change!
     }
 
 private:

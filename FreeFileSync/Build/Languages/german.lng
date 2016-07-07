@@ -7,6 +7,21 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Parameters for opposite side</source>
+<target>Parameter für gegenüberliegende Seite</target>
+
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Temporäre lokale Kopie für SFTP und MTP Speicher</target>
+
+<source>Parent folder path</source>
+<target>Übergeordneter Ordnerpfad</target>
+
+<source>Full file or folder path</source>
+<target>Kompletter Datei oder Ordnerpfad</target>
+
+<source>Local path not available for %x.</source>
+<target>Lokaler Pfad ist nicht verfügbar für %x.</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -722,11 +737,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Serious Error</source>
 <target>Schwerer Fehler</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Ordner</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Absoluter Pfad</target>
@@ -1525,18 +1540,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integriert externe Anwendungen in das Kontextmenü. Die folgenden Makros stehen zur Verfügung:</target>
 
-<source>- full file or folder name</source>
-<target>- kompletter Datei oder Ordnername</target>
-
-<source>- folder part only</source>
-<target>- nur Ordneranteil</target>
-
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Entsprechung der anderen Seite zu %item_path%</target>
-
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Entsprechung der anderen Seite zu %item_folder%</target>
-
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Sollen versteckte Fenster und Warnmeldungen wieder gezeigt werden?</target>
 
@@ -1827,4 +1830,10 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
 <target>Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Die portable Version kann nicht in den gewählten Ordner installiert werden.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Bitte wählen Sie den lokalen Installationstyp oder einen anderen Ordner für die Installation.</target>
 

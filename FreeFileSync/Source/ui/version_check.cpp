@@ -15,8 +15,9 @@
 #include <zen/thread.h> //std::thread::id
 #include <wx+/popup_dlg.h>
 #include <wx+/http.h>
-#include "version_id.h"
+#include <wx+/image_resources.h>
 #include "../lib/ffs_paths.h"
+#include "version_check_impl.h"
 
 
 using namespace zen;
@@ -99,9 +100,8 @@ enum GetVerResult
 //access is thread-safe on Windows (WinInet), but not on Linux/OS X (wxWidgets)
 GetVerResult getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams, std::wstring& version)
 {
-    try
+    try //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
     {
-        //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
         const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", L"FFS-Update-Check", postParams); //throw FileError
         version = utfCvrtTo<std::wstring>(buffer);
         trim(version);
@@ -121,6 +121,35 @@ std::vector<size_t> parseVersion(const std::wstring& version)
         output.push_back(stringTo<size_t>(digit));
     return output;
 }
+
+
+std::wstring getOnlineChangelogDelta()
+{
+    try //harmonize with wxHTTP: get_latest_changes.php must be accessible without https!!!
+    {
+        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", L"FFS-Update-Check", { { "since", utfCvrtTo<std::string>(zen::ffsVersion) } }); //throw FileError
+        return utfCvrtTo<std::wstring>(buffer);
+    }
+    catch (FileError&) { assert(false); return std::wstring(); }
+}
+
+
+void showUpdateAvailableDialog(wxWindow* parent, const std::wstring& onlineVersion, const std::wstring& onlineChangeLog)
+{
+    switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
+                                   setIcon(getResourceImage(L"download_update")).
+                                   setTitle(_("Check for Program Updates")).
+                                   setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n" + _("Download now?")).
+                                   setDetailInstructions(onlineChangeLog),
+                                   _("&Download")))
+    {
+        case ConfirmationButton::DO_IT:
+            wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
+            break;
+        case ConfirmationButton::CANCEL:
+            break;
+    }
+}
 }
 
 
@@ -139,37 +168,27 @@ bool zen::haveNewerVersionOnline(const std::wstring& onlineVersion)
 
 bool zen::updateCheckActive(time_t lastUpdateCheck)
 {
-    return lastUpdateCheck != getInactiveCheckId();
+    return lastUpdateCheck != getVersionCheckInactiveId();
 }
 
 
 void zen::disableUpdateCheck(time_t& lastUpdateCheck)
 {
-    lastUpdateCheck = getInactiveCheckId();
+    lastUpdateCheck = getVersionCheckInactiveId();
 }
 
 
-void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
+void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog)
 {
     std::wstring onlineVersion;
     switch (getOnlineVersion(geHttpPostParameters(), onlineVersion))
     {
         case GET_VER_SUCCESS:
-            lastOnlineVersion = onlineVersion;
+            lastOnlineVersion   = onlineVersion;
+            lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
+
             if (haveNewerVersionOnline(onlineVersion))
-            {
-                switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
-                                               setTitle(_("Check for Program Updates")).
-                                               setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")),
-                                               _("&Download")))
-                {
-                    case ConfirmationButton::DO_IT:
-                        wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
-                        break;
-                    case ConfirmationButton::CANCEL:
-                        break;
-                }
-            }
+                showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
             else
                 showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
                                        setTitle(_("Check for Program Updates")).
@@ -184,6 +203,8 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
 
         case GET_VER_PAGE_NOT_FOUND:
             lastOnlineVersion = L"Unknown";
+            lastOnlineChangeLog.clear();
+
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),
@@ -197,17 +218,6 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion)
             }
             break;
     }
-}
-
-
-bool zen::shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
-{
-    if (updateCheckActive(lastUpdateCheck))
-    {
-        const time_t now = std::time(nullptr);
-        return numeric::dist(now, lastUpdateCheck) >= 7 * 24 * 3600; //check weekly
-    }
-    return false;
 }
 
 
@@ -235,7 +245,7 @@ std::shared_ptr<UpdateCheckResultAsync> zen::periodicUpdateCheckRunAsync(const U
 
 
 //run on main thread:
-void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResultAsync* resultAsync)
+void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog, const UpdateCheckResultAsync* resultAsync)
 {
     std::wstring onlineVersion;
     const GetVerResult versionStatus = getOnlineVersion(geHttpPostParameters(), onlineVersion);
@@ -243,23 +253,12 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
     switch (versionStatus)
     {
         case GET_VER_SUCCESS:
-            lastUpdateCheck = std::time(nullptr);
-            lastOnlineVersion = onlineVersion;
+            lastUpdateCheck     = getVersionCheckCurrentTime();
+            lastOnlineVersion   = onlineVersion;
+            lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
 
             if (haveNewerVersionOnline(onlineVersion))
-            {
-                switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
-                                               setTitle(_("Check for Program Updates")).
-                                               setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")),
-                                               _("&Download")))
-                {
-                    case ConfirmationButton::DO_IT:
-                        wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
-                        break;
-                    case ConfirmationButton::CANCEL:
-                        break;
-                }
-            }
+                showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
             break;
 
         case GET_VER_NO_CONNECTION:
@@ -267,6 +266,8 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
 
         case GET_VER_PAGE_NOT_FOUND:
             lastOnlineVersion = L"Unknown";
+            lastOnlineChangeLog.clear();
+
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),

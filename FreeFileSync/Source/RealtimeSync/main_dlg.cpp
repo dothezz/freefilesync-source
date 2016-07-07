@@ -100,6 +100,8 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     setLastUsedConfig(currentConfigFile);
     //-----------------------------------------------------------------------------------------
 
+    Center(); //needs to be re-applied after a dialog size change! (see addFolder() within setConfiguration())
+
     if (startWatchingImmediately) //start watch mode directly
     {
         wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);

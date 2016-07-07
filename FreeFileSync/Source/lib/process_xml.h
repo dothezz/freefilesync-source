@@ -41,7 +41,7 @@ enum OnGuiError
 };
 
 using Description = std::wstring;
-using Commandline = std::wstring;
+using Commandline = Zstring;
 using ExternalApps = std::vector<std::pair<Description, Commandline>>;
 
 //---------------------------------------------------------------------
@@ -160,6 +160,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     struct Gui
     {
+		Gui() {} //clang needs this anyway
         struct
         {
             wxPoint dlgPos;
@@ -205,7 +206,7 @@ struct XmlGlobalSettings
         std::vector<ConfigFileItem> lastUsedConfigFiles;
 
         std::vector<ConfigFileItem> cfgFileHistory;
-        size_t cfgFileHistMax = 50;
+        size_t cfgFileHistMax = 100;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
@@ -216,15 +217,16 @@ struct XmlGlobalSettings
 
         ExternalApps externelApplications
         {
-            //default external apps will be translated "on the fly"!!!
-            //CONTRACT: first entry will be used for [Enter] or mouse double-click, second for open with default app!
-            { L"Browse directory",              L"xdg-open \"%item_folder%\"" },
-            { L"Open with default application", L"xdg-open \"%item_path%\""   },
+            //default external app descriptions will be translated "on the fly"!!!
+            //CONTRACT: first entry will be used for [Enter] or mouse double-click!
+            { L"Browse directory",              Zstr("xdg-open \"%item_folder%\"") },
+            { L"Open with default application", Zstr("xdg-open \"%local_path%\"")   },
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
         };
 
         time_t lastUpdateCheck = 0; //number of seconds since 00:00 hours, Jan 1, 1970 UTC
         std::wstring lastOnlineVersion;
+        std::wstring lastOnlineChangeLog;
     } gui;
 };
 

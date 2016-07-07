@@ -11,7 +11,7 @@
 
 namespace zen
 {
-std::pair<const Grid*, ptrdiff_t> findGridMatch(const Grid& grid1, const Grid& grid2, const std::wstring& searchString, bool respectCase);
+std::pair<const Grid*, ptrdiff_t> findGridMatch(const Grid& grid1, const Grid& grid2, const std::wstring& searchString, bool respectCase, bool searchAscending);
 //returns (grid/row) where the value was found, (nullptr, -1) if not found
 }
 

@@ -8,6 +8,7 @@
 #define POPUP_DLG_H_820780154723456
 
 #include <wx/window.h>
+#include <wx/bitmap.h>
 #include <wx/string.h>
 
 
@@ -49,7 +50,7 @@ class ConfirmationDialog3;
 
 struct PopupDialogCfg
 {
-    PopupDialogCfg() : checkBoxValue() {}
+	PopupDialogCfg& setIcon              (const wxBitmap& bmp  ) { icon       = bmp;   return *this; }
     PopupDialogCfg& setTitle             (const wxString& label) { title      = label; return *this; }
     PopupDialogCfg& setMainInstructions  (const wxString& label) { textMain   = label; return *this; } //set at least one of these!
     PopupDialogCfg& setDetailInstructions(const wxString& label) { textDetail = label; return *this; } //
@@ -58,17 +59,17 @@ struct PopupDialogCfg
 private:
     friend class StandardPopupDialog;
 
+	wxBitmap icon;
     wxString title;
     wxString textMain;
     wxString textDetail;
-    bool* checkBoxValue; //in/out
+    bool* checkBoxValue = nullptr; //in/out
     wxString checkBoxLabel;
 };
 
 
 struct PopupDialogCfg3
 {
-    PopupDialogCfg3() : buttonToDisableWhenChecked(ConfirmationButton3::CANCEL) {}
     PopupDialogCfg3& setTitle             (const wxString& label) { pdCfg.setTitle             (label); return *this; }
     PopupDialogCfg3& setMainInstructions  (const wxString& label) { pdCfg.setMainInstructions  (label); return *this; } //set at least one of these!
     PopupDialogCfg3& setDetailInstructions(const wxString& label) { pdCfg.setDetailInstructions(label); return *this; } //
@@ -85,7 +86,7 @@ private:
     friend class ConfirmationDialog3;
 
     PopupDialogCfg pdCfg;
-    ConfirmationButton3 buttonToDisableWhenChecked;
+    ConfirmationButton3 buttonToDisableWhenChecked = ConfirmationButton3::CANCEL;
 };
 }
 

@@ -30,8 +30,8 @@ void showAboutDialog(wxWindow* parent);
 ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, FilterConfig& filter, const wxString& caption);
 
 ReturnSmallDlg::ButtonPressed showCopyToDialog(wxWindow* parent,
-                                               const std::vector<FileSystemObject*>& rowsOnLeft,
-                                               const std::vector<FileSystemObject*>& rowsOnRight,
+                                               const std::vector<const FileSystemObject*>& rowsOnLeft,
+                                               const std::vector<const FileSystemObject*>& rowsOnRight,
                                                Zstring& lastUsedPath,
                                                std::vector<Zstring>& folderPathHistory,
                                                size_t historySizeMax,
@@ -39,8 +39,8 @@ ReturnSmallDlg::ButtonPressed showCopyToDialog(wxWindow* parent,
                                                bool& overwriteIfExists);
 
 ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
-                                               const std::vector<FileSystemObject*>& rowsOnLeft,
-                                               const std::vector<FileSystemObject*>& rowsOnRight,
+                                               const std::vector<const FileSystemObject*>& rowsOnLeft,
+                                               const std::vector<const FileSystemObject*>& rowsOnRight,
                                                bool& useRecycleBin);
 
 ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,

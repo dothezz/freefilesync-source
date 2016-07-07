@@ -41,6 +41,7 @@ private:
 template <bool respectCase>
 ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
                   const std::wstring& searchString,
+                  bool searchAscending,
                   size_t rowFirst, //specify area to search:
                   size_t rowLast)  // [rowFirst, rowLast)
 {
@@ -52,10 +53,18 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
         {
             const MatchFound<respectCase> matchFound(searchString);
 
-            for (size_t row = rowFirst; row < rowLast; ++row)
-                for (auto iterCol = colAttr.begin(); iterCol != colAttr.end(); ++iterCol)
-                    if (matchFound(prov->getValue(row, iterCol->type_)))
-                        return row;
+            if (searchAscending)
+            {
+                for (size_t row = rowFirst; row < rowLast; ++row)
+                    for (const Grid::ColumnAttribute& ca : colAttr)
+                        if (matchFound(prov->getValue(row, ca.type_)))
+                            return row;
+            }
+            else
+                for (size_t row = rowLast; row-- > rowFirst;)
+                    for (const Grid::ColumnAttribute& ca : colAttr)
+                        if (matchFound(prov->getValue(row, ca.type_)))
+                            return row;
         }
     }
     return -1;
@@ -63,35 +72,43 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
 }
 
 
-std::pair<const Grid*, ptrdiff_t> zen::findGridMatch(const Grid& grid1, const Grid& grid2, const std::wstring& searchString, bool respectCase)
+std::pair<const Grid*, ptrdiff_t> zen::findGridMatch(const Grid& grid1, const Grid& grid2, const std::wstring& searchString, bool respectCase, bool searchAscending)
 {
     //PERF_START
 
-    const size_t rowCountL = grid1.getRowCount();
-    const size_t rowCountR = grid2.getRowCount();
+    const size_t rowCount1 = grid1.getRowCount();
+    const size_t rowCount2 = grid2.getRowCount();
+
+    size_t cursorRow1 = grid1.getGridCursor();
+    if (cursorRow1 >= rowCount1)
+        cursorRow1 = 0;
 
     std::pair<const Grid*, ptrdiff_t> result(nullptr, -1);
 
-    size_t cursorRowL = grid1.getGridCursor();
-    if (cursorRowL >= rowCountL)
-        cursorRowL = 0;
+    auto finishSearch = [&](const Grid& grid, size_t rowFirst, size_t rowLast)
     {
-        auto finishSearch = [&](const Grid& grid, size_t rowFirst, size_t rowLast) -> bool
+        const ptrdiff_t targetRow = respectCase ?
+                                    findRow<true >(grid, searchString, searchAscending, rowFirst, rowLast) :
+                                    findRow<false>(grid, searchString, searchAscending, rowFirst, rowLast);
+        if (targetRow >= 0)
         {
-            const ptrdiff_t targetRow = respectCase ?
-            findRow<true>( grid, searchString, rowFirst, rowLast) :
-            findRow<false>(grid, searchString, rowFirst, rowLast);
-            if (targetRow >= 0)
-            {
-                result = std::make_pair(&grid, targetRow);
-                return true;
-            }
-            return false;
-        };
+            result = std::make_pair(&grid, targetRow);
+            return true;
+        }
+        return false;
+    };
 
-        if (!finishSearch(grid1, cursorRowL + 1, rowCountL))
-            if (!finishSearch(grid2, 0, rowCountR))
-                finishSearch(grid1, 0, cursorRowL + 1);
+    if (searchAscending)
+    {
+        if (!finishSearch(grid1, cursorRow1 + 1, rowCount1))
+            if (!finishSearch(grid2, 0, rowCount2))
+                finishSearch(grid1, 0, cursorRow1 + 1);
+    }
+    else
+    {
+        if (!finishSearch(grid1, 0, cursorRow1))
+            if (!finishSearch(grid2, 0, rowCount2))
+                finishSearch(grid1, cursorRow1, rowCount1);
     }
     return result;
 }

@@ -23,9 +23,9 @@ using namespace std::rel_ops;
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
-const int XML_FORMAT_VER_GLOBAL    = 2; //
-const int XML_FORMAT_VER_FFS_GUI   = 5; //for FFS 7.7
-const int XML_FORMAT_VER_FFS_BATCH = 5; //
+const int XML_FORMAT_VER_GLOBAL    = 3;
+const int XML_FORMAT_VER_FFS_GUI   = 5;
+const int XML_FORMAT_VER_FFS_BATCH = 5;
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -76,7 +76,7 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
 }
 
 
-XmlGlobalSettings::XmlGlobalSettings() 
+XmlGlobalSettings::XmlGlobalSettings()
 {
 }
 
@@ -901,7 +901,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 }
 
 
-void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
+void readConfig(const XmlIn& in, MainConfiguration& mainCfg, int formatVer)
 {
     //read compare settings
     XmlIn inMain = in["MainConfig"];
@@ -939,9 +939,9 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
 }
 
 
-void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
+void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config, int formatVer)
 {
-    readConfig(in, config.mainCfg); //read main config
+    readConfig(in, config.mainCfg, formatVer); //read main config
 
     //read GUI specific config data
     XmlIn inGuiCfg = in["GuiConfig"];
@@ -954,9 +954,9 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 }
 
 
-void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
+void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config, int formatVer)
 {
-    readConfig(in, config.mainCfg); //read main config
+    readConfig(in, config.mainCfg, formatVer); //read main config
 
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
@@ -968,7 +968,7 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
 }
 
 
-void readConfig(const XmlIn& in, XmlGlobalSettings& config)
+void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
 {
     XmlIn inGeneral = in["General"];
 
@@ -1086,32 +1086,55 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //external applications
     warn_static("remove old parameter after migration! 2016-05-28")
     if (inGui["ExternalApplications"])
-	{
-		inGui["ExternalApplications"](config.gui.externelApplications);
-		if (config.gui.externelApplications.empty()) //who knows, let's repair some old failed data migrations
-			config.gui.externelApplications = XmlGlobalSettings().gui.externelApplications;
-		else
-		{
-		}
-	}
-	else
-		inGui["ExternalApps"](config.gui.externelApplications);
+    {
+        inGui["ExternalApplications"](config.gui.externelApplications);
+        if (config.gui.externelApplications.empty()) //who knows, let's repair some old failed data migrations
+            config.gui.externelApplications = XmlGlobalSettings().gui.externelApplications;
+        else
+        {
+        }
+    }
+    else
+        inGui["ExternalApps"](config.gui.externelApplications);
+
+    warn_static("remove macro migration after some time! 2016-06-30")
+    if (formatVer < 3)
+        for (auto& item : config.gui.externelApplications)
+        {
+            replace(item.second, Zstr("%item2_path%"),   Zstr("%item_path2%"));
+            replace(item.second, Zstr("%item_folder%"),  Zstr("%folder_path%"));
+            replace(item.second, Zstr("%item2_folder%"), Zstr("%folder_path2%"));
+
+            replace(item.second, Zstr("explorer /select, \"%item_path%\""), Zstr("explorer /select, \"%local_path%\""));
+            replace(item.second, Zstr("\"%item_path%\""), Zstr("\"%local_path%\""));
+            replace(item.second, Zstr("xdg-open \"%item_path%\""), Zstr("xdg-open \"%local_path%\""));
+            replace(item.second, Zstr("open -R \"%item_path%\""), Zstr("open -R \"%local_path%\""));
+            replace(item.second, Zstr("open \"%item_path%\""), Zstr("open \"%local_path%\""));
+
+            if (contains(makeUpperCopy(item.second), Zstr("WINMERGEU.EXE")) ||
+                contains(makeUpperCopy(item.second), Zstr("PSPAD.EXE")))
+            {
+                replace(item.second, Zstr("%item_path%"),  Zstr("%local_path%"));
+                replace(item.second, Zstr("%item_path2%"), Zstr("%local_path2%"));
+            }
+        }
 
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
     inGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
+    inGui["LastOnlineChanges"](config.gui.lastOnlineChangeLog);
 
     //batch specific global settings
     //XmlIn inBatch = in["Batch"];
 }
 
 
-bool needsMigration(const XmlDoc& doc, int currentXmlFormatVer)
+int getConfigFormatVersion(const XmlDoc& doc)
 {
     //(try to) migrate old configuration if needed
     int xmlFormatVer = 0;
     /*bool success = */doc.root().getAttribute("XmlFormat", xmlFormatVer);
-    return xmlFormatVer < currentXmlFormatVer;
+    return xmlFormatVer;
 }
 
 
@@ -1123,15 +1146,17 @@ void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int curr
     if (getXmlTypeNoThrow(doc) != type) //noexcept
         throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
 
+    const int formatVer = getConfigFormatVersion(doc);
+
     XmlIn in(doc);
-    ::readConfig(in, cfg);
+    ::readConfig(in, cfg, formatVer);
 
     try
     {
         checkForMappingErrors(in, filepath); //throw FileError
 
         //(try to) migrate old configuration if needed
-        if (needsMigration(doc, currentXmlFormatVer))
+        if (formatVer< currentXmlFormatVer)
             try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
             catch (FileError&) { assert(false); } //don't bother user!
     }
@@ -1166,16 +1191,18 @@ namespace
 template <class XmlCfg>
 XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filepath, int currentXmlFormatVer, std::wstring& warningMsg) //nothrow
 {
+    const int formatVer = getConfigFormatVersion(doc);
+
     XmlIn in(doc);
     XmlCfg cfg;
-    ::readConfig(in, cfg);
+    ::readConfig(in, cfg, formatVer);
 
     try
     {
         checkForMappingErrors(in, filepath); //throw FileError
 
         //(try to) migrate old configuration if needed
-        if (needsMigration(doc, currentXmlFormatVer))
+        if (formatVer < currentXmlFormatVer)
             try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
             catch (FileError&) { assert(false); }     //don't bother user!
     }
@@ -1489,6 +1516,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //last update check
     outGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
     outGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
+    outGui["LastOnlineChanges"](config.gui.lastOnlineChangeLog);
 
     //batch specific global settings
     //XmlOut outBatch = out["Batch"];

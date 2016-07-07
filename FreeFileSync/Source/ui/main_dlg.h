@@ -21,6 +21,7 @@
 #include "tree_view.h"
 #include "folder_history_box.h"
 #include "../lib/process_xml.h"
+#include "../algorithm.h"
 
 class FolderPairFirst;
 class FolderPairPanel;
@@ -122,7 +123,9 @@ private:
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
-    void openExternalApplication(const wxString& commandline, const std::vector<zen::FileSystemObject*>& selection, bool leftSide); //selection may be empty
+    void openExternalApplication(const Zstring& commandLinePhrase, bool leftSide,
+                                 const std::vector<zen::FileSystemObject*>& selectionLeft,
+                                 const std::vector<zen::FileSystemObject*>& selectionRight); //selection may be empty
 
     //status bar supports one of the following two states at a time:
     void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, std::uint64_t filesizeLeftView, std::uint64_t filesizeRightView);
@@ -247,7 +250,7 @@ private:
 
     void showFindPanel(); //CTRL + F
     void hideFindPanel();
-    void startFindNext(); //F3
+    void startFindNext(bool searchAscending); //F3
 
     void resetLayout();
 
@@ -335,6 +338,8 @@ private:
     wxWindow* focusWindowAfterSearch = nullptr; //used to restore focus after search panel is closed
 
     bool localKeyEventsEnabled = true;
+
+    zen::TempFileBuffer tempFileBuf; //buffer temporary copies of non-native files for %local_path%
 };
 
 #endif //MAIN_DLG_H_8910481324545644545

@@ -15,44 +15,37 @@ using namespace zen;
 template <class StatusResult>
 void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
 {
-    struct GetValues : public FSObjectVisitor
+    visitFSObject(fsObj, [&](const FolderPair& folder)
     {
-        GetValues(StatusResult& res) : result_(res) {}
+        if (!folder.isEmpty<LEFT_SIDE>())
+            ++result.foldersOnLeftView;
 
-        void visit(const FilePair& file) override
+        if (!folder.isEmpty<RIGHT_SIDE>())
+            ++result.foldersOnRightView;
+    },
+
+    [&](const FilePair& file)
+    {
+        if (!file.isEmpty<LEFT_SIDE>())
         {
-            if (!file.isEmpty<LEFT_SIDE>())
-            {
-                result_.filesizeLeftView += file.getFileSize<LEFT_SIDE>();
-                ++result_.filesOnLeftView;
-            }
-            if (!file.isEmpty<RIGHT_SIDE>())
-            {
-                result_.filesizeRightView += file.getFileSize<RIGHT_SIDE>();
-                ++result_.filesOnRightView;
-            }
+            result.filesizeLeftView += file.getFileSize<LEFT_SIDE>();
+            ++result.filesOnLeftView;
         }
-
-        void visit(const SymlinkPair& symlink) override
+        if (!file.isEmpty<RIGHT_SIDE>())
         {
-            if (!symlink.isEmpty<LEFT_SIDE>())
-                ++result_.filesOnLeftView;
-
-            if (!symlink.isEmpty<RIGHT_SIDE>())
-                ++result_.filesOnRightView;
+            result.filesizeRightView += file.getFileSize<RIGHT_SIDE>();
+            ++result.filesOnRightView;
         }
+    },
 
-        void visit(const FolderPair& folder) override
-        {
-            if (!folder.isEmpty<LEFT_SIDE>())
-                ++result_.foldersOnLeftView;
+    [&](const SymlinkPair& symlink)
+    {
+        if (!symlink.isEmpty<LEFT_SIDE>())
+            ++result.filesOnLeftView;
 
-            if (!folder.isEmpty<RIGHT_SIDE>())
-                ++result_.foldersOnRightView;
-        }
-        StatusResult& result_;
-    } getVal(result);
-    fsObj.accept(getVal);
+        if (!symlink.isEmpty<RIGHT_SIDE>())
+            ++result.filesOnRightView;
+    });
 }
 
 
@@ -309,7 +302,7 @@ void GridView::setData(FolderComparison& folderCmp)
     folderPairCount = std::count_if(begin(folderCmp), end(folderCmp),
                                     [](const BaseFolderPair& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
     {
-        return !AFS::isNullPath(baseObj.getAbstractPath<LEFT_SIDE >()) ||
+        return !AFS::isNullPath(baseObj.getAbstractPath< LEFT_SIDE>()) ||
                !AFS::isNullPath(baseObj.getAbstractPath<RIGHT_SIDE>());
     });
 

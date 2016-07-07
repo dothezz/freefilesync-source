@@ -21,7 +21,6 @@ bool haveNewerVersionOnline(const std::wstring& onlineVersion);
 //periodic update check:
 bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck);
 
-
 struct UpdateCheckResultPrep;
 struct UpdateCheckResultAsync;
 
@@ -30,12 +29,15 @@ std::shared_ptr<UpdateCheckResultPrep> periodicUpdateCheckPrepare();
 //run on worker thread: (long-running part of the check)
 std::shared_ptr<UpdateCheckResultAsync> periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep);
 //run on main thread:
-void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, const UpdateCheckResultAsync* resultAsync);
+void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck,
+                             std::wstring& lastOnlineVersion,
+                             std::wstring& lastOnlineChangeLog,
+                             const UpdateCheckResultAsync* resultAsync);
 
 //----------------------------------------------------------------------------
 
 //call from main thread:
-void checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion);
+void checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog);
 }
 
 #endif //VERSION_CHECK_H_324872374893274983275

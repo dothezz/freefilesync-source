@@ -1,3 +1,19 @@
+FreeFileSync 8.3 [2016-07-08]
+-----------------------------
+Make temporary local copy for non-native file paths: %local_path%
+Support selections from both grid sides at a time for external applications
+New external application macros: %item_path%, %folder_path%, %item_path2%, %folder_path2%
+Migrate external application commands to new macro syntax
+Support reverse grid search (Shift + F3)
+Don't condense empty sub folders on overview panel
+Show changelog delta in update notification
+Center modal dialogs after layout redetermination
+Warn about portable installation into programs folder
+Calculate default message dialog height depending on screen size
+Don't substitute external applications path for empty base folder
+Fixed prolonged tooltip time not being evaluated
+
+
 FreeFileSync 8.2 [2016-05-30]
 -----------------------------
 Unified item path representation on main grid
@@ -7,7 +23,7 @@ Fixed crash when FreeFileSync is still running during OS shutdown
 Fixed crash on startup due to missing root certificates
 Work around start up crash on Windows installations missing certain patches
 Fixed in-place progress panel height being trimmed
-Support drawing arbitrary polyons with graph control
+Support drawing arbitrary polygons with graph control
 Apply Posix file name normalization (OS X)
 Normalize keyboard input encoding for all text fields (OS X)
 Report errors when cleaning up old log files

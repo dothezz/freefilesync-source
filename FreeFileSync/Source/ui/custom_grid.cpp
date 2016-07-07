@@ -344,23 +344,10 @@ private:
 
         DisplayType output = DisplayType::NORMAL;
         //mark directories and symlinks
-        struct GetRowType : public FSObjectVisitor
-        {
-            GetRowType(DisplayType& result) : result_(result) {}
+        visitFSObject(*fsObj, [&](const FolderPair& folder) { output = DisplayType::FOLDER; },
+        [](const FilePair& file) {},
+        [&](const SymlinkPair& symlink) { output = DisplayType::SYMLINK; });
 
-            void visit(const FilePair&    file) override {}
-            void visit(const SymlinkPair& symlink) override
-            {
-                result_ = DisplayType::SYMLINK;
-            }
-            void visit(const FolderPair& folder) override
-            {
-                result_ = DisplayType::FOLDER;
-            }
-        private:
-            DisplayType& result_;
-        } getType(output);
-        fsObj->accept(getType);
         return output;
     }
 
@@ -368,103 +355,97 @@ private:
     {
         if (const FileSystemObject* fsObj = getRawData(row))
         {
-            struct GetTextValue : public FSObjectVisitor
+            const ColumnTypeRim colTypeRim = static_cast<ColumnTypeRim>(colType);
+
+            std::wstring value;
+            visitFSObject(*fsObj, [&](const FolderPair& folder)
             {
-                GetTextValue(ColumnTypeRim ctr, ItemPathFormat fmt) : colType_(ctr), itemPathFormat_(fmt) {}
-
-                void visit(const FilePair& file) override
+                value = [&]
                 {
-                    value = [&]
+                    switch (colTypeRim)
                     {
-                        switch (colType_)
-                        {
-                            case ColumnTypeRim::ITEM_PATH:
-                                switch (itemPathFormat_)
-                                {
-                                    case ItemPathFormat::FULL_PATH:
-                                        return file.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(file.getAbstractPath<side>());
-                                    case ItemPathFormat::RELATIVE_PATH:
-                                        return utfCvrtTo<std::wstring>(file.getRelativePath<side>());
-                                    case ItemPathFormat::ITEM_NAME:
-                                        return utfCvrtTo<std::wstring>(file.getItemName<side>());
-                                }
-                                break;
-                            case ColumnTypeRim::SIZE:
-                                //return file.isEmpty<side>() ? std::wstring() : utfCvrtTo<std::wstring>(file.getFileId<side>()); // -> test file id
-                                return file.isEmpty<side>() ? std::wstring() : toGuiString(file.getFileSize<side>());
-                            case ColumnTypeRim::DATE:
-                                return file.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(file.getLastWriteTime<side>());
-                            case ColumnTypeRim::EXTENSION:
-                                return utfCvrtTo<std::wstring>(getFileExtension(file.getItemName<side>()));
-                        }
-                        assert(false);
-                        return std::wstring();
-                    }();
-                }
+                        case ColumnTypeRim::ITEM_PATH:
+                            switch (itemPathFormat)
+                            {
+                                case ItemPathFormat::FULL_PATH:
+                                    return folder.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(folder.getAbstractPath<side>());
+                                case ItemPathFormat::RELATIVE_PATH:
+                                    return utfCvrtTo<std::wstring>(folder.getRelativePath<side>());
+                                case ItemPathFormat::ITEM_NAME:
+                                    return utfCvrtTo<std::wstring>(folder.getItemName<side>());
+                            }
+                            break;
+                        case ColumnTypeRim::SIZE:
+                            return folder.isEmpty<side>() ? std::wstring() : L"<" + _("Folder") + L">";
+                        case ColumnTypeRim::DATE:
+                            return std::wstring();
+                        case ColumnTypeRim::EXTENSION:
+                            return std::wstring();
+                    }
+                    assert(false);
+                    return std::wstring();
+                }();
+            },
 
-                void visit(const SymlinkPair& symlink) override
+            [&](const FilePair& file)
+            {
+                value = [&]
                 {
-                    value = [&]
+                    switch (colTypeRim)
                     {
-                        switch (colType_)
-                        {
-                            case ColumnTypeRim::ITEM_PATH:
-                                switch (itemPathFormat_)
-                                {
-                                    case ItemPathFormat::FULL_PATH:
-                                        return symlink.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(symlink.getAbstractPath<side>());
-                                    case ItemPathFormat::RELATIVE_PATH:
-                                        return utfCvrtTo<std::wstring>(symlink.getRelativePath<side>());
-                                    case ItemPathFormat::ITEM_NAME:
-                                        return utfCvrtTo<std::wstring>(symlink.getItemName<side>());
-                                }
-                                break;
-                            case ColumnTypeRim::SIZE:
-                                return symlink.isEmpty<side>() ? std::wstring() : L"<" + _("Symlink") + L">";
-                            case ColumnTypeRim::DATE:
-                                return symlink.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(symlink.getLastWriteTime<side>());
-                            case ColumnTypeRim::EXTENSION:
-                                return utfCvrtTo<std::wstring>(getFileExtension(symlink.getItemName<side>()));
-                        }
-                        assert(false);
-                        return std::wstring();
-                    }();
-                }
+                        case ColumnTypeRim::ITEM_PATH:
+                            switch (itemPathFormat)
+                            {
+                                case ItemPathFormat::FULL_PATH:
+                                    return file.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(file.getAbstractPath<side>());
+                                case ItemPathFormat::RELATIVE_PATH:
+                                    return utfCvrtTo<std::wstring>(file.getRelativePath<side>());
+                                case ItemPathFormat::ITEM_NAME:
+                                    return utfCvrtTo<std::wstring>(file.getItemName<side>());
+                            }
+                            break;
+                        case ColumnTypeRim::SIZE:
+                            //return file.isEmpty<side>() ? std::wstring() : utfCvrtTo<std::wstring>(file.getFileId<side>()); // -> test file id
+                            return file.isEmpty<side>() ? std::wstring() : toGuiString(file.getFileSize<side>());
+                        case ColumnTypeRim::DATE:
+                            return file.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(file.getLastWriteTime<side>());
+                        case ColumnTypeRim::EXTENSION:
+                            return utfCvrtTo<std::wstring>(getFileExtension(file.getItemName<side>()));
+                    }
+                    assert(false);
+                    return std::wstring();
+                }();
+            },
 
-                void visit(const FolderPair& folder) override
+            [&](const SymlinkPair& symlink)
+            {
+                value = [&]
                 {
-                    value = [&]
+                    switch (colTypeRim)
                     {
-                        switch (colType_)
-                        {
-                            case ColumnTypeRim::ITEM_PATH:
-                                switch (itemPathFormat_)
-                                {
-                                    case ItemPathFormat::FULL_PATH:
-                                        return folder.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(folder.getAbstractPath<side>());
-                                    case ItemPathFormat::RELATIVE_PATH:
-                                        return utfCvrtTo<std::wstring>(folder.getRelativePath<side>());
-                                    case ItemPathFormat::ITEM_NAME:
-                                        return utfCvrtTo<std::wstring>(folder.getItemName<side>());
-                                }
-                                break;
-                            case ColumnTypeRim::SIZE:
-                                return folder.isEmpty<side>() ? std::wstring() : L"<" + _("Folder") + L">";
-                            case ColumnTypeRim::DATE:
-                                return std::wstring();
-                            case ColumnTypeRim::EXTENSION:
-                                return std::wstring();
-                        }
-                        assert(false);
-                        return std::wstring();
-                    }();
-                }
-                const ColumnTypeRim colType_;
-                const ItemPathFormat itemPathFormat_;
-                std::wstring value; //out
-            } getVal(static_cast<ColumnTypeRim>(colType), itemPathFormat);
-            fsObj->accept(getVal);
-            return getVal.value;
+                        case ColumnTypeRim::ITEM_PATH:
+                            switch (itemPathFormat)
+                            {
+                                case ItemPathFormat::FULL_PATH:
+                                    return symlink.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(symlink.getAbstractPath<side>());
+                                case ItemPathFormat::RELATIVE_PATH:
+                                    return utfCvrtTo<std::wstring>(symlink.getRelativePath<side>());
+                                case ItemPathFormat::ITEM_NAME:
+                                    return utfCvrtTo<std::wstring>(symlink.getItemName<side>());
+                            }
+                            break;
+                        case ColumnTypeRim::SIZE:
+                            return symlink.isEmpty<side>() ? std::wstring() : L"<" + _("Symlink") + L">";
+                        case ColumnTypeRim::DATE:
+                            return symlink.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(symlink.getLastWriteTime<side>());
+                        case ColumnTypeRim::EXTENSION:
+                            return utfCvrtTo<std::wstring>(getFileExtension(symlink.getItemName<side>()));
+                    }
+                    assert(false);
+                    return std::wstring();
+                }();
+            });
+            return value;
         }
         //if data is not found:
         return std::wstring();
@@ -723,29 +704,23 @@ private:
         {
             out.fsObj = fsObj;
 
-            struct GetIcon : public FSObjectVisitor
+            visitFSObject(*fsObj, [&](const FolderPair& folder)
             {
-                GetIcon(IconInfo& ii) : ii_(ii) {}
+                out.type = IconInfo::FOLDER;
+                //todo: if ("is followed symlink") out.drawAsLink = true;
+            },
 
-                void visit(const FilePair& file) override
-                {
-                    ii_.type       = IconInfo::ICON_PATH;
-                    ii_.drawAsLink = file.isFollowedSymlink<side>() || hasLinkExtension(file.getItemName<side>());
-                }
-                void visit(const SymlinkPair& symlink) override
-                {
-                    ii_.type       = IconInfo::ICON_PATH;
-                    ii_.drawAsLink = true;
-                }
-                void visit(const FolderPair& folder) override
-                {
-                    ii_.type = IconInfo::FOLDER;
-                    //todo: if ("is followed symlink") ii_.drawAsLink = true;
-                }
+            [&](const FilePair& file)
+            {
+                out.type       = IconInfo::ICON_PATH;
+                out.drawAsLink = file.isFollowedSymlink<side>() || hasLinkExtension(file.getItemName<side>());
+            },
 
-                IconInfo& ii_;
-            } getIcon(out);
-            fsObj->accept(getIcon);
+            [&](const SymlinkPair& symlink)
+            {
+                out.type       = IconInfo::ICON_PATH;
+                out.drawAsLink = true;
+            });
         }
         return out;
     }
@@ -761,28 +736,19 @@ private:
                           AFS::getDisplayPath(fsObj->getAbstractPath<side>()) :
                           utfCvrtTo<std::wstring>(fsObj->getRelativePath<side>());
 
-                struct AssembleTooltip : public FSObjectVisitor
+                visitFSObject(*fsObj, [](const FolderPair& folder) {},
+                [&](const FilePair& file)
                 {
-                    AssembleTooltip(std::wstring& tipMsg) : tipMsg_(tipMsg) {}
+                    toolTip += L"\n" +
+                               _("Size:") + L" " + zen::filesizeToShortString(file.getFileSize<side>()) + L"\n" +
+                               _("Date:") + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<side>());
+                },
 
-                    void visit(const FilePair& file) override
-                    {
-                        tipMsg_ += L"\n" +
-                                   _("Size:") + L" " + zen::filesizeToShortString(file.getFileSize<side>()) + L"\n" +
-                                   _("Date:") + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<side>());
-                    }
-
-                    void visit(const SymlinkPair& symlink) override
-                    {
-                        tipMsg_ += L"\n" +
-                                   _("Date:") + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<side>());
-                    }
-
-                    void visit(const FolderPair& folder) override {}
-
-                    std::wstring& tipMsg_;
-                } assembler(toolTip);
-                fsObj->accept(assembler);
+                [&](const SymlinkPair& symlink)
+                {
+                    toolTip += L"\n" +
+                               _("Date:") + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<side>());
+                });
             }
         return toolTip;
     }
@@ -872,8 +838,7 @@ class GridDataCenter : public GridDataBase
 public:
     GridDataCenter(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) :
         GridDataBase(grid, gridDataView),
-        toolTip(grid), //tool tip must not live longer than grid!
-        notch(getResourceImage(L"notch").ConvertToImage()) {}
+        toolTip(grid) {} //tool tip must not live longer than grid!
 
     void onSelectBegin()
     {
@@ -1312,7 +1277,7 @@ private:
 
     Opt<wxBitmap> renderBuf; //avoid costs of recreating this temporal variable
     Tooltip toolTip;
-    wxImage notch;
+    wxImage notch { getResourceImage(L"notch").ConvertToImage() };
 };
 
 //########################################################################################################
@@ -1623,8 +1588,7 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
         { static_cast<ColumnType>(ColumnTypeCenter::CHECKBOX    ), widthCheckbox, 0, true },
         { static_cast<ColumnType>(ColumnTypeCenter::CMP_CATEGORY), widthCategory, 0, true },
         { static_cast<ColumnType>(ColumnTypeCenter::SYNC_ACTION ), widthAction,   0, true },
-    }
-    );
+    });
 }
 
 

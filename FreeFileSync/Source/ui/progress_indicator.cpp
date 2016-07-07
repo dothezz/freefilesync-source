@@ -315,7 +315,7 @@ void CompareProgressDialog::Pimpl::initNewPhase()
             break;
     }
 
-	updateStatusPanelNow();
+    updateStatusPanelNow();
 }
 
 
@@ -1408,7 +1408,6 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 
     this->GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     pnl.Layout();
-
     this->Center(); //call *after* dialog layout update and *before* wxWindow::Show()!
 
     if (showProgress)

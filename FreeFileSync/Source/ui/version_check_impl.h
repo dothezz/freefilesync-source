@@ -12,11 +12,11 @@
 
 namespace zen
 {
-/*constexpr*/ long getInactiveCheckId()
+time_t getVersionCheckInactiveId()
 {
     //use current version to calculate a changing number for the inactive state near UTC begin, in order to always check for updates after installing a new version
     //=> convert version into 11-based *unique* number (this breaks lexicographical version ordering, but that's irrelevant!)
-    long id = 0;
+    time_t id = 0;
     const wchar_t* first = zen::ffsVersion;
     const wchar_t* last = first + zen::strLength(ffsVersion);
     std::for_each(first, last, [&](wchar_t c)
@@ -32,6 +32,23 @@ namespace zen
     });
     assert(0 < id && id < 3600 * 24 * 365); //as long as value is within a year after UTC begin (1970) there's no risk to clash with *current* time
     return id;
+}
+
+
+inline
+time_t getVersionCheckCurrentTime()
+{
+	return std::time(nullptr);
+}
+
+
+bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
+{
+	if (lastUpdateCheck == getVersionCheckInactiveId())
+		return false;
+
+    const time_t now = std::time(nullptr);
+    return numeric::dist(now, lastUpdateCheck) >= 7 * 24 * 3600; //check weekly
 }
 }
 

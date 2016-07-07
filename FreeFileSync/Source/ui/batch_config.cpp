@@ -78,8 +78,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
-
-    //   Layout();
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonSaveAs->SetFocus();
 }

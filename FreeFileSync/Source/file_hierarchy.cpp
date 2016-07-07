@@ -40,7 +40,7 @@ namespace
 SyncOperation getIsolatedSyncOperation(bool itemExistsLeft,
                                        bool itemExistsRight,
                                        CompareFilesResult cmpResult,
-                                       bool selectedForSynchronization,
+                                       bool selectedForSync,
                                        SyncDirection syncDir,
                                        bool hasDirectionConflict) //perf: std::wstring was wasteful here
 {
@@ -52,7 +52,7 @@ SyncOperation getIsolatedSyncOperation(bool itemExistsLeft,
 
     assert(!hasDirectionConflict || syncDir == SyncDirection::NONE);
 
-    if (!selectedForSynchronization)
+    if (!selectedForSync)
         return cmpResult == FILE_EQUAL ?
                SO_EQUAL :
                SO_DO_NOTHING;
@@ -149,7 +149,7 @@ SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir) con
 
 SyncOperation FileSystemObject::getSyncOperation() const
 {
-    return getIsolatedSyncOperation(!isEmpty<LEFT_SIDE>(), !isEmpty<RIGHT_SIDE>(), getCategory(), selectedForSynchronization, getSyncDir(), syncDirectionConflict.get() != nullptr);
+    return getIsolatedSyncOperation(!isEmpty<LEFT_SIDE>(), !isEmpty<RIGHT_SIDE>(), getCategory(), selectedForSync, getSyncDir(), syncDirectionConflict.get() != nullptr);
     //do *not* make a virtual call to testSyncOperation()! See FilePair::testSyncOperation()! <- better not implement one in terms of the other!!!
 }
 
@@ -377,7 +377,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
             //harmonize with synchronization.cpp::SynchronizeFolderPair::synchronizeFileInt, ect!!
         {
             Zstring shortNameOld = fsObj.getItemName<RIGHT_SIDE>();
-            Zstring shortNameNew = fsObj.getItemName<LEFT_SIDE >();
+            Zstring shortNameNew = fsObj.getItemName< LEFT_SIDE>();
             if (op == SO_COPY_METADATA_TO_LEFT)
                 std::swap(shortNameOld, shortNameNew);
 

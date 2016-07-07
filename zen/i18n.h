@@ -110,8 +110,9 @@ struct CleanUpTranslationHandler
     {
         std::shared_ptr<const TranslationHandler>*& handler = getTranslationInstance();
         assert(!handler); //clean up at a better time rather than during static destruction! MT issues!
-        delete handler;
+		auto oldHandler = handler;
         handler = nullptr; //getTranslator() may be called even after static objects of this translation unit are destroyed!
+        delete oldHandler;
     }
 };
 }
@@ -127,9 +128,9 @@ void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler)
     static implementation::CleanUpTranslationHandler cuth; //external linkage even in header!
 
     std::shared_ptr<const TranslationHandler>*& handler = implementation::getTranslationInstance();
-	auto tmp = handler;
+	auto oldHandler = handler;
 	handler = nullptr;
-    delete tmp;
+    delete oldHandler;
 	if (newHandler)
 		handler = new std::shared_ptr<const TranslationHandler>(std::move(newHandler));
 }

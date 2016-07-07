@@ -100,6 +100,15 @@ VolumeId zen::getVolumeId(const Zstring& itemPath) //throw FileError
 }
 
 
+Zstring zen::getTempFolderPath() //throw FileError
+{
+    const char* buf = ::getenv("TMPDIR"); //no extended error reporting
+    if (!buf)
+        throw FileError(_("Cannot get process information."), L"getenv: TMPDIR not found.");
+    return buf;
+}
+
+
 bool zen::removeFile(const Zstring& filePath) //throw FileError
 {
     const wchar_t functionName[] = L"unlink";
@@ -291,7 +300,7 @@ void setWriteTimeNative(const Zstring& filePath, std::int64_t modTime, ProcSymli
     //=> using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     if (procSl == ProcSymlink::FOLLOW)
     {
-        const int fdFile = ::open(filePath.c_str(), O_WRONLY, 0); //"if O_CREAT is not specified, then mode is ignored"
+        const int fdFile = ::open(filePath.c_str(), O_WRONLY);
         if (fdFile == -1)
         {
             if (errno == EACCES) //bullshit, access denied even with 0777 permissions! => utimes should work!
@@ -322,7 +331,7 @@ void zen::setFileTime(const Zstring& filePath, std::int64_t modTime, ProcSymlink
 }
 
 
-bool zen::supportsPermissions(const Zstring& dirpath) //throw FileError
+bool zen::supportsPermissions(const Zstring& dirPath) //throw FileError
 {
     return true;
 }
@@ -441,12 +450,12 @@ void makeDirectoryRecursivelyImpl(const Zstring& directory) //FileError
 }
 
 
-void zen::makeDirectoryRecursively(const Zstring& dirpath) //throw FileError
+void zen::makeDirectoryRecursively(const Zstring& dirPath) //throw FileError
 {
     //remove trailing separator (even for C:\ root directories)
-    const Zstring dirFormatted = endsWith(dirpath, FILE_NAME_SEPARATOR) ?
-                                 beforeLast(dirpath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE) :
-                                 dirpath;
+    const Zstring dirFormatted = endsWith(dirPath, FILE_NAME_SEPARATOR) ?
+                                 beforeLast(dirPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE) :
+                                 dirPath;
     makeDirectoryRecursivelyImpl(dirFormatted); //FileError
 }
 

@@ -501,8 +501,8 @@ private:
 
                     //create or update new "in-sync" state
                     InSyncFile& dbFile = updateItem(dbFiles, file.getPairItemName(),
-                                                    InSyncFile(InSyncDescrFile(file.getLastWriteTime<LEFT_SIDE >(),
-                                                                               file.getFileId       <LEFT_SIDE >()),
+                                                    InSyncFile(InSyncDescrFile(file.getLastWriteTime< LEFT_SIDE>(),
+                                                                               file.getFileId       < LEFT_SIDE>()),
                                                                InSyncDescrFile(file.getLastWriteTime<RIGHT_SIDE>(),
                                                                                file.getFileId       <RIGHT_SIDE>()),
                                                                activeCmpVar_,
@@ -663,10 +663,10 @@ private:
 std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair& baseFolder, //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
                                                             const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
-    const AbstractPath dbPathLeft  = getDatabaseFilePath<LEFT_SIDE >(baseFolder);
+    const AbstractPath dbPathLeft  = getDatabaseFilePath< LEFT_SIDE>(baseFolder);
     const AbstractPath dbPathRight = getDatabaseFilePath<RIGHT_SIDE>(baseFolder);
 
-    if (!baseFolder.isExisting<LEFT_SIDE >() ||
+    if (!baseFolder.isExisting< LEFT_SIDE>() ||
         !baseFolder.isExisting<RIGHT_SIDE>())
     {
         //avoid race condition with directory existence check: reading sync.ffs_db may succeed although first dir check had failed => conflicts!
@@ -700,10 +700,10 @@ std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair
 void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError
 {
     //transactional behaviour! write to tmp files first
-    const AbstractPath dbPathLeft  = getDatabaseFilePath<LEFT_SIDE >(baseFolder);
+    const AbstractPath dbPathLeft  = getDatabaseFilePath< LEFT_SIDE>(baseFolder);
     const AbstractPath dbPathRight = getDatabaseFilePath<RIGHT_SIDE>(baseFolder);
 
-    const AbstractPath dbPathLeftTmp  = getDatabaseFilePath<LEFT_SIDE >(baseFolder, true);
+    const AbstractPath dbPathLeftTmp  = getDatabaseFilePath< LEFT_SIDE>(baseFolder, true);
     const AbstractPath dbPathRightTmp = getDatabaseFilePath<RIGHT_SIDE>(baseFolder, true);
 
     //delete old tmp file, if necessary -> throws if deletion fails!

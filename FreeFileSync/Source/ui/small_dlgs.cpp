@@ -128,6 +128,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonClose->SetFocus(); //on GTK ESC is only associated with wxID_OK correctly if we set at least *any* focus at all!!!
 }
@@ -148,8 +149,8 @@ class CopyToDialog : public CopyToDlgGenerated
 {
 public:
     CopyToDialog(wxWindow* parent,
-                 const std::vector<zen::FileSystemObject*>& rowsOnLeft,
-                 const std::vector<zen::FileSystemObject*>& rowsOnRight,
+                 const std::vector<const FileSystemObject*>& rowsOnLeft,
+                 const std::vector<const FileSystemObject*>& rowsOnRight,
                  Zstring& lastUsedPath,
                  const std::shared_ptr<FolderHistory>& folderHistory,
                  bool& keepRelPaths,
@@ -171,8 +172,8 @@ private:
 
 
 CopyToDialog::CopyToDialog(wxWindow* parent,
-                           const std::vector<FileSystemObject*>& rowsOnLeft,
-                           const std::vector<FileSystemObject*>& rowsOnRight,
+                           const std::vector<const FileSystemObject*>& rowsOnLeft,
+                           const std::vector<const FileSystemObject*>& rowsOnRight,
                            Zstring& lastUsedPath,
                            const std::shared_ptr<FolderHistory>& folderHistory,
                            bool& keepRelPaths,
@@ -219,6 +220,7 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonOK->SetFocus();
 }
@@ -247,8 +249,8 @@ void CopyToDialog::OnOK(wxCommandEvent& event)
 
 
 ReturnSmallDlg::ButtonPressed zen::showCopyToDialog(wxWindow* parent,
-                                                    const std::vector<FileSystemObject*>& rowsOnLeft,
-                                                    const std::vector<FileSystemObject*>& rowsOnRight,
+                                                    const std::vector<const FileSystemObject*>& rowsOnLeft,
+                                                    const std::vector<const FileSystemObject*>& rowsOnRight,
                                                     Zstring& lastUsedPath,
                                                     std::vector<Zstring>& folderPathHistory,
                                                     size_t historySizeMax,
@@ -271,8 +273,8 @@ class DeleteDialog : public DeleteDlgGenerated
 {
 public:
     DeleteDialog(wxWindow* parent,
-                 const std::vector<zen::FileSystemObject*>& rowsOnLeft,
-                 const std::vector<zen::FileSystemObject*>& rowsOnRight,
+                 const std::vector<const FileSystemObject*>& rowsOnLeft,
+                 const std::vector<const FileSystemObject*>& rowsOnRight,
                  bool& useRecycleBin);
 
 private:
@@ -283,8 +285,8 @@ private:
 
     void updateGui();
 
-    const std::vector<zen::FileSystemObject*>& rowsToDeleteOnLeft;
-    const std::vector<zen::FileSystemObject*>& rowsToDeleteOnRight;
+    const std::vector<const FileSystemObject*>& rowsToDeleteOnLeft;
+    const std::vector<const FileSystemObject*>& rowsToDeleteOnRight;
     const TickVal tickCountStartup;
 
     //output-only parameters:
@@ -293,8 +295,8 @@ private:
 
 
 DeleteDialog::DeleteDialog(wxWindow* parent,
-                           const std::vector<FileSystemObject*>& rowsOnLeft,
-                           const std::vector<FileSystemObject*>& rowsOnRight,
+                           const std::vector<const FileSystemObject*>& rowsOnLeft,
+                           const std::vector<const FileSystemObject*>& rowsOnRight,
                            bool& useRecycleBin) :
     DeleteDlgGenerated(parent),
     rowsToDeleteOnLeft(rowsOnLeft),
@@ -313,8 +315,8 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
-
     Layout();
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonOK->SetFocus();
 }
@@ -379,8 +381,8 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 
 
 ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(wxWindow* parent,
-                                                    const std::vector<zen::FileSystemObject*>& rowsOnLeft,
-                                                    const std::vector<zen::FileSystemObject*>& rowsOnRight,
+                                                    const std::vector<const FileSystemObject*>& rowsOnLeft,
+                                                    const std::vector<const FileSystemObject*>& rowsOnRight,
                                                     bool& useRecycleBin)
 {
     DeleteDialog confirmDeletion(parent, rowsOnLeft, rowsOnRight, useRecycleBin);
@@ -442,9 +444,9 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
     };
 
     setValue(*m_staticTextData, st.getDataToProcess() == 0, filesizeToShortString(st.getDataToProcess()), *m_bitmapData,  L"data");
-    setIntValue(*m_staticTextCreateLeft,  st.createCount<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
-    setIntValue(*m_staticTextUpdateLeft,  st.updateCount<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
-    setIntValue(*m_staticTextDeleteLeft,  st.deleteCount<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
+    setIntValue(*m_staticTextCreateLeft,  st.createCount< LEFT_SIDE>(), *m_bitmapCreateLeft,  L"so_create_left_small");
+    setIntValue(*m_staticTextUpdateLeft,  st.updateCount< LEFT_SIDE>(), *m_bitmapUpdateLeft,  L"so_update_left_small");
+    setIntValue(*m_staticTextDeleteLeft,  st.deleteCount< LEFT_SIDE>(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
     setIntValue(*m_staticTextCreateRight, st.createCount<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
     setIntValue(*m_staticTextUpdateRight, st.updateCount<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
     setIntValue(*m_staticTextDeleteRight, st.deleteCount<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
@@ -453,6 +455,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonStartSync->SetFocus();
 }
@@ -538,10 +541,11 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
     bSizerLockedFiles->Show(false);
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
-                             L"%item_path%    \t" + _("- full file or folder name") + L"\n" +
-                             L"%item_folder%  \t" + _("- folder part only") + L"\n" +
-                             L"%item2_path%   \t" + _("- Other side's counterpart to %item_path%") + L"\n" +
-                             L"%item2_folder% \t" + _("- Other side's counterpart to %item_folder%");
+                             L"%item_path%    \t" + _("Full file or folder path") + L"\n" +
+                             L"%folder_path%  \t" + _("Parent folder path") + L"\n" +
+							 L"%local_path%   \t" + _("Temporary local copy for SFTP and MTP storage") + L"\n" +
+		                     L"\n" +
+                             L"%item_path2%, %folder_path2%, %local_path2% \t" + _("Parameters for opposite side");
 
     m_gridCustomCommand->GetGridWindow()->SetToolTip(toolTip);
     m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);
@@ -549,8 +553,8 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
-
     Layout();
+    Center(); //needs to be re-applied after a dialog size change!
 
     //automatically fit column width to match total grid width
     Connect(wxEVT_SIZE, wxSizeEventHandler(OptionsDlg::onResize), nullptr, this);
@@ -655,8 +659,8 @@ void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
         if (description != it->first) //remember english description to save in GlobalSettings.xml later rather than hard-code translation
             descriptionTransToEng[description] = it->first;
 
-        m_gridCustomCommand->SetCellValue(row, 0, description); //description
-        m_gridCustomCommand->SetCellValue(row, 1, it->second);  //commandline
+        m_gridCustomCommand->SetCellValue(row, 0, description);
+        m_gridCustomCommand->SetCellValue(row, 1, utfCvrtTo<wxString>(it->second)); //commandline
     }
 }
 
@@ -667,7 +671,7 @@ xmlAccess::ExternalApps OptionsDlg::getExtApp() const
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
     {
         auto description = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 0));
-        auto commandline = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 1));
+        auto commandline = utfCvrtTo<Zstring>        (m_gridCustomCommand->GetCellValue(i, 1));
 
         //try to undo translation of description for GlobalSettings.xml
         auto it = descriptionTransToEng.find(description);
@@ -770,6 +774,7 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, s
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
 
     m_buttonOkay->SetFocus();
 }

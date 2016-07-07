@@ -268,7 +268,7 @@ void writeArray(BufferedOutputStream& stream, const void* data, size_t len)
 template <class N, class BufferedOutputStream> inline
 void writeNumber(BufferedOutputStream& stream, const N& num)
 {
-    static_assert(IsArithmetic<N>::value || IsSameType<N, bool>::value, "");
+    static_assert(IsArithmetic<N>::value || IsSameType<N, bool>::value, "not a number!");
     writeArray(stream, &num, sizeof(N));
 }
 

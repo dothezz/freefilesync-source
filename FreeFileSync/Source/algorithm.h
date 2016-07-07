@@ -44,12 +44,12 @@ void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)
 
 std::pair<std::wstring, int> getSelectedItemsAsString( //returns string with item names and total count of selected(!) items, NOT total files/dirs!
-    const std::vector<FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
-    const std::vector<FileSystemObject*>& selectionRight); //
+    const std::vector<const FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
+    const std::vector<const FileSystemObject*>& selectionRight); //
 
 //manual copy to alternate folder:
-void copyToAlternateFolder(const std::vector<FileSystemObject*>& rowsToCopyOnLeft,  //all pointers need to be bound!
-                           const std::vector<FileSystemObject*>& rowsToCopyOnRight, //
+void copyToAlternateFolder(const std::vector<const FileSystemObject*>& rowsToCopyOnLeft,  //all pointers need to be bound!
+                           const std::vector<const FileSystemObject*>& rowsToCopyOnRight, //
                            const Zstring& targetFolderPathPhrase,
                            bool keepRelPaths,
                            bool overwriteIfExists,
@@ -64,6 +64,31 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          //global warnings:
                          bool& warningRecyclerMissing,
                          ProcessCallback& callback);
-}
 
+//get native Win32 paths or create temporary copy for SFTP/MTP, ect.
+class TempFileBuffer
+{
+public:
+	TempFileBuffer() {}
+    ~TempFileBuffer();
+
+    struct FileDetails
+    {
+        AbstractPath path;
+        FileDescriptor descr;
+    };
+    Zstring getTempPath(const FileDetails& details) const; //returns empty if not in buffer (item not existing, error during copy)
+
+    //contract: only add files not yet in the buffer!
+    void createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback);
+
+private:
+    TempFileBuffer           (const TempFileBuffer&) = delete;
+    TempFileBuffer& operator=(const TempFileBuffer&) = delete;
+
+    std::map<FileDetails, Zstring> tempFilePaths;
+    Zstring tempFolderPath;
+};
+bool operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer::FileDetails& rhs);
+}
 #endif //ALGORITHM_H_34218518475321452548

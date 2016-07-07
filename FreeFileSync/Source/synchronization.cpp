@@ -260,7 +260,7 @@ namespace
 bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 {
     //initial file copying shall not be detected as major difference
-    if ((folderPairStat.createCount<LEFT_SIDE >() == 0 ||
+    if ((folderPairStat.createCount< LEFT_SIDE>() == 0 ||
          folderPairStat.createCount<RIGHT_SIDE>() == 0) &&
         folderPairStat.updateCount  () == 0 &&
         folderPairStat.deleteCount  () == 0 &&
@@ -540,7 +540,7 @@ public:
     }
 
 private:
-    MinimumDiskSpaceNeeded() : spaceNeededLeft(),  spaceNeededRight() {}
+    MinimumDiskSpaceNeeded() {}
 
     void recurse(const HierarchyObject& hierObj)
     {
@@ -600,8 +600,8 @@ private:
             recurse(folder);
     }
 
-    std::int64_t spaceNeededLeft;
-    std::int64_t spaceNeededRight;
+    std::int64_t spaceNeededLeft  = 0;
+    std::int64_t spaceNeededRight = 0;
 };
 
 //----------------------------------------------------------------------------------------
@@ -1840,7 +1840,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         append(unresolvedConflicts, folderPairStat.getConflicts());
 
         //exclude a few pathological cases (including empty left, right folders)
-        if (AFS::equalAbstractPath(j->getAbstractPath<LEFT_SIDE >(),
+        if (AFS::equalAbstractPath(j->getAbstractPath< LEFT_SIDE>(),
                                    j->getAbstractPath<RIGHT_SIDE>()))
         {
             jobType[folderIndex] = FolderPairJobType::SKIP;
@@ -1883,7 +1883,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         }
 
         //check for empty target folder paths: this only makes sense if empty field is source (and no DB files need to be created)
-        if ((AFS::isNullPath(j->getAbstractPath<LEFT_SIDE >()) && (writeLeft  || folderPairCfg.saveSyncDB_)) ||
+        if ((AFS::isNullPath(j->getAbstractPath< LEFT_SIDE>()) && (writeLeft  || folderPairCfg.saveSyncDB_)) ||
             (AFS::isNullPath(j->getAbstractPath<RIGHT_SIDE>()) && (writeRight || folderPairCfg.saveSyncDB_)))
         {
             callback.reportFatalError(_("Target folder input field must not be empty."));
@@ -1894,7 +1894,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         //check for network drops after comparison
         // - convenience: exit sync right here instead of showing tons of errors during file copy
         // - early failure! there's no point in evaluating subsequent warnings
-        if (baseFolderDrop<LEFT_SIDE >(*j, folderAccessTimeout, callback) ||
+        if (baseFolderDrop< LEFT_SIDE>(*j, folderAccessTimeout, callback) ||
             baseFolderDrop<RIGHT_SIDE>(*j, folderAccessTimeout, callback))
         {
             jobType[folderIndex] = FolderPairJobType::SKIP;
@@ -1916,7 +1916,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                     }
             return false;
         };
-        if (sourceFolderMissing(j->getAbstractPath<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+        if (sourceFolderMissing(j->getAbstractPath< LEFT_SIDE>(), j->isExisting< LEFT_SIDE>()) ||
             sourceFolderMissing(j->getAbstractPath<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
         {
             jobType[folderIndex] = FolderPairJobType::SKIP;
@@ -1937,10 +1937,10 @@ void zen::synchronize(const TimeComp& timeStamp,
         }
 
         //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
-        if (!AFS::isNullPath(j->getAbstractPath<LEFT_SIDE >()) &&
+        if (!AFS::isNullPath(j->getAbstractPath< LEFT_SIDE>()) &&
             !AFS::isNullPath(j->getAbstractPath<RIGHT_SIDE>()))
             if (significantDifferenceDetected(folderPairStat))
-                significantDiffPairs.emplace_back(j->getAbstractPath<LEFT_SIDE >(),
+                significantDiffPairs.emplace_back(j->getAbstractPath< LEFT_SIDE>(),
                                                   j->getAbstractPath<RIGHT_SIDE>());
 
         //check for sufficient free diskspace
@@ -1958,7 +1958,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 catch (FileError&) {} //for warning only => no need for tryReportingError()
         };
         const std::pair<std::int64_t, std::int64_t> spaceNeeded = MinimumDiskSpaceNeeded::calculate(*j);
-        checkSpace(j->getAbstractPath<LEFT_SIDE >(), spaceNeeded.first);
+        checkSpace(j->getAbstractPath< LEFT_SIDE>(), spaceNeeded.first);
         checkSpace(j->getAbstractPath<RIGHT_SIDE>(), spaceNeeded.second);
 
         //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
@@ -2075,18 +2075,18 @@ void zen::synchronize(const TimeComp& timeStamp,
 
             //------------------------------------------------------------------------------------------
             callback.reportInfo(_("Synchronizing folder pair:") + L" [" + getVariantName(folderPairCfg.syncVariant_) + L"]\n" +
-                                L"    " + AFS::getDisplayPath(j->getAbstractPath<LEFT_SIDE >()) + L"\n" +
+                                L"    " + AFS::getDisplayPath(j->getAbstractPath< LEFT_SIDE>()) + L"\n" +
                                 L"    " + AFS::getDisplayPath(j->getAbstractPath<RIGHT_SIDE>()));
             //------------------------------------------------------------------------------------------
 
             //checking a second time: (a long time may have passed since the intro checks!)
-            if (baseFolderDrop<LEFT_SIDE >(*j, folderAccessTimeout, callback) ||
+            if (baseFolderDrop< LEFT_SIDE>(*j, folderAccessTimeout, callback) ||
                 baseFolderDrop<RIGHT_SIDE>(*j, folderAccessTimeout, callback))
                 continue;
 
             //create base folders if not yet existing
             if (folderPairStat.createCount() > 0 || folderPairCfg.saveSyncDB_) //else: temporary network drop leading to deletions already caught by "sourceFolderMissing" check!
-                if (!createBaseFolder<LEFT_SIDE >(*j, callback) || //+ detect temporary network drop!!
+                if (!createBaseFolder< LEFT_SIDE>(*j, callback) || //+ detect temporary network drop!!
                     !createBaseFolder<RIGHT_SIDE>(*j, callback))   //
                     continue;
 
@@ -2113,7 +2113,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 tryReportingError([&]
                 {
                     copyPermissionsFp = copyFilePermissions && //copy permissions only if asked for and supported by *both* sides!
-                    !AFS::isNullPath(j->getAbstractPath<LEFT_SIDE >()) && //scenario: directory selected on one side only
+                    !AFS::isNullPath(j->getAbstractPath< LEFT_SIDE>()) && //scenario: directory selected on one side only
                     !AFS::isNullPath(j->getAbstractPath<RIGHT_SIDE>()) && //
                     AFS::supportPermissionCopy(j->getAbstractPath<LEFT_SIDE>(), j->getAbstractPath<RIGHT_SIDE>()); //throw FileError
                 }, callback); //throw X?

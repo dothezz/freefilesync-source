@@ -34,6 +34,8 @@ void setFileTime(const Zstring& filePath, std::int64_t modificationTime, ProcSym
 std::uint64_t getFilesize(const Zstring& filePath); //throw FileError
 std::uint64_t getFreeDiskSpace(const Zstring& path); //throw FileError, returns 0 if not available
 VolumeId      getVolumeId(const Zstring& itemPath); //throw FileError
+//get per-user directory designated for temporary files:
+Zstring getTempFolderPath(); //throw FileError
 
 bool removeFile(const Zstring& filePath); //throw FileError; return "false" if file is not existing
 
@@ -44,11 +46,11 @@ void removeDirectoryRecursively(const Zstring& dirPath); //throw FileError
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& itemPathOld, const Zstring& itemPathNew); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
-bool supportsPermissions(const Zstring& dirpath); //throw FileError, dereferences symlinks
+bool supportsPermissions(const Zstring& dirPath); //throw FileError, dereferences symlinks
 
 //- no error if already existing
 //- create recursively if parent directory is not existing
-void makeDirectoryRecursively(const Zstring& dirpath); //throw FileError
+void makeDirectoryRecursively(const Zstring& dirPath); //throw FileError
 
 //fail if already existing or parent directory not existing:
 //source path is optional (may be empty)

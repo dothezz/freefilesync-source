@@ -375,7 +375,7 @@ public:
     void setSyncDir(SyncDirection newDir);
     void setSyncDirConflict(const std::wstring& description); //set syncDir = SyncDirection::NONE + fill conflict description
 
-    bool isActive() const;
+    bool isActive() const { return selectedForSync; }
     void setActive(bool active);
 
     //sync operation
@@ -430,7 +430,7 @@ private:
     std::unique_ptr<std::wstring> cmpResultDescr; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
     CompareFilesResult cmpResult; //although this uses 4 bytes there is currently *no* space wasted in class layout!
 
-    bool selectedForSynchronization = true;
+    bool selectedForSync = true;
 
     //Note: we model *four* states with following two variables => "syncDirectionConflict is empty or syncDir == NONE" is a class invariant!!!
     SyncDirection syncDir_ = SyncDirection::NONE; //1 byte: optimize memory layout!
@@ -579,7 +579,28 @@ std::wstring getSyncOpDescription  (const FileSystemObject& fsObj);
 
 //------------------------------------------------------------------
 
+template <class Function1, class Function2, class Function3>
+struct FSObjectLambdaVisitor : public FSObjectVisitor
+{
+    FSObjectLambdaVisitor(Function1 onFolder,
+                          Function2 onFile,
+                          Function3 onSymlink) : onFolder_(onFolder), onFile_(onFile), onSymlink_(onSymlink) {}
+private:
+    void visit(const FolderPair&  folder) override { onFolder_ (folder); }
+    void visit(const FilePair&    file  ) override { onFile_   (file); }
+    void visit(const SymlinkPair& link  ) override { onSymlink_(link); }
 
+    Function1 onFolder_;
+    Function2 onFile_;
+    Function3 onSymlink_;
+};
+
+template <class Function1, class Function2, class Function3> inline
+void visitFSObject(const FileSystemObject& fsObj, Function1 onFolder, Function2 onFile, Function3 onSymlink)
+{
+    FSObjectLambdaVisitor<Function1, Function2, Function3> visitor(onFolder, onFile, onSymlink);
+    fsObj.accept(visitor);
+}
 
 
 
@@ -663,16 +684,9 @@ std::wstring FileSystemObject::getSyncOpConflict() const
 
 
 inline
-bool FileSystemObject::isActive() const
-{
-    return selectedForSynchronization;
-}
-
-
-inline
 void FileSystemObject::setActive(bool active)
 {
-    selectedForSynchronization = active;
+    selectedForSync = active;
     notifySyncCfgChanged();
 }
 
@@ -717,6 +731,7 @@ Zstring FileSystemObject::getPairRelativePath() const
 inline
 Zstring FileSystemObject::getPairItemName() const
 {
+    assert(!isEmpty<LEFT_SIDE>() || !isEmpty<RIGHT_SIDE>());
     return isEmpty<LEFT_SIDE>() ? getItemName<RIGHT_SIDE>() : getItemName<LEFT_SIDE>();
 }
 

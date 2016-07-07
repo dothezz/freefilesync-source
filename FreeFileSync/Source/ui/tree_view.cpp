@@ -25,18 +25,20 @@ namespace
 const int WIDTH_PERCENTAGE_BAR = 60;
 }
 
+
 inline
 void TreeView::compressNode(Container& cont) //remove single-element sub-trees -> gain clarity + usability (call *after* inclusion check!!!)
 {
-    if (cont.subDirs.empty() || //single files node or...
-        (cont.firstFileId == nullptr && //single dir node...
-         cont.subDirs.size() == 1  && //
-         cont.subDirs[0].firstFileId == nullptr && //...that is empty
-         cont.subDirs[0].subDirs.empty()))       //
-    {
-        cont.subDirs.clear();
+    if (cont.subDirs.empty()) //single files node
         cont.firstFileId = nullptr;
-    }
+
+#if 0 //let's not go overboard: empty folders should not be condensed => used for file exclusion filter; user expects to see them
+    if (cont.firstFileId == nullptr && //single dir node...
+        cont.subDirs.size() == 1   && //
+        cont.subDirs[0].firstFileId == nullptr && //...that is empty
+        cont.subDirs[0].subDirs.empty())          //
+        cont.subDirs.clear();
+#endif
 }
 
 
@@ -369,7 +371,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
 
     if (folderCmp.size() == 1) //single folder pair case (empty pairs were already removed!) do NOT use folderCmpView for this check!
     {
-        if (!folderCmpView.empty()) //it may really be!
+        if (!folderCmpView.empty()) //possibly empty!
             getChildren(folderCmpView[0], 0, flatTree); //do not show root
     }
     else
@@ -431,7 +433,7 @@ void TreeView::updateView(Predicate pred)
         else
         {
             root.baseFolder = baseObj;
-            root.displayName = getShortDisplayNameForFolderPair(AFS::getDisplayPath(baseObj->getAbstractPath<LEFT_SIDE >()),
+            root.displayName = getShortDisplayNameForFolderPair(AFS::getDisplayPath(baseObj->getAbstractPath< LEFT_SIDE>()),
                                                                 AFS::getDisplayPath(baseObj->getAbstractPath<RIGHT_SIDE>()));
 
             this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
@@ -667,7 +669,7 @@ void TreeView::setData(FolderComparison& newData)
     //remove truly empty folder pairs as early as this: we want to distinguish single/multiple folder pair cases by looking at "folderCmp"
     erase_if(folderCmp, [](const std::shared_ptr<BaseFolderPair>& baseObj)
     {
-        return AFS::isNullPath(baseObj->getAbstractPath<LEFT_SIDE >()) &&
+        return AFS::isNullPath(baseObj->getAbstractPath< LEFT_SIDE>()) &&
                AFS::isNullPath(baseObj->getAbstractPath<RIGHT_SIDE>());
     });
 }
@@ -807,7 +809,7 @@ private:
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                         {
-                            const std::wstring& dirLeft  = AFS::getDisplayPath(root->baseFolder_.getAbstractPath<LEFT_SIDE >());
+                            const std::wstring& dirLeft  = AFS::getDisplayPath(root->baseFolder_.getAbstractPath< LEFT_SIDE>());
                             const std::wstring& dirRight = AFS::getDisplayPath(root->baseFolder_.getAbstractPath<RIGHT_SIDE>());
                             if (dirLeft.empty())
                                 return dirRight;

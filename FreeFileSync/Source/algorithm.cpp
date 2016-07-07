@@ -7,12 +7,18 @@
 #include "algorithm.h"
 #include <set>
 #include <unordered_map>
+//#include <random>
 #include <zen/perf.h>
+#include <zen/crc.h>
+#include <zen/guid.h>
+#include <zen/file_access.h> //needed for TempFileBuffer only
+#include <zen/serialize.h>
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
 #include "lib/status_handler_impl.h"
 #include "fs/concrete.h"
+#include "fs/native.h"
 
 using namespace zen;
 //using namespace std::rel_ops;
@@ -539,7 +545,7 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(file, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes);
         const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes);
 
         if (changeOnLeft != changeOnRight)
@@ -575,7 +581,7 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(symlink, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes);
         const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes);
 
         if (changeOnLeft != changeOnRight)
@@ -618,7 +624,7 @@ private:
         if (cat != DIR_EQUAL)
         {
             //evaluation
-            const bool changeOnLeft  = !matchesDbEntry<LEFT_SIDE >(folder, dbEntry);
+            const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(folder, dbEntry);
             const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(folder, dbEntry);
 
             if (changeOnLeft != changeOnRight)
@@ -766,25 +772,20 @@ struct SetNewDirection
 void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
     //process subdirectories also!
-    struct Recurse: public FSObjectVisitor
+    visitFSObject(fsObj, [&](const FolderPair& folder)
     {
-        Recurse(SyncDirection newDir) : newDir_(newDir) {}
-        void visit(const FilePair& file) override
-        {
-            SetNewDirection::execute(const_cast<FilePair&>(file), newDir_); //phyiscal object is not const in this method anyway
-        }
-        void visit(const SymlinkPair& symlink) override
-        {
-            SetNewDirection::execute(const_cast<SymlinkPair&>(symlink), newDir_); //
-        }
-        void visit(const FolderPair& folder) override
-        {
-            SetNewDirection::execute(const_cast<FolderPair&>(folder), newDir_); //
-        }
-    private:
-        const SyncDirection newDir_;
-    } setDirVisitor(newDirection);
-    fsObj.accept(setDirVisitor);
+        SetNewDirection::execute(const_cast<FolderPair&>(folder), newDirection); //
+    },
+
+    [&](const FilePair& file)
+    {
+        SetNewDirection::execute(const_cast<FilePair&>(file), newDirection); //phyiscal object is not const in this method anyway
+    },
+
+    [&](const SymlinkPair& symlink)
+    {
+        SetNewDirection::execute(const_cast<SymlinkPair&>(symlink), newDirection); //
+    });
 }
 
 //--------------- functions related to filtering ------------------------------------------------------------------------------------
@@ -792,7 +793,7 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
 namespace
 {
 template <bool include>
-void inOrExcludeAllRows(zen::HierarchyObject& hierObj)
+void inOrExcludeAllRows(HierarchyObject& hierObj)
 {
     for (FilePair& file : hierObj.refSubFiles())
         file.setActive(include);
@@ -807,7 +808,7 @@ void inOrExcludeAllRows(zen::HierarchyObject& hierObj)
 }
 
 
-void zen::setActiveStatus(bool newStatus, zen::FolderComparison& folderCmp)
+void zen::setActiveStatus(bool newStatus, FolderComparison& folderCmp)
 {
     if (newStatus)
         std::for_each(begin(folderCmp), end(folderCmp), [](BaseFolderPair& baseFolder) { inOrExcludeAllRows<true>(baseFolder); }); //include all rows
@@ -816,27 +817,19 @@ void zen::setActiveStatus(bool newStatus, zen::FolderComparison& folderCmp)
 }
 
 
-void zen::setActiveStatus(bool newStatus, zen::FileSystemObject& fsObj)
+void zen::setActiveStatus(bool newStatus, FileSystemObject& fsObj)
 {
     fsObj.setActive(newStatus);
 
     //process subdirectories also!
-    struct Recurse: public FSObjectVisitor
+    visitFSObject(fsObj, [&](const FolderPair& folder)
     {
-        Recurse(bool newStat) : newStatus_(newStat) {}
-        void visit(const FilePair&    file) override {}
-        void visit(const SymlinkPair& link) override {}
-        void visit(const FolderPair&  folder) override
-        {
-            if (newStatus_)
-                inOrExcludeAllRows<true>(const_cast<FolderPair&>(folder)); //object is not physically const here anyway
-            else
-                inOrExcludeAllRows<false>(const_cast<FolderPair&>(folder)); //
-        }
-    private:
-        const bool newStatus_;
-    } recurse(newStatus);
-    fsObj.accept(recurse);
+        if (newStatus)
+            inOrExcludeAllRows<true>(const_cast<FolderPair&>(folder)); //object is not physically const here anyway
+        else
+            inOrExcludeAllRows<false>(const_cast<FolderPair&>(folder)); //
+    },
+    [](const FilePair& file) {}, [](const SymlinkPair& symlink) {});
 }
 
 namespace
@@ -1121,8 +1114,8 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom
 
 //############################################################################################################
 
-std::pair<std::wstring, int> zen::getSelectedItemsAsString(const std::vector<FileSystemObject*>& selectionLeft,
-                                                           const std::vector<FileSystemObject*>& selectionRight)
+std::pair<std::wstring, int> zen::getSelectedItemsAsString(const std::vector<const FileSystemObject*>& selectionLeft,
+                                                           const std::vector<const FileSystemObject*>& selectionRight)
 {
     //don't use wxString! its rather dumb linear allocation strategy brings perf down to a crawl!
     std::wstring fileList; //
@@ -1148,34 +1141,8 @@ std::pair<std::wstring, int> zen::getSelectedItemsAsString(const std::vector<Fil
 
 namespace
 {
-struct FSObjectLambdaVisitor : public FSObjectVisitor
-{
-    static void visit(FileSystemObject& fsObj,
-                      const std::function<void(const FolderPair&  folder)>& onFolder,
-                      const std::function<void(const FilePair&    file  )>& onFile,
-                      const std::function<void(const SymlinkPair& link  )>& onSymlink)
-    {
-        FSObjectLambdaVisitor visitor(onFolder, onFile, onSymlink);
-        fsObj.accept(visitor);
-    }
-
-private:
-    FSObjectLambdaVisitor(const std::function<void(const FolderPair&  folder)>& onFolder,
-                          const std::function<void(const FilePair&    file  )>& onFile,
-                          const std::function<void(const SymlinkPair& link  )>& onSymlink) : onFolder_(onFolder), onFile_(onFile), onSymlink_(onSymlink) {}
-
-    void visit(const FolderPair&  folder) override { if (onFolder_ ) onFolder_ (folder); }
-    void visit(const FilePair&    file  ) override { if (onFile_   ) onFile_   (file); }
-    void visit(const SymlinkPair& link  ) override { if (onSymlink_) onSymlink_(link); }
-
-    const std::function<void(const FolderPair&  folder)> onFolder_;
-    const std::function<void(const FilePair&    file  )> onFile_;
-    const std::function<void(const SymlinkPair& link  )> onSymlink_;
-};
-
-
 template <SelectedSide side>
-void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
+void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsToCopy,
                                const AbstractPath& targetFolderPath,
                                bool keepRelPaths,
                                bool overwriteIfExists,
@@ -1190,7 +1157,7 @@ void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
     const std::wstring txtCreatingFile  (_("Creating file %x"         ));
     const std::wstring txtCreatingLink  (_("Creating symbolic link %x"));
 
-    auto copyItem = [&](FileSystemObject& fsObj, const AbstractPath& targetPath) //throw FileError
+    auto copyItem = [&](const FileSystemObject& fsObj, const AbstractPath& targetPath) //throw FileError
     {
         const std::function<void()> deleteTargetItem = [&]
         {
@@ -1210,7 +1177,7 @@ void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
                 }
         };
 
-        FSObjectLambdaVisitor::visit(fsObj, [&](const FolderPair& folder)
+        visitFSObject(fsObj, [&](const FolderPair& folder)
         {
             StatisticsReporter statReporter(1, 0, callback);
             notifyItemCopy(txtCreatingFolder, AFS::getDisplayPath(targetPath));
@@ -1252,7 +1219,7 @@ void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
         });
     };
 
-    for (FileSystemObject* fsObj : rowsToCopy)
+    for (const FileSystemObject* fsObj : rowsToCopy)
         tryReportingError([&]
     {
         const Zstring& relPath = keepRelPaths ? fsObj->getRelativePath<side>() : fsObj->getItemName<side>();
@@ -1280,34 +1247,36 @@ void copyToAlternateFolderFrom(const std::vector<FileSystemObject*>& rowsToCopy,
 }
 
 
-void zen::copyToAlternateFolder(const std::vector<FileSystemObject*>& rowsToCopyOnLeft,
-                                const std::vector<FileSystemObject*>& rowsToCopyOnRight,
+void zen::copyToAlternateFolder(const std::vector<const FileSystemObject*>& rowsToCopyOnLeft,
+                                const std::vector<const FileSystemObject*>& rowsToCopyOnRight,
                                 const Zstring& targetFolderPathPhrase,
                                 bool keepRelPaths,
                                 bool overwriteIfExists,
                                 ProcessCallback& callback)
 {
-    std::vector<FileSystemObject*> itemSelectionLeft  = rowsToCopyOnLeft;
-    std::vector<FileSystemObject*> itemSelectionRight = rowsToCopyOnRight;
-    erase_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); });
+    std::vector<const FileSystemObject*> itemSelectionLeft  = rowsToCopyOnLeft;
+    std::vector<const FileSystemObject*> itemSelectionRight = rowsToCopyOnRight;
+    erase_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty< LEFT_SIDE>(); });
     erase_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
 
     const int itemCount = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
     std::int64_t dataToProcess = 0;
 
-    for (FileSystemObject* fsObj : itemSelectionLeft)
-        FSObjectLambdaVisitor::visit(*fsObj, nullptr /*onDir*/,
-        [&](const FilePair& file) {dataToProcess += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>()); }, nullptr /*onSymlink*/);
+    for (const FileSystemObject* fsObj : itemSelectionLeft)
+        visitFSObject(*fsObj, [](const FolderPair& folder) {},
+    [&](const FilePair& file) { dataToProcess += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
-    for (FileSystemObject* fsObj : itemSelectionRight)
-        FSObjectLambdaVisitor::visit(*fsObj, nullptr /*onDir*/,
-        [&](const FilePair& file) {dataToProcess += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>()); }, nullptr /*onSymlink*/);
+    for (const FileSystemObject* fsObj : itemSelectionRight)
+        visitFSObject(*fsObj, [](const FolderPair& folder) {},
+    [&](const FilePair& file) { dataToProcess += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
     callback.initNewPhase(itemCount, dataToProcess, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
+    //------------------------------------------------------------------------------
+
     const AbstractPath targetFolderPath = createAbstractPath(targetFolderPathPhrase);
 
-    copyToAlternateFolderFrom<LEFT_SIDE >(itemSelectionLeft,  targetFolderPath, keepRelPaths, overwriteIfExists, callback);
+    copyToAlternateFolderFrom< LEFT_SIDE>(itemSelectionLeft,  targetFolderPath, keepRelPaths, overwriteIfExists, callback);
     copyToAlternateFolderFrom<RIGHT_SIDE>(itemSelectionRight, targetFolderPath, keepRelPaths, overwriteIfExists, callback);
 }
 
@@ -1350,7 +1319,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
 
         if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
         {
-            FSObjectLambdaVisitor::visit(*fsObj,
+            visitFSObject(*fsObj,
             [&](const FolderPair& folder)
             {
                 if (useRecycleBin)
@@ -1470,11 +1439,13 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteLeft  = rowsToDeleteOnLeft;
     std::vector<FileSystemObject*> deleteRight = rowsToDeleteOnRight;
 
-    erase_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty<LEFT_SIDE >(); }); //needed?
+    erase_if(deleteLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty< LEFT_SIDE>(); }); //needed?
     erase_if(deleteRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); }); //yes, for correct stats:
 
     const int itemCount = static_cast<int>(deleteLeft.size() + deleteRight.size());
     callback.initNewPhase(itemCount, 0, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
+
+    //------------------------------------------------------------------------------
 
     //ensure cleanup: redetermination of sync-directions and removal of invalid rows
     auto updateDirection = [&]
@@ -1522,7 +1493,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteRecylerRight;
 
     std::map<AbstractPath, bool, AFS::LessAbstractPath> recyclerSupported;
-    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, recyclerSupported, callback);
+    categorize< LEFT_SIDE>(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, recyclerSupported, callback);
     categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, recyclerSupported, callback);
 
     //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
@@ -1543,4 +1514,114 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
     deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRecylerRight,   true,  callback);
     deleteFromGridAndHDOneSide<RIGHT_SIDE>(deletePermanentRight, false, callback);
+}
+
+//############################################################################################################
+
+bool zen::operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer::FileDetails& rhs)
+{
+    if (lhs.descr.lastWriteTimeRaw != rhs.descr.lastWriteTimeRaw)
+        return lhs.descr.lastWriteTimeRaw < rhs.descr.lastWriteTimeRaw;
+
+    if (lhs.descr.fileSize != rhs.descr.fileSize)
+        return lhs.descr.fileSize < rhs.descr.fileSize;
+
+    if (lhs.descr.fileId != rhs.descr.fileId)
+        return lhs.descr.fileId < rhs.descr.fileId;
+
+    if (lhs.descr.isFollowedSymlink != rhs.descr.isFollowedSymlink)
+        return lhs.descr.isFollowedSymlink < rhs.descr.isFollowedSymlink;
+
+    return AFS::LessAbstractPath()(lhs.path, rhs.path);
+}
+
+
+TempFileBuffer::~TempFileBuffer()
+{
+    if (!tempFolderPath.empty())
+        try
+        {
+            removeDirectoryRecursively(tempFolderPath); //throw FileError
+        }
+        catch (FileError&) { assert(false); }
+}
+
+
+//returns empty if not available (item not existing, error during copy)
+Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
+{
+    auto it = tempFilePaths.find(details);
+    if (it != tempFilePaths.end())
+        return it->second;
+    return Zstring();
+}
+
+
+void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback)
+{
+    const int itemCount = workLoad.size();
+    std::int64_t dataToProcess = 0;
+
+    for (const FileDetails& details : workLoad)
+        dataToProcess += details.descr.fileSize;
+
+    callback.initNewPhase(itemCount, dataToProcess, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
+
+    //------------------------------------------------------------------------------
+
+    if (tempFolderPath.empty())
+    {
+        Opt<std::wstring> errMsg = tryReportingError([&]
+        {
+            //generate random temp folder path e.g. C:\Users\Zenju\AppData\Local\Temp\FFS-068b2e88
+            Zstring tempPathTmp = appendSeparator(getTempFolderPath()); //throw FileError
+            tempPathTmp += Zstr("FFS-");
+
+            const std::string guid = generateGUID(); //no need for full-blown (pseudo-)random numbers for this one-time invocation
+            const uint32_t crc32 = getCrc32(guid.begin(), guid.end());
+            tempPathTmp += printNumber<Zstring>(Zstr("%08x"), static_cast<unsigned int>(crc32));
+
+            makeDirectoryRecursively(tempPathTmp); //throw FileError
+
+            tempFolderPath = tempPathTmp;
+        }, callback); //throw X?
+        if (errMsg) return;
+    }
+
+    for (const FileDetails& details : workLoad)
+    {
+        assert(tempFilePaths.find(details) == tempFilePaths.end()); //ensure correct stats, NO overwrite-copy => caller-contract!
+
+        MemoryStreamOut<std::string> cookie; //create hash to distinguish different versions and file locations
+        writeNumber   (cookie, details.descr.lastWriteTimeRaw);
+        writeNumber   (cookie, details.descr.fileSize);
+        writeContainer(cookie, details.descr.fileId);
+        writeNumber   (cookie, details.descr.isFollowedSymlink);
+        writeContainer(cookie, AFS::getInitPathPhrase(details.path));
+
+        const uint16_t crc16 = getCrc16(cookie.ref().begin(), cookie.ref().end());
+        const Zstring detailsHash = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(crc16));
+
+        const Zstring fileName = AFS::getFileShortName(details.path);
+
+        auto it = std::find(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
+        const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + detailsHash + Zstring(it, fileName.end());
+
+        const Zstring tempFilePath = appendSeparator(tempFolderPath) + tempFileName;
+
+        tryReportingError([&]
+        {
+            StatisticsReporter statReporter(1, details.descr.fileSize, callback);
+
+            callback.reportInfo(replaceCpy(_("Creating file %x"), L"%x", fmtPath(tempFilePath)));
+
+            auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            AFS::copyFileTransactional(details.path, createItemPathNative(tempFilePath), //throw FileError, ErrorFileLocked
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, onNotifyCopyStatus);
+            statReporter.reportDelta(1, 0);
+
+            tempFilePaths[details] = tempFilePath;
+            statReporter.reportFinished();
+        }, callback); //throw X?
+    }
 }

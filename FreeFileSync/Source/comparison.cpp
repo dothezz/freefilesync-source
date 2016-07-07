@@ -249,7 +249,7 @@ std::wstring getConflictInvalidDate(const std::wstring& displayPath, std::int64_
 std::wstring getConflictSameDateDiffSize(const FilePair& file)
 {
     return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtPath(file.getPairRelativePath())) + L"\n" +
-           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<LEFT_SIDE>()) + L"\n" +
+           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<RIGHT_SIDE>());
 }
 
@@ -263,7 +263,7 @@ std::wstring getConflictSkippedBinaryComparison(const FilePair& file)
 std::wstring getDescrDiffMetaShortnameCase(const FileSystemObject& fsObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + fmtPath(fsObj.getItemName<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowLeft  + L" " + fmtPath(fsObj.getItemName< LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + fmtPath(fsObj.getItemName<RIGHT_SIDE>());
 }
 
@@ -272,7 +272,7 @@ template <class FileOrLinkPair>
 std::wstring getDescrDiffMetaDate(const FileOrLinkPair& file)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime< LEFT_SIDE>()) + L"\n" +
            L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<RIGHT_SIDE>());
 }
 
@@ -668,7 +668,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
     using FileData = const FolderContainer::FileList::value_type;
 
     linearMerge(lhs.files, rhs.files,
-    [&](const FileData& fileLeft ) { FilePair& newItem = output.addSubFile<LEFT_SIDE >(fileLeft .first, fileLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
+    [&](const FileData& fileLeft ) { FilePair& newItem = output.addSubFile< LEFT_SIDE>(fileLeft .first, fileLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
     [&](const FileData& fileRight) { FilePair& newItem = output.addSubFile<RIGHT_SIDE>(fileRight.first, fileRight.second); checkFailedRead(newItem, errorMsg); }, //right only
 
     [&](const FileData& fileLeft, const FileData& fileRight) //both sides
@@ -687,7 +687,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
     using SymlinkData = const FolderContainer::SymlinkList::value_type;
 
     linearMerge(lhs.symlinks, rhs.symlinks,
-    [&](const SymlinkData& symlinkLeft ) { SymlinkPair& newItem = output.addSubLink<LEFT_SIDE >(symlinkLeft .first, symlinkLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
+    [&](const SymlinkData& symlinkLeft ) { SymlinkPair& newItem = output.addSubLink< LEFT_SIDE>(symlinkLeft .first, symlinkLeft .second); checkFailedRead(newItem, errorMsg); }, //left only
     [&](const SymlinkData& symlinkRight) { SymlinkPair& newItem = output.addSubLink<RIGHT_SIDE>(symlinkRight.first, symlinkRight.second); checkFailedRead(newItem, errorMsg); }, //right only
 
     [&](const SymlinkData& symlinkLeft, const SymlinkData& symlinkRight) //both sides

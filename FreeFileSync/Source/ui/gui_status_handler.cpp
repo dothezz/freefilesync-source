@@ -120,7 +120,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t da
 {
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
 
-	mainDlg.compareStatus->initNewPhase(); //call after "StatusHandler::initNewPhase"
+    mainDlg.compareStatus->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
     forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
