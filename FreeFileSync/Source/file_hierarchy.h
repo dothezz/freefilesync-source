@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef FILE_HIERARCHY_H_257235289645296
 #define FILE_HIERARCHY_H_257235289645296
@@ -93,9 +93,9 @@ struct SelectParam<RIGHT_SIDE>
 struct FolderContainer
 {
     //------------------------------------------------------------------
-    typedef std::map<Zstring, FolderContainer, LessFilePath> FolderList;  //
-    typedef std::map<Zstring, FileDescriptor,  LessFilePath> FileList;    //key: file name
-    typedef std::map<Zstring, LinkDescriptor,  LessFilePath> SymlinkList; //
+    using FolderList  = std::map<Zstring, FolderContainer, LessFilePath>; //
+    using FileList    = std::map<Zstring, FileDescriptor,  LessFilePath>; //key: file name
+    using SymlinkList = std::map<Zstring, LinkDescriptor,  LessFilePath>; //
     //------------------------------------------------------------------
 
     FolderContainer() = default;
@@ -154,9 +154,9 @@ class HierarchyObject
     friend class FileSystemObject;
 
 public:
-    typedef FixedList<FilePair>    FileList; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
-    typedef FixedList<SymlinkPair> SymlinkList; //Note: deque<> has circular dependency in VCPP!
-    typedef FixedList<FolderPair>  FolderList;
+    using FileList    = FixedList<FilePair>;    //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
+    using SymlinkList = FixedList<SymlinkPair>; //Note: deque<> has circular dependency in VCPP!
+    using FolderList  = FixedList<FolderPair>;
 
     FolderPair& addSubFolder(const Zstring& itemNameLeft,
                              const Zstring& itemNameRight,
@@ -303,7 +303,7 @@ private:
     IterTy it_;
 };
 
-typedef std::vector<std::shared_ptr<BaseFolderPair>> FolderComparison; //make sure pointers to sub-elements remain valid
+using FolderComparison = std::vector<std::shared_ptr<BaseFolderPair>>; //make sure pointers to sub-elements remain valid
 //don't change this back to std::vector<BaseFolderPair> too easily: comparison uses push_back to add entries which may result in a full copy!
 
 DerefIter<typename FolderComparison::iterator,             BaseFolderPair> inline begin(      FolderComparison& vect) { return vect.begin(); }
@@ -326,8 +326,8 @@ template <class T>
 class ObjectMgr
 {
 public:
-    typedef       ObjectMgr* ObjectId;
-    typedef const ObjectMgr* ObjectIdConst;
+    using ObjectId      = ObjectMgr* ;
+    using ObjectIdConst = const ObjectMgr*;
 
     ObjectIdConst  getId() const { return this; }
     /**/  ObjectId getId()       { return this; }

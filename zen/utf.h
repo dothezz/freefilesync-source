@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef UTF_H_01832479146991573473545
 #define UTF_H_01832479146991573473545
@@ -18,6 +18,9 @@ template <class TargetString, class SourceString>
 TargetString utfCvrtTo(const SourceString& str);
 
 const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
+
+template <class CharString>
+bool isValidUtf8(const CharString& str); //check for UTF-8 encoding errors
 
 //---- explicit conversion: wide <-> utf8 ----
 template <class CharString, class WideString>
@@ -53,9 +56,9 @@ size_t findUnicodePos(const UtfString& str, size_t unicodePos); //return positio
 //----------------------- implementation ----------------------------------
 namespace implementation
 {
-typedef std::uint32_t CodePoint;
-typedef std::uint16_t Char16;
-typedef unsigned char Char8;
+using CodePoint = std::uint32_t;
+using Char16    = std::uint16_t;
+using Char8     = unsigned char;
 
 const CodePoint LEAD_SURROGATE      = 0xd800;
 const CodePoint TRAIL_SURROGATE     = 0xdc00; //== LEAD_SURROGATE_MAX + 1
@@ -410,6 +413,21 @@ CharString wideToUtf8(const WideString& str, Int2Type<4>) //other OS: convert ut
     [&](CodePoint cp) { codePointToUtf8(cp, [&](char c) { output += c; }); });
     return output;
 }
+}
+
+
+template <class CharString> inline
+bool isValidUtf8(const CharString& str) 
+{
+	using namespace implementation;
+	bool valid = true;
+    utf8ToCodePoint(strBegin(str), strBegin(str) + strLength(str),
+    [&](CodePoint cp) 
+	{ 
+		if (cp == REPLACEMENT_CHAR)
+			valid = false; //perf: should we use an (expensive) exception for iteration break?
+	});
+    return valid;
 }
 
 

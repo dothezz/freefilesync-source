@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "process_xml.h"
 #include <utility>
@@ -875,6 +875,16 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
     in["Left" ](enhPair.folderPathPhraseLeft_);
     in["Right"](enhPair.folderPathPhraseRight_);
 
+	warn_static("remove after migration - 2016-07-24")
+            replace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
+            replace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
+            replace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));
+            replace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyVideos%"   ), Zstr("%csidl_Videos%"));
+            replace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
+            replace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
+            replace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));
+            replace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyVideos%"   ), Zstr("%csidl_Videos%"));
+
     //###########################################################
     //alternate comp configuration (optional)
     if (XmlIn inAltCmp = in["CompareConfig"])
@@ -1118,6 +1128,9 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
                 replace(item.second, Zstr("%item_path2%"), Zstr("%local_path2%"));
             }
         }
+	warn_static("remove macro migration after some time! 2016-07-18")
+        for (auto& item : config.gui.externelApplications)
+            replace(item.second, Zstr("%item_folder%"),  Zstr("%folder_path%"));
 
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
@@ -1313,7 +1326,7 @@ void writeConfig(const FilterConfig& filter, XmlOut& out)
 }
 
 
-void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
+void writeConfig(const FolderPairEnh& enhPair, XmlOut& out)
 {
     XmlOut outPair = out.ref().addChild("Pair");
 
@@ -1370,11 +1383,11 @@ void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
     XmlOut outFp = outMain["FolderPairs"];
 
     //write first folder pair
-    writeConfigFolderPair(mainCfg.firstPair, outFp);
+    writeConfig(mainCfg.firstPair, outFp);
 
     //write additional folder pairs
-    std::for_each(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(),
-    [&](const FolderPairEnh& fp) { writeConfigFolderPair(fp, outFp); });
+    for (const FolderPairEnh& fp : mainCfg.additionalPairs)
+        writeConfig(fp, outFp);
 
     outMain["OnCompletion"](mainCfg.onCompletion);
 }

@@ -77,7 +77,7 @@
 <target>Wprowadzona liczba katalogów do synchronizacji jest nierówna.</target>
 
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target>Plik konfiguracyjny nie może zawierać informacji o synchronizowanych katalogach gdy nazwy ścieżek przekazywane są w linii poleceń.</target>
+<target>Plik konfiguracyjny nie może zawierać informacji o synchronizowanych katalogach, gdy nazwy ścieżek przekazywane są w linii poleceń.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>Nie można ustawić wielu katalogów dla więcej niż jednego pliku konfiguracyjnego.</target>
@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Jeżeli zignorujesz to ostrzeżenie, katalogi zostaną potraktowane jako puste. Brakujące katalogi są tworzone automatycznie.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Jeżeli ten błąd zostanie zignorowany, katalogi zostaną uznane za puste. Brakujące katalogi będą w razie potrzeby utworzone automatycznie.</target>
 
 <source>A folder input field is empty.</source>
 <target>Pole katalog źródłowy jest puste.</target>
@@ -155,10 +155,10 @@
 <target>Bezpieczne kopiowanie</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Włącz</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Wyłącz</target>
 
 <source>Copy locked files</source>
 <target>Kopiuj zablokowane pliki</target>
@@ -167,22 +167,22 @@
 <target>Kopiuj uprawnienia plików</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Tolerancja czasu dla pliku</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Limit czasu odpowiedzi podczas dostępu do katalogu</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Uruchom w tle z priorytetem</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Zablokuj katalogi podczas synchronizacji</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Weryfikuj przekopiowane pliki</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Wykorzystane niestandardowe ustawienia globalne:</target>
 
 <source>Starting comparison</source>
 <target>Kompresowanie</target>
@@ -273,6 +273,12 @@ Przesłany: %y bajtów
 <source>Cannot move file %x to %y.</source>
 <target>Nie można przenieść pliku %x do %y.</target>
 
+<source>Unable to connect to %x.</source>
+<target>Błąd połączenia do %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Nie można otworzyć katalogu %x.</target>
+
 <source>Cannot enumerate directory %x.</source>
 <target>Nie można wyliczyć katalogu %x.</target>
 
@@ -309,9 +315,6 @@ Przesłany: %y bajtów
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nie można określić położenia dowiązania symbolicznego %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Nie można otworzyć katalogu %x.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Nie można określić wolnego miejsca na %x.</target>
 
@@ -320,12 +323,6 @@ Przesłany: %y bajtów
 
 <source>Incorrect command line:</source>
 <target>Niepoprawne polecenie:</target>
-
-<source>Error Code %x:</source>
-<target>Kod błędu %x:</target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +439,7 @@ Przesłany: %y bajtów
 <target>Nie można uzyskać dostępu do usługi Volume Shadow Copy.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Uruchom 64-bitową wersję FreeFileSync aby utworzyć Shadow Copies na tym systemie.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Nie można określić nazwy dysku dla %x.</target>
@@ -499,7 +496,7 @@ Przesłany: %y bajtów
 <target>3. Wciśnij 'Start'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Aby rozpocząć zaimportuj plik .ffs_batch.</target>
+<target>Aby rozpocząć, zaimportuj plik .ffs_batch.</target>
 
 <source>Folders to watch:</source>
 <target>Katalogi do obserwowania:</target>
@@ -517,7 +514,7 @@ Przesłany: %y bajtów
 <target>Czas bezczynności (w sekundach):</target>
 
 <source>Idle time between last detected change and execution of command</source>
-<target>Czas pomiędzy ostatnią wykrytą zmianą, a uruchomieniem komendy</target>
+<target>Czas pomiędzy ostatnią wykrytą zmianą a uruchomieniem komendy</target>
 
 <source>Command line:</source>
 <target>Polecenie:</target>
@@ -644,8 +641,8 @@ Komenda jest wykonywana gdy:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Te elementy znajdują się w konflikcie, którego nie można rozwiązać. Pliki nie zostaną zsynchronizowane:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Poniższe katalogi znacząco się różnią. Upewnij się, że określone zostały poprawne katalogi do synchronizacji.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target><Poniższe katalogi znacząco się różnią. Zweryfikuj czy do synchronizacji zostały określone prawidłowe katalogi.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Brak wystarczającej przestrzeni dyskowej na:</target>
@@ -726,23 +723,20 @@ Komenda jest wykonywana gdy:
 <source>Serious Error</source>
 <target>Poważny błąd</target>
 
-<source>Symlink</source>
-<target>Dowiązanie symboliczne</target>
-
 <source>Folder</source>
 <target>Katalog</target>
+
+<source>Symlink</source>
+<target>Dowiązanie symboliczne</target>
 
 <source>Full path</source>
 <target>Pełna ścieżka</target>
 
-<source>Name</source>
-<target>Nazwa</target>
+<source>Relative path</source>
+<target>Ścieżka względna</target>
 
-<source>Relative folder</source>
-<target>Relatywny katalog</target>
-
-<source>Base folder</source>
-<target>Katalog bazowy</target>
+<source>Item name</source>
+<target>Nazwa elementu</target>
 
 <source>Size</source>
 <target>Rozmiar</target>
@@ -919,7 +913,7 @@ Komenda jest wykonywana gdy:
 <target>Para folderów:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Główne ustawienia:</target>
 
 <source>Use local settings:</source>
 <target>Korzystaj z ustawień lokalnych:</target>
@@ -1088,6 +1082,12 @@ Komenda jest wykonywana gdy:
 <source>Time elapsed:</source>
 <target>Upłynęło:</target>
 
+<source>Bytes:</source>
+<target>Bajty:</target>
+
+<source>Items:</source>
+<target>Elementy:</target>
+
 <source>Synchronizing...</source>
 <target>Synchronizuję...</target>
 
@@ -1252,6 +1252,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Dostępna jest nowa wersja FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Lokalna ścieżka nie jest dostępna dla %x.</target>
 
 <source>Confirm</source>
 <target>Potwierdź</target>
@@ -1533,17 +1536,17 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne makra:</target>
 
-<source>- full file or folder name</source>
-<target>- pełna nazwa pliku lub katalogu</target>
+<source>Full file or folder path</source>
+<target>Pełna ścieżka do pliku lub katalogu</target>
 
-<source>- folder part only</source>
-<target>- tylko część katalogu</target>
+<source>Parent folder path</source>
+<target>Nadrzędna ścieżka</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Odpowiednik %item_path% po drugiej stronie</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Tymczasowa kopia lokalna dla SFTP i MTP</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Odpowiednik %item_folder% po drugiej stronie</target>
+<source>Parameters for opposite side</source>
+<target>Parametry dla strony przeciwnej</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Przywrócić ukryte dialogi i powiadomienia?</target>
@@ -1635,6 +1638,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Files</source>
 <target>Pliki</target>
 
+<source>Name</source>
+<target>Nazwa</target>
+
 <source>Items</source>
 <target>Elementy</target>
 
@@ -1651,13 +1657,13 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <target>Posiadasz aktualną wersję FreeFileSync.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Nie można znaleźć aktualnej wersji programu FreeFileSync w sieci. Nowsza wersja może być dostępna. Czy chcesz sprawdzić ręcznie?</target>
 
 <source>&Check</source>
 <target>S&prawdź</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Plik %x jest niespójny.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nie można odnaleźć funkcji systemowej %x.</target>
@@ -1666,7 +1672,7 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <target>Błąd podczas rejestrowania do odbioru komunikatów systemowych.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Pliki instalacyjne są uszkodzone. Przeinstaluj FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nie można zarejestrować powiadomień urządzenia dla %x.</target>
@@ -1745,6 +1751,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Cannot change process I/O priorities.</source>
 <target>Nie można zmienić priorytetu I/O procesu.</target>
+
+<source>Error Code %x:</source>
+<target>Kod błędu %x:</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Sprawdzanie kosza systemowego dla katalogu %x zakończone niepowodzeniem.</target>
@@ -1831,8 +1840,14 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <target>Dziękujemy za wsparcie i dotacje!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ten instalator FreeFileSync osiągnął swój dzienny limit instalacji.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Pobrać standardową wersję programu FreeFileSync?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Przenośna wersja programu nie możne zostać zainstalowana w wybranym katalogu.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Wybierz lokalny typ instalacji lub określ inny katalog.</target>
 

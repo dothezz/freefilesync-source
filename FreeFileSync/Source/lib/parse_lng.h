@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef PARSE_LNG_H_46794693622675638
 #define PARSE_LNG_H_46794693622675638
@@ -459,6 +459,11 @@ private:
         if (original.empty())
             throw ParsingError(L"Translation source text is empty", scn.posRow(), scn.posCol());
 
+		if (!isValidUtf8(original))
+			throw ParsingError(L"Translation source text contains UTF-8 encoding error", scn.posRow(), scn.posCol());
+		if (!isValidUtf8(translation))
+			throw ParsingError(L"Translation text contains UTF-8 encoding error", scn.posRow(), scn.posCol());
+
         if (!translation.empty())
         {
             //if original contains placeholder, so must translation!
@@ -530,6 +535,11 @@ private:
         if (!contains(original.second, "%x"))
             throw ParsingError(L"Plural form source text does not contain %x placeholder", scn.posRow(), scn.posCol());
 
+		if (!isValidUtf8(original.first) || !isValidUtf8(original.second))
+			throw ParsingError(L"Translation source text contains UTF-8 encoding error", scn.posRow(), scn.posCol());
+		if (std::any_of(translation.begin(), translation.end(), [](const std::string& pform) { return !isValidUtf8(pform); }))
+			throw ParsingError(L"Translation text contains UTF-8 encoding error", scn.posRow(), scn.posCol());
+
         if (!translation.empty())
         {
             //check for invalid number of plural forms
@@ -586,7 +596,7 @@ private:
 
             //if source is a one-liner, so should be the translation
             if (!contains(original.first, '\n') && !contains(original.second, '\n') &&
-            std::any_of(translation.begin(), translation.end(), [&](const std::string& pform) { return contains(pform, '\n'); }))
+            std::any_of(translation.begin(), translation.end(), [](const std::string& pform) { return contains(pform, '\n'); }))
             throw ParsingError(L"Source text is a one-liner, but at least one plural form translation consists of multiple lines", scn.posRow(), scn.posCol());
         }
     }

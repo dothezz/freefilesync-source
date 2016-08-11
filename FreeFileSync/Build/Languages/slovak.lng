@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nie je možné nájsť následujúce priečinky:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Ak budete túto chybu ignorovať, priečinok bude považovaný za prázdny. Chýbajuce priečinky budú podľa potreby automaticky vytvorené.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ak bude táto chyba ignorovaná, budú tieto priečinky považované za prázdne.</target>
 
 <source>A folder input field is empty.</source>
 <target>Nie je zadaná vstupný priečinok.</target>
@@ -155,10 +155,10 @@
 <target>Bezpečné kopírovanie súborov</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Povolené</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Zakázané</target>
 
 <source>Copy locked files</source>
 <target>Kopírovať zamknuté súbory</target>
@@ -167,22 +167,22 @@
 <target>Kopírovať prístupové oprávnenie súborov</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Časová tolerancia súboru</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Časový limit prístupu k priečinku</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Vykonať s prioritou na pozadí</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Uzamknúť priečinky počas synchronizácie</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Overiť skopírované súbory</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Použiť ne-predvolené globálne nastavenia:</target>
 
 <source>Starting comparison</source>
 <target>Spustiť porovnávania</target>
@@ -273,6 +273,12 @@ Aktuálne: %y b
 <source>Cannot move file %x to %y.</source>
 <target>Nie je možné presunúť súbor %x do %y.</target>
 
+<source>Unable to connect to %x.</source>
+<target>Nie je možné vytvoriť pripojenie k %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Nie je možné otvoriť adresár %x.</target>
+
 <source>Cannot enumerate directory %x.</source>
 <target>Nie je možné prechádzať adresár %x.</target>
 
@@ -309,9 +315,6 @@ Aktuálne: %y b
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nie je možné nájsť odkaz zástupcu %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Nie je možné otvoriť adresár %x.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Nie je možné zistiť voľné miesto na disku %x.</target>
 
@@ -320,12 +323,6 @@ Aktuálne: %y b
 
 <source>Incorrect command line:</source>
 <target>Neplatný príkaz:</target>
-
-<source>Error Code %x:</source>
-<target>Chybový kód %x:</target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +439,7 @@ Aktuálne: %y b
 <target>Nie je prístup k službe Tieňové kópie.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Prosím spustite 64-bitovú verziu FreeFileSync, pre vytvorenie Tieň. kópie v tomto systéme.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>>Nie je možné zistiť názov jednotky pre %x.</target>
@@ -644,8 +641,8 @@ Príkaz bude spustení ak:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Následujúce položky majú nevyriešené konflikty a nebudú synchronizované:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Následujúce priečinky sa významne lišia. Skontrolujte či máte vybránu správnu dvojicu priečinkov pre synchronizáciu.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Nasledujúce priečinky sa signifikantne líšia. Prosím overte, či sú vybrané správne priečinky pre synchronizáciu.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nedostatok miesta na disku:</target>
@@ -726,23 +723,20 @@ Príkaz bude spustení ak:
 <source>Serious Error</source>
 <target>Závažná chyba</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Priečinok</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Plná cesta</target>
 
-<source>Name</source>
-<target>Názov</target>
+<source>Relative path</source>
+<target>Relatívna cesta</target>
 
-<source>Relative folder</source>
-<target>Relatívny priečinok</target>
-
-<source>Base folder</source>
-<target>Zlákladný priečinok</target>
+<source>Item name</source>
+<target>Názov položky</target>
 
 <source>Size</source>
 <target>Veľkosť</target>
@@ -919,7 +913,7 @@ Príkaz bude spustení ak:
 <target>Dvojica priečinkov:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Hlavné nastavenia:</target>
 
 <source>Use local settings:</source>
 <target>Použiť lokálne nastavenie:</target>
@@ -952,7 +946,7 @@ Príkaz bude spustení ak:
 <target>Používať letný čas</target>
 
 <source>Local settings:</source>
-<target>lOKáLNE Nastavenia:</target>
+<target>Lokálne Nastavenia:</target>
 
 <source>Include:</source>
 <target>Zahrnúť:</target>
@@ -1083,10 +1077,16 @@ Príkaz bude spustení ak:
 <target>Nájdených položiek:</target>
 
 <source>Time remaining:</source>
-<target>Ostávajúci čas:</target>
+<target>Zostávajúci čas:</target>
 
 <source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
+
+<source>Bytes:</source>
+<target>Byty(ov):</target>
+
+<source>Items:</source>
+<target>Položky(iek):</target>
 
 <source>Synchronizing...</source>
 <target>Synchronizujem...</target>
@@ -1249,6 +1249,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Je dostupná nová verzia FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Lokálna cesta pre %x nie je k dispozícií.</target>
 
 <source>Confirm</source>
 <target>Potvrdiť</target>
@@ -1530,17 +1533,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrácia externej aplikácie do kontextovéj ponuky. K dispozici jsou následující makrá:</target>
 
-<source>- full file or folder name</source>
-<target>- celá cesta alebo názov priečinka</target>
+<source>Full file or folder path</source>
+<target>Úplná cesta k súboru alebo priečinku</target>
 
-<source>- folder part only</source>
-<target>- iba cesta priečinka</target>
+<source>Parent folder path</source>
+<target>Cesta k nadriadenému priečinku</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- celá cesta alebo názov z opačného panelu pre %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Dočasná lokálna kópia pre SFTP a MTP úložisko</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- iba cesta z opačného panelu pre %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parametre pre protiľahlú stranu</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Zobraziť skryté dialógy a varovné hlásenia?</target>
@@ -1632,6 +1635,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Súbory</target>
 
+<source>Name</source>
+<target>Názov</target>
+
 <source>Items</source>
 <target>Položky</target>
 
@@ -1648,13 +1654,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync je aktuálny.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Nie je možné nájsť online číslo verzie FreeFileSync. pravdepodobne je k dispozícií novšia verzia. Overiť teraz manuálne?</target>
 
 <source>&Check</source>
 <target>&Kontrola</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Overenie konzistencie pre %x zlyhalo.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nie je možné nájsť systémovú funkciu %x.</target>
@@ -1663,7 +1669,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Nepodarilo sa registrovať k odberu systémových správ.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Inštalačný súbor je poškodený. Prosím preinštalujte FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepodarilo sa registrovať správy zaiadenia %x.</target>
@@ -1743,6 +1749,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Nie je možné nastaviť I/O priority procesu.</target>
 
+<source>Error Code %x:</source>
+<target>Chybový kód %x:</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Zlyhala kontrola Koša pre priečinok %x.</target>
 
@@ -1819,7 +1828,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Synchronizačná databáza FreeFileSync</target>
 
 <source>RealTimeSync Configuration</source>
-<target>konfigurácia RealTimeSync</target>
+<target>Konfigurácia RealTimeSync</target>
 
 <source>Edit with FreeFileSync</source>
 <target>Upraviť vo FreeFileSync</target>
@@ -1828,8 +1837,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Ďakujem za Vaše príspevky a podporu!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Inštalačný program FreeFileSync pre dárcov dosiahol denný limit inštalovania.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Stiahnúť teraz regulárnu verziu FreeFileSync z domovskej stránky?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Prenosná verzia nemôže byť nainštalovaná do vybraného priečinka.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Prosím zvoľte lokálny typ inštalácie alebo vyberte iný priečinok pre inštaláciu.</target>
 

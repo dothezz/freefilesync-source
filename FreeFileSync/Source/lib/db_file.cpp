@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "db_file.h"
 #include <zen/guid.h>
@@ -20,8 +20,8 @@ const int DB_FORMAT_CONTAINER = 9;
 const int DB_FORMAT_STREAM    = 2; //since 2015-05-02
 //-------------------------------------------------------------------------------------------------------------------------------
 
-typedef std::string UniqueId;
-typedef std::map<UniqueId, ByteArray> DbStreams; //list of streams ordered by session UUID
+using UniqueId  = std::string;
+using DbStreams = std::map<UniqueId, ByteArray>; //list of streams ordered by session UUID
 
 using MemStreamOut = MemoryStreamOut<ByteArray>;
 using MemStreamIn  = MemoryStreamIn <ByteArray>;

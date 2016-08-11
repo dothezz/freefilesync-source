@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>إذا تجاهلت هذا الخطأ سيتم اعتبار المجلدات فارغة. يتم إنشاء المجلدات المفقودة تلقائيا عند الحاجة.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target></target>
 
 <source>A folder input field is empty.</source>
 <target>حقل إدخال خاص بمجلد فارغ.</target>
@@ -653,8 +653,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>العناصر التالية لم تحل اختلافاتها، و لن يتم مزامنتها:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>المجلدات التالية مختلفة اختلافا كبيرا. تأكد من أنك قمت بتحديد المجلدات الصحيحة لإجراء التزامن.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target></target>
 
 <source>Not enough free disk space available in:</source>
 <target>المساحة الحرة المتوفرة على القرص غير كافية:</target>
@@ -738,23 +738,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>خطأ فادح</target>
 
-<source>Symlink</source>
-<target>ارتباط-رمزي</target>
-
 <source>Folder</source>
 <target>المجلد</target>
+
+<source>Symlink</source>
+<target>ارتباط-رمزي</target>
 
 <source>Full path</source>
 <target>المسار الكامل</target>
 
-<source>Name</source>
-<target>الاسم</target>
+<source>Relative path</source>
+<target></target>
 
-<source>Relative folder</source>
-<target>مجلد نسبي</target>
-
-<source>Base folder</source>
-<target>المجلد الأساسي (القاعدي)</target>
+<source>Item name</source>
+<target></target>
 
 <source>Size</source>
 <target>الحجم</target>
@@ -1100,6 +1097,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>الوقت المنقضي:</target>
 
+<source>Bytes:</source>
+<target></target>
+
+<source>Items:</source>
+<target></target>
+
 <source>Synchronizing...</source>
 <target>مزامنة...</target>
 
@@ -1264,6 +1267,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>يتوفر إصدار جديد من FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target></target>
 
 <source>Confirm</source>
 <target>تأكيد</target>
@@ -1566,17 +1572,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>دمج تطبيقات خارجية في قائمة السياق. تتوفر وحدات الماكرو التالية:</target>
 
-<source>- full file or folder name</source>
-<target>- اسم الملف أو المجلد كاملاً</target>
+<source>Full file or folder path</source>
+<target></target>
 
-<source>- folder part only</source>
-<target>- جزء مجلد فقط</target>
+<source>Parent folder path</source>
+<target></target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- النظير للجانب الآخر لـ  %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target></target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- االنظير للجانب الآخر لـ  %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target></target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>إظهار التنبيهات و نوافذ الحوار المخفية مرة ثانية؟</target>
@@ -1667,6 +1673,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Files</source>
 <target>ملفات</target>
+
+<source>Name</source>
+<target>الاسم</target>
 
 <source>Items</source>
 <target>عناصر</target>
@@ -1876,5 +1885,11 @@ This guarantees a consistent state even in case of a serious error.
 <target></target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target></target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
 <target></target>
 

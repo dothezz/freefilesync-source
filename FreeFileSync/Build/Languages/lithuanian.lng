@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nepavyksta rasti šių aplankų:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Jeigu ignoruosite šią klaidą aplankas bus laikomas tuščiu. Trūkstami aplankai, kai reikės bus sukurti.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Jei nebus paisoma šios klaidos, aplankams bus laikomas tusčiu. Trūkstami aplankai sukuriami automatiškai.</target>
 
 <source>A folder input field is empty.</source>
 <target>Aplanko įvesties laukas yra tuščias.</target>
@@ -155,10 +155,10 @@
 <target>Apsauginė failo kopija</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Įjungta</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Išjungta</target>
 
 <source>Copy locked files</source>
 <target>Kopijuoti užrakintus failus</target>
@@ -167,22 +167,22 @@
 <target>Kopijuoti failo leidimus</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Failo laiko nuokrypis</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Pasibaigė skirtas laikas aplankui pasiekti</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Vykdyti kaip aukštesnio prioriteto poprograme</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Suvienodinimo metu užrakinti aplankus</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Patikrinti nukopijuotus failus</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Naudoti nepradinius globalius parametrus:</target>
 
 <source>Starting comparison</source>
 <target>Pradedamas palyginimas</target>
@@ -325,7 +325,7 @@ Esamas: %y baitai
 <target>Klaidos kodas %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Nepavyko prisijungti prie %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +442,7 @@ Esamas: %y baitai
 <target>Duomenų Šešėlinės Kopijos Paslauga nepasiekiama.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Norėdami sukurti sistemos šešėlinę kopiją, prašome baudoti 64-bitų FreeFileSync versiją.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Vietos vardo %x nustatyti nepavyko.</target>
@@ -644,8 +644,8 @@ Komanda inicijuojama jei:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Šie elementai turi neišspręstų konfliktų ir nebus suvienodinti:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Sekantys aplankai yra su žyniais skirtumais. Įsitikinkite, kad pasirinkote suvienodinimui teisingus aplankus.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Sekantys aplankai turi ryškius skirtumus. Prašome patikrinti, ar tikrai teisingi aplankai yra pasirinkti suvienodinimui.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nepakanka laisvos disko vietos:</target>
@@ -726,23 +726,20 @@ Komanda inicijuojama jei:
 <source>Serious Error</source>
 <target>Rimta klaida</target>
 
-<source>Symlink</source>
-<target>Simbolinė nuoroda</target>
-
 <source>Folder</source>
 <target>Aplankas</target>
+
+<source>Symlink</source>
+<target>Simbolinė nuoroda</target>
 
 <source>Full path</source>
 <target>Pilnas kelias</target>
 
-<source>Name</source>
-<target>Pavadinimas</target>
+<source>Relative path</source>
+<target>Santykinis kelias</target>
 
-<source>Relative folder</source>
-<target>Aplanai</target>
-
-<source>Base folder</source>
-<target>Pasirinktas aplankas</target>
+<source>Item name</source>
+<target>Elemento pavadinimas</target>
 
 <source>Size</source>
 <target>Dydis</target>
@@ -919,7 +916,7 @@ Komanda inicijuojama jei:
 <target>Aplanko pora:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Pagrindiniai parametrai:</target>
 
 <source>Use local settings:</source>
 <target>Naudoti vietinius nustatymus:</target>
@@ -1088,6 +1085,12 @@ Komanda inicijuojama jei:
 <source>Time elapsed:</source>
 <target>Praėjęs laikas:</target>
 
+<source>Bytes:</source>
+<target>Baitai:</target>
+
+<source>Items:</source>
+<target>Elementai:</target>
+
 <source>Synchronizing...</source>
 <target>Suvienodinama...</target>
 
@@ -1252,6 +1255,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Yra nauja FreeFileSync versija:</target>
+
+<source>Local path not available for %x.</source>
+<target>Nerastas %x vietinis kelias.</target>
 
 <source>Confirm</source>
 <target>Patvirtinti</target>
@@ -1533,17 +1539,17 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integruoti išorines programas į kontekstinį meniu. Sekantys makro galimi:</target>
 
-<source>- full file or folder name</source>
-<target>- pilnas failo ar aplanko pavadinimas</target>
+<source>Full file or folder path</source>
+<target>Pilnas failų ir aplankų kelias</target>
 
-<source>- folder part only</source>
-<target>- tik aplanko dalis</target>
+<source>Parent folder path</source>
+<target>Pirminio aplanko kelias</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Kitos pusės atitikmuo %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Laikina kopija saugoti SFTP ir MTP</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Kitos pusės atitikmuo %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parametrai priešingai pusei</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Ar vėl rodyti visus paslėptus dialogo langus ir įspėjamuosius pranešimus?</target>
@@ -1635,6 +1641,9 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <source>Files</source>
 <target>Failai</target>
 
+<source>Name</source>
+<target>Pavadinimas</target>
+
 <source>Items</source>
 <target>Pozicijos</target>
 
@@ -1651,13 +1660,13 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>FreeFileSync yra naujausia.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Negalima surasti dabartinės FreeFileSync versijos internete. Galgūt yra nauja versija. Ar patikrinti dabar rankiniu būdu?</target>
 
 <source>&Check</source>
 <target>&Tikrinti</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Nuoseklumo patikrinimas neįvyko %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nepavyksta rasti sisteminės funkcijos %x.</target>
@@ -1666,7 +1675,7 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Nepavyko aktyvuoti sisteminių žinučių gavimo funkciją.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Įdiegimo failas yra pažeistas. Prašome įdiegti FreeFileSync išnaujo.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepavyko priregistruoti %x įrenginio pranešimų.</target>
@@ -1831,8 +1840,14 @@ Tai garantuos pastovią buseną, netgi įvykus rimtai klaidai.
 <target>Ačių už jūsų aukas ir palaikymą!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ši donorų FreeFileSync diegimo programa	pasiekė dienos įdiegimo limitą.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Parsisiųsti iš pagrindinio puslapio standartinę FreeFileSync versiją?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Nešiojama versija negali būti įdiegta į pasirinktą aplanką.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Prašome pasirinkti vietinio įdiegimo metodą arba pakeiskite aplaką.</target>
 

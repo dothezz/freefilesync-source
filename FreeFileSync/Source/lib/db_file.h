@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef DB_FILE_H_834275398588021574
 #define DB_FILE_H_834275398588021574
@@ -65,9 +65,9 @@ struct InSyncFolder
     InSyncStatus status;
 
     //------------------------------------------------------------------
-    typedef std::map<Zstring, InSyncFolder,  LessFilePath> FolderList;  //
-    typedef std::map<Zstring, InSyncFile,    LessFilePath> FileList;    // key: file name
-    typedef std::map<Zstring, InSyncSymlink, LessFilePath> SymlinkList; //
+    using FolderList  = std::map<Zstring, InSyncFolder,  LessFilePath>; //
+    using FileList    = std::map<Zstring, InSyncFile,    LessFilePath>; // key: file name
+    using SymlinkList = std::map<Zstring, InSyncSymlink, LessFilePath>; //
     //------------------------------------------------------------------
 
     FolderList  folders;

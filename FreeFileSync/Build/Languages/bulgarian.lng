@@ -8,10 +8,10 @@
 </header>
 
 <source>Both sides have changed since last synchronization.</source>
-<target>Двете страни са променени след последната синхронизация.</target>
+<target>Двете страни имат промени след последната синхронизация.</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Не може да се определи посоката на синхронизация:</target>
+<target>Не може да определи посоката на синхронизация:</target>
 
 <source>No change since last synchronization.</source>
 <target>Няма промени след последната синхронизация.</target>
@@ -20,46 +20,46 @@
 <target>Записът в базата данни не е синхронизиран по текущите настройки.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Задават се подразбирани посоки на синхронизация: старите файлове ще се заменят с по-нови.</target>
+<target>Задава подразбирани посоки на синхронизация: старите файлове ще се заменят с по-нови.</target>
 
 <source>Creating folder %x</source>
-<target>Създава се папка %x</target>
+<target>Създава папка %x</target>
 
 <source>Creating file %x</source>
-<target>Създава се файл %x</target>
+<target>Създава файл %x</target>
 
 <source>Creating symbolic link %x</source>
-<target>Създава се символна връзка %x</target>
+<target>Създава символна връзка %x</target>
 
 <source>Moving file %x to the recycle bin</source>
-<target>Файл %x се премества в кошчето</target>
+<target>Премества в кошчето файл %x</target>
 
 <source>Moving folder %x to the recycle bin</source>
-<target>Папка %x се премества в кошчето</target>
+<target>Премества в кошчето папка %x</target>
 
 <source>Moving symbolic link %x to the recycle bin</source>
-<target>Символна връзка %x се премества в кошчето</target>
+<target>Премества в кошчето символна връзка %x</target>
 
 <source>Deleting file %x</source>
-<target>Изтрива се файл %x</target>
+<target>Изтрива файл %x</target>
 
 <source>Deleting folder %x</source>
-<target>Изтрива се папка %x</target>
+<target>Изтрива папка %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target>Изтрива се символна връзка %x</target>
+<target>Изтрива символна връзка %x</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target>Проверява се достъпността на кошчето за папка %x...</target>
+<target>Проверява достъпността на кошчето за папка %x...</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Кошчето е недостъпно за следните папки. Вместо това файловете ще бъдат необратимо изтрити:</target>
+<target>Кошчето е недостъпно за следните папки. Вместо това ще изтрие необратимо файловете:</target>
 
 <source>An exception occurred</source>
-<target>Получи се изключение</target>
+<target>Възникна изключение</target>
 
 <source>A directory path is expected after %x.</source>
-<target>Очаква се път до директорията след %x.</target>
+<target>Очаква път до директорията след %x.</target>
 
 <source>Syntax error</source>
 <target>Синтактична грешка</target>
@@ -77,7 +77,7 @@
 <target>Зададен е нееднакъв брой директории отляво и отдясно.</target>
 
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target>Конфигурационният файл не може да съдържа настройки на ниво двойка директории, ако директориите се задават от команден ред.</target>
+<target>Конфигурационният файл не може да съдържа настройки на ниво двойка директории, ако директории се задават от команден ред.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
 <target>Не може да се задават директории за повече от един конфигурационен файл.</target>
@@ -101,7 +101,7 @@
 <target>Път до алтернативен файл GlobalSettings.xml.</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>Произволен брой конфигурационни файлове .ffs_gui и/или .ffs_batch за FreeFileSync.</target>
+<target>Произволен брой FreeFileSync-конфигурационни-файлове .ffs_gui и/или .ffs_batch.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Произволен брой алтернативни двойки директории за най-много един конфигурационен файл.</target>
@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Не са намерени следните папки:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Ако игнорирате тази грешка, папките ще се считат празни. Липсващи папки се създават автоматично при нужда.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ако тази грешка се игнорира, папките се считат празни. Липсващи папки се създават автоматично при нужда.</target>
 
 <source>A folder input field is empty.</source>
 <target>Полето за въведена папка е празно.</target>
@@ -122,7 +122,7 @@
 <target>Съответната папка ще се счита празна.</target>
 
 <source>The following folder paths are dependent from each other:</source>
-<target>Пътищата до следните папки са взаимно зависими:</target>
+<target>Пътищата до следните папки са взаимозависими:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Файл %x има невалидна дата.</target>
@@ -137,28 +137,28 @@
 <target>Размер:</target>
 
 <source>Content comparison was skipped for excluded files %x.</source>
-<target>Беше прескочено сравняване на съдържанието за изключените файлове %x.</target>
+<target>Прескочено е сравняването на съдържанието за изключените файлове %x.</target>
 
 <source>Items differ in attributes only</source>
 <target>Елементите се различават само по атрибути</target>
 
 <source>Resolving symbolic link %x</source>
-<target>Проследява се символна връзка %x</target>
+<target>Проследява символна връзка %x</target>
 
 <source>Comparing content of files %x</source>
-<target>Сравнява се съдържанието на файловете %x</target>
+<target>Сравнява съдържанието на файловете %x</target>
 
 <source>Generating file list...</source>
-<target>Създава се списък на файловете...</target>
+<target>Създава списък на файловете...</target>
 
 <source>Fail-safe file copy</source>
 <target>Надеждно копиране на файлове</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Активирано</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Неактивирано</target>
 
 <source>Copy locked files</source>
 <target>Копирай заключени файлове</target>
@@ -167,28 +167,28 @@
 <target>Копирай правата за достъп на файла</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Толеранс на файловото време</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Време за достъп до папката</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Изпълнявай с фонов приоритет</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Заключи директориите по време на синхронизация</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Верифицирай копираните файлове</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Използва нестандартни глобални настройки:</target>
 
 <source>Starting comparison</source>
 <target>Започва сравняване</target>
 
 <source>Calculating sync directions...</source>
-<target>Пресмятат се посоките на синхронизация...</target>
+<target>Пресмята посоките на синхронизация...</target>
 
 <source>Out of memory.</source>
 <target>Недостатъчна памет.</target>
@@ -248,13 +248,13 @@
 <target>Актуализирай атрибутите на десния елемент</target>
 
 <source>Cannot write permissions of %x.</source>
-<target>Не могат да се запишат правата за достъп на %x.</target>
+<target>Не може да запише правата за достъп на %x.</target>
 
 <source>Operation not supported for different base folder types.</source>
 <target>Операцията не се поддържа за различни типове основни папки.</target>
 
 <source>Cannot write file %x.</source>
-<target>Не може да се запише файл %x.</target>
+<target>Не може да запише файл %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -268,55 +268,55 @@ Actual: %y bytes
 </target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>Не може да се копира символната връзка %x в %y.</target>
+<target>Не може да копира символната връзка %x в %y.</target>
 
 <source>Cannot move file %x to %y.</source>
-<target>Не може да се премести файл %x в %y.</target>
+<target>Не може да премести файл %x в %y.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>Не може да се прочете директория %x.</target>
+<target>Не може да прочете директория %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>Не могат да се прочетат атрибутите на файл %x.</target>
+<target>Не може да прочете атрибутите на файл %x.</target>
 
 <source>Cannot find %x.</source>
 <target>Не е намерен %x.</target>
 
 <source>Cannot open file %x.</source>
-<target>Не може да се отвори файл %x.</target>
+<target>Не може да отвори файл %x.</target>
 
 <source>Cannot read file %x.</source>
-<target>Не може да се прочете файл %x.</target>
+<target>Не може да прочете файл %x.</target>
 
 <source>Cannot find device %x.</source>
 <target>Не е намерено устройство %x.</target>
 
 <source>Cannot create directory %x.</source>
-<target>Не може да се създаде директория %x.</target>
+<target>Не може да създаде директория %x.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>Не може да се изтрие директория %x.</target>
+<target>Не може да изтрие директория %x.</target>
 
 <source>Cannot delete file %x.</source>
-<target>Не може да се изтрие файл %x.</target>
+<target>Не може да изтрие файл %x.</target>
 
 <source>Cannot write modification time of %x.</source>
-<target>Не може да се запише времето на промяна на %x.</target>
+<target>Не може да запише времето на промяна на %x.</target>
 
 <source>Cannot determine final path for %x.</source>
-<target>Не може да се определи крайния път за %x.</target>
+<target>Не може да определи крайния път за %x.</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Не може да се проследи символната връзка %x.</target>
+<target>Не може да проследи символната връзка %x.</target>
 
 <source>Cannot open directory %x.</source>
-<target>Не може да се отвори директория %x.</target>
+<target>Не може да отвори директория %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
-<target>Не може да се определи свободното дисково пространство за %x.</target>
+<target>Не може да определи свободното дисково пространство за %x.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
-<target>Не може да се премести %x в кошчето.</target>
+<target>Не може да премести %x в кошчето.</target>
 
 <source>Incorrect command line:</source>
 <target>Невалиден команден ред:</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>Код на грешка %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Не може да се свърже към %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -346,7 +346,7 @@ Actual: %y bytes
 <target>%x ГБ</target>
 
 <source>Cannot load file %x.</source>
-<target>Не може да се зареди файл %x.</target>
+<target>Не може да зареди файл %x.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Файлът с база данни %x е несъвместим.</target>
@@ -364,16 +364,16 @@ Actual: %y bytes
 <target>Файловете с бази данни не споделят обща сесия.</target>
 
 <source>Searching for folder %x...</source>
-<target>Търсене на папка %x...</target>
+<target>Търси папка %x...</target>
 
 <source>Timeout while searching for folder %x.</source>
 <target>Изтекло време за търсене на папка %x.</target>
 
 <source>Cannot get process information.</source>
-<target>Не може да се получи информация за процеса.</target>
+<target>Не може да получи информация за процеса.</target>
 
 <source>Waiting while directory is locked:</source>
-<target>Изчаква се, докато е заключена директорията:</target>
+<target>Изчаква, докато е заключена директорията:</target>
 
 <source>Lock owner:</source>
 <target>Притежател на заключването:</target>
@@ -388,10 +388,10 @@ Actual: %y bytes
 </target>
 
 <source>Detecting abandoned lock...</source>
-<target>Откриване на изоставено заключване...</target>
+<target>Намира изоставено заключване...</target>
 
 <source>Saving file %x...</source>
-<target>Запазва се файл %x...</target>
+<target>Запазва файл %x...</target>
 
 <source>Items processed:</source>
 <target>Обработени елементи:</target>
@@ -406,7 +406,7 @@ Actual: %y bytes
 <target>Грешка при анализ на файл %x, ред %y, колона %z.</target>
 
 <source>Cannot set directory lock for %x.</source>
-<target>Не може да се заключи директорията за %x.</target>
+<target>Не може да заключи директорията за %x.</target>
 
 <source>
 <pluralform>1 thread</pluralform>
@@ -418,7 +418,7 @@ Actual: %y bytes
 </target>
 
 <source>Scanning:</source>
-<target>Търсят се файлове:</target>
+<target>Търси файлове:</target>
 
 <source>/sec</source>
 <target>/сек.</target>
@@ -436,22 +436,22 @@ Actual: %y bytes
 <target>Преглед на директорията</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>Не може да се получи достъп до услуга Volume Shadow Copy.</target>
+<target>Не може да получи достъп до услуга Volume Shadow Copy.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Моля, ползвайте 64-битова FreeFileSync-версия за създаване на shadow-копия на тази система.</target>
 
 <source>Cannot determine volume name for %x.</source>
-<target>Не може да се определи името на тома за %x.</target>
+<target>Не може да определи името на тома за %x.</target>
 
 <source>Volume name %x is not part of file path %y.</source>
 <target>Името на тома %x не е част от пътя до файла %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
-<target>Заявка за стоп: изчаква се завършване на текущата операция...</target>
+<target>Заявка за стоп: изчаква завършване на текущата операция...</target>
 
 <source>Unable to create time stamp for versioning:</source>
-<target>Не може да се отбележи времето на версификация:</target>
+<target>Не може да отбележи времето на версификация:</target>
 
 <source>Drag && drop</source>
 <target>Влачете и пуснете</target>
@@ -496,7 +496,7 @@ Actual: %y bytes
 <target>3. Натиснете 'Старт'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>За стартиране просто импортирайте файл .ffs_batch.</target>
+<target>За старт просто импортирайте файл .ffs_batch.</target>
 
 <source>Folders to watch:</source>
 <target>Папки за следене:</target>
@@ -537,7 +537,7 @@ The command is triggered if:
 <target>Относно</target>
 
 <source>Build: %x</source>
-<target>Вариант: %x</target>
+<target>Версия: %x</target>
 
 <source>All files</source>
 <target>Всички файлове</target>
@@ -552,7 +552,7 @@ The command is triggered if:
 <target>Следенето на директории е активирано</target>
 
 <source>Waiting until all directories are available...</source>
-<target>Изчаква се достъпност на всички директории...</target>
+<target>Изчаква достъпност на всички директории...</target>
 
 <source>&Restore</source>
 <target>Въ&зстановяване</target>
@@ -582,7 +582,7 @@ The command is triggered if:
 <target>Огледална</target>
 
 <source>Update</source>
-<target>Актуализиране</target>
+<target>Актуализация</target>
 
 <source>Custom</source>
 <target>По избор</target>
@@ -615,7 +615,7 @@ The command is triggered if:
 <target>Актуализира атрибутите на %x</target>
 
 <source>Cannot write file attributes of %x.</source>
-<target>Не могат да се запишат файловите атрибути на %x.</target>
+<target>Не може да запише файловите атрибути на %x.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x и %y имат различно съдържание.</target>
@@ -641,8 +641,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следните елементи имат нерешени конфликти и няма да бъдат синхронизирани:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Следните папки са съществено различни. Уверете се, че сте избрали точните папки за синхронизация.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Следните папки са съществено различни. Моля, проверете дали са избрани верните папки за синхронизация.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Недостатъчно свободно дисково пространство в:</target>
@@ -654,13 +654,13 @@ The command is triggered if:
 <target>Налично:</target>
 
 <source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Много двойки папки записват в обща подпапка. Моля, проверете конфигурацията.</target>
+<target>Много двойки папки записват в обща под-папка. Моля, проверете конфигурацията.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизация на двойка папки:</target>
 
 <source>Generating database...</source>
-<target>Създава се база данни...</target>
+<target>Създава база данни...</target>
 
 <source>job name</source>
 <target>име на задачата</target>
@@ -687,10 +687,10 @@ The command is triggered if:
 <target>Синхронизацията завърши успешно</target>
 
 <source>Cleaning up old log files...</source>
-<target>Изчистват се старите log-файлове...</target>
+<target>Изчиства старите log-файлове...</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
-<target>За решение на този проблем може да превключите на главното меню на FreeFileSync.</target>
+<target>За решение на този проблем идете на главното меню на FreeFileSync.</target>
 
 <source>&Don't show this warning again</source>
 <target>Не показвай ве&че това предупреждение</target>
@@ -702,7 +702,7 @@ The command is triggered if:
 <target>Превкл&ючи</target>
 
 <source>Switching to FreeFileSync's main window</source>
-<target>Превключване към главното меню на FreeFileSync</target>
+<target>Иди на главното меню на FreeFileSync</target>
 
 <source>
 <pluralform>Automatic retry in 1 second...</pluralform>
@@ -717,28 +717,25 @@ The command is triggered if:
 <target>Игнорирай сле&дващите грешки</target>
 
 <source>Retrying operation...</source>
-<target>Повтаря се операцията...</target>
+<target>Повтаря операцията...</target>
 
 <source>Serious Error</source>
 <target>Сериозна грешка</target>
 
-<source>Symlink</source>
-<target>Символна връзка</target>
-
 <source>Folder</source>
 <target>Папка</target>
+
+<source>Symlink</source>
+<target>Символна връзка</target>
 
 <source>Full path</source>
 <target>Пълен път</target>
 
-<source>Name</source>
-<target>Име</target>
+<source>Relative path</source>
+<target>Относителен път</target>
 
-<source>Relative folder</source>
-<target>Относителна папка</target>
-
-<source>Base folder</source>
-<target>Основна папка</target>
+<source>Item name</source>
+<target>Име на елемента</target>
 
 <source>Size</source>
 <target>Размер</target>
@@ -849,7 +846,7 @@ The command is triggered if:
 <target>&Веднага</target>
 
 <source>Check &automatically once a week</source>
-<target>&Автоматично веднъж седмично</target>
+<target>Веднъж седмично &автоматично</target>
 
 <source>Cancel</source>
 <target>Отказ</target>
@@ -891,10 +888,10 @@ The command is triggered if:
 <target>Запази като...</target>
 
 <source>View type:</source>
-<target>Изберете тип:</target>
+<target>Тип на изгледа:</target>
 
 <source>Select view:</source>
-<target>Изберете показване:</target>
+<target>Избор на изгледа:</target>
 
 <source>Statistics:</source>
 <target>Статистика:</target>
@@ -915,7 +912,7 @@ The command is triggered if:
 <target>Двойка папки:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Главни настройки:</target>
 
 <source>Use local settings:</source>
 <target>Ползвай локални настройки:</target>
@@ -972,7 +969,7 @@ The command is triggered if:
 <target>Максимум:</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Изберете филтърни правила за изключване на някои файлове от синхронизация. Въведете относителни файлови пътища към съответните двойки папки.</target>
+<target>Изберете филтърни правила за изключване някои файлове от синхронизация. Въведете относителни файлови пътища към съответните двойки папки.</target>
 
 <source>C&lear</source>
 <target>И&зчисти</target>
@@ -1067,7 +1064,7 @@ The command is triggered if:
 <target>Изберете папка</target>
 
 <source>Start synchronization now?</source>
-<target>Старт на синхронизация веднага?</target>
+<target>Почни синхронизация веднага?</target>
 
 <source>Variant:</source>
 <target>Вариант:</target>
@@ -1083,6 +1080,12 @@ The command is triggered if:
 
 <source>Time elapsed:</source>
 <target>Изминало време:</target>
+
+<source>Bytes:</source>
+<target>Байтове:</target>
+
+<source>Items:</source>
+<target>Елементи:</target>
 
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>
@@ -1133,7 +1136,7 @@ The command is triggered if:
 <target>&Презапиши съществуващите файлове</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
-<target>Следните настройки се ползват от всички задачи за синхронизация.</target>
+<target>Всички задачи за синхронизация ползват следните настройки.</target>
 
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
@@ -1248,6 +1251,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Има нова версия на FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Не е наличен локален път за %x.</target>
 
 <source>Confirm</source>
 <target>Потвърждение</target>
@@ -1460,7 +1466,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Търсене на файлове...</target>
 
 <source>Comparing content...</source>
-<target>Сравняване съдържанието на файлове...</target>
+<target>Сравнява съдържанието на файлове...</target>
 
 <source>Completed</source>
 <target>Завършено</target>
@@ -1522,17 +1528,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Включи външни приложения в контекстното меню. Налични са следните макроси:</target>
 
-<source>- full file or folder name</source>
-<target>- пълно име на файла или папката</target>
+<source>Full file or folder path</source>
+<target>Пълен път до файла или папката</target>
 
-<source>- folder part only</source>
-<target>- само частта на папката</target>
+<source>Parent folder path</source>
+<target>Път до родителската папка</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- съответствие от другата страна на %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Временно локално копие за SFTP- и MTP-запазване</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- съответствие от другата страна на %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Параметри за срещуположната страна</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Да покажа ли пак скритите диалози и предупреждения?</target>
@@ -1541,13 +1547,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>&Покажи</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
-<target>Определяне на еднаквите файлове, сравнявайки времето на промяна и размера.</target>
+<target>Определяне на еднакви файлове, сравнявайки времето на промяна и размера.</target>
 
 <source>Identify equal files by comparing the file content.</source>
-<target>Определяне на еднаквите файлове, сравнявайки файловото съдържание.</target>
+<target>Определяне на еднакви файлове, сравнявайки файловото съдържание.</target>
 
 <source>Identify equal files by comparing their file size.</source>
-<target>Определяне на еднаквите файлове, сравнявайки файловия размер.</target>
+<target>Определяне на еднакви файлове, сравнявайки файловия размер.</target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Откриване и разпростиране на промените в двете страни. Изтривания, премествания и конфликти се откриват автоматично с база данни.</target>
@@ -1556,13 +1562,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>Създаване на огледално копие на лявата папка, привеждайки дясната папка в съответствие.</target>
 
 <source>Copy new and updated files to the right folder.</source>
-<target>Копиране на новите и актуализирани файлове към дясната папка.</target>
+<target>Копиране на нови и актуализирани файлове към дясната папка.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Създаване на собствени правила за синхронизация.</target>
 
 <source>Synchronization Settings</source>
-<target>Настройки на синхронизация</target>
+<target>Настройки за синхронизация</target>
 
 <source>Comparison</source>
 <target>Сравняване</target>
@@ -1624,6 +1630,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Файлове</target>
 
+<source>Name</source>
+<target>Име</target>
+
 <source>Items</source>
 <target>Елементи</target>
 
@@ -1640,13 +1649,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync вече е актуална.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Онлайн-номера на текущата FreeFileSync-версия не е открит. Изглежда има по-нова версия. Ще опитате ли ръчно сега?</target>
 
 <source>&Check</source>
 <target>Оп&итай</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Неуспешна проверка за съвместимост на %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Не е намерена системната функция %x.</target>
@@ -1655,37 +1664,37 @@ This guarantees a consistent state even in case of a serious error.
 <target>Невъзможна регистрация за получаване на системни съобщения.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Инсталационните файлове са повредени. Моля, преинсталирайте FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не се регистрират съобщенията на устройство %x.</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>Не може да се следи директория %x.</target>
+<target>Не може да следи директория %x.</target>
 
 <source>The file is locked by another process:</source>
 <target>Файлът е заключен от друг процес:</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Не може да се прочете контекста за сигурност на %x.</target>
+<target>Не може да прочете контекста за сигурност на %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>Не може да се запише контекста за сигурност на %x.</target>
+<target>Не може да запише контекста за сигурност на %x.</target>
 
 <source>Cannot read permissions of %x.</source>
-<target>Не могат да се прочетат правата за достъп на %x.</target>
+<target>Не може да прочете правата за достъп на %x.</target>
 
 <source>Cannot copy permissions from %x to %y.</source>
-<target>Не могат да се копират правата за достъп от %x в %y.</target>
+<target>Не може да копира правата за достъп от %x в %y.</target>
 
 <source>%x is not a regular directory name.</source>
 <target>%x не е регулярно име на директория.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>Не може да се копира файл %x в %y.</target>
+<target>Не може да копира файл %x в %y.</target>
 
 <source>Cannot copy attributes from %x to %y.</source>
-<target>Не могат да се копират атрибутите от %x в %y.</target>
+<target>Не може да копира атрибутите от %x в %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Типа на елемент %x не се поддържа:</target>
@@ -1724,19 +1733,19 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>Cannot set privilege %x.</source>
-<target>Привилегията %x не може да се зададе.</target>
+<target>Не може да зададе привилегията %x.</target>
 
 <source>Unable to suspend system sleep mode.</source>
-<target>Режима на заспиване на системата не може да се прекрати.</target>
+<target>Не може да прекрати режима на заспиване на системата.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>I/O-приоритета на процеса не може да се измени.</target>
+<target>Не може да промени I/O-приоритетите на процеса.</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
-<target>Проверката на кошчето за папка %x е неуспешна.</target>
+<target>Неуспешна проверка на кошчето за папка %x.</target>
 
 <source>The following XML elements could not be read:</source>
-<target>Следните XML-елементи не могат да се прочетат:</target>
+<target>Не могат да се прочетат следните XML-елементи:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Конфигурационният файл %x е непълен. Ще бъдат зададени подразбирани стойности за липсващите елементи.</target>
@@ -1817,8 +1826,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Благодарности за Вашите дарения и подкрепа!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Този FreeFileSync-инсталатор за донори изчерпа дневния си лимит за инсталации.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Сваляне на регулярната версия от страницата на FreeFileSync сега?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Преносимата версия не може да се инсталира в избраната папка.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Моля, изберете локален тип инсталация или пък друга папка за инсталация.</target>
 

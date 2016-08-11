@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "small_dlgs.h"
 #include <wx/wupdlock.h>
@@ -543,8 +543,8 @@ OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSet
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
                              L"%item_path%    \t" + _("Full file or folder path") + L"\n" +
                              L"%folder_path%  \t" + _("Parent folder path") + L"\n" +
-							 L"%local_path%   \t" + _("Temporary local copy for SFTP and MTP storage") + L"\n" +
-		                     L"\n" +
+                             L"%local_path%   \t" + _("Temporary local copy for SFTP and MTP storage") + L"\n" +
+                             L"\n" +
                              L"%item_path2%, %folder_path2%, %local_path2% \t" + _("Parameters for opposite side");
 
     m_gridCustomCommand->GetGridWindow()->SetToolTip(toolTip);

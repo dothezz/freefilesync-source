@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef FIXED_LIST_H_01238467085684139453534
 #define FIXED_LIST_H_01238467085684139453534
@@ -46,11 +46,11 @@ public:
         NodeT* it_;
     };
 
-    typedef T value_type;
-    typedef ListIterator<      Node,       T> iterator;
-    typedef ListIterator<const Node, const T> const_iterator;
-    typedef       T& reference;
-    typedef const T& const_reference;
+    using value_type      = T;
+    using iterator        = ListIterator<      Node,       T>;
+    using const_iterator  = ListIterator<const Node, const T>;
+    using reference       = T&;
+    using const_reference = const T&;
 
     iterator begin() { return firstInsert; }
     iterator end  () { return iterator(); }

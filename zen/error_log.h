@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef ERROR_LOG_H_8917590832147915
 #define ERROR_LOG_H_8917590832147915
@@ -26,7 +26,7 @@ enum MessageType
     TYPE_FATAL_ERROR = 0x8,
 };
 
-typedef Zbase<wchar_t> MsgString; //std::wstring may employ small string optimization: we cannot accept bloating the "ErrorLog::entries" memory block below (think 1 million items)
+using MsgString = Zbase<wchar_t>; //std::wstring may employ small string optimization: we cannot accept bloating the "ErrorLog::entries" memory block below (think 1 million items)
 
 struct LogEntry
 {
@@ -48,7 +48,7 @@ public:
     int getItemCount(int typeFilter = TYPE_INFO | TYPE_WARNING | TYPE_ERROR | TYPE_FATAL_ERROR) const;
 
     //subset of std::vector<> interface:
-    typedef std::vector<LogEntry>::const_iterator const_iterator;
+    using const_iterator = std::vector<LogEntry>::const_iterator;
     const_iterator begin() const { return entries.begin(); }
     const_iterator end  () const { return entries.end  (); }
     bool empty() const { return entries.empty(); }

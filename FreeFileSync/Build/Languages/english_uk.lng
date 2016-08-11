@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</target>
 
 <source>A folder input field is empty.</source>
 <target>A folder input field is empty.</target>
@@ -155,10 +155,10 @@
 <target>Fail-safe file copy</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Enabled</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Disabled</target>
 
 <source>Copy locked files</source>
 <target>Copy locked files</target>
@@ -167,22 +167,22 @@
 <target>Copy file access permissions</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>File time tolerance</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Folder access timeout</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Run with background priority</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Lock directories during sync</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Verify copied files</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Using non-default global settings:</target>
 
 <source>Starting comparison</source>
 <target>Starting comparison</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>Error Code %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Unable to connect to %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -439,7 +439,7 @@ Actual: %y bytes
 <target>Cannot access the Volume Shadow Copy Service.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Cannot determine volume name for %x.</target>
@@ -641,8 +641,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>The following items have unresolved conflicts and will not be synchronised:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>The following folders are significantly different. Make sure you have selected the correct folders for synchronisation.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>The following folders are significantly different. Please check that the correct folders are selected for synchronisation.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Not enough free disk space available in:</target>
@@ -722,23 +722,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Serious Error</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Folder</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Full path</target>
 
-<source>Name</source>
-<target>Name</target>
+<source>Relative path</source>
+<target>Relative path</target>
 
-<source>Relative folder</source>
-<target>Relative folder</target>
-
-<source>Base folder</source>
-<target>Base folder</target>
+<source>Item name</source>
+<target>Item name</target>
 
 <source>Size</source>
 <target>Size</target>
@@ -915,7 +912,7 @@ The command is triggered if:
 <target>Folder pair:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Main settings:</target>
 
 <source>Use local settings:</source>
 <target>Use local settings:</target>
@@ -1084,6 +1081,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Time elapsed:</target>
 
+<source>Bytes:</source>
+<target>Bytes:</target>
+
+<source>Items:</source>
+<target>Items:</target>
+
 <source>Synchronizing...</source>
 <target>Synchronising...</target>
 
@@ -1248,6 +1251,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>A new version of FreeFileSync is available:</target>
+
+<source>Local path not available for %x.</source>
+<target>Local path not available for %x.</target>
 
 <source>Confirm</source>
 <target>Confirm</target>
@@ -1522,17 +1528,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrate external applications into context menu. The following macros are available:</target>
 
-<source>- full file or folder name</source>
-<target>- full file or folder name</target>
+<source>Full file or folder path</source>
+<target>Full file or folder path</target>
 
-<source>- folder part only</source>
-<target>- folder part only</target>
+<source>Parent folder path</source>
+<target>Parent folder path</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Other side's counterpart to %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Temporary local copy for SFTP and MTP storage</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Other side's counterpart to %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parameters for opposite side</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Show hidden dialogues and warning messages again?</target>
@@ -1624,6 +1630,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Files</target>
 
+<source>Name</source>
+<target>Name</target>
+
 <source>Items</source>
 <target>Items</target>
 
@@ -1640,13 +1649,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync is up to date.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</target>
 
 <source>&Check</source>
 <target>&Check</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Consistency check failed for %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Cannot find system function %x.</target>
@@ -1655,7 +1664,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Unable to register to receive system messages.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Installation files are corrupt. Please reinstall FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Unable to register device notifications for %x.</target>
@@ -1817,8 +1826,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Thanks for your donation and support!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>This FreeFileSync installer for donors has reached its daily installation limit.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Download the regular version from the FreeFileSync homepage now?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>The portable version cannot install into the selected folder.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Please choose the local installation type or select a different folder for installation.</target>
 

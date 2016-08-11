@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "icon_buffer.h"
 #include <map>
@@ -187,11 +187,11 @@ private:
     struct IconData;
 
 #ifdef __clang__ //workaround libc++ limitation for incomplete types: http://llvm.org/bugs/show_bug.cgi?id=17701
-    typedef std::map<AbstractPath, std::unique_ptr<IconData>, AFS::LessAbstractPath> FileIconMap;
+    using FileIconMap = std::map<AbstractPath, std::unique_ptr<IconData>, AFS::LessAbstractPath>;
     static IconData& refData(FileIconMap::iterator it) { return *(it->second); }
     static std::unique_ptr<IconData> makeValueObject() { return std::make_unique<IconData>(); }
 #else
-    typedef std::map<AbstractPath, IconData, AFS::LessAbstractPath> FileIconMap;
+    using FileIconMap = std::map<AbstractPath, IconData, AFS::LessAbstractPath>;
     IconData& refData(FileIconMap::iterator it) { return it->second; }
     static IconData makeValueObject() { return IconData(); }
 #endif

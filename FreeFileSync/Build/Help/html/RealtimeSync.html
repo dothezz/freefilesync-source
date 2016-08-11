@@ -15,8 +15,8 @@
 	<p>
 		The primary purpose of RealTimeSync is to execute a command line each time it <b>detects changes</b> in one of the monitored directories
 		or when a <b>directory becomes available</b> (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.
+		<br><br>
 	</p>
-	<br>
 	
 	<h2>Example: <span style="font-weight:normal">Real time synchronization - in combination with FreeFileSync</span></h2>
 	<p>
@@ -31,7 +31,7 @@
 	</div>
 	<br>
 
-	<div class="box-outer"><div class="bluebox"><div class="box-inner">
+	<div class="bluebox">
 		<b>Note</b>
 		<ul style="margin: 0">
 			<li>The command should <b>not</b> <b>block</b> progress. If you call a FreeFileSync batch job, make 
@@ -47,8 +47,7 @@
 	
 			<li>RealTimeSync is not tied to starting FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
 		</ul>
-	</div></div></div>
-	<br>
+	</div>
 	<br>
 
 	<h2>Example: <span style="font-weight:normal">Automatic synchronization when a USB stick is inserted</span></h2>
@@ -71,18 +70,17 @@
 		on the stick. RealTimeSync will also trigger each time files are modified in <span class="file-path">H:\Data</span>.
 	</p>
 
-	<div class="box-outer"><div class="bluebox"><div class="box-inner">
+	<div class="bluebox">
 		<b>Note</b><br>	
 		The full path of the last changed file and the action that triggered the
 		change notification (create, update or delete) are written
 		to the environment variables <b><span class="command-line">%change_path%</span></b> and <b><span class="command-line">%change_action%</span></b>.
-	</div></div></div>	
-	<br>
+	</div>
 	<br>
 
 	<h2>Example: <span style="font-weight:normal">Log names of changed files and directories (Windows)</span></h2>
 	<p>
-		<div class="box-outer"><div class="greybox"><div class="box-inner">
+		<div class="greybox">
 			Show which file or directory has triggered a change. Enter command line:<br>			
 			<div class="command-line">
 				&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &amp; pause
@@ -91,19 +89,18 @@
 			
 			Write a list of all changes to a log file:<br>			
 			<div class="command-line">
-				&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &gt;&gt; %UserProfile%\Desktop\log.txt
+				&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &gt;&gt; %csidl_Desktop%\log.txt
 			</div>
-		</div></div></div>	
+		</div>
 	</p>
 
-	<div class="box-outer"><div class="bluebox"><div class="box-inner">
+	<div class="bluebox">
 		<b>Note</b><br>
 		When RealTimeSync executes a Windows batch file (bat or cmd) a black console window is shown. You can hide it using the Visual Basic script
 		<span class="file-path">HideConsole.vbs</span> located in FreeFileSync's installation directory:
 		<br><br>
 		<div class="command-line">wscript &quot;C:\Program files\FreeFileSync\HideConsole.vbs&quot; C:\MyBatchFile.cmd</div>
-	</div></div></div>
-	<br>
+	</div>
 	<br>
 
 	<h2>Limitations:</h2>

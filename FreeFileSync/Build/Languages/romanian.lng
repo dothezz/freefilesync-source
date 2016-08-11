@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Dacă ignori această eroare, dosarele lipsă vor fi considerate goale. Dosarele lipsă vor fi create automat la nevoie.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Dacă această eroare este ignorată, dosarele lipsă vor fi considerate goale. Dosarele lipsă vor fi create automat la nevoie.</target>
 
 <source>A folder input field is empty.</source>
 <target>Un cîmp de introducere a dosarului este gol.</target>
@@ -155,10 +155,10 @@
 <target>Copiază filele în modul protejat la eșec [fail-safe]</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Activat</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Dezactivat</target>
 
 <source>Copy locked files</source>
 <target>Copiază filele partajate [shared] sau zăvorîte [locked]</target>
@@ -167,22 +167,22 @@
 <target>Copiază permisiunile de acces ale filelor</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Toleranța timpului filei</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Expirarea accesului la dosar</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Rulează cu prioritate de fundal [background]</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Zăvorăște [lock] dosarele în timpul sincronizării</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Verifică filele copiate</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Folosirea de setări globale non-implicite:</target>
 
 <source>Starting comparison</source>
 <target>Pornesc compararea</target>
@@ -273,6 +273,12 @@ Actuală: %y baiți
 <source>Cannot move file %x to %y.</source>
 <target>Nu pot muta fila %x în %y.</target>
 
+<source>Unable to connect to %x.</source>
+<target>Nu mă pot conecta la %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Nu pot deschide dosarul %x.</target>
+
 <source>Cannot enumerate directory %x.</source>
 <target>Nu pot enumera dosarul %x.</target>
 
@@ -309,9 +315,6 @@ Actuală: %y baiți
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nu pot rezolva legătura simbolică %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Nu pot deschide dosarul %x.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Nu pot determina spațiul liber de stocare pentru %x.</target>
 
@@ -320,12 +323,6 @@ Actuală: %y baiți
 
 <source>Incorrect command line:</source>
 <target>Linie de comandă incorectă:</target>
-
-<source>Error Code %x:</source>
-<target>Cod de Eroare %x:</target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +439,7 @@ Actuală: %y baiți
 <target>Nu pot accesa Serviciul de Conservare a Volumelor [Volume Shadow Copy].</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Folosește versiunea pe 64-biți a FreeFileSync pentru a crea conservări (copii de rezervă) pe acest sistem.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Nu pot determina numele volumului pentru %x.</target>
@@ -644,7 +641,7 @@ Comanda este declanșată dacă:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Există conflicte nerezolvate la elementele listate mai jos, deci ele nu vor fi sincronizate:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
 <target>Dosarele următoare au diferențe semnificative. Asigură-te că ai selectat dosarele corecte pentru sincronizare.</target>
 
 <source>Not enough free disk space available in:</source>
@@ -726,23 +723,20 @@ Comanda este declanșată dacă:
 <source>Serious Error</source>
 <target>Eroare Serioasă</target>
 
-<source>Symlink</source>
-<target>Simlegătură</target>
-
 <source>Folder</source>
 <target>Dosar</target>
+
+<source>Symlink</source>
+<target>Simlegătură</target>
 
 <source>Full path</source>
 <target>Cale Completă</target>
 
-<source>Name</source>
-<target>Nume</target>
+<source>Relative path</source>
+<target>Calea Relativă</target>
 
-<source>Relative folder</source>
-<target>Dosar Relativ</target>
-
-<source>Base folder</source>
-<target>Dosar Bază (Rădăcină)</target>
+<source>Item name</source>
+<target>Numele Elementului</target>
 
 <source>Size</source>
 <target>Mărime</target>
@@ -919,7 +913,7 @@ Comanda este declanșată dacă:
 <target>Perechea de Dosare:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Setările Principale:</target>
 
 <source>Use local settings:</source>
 <target>Folosește setările locale:</target>
@@ -1088,6 +1082,12 @@ Comanda este declanșată dacă:
 <source>Time elapsed:</source>
 <target>Timp Scurs:</target>
 
+<source>Bytes:</source>
+<target>Baiți:</target>
+
+<source>Items:</source>
+<target>Elemente:</target>
+
 <source>Synchronizing...</source>
 <target>Sincronizare Aflată în Curs...</target>
 
@@ -1251,7 +1251,10 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>&Descarcă</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target></target>
+<target>Este disponibilă o versiune nouă de FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Calea locală nu este disponibilă pentru %x.</target>
 
 <source>Confirm</source>
 <target>Confirmă</target>
@@ -1533,17 +1536,17 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Comenzi pentru aplicații externe incluse în meniul contextual al softului. Sînt disponibile următoarele macrocomenzi:</target>
 
-<source>- full file or folder name</source>
-<target>- numele complet al filei sau dosarului</target>
+<source>Full file or folder path</source>
+<target>Calea completă a filei sau dosarului</target>
 
-<source>- folder part only</source>
-<target>- doar pentru partea dosarului</target>
+<source>Parent folder path</source>
+<target>Calea dosarului părinte</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- corespondentul din partea opusă al lui %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Copie locală temporară pentru stocarea SFTP sau MTP</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- corespondentul din partea opusă al lui %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parametrii pentru partea opusă</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Arăt din nou dialogurile și mesajele de eroare ascunse?</target>
@@ -1635,6 +1638,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Files</source>
 <target>File</target>
 
+<source>Name</source>
+<target>Nume</target>
+
 <source>Items</source>
 <target>Elemente</target>
 
@@ -1648,16 +1654,16 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>Vrei s-o descarci acum ?</target>
 
 <source>FreeFileSync is up to date.</source>
-<target></target>
+<target>Ai deja ultima versiune de FreeFileSync.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Nu pot găsi pe internet numărul versiunii curente de FreeFileSync. O versiune mai nouă e probabil disponibilă. Vrei să verifici manual acum?</target>
 
 <source>&Check</source>
 <target>&Verifică</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Verificarea consecvenței datelor a eșuat pentru %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nu pot găsi funcția de sistem %x.</target>
@@ -1666,7 +1672,7 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>Nu pot înregistra softul pentru a primi mesaje de la sistemul de operare.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Pachetul de instalare este stricat (corupt). Reinstalează FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nu pot înregistra notificările dispozitivului pentru %x.</target>
@@ -1745,6 +1751,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Cannot change process I/O priorities.</source>
 <target>Nu pot schimba prioritățile I/O ale procesului.</target>
+
+<source>Error Code %x:</source>
+<target>Cod de Eroare %x:</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Verificarea disponibilității Reciclatorului a eșuat pentru dosarul %x.</target>
@@ -1831,8 +1840,14 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <target>Mulțumiri pentru donația și sprijinul tău!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Acest instalator FreeFileSync pentru donatori și-a atins limita zilnică de instalări permise.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Descarci acum versiunea obișnuită de pe situl FreeFileSync?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Versiunea portabilă nu poate fi instalată în dosarul selectat.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Alege instalarea locală sau selectează un dosar diferit pentru instalare.</target>
 

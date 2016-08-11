@@ -59,7 +59,7 @@
 <target>發生異常</target>
 
 <source>A directory path is expected after %x.</source>
-<target>%x 後預期的目錄路徑。</target>
+<target>在 %x 後預期的目錄路徑。</target>
 
 <source>Syntax error</source>
 <target>語法錯誤</target>
@@ -89,7 +89,7 @@
 <target>語法：</target>
 
 <source>global config file:</source>
-<target>整體配置檔案：</target>
+<target>全域配置檔案：</target>
 
 <source>config files:</source>
 <target>配置檔案：</target>
@@ -112,17 +112,17 @@
 <source>Cannot find the following folders:</source>
 <target>找不到下列資料夾：</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>如果您忽略此錯誤的資料夾都將被視為空的。遺失的資料夾會在需要時自動新建。</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>如果忽略此錯誤的資料夾將視為空。在需要時會自動新建缺少的資料夾。</target>
 
 <source>A folder input field is empty.</source>
-<target>資料夾輸入欄位是空的。</target>
+<target>資料夾輸入欄位是空白。</target>
 
 <source>The corresponding folder will be considered as empty.</source>
-<target>對應的資料夾將視為空的。</target>
+<target>對應的資料夾將視為空。</target>
 
 <source>The following folder paths are dependent from each other:</source>
-<target>以下資料夾路徑是相互依賴：</target>
+<target>下列資料夾路徑是相互依賴：</target>
 
 <source>File %x has an invalid date.</source>
 <target>檔案 %x 的日期無效。</target>
@@ -146,7 +146,7 @@
 <target>正在解析符號連結 %x</target>
 
 <source>Comparing content of files %x</source>
-<target>正在比對檔案内容 %x</target>
+<target>正在比對檔案 %x 的内容</target>
 
 <source>Generating file list...</source>
 <target>正在產生檔案清單…</target>
@@ -155,34 +155,34 @@
 <target>故障保護檔案複製</target>
 
 <source>Enabled</source>
-<target></target>
+<target>啟用</target>
 
 <source>Disabled</source>
-<target></target>
+<target>禁用</target>
 
 <source>Copy locked files</source>
 <target>複製被鎖定的檔案</target>
 
 <source>Copy file access permissions</source>
-<target>複製檔案系統權限</target>
+<target>複製檔存取權限</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>檔案時間差</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>資料夾存取超時</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>背景優先執行</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>在同步期間鎖定目錄</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>驗證複製的檔案</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>使用非預設全域設定：</target>
 
 <source>Starting comparison</source>
 <target>開始比對</target>
@@ -304,7 +304,7 @@ Actual: %y bytes
 <target>無法寫入 %x 的修改時間。</target>
 
 <source>Cannot determine final path for %x.</source>
-<target>無法確定最後路徑為 %x。</target>
+<target>無法確定 %x 最後路徑。</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>無法解析符號連結 %x。</target>
@@ -325,14 +325,14 @@ Actual: %y bytes
 <target>錯誤代碼 %x：</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>無法連接到 %x。</target>
 
 <source>
 <pluralform>1 byte</pluralform>
 <pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>%x 個位元組</pluralform>
+<pluralform>%x 位元組</pluralform>
 </target>
 
 <source>%x MB</source>
@@ -386,7 +386,7 @@ Actual: %y bytes
 </target>
 
 <source>Detecting abandoned lock...</source>
-<target>正在檢測被放棄的鎖定…</target>
+<target>正在檢測廢棄鎖…</target>
 
 <source>Saving file %x...</source>
 <target>正在儲存檔案 %x…</target>
@@ -411,7 +411,7 @@ Actual: %y bytes
 <pluralform>%x threads</pluralform>
 </source>
 <target>
-<pluralform>%x 個執行緒</pluralform>
+<pluralform>%x 執行緒</pluralform>
 </target>
 
 <source>Scanning:</source>
@@ -436,10 +436,10 @@ Actual: %y bytes
 <target>無法讀取卷影複製服務。</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>請在此系統上執行64位元版本的FreeFileSync新建卷影副本。</target>
 
 <source>Cannot determine volume name for %x.</source>
-<target>無法確定卷名為 %x。</target>
+<target>無法確定 %x 卷名。</target>
 
 <source>Volume name %x is not part of file path %y.</source>
 <target>卷名 %x 不是檔案路徑 %y 的一部分。</target>
@@ -448,7 +448,7 @@ Actual: %y bytes
 <target>停止要求：等待目前的操作結束…</target>
 
 <source>Unable to create time stamp for versioning:</source>
-<target>無法新建時間戳記的版本控制：</target>
+<target>無法創建時間戳記的版本控制：</target>
 
 <source>Drag && drop</source>
 <target>拖放</target>
@@ -543,13 +543,13 @@ The command is triggered if:
 <target>自動化同步</target>
 
 <source>The following path does not support directory monitoring:</source>
-<target>以下路徑不支援目錄監測：</target>
+<target>下列路徑不支援目錄監測：</target>
 
 <source>Directory monitoring active</source>
 <target>目錄監測啟動</target>
 
 <source>Waiting until all directories are available...</source>
-<target>正在等待所有目錄可用…</target>
+<target>正在等到所有目錄可用…</target>
 
 <source>&Restore</source>
 <target>還原(&R)</target>
@@ -609,13 +609,13 @@ The command is triggered if:
 <target>正在驗證檔案 %x</target>
 
 <source>Updating attributes of %x</source>
-<target>正在更新 %x 個屬性</target>
+<target>正在更新 %x 的屬性</target>
 
 <source>Cannot write file attributes of %x.</source>
 <target>無法寫入 %x 的檔案屬性。</target>
 
 <source>%x and %y have different content.</source>
-<target>%x 和 %y 擁有的內容不同。</target>
+<target>%x 和 %y 具有不同的內容。</target>
 
 <source>Data verification error:</source>
 <target>資料驗證錯誤：</target>
@@ -638,8 +638,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>下列項目有未解決的衝突，將不會同步：</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>下列資料夾明顯不同。請確保同步中所選資料夾是正確的。</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>下列資料夾是明顯不同的。請檢查同步中的所有被選擇的正確資料夾。</target>
 
 <source>Not enough free disk space available in:</source>
 <target>沒有足夠的可用空間：</target>
@@ -718,23 +718,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>嚴重錯誤</target>
 
-<source>Symlink</source>
-<target>符號連結</target>
-
 <source>Folder</source>
 <target>資料夾</target>
+
+<source>Symlink</source>
+<target>符號連結</target>
 
 <source>Full path</source>
 <target>完整路徑</target>
 
-<source>Name</source>
-<target>名稱</target>
+<source>Relative path</source>
+<target>相對路徑</target>
 
-<source>Relative folder</source>
-<target>對應資料夾</target>
-
-<source>Base folder</source>
-<target>基本資料夾</target>
+<source>Item name</source>
+<target>項目名稱</target>
 
 <source>Size</source>
 <target>大小</target>
@@ -911,7 +908,7 @@ The command is triggered if:
 <target>配對資料夾：</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>主要設定：</target>
 
 <source>Use local settings:</source>
 <target>使用本機設定：</target>
@@ -1072,13 +1069,19 @@ The command is triggered if:
 <target>不要再顯示此對話框(&D)</target>
 
 <source>Items found:</source>
-<target>尋找項目：</target>
+<target>找到的項目：</target>
 
 <source>Time remaining:</source>
 <target>剩餘時間：</target>
 
 <source>Time elapsed:</source>
 <target>經過時間：</target>
+
+<source>Bytes:</source>
+<target>位元組：</target>
+
+<source>Items:</source>
+<target>項目：</target>
 
 <source>Synchronizing...</source>
 <target>正在同步…</target>
@@ -1105,7 +1108,7 @@ The command is triggered if:
 <target>停止(&S)</target>
 
 <source>Stop synchronization at first error</source>
-<target>在第一個錯誤出現停止同步</target>
+<target>在第一個錯誤出現時停止同步</target>
 
 <source>Run minimized</source>
 <target>最小化執行</target>
@@ -1129,7 +1132,7 @@ The command is triggered if:
 <target>覆蓋現有檔案(&O)</target>
 
 <source>The following settings are used for all synchronization jobs.</source>
-<target>以下設定用於所有同步作業。</target>
+<target>下列設定用於所有同步作業。</target>
 
 <source>
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
@@ -1244,6 +1247,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync有新版本可用：</target>
+
+<source>Local path not available for %x.</source>
+<target>沒有適用於 %x 的本機路徑。</target>
 
 <source>Confirm</source>
 <target>確認</target>
@@ -1511,17 +1517,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>整合內容功能表中的外部應用程式。可以使用下面的巨集：</target>
 
-<source>- full file or folder name</source>
-<target>- 完整檔案或資料夾名稱</target>
+<source>Full file or folder path</source>
+<target>完整檔案或資料夾路徑</target>
 
-<source>- folder part only</source>
-<target>- 只有資料夾一部分</target>
+<source>Parent folder path</source>
+<target>上層資料夾路徑</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- 另一邊對應到 %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>SFTP和MTP儲存裝置的臨時本機副本</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- 另一邊對應到 %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>另一邊的參數</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>再次顯示隱藏對話框和警告訊息？</target>
@@ -1613,6 +1619,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>檔案</target>
 
+<source>Name</source>
+<target>名稱</target>
+
 <source>Items</source>
 <target>項目</target>
 
@@ -1629,13 +1638,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync已經是最新版本。</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>找不到線上目前FreeFileSync版號。可能有較新的版本可用。現在要手動檢查嗎？</target>
 
 <source>&Check</source>
 <target>檢查(&C)</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>%x 的一致性檢查失敗。</target>
 
 <source>Cannot find system function %x.</source>
 <target>找不到系統函數 %x。</target>
@@ -1644,7 +1653,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>無法登錄接收系統訊息。</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>安裝檔已損壞。請重新安裝FreeFileSync。</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x 無法註冊裝置通知。</target>
@@ -1665,16 +1674,16 @@ This guarantees a consistent state even in case of a serious error.
 <target>無法讀取 %x 的權限。</target>
 
 <source>Cannot copy permissions from %x to %y.</source>
-<target>無法從 %x 複製權限到 %y。</target>
+<target>無法複製從 %x 到 %y 的權限。</target>
 
 <source>%x is not a regular directory name.</source>
 <target>%x 不是一個常規目錄名稱。</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>無法從 %x 複製檔案到 %y。</target>
+<target>無法複製檔案 %x 到 %y。</target>
 
 <source>Cannot copy attributes from %x to %y.</source>
-<target>無法從 %x 複製屬性到 %y。</target>
+<target>無法複製從 %x 到 %y 的屬性。</target>
 
 <source>Type of item %x is not supported:</source>
 <target>項目類型 %x 不被支援：</target>
@@ -1710,7 +1719,7 @@ This guarantees a consistent state even in case of a serious error.
 </target>
 
 <source>Cannot set privilege %x.</source>
-<target>無法設定權限 %x。</target>
+<target>無法設定特別權限 %x。</target>
 
 <source>Unable to suspend system sleep mode.</source>
 <target>無法中止系統睡眠模式。</target>
@@ -1719,7 +1728,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>無法更改I/O處理優先順序。</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
-<target>正在檢查資源回收筒的資料夾 %x 失敗。</target>
+<target>檢查資源回收筒的資料夾 %x 失敗。</target>
 
 <source>The following XML elements could not be read:</source>
 <target>無法讀取下列XML元素：</target>
@@ -1803,8 +1812,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>感謝您的捐贈和支援！</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>捐贈者的FreeFileSync安裝程式已達到其日常的安裝限制。</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>現在要從FreeFileSync首頁下載普通版嗎？</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>可擕式版本不能安裝到所選的資料夾。</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>請選擇本地安裝類型或選擇不同的安裝資料夾。</target>
 

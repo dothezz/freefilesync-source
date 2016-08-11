@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>De volgende mappen konden niet worden gevonden:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Indien u deze fout negeert zullen de mappen als leeg beschouwd worden. Ontbrekende mappen worden indien nodig automatisch aangemaakt.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Indien deze fout wordt genegeerd zullen de mappen als leeg beschouwd worden. Ontbrekende mappen worden automatisch aangemaakt indien nodig.</target>
 
 <source>A folder input field is empty.</source>
 <target>Invoerveld van een map is leeg.</target>
@@ -155,10 +155,10 @@
 <target>Fail-safe bestand kopieëren</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Ingeschakeld</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Uitgeschakeld</target>
 
 <source>Copy locked files</source>
 <target>Vergrendelde bestanden kopieëren</target>
@@ -167,22 +167,22 @@
 <target>Toegangsmachtigingen om bestanden te kopieëren</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Tolerantie bestandstijd</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Time-out map toegang</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Uitvoeren met achtergrond prioriteit</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Directories vergrendelen tijdens de synchronisatie</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Controleer de gekopieerde bestanden</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Het gebruik van niet-standaard algemene instellingen:</target>
 
 <source>Starting comparison</source>
 <target>Start vergelijking</target>
@@ -325,7 +325,7 @@ Werkelijk: %y bytes
 <target>Foutcode %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Kan geen verbinding maken met %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -439,7 +439,7 @@ Werkelijk: %y bytes
 <target>Kan geen toegang krijgen tot de Volume Shadow Copy Service.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Gelieve de 64-bits versie van FreeFileSync te gebruiken om schaduwkopieën te maken op dit systeem.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan de volumenaam niet vaststellen voor %x.</target>
@@ -641,8 +641,8 @@ De opdracht wordt geactiveerd als:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>De volgende items hebben onopgeloste conflicten en zullen niet worden gesynchroniseerd:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>De volgende mappen zijn aanzienlijk verschillend. Zorg ervoor dat u de juiste mappen voor synchronisatie hebt geselecteerd.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>De volgende mappen zijn significant verschillend. Controleer of de juiste mappen zijn geselecteerd voor synchronisatie.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Er is onvoldoende vrije schijfruimte beschikbaar in:</target>
@@ -722,23 +722,20 @@ De opdracht wordt geactiveerd als:
 <source>Serious Error</source>
 <target>Ernstige fout</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Map</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Volledig pad</target>
 
-<source>Name</source>
-<target>Naam</target>
+<source>Relative path</source>
+<target>Relatief pad</target>
 
-<source>Relative folder</source>
-<target>Relatieve map</target>
-
-<source>Base folder</source>
-<target>Basismap</target>
+<source>Item name</source>
+<target>Itemnaam</target>
 
 <source>Size</source>
 <target>Grootte</target>
@@ -915,7 +912,7 @@ De opdracht wordt geactiveerd als:
 <target>Mappaar:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Belangrijkste instellingen:</target>
 
 <source>Use local settings:</source>
 <target>Gebruik lokale instellingen:</target>
@@ -1084,6 +1081,12 @@ De opdracht wordt geactiveerd als:
 <source>Time elapsed:</source>
 <target>Verstreken tijd:</target>
 
+<source>Bytes:</source>
+<target>Bytes:</target>
+
+<source>Items:</source>
+<target>Objecten:</target>
+
 <source>Synchronizing...</source>
 <target>Synchroniseren...</target>
 
@@ -1248,6 +1251,9 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
+
+<source>Local path not available for %x.</source>
+<target>Lokale pad niet beschikbaar voor %x.</target>
 
 <source>Confirm</source>
 <target>Bevestigen</target>
@@ -1522,17 +1528,17 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Externe applicaties integreren in het contextmenu. De volgende macro's zijn beschikbaar:</target>
 
-<source>- full file or folder name</source>
-<target>- volledige bestands- of map-naam</target>
+<source>Full file or folder path</source>
+<target>Volledig bestand of mappad</target>
 
-<source>- folder part only</source>
-<target>- alleen map-deel</target>
+<source>Parent folder path</source>
+<target>Bovenliggend mappad</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Andere kant van de tegenhanger naar %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Tijdelijke lokale kopie voor SFTP en MTP-opslag</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Andere kant van de tegenhanger naar %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parameters voor de andere kant</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Verborgen vensters en waarschuwingsberichten opnieuw weergeven?</target>
@@ -1613,7 +1619,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>leeg</target>
 
 <source>Leave as unresolved conflict</source>
-<target>Laten als onopgelost conflicht</target>
+<target>Laten als onopgelost conflict</target>
 
 <source>File</source>
 <target>Bestand</target>
@@ -1623,6 +1629,9 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 
 <source>Files</source>
 <target>Bestanden</target>
+
+<source>Name</source>
+<target>Naam</target>
 
 <source>Items</source>
 <target>Items</target>
@@ -1640,13 +1649,13 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>FreeFileSync is actueel.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Kan het actuele FreeFileSync versienummer online niet vinden. Een nieuwere versie is waarschijnlijk beschikbaar. Nu handmatig controleren?</target>
 
 <source>&Check</source>
 <target>&Controleren</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Consistentiecontrole mislukt voor %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan de systeemfunctie %x niet vinden.</target>
@@ -1655,7 +1664,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Niet in staat om de ontvangen systeemberichten te registreren.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Installatiebestanden zijn beschadigd. Gelieve FreeFileSync opnieuw te installeren.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Niet in staat om apparaat meldingen te registreren voor %x.</target>
@@ -1757,7 +1766,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Lokaal</target>
 
 <source>Portable</source>
-<target>Portable</target>
+<target>Mobiel</target>
 
 <source>recommended</source>
 <target>aanbevolen</target>
@@ -1769,7 +1778,7 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Registreer FreeFileSync bestands-extensies</target>
 
 <source>Create Explorer context menu entries</source>
-<target>Maak Explorer contect menu-items</target>
+<target>Maak Explorer context menu-items</target>
 
 <source>Save settings in installation directory</source>
 <target>Sla instellingen op in de installatiemap</target>
@@ -1817,8 +1826,14 @@ Dit garandeert een consistente status zelfs in het geval van een ernstige fout.
 <target>Bedankt voor uw donatie en ondersteuning!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Dit FreeFileSync installatie programma voor donateurs heeft zijn dagelijkse installatielimiet bereikt.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Nu de reguliere versie van FreeFileSync vanaf de homepage downloaden?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>De mobiele versie kan niet in de geselecteerde map geinstalleerd worden.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Kies voor een lokale installatie of selecteer een andere map voor de installatie.</target>
 

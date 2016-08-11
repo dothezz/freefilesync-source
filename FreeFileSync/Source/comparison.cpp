@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "comparison.h"
 #include <zen/process_priority.h>
@@ -100,7 +100,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
                 errorMsg += L"\n" + AFS::getDisplayPath(fc.first);
 
             errorMsg += L"\n\n";
-            errorMsg +=  _("If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.");
+            errorMsg +=  _("If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.");
 
             if (!status.failedChecks.empty())
             {

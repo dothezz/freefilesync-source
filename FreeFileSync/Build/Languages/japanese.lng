@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>以下のフォルダがみつかりません:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>このエラーを無視した場合、空のフォルダが考慮され、必要に応じて不足しているフォルダが自動的に生成されます。</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>このエラーを無視した場合、空のフォルダが考慮され、必要に応じて不足しているフォルダが自動的に生成されます.</target>
 
 <source>A folder input field is empty.</source>
 <target>フォルダ入力欄が空白です.</target>
@@ -155,10 +155,10 @@
 <target>安全なファイルコピーを実施</target>
 
 <source>Enabled</source>
-<target></target>
+<target>有効</target>
 
 <source>Disabled</source>
-<target></target>
+<target>無効</target>
 
 <source>Copy locked files</source>
 <target>ロックされたファイルをコピーする</target>
@@ -167,22 +167,22 @@
 <target>ファイルのアクセスパーミッションをコピーする</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>ファイル時間の許容範囲</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>フォルダ アクセスのタイムアウト</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>優先度バックグラウンドで実行</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>同期処理中はディレクトリをロック</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>コピーしたファイルを検証</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>非デフォルトのグローバル設定を使用:</target>
 
 <source>Starting comparison</source>
 <target>比較処理を開始中</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>エラーコード %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>%x に接続できません.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -436,7 +436,7 @@ Actual: %y bytes
 <target>ボリュームシャドウコピーサービスにアクセス出来ません.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>現システムでシャドゥ コピーを作成するには 64-bit 版の FreeFileSync を使用してください.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x のボリューム名が決定されていません.</target>
@@ -638,8 +638,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>以下の項目は、未解決の競合が存在するため同期処理を実行できませんでした:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>以下のフォルダは内容が大幅に異なっています。同期フォルダの設定に誤りがないかどうかをご確認ください.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>以下ののフォルダは内容が大幅に異なっています。同期フォルダの設定に誤りがないかどうかをご確認ください.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>利用可能なディスク空き容量が足りません:</target>
@@ -718,23 +718,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>重大なエラー</target>
 
-<source>Symlink</source>
-<target>Symリンク</target>
-
 <source>Folder</source>
 <target>フォルダ</target>
+
+<source>Symlink</source>
+<target>Symリンク</target>
 
 <source>Full path</source>
 <target>フルパス</target>
 
-<source>Name</source>
-<target>名前</target>
+<source>Relative path</source>
+<target>相対パス</target>
 
-<source>Relative folder</source>
-<target>相対フォルダ</target>
-
-<source>Base folder</source>
-<target>基準フォルダ</target>
+<source>Item name</source>
+<target>項目名</target>
 
 <source>Size</source>
 <target>サイズ</target>
@@ -911,7 +908,7 @@ The command is triggered if:
 <target>フォルダ ペア:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>メイン設定:</target>
 
 <source>Use local settings:</source>
 <target>ローカル設定を使用:</target>
@@ -1080,6 +1077,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>経過時間:</target>
 
+<source>Bytes:</source>
+<target>バイト:</target>
+
+<source>Items:</source>
+<target>項目:</target>
+
 <source>Synchronizing...</source>
 <target>同期処理中...</target>
 
@@ -1244,6 +1247,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync の新しいバージョンが利用できます:</target>
+
+<source>Local path not available for %x.</source>
+<target>利用できないローカスパス %x.</target>
 
 <source>Confirm</source>
 <target>確認</target>
@@ -1511,17 +1517,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:</target>
 
-<source>- full file or folder name</source>
-<target>- ファイル、フォルダの完全な名前</target>
+<source>Full file or folder path</source>
+<target>ﾌｧｲﾙ、ﾌｫﾙﾀﾞの完全な名前</target>
 
-<source>- folder part only</source>
-<target>- フォルダ部分のみ</target>
+<source>Parent folder path</source>
+<target>親フォルダのパス</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- %item_path% の反対側の対象</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>SFTP、MTPストレージ用の一時ローカルコピー</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- %item_folder% の反対側の対象</target>
+<source>Parameters for opposite side</source>
+<target>反対側のパラメータ</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>非表示のダイアログと警告を再表示しますか?</target>
@@ -1613,6 +1619,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>ファイル</target>
 
+<source>Name</source>
+<target>名前</target>
+
 <source>Items</source>
 <target>項目</target>
 
@@ -1629,13 +1638,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync は最新です.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>FreeFileSync のバージョン確認はできませんでしたが、おそらく利用可能な更新があります、今手動で確認しますか?</target>
 
 <source>&Check</source>
 <target>チェック(&C)</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>%x の整合性チェックに失敗.</target>
 
 <source>Cannot find system function %x.</source>
 <target>システム関数 %x がみつかりません.</target>
@@ -1644,7 +1653,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>システム受信メッセージに登録できません.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>ファイルが破損しています、FreeFileSync を再インストールしてください.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x のデバイス通知を登録できません.</target>
@@ -1752,7 +1761,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>設定の保存先 "%APPDATA%\FreeFileSync"</target>
 
 <source>Register FreeFileSync file extensions</source>
-<target></target>
+<target>FreeFileSync 拡張子の関連付け</target>
 
 <source>Create Explorer context menu entries</source>
 <target>エクスプローラのメニュー項目に統合</target>
@@ -1803,8 +1812,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>あなたの寄付と支援に感謝します!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>この FreeFileSync インストーラは日付の制限に達しています.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>FreeFileSync の標準版を今ホームページからダウンロードしますか?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>選択したフォルダにはポータブル版をインストールできません.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>ローカル インストールを選択するか、別のインストール先を選択してください.</target>
 

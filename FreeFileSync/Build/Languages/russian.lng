@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Если вы игнорируете эту ошибку, то папки выше будут рассматриваться как пустые. Недостающие папки создаются автоматически, когда это необходимо.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Если эта ошибка будет проигнорирована, то папки выше будут рассматриваться как пустые. Недостающие папки создаются автоматически, когда это необходимо.</target>
 
 <source>A folder input field is empty.</source>
 <target>Поле ввода папки пустое.</target>
@@ -155,10 +155,10 @@
 <target>Отказоустойчивое копирование файла</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Разрешено</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Запрещено</target>
 
 <source>Copy locked files</source>
 <target>Копирование заблокированных файлов</target>
@@ -167,22 +167,22 @@
 <target>Копирование прав доступа к файлам</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Допускаемая разница во времени изменения файла</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Тайм-аут доступа к папкам</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Запустить с фоновым приоритетом</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Блокировать папки во время синхронизации</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Проверить скопированные файлы</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Использование нестандартных глобальных настроек:</target>
 
 <source>Starting comparison</source>
 <target>Начать сравнение</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>Код ошибки %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Невозможно соединиться с %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +442,7 @@ Actual: %y bytes
 <target>Невозможно получить доступ к службе Теневого Копирования Тома.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Пожалуйста, запустите 64-битную версию FreeFileSync, чтобы создать теневые копии на этой системе.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Невозможно определить имя тома для %x.</target>
@@ -644,8 +644,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следующие элементы имеют неурегулированные конфликты и не будут синхронизированы:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Следующие папки значительно отличаются. Убедитесь, что вы выбрали правильные папки для синхронизации.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Следующие папки значительно отличаются. Пожалуйста, проверьте, что выбраны правильные папки для синхронизации.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Не достаточно свободного места в:</target>
@@ -726,23 +726,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Серьезная ошибка</target>
 
-<source>Symlink</source>
-<target>Символьная ссылка</target>
-
 <source>Folder</source>
 <target>Папка</target>
+
+<source>Symlink</source>
+<target>Символьная ссылка</target>
 
 <source>Full path</source>
 <target>Полный путь</target>
 
-<source>Name</source>
-<target>Имя</target>
+<source>Relative path</source>
+<target>Относительный путь</target>
 
-<source>Relative folder</source>
-<target>Относительная папка</target>
-
-<source>Base folder</source>
-<target>Основная папка</target>
+<source>Item name</source>
+<target>Название элемента</target>
 
 <source>Size</source>
 <target>Размер</target>
@@ -919,7 +916,7 @@ The command is triggered if:
 <target>Пара папок:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Основные настройки:</target>
 
 <source>Use local settings:</source>
 <target>Использовать локальные настройки:</target>
@@ -1088,6 +1085,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Времени прошло:</target>
 
+<source>Bytes:</source>
+<target>Байт(ы):</target>
+
+<source>Items:</source>
+<target>Элементы:</target>
+
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>
 
@@ -1252,6 +1255,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Доступна новая версия FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Локальный путь не доступен для %x.</target>
 
 <source>Confirm</source>
 <target>Подтвердить</target>
@@ -1533,17 +1539,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Интегрируйте внешние приложения в контекстное меню. Доступны следующие команды:</target>
 
-<source>- full file or folder name</source>
-<target>- полный путь файла или папки</target>
+<source>Full file or folder path</source>
+<target>Полный путь файла или папки</target>
 
-<source>- folder part only</source>
-<target>- часть пути папки</target>
+<source>Parent folder path</source>
+<target>Путь родительской папки</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- аналог %item_path% с другой стороны</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Временная локальная копия для SFTP и MTP хранилища</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- аналог %item_folder% с другой стороны</target>
+<source>Parameters for opposite side</source>
+<target>Параметры для противоположной стороны</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Показать скрытые окна и сообщения с предупреждениями снова?</target>
@@ -1635,6 +1641,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Файлы</target>
 
+<source>Name</source>
+<target>Имя</target>
+
 <source>Items</source>
 <target>Элементы</target>
 
@@ -1651,13 +1660,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>У Вас самая последняя версия FreeFileSync.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Невозможно найти номер текущей версии FreeFileSync в Интернете. Скорее всего имеется более новая версия. Проверить вручную сейчас?</target>
 
 <source>&Check</source>
 <target>&Проверить</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Последовательная проверка не удалась для %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Невозможно найти системную функцию %x.</target>
@@ -1666,7 +1675,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Невозможно зарегистрироваться для получения системных сообщений.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Установочные файлы повреждены. Пожалуйста, переустановите FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не удалось зарегистрировать уведомления устройств для %x.</target>
@@ -1831,8 +1840,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Спасибо за Ваше пожертвование и поддержку!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Этот установщик FreeFileSync для доноров достиг дневного лимита установок.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Загрузить обычную версию с домашней страницы FreeFileSync сейчас?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Портативная версия не может быть установлена в выбранную папку.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Пожалуйста, выберите локальный тип установки или выберите другую папку для установки.</target>
 

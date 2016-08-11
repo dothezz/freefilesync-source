@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef STRING_BASE_H_083217454562342526
 #define STRING_BASE_H_083217454562342526
@@ -186,7 +186,7 @@ private:
     {
         Descriptor(size_t len, size_t cap) :
             length  (static_cast<std::uint32_t>(len)),
-            capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "the types are always lock-free"
+            capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "The atomic type is always lock-free"
 
         std::atomic<unsigned int> refCount { 1 }; //std:atomic is uninitialized by default!
         std::uint32_t length;
@@ -222,11 +222,11 @@ public:
     //operator const Char* () const; //NO implicit conversion to a C-string!! Many problems... one of them: if we forget to provide operator overloads, it'll just work with a Char*...
 
     //STL accessors
-    typedef       Char*       iterator;
-    typedef const Char* const_iterator;
-    typedef       Char&       reference;
-    typedef const Char& const_reference;
-    typedef       Char value_type;
+    using iterator        = Char*;
+    using const_iterator  = const Char*;
+    using reference       = Char&;
+    using const_reference = const Char&;
+    using value_type      = Char;
 
     Zbase(const_iterator first, const_iterator last);
     Char*       begin();

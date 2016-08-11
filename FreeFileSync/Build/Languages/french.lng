@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Impossible de trouver les dossiers suivants :</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Si vous ignorez cette erreur, le dossier sera considéré comme vide. Les dossiers manquants sont créés automatiquement si nécessaire.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Si cette erreur est ignorée, les dossiers seront considérés comme vides. Les dossiers manquants seront automatiquement créés si nécessaire.</target>
 
 <source>A folder input field is empty.</source>
 <target>Une entrée dossier est vide.</target>
@@ -155,10 +155,10 @@
 <target>Copie de fichiers sécurisé</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Activé</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Désactivé</target>
 
 <source>Copy locked files</source>
 <target>Copier les fichiers verrouillés</target>
@@ -167,22 +167,22 @@
 <target>Copie des droits d'accès aux fichiers</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Tolérance horaire</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Dépassement du délai d'accès au dossier</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Exécution avec la priorité de tâche de fond.</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Vérouillage des répertoires pendant la synchronisation</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Vérification de la copie des fichiers</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Utilisation des paramètres globaux particuliers :</target>
 
 <source>Starting comparison</source>
 <target>Comparaison en cours</target>
@@ -273,6 +273,12 @@ Trouvé : %y octets
 <source>Cannot move file %x to %y.</source>
 <target>Impossible de déplacer le fichier %x vers %y.</target>
 
+<source>Unable to connect to %x.</source>
+<target>Impossible de se connecter à %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Impossible d'ouvrir le répertoire %x.</target>
+
 <source>Cannot enumerate directory %x.</source>
 <target>Impossible de parcourir le répertoire %x.</target>
 
@@ -309,9 +315,6 @@ Trouvé : %y octets
 <source>Cannot resolve symbolic link %x.</source>
 <target>Impossible de résoudre le lien symbolique %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Impossible d'ouvrir le répertoire %x.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Impossible  de calculer l'espace disque libre de %x.</target>
 
@@ -320,12 +323,6 @@ Trouvé : %y octets
 
 <source>Incorrect command line:</source>
 <target>Ligne de commande incorrecte :</target>
-
-<source>Error Code %x:</source>
-<target>Code erreur %x :</target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -439,7 +436,7 @@ Trouvé : %y octets
 <target>Impossible d'accéder au service Volume Shadow Copy.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Veuillez exécuter de préférence la version 64 bits de FreeFileSync pour utiliser le service Shadow Copy.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Impossible de déterminer le nom du volume de %x.</target>
@@ -641,8 +638,8 @@ La commande est déclenchée si :
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Les éléments suivants sont en conflit non résolu et ne seront pas synchronisés :</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Les dossiers suivants sont très différentes. Assurez-vous que vous avez sélectionné les bons dossiers pour la synchronisation.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Les dossiers suivants sont assez différents. Veuillez contrôler que ce sont les bons dossiers qui sont sélectionnés pour la synchronisation.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Espace disque insuffisant sur :</target>
@@ -722,23 +719,20 @@ La commande est déclenchée si :
 <source>Serious Error</source>
 <target>Erreur Grave</target>
 
-<source>Symlink</source>
-<target>Lien symbolique</target>
-
 <source>Folder</source>
 <target>Dossier</target>
+
+<source>Symlink</source>
+<target>Lien symbolique</target>
 
 <source>Full path</source>
 <target>Chemin complet</target>
 
-<source>Name</source>
-<target>Nom</target>
+<source>Relative path</source>
+<target>Chemin relatif</target>
 
-<source>Relative folder</source>
-<target>Dossier relatif</target>
-
-<source>Base folder</source>
-<target>Dossier de base</target>
+<source>Item name</source>
+<target>Nom de l'élément</target>
 
 <source>Size</source>
 <target>Taille</target>
@@ -915,7 +909,7 @@ La commande est déclenchée si :
 <target>Paire de dossiers :</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Paramètres principaux :</target>
 
 <source>Use local settings:</source>
 <target>Utiliser les paramètres locaux :</target>
@@ -1084,6 +1078,12 @@ La commande est déclenchée si :
 <source>Time elapsed:</source>
 <target>Temps écoulé :</target>
 
+<source>Bytes:</source>
+<target>Octets :</target>
+
+<source>Items:</source>
+<target>Eléments :</target>
+
 <source>Synchronizing...</source>
 <target>Synchronisation en cours...</target>
 
@@ -1248,6 +1248,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Une nouvelle version de FreeFileSync est disponible :</target>
+
+<source>Local path not available for %x.</source>
+<target>Chemin local invalide pour %x.</target>
 
 <source>Confirm</source>
 <target>Confirmer</target>
@@ -1522,17 +1525,17 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Inclure les applications externes dans le menu contextuel. Les macros suivantes sont disponibles :</target>
 
-<source>- full file or folder name</source>
-<target>- nom du fichier ou du dossier complet</target>
+<source>Full file or folder path</source>
+<target>Chemin complet du fichier ou du dossier</target>
 
-<source>- folder part only</source>
-<target>- Partie dossier seulement</target>
+<source>Parent folder path</source>
+<target>Chemin parent du dossier</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Duplication vers %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Copie temporaire en local pour les stockages en SFTP et MTP.</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Duplication vers %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Paramètres du côté opposé.</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Voulez-vous réafficher les boîtes de dialogues et les avertissements ?</target>
@@ -1624,6 +1627,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Files</source>
 <target>Fichiers</target>
 
+<source>Name</source>
+<target>Nom</target>
+
 <source>Items</source>
 <target>Éléments</target>
 
@@ -1640,13 +1646,13 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>FreeFileSync est à jour.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Le numéro de la version courante de FreeFileSync est introuvable sur internet. Une nouvelle version est probablement disponible. Voulez-vous vérifier maintenant ?</target>
 
 <source>&Check</source>
 <target>&Contrôle</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Contrôle de cohérence incorrect pour %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Impossible de trouver la fonction système %x.</target>
@@ -1655,7 +1661,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Impossible d'enregistrer la réception des messages système.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Les fichiers d'installation sont abîmés. Veuillez réinstaller FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Impossible d'enregistrer les notifications de périphérique pour %x.</target>
@@ -1732,6 +1738,9 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <source>Cannot change process I/O priorities.</source>
 <target>Impossible de modifier les priorités E/S des tâches.</target>
 
+<source>Error Code %x:</source>
+<target>Code erreur %x :</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Echec de la vérification de la corbeille pour le dossier %x.</target>
 
@@ -1766,7 +1775,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Enregistrer la configuration dans "%APPDATA%\FreeFileSync"</target>
 
 <source>Register FreeFileSync file extensions</source>
-<target></target>
+<target>Enregistrez les extensions de fichier FreeFileSync</target>
 
 <source>Create Explorer context menu entries</source>
 <target>Créer les entrées du menu contextuel de l'Explorateur</target>
@@ -1793,10 +1802,10 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>le menu Démarrer</target>
 
 <source>Registering FreeFileSync file extensions</source>
-<target></target>
+<target>Enregistrement des extensions de fichier FreeFileSync</target>
 
 <source>Unregistering FreeFileSync file extensions</source>
-<target></target>
+<target>Désenregistrement des extensions de fichier FreeFileSync</target>
 
 <source>FreeFileSync Configuration</source>
 <target>Configuration de FreeFileSync</target>
@@ -1817,8 +1826,14 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Merci pour votre don et votre aide !</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ce programme d'installation FreeFileSync pour les donateurs a atteint sa limite d'installation quotidienne.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Voulez-vous télécharger la version standard sur le site de FreeFileSync maintenant ?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>La version portable ne peut être installée dans le dossier choisi.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Veuillez choisir le type d'installation locale ou sélectionner un autre dossier pour cette installation.</target>
 

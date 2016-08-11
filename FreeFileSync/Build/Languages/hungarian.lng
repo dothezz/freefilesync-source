@@ -32,13 +32,13 @@
 <target>%x szimbolikus hivatkozás létrehozása</target>
 
 <source>Moving file %x to the recycle bin</source>
-<target>%x fájlt a Lomtárba mozgatja</target>
+<target>%x fájlt a Lomtárba helyezi</target>
 
 <source>Moving folder %x to the recycle bin</source>
-<target>%x könyvtárat a Lomtárba mozgatja</target>
+<target>%x könyvtárat a Lomtárba helyezi</target>
 
 <source>Moving symbolic link %x to the recycle bin</source>
-<target>%x szimbolikus linket a Lomtárba mozgatja</target>
+<target>%x szimbolikus hivatkozást a Lomtárba helyezi</target>
 
 <source>Deleting file %x</source>
 <target>%x fájl törlése</target>
@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>A következő könyvtárak nem találhatóak:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Ha figyelmen kívül ezt a hibajelzést, a könyvtárak üresnek minősülnek. Az hiányzó könyvárak automatikusan jönnek létre ha szükséges.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ha ezt a hibát figyelmen kívül hagyja, a könytárakat üresnek tekinti a program. A hiányzó könyvtárakat automatikusan létrehozza, amikor szükséges.</target>
 
 <source>A folder input field is empty.</source>
 <target>A könyvtár beviteli mező üres.</target>
@@ -155,37 +155,37 @@
 <target>Hibamentes fájlmásolás</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Engedélyezett</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Letiltott</target>
 
 <source>Copy locked files</source>
-<target>Másolja a zárolt fájlokat</target>
+<target>Zárolt fájlok másolása</target>
 
 <source>Copy file access permissions</source>
-<target>Másolja a fájl hozzáférési jogosultságokat</target>
+<target>A fájl hozzáférési jogosultságok másolása</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Fájlok időkülönbségének tűréshatára</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Könyvtár hozzáférés időtúllépés</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Futtatás háttér prioritással</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Könyvtárak zárolása szinkronizálás idejére</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Másolt fájlok ellenőrzése</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Nem az alap általános beállítások használata:</target>
 
 <source>Starting comparison</source>
-<target>Kezdi az összehasonlítást</target>
+<target>Összehasonlítás megkezdése</target>
 
 <source>Calculating sync directions...</source>
 <target>Szinkronizálási irányok számítása...</target>
@@ -254,7 +254,7 @@
 <target>A művelet nem támogatott különböző alapkönyvtártípusok esetén.</target>
 
 <source>Cannot write file %x.</source>
-<target>%x fájl írása nem sikerült.</target>
+<target>%x fájl írása sikertelen.</target>
 
 <source>
 Unexpected size of data stream.
@@ -268,55 +268,55 @@ Jelenlegi: %y bájt
 </target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>%x szimbolikus linket nem tudja %y-ba másolni.</target>
+<target>%x szimbolikus hivatkozás nem másolható %y-ba.</target>
 
 <source>Cannot move file %x to %y.</source>
-<target>Nem sikerült %x fájl mozgatása %y fájlba.</target>
+<target>%x fájl nem mozgatható %y-ba.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>%x könyvtárat nem sikerült besorolni.</target>
+<target>%x könyvtár nem besorolható.</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>%x fájl attribútumainak olvasása nem sikerült.</target>
+<target>%x fájl attribútumai nem olvashatók.</target>
 
 <source>Cannot find %x.</source>
 <target>%x nem található.</target>
 
 <source>Cannot open file %x.</source>
-<target>%x fájl nem nyitható.</target>
+<target>%x fájl nem nyitható meg.</target>
 
 <source>Cannot read file %x.</source>
-<target>%x fájl olvasása nem sikerült.</target>
+<target>%x fájl nem olvasható.</target>
 
 <source>Cannot find device %x.</source>
 <target>%x eszköz nem található.</target>
 
 <source>Cannot create directory %x.</source>
-<target>%x könyvtár létrehozása nem sikerült.</target>
+<target>%x könyvtár nem hozható létre.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>%x könyvtár törlése nem sikerült.</target>
+<target>%x könyvtár nem törölhető.</target>
 
 <source>Cannot delete file %x.</source>
-<target>%x fájl törlése nem sikerült.</target>
+<target>%x fájl nem törölhető.</target>
 
 <source>Cannot write modification time of %x.</source>
-<target>%x esetében nem sikerült felírni az utolsó módosítás dátumát.</target>
+<target>%x módosításának időpontja nem rögzíthető.</target>
 
 <source>Cannot determine final path for %x.</source>
-<target>%x számára nem lehet a végső útvonalat meghatározni.</target>
+<target>%x számára a végső útvonal nem határozható meg.</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>%x szimbolikus hivatkozás feloldása nem sikerült.</target>
+<target>%x szimbolikus hivatkozás nem oldható fel.</target>
 
 <source>Cannot open directory %x.</source>
-<target>%x könyvtár megnyitása nem sikerült.</target>
+<target>%x könyvtár nem nyitható meg.</target>
 
 <source>Cannot determine free disk space for %x.</source>
-<target>%x-en nem lehet a szabad tárterületet meghatározni.</target>
+<target>%x-en nem határozható meg a szabad tárterület.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
-<target>%x nem helyezhető a Lomtárba.</target>
+<target>%x nem helyezhető Lomtárba.</target>
 
 <source>Incorrect command line:</source>
 <target>Hibás parancssor:</target>
@@ -325,7 +325,7 @@ Jelenlegi: %y bájt
 <target>Hibakód %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Nem képes %x-hez kapcsolódni.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -346,7 +346,7 @@ Jelenlegi: %y bájt
 <target>%x GB</target>
 
 <source>Cannot load file %x.</source>
-<target>%x fájl betöltése nem sikerült.</target>
+<target>%x fájl betöltése sikertelen.</target>
 
 <source>Database file %x is incompatible.</source>
 <target>%x adatbázisfájl inkompatibilis: .</target>
@@ -370,7 +370,7 @@ Jelenlegi: %y bájt
 <target>Időtúllépés a %x könyvtár keresése folyamán.</target>
 
 <source>Cannot get process information.</source>
-<target>Nem sikerült lekérdezni processz-információkat.</target>
+<target>Nem sikerült lekérdezni a processz-információkat.</target>
 
 <source>Waiting while directory is locked:</source>
 <target>Várakozás amíg a könyvtár zárolt:</target>
@@ -406,7 +406,7 @@ Jelenlegi: %y bájt
 <target>Hiba történt a feldolgozás közben: %x fájl, %y sor, %z oszlop.</target>
 
 <source>Cannot set directory lock for %x.</source>
-<target>Nem sikerült zárolni a(z) %x könyvtárat.</target>
+<target>%x könyvtár zárolása sikertelen.</target>
 
 <source>
 <pluralform>1 thread</pluralform>
@@ -439,7 +439,7 @@ Jelenlegi: %y bájt
 <target>Nem elérhető a Kötet Árnyék-másolat szolgáltatás.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Árnyék másolatok készítéséhez ezen a rendszeren futtassa a FreeFileSync 64 bites verzióját.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>%x számára nem lehet a kötet-nevet meghatározni.</target>
@@ -606,7 +606,7 @@ A parancs végrehajtódik, ha:
 <target>%x fájl frissítése</target>
 
 <source>Updating symbolic link %x</source>
-<target>%x szimbolikus link frissítése</target>
+<target>%x szimbolikus hivatkozás frissítése</target>
 
 <source>Verifying file %x</source>
 <target>%x fájl ellenőrzése</target>
@@ -615,7 +615,7 @@ A parancs végrehajtódik, ha:
 <target>%x attribútumainak frissítése</target>
 
 <source>Cannot write file attributes of %x.</source>
-<target>Nem sikerült %x fájl attribútumainak írása.</target>
+<target>%x fájl attribútumainak írása nem sikerült.</target>
 
 <source>%x and %y have different content.</source>
 <target>%x és %y tartalma különböző.</target>
@@ -624,16 +624,16 @@ A parancs végrehajtódik, ha:
 <target>Adat ellenőrzési hiba:</target>
 
 <source>Creating a Volume Shadow Copy for %x...</source>
-<target>Árnyékmásolat-kötetet készít %x számára...</target>
+<target>%x számára árnyékmásolat-kötetet készítése...</target>
 
 <source>Target folder %x already existing.</source>
 <target>%x célkönyvtár már létezik.</target>
 
 <source>Target folder input field must not be empty.</source>
-<target>A célkönyvtárat meghatározó beviteli mező nem lehet üres.</target>
+<target>A célkönyvtár beviteli mezője nem lehet üres.</target>
 
 <source>Source folder %x not found.</source>
-<target>%x forráskönyvtár nem található .</target>
+<target>%x forráskönyvtár nem található.</target>
 
 <source>Please enter a target folder for versioning.</source>
 <target>Adja meg a célkönyvtárat a verziókövetéshez.</target>
@@ -641,8 +641,8 @@ A parancs végrehajtódik, ha:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>A következő tételek feloldatlan ütközést tartalmaznak, így nem lesznek szinkronizálva:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Az érintett könyvtárak lényegileg különbözőek. Győződjön meg arról, hogy a megfelelő könyvtárakat választotta ki szinkronizálásra.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Az érintett könyvtárak lényegileg különböznek. Kérem ellenőrizze, a megfelelő könyvtárakat választotta-e ki szinkronizálásra.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nincs elég szabad lemezterület:</target>
@@ -654,7 +654,7 @@ A parancs végrehajtódik, ha:
 <target>Szabad:</target>
 
 <source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Több könyvtár-pár írna egy közös alkönyvtárba. Ellenőrizze a konfigurációját.</target>
+<target>Több könyvtár-pár írna egy közös alkönyvtárba. Vizsgálja felül a konfigurációját.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>A szinkronizált könyvtár-pár:</target>
@@ -672,10 +672,10 @@ A parancs végrehajtódik, ha:
 <target>Leállítva</target>
 
 <source>Synchronization completed with errors</source>
-<target>A szinkronizálás befejeződött, de történtek hibák</target>
+<target>A szinkronizálás hibákkal fejeződött be</target>
 
 <source>Synchronization completed with warnings</source>
-<target>A szinkronizálás befejeződött, de figyelmeztetésekkel</target>
+<target>A szinkronizálás figyelmeztetések mellett fejeződött be.</target>
 
 <source>Warning</source>
 <target>Figyelmeztetés</target>
@@ -690,7 +690,7 @@ A parancs végrehajtódik, ha:
 <target>Régi log fájlok törlése...</target>
 
 <source>You can switch to FreeFileSync's main window to resolve this issue.</source>
-<target>E jelenség megoldásához kapcsoljon át a FreeFileSync fő  ablakába.</target>
+<target>E jelenség megoldásához kapcsoljon át a FreeFileSync fő ablakába.</target>
 
 <source>&Don't show this warning again</source>
 <target>&Ne mutassa ismételten ezt a figyelmeztetést</target>
@@ -722,23 +722,20 @@ A parancs végrehajtódik, ha:
 <source>Serious Error</source>
 <target>Komoly hiba</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Könyvtár</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Teljes elérési útvonal</target>
 
-<source>Name</source>
-<target>Név</target>
+<source>Relative path</source>
+<target>Relatív elérési útvonal</target>
 
-<source>Relative folder</source>
-<target>Relatív könyvtár</target>
-
-<source>Base folder</source>
-<target>Alapkönyvtár</target>
+<source>Item name</source>
+<target>Tétel neve</target>
 
 <source>Size</source>
 <target>Méret</target>
@@ -915,7 +912,7 @@ A parancs végrehajtódik, ha:
 <target>Könyvtár-pár:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Fő beállítások:</target>
 
 <source>Use local settings:</source>
 <target>Használja a helyi beállításokat:</target>
@@ -924,10 +921,10 @@ A parancs végrehajtódik, ha:
 <target>Válasszon egy változatot:</target>
 
 <source>Include &symbolic links:</source>
-<target>Tartalmazza a &szimbolikus linkeket:</target>
+<target>Tartalmazza a &szimbolikus hivatkozásokat:</target>
 
 <source>&Follow</source>
-<target>&Folytassa</target>
+<target>&Folytat</target>
 
 <source>&Direct</source>
 <target>&Direkt</target>
@@ -1083,6 +1080,12 @@ A parancs végrehajtódik, ha:
 
 <source>Time elapsed:</source>
 <target>Eltelt idő:</target>
+
+<source>Bytes:</source>
+<target>Bájt:</target>
+
+<source>Items:</source>
+<target>Tétel:</target>
 
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>
@@ -1248,6 +1251,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Elérhető a FreeFileSync új verziója:</target>
+
+<source>Local path not available for %x.</source>
+<target>%x-hez a helyi útvonal nem érhető el.</target>
 
 <source>Confirm</source>
 <target>Jóváhagy</target>
@@ -1522,17 +1528,17 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integráljon a helyi menübe külső alkalmazásokat. A következő makrók érhetők el:</target>
 
-<source>- full file or folder name</source>
-<target>- teljes fájl- vagy könyvtárnév</target>
+<source>Full file or folder path</source>
+<target>Teljes fájl vagy könyvtár elérési útvonal</target>
 
-<source>- folder part only</source>
-<target>- csak a könyvtár része</target>
+<source>Parent folder path</source>
+<target>Szülő könyvtár elérési útvonala</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- A másik oldali megfelelőjét a következő fájlba: %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Ideiglenes helyi másolat SFTP és MTP tárolóhoz</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- A másik oldali megfelelőjét a következő könyvtárba: %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Paraméterek az ellenkező oldalhoz</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Mutassa újra a rejtett párbeszédablakokat és figyelmeztetéseket</target>
@@ -1624,6 +1630,9 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <source>Files</source>
 <target>Fájlok</target>
 
+<source>Name</source>
+<target>Név</target>
+
 <source>Items</source>
 <target>Elemek</target>
 
@@ -1640,13 +1649,13 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>A FreeFileSync naprakész.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Nem elérhető online a FreeFileSync jelenlegi verziószáma. Egy újabb verzió valószínűleg elérhető. Ellenőrizzem most manuálisan?</target>
 
 <source>&Check</source>
 <target>&Ellenőriz</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>%x konzisztencia ellenőrzése sikertelen.</target>
 
 <source>Cannot find system function %x.</source>
 <target>%x rendszerfunkció nem elérhető.</target>
@@ -1655,7 +1664,7 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>Nem tud regisztrálni hogy megkapja a rendszerüzeneteket.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>A telepítő fájlok sérültek. Installálja újra a FreeFileSync-et.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x-hez nem lehet eszköz-értesítéseket regisztrálni.</target>
@@ -1667,28 +1676,28 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>A fájlt egy másik processz zárolta:</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Nem sikerült a biztonsági környezet olvasása a következőnél: %x.</target>
+<target>%x biztonsági környezete nem olvasható.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>%x esetében nem sikerült a biztonsági környezet írása.</target>
+<target>%x biztonsági környezetét nem sikerült felírni.</target>
 
 <source>Cannot read permissions of %x.</source>
-<target>%x esetében nem sikerült a jogosultságok olvasása.</target>
+<target>%x jogosultságai nem olvashatók.</target>
 
 <source>Cannot copy permissions from %x to %y.</source>
-<target>Nem lehet az jogosultságokat %x-ből %y-ba másolni.</target>
+<target>A jogosultságok nem másolhatók %x-ből %y-ba.</target>
 
 <source>%x is not a regular directory name.</source>
 <target>%x nem megfelelő könyvtárnév.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>%x fájl másolása a(z) %y fájlba nem sikerült.</target>
+<target>%x fájl nem másolható %y-ba.</target>
 
 <source>Cannot copy attributes from %x to %y.</source>
-<target>Nem lehet az attribútumokat %x-ből %y-ba másolni.</target>
+<target>Az attribútumok nem másolhatók %x-ből %y-ba.</target>
 
 <source>Type of item %x is not supported:</source>
-<target>A(z) %x elem típusa nem támogatott:</target>
+<target>%x elem típusa nem támogatott:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1724,25 +1733,25 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 </target>
 
 <source>Cannot set privilege %x.</source>
-<target>A következő privilégium beállítása sikertelen: %x.</target>
+<target>%x privilégium nem állítható be.</target>
 
 <source>Unable to suspend system sleep mode.</source>
-<target>Nem tudta felfüggeszteni a rendszer alvó üzemmódját.</target>
+<target>Nem sikerült felfüggeszteni a rendszer alvó üzemmódját.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>Nem sikerült a folyamatok I/O prioritását megváltoztatni.</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
-<target>A lomtár ellenőrzése meghiúsult a(z) %x könyvtár esetében.</target>
+<target>%x könyvtár vonatkozásában a lomtár ellenőrzése meghiúsult.</target>
 
 <source>The following XML elements could not be read:</source>
-<target>A következő XML elemeket nem lehet olvasni:</target>
+<target>A következő XML elemek nem olvashatók:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target>A %x konfigurációs fájl nem teljes. A hiányzó elemeket az alapértelmezés szerinti értékekkel helyettesíti.</target>
+<target>%x konfigurációs fájl nem teljes. A hiányzó elemeket az alapértelmezés szerinti értékekkel helyettesíti.</target>
 
 <source>Internet access failed.</source>
-<target>Nem sikerült az internet hozzáférés.</target>
+<target>Meghiúsult az internet hozzáférés.</target>
 
 <source>Prepare installation</source>
 <target>Telepítés előkészítése</target>
@@ -1817,8 +1826,14 @@ Ez garantálja a konzisztens állapotot egy komoly hiba esetén is.
 <target>Köszönöm az adományt és támogatást!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ez az adományozók számára biztosított FreeFileSync telepítő elérte a napi telepítési határát.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Letöltsem most az általános verziót a FreeFileSync honlapjáról?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>A hordozható verziót nem lehet a kiválasztott könyvtárba telepíteni.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Válassza a helyi telepítési módot vagy válasszon másik könytárat a telepítéshez.</target>
 

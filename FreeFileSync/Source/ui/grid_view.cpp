@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "grid_view.h"
 #include "sorting.h"
@@ -56,8 +56,7 @@ void GridView::updateView(Predicate pred)
     rowPositions.clear();
     rowPositionsFirstChild.clear();
 
-    std::for_each(sortedRef.begin(), sortedRef.end(),
-                  [&](const RefIndex& ref)
+    for (const RefIndex& ref : sortedRef)
     {
         if (const FileSystemObject* fsObj = FileSystemObject::retrieve(ref.objId))
             if (pred(*fsObj))
@@ -83,7 +82,7 @@ void GridView::updateView(Predicate pred)
                 //build subview
                 this->viewRef.push_back(ref.objId);
             }
-    });
+    }
 }
 
 

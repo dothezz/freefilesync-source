@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef SCOPE_GUARD_H_8971632487321434
 #define SCOPE_GUARD_H_8971632487321434
@@ -15,7 +15,7 @@
 
 
 //std::uncaught_exceptions() currently unsupported on GCC and Clang => clean up ASAP
-    static_assert(__GNUC__ < 5 || (__GNUC__ == 5 && (__GNUC_MINOR__ < 3 || (__GNUC_MINOR__ == 3 && __GNUC_PATCHLEVEL__ <= 1))), "check std::uncaught_exceptions support");
+    static_assert(__GNUC__ < 6 || (__GNUC__ == 6 && (__GNUC_MINOR__ < 1 || (__GNUC_MINOR__ == 1 && __GNUC_PATCHLEVEL__ <= 1))), "check std::uncaught_exceptions support");
 
 namespace __cxxabiv1
 {

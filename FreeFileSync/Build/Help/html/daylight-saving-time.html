@@ -37,8 +37,8 @@
 	<p>
 		For a detailed discussion about this issue see:<br>
 		<a rel="nofollow" target="_blank" href="http://www.codeproject.com/KB/datetime/dstbugs.aspx">http://www.codeproject.com/KB/datetime/dstbugs.aspx</a>
+		<br><br>
 	</p>
-	<br>
 
 	<h2>Solutions:</h2>
 
@@ -51,11 +51,11 @@
 			</p>
 			<img src="../images/ignore-time-shift.png" alt="Ignore daylight saving time shift"><br>
 			<br>
-			<div class="box-outer"><div class="bluebox"><div class="box-inner">
+			<div class="bluebox">
 				<b>Note</b><br>
 				File times have to be equal or differ by exactly the time shift entered to be considered the same. 
 				Therefore the time shift setting should not be confused with a time interval or tolerance.
-			</div></div></div>
+			</div>
 			<br>
 		
 		<li>Alternatively you can avoid the problem in first place by only synchronizing from FAT to FAT or NTFS to NTFS file systems.

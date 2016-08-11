@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Ne najdem naslednjih map:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Mape bodo smatrane kot prazne, če prezrete to napako. Manjkajoče mape bodo ustvarjene samodejno, ko bo to potrebno.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>V primeru ignoriranja te napake bo mapa smatrana kot prazna. Manjkajoče mape se ustvarijo avtomatično, ko je to potrebno.</target>
 
 <source>A folder input field is empty.</source>
 <target>Vnosno polje za mapo je prazno.</target>
@@ -155,10 +155,10 @@
 <target>Kopiranje datotek varno pred odpovedjo</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Omogočeno</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Onemogočeno</target>
 
 <source>Copy locked files</source>
 <target>Kopiraj zaklenjene datoteke</target>
@@ -167,22 +167,22 @@
 <target>Kopiraj dovoljenja dostopov datoteke</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Časovna toleranca datoteke</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Časovna omejitev dostopa do mape</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Zaženi s prioriteto v ozadju</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Zakleni direktorije med sinhroniziranjem</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Preveri kopirane datoteke</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Uporabljam neprivzete globalne nastavitve:</target>
 
 <source>Starting comparison</source>
 <target>Začenjam primerjavo</target>
@@ -325,7 +325,7 @@ Dejansko: %y bajtov
 <target>Koda napake %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Ne morem povezati na %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -445,7 +445,7 @@ Dejansko: %y bajtov
 <target>Ne morem dostopati do Volume Shadov Copy servisa.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Prosim zaženite 64 bitno različico FreeFileSync, da ustvarite samodejne kopije v ozadju na tem sistemu.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Ne morem določiti ime nosilca za %x.</target>
@@ -647,8 +647,8 @@ Ukaz se sproži če:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Naslednji elementi imajo nerešene konflikte in ne bodo sinhronizirani:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Naslednje mape so zelo različne. Prepričajte se, da ste izbrali ustrezne mape za sinhronizacijo.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Naslednje mape so bistveno različne. Prosimo preverite, da so izbrane pravilne mape za sinhroniziranje.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Na voljo ni dovolj prostega prostora na disku v:</target>
@@ -730,23 +730,20 @@ Ukaz se sproži če:
 <source>Serious Error</source>
 <target>Resna napaka</target>
 
-<source>Symlink</source>
-<target>Simbolična povezava</target>
-
 <source>Folder</source>
 <target>Mapa</target>
+
+<source>Symlink</source>
+<target>Simbolična povezava</target>
 
 <source>Full path</source>
 <target>Polna pot</target>
 
-<source>Name</source>
-<target>Ime</target>
+<source>Relative path</source>
+<target>Relativna pot</target>
 
-<source>Relative folder</source>
-<target>Relativna mapa</target>
-
-<source>Base folder</source>
-<target>Osnovna mapa</target>
+<source>Item name</source>
+<target>Ime objekta</target>
 
 <source>Size</source>
 <target>Velikost</target>
@@ -923,7 +920,7 @@ Ukaz se sproži če:
 <target>Par map:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Glavne nastavitve:</target>
 
 <source>Use local settings:</source>
 <target>Uporabi lokalne nastavitve:</target>
@@ -1092,6 +1089,12 @@ Ukaz se sproži če:
 <source>Time elapsed:</source>
 <target>Pretečeni čas:</target>
 
+<source>Bytes:</source>
+<target>Bitov:</target>
+
+<source>Items:</source>
+<target>Objektov:</target>
+
 <source>Synchronizing...</source>
 <target>Sinhroniziram...</target>
 
@@ -1256,6 +1259,9 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Nova različica FreeFileSync je na voljo:</target>
+
+<source>Local path not available for %x.</source>
+<target>Lokalna pot ni na voljo za %x.</target>
 
 <source>Confirm</source>
 <target>Potrdi</target>
@@ -1544,17 +1550,17 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:</target>
 
-<source>- full file or folder name</source>
-<target>- polno ime datoteke ali mape</target>
+<source>Full file or folder path</source>
+<target>Celotna datoteka ali pot do mape</target>
 
-<source>- folder part only</source>
-<target>- samo del z mapo</target>
+<source>Parent folder path</source>
+<target>Pot do nadrejene mape</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Na drugi strani nasprotno v %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Začasna lokalna kopija za SFTP in MTP prostor za shranjevanje</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Na drugi strani nasprotno v %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parametri za nasprotno stran</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Ponovno prikaži skrite dialoge in obvestila?</target>
@@ -1646,6 +1652,9 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <source>Files</source>
 <target>Datoteke</target>
 
+<source>Name</source>
+<target>Ime</target>
+
 <source>Items</source>
 <target>Elementi</target>
 
@@ -1662,13 +1671,13 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <target>FreeFileSync je posodobljen.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Ne morem najti trenutne številke verzije FreeFileSync na spletu. Novejša verzija je najbrž na voljo. Želite preveriti ročno?</target>
 
 <source>&Check</source>
 <target>&Preveri</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Preverjanje usklajenosti ni uspelo za %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Ne morem najti sistemske funkcije %x.</target>
@@ -1677,7 +1686,7 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <target>Ne morem se registrirati za prejem sistemskih sporočil.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Namestitvene datoteke so poškodovane. Prosimo,da ponovno namestitr FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Omogoči registracijo obvestil naprave za %x.</target>
@@ -1845,8 +1854,14 @@ To zagotavlja konsistenčnost podatkov v primeru napake.
 <target>Hvala za vašo donacijo in podporo!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ta FreeFileSync namestitveni program za donatorje je dosegel dnevno namestitveno mejo.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Prenesite redno verzijo iz FreeFileSync domače strani zdaj?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>namestitev prenosne verzije v izbrano mapo ni mogoč.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Prosimo izberite tip lokalne namestitve ali pa izberite drugo mapo za namestitev.</target>
 

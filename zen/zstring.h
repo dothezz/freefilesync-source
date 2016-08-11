@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef ZSTRING_H_73425873425789
 #define ZSTRING_H_73425873425789
@@ -10,13 +10,13 @@
 #include "string_base.h"
 
 
-    typedef char Zchar;
+    using Zchar = char;
     #define Zstr(x) x
     const Zchar FILE_NAME_SEPARATOR = '/';
 
 //"The reason for all the fuss above" - Loki/SmartPtr
 //a high-performance string for interfacing with native OS APIs in multithreaded contexts
-typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, zen::AllocatorOptimalSpeed> Zstring;
+using Zstring = zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, zen::AllocatorOptimalSpeed>;
 
 
 int cmpStringNoCase(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen);

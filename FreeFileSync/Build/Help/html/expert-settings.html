@@ -12,15 +12,16 @@
 	<p>
 		FreeFileSync has a number of special purpose settings that can only be accessed
 		directly via the global configuration file <span class="file-path">GlobalSettings.xml</span>.
-		Note that this file is read once when FreeFileSync starts and saved when it closes. Therefore apply changes only while FreeFileSync is not running. <br>
+		Note that this file is read once when FreeFileSync starts and saved again on exit.
+		Therefore you should <b>apply manual changes only while FreeFileSync is not running.</b><br>
 		 <br>
-		To locate this file on Windows enter <span class="command-line">%appdata%\FreeFileSync</span> in the Windows Explorer address bar or go to the FreeFileSync
+		To locate this file on Windows enter <b><span class="command-line">%appdata%\FreeFileSync</span></b> in the Windows Explorer address bar or go to the FreeFileSync
 		installation folder if you are using the portable installation. 
-		On Linux you can find the file in <span class="command-line">~/.FreeFileSync</span> for the Launchpad release and in the installation folder for the portable version. 
-		On OS X go to <span class="command-line">~/Library/Application Support/FreeFileSync</span>.
+		On Linux you can find the file in <b><span class="command-line">~/.FreeFileSync</span></b> for the Launchpad release and in the installation folder for the portable version. 
+		On OS X go to <b><span class="command-line">~/Library/Application Support/FreeFileSync</span></b>.
 	</p>
 
-	<div class="box-outer"><div class="greybox"><div class="box-inner">
+	<div class="greybox">
 		<div class="command-line">
 			&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;<br>
 			&lt;FreeFileSync XmlType=&quot;GLOBAL&quot;&gt;<br>
@@ -33,7 +34,7 @@
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<b>LastSyncsLogSizeMax</b> Bytes=&quot;100000&quot;/&gt;<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<b>NotificationSound</b> CompareFinished=&quot;ding.wav&quot; SyncFinished=&quot;harp.wav&quot;/&gt;
 		</div>
-	</div></div></div>	
+	</div>
 	<br>
 
 	<p>

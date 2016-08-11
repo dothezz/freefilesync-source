@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "custom_grid.h"
 #include <set>
@@ -1452,11 +1452,9 @@ private:
 
         //apply resized offset to other side, but only if stretch factors match!
         std::vector<Grid::ColumnAttribute> cfgTrg = trg.getColumnConfig();
-        std::for_each(cfgTrg.begin(), cfgTrg.end(), [&](Grid::ColumnAttribute& ca)
-        {
+        for (Grid::ColumnAttribute& ca : cfgTrg)
             if (ca.type_ == type && ca.stretch_ == stretchSrc)
                 ca.offset_ = offset;
-        });
         trg.setColumnConfig(cfgTrg);
     }
 

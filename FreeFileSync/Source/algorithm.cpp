@@ -1,13 +1,12 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "algorithm.h"
 #include <set>
 #include <unordered_map>
-//#include <random>
 #include <zen/perf.h>
 #include <zen/crc.h>
 #include <zen/guid.h>
@@ -19,6 +18,7 @@
 #include "lib/status_handler_impl.h"
 #include "fs/concrete.h"
 #include "fs/native.h"
+
 
 using namespace zen;
 //using namespace std::rel_ops;
@@ -1559,7 +1559,7 @@ Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
 
 void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback)
 {
-    const int itemCount = workLoad.size();
+    const int itemCount = static_cast<int>(workLoad.size());
     std::int64_t dataToProcess = 0;
 
     for (const FileDetails& details : workLoad)

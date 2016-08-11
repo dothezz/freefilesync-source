@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "localization.h"
 #include <unordered_map>
@@ -57,8 +57,8 @@ public:
     }
 
 private:
-    typedef std::unordered_map<std::wstring, std::wstring> Translation; //hash_map is 15% faster than std::map on GCC
-    typedef std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring>> TranslationPlural;
+    using Translation       = std::unordered_map<std::wstring, std::wstring>; //hash_map is 15% faster than std::map on GCC
+    using TranslationPlural = std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring>>;
 
     Translation       transMapping; //map original text |-> translation
     TranslationPlural transMappingPl;
@@ -389,8 +389,7 @@ const std::vector<TranslationInfo>& zen::getExistingTranslations()
 void zen::releaseWxLocale()
 {
     wxWidgetsLocale::getInstance().release();
-    zen::setTranslator(nullptr); //good place for clean up rather than some time during static destruction: there might be dependencies
-    //e.g. crash handler on some thread may show a message box!
+    zen::setTranslator(nullptr); //good place for clean up rather than some time during static destruction: is there an actual benefit???
 }
 
 

@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef THREAD_H_7896323423432235246427
 #define THREAD_H_7896323423432235246427
@@ -145,7 +145,7 @@ namespace impl
 template <class Function> inline
 auto runAsync(Function&& fun, TrueType /*copy-constructible*/)
 {
-    typedef decltype(fun()) ResultType;
+    using ResultType = decltype(fun());
 
     //note: std::packaged_task does NOT support move-only function objects!
     std::packaged_task<ResultType()> pt(std::forward<Function>(fun));
@@ -315,7 +315,8 @@ private:
         activeCondition = cv;
     }
 
-    std::atomic<bool> interrupted{ false }; //std:atomic is uninitialized by default!
+    std::atomic<bool> interrupted{ false }; //std:atomic is uninitialized by default!!!
+	//"The default constructor is trivial: no initialization takes place other than zero initialization of static and thread-local objects."
 
     std::condition_variable* activeCondition = nullptr;
     std::mutex lockConditionPtr; //serialize pointer access (only!)

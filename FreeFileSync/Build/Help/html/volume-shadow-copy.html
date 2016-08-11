@@ -14,14 +14,13 @@
 		Copy of the source drive. This feature can be configured via <b>Menu &rarr; Tools &rarr; Options: Copy locked files</b>.
 	</p>
 
-	<div class="box-outer"><div class="bluebox"><div class="box-inner">
+	<div class="bluebox">
 		<b>Note</b>
 		<ul style="margin: 0">
 			<li>The volume snapshot created by the Volume Shadow Copy Service is only used when copying locked files.
 			<li>Accessing the Volume Shadow Copy Service requires FreeFileSync to be started with administrator rights.
 		</ul>		
-	</div></div></div>	
-	<br>
+	</div>
 	<br>
 
 	<h2>Troubleshooting</h2>
@@ -30,7 +29,7 @@
 		registration might help. Create and execute a cmd batch file and insert the following lines or enter directly via command line:
 	</p>
 
-	<div class="box-outer"><div class="greybox"><div class="box-inner">
+	<div class="greybox">
 		<div class="command-line">
 			cd /d %windir%\system32<br>
 			Net stop vss<br>
@@ -48,7 +47,7 @@
 			regsvr32 msxml3.dll<br>
 			regsvr32 msxml4.dll
 		</div>
-	</div></div></div>
+	</div>
 	<p>
 		Reference: <a rel="nofollow" target="_blank" href="http://support.microsoft.com/kb/940032">http://support.microsoft.com/kb/940032</a>
 	</p>

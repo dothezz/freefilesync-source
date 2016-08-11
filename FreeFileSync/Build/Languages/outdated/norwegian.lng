@@ -7,275 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
-
-<source>Thanks for your donation and support!</source>
-<target></target>
-
-<source>Internet access failed.</source>
-<target></target>
-
-<source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target></target>
-
-<source>The following XML elements could not be read:</source>
-<target></target>
-
-<source>Cannot copy attributes from %x to %y.</source>
-<target></target>
-
-<source>%x is not a regular directory name.</source>
-<target></target>
-
-<source>Cannot copy permissions from %x to %y.</source>
-<target></target>
-
-<source>Unable to register device notifications for %x.</source>
-<target></target>
-
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
-
-<source>Consistency check failed for %x.</source>
-<target></target>
-
-<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
-
-<source>empty</source>
-<target></target>
-
-<source>Main config</source>
-<target></target>
-
-<source>Identify equal files by comparing their file size.</source>
-<target></target>
-
-<source>Copy DACL, SACL, Owner, Group</source>
-<target></target>
-
-<source>Please enter a target folder.</source>
-<target></target>
-
-<source>
-<pluralform>Copy the following item to another folder?</pluralform>
-<pluralform>Copy the following %x items to another folder?</pluralform>
-</source>
-<target></target>
-
-<source>Loading...</source>
-<target></target>
-
-<source>Move down</source>
-<target></target>
-
-<source>Move up</source>
-<target></target>
-
-<source>Save as default</source>
-<target></target>
-
-<source>Remove entry from list</source>
-<target></target>
-
-<source>&Delete</source>
-<target></target>
-
-<source>&Copy to...</source>
-<target></target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target></target>
-
-<source>Copy items</source>
-<target></target>
-
-<source>SSH File Transfer Protocol</source>
-<target></target>
-
-<source>&Overwrite existing files</source>
-<target></target>
-
-<source>&Keep relative paths</source>
-<target></target>
-
-<source>Items:</source>
-<target></target>
-
-<source>Bytes:</source>
-<target></target>
-
-<source>Select Folder</source>
-<target></target>
-
-<source>Select a directory on the server:</source>
-<target></target>
-
-<source>Directory on server:</source>
-<target></target>
-
-<source>&Show password</source>
-<target></target>
-
-<source>Password:</source>
-<target></target>
-
-<source>User name:</source>
-<target></target>
-
-<source>Port:</source>
-<target></target>
-
-<source>Server name or IP address:</source>
-<target></target>
-
-<source>Enter your SFTP login details:</source>
-<target></target>
-
-<source>Arrange folder pair</source>
-<target></target>
-
-<source>
-- Not supported by all file systems
-- Requires and creates database files
-- Detection not available for first sync
-</source>
-<target></target>
-
-<source>Example:</source>
-<target></target>
-
-<source>List of file time offsets to ignore</source>
-<target></target>
-
-<source>&Ignore time shift [hh:mm]</source>
-<target></target>
-
-<source>&Direct</source>
-<target></target>
-
-<source>&Follow</source>
-<target></target>
-
-<source>Include &symbolic links:</source>
-<target></target>
-
-<source>Main settings:</source>
-<target></target>
-
-<source>Folder pair:</source>
-<target></target>
-
-<source>&Preferences</source>
-<target></target>
-
-<source>Select alternative folder type</source>
-<target></target>
-
-<source>Select SFTP folder</source>
-<target></target>
-
-<source>SFTP folder</source>
-<target></target>
-
-<source>Please select a folder on a local file system, network or an MTP device.</source>
-<target></target>
-
-<source>The selected folder %x cannot be used with FreeFileSync.</source>
-<target></target>
-
-<source>Item name</source>
-<target></target>
-
-<source>Relative path</source>
-<target></target>
-
-<source>Switching to FreeFileSync's main window</source>
-<target></target>
-
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target></target>
-
-<source>Data verification error:</source>
-<target></target>
-
-<source>%x and %y have different content.</source>
-<target></target>
-
-<source>File size</source>
-<target></target>
-
-<source>The following path does not support directory monitoring:</source>
-<target></target>
-
-<source>Start</source>
-<target></target>
-
-<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
-
-<source>Timeout while searching for folder %x.</source>
-<target></target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
-
-<source>Cannot determine free disk space for %x.</source>
-<target></target>
-
-<source>Cannot find device %x.</source>
-<target></target>
-
-<source>Cannot find %x.</source>
-<target></target>
-
-<source>
-Unexpected size of data stream.
-Expected: %x bytes
-Actual: %y bytes
-</source>
-<target></target>
-
-<source>Operation not supported for different base folder types.</source>
-<target></target>
-
-<source>Using non-default global settings:</source>
-<target></target>
-
-<source>Verify copied files</source>
-<target></target>
-
-<source>Lock directories during sync</source>
-<target></target>
-
-<source>Run with background priority</source>
-<target></target>
-
-<source>Folder access timeout</source>
-<target></target>
-
-<source>File time tolerance</source>
-<target></target>
-
-<source>Disabled</source>
-<target></target>
-
-<source>Enabled</source>
-<target></target>
-
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target></target>
-
-<source>Open configuration for editing without executing it.</source>
-<target></target>
-
-<source>Cannot find file %x.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Begge sider er endret siden siste synkronisering.</target>
 
@@ -333,6 +64,9 @@ Actual: %y bytes
 <source>Syntax error</source>
 <target>Syntaksfeil</target>
 
+<source>Cannot find file %x.</source>
+<target></target>
+
 <source>Error</source>
 <target>Feil</target>
 
@@ -372,8 +106,14 @@ Actual: %y bytes
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Et ubegrenset antall alternative kataloger for maksimalt én konfigurasjonsfil.</target>
 
+<source>Open configuration for editing without executing it.</source>
+<target></target>
+
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finne følgende mapper:</target>
+
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target></target>
 
 <source>A folder input field is empty.</source>
 <target>Der er ikke valgt noen mapper.</target>
@@ -414,11 +154,35 @@ Actual: %y bytes
 <source>Fail-safe file copy</source>
 <target>Sikker filkopiering</target>
 
+<source>Enabled</source>
+<target></target>
+
+<source>Disabled</source>
+<target></target>
+
 <source>Copy locked files</source>
 <target>Kopier låste filer</target>
 
 <source>Copy file access permissions</source>
 <target>Kopier adgangstillatelser</target>
+
+<source>File time tolerance</source>
+<target></target>
+
+<source>Folder access timeout</source>
+<target></target>
+
+<source>Run with background priority</source>
+<target></target>
+
+<source>Lock directories during sync</source>
+<target></target>
+
+<source>Verify copied files</source>
+<target></target>
+
+<source>Using non-default global settings:</source>
+<target></target>
 
 <source>Starting comparison</source>
 <target>Starter analyse</target>
@@ -486,8 +250,18 @@ Actual: %y bytes
 <source>Cannot write permissions of %x.</source>
 <target>Kan ikke skrive tillatelsene til %x.</target>
 
+<source>Operation not supported for different base folder types.</source>
+<target></target>
+
 <source>Cannot write file %x.</source>
 <target>Kan ikke opprette filen %x.</target>
+
+<source>
+Unexpected size of data stream.
+Expected: %x bytes
+Actual: %y bytes
+</source>
+<target></target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan ikke kopiere symolsk link %x til %y.</target>
@@ -501,11 +275,17 @@ Actual: %y bytes
 <source>Cannot read file attributes of %x.</source>
 <target>Kan ikke lese filattributterne på %x.</target>
 
+<source>Cannot find %x.</source>
+<target></target>
+
 <source>Cannot open file %x.</source>
 <target>Filen %x kan ikke åpnes.</target>
 
 <source>Cannot read file %x.</source>
 <target>Kan ikke lese filen %x.</target>
+
+<source>Cannot find device %x.</source>
+<target></target>
 
 <source>Cannot create directory %x.</source>
 <target>Kan ikke opprette mappen %x.</target>
@@ -528,6 +308,9 @@ Actual: %y bytes
 <source>Cannot open directory %x.</source>
 <target>Kan ikke åpne mappen %x.</target>
 
+<source>Cannot determine free disk space for %x.</source>
+<target></target>
+
 <source>Unable to move %x to the recycle bin.</source>
 <target>Kunne ikke flytte %x til papirkurv.</target>
 
@@ -536,6 +319,9 @@ Actual: %y bytes
 
 <source>Error Code %x:</source>
 <target>Feilkode %x:</target>
+
+<source>Unable to connect to %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -575,6 +361,9 @@ Actual: %y bytes
 
 <source>Searching for folder %x...</source>
 <target>Søker etter mappen %x...</target>
+
+<source>Timeout while searching for folder %x.</source>
+<target></target>
 
 <source>Cannot get process information.</source>
 <target>Kan ikke hente prosessinformasjon.</target>
@@ -644,6 +433,9 @@ Actual: %y bytes
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
 <target>VSS tjenesten er ikke tilgjengelig.</target>
+
+<source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
+<target></target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Kan ikke bestemme volumnavn for %x.</target>
@@ -734,6 +526,9 @@ Kommandoen utføres hvis:
 - nye mapper finnes (f.eks USB nøkkel)
 </target>
 
+<source>Start</source>
+<target></target>
+
 <source>About</source>
 <target>Om</target>
 
@@ -745,6 +540,9 @@ Kommandoen utføres hvis:
 
 <source>Automated Synchronization</source>
 <target>Automatisk synkronisering</target>
+
+<source>The following path does not support directory monitoring:</source>
+<target></target>
 
 <source>Directory monitoring active</source>
 <target>Mappeovervåkning aktiv</target>
@@ -769,6 +567,9 @@ Kommandoen utføres hvis:
 
 <source>File content</source>
 <target>Innhold</target>
+
+<source>File size</source>
+<target></target>
 
 <source>Two way</source>
 <target>Toveis</target>
@@ -812,6 +613,12 @@ Kommandoen utføres hvis:
 <source>Cannot write file attributes of %x.</source>
 <target>Kan ikke skrive filattributter til %x.</target>
 
+<source>%x and %y have different content.</source>
+<target></target>
+
+<source>Data verification error:</source>
+<target></target>
+
 <source>Creating a Volume Shadow Copy for %x...</source>
 <target>Oppretter VSS kopi for %x...</target>
 
@@ -829,6 +636,9 @@ Kommandoen utføres hvis:
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Følgende mapper har uløste konflikter og synkroniseres ikke:</target>
+
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target></target>
 
 <source>Not enough free disk space available in:</source>
 <target>Ikke nok ledig diskplass på:</target>
@@ -887,6 +697,9 @@ Kommandoen utføres hvis:
 <source>&Switch</source>
 <target>&Skift</target>
 
+<source>Switching to FreeFileSync's main window</source>
+<target></target>
+
 <source>
 <pluralform>Automatic retry in 1 second...</pluralform>
 <pluralform>Automatic retry in %x seconds...</pluralform>
@@ -905,14 +718,20 @@ Kommandoen utføres hvis:
 <source>Serious Error</source>
 <target>Kritisk feil</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Mappe</target>
 
+<source>Symlink</source>
+<target>Symlink</target>
+
 <source>Full path</source>
 <target>Full sti</target>
+
+<source>Relative path</source>
+<target></target>
+
+<source>Item name</source>
+<target></target>
 
 <source>Size</source>
 <target>Størrelse</target>
@@ -956,6 +775,21 @@ Kommandoen utføres hvis:
 <source>Paste</source>
 <target>Lim inn</target>
 
+<source>The selected folder %x cannot be used with FreeFileSync.</source>
+<target></target>
+
+<source>Please select a folder on a local file system, network or an MTP device.</source>
+<target></target>
+
+<source>SFTP folder</source>
+<target></target>
+
+<source>Select SFTP folder</source>
+<target></target>
+
+<source>Select alternative folder type</source>
+<target></target>
+
 <source>&New</source>
 <target>&Ny</target>
 
@@ -982,6 +816,9 @@ Kommandoen utføres hvis:
 
 <source>&Actions</source>
 <target>&Handling</target>
+
+<source>&Preferences</source>
+<target></target>
 
 <source>&Language</source>
 <target>&Språk</target>
@@ -1067,14 +904,38 @@ Kommandoen utføres hvis:
 <source>Total bytes to copy</source>
 <target>Antal bytes som kopieres</target>
 
+<source>Folder pair:</source>
+<target></target>
+
+<source>Main settings:</source>
+<target></target>
+
 <source>Use local settings:</source>
 <target>Bruk lokale instillinger:</target>
 
 <source>Select a variant:</source>
 <target>Velg metode:</target>
 
+<source>Include &symbolic links:</source>
+<target></target>
+
+<source>&Follow</source>
+<target></target>
+
+<source>&Direct</source>
+<target></target>
+
 <source>More information</source>
 <target>Mer informasjon</target>
+
+<source>&Ignore time shift [hh:mm]</source>
+<target></target>
+
+<source>List of file time offsets to ignore</source>
+<target></target>
+
+<source>Example:</source>
+<target></target>
 
 <source>Handle daylight saving time</source>
 <target>Behandle sommertid</target>
@@ -1114,6 +975,13 @@ Kommandoen utføres hvis:
 
 <source>Detect moved files</source>
 <target>Gjennkjenn flyttede filer</target>
+
+<source>
+- Not supported by all file systems
+- Requires and creates database files
+- Detection not available for first sync
+</source>
+<target></target>
 
 <source>Delete files:</source>
 <target>Slett filer:</target>
@@ -1157,6 +1025,36 @@ Kommandoen utføres hvis:
 <source>OK</source>
 <target>OK</target>
 
+<source>Arrange folder pair</source>
+<target></target>
+
+<source>Enter your SFTP login details:</source>
+<target></target>
+
+<source>Server name or IP address:</source>
+<target></target>
+
+<source>Port:</source>
+<target></target>
+
+<source>User name:</source>
+<target></target>
+
+<source>Password:</source>
+<target></target>
+
+<source>&Show password</source>
+<target></target>
+
+<source>Directory on server:</source>
+<target></target>
+
+<source>Select a directory on the server:</source>
+<target></target>
+
+<source>Select Folder</source>
+<target></target>
+
 <source>Start synchronization now?</source>
 <target>Synkroniser nå?</target>
 
@@ -1174,6 +1072,12 @@ Kommandoen utføres hvis:
 
 <source>Time elapsed:</source>
 <target>Brukt tid:</target>
+
+<source>Bytes:</source>
+<target></target>
+
+<source>Items:</source>
+<target></target>
 
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
@@ -1216,6 +1120,12 @@ Kommandoen utføres hvis:
 
 <source>How can I schedule a batch job?</source>
 <target>Hvordan opprettes en batchfil?</target>
+
+<source>&Keep relative paths</source>
+<target></target>
+
+<source>&Overwrite existing files</source>
+<target></target>
 
 <source>The following settings are used for all synchronization jobs.</source>
 <target>Disse innstillinger gjelder alle synkroniseringer.</target>
@@ -1286,11 +1196,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Takk for oversettelse:</target>
 
+<source>SSH File Transfer Protocol</source>
+<target></target>
+
 <source>Save as Batch Job</source>
 <target>Lagre som batchfil</target>
 
 <source>Delete Items</source>
 <target>Slett mapperr</target>
+
+<source>Copy items</source>
+<target></target>
 
 <source>Options</source>
 <target>Valg</target>
@@ -1321,6 +1237,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Download</source>
 <target>&Last ned</target>
+
+<source>A new version of FreeFileSync is available:</source>
+<target></target>
+
+<source>Local path not available for %x.</source>
+<target></target>
 
 <source>Confirm</source>
 <target>Bekreft</target>
@@ -1382,6 +1304,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Exclude temporarily</source>
 <target>Ekskluder midlertidig</target>
 
+<source>&Copy to...</source>
+<target></target>
+
+<source>&Delete</source>
+<target></target>
+
 <source>Include all</source>
 <target>Velg alle</target>
 
@@ -1426,6 +1354,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Do&n't save</source>
 <target>&Ikke lagre</target>
+
+<source>Remove entry from list</source>
+<target></target>
 
 <source>Clear filter</source>
 <target>Slett filter</target>
@@ -1475,6 +1406,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show filtered or temporarily excluded files</source>
 <target>Vis filtrerte eller midlertidig ekskluderte filer</target>
 
+<source>Save as default</source>
+<target></target>
+
 <source>Filter</source>
 <target>Filter</target>
 
@@ -1483,6 +1417,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot find %x</source>
 <target>Kan ikke finne %x</target>
+
+<source>Move up</source>
+<target></target>
+
+<source>Move down</source>
+<target></target>
 
 <source>Comma-separated values</source>
 <target>Kommaoppdelte verdier</target>
@@ -1535,6 +1475,18 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Logg</target>
 
+<source>Loading...</source>
+<target></target>
+
+<source>
+<pluralform>Copy the following item to another folder?</pluralform>
+<pluralform>Copy the following %x items to another folder?</pluralform>
+</source>
+<target></target>
+
+<source>Please enter a target folder.</source>
+<target></target>
+
 <source>
 <pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
@@ -1556,20 +1508,23 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Vil du slette følgende %x mapper?</pluralform>
 </target>
 
+<source>Copy DACL, SACL, Owner, Group</source>
+<target></target>
+
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrer eksterne programmer i kontekstmeny. Bruk følgende makroer:</target>
 
-<source>- full file or folder name</source>
-<target>Komplett fil- eller mappenavn</target>
+<source>Full file or folder path</source>
+<target></target>
 
-<source>- folder part only</source>
-<target>Kun mappedelen</target>
+<source>Parent folder path</source>
+<target></target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>Motsatt sides motstykke til %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target></target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>Motsatt sides motstykke til %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target></target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Vis gjemte vinduer og advarsler igjen?</target>
@@ -1582,6 +1537,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Identify equal files by comparing the file content.</source>
 <target>Gjennkjenn like filer etter innhold.</target>
+
+<source>Identify equal files by comparing their file size.</source>
+<target></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
 <target>Finn og fordel endringer på begge sider. Slettede filer, omdøpninger og konflikter finnes automatisk i en database.</target>
@@ -1640,6 +1598,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Append a time stamp to each file name</source>
 <target>Legg til tidsstempel til hvert filnavn</target>
 
+<source>Main config</source>
+<target></target>
+
+<source>empty</source>
+<target></target>
+
 <source>Leave as unresolved conflict</source>
 <target>Etterlat som uløst konflikt</target>
 
@@ -1670,14 +1634,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er oppdatert.</target>
 
+<source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
+<target></target>
+
 <source>&Check</source>
 <target>&Kontroller</target>
+
+<source>Consistency check failed for %x.</source>
+<target></target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finne systemfunksjonen %x.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Kunne ikke registrere mottakelse av systembesjkeder.</target>
+
+<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
+<target></target>
+
+<source>Unable to register device notifications for %x.</source>
+<target></target>
 
 <source>Cannot monitor directory %x.</source>
 <target>Kan ikke overvåke mappen %x.</target>
@@ -1694,8 +1670,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot read permissions of %x.</source>
 <target>Kan ikke lese tillatelsene på %x.</target>
 
+<source>Cannot copy permissions from %x to %y.</source>
+<target></target>
+
+<source>%x is not a regular directory name.</source>
+<target></target>
+
 <source>Cannot copy file %x to %y.</source>
 <target>Kan ikke kopiere filen %x til %y.</target>
+
+<source>Cannot copy attributes from %x to %y.</source>
+<target></target>
 
 <source>Type of item %x is not supported:</source>
 <target>Filtypen %x støttes ikke:</target>
@@ -1744,6 +1729,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Sjekk papirkurv-feil for mappen %x.</target>
+
+<source>The following XML elements could not be read:</source>
+<target></target>
+
+<source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
+<target></target>
+
+<source>Internet access failed.</source>
+<target></target>
 
 <source>Prepare installation</source>
 <target>Forbered installering</target>
@@ -1813,4 +1807,19 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Edit with FreeFileSync</source>
 <target>Rediger med FreeFileSync</target>
+
+<source>Thanks for your donation and support!</source>
+<target></target>
+
+<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
+<target></target>
+
+<source>Download the regular version from the FreeFileSync homepage now?</source>
+<target></target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target></target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target></target>
 

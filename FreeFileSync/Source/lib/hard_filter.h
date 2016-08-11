@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef HARD_FILTER_H_825780275842758345
 #define HARD_FILTER_H_825780275842758345
@@ -41,7 +41,7 @@ public:
 
     virtual bool isNull() const = 0; //filter is equivalent to NullFilter, but may be technically slower
 
-    typedef std::shared_ptr<const HardFilter> FilterRef; //always bound by design!
+    using FilterRef = std::shared_ptr<const HardFilter>; //always bound by design!
 
     virtual FilterRef copyFilterAddingExclusion(const Zstring& excludePhrase) const = 0;
 
@@ -51,6 +51,7 @@ private:
     virtual bool cmpLessSameType(const HardFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
 
+bool operator<(const HardFilter& lhs, const HardFilter& rhs); //GCC: friend-declaration is not a "proper" declaration
 inline bool operator==(const HardFilter& lhs, const HardFilter& rhs) { return !(lhs < rhs) && !(rhs < lhs); }
 inline bool operator!=(const HardFilter& lhs, const HardFilter& rhs) { return !(lhs == rhs); }
 

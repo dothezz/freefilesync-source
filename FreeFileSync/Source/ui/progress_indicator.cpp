@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "progress_indicator.h"
 #include <memory>
@@ -48,11 +48,17 @@ const int WINDOW_BYTES_PER_SEC     =  5000; //
 
 inline wxColor getColorGridLine() { return { 192, 192, 192 }; } //light grey
 
-inline wxColor getColorCurveAreaBytes   () { return { 111, 255,  99 }; } //light green
-inline wxColor getColorCurveAreaItems   () { return { 127, 147, 255 }; } //light blue
-inline wxColor getColorCurveAreaBytesRim() { return {  20, 200,   0 }; } //medium green
-inline wxColor getColorCurveAreaItemsRim() { return {  90, 120, 255 }; } //medium blue
+inline wxColor getColorBytes() { return { 111, 255,  99 }; } //light green
+inline wxColor getColorItems() { return { 127, 147, 255 }; } //light blue
 
+inline wxColor getColorBytesRim() { return {  20, 200,   0 }; } //medium green
+inline wxColor getColorItemsRim() { return {  90, 120, 255 }; } //medium blue
+
+inline wxColor getColorBytesBackground() { return { 205, 255, 202 }; } //faint green
+inline wxColor getColorItemsBackground() { return { 198, 206, 255 }; } //faint blue
+
+inline wxColor getColorBytesBackgroundRim() { return {  12, 128,   0 }; } //dark green
+inline wxColor getColorItemsBackgroundRim() { return {  53,  25, 255 }; } //dark blue
 
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
@@ -224,8 +230,8 @@ CompareProgressDialog::Pimpl::Pimpl(wxFrame& parentWindow) :
                                         setBackgroundColor(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE)).
                                         setSelectionMode(Graph2D::SELECT_NONE));
 
-    m_panelGraphProgress->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(1).fillPolygonArea(getColorCurveAreaBytes()).setColor(Graph2D::getBorderColor()));
-    m_panelGraphProgress->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(1).fillPolygonArea(getColorCurveAreaItems()).setColor(Graph2D::getBorderColor()));
+    m_panelGraphProgress->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(1).fillPolygonArea(getColorBytes()).setColor(Graph2D::getBorderColor()));
+    m_panelGraphProgress->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(1).fillPolygonArea(getColorItems()).setColor(Graph2D::getBorderColor()));
 
     m_panelGraphProgress->addCurve(std::make_shared<CurveDataProgressSeparatorLine>(), Graph2D::CurveAttributes().setLineWidth(1).setColor(Graph2D::getBorderColor()));
 
@@ -888,7 +894,7 @@ private:
             return;
         }
         processingKeyEventHandler = true;
-        ZEN_ON_SCOPE_EXIT(processingKeyEventHandler = false;)
+        ZEN_ON_SCOPE_EXIT(processingKeyEventHandler = false);
 
 
         const int keyCode = event.GetKeyCode();
@@ -945,7 +951,7 @@ private:
     {
         try
         {
-            typedef Zbase<wchar_t> zxString; //guaranteed exponential growth, unlike wxString
+            using zxString = Zbase<wchar_t>; //guaranteed exponential growth, unlike wxString
             zxString clipboardString;
 
             if (auto prov = m_gridMessages->getDataProvider())
@@ -1379,11 +1385,11 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl.m_panelGraphBytes->setCurve(curveDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
     pnl.m_panelGraphItems->setCurve(curveDataItemsTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
 
-    pnl.m_panelGraphBytes->addCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(wxColor(205, 255, 202))./*faint green*/ setColor(wxColor(12, 128,  0))); //dark green
-    pnl.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(wxColor(198, 206, 255))./*faint blue */ setColor(wxColor(53, 25, 255))); //dark blue
+    pnl.m_panelGraphBytes->addCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorBytesBackground()).setColor(getColorBytesBackgroundRim()));
+    pnl.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorItemsBackground()).setColor(getColorItemsBackgroundRim()));
 
-    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorCurveAreaBytes()).setColor(getColorCurveAreaBytesRim()));
-    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorCurveAreaItems()).setColor(getColorCurveAreaItemsRim()));
+    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorBytes()).setColor(getColorBytesRim()));
+    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorItems()).setColor(getColorItemsRim()));
 
     //graph legend:
     auto generateSquareBitmap = [&](const wxColor& fillCol, const wxColor& borderCol)
@@ -1397,8 +1403,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
         }
         return bmpSquare;
     };
-    pnl.m_bitmapGraphKeyBytes->SetBitmap(generateSquareBitmap(getColorCurveAreaBytes(), getColorCurveAreaBytesRim()));
-    pnl.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(getColorCurveAreaItems(), getColorCurveAreaItemsRim()));
+    pnl.m_bitmapGraphKeyBytes->SetBitmap(generateSquareBitmap(getColorBytes(), getColorBytesRim()));
+    pnl.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(getColorItems(), getColorItemsRim()));
 
     //allow changing the "on completion" command
     pnl.m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later

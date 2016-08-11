@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef SYS_ERROR_H_3284791347018951324534
 #define SYS_ERROR_H_3284791347018951324534
@@ -19,12 +19,12 @@
 namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
-    typedef int ErrorCode;
+    using ErrorCode = int;
 
 ErrorCode getLastError();
 
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec);
-std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec, const std::wstring& errorMsg);
+std::wstring formatSystemError(const std::wstring& functionName, const std::wstring& errorCode, const std::wstring& errorMsg);
 
 //A low-level exception class giving (non-translated) detail information only - same conceptional level like "GetLastError()"!
 class SysError
@@ -73,13 +73,16 @@ std::wstring formatSystemErrorRaw(ErrorCode ec) //return empty string on error
 std::wstring formatSystemError(const std::wstring& functionName, long long lastError) = delete; //intentional overload ambiguity to catch usage errors with HRESULT!
 
 inline
-std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec) { return formatSystemError(functionName, ec, formatSystemErrorRaw(ec)); }
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec) 
+{
+	return formatSystemError(functionName, numberTo<std::wstring>(ec), formatSystemErrorRaw(ec)); 
+}
 
 
 inline
-std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec, const std::wstring& errorMsg)
+std::wstring formatSystemError(const std::wstring& functionName, const std::wstring& errorCode, const std::wstring& errorMsg)
 {
-    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", numberTo<std::wstring>(ec));
+    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", errorCode);
 
     if (!errorMsg.empty())
     {

@@ -112,7 +112,7 @@
 <source>Cannot find the following folders:</source>
 <target>Nelze najít následující složky:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Pokud přeskočíte tuto chybu, složka bude považována za prázdnou. Chybějící složky pak budou automaticky vytvořeny.</target>
 
 <source>A folder input field is empty.</source>
@@ -155,34 +155,34 @@
 <target>Bezpečné kopírování souborů</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Zapnuto</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Vypnuto</target>
 
 <source>Copy locked files</source>
-<target>Kopírovat zamčené soubory</target>
+<target>Kopírování zamčených souborů</target>
 
 <source>Copy file access permissions</source>
-<target>Kopírovat přístupová oprávnění k souborům</target>
+<target>Kopírování přístupových oprávnění k souborům</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Časová tolerance</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Časový limit přístupu ke složce</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Spuštění s prioritou na pozadí</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Zamčení adresářů během sycnchronizace</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Povtvrzení zkopírovaných souboů</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Použití zvláštního nastavení:</target>
 
 <source>Starting comparison</source>
 <target>Začátek porovnávání</target>
@@ -325,7 +325,7 @@ Aktuálně: %y b
 <target>Chybový kód %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Nepodařilo se připojit k %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +442,7 @@ Aktuálně: %y b
 <target>Nepodařil se přístup ke službě Stínové kopie.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Prosím použijte 64-bitovou verzi FreeFileSync pro použití služby Stínové kopie.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>>Nelze zjistit jméno jednotky souboru %x.</target>
@@ -644,7 +644,7 @@ Příkaz je spuštěn když:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Následující položky jsou nevyřešené konflikty a nebudou synchronizovány:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
 <target>Následující složky se významně liší. Zkontrolujte zda máte vybránu správnou dvojici složek pro synchronizaci.</target>
 
 <source>Not enough free disk space available in:</source>
@@ -726,23 +726,20 @@ Příkaz je spuštěn když:
 <source>Serious Error</source>
 <target>Závažná chyba</target>
 
-<source>Symlink</source>
-<target>Symlink</target>
-
 <source>Folder</source>
 <target>Složka</target>
+
+<source>Symlink</source>
+<target>Symlink</target>
 
 <source>Full path</source>
 <target>Plná cesta</target>
 
-<source>Name</source>
-<target>Jméno</target>
+<source>Relative path</source>
+<target>Relativní cesta</target>
 
-<source>Relative folder</source>
-<target>Relativní složka</target>
-
-<source>Base folder</source>
-<target>Složka</target>
+<source>Item name</source>
+<target>Název</target>
 
 <source>Size</source>
 <target>Velikost</target>
@@ -919,7 +916,7 @@ Příkaz je spuštěn když:
 <target>Dvojice složek:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Hlavní nastavení:</target>
 
 <source>Use local settings:</source>
 <target>Použít nastavení:</target>
@@ -1088,6 +1085,12 @@ Příkaz je spuštěn když:
 <source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
 
+<source>Bytes:</source>
+<target>Bajtů:</target>
+
+<source>Items:</source>
+<target>Položek:</target>
+
 <source>Synchronizing...</source>
 <target>Synchronizuji...</target>
 
@@ -1249,6 +1252,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Je dostupná novější verze FreeFileSync:</target>
+
+<source>Local path not available for %x.</source>
+<target>Mistní cesta není k dspozici pro %x.</target>
 
 <source>Confirm</source>
 <target>Potvrdit</target>
@@ -1530,17 +1536,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:</target>
 
-<source>- full file or folder name</source>
-<target>- celá cesta nebo jméno souboru</target>
+<source>Full file or folder path</source>
+<target>Plná cesta souboru nebo složky</target>
 
-<source>- folder part only</source>
-<target>- pouze cesta</target>
+<source>Parent folder path</source>
+<target>Nadřazená složka</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- celá cesta nebo jméno z opačného panelu pro %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Dočasná místní kopie pro SFTP a MTP</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- pouze cesta z opačného panelu pro %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parametry protistrany</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Zobrazit skryté dialogy a varovná hlášení?</target>
@@ -1632,6 +1638,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Soubory</target>
 
+<source>Name</source>
+<target>Název</target>
+
 <source>Items</source>
 <target>Položky</target>
 
@@ -1648,13 +1657,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync je aktuální.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Současná verze FreeFileSync nebyla nalezena online! Pravděpodobně existuje novější verze. Chcete verzi zkontrolovat ručně?</target>
 
 <source>&Check</source>
 <target>&Kontrola</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Nepodařila se kontrola konzistence pro %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Nelze najít systémovou funkci %x.</target>
@@ -1663,7 +1672,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Nepodařilo se zaregistrovat k odběru systémových zpráv.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Instalace aplikace je poškozena. Prosím přeinstalujte FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nepodařilo se zaregistrovat zprávy zařízení %x.</target>
@@ -1828,8 +1837,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Děkuji za Vaše příspěvky a podporu!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Tento instalátor pro přispěvovatele FreeFileSync dosáhl maximální počet instalací.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Stáhnout verzi FreeFileSync z domovské stránky?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Přenosnou verzi aplikace nelze instalovat do vybrané složky.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Prosím zvolte lokální typ instalace nebo vyberte jinou sloužku.</target>
 

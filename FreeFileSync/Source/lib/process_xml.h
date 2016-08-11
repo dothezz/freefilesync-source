@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef PROCESS_XML_H_28345825704254262435
 #define PROCESS_XML_H_28345825704254262435
@@ -160,7 +160,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     struct Gui
     {
-		Gui() {} //clang needs this anyway
+        Gui() {} //clang needs this anyway
         struct
         {
             wxPoint dlgPos;
@@ -219,7 +219,7 @@ struct XmlGlobalSettings
         {
             //default external app descriptions will be translated "on the fly"!!!
             //CONTRACT: first entry will be used for [Enter] or mouse double-click!
-            { L"Browse directory",              Zstr("xdg-open \"%item_folder%\"") },
+            { L"Browse directory",              Zstr("xdg-open \"%folder_path%\"") },
             { L"Open with default application", Zstr("xdg-open \"%local_path%\"")   },
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
         };

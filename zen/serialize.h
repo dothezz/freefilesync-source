@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef SERIALIZE_H_839405783574356
 #define SERIALIZE_H_839405783574356
@@ -25,16 +25,16 @@ binary container for data storage: must support "basic" std::vector interface (e
 */
 
 //binary container reference implementations
-typedef Zbase<char> Utf8String; //ref-counted + COW text stream + guaranteed performance: exponential growth
+using Utf8String = Zbase<char>; //ref-counted + COW text stream + guaranteed performance: exponential growth
 class ByteArray;                //ref-counted       byte stream + guaranteed performance: exponential growth -> no COW, but 12% faster than Utf8String (due to no null-termination?)
 
 
 class ByteArray //essentially a std::vector<char> with ref-counted semantics, but no COW! => *almost* value type semantics, but not quite
 {
 public:
-    typedef std::vector<char>::value_type value_type;
-    typedef std::vector<char>::iterator iterator;
-    typedef std::vector<char>::const_iterator const_iterator;
+    using value_type     = std::vector<char>::value_type;
+    using iterator       = std::vector<char>::iterator;
+    using const_iterator = std::vector<char>::const_iterator;
 
     iterator begin() { return buffer->begin(); }
     iterator end  () { return buffer->end  (); }

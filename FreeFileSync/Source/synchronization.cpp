@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "synchronization.h"
 #include <zen/process_priority.h>
@@ -2006,7 +2006,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     //check if user accidentally selected wrong directories for sync
     if (!significantDiffPairs.empty())
     {
-        std::wstring msg = _("The following folders are significantly different. Make sure you have selected the correct folders for synchronization.");
+        std::wstring msg = _("The following folders are significantly different. Please check that the correct folders are selected for synchronization.");
 
         for (const auto& item : significantDiffPairs)
             msg += L"\n\n" +

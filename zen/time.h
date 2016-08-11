@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef TIME_H_8457092814324342453627
 #define TIME_H_8457092814324342453627
@@ -207,7 +207,7 @@ struct PredefinedFormatTag  {};
 template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormatTag) //format as specified by "std::strftime", returns empty string on failure
 {
-    typedef typename GetCharType<String>::Type CharType;
+    using CharType = typename GetCharType<String>::Type;
     std::tm ctc = toClibTimeComponents(comp);
     std::mktime(&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
     //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
@@ -220,7 +220,7 @@ String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormat
 template <class String, class FormatType> inline
 String formatTime(FormatType, const TimeComp& comp, PredefinedFormatTag)
 {
-    typedef typename GetCharType<String>::Type CharType;
+    using CharType = typename GetCharType<String>::Type;
     return formatTime<String>(GetFormat<FormatType>().format(CharType()), comp, UserDefinedFormatTag());
 }
 }
@@ -249,13 +249,13 @@ time_t localToTimeT(const TimeComp& comp) //returns -1 on error
 template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp)
 {
-    typedef typename SelectIf<
+    using FormatTag = typename SelectIf<
     IsSameType<String2, FormatDateTag       >::value ||
     IsSameType<String2, FormatTimeTag       >::value ||
     IsSameType<String2, FormatDateTimeTag   >::value ||
     IsSameType<String2, FormatIsoDateTag    >::value ||
     IsSameType<String2, FormatIsoTimeTag    >::value ||
-    IsSameType<String2, FormatIsoDateTimeTag>::value, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Type FormatTag;
+    IsSameType<String2, FormatIsoDateTimeTag>::value, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Type;
 
     return implementation::formatTime<String>(format, comp, FormatTag());
 }
@@ -264,7 +264,7 @@ String formatTime(const String2& format, const TimeComp& comp)
 template <class String, class String2>
 bool parseTime(const String& format, const String2& str, TimeComp& comp) //return true on success
 {
-    typedef typename GetCharType<String>::Type CharType;
+    using CharType = typename GetCharType<String>::Type;
     static_assert(IsSameType<CharType, typename GetCharType<String2>::Type>::value, "");
 
     const CharType*       itFmt = strBegin(format);

@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "parallel_scan.h"
 #include <zen/file_error.h>
@@ -138,7 +138,7 @@ Windows 7:                                        Windows XP:
 std::vector<std::set<DirectoryKey>> separateByDistinctDisk(const std::set<DirectoryKey>& dirkeys)
 {
     //use one thread per physical disk:
-    typedef std::map<DiskInfo, std::set<DirectoryKey>> DiskKeyMapping;
+    using DiskKeyMapping = std::map<DiskInfo, std::set<DirectoryKey>>;
     DiskKeyMapping tmp;
     std::for_each(dirkeys.begin(), dirkeys.end(),
     [&](const DirectoryKey& key) { tmp[retrieveDiskInfo(key.dirpathFull_)].insert(key); });
@@ -151,7 +151,7 @@ std::vector<std::set<DirectoryKey>> separateByDistinctDisk(const std::set<Direct
 */
 
 //------------------------------------------------------------------------------------------
-typedef Zbase<wchar_t, StorageRefCountThreadSafe> BasicWString; //thread-safe string class for UI texts
+using BasicWString = Zbase<wchar_t, StorageRefCountThreadSafe>; //thread-safe string class for UI texts
 
 
 class AsyncCallback //actor pattern

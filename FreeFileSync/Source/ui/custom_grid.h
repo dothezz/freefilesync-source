@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef CUSTOM_GRID_H_8405817408327894
 #define CUSTOM_GRID_H_8405817408327894
@@ -71,8 +71,8 @@ struct SyncDirectionEvent : public wxCommandEvent
     const SyncDirection direction_;
 };
 
-typedef void (wxEvtHandler::*CheckRowsEventFunction)(CheckRowsEvent&);
-typedef void (wxEvtHandler::*SyncDirectionEventFunction)(SyncDirectionEvent&);
+using CheckRowsEventFunction     = void (wxEvtHandler::*)(CheckRowsEvent&);
+using SyncDirectionEventFunction = void (wxEvtHandler::*)(SyncDirectionEvent&);
 
 #define CheckRowsEventHandler(func) \
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(CheckRowsEventFunction, &func)

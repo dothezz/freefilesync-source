@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "application.h"
 #include <memory>
@@ -56,7 +56,7 @@ bool Application::OnInit()
     //::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
-	wxToolTip::Enable(true); //yawn, a wxWidgets screw-up: wxToolTip::SetAutoPop is no-op if global tooltip window is not yet constructed: wxToolTip::Enable creates it
+    wxToolTip::Enable(true); //yawn, a wxWidgets screw-up: wxToolTip::SetAutoPop is no-op if global tooltip window is not yet constructed: wxToolTip::Enable creates it
     wxToolTip::SetAutoPop(10000); //https://msdn.microsoft.com/en-us/library/windows/desktop/aa511495
 
     SetAppName(L"FreeFileSync"); //if not set, the default is the executable's name!
@@ -161,7 +161,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     std::vector<Zstring> dirPathPhrasesLeft;
     std::vector<Zstring> dirPathPhrasesRight;
     std::vector<std::pair<Zstring, XmlType>> configFiles; //XmlType: batch or GUI files only
-    Opt<Zstring> globalConfigFile;
+    Zstring globalConfigFile;
     bool openForEdit = false;
     {
         const Zchar optionEdit    [] = Zstr("-edit");
@@ -287,7 +287,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     //distinguish sync scenarios:
     //---------------------------
-    const Zstring globalConfigFilePath = globalConfigFile ? *globalConfigFile : xmlAccess::getGlobalConfigFile();
+    const Zstring globalConfigFilePath = !globalConfigFile.empty() ? globalConfigFile : xmlAccess::getGlobalConfigFile();
 
     if (configFiles.empty())
     {

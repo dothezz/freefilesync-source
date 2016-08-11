@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "dir_watcher.h"
 #include <algorithm>
@@ -84,7 +84,7 @@ DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
             const ErrorCode ec = getLastError(); //copy before directly/indirectly making other system calls!
             if (ec == ENOSPC) //fix misleading system message "No space left on device"
                 throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(subDirPath)),
-                                formatSystemError(L"inotify_add_watch", ec, L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
+                                formatSystemError(L"inotify_add_watch", numberTo<std::wstring>(ec), L"The user limit on the total number of inotify watches was reached or the kernel failed to allocate a needed resource."));
 
             throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtPath(subDirPath)), formatSystemError(L"inotify_add_watch", ec));
         }

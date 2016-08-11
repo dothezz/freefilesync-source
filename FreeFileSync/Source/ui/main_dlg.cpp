@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "main_dlg.h"
 #include <zen/format_unit.h>
@@ -735,7 +735,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
         };
 
         addFolderCheck(currMainCfg.firstPair);
-        std::for_each(currMainCfg.additionalPairs.begin(), currMainCfg.additionalPairs.end(), addFolderCheck);
+        for (const FolderPairEnh& fp : currMainCfg.additionalPairs)
+            addFolderCheck(fp);
         //------------------------------------------------------------------------------------------
 
         if (havePartialPair != haveFullPair) //either all pairs full or all half-filled -> validity check!
@@ -841,9 +842,14 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     else
         Center();
 
-    if (globalSettings.gui.mainDlg.isMaximized)
+    if (globalSettings.gui.mainDlg.isMaximized) //no real need to support both maximize and full screen functions
     {
-            Maximize(true);
+        //#ifdef ZEN_MAC
+        //        if (fullScreenApiSupported) -> starting in full screen seems to annoy users
+        //            ShowFullScreen(true); //once EnableFullScreenView() is set, this internally uses the new full screen API
+        //        else
+        //#endif
+        Maximize(true);
     }
 
     //set column attributes
@@ -1018,7 +1024,7 @@ void MainDialog::setFilterManually(const std::vector<FileSystemObject*>& selecti
 namespace
 {
 //perf: wxString doesn't model exponential growth and is unsuitable for large data sets
-typedef Zbase<wchar_t> zxString; //guaranteed exponential growth
+using zxString = Zbase<wchar_t>; //guaranteed exponential growth
 }
 
 void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRefs)
@@ -1052,12 +1058,11 @@ void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRe
             addSelection(*gr);
 
         //finally write to clipboard
-        if (!clipboardString.empty())
-            if (wxClipboard::Get()->Open())
-            {
-                ZEN_ON_SCOPE_EXIT(wxClipboard::Get()->Close());
-                wxClipboard::Get()->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString))); //ownership passed
-            }
+        if (wxClipboard::Get()->Open())
+        {
+            ZEN_ON_SCOPE_EXIT(wxClipboard::Get()->Close());
+            wxClipboard::Get()->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString))); //ownership passed
+        }
     }
     catch (const std::bad_alloc& e)
     {
@@ -1237,11 +1242,11 @@ void extractFileDetails(const FileSystemObject& fsObj, Function onDetails)
     [&](const FilePair& file)
     {
         const TempFileBuffer::FileDetails details = { file.getAbstractPath<side>(),
-                                      FileDescriptor(file.getLastWriteTime <side>(),
-                                                     file.getFileSize      <side>(),
-                                                     file.getFileId        <side>(),
-                                                     file.isFollowedSymlink<side>())
-                                    };
+                                                      FileDescriptor(file.getLastWriteTime <side>(),
+                                                                     file.getFileSize      <side>(),
+                                                                     file.getFileId        <side>(),
+                                                                     file.isFollowedSymlink<side>())
+                                                    };
         onDetails(details);
     }, [](const SymlinkPair& symlink) {});
 }
@@ -1249,14 +1254,14 @@ void extractFileDetails(const FileSystemObject& fsObj, Function onDetails)
 
 template <SelectedSide side>
 void collectNonNativeFiles(const std::vector<FileSystemObject*>& selectedRows, const TempFileBuffer& tempFileBuf,
-                          std::set<TempFileBuffer::FileDetails>& workLoad)
+                           std::set<TempFileBuffer::FileDetails>& workLoad)
 {
     for (const FileSystemObject* fsObj : selectedRows)
         extractFileDetails<side>(*fsObj, [&](const TempFileBuffer::FileDetails& details)
     {
-		if (!AFS::getNativeItemPath(details.path))
-			if (tempFileBuf.getTempPath(details).empty()) //TempFileBuffer::createTempFiles() contract!
-				workLoad.insert(details);
+        if (!AFS::getNativeItemPath(details.path))
+            if (tempFileBuf.getTempPath(details).empty()) //TempFileBuffer::createTempFiles() contract!
+                workLoad.insert(details);
     });
 }
 
@@ -1284,23 +1289,23 @@ void invokeCommandLine(const Zstring& commandLinePhrase, //throw FileError
         Zstring localPath;
         Zstring localPath2;
 
-		if (AFS::getNativeItemPath(basePath))
-			localPath = itemPath; //no matter if item exists or not
-		else //returns empty if not available (item not existing, error during copy):
-			extractFileDetails<side>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath = tempFileBuf.getTempPath(details); });
+        if (AFS::getNativeItemPath(basePath))
+            localPath = itemPath; //no matter if item exists or not
+        else //returns empty if not available (item not existing, error during copy):
+            extractFileDetails<side>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath = tempFileBuf.getTempPath(details); });
 
-		if (AFS::getNativeItemPath(basePath2))
-			localPath2 = itemPath2;
-		else
-			extractFileDetails<side2>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath2 = tempFileBuf.getTempPath(details); });
+        if (AFS::getNativeItemPath(basePath2))
+            localPath2 = itemPath2;
+        else
+            extractFileDetails<side2>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath2 = tempFileBuf.getTempPath(details); });
 
         if (localPath .empty()) localPath  = replaceCpy(toZ(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath );
         if (localPath2.empty()) localPath2 = replaceCpy(toZ(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath2);
-		
+
         Zstring command = commandLinePhrase;
         replace(command, Zstr("%item_path%"),    itemPath);
         replace(command, Zstr("%item_path2%"),   itemPath2);
-        replace(command, Zstr("%folder_path%"),  folderPath); 
+        replace(command, Zstr("%folder_path%"),  folderPath);
         replace(command, Zstr("%folder_path2%"), folderPath2);
         replace(command, Zstr("%local_path%"),   localPath);
         replace(command, Zstr("%local_path2%"),  localPath2);
@@ -1380,7 +1385,7 @@ void MainDialog::openExternalApplication(const Zstring& commandLinePhrase, bool 
         }
 
     std::set<TempFileBuffer::FileDetails> nonNativeFiles;
-    if (contains(commandLinePhrase, Zstr("%local_path%"))) 
+    if (contains(commandLinePhrase, Zstr("%local_path%")))
     {
         collectNonNativeFiles< LEFT_SIDE>(selectionLeft,  tempFileBuf, nonNativeFiles);
         collectNonNativeFiles<RIGHT_SIDE>(selectionRight, tempFileBuf, nonNativeFiles);
@@ -1836,7 +1841,7 @@ void MainDialog::onLocalKeyEvent(wxKeyEvent& event) //process key events without
         return;
     }
     localKeyEventsEnabled = false; //avoid recursion
-    ZEN_ON_SCOPE_EXIT(localKeyEventsEnabled = true;)
+    ZEN_ON_SCOPE_EXIT(localKeyEventsEnabled = true);
 
 
     const int keyCode = event.GetKeyCode();
@@ -2683,7 +2688,7 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& fileP
 
 void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filePaths)
 {
-    std::for_each(filePaths.begin(), filePaths.end(), [&](const Zstring& filepath)
+    for (const Zstring& filepath : filePaths)
     {
         const int histSize = m_listBoxHistory->GetCount();
         for (int i = 0; i < histSize; ++i)
@@ -2693,7 +2698,7 @@ void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filePaths)
                     m_listBoxHistory->Delete(i);
                     break;
                 }
-    });
+    }
 }
 
 
@@ -3025,14 +3030,11 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
     m_listBoxHistory->GetSelections(selections);
 
     std::vector<Zstring> filepaths;
-    std::for_each(selections.begin(), selections.end(),
-                  [&](int pos)
-    {
+    for (int pos : selections)
         if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(pos)))
             filepaths.push_back(histData->cfgFile_);
         else
             assert(false);
-    });
 
     if (!filepaths.empty())
         loadConfiguration(filepaths);
@@ -3051,13 +3053,11 @@ void MainDialog::OnLoadFromHistoryDoubleClick(wxCommandEvent& event)
     m_listBoxHistory->GetSelections(selections);
 
     std::vector<Zstring> filepaths;
-    std::for_each(selections.begin(), selections.end(), [&](int pos)
-    {
+    for (int pos : selections)
         if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(pos)))
             filepaths.push_back(histData->cfgFile_);
         else
             assert(false);
-    });
 
     if (!filepaths.empty())
         if (loadConfiguration(filepaths))
@@ -3619,7 +3619,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     ZEN_ON_SCOPE_EXIT(
         m_gridMainL->Scroll(scrollPosX, scrollPosY); //
         m_gridMainR->Scroll(scrollPosX, scrollPosY); //restore
-        m_gridMainC->Scroll(-1, scrollPosY); )       //
+        m_gridMainC->Scroll(-1, scrollPosY); );      //
 
     clearGrid(); //avoid memory peak by clearing old data first
 

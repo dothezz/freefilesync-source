@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef CHOICE_ENUM_H_132413545345687
 #define CHOICE_ENUM_H_132413545345687
@@ -44,7 +44,7 @@ struct EnumDescrList
         descrList.emplace_back(value, std::make_pair(text, tooltip));
         return *this;
     }
-    typedef std::vector<std::pair<Enum, std::pair<wxString, wxString>>> DescrList;
+    using DescrList = std::vector<std::pair<Enum, std::pair<wxString, wxString>>>;
     DescrList descrList;
 };
 template <class Enum> void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value);

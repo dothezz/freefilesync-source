@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Не могу пронаћи следеће фолдере:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Ако игноришете ову грешку фолдери ће се сматрати празним. Недостајући фолдери креираће се аутоматски по потреби.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Ако се ова грешка игнорише фолдери ће се сматрати празним. Недостајући фолдери креираће се аутоматски по потреби.</target>
 
 <source>A folder input field is empty.</source>
 <target>Поље за одабир фолдера је празно.</target>
@@ -155,10 +155,10 @@
 <target>Копирање заштићено од грешака</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Омогућено</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Онемогућено</target>
 
 <source>Copy locked files</source>
 <target>Копирај закључане датотеке</target>
@@ -167,22 +167,22 @@
 <target>Копирај овлашћења приступа датотекама</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Толеранција времена датотеке</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Тајмаут приступа фолдеру</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Извршавај са приоритетом у позадини</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Закључај фолдере током синхронизације</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Провери копиране датотеке</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Употреба не-подразумеваних глобалних подешавања:</target>
 
 <source>Starting comparison</source>
 <target>Покретање упоређивања</target>
@@ -273,6 +273,12 @@ Actual: %y bytes
 <source>Cannot move file %x to %y.</source>
 <target>Не могу преместити датотеку %x у %y.</target>
 
+<source>Unable to connect to %x.</source>
+<target>Не може се успоставити веза са %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Не могу отворити фолдер %x.</target>
+
 <source>Cannot enumerate directory %x.</source>
 <target>Не могу излистати фолдер %x.</target>
 
@@ -309,9 +315,6 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Не могу разрешити симболичну везу %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Не могу отворити фолдер %x.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Не могу одредити слободан простор на диску за %x.</target>
 
@@ -320,12 +323,6 @@ Actual: %y bytes
 
 <source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
-
-<source>Error Code %x:</source>
-<target>Грешка број %x:</target>
-
-<source>Unable to connect to %x.</source>
-<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -442,7 +439,7 @@ Actual: %y bytes
 <target>Не могу приступити Volume Shadow Copy сервису.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Молимо покрените 64-битну верзију FreeFileSync-а за израду shadow копија на овом систему.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Не могу утврдити назив партиције за %x.</target>
@@ -644,8 +641,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следеће ставке имају неразрешених конфликата и неће бити синхронизоване:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>Следећи фолдери су значајно различити. Обезбедите да сте сигурно одабрали праве фолдере за синхронизацију.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>Следећи фолдери су значајно различити. Молим проверите да ли сте изабрали праве фолдере за синхронизацију.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Недовољно простора на диску у:</target>
@@ -726,23 +723,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>Озбиљна грешка</target>
 
-<source>Symlink</source>
-<target>Сим-веза</target>
-
 <source>Folder</source>
 <target>Фолдер</target>
+
+<source>Symlink</source>
+<target>Сим-веза</target>
 
 <source>Full path</source>
 <target>Пуна путања</target>
 
-<source>Name</source>
-<target>Име</target>
+<source>Relative path</source>
+<target>Релативна путања</target>
 
-<source>Relative folder</source>
-<target>Релативни фолдер</target>
-
-<source>Base folder</source>
-<target>Основни фолдер</target>
+<source>Item name</source>
+<target>Име ставке</target>
 
 <source>Size</source>
 <target>Величина</target>
@@ -919,7 +913,7 @@ The command is triggered if:
 <target>Фолдерски пар:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Главна подешавања:</target>
 
 <source>Use local settings:</source>
 <target>Употреби локална подешавања:</target>
@@ -1088,6 +1082,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Протекло време:</target>
 
+<source>Bytes:</source>
+<target>Бајтова:</target>
+
+<source>Items:</source>
+<target>Ставке:</target>
+
 <source>Synchronizing...</source>
 <target>Синхронизујем...</target>
 
@@ -1252,6 +1252,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Нова верзија FreeFileSync је доступна:</target>
+
+<source>Local path not available for %x.</source>
+<target>Локална путања није доступна за %x.</target>
 
 <source>Confirm</source>
 <target>Потврди</target>
@@ -1533,17 +1536,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Интегриши спољне апликације у контекстни мени. Следећи макрои су доступни:</target>
 
-<source>- full file or folder name</source>
-<target>- цело име датотеке или фолдера</target>
+<source>Full file or folder path</source>
+<target>Пуна путања за датотеку или фолдер</target>
 
-<source>- folder part only</source>
-<target>- само фолдерски део</target>
+<source>Parent folder path</source>
+<target>Путања родитељског фолдера</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Дупликат с друге стране у %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Привремена локална копија за SFTP и MTP складиште</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Дупликат с друге стране у %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Параметри за наспрамну страну</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Прикажи све скривене прозоре и упозорења поново?</target>
@@ -1635,6 +1638,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>Датотеке</target>
 
+<source>Name</source>
+<target>Име</target>
+
 <source>Items</source>
 <target>Ставке</target>
 
@@ -1651,13 +1657,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync је ажуриран.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Не могу на мрежи пронаћи тренутни број верзије FreeFileSync-а. Нова верзија је вероватно доступна. Да ли проверити ручно сада?</target>
 
 <source>&Check</source>
 <target>&Провера</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Није успела провера конзистентности за %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Не могу пронаћи системску функцију %x.</target>
@@ -1666,7 +1672,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Није могућа регистрација примања системских порука.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Инсталационе датотеке су оштећене. Молим инсталирајте FreeFileSync поново.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не могу регистровати нотификацију уређаја за %x.</target>
@@ -1745,6 +1751,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot change process I/O priorities.</source>
 <target>Не може се променити процес I/O приоритета.</target>
+
+<source>Error Code %x:</source>
+<target>Грешка број %x:</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Провера доступности Корпе за смеће није успела за фолдер %x.</target>
@@ -1831,8 +1840,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>Хвала за вашу донацију и подршку!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Ова FreeFileSync инсталација за донаторе достигла је своју границу дневног инсталисања.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Преузети регуларну верзију са веб странице FreeFileSync-а?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Преносна верзија не може бити инсталисана у одабраном фолдеру.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Молим одаберите локални тип инсталације или одаберите други фолдер за инсталацију.</target>
 

@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>Não é possível encontrar as seguintes pastas:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>Se ignorar este erro, as pastas serão consideradas vazias. Pastas faltando são criadas automaticamente se necessário.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>Se este erro é ignorado as pastas serão consideradas vazias. Pastas ausentes são criados automaticamente quando necessário.</target>
 
 <source>A folder input field is empty.</source>
 <target>Um dos campos de directório para comparar está vazio.</target>
@@ -155,10 +155,10 @@
 <target>Cópia à prova de falhas</target>
 
 <source>Enabled</source>
-<target></target>
+<target>Activado</target>
 
 <source>Disabled</source>
-<target></target>
+<target>Desativado</target>
 
 <source>Copy locked files</source>
 <target>Copiar ficheiros bloqueados</target>
@@ -167,22 +167,22 @@
 <target>Copiar permissões de acesso do ficheiro</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>Tolerância de tempo de ficheiro</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>Tempo limite de acesso à pasta</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>Correr com prioridade de fundo</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>Bloquear diretórios durante sincronia</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>Verificar ficheiros copiados</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>Usando definições globais não predefinidas:</target>
 
 <source>Starting comparison</source>
 <target>A iniciar a comparação</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>Código de erro %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>Não é possível conectar-se em %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -439,7 +439,7 @@ Actual: %y bytes
 <target>Não é possível aceder ao serviço Volume Shadow Copy.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>Por favor, executar a versão do FreeFileSync de 64 bits para criar cópias de sombra neste sistema.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>Não é possível determinar o nome do volume para %x.</target>
@@ -641,8 +641,8 @@ O comando é executado se:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Os seguintes itens têm conflitos não resolvidos, e não serão sincronizados:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>As pastas a seguir são significativamente diferentes. Certifique-se de seleccionar as pastas corretas para sincronização.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>As seguintes pastas são significativamente diferentes. Por favor, verifique se as pastas corretas estão selecionadas para a sincronização.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Não há espaço livre suficiente em:</target>
@@ -722,23 +722,20 @@ O comando é executado se:
 <source>Serious Error</source>
 <target>Erro Grave</target>
 
-<source>Symlink</source>
-<target>Link Simbólico</target>
-
 <source>Folder</source>
 <target>Pasta</target>
+
+<source>Symlink</source>
+<target>Link Simbólico</target>
 
 <source>Full path</source>
 <target>Caminho completo</target>
 
-<source>Name</source>
-<target>Nome</target>
+<source>Relative path</source>
+<target>Caminho relativo</target>
 
-<source>Relative folder</source>
-<target>Pasta relativa</target>
-
-<source>Base folder</source>
-<target>Pasta principal</target>
+<source>Item name</source>
+<target>Nome do item</target>
 
 <source>Size</source>
 <target>Tamanho</target>
@@ -915,7 +912,7 @@ O comando é executado se:
 <target>Par da pasta:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>Definições principais:</target>
 
 <source>Use local settings:</source>
 <target>Usar opções locais:</target>
@@ -1084,6 +1081,12 @@ O comando é executado se:
 <source>Time elapsed:</source>
 <target>Tempo decorrido:</target>
 
+<source>Bytes:</source>
+<target>Bytes:</target>
+
+<source>Items:</source>
+<target>Itens:</target>
+
 <source>Synchronizing...</source>
 <target>A sincronizar...</target>
 
@@ -1249,6 +1252,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>A new version of FreeFileSync is available:</source>
 <target>Uma nova versão do FreeFileSync está disponível:</target>
 
+<source>Local path not available for %x.</source>
+<target>Caminho local não disponível para %x.</target>
+
 <source>Confirm</source>
 <target>Confirmar</target>
 
@@ -1412,7 +1418,7 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>Mostrar ficheiros filtrados ou temporariamente excluidos</target>
 
 <source>Save as default</source>
-<target>Salvar como padrão</target>
+<target>Guardar como padrão</target>
 
 <source>Filter</source>
 <target>Filtro</target>
@@ -1522,17 +1528,17 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:</target>
 
-<source>- full file or folder name</source>
-<target>- nome completo de ficheiro ou pasta</target>
+<source>Full file or folder path</source>
+<target>Caminho completo do ficheiro ou pasta</target>
 
-<source>- folder part only</source>
-<target>- nome da pasta parcial</target>
+<source>Parent folder path</source>
+<target>Caminho da pasta pai</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- Contrapartida de %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>Cópia local temporária para armazenamento SFTP e FTP</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- Contrapartida de %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>Parâmetros do lado oposto</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Mostrar diálogos ocultos e mensagens de erro novamente?</target>
@@ -1624,6 +1630,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Files</source>
 <target>Ficheiros</target>
 
+<source>Name</source>
+<target>Nome</target>
+
 <source>Items</source>
 <target>Itens</target>
 
@@ -1640,13 +1649,13 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>FreeFileSync está actualizado.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>Não é possível encontrar o número da versão online do FreeFileSync. Uma nova versão deve estar disponível. Verificar manualmente agora?</target>
 
 <source>&Check</source>
 <target>&Verificar</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>Falha na verificação de consistência para %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Não é possível encontrar a função do sistema %x.</target>
@@ -1655,7 +1664,7 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>Não foi possível registar para receber mensagens do sistema.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Ficheiros de instalação corompidos. Por favor, reinstale o FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Não é possível registrar as notificações do dispositivo para %x.</target>
@@ -1817,8 +1826,14 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>Obrigado pela sua doação e apoio!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>Este instalador do FreeFileSync para doadores atingiu seu limite diário de instalação.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>Descarregar a versão normal a partir do sítio da web do FreeFileSync agora?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>Não é possível instalar a versão portátil na pasta selecionada.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>Por favor, escolha o tipo do local de instalação ou selecione uma pasta diferente para instalar.</target>
 

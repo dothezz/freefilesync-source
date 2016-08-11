@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #include "file_access.h"
 #include <map>
@@ -259,26 +259,7 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
 namespace
 {
 
-void setWriteTimeFallback(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
-{
-    struct ::timeval writeTime[2] = {};
-    writeTime[0].tv_sec = ::time(nullptr); //access time (seconds)
-    writeTime[1].tv_sec = modTime;         //modification time (seconds)
-
-    if (procSl == ProcSymlink::FOLLOW)
-    {
-        if (::utimes(filePath.c_str(), writeTime) != 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"utimes");
-    }
-    else
-    {
-        if (::lutimes(filePath.c_str(), writeTime) != 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"lutimes");
-    }
-}
-
-
-void setWriteTimeNative(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
+void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTime, ProcSymlink procSl) //throw FileError
 {
     /*
     [2013-05-01] sigh, we can't use utimensat() on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
@@ -287,36 +268,33 @@ void setWriteTimeNative(const Zstring& filePath, std::int64_t modTime, ProcSymli
     [2015-03-09]
      - cannot reproduce issues with NTFS and utimensat() on Ubuntu
      - utimensat() is supposed to obsolete utime/utimes and is also used by "cp" and "touch"
-     - solves utimes() EINVAL bug for certain CIFS/NTFS drives: http://www.freefilesync.org/forum/viewtopic.php?t=387
-        => don't use utimensat() directly, but open file descriptor manually, else EINVAL, again!
-
-    => let's give utimensat another chance:
+		=> let's give utimensat another chance:
+		using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     */
     struct ::timespec newTimes[2] = {};
-    newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs!!
-    //http://www.freefilesync.org/forum/viewtopic.php?t=1701
-    newTimes[1].tv_sec = modTime; //modification time
+    newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs: http://www.freefilesync.org/forum/viewtopic.php?t=1701
+    newTimes[1] = modTime; //modification time
 
-    //=> using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     if (procSl == ProcSymlink::FOLLOW)
     {
-        const int fdFile = ::open(filePath.c_str(), O_WRONLY);
-        if (fdFile == -1)
-        {
-            if (errno == EACCES) //bullshit, access denied even with 0777 permissions! => utimes should work!
-                return setWriteTimeFallback(filePath, modTime, procSl); //throw FileError
+		//hell knows why files on gvfs-mounted Samba shares fail to open(O_WRONLY) returning EOPNOTSUPP:
+		//http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works
+        if (::utimensat(AT_FDCWD, itemPath.c_str(), newTimes, 0) == 0)
+			return;
 
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"open");
-        }
+		//in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: http://www.freefilesync.org/forum/viewtopic.php?t=387
+        const int fdFile = ::open(itemPath.c_str(), O_WRONLY);
+        if (fdFile == -1)
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"open");
         ZEN_ON_SCOPE_EXIT(::close(fdFile));
 
         if (::futimens(fdFile, newTimes) != 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"futimens");
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"futimens");
     }
     else
     {
-        if (::utimensat(AT_FDCWD, filePath.c_str(), newTimes, AT_SYMLINK_NOFOLLOW) != 0)
-            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(filePath)), L"utimensat");
+        if (::utimensat(AT_FDCWD, itemPath.c_str(), newTimes, AT_SYMLINK_NOFOLLOW) != 0)
+            THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"utimensat");
     }
 }
 
@@ -326,7 +304,9 @@ void setWriteTimeNative(const Zstring& filePath, std::int64_t modTime, ProcSymli
 
 void zen::setFileTime(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
 {
-    setWriteTimeNative(filePath, modTime, procSl); //throw FileError
+    struct ::timespec writeTime = {};
+    writeTime.tv_sec = modTime;
+    setWriteTimeNative(filePath, writeTime, procSl); //throw FileError
 
 }
 
@@ -526,8 +506,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     if (::lstat(sourceLink.c_str(), &sourceInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(sourceLink)), L"lstat");
 
-    setWriteTimeNative(targetLink, sourceInfo.st_mtime, ProcSymlink::DIRECT); //throw FileError
-
+    setWriteTimeNative(targetLink, sourceInfo.st_mtim, ProcSymlink::DIRECT); //throw FileError
 
     if (copyFilePermissions)
         copyItemPermissions(sourceLink, targetLink, ProcSymlink::DIRECT); //throw FileError
@@ -585,11 +564,11 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
     //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
     //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
     //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
-    setWriteTimeNative(targetFile, sourceInfo.st_mtime, ProcSymlink::FOLLOW); //throw FileError
+    setWriteTimeNative(targetFile, sourceInfo.st_mtim, ProcSymlink::FOLLOW); //throw FileError
 
     InSyncAttributes newAttrib;
     newAttrib.fileSize         = sourceInfo.st_size;
-    newAttrib.modificationTime = sourceInfo.st_mtime;
+    newAttrib.modificationTime = sourceInfo.st_mtim.tv_sec; //
     newAttrib.sourceFileId     = extractFileId(sourceInfo);
     newAttrib.targetFileId     = extractFileId(targetInfo);
     return newAttrib;

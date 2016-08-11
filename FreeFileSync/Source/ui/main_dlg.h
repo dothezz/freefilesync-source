@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef MAIN_DLG_H_8910481324545644545
 #define MAIN_DLG_H_8910481324545644545
@@ -276,7 +276,7 @@ private:
 
     void clearGrid(ptrdiff_t pos = -1);
 
-    typedef int MenuItemID;
+    using MenuItemID = int;
     std::map<MenuItemID, wxLanguage> languageMenuItemMap; //needed to attach menu item events
 
     //***********************************************

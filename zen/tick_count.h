@@ -1,8 +1,8 @@
-// **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0        *
-// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
-// **************************************************************************
+// *****************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under    *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
+// *****************************************************************************
 
 #ifndef TICK_COUNT_H_3807326223463457
 #define TICK_COUNT_H_3807326223463457
@@ -35,7 +35,7 @@ TickVal getTicks();    //return invalid value on error: !TickVal::isValid()
 class TickVal
 {
 public:
-    typedef timespec NativeVal;
+    using NativeVal = timespec;
 
     TickVal() {}
     explicit TickVal(const NativeVal& val) : val_(val) {}

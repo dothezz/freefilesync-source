@@ -1,3 +1,18 @@
+FreeFileSync 8.4
+----------------
+Mark temporary copies created by %local_path% read-only
+Fixed crash when accessing Bitvise SFTP Servers
+Support nanosecond-precision file time copying (Linux)
+Start maximized instead of in full screen mode (OS X)
+Fixed crash while setting privileges during shutdown
+Fixed crash when failing to clean up log files
+Fixed EOPNOTSUPP error when copying file to gvfs Samba share (Linux)
+Fixed default external applications command line (Linux)
+Thread-safe translation change even during app shutdown
+Don't consider port and password when comparing SFTP paths
+Updated translation files
+
+
 FreeFileSync 8.3 [2016-07-08]
 -----------------------------
 Make temporary local copy for non-native file paths: %local_path%
@@ -287,7 +302,7 @@ Refactored basic low-level file traversal routine
 Optimized file icon startup procedure
 Fixed occasional failure to set modification times on Samba shares (OS X)
 Transfer creation times during file copy (OS X)
-Support copying file times with nano-second precision (OS X)
+Support copying file times with nanosecond precision (OS X)
 
 
 FreeFileSync 6.13 [2015-01-11]

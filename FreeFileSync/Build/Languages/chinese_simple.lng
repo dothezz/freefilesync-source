@@ -112,8 +112,8 @@
 <source>Cannot find the following folders:</source>
 <target>无法找到如下文件夹:</target>
 
-<source>If you ignore this error the folders will be considered empty. Missing folders are created automatically when needed.</source>
-<target>如果你忽略这个错误, 文件夹将被认为是空的. 在需要的时候丢失的文件夹将会被自动创建.</target>
+<source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
+<target>如果这个错误被忽略文件夹将被认为是空的. 当有必要时丢失的文件夹将会被创建.</target>
 
 <source>A folder input field is empty.</source>
 <target>有一个文件夹输入框为空.</target>
@@ -155,10 +155,10 @@
 <target>无风险的文件复制</target>
 
 <source>Enabled</source>
-<target></target>
+<target>启用</target>
 
 <source>Disabled</source>
-<target></target>
+<target>禁用</target>
 
 <source>Copy locked files</source>
 <target>复制被锁定的文件</target>
@@ -167,22 +167,22 @@
 <target>复制文件存取权限</target>
 
 <source>File time tolerance</source>
-<target></target>
+<target>文件时间容差</target>
 
 <source>Folder access timeout</source>
-<target></target>
+<target>文件夹访问超时</target>
 
 <source>Run with background priority</source>
-<target></target>
+<target>以后台优先级运行</target>
 
 <source>Lock directories during sync</source>
-<target></target>
+<target>同步期间锁定目录</target>
 
 <source>Verify copied files</source>
-<target></target>
+<target>校验已复制文件</target>
 
 <source>Using non-default global settings:</source>
-<target></target>
+<target>使用非默认全局设置:</target>
 
 <source>Starting comparison</source>
 <target>正在开始比较</target>
@@ -325,7 +325,7 @@ Actual: %y bytes
 <target>错误代码 %x:</target>
 
 <source>Unable to connect to %x.</source>
-<target></target>
+<target>无法连接到 %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -436,7 +436,7 @@ Actual: %y bytes
 <target>无法访问卷影复制服务.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
-<target></target>
+<target>请运行FreeFileSync的64位版本来在此系统上创建卷影.</target>
 
 <source>Cannot determine volume name for %x.</source>
 <target>无法为 %x 确定卷名.</target>
@@ -638,8 +638,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>如下项目有无法解决的冲突并将不会被同步:</target>
 
-<source>The following folders are significantly different. Make sure you have selected the correct folders for synchronization.</source>
-<target>下列文件夹有明显的不同. 请确认你已选择了正确的文件夹来进行同步.</target>
+<source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
+<target>如下的文件夹有显著不同. 请检查是否选择了正确的文件夹来进行同步.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>没有足够的可用磁盘空间用于:</target>
@@ -718,23 +718,20 @@ The command is triggered if:
 <source>Serious Error</source>
 <target>严重错误</target>
 
-<source>Symlink</source>
-<target>符号连接</target>
-
 <source>Folder</source>
 <target>文件夹</target>
+
+<source>Symlink</source>
+<target>符号连接</target>
 
 <source>Full path</source>
 <target>完整路径</target>
 
-<source>Name</source>
-<target>文件名</target>
+<source>Relative path</source>
+<target>相对路径</target>
 
-<source>Relative folder</source>
-<target>相对文件夹</target>
-
-<source>Base folder</source>
-<target>主文件夹</target>
+<source>Item name</source>
+<target>项目名称</target>
 
 <source>Size</source>
 <target>大小</target>
@@ -911,7 +908,7 @@ The command is triggered if:
 <target>文件夹对:</target>
 
 <source>Main settings:</source>
-<target></target>
+<target>主设置:</target>
 
 <source>Use local settings:</source>
 <target>使用本地设置:</target>
@@ -1080,6 +1077,12 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>已用时间:</target>
 
+<source>Bytes:</source>
+<target>字节:</target>
+
+<source>Items:</source>
+<target>项目:</target>
+
 <source>Synchronizing...</source>
 <target>同步中...</target>
 
@@ -1241,6 +1244,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>A new version of FreeFileSync is available:</source>
 <target>已经有新版本的FreeFileSync可用:</target>
+
+<source>Local path not available for %x.</source>
+<target>本地路径不适用于 %x.</target>
 
 <source>Confirm</source>
 <target>确认</target>
@@ -1508,17 +1514,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>集成外部应用程序到右键菜单. 如下宏可用:</target>
 
-<source>- full file or folder name</source>
-<target>- 完整的文件或文件夹名</target>
+<source>Full file or folder path</source>
+<target>完整的文件或文件夹路径</target>
 
-<source>- folder part only</source>
-<target>- 只对文件夹部分</target>
+<source>Parent folder path</source>
+<target>上级文件夹路径</target>
 
-<source>- Other side's counterpart to %item_path%</source>
-<target>- 另一边的对应项到 %item_path%</target>
+<source>Temporary local copy for SFTP and MTP storage</source>
+<target>SFTP和MTP存储的临时本地副本</target>
 
-<source>- Other side's counterpart to %item_folder%</source>
-<target>- 另一边的对应项到 %item_folder%</target>
+<source>Parameters for opposite side</source>
+<target>用于对侧的参数</target>
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>是否要重新显示被隐藏的对话框和警告信息?</target>
@@ -1610,6 +1616,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Files</source>
 <target>文件</target>
 
+<source>Name</source>
+<target>文件名</target>
+
 <source>Items</source>
 <target>项目</target>
 
@@ -1626,13 +1635,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>FreeFileSync 已是最新.</target>
 
 <source>Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?</source>
-<target></target>
+<target>无法在线找到当前FreeFileSync的版本号. 可能有新版本可用. 是否现在手动检测?</target>
 
 <source>&Check</source>
 <target>检查(&C)</target>
 
 <source>Consistency check failed for %x.</source>
-<target></target>
+<target>对于 %x 的一致性检测失败.</target>
 
 <source>Cannot find system function %x.</source>
 <target>无法找到系统功能 %x.</target>
@@ -1641,7 +1650,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>无法注册以接收系统信息.</target>
 
 <source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>安装文件损坏. 请重新安装FreeFileSync.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>无法为 %x 注册设备通知.</target>
@@ -1800,8 +1809,14 @@ This guarantees a consistent state even in case of a serious error.
 <target>谢谢你的捐助和支持!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target></target>
+<target>这个用于捐助者的FreeFileSync安装程序已经达到每日安装上限.</target>
 
 <source>Download the regular version from the FreeFileSync homepage now?</source>
-<target></target>
+<target>是否要马上从FreeFileSync网站下载普通版本?</target>
+
+<source>The portable version cannot install into the selected folder.</source>
+<target>便携版本无法安装到选定的文件夹.</target>
+
+<source>Please choose the local installation type or select a different folder for installation.</source>
+<target>请选择本地安装类型或选择用于安装的不同文件夹.</target>
 
