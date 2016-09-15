@@ -6,6 +6,7 @@
 #include <zen/utf.h>
 #include <zen/optional.h>
 #include <zen/scope_guard.h>
+#include <zen/globals.h>
 
     #include <stdlib.h> //getenv()
     #include <unistd.h> //getcwd

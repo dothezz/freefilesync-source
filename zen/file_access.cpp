@@ -258,7 +258,6 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
 
 namespace
 {
-
 void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTime, ProcSymlink procSl) //throw FileError
 {
     /*
@@ -268,8 +267,8 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
     [2015-03-09]
      - cannot reproduce issues with NTFS and utimensat() on Ubuntu
      - utimensat() is supposed to obsolete utime/utimes and is also used by "cp" and "touch"
-		=> let's give utimensat another chance:
-		using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
+        => let's give utimensat another chance:
+        using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     */
     struct ::timespec newTimes[2] = {};
     newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs: http://www.freefilesync.org/forum/viewtopic.php?t=1701
@@ -277,12 +276,12 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
 
     if (procSl == ProcSymlink::FOLLOW)
     {
-		//hell knows why files on gvfs-mounted Samba shares fail to open(O_WRONLY) returning EOPNOTSUPP:
-		//http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works
+        //hell knows why files on gvfs-mounted Samba shares fail to open(O_WRONLY) returning EOPNOTSUPP:
+        //http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works
         if (::utimensat(AT_FDCWD, itemPath.c_str(), newTimes, 0) == 0)
-			return;
+            return;
 
-		//in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: http://www.freefilesync.org/forum/viewtopic.php?t=387
+        //in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: http://www.freefilesync.org/forum/viewtopic.php?t=387
         const int fdFile = ::open(itemPath.c_str(), O_WRONLY);
         if (fdFile == -1)
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"open");

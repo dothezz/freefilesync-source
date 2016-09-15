@@ -5,12 +5,13 @@
 // *****************************************************************************
 
 #include "format_unit.h"
-#include "basic_math.h"
-#include "i18n.h"
-#include "time.h"
 #include <cwchar> //swprintf
 #include <ctime>
 #include <cstdio>
+#include "basic_math.h"
+#include "i18n.h"
+#include "time.h"
+#include "globals.h"
 
     #include <clocale> //thousands separator
     #include "utf.h"   //

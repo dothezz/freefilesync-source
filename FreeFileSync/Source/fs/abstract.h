@@ -156,13 +156,13 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
         struct SymlinkInfo
         {
-            const Zstring& itemName;
+            const Zstring itemName;
             std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
         };
 
         struct FileInfo
         {
-            const Zstring& itemName;
+            const Zstring itemName;
             std::uint64_t fileSize;      //unit: bytes!
             std::int64_t  lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
             const FileId  id;            //optional: empty if not supported!
@@ -171,7 +171,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
         struct DirInfo
         {
-            const Zstring& itemName;
+            const Zstring itemName;
         };
 
         enum HandleLink
@@ -186,9 +186,9 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
             ON_ERROR_IGNORE
         };
 
-        virtual void                               onFile   (const FileInfo&    fi) = 0;
-        virtual HandleLink                         onSymlink(const SymlinkInfo& si) = 0;
-        virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) = 0;
+        virtual void                               onFile   (const FileInfo&    fi) = 0; //
+        virtual HandleLink                         onSymlink(const SymlinkInfo& si) = 0; //throw X
+        virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) = 0; //
         //nullptr: ignore directory, non-nullptr: traverse into, using the (new) callback
 
         virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data at current level as incomplete!
@@ -354,7 +354,7 @@ bool tryReportingDirError(Command cmd, AbstractFileSystem::TraverserCallback& ca
         }
         catch (const FileError& e)
         {
-            switch (callback.reportDirError(e.toString(), retryNumber))
+            switch (callback.reportDirError(e.toString(), retryNumber)) //throw X
             {
                 case AbstractFileSystem::TraverserCallback::ON_ERROR_RETRY:
                     break;
@@ -376,7 +376,7 @@ bool tryReportingItemError(Command cmd, AbstractFileSystem::TraverserCallback& c
         }
         catch (const FileError& e)
         {
-            switch (callback.reportItemError(e.toString(), retryNumber, itemName))
+            switch (callback.reportItemError(e.toString(), retryNumber, itemName)) //throw X
             {
                 case AbstractFileSystem::TraverserCallback::ON_ERROR_RETRY:
                     break;

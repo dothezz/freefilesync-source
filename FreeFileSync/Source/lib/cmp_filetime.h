@@ -69,7 +69,6 @@ enum class TimeResult
 inline
 TimeResult compareFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
-
     //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
     static const std::int64_t oneYearFromNow = std::time(nullptr) + 365 * 24 * 3600;
 

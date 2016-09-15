@@ -5,11 +5,11 @@
 // *****************************************************************************
 
 #include "small_dlgs.h"
-#include <wx/wupdlock.h>
+#include <chrono>
 #include <zen/format_unit.h>
 #include <zen/build_info.h>
-#include <zen/tick_count.h>
 #include <zen/stl_tools.h>
+#include <wx/wupdlock.h>
 #include <wx+/choice_enum.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/rtl.h>
@@ -287,7 +287,7 @@ private:
 
     const std::vector<const FileSystemObject*>& rowsToDeleteOnLeft;
     const std::vector<const FileSystemObject*>& rowsToDeleteOnRight;
-    const TickVal tickCountStartup;
+    const std::chrono::steady_clock::time_point dlgStartTime = std::chrono::steady_clock::now();
 
     //output-only parameters:
     bool& useRecycleBinOut;
@@ -301,7 +301,6 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     DeleteDlgGenerated(parent),
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
-    tickCountStartup(getTicks()),
     useRecycleBinOut(useRecycleBin)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
@@ -362,11 +361,8 @@ void DeleteDialog::updateGui()
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
     //additional safety net, similar to Windows Explorer: time delta between DEL and ENTER must be at least 50ms to avoid accidental deletion!
-    const TickVal now = getTicks();   //0 on error
-    std::int64_t tps = ticksPerSec(); //
-    if (now.isValid() && tickCountStartup.isValid() && tps != 0)
-        if (dist(tickCountStartup, now) * 1000 / tps < 50)
-            return;
+    if (std::chrono::steady_clock::now() < dlgStartTime + std::chrono::milliseconds(50))
+        return;
 
     useRecycleBinOut = m_checkBoxUseRecycler->GetValue();
 

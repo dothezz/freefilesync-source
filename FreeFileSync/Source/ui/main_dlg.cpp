@@ -266,7 +266,9 @@ const int TOP_BUTTON_OPTIMAL_WIDTH = 180;
 void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& variantName, bool makeGrey)
 {
     wxImage labelImage   = createImageFromText(btn.GetLabel(), btn.GetFont(), wxSystemSettings::GetColour(makeGrey ? wxSYS_COLOUR_GRAYTEXT : wxSYS_COLOUR_BTNTEXT));
-    wxImage variantImage = createImageFromText(variantName, wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxBOLD), wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    wxImage variantImage = createImageFromText(variantName,
+                                               wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD),
+                                               wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     wxImage descrImage = stackImages(labelImage, variantImage, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER);
     const wxImage& iconImage = makeGrey ? greyScale(bmp.ConvertToImage()) : bmp.ConvertToImage();
 
@@ -306,6 +308,12 @@ xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFile) /
 }
 
 
+Zstring MainDialog::getLastRunConfigPath()
+{
+    return zen::getConfigDir() + Zstr("LastRun.ffs_gui");
+}
+
+
 void MainDialog::create(const Zstring& globalConfigFile)
 {
     using namespace xmlAccess;
@@ -340,8 +348,9 @@ void MainDialog::create(const Zstring& globalConfigFile)
 
     if (cfgFilePaths.empty())
     {
-        if (zen::fileExists(lastRunConfigName())) //3. try to load auto-save config
-            cfgFilePaths.push_back(lastRunConfigName());
+        const Zstring lastRunConfigFilePath = getLastRunConfigPath();
+        if (zen::fileExists(lastRunConfigFilePath)) //3. try to load auto-save config
+            cfgFilePaths.push_back(lastRunConfigFilePath);
     }
 
     XmlGuiConfig guiCfg; //structure to receive gui settings with default values
@@ -412,6 +421,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
     globalConfigFile_(globalConfigFile),
+    lastRunConfigPath(getLastRunConfigPath()),
     folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
     folderHistoryRight(std::make_shared<FolderHistory>())  //
 {
@@ -780,7 +790,7 @@ MainDialog::~MainDialog()
 
     try //save "LastRun.ffs_gui"
     {
-        writeConfig(getConfig(), lastRunConfigName()); //throw FileError
+        writeConfig(getConfig(), lastRunConfigPath); //throw FileError
     }
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
     catch (const FileError&) {}
@@ -800,7 +810,7 @@ void MainDialog::onQueryEndSession()
     try { writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); }
     catch (const FileError&) {} //we try our best to do something useful in this extreme situation - no reason to notify or even log errors here!
 
-    try { writeConfig(getConfig(), lastRunConfigName()); }
+    try { writeConfig(getConfig(), lastRunConfigPath); }
     catch (const FileError&) {}
 }
 
@@ -870,7 +880,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     std::reverse(cfgFilePaths.begin(), cfgFilePaths.end());
     //list is stored with last used files first in xml, however addFileToCfgHistory() needs them last!!!
 
-    cfgFilePaths.push_back(lastRunConfigName()); //make sure <Last session> is always part of history list (if existing)
+    cfgFilePaths.push_back(lastRunConfigPath); //make sure <Last session> is always part of history list (if existing)
     addFileToCfgHistory(cfgFilePaths);
 
     removeObsoleteCfgHistoryItems(cfgFilePaths); //remove non-existent items (we need this only on startup)
@@ -2623,7 +2633,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             wxString label;
             unsigned int newPos = 0;
 
-            if (equalFilePath(filepath, lastRunConfigName()))
+            if (equalFilePath(filepath, lastRunConfigPath))
                 label = lastSessionLabel;
             else
             {
@@ -2704,7 +2714,7 @@ void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filePaths)
 
 void MainDialog::updateUnsavedCfgStatus()
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
 
     const bool haveUnsavedCfg = lastConfigurationSaved != getConfig();
 
@@ -2745,7 +2755,7 @@ void MainDialog::updateUnsavedCfgStatus()
 
 void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
 
     using namespace xmlAccess;
 
@@ -2801,7 +2811,7 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
     }
     else
     {
-        Zstring defaultFileName = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
+        Zstring defaultFileName = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
         if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
             defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_gui");
@@ -2842,7 +2852,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
     //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "m_bpButtonViewTypeSyncAction" is negliable
 
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
     const XmlGuiConfig guiCfg = getConfig();
 
     //prepare batch config: reuse existing batch-specific settings from file if available
@@ -2927,7 +2937,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 {
     if (lastConfigurationSaved != getConfig())
     {
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
 
         //notify user about changed settings
         if (globalCfg.optDialogs.popupOnConfigChange)
@@ -2987,7 +2997,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
 void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
 
     wxFileDialog filePicker(this,
                             wxString(),
@@ -3260,13 +3270,6 @@ xmlAccess::XmlGuiConfig MainDialog::getConfig() const
     guiCfg.highlightSyncAction = m_bpButtonViewTypeSyncAction->isActive();
 
     return guiCfg;
-}
-
-
-const Zstring& MainDialog::lastRunConfigName()
-{
-    static Zstring instance = zen::getConfigDir() + Zstr("LastRun.ffs_gui");
-    return instance;
 }
 
 
@@ -3812,7 +3815,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
     try
     {
         //PERF_START;
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigName()) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
 
         const auto& guiCfg = getConfig();
 

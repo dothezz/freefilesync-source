@@ -12,6 +12,8 @@
 using namespace zen;
 
 
+
+
 void HierarchyObject::removeEmptyRec()
 {
     bool emptyExisting = false;

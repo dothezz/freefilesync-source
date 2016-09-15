@@ -16,9 +16,9 @@ using namespace zen;
 
 namespace
 {
-const std::wstring cmdTxtCloseProgressDlg = L"Close progress dialog"; //special command //mark for extraction: _("Close progress dialog")
+std::wstring getCmdTxtCloseProgressDlg() { return L"Close progress dialog"; } //special command //mark for extraction: _("Close progress dialog")
 
-const std::wstring separationLine(L"---------------------------------------------------------------------------------------------------------------");
+std::wstring getSeparationLine() { return L"---------------------------------------------------------------------------------------------------------------"; }
 
 
 std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/command) pairs
@@ -41,7 +41,7 @@ const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 
 bool isCloseProgressDlgCommand(const Zstring& value)
 {
-    return trimCpy(utfCvrtTo<std::wstring>(value)) == cmdTxtCloseProgressDlg;
+    return trimCpy(utfCvrtTo<std::wstring>(value)) == getCmdTxtCloseProgressDlg();
 }
 
 
@@ -75,8 +75,8 @@ void OnCompletionBox::addItemHistory()
 {
     const Zstring command = trimCpy(getValue());
 
-    if (command == utfCvrtTo<Zstring>(separationLine) || //do not add sep. line
-        command == utfCvrtTo<Zstring>(cmdTxtCloseProgressDlg) || //do not add special command
+    if (command == utfCvrtTo<Zstring>(getSeparationLine()) || //do not add sep. line
+        command == utfCvrtTo<Zstring>(getCmdTxtCloseProgressDlg()) || //do not add special command
         command.empty())
         return;
 
@@ -99,8 +99,8 @@ Zstring OnCompletionBox::getValue() const
 {
     auto value = trimCpy(copyStringTo<std::wstring>(GetValue()));
 
-    if (value == implementation::translate(cmdTxtCloseProgressDlg)) //undo translation for config file storage
-        value = cmdTxtCloseProgressDlg;
+    if (value == implementation::translate(getCmdTxtCloseProgressDlg())) //undo translation for config file storage
+        value = getCmdTxtCloseProgressDlg();
 
     return utfCvrtTo<Zstring>(value);
 }
@@ -110,8 +110,8 @@ void OnCompletionBox::setValue(const Zstring& value)
 {
     auto tmp = trimCpy(utfCvrtTo<std::wstring>(value));
 
-    if (tmp == cmdTxtCloseProgressDlg)
-        tmp = implementation::translate(cmdTxtCloseProgressDlg); //have this symbolic constant translated properly
+    if (tmp == getCmdTxtCloseProgressDlg())
+        tmp = implementation::translate(getCmdTxtCloseProgressDlg()); //have this symbolic constant translated properly
 
     setValueAndUpdateList(tmp);
 }
@@ -125,7 +125,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     std::deque<std::wstring> items;
 
     //1. special command
-    items.push_back(implementation::translate(cmdTxtCloseProgressDlg));
+    items.push_back(implementation::translate(getCmdTxtCloseProgressDlg()));
 
     //2. built in commands
     for (const auto& item : defaultCommands)
@@ -134,7 +134,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     //3. history elements
     if (!history_.empty())
     {
-        items.push_back(separationLine);
+        items.push_back(getSeparationLine());
         for (const Zstring& hist : history_)
             items.push_back(utfCvrtTo<std::wstring>(hist));
         std::sort(items.end() - history_.size(), items.end());
@@ -146,7 +146,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     if (std::find(items.begin(), items.end(), value) == items.end())
     {
         if (!value.empty())
-            items.push_front(separationLine);
+            items.push_front(getSeparationLine());
         items.push_front(value);
     }
 
@@ -174,7 +174,7 @@ void OnCompletionBox::OnValidateSelection(wxCommandEvent& event)
 {
     const auto value = copyStringTo<std::wstring>(GetValue());
 
-    if (value == separationLine)
+    if (value == getSeparationLine())
         return setValueAndUpdateList(std::wstring());
 
     for (const auto& item : defaultCommands)

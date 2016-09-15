@@ -9,13 +9,11 @@
 
 #include <cassert>
 #include <exception>
-#include <type_traits> //std::decay
-
-//best of Zen, Loki and C++17
+#include "type_tools.h"
 
 
 //std::uncaught_exceptions() currently unsupported on GCC and Clang => clean up ASAP
-    static_assert(__GNUC__ < 6 || (__GNUC__ == 6 && (__GNUC_MINOR__ < 1 || (__GNUC_MINOR__ == 1 && __GNUC_PATCHLEVEL__ <= 1))), "check std::uncaught_exceptions support");
+    static_assert(__GNUC__ < 6 || (__GNUC__ == 6 && (__GNUC_MINOR__ < 2 || (__GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ <= 1))), "check std::uncaught_exceptions support");
 
 namespace __cxxabiv1
 {
@@ -28,6 +26,7 @@ inline int getUncaughtExceptionCount()
     return *(reinterpret_cast<unsigned int*>(static_cast<char*>(static_cast<void*>(__cxxabiv1::__cxa_get_globals())) + sizeof(void*)));
 }
 
+//best of Zen, Loki and C++17
 
 namespace zen
 {
@@ -51,45 +50,32 @@ enum class ScopeGuardRunMode
 };
 
 
-template <ScopeGuardRunMode runMode, typename F>
-struct ScopeGuardDestructor;
-
-//specialize scope guard destructor code and get rid of those pesky MSVC "4127 conditional expression is constant"
-template <typename F>
-struct ScopeGuardDestructor<ScopeGuardRunMode::ON_EXIT, F>
+//partially specialize scope guard destructor code and get rid of those pesky MSVC "4127 conditional expression is constant"
+template <typename F> inline
+void runScopeGuardDestructor(F& fun, int /*exeptionCountOld*/, StaticEnum<ScopeGuardRunMode, ScopeGuardRunMode::ON_EXIT>)
 {
-    static void run(F& fun, int exeptionCountOld)
-    {
-		(void)exeptionCountOld; //silence unused parameter warning
+    try { fun(); }
+    catch (...) { assert(false); } //consistency: don't expect exceptions for ON_EXIT even if "!failed"!
+}
+
+
+template <typename F> inline
+void runScopeGuardDestructor(F& fun, int exeptionCountOld, StaticEnum<ScopeGuardRunMode, ScopeGuardRunMode::ON_SUCCESS>)
+{
+    const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
+    if (!failed)
+        fun(); //throw X
+}
+
+
+template <typename F> inline
+void runScopeGuardDestructor(F& fun, int exeptionCountOld, StaticEnum<ScopeGuardRunMode, ScopeGuardRunMode::ON_FAIL>)
+{
+    const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
+    if (failed)
         try { fun(); }
-        catch (...) { assert(false); } //consistency: don't expect exceptions for ON_EXIT even if "!failed"!
-    }
-};
-
-
-template <typename F>
-struct ScopeGuardDestructor<ScopeGuardRunMode::ON_SUCCESS, F>
-{
-    static void run(F& fun, int exeptionCountOld)
-    {
-        const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
-        if (!failed)
-            fun(); //throw X
-    }
-};
-
-
-template <typename F>
-struct ScopeGuardDestructor<ScopeGuardRunMode::ON_FAIL, F>
-{
-    static void run(F& fun, int exeptionCountOld)
-    {
-        const bool failed = getUncaughtExceptionCount() > exeptionCountOld;
-        if (failed)
-            try { fun(); }
-            catch (...) { assert(false); }
-    }
-};
+        catch (...) { assert(false); }
+}
 
 
 template <ScopeGuardRunMode runMode, typename F>
@@ -106,7 +92,7 @@ public:
     ~ScopeGuard() noexcept(runMode != ScopeGuardRunMode::ON_SUCCESS)
     {
         if (!dismissed)
-            ScopeGuardDestructor<runMode, F>::run(fun_, exeptionCount);
+            runScopeGuardDestructor(fun_, exeptionCount, StaticEnum<ScopeGuardRunMode, runMode>());
     }
 
     void dismiss() { dismissed = true; }

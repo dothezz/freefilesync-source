@@ -36,16 +36,13 @@ void uninitializeHelp(); //clean up gracefully during app shutdown: leaving this
 namespace impl
 {
 //finish wxWidgets' job:
-class FfsHelpController
+struct FfsHelpController
 {
-public:
-    static FfsHelpController& getInstance()
+    static FfsHelpController& instance()
     {
         static FfsHelpController inst;
         return inst;
     }
-
-    void uninitialize() {}
 
     void openSection(const wxString& section, wxWindow* parent)
     {
@@ -56,6 +53,7 @@ public:
         //-> Suse Linux: avoids program hang on exit if user closed help parent dialog before the help dialog itself was closed (why is this even possible???)
         //               avoids ESC key not being recognized by help dialog (but by parent dialog instead)
     }
+    void uninitialize() {}
 };
 }
 
@@ -63,20 +61,20 @@ public:
 inline
 void displayHelpEntry(const wxString& topic, wxWindow* parent)
 {
-    impl::FfsHelpController::getInstance().openSection(L"html/" + topic + L".html", parent);
+    impl::FfsHelpController::instance().openSection(L"html/" + topic + L".html", parent);
 }
 
 
 inline
 void displayHelpEntry(wxWindow* parent)
 {
-    impl::FfsHelpController::getInstance().openSection(wxString(), parent);
+    impl::FfsHelpController::instance().openSection(wxString(), parent);
 }
 
 inline
 void uninitializeHelp()
 {
-    impl::FfsHelpController::getInstance().uninitialize();
+    impl::FfsHelpController::instance().uninitialize();
 
 }
 }
