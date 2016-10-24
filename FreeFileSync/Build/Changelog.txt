@@ -1,15 +1,32 @@
-FreeFileSync 8.5
-----------------
+FreeFileSync 8.6 [2016-10-25]
+-----------------------------
+Added SFTP support for OS X
+Support SFTP authentication via public/private key
+Remember configuration history scroll position
+SFTP folder picker supports browsing hidden folders
+Fixed failure to copy files with corrupted ADS
+Signed application installer (OS X)
+Increase config history default size to 100 items
+Auto-close FreeFileSync processes before uninstallation
+Simplified SFTP configuration syntax
+Fixed update check sending incomplete keep-alive header
+Detailed error reporting after failed web access
+Suggest folder path macro substitutions also at inner positions
+Transfer folder creation times (OS X)
+
+
+FreeFileSync 8.5 [2016-09-16]
+-----------------------------
 Support multiple SSH connections per SFTP folder traversal: N times speed up
 Support multiple SFTP channels per SSH connection: additional N times speed up
 Fixed installer crashes by using correct DEP-compatibility
 Fixed notification area icon being generated too often
-Thread-safe SFTP deinitialization on shutdown
+Thread-safe SFTP uninitialization on shutdown
 Thread-safe mini-dump creation during shutdown
 Fixed case-insensitive migration of new csidl macro names
 Reduced SFTP access serialization overhead
 Buffer SFTP sessions independently from usage context
-Detect and discard timed-out SSH sessions
+Detect and discard unstable SSH sessions
 Pre-empt SFTP session disconnect via dedicated SFTP cleanup thread
 Run SFTP tasks directly on worker threads without helper thread overhead
 
@@ -285,7 +302,7 @@ Work around silent failure to copy file times to external drives (Linux)
 FreeFileSync 6.15 [2015-04-07]
 ------------------------------
 Revert to log file naming convention without colon character
-Prevent endless recursion when traversing into folder on corrupt file system
+Prevent endless recursion when traversing into folder on corrupted file system
 Fixed view filter button rendering issue for RTL languages
 Fixed grid losing far scroll positions when increasing icon sizes
 Flush file buffers before verifying file copy
@@ -654,7 +671,7 @@ Revised middle grid inactive color and duplicate equality symbol
 Skip XML comments while parsing config files
 Redesigned confirmation popup dialogs
 Standard button spacing conforms to operating system conventions
-Shrinked memory consumption of file hierarchy data structures
+Shrink memory consumption of file hierarchy data structures
 Don't show file deletion dialog if selection is empty
 Fixed incorrect progress statistics if a file or directory is deleted externally after comparison
 Focus grid cursor row after switching sides with keyboard direction keys
@@ -903,7 +920,7 @@ Reduced size of database files by 30%
 Fine-tuned <automatic> algorithm to avoid certain conflicts after changing comparison settings
 Lower peak memory consumption when reading database participating in multiple sync jobs
 Refined symlink categorization and <automatic> variant handling
-Always save log of last syncs to %appdata%\FreeFileSynce\LastSyncs.log (128 kB limit)
+Always save log of last syncs to %appdata%\FreeFileSync\LastSyncs.log (128 kB limit)
 "Save" and "Save As" menu options
 Properly show status message after save configuration
 Avoid issues applying file modification time on certain NAS
@@ -1602,7 +1619,7 @@ Alternate log file directory configurable via GUI
 Added drag & drop support for batch job assembly
 Simplified filter usage: - <dirname> matches "<dirname>\*" as well as "<dirname>\"
 						 - only distinct filter entries are considered
-Platform dependent linebreaks in configuration *.xml files
+Platform dependent line breaks in configuration *.xml files
 "Significant difference check" runs at folder pair level
 Sorting runs at folder pair level
 New check for sufficient free disk space (considering recycle bin usage)
@@ -1685,7 +1702,7 @@ Hide/Show individual columns
 Added "sort by comparison result"
 Sort file list by relative name after comparison (GUI mode only)
 Removed Windows registry usage for portable version
-Restored linebreaks in status texts for better readability
+Restored line breaks in status texts for better readability
 Revised German translation. Thanks to «Latino»!
 Created custom button control to finally translate "compare" and "synchronize"
 Allow manual setup of file manager integration (Windows and Linux)
@@ -1845,7 +1862,7 @@ New function to delete files (or move them to recycle bin) manually on the UI (w
 Improved manual filtering of rows: If folders are marked all dependent subfolders and files are marked as well 
 (keeping sort sequence when "hide filtered elements" is marked)
 Comprehensive performance optimization of the two features above (manual filtering, deletion) for large grids (> 200,000 rows)
-Improved usability: resizeable borders, keyboard shortcuts, default buttons, dialog standard focus
+Improved usability: resizable borders, keyboard shortcuts, default buttons, dialog standard focus
 Main window will remember restored position even if maximized
 Updated sources to become more Linux and Unicode friendly
 Updated German translation

@@ -99,7 +99,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
         const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
         {
             const auto now = std::chrono::steady_clock::now();
-			if (now >= lastCheck + std::chrono::seconds(CHECK_FOLDER_INTERVAL))
+            if (now >= lastCheck + std::chrono::seconds(CHECK_FOLDER_INTERVAL))
             {
                 lastCheck = now;
                 return true;

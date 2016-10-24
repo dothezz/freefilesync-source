@@ -95,7 +95,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 inline
 Global<const TranslationHandler>& getGlobalTranslationHandler()
 {
-	 //getTranslator() may be called even after static objects of this translation unit are destroyed!
+    //getTranslator() may be called even after static objects of this translation unit are destroyed!
     static Global<const TranslationHandler> inst; //external linkage even in header!
     return inst;
 }

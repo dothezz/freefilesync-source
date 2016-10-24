@@ -1189,8 +1189,6 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             }
             catch (const FileError&) { if (!AFS::folderExists(targetPath)) throw; } //might already exist: see creation of intermediate directories below
             statReporter.reportDelta(1, 0);
-
-            statReporter.reportFinished();
         },
 
         [&](const FilePair& file)
@@ -1202,8 +1200,6 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             AFS::copyFileTransactional(file.getAbstractPath<side>(), targetPath, //throw FileError, ErrorFileLocked
                                        false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, onNotifyCopyStatus);
             statReporter.reportDelta(1, 0);
-
-            statReporter.reportFinished();
         },
 
         [&](const SymlinkPair& symlink)
@@ -1214,8 +1210,6 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             deleteTargetItem();
             AFS::copySymlink(symlink.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
             statReporter.reportDelta(1, 0);
-
-            statReporter.reportFinished();
         });
     };
 
@@ -1259,18 +1253,18 @@ void zen::copyToAlternateFolder(const std::vector<const FileSystemObject*>& rows
     erase_if(itemSelectionLeft,  [](const FileSystemObject* fsObj) { return fsObj->isEmpty< LEFT_SIDE>(); });
     erase_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
 
-    const int itemCount = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
-    std::int64_t dataToProcess = 0;
+    const int itemTotal = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
+    std::int64_t bytesTotal = 0;
 
     for (const FileSystemObject* fsObj : itemSelectionLeft)
         visitFSObject(*fsObj, [](const FolderPair& folder) {},
-    [&](const FilePair& file) { dataToProcess += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>()); }, [](const SymlinkPair& symlink) {});
+    [&](const FilePair& file) { bytesTotal += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
     for (const FileSystemObject* fsObj : itemSelectionRight)
         visitFSObject(*fsObj, [](const FolderPair& folder) {},
-    [&](const FilePair& file) { dataToProcess += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>()); }, [](const SymlinkPair& symlink) {});
+    [&](const FilePair& file) { bytesTotal += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
-    callback.initNewPhase(itemCount, dataToProcess, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
+    callback.initNewPhase(itemTotal, bytesTotal, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
     //------------------------------------------------------------------------------
 
@@ -1374,9 +1368,6 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
 
             fsObj->removeObject<side>(); //if directory: removes recursively!
         }
-
-        statReporter.reportFinished();
-
     }, callback); //throw X?
 }
 
@@ -1559,13 +1550,13 @@ Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
 
 void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback)
 {
-    const int itemCount = static_cast<int>(workLoad.size());
-    std::int64_t dataToProcess = 0;
+    const int itemTotal = static_cast<int>(workLoad.size());
+    std::int64_t bytesTotal = 0;
 
     for (const FileDetails& details : workLoad)
-        dataToProcess += details.descr.fileSize;
+        bytesTotal += details.descr.fileSize;
 
-    callback.initNewPhase(itemCount, dataToProcess, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
+    callback.initNewPhase(itemTotal, bytesTotal, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
     //------------------------------------------------------------------------------
 
@@ -1621,7 +1612,6 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
             statReporter.reportDelta(1, 0);
 
             tempFilePaths[details] = tempFilePath;
-            statReporter.reportFinished();
         }, callback); //throw X?
     }
 }

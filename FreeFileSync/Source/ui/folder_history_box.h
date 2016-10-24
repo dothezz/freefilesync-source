@@ -19,7 +19,7 @@
 class FolderHistory
 {
 public:
-    FolderHistory() : maxSize_(0) {}
+    FolderHistory() {}
 
     FolderHistory(const std::vector<Zstring>& folderPathPhrases, size_t maxSize) :
         maxSize_(maxSize),
@@ -52,7 +52,7 @@ public:
     void delItem(const Zstring& folderPathPhrase) { zen::erase_if(folderPathPhrases_, [&](const Zstring& item) { return equalFilePath(item, folderPathPhrase); }); }
 
 private:
-    size_t maxSize_;
+    size_t maxSize_ = 0;
     std::vector<Zstring> folderPathPhrases_;
 };
 

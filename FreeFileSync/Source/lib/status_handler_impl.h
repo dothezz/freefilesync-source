@@ -47,48 +47,43 @@ public:
 
     ~StatisticsReporter()
     {
-        if (taskCancelled)
-            cb_.updateTotalData(itemsReported, bytesReported); //=> unexpected increase of total workload
+        const bool scopeFail = getUncaughtExceptionCount() > exeptionCount_;
+        if (scopeFail)
+            cb_.updateTotalData(itemsReported_, bytesReported_); //=> unexpected increase of total workload
         else
             //update statistics to consider the real amount of data, e.g. more than the "file size" for ADS streams,
             //less for sparse and compressed files,  or file changed in the meantime!
-            cb_.updateTotalData(itemsReported - itemsExpected_, bytesReported - bytesExpected_); //noexcept!
+            cb_.updateTotalData(itemsReported_ - itemsExpected_, bytesReported_ - bytesExpected_); //noexcept!
     }
 
     void reportDelta(int itemsDelta, std::int64_t bytesDelta) //may throw!
     {
         cb_.updateProcessedData(itemsDelta, bytesDelta); //nothrow! -> ensure client and service provider are in sync!
-        itemsReported += itemsDelta;
-        bytesReported += bytesDelta;                      //
+        itemsReported_ += itemsDelta;
+        bytesReported_ += bytesDelta;                      //
 
         //special rule: avoid temporary statistics mess up, even though they are corrected anyway below:
-        if (itemsReported > itemsExpected_)
+        if (itemsReported_ > itemsExpected_)
         {
-            cb_.updateTotalData(itemsReported - itemsExpected_, 0);
-            itemsReported = itemsExpected_;
+            cb_.updateTotalData(itemsReported_ - itemsExpected_, 0);
+            itemsReported_ = itemsExpected_;
         }
-        if (bytesReported > bytesExpected_)
+        if (bytesReported_ > bytesExpected_)
         {
-            cb_.updateTotalData(0, bytesReported - bytesExpected_); //=> everything above "bytesExpected" adds to both "processed" and "total" data
-            bytesReported = bytesExpected_;
+            cb_.updateTotalData(0, bytesReported_ - bytesExpected_); //=> everything above "bytesExpected" adds to both "processed" and "total" data
+            bytesReported_ = bytesExpected_;
         }
 
         cb_.requestUiRefresh(); //may throw!
     }
 
-    void reportFinished() //nothrow!
-    {
-        assert(taskCancelled);
-        taskCancelled = false;
-    }
-
 private:
-    bool taskCancelled = true;
-    int itemsReported = 0;
-    std::int64_t bytesReported = 0;
+    int itemsReported_ = 0;
+    std::int64_t bytesReported_ = 0;
     const int itemsExpected_;
     const std::int64_t bytesExpected_;
     ProcessCallback& cb_;
+    const int exeptionCount_ = getUncaughtExceptionCount();
 };
 }
 

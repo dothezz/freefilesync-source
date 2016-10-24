@@ -23,9 +23,9 @@ using namespace std::rel_ops;
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
-const int XML_FORMAT_VER_GLOBAL    = 3;
-const int XML_FORMAT_VER_FFS_GUI   = 5;
-const int XML_FORMAT_VER_FFS_BATCH = 5;
+const int XML_FORMAT_VER_GLOBAL    = 4;
+const int XML_FORMAT_VER_FFS_GUI   = 6;
+const int XML_FORMAT_VER_FFS_BATCH = 6;
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -163,7 +163,6 @@ void writeText(const wxLanguage& value, std::string& output)
         assert(false);
         output = "English (U.S.)";
     }
-    return;
 }
 
 template <> inline
@@ -806,7 +805,7 @@ void readConfig(const XmlIn& in, CompConfig& cmpConfig)
     in["Variant" ](cmpConfig.compareVar);
     in["Symlinks"](cmpConfig.handleSymlinks);
 
-    warn_static("remove old parameter after migration! 2015-11-05")
+    //TODO: remove old parameter after migration! 2015-11-05
     if (in["TimeShift"])
     {
         std::wstring timeShiftPhrase;
@@ -869,29 +868,42 @@ void readConfig(const XmlIn& in, FilterConfig& filter)
 }
 
 
-void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
+void readConfig(const XmlIn& in, FolderPairEnh& enhPair, int formatVer)
 {
     //read folder pairs
     in["Left" ](enhPair.folderPathPhraseLeft_);
     in["Right"](enhPair.folderPathPhraseRight_);
 
-    warn_static("remove after migration - 2016-07-24")
-    auto ciReplace = [](Zstring& pathPhrase, const Zstring& oldTerm, const Zstring& newTerm)
-    {
-        auto tmpPath = makeUpperCopy(pathPhrase);
-        auto tmpOld  = makeUpperCopy(oldTerm);
-        size_t pos = tmpPath.find(tmpOld);
-        if (pos != Zstring::npos)
-            pathPhrase = Zstring(pathPhrase.c_str(), pos) + newTerm + (pathPhrase.c_str() + pos + oldTerm.size());
-    };
-    ciReplace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
-    ciReplace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
-    ciReplace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));
-    ciReplace(enhPair.folderPathPhraseLeft_, Zstr("%csidl_MyVideos%"   ), Zstr("%csidl_Videos%"));
+    //TODO: remove after migration - 2016-07-24
+    auto ciReplace = [](Zstring& pathPhrase, const Zstring& oldTerm, const Zstring& newTerm) { pathPhrase = pathReplaceCpy(pathPhrase, oldTerm, newTerm); };
+    ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
+    ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
+    ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));
+    ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyVideos%"   ), Zstr("%csidl_Videos%"));
     ciReplace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
     ciReplace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
     ciReplace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));
     ciReplace(enhPair.folderPathPhraseRight_, Zstr("%csidl_MyVideos%"   ), Zstr("%csidl_Videos%"));
+
+    //TODO: remove after migration 2016-09-27
+    if (formatVer < 6) //the-base64-encoded password is now stored as an option at the string end
+    {
+        //sftp://username:[base64]c2VjcmV0c@private.example.com ->
+        //sftp://username@private.example.com|pass64=c2VjcmV0c
+        auto updateSftpSyntax = [](Zstring& pathPhrase)
+        {
+            const size_t pos = pathPhrase.find(Zstr(":[base64]"));
+            if (pos != Zstring::npos)
+            {
+                const size_t posEnd = pathPhrase.find(Zstr("@"), pos);
+                if (posEnd != Zstring::npos)
+                    pathPhrase = Zstring(pathPhrase.begin(), pathPhrase.begin() + pos) + (pathPhrase.c_str() + posEnd) +
+                                 Zstr("|pass64=") + Zstring(pathPhrase.begin() + pos + strLength(Zstr(":[base64]")), pathPhrase.begin() + posEnd);
+            }
+        };
+        updateSftpSyntax(enhPair.folderPathPhraseLeft_);
+        updateSftpSyntax(enhPair.folderPathPhraseRight_);
+    }
 
     //###########################################################
     //alternate comp configuration (optional)
@@ -942,7 +954,7 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg, int formatVer)
     for (XmlIn inPair = inMain["FolderPairs"]["Pair"]; inPair; inPair.next())
     {
         FolderPairEnh newPair;
-        readConfig(inPair, newPair);
+        readConfig(inPair, newPair, formatVer);
 
         if (firstItem)
         {
@@ -990,16 +1002,11 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
 {
     XmlIn inGeneral = in["General"];
 
-    warn_static("remove old parameter after migration! 2016-01-18")
+    //TODO: remove old parameter after migration! 2016-01-18
     if (in["Shared"])
         inGeneral = in["Shared"];
 
-    warn_static("remove old parameter after migration! 2015-11-07")
-    int langId = 0;
-    if (inGeneral["Language"] && inGeneral["Language"].get()->getAttribute("Id", langId))
-        config.programLanguage = static_cast<wxLanguage>(langId);
-    else
-        inGeneral["Language"].attribute("Name", config.programLanguage);
+    inGeneral["Language"].attribute("Name", config.programLanguage);
 
     inGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failSafeFileCopy);
     inGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
@@ -1092,7 +1099,12 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
 
     inGui["ConfigHistory"](config.gui.cfgFileHistory);
-    inGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
+    inGui["ConfigHistory"].attribute("MaxSize",   config.gui.cfgFileHistMax);
+    inGui["ConfigHistory"].attribute("ScrollPos", config.gui.cfgFileHistFirstItemPos);
+
+    //TODO: remove parameter migration after some time! 2016-09-23
+    if (formatVer < 4)
+        config.gui.cfgFileHistMax = std::max<size_t>(config.gui.cfgFileHistMax, 100);
 
     inGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     inGui["FolderHistoryRight"](config.gui.folderHistoryRight);
@@ -1102,7 +1114,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
 
     //external applications
-    warn_static("remove old parameter after migration! 2016-05-28")
+    //TODO: remove old parameter after migration! 2016-05-28
     if (inGui["ExternalApplications"])
     {
         inGui["ExternalApplications"](config.gui.externelApplications);
@@ -1115,7 +1127,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     else
         inGui["ExternalApps"](config.gui.externelApplications);
 
-    warn_static("remove macro migration after some time! 2016-06-30")
+    //TODO: remove macro migration after some time! 2016-06-30
     if (formatVer < 3)
         for (auto& item : config.gui.externelApplications)
         {
@@ -1136,7 +1148,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
                 replace(item.second, Zstr("%item_path2%"), Zstr("%local_path2%"));
             }
         }
-    warn_static("remove macro migration after some time! 2016-07-18")
+    //TODO: remove macro migration after some time! 2016-07-18
     for (auto& item : config.gui.externelApplications)
         replace(item.second, Zstr("%item_folder%"),  Zstr("%folder_path%"));
 
@@ -1522,7 +1534,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
 
     outGui["ConfigHistory" ](config.gui.cfgFileHistory);
-    outGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
+    outGui["ConfigHistory"].attribute("MaxSize",   config.gui.cfgFileHistMax);
+    outGui["ConfigHistory"].attribute("ScrollPos", config.gui.cfgFileHistFirstItemPos);
 
     outGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     outGui["FolderHistoryRight"](config.gui.folderHistoryRight);

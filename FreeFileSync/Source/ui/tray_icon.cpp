@@ -64,7 +64,7 @@ class FfsTrayIcon::ProgressIconGenerator
 public:
     ProgressIconGenerator(const wxImage& logo) : logo_(logo) {}
 
-     wxIcon get(double fraction);
+    wxIcon get(double fraction);
 
 private:
     const wxImage logo_;

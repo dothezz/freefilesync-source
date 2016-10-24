@@ -259,7 +259,7 @@ void GridView::removeInvalidRows()
     rowPositionsFirstChild.clear();
 
     //remove rows that have been deleted meanwhile
-    erase_if(sortedRef, [&](const RefIndex& refIdx) { return FileSystemObject::retrieve(refIdx.objId) == nullptr; });
+    erase_if(sortedRef, [&](const RefIndex& refIdx) { return !FileSystemObject::retrieve(refIdx.objId); });
 }
 
 

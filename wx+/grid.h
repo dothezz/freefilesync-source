@@ -215,8 +215,8 @@ public:
 
     //############################################################################################################
 
-static wxColor getColorSelectionGradientFrom();
-static wxColor getColorSelectionGradientTo();
+    static wxColor getColorSelectionGradientFrom();
+    static wxColor getColorSelectionGradientTo();
 
 private:
     void onPaintEvent(wxPaintEvent& event);

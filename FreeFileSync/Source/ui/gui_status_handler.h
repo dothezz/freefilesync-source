@@ -27,7 +27,7 @@ public:
     StatusHandlerTemporaryPanel(MainDialog& dlg);
     ~StatusHandlerTemporaryPanel();
 
-    void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
+    void initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseID) override;
 
     void     reportInfo      (const std::wstring& text)                                override;
     Response reportError     (const std::wstring& text, size_t retryNumber)            override;
@@ -64,8 +64,8 @@ public:
                                 std::vector<Zstring>& onCompletionHistory);
     ~StatusHandlerFloatingDialog();
 
-    void initNewPhase       (int objectsTotal, std::int64_t dataTotal, Phase phaseID) override;
-    void updateProcessedData(int objectsDelta, std::int64_t dataDelta               ) override;
+    void initNewPhase       (int itemsTotal, std::int64_t bytesTotal, Phase phaseID) override;
+    void updateProcessedData(int itemsDelta, std::int64_t bytesDelta               ) override;
 
     void     reportInfo      (const std::wstring& text                               ) override;
     Response reportError     (const std::wstring& text, size_t retryNumber           ) override;

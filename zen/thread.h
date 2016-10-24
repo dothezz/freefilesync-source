@@ -59,6 +59,9 @@ void interruptibleWait(std::condition_variable& cv, std::unique_lock<std::mutex>
 template <class Rep, class Period>
 void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime); //throw ThreadInterruption
 
+
+std::uint64_t getThreadId(); //simple integer thread id, unlike boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
+
 //------------------------------------------------------------------------------------------
 
 /*
@@ -316,7 +319,7 @@ private:
     }
 
     std::atomic<bool> interrupted{ false }; //std:atomic is uninitialized by default!!!
-	//"The default constructor is trivial: no initialization takes place other than zero initialization of static and thread-local objects."
+    //"The default constructor is trivial: no initialization takes place other than zero initialization of static and thread-local objects."
 
     std::condition_variable* activeCondition = nullptr;
     std::mutex lockConditionPtr; //serialize pointer access (only!)
@@ -397,6 +400,16 @@ inline
 void InterruptibleThread::interrupt() { intStatus_->interrupt(); }
 
 
+
+
+inline
+std::uint64_t getThreadId()
+{
+	//obviously "gettid()" is not available on Ubuntu/Debian/Suse => use the OpenSSL approach:
+	static_assert(sizeof(std::uint64_t) >= sizeof(void*), "");
+	return reinterpret_cast<std::uint64_t>(static_cast<void*>(&errno));
+
+}
 }
 
 #endif //THREAD_H_7896323423432235246427

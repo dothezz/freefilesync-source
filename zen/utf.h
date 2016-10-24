@@ -417,16 +417,16 @@ CharString wideToUtf8(const WideString& str, Int2Type<4>) //other OS: convert ut
 
 
 template <class CharString> inline
-bool isValidUtf8(const CharString& str) 
+bool isValidUtf8(const CharString& str)
 {
-	using namespace implementation;
-	bool valid = true;
+    using namespace implementation;
+    bool valid = true;
     utf8ToCodePoint(strBegin(str), strBegin(str) + strLength(str),
-    [&](CodePoint cp) 
-	{ 
-		if (cp == REPLACEMENT_CHAR)
-			valid = false; //perf: should we use an (expensive) exception for iteration break?
-	});
+                    [&](CodePoint cp)
+    {
+        if (cp == REPLACEMENT_CHAR)
+            valid = false; //perf: should we use an (expensive) exception for iteration break?
+    });
     return valid;
 }
 

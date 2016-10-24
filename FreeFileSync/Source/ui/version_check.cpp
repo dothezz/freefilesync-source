@@ -90,27 +90,13 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
 }
 
 
-enum GetVerResult
-{
-    GET_VER_SUCCESS,
-    GET_VER_NO_CONNECTION, //no internet connection?
-    GET_VER_PAGE_NOT_FOUND //version file seems to have moved! => trigger an update!
-};
-
 //access is thread-safe on Windows (WinInet), but not on Linux/OS X (wxWidgets)
-GetVerResult getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams, std::wstring& version)
+std::wstring getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
 {
-    try //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
-    {
-        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", L"FFS-Update-Check", postParams); //throw FileError
-        version = utfCvrtTo<std::wstring>(buffer);
-        trim(version);
-        return version.empty() ? GET_VER_PAGE_NOT_FOUND : GET_VER_SUCCESS; //empty version possible??
-    }
-    catch (const FileError&)
-    {
-        return internetIsAlive() ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
-    }
+    //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
+    const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", L"FFS-Update-Check", postParams); //throw SysError
+    const auto version = utfCvrtTo<std::wstring>(buffer);
+    return trimCpy(version);
 }
 
 
@@ -127,10 +113,10 @@ std::wstring getOnlineChangelogDelta()
 {
     try //harmonize with wxHTTP: get_latest_changes.php must be accessible without https!!!
     {
-        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", L"FFS-Update-Check", { { "since", utfCvrtTo<std::string>(zen::ffsVersion) } }); //throw FileError
+        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", L"FFS-Update-Check", { { "since", utfCvrtTo<std::string>(zen::ffsVersion) } }); //throw SysError
         return utfCvrtTo<std::wstring>(buffer);
     }
-    catch (FileError&) { assert(false); return std::wstring(); }
+    catch (zen::SysError&) { assert(false); return std::wstring(); }
 }
 
 
@@ -180,35 +166,30 @@ void zen::disableUpdateCheck(time_t& lastUpdateCheck)
 
 void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog)
 {
-    std::wstring onlineVersion;
-    switch (getOnlineVersion(geHttpPostParameters(), onlineVersion))
+    try
     {
-        case GET_VER_SUCCESS:
-            lastOnlineVersion   = onlineVersion;
-            lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
+        const std::wstring onlineVersion = getOnlineVersion(geHttpPostParameters()); //throw SysError
+        lastOnlineVersion   = onlineVersion;
+        lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
 
-            if (haveNewerVersionOnline(onlineVersion))
-                showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
-            else
-                showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
-                                       setTitle(_("Check for Program Updates")).
-                                       setMainInstructions(_("FreeFileSync is up to date.")));
-            break;
-
-        case GET_VER_NO_CONNECTION:
-            showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+        if (haveNewerVersionOnline(onlineVersion))
+            showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
+        else
+            showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
                                    setTitle(_("Check for Program Updates")).
-                                   setMainInstructions(replaceCpy(_("Unable to connect to %x."), L"%x", L"www.freefilesync.org.")));
-            break;
-
-        case GET_VER_PAGE_NOT_FOUND:
+                                   setMainInstructions(_("FreeFileSync is up to date.")));
+    }
+    catch (const zen::SysError& e)
+    {
+        if (internetIsAlive())
+        {
             lastOnlineVersion = L"Unknown";
             lastOnlineChangeLog.clear();
 
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
-                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),
-                                           _("&Check")))
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")).
+                                           setDetailInstructions(e.toString()), _("&Check")))
             {
                 case ConfirmationButton::DO_IT:
                     wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
@@ -216,7 +197,14 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, s
                 case ConfirmationButton::CANCEL:
                     break;
             }
-            break;
+        }
+        else
+        {
+            showNotificationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+                                   setTitle(_("Check for Program Updates")).
+                                   setMainInstructions(replaceCpy(_("Unable to connect to %x."), L"%x", L"www.freefilesync.org")).
+                                   setDetailInstructions(e.toString()));
+        }
     }
 }
 
@@ -233,44 +221,58 @@ std::shared_ptr<UpdateCheckResultPrep> zen::periodicUpdateCheckPrepare()
 }
 
 
-struct zen::UpdateCheckResultAsync
+struct zen::UpdateCheckResult
 {
+    UpdateCheckResult() {}
+    UpdateCheckResult(const std::wstring& ver, const Opt<zen::SysError>& err, bool alive)  : onlineVersion(ver), error(err), internetIsAlive(alive) {}
+
+    std::wstring onlineVersion;
+    Opt<zen::SysError> error;
+    bool internetIsAlive = false;
 };
 
 //run on worker thread:
-std::shared_ptr<UpdateCheckResultAsync> zen::periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep)
+std::shared_ptr<UpdateCheckResult> zen::periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep)
 {
     return nullptr;
 }
 
 
 //run on main thread:
-void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog, const UpdateCheckResultAsync* resultAsync)
+void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog, const UpdateCheckResult* resultAsync)
 {
-    std::wstring onlineVersion;
-    const GetVerResult versionStatus = getOnlineVersion(geHttpPostParameters(), onlineVersion);
-
-    switch (versionStatus)
+    UpdateCheckResult result;
+    try
     {
-        case GET_VER_SUCCESS:
-            lastUpdateCheck     = getVersionCheckCurrentTime();
-            lastOnlineVersion   = onlineVersion;
-            lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
+        result.onlineVersion = getOnlineVersion(geHttpPostParameters()); //throw SysError
+        result.internetIsAlive = true;
+    }
+    catch (const SysError& e)
+    {
+        result.error = e;
+        result.internetIsAlive = internetIsAlive();
+    }
 
-            if (haveNewerVersionOnline(onlineVersion))
-                showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
-            break;
+    if (!result.error)
+    {
+        lastUpdateCheck     = getVersionCheckCurrentTime();
+        lastOnlineVersion   = result.onlineVersion;
+        lastOnlineChangeLog = haveNewerVersionOnline(result.onlineVersion) ? getOnlineChangelogDelta() : L"";
 
-        case GET_VER_NO_CONNECTION:
-            break; //ignore this error
-
-        case GET_VER_PAGE_NOT_FOUND:
+        if (haveNewerVersionOnline(result.onlineVersion))
+            showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
+    }
+    else
+    {
+        if (result.internetIsAlive)
+        {
             lastOnlineVersion = L"Unknown";
             lastOnlineChangeLog.clear();
 
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
-                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")),
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")).
+                                           setDetailInstructions(result.error->toString()),
                                            _("&Check")))
             {
                 case ConfirmationButton::DO_IT:
@@ -279,6 +281,7 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
                 case ConfirmationButton::CANCEL:
                     break;
             }
-            break;
+        }
+        //else: ignore this error
     }
 }

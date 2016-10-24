@@ -20,10 +20,10 @@ namespace
 const char FFS_DESKTOP_FILE[] = "freefilesync.desktop";
 }
 
-class Taskbar::Pimpl //throw (TaskbarNotAvailable)
+class Taskbar::Impl //throw (TaskbarNotAvailable)
 {
 public:
-    Pimpl(const wxFrame& window) :
+    Impl(const wxFrame& window) :
         tbEntry(unity_launcher_entry_get_for_desktop_id(FFS_DESKTOP_FILE))
         //tbEntry(unity_launcher_entry_get_for_app_uri("application://freefilesync.desktop"))
     {
@@ -31,7 +31,7 @@ public:
             throw TaskbarNotAvailable();
     }
 
-    ~Pimpl() { setStatus(STATUS_INDETERMINATE); } //it seems UnityLauncherEntry* does not need destruction
+    ~Impl() { setStatus(STATUS_INDETERMINATE); } //it seems UnityLauncherEntry* does not need destruction
 
     void setStatus(Status status)
     {
@@ -67,10 +67,10 @@ private:
 };
 
 #else //no taskbar support
-class Taskbar::Pimpl
+class Taskbar::Impl
 {
 public:
-    Pimpl(const wxFrame& window) { throw TaskbarNotAvailable(); }
+    Impl(const wxFrame& window) { throw TaskbarNotAvailable(); }
     void setStatus(Status status) {}
     void setProgress(double fraction) {}
 };
@@ -78,7 +78,7 @@ public:
 
 //########################################################################################################
 
-Taskbar::Taskbar(const wxFrame& window) : pimpl_(std::make_unique<Pimpl>(window)) {} //throw TaskbarNotAvailable
+Taskbar::Taskbar(const wxFrame& window) : pimpl_(std::make_unique<Impl>(window)) {} //throw TaskbarNotAvailable
 Taskbar::~Taskbar() {}
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }

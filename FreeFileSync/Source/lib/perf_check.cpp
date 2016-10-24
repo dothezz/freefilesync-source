@@ -157,8 +157,8 @@ z_1 + z_2 * X / m = F / m
 
 
 Statistics::Statistics(int totalObjectCount, double totalDataAmount, unsigned recordCount) :
-        objectsTotal(totalObjectCount),
-        dataTotal(totalDataAmount),
+        itemsTotal(totalObjectCount),
+        bytesTotal(totalDataAmount),
         recordsMax(recordCount),
         objectsLast(0),
         dataLast(0),
@@ -255,6 +255,6 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
         }
     }
 
-    return formatRemainingTime((objectsTotal - objectsCurrent) * z1_current + (dataTotal - dataCurrent) * z2_current);
+    return formatRemainingTime((itemsTotal - objectsCurrent) * z1_current + (bytesTotal - dataCurrent) * z2_current);
 }
 */

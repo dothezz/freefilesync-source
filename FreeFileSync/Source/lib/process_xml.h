@@ -207,6 +207,7 @@ struct XmlGlobalSettings
 
         std::vector<ConfigFileItem> cfgFileHistory;
         size_t cfgFileHistMax = 100;
+        int cfgFileHistFirstItemPos = 0;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;

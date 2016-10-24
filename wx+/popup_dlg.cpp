@@ -95,8 +95,8 @@ public:
                 m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
                 break;
         }
-		if (cfg.icon.IsOk())
-			m_bitmapMsgType->SetBitmap(cfg.icon);
+        if (cfg.icon.IsOk())
+            m_bitmapMsgType->SetBitmap(cfg.icon);
 
         if (titleTmp.empty())
             SetTitle(wxTheApp->GetAppDisplayName());
@@ -108,15 +108,15 @@ public:
                 SetTitle(wxTheApp->GetAppDisplayName() + L" - " + titleTmp);
         }
 
-		int maxWidth  = 500;
-		int maxHeight = 400; //try to determine better value based on actual display resolution:
+        int maxWidth  = 500;
+        int maxHeight = 400; //try to determine better value based on actual display resolution:
 
-		if (parent)
-		{
-		const int disPos = wxDisplay::GetFromWindow(parent); //window must be visible
-		if (disPos != wxNOT_FOUND)
-			maxHeight = wxDisplay(disPos).GetClientArea().GetHeight() *  2 / 3;
-		}
+        if (parent)
+        {
+            const int disPos = wxDisplay::GetFromWindow(parent); //window must be visible
+            if (disPos != wxNOT_FOUND)
+                maxHeight = wxDisplay(disPos).GetClientArea().GetHeight() *  2 / 3;
+        }
 
         assert(!cfg.textMain.empty() || !cfg.textDetail.empty());
         if (!cfg.textMain.empty())
@@ -206,7 +206,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-		Center(); //needs to be re-applied after a dialog size change!
+        Center(); //needs to be re-applied after a dialog size change!
     }
 };
 
@@ -225,7 +225,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-		Center(); //needs to be re-applied after a dialog size change!
+        Center(); //needs to be re-applied after a dialog size change!
     }
 };
 }
@@ -251,7 +251,7 @@ public:
         setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonAffirmative).setNegative(m_buttonNegative).setCancel(m_buttonCancel));
         setAsStandard(*m_buttonAffirmative);
         GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-		Center(); //needs to be re-applied after a dialog size change!
+        Center(); //needs to be re-applied after a dialog size change!
     }
 
 private:

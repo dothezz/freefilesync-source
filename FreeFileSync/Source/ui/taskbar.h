@@ -42,8 +42,8 @@ public:
     void setProgress(double fraction); //between [0, 1]; noexcept
 
 private:
-    class Pimpl;
-    std::unique_ptr<Pimpl> pimpl_;
+    class Impl;
+    const std::unique_ptr<Impl> pimpl_;
 };
 
 }

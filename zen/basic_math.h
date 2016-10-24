@@ -17,39 +17,28 @@
 
 namespace numeric
 {
-template <class T>
-T abs(T value);
+template <class T> T abs(T value);
+template <class T> T dist(T a, T b);
+template <class T> int sign(T value); //returns one of {-1, 0, 1}
+template <class T> T min(T a, T b, T c);
+template <class T> T max(T a, T b, T c);
+template <class T> bool isNull(T value);
 
 template <class T>
-T dist(T a, T b);
-
+void clamp(T& val, T minVal, T maxVal); //make sure minVal <= val && val <= maxVal
 template <class T>
-int sign(T value); //returns -1/0/1
-
-template <class T>
-T min(T a, T b, T c);
-
-template <class T>
-T max(T a, T b, T c);
-
-template <class T>
-void clamp(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
-template <class T>
-T clampCpy(const T& val, const T& minVal, const T& maxVal);
+T clampCpy(T val, T minVal, T maxVal);
 
 template <class T, class InputIterator> //precondition: range must be sorted!
 auto nearMatch(const T& val, InputIterator first, InputIterator last);
 
-template <class T>
-bool isNull(T value);
-
 int round(double d); //"little rounding function"
 
-template <class N>
-N integerDivideRoundUp(N numerator, N denominator);
+template <class N, class D>
+auto integerDivideRoundUp(N numerator, D denominator);
 
 template <size_t N, class T>
-T power(const T& value);
+T power(T value);
 
 double radToDeg(double rad);    //convert unit [rad] into [°]
 double degToRad(double degree); //convert unit [°] into [rad]
@@ -108,8 +97,9 @@ T dist(T a, T b)
 
 
 template <class T> inline
-int sign(T value) //returns -1/0/1
+int sign(T value) //returns one of {-1, 0, 1}
 {
+    static_assert(std::is_signed<T>::value, "");
     return value < 0 ? -1 : (value > 0 ? 1 : 0);
 }
 
@@ -117,19 +107,27 @@ int sign(T value) //returns -1/0/1
 template <class T> inline
 T min(T a, T b, T c) //don't follow std::min's "const T&(const T&, const T&)" API
 {
-    return std::min(std::min(a, b), c);
+    if (a < b)
+        return a < c ? a : c;
+    else
+        return b < c ? b : c;
+    //return std::min(std::min(a, b), c);
 }
 
 
 template <class T> inline
 T max(T a, T b, T c)
 {
-    return std::max(std::max(a, b), c);
+    if (a > b)
+        return a > c ? a : c;
+    else
+        return b > c ? b : c;
+    //return std::max(std::max(a, b), c);
 }
 
 
 template <class T> inline
-T clampCpy(const T& val, const T& minVal, const T& maxVal)
+T clampCpy(T val, T minVal, T maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)
@@ -140,7 +138,7 @@ T clampCpy(const T& val, const T& minVal, const T& maxVal)
 }
 
 template <class T> inline
-void clamp(T& val, const T& minVal, const T& maxVal)
+void clamp(T& val, T minVal, T maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)
@@ -229,10 +227,11 @@ int round(double d)
 }
 
 
-template <class N> inline
-N integerDivideRoundUp(N numerator, N denominator)
+template <class N, class D> inline
+auto integerDivideRoundUp(N numerator, D denominator)
 {
-    static_assert(std::is_unsigned<N>::value, "");
+    static_assert(std::is_integral<N>::value && std::is_unsigned<N>::value, "");
+    static_assert(std::is_integral<D>::value && std::is_unsigned<D>::value, "");
     assert(denominator > 0);
     return (numerator + denominator - 1) / denominator;
 }
@@ -240,33 +239,17 @@ N integerDivideRoundUp(N numerator, N denominator)
 
 namespace
 {
-template <size_t N, class T>
-struct PowerImpl
-{
-    static T result(const T& value)
-    {
-        return PowerImpl<N - 1, T>::result(value) * value;
-    }
-};
-
-template <class T>
-struct PowerImpl<2, T>
-{
-    static T result(const T& value)
-    {
-        return value * value;
-    }
-};
-
-template <class T>
-struct PowerImpl<0, T>; //not defined: invalidates power<0> and power<1>
-
-template <class T>
-struct PowerImpl<10, T>; //not defined: invalidates power<N> for N >= 10
+template <size_t N, class T> struct PowerImpl;
+/*
+    template <size_t N, class T> -> let's use non-recursive specializations to help the compiler
+    struct PowerImpl { static T result(const T& value) { return PowerImpl<N - 1, T>::result(value) * value; } };
+*/
+template <class T> struct PowerImpl<2, T> { static T result(T value) { return value * value; } };
+template <class T> struct PowerImpl<3, T> { static T result(T value) { return value * value * value; } };
 }
 
 template <size_t n, class T> inline
-T power(const T& value)
+T power(T value)
 {
     return PowerImpl<n, T>::result(value);
 }
@@ -327,7 +310,7 @@ double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invali
     {
         const double m = median(first, last);
 
-        //the second median needs to operate on absolute residuals => avoid transforming input range as it may decrease precision!
+        //the second median needs to operate on absolute residuals => avoid transforming input range which may have less than double precision!
 
         auto lessMedAbs = [m](double lhs, double rhs) { return abs(lhs - m) < abs(rhs - m); };
 

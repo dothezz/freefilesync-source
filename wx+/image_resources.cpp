@@ -46,7 +46,7 @@ public:
     static std::shared_ptr<GlobalBitmaps> instance()
     {
         static Global<GlobalBitmaps> inst(std::make_unique<GlobalBitmaps>());
-		assert(std::this_thread::get_id() == mainThreadId); //wxWidgets is not thread-safe!
+        assert(std::this_thread::get_id() == mainThreadId); //wxWidgets is not thread-safe!
         return inst.get();
     }
 
@@ -134,35 +134,35 @@ const wxAnimation& GlobalBitmaps::getAnimation(const wxString& name) const
 
 void zen::initResourceImages(const Zstring& filepath)
 {
-	if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
-		inst->init(filepath); 
-	else
-		assert(false);
+    if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
+        inst->init(filepath);
+    else
+        assert(false);
 }
 
 
-void zen::cleanupResourceImages() 
+void zen::cleanupResourceImages()
 {
-		if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
-			inst->cleanup(); 
-	else
-		assert(false);
+    if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
+        inst->cleanup();
+    else
+        assert(false);
 }
 
 
-const wxBitmap& zen::getResourceImage(const wxString& name) 
+const wxBitmap& zen::getResourceImage(const wxString& name)
 {
-	if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
-		return inst->getImage(name); 
+    if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
+        return inst->getImage(name);
     assert(false);
     return wxNullBitmap;
 }
 
 
-const wxAnimation& zen::getResourceAnimation(const wxString& name) 
+const wxAnimation& zen::getResourceAnimation(const wxString& name)
 {
-	if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
-		return inst->getAnimation(name); 
+    if (std::shared_ptr<GlobalBitmaps> inst = GlobalBitmaps::instance())
+        return inst->getAnimation(name);
     assert(false);
     return wxNullAnimation;
 }

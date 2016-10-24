@@ -19,8 +19,8 @@ public:
     PreventStandby(); //throw FileError
     ~PreventStandby();
 private:
-    struct Pimpl;
-    std::unique_ptr<Pimpl> pimpl;
+    struct Impl;
+    const std::unique_ptr<Impl> pimpl;
 };
 
 //lower CPU and file I/O priorities
@@ -30,8 +30,8 @@ public:
     ScheduleForBackgroundProcessing(); //throw FileError
     ~ScheduleForBackgroundProcessing();
 private:
-    struct Pimpl;
-    std::unique_ptr<Pimpl> pimpl;
+    struct Impl;
+    const std::unique_ptr<Impl> pimpl;
 };
 }
 

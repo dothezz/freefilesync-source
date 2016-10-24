@@ -21,7 +21,7 @@
 using namespace zen;
 
 
-struct DirWatcher::Pimpl
+struct DirWatcher::Impl
 {
     int notifDescr = 0;
     std::map<int, Zstring> watchDescrs; //watch descriptor and (sub-)directory name (postfixed with separator) -> owned by "notifDescr"
@@ -30,7 +30,7 @@ struct DirWatcher::Pimpl
 
 DirWatcher::DirWatcher(const Zstring& dirPath) : //throw FileError
     baseDirPath(dirPath),
-    pimpl_(std::make_unique<Pimpl>())
+    pimpl_(std::make_unique<Impl>())
 {
     //get all subdirectories
     std::vector<Zstring> fullFolderList { baseDirPath };

@@ -40,8 +40,8 @@ private:
 class FileInput : public FileBase
 {
 public:
-    FileInput(const Zstring& filepath);                    //throw FileError, ErrorFileLocked
-    FileInput(FileHandle handle, const Zstring& filepath); //takes ownership!
+    FileInput(const Zstring& filePath);                    //throw FileError, ErrorFileLocked
+    FileInput(FileHandle handle, const Zstring& filePath); //takes ownership!
     ~FileInput();
 
     //Windows: better use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632
@@ -65,8 +65,8 @@ public:
         ACC_CREATE_NEW
     };
 
-    FileOutput(const Zstring& filepath, AccessFlag access); //throw FileError, ErrorTargetExisting
-    FileOutput(FileHandle handle, const Zstring& filepath); //takes ownership!
+    FileOutput(const Zstring& filePath, AccessFlag access); //throw FileError, ErrorTargetExisting
+    FileOutput(FileHandle handle, const Zstring& filePath); //takes ownership!
     ~FileOutput();
 
     FileOutput(FileOutput&& tmp);

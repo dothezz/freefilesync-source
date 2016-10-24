@@ -29,8 +29,8 @@ public:
     void updateStatusPanelNow();
 
 private:
-    class Pimpl;
-    Pimpl* const pimpl;
+    class Impl;
+    Impl* const pimpl;
 };
 
 

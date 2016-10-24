@@ -332,9 +332,9 @@ BatchStatusHandler::~BatchStatusHandler()
 }
 
 
-void BatchStatusHandler::initNewPhase(int objectsTotal, std::int64_t dataTotal, ProcessCallback::Phase phaseID)
+void BatchStatusHandler::initNewPhase(int itemsTotal, std::int64_t bytesTotal, ProcessCallback::Phase phaseID)
 {
-    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
+    StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
     if (progressDlg)
         progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
@@ -342,9 +342,9 @@ void BatchStatusHandler::initNewPhase(int objectsTotal, std::int64_t dataTotal, 
 }
 
 
-void BatchStatusHandler::updateProcessedData(int objectsDelta, std::int64_t dataDelta)
+void BatchStatusHandler::updateProcessedData(int itemsDelta, std::int64_t bytesDelta)
 {
-    StatusHandler::updateProcessedData(objectsDelta, dataDelta);
+    StatusHandler::updateProcessedData(itemsDelta, bytesDelta);
 
     if (progressDlg)
         progressDlg->notifyProgressChange(); //noexcept

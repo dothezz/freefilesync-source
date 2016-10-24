@@ -92,8 +92,9 @@ bool acceptDialogFileDrop(const std::vector<Zstring>& shellItemPaths)
 {
     return std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
     {
-        return pathEndsWith(shellItemPath, Zstr(".ffs_gui")) ||
-               pathEndsWith(shellItemPath, Zstr(".ffs_batch"));
+        const Zstring ext = getFileExtension(shellItemPath);
+        return equalNoCase(ext, Zstr("ffs_gui")) ||
+               equalNoCase(ext, Zstr("ffs_batch"));
     });
 }
 }
@@ -699,17 +700,22 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
 
     //asynchronous call to wxWindow::Layout(): fix superfluous frame on right and bottom when FFS is started in fullscreen mode
     Connect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnLayoutWindowAsync), nullptr, this);
-    wxCommandEvent evtDummy;       //call once before OnLayoutWindowAsync()
+    wxCommandEvent evtDummy;           //call once before OnLayoutWindowAsync()
     OnResizeLeftFolderWidth(evtDummy); //
 
-    //scroll list box to show the new selection (after window resizing is hopefully complete)
+    //scroll cfg history to last used position. We cannot do this earlier e.g. in setGlobalCfgOnInit()
+    //1. setConfig() indirectly calls addFileToCfgHistory() which changes cfg history scroll position
+    //2. EnsureVisible() requires final window height! => do this after window resizing is complete
+    if (!m_listBoxHistory->IsEmpty())
+        m_listBoxHistory->SetFirstItem(numeric::clampCpy(globalSettings.gui.cfgFileHistFirstItemPos, //must be set *after* wxAuiManager::LoadPerspective() to have any effect
+                                                         0,  static_cast<int>(m_listBoxHistory->GetCount()) - 1));
+
+    //first selected item must be visible:
     for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
         if (m_listBoxHistory->IsSelected(i))
         {
-            m_listBoxHistory->SetFirstItem(std::max(0, i - 2)); //add some head room
+            m_listBoxHistory->EnsureVisible(i);
             break;
-            //can't use wxListBox::EnsureVisible(): it's an empty stub on Windows! Undocumented! Not even a runtime-error!
-            //=> yet another piece of "high-quality" code from wxWidgets making a dev's life "easy"...
         }
 
     m_buttonCompare->SetFocus();
@@ -884,6 +890,8 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     addFileToCfgHistory(cfgFilePaths);
 
     removeObsoleteCfgHistoryItems(cfgFilePaths); //remove non-existent items (we need this only on startup)
+
+    //globalSettings.gui.cfgFileHistFirstItemPos => defer evaluation until later within MainDialog constructor
     //--------------------------------------------------------------------------------
 
     //load list of last used folders
@@ -910,6 +918,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     //restore original captions
     for (const auto& item : captionNameMap)
         auiMgr.GetPane(item.second).Caption(item.first);
+    //------------------------------------------------------------------------------------------------
 
     //if MainDialog::onQueryEndSession() is called while comparison is active, this panel is saved and restored as "visible"
     auiMgr.GetPane(compareStatus->getAsWindow()).Hide();
@@ -961,6 +970,7 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
         history.resize(globalSettings.gui.cfgFileHistMax);
 
     globalSettings.gui.cfgFileHistory = history;
+    globalSettings.gui.cfgFileHistFirstItemPos = m_listBoxHistory->GetTopItem();
     //--------------------------------------------------------------------------------
     globalSettings.gui.lastUsedConfigFiles.clear();
     for (const Zstring& cfgFilePath : activeConfigFiles)
@@ -2664,6 +2674,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
     for (int pos = 0; pos < static_cast<int>(selections.size()); ++pos)
         if (m_listBoxHistory->IsSelected(pos) != selections[pos])
             m_listBoxHistory->SetSelection(pos, selections[pos]);
+    //note: a *positive* SetSelection() will include a EnsureVisible()!
 }
 
 
@@ -3129,7 +3140,7 @@ void MainDialog::deleteSelectedCfgHistoryItems()
     std::for_each(selections.rbegin(), selections.rend(), [&](int pos) { m_listBoxHistory->Delete(pos); });
 
     //set active selection on next element to allow "batch-deletion" by holding down DEL key
-    if (!selections.empty() && m_listBoxHistory->GetCount() > 0)
+    if (!selections.empty() && !m_listBoxHistory->IsEmpty())
     {
         int newSelection = *selections.begin();
         if (newSelection >= static_cast<int>(m_listBoxHistory->GetCount()))
@@ -3752,7 +3763,7 @@ void MainDialog::updateStatistics()
     //update preview of item count and bytes to be transferred:
     const SyncStatistics st(folderCmp);
 
-    setValue(*m_staticTextData, st.getDataToProcess() == 0, filesizeToShortString(st.getDataToProcess()), *m_bitmapData,  L"data");
+    setValue(*m_staticTextData, st.getBytesToProcess() == 0, filesizeToShortString(st.getBytesToProcess()), *m_bitmapData,  L"data");
     setIntValue(*m_staticTextCreateLeft,  st.createCount< LEFT_SIDE>(), *m_bitmapCreateLeft,  L"so_create_left_small");
     setIntValue(*m_staticTextUpdateLeft,  st.updateCount< LEFT_SIDE>(), *m_bitmapUpdateLeft,  L"so_update_left_small");
     setIntValue(*m_staticTextDeleteLeft,  st.deleteCount< LEFT_SIDE>(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
@@ -4793,7 +4804,7 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
             std::shared_ptr<UpdateCheckResultPrep> resultPrep = periodicUpdateCheckPrepare(); //run on main thread:
 
             guiQueue.processAsync([resultPrep] { return periodicUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
-                                  [this] (std::shared_ptr<UpdateCheckResultAsync>&& resultAsync)
+                                  [this] (std::shared_ptr<UpdateCheckResult>&& resultAsync)
             {
                 periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck,
                                         globalCfg.gui.lastOnlineVersion,

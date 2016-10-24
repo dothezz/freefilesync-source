@@ -18,7 +18,7 @@
 		To locate this file on Windows enter <b><span class="command-line">%appdata%\FreeFileSync</span></b> in the Windows Explorer address bar or go to the FreeFileSync
 		installation folder if you are using the portable installation. 
 		On Linux you can find the file in <b><span class="command-line">~/.FreeFileSync</span></b> for the Launchpad release and in the installation folder for the portable version. 
-		On OS X go to <b><span class="command-line">~/Library/Application Support/FreeFileSync</span></b>.
+		On macOS go to <b><span class="command-line">~/Library/Application Support/FreeFileSync</span></b>.
 	</p>
 
 	<div class="greybox">
@@ -61,13 +61,14 @@
 
 	<p>
 		<b>LockDirectoriesDuringSync:</b><br>
-		In order to avoid race conditions of multiple FreeFileSync instances
-		writing to the same folder at the same time, synchronization tasks are serialized
-		with lock files (<span class="file-path">sync.ffs_lock</span>).
-		The lock files are only recognized by FreeFileSync and make sure that only a single instance 
-		can read and write a shared folder while other instances are queued to wait.
-		This is primarily intended for network synchronization scenarios where
-		multiple users may run FreeFileSync concurrently against a common network folder.
+		In order to prevent multiple synchronization tasks from reading and writing the same files,
+		FreeFileSync instances are serialized with lock files (<span class="file-path">sync.ffs_lock</span>).
+		The lock files are only recognized by FreeFileSync and make sure that
+		at most a single synchronization is running against a certain folder at a time while 
+		other instances are queued to wait.
+		This ensures that only consistent sets of files are subject to synchronization.		
+		The primary use case are network synchronization scenarios where
+		multiple users run FreeFileSync concurrently against a shared network folder.
 	</p>
 
 	<p>

@@ -18,10 +18,10 @@ template <class T>
 class Global
 {
 public:
-	Global() { static_assert(std::is_trivially_destructible<Pod>::value, "this memory needs to live forever"); }
-	explicit Global(std::unique_ptr<T>&& newInst) { set(std::move(newInst)); }
-	~Global() { set(nullptr); }
-	
+    Global() { static_assert(std::is_trivially_destructible<Pod>::value, "this memory needs to live forever"); }
+    explicit Global(std::unique_ptr<T>&& newInst) { set(std::move(newInst)); }
+    ~Global() { set(nullptr); }
+
     std::shared_ptr<T> get() //=> return std::shared_ptr to let instance life time be handled by caller (MT usage!)
     {
         while (pod.spinLock.exchange(true)) ;
@@ -45,15 +45,15 @@ public:
     }
 
 private:
-	//avoid static destruction order fiasco: there may be accesses to "Global<T>::get()" during process shutdown
-	//e.g. _("") used by message in debug_minidump.cpp or by some detached thread assembling an error message!
-	//=> use trivially-destructible POD only!!!
-	struct Pod
-	{
-		std::shared_ptr<T>* inst = nullptr;
-		//serialize access; can't use std::mutex: has non-trival destructor
-		std::atomic<bool> spinLock { false };
-	} pod;
+    //avoid static destruction order fiasco: there may be accesses to "Global<T>::get()" during process shutdown
+    //e.g. _("") used by message in debug_minidump.cpp or by some detached thread assembling an error message!
+    //=> use trivially-destructible POD only!!!
+    struct Pod
+    {
+        std::shared_ptr<T>* inst = nullptr;
+        //serialize access; can't use std::mutex: has non-trival destructor
+        std::atomic<bool> spinLock { false };
+    } pod;
 };
 
 }

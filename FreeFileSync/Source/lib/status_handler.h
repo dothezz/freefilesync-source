@@ -58,14 +58,14 @@ public:
 
 protected:
     //implement parts of ProcessCallback
-    void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) override //may throw
+    void initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseId) override //may throw
     {
         currentPhase_ = phaseId;
-        refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);
+        refNumbers(numbersTotal_, currentPhase_) = std::make_pair(itemsTotal, bytesTotal);
     }
 
-    void updateProcessedData(int objectsDelta, std::int64_t dataDelta) override { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
-    void updateTotalData    (int objectsDelta, std::int64_t dataDelta) override { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
+    void updateProcessedData(int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersCurrent_, itemsDelta, bytesDelta); } //note: these methods MUST NOT throw in order
+    void updateTotalData    (int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersTotal_  , itemsDelta, bytesDelta); } //to properly allow undoing setting of statistics!
 
     void requestUiRefresh() override //throw X
     {
@@ -109,11 +109,11 @@ protected:
 private:
     using StatNumbers = std::vector<std::pair<int, std::int64_t>>;
 
-    void updateData(StatNumbers& num, int objectsDelta, std::int64_t dataDelta)
+    void updateData(StatNumbers& num, int itemsDelta, std::int64_t bytesDelta)
     {
         auto& st = refNumbers(num, currentPhase_);
-        st.first  += objectsDelta;
-        st.second += dataDelta;
+        st.first  += itemsDelta;
+        st.second += bytesDelta;
     }
 
     static const std::pair<int, std::int64_t>& refNumbers(const StatNumbers& num, Phase phaseId)

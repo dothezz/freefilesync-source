@@ -66,8 +66,8 @@ private:
 
     const Zstring baseDirPath;
 
-    struct Pimpl;
-    std::unique_ptr<Pimpl> pimpl_;
+    struct Impl;
+    const std::unique_ptr<Impl> pimpl_;
 };
 
 }

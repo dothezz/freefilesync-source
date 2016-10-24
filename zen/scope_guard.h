@@ -86,24 +86,24 @@ public:
     explicit ScopeGuard(      F&& fun) : fun_(std::move(fun)) {}
 
     ScopeGuard(ScopeGuard&& other) : fun_(std::move(other.fun_)),
-        exeptionCount(other.exeptionCount),
-        dismissed(other.dismissed) { other.dismissed = true; }
+        exeptionCount_(other.exeptionCount_),
+        dismissed_(other.dismissed_) { other.dismissed_ = true; }
 
     ~ScopeGuard() noexcept(runMode != ScopeGuardRunMode::ON_SUCCESS)
     {
-        if (!dismissed)
-            runScopeGuardDestructor(fun_, exeptionCount, StaticEnum<ScopeGuardRunMode, runMode>());
+        if (!dismissed_)
+            runScopeGuardDestructor(fun_, exeptionCount_, StaticEnum<ScopeGuardRunMode, runMode>());
     }
 
-    void dismiss() { dismissed = true; }
+    void dismiss() { dismissed_ = true; }
 
 private:
     ScopeGuard           (const ScopeGuard&) = delete;
     ScopeGuard& operator=(const ScopeGuard&) = delete;
 
     F fun_;
-    const int exeptionCount = getUncaughtExceptionCount();
-    bool dismissed = false;
+    const int exeptionCount_ = getUncaughtExceptionCount();
+    bool dismissed_ = false;
 };
 
 

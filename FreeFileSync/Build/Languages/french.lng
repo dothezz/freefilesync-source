@@ -1685,7 +1685,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Impossible de copier les permissions de %x à %y.</target>
 
 <source>%x is not a regular directory name.</source>
-<target>%x n'est pas un nom de répertoire valise.</target>
+<target>%x n'est pas un nom de répertoire valide.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Impossible de copier le fichier %x vers %y.</target>

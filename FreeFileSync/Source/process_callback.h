@@ -31,12 +31,12 @@ struct ProcessCallback
         PHASE_COMPARING_CONTENT,
         PHASE_SYNCHRONIZING
     };
-    virtual void initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseId) = 0; //throw ?; informs about the estimated amount of data that will be processed in this phase
+    virtual void initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseId) = 0; //throw ?; informs about the estimated amount of data that will be processed in this phase
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
-    virtual void updateProcessedData(int objectsDelta, std::int64_t dataDelta) = 0; //noexcept!!
-    virtual void updateTotalData    (int objectsDelta, std::int64_t dataDelta) = 0; //
+    virtual void updateProcessedData(int itemsDelta, std::int64_t bytesDelta) = 0; //noexcept!!
+    virtual void updateTotalData    (int itemsDelta, std::int64_t bytesDelta) = 0; //
     /*the estimated and actual total workload may change *during* sync:
             1. file cannot be moved -> fallback to copy + delete
             2. file copy, actual size changed after comparison

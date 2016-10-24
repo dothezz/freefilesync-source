@@ -61,8 +61,8 @@ template <class InputIterator1, class InputIterator2>
 bool equal(InputIterator1 first1, InputIterator1 last1,
            InputIterator2 first2, InputIterator2 last2);
 
-size_t hashBytes(const unsigned char* ptr, size_t len);
-size_t hashBytesAppend(size_t hashVal, const unsigned char* ptr, size_t len);
+template <class ByteIterator> size_t hashBytes                      (ByteIterator first, ByteIterator last);
+template <class ByteIterator> size_t hashBytesAppend(size_t hashVal, ByteIterator first, ByteIterator last);
 
 
 //support for custom string classes in std::unordered_set/map
@@ -72,7 +72,8 @@ struct StringHash
     size_t operator()(const String& str) const
     {
         const auto* strFirst = strBegin(str);
-        return hashBytes(reinterpret_cast<const unsigned char*>(strFirst), strLength(str) * sizeof(strFirst[0]));
+        return hashBytes(reinterpret_cast<const char*>(strFirst),
+                         reinterpret_cast<const char*>(strFirst + strLength(str)));
     }
 };
 
@@ -208,36 +209,36 @@ bool equal(InputIterator1 first1, InputIterator1 last1,
 
 
 
-inline
-size_t hashBytes(const unsigned char* ptr, size_t len)
+template <class ByteIterator> inline
+size_t hashBytes(ByteIterator first, ByteIterator last)
 {
-    //http://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+    //FNV-1a: http://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 #ifdef ZEN_BUILD_32BIT
     const size_t basis = 2166136261U;
 #elif defined ZEN_BUILD_64BIT
     const size_t basis = 14695981039346656037ULL;
 #endif
-	return hashBytesAppend(basis, ptr, len);
+    return hashBytesAppend(basis, first, last);
 }
 
 
-inline
-size_t hashBytesAppend(size_t hashVal, const unsigned char* ptr, size_t len)
+template <class ByteIterator> inline
+size_t hashBytesAppend(size_t hashVal, ByteIterator first, ByteIterator last)
 {
 #ifdef ZEN_BUILD_32BIT
     const size_t prime = 16777619U;
 #elif defined ZEN_BUILD_64BIT
     const size_t prime = 1099511628211ULL;
 #endif
+    static_assert(sizeof(typename std::iterator_traits<ByteIterator>::value_type) == 1, "");
 
-    for (size_t i = 0; i < len; ++i)
+	for (; first != last; ++first)
     {
-        hashVal ^= static_cast<size_t>(ptr[i]);
+        hashVal ^= static_cast<size_t>(*first);
         hashVal *= prime;
     }
     return hashVal;
 }
-
 }
 
 #endif //STL_TOOLS_H_84567184321434

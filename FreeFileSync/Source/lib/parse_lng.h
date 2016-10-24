@@ -193,7 +193,7 @@ struct Token
 class KnownTokens
 {
 public:
-	KnownTokens() {} //clang wants it, clang gets it
+    KnownTokens() {} //clang wants it, clang gets it
 
     using TokenMap = std::map<Token::Type, std::string>;
 

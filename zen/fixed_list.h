@@ -9,12 +9,13 @@
 
 #include <cassert>
 #include <iterator>
-
+#include "stl_tools.h"
 
 namespace zen
 {
-//std::list(C++11)-like class for inplace element construction supporting non-copyable/movable types
-//may be replaced by C++11 std::list when available...or never...
+//std::list(C++11)-like class for inplace element construction supporting non-copyable/non-movable types
+//-> no iterator invalidation after emplace_back()
+	
 template <class T>
 class FixedList
 {
@@ -23,7 +24,7 @@ class FixedList
         template <class... Args>
         Node(Args&& ... args) : val(std::forward<Args>(args)...) {}
 
-        Node* next = nullptr; //singly linked list is sufficient
+        Node* next = nullptr; //singly-linked list is sufficient
         T val;
     };
 
@@ -33,13 +34,13 @@ public:
     ~FixedList() { clear(); }
 
     template <class NodeT, class U>
-    class ListIterator : public std::iterator<std::forward_iterator_tag, U>
+    class FixedIterator : public std::iterator<std::forward_iterator_tag, U>
     {
     public:
-        ListIterator(NodeT* it = nullptr) : it_(it) {}
-        ListIterator& operator++() { it_ = it_->next; return *this; }
-        inline friend bool operator==(const ListIterator& lhs, const ListIterator& rhs) { return lhs.it_ == rhs.it_; }
-        inline friend bool operator!=(const ListIterator& lhs, const ListIterator& rhs) { return !(lhs == rhs); }
+        FixedIterator(NodeT* it = nullptr) : it_(it) {}
+        FixedIterator& operator++() { it_ = it_->next; return *this; }
+        inline friend bool operator==(const FixedIterator& lhs, const FixedIterator& rhs) { return lhs.it_ == rhs.it_; }
+        inline friend bool operator!=(const FixedIterator& lhs, const FixedIterator& rhs) { return !(lhs == rhs); }
         U& operator* () const { return  it_->val; }
         U* operator->() const { return &it_->val; }
     private:
@@ -47,48 +48,68 @@ public:
     };
 
     using value_type      = T;
-    using iterator        = ListIterator<      Node,       T>;
-    using const_iterator  = ListIterator<const Node, const T>;
+    using iterator        = FixedIterator<      Node,       T>;
+    using const_iterator  = FixedIterator<const Node, const T>;
     using reference       = T&;
     using const_reference = const T&;
 
-    iterator begin() { return firstInsert; }
+    iterator begin() { return firstInsert_; }
     iterator end  () { return iterator(); }
 
-    const_iterator begin() const { return firstInsert; }
+    const_iterator begin() const { return firstInsert_; }
     const_iterator end  () const { return const_iterator(); }
 
-    //const_iterator cbegin() const { return firstInsert; }
+    //const_iterator cbegin() const { return firstInsert_; }
     //const_iterator cend  () const { return const_iterator(); }
 
-    reference       front()       { return firstInsert->val; }
-    const_reference front() const { return firstInsert->val; }
+    reference       front()       { return firstInsert_->val; }
+    const_reference front() const { return firstInsert_->val; }
 
-    reference&       back()       { return lastInsert->val; }
-    const_reference& back() const { return lastInsert->val; }
+    reference&       back()       { return lastInsert_->val; }
+    const_reference& back() const { return lastInsert_->val; }
 
     template <class... Args>
-    void emplace_back(Args&& ... args) { pushNode(new Node(std::forward<Args>(args)...)); }
+    void emplace_back(Args&&... args)
+    {
+        Node* newNode = new Node(std::forward<Args>(args)...);
+
+        if (!lastInsert_)
+        {
+            assert(!firstInsert_ && sz_ == 0);
+            firstInsert_ = lastInsert_ = newNode;
+        }
+        else
+        {
+            assert(lastInsert_->next == nullptr);
+            lastInsert_->next = newNode;
+            lastInsert_ = newNode;
+        }
+        ++sz_;
+    }
 
     template <class Predicate>
     void remove_if(Predicate pred)
     {
         Node* prev = nullptr;
-        Node* ptr = firstInsert;
+        Node* ptr = firstInsert_;
 
         while (ptr)
             if (pred(ptr->val))
             {
                 Node* next = ptr->next;
-                deleteNode(ptr);
+
+                delete ptr;
+                assert(sz_ > 0);
+                --sz_;
+
                 ptr = next;
 
                 if (prev)
                     prev->next = next;
                 else
-                    firstInsert = next;
+                    firstInsert_ = next;
                 if (!next)
-                    lastInsert = prev;
+                    lastInsert_ = prev;
             }
             else
             {
@@ -99,59 +120,119 @@ public:
 
     void clear()
     {
-        Node* ptr = firstInsert;
+        Node* ptr = firstInsert_;
         while (ptr)
         {
             Node* next = ptr->next;
-            deleteNode(ptr);
+            delete ptr;
             ptr = next;
         }
 
-        firstInsert = lastInsert = nullptr;
-        assert(sz == 0);
+        sz_ = 0;
+        firstInsert_ = lastInsert_ = nullptr;
     }
 
-    bool empty() const { return firstInsert == nullptr; }
+    bool empty() const { return sz_ == 0; }
 
-    size_t size() const { return sz; }
+    size_t size() const { return sz_; }
 
     void swap(FixedList& other)
     {
-        std::swap(firstInsert, other.firstInsert);
-        std::swap(lastInsert , other.lastInsert);
-        std::swap(sz         , other.sz);
+        std::swap(firstInsert_, other.firstInsert_);
+        std::swap(lastInsert_ , other.lastInsert_);
+        std::swap(sz_         , other.sz_);
     }
 
 private:
     FixedList           (const FixedList&) = delete;
     FixedList& operator=(const FixedList&) = delete;
 
-    void pushNode(Node* newNode) //throw()
+    Node* firstInsert_ = nullptr;
+    Node* lastInsert_  = nullptr; //point to last insertion; required by efficient emplace_back()
+    size_t sz_ = 0;
+};
+
+
+//just as fast as FixedList, but simpler, more CPU-cache-friendly => superseeds FixedList!
+template <class T>
+class FixedVector
+{
+public:
+    FixedVector() {}
+
+	/*
+	class EndIterator {}; //just like FixedList: no iterator invalidation after emplace_back()
+
+	template <class V>
+    class FixedIterator : public std::iterator<std::forward_iterator_tag, V> //could make this random-access if needed
     {
-        if (lastInsert == nullptr)
-        {
-            assert(firstInsert == nullptr && sz == 0);
-            firstInsert = lastInsert = newNode;
-        }
-        else
-        {
-            assert(lastInsert->next == nullptr);
-            lastInsert->next = newNode;
-            lastInsert = newNode;
-        }
-        ++sz;
+    public:
+        FixedIterator(std::vector<std::unique_ptr<T>>& cont, size_t pos) : cont_(cont), pos_(pos) {}
+        FixedIterator& operator++() { ++pos_; return *this; }
+        inline friend bool operator==(const FixedIterator& lhs, EndIterator) { return lhs.pos_ == lhs.cont_.size(); }
+        inline friend bool operator!=(const FixedIterator& lhs, EndIterator) { return !(lhs == EndIterator()); }
+        V& operator* () const { return  *cont_[pos_]; }
+        V* operator->() const { return &*cont_[pos_]; }
+    private:
+		std::vector<std::unique_ptr<T>>& cont_;
+		size_t pos_ = 0; 
+    };
+	*/
+
+    template <class IterImpl, class V>
+    class FixedIterator : public std::iterator<std::forward_iterator_tag, V> //could make this bidirectional if needed
+    {
+    public:
+        FixedIterator(IterImpl it) : it_(it) {}
+        FixedIterator& operator++() { ++it_; return *this; }
+        inline friend bool operator==(const FixedIterator& lhs, const FixedIterator& rhs) { return lhs.it_ == rhs.it_; }
+        inline friend bool operator!=(const FixedIterator& lhs, const FixedIterator& rhs) { return !(lhs == rhs); }
+        V& operator* () const { return  **it_; }
+        V* operator->() const { return &**it_; }
+    private:
+        IterImpl it_;  //TODO: avoid iterator invalidation after emplace_back(); caveat: end() must not store old length!
+    };
+
+    using value_type      = T;
+    using iterator        = FixedIterator<typename std::vector<std::unique_ptr<T>>::iterator      ,       T>;
+    using const_iterator  = FixedIterator<typename std::vector<std::unique_ptr<T>>::const_iterator, const T>;
+    using reference       =       T&;
+    using const_reference = const T&;
+
+	iterator begin() { return items_.begin(); }
+    iterator end  () { return items_.end  (); }
+
+	const_iterator begin() const { return items_.begin(); }
+    const_iterator end  () const { return items_.end  (); }
+
+    reference       front()       { return *items_.front(); }
+    const_reference front() const { return *items_.front(); }
+
+    reference&       back()       { return *items_.back(); }
+    const_reference& back() const { return *items_.back(); }
+
+    template <class... Args>
+    void emplace_back(Args&&... args)
+    {
+		items_.push_back(std::make_unique<T>(std::forward<Args>(args)...));
     }
 
-    void deleteNode(Node* oldNode)
+    template <class Predicate>
+    void remove_if(Predicate pred)
     {
-        assert(sz > 0);
-        --sz;
-        delete oldNode;
+		erase_if(items_, [&](const std::unique_ptr<T>& p){ return pred(*p); });
     }
 
-    Node* firstInsert = nullptr;
-    Node* lastInsert  = nullptr; //point to last insertion; required by efficient emplace_back()
-    size_t sz = 0;
+    void   clear() { items_.clear(); }
+    bool   empty() const { return items_.empty(); }
+    size_t size () const { return items_.size(); }
+    void swap(FixedVector& other) { items_.swap(other.items_); }
+
+private:
+    FixedVector           (const FixedVector&) = delete;
+    FixedVector& operator=(const FixedVector&) = delete;
+
+	std::vector<std::unique_ptr<T>> items_;
 };
 }
 

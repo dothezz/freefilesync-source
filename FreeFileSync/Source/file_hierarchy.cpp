@@ -151,7 +151,7 @@ SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir) con
 
 SyncOperation FileSystemObject::getSyncOperation() const
 {
-    return getIsolatedSyncOperation(!isEmpty<LEFT_SIDE>(), !isEmpty<RIGHT_SIDE>(), getCategory(), selectedForSync, getSyncDir(), syncDirectionConflict.get() != nullptr);
+    return getIsolatedSyncOperation(!isEmpty<LEFT_SIDE>(), !isEmpty<RIGHT_SIDE>(), getCategory(), selectedForSync_, getSyncDir(), syncDirectionConflict_.get() != nullptr);
     //do *not* make a virtual call to testSyncOperation()! See FilePair::testSyncOperation()! <- better not implement one in terms of the other!!!
 }
 
@@ -161,16 +161,16 @@ SyncOperation FileSystemObject::getSyncOperation() const
 
 SyncOperation FolderPair::getSyncOperation() const
 {
-    if (!haveBufferedSyncOp)
+    if (!haveBufferedSyncOp_)
     {
-        haveBufferedSyncOp = true;
+        haveBufferedSyncOp_ = true;
         //redetermine...
 
         //suggested operation *not* considering child elements
-        syncOpBuffered = FileSystemObject::getSyncOperation();
+        syncOpBuffered_ = FileSystemObject::getSyncOperation();
 
         //action for child elements may occassionally have to overwrite parent task:
-        switch (syncOpBuffered)
+        switch (syncOpBuffered_)
         {
             case SO_MOVE_LEFT_SOURCE:
             case SO_MOVE_LEFT_TARGET:
@@ -194,52 +194,52 @@ SyncOperation FolderPair::getSyncOperation() const
                     //1. if at least one child-element is to be created, make sure parent folder is created also
                     //note: this automatically fulfills "create parent folders even if excluded"
                     if (hasDirectChild(*this,
-                                       [](const FileSystemObject& fsObj) -> bool
+                                       [](const FileSystemObject& fsObj)
                 {
                     const SyncOperation op = fsObj.getSyncOperation();
                         return  op == SO_CREATE_NEW_LEFT ||
-                        op == SO_MOVE_LEFT_TARGET;
+                                op == SO_MOVE_LEFT_TARGET;
                     }))
-                    syncOpBuffered = SO_CREATE_NEW_LEFT;
+                    syncOpBuffered_ = SO_CREATE_NEW_LEFT;
                     //2. cancel parent deletion if only a single child is not also scheduled for deletion
-                    else if (syncOpBuffered == SO_DELETE_RIGHT &&
+                    else if (syncOpBuffered_ == SO_DELETE_RIGHT &&
                              hasDirectChild(*this,
-                                            [](const FileSystemObject& fsObj) -> bool
+                                            [](const FileSystemObject& fsObj)
                 {
                     if (fsObj.isEmpty())
                             return false; //fsObj may already be empty because it once contained a "move source"
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_RIGHT &&
-                        op != SO_MOVE_RIGHT_SOURCE;
+                               op != SO_MOVE_RIGHT_SOURCE;
                     }))
-                    syncOpBuffered = SO_DO_NOTHING;
+                    syncOpBuffered_ = SO_DO_NOTHING;
                 }
                 else if (isEmpty<RIGHT_SIDE>())
                 {
                     if (hasDirectChild(*this,
-                                       [](const FileSystemObject& fsObj) -> bool
+                                       [](const FileSystemObject& fsObj)
                 {
                     const SyncOperation op = fsObj.getSyncOperation();
                         return  op == SO_CREATE_NEW_RIGHT ||
-                        op == SO_MOVE_RIGHT_TARGET;
+                                op == SO_MOVE_RIGHT_TARGET;
                     }))
-                    syncOpBuffered = SO_CREATE_NEW_RIGHT;
-                    else if (syncOpBuffered == SO_DELETE_LEFT &&
+                    syncOpBuffered_ = SO_CREATE_NEW_RIGHT;
+                    else if (syncOpBuffered_ == SO_DELETE_LEFT &&
                              hasDirectChild(*this,
-                                            [](const FileSystemObject& fsObj) -> bool
+                                            [](const FileSystemObject& fsObj)
                 {
                     if (fsObj.isEmpty())
                             return false;
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_LEFT &&
-                        op != SO_MOVE_LEFT_SOURCE;
+                               op != SO_MOVE_LEFT_SOURCE;
                     }))
-                    syncOpBuffered = SO_DO_NOTHING;
+                    syncOpBuffered_ = SO_DO_NOTHING;
                 }
                 break;
         }
     }
-    return syncOpBuffered;
+    return syncOpBuffered_;
 }
 
 
@@ -250,8 +250,8 @@ SyncOperation FilePair::applyMoveOptimization(SyncOperation op) const
         check whether we can optimize "create + delete" via "move":
         note: as long as we consider "create + delete" cases only, detection of renamed files, should be fine even for "binary" comparison variant!
     */
-    if (moveFileRef)
-        if (auto refFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FilePair", but only need a "FileSystemObject"
+    if (moveFileRef_)
+        if (auto refFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(moveFileRef_))) //we expect a "FilePair", but only need a "FileSystemObject"
         {
             SyncOperation opRef = refFile->FileSystemObject::getSyncOperation(); //do *not* make a virtual call!
 

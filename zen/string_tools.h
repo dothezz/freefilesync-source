@@ -56,7 +56,8 @@ template <class S, class T, class Num> S printNumber(const T& format, const Num&
 //string to string conversion: converts string-like type into char-compatible target string class
 template <class T, class S> T copyStringTo(S&& str);
 
-
+//case-sensitive comparison
+template <class S, class T> int cmpString(const S& lhs, const T& rhs);
 
 
 
@@ -233,7 +234,7 @@ std::vector<S> split(const S& str, const T& delimiter)
     const size_t delimLen = strLength(delimiter);
 
     if (delimLen == 0)
-		return { str };
+        return { str };
     else
     {
         const auto* const delimFirst = strBegin(delimiter);
@@ -241,8 +242,8 @@ std::vector<S> split(const S& str, const T& delimiter)
 
         const auto* blockStart    = strBegin(str);
         const auto* const strLast = blockStart + strLength(str);
-    
-		std::vector<S> output;
+
+        std::vector<S> output;
 
         for (;;)
         {
@@ -251,7 +252,7 @@ std::vector<S> split(const S& str, const T& delimiter)
 
             output.emplace_back(blockStart, blockEnd - blockStart);
             if (blockEnd == strLast) //clients expect: if delimiter not found, return str
-				return output;
+                return output;
             blockStart = blockEnd + delimLen;
         }
     }
@@ -263,11 +264,11 @@ namespace impl
 ZEN_INIT_DETECT_MEMBER(append);
 
 //either call operator+=(S(str, len)) or append(str, len)
-template <class S, class Char> inline
-typename EnableIf<HasMember_append<S>::value>::Type stringAppend(S& str, const Char* other, size_t len) { str.append(other, len); }
+template <class S, class InputIterator> inline
+typename EnableIf<HasMember_append<S>::value>::Type stringAppend(S& str, InputIterator first, InputIterator last) { str.append(first, last);  }
 
-template <class S, class Char> inline
-typename EnableIf<!HasMember_append<S>::value>::Type stringAppend(S& str, const Char* other, size_t len) { str += S(other, len); }
+template <class S, class InputIterator> inline
+typename EnableIf<!HasMember_append<S>::value>::Type stringAppend(S& str, InputIterator first, InputIterator last) { str += S(first, last); }
 }
 
 
@@ -289,20 +290,20 @@ S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
     const auto* const oldBegin = strBegin(oldTerm);
     const auto* const oldEnd   = oldBegin + oldLen;
 
-    //optimize "oldTerm not found"
+    //optimize "oldTerm not found": return ref-counted copy
     const auto* strMatch = std::search(strPos, strEnd,
                                        oldBegin, oldEnd);
     if (strMatch == strEnd)
         return str;
 
-    const size_t newLen = strLength(newTerm);
     const auto* const newBegin = strBegin(newTerm);
+	const auto* const newEnd   = newBegin + strLength(newTerm);
     S output;
 
     for (;;)
     {
-        impl::stringAppend(output, strPos, strMatch - strPos);
-        impl::stringAppend(output, newBegin, newLen);
+        impl::stringAppend(output, strPos, strMatch);
+        impl::stringAppend(output, newBegin, newEnd);
 
         strPos = strMatch + oldLen;
 
@@ -314,7 +315,7 @@ S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
         if (strMatch == strEnd)
             break;
     }
-    impl::stringAppend(output, strPos, strEnd - strPos);
+    impl::stringAppend(output, strPos, strEnd);
 
     return output;
 }
@@ -378,6 +379,28 @@ struct CopyStringToString<T, T> //perf: we don't need a deep copy if string type
 
 template <class T, class S> inline
 T copyStringTo(S&& str) { return impl::CopyStringToString<std::decay_t<S>, T>().copy(std::forward<S>(str)); }
+
+
+template <class S, class T> inline
+int cmpString(const S& lhs, const T& rhs)
+{
+    const size_t lenL = strLength(lhs);
+    const size_t lenR = strLength(rhs);
+
+    const auto* strPosL = strBegin(lhs);
+    const auto* strPosR = strBegin(rhs);
+
+    const auto* const strPosLLast = strPosL + std::min(lenL, lenR);
+
+    while (strPosL != strPosLLast)
+    {
+        const auto charL = static_cast<unsigned int>(*strPosL++); //unsigned char-comparison is the convention!
+        const auto charR = static_cast<unsigned int>(*strPosR++);
+        if (charL != charR)
+            return static_cast<int>(charL) - static_cast<int>(charR);
+    }
+    return static_cast<int>(lenL) - static_cast<int>(lenR);
+}
 
 
 namespace impl
@@ -635,7 +658,6 @@ Num stringTo(const S& str)
 
     return impl::stringTo<Num>(str, TypeTag());
 }
-
 }
 
 #endif //STRING_TOOLS_H_213458973046

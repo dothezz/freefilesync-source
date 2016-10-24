@@ -17,8 +17,8 @@ namespace zen
     Windows: WinInet-based   => may be called from worker thread
     Linux:   wxWidgets-based => don't call from worker thread
 */
-std::string sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const std::vector<std::pair<std::string, std::string>>& postParams); //throw FileError
-std::string sendHttpGet (const std::wstring& url, const std::wstring& userAgent); //throw FileError
+std::string sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const std::vector<std::pair<std::string, std::string>>& postParams); //throw SysError
+std::string sendHttpGet (const std::wstring& url, const std::wstring& userAgent); //throw SysError
 bool internetIsAlive(); //noexcept
 }
 

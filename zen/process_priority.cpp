@@ -11,13 +11,13 @@
 using namespace zen;
 
 
-struct PreventStandby::Pimpl {};
+struct PreventStandby::Impl {};
 PreventStandby::PreventStandby() {}
 PreventStandby::~PreventStandby() {}
 
 //solution for GNOME?: http://people.gnome.org/~mccann/gnome-session/docs/gnome-session.html#org.gnome.SessionManager.Inhibit
 
-struct ScheduleForBackgroundProcessing::Pimpl {};
+struct ScheduleForBackgroundProcessing::Impl {};
 ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing() {};
 ScheduleForBackgroundProcessing::~ScheduleForBackgroundProcessing() {};
 

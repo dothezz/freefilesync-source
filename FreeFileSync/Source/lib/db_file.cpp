@@ -179,9 +179,9 @@ public:
             }
         };
 
-        const ByteArray tmpL = compStream(generator.outputLeft .ref(), displayFilePathL);
-        const ByteArray tmpR = compStream(generator.outputRight.ref(), displayFilePathR);
-        const ByteArray tmpB = compStream(generator.outputBoth .ref(), displayFilePathL + L"/" + displayFilePathR);
+        const ByteArray tmpL = compStream(generator.outputLeft_ .ref(), displayFilePathL);
+        const ByteArray tmpR = compStream(generator.outputRight_.ref(), displayFilePathR);
+        const ByteArray tmpB = compStream(generator.outputBoth_ .ref(), displayFilePathL + L"/" + displayFilePathR);
 
         MemStreamOut outL;
         MemStreamOut outR;
@@ -213,32 +213,32 @@ public:
 private:
     void recurse(const InSyncFolder& container)
     {
-        writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.files.size()));
+        writeNumber<std::uint32_t>(outputBoth_, static_cast<std::uint32_t>(container.files.size()));
         for (const auto& dbFile : container.files)
         {
-            writeUtf8(outputBoth, dbFile.first);
-            writeNumber(outputBoth, static_cast<std::int32_t>(dbFile.second.cmpVar));
-            writeNumber<std::uint64_t>(outputBoth, dbFile.second.fileSize);
+            writeUtf8(outputBoth_, dbFile.first);
+            writeNumber(outputBoth_, static_cast<std::int32_t>(dbFile.second.cmpVar));
+            writeNumber<std::uint64_t>(outputBoth_, dbFile.second.fileSize);
 
-            writeFile(outputLeft,  dbFile.second.left);
-            writeFile(outputRight, dbFile.second.right);
+            writeFile(outputLeft_,  dbFile.second.left);
+            writeFile(outputRight_, dbFile.second.right);
         }
 
-        writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.symlinks.size()));
+        writeNumber<std::uint32_t>(outputBoth_, static_cast<std::uint32_t>(container.symlinks.size()));
         for (const auto& dbSymlink : container.symlinks)
         {
-            writeUtf8(outputBoth, dbSymlink.first);
-            writeNumber(outputBoth, static_cast<std::int32_t>(dbSymlink.second.cmpVar));
+            writeUtf8(outputBoth_, dbSymlink.first);
+            writeNumber(outputBoth_, static_cast<std::int32_t>(dbSymlink.second.cmpVar));
 
-            writeLink(outputLeft,  dbSymlink.second.left);
-            writeLink(outputRight, dbSymlink.second.right);
+            writeLink(outputLeft_,  dbSymlink.second.left);
+            writeLink(outputRight_, dbSymlink.second.right);
         }
 
-        writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.folders.size()));
+        writeNumber<std::uint32_t>(outputBoth_, static_cast<std::uint32_t>(container.folders.size()));
         for (const auto& dbFolder : container.folders)
         {
-            writeUtf8(outputBoth, dbFolder.first);
-            writeNumber<std::int32_t>(outputBoth, dbFolder.second.status);
+            writeUtf8(outputBoth_, dbFolder.first);
+            writeNumber<std::int32_t>(outputBoth_, dbFolder.second.status);
 
             recurse(dbFolder.second);
         }
@@ -258,9 +258,9 @@ private:
         writeNumber<std::int64_t>(output, descr.lastWriteTimeRaw);
     }
 
-    MemStreamOut outputLeft;  //data related to one side only
-    MemStreamOut outputRight; //
-    MemStreamOut outputBoth;  //data concerning both sides
+    MemStreamOut outputLeft_;  //data related to one side only
+    MemStreamOut outputRight_; //
+    MemStreamOut outputBoth_;  //data concerning both sides
 };
 
 
@@ -295,9 +295,7 @@ public:
             if (streamVersionL != streamVersionR)
                 throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"different stream formats");
 
-            warn_static("remove check for stream version 1 after migration! 2015-05-02")
-            if (streamVersionL != 1 &&
-                streamVersionL != DB_FORMAT_STREAM)
+            if (streamVersionL != DB_FORMAT_STREAM)
                 throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(displayFilePathL)), L"unknown stream format");
 
             const bool has1stPartL = readNumber<std::int8_t>(inL) != 0; //throw UnexpectedEndOfStreamError
@@ -345,38 +343,40 @@ private:
                  const ByteArray& bufferR,
                  const ByteArray& bufferB) :
         streamVersion_(streamVersion),
-        inputLeft (bufferL),
-        inputRight(bufferR),
-        inputBoth (bufferB) {}
+        inputLeft_ (bufferL),
+        inputRight_(bufferR),
+        inputBoth_ (bufferB) {}
 
     void recurse(InSyncFolder& container)
     {
-        size_t fileCount = readNumber<std::uint32_t>(inputBoth);
+        (void)streamVersion_; //clang: -Wunused-private-field
+
+        size_t fileCount = readNumber<std::uint32_t>(inputBoth_);
         while (fileCount-- != 0)
         {
-            const Zstring itemName = readUtf8(inputBoth);
-            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
-            const std::uint64_t fileSize = readNumber<std::uint64_t>(inputBoth);
-            const InSyncDescrFile dataL = readFile(inputLeft);
-            const InSyncDescrFile dataR = readFile(inputRight);
+            const Zstring itemName = readUtf8(inputBoth_);
+            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth_));
+            const std::uint64_t fileSize = readNumber<std::uint64_t>(inputBoth_);
+            const InSyncDescrFile dataL = readFile(inputLeft_);
+            const InSyncDescrFile dataR = readFile(inputRight_);
             container.addFile(itemName, dataL, dataR, cmpVar, fileSize);
         }
 
-        size_t linkCount = readNumber<std::uint32_t>(inputBoth);
+        size_t linkCount = readNumber<std::uint32_t>(inputBoth_);
         while (linkCount-- != 0)
         {
-            const Zstring itemName = readUtf8(inputBoth);
-            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth));
-            InSyncDescrLink dataL = readLink(inputLeft);
-            InSyncDescrLink dataR = readLink(inputRight);
+            const Zstring itemName = readUtf8(inputBoth_);
+            const auto cmpVar = static_cast<CompareVariant>(readNumber<std::int32_t>(inputBoth_));
+            InSyncDescrLink dataL = readLink(inputLeft_);
+            InSyncDescrLink dataR = readLink(inputRight_);
             container.addSymlink(itemName, dataL, dataR, cmpVar);
         }
 
-        size_t dirCount = readNumber<std::uint32_t>(inputBoth);
+        size_t dirCount = readNumber<std::uint32_t>(inputBoth_);
         while (dirCount-- != 0)
         {
-            const Zstring itemName = readUtf8(inputBoth);
-            const auto status = static_cast<InSyncFolder::InSyncStatus>(readNumber<std::int32_t>(inputBoth));
+            const Zstring itemName = readUtf8(inputBoth_);
+            const auto status = static_cast<InSyncFolder::InSyncStatus>(readNumber<std::int32_t>(inputBoth_));
 
             InSyncFolder& dbFolder = container.addFolder(itemName, status);
             recurse(dbFolder);
@@ -389,22 +389,7 @@ private:
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
         const auto lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
-
-        AFS::FileId fileId;
-        warn_static("remove after migration! 2015-05-02")
-        if (streamVersion_ == 1)
-        {
-            auto devId   = static_cast<VolumeId >(readNumber<std::uint64_t>(input)); //
-            auto fileIdx = static_cast<FileIndex>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
-            if (devId != 0 && fileIdx != 0)
-            {
-                fileId.append(reinterpret_cast<const char*>(&devId), sizeof(devId));
-                fileId.append(reinterpret_cast<const char*>(&fileIdx), sizeof(fileIdx));
-            }
-        }
-        else
-
-            fileId = readContainer<Zbase<char>>(input);
+        const AFS::FileId fileId = readContainer<Zbase<char>>(input);
 
         return InSyncDescrFile(lastWriteTimeRaw, fileId);
     }
@@ -416,9 +401,9 @@ private:
     }
 
     const int streamVersion_;
-    MemStreamIn inputLeft;  //data related to one side only
-    MemStreamIn inputRight; //
-    MemStreamIn inputBoth;  //data concerning both sides
+    MemStreamIn inputLeft_;  //data related to one side only
+    MemStreamIn inputRight_; //
+    MemStreamIn inputBoth_;  //data concerning both sides
 };
 
 //#######################################################################################################################################

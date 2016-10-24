@@ -116,9 +116,9 @@ void StatusHandlerTemporaryPanel::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void StatusHandlerTemporaryPanel::initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID)
+void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseID)
 {
-    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
+    StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
 
     mainDlg.compareStatus->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
@@ -365,10 +365,10 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
 }
 
 
-void StatusHandlerFloatingDialog::initNewPhase(int objectsTotal, std::int64_t dataTotal, Phase phaseID)
+void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseID)
 {
     assert(phaseID == PHASE_SYNCHRONIZING);
-    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
+    StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
     if (progressDlg)
         progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
@@ -376,9 +376,9 @@ void StatusHandlerFloatingDialog::initNewPhase(int objectsTotal, std::int64_t da
 }
 
 
-void StatusHandlerFloatingDialog::updateProcessedData(int objectsDelta, std::int64_t dataDelta)
+void StatusHandlerFloatingDialog::updateProcessedData(int itemsDelta, std::int64_t bytesDelta)
 {
-    StatusHandler::updateProcessedData(objectsDelta, dataDelta);
+    StatusHandler::updateProcessedData(itemsDelta, bytesDelta);
     if (progressDlg)
         progressDlg->notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!

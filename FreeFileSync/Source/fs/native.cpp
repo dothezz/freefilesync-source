@@ -350,7 +350,7 @@ private:
 
     bool folderExistsThrowing(const Zstring& itemPathImpl) const override //throw FileError
     {
-        warn_static("finish file error detection")
+        //TODO: finish file error detection
 
         initComForThread(); //throw FileError
         return zen::dirExists(itemPathImpl);
@@ -358,7 +358,7 @@ private:
 
     void connectNetworkFolder(const Zstring& itemPathImpl, bool allowUserInteraction) const override //throw FileError
     {
-        warn_static("clean-up/remove/re-think connectNetworkFolder()")
+        //TODO: clean-up/remove/re-think connectNetworkFolder()
 
     }
 
@@ -427,7 +427,7 @@ bool zen::acceptsItemPathPhraseNative(const Zstring& itemPathPhrase) //noexcept
 
 AbstractPath zen::createItemPathNative(const Zstring& itemPathPhrase) //noexcept
 {
-    warn_static("get volume by name hangs for idle HDD! => run createItemPathNative during getFolderStatusNonBlocking() but getResolvedFilePath currently not thread-safe!")
+    //TODO: get volume by name hangs for idle HDD! => run createItemPathNative during getFolderStatusNonBlocking() but getResolvedFilePath currently not thread-safe!
     const Zstring itemPathImpl = getResolvedFilePath(itemPathPhrase);
     return AbstractPath(std::make_shared<NativeFileSystem>(), itemPathImpl);
 }

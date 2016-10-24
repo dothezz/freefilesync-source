@@ -44,8 +44,8 @@ public:
     static wxBitmap linkOverlayIcon(IconSize sz);
 
 private:
-    struct Pimpl;
-    std::unique_ptr<Pimpl> pimpl;
+    struct Impl;
+    const std::unique_ptr<Impl> pimpl;
 
     const IconSize iconSizeType;
 };

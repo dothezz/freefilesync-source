@@ -41,6 +41,10 @@ private:
 
 
 
+#define THROW_LAST_SYS_ERROR(functionName)                           \
+    do { const ErrorCode ecInternal = getLastError(); throw SysError(formatSystemError(functionName, ecInternal)); } while (false)
+
+
 
 
 
@@ -73,9 +77,9 @@ std::wstring formatSystemErrorRaw(ErrorCode ec) //return empty string on error
 std::wstring formatSystemError(const std::wstring& functionName, long long lastError) = delete; //intentional overload ambiguity to catch usage errors with HRESULT!
 
 inline
-std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec) 
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec)
 {
-	return formatSystemError(functionName, numberTo<std::wstring>(ec), formatSystemErrorRaw(ec)); 
+    return formatSystemError(functionName, numberTo<std::wstring>(ec), formatSystemErrorRaw(ec));
 }
 
 

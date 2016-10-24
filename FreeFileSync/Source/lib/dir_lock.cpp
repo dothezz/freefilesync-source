@@ -251,7 +251,7 @@ ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileErro
 
 void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //throw FileError
 {
-	using namespace std::chrono;
+    using namespace std::chrono;
     std::wstring infoMsg = _("Waiting while directory is locked:") + L' ' + fmtPath(lockFilePath);
 
     if (callback)
@@ -297,7 +297,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
             }
 
             if (lockOwnderDead || //no need to wait any longer...
-				now >= lastLifeSign + seconds(DETECT_ABANDONED_INTERVAL))
+                now >= lastLifeSign + seconds(DETECT_ABANDONED_INTERVAL))
             {
                 DirLock dummy(abandonedLockDeletionName(lockFilePath), callback); //throw FileError
 
@@ -324,7 +324,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
                 if (callback)
                 {
                     //one signal missed: it's likely this is an abandoned lock => show countdown
-					if (now >= lastLifeSign + seconds(EMIT_LIFE_SIGN_INTERVAL + 1))
+                    if (now >= lastLifeSign + seconds(EMIT_LIFE_SIGN_INTERVAL + 1))
                     {
                         const int remainingSeconds = std::max<int>(0, DETECT_ABANDONED_INTERVAL - duration_cast<seconds>(steady_clock::now() - lastLifeSign).count());
                         const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", toGuiString(remainingSeconds));

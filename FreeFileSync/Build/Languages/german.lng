@@ -1069,11 +1069,20 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Port:</source>
 <target>Port:</target>
 
+<source>Authentication:</source>
+<target>Authentifizierung:</target>
+
+<source>&Password</source>
+<target>&Passwort</target>
+
+<source>&Key file</source>
+<target>&Schlüsseldatei</target>
+
 <source>User name:</source>
 <target>Benutzername:</target>
 
-<source>Password:</source>
-<target>Passwort:</target>
+<source>Private key file:</source>
+<target>Private Schlüsseldatei:</target>
 
 <source>&Show password</source>
 <target>&Passwort zeigen</target>
@@ -1081,11 +1090,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Directory on server:</source>
 <target>Verzeichnis auf Server:</target>
 
-<source>Performance settings:</source>
-<target>Leistungseinstellungen:</target>
+<source>Performance improvements:</source>
+<target>Leistungsverbesserungen:</target>
 
 <source>How to get best performance?</source>
-<target>Wie erreicht man die beste Leistung?</target>
+<target>Wie erhält man die beste Leistung?</target>
 
 <source>SSH connections for directory reading:</source>
 <target>SSH Verbindungen zum Lesen des Verzeichnisses:</target>
@@ -1534,6 +1543,12 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Loading...</source>
 <target>Lade...</target>
 
+<source>Password:</source>
+<target>Passwort:</target>
+
+<source>Key password:</source>
+<target>Schlüsselpasswort:</target>
+
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
 <pluralform>Copy the following %x items to another folder?</pluralform>
@@ -1798,9 +1813,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Die Konfigurationsdatei %x ist unvollständig. Die fehlenden Elemente werden auf ihre Standardwerte gesetzt.</target>
 
-<source>Internet access failed.</source>
-<target>Der Internetzugriff ist fehlgeschlagen.</target>
-
 <source>Prepare installation</source>
 <target>Installation vorbereiten</target>
 
@@ -1870,8 +1882,8 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Edit with FreeFileSync</source>
 <target>Mit FreeFileSync editieren</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Danke für Ihre Spende und Unterstützung!</target>
+<source>Thank you, %x, for your donation and support!</source>
+<target>Danke %x für die Spende und Unterstützung!</target>
 
 <source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
 <target>Das FreeFileSync Installationsprogramm für Spender hat sein tägliches Installationslimit erreicht.</target>
@@ -1884,4 +1896,7 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Bitte wählen Sie den lokalen Installationstyp oder einen anderen Ordner für die Installation.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>Der stille Installationsmodus is nur in der FreeFileSync Spendenversion verfügbar.</target>
 

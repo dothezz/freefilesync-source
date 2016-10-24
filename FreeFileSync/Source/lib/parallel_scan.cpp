@@ -151,7 +151,7 @@ std::vector<std::set<DirectoryKey>> separateByDistinctDisk(const std::set<Direct
 */
 
 //------------------------------------------------------------------------------------------
-using BasicWString = Zbase<wchar_t, StorageRefCountThreadSafe>; //thread-safe string class for UI texts
+using BasicWString = Zbase<wchar_t>; //thread-safe string class for UI texts
 
 
 class AsyncCallback //actor pattern

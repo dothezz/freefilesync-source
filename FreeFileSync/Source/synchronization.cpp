@@ -48,7 +48,7 @@ SyncStatistics::SyncStatistics(const HierarchyObject& hierObj)
 SyncStatistics::SyncStatistics(const FilePair& file)
 {
     processFile(file);
-    rowsTotal += 1;
+    ++rowsTotal_;
 }
 
 
@@ -62,9 +62,9 @@ void SyncStatistics::recurse(const HierarchyObject& hierObj)
     for (const FolderPair& folder : hierObj.refSubFolders())
         processFolder(folder);
 
-    rowsTotal += hierObj.refSubFolders().size();
-    rowsTotal += hierObj.refSubFiles  ().size();
-    rowsTotal += hierObj.refSubLinks  ().size();
+    rowsTotal_ += hierObj.refSubFolders().size();
+    rowsTotal_ += hierObj.refSubFiles  ().size();
+    rowsTotal_ += hierObj.refSubLinks  ().size();
 }
 
 
@@ -74,29 +74,29 @@ void SyncStatistics::processFile(const FilePair& file)
     switch (file.getSyncOperation()) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            ++createLeft;
-            dataToProcess += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+            ++createLeft_;
+            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_CREATE_NEW_RIGHT:
-            ++createRight;
-            dataToProcess += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+            ++createRight_;
+            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_DELETE_LEFT:
-            ++deleteLeft;
+            ++deleteLeft_;
             break;
 
         case SO_DELETE_RIGHT:
-            ++deleteRight;
+            ++deleteRight_;
             break;
 
         case SO_MOVE_LEFT_TARGET:
-            ++updateLeft;
+            ++updateLeft_;
             break;
 
         case SO_MOVE_RIGHT_TARGET:
-            ++updateRight;
+            ++updateRight_;
             break;
 
         case SO_MOVE_LEFT_SOURCE:  //ignore; already counted
@@ -104,25 +104,25 @@ void SyncStatistics::processFile(const FilePair& file)
             break;
 
         case SO_OVERWRITE_LEFT:
-            ++updateLeft;
-            dataToProcess += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+            ++updateLeft_;
+            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_OVERWRITE_RIGHT:
-            ++updateRight;
-            dataToProcess += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+            ++updateRight_;
+            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_UNRESOLVED_CONFLICT:
-            conflictMsgs.emplace_back(file.getPairRelativePath(), file.getSyncOpConflict());
+            conflictMsgs_.emplace_back(file.getPairRelativePath(), file.getSyncOpConflict());
             break;
 
         case SO_COPY_METADATA_TO_LEFT:
-            ++updateLeft;
+            ++updateLeft_;
             break;
 
         case SO_COPY_METADATA_TO_RIGHT:
-            ++updateRight;
+            ++updateRight_;
             break;
 
         case SO_DO_NOTHING:
@@ -138,33 +138,33 @@ void SyncStatistics::processLink(const SymlinkPair& link)
     switch (link.getSyncOperation()) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            ++createLeft;
+            ++createLeft_;
             break;
 
         case SO_CREATE_NEW_RIGHT:
-            ++createRight;
+            ++createRight_;
             break;
 
         case SO_DELETE_LEFT:
-            ++deleteLeft;
+            ++deleteLeft_;
             break;
 
         case SO_DELETE_RIGHT:
-            ++deleteRight;
+            ++deleteRight_;
             break;
 
         case SO_OVERWRITE_LEFT:
         case SO_COPY_METADATA_TO_LEFT:
-            ++updateLeft;
+            ++updateLeft_;
             break;
 
         case SO_OVERWRITE_RIGHT:
         case SO_COPY_METADATA_TO_RIGHT:
-            ++updateRight;
+            ++updateRight_;
             break;
 
         case SO_UNRESOLVED_CONFLICT:
-            conflictMsgs.emplace_back(link.getPairRelativePath(), link.getSyncOpConflict());
+            conflictMsgs_.emplace_back(link.getPairRelativePath(), link.getSyncOpConflict());
             break;
 
         case SO_MOVE_LEFT_SOURCE:
@@ -185,33 +185,33 @@ void SyncStatistics::processFolder(const FolderPair& folder)
     switch (folder.getSyncOperation()) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            ++createLeft;
+            ++createLeft_;
             break;
 
         case SO_CREATE_NEW_RIGHT:
-            ++createRight;
+            ++createRight_;
             break;
 
         case SO_DELETE_LEFT: //if deletion variant == user-defined directory existing on other volume, this results in a full copy + delete operation!
-            ++deleteLeft;    //however we cannot (reliably) anticipate this situation, fortunately statistics can be adapted during sync!
+            ++deleteLeft_;    //however we cannot (reliably) anticipate this situation, fortunately statistics can be adapted during sync!
             break;
 
         case SO_DELETE_RIGHT:
-            ++deleteRight;
+            ++deleteRight_;
             break;
 
         case SO_UNRESOLVED_CONFLICT:
-            conflictMsgs.emplace_back(folder.getPairRelativePath(), folder.getSyncOpConflict());
+            conflictMsgs_.emplace_back(folder.getPairRelativePath(), folder.getSyncOpConflict());
             break;
 
         case SO_OVERWRITE_LEFT:
         case SO_COPY_METADATA_TO_LEFT:
-            ++updateLeft;
+            ++updateLeft_;
             break;
 
         case SO_OVERWRITE_RIGHT:
         case SO_COPY_METADATA_TO_RIGHT:
-            ++updateRight;
+            ++updateRight_;
             break;
 
         case SO_MOVE_LEFT_SOURCE:
@@ -308,9 +308,9 @@ public:
     template <class Function> void removeDirWithCallback  (const AbstractPath& dirPath,  const Zstring& relativePath, Function onNotifyItemDeletion, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
     template <class Function> void removeLinkWithCallback (const AbstractPath& linkPath, const Zstring& relativePath, Function onNotifyItemDeletion, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //
 
-    const std::wstring& getTxtRemovingFile   () const { return txtRemovingFile;      } //
-    const std::wstring& getTxtRemovingSymLink() const { return txtRemovingSymlink;   } //buffered status texts
-    const std::wstring& getTxtRemovingDir    () const { return txtRemovingDirectory; } //
+    const std::wstring& getTxtRemovingFile   () const { return txtRemovingFile_;    } //
+    const std::wstring& getTxtRemovingFolder () const { return txtRemovingFolder_;  } //buffered status texts
+    const std::wstring& getTxtRemovingSymLink() const { return txtRemovingSymlink_; } //
 
 private:
     DeletionHandling           (const DeletionHandling&) = delete;
@@ -319,17 +319,17 @@ private:
     AFS::RecycleSession& getOrCreateRecyclerSession() //throw FileError => dont create in constructor!!!
     {
         assert(deletionPolicy_ == DeletionPolicy::RECYCLER);
-        if (!recyclerSession.get())
-            recyclerSession =  AFS::createRecyclerSession(baseFolderPath_); //throw FileError
-        return *recyclerSession;
+        if (!recyclerSession_.get())
+            recyclerSession_ =  AFS::createRecyclerSession(baseFolderPath_); //throw FileError
+        return *recyclerSession_;
     }
 
     FileVersioner& getOrCreateVersioner() //throw FileError => dont create in constructor!!!
     {
         assert(deletionPolicy_ == DeletionPolicy::VERSIONING);
-        if (!versioner.get())
-            versioner = std::make_unique<FileVersioner>(versioningFolderPath, versioningStyle_, timeStamp_); //throw FileError
-        return *versioner;
+        if (!versioner_.get())
+            versioner_ = std::make_unique<FileVersioner>(versioningFolderPath_, versioningStyle_, timeStamp_); //throw FileError
+        return *versioner_;
     }
 
     ProcessCallback& procCallback_;
@@ -337,21 +337,21 @@ private:
     const DeletionPolicy deletionPolicy_; //keep it invariant! e.g. consider getOrCreateVersioner() one-time construction!
 
     const AbstractPath baseFolderPath_;
-    std::unique_ptr<AFS::RecycleSession> recyclerSession;
+    std::unique_ptr<AFS::RecycleSession> recyclerSession_;
 
     //used only for DeletionPolicy::VERSIONING:
-    const AbstractPath versioningFolderPath;
+    const AbstractPath versioningFolderPath_;
     const VersioningStyle versioningStyle_;
     const TimeComp timeStamp_;
-    std::unique_ptr<FileVersioner> versioner; //throw FileError in constructor => create on demand!
+    std::unique_ptr<FileVersioner> versioner_; //throw FileError in constructor => create on demand!
 
     //buffer status texts:
-    std::wstring txtRemovingFile;
-    std::wstring txtRemovingSymlink;
-    std::wstring txtRemovingDirectory;
+    std::wstring txtRemovingFile_;
+    std::wstring txtRemovingSymlink_;
+    std::wstring txtRemovingFolder_;
 
-    const std::wstring txtMovingFile;
-    const std::wstring txtMovingFolder;
+    const std::wstring txtMovingFile_;
+    const std::wstring txtMovingFolder_;
 };
 
 
@@ -364,30 +364,30 @@ DeletionHandling::DeletionHandling(const AbstractPath& baseFolderPath,
     procCallback_(procCallback),
     deletionPolicy_(handleDel),
     baseFolderPath_(baseFolderPath),
-    versioningFolderPath(createAbstractPath(versioningFolderPhrase)),
+    versioningFolderPath_(createAbstractPath(versioningFolderPhrase)),
     versioningStyle_(versioningStyle),
     timeStamp_(timeStamp),
-    txtMovingFile  (_("Moving file %x to %y")),
-    txtMovingFolder(_("Moving folder %x to %y"))
+    txtMovingFile_  (_("Moving file %x to %y")),
+    txtMovingFolder_(_("Moving folder %x to %y"))
 {
     switch (deletionPolicy_)
     {
         case DeletionPolicy::PERMANENT:
-            txtRemovingFile      = _("Deleting file %x"         );
-            txtRemovingDirectory = _("Deleting folder %x"       );
-            txtRemovingSymlink   = _("Deleting symbolic link %x");
+            txtRemovingFile_    = _("Deleting file %x"         );
+            txtRemovingFolder_  = _("Deleting folder %x"       );
+            txtRemovingSymlink_ = _("Deleting symbolic link %x");
             break;
 
         case DeletionPolicy::RECYCLER:
-            txtRemovingFile      = _("Moving file %x to the recycle bin"         );
-            txtRemovingDirectory = _("Moving folder %x to the recycle bin"       );
-            txtRemovingSymlink   = _("Moving symbolic link %x to the recycle bin");
+            txtRemovingFile_    = _("Moving file %x to the recycle bin"         );
+            txtRemovingFolder_  = _("Moving folder %x to the recycle bin"       );
+            txtRemovingSymlink_ = _("Moving symbolic link %x to the recycle bin");
             break;
 
         case DeletionPolicy::VERSIONING:
-            txtRemovingFile      = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
-            txtRemovingDirectory = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
-            txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath)));
+            txtRemovingFile_    = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath_)));
+            txtRemovingFolder_  = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath_)));
+            txtRemovingSymlink_ = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtPath(AFS::getDisplayPath(versioningFolderPath_)));
             break;
     }
 }
@@ -401,12 +401,12 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError; thr
             break;
 
         case DeletionPolicy::RECYCLER:
-            if (recyclerSession.get())
+            if (recyclerSession_.get())
             {
                 auto notifyDeletionStatus = [&](const std::wstring& displayPath)
                 {
                     if (!displayPath.empty())
-                        procCallback_.reportStatus(replaceCpy(txtRemovingFile, L"%x", fmtPath(displayPath))); //throw ?
+                        procCallback_.reportStatus(replaceCpy(txtRemovingFile_, L"%x", fmtPath(displayPath))); //throw ?
                     else
                         procCallback_.requestUiRefresh(); //throw ?
                 };
@@ -450,8 +450,8 @@ void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
                 onNotifyItemDeletion(); //it would be more correct to report *after* work was done!
                 procCallback_.reportStatus(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
             };
-            auto onBeforeFileDeletion = [&](const std::wstring& displayPath) { notifyDeletion(txtRemovingFile,      displayPath); };
-            auto onBeforeDirDeletion  = [&](const std::wstring& displayPath) { notifyDeletion(txtRemovingDirectory, displayPath); };
+            auto onBeforeFileDeletion = [&](const std::wstring& displayPath) { notifyDeletion(txtRemovingFile_,   displayPath); };
+            auto onBeforeDirDeletion  = [&](const std::wstring& displayPath) { notifyDeletion(txtRemovingFolder_, displayPath); };
 
             AFS::removeFolderRecursively(folderPath, onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
         }
@@ -469,8 +469,8 @@ void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
                 onNotifyItemDeletion(); //it would be more correct to report *after* work was done!
                 procCallback_.reportStatus(replaceCpy(replaceCpy(statusText, L"%x", L"\n" + fmtPath(displayPathFrom)), L"%y", L"\n" + fmtPath(displayPathTo)));
             };
-            auto onBeforeFileMove   = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFile,   displayPathFrom, displayPathTo); };
-            auto onBeforeFolderMove = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFolder, displayPathFrom, displayPathTo); };
+            auto onBeforeFileMove   = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFile_,   displayPathFrom, displayPathTo); };
+            auto onBeforeFolderMove = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFolder_, displayPathFrom, displayPathTo); };
 
             getOrCreateVersioner().revisionFolder(folderPath, relativePath, onBeforeFileMove, onBeforeFolderMove, onNotifyCopyStatus); //throw FileError
         }
@@ -649,7 +649,7 @@ private:
 
     void runZeroPass(HierarchyObject& hierObj);
     template <PassId pass>
-    void runPass(HierarchyObject& hierObj);
+    void runPass(HierarchyObject& hierObj); //throw X
 
     void synchronizeFile(FilePair& file);
     template <SelectedSide side> void synchronizeFileInt(FilePair& file, SyncOperation syncOp);
@@ -768,7 +768,7 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
             sourceRelPathTmp = sourceObj.getItemName<side>() + Zchar('_') + numberTo<Zstring>(i) + AFS::TEMP_FILE_ENDING;
         }
 
-    warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+    //TODO: prepare2StepMove: consider ErrorDifferentVolume! e.g. symlink aliasing!
 
     //update file hierarchy
     const FileDescriptor descrSource(sourceObj.getLastWriteTime <side>(),
@@ -780,6 +780,7 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
     static_assert(IsSameType<FixedList<FilePair>, HierarchyObject::FileList>::value,
                   "ATTENTION: we're adding to the file list WHILE looping over it! This is only working because FixedList iterators are not invalidated by insertion!");
     sourceObj.removeObject<side>(); //remove only *after* evaluating "sourceObj, side"!
+    //note: this new item is *not* considered at the end of 0th pass because "!sourceWillBeDeleted && !haveNameClash"
 
     //prepare move in second pass
     tempFile.setSyncDir(side == LEFT_SIDE ? SyncDirection::LEFT : SyncDirection::RIGHT);
@@ -906,7 +907,7 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
                             SyncStatistics statSrc(*sourceObj);
                             SyncStatistics statTrg(*targetObj);
                             return std::make_pair(getCUD(statSrc) + getCUD(statTrg),
-                            statSrc.getDataToProcess() + statTrg.getDataToProcess());
+                            statSrc.getBytesToProcess() + statTrg.getBytesToProcess());
                         };
 
                         const auto statBefore = getStats();
@@ -1050,23 +1051,23 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FolderPair& f
 
 
 template <SynchronizeFolderPair::PassId pass>
-void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
+void SynchronizeFolderPair::runPass(HierarchyObject& hierObj) //throw X
 {
     //synchronize files:
     for (FilePair& file : hierObj.refSubFiles())
         if (pass == this->getPass(file)) //"this->" required by two-pass lookup as enforced by GCC 4.7
-            tryReportingError([&] { synchronizeFile(file); }, procCallback_); //throw X?
+            tryReportingError([&] { synchronizeFile(file); }, procCallback_); //throw X
 
     //synchronize symbolic links:
     for (SymlinkPair& symlink : hierObj.refSubLinks())
         if (pass == this->getPass(symlink))
-            tryReportingError([&] { synchronizeLink(symlink); }, procCallback_); //throw X?
+            tryReportingError([&] { synchronizeLink(symlink); }, procCallback_); //throw X
 
     //synchronize folders:
     for (FolderPair& folder : hierObj.refSubFolders())
     {
         if (pass == this->getPass(folder))
-            tryReportingError([&] { synchronizeFolder(folder); }, procCallback_); //throw X?
+            tryReportingError([&] { synchronizeFolder(folder); }, procCallback_); //throw X
 
         this->runPass<pass>(folder); //recurse
     }
@@ -1158,20 +1159,14 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
             }
             catch (FileError&)
             {
-                warn_static("still an error if base dir is missing!")
-                //  const Zstring basedir = beforeLast(file.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
-                //if (!dirExists(basedir) ||
-
-
-                if (!AFS::somethingExists(file.getAbstractPath<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
-                {
-                    //source deleted meanwhile...nothing was done (logical point of view!)
-                    file.removeObject<sideSrc>(); //remove only *after* evaluating "file, sideSrc"!
-                }
-                else
+                if (AFS::somethingExists(file.getAbstractPath<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
                     throw;
+
+                //TODO: failure to access base dir is incorrectly considered an empty dir
+
+                //source deleted meanwhile...nothing was done (logical point of view!)
+                file.removeObject<sideSrc>(); //remove only *after* evaluating "file, sideSrc"!
             }
-            statReporter.reportFinished();
         }
         break;
 
@@ -1186,11 +1181,9 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
                 getDelHandling<sideTrg>().removeFileWithCallback(file.getAbstractPath<sideTrg>(), file.getPairRelativePath(), onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
 
-                warn_static("what if item not found? still an error if base dir is missing; externally deleted otherwise!")
+                //TODO: failure to access item during deletion is an error and should not be ignored!
 
                 file.removeObject<sideTrg>(); //update FilePair
-
-                statReporter.reportFinished();
             }
             break;
 
@@ -1207,8 +1200,14 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 const AbstractPath newPath = AFS::appendRelPath(moveTarget->base().getAbstractPath<sideTrg>(), moveTarget->getRelativePath<sideSrc>());
 
                 reportInfo(txtMovingFile, AFS::getDisplayPath(oldPath), AFS::getDisplayPath(newPath));
-                warn_static("was wenn diff volume: symlink aliasing!")
+
+                StatisticsReporter statReporter(1, 0, procCallback_);
+
+                //TODO: synchronizeFileInt: consider ErrorDifferentVolume! e.g. symlink aliasing!
+
                 AFS::renameItem(oldPath, newPath); //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+
+                statReporter.reportDelta(1, 0);
 
                 //update FilePair
                 assert(moveSource->getFileSize<sideTrg>() == moveTarget->getFileSize<sideSrc>());
@@ -1220,8 +1219,6 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                                                  moveSource->isFollowedSymlink<sideTrg>(),
                                                  moveTarget->isFollowedSymlink<sideSrc>());
                 moveSource->removeObject<sideTrg>(); //remove only *after* evaluating "moveSource, sideTrg"!
-
-                procCallback_.updateProcessedData(1, 0);
             }
             else (assert(false));
             break;
@@ -1239,11 +1236,11 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
             reportInfo(txtOverwritingFile, AFS::getDisplayPath(targetPathResolvedOld));
 
+            StatisticsReporter statReporter(1, file.getFileSize<sideSrc>(), procCallback_);
+
             if (file.isFollowedSymlink<sideTrg>()) //since we follow the link, we need to sync case sensitivity of the link manually!
                 if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
                     AFS::renameItem(file.getAbstractPath<sideTrg>(), targetPathLogical); //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
-
-            StatisticsReporter statReporter(1, file.getFileSize<sideSrc>(), procCallback_);
 
             auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
@@ -1276,40 +1273,41 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                                       newAttr.sourceFileId,
                                       file.isFollowedSymlink<sideTrg>(),
                                       file.isFollowedSymlink<sideSrc>());
-
-            statReporter.reportFinished();
         }
         break;
 
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
             //harmonize with file_hierarchy.cpp::getSyncOpDescription!!
-
             reportInfo(txtWritingAttributes, AFS::getDisplayPath(file.getAbstractPath<sideTrg>()));
+            {
+                StatisticsReporter statReporter(1, 0, procCallback_);
 
-            if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
-                AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
-                                AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>()));
+                assert(file.getItemName<sideTrg>() != file.getItemName<sideSrc>());
+                if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
+                    AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                                    AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>()));
 
 #if 0 //changing file time without copying content is not justified after CompareVariant::SIZE finds "equal" files! similar issue with CompareVariant::TIME_SIZE and FileTimeTolerance == -1
-            //Bonus: some devices don't support setting (precise) file times anyway, e.g. FAT or MTP!
-            if (file.getLastWriteTime<sideTrg>() != file.getLastWriteTime<sideSrc>())
-                //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
-                //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
-                AFS::setModTime(file.getAbstractPath<sideTrg>(), file.getLastWriteTime<sideSrc>()); //throw FileError
+                //Bonus: some devices don't support setting (precise) file times anyway, e.g. FAT or MTP!
+                if (file.getLastWriteTime<sideTrg>() != file.getLastWriteTime<sideSrc>())
+                    //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
+                    //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
+                    AFS::setModTime(file.getAbstractPath<sideTrg>(), file.getLastWriteTime<sideSrc>()); //throw FileError
 #endif
 
-            //-> both sides *should* be completely equal now...
-            assert(file.getFileSize<sideTrg>() == file.getFileSize<sideSrc>());
-            file.setSyncedTo<sideTrg>(file.getItemName<sideSrc>(), file.getFileSize<sideSrc>(),
-                                      file.getLastWriteTime<sideTrg>(),
-                                      file.getLastWriteTime<sideSrc>(),
-                                      file.getFileId       <sideTrg>(),
-                                      file.getFileId       <sideSrc>(),
-                                      file.isFollowedSymlink<sideTrg>(),
-                                      file.isFollowedSymlink<sideSrc>());
+                statReporter.reportDelta(1, 0);
 
-            procCallback_.updateProcessedData(1, 0);
+                //-> both sides *should* be completely equal now...
+                assert(file.getFileSize<sideTrg>() == file.getFileSize<sideSrc>());
+                file.setSyncedTo<sideTrg>(file.getItemName<sideSrc>(), file.getFileSize<sideSrc>(),
+                                          file.getLastWriteTime<sideTrg>(),
+                                          file.getLastWriteTime<sideSrc>(),
+                                          file.getFileId       <sideTrg>(),
+                                          file.getFileId       <sideSrc>(),
+                                          file.isFollowedSymlink<sideTrg>(),
+                                          file.isFollowedSymlink<sideSrc>());
+            }
             break;
 
         case SO_MOVE_LEFT_SOURCE:  //use SO_MOVE_LEFT_TARGET/SO_MOVE_RIGHT_TARGET to execute move:
@@ -1361,23 +1359,25 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
             try
             {
                 AFS::copySymlink(symlink.getAbstractPath<sideSrc>(), targetPath, copyFilePermissions_); //throw FileError
+
+                statReporter.reportDelta(1, 0);
+
                 //update SymlinkPair
                 symlink.setSyncedTo<sideTrg>(symlink.getItemName<sideSrc>(),
                                              symlink.getLastWriteTime<sideSrc>(), //target time set from source
                                              symlink.getLastWriteTime<sideSrc>());
 
-                statReporter.reportDelta(1, 0);
             }
             catch (FileError&)
             {
-                warn_static("still an error if base dir is missing!")
-
                 if (AFS::somethingExists(symlink.getAbstractPath<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
                     throw;
+
+                //TODO: failure to access base dir is incorrectly considered an empty dir
+
                 //source deleted meanwhile...nothing was done (logical point of view!)
                 symlink.removeObject<sideSrc>();
             }
-            statReporter.reportFinished();
         }
         break;
 
@@ -1392,9 +1392,9 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
 
                 getDelHandling<sideTrg>().removeLinkWithCallback(symlink.getAbstractPath<sideTrg>(), symlink.getPairRelativePath(), onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
 
-                symlink.removeObject<sideTrg>(); //update SymlinkPair
+                //TODO: failure to access item during deletion is an error and should not be ignored!
 
-                statReporter.reportFinished();
+                symlink.removeObject<sideTrg>(); //update SymlinkPair
             }
             break;
 
@@ -1424,30 +1424,31 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
                 symlink.setSyncedTo<sideTrg>(symlink.getItemName<sideSrc>(),
                                              symlink.getLastWriteTime<sideSrc>(), //target time set from source
                                              symlink.getLastWriteTime<sideSrc>());
-
-                statReporter.reportFinished();
             }
             break;
 
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
             reportInfo(txtWritingAttributes, AFS::getDisplayPath(symlink.getAbstractPath<sideTrg>()));
+            {
+                StatisticsReporter statReporter(1, 0, procCallback_);
 
-            if (symlink.getItemName<sideTrg>() != symlink.getItemName<sideSrc>()) //have difference in case?
-                AFS::renameItem(symlink.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
-                                AFS::appendRelPath(symlink.base().getAbstractPath<sideTrg>(), symlink.getRelativePath<sideSrc>()));
+                if (symlink.getItemName<sideTrg>() != symlink.getItemName<sideSrc>()) //have difference in case?
+                    AFS::renameItem(symlink.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                                    AFS::appendRelPath(symlink.base().getAbstractPath<sideTrg>(), symlink.getRelativePath<sideSrc>()));
 
-            //if (symlink.getLastWriteTime<sideTrg>() != symlink.getLastWriteTime<sideSrc>())
-            //    //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
-            //    //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
-            //    AFS::setModTimeSymlink(symlink.getAbstractPath<sideTrg>(), symlink.getLastWriteTime<sideSrc>()); //throw FileError
+                //if (symlink.getLastWriteTime<sideTrg>() != symlink.getLastWriteTime<sideSrc>())
+                //    //- no need to call sameFileTime() or respect 2 second FAT/FAT32 precision in this comparison
+                //    //- do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
+                //    AFS::setModTimeSymlink(symlink.getAbstractPath<sideTrg>(), symlink.getLastWriteTime<sideSrc>()); //throw FileError
 
-            //-> both sides *should* be completely equal now...
-            symlink.setSyncedTo<sideTrg>(symlink.getItemName<sideSrc>(),
-                                         symlink.getLastWriteTime<sideTrg>(), //target time set from source
-                                         symlink.getLastWriteTime<sideSrc>());
+                statReporter.reportDelta(1, 0);
 
-            procCallback_.updateProcessedData(1, 0);
+                //-> both sides *should* be completely equal now...
+                symlink.setSyncedTo<sideTrg>(symlink.getItemName<sideSrc>(),
+                                             symlink.getLastWriteTime<sideTrg>(), //target time set from source
+                                             symlink.getLastWriteTime<sideSrc>());
+            }
             break;
 
         case SO_MOVE_LEFT_SOURCE:
@@ -1489,33 +1490,34 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
     {
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
+        {
             if (auto parentFolder = dynamic_cast<const FolderPair*>(&folder.parent()))
                 if (parentFolder->isEmpty<sideTrg>()) //BaseFolderPair OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
                     return; //if parent directory creation failed, there's no reason to show more errors!
 
-            warn_static("save this file access?")
+            const AbstractPath targetPath = AFS::appendRelPath(folder.base().getAbstractPath<sideTrg>(), folder.getRelativePath<sideSrc>());
+            reportInfo(txtCreatingFolder, AFS::getDisplayPath(targetPath));
+
             if (AFS::somethingExists(folder.getAbstractPath<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
             {
-                const AbstractPath targetPath = AFS::appendRelPath(folder.base().getAbstractPath<sideTrg>(), folder.getRelativePath<sideSrc>());
-                reportInfo(txtCreatingFolder, AFS::getDisplayPath(targetPath));
-
+                StatisticsReporter statReporter(1, 0, procCallback_);
                 try
                 {
                     AFS::copyNewFolder(folder.getAbstractPath<sideSrc>(), targetPath, copyFilePermissions_); //throw FileError
                 }
                 catch (const FileError&) { if (!AFS::folderExists(targetPath)) throw; }
 
+                statReporter.reportDelta(1, 0);
+
                 //update FolderPair
                 folder.setSyncedTo(folder.getItemName<sideSrc>());
-
-                procCallback_.updateProcessedData(1, 0);
             }
             else //source deleted meanwhile...nothing was done (logical point of view!) -> uh....what about a temporary network drop???
             {
-                warn_static("still an error if base dir is missing!")
+                //TODO: failure to access base dir is incorrectly considered an empty dir
 
                 const SyncStatistics subStats(folder);
-                procCallback_.updateTotalData(-getCUD(subStats) - 1, -subStats.getDataToProcess());
+                StatisticsReporter statReporter(1 + getCUD(subStats), subStats.getBytesToProcess(), procCallback_);
 
                 //remove only *after* evaluating folder!!
                 folder.refSubFiles  ().clear(); //
@@ -1523,27 +1525,27 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
                 folder.refSubFolders().clear(); //
                 folder.removeObject<sideSrc>(); //
             }
-            break;
+        }
+        break;
 
         case SO_DELETE_LEFT:
         case SO_DELETE_RIGHT:
-            reportInfo(getDelHandling<sideTrg>().getTxtRemovingDir(), AFS::getDisplayPath(folder.getAbstractPath<sideTrg>()));
+            reportInfo(getDelHandling<sideTrg>().getTxtRemovingFolder(), AFS::getDisplayPath(folder.getAbstractPath<sideTrg>()));
             {
                 const SyncStatistics subStats(folder); //counts sub-objects only!
-
-                StatisticsReporter statReporter(1 + getCUD(subStats), subStats.getDataToProcess(), procCallback_);
+                StatisticsReporter statReporter(1 + getCUD(subStats), subStats.getBytesToProcess(), procCallback_);
 
                 auto onNotifyItemDeletion = [&] { statReporter.reportDelta(1, 0); };
                 auto onNotifyCopyStatus   = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
                 getDelHandling<sideTrg>().removeDirWithCallback(folder.getAbstractPath<sideTrg>(), folder.getPairRelativePath(), onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
 
+                //TODO: failure to access item during deletion is an error and should not be ignored!
+
                 folder.refSubFiles  ().clear(); //
                 folder.refSubLinks  ().clear(); //update FolderPair
                 folder.refSubFolders().clear(); //
                 folder.removeObject<sideTrg>(); //
-
-                statReporter.reportFinished();
             }
             break;
 
@@ -1552,16 +1554,20 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
             reportInfo(txtWritingAttributes, AFS::getDisplayPath(folder.getAbstractPath<sideTrg>()));
+            {
+                StatisticsReporter statReporter(1, 0, procCallback_);
 
-            if (folder.getItemName<sideTrg>() != folder.getItemName<sideSrc>()) //have difference in case?
-                AFS::renameItem(folder.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
-                                AFS::appendRelPath(folder.base().getAbstractPath<sideTrg>(), folder.getRelativePath<sideSrc>()));
-            //copyFileTimes -> useless: modification time changes with each child-object creation/deletion
+                assert(folder.getItemName<sideTrg>() != folder.getItemName<sideSrc>());
+                if (folder.getItemName<sideTrg>() != folder.getItemName<sideSrc>()) //have difference in case?
+                    AFS::renameItem(folder.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                                    AFS::appendRelPath(folder.base().getAbstractPath<sideTrg>(), folder.getRelativePath<sideSrc>()));
+                //copyFileTimes -> useless: modification time changes with each child-object creation/deletion
 
-            //-> both sides *should* be completely equal now...
-            folder.setSyncedTo(folder.getItemName<sideSrc>());
+                statReporter.reportDelta(1, 0);
 
-            procCallback_.updateProcessedData(1, 0);
+                //-> both sides *should* be completely equal now...
+                folder.setSyncedTo(folder.getItemName<sideSrc>());
+            }
             break;
 
         case SO_MOVE_LEFT_SOURCE:
@@ -1747,20 +1753,20 @@ void zen::synchronize(const TimeComp& timeStamp,
     //aggregate basic information
     std::vector<SyncStatistics> folderPairStats;
     {
-        int     objectsTotal = 0;
-        int64_t dataTotal    = 0;
+        int     itemsTotal = 0;
+        int64_t bytesTotal = 0;
         for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
             SyncStatistics fpStats(*j);
-            objectsTotal += getCUD(fpStats);
-            dataTotal    += fpStats.getDataToProcess();
+            itemsTotal += getCUD(fpStats);
+            bytesTotal += fpStats.getBytesToProcess();
             folderPairStats.push_back(fpStats);
         }
 
         //inform about the total amount of data that will be processed from now on
         //keep at beginning so that all gui elements are initialized properly
-        callback.initNewPhase(objectsTotal, //throw X
-                              dataTotal,
+        callback.initNewPhase(itemsTotal, //throw X
+                              bytesTotal,
                               ProcessCallback::PHASE_SYNCHRONIZING);
     }
 

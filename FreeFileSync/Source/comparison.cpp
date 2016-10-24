@@ -482,15 +482,13 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
     }
 
     //finish categorization...
-    const size_t objectsTotal = filesToCompareBytewise.size();
+    const int itemsTotal = static_cast<int>(filesToCompareBytewise.size());
 
     std::uint64_t bytesTotal = 0; //left and right filesizes are equal
     for (FilePair* file : filesToCompareBytewise)
         bytesTotal += file->getFileSize<LEFT_SIDE>();
 
-    callback_.initNewPhase(static_cast<int>(objectsTotal), //may throw
-                           bytesTotal,
-                           ProcessCallback::PHASE_COMPARING_CONTENT);
+    callback_.initNewPhase(itemsTotal, bytesTotal, ProcessCallback::PHASE_COMPARING_CONTENT); //may throw
 
     const std::wstring txtComparingContentOfFiles = _("Comparing content of files %x");
 
@@ -513,8 +511,6 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
             haveSameContent = filesHaveSameContent(file->getAbstractPath<LEFT_SIDE>(),
                                                    file->getAbstractPath<RIGHT_SIDE>(), onUpdateStatus); //throw FileError
             statReporter.reportDelta(1, 0);
-
-            statReporter.reportFinished();
         }, callback_); //throw X?
 
         if (errMsg)

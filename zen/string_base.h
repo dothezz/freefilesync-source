@@ -26,7 +26,7 @@ Allocator Policy:
 */
 class AllocatorOptimalSpeed //exponential growth + min size
 {
-public:
+protected:
     //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
     static void* allocate(size_t size) { return ::malloc(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::free(ptr); }
@@ -38,7 +38,7 @@ public:
 
 class AllocatorOptimalMemory //no wasted memory, but more reallocations required when manipulating string
 {
-public:
+protected:
     static void* allocate(size_t size) { return ::malloc(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::free(ptr); }
     static size_t calcCapacity(size_t length) { return length; }
@@ -81,8 +81,9 @@ protected:
 
     Char* clone(Char* ptr)
     {
-        Char* newData = create(length(ptr)); //throw std::bad_alloc
-        std::copy(ptr, ptr + length(ptr) + 1, newData);
+        const size_t len = length(ptr);
+        Char* newData = create(len); //throw std::bad_alloc
+        std::copy(ptr, ptr + len + 1, newData);
         return newData;
     }
 
@@ -197,25 +198,28 @@ private:
     static const Descriptor* descr(const Char* ptr) { return reinterpret_cast<const Descriptor*>(ptr) - 1; }
 };
 
+
+template <class Char>
+using DefaultStoragePolicy = StorageRefCountThreadSafe<Char, AllocatorOptimalSpeed>;
+
+
 //################################################################################################################################################################
 
 //perf note: interestingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
-template <class Char,                                                   //Character Type
-          template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
-          class AP = AllocatorOptimalSpeed>                             //Allocator Policy
-class Zbase : public SP<Char, AP>
+template <class Char,                                       //Character Type
+          template <class> class SP = DefaultStoragePolicy> //Storage Policy
+class Zbase : public SP<Char>
 {
 public:
     Zbase();
-    Zbase(const Char* source); //implicit conversion from a C-string
-    Zbase(const Char* source, size_t length);
-    Zbase(const Zbase& source);
+    Zbase(const Char* str) : Zbase(str, str + strLength(str)) {} //implicit conversion from a C-string!
+    Zbase(const Char* str, size_t len) : Zbase(str, str + len) {}
+    Zbase(const Zbase& str);
     Zbase(Zbase&& tmp) noexcept;
-    //explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error! //-> non-standard extension!!!
-
-    //allow explicit construction from different string type, prevent ambiguity via SFINAE
-    //template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
+    template <class InputIterator>
+    Zbase(InputIterator first, InputIterator last);
+    //explicit Zbase(Char ch); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error! //-> non-standard extension!!!
 
     ~Zbase();
 
@@ -228,19 +232,17 @@ public:
     using const_reference = const Char&;
     using value_type      = Char;
 
-    Zbase(const_iterator first, const_iterator last);
-    Char*       begin();
-    Char*       end  ();
-    const Char* begin() const;
-    const Char* end  () const;
-    const Char* cbegin() const { return begin(); }
-    const Char* cend  () const { return end(); }
+    iterator begin();
+    iterator end  ();
+    const_iterator begin () const { return rawStr_; }
+    const_iterator end   () const { return rawStr_ + length(); }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend  () const { return end  (); }
 
     //std::string functions
     size_t length() const;
     size_t size  () const { return length(); }
-    const Char* c_str() const { return rawStr; } //C-string format with 0-termination
-    const Char* data()  const { return rawStr; } //internal representation, 0-termination not guaranteed
+    const Char* c_str() const { return rawStr_; } //C-string format with 0-termination
     const Char operator[](size_t pos) const;
     bool empty() const { return length() == 0; }
     void clear();
@@ -251,20 +253,24 @@ public:
     size_t rfind(const Char* str,  size_t pos = npos) const; //
     //Zbase& replace(size_t pos1, size_t n1, const Zbase& str);
     void reserve(size_t minCapacity);
-    Zbase& assign(const Char* source, size_t len);
-    Zbase& append(const Char* source, size_t len);
+    Zbase& assign(const Char* str, size_t len) { return assign(str, str + len); }
+    Zbase& append(const Char* str, size_t len) { return append(str, str + len); }
+
+    template <class InputIterator> Zbase& assign(InputIterator first, InputIterator last);
+    template <class InputIterator> Zbase& append(InputIterator first, InputIterator last);
+
     void resize(size_t newSize, Char fillChar = 0);
-    void swap(Zbase& other);
+    void swap(Zbase& str) { std::swap(rawStr_, str.rawStr_); }
     void push_back(Char val) { operator+=(val); } //STL access
     void pop_back();
 
-    Zbase& operator=(const Zbase& source);
+    Zbase& operator=(const Zbase& str);
     Zbase& operator=(Zbase&& tmp) noexcept;
-    Zbase& operator=(const Char* source);
-    Zbase& operator=(Char source);
-    Zbase& operator+=(const Zbase& other);
-    Zbase& operator+=(const Char* other);
-    Zbase& operator+=(Char ch);
+    Zbase& operator=(const Char* str)   { return assign(str, strLength(str)); }
+    Zbase& operator=(Char ch)           { return assign(&ch, 1); }
+    Zbase& operator+=(const Zbase& str) { return append(str.c_str(), str.length()); }
+    Zbase& operator+=(const Char* str)  { return append(str, strLength(str)); }
+    Zbase& operator+=(Char ch)          { return append(&ch, 1); }
 
     static const size_t npos = static_cast<size_t>(-1);
 
@@ -274,32 +280,32 @@ private:
     Zbase& operator+=(int) = delete; //
     void   push_back (int) = delete; //
 
-    Char* rawStr;
+    Char* rawStr_;
 };
 
-template <class Char, template <class, class> class SP, class AP>        bool operator==(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP>        bool operator==(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> inline bool operator==(const Char*                lhs, const Zbase<Char, SP, AP>& rhs) { return operator==(rhs, lhs); }
+template <class Char, template <class> class SP>        bool operator==(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs);
+template <class Char, template <class> class SP>        bool operator==(const Zbase<Char, SP>& lhs, const Char*            rhs);
+template <class Char, template <class> class SP> inline bool operator==(const Char*            lhs, const Zbase<Char, SP>& rhs) { return operator==(rhs, lhs); }
 
-template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs) { return !operator==(lhs, rhs); }
-template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Zbase<Char, SP, AP>& lhs, const Char*                rhs) { return !operator==(lhs, rhs); }
-template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Char*                lhs, const Zbase<Char, SP, AP>& rhs) { return !operator==(lhs, rhs); }
+template <class Char, template <class> class SP> inline bool operator!=(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs) { return !operator==(lhs, rhs); }
+template <class Char, template <class> class SP> inline bool operator!=(const Zbase<Char, SP>& lhs, const Char*            rhs) { return !operator==(lhs, rhs); }
+template <class Char, template <class> class SP> inline bool operator!=(const Char*            lhs, const Zbase<Char, SP>& rhs) { return !operator==(lhs, rhs); }
 
-template <class Char, template <class, class> class SP, class AP> bool operator<(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator<(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator<(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class> class SP> bool operator<(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs);
+template <class Char, template <class> class SP> bool operator<(const Zbase<Char, SP>& lhs, const Char*            rhs);
+template <class Char, template <class> class SP> bool operator<(const Char*            lhs, const Zbase<Char, SP>& rhs);
 
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Char*                rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs,       Char                 rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs) { return Zbase<Char, SP>(lhs) += rhs; }
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(const Zbase<Char, SP>& lhs, const Char*            rhs) { return Zbase<Char, SP>(lhs) += rhs; }
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(const Zbase<Char, SP>& lhs,       Char             rhs) { return Zbase<Char, SP>(lhs) += rhs; }
 
 //don't use unified first argument but save one move-construction in the r-value case instead!
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Zbase<Char, SP, AP>& rhs) { return std::move(lhs += rhs); } //the move *is* needed!!!
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Char*                rhs) { return std::move(lhs += rhs); } //lhs, is an l-value parameter...
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs,       Char                 rhs) { return std::move(lhs += rhs); } //and not a local variable => no copy elision
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(Zbase<Char, SP>&& lhs, const Zbase<Char, SP>& rhs) { return std::move(lhs += rhs); } //the move *is* needed!!!
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(Zbase<Char, SP>&& lhs, const Char*            rhs) { return std::move(lhs += rhs); } //lhs, is an l-value parameter...
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(Zbase<Char, SP>&& lhs,       Char             rhs) { return std::move(lhs += rhs); } //and not a local variable => no copy elision
 
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(&lhs, 1) += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs    ) += rhs; }
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(      Char        lhs, const Zbase<Char, SP>& rhs) { return Zbase<Char, SP>(&lhs, 1) += rhs; }
+template <class Char, template <class> class SP> inline Zbase<Char, SP> operator+(const Char*       lhs, const Zbase<Char, SP>& rhs) { return Zbase<Char, SP>(lhs    ) += rhs; }
 
 
 
@@ -314,82 +320,51 @@ template <class Char, template <class, class> class SP, class AP> inline Zbase<C
 
 
 //################################# implementation ########################################
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase()
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>::Zbase()
 {
     //resist the temptation to avoid this allocation by referening a static global: NO performance advantage, MT issues!
-    rawStr    = this->create(0);
-    rawStr[0] = 0;
+    rawStr_    = this->create(0);
+    rawStr_[0] = 0;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(const Char* source)
+template <class Char, template <class> class SP>
+template <class InputIterator> inline
+Zbase<Char, SP>::Zbase(InputIterator first, InputIterator last)
 {
-    const size_t sourceLen = strLength(source);
-    rawStr = this->create(sourceLen);
-    std::copy(source, source + sourceLen + 1, rawStr); //include null-termination
+    rawStr_ = this->create(std::distance(first, last));
+    *std::copy(first, last, rawStr_) = 0;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(const Char* source, size_t sourceLen)
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>::Zbase(const Zbase<Char, SP>& str)
 {
-    rawStr = this->create(sourceLen);
-    std::copy(source, source + sourceLen, rawStr);
-    rawStr[sourceLen] = 0;
+    rawStr_ = this->clone(str.rawStr_);
 }
 
 
-template <class Char, template <class, class> class SP, class AP>
-Zbase<Char, SP, AP>::Zbase(const_iterator first, const_iterator last)
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>::Zbase(Zbase<Char, SP>&& tmp) noexcept
 {
-    assert(first <= last);
-    const size_t sourceLen = last - first;
-    rawStr = this->create(sourceLen);
-    std::copy(first, last, rawStr);
-    rawStr[sourceLen] = 0;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(const Zbase<Char, SP, AP>& source)
-{
-    rawStr = this->clone(source.rawStr);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp) noexcept
-{
-    rawStr = tmp.rawStr;
-    tmp.rawStr = nullptr; //usually nullptr would violate the class invarants, but it is good enough for the destructor!
+    rawStr_ = tmp.rawStr_;
+    tmp.rawStr_ = nullptr; //usually nullptr would violate the class invarants, but it is good enough for the destructor!
     //caveat: do not increment ref-count of an unshared string! We'd lose optimization opportunity of reusing its memory!
 }
 
-/*
-template <class Char, template <class, class> class SP, class AP>
-template <class S> inline
-Zbase<Char, SP, AP>::Zbase(const S& other, typename S::value_type)
-{
-    const size_t sourceLen = other.size();
-    rawStr = this->create(sourceLen);
-    std::copy(other.c_str(), other.c_str() + sourceLen, rawStr);
-    rawStr[sourceLen] = 0;
-}
-*/
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>::~Zbase()
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>::~Zbase()
 {
     static_assert(noexcept(this->~Zbase()), ""); //has exception spec of compiler-generated destructor by default
 
-    this->destroy(rawStr); //rawStr may be nullptr; see move constructor!
+    this->destroy(rawStr_); //rawStr_ may be nullptr; see move constructor!
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::find(const Zbase& str, size_t pos) const
 {
     assert(pos <= length());
     const size_t len = length();
@@ -400,8 +375,8 @@ size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::find(const Char* str, size_t pos) const
 {
     assert(pos <= length());
     const size_t len = length();
@@ -412,8 +387,8 @@ size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::find(Char ch, size_t pos) const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::find(Char ch, size_t pos) const
 {
     assert(pos <= length());
     const size_t len = length();
@@ -423,8 +398,8 @@ size_t Zbase<Char, SP, AP>::find(Char ch, size_t pos) const
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::rfind(Char ch, size_t pos) const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::rfind(Char ch, size_t pos) const
 {
     assert(pos == npos || pos <= length());
     const size_t len = length();
@@ -434,8 +409,8 @@ size_t Zbase<Char, SP, AP>::rfind(Char ch, size_t pos) const
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::rfind(const Char* str, size_t pos) const
 {
     assert(pos == npos || pos <= length());
     const size_t strLen = strLength(str);
@@ -447,126 +422,112 @@ size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)
+template <class Char, template <class> class SP> inline
+void Zbase<Char, SP>::resize(size_t newSize, Char fillChar)
 {
     const size_t oldSize = length();
-    if (this->canWrite(rawStr, newSize))
+    if (this->canWrite(rawStr_, newSize))
     {
         if (oldSize < newSize)
-            std::fill(rawStr + oldSize, rawStr + newSize, fillChar);
-        rawStr[newSize] = 0;
-        this->setLength(rawStr, newSize);
+            std::fill(rawStr_ + oldSize, rawStr_ + newSize, fillChar);
+        rawStr_[newSize] = 0;
+        this->setLength(rawStr_, newSize);
     }
     else
     {
         Char* newStr = this->create(newSize);
         if (oldSize < newSize)
         {
-            std::copy(rawStr, rawStr + oldSize, newStr);
+            std::copy(rawStr_, rawStr_ + oldSize, newStr);
             std::fill(newStr + oldSize, newStr + newSize, fillChar);
         }
         else
-            std::copy(rawStr, rawStr + newSize, newStr);
+            std::copy(rawStr_, rawStr_ + newSize, newStr);
         newStr[newSize] = 0;
 
-        this->destroy(rawStr);
-        rawStr = newStr;
+        this->destroy(rawStr_);
+        rawStr_ = newStr;
     }
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator==(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs)
+template <class Char, template <class> class SP> inline
+bool operator==(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs)
 {
     return lhs.length() == rhs.length() && std::equal(lhs.begin(), lhs.end(), rhs.begin()); //respect embedded 0
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator==(const Zbase<Char, SP, AP>& lhs, const Char* rhs)
+template <class Char, template <class> class SP> inline
+bool operator==(const Zbase<Char, SP>& lhs, const Char* rhs)
 {
     return lhs.length() == strLength(rhs) && std::equal(lhs.begin(), lhs.end(), rhs); //respect embedded 0
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator<(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs)
+template <class Char, template <class> class SP> inline
+bool operator<(const Zbase<Char, SP>& lhs, const Zbase<Char, SP>& rhs)
 {
     return std::lexicographical_compare(lhs.begin(), lhs.end(), //respect embedded 0
                                         rhs.begin(), rhs.end());
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator<(const Zbase<Char, SP, AP>& lhs, const Char* rhs)
+template <class Char, template <class> class SP> inline
+bool operator<(const Zbase<Char, SP>& lhs, const Char* rhs)
 {
     return std::lexicographical_compare(lhs.begin(), lhs.end(), //respect embedded 0
                                         rhs, rhs + strLength(rhs));
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator<(const Char* lhs, const Zbase<Char, SP, AP>& rhs)
+template <class Char, template <class> class SP> inline
+bool operator<(const Char* lhs, const Zbase<Char, SP>& rhs)
 {
     return std::lexicographical_compare(lhs, lhs + strLength(lhs), //respect embedded 0
                                         rhs.begin(), rhs.end());
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::length() const
+template <class Char, template <class> class SP> inline
+size_t Zbase<Char, SP>::length() const
 {
-    return SP<Char, AP>::length(rawStr);
+    return SP<Char>::length(rawStr_);
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-const Char Zbase<Char, SP, AP>::operator[](size_t pos) const
+template <class Char, template <class> class SP> inline
+const Char Zbase<Char, SP>::operator[](size_t pos) const
 {
     assert(pos < length()); //design by contract! no runtime check!
-    return rawStr[pos];
+    return rawStr_[pos];
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-const Char* Zbase<Char, SP, AP>::begin() const
-{
-    return rawStr;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Char* Zbase<Char, SP, AP>::end() const
-{
-    return rawStr + length();
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Char* Zbase<Char, SP, AP>::begin()
+template <class Char, template <class> class SP> inline
+auto Zbase<Char, SP>::begin() -> iterator
 {
     reserve(length()); //make unshared!
-    return rawStr;
+    return rawStr_;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Char* Zbase<Char, SP, AP>::end()
+template <class Char, template <class> class SP> inline
+auto Zbase<Char, SP>::end() -> iterator
 {
     return begin() + length();
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::clear()
+template <class Char, template <class> class SP> inline
+void Zbase<Char, SP>::clear()
 {
     if (!empty())
     {
-        if (this->canWrite(rawStr, 0))
+        if (this->canWrite(rawStr_, 0))
         {
-            rawStr[0] = 0;              //keep allocated memory
-            this->setLength(rawStr, 0); //
+            rawStr_[0] = 0;              //keep allocated memory
+            this->setLength(rawStr_, 0); //
         }
         else
             *this = Zbase();
@@ -574,111 +535,70 @@ void Zbase<Char, SP, AP>::clear()
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::swap(Zbase<Char, SP, AP>& other)
+template <class Char, template <class> class SP> inline
+void Zbase<Char, SP>::reserve(size_t minCapacity) //make unshared and check capacity
 {
-    std::swap(rawStr, other.rawStr);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::reserve(size_t minCapacity) //make unshared and check capacity
-{
-    if (!this->canWrite(rawStr, minCapacity))
+    if (!this->canWrite(rawStr_, minCapacity))
     {
         //allocate a new string
         const size_t len = length();
         Char* newStr = this->create(len, std::max(len, minCapacity)); //reserve() must NEVER shrink the string: logical const!
-        std::copy(rawStr, rawStr + len + 1, newStr); //include 0-termination
+        std::copy(rawStr_, rawStr_ + len + 1, newStr); //include 0-termination
 
-        this->destroy(rawStr);
-        rawStr = newStr;
+        this->destroy(rawStr_);
+        rawStr_ = newStr;
     }
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::assign(const Char* source, size_t len)
+template <class Char, template <class> class SP>
+template <class InputIterator> inline
+Zbase<Char, SP>& Zbase<Char, SP>::assign(InputIterator first, InputIterator last)
 {
-    if (this->canWrite(rawStr, len))
+    const size_t len = std::distance(first, last);
+    if (this->canWrite(rawStr_, len))
     {
-        std::copy(source, source + len, rawStr);
-        rawStr[len] = 0; //include null-termination
-        this->setLength(rawStr, len);
+        *std::copy(first, last, rawStr_) = 0;
+        this->setLength(rawStr_, len);
     }
     else
-        *this = Zbase(source, len);
+        *this = Zbase(first, last);
 
     return *this;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::append(const Char* source, size_t len)
+template <class Char, template <class> class SP>
+template <class InputIterator> inline
+Zbase<Char, SP>& Zbase<Char, SP>::append(InputIterator first, InputIterator last)
 {
+    const size_t len = std::distance(first, last);
     const size_t thisLen = length();
     reserve(thisLen + len); //make unshared and check capacity
 
-    std::copy(source, source + len, rawStr + thisLen);
-    rawStr[thisLen + len] = 0;
-    this->setLength(rawStr, thisLen + len);
+    *std::copy(first, last, rawStr_ + thisLen) = 0;
+    this->setLength(rawStr_, thisLen + len);
     return *this;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(const Zbase<Char, SP, AP>& other)
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>& Zbase<Char, SP>::operator=(const Zbase<Char, SP>& str)
 {
-    Zbase<Char, SP, AP>(other).swap(*this);
+    Zbase<Char, SP>(str).swap(*this);
     return *this;
 }
 
 
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP>&& tmp) noexcept
+template <class Char, template <class> class SP> inline
+Zbase<Char, SP>& Zbase<Char, SP>::operator=(Zbase<Char, SP>&& tmp) noexcept
 {
     swap(tmp); //don't use unifying assignment but save one move-construction in the r-value case instead!
     return *this;
 }
 
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(const Char* source)
-{
-    return assign(source, strLength(source));
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Char ch)
-{
-    return assign(&ch, 1);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator+=(const Zbase<Char, SP, AP>& other)
-{
-    return append(other.c_str(), other.length());
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator+=(const Char* other)
-{
-    return append(other, strLength(other));
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator+=(Char ch)
-{
-    return append(&ch, 1);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::pop_back()
+template <class Char, template <class> class SP> inline
+void Zbase<Char, SP>::pop_back()
 {
     const size_t len = length();
     assert(len > 0);

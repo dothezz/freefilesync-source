@@ -6,6 +6,7 @@
 
 #include "http.h"
 
+    #include <wx/app.h>
     #include <zen/thread.h> //std::thread::id
     #include <wx/protocol/http.h>
 
@@ -16,7 +17,7 @@ namespace
 {
 
 
-std::string sendHttpRequestImpl(const std::wstring& url, //throw FileError
+std::string sendHttpRequestImpl(const std::wstring& url, //throw SysError
                                 const std::wstring& userAgent,
                                 const std::string* postParams, //issue POST if bound, GET otherwise
                                 int level = 0)
@@ -34,11 +35,11 @@ std::string sendHttpRequestImpl(const std::wstring& url, //throw FileError
     webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
 
     if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        throw FileError(_("Internet access failed."), L"wxHTTP::Connect");
+        throw SysError(L"wxHTTP::Connect");
 
     if (postParams)
         if (!webAccess.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
-            throw FileError(_("Internet access failed."), L"wxHTTP::SetPostText");
+            throw SysError(L"wxHTTP::SetPostText");
 
     std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //must be deleted BEFORE webAccess is closed
     const int sc = webAccess.GetResponse();
@@ -52,14 +53,14 @@ std::string sendHttpRequestImpl(const std::wstring& url, //throw FileError
             if (!newUrl.empty())
                 return sendHttpRequestImpl(newUrl, userAgent, postParams, level + 1);
         }
-        throw FileError(_("Internet access failed."), L"Unresolvable redirect.");
+        throw SysError(L"Unresolvable redirect.");
     }
 
     if (sc != 200) //HTTP_STATUS_OK
-        throw FileError(_("Internet access failed."), replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
+        throw SysError(replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
 
     if (!httpStream || webAccess.GetError() != wxPROTO_NOERR)
-        throw FileError(_("Internet access failed."), L"wxHTTP::GetError");
+        throw SysError(L"wxHTTP::GetError");
 
     std::string buffer;
     int newValue = 0;
@@ -93,7 +94,7 @@ std::string urlencode(const std::string& str)
 }
 
 
-std::string zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const std::vector<std::pair<std::string, std::string>>& postParams) //throw FileError
+std::string zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
 {
     //convert post parameters into "application/x-www-form-urlencoded"
     std::string flatParams;
@@ -103,13 +104,13 @@ std::string zen::sendHttpPost(const std::wstring& url, const std::wstring& userA
     if (!flatParams.empty())
         flatParams.pop_back();
 
-    return sendHttpRequestImpl(url, userAgent, &flatParams); //throw FileError
+    return sendHttpRequestImpl(url, userAgent, &flatParams); //throw SysError
 }
 
 
-std::string zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent) //throw FileError
+std::string zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent) //throw SysError
 {
-    return sendHttpRequestImpl(url, userAgent, nullptr); //throw FileError
+    return sendHttpRequestImpl(url, userAgent, nullptr); //throw SysError
 }
 
 

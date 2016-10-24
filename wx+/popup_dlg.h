@@ -50,7 +50,7 @@ class ConfirmationDialog3;
 
 struct PopupDialogCfg
 {
-	PopupDialogCfg& setIcon              (const wxBitmap& bmp  ) { icon       = bmp;   return *this; }
+    PopupDialogCfg& setIcon              (const wxBitmap& bmp  ) { icon       = bmp;   return *this; }
     PopupDialogCfg& setTitle             (const wxString& label) { title      = label; return *this; }
     PopupDialogCfg& setMainInstructions  (const wxString& label) { textMain   = label; return *this; } //set at least one of these!
     PopupDialogCfg& setDetailInstructions(const wxString& label) { textDetail = label; return *this; } //
@@ -59,7 +59,7 @@ struct PopupDialogCfg
 private:
     friend class StandardPopupDialog;
 
-	wxBitmap icon;
+    wxBitmap icon;
     wxString title;
     wxString textMain;
     wxString textDetail;

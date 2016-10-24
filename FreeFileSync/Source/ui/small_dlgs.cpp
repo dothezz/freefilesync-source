@@ -10,6 +10,7 @@
 #include <zen/build_info.h>
 #include <zen/stl_tools.h>
 #include <wx/wupdlock.h>
+#include <wx/filedlg.h>
 #include <wx+/choice_enum.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/rtl.h>
@@ -439,7 +440,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
         setValue(txtControl, value == 0, toGuiString(value), bmpControl, bmpName);
     };
 
-    setValue(*m_staticTextData, st.getDataToProcess() == 0, filesizeToShortString(st.getDataToProcess()), *m_bitmapData,  L"data");
+    setValue(*m_staticTextData, st.getBytesToProcess() == 0, filesizeToShortString(st.getBytesToProcess()), *m_bitmapData,  L"data");
     setIntValue(*m_staticTextCreateLeft,  st.createCount< LEFT_SIDE>(), *m_bitmapCreateLeft,  L"so_create_left_small");
     setIntValue(*m_staticTextUpdateLeft,  st.updateCount< LEFT_SIDE>(), *m_bitmapUpdateLeft,  L"so_update_left_small");
     setIntValue(*m_staticTextDeleteLeft,  st.deleteCount< LEFT_SIDE>(), *m_bitmapDeleteLeft,  L"so_delete_left_small");

@@ -68,10 +68,10 @@ Zstring resolveRelativePath(const Zstring& relativePath)
         }
 
         //we cannot use ::realpath() since it resolves *existing* relative paths only!
-        if (char* dirpath = ::getcwd(nullptr, 0))
+        if (char* dirPath = ::getcwd(nullptr, 0))
         {
-            ZEN_ON_SCOPE_EXIT(::free(dirpath));
-            return appendSeparator(dirpath) + relativePath;
+            ZEN_ON_SCOPE_EXIT(::free(dirPath));
+            return appendSeparator(dirPath) + relativePath;
         }
     }
     return relativePath;
@@ -186,46 +186,53 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
 }
 
 
-void getDirectoryAliasesRecursive(const Zstring& dirpath, std::set<Zstring, LessFilePath>& output)
+void getDirectoryAliasesRecursive(const Zstring& dirPath, std::set<Zstring, LessFilePath>& output)
 {
 
-    //3. environment variables: C:\Users\<user> -> %USERPROFILE%
+    //3. environment variables: C:\Users\<user> -> %UserProfile%, C:\Users\%UserName%
     {
-        std::map<Zstring, Zstring> envToDir;
+        std::vector<std::pair<Zstring, Zstring>> macroList;
 
         //get list of useful variables
         auto addEnvVar = [&](const Zstring& envName)
         {
             if (Opt<Zstring> value = getEnvironmentVar(envName))
-                envToDir.emplace(envName, *value);
+                macroList.emplace_back(envName, *value);
         };
         addEnvVar("HOME"); //Linux: /home/<user>  Mac: /Users/<user>
+        //addEnvVar("USER");  -> any benefit?
         //substitute paths by symbolic names
-        for (const auto& entry : envToDir)
-            if (pathStartsWith(dirpath, entry.second))
-                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirpath.c_str() + entry.second.size()));
+        for (const auto& item : macroList)
+        {
+            const Zstring& macroName = item.first;
+            const Zstring& macroPath = item.second;
+
+            const Zstring pathSubst = pathReplaceCpy(dirPath, macroPath, MACRO_SEP + macroName + MACRO_SEP);
+            if (pathSubst != dirPath)
+                output.insert(pathSubst);
+        }
     }
 
-    //4. replace (all) macros: %USERPROFILE% -> C:\Users\<user>
+    //4. replace (all) macros: %UserProfile% -> C:\Users\<user>
     {
-        Zstring testMacros = expandMacros(dirpath);
-        if (testMacros != dirpath)
-            if (output.insert(testMacros).second)
-                getDirectoryAliasesRecursive(testMacros, output); //recurse!
+        const Zstring pathExp = expandMacros(dirPath);
+        if (pathExp != dirPath)
+            if (output.insert(pathExp).second)
+                getDirectoryAliasesRecursive(pathExp, output); //recurse!
     }
 }
 
 
 std::vector<Zstring> zen::getDirectoryAliases(const Zstring& folderPathPhrase)
 {
-    const Zstring dirpath = trimCpy(folderPathPhrase, true, false);
-    if (dirpath.empty())
+    const Zstring dirPath = trimCpy(folderPathPhrase, true, false);
+    if (dirPath.empty())
         return std::vector<Zstring>();
 
     std::set<Zstring, LessFilePath> tmp;
-    getDirectoryAliasesRecursive(dirpath, tmp);
+    getDirectoryAliasesRecursive(dirPath, tmp);
 
-    tmp.erase(dirpath);
+    tmp.erase(dirPath);
     tmp.erase(Zstring());
 
     return std::vector<Zstring>(tmp.begin(), tmp.end());

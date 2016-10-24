@@ -24,41 +24,41 @@ public:
     SyncStatistics(const FilePair& file);
 
     template <SelectedSide side>
-    int createCount() const { return SelectParam<side>::ref(createLeft, createRight); }
-    int createCount() const { return createLeft + createRight; }
+    int createCount() const { return SelectParam<side>::ref(createLeft_, createRight_); }
+    int createCount() const { return createLeft_ + createRight_; }
 
     template <SelectedSide side>
-    int updateCount() const { return SelectParam<side>::ref(updateLeft, updateRight); }
-    int updateCount() const { return updateLeft + updateRight; }
+    int updateCount() const { return SelectParam<side>::ref(updateLeft_, updateRight_); }
+    int updateCount() const { return updateLeft_ + updateRight_; }
 
     template <SelectedSide side>
-    int deleteCount() const { return SelectParam<side>::ref(deleteLeft, deleteRight); }
-    int deleteCount() const { return deleteLeft + deleteRight; }
+    int deleteCount() const { return SelectParam<side>::ref(deleteLeft_, deleteRight_); }
+    int deleteCount() const { return deleteLeft_ + deleteRight_; }
 
-    int conflictCount() const { return static_cast<int>(conflictMsgs.size()); }
+    int conflictCount() const { return static_cast<int>(conflictMsgs_.size()); }
 
-    std::int64_t getDataToProcess() const { return dataToProcess; }
-    size_t       rowCount        () const { return rowsTotal; }
+    std::int64_t getBytesToProcess() const { return bytesToProcess_; }
+    size_t       rowCount         () const { return rowsTotal_; }
 
     using ConflictInfo = std::pair<Zstring, std::wstring>; //pair(filePath/conflict message)
-    const std::vector<ConflictInfo>& getConflicts() const { return conflictMsgs; }
+    const std::vector<ConflictInfo>& getConflicts() const { return conflictMsgs_; }
 
 private:
     void recurse(const HierarchyObject& hierObj);
 
-    void processFile(const FilePair& file);
-    void processLink(const SymlinkPair& link);
+    void processFile  (const FilePair& file);
+    void processLink  (const SymlinkPair& link);
     void processFolder(const FolderPair& folder);
 
-    int createLeft  = 0;
-    int createRight = 0;
-    int updateLeft  = 0;
-    int updateRight = 0;
-    int deleteLeft  = 0;
-    int deleteRight = 0;
-    std::vector<ConflictInfo> conflictMsgs; //conflict texts to display as a warning message
-    std::int64_t dataToProcess = 0;
-    size_t rowsTotal = 0;
+    int createLeft_  = 0;
+    int createRight_ = 0;
+    int updateLeft_  = 0;
+    int updateRight_ = 0;
+    int deleteLeft_  = 0;
+    int deleteRight_ = 0;
+    std::vector<ConflictInfo> conflictMsgs_; //conflict texts to display as a warning message
+    std::int64_t bytesToProcess_ = 0;
+    size_t rowsTotal_ = 0;
 };
 
 

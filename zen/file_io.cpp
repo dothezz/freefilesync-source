@@ -16,13 +16,13 @@ using namespace zen;
 
 namespace
 {
-//- "filepath" could be a named pipe which *blocks* forever for open()!
+//- "filePath" could be a named pipe which *blocks* forever for open()!
 //- open() with O_NONBLOCK avoids the block, but opens successfully
 //- create sample pipe: "sudo mkfifo named_pipe"
-void checkForUnsupportedType(const Zstring& filepath) //throw FileError
+void checkForUnsupportedType(const Zstring& filePath) //throw FileError
 {
     struct ::stat fileInfo = {};
-    if (::stat(filepath.c_str(), &fileInfo) != 0) //follows symlinks
+    if (::stat(filePath.c_str(), &fileInfo) != 0) //follows symlinks
         return; //let the caller handle errors like "not existing"
 
     if (!S_ISREG(fileInfo.st_mode) &&
@@ -39,7 +39,7 @@ void checkForUnsupportedType(const Zstring& filepath) //throw FileError
             const std::wstring numFmt = printNumber<std::wstring>(L"0%06o", m & S_IFMT);
             return name ? numFmt + L", " + name : numFmt;
         };
-        throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtPath(filepath)) + L" " + getTypeName(fileInfo.st_mode));
+        throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtPath(filePath)) + L" " + getTypeName(fileInfo.st_mode));
     }
 }
 
@@ -51,18 +51,18 @@ FileHandle getInvalidHandle()
 }
 
 
-FileInput::FileInput(FileHandle handle, const Zstring& filepath) : FileBase(filepath), fileHandle(handle) {}
+FileInput::FileInput(FileHandle handle, const Zstring& filePath) : FileBase(filePath), fileHandle(handle) {}
 
 
-FileInput::FileInput(const Zstring& filepath) : //throw FileError, ErrorFileLocked
-    FileBase(filepath), fileHandle(getInvalidHandle())
+FileInput::FileInput(const Zstring& filePath) : //throw FileError, ErrorFileLocked
+    FileBase(filePath), fileHandle(getInvalidHandle())
 {
-    checkForUnsupportedType(filepath); //throw FileError; opening a named pipe would block forever!
+    checkForUnsupportedType(filePath); //throw FileError; opening a named pipe would block forever!
 
     //don't use O_DIRECT: http://yarchive.net/comp/linux/o_direct.html
-    fileHandle = ::open(filepath.c_str(), O_RDONLY);
+    fileHandle = ::open(filePath.c_str(), O_RDONLY);
     if (fileHandle == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
-        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filepath)), L"open");
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filePath)), L"open");
 
     //------------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ FileInput::FileInput(const Zstring& filepath) : //throw FileError, ErrorFileLock
 
     //optimize read-ahead on input file:
     if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
-        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filepath)), L"posix_fadvise");
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filePath)), L"posix_fadvise");
 
 }
 
@@ -106,20 +106,20 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; m
 
 //----------------------------------------------------------------------------------------------------
 
-FileOutput::FileOutput(FileHandle handle, const Zstring& filepath) : FileBase(filepath), fileHandle(handle) {}
+FileOutput::FileOutput(FileHandle handle, const Zstring& filePath) : FileBase(filePath), fileHandle(handle) {}
 
 
-FileOutput::FileOutput(const Zstring& filepath, AccessFlag access) : //throw FileError, ErrorTargetExisting
-    FileBase(filepath), fileHandle(getInvalidHandle())
+FileOutput::FileOutput(const Zstring& filePath, AccessFlag access) : //throw FileError, ErrorTargetExisting
+    FileBase(filePath), fileHandle(getInvalidHandle())
 {
-    //checkForUnsupportedType(filepath); -> not needed, open() + O_WRONLY should fail fast
+    //checkForUnsupportedType(filePath); -> not needed, open() + O_WRONLY should fail fast
 
-    fileHandle = ::open(filepath.c_str(), O_WRONLY | O_CREAT | (access == FileOutput::ACC_CREATE_NEW ? O_EXCL : O_TRUNC),
+    fileHandle = ::open(filePath.c_str(), O_WRONLY | O_CREAT | (access == FileOutput::ACC_CREATE_NEW ? O_EXCL : O_TRUNC),
                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); //0666
     if (fileHandle == -1)
     {
         const int ec = errno; //copy before making other system calls!
-        const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(filepath));
+        const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(filePath));
         const std::wstring errorDescr = formatSystemError(L"open", ec);
 
         if (ec == EEXIST)

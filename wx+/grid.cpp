@@ -186,7 +186,7 @@ wxSize GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& 
 
     RecursiveDcClipper clip(dc, rect);
     dc.DrawText(textTrunc, pt);
-	return extentTrunc;
+    return extentTrunc;
 }
 
 
@@ -1149,9 +1149,9 @@ private:
 
         void evalMousePos()
         {
-                const auto now = std::chrono::steady_clock::now();				   
-				const double deltaSecs = std::chrono::duration<double>(now - lastEvalTime).count(); //unit: [sec]
-                lastEvalTime = now;
+            const auto now = std::chrono::steady_clock::now();
+            const double deltaSecs = std::chrono::duration<double>(now - lastEvalTime).count(); //unit: [sec]
+            lastEvalTime = now;
 
             const wxPoint clientPos = wnd_.ScreenToClient(wxGetMousePosition());
             const wxSize clientSize = wnd_.GetClientSize();

@@ -317,7 +317,7 @@ void WorkerThread::operator()() const //thread entry
 
 //#########################  redirect to impl  #####################################################
 
-struct IconBuffer::Pimpl
+struct IconBuffer::Impl
 {
     std::shared_ptr<WorkLoad> workload = std::make_shared<WorkLoad>();
     std::shared_ptr<Buffer>   buffer   = std::make_shared<Buffer>();
@@ -329,7 +329,7 @@ struct IconBuffer::Pimpl
 };
 
 
-IconBuffer::IconBuffer(IconSize sz) : pimpl(std::make_unique<Pimpl>()), iconSizeType(sz)
+IconBuffer::IconBuffer(IconSize sz) : pimpl(std::make_unique<Impl>()), iconSizeType(sz)
 {
     pimpl->worker = InterruptibleThread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }

@@ -250,12 +250,12 @@ template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp)
 {
     using FormatTag = typename SelectIf<
-    IsSameType<String2, FormatDateTag       >::value ||
-    IsSameType<String2, FormatTimeTag       >::value ||
-    IsSameType<String2, FormatDateTimeTag   >::value ||
-    IsSameType<String2, FormatIsoDateTag    >::value ||
-    IsSameType<String2, FormatIsoTimeTag    >::value ||
-    IsSameType<String2, FormatIsoDateTimeTag>::value, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Type;
+                      IsSameType<String2, FormatDateTag       >::value ||
+                      IsSameType<String2, FormatTimeTag       >::value ||
+                      IsSameType<String2, FormatDateTimeTag   >::value ||
+                      IsSameType<String2, FormatIsoDateTag    >::value ||
+                      IsSameType<String2, FormatIsoTimeTag    >::value ||
+                      IsSameType<String2, FormatIsoDateTimeTag>::value, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Type;
 
     return implementation::formatTime<String>(format, comp, FormatTag());
 }

@@ -401,26 +401,26 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
 }
 
 
-void makeDirectoryRecursivelyImpl(const Zstring& directory) //FileError
+void makeDirectoryRecursivelyImpl(const Zstring& dirPath) //FileError
 {
-    assert(!endsWith(directory, FILE_NAME_SEPARATOR)); //even "C:\" should be "C:" as input!
+    assert(!endsWith(dirPath, FILE_NAME_SEPARATOR)); //even "C:\" should be "C:" as input!
 
     try
     {
-        copyNewDirectory(Zstring(), directory, false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+        copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
     }
     catch (const ErrorTargetExisting&) {} //*something* existing: folder or FILE!
     catch (const ErrorTargetPathMissing&)
     {
         //we need to create parent directories first
-        const Zstring dirParent = beforeLast(directory, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-        if (!dirParent.empty())
+        const Zstring parentPath = beforeLast(dirPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+        if (!parentPath.empty())
         {
             //recurse...
-            makeDirectoryRecursivelyImpl(dirParent); //throw FileError
+            makeDirectoryRecursivelyImpl(parentPath); //throw FileError
 
             //now try again...
-            copyNewDirectory(Zstring(), directory, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
+            copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
             return;
         }
         throw;
@@ -518,7 +518,7 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
                                     const Zstring& targetFile,
                                     const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
 {
-    FileInput fileIn(sourceFile); //throw FileError
+    FileInput fileIn(sourceFile); //throw FileError, (ErrorFileLocked -> Windows-only)
     if (notifyProgress) notifyProgress(0); //throw X!
 
     struct ::stat sourceInfo = {};
@@ -574,16 +574,16 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
 }
 
 /*
-                ------------------
-                |File Copy Layers|
-                ------------------
-                   copyNewFile
-                        |
-               copyFileOsSpecific (solve 8.3 issue on Windows)
-                        |
-              copyFileWindowsSelectRoutine
-              /                           \
-copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsBackupStream(::BackupRead/::BackupWrite)
+                    ------------------
+                    |File Copy Layers|
+                    ------------------
+                       copyNewFile
+                            |
+                   copyFileOsSpecific (solve 8.3 issue on Windows)
+                            |
+                  copyFileWindowsSelectRoutine
+                  /                           \
+copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsStream(::BackupRead/::BackupWrite)
 */
 }
 

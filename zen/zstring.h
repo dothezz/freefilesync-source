@@ -16,7 +16,7 @@
 
 //"The reason for all the fuss above" - Loki/SmartPtr
 //a high-performance string for interfacing with native OS APIs in multithreaded contexts
-using Zstring = zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, zen::AllocatorOptimalSpeed>;
+using Zstring = zen::Zbase<Zchar>;
 
 
 int cmpStringNoCase(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen);
@@ -83,6 +83,9 @@ bool pathEndsWith(const S& str, const T& postfix)
     return cmpFilePath(strBegin(str) + strLen - pfLen, pfLen, strBegin(postfix), pfLen) == 0;
 }
 
+
+template <class S, class T, class U>
+S pathReplaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 
 
 
@@ -164,6 +167,15 @@ int cmpFilePath(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen)
     if (rv != 0)
         return rv;
     return static_cast<int>(lhsLen) - static_cast<int>(rhsLen);
+}
+
+
+template <class S, class T, class U> inline
+S pathReplaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
+{
+    assert(!contains(str, Zchar('\0')));
+
+    return replaceCpy(str, oldTerm, newTerm, replaceAll);
 }
 
 

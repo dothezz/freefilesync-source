@@ -184,10 +184,10 @@ class CurveDataProgressSeparatorLine : public CurveData
 }
 
 
-class CompareProgressDialog::Pimpl : public CompareProgressDlgGenerated
+class CompareProgressDialog::Impl : public CompareProgressDlgGenerated
 {
 public:
-    Pimpl(wxFrame& parentWindow);
+    Impl(wxFrame& parentWindow);
 
     void init(const Statistics& syncStat); //constructor/destructor semantics, but underlying Window is reused
     void teardown();                       //
@@ -215,7 +215,7 @@ private:
 };
 
 
-CompareProgressDialog::Pimpl::Pimpl(wxFrame& parentWindow) :
+CompareProgressDialog::Impl::Impl(wxFrame& parentWindow) :
     CompareProgressDlgGenerated(&parentWindow),
     parentWindow_(parentWindow)
 {
@@ -243,7 +243,7 @@ CompareProgressDialog::Pimpl::Pimpl(wxFrame& parentWindow) :
 }
 
 
-void CompareProgressDialog::Pimpl::init(const Statistics& syncStat)
+void CompareProgressDialog::Impl::init(const Statistics& syncStat)
 {
     syncStat_ = &syncStat;
     titleTextBackup = parentWindow_.GetTitle();
@@ -278,7 +278,7 @@ void CompareProgressDialog::Pimpl::init(const Statistics& syncStat)
 }
 
 
-void CompareProgressDialog::Pimpl::teardown()
+void CompareProgressDialog::Impl::teardown()
 {
     syncStat_ = nullptr;
     parentWindow_.SetTitle(titleTextBackup);
@@ -286,7 +286,7 @@ void CompareProgressDialog::Pimpl::teardown()
 }
 
 
-void CompareProgressDialog::Pimpl::initNewPhase()
+void CompareProgressDialog::Impl::initNewPhase()
 {
     switch (syncStat_->currentPhase())
     {
@@ -325,7 +325,7 @@ void CompareProgressDialog::Pimpl::initNewPhase()
 }
 
 
-void CompareProgressDialog::Pimpl::updateStatusPanelNow()
+void CompareProgressDialog::Impl::updateStatusPanelNow()
 {
     if (!syncStat_) //no comparison running!!
         return;
@@ -437,7 +437,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
 
 //redirect to implementation
 CompareProgressDialog::CompareProgressDialog(wxFrame& parentWindow) :
-    pimpl(new Pimpl(parentWindow)) {} //owned by parentWindow
+    pimpl(new Impl(parentWindow)) {} //owned by parentWindow
 
 wxWindow* CompareProgressDialog::getAsWindow()
 {
@@ -1625,7 +1625,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             //remaining item and byte count
             setText(*pnl.m_staticTextItemsRemaining, toGuiString(itemsTotal - itemsCurrent), &layoutChanged);
             setText(*pnl.m_staticTextBytesRemaining, L"(" + filesizeToShortString(bytesTotal - bytesCurrent) + L")", &layoutChanged);
-            //it's possible data remaining becomes shortly negative if last file synced has ADS data and the dataTotal was not yet corrected!
+            //it's possible data remaining becomes shortly negative if last file synced has ADS data and the bytesTotal was not yet corrected!
 
             //remaining time and speed
             assert(perf);
