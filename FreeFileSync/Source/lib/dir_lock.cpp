@@ -223,12 +223,12 @@ std::string retrieveLockId(const Zstring& lockFilePath) //throw FileError
 }
 
 
-enum ProcessStatus
+enum class ProcessStatus
 {
-    PROC_STATUS_NOT_RUNNING,
-    PROC_STATUS_RUNNING,
-    PROC_STATUS_ITS_US,
-    PROC_STATUS_CANT_TELL
+    NOT_RUNNING,
+    RUNNING,
+    ITS_US,
+    CANT_TELL,
 };
 
 ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileError
@@ -237,15 +237,15 @@ ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileErro
 
     if (lockInfo.computerName != localInfo.computerName ||
         lockInfo.userId != localInfo.userId) //another user may run a session right now!
-        return PROC_STATUS_CANT_TELL; //lock owned by different computer in this network
+        return ProcessStatus::CANT_TELL; //lock owned by different computer in this network
 
     if (lockInfo.sessionId == localInfo.sessionId &&
         lockInfo.processId == localInfo.processId) //obscure, but possible: deletion failed or a lock file is "stolen" and put back while the program is running
-        return PROC_STATUS_ITS_US;
+        return ProcessStatus::ITS_US;
 
     if (Opt<SessionId> sessionId = getSessionId(lockInfo.processId)) //throw FileError
-        return *sessionId == lockInfo.sessionId ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
-    return PROC_STATUS_NOT_RUNNING;
+        return *sessionId == lockInfo.sessionId ? ProcessStatus::RUNNING : ProcessStatus::NOT_RUNNING;
+    return ProcessStatus::NOT_RUNNING;
 }
 
 
@@ -271,12 +271,12 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
             originalLockId = lockInfo.lockId;
             switch (getProcessStatus(lockInfo)) //throw FileError
             {
-                case PROC_STATUS_ITS_US: //since we've already passed LockAdmin, the lock file seems abandoned ("stolen"?) although it's from this process
-                case PROC_STATUS_NOT_RUNNING:
+                case ProcessStatus::ITS_US: //since we've already passed LockAdmin, the lock file seems abandoned ("stolen"?) although it's from this process
+                case ProcessStatus::NOT_RUNNING:
                     lockOwnderDead = true;
                     break;
-                case PROC_STATUS_RUNNING:
-                case PROC_STATUS_CANT_TELL:
+                case ProcessStatus::RUNNING:
+                case ProcessStatus::CANT_TELL:
                     break;
             }
         }

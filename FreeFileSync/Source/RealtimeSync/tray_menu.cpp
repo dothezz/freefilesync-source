@@ -5,8 +5,8 @@
 // *****************************************************************************
 
 #include "tray_menu.h"
+#include <chrono>
 #include <zen/thread.h>
-#include <zen/tick_count.h>
 #include <wx/taskbar.h>
 #include <wx/icon.h> //Linux needs this
 #include <wx/app.h>
@@ -25,15 +25,16 @@ using namespace zen;
 
 namespace
 {
-const int RETRY_AFTER_ERROR_INTERVAL = 15; //unit: [s]
+const int RETRY_AFTER_ERROR_INTERVAL_SEC = 15; //unit: [s]
 
-const std::int64_t TICKS_UPDATE_INTERVAL = rts::UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
-TickVal lastExec = getTicks();
+std::chrono::steady_clock::time_point lastExec;
+
 
 bool updateUiIsAllowed()
 {
-    const TickVal now = getTicks(); //0 on error
-    if (dist(lastExec, now) >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    const auto now = std::chrono::steady_clock::now();
+
+    if (numeric::dist(now, lastExec) > std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS)) //handle potential chrono wrap-around!
     {
         lastExec = now;
         return true;
@@ -300,8 +301,8 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
             trayIcon.clearShowErrorRequested();
 
             //wait for some time, then return to retry
-            static_assert(RETRY_AFTER_ERROR_INTERVAL * 1000 % UI_UPDATE_INTERVAL == 0, "");
-            for (int i = 0; i < RETRY_AFTER_ERROR_INTERVAL * 1000 / UI_UPDATE_INTERVAL; ++i)
+            static_assert(RETRY_AFTER_ERROR_INTERVAL_SEC * 1000 % UI_UPDATE_INTERVAL_MS == 0, "");
+            for (int i = 0; i < RETRY_AFTER_ERROR_INTERVAL_SEC * 1000 / UI_UPDATE_INTERVAL_MS; ++i)
             {
                 trayIcon.doUiRefreshNow(); //throw AbortMonitoring
 
@@ -314,7 +315,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                         case ConfirmationButton::CANCEL:
                             throw AbortMonitoring(SHOW_GUI);
                     }
-                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
+                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS));
             }
         }
 

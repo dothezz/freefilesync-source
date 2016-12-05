@@ -96,11 +96,13 @@ const Char* cStringFind(const Char* str, Char ch) //= strchr(), wcschr()
 }
 
 
+/*
 struct FullMatch
 {
     static bool matchesMaskEnd (const Zchar* path) { return *path == 0; }
     static bool matchesMaskStar(const Zchar* path) { return true; }
 };
+*/
 
 struct ParentFolderMatch //strict match of parent folder path!
 {
@@ -236,8 +238,6 @@ std::vector<Zstring> zen::splitByDelimiter(const Zstring& filterString)
 
 NameFilter::NameFilter(const Zstring& includePhrase, const Zstring& excludePhrase)
 {
-    //no need for regular expressions: In tests wxRegex was slower than wxString::Matches() by a factor of 10
-
     //setup include/exclude filters for files and directories
     for (const Zstring& entry : splitByDelimiter(includePhrase)) addFilterEntry(entry, includeMasksFileFolder, includeMasksFolder);
     for (const Zstring& entry : splitByDelimiter(excludePhrase)) addFilterEntry(entry, excludeMasksFileFolder, excludeMasksFolder);
@@ -260,6 +260,7 @@ void NameFilter::addExclusion(const Zstring& excludePhrase)
 
 bool NameFilter::passFileFilter(const Zstring& relFilePath) const
 {
+    assert(!startsWith(relFilePath, FILE_NAME_SEPARATOR));
     const Zstring& pathFmt = relFilePath; //nothing to do here
 
     if (matchesMask<AnyMatch         >(pathFmt, excludeMasksFileFolder) || //either full match on file or partial match on any parent folder
@@ -273,6 +274,7 @@ bool NameFilter::passFileFilter(const Zstring& relFilePath) const
 
 bool NameFilter::passDirFilter(const Zstring& relDirPath, bool* childItemMightMatch) const
 {
+    assert(!startsWith(relDirPath, FILE_NAME_SEPARATOR));
     assert(!childItemMightMatch || *childItemMightMatch == true); //check correct usage
 
     const Zstring& pathFmt = relDirPath; //nothing to do here
@@ -284,8 +286,8 @@ bool NameFilter::passDirFilter(const Zstring& relDirPath, bool* childItemMightMa
             *childItemMightMatch = false; //perf: no need to traverse deeper; subfolders/subfiles would be excluded by filter anyway!
         /*
         Attention: the design choice that "childItemMightMatch" is optional implies that the filter must provide correct results no matter if this
-        value is considered by the client! In particular, if *childItemMightMatch == false, then any filter evaluations for child items must
-        also return "false"!
+        value is considered by the client!
+        In particular, if *childItemMightMatch == false, then any filter evaluations for child items must also return "false"!
         This is not a problem for folder traversal which stops at the first *childItemMightMatch == false anyway, but other code continues recursing further,
         e.g. the database update code in db_file.cpp recurses unconditionally without filter check! It's possible to construct edge cases with incorrect
         behavior if "childItemMightMatch" were not optional:

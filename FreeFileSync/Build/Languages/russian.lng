@@ -796,7 +796,7 @@ The command is triggered if:
 <target>Выберите папку SFTP</target>
 
 <source>Select alternative folder type</source>
-<target>Выберете альтернативный тип папки</target>
+<target>Выберите альтернативный тип папки</target>
 
 <source>&New</source>
 <target>&Новая</target>
@@ -895,7 +895,7 @@ The command is triggered if:
 <target>Тип просмотра:</target>
 
 <source>Select view:</source>
-<target>Выберете отображение:</target>
+<target>Выберите отображение:</target>
 
 <source>Statistics:</source>
 <target>Статистика:</target>
@@ -1062,10 +1062,10 @@ The command is triggered if:
 <target>Папка на сервере:</target>
 
 <source>Select a directory on the server:</source>
-<target>Выберете папку на сервере:</target>
+<target>Выберите папку на сервере:</target>
 
 <source>Select Folder</source>
-<target>Выберете папку</target>
+<target>Выберите папку</target>
 
 <source>Start synchronization now?</source>
 <target>Начать синхронизацию сейчас?</target>
@@ -1098,7 +1098,7 @@ The command is triggered if:
 <target>Свернуть в область уведомлений</target>
 
 <source>Bytes copied:</source>
-<target>Данных скопированно:</target>
+<target>Данных скопировано:</target>
 
 <source>Close</source>
 <target>Закрыть</target>

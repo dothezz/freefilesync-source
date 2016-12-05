@@ -10,6 +10,7 @@
 #include <list>
 #include <zen/thread.h>
 #include <zen/file_error.h>
+#include <zen/basic_math.h>
 #include "../fs/abstract.h"
 #include "../process_callback.h"
 
@@ -49,7 +50,7 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
         }));
 
     //don't wait (almost) endlessly like Win32 would on non-existing network shares:
-    std::chrono::steady_clock::time_point stopTime = std::chrono::steady_clock::now() + std::chrono::seconds(folderAccessTimeout);
+    const auto startTime = std::chrono::steady_clock::now();
 
     for (auto& fi : futureInfo)
     {
@@ -57,8 +58,8 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
 
         procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", displayPathFmt)); //may throw!
 
-        while (std::chrono::steady_clock::now() < stopTime &&
-               fi.second.wait_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL / 2)) != std::future_status::ready)
+        while (numeric::dist(std::chrono::steady_clock::now(), startTime) < std::chrono::seconds(folderAccessTimeout) && //handle potential chrono wrap-around!
+               fi.second.wait_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
             procCallback.requestUiRefresh(); //may throw!
 
         if (isReady(fi.second))

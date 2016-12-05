@@ -257,16 +257,16 @@ private:
     void OnSearchPanelKeyPressed(wxKeyEvent& event);
 
     //menu events
-    void OnMenuOptions       (wxCommandEvent& event) override;
-    void OnMenuExportFileList(wxCommandEvent& event) override;
-    void OnMenuResetLayout   (wxCommandEvent& event) override { resetLayout(); }
-    void OnMenuFindItem      (wxCommandEvent& event) override;
-    void OnMenuCheckVersion  (wxCommandEvent& event) override;
+    void OnMenuOptions        (wxCommandEvent& event) override;
+    void OnMenuExportFileList (wxCommandEvent& event) override;
+    void OnMenuResetLayout    (wxCommandEvent& event) override { resetLayout(); }
+    void OnMenuFindItem       (wxCommandEvent& event) override;
+    void OnMenuCheckVersion   (wxCommandEvent& event) override;
     void OnMenuCheckVersionAutomatically(wxCommandEvent& event) override;
-    void OnMenuDownloadNewVersion       (wxCommandEvent& event);
-    void OnMenuAbout         (wxCommandEvent& event) override;
-    void OnShowHelp          (wxCommandEvent& event) override;
-    void OnMenuQuit          (wxCommandEvent& event) override { Close(); }
+    void OnMenuUpdateAvailable(wxCommandEvent& event);
+    void OnMenuAbout          (wxCommandEvent& event) override;
+    void OnShowHelp           (wxCommandEvent& event) override;
+    void OnMenuQuit           (wxCommandEvent& event) override { Close(); }
 
     void OnMenuLanguageSwitch(wxCommandEvent& event);
 
@@ -329,8 +329,8 @@ private:
     std::int64_t manualTimeSpanFrom = 0;
     std::int64_t manualTimeSpanTo   = 0; //buffer manual time span selection at session level
 
-    std::shared_ptr<FolderHistory> folderHistoryLeft;  //shared by all wxComboBox dropdown controls
-    std::shared_ptr<FolderHistory> folderHistoryRight; //always bound!
+    std::shared_ptr<FolderHistory> folderHistoryLeft  = std::make_shared<FolderHistory>();  //shared by all wxComboBox dropdown controls
+    std::shared_ptr<FolderHistory> folderHistoryRight = std::make_shared<FolderHistory>(); //always bound!
 
     zen::AsyncGuiQueue guiQueue; //schedule and run long-running tasks asynchronously, but process results on GUI queue
 

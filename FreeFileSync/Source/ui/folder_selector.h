@@ -41,7 +41,7 @@ public:
 
     ~FolderSelector();
 
-    void setSiblingSelector(FolderSelector* selector) { siblingSelector = selector; }
+    void setSiblingSelector(FolderSelector* selector) { siblingSelector_ = selector; }
 
     Zstring getPath() const;
     void setPath(const Zstring& folderPathPhrase);
@@ -61,7 +61,7 @@ private:
     wxButton&         selectAltFolderButton_;
     FolderHistoryBox& folderComboBox_;
     wxStaticText*     staticText_ = nullptr; //optional
-    FolderSelector* siblingSelector = nullptr;
+    FolderSelector*   siblingSelector_ = nullptr;
 };
 }
 

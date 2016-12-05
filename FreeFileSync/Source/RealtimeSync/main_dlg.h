@@ -62,10 +62,10 @@ private:
     std::vector<DirectoryPanel*> dirpathsExtra; //additional pairs to the standard pair
 
 
-    const Zstring lastRunConfigPath;
-    Zstring currentConfigFileName;
+    const Zstring lastRunConfigPath_;
+    Zstring currentConfigFileName_;
 
-    zen::AsyncGuiQueue guiQueue; //schedule and run long-running tasks asynchronously, but process results on GUI queue
+    zen::AsyncGuiQueue guiQueue_; //schedule and run long-running tasks asynchronously, but process results on GUI queue
 };
 
 #endif //MAIN_DLG_H_2384790842252445

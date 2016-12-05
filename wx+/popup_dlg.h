@@ -36,7 +36,7 @@ enum class ConfirmationButton3
 
 enum class ConfirmationButton
 {
-    DO_IT  = static_cast<int>(ConfirmationButton3::DO_IT), //[!]
+    DO_IT  = static_cast<int>(ConfirmationButton3::DO_IT ), //[!]
     CANCEL = static_cast<int>(ConfirmationButton3::CANCEL), //Clang requires a "static_cast"
 };
 
@@ -70,23 +70,24 @@ private:
 
 struct PopupDialogCfg3
 {
-    PopupDialogCfg3& setTitle             (const wxString& label) { pdCfg.setTitle             (label); return *this; }
-    PopupDialogCfg3& setMainInstructions  (const wxString& label) { pdCfg.setMainInstructions  (label); return *this; } //set at least one of these!
-    PopupDialogCfg3& setDetailInstructions(const wxString& label) { pdCfg.setDetailInstructions(label); return *this; } //
-    PopupDialogCfg3& setCheckBox(bool& value, const wxString& label) { pdCfg.setCheckBox(value, label); return *this; }
+    PopupDialogCfg3& setIcon              (const wxBitmap& bmp  ) { pdCfg_.setIcon              (bmp);   return *this; }
+    PopupDialogCfg3& setTitle             (const wxString& label) { pdCfg_.setTitle             (label); return *this; }
+    PopupDialogCfg3& setMainInstructions  (const wxString& label) { pdCfg_.setMainInstructions  (label); return *this; } //set at least one of these!
+    PopupDialogCfg3& setDetailInstructions(const wxString& label) { pdCfg_.setDetailInstructions(label); return *this; } //
+    PopupDialogCfg3& setCheckBox(bool& value, const wxString& label) { pdCfg_.setCheckBox(value, label); return *this; }
     PopupDialogCfg3& setCheckBox(bool& value, const wxString& label, ConfirmationButton3 disableWhenChecked)
     {
         assert(disableWhenChecked != ConfirmationButton3::CANCEL);
         setCheckBox(value, label);
-        buttonToDisableWhenChecked = disableWhenChecked;
+        buttonToDisableWhenChecked_ = disableWhenChecked;
         return *this;
     }
 
 private:
     friend class ConfirmationDialog3;
 
-    PopupDialogCfg pdCfg;
-    ConfirmationButton3 buttonToDisableWhenChecked = ConfirmationButton3::CANCEL;
+    PopupDialogCfg pdCfg_;
+    ConfirmationButton3 buttonToDisableWhenChecked_ = ConfirmationButton3::CANCEL;
 };
 }
 

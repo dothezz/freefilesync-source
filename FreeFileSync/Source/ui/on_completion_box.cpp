@@ -10,6 +10,9 @@
 #include <algorithm>
 #include <zen/stl_tools.h>
 #include <zen/utf.h>
+//#ifdef ZEN_WIN
+//    #include <zen/win_ver.h>
+//#endif
 
 using namespace zen;
 

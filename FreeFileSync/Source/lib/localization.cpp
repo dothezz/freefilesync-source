@@ -123,10 +123,12 @@ std::vector<TranslationInfo> loadTranslations()
 {
     std::vector<TranslationInfo> locMapping;
     {
+        const wchar_t ltrMark = L'\u200E'; //UTF-8: E2 80 8E
+
         //default entry:
         TranslationInfo newEntry;
         newEntry.languageID     = wxLANGUAGE_ENGLISH_US;
-        newEntry.languageName   = L"English (US)";
+        newEntry.languageName   = std::wstring(L"English (US)") + ltrMark; //handle weak ")" for bidi-algorithm
         newEntry.translatorName = L"Zenju";
         newEntry.languageFlag   = L"flag_usa.png";
         newEntry.langFilePath   = Zstr("");
@@ -136,7 +138,7 @@ std::vector<TranslationInfo> loadTranslations()
     //search language files available
     std::vector<Zstring> lngFilePaths;
 
-    traverseFolder(zen::getResourceDir() + Zstr("Languages"), [&](const zen::FileInfo& fi) //FileInfo is ambiguous on OS X
+    traverseFolder(zen::getResourceDirPf() + Zstr("Languages"), [&](const zen::FileInfo& fi) //FileInfo is ambiguous on OS X
     {
         if (pathEndsWith(fi.fullPath, Zstr(".lng")))
             lngFilePaths.push_back(fi.fullPath);
@@ -156,7 +158,7 @@ std::vector<TranslationInfo> loadTranslations()
             assert(!lngHeader.localeName    .empty());
             assert(!lngHeader.flagFile      .empty());
             /*
-            Some ISO codes are used by multiple wxLanguage ids which can lead to incorrect mapping!!!
+            Some ISO codes are used by multiple wxLanguage IDs which can lead to incorrect mapping!!!
             => Identify by description, e.g. "Chinese (Traditional)". The following ids are affected:
                 wxLANGUAGE_CHINESE_TRADITIONAL
                 wxLANGUAGE_ENGLISH_UK

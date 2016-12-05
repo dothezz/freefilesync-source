@@ -23,8 +23,8 @@ public:
     void hide();
 
 private:
-    class TooltipDialogGenerated;
-    TooltipDialogGenerated* tipWindow = nullptr;
+    class TooltipDlgGenerated;
+    TooltipDlgGenerated* tipWindow_ = nullptr;
     wxWindow& parent_;
 };
 }

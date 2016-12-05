@@ -10,14 +10,14 @@
 #include <functional>
 #include <memory>
 #include <wx/window.h>
-
+#include "version_check_impl.h"
 
 namespace zen
 {
 bool updateCheckActive (time_t  lastUpdateCheck);
 void disableUpdateCheck(time_t& lastUpdateCheck);
-bool haveNewerVersionOnline(const std::wstring& onlineVersion);
-
+bool haveNewerVersionOnline(const std::string& onlineVersion);
+//----------------------------------------------------------------------------
 //periodic update check:
 bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck);
 
@@ -29,15 +29,12 @@ std::shared_ptr<UpdateCheckResultPrep> periodicUpdateCheckPrepare();
 //run on worker thread: (long-running part of the check)
 std::shared_ptr<UpdateCheckResult> periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep);
 //run on main thread:
-void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck,
-                             std::wstring& lastOnlineVersion,
-                             std::wstring& lastOnlineChangeLog,
+void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion,
                              const UpdateCheckResult* resultAsync);
-
 //----------------------------------------------------------------------------
-
 //call from main thread:
-void checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog);
+void checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion);
+//----------------------------------------------------------------------------
 }
 
 #endif //VERSION_CHECK_H_324872374893274983275

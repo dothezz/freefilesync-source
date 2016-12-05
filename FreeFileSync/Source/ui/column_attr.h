@@ -16,7 +16,7 @@ enum class ColumnTypeRim
     ITEM_PATH,
     SIZE,
     DATE,
-    EXTENSION
+    EXTENSION,
 };
 
 struct ColumnAttributeRim
@@ -33,12 +33,12 @@ struct ColumnAttributeRim
 inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
-    return
+    return //harmonize with main_dlg.cpp::onGridLabelContextRim() => expects stretched ITEM_PATH and non-stretched other columns!
     {
         { ColumnTypeRim::ITEM_PATH, -80, 1, true  }, //stretch to full width and substract sum of fixed-size widths!
+        { ColumnTypeRim::EXTENSION,  60, 0, false },
         { ColumnTypeRim::DATE,      112, 0, false },
         { ColumnTypeRim::SIZE,       80, 0, true  },
-        { ColumnTypeRim::EXTENSION,  60, 0, false },
     };
 }
 
@@ -48,9 +48,9 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
     return
     {
         { ColumnTypeRim::ITEM_PATH, -80, 1, true  },
+        { ColumnTypeRim::EXTENSION,  60, 0, false },
         { ColumnTypeRim::DATE,      112, 0, false },
         { ColumnTypeRim::SIZE,       80, 0, true  },
-        { ColumnTypeRim::EXTENSION,  60, 0, false },
     };
 }
 
@@ -58,7 +58,7 @@ enum class ItemPathFormat
 {
     FULL_PATH,
     RELATIVE_PATH,
-    ITEM_NAME
+    ITEM_NAME,
 };
 
 const ItemPathFormat defaultItemPathFormatLeftGrid  = ItemPathFormat::RELATIVE_PATH;
@@ -77,9 +77,9 @@ enum class ColumnTypeCenter
 
 enum class ColumnTypeNavi
 {
+    FOLDER_NAME,
+    ITEM_COUNT,
     BYTES,
-    DIRECTORY,
-    ITEM_COUNT
 };
 
 struct ColumnAttributeNavi
@@ -87,7 +87,7 @@ struct ColumnAttributeNavi
     ColumnAttributeNavi() {}
     ColumnAttributeNavi(ColumnTypeNavi type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
-    ColumnTypeNavi type_    = ColumnTypeNavi::DIRECTORY;
+    ColumnTypeNavi type_    = ColumnTypeNavi::FOLDER_NAME;
     int            offset_  = 0;
     int            stretch_ = 0;;
     bool           visible_ = false;
@@ -97,17 +97,17 @@ struct ColumnAttributeNavi
 inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
-    return
+    return //harmonize with tree_view.cpp::onGridLabelContext() => expects stretched FOLDER_NAME and non-stretched other columns!
     {
-        { ColumnTypeNavi::DIRECTORY, -120, 1, true }, //stretch to full width and substract sum of fixed size widths
-        { ColumnTypeNavi::ITEM_COUNT,  60, 0, true },
-        { ColumnTypeNavi::BYTES,       60, 0, true }, //GTK needs a few pixels more width
+        { ColumnTypeNavi::FOLDER_NAME, -120, 1, true }, //stretch to full width and substract sum of fixed size widths
+        { ColumnTypeNavi::ITEM_COUNT,    60, 0, true },
+        { ColumnTypeNavi::BYTES,         60, 0, true }, //GTK needs a few pixels more width
     };
 }
 
-const           bool naviGridShowPercentageDefault = true;
-const ColumnTypeNavi naviGridLastSortColumnDefault = ColumnTypeNavi::BYTES; //remember sort on navigation panel
-const           bool naviGridLastSortAscendingDefault = false;              //
+const           bool naviGridShowPercentageDefault    = true;
+const ColumnTypeNavi naviGridLastSortColumnDefault    = ColumnTypeNavi::BYTES; //remember sort on navigation panel
+const           bool naviGridLastSortAscendingDefault = false;                 //
 }
 
 #endif //COLUMN_ATTR_H_189467891346732143213

@@ -17,7 +17,7 @@
 #include <wx+/http.h>
 #include <wx+/image_resources.h>
 #include "../lib/ffs_paths.h"
-#include "version_check_impl.h"
+#include "small_dlgs.h"
 
 
 using namespace zen;
@@ -26,17 +26,21 @@ using namespace zen;
 namespace
 {
 
+const wchar_t ffsUpdateCheckUserAgent[] = L"FFS-Update-Check";
+
 
 std::wstring getIso639Language()
 {
     assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, consider wxWidgets usage
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
-    if (localeName.empty())
-        return std::wstring();
-
-    assert(beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL).size() == 2);
-    return beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL);
+    if (!localeName.empty())
+    {
+        assert(beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL).size() == 2);
+        return beforeLast(localeName, L"_", IF_MISSING_RETURN_ALL);
+    }
+    assert(false);
+    return L"zz";
 }
 
 
@@ -45,10 +49,13 @@ std::wstring getIso3166Country()
     assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, consider wxWidgets usage
 
     const std::wstring localeName(wxLocale::GetLanguageCanonicalName(wxLocale::GetSystemLanguage()));
-    if (localeName.empty())
-        return std::wstring();
-
-    return afterLast(localeName, L"_", IF_MISSING_RETURN_NONE);
+    if (!localeName.empty())
+    {
+        if (contains(localeName, L"_"))
+            return afterLast(localeName, L"_", IF_MISSING_RETURN_NONE);
+    }
+    assert(false);
+    return L"ZZ";
 }
 
 
@@ -58,7 +65,7 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
     assert(std::this_thread::get_id() == mainThreadId); //this function is not thread-safe, e.g. consider wxWidgets usage in isPortableVersion()
     std::vector<std::pair<std::string, std::string>> params;
 
-    params.emplace_back("ffs_version", utfCvrtTo<std::string>(zen::ffsVersion));
+    params.emplace_back("ffs_version", zen::ffsVersion);
     params.emplace_back("ffs_type", isPortableVersion() ? "Portable" : "Local");
 
     params.emplace_back("os_name", "Linux");
@@ -80,53 +87,39 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
     params.emplace_back("os_arch", "64");
 #endif
 
-    const std::string isoLang    = utfCvrtTo<std::string>(getIso639Language());
-    const std::string isoCountry = utfCvrtTo<std::string>(getIso3166Country());
-
-    params.emplace_back("language", !isoLang   .empty() ? isoLang    : "zz");
-    params.emplace_back("country" , !isoCountry.empty() ? isoCountry : "ZZ");
+    params.emplace_back("language", utfCvrtTo<std::string>(getIso639Language()));
+    params.emplace_back("country" , utfCvrtTo<std::string>(getIso3166Country()));
 
     return params;
 }
 
 
-//access is thread-safe on Windows (WinInet), but not on Linux/OS X (wxWidgets)
-std::wstring getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
+
+
+void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersion)
 {
-    //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
-    const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", L"FFS-Update-Check", postParams); //throw SysError
-    const auto version = utfCvrtTo<std::wstring>(buffer);
-    return trimCpy(version);
-}
-
-
-std::vector<size_t> parseVersion(const std::wstring& version)
-{
-    std::vector<size_t> output;
-    for (const std::wstring& digit : split(version, FFS_VERSION_SEPARATOR))
-        output.push_back(stringTo<size_t>(digit));
-    return output;
-}
-
-
-std::wstring getOnlineChangelogDelta()
-{
-    try //harmonize with wxHTTP: get_latest_changes.php must be accessible without https!!!
+    std::wstring updateDetailsMsg;
+    try
     {
-        const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", L"FFS-Update-Check", { { "since", utfCvrtTo<std::string>(zen::ffsVersion) } }); //throw SysError
-        return utfCvrtTo<std::wstring>(buffer);
+        try //harmonize with wxHTTP: get_latest_changes.php must be accessible without https!!!
+        {
+            const std::string buf = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", ffsUpdateCheckUserAgent,
+            { { "since", zen::ffsVersion } }).readAll(); //throw SysError
+            updateDetailsMsg = utfCvrtTo<std::wstring>(buf);
+        }
+        catch (const zen::SysError& e) { throw FileError(_("Failed to retrieve update information."), e.toString()); }
+
     }
-    catch (zen::SysError&) { assert(false); return std::wstring(); }
-}
+    catch (const FileError& e) //fall back to regular update info dialog:
+    {
+        updateDetailsMsg = e.toString() + L"\n\n" + updateDetailsMsg;
+    }
 
-
-void showUpdateAvailableDialog(wxWindow* parent, const std::wstring& onlineVersion, const std::wstring& onlineChangeLog)
-{
     switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
-                                   setIcon(getResourceImage(L"download_update")).
+                                   setIcon(getResourceImage(L"update_available")).
                                    setTitle(_("Check for Program Updates")).
-                                   setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n" + _("Download now?")).
-                                   setDetailInstructions(onlineChangeLog),
+                                   setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + utfCvrtTo<std::wstring>(onlineVersion) + L"\n" + _("Download now?")).
+                                   setDetailInstructions(updateDetailsMsg),
                                    _("&Download")))
     {
         case ConfirmationButton::DO_IT:
@@ -136,13 +129,31 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::wstring& onlineVersi
             break;
     }
 }
+
+
+//access is thread-safe on Windows (WinInet), but not on Linux/OS X (wxWidgets)
+std::string getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
+{
+    //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
+    const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", ffsUpdateCheckUserAgent, postParams).readAll(); //throw SysError
+    return trimCpy(buffer);
 }
 
 
-bool zen::haveNewerVersionOnline(const std::wstring& onlineVersion)
+std::vector<size_t> parseVersion(const std::string& version)
 {
-    std::vector<size_t> current = parseVersion(zen::ffsVersion);
-    std::vector<size_t> online  = parseVersion(onlineVersion);
+    std::vector<size_t> output;
+    for (const std::string& digit : split(version, FFS_VERSION_SEPARATOR))
+        output.push_back(stringTo<size_t>(digit));
+    return output;
+}
+}
+
+
+bool zen::haveNewerVersionOnline(const std::string& onlineVersion)
+{
+    const std::vector<size_t> current = parseVersion(zen::ffsVersion);
+    const std::vector<size_t> online  = parseVersion(onlineVersion);
 
     if (online.empty() || online[0] == 0) //online version string may be "This website has been moved..." In this case better check for an update
         return true;
@@ -164,18 +175,18 @@ void zen::disableUpdateCheck(time_t& lastUpdateCheck)
 }
 
 
-void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog)
+void zen::checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion)
 {
     try
     {
-        const std::wstring onlineVersion = getOnlineVersion(geHttpPostParameters()); //throw SysError
-        lastOnlineVersion   = onlineVersion;
-        lastOnlineChangeLog = haveNewerVersionOnline(onlineVersion) ? getOnlineChangelogDelta() : L"";
+        const std::string onlineVersion = getOnlineVersion(geHttpPostParameters()); //throw SysError
+        lastOnlineVersion = onlineVersion;
 
         if (haveNewerVersionOnline(onlineVersion))
-            showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
+            showUpdateAvailableDialog(parent, lastOnlineVersion);
         else
             showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
+                                   setIcon(getResourceImage(L"update_check")).
                                    setTitle(_("Check for Program Updates")).
                                    setMainInstructions(_("FreeFileSync is up to date.")));
     }
@@ -183,8 +194,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::wstring& lastOnlineVersion, s
     {
         if (internetIsAlive())
         {
-            lastOnlineVersion = L"Unknown";
-            lastOnlineChangeLog.clear();
+            lastOnlineVersion = "Unknown";
 
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
@@ -224,9 +234,9 @@ std::shared_ptr<UpdateCheckResultPrep> zen::periodicUpdateCheckPrepare()
 struct zen::UpdateCheckResult
 {
     UpdateCheckResult() {}
-    UpdateCheckResult(const std::wstring& ver, const Opt<zen::SysError>& err, bool alive)  : onlineVersion(ver), error(err), internetIsAlive(alive) {}
+    UpdateCheckResult(const std::string& ver, const Opt<zen::SysError>& err, bool alive)  : onlineVersion(ver), error(err), internetIsAlive(alive) {}
 
-    std::wstring onlineVersion;
+    std::string onlineVersion;
     Opt<zen::SysError> error;
     bool internetIsAlive = false;
 };
@@ -239,7 +249,7 @@ std::shared_ptr<UpdateCheckResult> zen::periodicUpdateCheckRunAsync(const Update
 
 
 //run on main thread:
-void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::wstring& lastOnlineVersion, std::wstring& lastOnlineChangeLog, const UpdateCheckResult* resultAsync)
+void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion, const UpdateCheckResult* resultAsync)
 {
     UpdateCheckResult result;
     try
@@ -255,19 +265,17 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
 
     if (!result.error)
     {
-        lastUpdateCheck     = getVersionCheckCurrentTime();
-        lastOnlineVersion   = result.onlineVersion;
-        lastOnlineChangeLog = haveNewerVersionOnline(result.onlineVersion) ? getOnlineChangelogDelta() : L"";
+        lastUpdateCheck   = getVersionCheckCurrentTime();
+        lastOnlineVersion = result.onlineVersion;
 
         if (haveNewerVersionOnline(result.onlineVersion))
-            showUpdateAvailableDialog(parent, lastOnlineVersion, lastOnlineChangeLog);
+            showUpdateAvailableDialog(parent, lastOnlineVersion);
     }
     else
     {
         if (result.internetIsAlive)
         {
-            lastOnlineVersion = L"Unknown";
-            lastOnlineChangeLog.clear();
+            lastOnlineVersion = "Unknown";
 
             switch (showConfirmationDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
                                            setTitle(_("Check for Program Updates")).
@@ -285,3 +293,5 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
         //else: ignore this error
     }
 }
+
+

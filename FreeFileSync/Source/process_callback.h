@@ -12,7 +12,7 @@
 
 
 //interface for comparison and synchronization process status updates (used by GUI or Batch mode)
-const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary,
+const int UI_UPDATE_INTERVAL_MS = 100; //unit: [ms]; perform ui updates not more often than necessary,
 //100 seems to be a good value with only a minimal performance loss; also used by Win 7 copy progress bar
 //this one is required by async directory existence check!
 

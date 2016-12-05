@@ -18,7 +18,6 @@
 #include "synchronization.h"
 #include "ui/batch_status_handler.h"
 #include "ui/main_dlg.h"
-#include "ui/switch_to_gui.h"
 #include "lib/help_provider.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
@@ -53,7 +52,7 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 bool Application::OnInit()
 {
     ::gtk_init(nullptr, nullptr);
-    //::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
+    //::gtk_rc_parse((getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::Enable(true); //yawn, a wxWidgets screw-up: wxToolTip::SetAutoPop is no-op if global tooltip window is not yet constructed: wxToolTip::Enable creates it
@@ -61,17 +60,24 @@ bool Application::OnInit()
 
     SetAppName(L"FreeFileSync"); //if not set, the default is the executable's name!
 
-    initResourceImages(getResourceDir() + Zstr("Resources.zip"));
+    initResourceImages(getResourceDirPf() + Zstr("Resources.zip"));
+
+    try
+    {
+        //tentatively set program language to OS default until GlobalSettings.xml is read later
+        setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
+    }
+    catch (const FileError&) { assert(false); }
 
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
+
 
     //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
 
     //Note: app start is deferred: batch mode requires the wxApp eventhandler to be established for UI update events. This is not the case at the time of OnInit()!
     Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
     AddPendingEvent(wxCommandEvent(EVENT_ENTER_EVENT_LOOP));
-
     return true; //true: continue processing; false: exit immediately.
 }
 
@@ -136,13 +142,6 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     //wxWidgets app exit handling is weird... we want to exit only if the logical main window is closed, not just *any* window!
     wxTheApp->SetExitOnFrameDelete(false); //prevent popup-windows from becoming temporary top windows leading to program exit after closure
     ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) wxTheApp->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
-
-    try
-    {
-        //tentatively set program language to OS default until GlobalSettings.xml is read later
-        setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
-    }
-    catch (const FileError&) { assert(false); }
 
     auto notifyFatalError = [&](const std::wstring& msg, const std::wstring& title)
     {
@@ -473,10 +472,8 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
     {
         const TimeComp timeStamp = localTime();
 
-        const SwitchToGui switchBatchToGui(globalConfigFile, globalCfg, referenceFile, batchCfg); //prepare potential operational switch
-
         //class handling status updates and error messages
-        BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess
+        BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess, BatchRequestSwitchToMainDialog
                                          extractJobName(referenceFile),
                                          globalCfg.soundFileSyncFinished,
                                          timeStamp,
@@ -486,7 +483,6 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                                          batchCfg.handleError,
                                          globalCfg.automaticRetryCount,
                                          globalCfg.automaticRetryDelay,
-                                         switchBatchToGui,
                                          returnCode,
                                          batchCfg.mainCfg.onCompletion,
                                          globalCfg.gui.onCompletionHistory);
@@ -518,7 +514,7 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                                              globalCfg.createLockFile,
                                              dirLocks,
                                              cmpConfig,
-                                             statusHandler);
+                                             statusHandler); //throw ?
 
         //START SYNCHRONIZATION
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
@@ -535,9 +531,14 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
                     globalCfg.folderAccessTimeout,
                     syncProcessCfg,
                     cmpResult,
-                    statusHandler);
+                    statusHandler); //throw ?
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler
+    catch (BatchRequestSwitchToMainDialog&)
+    {
+        //open new toplevel window *after* progress dialog is gone => run on main event loop
+        return MainDialog::create(globalConfigFile, &globalCfg, xmlAccess::convertBatchToGui(batchCfg), { referenceFile }, true /*startComparison*/);
+    }
 
     try //save global settings to XML: e.g. ignored warnings
     {

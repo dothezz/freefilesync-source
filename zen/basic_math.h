@@ -18,7 +18,7 @@
 namespace numeric
 {
 template <class T> T abs(T value);
-template <class T> T dist(T a, T b);
+template <class T> auto dist(T a, T b);
 template <class T> int sign(T value); //returns one of {-1, 0, 1}
 template <class T> T min(T a, T b, T c);
 template <class T> T max(T a, T b, T c);
@@ -90,7 +90,7 @@ T abs(T value)
 }
 
 template <class T> inline
-T dist(T a, T b)
+auto dist(T a, T b) //return type might be different than T, e.g. std::chrono::duration instead of std::chrono::time_point
 {
     return a > b ? a - b : b - a;
 }

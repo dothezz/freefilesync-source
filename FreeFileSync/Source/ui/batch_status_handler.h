@@ -10,18 +10,17 @@
 #include <zen/error_log.h>
 #include <zen/time.h>
 #include "progress_indicator.h"
-#include "switch_to_gui.h"
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
 #include "../lib/return_codes.h"
 
 
-//Exception class used to abort the "compare" and "sync" process
+//Exception classes used to abort the "compare" and "sync" process
 class BatchAbortProcess {};
-
+class BatchRequestSwitchToMainDialog {};
 
 //BatchStatusHandler(SyncProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
-class BatchStatusHandler : public zen::StatusHandler //throw BatchAbortProcess
+class BatchStatusHandler : public zen::StatusHandler //throw BatchAbortProcess, BatchRequestSwitchToMainDialog
 {
 public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
@@ -34,7 +33,6 @@ public:
                        const xmlAccess::OnError handleError,
                        size_t automaticRetryCount,
                        size_t automaticRetryDelay,
-                       const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        zen::FfsReturnCode& returnCode,
                        const Zstring& onCompletion,
                        std::vector<Zstring>& onCompletionHistory);
@@ -54,23 +52,22 @@ public:
 private:
     void onProgressDialogTerminate();
 
-    const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
-    bool showFinalResults;
-    bool switchToGuiRequested = false;
+    bool showFinalResults_;
+    bool switchToGuiRequested_ = false;
     const int logfilesCountLimit_;
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnError handleError_;
-    zen::ErrorLog errorLog; //list of non-resolved errors and warnings
+    zen::ErrorLog errorLog_; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;
 
     const size_t automaticRetryCount_;
     const size_t automaticRetryDelay_;
 
-    SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
+    SyncProgressDialog* progressDlg_; //managed to have shorter lifetime than this handler!
 
     const std::wstring jobName_;
     const zen::TimeComp timeStamp_;
-    const time_t startTime_; //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
+    const time_t startTime_ = std::time(nullptr); //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
 
     const Zstring logFolderPathPhrase_;
 };

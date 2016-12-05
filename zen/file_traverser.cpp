@@ -41,7 +41,7 @@ void zen::traverseFolder(const Zstring& dirPath,
         {
             struct ::dirent* dirEntry = nullptr;
             if (::readdir_r(folder, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r");
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r");
             //don't retry but restart dir traversal on error! https://blogs.msdn.microsoft.com/oldnewthing/20140612-00/?p=753/
 
             if (!dirEntry) //no more items
@@ -56,7 +56,7 @@ void zen::traverseFolder(const Zstring& dirPath,
 
             const Zstring& itemName = itemNameRaw;
             if (itemName.empty()) //checks result of osx::normalizeUtfForPosix, too!
-                throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item with empty name.");
+                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item with empty name.");
 
             const Zstring& itemPath = appendSeparator(dirPath) + itemName;
 

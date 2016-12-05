@@ -39,7 +39,7 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-    ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((zen::getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::Enable(true); //yawn, a wxWidgets screw-up: wxToolTip::SetAutoPop is no-op if global tooltip window is not yet constructed: wxToolTip::Enable creates it
@@ -47,7 +47,18 @@ bool Application::OnInit()
 
     SetAppName(L"RealTimeSync");
 
-    initResourceImages(getResourceDir() + Zstr("Resources.zip"));
+    initResourceImages(getResourceDirPf() + Zstr("Resources.zip"));
+
+    try
+    {
+        setLanguage(xmlAccess::getProgramLanguage()); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        warn_static("Bug? (exit on frame delete)")
+        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
+        //continue!
+    }
 
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
@@ -58,7 +69,6 @@ bool Application::OnInit()
     Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
     wxCommandEvent scrollEvent(EVENT_ENTER_EVENT_LOOP);
     AddPendingEvent(scrollEvent);
-
     return true; //true: continue processing; false: exit immediately.
 }
 
@@ -75,17 +85,6 @@ int Application::OnExit()
 void Application::onEnterEventLoop(wxEvent& event)
 {
     Disconnect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
-
-    try
-    {
-        wxLanguage lngId = xmlAccess::getProgramLanguage();
-        setLanguage(lngId); //throw FileError
-    }
-    catch (const FileError& e)
-    {
-        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
-        //continue!
-    }
 
     //try to set config/batch- filepath set by %1 parameter
     std::vector<Zstring> commandArgs;

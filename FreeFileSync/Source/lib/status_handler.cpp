@@ -5,21 +5,22 @@
 // *****************************************************************************
 
 #include "status_handler.h"
-#include <zen/tick_count.h>
+#include <chrono>
+#include <zen/basic_math.h>
 
 using namespace zen;
 
 
 namespace
 {
-const std::int64_t TICKS_UPDATE_INTERVAL = UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
-TickVal lastExec = getTicks();
+std::chrono::steady_clock::time_point lastExec;
 };
 
 bool zen::updateUiIsAllowed()
 {
-    const TickVal now = getTicks(); //0 on error
-    if (dist(lastExec, now) >= TICKS_UPDATE_INTERVAL) //perform ui updates not more often than necessary
+    const auto now = std::chrono::steady_clock::now();
+
+    if (numeric::dist(now, lastExec) > std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS)) //handle potential chrono wrap-around!
     {
         lastExec = now;
         return true;

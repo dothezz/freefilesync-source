@@ -24,6 +24,7 @@ namespace zen
 {
 template <class Char> bool isWhiteSpace(Char ch);
 template <class Char> bool isDigit     (Char ch); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
+template <class Char> bool isHexDigit  (Char ch);
 template <class Char> bool isAlpha     (Char ch);
 
 template <class S, class T> bool startsWith(const S& str, const T& prefix);  //
@@ -50,6 +51,9 @@ template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldT
 //high-performance conversion between numbers and strings
 template <class S,   class Num> S   numberTo(const Num& number);
 template <class Num, class S  > Num stringTo(const S&   str);
+
+std::pair<char, char> hexify  (unsigned char c, bool upperCase = true);
+char                  unhexify(char high, char low);
 
 template <class S, class T, class Num> S printNumber(const T& format, const Num& number); //format a single number using std::snprintf()
 
@@ -98,6 +102,16 @@ bool isDigit(Char ch) //similar to implmenetation of std::::isdigit()!
 {
     static_assert(IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value, "");
     return static_cast<Char>('0') <= ch && ch <= static_cast<Char>('9');
+}
+
+
+template <class Char> inline
+bool isHexDigit(Char c)
+{
+    static_assert(IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value, "");
+    return (static_cast<Char>('0') <= c && c <= static_cast<Char>('9')) ||
+           (static_cast<Char>('A') <= c && c <= static_cast<Char>('F')) ||
+           (static_cast<Char>('a') <= c && c <= static_cast<Char>('f'));
 }
 
 
@@ -297,7 +311,7 @@ S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
         return str;
 
     const auto* const newBegin = strBegin(newTerm);
-	const auto* const newEnd   = newBegin + strLength(newTerm);
+    const auto* const newEnd   = newBegin + strLength(newTerm);
     S output;
 
     for (;;)
@@ -657,6 +671,42 @@ Num stringTo(const S& str)
                     impl::NUM_TYPE_OTHER>;
 
     return impl::stringTo<Num>(str, TypeTag());
+}
+
+
+inline //hexify beats "printNumber<std::string>("%02X", c)" by a nice factor of 3!
+std::pair<char, char> hexify(unsigned char c, bool upperCase)
+{
+    auto hexifyDigit = [upperCase](int num) -> char //input [0, 15], output 0-9, A-F
+    {
+        assert(0 <= num&& num <= 15);  //guaranteed by design below!
+        if (num <= 9)
+            return static_cast<char>('0' + num); //no signed/unsigned char problem here!
+
+        if (upperCase)
+            return static_cast<char>('A' + (num - 10));
+        else
+            return static_cast<char>('a' + (num - 10));
+    };
+    return std::make_pair(hexifyDigit(c / 16), hexifyDigit(c % 16));
+}
+
+
+inline //unhexify beats "::sscanf(&it[3], "%02X", &tmp)" by a factor of 3000 for ~250000 calls!!!
+char unhexify(char high, char low)
+{
+    auto unhexifyDigit = [](char hex) -> int //input 0-9, a-f, A-F; output range: [0, 15]
+    {
+        if ('0' <= hex && hex <= '9') //no signed/unsigned char problem here!
+            return hex - '0';
+        else if ('A' <= hex && hex <= 'F')
+            return (hex - 'A') + 10;
+        else if ('a' <= hex && hex <= 'f')
+            return (hex - 'a') + 10;
+        assert(false);
+        return 0;
+    };
+    return static_cast<unsigned char>(16 * unhexifyDigit(high) + unhexifyDigit(low)); //[!] convert to unsigned char first, then to char (which may be signed)
 }
 }
 

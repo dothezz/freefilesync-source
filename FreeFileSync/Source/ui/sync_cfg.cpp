@@ -66,9 +66,9 @@ private:
     void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"daylight-saving-time", this); }
 
     void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
-    void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar = CompareVariant::TIME_SIZE; updateCompGui(); updateSyncGui(); } //
-    void OnCompByContent          (wxCommandEvent& event) override { localCmpVar = CompareVariant::CONTENT;   updateCompGui(); updateSyncGui(); } //affects sync settings, too!
-    void OnCompBySize             (wxCommandEvent& event) override { localCmpVar = CompareVariant::SIZE;      updateCompGui(); updateSyncGui(); } //
+    void OnCompByTimeSize         (wxCommandEvent& event) override { localCmpVar_ = CompareVariant::TIME_SIZE; updateCompGui(); updateSyncGui(); } //
+    void OnCompByContent          (wxCommandEvent& event) override { localCmpVar_ = CompareVariant::CONTENT;   updateCompGui(); updateSyncGui(); } //affects sync settings, too!
+    void OnCompBySize             (wxCommandEvent& event) override { localCmpVar_ = CompareVariant::SIZE;      updateCompGui(); updateSyncGui(); } //
     void OnCompByTimeSizeDouble   (wxMouseEvent&   event) override;
     void OnCompBySizeDouble       (wxMouseEvent&   event) override;
     void OnCompByContentDouble    (wxMouseEvent&   event) override;
@@ -80,7 +80,7 @@ private:
 
     void updateCompGui();
 
-    CompareVariant localCmpVar = CompareVariant::TIME_SIZE;
+    CompareVariant localCmpVar_ = CompareVariant::TIME_SIZE;
 
     //------------- filter panel --------------------------
     void OnHelpShowExamples(wxHyperlinkEvent& event) override { displayHelpEntry(L"exclude-items", this); }
@@ -94,17 +94,17 @@ private:
 
     void updateFilterGui();
 
-    EnumDescrList<UnitTime> enumTimeDescr;
-    EnumDescrList<UnitSize> enumSizeDescr;
+    EnumDescrList<UnitTime> enumTimeDescr_;
+    EnumDescrList<UnitSize> enumSizeDescr_;
 
     //------------- synchronization panel -----------------
-    void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::TWO_WAY; updateSyncGui(); }
-    void OnSyncMirror(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::MIRROR;  updateSyncGui(); }
-    void OnSyncUpdate(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::UPDATE;  updateSyncGui(); }
-    void OnSyncCustom(wxCommandEvent& event) override { directionCfg.var = DirectionConfig::CUSTOM;  updateSyncGui(); }
+    void OnSyncTwoWay(wxCommandEvent& event) override { directionCfg_.var = DirectionConfig::TWO_WAY; updateSyncGui(); }
+    void OnSyncMirror(wxCommandEvent& event) override { directionCfg_.var = DirectionConfig::MIRROR;  updateSyncGui(); }
+    void OnSyncUpdate(wxCommandEvent& event) override { directionCfg_.var = DirectionConfig::UPDATE;  updateSyncGui(); }
+    void OnSyncCustom(wxCommandEvent& event) override { directionCfg_.var = DirectionConfig::CUSTOM;  updateSyncGui(); }
 
     void OnToggleLocalSyncSettings(wxCommandEvent& event) override { updateSyncGui(); }
-    void OnToggleDetectMovedFiles (wxCommandEvent& event) override { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateSyncGui(); } //parameter NOT owned by checkbox!
+    void OnToggleDetectMovedFiles (wxCommandEvent& event) override { directionCfg_.detectMovedFiles = !directionCfg_.detectMovedFiles; updateSyncGui(); } //parameter NOT owned by checkbox!
     void OnChangeSyncOption       (wxCommandEvent& event) override { updateSyncGui(); }
 
     void OnSyncTwoWayDouble(wxMouseEvent& event) override;
@@ -119,11 +119,11 @@ private:
     void OnDifferent      (wxCommandEvent& event) override;
     void OnConflict       (wxCommandEvent& event) override;
 
-    void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::PERMANENT;  updateSyncGui(); }
-    void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::RECYCLER;   updateSyncGui(); }
-    void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion = DeletionPolicy::VERSIONING; updateSyncGui(); }
+    void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::PERMANENT;  updateSyncGui(); }
+    void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::RECYCLER;   updateSyncGui(); }
+    void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::VERSIONING; updateSyncGui(); }
 
-    void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion); updateSyncGui(); }
+    void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion_); updateSyncGui(); }
 
     void OnHelpDetectMovedFiles(wxHyperlinkEvent& event) override { displayHelpEntry(L"synchronization-settings" , this); }
     void OnHelpVersioning      (wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning", this); }
@@ -135,8 +135,8 @@ private:
 
     //-----------------------------------------------------
 
-    void OnErrorPopup (wxCommandEvent& event) override { onGuiError = ON_GUIERROR_POPUP;  updateMiscGui(); } //parameter NOT owned by radio button
-    void OnErrorIgnore(wxCommandEvent& event) override { onGuiError = ON_GUIERROR_IGNORE; updateMiscGui(); } //
+    void OnErrorPopup (wxCommandEvent& event) override { onGuiError_ = ON_GUIERROR_POPUP;  updateMiscGui(); } //parameter NOT owned by radio button
+    void OnErrorIgnore(wxCommandEvent& event) override { onGuiError_ = ON_GUIERROR_IGNORE; updateMiscGui(); } //
 
     MiscSyncConfig getMiscSyncOptions() const;
     void setMiscSyncOptions(const MiscSyncConfig& miscCfg);
@@ -144,12 +144,12 @@ private:
     void updateMiscGui();
 
     //parameters with ownership NOT within GUI controls!
-    DirectionConfig directionCfg;
-    DeletionPolicy handleDeletion = DeletionPolicy::RECYCLER; //use Recycler, delete permanently or move to user-defined location
-    OnGuiError onGuiError = ON_GUIERROR_POPUP;
+    DirectionConfig directionCfg_;
+    DeletionPolicy handleDeletion_ = DeletionPolicy::RECYCLER; //use Recycler, delete permanently or move to user-defined location
+    OnGuiError onGuiError_ = ON_GUIERROR_POPUP;
 
-    EnumDescrList<VersioningStyle> enumVersioningStyle;
-    FolderSelector versioningFolder;
+    EnumDescrList<VersioningStyle> enumVersioningStyle_;
+    FolderSelector versioningFolder_;
 
     //-----------------------------------------------------
 
@@ -157,14 +157,14 @@ private:
     bool unselectFolderPairConfig(); //returns false on error: shows message box!
 
     //output-only parameters
-    GlobalSyncConfig& globalCfgOut;
-    std::vector<LocalPairConfig>& folderPairConfigOut;
+    GlobalSyncConfig& globalCfgOut_;
+    std::vector<LocalPairConfig>& folderPairConfigOut_;
 
     //working copy of ALL config parameters: only one folder pair is selected at a time!
     GlobalSyncConfig globalCfg_;
     std::vector<LocalPairConfig> folderPairConfig_;
 
-    int selectedPairIndexToShow = EMPTY_PAIR_INDEX_SELECTED;
+    int selectedPairIndexToShow_ = EMPTY_PAIR_INDEX_SELECTED;
     static const int EMPTY_PAIR_INDEX_SELECTED = -2;
 
     const size_t onCompletionHistoryMax_;
@@ -213,9 +213,9 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
                            GlobalSyncConfig& globalCfg,
                            size_t onCompletionHistoryMax) :
     ConfigDlgGenerated(parent),
-    versioningFolder(*m_panelVersioning, *m_buttonSelectVersioningFolder, *m_bpButtonSelectAltFolder, *m_versioningFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/),
-    globalCfgOut(globalCfg),
-    folderPairConfigOut(folderPairConfig),
+    versioningFolder_(*m_panelVersioning, *m_buttonSelectVersioningFolder, *m_bpButtonSelectAltFolder, *m_versioningFolderPath, nullptr /*staticText*/, nullptr /*dropWindow2*/),
+    globalCfgOut_(globalCfg),
+    folderPairConfigOut_(folderPairConfig),
     globalCfg_(globalCfg),
     folderPairConfig_(folderPairConfig),
     onCompletionHistoryMax_(onCompletionHistoryMax)
@@ -269,7 +269,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
     m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(ConfigDialog::onFilterKeyEvent), nullptr, this);
 
-    enumTimeDescr.
+    enumTimeDescr_.
     add(UnitTime::NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
     add(UnitTime::TODAY,       _("Today")).
     //add(UnitTime::THIS_WEEK,   _("This week")).
@@ -277,7 +277,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     add(UnitTime::THIS_YEAR,   _("This year")).
     add(UnitTime::LAST_X_DAYS, _("Last x days"));
 
-    enumSizeDescr.
+    enumSizeDescr_.
     add(UnitSize::NONE, L"(" + _("None") + L")"). //meta options should be enclosed in parentheses
     add(UnitSize::BYTE, _("Byte")).
     add(UnitSize::KB,   _("KB")).
@@ -306,7 +306,7 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnUpdate, 1.25);
     setRelativeFontSize(*m_toggleBtnCustom, 1.25);
 
-    enumVersioningStyle.
+    enumVersioningStyle_.
     add(VersioningStyle::REPLACE,       _("Replace"),    _("Move files and replace if existing")).
     add(VersioningStyle::ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
@@ -431,7 +431,7 @@ void ConfigDialog::OnSelectFolderPair(wxCommandEvent& event)
     if (!unselectFolderPairConfig())
     {
         //restore old selection:
-        m_listBoxFolderPair->SetSelection(selectedPairIndexToShow + 1);
+        m_listBoxFolderPair->SetSelection(selectedPairIndexToShow_ + 1);
         return;
     }
     selectFolderPairConfig(selPos - 1);
@@ -480,7 +480,7 @@ std::shared_ptr<const CompConfig> ConfigDialog::getCompConfig() const
         return nullptr;
 
     CompConfig compCfg;
-    compCfg.compareVar = localCmpVar;
+    compCfg.compareVar = localCmpVar_;
     compCfg.handleSymlinks = !m_checkBoxSymlinksInclude->GetValue() ? SymLinkHandling::EXCLUDE : m_radioBtnSymlinksDirect->GetValue() ? SymLinkHandling::DIRECT : SymLinkHandling::FOLLOW;
     compCfg.ignoreTimeShiftMinutes = fromTimeShiftPhrase(copyStringTo<std::wstring>(m_textCtrlTimeShift->GetValue()));
 
@@ -495,7 +495,7 @@ void ConfigDialog::setCompConfig(std::shared_ptr<const CompConfig> compCfg)
     if (!compCfg) //when local settings are inactive, display (current) global settings instead:
         compCfg = std::make_shared<const CompConfig>(globalCfg_.cmpConfig);
 
-    localCmpVar = compCfg->compareVar;
+    localCmpVar_ = compCfg->compareVar;
 
     switch (compCfg->handleSymlinks)
     {
@@ -532,7 +532,7 @@ void ConfigDialog::updateCompGui()
     m_toggleBtnByContent ->SetValue(false);
 
     if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
-        switch (localCmpVar)
+        switch (localCmpVar_)
         {
             case CompareVariant::TIME_SIZE:
                 m_toggleBtnByTimeSize->SetValue(true);
@@ -553,12 +553,12 @@ void ConfigDialog::updateCompGui()
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
-    setBitmap(*m_bitmapByTimeSize, localCmpVar == CompareVariant::TIME_SIZE, getResourceImage(L"file-time"));
-    setBitmap(*m_bitmapByContent,  localCmpVar == CompareVariant::CONTENT,   getResourceImage(L"file-content"));
-    setBitmap(*m_bitmapBySize,     localCmpVar == CompareVariant::SIZE,      getResourceImage(L"file-size"));
+    setBitmap(*m_bitmapByTimeSize, localCmpVar_ == CompareVariant::TIME_SIZE, getResourceImage(L"file-time"));
+    setBitmap(*m_bitmapByContent,  localCmpVar_ == CompareVariant::CONTENT,   getResourceImage(L"file-content"));
+    setBitmap(*m_bitmapBySize,     localCmpVar_ == CompareVariant::SIZE,      getResourceImage(L"file-size"));
 
     //active variant description:
-    setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar));
+    setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar_));
 
     m_radioBtnSymlinksDirect->Enable(m_checkBoxSymlinksInclude->GetValue());
     m_radioBtnSymlinksFollow->Enable(m_checkBoxSymlinksInclude->GetValue());
@@ -590,11 +590,11 @@ FilterConfig ConfigDialog::getFilterConfig() const
 
     return FilterConfig(includeFilter, exludeFilter,
                         m_spinCtrlTimespan->GetValue(),
-                        getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
+                        getEnumVal(enumTimeDescr_, *m_choiceUnitTimespan),
                         m_spinCtrlMinSize->GetValue(),
-                        getEnumVal(enumSizeDescr, *m_choiceUnitMinSize),
+                        getEnumVal(enumSizeDescr_, *m_choiceUnitMinSize),
                         m_spinCtrlMaxSize->GetValue(),
-                        getEnumVal(enumSizeDescr, *m_choiceUnitMaxSize));
+                        getEnumVal(enumSizeDescr_, *m_choiceUnitMaxSize));
 }
 
 
@@ -603,9 +603,9 @@ void ConfigDialog::setFilterConfig(const FilterConfig& filter)
     m_textCtrlInclude->ChangeValue(utfCvrtTo<wxString>(filter.includeFilter));
     m_textCtrlExclude->ChangeValue(utfCvrtTo<wxString>(filter.excludeFilter));
 
-    setEnumVal(enumTimeDescr, *m_choiceUnitTimespan, filter.unitTimeSpan);
-    setEnumVal(enumSizeDescr, *m_choiceUnitMinSize,  filter.unitSizeMin);
-    setEnumVal(enumSizeDescr, *m_choiceUnitMaxSize,  filter.unitSizeMax);
+    setEnumVal(enumTimeDescr_, *m_choiceUnitTimespan, filter.unitTimeSpan);
+    setEnumVal(enumSizeDescr_, *m_choiceUnitMinSize,  filter.unitSizeMin);
+    setEnumVal(enumSizeDescr_, *m_choiceUnitMaxSize,  filter.unitSizeMax);
 
     m_spinCtrlTimespan->SetValue(static_cast<int>(filter.timeSpan));
     m_spinCtrlMinSize ->SetValue(static_cast<int>(filter.sizeMin));
@@ -733,42 +733,42 @@ void toggleCustomSyncConfig(DirectionConfig& directionCfg, SyncDirection& custSy
 
 void ConfigDialog::OnExLeftSideOnly(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.exLeftSideOnly);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.exLeftSideOnly);
     updateSyncGui();
 }
 
 
 void ConfigDialog::OnExRightSideOnly(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.exRightSideOnly);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.exRightSideOnly);
     updateSyncGui();
 }
 
 
 void ConfigDialog::OnLeftNewer(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.leftNewer);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.leftNewer);
     updateSyncGui();
 }
 
 
 void ConfigDialog::OnRightNewer(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.rightNewer);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.rightNewer);
     updateSyncGui();
 }
 
 
 void ConfigDialog::OnDifferent(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.different);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.different);
     updateSyncGui();
 }
 
 
 void ConfigDialog::OnConflict(wxCommandEvent& event)
 {
-    toggleCustomSyncConfig(directionCfg, directionCfg.custom.conflict);
+    toggleCustomSyncConfig(directionCfg_, directionCfg_.custom.conflict);
     updateSyncGui();
 }
 
@@ -857,10 +857,10 @@ std::shared_ptr<const SyncConfig> ConfigDialog::getSyncConfig() const
         return nullptr;
 
     SyncConfig syncCfg;
-    syncCfg.directionCfg           = directionCfg;
-    syncCfg.handleDeletion         = handleDeletion;
-    syncCfg.versioningFolderPhrase = versioningFolder.getPath();
-    syncCfg.versioningStyle        = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+    syncCfg.directionCfg           = directionCfg_;
+    syncCfg.handleDeletion         = handleDeletion_;
+    syncCfg.versioningFolderPhrase = versioningFolder_.getPath();
+    syncCfg.versioningStyle        = getEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle);
 
     return std::make_shared<const SyncConfig>(syncCfg);
 }
@@ -873,10 +873,10 @@ void ConfigDialog::setSyncConfig(std::shared_ptr<const SyncConfig> syncCfg)
     if (!syncCfg) //when local settings are inactive, display (current) global settings instead:
         syncCfg = std::make_shared<const SyncConfig>(globalCfg_.syncCfg);
 
-    directionCfg   = syncCfg->directionCfg; //make working copy; ownership *not* on GUI
-    handleDeletion = syncCfg->handleDeletion;
-    versioningFolder.setPath(syncCfg->versioningFolderPhrase);
-    setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle, syncCfg->versioningStyle);
+    directionCfg_   = syncCfg->directionCfg; //make working copy; ownership *not* on GUI
+    handleDeletion_ = syncCfg->handleDeletion;
+    versioningFolder_.setPath(syncCfg->versioningFolderPhrase);
+    setEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle, syncCfg->versioningStyle);
 
     updateSyncGui();
 }
@@ -890,7 +890,7 @@ void ConfigDialog::updateSyncGui()
     m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::SYNC),
                              static_cast<int>(m_checkBoxUseLocalSyncOptions->GetValue() ? ConfigTypeImage::SYNC: ConfigTypeImage::SYNC_GREY));
 
-    updateSyncDirectionIcons(directionCfg,
+    updateSyncDirectionIcons(directionCfg_,
                              *m_bpButtonLeftOnly,
                              *m_bpButtonRightOnly,
                              *m_bpButtonLeftNewer,
@@ -899,8 +899,8 @@ void ConfigDialog::updateSyncGui()
                              *m_bpButtonConflict);
 
     //selecting "detect move files" does not always make sense:
-    m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg));
-    m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg)); //parameter NOT owned by checkbox!
+    m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg_));
+    m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg_)); //parameter NOT owned by checkbox!
 
     auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
     {
@@ -912,14 +912,14 @@ void ConfigDialog::updateSyncGui()
     };
 
     //display only relevant sync options
-    m_bitmapDatabase     ->Show(directionCfg.var == DirectionConfig::TWO_WAY);
-    fgSizerSyncDirections->Show(directionCfg.var != DirectionConfig::TWO_WAY);
+    m_bitmapDatabase     ->Show(directionCfg_.var == DirectionConfig::TWO_WAY);
+    fgSizerSyncDirections->Show(directionCfg_.var != DirectionConfig::TWO_WAY);
 
-    if (directionCfg.var == DirectionConfig::TWO_WAY)
+    if (directionCfg_.var == DirectionConfig::TWO_WAY)
         setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
     else
     {
-        const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ? localCmpVar : globalCfg_.cmpConfig.compareVar;
+        const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ? localCmpVar_ : globalCfg_.cmpConfig.compareVar;
 
         m_bitmapLeftNewer   ->Show(activeCmpVar == CompareVariant::TIME_SIZE);
         m_bpButtonLeftNewer ->Show(activeCmpVar == CompareVariant::TIME_SIZE);
@@ -931,7 +931,7 @@ void ConfigDialog::updateSyncGui()
     }
 
     //active variant description:
-    setText(*m_textCtrlSyncVarDescription, L"\n" + getSyncVariantDescription(directionCfg.var));
+    setText(*m_textCtrlSyncVarDescription, L"\n" + getSyncVariantDescription(directionCfg_.var));
 
     //update toggle buttons -> they have no parameter-ownership at all!
     m_toggleBtnTwoWay->SetValue(false);
@@ -940,7 +940,7 @@ void ConfigDialog::updateSyncGui()
     m_toggleBtnCustom->SetValue(false);
 
     if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
-        switch (directionCfg.var)
+        switch (directionCfg_.var)
         {
             case DirectionConfig::TWO_WAY:
                 m_toggleBtnTwoWay->SetValue(true);
@@ -956,7 +956,7 @@ void ConfigDialog::updateSyncGui()
                 break;
         }
 
-    switch (handleDeletion)
+    switch (handleDeletion_)
     {
         case DeletionPolicy::PERMANENT:
             m_radioBtnPermanent->SetValue(true);
@@ -980,15 +980,15 @@ void ConfigDialog::updateSyncGui()
     m_bpButtonDeletionType->SetBitmapDisabled(greyScale(m_bpButtonDeletionType->GetBitmap())); //fix wxWidgets' all-too-clever multi-state!
 
 
-    const bool versioningSelected = handleDeletion == DeletionPolicy::VERSIONING;
+    const bool versioningSelected = handleDeletion_ == DeletionPolicy::VERSIONING;
     m_panelVersioning->Show(versioningSelected);
 
     if (versioningSelected)
     {
-        updateTooltipEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+        updateTooltipEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle);
 
         const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
-        switch (getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle))
+        switch (getEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle))
         {
             case VersioningStyle::REPLACE:
                 setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc");
@@ -1012,10 +1012,10 @@ void ConfigDialog::updateSyncGui()
 
 MiscSyncConfig ConfigDialog::getMiscSyncOptions() const
 {
-    assert(selectedPairIndexToShow == -1);
+    assert(selectedPairIndexToShow_ == -1);
 
     MiscSyncConfig miscCfg;
-    miscCfg.handleError         = onGuiError;
+    miscCfg.handleError         = onGuiError_;
     miscCfg.onCompletionCommand = m_comboBoxOnCompletion->getValue();
     miscCfg.onCompletionHistory = m_comboBoxOnCompletion->getHistory();
     return miscCfg;
@@ -1024,7 +1024,7 @@ MiscSyncConfig ConfigDialog::getMiscSyncOptions() const
 
 void ConfigDialog::setMiscSyncOptions(const MiscSyncConfig& miscCfg)
 {
-    onGuiError = miscCfg.handleError;
+    onGuiError_ = miscCfg.handleError;
     m_comboBoxOnCompletion->setValue(miscCfg.onCompletionCommand);
     m_comboBoxOnCompletion->setHistory(miscCfg.onCompletionHistory, onCompletionHistoryMax_);
 
@@ -1034,7 +1034,7 @@ void ConfigDialog::setMiscSyncOptions(const MiscSyncConfig& miscCfg)
 
 void ConfigDialog::updateMiscGui()
 {
-    switch (onGuiError)
+    switch (onGuiError_)
     {
         case ON_GUIERROR_IGNORE:
             m_radioBtnIgnoreErrors->SetValue(true);
@@ -1048,11 +1048,11 @@ void ConfigDialog::updateMiscGui()
 
 void ConfigDialog::selectFolderPairConfig(int newPairIndexToShow)
 {
-    assert(selectedPairIndexToShow == EMPTY_PAIR_INDEX_SELECTED);
+    assert(selectedPairIndexToShow_ == EMPTY_PAIR_INDEX_SELECTED);
     assert(newPairIndexToShow == -1 || makeUnsigned(newPairIndexToShow) < folderPairConfig_.size());
     numeric::clamp(newPairIndexToShow, -1, static_cast<int>(folderPairConfig_.size()) - 1);
 
-    selectedPairIndexToShow = newPairIndexToShow;
+    selectedPairIndexToShow_ = newPairIndexToShow;
     m_listBoxFolderPair->SetSelection(newPairIndexToShow + 1);
 
     //show/hide controls that are only relevant for main/local config
@@ -1085,16 +1085,16 @@ void ConfigDialog::selectFolderPairConfig(int newPairIndexToShow)
     }
     else
     {
-        setCompConfig  (folderPairConfig_[selectedPairIndexToShow].altCmpConfig);
-        setSyncConfig  (folderPairConfig_[selectedPairIndexToShow].altSyncConfig);
-        setFilterConfig(folderPairConfig_[selectedPairIndexToShow].localFilter);
+        setCompConfig  (folderPairConfig_[selectedPairIndexToShow_].altCmpConfig);
+        setSyncConfig  (folderPairConfig_[selectedPairIndexToShow_].altSyncConfig);
+        setFilterConfig(folderPairConfig_[selectedPairIndexToShow_].localFilter);
     }
 }
 
 
 bool ConfigDialog::unselectFolderPairConfig()
 {
-    assert(selectedPairIndexToShow == -1 ||  makeUnsigned(selectedPairIndexToShow) < folderPairConfig_.size());
+    assert(selectedPairIndexToShow_ == -1 ||  makeUnsigned(selectedPairIndexToShow_) < folderPairConfig_.size());
 
     auto compCfg   = getCompConfig();
     auto syncCfg   = getSyncConfig();
@@ -1121,7 +1121,7 @@ bool ConfigDialog::unselectFolderPairConfig()
 
     m_comboBoxOnCompletion->addItemHistory(); //commit current "on completion" history item
 
-    if (selectedPairIndexToShow < 0)
+    if (selectedPairIndexToShow_ < 0)
     {
         globalCfg_.cmpConfig = *compCfg;
         globalCfg_.syncCfg   = *syncCfg;
@@ -1130,12 +1130,12 @@ bool ConfigDialog::unselectFolderPairConfig()
     }
     else
     {
-        folderPairConfig_[selectedPairIndexToShow].altCmpConfig  = compCfg;
-        folderPairConfig_[selectedPairIndexToShow].altSyncConfig = syncCfg;
-        folderPairConfig_[selectedPairIndexToShow].localFilter   = filterCfg;
+        folderPairConfig_[selectedPairIndexToShow_].altCmpConfig  = compCfg;
+        folderPairConfig_[selectedPairIndexToShow_].altSyncConfig = syncCfg;
+        folderPairConfig_[selectedPairIndexToShow_].localFilter   = filterCfg;
     }
 
-    selectedPairIndexToShow = EMPTY_PAIR_INDEX_SELECTED;
+    selectedPairIndexToShow_ = EMPTY_PAIR_INDEX_SELECTED;
     //m_listBoxFolderPair->SetSelection(wxNOT_FOUND); not needed, selectedPairIndexToShow has parameter ownership
     return true;
 }
@@ -1146,8 +1146,8 @@ void ConfigDialog::OnOkay(wxCommandEvent& event)
     if (!unselectFolderPairConfig())
         return;
 
-    globalCfgOut        = globalCfg_;
-    folderPairConfigOut = folderPairConfig_;
+    globalCfgOut_        = globalCfg_;
+    folderPairConfigOut_ = folderPairConfig_;
 
     EndModal(ReturnSyncConfig::BUTTON_OKAY);
 }

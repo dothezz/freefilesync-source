@@ -7,6 +7,12 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Installation was registered on a different operating system.</source>
+<target>Die Installation wurde auf einem anderen Betriebssystem registriert.</target>
+
+<source>The server does not support authentication via %x.</source>
+<target>Der Server unterstützt keine Authentifizierung über %x.</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -130,14 +136,14 @@
 <source>Date:</source>
 <target>Datum:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Die Dateien %x haben dasselbe Datum, aber unterschiedliche Größen.</target>
+<source>Files have the same date but a different size.</source>
+<target>Die Dateien haben dasselbe Datum, aber unterschiedliche Größen.</target>
 
 <source>Size:</source>
 <target>Größe:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Der Vergleich nach Dateiinhalt wurde für die ausgeschlossenen Dateien %x übersprungen.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Der Vergleich nach Dateiinhalt wurde für die ausgeschlossenen Dateien übersprungen.</target>
 
 <source>Items differ in attributes only</source>
 <target>Die Elemente unterscheiden sich nur in Attributen</target>
@@ -279,8 +285,8 @@ Tatsächlich: %y bytes
 <source>Cannot open directory %x.</source>
 <target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelistet werden.</target>
+<source>Cannot read directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelesen werden.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Die Dateiattribute von %x können nicht gelesen werden.</target>
@@ -381,7 +387,7 @@ Tatsächlich: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Die Datenbankdatei %x existiert noch nicht.</target>
 
-<source>Database file is corrupt:</source>
+<source>Database file is corrupted:</source>
 <target>Die Datenbankdatei ist beschädigt:</target>
 
 <source>Database files do not share a common session.</source>
@@ -863,11 +869,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Tools</source>
 <target>E&xtras</target>
 
-<source>&Check for new version</source>
-<target>&Auf neue Version prüfen</target>
-
-<source>&Check now</source>
-<target>&Jetzt prüfen</target>
+<source>&Check for updates now</source>
+<target>&Jetzt auf Aktualisierung prüfen</target>
 
 <source>Check &automatically once a week</source>
 <target>&Automatisch wöchentlich prüfen</target>
@@ -1240,6 +1243,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Source code written in C++ using:</source>
 <target>Der Quellcode wurde in C++ geschrieben mit:</target>
 
+<source>Donation details</source>
+<target>Spendendetails</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Wenn Sie FreeFileSync mögen:</target>
 
@@ -1249,7 +1255,7 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback und Vorschläge sind willkommen</target>
 
-<source>Homepage</source>
+<source>Home page</source>
 <target>Homepage</target>
 
 <source>Email</source>
@@ -1260,6 +1266,27 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Many thanks for localization:</source>
 <target>Vielen Dank für die Lokalisation:</target>
+
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Aktivieren Sie die FreeFileSync Spendenversion durch eine der folgenden Methoden:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Jetzt über das Internet aktivieren:</target>
+
+<source>Activate online</source>
+<target>Online aktivieren</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Einen Offline-Aktivierungsschlüssel von folgender URL abrufen:</target>
+
+<source>&Copy to clipboard</source>
+<target>In &Zwischenablage kopieren</target>
+
+<source>Enter activation key:</source>
+<target>Aktivierungsschlüssel eingeben:</target>
+
+<source>Activate offline</source>
+<target>Offline aktivieren</target>
 
 <source>SSH File Transfer Protocol</source>
 <target>SSH File Transfer Protocol</target>
@@ -1278,6 +1305,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Select Time Span</source>
 <target>Zeitspanne auswählen</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync Spendenversion</target>
 
 <source>&Options</source>
 <target>&Optionen</target>
@@ -1300,8 +1330,8 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Overview</source>
 <target>Übersicht</target>
 
-<source>&Download</source>
-<target>Zum &Download</target>
+<source>&Show details</source>
+<target>&Zeige Details</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Eine neue Version von FreeFileSync ist verfügbar:</target>
@@ -1543,6 +1573,12 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Loading...</source>
 <target>Lade...</target>
 
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Danke %x für die Spende und Unterstützung!</target>
+
 <source>Password:</source>
 <target>Passwort:</target>
 
@@ -1605,6 +1641,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>&Show</source>
 <target>&Zeigen</target>
+
+<source>Downloading update...</source>
+<target>Lade Aktualisierung...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Erkenne gleiche Dateien anhand der Änderungszeit und Größe.</target>
@@ -1699,11 +1738,32 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Percentage</source>
 <target>Prozent</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Aktualisierungsinformationen konnten nicht abgerufen werden.</target>
+
+<source>Automatic updates:</source>
+<target>Automatische Aktualisierung:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Benötigt FreeFileSync Spendenversion</target>
+
 <source>Check for Program Updates</source>
 <target>Suche nach neuer Programmversion</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Jetzt automatisch aktualisieren oder manuell von der FreeFileSync Homepage herunterladen?</target>
+
+<source>&Auto-update</source>
+<target>&Automatisch</target>
+
+<source>&Home page</source>
+<target>&Homepage</target>
+
 <source>Download now?</source>
 <target>Jetzt herunterladen?</target>
+
+<source>&Download</source>
+<target>Zum &Download</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync ist auf dem neuesten Stand.</target>
@@ -1717,14 +1777,17 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Consistency check failed for %x.</source>
 <target>Die Konsistenzprüfung für %x ist fehlgeschlagen.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Die Systemfunktion %x wurde nicht gefunden.</target>
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Die Aktivierung der FreeFileSync Spendenversion ist fehlgeschlagen.</target>
+
+<source>Incorrect activation key.</source>
+<target>Falscher Aktivierungsschlüssel.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Die Registrierung zum Empfang von Systemmeldungen ist fehlgeschlagen.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
+<source>Cannot find system function %x.</source>
+<target>Die Systemfunktion %x wurde nicht gefunden.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Die Registrierung für Gerätemeldungen ist für %x fehlgeschlagen.</target>
@@ -1881,15 +1944,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Edit with FreeFileSync</source>
 <target>Mit FreeFileSync editieren</target>
-
-<source>Thank you, %x, for your donation and support!</source>
-<target>Danke %x für die Spende und Unterstützung!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Das FreeFileSync Installationsprogramm für Spender hat sein tägliches Installationslimit erreicht.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Jetzt die normale Version von der FreeFileSync Homepage herunterladen?</target>
 
 <source>The portable version cannot install into the selected folder.</source>
 <target>Die portable Version kann nicht in den gewählten Ordner installiert werden.</target>

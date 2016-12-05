@@ -405,9 +405,9 @@ void InterruptibleThread::interrupt() { intStatus_->interrupt(); }
 inline
 std::uint64_t getThreadId()
 {
-	//obviously "gettid()" is not available on Ubuntu/Debian/Suse => use the OpenSSL approach:
-	static_assert(sizeof(std::uint64_t) >= sizeof(void*), "");
-	return reinterpret_cast<std::uint64_t>(static_cast<void*>(&errno));
+    //obviously "gettid()" is not available on Ubuntu/Debian/Suse => use the OpenSSL approach:
+    static_assert(sizeof(std::uint64_t) >= sizeof(void*), "");
+    return reinterpret_cast<std::uint64_t>(static_cast<void*>(&errno));
 
 }
 }

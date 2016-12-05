@@ -11,6 +11,7 @@
 #include <zen/dir_watcher.h>
 #include <zen/thread.h>
 //#include <zen/tick_count.h>
+#include <zen/basic_math.h>
 #include <wx/utils.h>
 #include "../lib/resolve_path.h"
 //#include "../library/db_file.h"     //SYNC_DB_FILE_ENDING -> complete file too much of a dependency; file ending too little to decouple into single header
@@ -22,7 +23,7 @@ using namespace zen;
 
 namespace
 {
-const int CHECK_FOLDER_INTERVAL = 1; //unit: [s]
+const int FOLDER_EXISTENCE_CHECK_INTERVAL_SEC = 1; //unit: [s]
 
 
 std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhrases) //throw FileError
@@ -78,7 +79,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
             //a non-existent network path may block, so check existence asynchronously!
             auto ftDirExists = runAsync([=] { return zen::dirExists(folderPathFmt); });
             //we need to check dirExists(), not somethingExists(): it's not clear if DirWatcher detects a type clash (file instead of directory!)
-            while (ftDirExists.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2)) != std::future_status::ready)
+            while (ftDirExists.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
                 onRefreshGui(false /*readyForSync*/); //may throw!
             if (!ftDirExists.get())
                 return WaitResult(folderPathFmt);
@@ -93,15 +94,16 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
         }
     }
 
-    auto lastCheck = std::chrono::steady_clock::now();
+    auto lastCheckTime = std::chrono::steady_clock::now();
     for (;;)
     {
         const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
         {
             const auto now = std::chrono::steady_clock::now();
-            if (now >= lastCheck + std::chrono::seconds(CHECK_FOLDER_INTERVAL))
+
+            if (numeric::dist(now, lastCheckTime) > std::chrono::seconds(FOLDER_EXISTENCE_CHECK_INTERVAL_SEC)) //handle potential chrono wrap-around!
             {
-                lastCheck = now;
+                lastCheckTime = now;
                 return true;
             }
             return false;
@@ -142,7 +144,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2));
+        std::this_thread::sleep_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2));
         onRefreshGui(true /*readyForSync*/); //throw ?: may start sync at this presumably idle time
     }
 }
@@ -163,16 +165,16 @@ void waitForMissingDirs(const std::vector<Zstring>& folderPathPhrases, //throw F
                 //2. check dir existence
                 return zen::dirExists(folderPathFmt);
             });
-            while (ftDirExisting.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL / 2)) != std::future_status::ready)
+            while (ftDirExisting.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
                 onRefreshGui(folderPathFmt); //may throw!
 
             if (!ftDirExisting.get())
             {
                 allExisting = false;
                 //wait some time...
-                const int refreshInterval = rts::UI_UPDATE_INTERVAL / 2;
-                static_assert(CHECK_FOLDER_INTERVAL * 1000 % refreshInterval == 0, "");
-                for (int i = 0; i < CHECK_FOLDER_INTERVAL * 1000 / refreshInterval; ++i)
+                const int refreshInterval = rts::UI_UPDATE_INTERVAL_MS / 2;
+                static_assert(FOLDER_EXISTENCE_CHECK_INTERVAL_SEC * 1000 % refreshInterval == 0, "");
+                for (int i = 0; i < FOLDER_EXISTENCE_CHECK_INTERVAL_SEC * 1000 / refreshInterval; ++i)
                 {
                     onRefreshGui(folderPathFmt); //may throw!
                     std::this_thread::sleep_for(std::chrono::milliseconds(refreshInterval));

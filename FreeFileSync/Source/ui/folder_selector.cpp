@@ -148,8 +148,8 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
 
         setPath(fmtShellPath(itemPaths[0]));
         //drop two folder paths at once:
-        if (siblingSelector && itemPaths.size() >= 2)
-            siblingSelector->setPath(fmtShellPath(itemPaths[1]));
+        if (siblingSelector_ && itemPaths.size() >= 2)
+            siblingSelector_->setPath(fmtShellPath(itemPaths[1]));
 
         //notify action invoked by user
         wxCommandEvent dummy(EVENT_ON_FOLDER_SELECTED);

@@ -16,14 +16,13 @@ namespace zen
 {
 struct StdButtons
 {
-    StdButtons() : btnYes(nullptr), btnNo(nullptr), btnCancel(nullptr) {}
     StdButtons& setAffirmative (wxButton* btn) { btnYes    = btn; return *this; }
     StdButtons& setNegative    (wxButton* btn) { btnNo     = btn; return *this; }
     StdButtons& setCancel      (wxButton* btn) { btnCancel = btn; return *this; }
 
-    wxButton* btnYes;
-    wxButton* btnNo;
-    wxButton* btnCancel;
+    wxButton* btnYes    = nullptr;
+    wxButton* btnNo     = nullptr;
+    wxButton* btnCancel = nullptr;
 };
 
 void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons = StdButtons());

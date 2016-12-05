@@ -77,7 +77,7 @@ private:
         {
             struct ::dirent* dirEntry = nullptr;
             if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r");
+                THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r");
             //don't retry but restart dir traversal on error! http://blogs.msdn.com/b/oldnewthing/archive/2014/06/12/10533529.aspx
 
             if (!dirEntry) //no more items
@@ -86,7 +86,7 @@ private:
             //don't return "." and ".."
             const char* itemName = dirEntry->d_name; //evaluate dirEntry *before* going into recursion => we use a single "buffer"!
 
-            if (itemName[0] == 0) throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item is missing a name.");
+            if (itemName[0] == 0) throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtPath(dirPath)), L"readdir_r: Data corruption; item is missing a name.");
             if (itemName[0] == '.' &&
                 (itemName[1] == 0 || (itemName[1] == '.' && itemName[2] == 0)))
                 continue;

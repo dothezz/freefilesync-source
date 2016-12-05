@@ -72,8 +72,8 @@ struct UnbufferedOutputStream
     size_t tryWrite(const void* buffer, size_t bytesToWrite); //may return short! CONTRACT: bytesToWrite > 0
 };
 */
-//functions based on unbuffered stream abstraction
 
+//functions based on unbuffered stream abstraction
 template <class UnbufferedInputStream, class UnbufferedOutputStream>
 void unbufferedStreamCopy(UnbufferedInputStream& streamIn, UnbufferedOutputStream& streamOut, const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //throw X
 
@@ -104,7 +104,6 @@ struct BufferedOutputStream
 template <class N, class BufferedOutputStream> void writeNumber   (BufferedOutputStream& stream, const N& num);                 //
 template <class C, class BufferedOutputStream> void writeContainer(BufferedOutputStream& stream, const C& str);                 //throw ()
 template <         class BufferedOutputStream> void writeArray    (BufferedOutputStream& stream, const void* data, size_t len); //
-
 //----------------------------------------------------------------------
 class UnexpectedEndOfStreamError {};
 template <class N, class BufferedInputStream> N    readNumber   (BufferedInputStream& stream); //throw UnexpectedEndOfStreamError (corrupted data)
@@ -115,21 +114,23 @@ template <         class BufferedInputStream> void readArray    (BufferedInputSt
 template <class BinContainer>
 struct MemoryStreamIn
 {
-    MemoryStreamIn(const BinContainer& cont) : buffer(cont) {} //this better be cheap!
+    MemoryStreamIn(const BinContainer& cont) : buffer_(cont) {} //this better be cheap!
 
     size_t read(void* data, size_t len) //return "len" bytes unless end of stream!
     {
         static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
-        const size_t bytesRead = std::min(len, buffer.size() - pos);
-        auto itFirst = buffer.begin() + pos;
+        const size_t bytesRead = std::min(len, buffer_.size() - pos_);
+        auto itFirst = buffer_.begin() + pos_;
         std::copy(itFirst, itFirst + bytesRead, static_cast<char*>(data));
-        pos += bytesRead;
+        pos_ += bytesRead;
         return bytesRead;
     }
 
+	size_t pos() const { return pos_; }
+
 private:
-    const BinContainer buffer;
-    size_t pos = 0;
+    const BinContainer buffer_;
+    size_t pos_ = 0;
 };
 
 template <class BinContainer>
@@ -138,15 +139,15 @@ struct MemoryStreamOut
     void write(const void* data, size_t len)
     {
         static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
-        const size_t oldSize = buffer.size();
-        buffer.resize(oldSize + len);
-        std::copy(static_cast<const char*>(data), static_cast<const char*>(data) + len, buffer.begin() + oldSize);
+        const size_t oldSize = buffer_.size();
+        buffer_.resize(oldSize + len);
+        std::copy(static_cast<const char*>(data), static_cast<const char*>(data) + len, buffer_.begin() + oldSize);
     }
 
-    const BinContainer& ref() const { return buffer; }
+    const BinContainer& ref() const { return buffer_; }
 
 private:
-    BinContainer buffer;
+    BinContainer buffer_;
 };
 
 

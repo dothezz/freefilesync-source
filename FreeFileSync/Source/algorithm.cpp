@@ -326,14 +326,14 @@ public:
 
 private:
     DetectMovedFiles(BaseFolderPair& baseFolder, const InSyncFolder& dbFolder) :
-        cmpVar           (baseFolder.getCompVariant()),
-        fileTimeTolerance(baseFolder.getFileTimeTolerance()),
-        ignoreTimeShiftMinutes(baseFolder.getIgnoredTimeShift())
+        cmpVar_           (baseFolder.getCompVariant()),
+        fileTimeTolerance_(baseFolder.getFileTimeTolerance()),
+        ignoreTimeShiftMinutes_(baseFolder.getIgnoredTimeShift())
     {
         recurse(baseFolder, &dbFolder);
 
-        if ((!exLeftOnlyById .empty() || !exLeftOnlyByPath .empty()) &&
-            (!exRightOnlyById.empty() || !exRightOnlyByPath.empty()))
+        if ((!exLeftOnlyById_ .empty() || !exLeftOnlyByPath_ .empty()) &&
+            (!exRightOnlyById_.empty() || !exRightOnlyByPath_.empty()))
             detectMovePairs(dbFolder);
     }
 
@@ -357,10 +357,10 @@ private:
             if (cat == FILE_LEFT_SIDE_ONLY)
             {
                 if (const InSyncFile* dbFile = getDbFileEntry())
-                    exLeftOnlyByPath.emplace(dbFile, &file);
+                    exLeftOnlyByPath_.emplace(dbFile, &file);
                 else if (!file.getFileId<LEFT_SIDE>().empty())
                 {
-                    auto rv = exLeftOnlyById.emplace(file.getFileId<LEFT_SIDE>(), &file);
+                    auto rv = exLeftOnlyById_.emplace(file.getFileId<LEFT_SIDE>(), &file);
                     if (!rv.second) //duplicate file ID! NTFS hard link/symlink?
                         rv.first->second = nullptr;
                 }
@@ -368,10 +368,10 @@ private:
             else if (cat == FILE_RIGHT_SIDE_ONLY)
             {
                 if (const InSyncFile* dbFile = getDbFileEntry())
-                    exRightOnlyByPath.emplace(dbFile, &file);
+                    exRightOnlyByPath_.emplace(dbFile, &file);
                 else if (!file.getFileId<RIGHT_SIDE>().empty())
                 {
-                    auto rv = exRightOnlyById.emplace(file.getFileId<RIGHT_SIDE>(), &file);
+                    auto rv = exRightOnlyById_.emplace(file.getFileId<RIGHT_SIDE>(), &file);
                     if (!rv.second) //duplicate file ID! NTFS hard link/symlink?
                         rv.first->second = nullptr;
                 }
@@ -440,10 +440,10 @@ private:
 
     void findAndSetMovePair(const InSyncFile& dbFile) const
     {
-        if (stillInSync(dbFile, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
-            if (FilePair* fileLeftOnly = getAssocFilePair<LEFT_SIDE>(dbFile, exLeftOnlyById, exLeftOnlyByPath))
+        if (stillInSync(dbFile, cmpVar_, fileTimeTolerance_, ignoreTimeShiftMinutes_))
+            if (FilePair* fileLeftOnly = getAssocFilePair<LEFT_SIDE>(dbFile, exLeftOnlyById_, exLeftOnlyByPath_))
                 if (sameSizeAndDate<LEFT_SIDE>(*fileLeftOnly, dbFile))
-                    if (FilePair* fileRightOnly = getAssocFilePair<RIGHT_SIDE>(dbFile, exRightOnlyById, exRightOnlyByPath))
+                    if (FilePair* fileRightOnly = getAssocFilePair<RIGHT_SIDE>(dbFile, exRightOnlyById_, exRightOnlyByPath_))
                         if (sameSizeAndDate<RIGHT_SIDE>(*fileRightOnly, dbFile))
                             if (fileLeftOnly ->getMoveRef() == nullptr && //don't let a row participate in two move pairs!
                                 fileRightOnly->getMoveRef() == nullptr)   //
@@ -453,16 +453,16 @@ private:
                             }
     }
 
-    const CompareVariant cmpVar;
-    const int fileTimeTolerance;
-    const std::vector<unsigned int> ignoreTimeShiftMinutes;
+    const CompareVariant cmpVar_;
+    const int fileTimeTolerance_;
+    const std::vector<unsigned int> ignoreTimeShiftMinutes_;
 
-    std::unordered_map<AFS::FileId, FilePair*, StringHash> exLeftOnlyById;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
-    std::unordered_map<AFS::FileId, FilePair*, StringHash> exRightOnlyById; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
+    std::unordered_map<AFS::FileId, FilePair*, StringHash> exLeftOnlyById_;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
+    std::unordered_map<AFS::FileId, FilePair*, StringHash> exRightOnlyById_; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
     //MSVC: std::unordered_map: about twice as fast as std::map for 1 million items!
 
-    std::unordered_map<const InSyncFile*, FilePair*> exLeftOnlyByPath; //MSVC: only 4% faster than std::map for 1 million items!
-    std::unordered_map<const InSyncFile*, FilePair*> exRightOnlyByPath;
+    std::unordered_map<const InSyncFile*, FilePair*> exLeftOnlyByPath_; //MSVC: only 4% faster than std::map for 1 million items!
+    std::unordered_map<const InSyncFile*, FilePair*> exRightOnlyByPath_;
     /*
     detect renamed files:
 
@@ -499,12 +499,9 @@ public:
 
 private:
     RedetermineTwoWay(BaseFolderPair& baseFolder, const InSyncFolder& dbFolder) :
-        txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
-        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
-        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
-        cmpVar                (baseFolder.getCompVariant()),
-        fileTimeTolerance     (baseFolder.getFileTimeTolerance()),
-        ignoreTimeShiftMinutes(baseFolder.getIgnoredTimeShift())
+        cmpVar_                (baseFolder.getCompVariant()),
+        fileTimeTolerance_     (baseFolder.getFileTimeTolerance()),
+        ignoreTimeShiftMinutes_(baseFolder.getIgnoredTimeShift())
     {
         //-> considering filter not relevant:
         //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
@@ -545,13 +542,13 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes);
-        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes_);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(file, dbEntry, ignoreTimeShiftMinutes_);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> set direction based on sync status only!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar_, fileTimeTolerance_, ignoreTimeShiftMinutes_))
                 file.setSyncDirConflict(txtDbNotInSync);
             else
                 file.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -581,13 +578,13 @@ private:
         }
 
         //evaluation
-        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes);
-        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes);
+        const bool changeOnLeft  = !matchesDbEntry< LEFT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes_);
+        const bool changeOnRight = !matchesDbEntry<RIGHT_SIDE>(symlink, dbEntry, ignoreTimeShiftMinutes_);
 
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> set direction based on sync status only!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance, ignoreTimeShiftMinutes))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar_, fileTimeTolerance_, ignoreTimeShiftMinutes_))
                 symlink.setSyncDirConflict(txtDbNotInSync);
             else
                 symlink.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
@@ -647,13 +644,13 @@ private:
         recurse(folder, dbEntry ? &dbEntry->second : nullptr);
     }
 
-    const std::wstring txtBothSidesChanged;
-    const std::wstring txtNoSideChanged;
-    const std::wstring txtDbNotInSync;
+    const std::wstring txtBothSidesChanged = _("Both sides have changed since last synchronization.");
+    const std::wstring txtNoSideChanged    = _("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.");
+    const std::wstring txtDbNotInSync      = _("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.");
 
-    const CompareVariant cmpVar;
-    const int fileTimeTolerance;
-    const std::vector<unsigned int> ignoreTimeShiftMinutes;
+    const CompareVariant cmpVar_;
+    const int fileTimeTolerance_;
+    const std::vector<unsigned int> ignoreTimeShiftMinutes_;
 };
 }
 
@@ -1569,7 +1566,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
             tempPathTmp += Zstr("FFS-");
 
             const std::string guid = generateGUID(); //no need for full-blown (pseudo-)random numbers for this one-time invocation
-            const uint32_t crc32 = getCrc32(guid.begin(), guid.end());
+            const uint32_t crc32 = getCrc32(guid);
             tempPathTmp += printNumber<Zstring>(Zstr("%08x"), static_cast<unsigned int>(crc32));
 
             makeDirectoryRecursively(tempPathTmp); //throw FileError
@@ -1590,7 +1587,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
         writeNumber   (cookie, details.descr.isFollowedSymlink);
         writeContainer(cookie, AFS::getInitPathPhrase(details.path));
 
-        const uint16_t crc16 = getCrc16(cookie.ref().begin(), cookie.ref().end());
+        const uint16_t crc16 = getCrc16(cookie.ref());
         const Zstring detailsHash = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(crc16));
 
         const Zstring fileName = AFS::getFileShortName(details.path);

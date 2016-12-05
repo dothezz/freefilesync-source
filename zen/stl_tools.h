@@ -232,7 +232,7 @@ size_t hashBytesAppend(size_t hashVal, ByteIterator first, ByteIterator last)
 #endif
     static_assert(sizeof(typename std::iterator_traits<ByteIterator>::value_type) == 1, "");
 
-	for (; first != last; ++first)
+    for (; first != last; ++first)
     {
         hashVal ^= static_cast<size_t>(*first);
         hashVal *= prime;

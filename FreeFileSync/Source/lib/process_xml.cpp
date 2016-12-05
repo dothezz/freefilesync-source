@@ -84,7 +84,7 @@ XmlGlobalSettings::XmlGlobalSettings()
 
 Zstring xmlAccess::getGlobalConfigFile()
 {
-    return zen::getConfigDir() + Zstr("GlobalSettings.xml");
+    return zen::getConfigDirPathPf() + Zstr("GlobalSettings.xml");
 }
 
 
@@ -480,14 +480,14 @@ void writeText(const ColumnTypeNavi& value, std::string& output)
 {
     switch (value)
     {
-        case ColumnTypeNavi::BYTES:
-            output = "Bytes";
-            break;
-        case ColumnTypeNavi::DIRECTORY:
+        case ColumnTypeNavi::FOLDER_NAME:
             output = "Tree";
             break;
         case ColumnTypeNavi::ITEM_COUNT:
             output = "Count";
+            break;
+        case ColumnTypeNavi::BYTES:
+            output = "Bytes";
             break;
     }
 }
@@ -496,12 +496,12 @@ template <> inline
 bool readText(const std::string& input, ColumnTypeNavi& value)
 {
     const std::string tmp = trimCpy(input);
-    if (tmp == "Bytes")
-        value = ColumnTypeNavi::BYTES;
-    else if (tmp == "Tree")
-        value = ColumnTypeNavi::DIRECTORY;
+    if (tmp == "Tree")
+        value = ColumnTypeNavi::FOLDER_NAME;
     else if (tmp == "Count")
         value = ColumnTypeNavi::ITEM_COUNT;
+    else if (tmp == "Bytes")
+        value = ColumnTypeNavi::BYTES;
     else
         return false;
     return true;
@@ -1155,7 +1155,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     //last update check
     inGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
     inGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
-    inGui["LastOnlineChanges"](config.gui.lastOnlineChangeLog);
 
     //batch specific global settings
     //XmlIn inBatch = in["Batch"];
@@ -1550,7 +1549,6 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //last update check
     outGui["LastOnlineCheck"  ](config.gui.lastUpdateCheck);
     outGui["LastOnlineVersion"](config.gui.lastOnlineVersion);
-    outGui["LastOnlineChanges"](config.gui.lastOnlineChangeLog);
 
     //batch specific global settings
     //XmlOut outBatch = out["Batch"];

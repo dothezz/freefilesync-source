@@ -14,14 +14,14 @@ namespace zen
 //------------------------------------------------------------------------------
 //global program directories
 //------------------------------------------------------------------------------
-Zstring getResourceDir(); //resource directory WITH path separator at end
-Zstring getConfigDir  (); //config directory WITH path separator at end
+Zstring getResourceDirPf(); //resource directory WITH path separator at end
+Zstring getConfigDirPathPf  (); //config directory WITH path separator at end
 //------------------------------------------------------------------------------
 
 bool isPortableVersion();
 
+
 Zstring getFreeFileSyncLauncherPath(); //full path to application launcher C:\...\FreeFileSync.exe
-bool manualProgramUpdateRequired();
 }
 
 #endif //FFS_PATHS_H_842759083425342534253

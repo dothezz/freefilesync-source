@@ -12,6 +12,7 @@
 #include <zen/format_unit.h>
 #include "ffs_paths.h"
 #include "../fs/abstract.h"
+#include "../file_hierarchy.h"
 
 
 namespace zen
@@ -152,7 +153,7 @@ void streamToLogFile(const SummaryInfo& summary, //throw FileError
 
 
 inline
-Zstring getLastSyncsLogfilePath() { return getConfigDir() + Zstr("LastSyncs.log"); }
+Zstring getLastSyncsLogfilePath() { return getConfigDirPathPf() + Zstr("LastSyncs.log"); }
 
 
 inline

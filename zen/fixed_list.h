@@ -15,7 +15,7 @@ namespace zen
 {
 //std::list(C++11)-like class for inplace element construction supporting non-copyable/non-movable types
 //-> no iterator invalidation after emplace_back()
-	
+
 template <class T>
 class FixedList
 {
@@ -69,7 +69,7 @@ public:
     const_reference& back() const { return lastInsert_->val; }
 
     template <class... Args>
-    void emplace_back(Args&&... args)
+    void emplace_back(Args&& ... args)
     {
         Node* newNode = new Node(std::forward<Args>(args)...);
 
@@ -160,10 +160,10 @@ class FixedVector
 public:
     FixedVector() {}
 
-	/*
-	class EndIterator {}; //just like FixedList: no iterator invalidation after emplace_back()
+    /*
+    class EndIterator {}; //just like FixedList: no iterator invalidation after emplace_back()
 
-	template <class V>
+    template <class V>
     class FixedIterator : public std::iterator<std::forward_iterator_tag, V> //could make this random-access if needed
     {
     public:
@@ -174,10 +174,10 @@ public:
         V& operator* () const { return  *cont_[pos_]; }
         V* operator->() const { return &*cont_[pos_]; }
     private:
-		std::vector<std::unique_ptr<T>>& cont_;
-		size_t pos_ = 0; 
+        std::vector<std::unique_ptr<T>>& cont_;
+        size_t pos_ = 0;
     };
-	*/
+    */
 
     template <class IterImpl, class V>
     class FixedIterator : public std::iterator<std::forward_iterator_tag, V> //could make this bidirectional if needed
@@ -188,7 +188,7 @@ public:
         inline friend bool operator==(const FixedIterator& lhs, const FixedIterator& rhs) { return lhs.it_ == rhs.it_; }
         inline friend bool operator!=(const FixedIterator& lhs, const FixedIterator& rhs) { return !(lhs == rhs); }
         V& operator* () const { return  **it_; }
-        V* operator->() const { return &**it_; }
+        V* operator->() const { return &** it_; }
     private:
         IterImpl it_;  //TODO: avoid iterator invalidation after emplace_back(); caveat: end() must not store old length!
     };
@@ -199,10 +199,10 @@ public:
     using reference       =       T&;
     using const_reference = const T&;
 
-	iterator begin() { return items_.begin(); }
+    iterator begin() { return items_.begin(); }
     iterator end  () { return items_.end  (); }
 
-	const_iterator begin() const { return items_.begin(); }
+    const_iterator begin() const { return items_.begin(); }
     const_iterator end  () const { return items_.end  (); }
 
     reference       front()       { return *items_.front(); }
@@ -212,15 +212,15 @@ public:
     const_reference& back() const { return *items_.back(); }
 
     template <class... Args>
-    void emplace_back(Args&&... args)
+    void emplace_back(Args&& ... args)
     {
-		items_.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+        items_.push_back(std::make_unique<T>(std::forward<Args>(args)...));
     }
 
     template <class Predicate>
     void remove_if(Predicate pred)
     {
-		erase_if(items_, [&](const std::unique_ptr<T>& p){ return pred(*p); });
+        erase_if(items_, [&](const std::unique_ptr<T>& p) { return pred(*p); });
     }
 
     void   clear() { items_.clear(); }
@@ -232,7 +232,7 @@ private:
     FixedVector           (const FixedVector&) = delete;
     FixedVector& operator=(const FixedVector&) = delete;
 
-	std::vector<std::unique_ptr<T>> items_;
+    std::vector<std::unique_ptr<T>> items_;
 };
 }
 

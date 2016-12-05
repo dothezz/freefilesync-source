@@ -291,16 +291,14 @@ void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi colu
 
     switch (columnType)
     {
-        case ColumnTypeNavi::BYTES:
-            std::sort(items.begin(), items.end(), makeSortDirection(lessBytes, Int2Type<ascending>()));
-            break;
-
-        case ColumnTypeNavi::DIRECTORY:
+        case ColumnTypeNavi::FOLDER_NAME:
             std::sort(items.begin(), items.end(), LessShortName<ascending>());
             break;
-
         case ColumnTypeNavi::ITEM_COUNT:
             std::sort(items.begin(), items.end(), makeSortDirection(lessCount, Int2Type<ascending>()));
+            break;
+        case ColumnTypeNavi::BYTES:
+            std::sort(items.begin(), items.end(), makeSortDirection(lessBytes, Int2Type<ascending>()));
             break;
     }
 }
@@ -459,11 +457,11 @@ bool TreeView::getDefaultSortDirection(ColumnTypeNavi colType)
 {
     switch (colType)
     {
-        case ColumnTypeNavi::BYTES:
-            return false;
-        case ColumnTypeNavi::DIRECTORY:
+        case ColumnTypeNavi::FOLDER_NAME:
             return true;
         case ColumnTypeNavi::ITEM_COUNT:
+            return false;
+        case ColumnTypeNavi::BYTES:
             return false;
     }
     assert(false);
@@ -800,11 +798,7 @@ private:
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
-            case ColumnTypeNavi::BYTES:
-            case ColumnTypeNavi::ITEM_COUNT:
-                break;
-
-            case ColumnTypeNavi::DIRECTORY:
+            case ColumnTypeNavi::FOLDER_NAME:
                 if (treeDataView_)
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
@@ -818,6 +812,10 @@ private:
                             return dirLeft + L" \u2212 \n" + dirRight; //\u2212 = unicode minus
                         }
                 break;
+
+            case ColumnTypeNavi::ITEM_COUNT:
+            case ColumnTypeNavi::BYTES:
+                break;
         }
         return std::wstring();
     }
@@ -829,10 +827,7 @@ private:
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                 switch (static_cast<ColumnTypeNavi>(colType))
                 {
-                    case ColumnTypeNavi::BYTES:
-                        return filesizeToShortString(node->bytes_);
-
-                    case ColumnTypeNavi::DIRECTORY:
+                    case ColumnTypeNavi::FOLDER_NAME:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                             return root->displayName_;
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
@@ -843,6 +838,9 @@ private:
 
                     case ColumnTypeNavi::ITEM_COUNT:
                         return toGuiString(node->itemCount_);
+
+                    case ColumnTypeNavi::BYTES:
+                        return filesizeToShortString(node->bytes_);
                 }
         }
         return std::wstring();
@@ -900,7 +898,7 @@ private:
         //   --------------------------------------------------------------------------------
         // -> synchronize renderCell() <-> getBestSize() <-> getRowMouseHover()
 
-        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::DIRECTORY && treeDataView_)
+        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::FOLDER_NAME && treeDataView_)
         {
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
             {
@@ -1039,7 +1037,7 @@ private:
     {
         // -> synchronize renderCell() <-> getBestSize() <-> getRowMouseHover()
 
-        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::DIRECTORY && treeDataView_)
+        if (static_cast<ColumnTypeNavi>(colType) == ColumnTypeNavi::FOLDER_NAME && treeDataView_)
         {
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                 return node->level_ * widthLevelStep + GAP_SIZE + (showPercentBar ? WIDTH_PERCENTAGE_BAR + 2 * GAP_SIZE : 0) + widthNodeStatus + GAP_SIZE
@@ -1057,11 +1055,7 @@ private:
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
-            case ColumnTypeNavi::BYTES:
-            case ColumnTypeNavi::ITEM_COUNT:
-                break;
-
-            case ColumnTypeNavi::DIRECTORY:
+            case ColumnTypeNavi::FOLDER_NAME:
                 if (treeDataView_)
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                     {
@@ -1074,6 +1068,10 @@ private:
                             return static_cast<HoverArea>(HoverAreaNavi::NODE);
                     }
                 break;
+
+            case ColumnTypeNavi::ITEM_COUNT:
+            case ColumnTypeNavi::BYTES:
+                break;
         }
         return HoverArea::NONE;
     }
@@ -1082,12 +1080,12 @@ private:
     {
         switch (static_cast<ColumnTypeNavi>(colType))
         {
-            case ColumnTypeNavi::BYTES:
-                return _("Size");
-            case ColumnTypeNavi::DIRECTORY:
+            case ColumnTypeNavi::FOLDER_NAME:
                 return _("Name");
             case ColumnTypeNavi::ITEM_COUNT:
                 return _("Items");
+            case ColumnTypeNavi::BYTES:
+                return _("Size");
         }
         return std::wstring();
     }
@@ -1198,19 +1196,33 @@ private:
         {
             auto colAttr = grid_.getColumnConfig();
 
+            Grid::ColumnAttribute* caFolderName = nullptr;
+            Grid::ColumnAttribute* caToggle     = nullptr;
+
             for (Grid::ColumnAttribute& ca : colAttr)
-                if (ca.type_ == ct)
-                {
-                    ca.visible_ = !ca.visible_;
-                    grid_.setColumnConfig(colAttr);
-                    return;
-                }
+                if (ca.type_ == static_cast<ColumnType>(ColumnTypeNavi::FOLDER_NAME))
+                    caFolderName = &ca;
+                else if (ca.type_ == ct)
+                    caToggle = &ca;
+
+            assert(caFolderName && caFolderName->stretch_ > 0 && caFolderName->visible_);
+            assert(caToggle     && caToggle->stretch_ == 0);
+
+            if (caFolderName && caToggle)
+            {
+                caToggle->visible_ = !caToggle->visible_;
+
+                //take width of newly visible column from stretched folder name column
+                caFolderName->offset_ -= caToggle->visible_ ? caToggle->offset_ : -caToggle->offset_;
+
+                grid_.setColumnConfig(colAttr);
+            }
         };
 
         for (const Grid::ColumnAttribute& ca : grid_.getColumnConfig())
         {
-            menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn] { toggleColumn(ca.type_); },
-                             ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeNavi::DIRECTORY)); //do not allow user to hide file name column!
+            menu.addCheckBox(getColumnLabel(ca.type_), [ct = ca.type_, toggleColumn] { toggleColumn(ct); },
+                             ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeNavi::FOLDER_NAME)); //do not allow user to hide file name column!
         }
         //--------------------------------------------------------------------------------------------------------
         menu.addSeparator();

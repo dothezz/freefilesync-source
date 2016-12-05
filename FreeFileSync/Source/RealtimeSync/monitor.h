@@ -13,7 +13,7 @@
 
 namespace rts
 {
-const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
+const int UI_UPDATE_INTERVAL_MS = 100; //unit: [ms]; perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 
 
 struct MonitorCallback

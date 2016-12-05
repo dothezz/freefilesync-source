@@ -24,6 +24,9 @@ Run a task in an async thread, but process result in GUI event loop
 
 2. schedule async task and synchronous continuation:
     guiQueue.processAsync(evalAsync, evalOnGui);
+
+Alternative: use wxWidgets' inter-thread communication (wxEvtHandler::QueueEvent) https://wiki.wxwidgets.org/Inter-Thread_and_Inter-Process_communication
+        => don't bother, probably too many MT race conditions lurking around
 */
 
 namespace impl
@@ -67,7 +70,7 @@ public:
     void add(Fun&& evalAsync, Fun2&& evalOnGui)
     {
         using ResultType = decltype(evalAsync());
-        tasks.push_back(std::make_unique<ConcreteTask<ResultType, Fun2>>(zen::runAsync(std::forward<Fun>(evalAsync)), std::forward<Fun2>(evalOnGui)));
+        tasks_.push_back(std::make_unique<ConcreteTask<ResultType, Fun2>>(zen::runAsync(std::forward<Fun>(evalAsync)), std::forward<Fun2>(evalOnGui)));
     }
     //equivalent to "evalOnGui(evalAsync())"
     //  -> evalAsync: the usual thread-safety requirements apply!
@@ -75,14 +78,14 @@ public:
 
     void evalResults() //call from gui thread repreatedly
     {
-        if (!inRecursion) //prevent implicit recursion, e.g. if we're called from an idle event and spawn another one within the callback below
+        if (!inRecursion_) //prevent implicit recursion, e.g. if we're called from an idle event and spawn another one within the callback below
         {
-            inRecursion = true;
-            ZEN_ON_SCOPE_EXIT(inRecursion = false);
+            inRecursion_ = true;
+            ZEN_ON_SCOPE_EXIT(inRecursion_ = false);
 
             std::vector<std::unique_ptr<Task>> readyTasks; //Reentrancy; access to AsyncTasks::add is not protected! => evaluate outside erase_if
 
-            erase_if(tasks, [&](std::unique_ptr<Task>& task)
+            erase_if(tasks_, [&](std::unique_ptr<Task>& task)
             {
                 if (task->resultReady())
                 {
@@ -97,14 +100,14 @@ public:
         }
     }
 
-    bool empty() const { return tasks.empty(); }
+    bool empty() const { return tasks_.empty(); }
 
 private:
     AsyncTasks           (const AsyncTasks&) = delete;
     AsyncTasks& operator=(const AsyncTasks&) = delete;
 
-    bool inRecursion = false;
-    std::vector<std::unique_ptr<Task>> tasks;
+    bool inRecursion_ = false;
+    std::vector<std::unique_ptr<Task>> tasks_;
 };
 }
 
@@ -112,27 +115,27 @@ private:
 class AsyncGuiQueue : private wxEvtHandler
 {
 public:
-    AsyncGuiQueue() { timer.Connect(wxEVT_TIMER, wxEventHandler(AsyncGuiQueue::onTimerEvent), nullptr, this); }
+    AsyncGuiQueue() { timer_.Connect(wxEVT_TIMER, wxEventHandler(AsyncGuiQueue::onTimerEvent), nullptr, this); }
 
     template <class Fun, class Fun2>
     void processAsync(Fun&& evalAsync, Fun2&& evalOnGui)
     {
-        asyncTasks.add(std::forward<Fun >(evalAsync),
-                       std::forward<Fun2>(evalOnGui));
-        if (!timer.IsRunning())
-            timer.Start(50 /*unit: [ms]*/);
+        asyncTasks_.add(std::forward<Fun >(evalAsync),
+                        std::forward<Fun2>(evalOnGui));
+        if (!timer_.IsRunning())
+            timer_.Start(50 /*unit: [ms]*/);
     }
 
 private:
     void onTimerEvent(wxEvent& event) //schedule and run long-running tasks asynchronously
     {
-        asyncTasks.evalResults(); //process results on GUI queue
-        if (asyncTasks.empty())
-            timer.Stop();
+        asyncTasks_.evalResults(); //process results on GUI queue
+        if (asyncTasks_.empty())
+            timer_.Stop();
     }
 
-    impl::AsyncTasks asyncTasks;
-    wxTimer timer; //don't use wxWidgets' idle handling => repeated idle requests/consumption hogs 100% cpu!
+    impl::AsyncTasks asyncTasks_;
+    wxTimer timer_; //don't use wxWidgets' idle handling => repeated idle requests/consumption hogs 100% cpu!
 };
 
 }

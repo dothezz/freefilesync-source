@@ -16,57 +16,138 @@ using namespace zen;
 namespace
 {
 
-
-std::string sendHttpRequestImpl(const std::wstring& url, //throw SysError
-                                const std::wstring& userAgent,
-                                const std::string* postParams, //issue POST if bound, GET otherwise
-                                int level = 0)
+struct UrlRedirectError
 {
-    assert(!startsWith(makeUpperCopy(url), L"HTTPS:")); //not supported by wxHTTP!
-    const std::wstring urlFmt = startsWith(makeUpperCopy(url), L"HTTP://") ? afterFirst(url, L"://", IF_MISSING_RETURN_NONE) : url;
-    const std::wstring server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
-    const std::wstring page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
+    UrlRedirectError(const std::wstring& url) : newUrl(url) {}
+    std::wstring newUrl;
+};
+}
 
-    assert(std::this_thread::get_id() == mainThreadId);
-    assert(wxApp::IsMainLoopRunning());
 
-    wxHTTP webAccess;
-    webAccess.SetHeader(L"User-Agent", userAgent);
-    webAccess.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
-
-    if (!webAccess.Connect(server)) //will *not* fail for non-reachable url here!
-        throw SysError(L"wxHTTP::Connect");
-
-    if (postParams)
-        if (!webAccess.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
-            throw SysError(L"wxHTTP::SetPostText");
-
-    std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page)); //must be deleted BEFORE webAccess is closed
-    const int sc = webAccess.GetResponse();
-
-    //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
-    if (sc / 100 == 3) //e.g. 301, 302, 303, 307... we're not too greedy since we check location, too!
+class HttpInputStream::Impl
+{
+public:
+    Impl(const std::wstring& url, const std::wstring& userAgent, //throw SysError, UrlRedirectError
+         const std::string* postParams) //issue POST if bound, GET otherwise
     {
-        if (level < 5) //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
+        ZEN_ON_SCOPE_FAIL( cleanup(); /*destructor call would lead to member double clean-up!!!*/ );
+
+        assert(!startsWith(makeUpperCopy(url), L"HTTPS:")); //not supported by wxHTTP!
+        const std::wstring urlFmt = startsWith(makeUpperCopy(url), L"HTTP://") ||
+                                    startsWith(makeUpperCopy(url), L"HTTPS://") ? afterFirst(url, L"://", IF_MISSING_RETURN_NONE) : url;
+        const std::wstring server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
+        const std::wstring page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
+
+        assert(std::this_thread::get_id() == mainThreadId);
+        assert(wxApp::IsMainLoopRunning());
+
+        webAccess_.SetHeader(L"User-Agent", userAgent);
+        webAccess_.SetTimeout(10 /*[s]*/); //default: 10 minutes: WTF are these wxWidgets people thinking???
+
+        if (!webAccess_.Connect(server)) //will *not* fail for non-reachable url here!
+            throw SysError(L"wxHTTP::Connect");
+
+        if (postParams)
+            if (!webAccess_.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
+                throw SysError(L"wxHTTP::SetPostText");
+
+        httpStream_.reset(webAccess_.GetInputStream(page)); //pass ownership
+        const int sc = webAccess_.GetResponse();
+
+        //http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
+        if (sc / 100 == 3) //e.g. 301, 302, 303, 307... we're not too greedy since we check location, too!
         {
-            const std::wstring newUrl(webAccess.GetHeader(L"Location"));
-            if (!newUrl.empty())
-                return sendHttpRequestImpl(newUrl, userAgent, postParams, level + 1);
+            const std::wstring newUrl(webAccess_.GetHeader(L"Location"));
+            if (newUrl.empty())
+                throw SysError(L"Unresolvable redirect. Empty target Location.");
+
+            throw UrlRedirectError(newUrl);
         }
-        throw SysError(L"Unresolvable redirect.");
+
+        if (sc != 200) //HTTP_STATUS_OK
+            throw SysError(replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
+
+        if (!httpStream_ || webAccess_.GetError() != wxPROTO_NOERR)
+            throw SysError(L"wxHTTP::GetError (" + numberTo<std::wstring>(webAccess_.GetError()) + L")");
     }
 
-    if (sc != 200) //HTTP_STATUS_OK
-        throw SysError(replaceCpy<std::wstring>(L"HTTP status code %x.", L"%x", numberTo<std::wstring>(sc)));
+    ~Impl() { cleanup(); }
 
-    if (!httpStream || webAccess.GetError() != wxPROTO_NOERR)
-        throw SysError(L"wxHTTP::GetError");
+    size_t tryRead(void* buffer, size_t bytesToRead) //throw SysError; may return short, only 0 means EOF!
+    {
+        if (bytesToRead == 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
+            throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
+        httpStream_->Read(buffer, bytesToRead);
+
+        const wxStreamError ec = httpStream_->GetLastError();
+        if (ec != wxSTREAM_NO_ERROR && ec != wxSTREAM_EOF)
+            throw SysError(L"wxInputStream::GetLastError (" + numberTo<std::wstring>(httpStream_->GetLastError()) + L")");
+
+        const size_t bytesRead = httpStream_->LastRead();
+        //"if there are not enough bytes in the stream right now, LastRead() value will be
+        // less than size but greater than 0. If it is 0, it means that EOF has been reached."
+        assert(bytesRead > 0 || ec == wxSTREAM_EOF);
+        if (bytesRead > bytesToRead) //better safe than sorry
+            throw SysError(L"InternetReadFile: buffer overflow.");
+
+        return bytesRead; //"zero indicates end of file"
+    }
+
+private:
+    Impl           (const Impl&) = delete;
+    Impl& operator=(const Impl&) = delete;
+
+    void cleanup()
+    {
+    }
+
+    wxHTTP webAccess_;
+    std::unique_ptr<wxInputStream> httpStream_; //must be deleted BEFORE webAccess is closed
+};
+
+
+HttpInputStream::HttpInputStream(std::unique_ptr<Impl>&& pimpl) : pimpl_(std::move(pimpl)) {}
+
+HttpInputStream::~HttpInputStream() {}
+
+size_t HttpInputStream::tryRead(void* buffer, size_t bytesToRead) { return pimpl_->tryRead(buffer, bytesToRead); } //throw SysError
+
+
+std::string HttpInputStream::readAll() //throw SysError
+{
     std::string buffer;
-    int newValue = 0;
-    while ((newValue = httpStream->GetC()) != wxEOF)
-        buffer.push_back(static_cast<char>(newValue));
-    return buffer;
+    const size_t blockSize = getBlockSize();
+
+    for (;;)
+    {
+        buffer.resize(buffer.size() + blockSize);
+
+        const size_t bytesRead = pimpl_->tryRead(&*(buffer.end() - blockSize), blockSize); //throw SysError
+
+        if (bytesRead < blockSize)
+            buffer.resize(buffer.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
+
+        if (bytesRead == 0)
+            return buffer;
+    }
+}
+
+
+namespace
+{
+std::unique_ptr<HttpInputStream::Impl> sendHttpRequestImpl(const std::wstring& url, const std::wstring& userAgent, //throw SysError
+                                                           const std::string* postParams) //issue POST if bound, GET otherwise
+{
+    std::wstring urlRed =  url;
+    //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
+    for (int redirects = 0; redirects < 6; ++redirects)
+        try
+        {
+            return std::make_unique<HttpInputStream::Impl>(urlRed, userAgent, postParams); //throw SysError, UrlRedirectError
+        }
+        catch (const UrlRedirectError& e) { urlRed = e.newUrl; }
+    throw SysError(L"Too many redirects.");
 }
 
 
@@ -84,31 +165,72 @@ std::string urlencode(const std::string& str)
             out += c;
         else
         {
-            const char hexDigits[] = "0123456789ABCDEF";
+            const std::pair<char, char> hex = hexify(c);
+
             out += '%';
-            out += hexDigits[static_cast<unsigned char>(c) / 16];
-            out += hexDigits[static_cast<unsigned char>(c) % 16];
+            out += hex.first;
+            out += hex.second;
         }
+    return out;
+}
+
+
+std::string urldecode(const std::string& str)
+{
+    std::string out;
+    for (size_t i = 0; i < str.size(); ++i)
+    {
+        const char c = str[i];
+        if (c == '+')
+            out += ' ';
+        else if (c == '%' && str.size() - i >= 3 &&
+                 isHexDigit(str[i + 1]) &&
+                 isHexDigit(str[i + 2]))
+        {
+            out += unhexify(str[i + 1], str[i + 2]);
+            i += 2;
+        }
+        else
+            out += c;
+    }
     return out;
 }
 }
 
 
-std::string zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
+std::string zen::xWwwFormUrlEncode(const std::vector<std::pair<std::string, std::string>>& paramPairs)
 {
-    //convert post parameters into "application/x-www-form-urlencoded"
-    std::string flatParams;
-    for (const auto& pair : postParams)
-        flatParams += urlencode(pair.first) + '=' + urlencode(pair.second) + '&';
+    std::string output;
+    for (const auto& pair : paramPairs)
+        output += urlencode(pair.first) + '=' + urlencode(pair.second) + '&';
     //encode both key and value: https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
-    if (!flatParams.empty())
-        flatParams.pop_back();
-
-    return sendHttpRequestImpl(url, userAgent, &flatParams); //throw SysError
+    if (!output.empty())
+        output.pop_back();
+    return output;
 }
 
 
-std::string zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent) //throw SysError
+std::vector<std::pair<std::string, std::string>> zen::xWwwFormUrlDecode(const std::string& str)
+{
+    std::vector<std::pair<std::string, std::string>> output;
+
+    for (const std::string& nvPair : split(str, '&'))
+        if (!nvPair.empty())
+            output.emplace_back(urldecode(beforeFirst(nvPair, '=', IF_MISSING_RETURN_ALL)),
+                                urldecode(afterFirst (nvPair, '=', IF_MISSING_RETURN_NONE)));
+    return output;
+}
+
+
+HttpInputStream zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent,
+                                  const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
+{
+    const std::string encodedParams = xWwwFormUrlEncode(postParams);
+    return sendHttpRequestImpl(url, userAgent, &encodedParams); //throw SysError
+}
+
+
+HttpInputStream zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent) //throw SysError
 {
     return sendHttpRequestImpl(url, userAgent, nullptr); //throw SysError
 }

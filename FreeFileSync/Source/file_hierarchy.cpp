@@ -140,6 +140,9 @@ bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
            std::any_of(hierObj.refSubLinks  ().begin(), hierObj.refSubLinks  ().end(), p) ||
            std::any_of(hierObj.refSubFolders().begin(), hierObj.refSubFolders().end(), p);
 }
+
+const wchar_t arrowLeft [] = L"<-";
+const wchar_t arrowRight[] = L"->";
 }
 
 
@@ -312,12 +315,44 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
 
 std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
 {
-    const CompareFilesResult cmpRes = fsObj.getCategory();
-    if (cmpRes == FILE_CONFLICT ||
-        cmpRes == FILE_DIFFERENT_METADATA)
-        return fsObj.getCatExtraDescription();
+    const std::wstring footer = L"\n[" + utfCvrtTo<std::wstring>(fsObj. getPairItemName()) + L"]";
 
-    return getCategoryDescription(cmpRes);
+    const CompareFilesResult cmpRes = fsObj.getCategory();
+    switch (cmpRes)
+    {
+        case FILE_LEFT_SIDE_ONLY:
+        case FILE_RIGHT_SIDE_ONLY:
+        case FILE_DIFFERENT_CONTENT:
+        case FILE_EQUAL:
+            return getCategoryDescription(cmpRes) + footer; //use generic description
+
+        case FILE_LEFT_NEWER:
+        case FILE_RIGHT_NEWER:
+        {
+            std::wstring descr = getCategoryDescription(cmpRes);
+
+            visitFSObject(fsObj, [](const FolderPair& folder) {},
+            [&](const FilePair& file)
+            {
+                descr = descr + L"\n" +
+                        arrowLeft  + L" " + zen::utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                        arrowRight + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>());
+            },
+            [&](const SymlinkPair& symlink)
+            {
+                descr = descr + L"\n" +
+                        arrowLeft  + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                        arrowRight + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<RIGHT_SIDE>());
+            });
+            return descr + footer;
+        }
+
+        case FILE_DIFFERENT_METADATA:
+        case FILE_CONFLICT:
+            return fsObj.getCatExtraDescription() + footer;
+    }
+    assert(false);
+    return std::wstring();
 }
 
 
@@ -361,6 +396,8 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
 
 std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
 {
+    const std::wstring footer = L"\n[" + utfCvrtTo<std::wstring>(fsObj. getPairItemName()) + L"]";
+
     const SyncOperation op = fsObj.getSyncOperation();
     switch (op)
     {
@@ -372,7 +409,7 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         case SO_OVERWRITE_RIGHT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
-            return getSyncOpDescription(op); //use generic description
+            return getSyncOpDescription(op) + footer; //use generic description
 
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
@@ -385,11 +422,10 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
 
             if (shortNameOld != shortNameNew) //detected change in case
                 return getSyncOpDescription(op) + L"\n" +
-                       fmtPath(shortNameOld) + L" ->\n" + //show short name only
-                       fmtPath(shortNameNew);
+                       fmtPath(shortNameOld) + L" " + arrowRight + L"\n" + //show short name only
+                       fmtPath(shortNameNew) /*+ footer -> redundant */;
         }
-            //fallback:
-        return getSyncOpDescription(op);
+        return getSyncOpDescription(op) + footer; //fallback
 
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
@@ -409,21 +445,21 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                     const Zstring relSource = getRelName(*sourceFile,  onLeft);
                     const Zstring relTarget = getRelName(*targetFile, !onLeft);
 
+                    //attention: ::SetWindowText() doesn't handle tab characters correctly in combination with certain file names, so don't use them
                     return getSyncOpDescription(op) + L"\n" +
                            (equalFilePath(beforeLast(relSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE),
                                           beforeLast(relTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)) ?
                             //detected pure "rename"
-                            fmtPath(afterLast(relSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)) + L" ->\n" + //show short name only
+                            fmtPath(afterLast(relSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)) + L" " + arrowRight + L"\n" + //show short name only
                             fmtPath(afterLast(relTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)) :
                             //"move" or "move + rename"
-                            fmtPath(relSource) + L" ->\n" +
-                            fmtPath(relTarget));
-                    //attention: ::SetWindowText() doesn't handle tab characters correctly in combination with certain file names, so don't use them
+                            fmtPath(relSource) + L" " + arrowRight + L"\n" +
+                            fmtPath(relTarget)) /*+ footer -> redundant */;
                 }
             break;
 
         case SO_UNRESOLVED_CONFLICT:
-            return fsObj.getSyncOpConflict();
+            return fsObj.getSyncOpConflict() + footer;
     }
 
     assert(false);

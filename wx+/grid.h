@@ -178,7 +178,7 @@ public:
     //alternative until wxScrollHelper::ShowScrollbars() becomes available in wxWidgets 2.9
     void showScrollBars(ScrollBarStatus horizontal, ScrollBarStatus vertical);
 
-    std::vector<size_t> getSelectedRows() const { return selection.get(); }
+    std::vector<size_t> getSelectedRows() const { return selection_.get(); }
     void selectAllRows (GridEventPolicy rangeEventPolicy);
     void clearSelection(GridEventPolicy rangeEventPolicy); //turn off range selection event when calling this function in an event handler to avoid recursion!
 
@@ -202,8 +202,8 @@ public:
 
     void refreshCell(size_t row, ColumnType colType);
 
-    void enableColumnMove  (bool value) { allowColumnMove   = value; }
-    void enableColumnResize(bool value) { allowColumnResize = value; }
+    void enableColumnMove  (bool value) { allowColumnMove_   = value; }
+    void enableColumnResize(bool value) { allowColumnResize_ = value; }
 
     void setGridCursor(size_t row); //set + show + select cursor (+ emit range selection event)
     size_t getGridCursor() const; //returns row
@@ -298,7 +298,7 @@ private:
     };
     std::vector<ColumnWidth> getColWidths()                 const; //
     std::vector<ColumnWidth> getColWidths(int mainWinWidth) const; //evaluate stretched columns
-    int                                   getColWidthsSum(int mainWinWidth) const;
+    int                      getColWidthsSum(int mainWinWidth) const;
     std::vector<int> getColStretchedWidths(int clientWidth) const; //final width = (normalized) (stretchedWidth + offset)
 
     Opt<int> getColWidth(size_t col) const
@@ -315,7 +315,7 @@ private:
 
     void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive, const GridClickEvent* mouseInitiated); //select inclusive range [rowFrom, rowTo] + notify event!
 
-    bool isSelected(size_t row) const { return selection.isSelected(row); }
+    bool isSelected(size_t row) const { return selection_.isSelected(row); }
 
     struct ColAction
     {
@@ -342,21 +342,21 @@ private:
     ColLabelWin* colLabelWin_;
     MainWin*     mainWin_;
 
-    ScrollBarStatus showScrollbarX = SB_SHOW_AUTOMATIC;
-    ScrollBarStatus showScrollbarY = SB_SHOW_AUTOMATIC;
+    ScrollBarStatus showScrollbarX_ = SB_SHOW_AUTOMATIC;
+    ScrollBarStatus showScrollbarY_ = SB_SHOW_AUTOMATIC;
 
     int colLabelHeight_ = 0;
-    bool drawRowLabel = true;
+    bool drawRowLabel_ = true;
 
     std::shared_ptr<GridData> dataView_;
-    Selection selection;
-    bool allowColumnMove   = true;
-    bool allowColumnResize = true;
+    Selection selection_;
+    bool allowColumnMove_   = true;
+    bool allowColumnResize_ = true;
 
-    std::vector<VisibleColumn> visibleCols; //individual widths, type and total column count
-    std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
+    std::vector<VisibleColumn>   visibleCols_; //individual widths, type and total column count
+    std::vector<ColumnAttribute> oldColAttributes_; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
 
-    size_t rowCountOld = 0; //at the time of last Grid::Refresh()
+    size_t rowCountOld_ = 0; //at the time of last Grid::Refresh()
 };
 }
 

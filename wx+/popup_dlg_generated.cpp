@@ -34,7 +34,10 @@ PopupDialogGenerated::PopupDialogGenerated( wxWindow* parent, wxWindowID id, con
 
     m_staticTextMain = new wxStaticText( m_panel33, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextMain->Wrap( -1 );
-    bSizer16->Add( m_staticTextMain, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
+    bSizer16->Add( m_staticTextMain, 0, wxRIGHT, 10 );
+
+
+    bSizer16->Add( 0, 5, 0, 0, 5 );
 
     m_textCtrlTextDetail = new wxTextCtrl( m_panel33, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
     bSizer16->Add( m_textCtrlTextDetail, 1, wxEXPAND, 5 );

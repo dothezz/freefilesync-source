@@ -311,7 +311,7 @@ xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFile) /
 
 Zstring MainDialog::getLastRunConfigPath()
 {
-    return zen::getConfigDir() + Zstr("LastRun.ffs_gui");
+    return zen::getConfigDirPathPf() + Zstr("LastRun.ffs_gui");
 }
 
 
@@ -422,9 +422,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
     globalConfigFile_(globalConfigFile),
-    lastRunConfigPath(getLastRunConfigPath()),
-    folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
-    folderHistoryRight(std::make_shared<FolderHistory>())  //
+    lastRunConfigPath(getLastRunConfigPath())
 {
     m_folderPathLeft ->init(folderHistoryLeft);
     m_folderPathRight->init(folderHistoryRight);
@@ -603,21 +601,11 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     m_menuItemSynchronize ->SetBitmap(getResourceImage(L"sync_small"));
 
     m_menuItemOptions     ->SetBitmap(getResourceImage(L"settings_small"));
+    m_menuItemFind        ->SetBitmap(getResourceImage(L"find_small"));
 
     m_menuItemHelp ->SetBitmap(getResourceImage(L"help_small"));
     m_menuItemAbout->SetBitmap(getResourceImage(L"about_small"));
-
-    if (!manualProgramUpdateRequired())
-    {
-        m_menuItemCheckVersionNow ->Enable(false);
-        m_menuItemCheckVersionAuto->Enable(false);
-
-        //wxFormbuilder doesn't give us a wxMenuItem for m_menuCheckVersion, so we need this abomination:
-        wxMenuItemList& items = m_menuHelp->GetMenuItems();
-        for (auto it = items.begin(); it != items.end(); ++it)
-            if ((*it)->GetSubMenu() == m_menuCheckVersion)
-                (*it)->Enable(false);
-    }
+    m_menuItemCheckVersionNow->SetBitmap(getResourceImage(L"update_check_small"));
 
     //create language selection menu
     for (const TranslationInfo& ti : getExistingTranslations())
@@ -637,8 +625,8 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
     if (!globalSettings.gui.lastOnlineVersion.empty() && haveNewerVersionOnline(globalSettings.gui.lastOnlineVersion))
     {
         auto menu = new wxMenu();
-        wxMenuItem* newItem = new wxMenuItem(menu, wxID_ANY, _("&Download"));
-        this->Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnMenuDownloadNewVersion));
+        wxMenuItem* newItem = new wxMenuItem(menu, wxID_ANY, _("&Show details"));
+        this->Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnMenuUpdateAvailable));
         menu->Append(newItem); //pass ownership
         m_menubar1->Append(menu, L"\u21D2 " + _("A new version of FreeFileSync is available:") + L" \u2605 " + globalSettings.gui.lastOnlineVersion + L" \u2605");
     }
@@ -1515,7 +1503,7 @@ void MainDialog::flashStatusInformation(const wxString& text)
     oldStatusMsgs.push_back(m_staticTextStatusCenter->GetLabel());
 
     m_staticTextStatusCenter->SetLabel(text);
-    m_staticTextStatusCenter->SetForegroundColour(wxColor(31, 57, 226)); //highlight color: blue
+    m_staticTextStatusCenter->SetForegroundColour(wxColor(31, 57, 226)); //highlight_ color: blue
     m_staticTextStatusCenter->SetFont(m_staticTextStatusCenter->GetFont().Bold());
 
     m_panelStatusBar->Layout();
@@ -2390,18 +2378,32 @@ void MainDialog::onGridLabelContextRim(Grid& grid, ColumnTypeRim type, bool left
     {
         auto colAttr = grid.getColumnConfig();
 
+        Grid::ColumnAttribute* caItemPath = nullptr;
+        Grid::ColumnAttribute* caToggle   = nullptr;
+
         for (Grid::ColumnAttribute& ca : colAttr)
-            if (ca.type_ == ct)
-            {
-                ca.visible_ = !ca.visible_;
-                grid.setColumnConfig(colAttr);
-                return;
-            }
+            if (ca.type_ == static_cast<ColumnType>(ColumnTypeRim::ITEM_PATH))
+                caItemPath = &ca;
+            else if (ca.type_ == ct)
+                caToggle = &ca;
+
+        assert(caItemPath && caItemPath->stretch_ > 0 && caItemPath->visible_);
+        assert(caToggle   && caToggle->stretch_ == 0);
+
+        if (caItemPath && caToggle)
+        {
+            caToggle->visible_ = !caToggle->visible_;
+
+            //take width of newly visible column from stretched item path column
+            caItemPath->offset_ -= caToggle->visible_ ? caToggle->offset_ : -caToggle->offset_;
+
+            grid.setColumnConfig(colAttr);
+        }
     };
 
     if (const GridData* prov = grid.getDataProvider())
         for (const Grid::ColumnAttribute& ca : grid.getColumnConfig())
-            menu.addCheckBox(prov->getColumnLabel(ca.type_), [ca, toggleColumn] { toggleColumn(ca.type_); },
+            menu.addCheckBox(prov->getColumnLabel(ca.type_), [ct = ca.type_, toggleColumn] { toggleColumn(ct); },
                              ca.visible_, ca.type_ != static_cast<ColumnType>(ColumnTypeRim::ITEM_PATH)); //do not allow user to hide this column!
     //----------------------------------------------------------------------------------------------
     menu.addSeparator();
@@ -3681,7 +3683,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     //play (optional) sound notification
     if (!globalCfg.soundFileCompareFinished.empty())
     {
-        const Zstring soundFile = getResourceDir() + globalCfg.soundFileCompareFinished;
+        const Zstring soundFile = getResourceDirPf() + globalCfg.soundFileCompareFinished;
         if (fileExists(soundFile))
             wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
     }
@@ -4761,13 +4763,13 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
 void MainDialog::OnMenuCheckVersion(wxCommandEvent& event)
 {
-    zen::checkForUpdateNow(this, globalCfg.gui.lastOnlineVersion, globalCfg.gui.lastOnlineChangeLog);
+    zen::checkForUpdateNow(this, globalCfg.gui.lastOnlineVersion);
 }
 
 
-void MainDialog::OnMenuDownloadNewVersion(wxCommandEvent& event)
+void MainDialog::OnMenuUpdateAvailable(wxCommandEvent& event)
 {
-    wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
+    zen::checkForUpdateNow(this, globalCfg.gui.lastOnlineVersion); //show changelog + handle Donation Edition auto-updater (including expiration)
 }
 
 
@@ -4784,9 +4786,8 @@ void MainDialog::OnMenuCheckVersionAutomatically(wxCommandEvent& event)
     {
         flashStatusInformation(_("Searching for program updates..."));
         //synchronous update check is sufficient here:
-        periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck,
-                                globalCfg.gui.lastOnlineVersion,
-                                globalCfg.gui.lastOnlineChangeLog, periodicUpdateCheckRunAsync(periodicUpdateCheckPrepare().get()).get());
+        periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion,
+                                periodicUpdateCheckRunAsync(periodicUpdateCheckPrepare().get()).get());
     }
 }
 
@@ -4796,21 +4797,19 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), nullptr, this);
 
-    if (manualProgramUpdateRequired())
-        if (shouldRunPeriodicUpdateCheck(globalCfg.gui.lastUpdateCheck))
+    if (shouldRunPeriodicUpdateCheck(globalCfg.gui.lastUpdateCheck))
+    {
+        flashStatusInformation(_("Searching for program updates..."));
+
+        std::shared_ptr<UpdateCheckResultPrep> resultPrep = periodicUpdateCheckPrepare(); //run on main thread:
+
+        guiQueue.processAsync([resultPrep] { return periodicUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
+                              [this] (std::shared_ptr<UpdateCheckResult>&& resultAsync)
         {
-            flashStatusInformation(_("Searching for program updates..."));
-
-            std::shared_ptr<UpdateCheckResultPrep> resultPrep = periodicUpdateCheckPrepare(); //run on main thread:
-
-            guiQueue.processAsync([resultPrep] { return periodicUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
-                                  [this] (std::shared_ptr<UpdateCheckResult>&& resultAsync)
-            {
-                periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck,
-                                        globalCfg.gui.lastOnlineVersion,
-                                        globalCfg.gui.lastOnlineChangeLog, resultAsync.get()); //run on main thread:
-            });
-        }
+            periodicUpdateCheckEval(this, globalCfg.gui.lastUpdateCheck, globalCfg.gui.lastOnlineVersion,
+                                    resultAsync.get()); //run on main thread:
+        });
+    }
 }
 
 

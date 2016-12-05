@@ -18,33 +18,33 @@ struct ImageHolder //prepare conversion to wxImage as much as possible while sta
     ImageHolder() {}
 
     ImageHolder(int w, int h, bool withAlpha) : //init with allocated memory
-        width(w), height(h),
-        rgb(static_cast<unsigned char*>(::malloc(width * height * 3))),
-        alpha(withAlpha ? static_cast<unsigned char*>(::malloc(width * height)) : nullptr) {}
+        width_(w), height_(h),
+        rgb_(static_cast<unsigned char*>(::malloc(w * h * 3))),
+        alpha_(withAlpha ? static_cast<unsigned char*>(::malloc(w * h)) : nullptr) {}
 
     ImageHolder           (ImageHolder&& tmp) = default; //
     ImageHolder& operator=(ImageHolder&& tmp) = default; //move semantics only!
     ImageHolder           (const ImageHolder&) = delete; //
     ImageHolder& operator=(const ImageHolder&) = delete; //
 
-    explicit operator bool() const { return rgb.get() != nullptr; }
+    explicit operator bool() const { return rgb_.get() != nullptr; }
 
-    int getWidth () const { return width;  }
-    int getHeight() const { return height; }
+    int getWidth () const { return width_;  }
+    int getHeight() const { return height_; }
 
-    unsigned char* getRgb  () { return rgb  .get(); }
-    unsigned char* getAlpha() { return alpha.get(); }
+    unsigned char* getRgb  () { return rgb_  .get(); }
+    unsigned char* getAlpha() { return alpha_.get(); }
 
-    unsigned char* releaseRgb  () { return rgb  .release(); }
-    unsigned char* releaseAlpha() { return alpha.release(); }
+    unsigned char* releaseRgb  () { return rgb_  .release(); }
+    unsigned char* releaseAlpha() { return alpha_.release(); }
 
     struct CLibFree { void operator()(unsigned char* p) const { ::free(p); } }; //use malloc/free to allow direct move into wxImage!
 
 private:
-    int width  = 0;
-    int height = 0;
-    std::unique_ptr<unsigned char, CLibFree> rgb;   //optional
-    std::unique_ptr<unsigned char, CLibFree> alpha; //
+    int width_  = 0;
+    int height_ = 0;
+    std::unique_ptr<unsigned char, CLibFree> rgb_;   //optional
+    std::unique_ptr<unsigned char, CLibFree> alpha_; //
 };
 }
 

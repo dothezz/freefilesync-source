@@ -35,12 +35,19 @@ public:
     int deleteCount() const { return SelectParam<side>::ref(deleteLeft_, deleteRight_); }
     int deleteCount() const { return deleteLeft_ + deleteRight_; }
 
+    template <SelectedSide side>
+    bool expectPhysicalDeletion() const { return SelectParam<side>::ref(physicalDeleteLeft_, physicalDeleteRight_); }
+
     int conflictCount() const { return static_cast<int>(conflictMsgs_.size()); }
 
     std::int64_t getBytesToProcess() const { return bytesToProcess_; }
     size_t       rowCount         () const { return rowsTotal_; }
 
-    using ConflictInfo = std::pair<Zstring, std::wstring>; //pair(filePath/conflict message)
+    struct ConflictInfo
+    {
+        Zstring relPath;
+        std::wstring msg;
+    };
     const std::vector<ConflictInfo>& getConflicts() const { return conflictMsgs_; }
 
 private:
@@ -56,6 +63,8 @@ private:
     int updateRight_ = 0;
     int deleteLeft_  = 0;
     int deleteRight_ = 0;
+    bool physicalDeleteLeft_  = false; //at least 1 item will be deleted; considers most "update" cases which also delete items
+    bool physicalDeleteRight_ = false; //
     std::vector<ConflictInfo> conflictMsgs_; //conflict texts to display as a warning message
     std::int64_t bytesToProcess_ = 0;
     size_t rowsTotal_ = 0;

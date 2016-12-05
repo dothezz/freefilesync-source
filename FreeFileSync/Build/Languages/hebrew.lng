@@ -1184,7 +1184,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>&ברירת מחדל</target>
 
 <source>Source code written in C++ using:</source>
-<target>קוד מקור נכתב ב- C++ באמצעות:</target>
+<target>קוד מקור נכתב ב- C++‎ באמצעות:</target>
 
 <source>If you like FreeFileSync:</source>
 <target>במידה ו-FreeFileSync מוצאת חן בעינכם:</target>

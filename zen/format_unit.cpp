@@ -148,6 +148,12 @@ std::wstring zen::remainingTimeToString(double timeInSec)
 }
 
 
+//std::wstring zen::fractionToString1Dec(double fraction)
+//{
+//    return printNumber<std::wstring>(L"%.1f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
+//}
+
+
 std::wstring zen::fractionToString(double fraction)
 {
     return printNumber<std::wstring>(L"%.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?

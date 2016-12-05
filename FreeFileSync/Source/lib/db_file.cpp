@@ -129,11 +129,11 @@ DbStreams loadStreams(const AbstractPath& dbPath, const std::function<void(std::
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)), L"Unexpected end of stream.");
+        throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)), L"Unexpected end of stream.");
     }
     catch (const std::bad_alloc& e) //still required?
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)),
+        throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)),
                         _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
 }
@@ -293,7 +293,7 @@ public:
             const int streamVersionR = readNumber<std::int32_t>(inR); //
 
             if (streamVersionL != streamVersionR)
-                throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"different stream formats");
+                throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"different stream formats");
 
             if (streamVersionL != DB_FORMAT_STREAM)
                 throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(displayFilePathL)), L"unknown stream format");
@@ -302,7 +302,7 @@ public:
             const bool has1stPartR = readNumber<std::int8_t>(inR) != 0; //
 
             if (has1stPartL == has1stPartR)
-                throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"second part missing");
+                throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"second part missing");
 
             MemStreamIn& in1stPart = has1stPartL ? inL : inR;
             MemStreamIn& in2ndPart = has1stPartL ? inR : inL;
@@ -328,11 +328,11 @@ public:
         }
         catch (const UnexpectedEndOfStreamError&)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"Unexpected end of stream.");
+            throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR), L"Unexpected end of stream.");
         }
         catch (const std::bad_alloc& e)
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR),
+            throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR),
                             _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         }
     }

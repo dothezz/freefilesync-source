@@ -16,15 +16,15 @@
 using namespace zen;
 
 
-class Tooltip::TooltipDialogGenerated : public wxDialog
+class Tooltip::TooltipDlgGenerated : public wxDialog
 {
 public:
-    TooltipDialogGenerated(wxWindow* parent,
-                           wxWindowID id = wxID_ANY,
-                           const wxString& title = {},
-                           const wxPoint& pos = wxDefaultPosition,
-                           const wxSize& size = wxDefaultSize,
-                           long style = 0) : wxDialog(parent, id, title, pos, size, style)
+    TooltipDlgGenerated(wxWindow* parent,
+                        wxWindowID id = wxID_ANY,
+                        const wxString& title = {},
+                        const wxPoint& pos = wxDefaultPosition,
+                        const wxSize& size = wxDefaultSize,
+                        long style = 0) : wxDialog(parent, id, title, pos, size, style)
     {
         //Suse Linux/X11: needs parent window, else there are z-order issues
 
@@ -33,11 +33,11 @@ public:
         this->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT)); //
 
         wxBoxSizer* bSizer158 = new wxBoxSizer(wxHORIZONTAL);
-        m_bitmapLeft = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0);
-        bSizer158->Add(m_bitmapLeft, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+        bitmapLeft_ = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0);
+        bSizer158->Add(bitmapLeft_, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
-        m_staticTextMain = new wxStaticText(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, 0);
-        bSizer158->Add(m_staticTextMain, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5);
+        staticTextMain_ = new wxStaticText(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, 0);
+        bSizer158->Add(staticTextMain_, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5);
 
         this->SetSizer(bSizer158);
         this->Layout();
@@ -45,53 +45,53 @@ public:
 
     }
 
-    wxStaticText* m_staticTextMain;
-    wxStaticBitmap* m_bitmapLeft;
+    wxStaticText* staticTextMain_;
+    wxStaticBitmap* bitmapLeft_;
 };
 
 
 void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 {
-    if (!tipWindow)
-        tipWindow = new TooltipDialogGenerated(&parent_); //ownership passed to parent
+    if (!tipWindow_)
+        tipWindow_ = new TooltipDlgGenerated(&parent_); //ownership passed to parent
 
     const wxBitmap& newBmp = bmp ? *bmp : wxNullBitmap;
 
-    if (!isEqual(tipWindow->m_bitmapLeft->GetBitmap(), newBmp))
+    if (!isEqual(tipWindow_->bitmapLeft_->GetBitmap(), newBmp))
     {
-        tipWindow->m_bitmapLeft->SetBitmap(newBmp);
-        tipWindow->Refresh(); //needed if bitmap size changed!
+        tipWindow_->bitmapLeft_->SetBitmap(newBmp);
+        tipWindow_->Refresh(); //needed if bitmap size changed!
     }
 
-    if (text != tipWindow->m_staticTextMain->GetLabel())
+    if (text != tipWindow_->staticTextMain_->GetLabel())
     {
-        tipWindow->m_staticTextMain->SetLabel(text);
-        tipWindow->m_staticTextMain->Wrap(600);
+        tipWindow_->staticTextMain_->SetLabel(text);
+        tipWindow_->staticTextMain_->Wrap(600);
     }
 
-    tipWindow->GetSizer()->SetSizeHints(tipWindow); //~=Fit() + SetMinSize()
+    tipWindow_->GetSizer()->SetSizeHints(tipWindow_); //~=Fit() + SetMinSize()
     //Linux: Fit() seems to be broken => this needs to be called EVERY time inside show, not only if text or bmp change
 
     const wxPoint newPos = wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft ?
-                           mousePos - wxPoint(30 + tipWindow->GetSize().GetWidth(), 0) :
+                           mousePos - wxPoint(30 + tipWindow_->GetSize().GetWidth(), 0) :
                            mousePos + wxPoint(30, 0);
 
-    if (newPos != tipWindow->GetScreenPosition())
-        tipWindow->SetSize(newPos.x, newPos.y, wxDefaultCoord, wxDefaultCoord);
+    if (newPos != tipWindow_->GetScreenPosition())
+        tipWindow_->SetSize(newPos.x, newPos.y, wxDefaultCoord, wxDefaultCoord);
     //attention!!! possible endless loop: mouse pointer must NOT be within tipWindow!
     //else it will trigger a wxEVT_LEAVE_WINDOW on middle grid which will hide the window, causing the window to be shown again via this method, etc.
 
-    if (!tipWindow->IsShown())
-        tipWindow->Show();
+    if (!tipWindow_->IsShown())
+        tipWindow_->Show();
 }
 
 
 void Tooltip::hide()
 {
-    if (tipWindow)
+    if (tipWindow_)
     {
         //on wxGTK the tooltip is sometimes not shown again after it was hidden: e.g. drag-selection on middle grid
-        tipWindow->Destroy(); //apply brute force:
-        tipWindow = nullptr;  //
+        tipWindow_->Destroy(); //apply brute force:
+        tipWindow_ = nullptr;  //
     }
 }

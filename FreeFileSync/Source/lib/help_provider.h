@@ -15,16 +15,16 @@ inline void uninitializeHelp() {}
 }
 
 #else
-    #include <wx/html/helpctrl.h>
-
+#include <zen/globals.h>
+#include <wx+/http.h>
 #include "ffs_paths.h"
+
+    #include <wx/html/helpctrl.h>
 
 
 namespace zen
 {
-void displayHelpEntry(wxWindow* parent);
 void displayHelpEntry(const wxString& topic, wxWindow* parent);
-
 void uninitializeHelp(); //clean up gracefully during app shutdown: leaving this up to static destruction crashes on Win 8.1!
 
 
@@ -35,47 +35,32 @@ void uninitializeHelp(); //clean up gracefully during app shutdown: leaving this
 //######################## implementation ########################
 namespace impl
 {
-//finish wxWidgets' job:
-struct FfsHelpController
-{
-    static FfsHelpController& instance()
-    {
-        static FfsHelpController inst;
-        return inst;
-    }
-
-    void openSection(const wxString& section, wxWindow* parent)
-    {
-        wxHtmlModalHelp dlg(parent, utfCvrtTo<wxString>(zen::getResourceDir()) + L"Help/FreeFileSync.hhp", section,
-                            wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
-        (void)dlg;
-        //-> solves modal help craziness on OSX!
-        //-> Suse Linux: avoids program hang on exit if user closed help parent dialog before the help dialog itself was closed (why is this even possible???)
-        //               avoids ESC key not being recognized by help dialog (but by parent dialog instead)
-    }
-    void uninitialize() {}
-};
 }
 
 
 inline
 void displayHelpEntry(const wxString& topic, wxWindow* parent)
 {
-    impl::FfsHelpController::instance().openSection(L"html/" + topic + L".html", parent);
+    if (internetIsAlive()) //noexcept
+        wxLaunchDefaultBrowser(L"http://www.freefilesync.org/manual.php?topic=" + topic);
+    else
+        -> what if FFS is blocked, but the web browser would have internet access??
+    {
+        const wxString section = L"html/" + topic + L".html";
+        wxHtmlModalHelp dlg(parent, utfCvrtTo<wxString>(zen::getResourceDirPf()) + L"Help/FreeFileSync.hhp", section,
+        wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
+            (void)dlg;
+            //-> solves modal help craziness on OSX!
+            //-> Suse Linux: avoids program hang on exit if user closed help parent dialog before the help dialog itself was closed (why is this even possible???)
+            //               avoids ESC key not being recognized by help dialog (but by parent dialog instead)
+
+        }
 }
 
-
-inline
-void displayHelpEntry(wxWindow* parent)
-{
-    impl::FfsHelpController::instance().openSection(wxString(), parent);
-}
 
 inline
 void uninitializeHelp()
 {
-    impl::FfsHelpController::instance().uninitialize();
-
 }
 }
 #endif

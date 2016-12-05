@@ -7,8 +7,8 @@
 #ifndef PERF_H_83947184145342652456
 #define PERF_H_83947184145342652456
 
+#include <chrono>
 #include "deprecate.h"
-#include "tick_count.h"
 #include "scope_guard.h"
 
     #include <iostream>
@@ -24,75 +24,59 @@ namespace zen
 class PerfTimer
 {
 public:
-    class TimerError {};
+    ZEN_DEPRECATE PerfTimer() {}
 
-    ZEN_DEPRECATE
-    PerfTimer() : startTime(getTicksNow()) //throw TimerError
-    {
-        //std::clock() - "counts CPU time in Linux GCC and wall time in VC++" - WTF!???
-        if (ticksPerSec_ == 0)
-            throw TimerError();
-    }
-
-    ~PerfTimer() { if (!resultShown) try { showResult(); } catch (TimerError&) { assert(false); } }
+    ~PerfTimer() { if (!resultShown_) showResult(); }
 
     void pause()
     {
-        if (!paused)
+        if (!paused_)
         {
-            paused = true;
-            elapsedUntilPause += dist(startTime, getTicksNow());
+            paused_ = true;
+            elapsedUntilPause_ += std::chrono::steady_clock::now() - startTime_; //ignore potential ::QueryPerformanceCounter() wrap-around!
         }
     }
 
     void resume()
     {
-        if (paused)
+        if (paused_)
         {
-            paused = false;
-            startTime = getTicksNow();
+            paused_ = false;
+            startTime_ = std::chrono::steady_clock::now();
         }
     }
 
     void restart()
     {
-        startTime = getTicksNow();
-        paused = false;
-        elapsedUntilPause = 0;
+        paused_ = false;
+        startTime_ = std::chrono::steady_clock::now();
+        elapsedUntilPause_ = std::chrono::nanoseconds::zero();
     }
 
     int64_t timeMs() const
     {
-        int64_t ticksTotal = elapsedUntilPause;
-        if (!paused)
-            ticksTotal += dist(startTime, getTicksNow());
-        return 1000 * ticksTotal / ticksPerSec_;
+        auto elapsedTotal = elapsedUntilPause_;
+        if (!paused_)
+            elapsedTotal += std::chrono::steady_clock::now() - startTime_;
+
+        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTotal).count();
     }
 
     void showResult()
     {
-        const bool wasRunning = !paused;
+        const bool wasRunning = !paused_;
         if (wasRunning) pause(); //don't include call to MessageBox()!
         ZEN_ON_SCOPE_EXIT(if (wasRunning) resume());
 
         std::clog << "Perf: duration: " << timeMs() << " ms\n";
-        resultShown = true;
+        resultShown_ = true;
     }
 
 private:
-    TickVal getTicksNow() const
-    {
-        const TickVal now = getTicks();
-        if (!now.isValid())
-            throw TimerError();
-        return now;
-    }
-
-    const std::int64_t ticksPerSec_ = ticksPerSec(); //return 0 on error
-    bool resultShown = false;
-    TickVal startTime;
-    bool paused = false;
-    int64_t elapsedUntilPause = 0;
+    bool resultShown_ = false;
+    bool paused_      = false;
+    std::chrono::steady_clock::time_point startTime_ = std::chrono::steady_clock::now(); //uses ::QueryPerformanceCounter()
+    std::chrono::nanoseconds elapsedUntilPause_{}; //std::chrono::duration is uninitialized by default! WTF! When will this stupidity end???
 };
 }
 

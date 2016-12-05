@@ -12,6 +12,19 @@
 
 namespace zen
 {
+uint16_t getCrc16(const std::string& str);
+uint32_t getCrc32(const std::string& str);
+template <class ByteIterator> uint16_t getCrc16(ByteIterator first, ByteIterator last);
+template <class ByteIterator> uint32_t getCrc32(ByteIterator first, ByteIterator last);
+
+
+
+
+//------------------------- implementation -------------------------------
+inline uint16_t getCrc16(const std::string& str) { return getCrc16(str.begin(), str.end()); }
+inline uint32_t getCrc32(const std::string& str) { return getCrc32(str.begin(), str.end()); }
+
+
 template <class ByteIterator> inline
 uint16_t getCrc16(ByteIterator first, ByteIterator last)
 {

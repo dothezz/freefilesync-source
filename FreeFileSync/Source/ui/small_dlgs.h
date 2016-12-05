@@ -54,6 +54,30 @@ ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlo
 
 ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
 
+
+enum class ReturnActivationDlg
+{
+    CANCEL,
+    ACTIVATE_ONLINE,
+    ACTIVATE_OFFLINE,
+};
+ReturnActivationDlg showActivationDialog(wxWindow* parent, const std::wstring& lastErrorMsg, const std::wstring& manualActivationUrl, std::wstring& manualActivationKey);
+
+
+class DownloadProgressWindow //remporary progress info => life-time: stack
+{
+public:
+    DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize);
+    ~DownloadProgressWindow();
+
+    struct CancelPressed {};
+    void requestUiRefresh(); //throw CancelPressed
+    void notifyProgress(std::uint64_t delta);
+
+private:
+    class Impl;
+    Impl* const pimpl_;
+};
 }
 
 #endif //SMALL_DLGS_H_8321790875018750245

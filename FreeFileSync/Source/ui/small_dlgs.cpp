@@ -11,6 +11,7 @@
 #include <zen/stl_tools.h>
 #include <wx/wupdlock.h>
 #include <wx/filedlg.h>
+#include <wx/clipbrd.h>
 #include <wx+/choice_enum.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/rtl.h>
@@ -23,11 +24,13 @@
 #include "gui_generated.h"
 #include "custom_grid.h"
 #include "folder_selector.h"
+#include "version_check.h"
 #include "../algorithm.h"
 #include "../synchronization.h"
 #include "../lib/help_provider.h"
 #include "../lib/hard_filter.h"
 #include "../version/version.h"
+#include "../lib/status_handler.h" //updateUiIsAllowed()
 
 
 using namespace zen;
@@ -49,14 +52,18 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonClose));
 
-    setRelativeFontSize(*m_buttonDonate, 1.25);
-
     assert(m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
     m_bitmapHomepage->SetBitmap(getResourceImage(L"website"));
     m_bitmapEmail   ->SetBitmap(getResourceImage(L"email"));
     m_bitmapGpl     ->SetBitmap(getResourceImage(L"gpl"));
-    m_bitmapDonate  ->SetBitmap(getResourceImage(L"paypal"));
+
+    {
+        m_panelThankYou->Hide();
+        m_bitmapDonate->SetBitmap(getResourceImage(L"paypal"));
+        setRelativeFontSize(*m_staticTextDonate, 1.25);
+        setRelativeFontSize(*m_buttonDonate, 1.25);
+    }
 
     //m_animCtrlWink->SetAnimation(getResourceAnimation(L"wink"));
     //m_animCtrlWink->Play();
@@ -286,12 +293,12 @@ private:
 
     void updateGui();
 
-    const std::vector<const FileSystemObject*>& rowsToDeleteOnLeft;
-    const std::vector<const FileSystemObject*>& rowsToDeleteOnRight;
-    const std::chrono::steady_clock::time_point dlgStartTime = std::chrono::steady_clock::now();
+    const std::vector<const FileSystemObject*>& rowsToDeleteOnLeft_;
+    const std::vector<const FileSystemObject*>& rowsToDeleteOnRight_;
+    const std::chrono::steady_clock::time_point dlgStartTime_ = std::chrono::steady_clock::now();
 
     //output-only parameters:
-    bool& useRecycleBinOut;
+    bool& useRecycleBinOut_;
 };
 
 
@@ -300,9 +307,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
                            const std::vector<const FileSystemObject*>& rowsOnRight,
                            bool& useRecycleBin) :
     DeleteDlgGenerated(parent),
-    rowsToDeleteOnLeft(rowsOnLeft),
-    rowsToDeleteOnRight(rowsOnRight),
-    useRecycleBinOut(useRecycleBin)
+    rowsToDeleteOnLeft_(rowsOnLeft),
+    rowsToDeleteOnRight_(rowsOnRight),
+    useRecycleBinOut_(useRecycleBin)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
 
@@ -325,8 +332,8 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 void DeleteDialog::updateGui()
 {
 
-    const std::pair<std::wstring, int> delInfo = zen::getSelectedItemsAsString(rowsToDeleteOnLeft,
-                                                                               rowsToDeleteOnRight);
+    const std::pair<std::wstring, int> delInfo = zen::getSelectedItemsAsString(rowsToDeleteOnLeft_,
+                                                                               rowsToDeleteOnRight_);
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
@@ -362,10 +369,10 @@ void DeleteDialog::updateGui()
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
     //additional safety net, similar to Windows Explorer: time delta between DEL and ENTER must be at least 50ms to avoid accidental deletion!
-    if (std::chrono::steady_clock::now() < dlgStartTime + std::chrono::milliseconds(50))
+    if (std::chrono::steady_clock::now() < dlgStartTime_ + std::chrono::milliseconds(50)) //considers chrono-wrap-around!
         return;
 
-    useRecycleBinOut = m_checkBoxUseRecycler->GetValue();
+    useRecycleBinOut_ = m_checkBoxUseRecycler->GetValue();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -813,3 +820,154 @@ ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, std::
     SelectTimespanDlg timeSpanDlg(parent, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
 }
+
+//########################################################################################
+
+class ActivationDlg : public ActivationDlgGenerated
+{
+public:
+    ActivationDlg(wxWindow* parent, const std::wstring& lastErrorMsg, const std::wstring& manualActivationUrl, std::wstring& manualActivationKey);
+
+private:
+    void OnActivateOnline (wxCommandEvent& event) override;
+    void OnActivateOffline(wxCommandEvent& event) override;
+    void OnOfflineActivationEnter(wxCommandEvent& event) override { OnActivateOffline(event); }
+    void OnCopyUrl        (wxCommandEvent& event) override;
+    void OnCancel(wxCommandEvent& event) override { EndModal(static_cast<int>(ReturnActivationDlg::CANCEL)); }
+    void OnClose (wxCloseEvent&   event) override { EndModal(static_cast<int>(ReturnActivationDlg::CANCEL)); }
+
+    std::wstring& manualActivationKeyOut_; //in/out parameter
+};
+
+
+ActivationDlg::ActivationDlg(wxWindow* parent,
+                             const std::wstring& lastErrorMsg,
+                             const std::wstring& manualActivationUrl,
+                             std::wstring& manualActivationKey) :
+    ActivationDlgGenerated(parent),
+    manualActivationKeyOut_(manualActivationKey)
+{
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setCancel(m_buttonCancel));
+
+    //setMainInstructionFont(*m_staticTextMain);
+
+    m_bitmapActivation->SetBitmap(getResourceImage(L"website"));
+
+    m_textCtrlLastError           ->ChangeValue(lastErrorMsg);
+    m_textCtrlManualActivationUrl ->ChangeValue(manualActivationUrl);
+    m_textCtrlOfflineActivationKey->ChangeValue(manualActivationKey);
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
+
+    m_buttonActivateOnline->SetFocus();
+}
+
+
+void ActivationDlg::OnCopyUrl(wxCommandEvent& event)
+{
+    if (wxClipboard::Get()->Open())
+    {
+        ZEN_ON_SCOPE_EXIT(wxClipboard::Get()->Close());
+        wxClipboard::Get()->SetData(new wxTextDataObject(m_textCtrlManualActivationUrl->GetValue())); //ownership passed
+
+        m_textCtrlManualActivationUrl->SetFocus(); //[!] otherwise selection is lost
+        m_textCtrlManualActivationUrl->SelectAll(); //some visual feedback
+    }
+}
+
+
+void ActivationDlg::OnActivateOnline(wxCommandEvent& event)
+{
+    manualActivationKeyOut_ = m_textCtrlOfflineActivationKey->GetValue();
+    EndModal(static_cast<int>(ReturnActivationDlg::ACTIVATE_ONLINE));
+}
+
+
+void ActivationDlg::OnActivateOffline(wxCommandEvent& event)
+{
+    manualActivationKeyOut_ = m_textCtrlOfflineActivationKey->GetValue();
+    EndModal(static_cast<int>(ReturnActivationDlg::ACTIVATE_OFFLINE));
+}
+
+
+ReturnActivationDlg zen::showActivationDialog(wxWindow* parent, const std::wstring& lastErrorMsg, const std::wstring& manualActivationUrl, std::wstring& manualActivationKey)
+{
+    ActivationDlg dlg(parent, lastErrorMsg, manualActivationUrl, manualActivationKey);
+    return static_cast<ReturnActivationDlg>(dlg.ShowModal());
+}
+
+//########################################################################################
+
+class DownloadProgressWindow::Impl : public DownloadProgressDlgGenerated
+{
+public:
+    Impl(wxWindow* parent, const Zstring& fileName, std::uint64_t fileSize);
+
+    void notifyProgress(std::uint64_t delta) { bytesCurrent_ += delta; }
+
+    void requestUiRefresh() //throw CancelPressed
+    {
+        if (cancelled_)
+            throw CancelPressed();
+
+        if (updateUiIsAllowed())
+        {
+            updateGui();
+            //wxTheApp->Yield();
+            ::wxSafeYield(this); //disables user input except for "this" (using wxWindowDisabler instead would move the FFS main dialog into the background: why?)
+        }
+    }
+
+private:
+    void OnCancel(wxCommandEvent& event) override { cancelled_ = true; }
+
+    void updateGui()
+    {
+        const double fraction = bytesTotal_ == 0 ? 0 : 1.0 * bytesCurrent_ / bytesTotal_;
+        m_staticTextHeader->SetLabel(_("Downloading update...") + L" " +
+                                     numberTo<std::wstring>(numeric::round(fraction * 100)) + L"% (" + filesizeToShortString(bytesCurrent_) + L")");
+        m_gaugeProgress->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
+    }
+
+    bool cancelled_ = false;
+    std::uint64_t bytesCurrent_ = 0;
+    const std::uint64_t bytesTotal_;
+    const int GAUGE_FULL_RANGE = 1000000;
+};
+
+
+DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize) :
+    DownloadProgressDlgGenerated(parent),
+    bytesTotal_(fileSize)
+{
+
+    setStandardButtonLayout(*bSizerStdButtons, StdButtons().setCancel(m_buttonCancel));
+
+    setMainInstructionFont(*m_staticTextHeader);
+
+    m_bitmapDownloading->SetBitmap(getResourceImage(L"website"));
+
+    m_gaugeProgress->SetRange(GAUGE_FULL_RANGE);
+
+    m_staticTextDetails->SetLabel(utfCvrtTo<std::wstring>(filePath));
+
+    updateGui();
+
+    GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
+    //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
+    Center(); //needs to be re-applied after a dialog size change!
+    Show();
+
+    m_buttonCancel->SetFocus();
+}
+
+
+zen::DownloadProgressWindow::DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize) :
+    pimpl_(new DownloadProgressWindow::Impl(parent, filePath, fileSize)) {}
+
+zen::DownloadProgressWindow::~DownloadProgressWindow() { pimpl_->Destroy(); }
+
+void zen::DownloadProgressWindow::notifyProgress(std::uint64_t delta) { pimpl_->notifyProgress(delta); }
+void zen::DownloadProgressWindow::requestUiRefresh() { pimpl_->requestUiRefresh(); } //throw CancelPressed

@@ -16,14 +16,14 @@ time_t getVersionCheckInactiveId()
 {
     //use current version to calculate a changing number for the inactive state near UTC begin, in order to always check for updates after installing a new version
     //=> convert version into 11-based *unique* number (this breaks lexicographical version ordering, but that's irrelevant!)
-    time_t id = 0;
-    const wchar_t* first = zen::ffsVersion;
-    const wchar_t* last = first + zen::strLength(ffsVersion);
-    std::for_each(first, last, [&](wchar_t c)
+    int id = 0;
+    const char* first = zen::ffsVersion;
+    const char* last = first + zen::strLength(ffsVersion);
+    std::for_each(first, last, [&](char c)
     {
         id *= 11;
-        if (L'0' <= c && c <= L'9')
-            id += c - L'0';
+        if ('0' <= c && c <= '9')
+            id += c - '0';
         else
         {
             assert(c == FFS_VERSION_SEPARATOR);

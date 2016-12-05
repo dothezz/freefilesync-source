@@ -52,6 +52,7 @@ namespace zen { class TripleSplitter; }
 #include <wx/animate.h>
 #include <wx/grid.h>
 #include <wx/calctrl.h>
+#include <wx/gauge.h>
 
 #include "zen/i18n.h"
 
@@ -82,9 +83,9 @@ protected:
     wxMenu* m_menuTools;
     wxMenuItem* m_menuItemOptions;
     wxMenu* m_menuLanguages;
+    wxMenuItem* m_menuItemFind;
     wxMenu* m_menuHelp;
     wxMenuItem* m_menuItemHelp;
-    wxMenu* m_menuCheckVersion;
     wxMenuItem* m_menuItemCheckVersionNow;
     wxMenuItem* m_menuItemCheckVersionAuto;
     wxMenuItem* m_menuItemAbout;
@@ -373,9 +374,9 @@ protected:
     FolderHistoryBox* m_versioningFolderPath;
     wxButton* m_buttonSelectVersioningFolder;
     wxStaticText* m_staticText93;
+    wxChoice* m_choiceVersioningStyle;
     wxHyperlinkCtrl* m_hyperlink17;
     wxBoxSizer* bSizer192;
-    wxChoice* m_choiceVersioningStyle;
     wxStaticText* m_staticTextNamingCvtPart1;
     wxStaticText* m_staticTextNamingCvtPart2Bold;
     wxStaticText* m_staticTextNamingCvtPart3;
@@ -431,8 +432,8 @@ protected:
     virtual void OnDeletionRecycler( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnDeletionPermanent( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnDeletionVersioning( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnHelpVersioning( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnChangeSyncOption( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnHelpVersioning( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
@@ -928,9 +929,9 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class TooltipDialogGenerated
+/// Class TooltipDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class TooltipDialogGenerated : public wxDialog
+class TooltipDlgGenerated : public wxDialog
 {
 private:
 
@@ -940,8 +941,8 @@ public:
     wxStaticBitmap* m_bitmapLeft;
     wxStaticText* m_staticTextMain;
 
-    TooltipDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-    ~TooltipDialogGenerated();
+    TooltipDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+    ~TooltipDlgGenerated();
 
 };
 
@@ -998,10 +999,15 @@ protected:
     wxHyperlinkCtrl* m_hyperlink10;
     wxHyperlinkCtrl* m_hyperlink18;
     wxHyperlinkCtrl* m_hyperlink9;
+    wxPanel* m_panelThankYou;
+    wxPanel* m_panel391;
+    wxStaticBitmap* m_bitmapThanks;
+    wxStaticText* m_staticTextThanks;
+    wxButton* m_buttonShowDonationDetails;
     wxPanel* m_panelDonate;
     wxPanel* m_panel39;
     wxStaticBitmap* m_bitmapDonate;
-    wxStaticText* m_staticText83;
+    wxStaticText* m_staticTextDonate;
     wxButton* m_buttonDonate;
     wxStaticText* m_staticText94;
     wxStaticBitmap* m_bitmapHomepage;
@@ -1022,6 +1028,7 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnShowDonationDetails( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnDonate( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
 
@@ -1030,6 +1037,79 @@ public:
 
     AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
     ~AboutDlgGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DownloadProgressDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class DownloadProgressDlgGenerated : public wxDialog
+{
+private:
+
+protected:
+    wxStaticBitmap* m_bitmapDownloading;
+    wxStaticText* m_staticTextHeader;
+    wxGauge* m_gaugeProgress;
+    wxStaticText* m_staticTextDetails;
+    wxStaticLine* m_staticline9;
+    wxBoxSizer* bSizerStdButtons;
+    wxButton* m_buttonCancel;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+
+
+public:
+
+    DownloadProgressDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0 );
+    ~DownloadProgressDlgGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ActivationDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class ActivationDlgGenerated : public wxDialog
+{
+private:
+
+protected:
+    wxPanel* m_panel35;
+    wxStaticBitmap* m_bitmapActivation;
+    wxTextCtrl* m_textCtrlLastError;
+    wxStaticText* m_staticTextMain;
+    wxStaticLine* m_staticline181;
+    wxStaticLine* m_staticline18111;
+    wxPanel* m_panel3511;
+    wxStaticText* m_staticText136;
+    wxButton* m_buttonActivateOnline;
+    wxStaticLine* m_staticline181111;
+    wxStaticLine* m_staticline181112;
+    wxPanel* m_panel351;
+    wxStaticText* m_staticText1361;
+    wxButton* m_buttonCopyUrl;
+    wxTextCtrl* m_textCtrlManualActivationUrl;
+    wxStaticText* m_staticText13611;
+    wxTextCtrl* m_textCtrlOfflineActivationKey;
+    wxButton* m_buttonActivateOffline;
+    wxStaticLine* m_staticline13;
+    wxBoxSizer* bSizerStdButtons;
+    wxButton* m_buttonCancel;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnActivateOnline( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCopyUrl( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnOfflineActivationEnter( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnActivateOffline( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+
+
+public:
+
+    ActivationDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync Donation Edition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+    ~ActivationDlgGenerated();
 
 };
 

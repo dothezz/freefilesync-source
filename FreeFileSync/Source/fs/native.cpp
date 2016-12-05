@@ -185,6 +185,24 @@ private:
 
     Zstring appendRelPathToItemPathImpl(const Zstring& itemPathImpl, const Zstring& relPath) const override { return appendPaths(itemPathImpl, relPath, FILE_NAME_SEPARATOR); }
 
+    Opt<PathComplement> getPathComplementSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const override
+    {
+        const Zstring& lhs = appendSeparator(itemPathImplLhs);
+        const Zstring& rhs = appendSeparator(getItemPathImpl(apRhs));
+
+        const size_t lenMin = std::min(lhs.length(), rhs.length());
+
+        if (cmpFilePath(lhs.c_str(), lenMin,
+                        rhs.c_str(), lenMin) != 0)
+            return NoValue();
+
+        return PathComplement({ Zstring(lhs.begin() + lenMin, lhs.end()),
+                                Zstring(rhs.begin() + lenMin, rhs.end())
+                              });
+    }
+
+    bool lessItemPathSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const override { return LessFilePath()(itemPathImplLhs, getItemPathImpl(apRhs)); }
+
     //used during folder creation if parent folder is missing
     Opt<Zstring> getParentFolderPathImpl(const Zstring& itemPathImpl) const override
     {
@@ -198,8 +216,6 @@ private:
     }
 
     Zstring getFileShortName(const Zstring& itemPathImpl) const override { return afterLast(itemPathImpl, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL); }
-
-    bool lessItemPathSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const override { return LessFilePath()(itemPathImplLhs, getItemPathImpl(apRhs)); }
 
     bool havePathDependencySameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const override
     {

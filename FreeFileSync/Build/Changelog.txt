@@ -1,3 +1,20 @@
+FreeFileSync 8.7 [2016-12-06]
+-----------------------------
+New auto-updater feature for FreeFileSync Donation Edition
+Download zip archive of portable FreeFileSync Donation Edition
+New command line options to define parameters for silent installation
+Support offline activation for portable Donation Edition
+Use automatic keyboard-interactive SFTP authentication as fallback
+Check for available SFTP authentication methods before login
+Support cloud sync of portable edition installation files
+Access donation transaction details from about dialog
+Use width from flexible grid column when showing/hiding extra columns
+Show item short names in middle column tooltip
+Enhanced file category descriptions with modification times
+Don't warn about missing recycle bin when only moving or updating attributes
+Fixed crash when switching to main dialog during batch sync
+
+
 FreeFileSync 8.6 [2016-10-25]
 -----------------------------
 Added SFTP support for OS X

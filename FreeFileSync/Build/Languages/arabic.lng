@@ -115,9 +115,6 @@
 <source>Path to an alternate GlobalSettings.xml file.</source>
 <target>تحديد مسار مختلف لملف GlobalSettings.xml.</target>
 
-<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>أي عدد من ملفات خيارات FreeFileSync أو\و _gui and/or .ffs_batch.</target>
-
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد.</target>
 
@@ -278,8 +275,8 @@ Actual: %y bytes
 </source>
 <target>
 حجم غير متوقع لتدفق البيانات.
-المتوقع: %x bytes
-الفعلي: %y bytes
+المتوقع: ‎%x bytes
+الفعلي: ‎%y bytes
 </target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
@@ -344,22 +341,22 @@ Actual: %y bytes
 <pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>0 byte</pluralform>
-<pluralform>1 byte</pluralform>
-<pluralform>2 bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
-<pluralform>%x bytes</pluralform>
+<pluralform>‎0 byte</pluralform>
+<pluralform>‎1 byte</pluralform>
+<pluralform>‎2 bytes</pluralform>
+<pluralform>‎%x bytes</pluralform>
+<pluralform>‎%x bytes</pluralform>
+<pluralform>‎%x bytes</pluralform>
 </target>
 
 <source>%x MB</source>
-<target>%x MB</target>
+<target>‎%x MB</target>
 
 <source>%x KB</source>
-<target>%x KB</target>
+<target>‎%x KB</target>
 
 <source>%x GB</source>
-<target>%x GB</target>
+<target>‎%x GB</target>
 
 <source>Cannot load file %x.</source>
 <target>لا يمكن فتح الملف  %x.</target>
@@ -900,9 +897,6 @@ The command is triggered if:
 <source>Find:</source>
 <target>بحث:</target>
 
-<source>Match case</source>
-<target>مطابقة حالة الأحرف (Match case)</target>
-
 <source>New</source>
 <target>جديد</target>
 
@@ -1212,7 +1206,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>الا&فتراضي</target>
 
 <source>Source code written in C++ using:</source>
-<target>الرماز المصدري مكتوب بلغة C++ باستخدام:</target>
+<target>الرماز المصدري مكتوب بلغة C++‎ باستخدام:</target>
 
 <source>If you like FreeFileSync:</source>
 <target>إذا أعجبك FreeFileSync:</target>
@@ -1590,9 +1584,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Parent folder path</source>
 <target>مسار المجلد الحاوي</target>
 
-<source>Temporary local copy for SFTP and MTP storage</source>
-<target>نسخة محلية مؤقتة لتخزين SFTP and MTP</target>
-
 <source>Parameters for opposite side</source>
 <target>معلمات الجانب المعاكس</target>
 
@@ -1756,10 +1747,10 @@ This guarantees a consistent state even in case of a serious error.
 <target>نوع العنصر %x غير مدعوم:</target>
 
 <source>%x TB</source>
-<target>%x TB</target>
+<target>‎%x TB</target>
 
 <source>%x PB</source>
-<target>%x PB</target>
+<target>‎%x PB</target>
 
 <source>
 <pluralform>1 min</pluralform>

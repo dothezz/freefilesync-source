@@ -21,8 +21,9 @@ Zstring getExecutablePathPf() //directory containing executable WITH path separa
 {
     return appendSeparator(beforeLast(utfCvrtTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
 }
-
 }
+
+
 
 
 bool zen::isPortableVersion()
@@ -32,14 +33,7 @@ bool zen::isPortableVersion()
 }
 
 
-bool zen::manualProgramUpdateRequired()
-{
-    return true;
-    //return isPortableVersion(); //locally installed version is updated by Launchpad
-}
-
-
-Zstring zen::getResourceDir()
+Zstring zen::getResourceDirPf()
 {
     //make independent from wxWidgets global variable "appname"; support being called by RealTimeSync
     auto appName = wxTheApp->GetAppName();
@@ -53,7 +47,7 @@ Zstring zen::getResourceDir()
 }
 
 
-Zstring zen::getConfigDir()
+Zstring zen::getConfigDirPathPf()
 {
     //make independent from wxWidgets global variable "appname"; support being called by RealTimeSync
     auto appName = wxTheApp->GetAppName();

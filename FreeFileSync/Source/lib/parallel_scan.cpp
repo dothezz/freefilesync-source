@@ -5,11 +5,13 @@
 // *****************************************************************************
 
 #include "parallel_scan.h"
+#include <chrono>
 #include <zen/file_error.h>
+#include <zen/basic_math.h>
 #include <zen/thread.h>
 #include <zen/scope_guard.h>
 #include <zen/fixed_list.h>
-#include <zen/tick_count.h>
+//#include <zen/tick_count.h>
 #include "db_file.h"
 #include "lock_holder.h"
 
@@ -157,52 +159,53 @@ using BasicWString = Zbase<wchar_t>; //thread-safe string class for UI texts
 class AsyncCallback //actor pattern
 {
 public:
-    AsyncCallback(size_t reportingIntervalMs) : reportingIntervalTicks(reportingIntervalMs * ticksPerSec() / 1000) {}
+    AsyncCallback(size_t reportingIntervalMs) : reportingIntervalMs_(reportingIntervalMs) {}
 
     //blocking call: context of worker thread
     FillBufferCallback::HandleError reportError(const std::wstring& msg, size_t retryNumber) //throw ThreadInterruption
     {
-        std::unique_lock<std::mutex> dummy(lockErrorInfo);
-        interruptibleWait(conditionCanReportError, dummy, [this] { return !errorInfo && !errorResponse; }); //throw ThreadInterruption
+        std::unique_lock<std::mutex> dummy(lockErrorInfo_);
+        interruptibleWait(conditionCanReportError_, dummy, [this] { return !errorInfo_ && !errorResponse_; }); //throw ThreadInterruption
 
-        errorInfo = std::make_unique<std::pair<BasicWString, size_t>>(copyStringTo<BasicWString>(msg), retryNumber);
+        errorInfo_ = std::make_unique<std::pair<BasicWString, size_t>>(copyStringTo<BasicWString>(msg), retryNumber);
 
-        interruptibleWait(conditionGotResponse, dummy, [this] { return static_cast<bool>(errorResponse); }); //throw ThreadInterruption
+        interruptibleWait(conditionGotResponse_, dummy, [this] { return static_cast<bool>(errorResponse_); }); //throw ThreadInterruption
 
-        FillBufferCallback::HandleError rv = *errorResponse;
+        FillBufferCallback::HandleError rv = *errorResponse_;
 
-        errorInfo    .reset();
-        errorResponse.reset();
+        errorInfo_    .reset();
+        errorResponse_.reset();
 
         dummy.unlock(); //optimization for condition_variable::notify_all()
-        conditionCanReportError.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
+        conditionCanReportError_.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
 
         return rv;
     }
 
     void processErrors(FillBufferCallback& callback) //context of main thread, call repreatedly
     {
-        std::unique_lock<std::mutex> dummy(lockErrorInfo);
-        if (errorInfo.get() && !errorResponse.get())
+        std::unique_lock<std::mutex> dummy(lockErrorInfo_);
+        if (errorInfo_.get() && !errorResponse_.get())
         {
-            FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorInfo->first), errorInfo->second); //throw!
-            errorResponse = std::make_unique<FillBufferCallback::HandleError>(rv);
+            FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorInfo_->first), errorInfo_->second); //throw!
+            errorResponse_ = std::make_unique<FillBufferCallback::HandleError>(rv);
 
             dummy.unlock(); //optimization for condition_variable::notify_all()
-            conditionGotResponse.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
+            conditionGotResponse_.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         }
     }
 
-    void incrementNotifyingThreadId() { ++notifyingThreadID; } //context of main thread
+    void incrementNotifyingThreadId() { ++notifyingThreadID_; } //context of main thread
 
     //perf optimization: comparison phase is 7% faster by avoiding needless std::wstring contstruction for reportCurrentFile()
-    bool mayReportCurrentFile(int threadID, TickVal& lastReportTime) const
+    bool mayReportCurrentFile(int threadID, std::chrono::steady_clock::time_point& lastReportTime) const
     {
-        if (threadID != notifyingThreadID) //only one thread at a time may report status
+        if (threadID != notifyingThreadID_) //only one thread at a time may report status
             return false;
 
-        const TickVal now = getTicks(); //0 on error
-        if (dist(lastReportTime, now) >= reportingIntervalTicks) //perform ui updates not more often than necessary
+        const auto now = std::chrono::steady_clock::now(); //0 on error
+
+        if (numeric::dist(now, lastReportTime) > std::chrono::milliseconds(reportingIntervalMs_)) //perform ui updates not more often than necessary + handle potential chrono wrap-around!
         {
             lastReportTime = now; //keep "lastReportTime" at worker thread level to avoid locking!
             return true;
@@ -212,24 +215,24 @@ public:
 
     void reportCurrentFile(const std::wstring& filepath) //context of worker thread
     {
-        std::lock_guard<std::mutex> dummy(lockCurrentStatus);
-        currentFile = copyStringTo<BasicWString>(filepath);
+        std::lock_guard<std::mutex> dummy(lockCurrentStatus_);
+        currentFile_ = copyStringTo<BasicWString>(filepath);
     }
 
     std::wstring getCurrentStatus() //context of main thread, call repreatedly
     {
         std::wstring filepath;
         {
-            std::lock_guard<std::mutex> dummy(lockCurrentStatus);
-            filepath = copyStringTo<std::wstring>(currentFile);
+            std::lock_guard<std::mutex> dummy(lockCurrentStatus_);
+            filepath = copyStringTo<std::wstring>(currentFile_);
         }
 
         if (filepath.empty())
             return std::wstring();
 
-        std::wstring statusText = copyStringTo<std::wstring>(textScanning);
+        std::wstring statusText = copyStringTo<std::wstring>(textScanning_);
 
-        const long activeCount = activeWorker;
+        const long activeCount = activeWorker_;
         if (activeCount >= 2)
             statusText += L" [" + replaceCpy(_P("1 thread", "%x threads", activeCount), L"%x", numberTo<std::wstring>(activeCount)) + L"]";
 
@@ -238,33 +241,33 @@ public:
         return statusText;
     }
 
-    void incItemsScanned() { ++itemsScanned; } //perf: irrelevant! scanning is almost entirely file I/O bound, not CPU bound! => no prob having multiple threads poking at the same variable!
-    long getItemsScanned() const { return itemsScanned; }
+    void incItemsScanned() { ++itemsScanned_; } //perf: irrelevant! scanning is almost entirely file I/O bound, not CPU bound! => no prob having multiple threads poking at the same variable!
+    long getItemsScanned() const { return itemsScanned_; }
 
-    void incActiveWorker() { ++activeWorker; }
-    void decActiveWorker() { --activeWorker; }
-    long getActiveWorker() const { return activeWorker; }
+    void incActiveWorker() { ++activeWorker_; }
+    void decActiveWorker() { --activeWorker_; }
+    long getActiveWorker() const { return activeWorker_; }
 
 private:
     //---- error handling ----
-    std::mutex lockErrorInfo;
-    std::condition_variable conditionCanReportError;
-    std::condition_variable conditionGotResponse;
-    std::unique_ptr<std::pair<BasicWString, size_t>> errorInfo; //error message + retry number
-    std::unique_ptr<FillBufferCallback::HandleError> errorResponse;
+    std::mutex lockErrorInfo_;
+    std::condition_variable conditionCanReportError_;
+    std::condition_variable conditionGotResponse_;
+    std::unique_ptr<std::pair<BasicWString, size_t>> errorInfo_; //error message + retry number
+    std::unique_ptr<FillBufferCallback::HandleError> errorResponse_;
 
     //---- status updates ----
-    std::atomic<int> notifyingThreadID { 0 }; //CAVEAT: do NOT use boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
+    std::atomic<int> notifyingThreadID_ { 0 }; //CAVEAT: do NOT use boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
 
-    std::mutex lockCurrentStatus; //use a different lock for current file: continue traversing while some thread may process an error
-    BasicWString currentFile;
-    const std::int64_t reportingIntervalTicks;
+    std::mutex lockCurrentStatus_; //use a different lock for current file: continue traversing while some thread may process an error
+    BasicWString currentFile_;
+    const std::int64_t reportingIntervalMs_;
 
-    const BasicWString textScanning { copyStringTo<BasicWString>(_("Scanning:")) }; //this one is (currently) not shared and could be made a std::wstring, but we stay consistent and use thread-safe variables in this class only!
+    const BasicWString textScanning_ { copyStringTo<BasicWString>(_("Scanning:")) }; //this one is (currently) not shared and could be made a std::wstring, but we stay consistent and use thread-safe variables in this class only!
 
     //---- status updates II (lock free) ----
-    std::atomic<int> itemsScanned{ 0 }; //std:atomic is uninitialized by default!
-    std::atomic<int> activeWorker{ 0 }; //
+    std::atomic<int> itemsScanned_{ 0 }; //std:atomic is uninitialized by default!
+    std::atomic<int> activeWorker_{ 0 }; //
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -296,7 +299,7 @@ public:
 
     AsyncCallback& acb_;
     const int threadID_;
-    TickVal lastReportTime;
+    std::chrono::steady_clock::time_point lastReportTime_;
 };
 
 
@@ -339,7 +342,7 @@ void DirCallback::onFile(const FileInfo& fi) //throw ThreadInterruption
     const Zstring fileRelPath = parentRelPathPf_ + fi.itemName;
 
     //update status information no matter whether item is excluded or not!
-    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime))
+    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime_))
         cfg.acb_.reportCurrentFile(AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, fileRelPath)));
 
     //------------------------------------------------------------------------------------
@@ -371,7 +374,7 @@ std::unique_ptr<AFS::TraverserCallback> DirCallback::onDir(const DirInfo& di) //
     const Zstring& folderRelPath = parentRelPathPf_ + di.itemName;
 
     //update status information no matter whether item is excluded or not!
-    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime))
+    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime_))
         cfg.acb_.reportCurrentFile(AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, folderRelPath)));
 
     //------------------------------------------------------------------------------------
@@ -390,11 +393,11 @@ std::unique_ptr<AFS::TraverserCallback> DirCallback::onDir(const DirInfo& di) //
     if (level_ > 100) //Win32 traverser: stack overflow approximately at level 1000
         if (!tryReportingItemError([&] //check after FolderContainer::addSubFolder()
     {
-        throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, folderRelPath))), L"Endless recursion.");
+        throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, folderRelPath))), L"Endless recursion.");
         }, *this, di.itemName))
     return nullptr;
 
-    return std::make_unique<DirCallback>(cfg, folderRelPath + FILE_NAME_SEPARATOR, subFolder, level_ + 1); //releaseDirTraverser() is guaranteed to be called in any case
+    return std::make_unique<DirCallback>(cfg, folderRelPath + FILE_NAME_SEPARATOR, subFolder, level_ + 1);
 }
 
 
@@ -405,7 +408,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si) //throw Th
     const Zstring& linkRelPath = parentRelPathPf_ + si.itemName;
 
     //update status information no matter whether item is excluded or not!
-    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime))
+    if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime_))
         cfg.acb_.reportCurrentFile(AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, linkRelPath)));
 
     switch (cfg.handleSymlinks_)
@@ -497,7 +500,7 @@ public:
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker());
 
-        if (acb_->mayReportCurrentFile(travCfg.threadID_, travCfg.lastReportTime))
+        if (acb_->mayReportCurrentFile(travCfg.threadID_, travCfg.lastReportTime_))
             acb_->reportCurrentFile(AFS::getDisplayPath(travCfg.baseFolderPath_)); //just in case first directory access is blocking
 
         DirCallback cb(travCfg, Zstring(), outputContainer, 0);

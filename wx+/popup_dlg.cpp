@@ -76,27 +76,31 @@ public:
         PopupDialogGenerated(parent),
         checkBoxValue_(cfg.checkBoxValue)
     {
-        wxString titleTmp = cfg.title;
+        wxBitmap iconTmp;
+        wxString titleTmp;
         switch (type)
         {
             case DialogInfoType::INFO:
-                //"information" is meaningless as caption text!
+                //"Information" is meaningless as caption text!
                 //confirmation doesn't use info icon
-                //m_bitmapMsgType->Hide();
-                //m_bitmapMsgType->SetSize(30, -1);
-                //m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_info"));
+                //iconTmp  = getResourceImage(L"msg_info");
                 break;
             case DialogInfoType::WARNING:
-                if (titleTmp.empty()) titleTmp = _("Warning");
-                m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_warning"));
+                iconTmp  = getResourceImage(L"msg_warning");
+                titleTmp = _("Warning");
                 break;
             case DialogInfoType::ERROR2:
-                if (titleTmp.empty()) titleTmp = _("Error");
-                m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
+                iconTmp  = getResourceImage(L"msg_error");
+                titleTmp = _("Error");
                 break;
         }
         if (cfg.icon.IsOk())
-            m_bitmapMsgType->SetBitmap(cfg.icon);
+            iconTmp = cfg.icon;
+
+        if (!cfg.title.empty())
+            titleTmp = cfg.title;
+        //-----------------------------------------------
+        m_bitmapMsgType->SetBitmap(iconTmp);
 
         if (titleTmp.empty())
             SetTitle(wxTheApp->GetAppDisplayName());
@@ -130,7 +134,7 @@ public:
 
         if (!cfg.textDetail.empty())
         {
-            const wxString& text = L"\n" + cfg.textDetail + L"\n"; //add empty top/bottom lines *instead* of using border space!
+            const wxString& text = L"\n" + trimCpy(cfg.textDetail) + L"\n"; //add empty top/bottom lines *instead* of using border space!
             setBestInitialSize(*m_textCtrlTextDetail, text, wxSize(maxWidth, maxHeight));
             m_textCtrlTextDetail->ChangeValue(text);
         }
@@ -175,14 +179,14 @@ private:
     void OnButtonAffirmative(wxCommandEvent& event) override
     {
         if (checkBoxValue_)
-            * checkBoxValue_ = m_checkBoxCustom->GetValue();
+            *checkBoxValue_ = m_checkBoxCustom->GetValue();
         EndModal(static_cast<int>(ConfirmationButton3::DO_IT));
     }
 
     void OnButtonNegative(wxCommandEvent& event) override
     {
         if (checkBoxValue_)
-            * checkBoxValue_ = m_checkBoxCustom->GetValue();
+            *checkBoxValue_ = m_checkBoxCustom->GetValue();
         EndModal(static_cast<int>(ConfirmationButton3::DONT_DO_IT));
     }
 
@@ -234,8 +238,8 @@ class zen::ConfirmationDialog3 : public StandardPopupDialog
 {
 public:
     ConfirmationDialog3(wxWindow* parent, DialogInfoType type, const PopupDialogCfg3& cfg, const wxString& labelDoIt, const wxString& labelDontDoIt) :
-        StandardPopupDialog(parent, type, cfg.pdCfg),
-        buttonToDisableWhenChecked(cfg.buttonToDisableWhenChecked)
+        StandardPopupDialog(parent, type, cfg.pdCfg_),
+        buttonToDisableWhenChecked_(cfg.buttonToDisableWhenChecked_)
     {
         assert(contains(labelDoIt,     L"&"));
         assert(contains(labelDontDoIt, L"&"));
@@ -259,7 +263,7 @@ private:
 
     void updateGui()
     {
-        switch (buttonToDisableWhenChecked)
+        switch (buttonToDisableWhenChecked_)
         {
             case ConfirmationButton3::DO_IT:
                 m_buttonAffirmative->Enable(!m_checkBoxCustom->GetValue());
@@ -272,7 +276,7 @@ private:
         }
     }
 
-    const ConfirmationButton3 buttonToDisableWhenChecked;
+    const ConfirmationButton3 buttonToDisableWhenChecked_;
 };
 
 //########################################################################################

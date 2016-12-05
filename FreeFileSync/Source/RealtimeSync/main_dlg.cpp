@@ -54,7 +54,7 @@ void MainDialog::create(const Zstring& cfgFile)
 
 MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     : MainDlgGenerated(dlg),
-      lastRunConfigPath(zen::getConfigDir() + Zstr("LastRun.ffs_real"))
+      lastRunConfigPath_(zen::getConfigDirPathPf() + Zstr("LastRun.ffs_real"))
 {
 
     SetIcon(getRtsIcon()); //set application icon
@@ -77,9 +77,9 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
 
-    const Zstring currentConfigFile = cfgFileName.empty() ? lastRunConfigPath : cfgFileName;
+    const Zstring currentConfigFile = cfgFileName.empty() ? lastRunConfigPath_ : cfgFileName;
     bool loadCfgSuccess = false;
-    if (!cfgFileName.empty() || fileExists(lastRunConfigPath))
+    if (!cfgFileName.empty() || fileExists(lastRunConfigPath_))
         try
         {
             std::wstring warningMsg;
@@ -128,7 +128,7 @@ MainDialog::~MainDialog()
 
     try //write config to XML
     {
-        writeConfig(currentCfg, lastRunConfigPath); //throw FileError
+        writeConfig(currentCfg, lastRunConfigPath_); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -139,7 +139,7 @@ MainDialog::~MainDialog()
 
 void MainDialog::onQueryEndSession()
 {
-    try { writeConfig(getConfiguration(), lastRunConfigPath); } //throw FileError
+    try { writeConfig(getConfiguration(), lastRunConfigPath_); } //throw FileError
     catch (const FileError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
 }
 
@@ -189,7 +189,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     xmlAccess::XmlRealConfig currentCfg = getConfiguration();
 
-    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName))))
+    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName_))))
     {
         case rts::EXIT_APP:
             Close();
@@ -206,7 +206,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
 void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
-    Zstring defaultFileName = currentConfigFileName.empty() ? Zstr("Realtime.ffs_real") : currentConfigFileName;
+    Zstring defaultFileName = currentConfigFileName_.empty() ? Zstr("Realtime.ffs_real") : currentConfigFileName_;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
     if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
         defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_real");
@@ -263,15 +263,15 @@ void MainDialog::loadConfig(const Zstring& filepath)
 void MainDialog::setLastUsedConfig(const Zstring& filepath)
 {
     //set title
-    if (filepath == lastRunConfigPath)
+    if (filepath == lastRunConfigPath_)
     {
         SetTitle(L"RealTimeSync - " + _("Automated Synchronization"));
-        currentConfigFileName.clear();
+        currentConfigFileName_.clear();
     }
     else
     {
         SetTitle(utfCvrtTo<wxString>(filepath));
-        currentConfigFileName = filepath;
+        currentConfigFileName_ = filepath;
     }
 }
 
@@ -280,7 +280,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxString(),
-                            utfCvrtTo<wxString>(beforeLast(currentConfigFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            utfCvrtTo<wxString>(beforeLast(currentConfigFileName_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             wxString(),
                             wxString(L"RealTimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
@@ -437,7 +437,7 @@ void MainDialog::removeAddFolder(size_t pos)
         //the deferred deletion it is expected to do (and which is implemented correctly on Windows and Linux)
         //http://bb10.com/python-wxpython-devel/2012-09/msg00004.html
         //=> since we're in a mouse button callback of a sub-component of "pairToDelete" we need to delay deletion ourselves:
-        guiQueue.processAsync([] {}, [pairToDelete] { pairToDelete->Destroy(); });
+        guiQueue_.processAsync([] {}, [pairToDelete] { pairToDelete->Destroy(); });
 
         //set size of scrolled window
         const size_t additionalRows = std::min(dirpathsExtra.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown

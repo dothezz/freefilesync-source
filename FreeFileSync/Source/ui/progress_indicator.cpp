@@ -62,6 +62,7 @@ inline wxColor getColorItemsBackgroundRim() { return {  53,  25, 255 }; } //dark
 
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
+// std::chrono::system_clock is not a steady clock, but at least doesn't overflow!
 //http://www.freefilesync.org/forum/viewtopic.php?t=1426
 
 class StopWatch
@@ -69,41 +70,42 @@ class StopWatch
 public:
     void pause()
     {
-        if (!paused)
+        if (!paused_)
         {
-            paused = true;
-            elapsedUntilPause += numeric::dist(startTime, wxGetUTCTimeMillis().GetValue());
+            paused_ = true;
+            elapsedUntilPause_ += std::chrono::system_clock::now() - startTime_;
         }
     }
 
     void resume()
     {
-        if (paused)
+        if (paused_)
         {
-            paused = false;
-            startTime = wxGetUTCTimeMillis().GetValue();
+            paused_ = false;
+            startTime_ = std::chrono::system_clock::now();
         }
     }
 
     void restart()
     {
-        startTime = wxGetUTCTimeMillis().GetValue(); //uses ::GetSystemTimeAsFileTime()
-        paused = false;
-        elapsedUntilPause = 0;
+        paused_ = false;
+        startTime_ = std::chrono::system_clock::now();
+        elapsedUntilPause_ = std::chrono::nanoseconds::zero();
     }
 
     int64_t timeMs() const
     {
-        int64_t msTotal = elapsedUntilPause;
-        if (!paused)
-            msTotal += numeric::dist(startTime, wxGetUTCTimeMillis().GetValue());
-        return msTotal;
+        auto elapsedTotal = elapsedUntilPause_;
+        if (!paused_)
+            elapsedTotal += std::chrono::system_clock::now() - startTime_;
+
+        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTotal).count();
     }
 
 private:
-    wxLongLong_t startTime = wxGetUTCTimeMillis().GetValue(); //alas not a steady clock, but something's got to give!
-    bool    paused = false;
-    int64_t elapsedUntilPause = 0;
+    bool paused_ = false;
+    std::chrono::system_clock::time_point startTime_ = std::chrono::system_clock::now(); //uses ::GetSystemTimePreciseAsFileTime()
+    std::chrono::nanoseconds elapsedUntilPause_{}; //std::chrono::duration is uninitialized by default! WTF! When will this stupidity end???
 };
 
 
@@ -1014,7 +1016,7 @@ public:
 
         lastSample = std::make_pair(timeNowMs, value);
 
-        //allow for at most one sample per 100ms (handles duplicate inserts, too!) => this is unrelated to UI_UPDATE_INTERVAL!
+        //allow for at most one sample per 100ms (handles duplicate inserts, too!) => this is unrelated to UI_UPDATE_INTERVAL_MS!
         if (!samples.empty()) //always unconditionally insert first sample!
             if (timeNowMs / 100 == samples.rbegin()->first / 100)
                 return;
@@ -1704,7 +1706,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             {
                 wxTheApp->Yield(); //receive UI message that end pause OR forceful termination!
                 //*first* refresh GUI (removing flicker) before sleeping!
-                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL));
+                std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS));
             }
             //after SyncProgressDialogImpl::OnClose() called wxWindow::Destroy() on OS X this instance is instantly toast!
             if (wereDead)
@@ -1980,7 +1982,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
             if (!soundFileSyncComplete_.empty())
             {
-                const Zstring soundFile = getResourceDir() + soundFileSyncComplete_;
+                const Zstring soundFile = getResourceDirPf() + soundFileSyncComplete_;
                 if (fileExists(soundFile))
                     wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
             }

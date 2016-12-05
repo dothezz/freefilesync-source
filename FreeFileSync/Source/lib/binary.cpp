@@ -39,22 +39,22 @@ const size_t BLOCK_SIZE_MAX =  16 * 1024 * 1024;
 struct StreamReader
 {
     StreamReader(const AbstractPath& filePath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress, size_t& unevenBytes) :
-        stream(AFS::getInputStream(filePath)), //throw FileError, (ErrorFileLocked)
-        defaultBlockSize(stream->getBlockSize()),
-        dynamicBlockSize(defaultBlockSize),
+        stream_(AFS::getInputStream(filePath)), //throw FileError, (ErrorFileLocked)
+        defaultBlockSize_(stream_->getBlockSize()),
+        dynamicBlockSize_(defaultBlockSize_),
         notifyProgress_(notifyProgress),
         unevenBytes_(unevenBytes) {}
 
     void appendChunk(std::vector<char>& buffer) //throw FileError
     {
-        assert(!eof);
-        if (eof) return;
+        assert(!eof_);
+        if (eof_) return;
 
         const auto startTime = std::chrono::steady_clock::now();
 
-        buffer.resize(buffer.size() + dynamicBlockSize);
-        const size_t bytesRead = stream->tryRead(&*(buffer.end() - dynamicBlockSize), dynamicBlockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-        buffer.resize(buffer.size() - dynamicBlockSize + bytesRead); //caveat: unsigned arithmetics
+        buffer.resize(buffer.size() + dynamicBlockSize_);
+        const size_t bytesRead = stream_->tryRead(&*(buffer.end() - dynamicBlockSize_), dynamicBlockSize_); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        buffer.resize(buffer.size() - dynamicBlockSize_ + bytesRead); //caveat: unsigned arithmetics
 
         const auto stopTime = std::chrono::steady_clock::now();
 
@@ -68,7 +68,7 @@ struct StreamReader
 
         if (bytesRead == 0)
         {
-            eof = true;
+            eof_ = true;
             return;
         }
 
@@ -76,31 +76,31 @@ struct StreamReader
         const auto loopTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime).count();
 
         if (loopTimeMs >= 100)
-            lastDelayViolation = stopTime;
+            lastDelayViolation_ = stopTime;
 
         //avoid "flipping back": e.g. DVD-ROMs read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
-        if (stopTime >= lastDelayViolation + std::chrono::seconds(2))
+        if (stopTime >= lastDelayViolation_ + std::chrono::seconds(2))
         {
-            lastDelayViolation = stopTime;
-            proposedBlockSize = dynamicBlockSize * 2;
+            lastDelayViolation_ = stopTime;
+            proposedBlockSize = dynamicBlockSize_ * 2;
         }
         if (loopTimeMs > 500)
-            proposedBlockSize = dynamicBlockSize / 2;
+            proposedBlockSize = dynamicBlockSize_ / 2;
 
-        if (defaultBlockSize <= proposedBlockSize && proposedBlockSize <= BLOCK_SIZE_MAX)
-            dynamicBlockSize = proposedBlockSize;
+        if (defaultBlockSize_ <= proposedBlockSize && proposedBlockSize <= BLOCK_SIZE_MAX)
+            dynamicBlockSize_ = proposedBlockSize;
     }
 
-    bool isEof() const { return eof; }
+    bool isEof() const { return eof_; }
 
 private:
-    const std::unique_ptr<AFS::InputStream> stream;
-    const size_t defaultBlockSize;
-    size_t dynamicBlockSize;
+    const std::unique_ptr<AFS::InputStream> stream_;
+    const size_t defaultBlockSize_;
+    size_t dynamicBlockSize_;
     const std::function<void(std::int64_t bytesDelta)> notifyProgress_;
     size_t& unevenBytes_;
-    std::chrono::steady_clock::time_point lastDelayViolation = std::chrono::steady_clock::now();
-    bool eof = false;
+    std::chrono::steady_clock::time_point lastDelayViolation_ = std::chrono::steady_clock::now();
+    bool eof_ = false;
 };
 }
 

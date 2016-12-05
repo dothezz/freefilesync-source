@@ -44,15 +44,22 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     static bool isNullPath(const AbstractPath& ap) { return ap.afs->isNullPath(ap.itemPathImpl); }
 
-    static AbstractPath appendRelPath(const AbstractPath& ap, const Zstring& relPath)
+    static AbstractPath appendRelPath(const AbstractPath& ap, const Zstring& relPath);
+
+    struct PathComplement
     {
-        assert(relPath.empty() || (!startsWith(relPath, FILE_NAME_SEPARATOR) && !endsWith(relPath, FILE_NAME_SEPARATOR)));
-        return AbstractPath(ap.afs, ap.afs->appendRelPathToItemPathImpl(ap.itemPathImpl, relPath));
-    }
+        Zstring relPathL; //- relative path is filled only if the corresponding abstract path is a sub folder of the other (=> both relative paths are empty if abstract paths match)
+        Zstring relPathR; //- without FILE_NAME_SEPARATOR prefix
+    };
+    static Opt<PathComplement> getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs);
 
     static Zstring getFileShortName(const AbstractPath& ap) { return ap.afs->getFileShortName(ap.itemPathImpl); }
 
-    static bool havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs);
+    static bool havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs)
+    {
+        warn_static("remove after migration")
+        return typeid(*lhs.afs) != typeid(*rhs.afs) ? false : lhs.afs->havePathDependencySameAfsType(lhs.itemPathImpl, rhs);
+    }
 
     static Opt<Zstring> getNativeItemPath(const AbstractPath& ap) { return ap.afs->isNativeFileSystem() ? Opt<Zstring>(ap.itemPathImpl) : NoValue(); }
 
@@ -137,9 +144,9 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     private:
         std::unique_ptr<OutputStreamImpl> outStream_; //bound!
         const AbstractPath filePath_;
-        bool finalizeSucceeded = false;
-        Opt<std::uint64_t> bytesExpected;
-        std::uint64_t bytesWrittenTotal = 0;
+        bool finalizeSucceeded_ = false;
+        Opt<std::uint64_t> bytesExpected_;
+        std::uint64_t bytesWrittenTotal_ = 0;
     };
 
     //return value always bound:
@@ -275,12 +282,14 @@ private:
 
     virtual Zstring appendRelPathToItemPathImpl(const Zstring& itemPathImpl, const Zstring& relPath) const = 0;
 
+    virtual Opt<PathComplement> getPathComplementSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
+
+    virtual bool lessItemPathSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
+
     //used during folder creation if parent folder is missing
     virtual Opt<Zstring> getParentFolderPathImpl(const Zstring& itemPathImpl) const = 0;
 
     virtual Zstring getFileShortName(const Zstring& itemPathImpl) const = 0;
-
-    virtual bool lessItemPathSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
 
     virtual bool havePathDependencySameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
 
@@ -411,12 +420,35 @@ bool AbstractFileSystem::equalAbstractPath(const AbstractPath& lhs, const Abstra
     return !LessAbstractPath()(lhs, rhs) && !LessAbstractPath()(rhs, lhs);
 }
 
+namespace impl
+{
+inline
+bool isValidRelPath(const Zstring& relPath)
+{
+    const bool check1 = !contains(relPath, '\\');
+    const bool check2 = relPath.empty() || (!startsWith(relPath, FILE_NAME_SEPARATOR) && !endsWith(relPath, FILE_NAME_SEPARATOR));
+    return check1 && check2;
+}
+}
 
 inline
-bool AbstractFileSystem::havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs)
+AbstractPath AbstractFileSystem::appendRelPath(const AbstractPath& ap, const Zstring& relPath)
 {
-    return typeid(*lhs.afs) != typeid(*rhs.afs) ? false : lhs.afs->havePathDependencySameAfsType(lhs.itemPathImpl, rhs);
-};
+    assert(impl::isValidRelPath(relPath));
+    return AbstractPath(ap.afs, ap.afs->appendRelPathToItemPathImpl(ap.itemPathImpl, relPath));
+}
+
+
+inline
+auto AbstractFileSystem::getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs) -> Opt<PathComplement>
+{
+    if (typeid(*lhs.afs) != typeid(*rhs.afs))
+        return NoValue();
+    Opt<PathComplement> result = lhs.afs->getPathComplementSameAfsType(lhs.itemPathImpl, rhs);
+    assert(!result || (impl::isValidRelPath(result->relPathL)&& impl::isValidRelPath(result->relPathR)));
+    assert(!result || result->relPathL.empty() || result->relPathR.empty());
+    return result;
+}
 
 
 inline
@@ -449,7 +481,7 @@ AbstractFileSystem::OutputStream::OutputStream(std::unique_ptr<OutputStreamImpl>
     outStream_(std::move(outStream)), filePath_(filePath)
 {
     if (streamSize)
-        bytesExpected = *streamSize;
+        bytesExpected_ = *streamSize;
 }
 
 
@@ -460,7 +492,7 @@ AbstractFileSystem::OutputStream::~OutputStream()
 
     outStream_.reset(); //close file handle *before* remove!
 
-    if (!finalizeSucceeded) //transactional output stream! => clean up!
+    if (!finalizeSucceeded_) //transactional output stream! => clean up!
         try { AbstractFileSystem::removeFile(filePath_); /*throw FileError*/ }
         catch (FileError& e) { (void)e; assert(false); }
 }
@@ -476,7 +508,7 @@ size_t AbstractFileSystem::OutputStream::tryWrite(const void* data, size_t len) 
     if (bytesWritten > len)
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
-    bytesWrittenTotal += bytesWritten;
+    bytesWrittenTotal_ += bytesWritten;
     return bytesWritten;
 }
 
@@ -485,14 +517,14 @@ inline
 AbstractFileSystem::FileId AbstractFileSystem::OutputStream::finalize(const std::function<void()>& onUpdateStatus) //throw FileError
 {
     //important check: catches corrupt sftp download with libssh2!
-    if (bytesExpected && *bytesExpected != bytesWrittenTotal)
+    if (bytesExpected_ && *bytesExpected_ != bytesWrittenTotal_)
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getDisplayPath(filePath_))),
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
-                                              L"%x", numberTo<std::wstring>(*bytesExpected)),
-                                   L"%y", numberTo<std::wstring>(bytesWrittenTotal)));
+                                              L"%x", numberTo<std::wstring>(*bytesExpected_)),
+                                   L"%y", numberTo<std::wstring>(bytesWrittenTotal_)));
 
     FileId fileId = outStream_->finalize(onUpdateStatus); //throw FileError
-    finalizeSucceeded = true;
+    finalizeSucceeded_ = true;
     return fileId;
 }
 

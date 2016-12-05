@@ -90,6 +90,13 @@ public:
 private:
     bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray) override
     {
+        /*Linux, MTP: we get an empty file array
+            => switching to wxTextDropTarget won't help (much): we'd get the format
+                mtp://[usb:001,002]/Telefonspeicher/Folder/file.txt
+            instead of
+                /run/user/1000/gvfs/mtp:host=%5Busb%3A001%2C002%5D/Telefonspeicher/Folder/file.txt
+        */
+
         //wxPoint clientDropPos(x, y)
         std::vector<Zstring> filePaths;
         for (const wxString& file : fileArray)

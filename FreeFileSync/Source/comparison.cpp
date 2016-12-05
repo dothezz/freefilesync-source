@@ -45,11 +45,6 @@ namespace
 {
 struct ResolvedFolderPair
 {
-    ResolvedFolderPair(const AbstractPath& left,
-                       const AbstractPath& right) :
-        folderPathLeft (left),
-        folderPathRight(right) {}
-
     AbstractPath folderPathLeft;
     AbstractPath folderPathRight;
 };
@@ -83,7 +78,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
             uniqueBaseFolders.insert(folderPathLeft);
             uniqueBaseFolders.insert(folderPathRight);
 
-            output.resolvedPairs.emplace_back(folderPathLeft, folderPathRight);
+            output.resolvedPairs.push_back({ folderPathLeft, folderPathRight });
         }
 
         const FolderStatus status = getFolderStatusNonBlocking(uniqueBaseFolders, folderAccessTimeout, allowUserInteraction, callback); //re-check *all* directories on each try!
@@ -128,7 +123,7 @@ void checkForIncompleteInput(const std::vector<ResolvedFolderPair>& folderPairs,
         else if (!AFS::isNullPath(fp.folderPathLeft))
             haveFullPair = true;
 
-    if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
+    if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-folder comparison scenario
         callback.reportWarning(_("A folder input field is empty.") + L" \n\n" +
                                _("The corresponding folder will be considered as empty."), warningInputFieldEmpty);
 }
@@ -179,7 +174,7 @@ private:
                                                       std::vector<FilePair*>& undefinedFiles,
                                                       std::vector<SymlinkPair*>& undefinedSymlinks) const;
 
-    std::map<DirectoryKey, DirectoryValue> directoryBuffer; //contains only *existing* directories
+    std::map<DirectoryKey, DirectoryValue> directoryBuffer_; //contains only *existing* directories
     const int fileTimeTolerance_;
     ProcessCallback& callback_;
 };
@@ -195,8 +190,8 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int
 
         void reportStatus(const std::wstring& statusMsg, int itemsTotal) override
         {
-            callback_.updateProcessedData(itemsTotal - itemsReported, 0); //processed bytes are reported in subfunctions!
-            itemsReported = itemsTotal;
+            callback_.updateProcessedData(itemsTotal - itemsReported_, 0); //processed bytes are reported in subfunctions!
+            itemsReported_ = itemsTotal;
 
             callback_.reportStatus(statusMsg); //may throw
             //callback_.requestUiRefresh(); //already called by reportStatus()
@@ -219,13 +214,13 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int
 
     private:
         ProcessCallback& callback_;
-        int itemsReported = 0;
+        int itemsReported_ = 0;
     } cb(callback);
 
     fillBuffer(keysToRead, //in
-               directoryBuffer, //out
+               directoryBuffer_, //out
                cb,
-               UI_UPDATE_INTERVAL / 2); //every ~50 ms
+               UI_UPDATE_INTERVAL_MS / 2); //every ~50 ms
 }
 
 
@@ -233,38 +228,39 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int
 
 //const wchar_t arrowLeft [] = L"\u2190";
 //const wchar_t arrowRight[] = L"\u2192"; unicode arrows -> too small
-const wchar_t arrowLeft [] = L"<--";
-const wchar_t arrowRight[] = L"-->";
+const wchar_t arrowLeft [] = L"<-";
+const wchar_t arrowRight[] = L"->";
 
+//NOTE: conflict texts are NOT expected to contain additional path info (already implicit through associated item!)
+//      => only add path info if information is relevant, e.g. conflict is specific to left/right side only
 
-//check for very old dates or dates in the future
-std::wstring getConflictInvalidDate(const std::wstring& displayPath, std::int64_t utcTime)
+template <SelectedSide side, class FileOrLinkPair> inline
+std::wstring getConflictInvalidDate(const FileOrLinkPair& file)
 {
-    return replaceCpy(_("File %x has an invalid date."), L"%x", fmtPath(displayPath)) + L"\n" +
-           _("Date:") + L" " + utcToLocalTimeString(utcTime);
+    return replaceCpy(_("File %x has an invalid date."), L"%x", fmtPath(AFS::getDisplayPath(file.template getAbstractPath<side>()))) + L"\n" +
+           _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<side>());
 }
 
 
-//check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FilePair& file)
 {
-    return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtPath(file.getPairRelativePath())) + L"\n" +
-           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<LEFT_SIDE>()) + L"\n" +
-           L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<RIGHT_SIDE>());
+    return _("Files have the same date but a different size.") + L"\n" +
+           arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<LEFT_SIDE>()) + L"\n" +
+           arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<RIGHT_SIDE>());
 }
 
 
 std::wstring getConflictSkippedBinaryComparison(const FilePair& file)
 {
-    return replaceCpy(_("Content comparison was skipped for excluded files %x."), L"%x", fmtPath(file.getPairRelativePath()));
+    return _("Content comparison was skipped for excluded files.");
 }
 
 
 std::wstring getDescrDiffMetaShortnameCase(const FileSystemObject& fsObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + fmtPath(fsObj.getItemName< LEFT_SIDE>()) + L"\n" +
-           L"    " + arrowRight + L" " + fmtPath(fsObj.getItemName<RIGHT_SIDE>());
+           arrowLeft  + L" " + fmtPath(fsObj.getItemName< LEFT_SIDE>()) + L"\n" +
+           arrowRight + L" " + fmtPath(fsObj.getItemName<RIGHT_SIDE>());
 }
 
 
@@ -272,8 +268,8 @@ template <class FileOrLinkPair>
 std::wstring getDescrDiffMetaDate(const FileOrLinkPair& file)
 {
     return _("Items differ in attributes only") + L"\n" +
-           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-           L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<RIGHT_SIDE>());
+           arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+           arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<RIGHT_SIDE>());
 }
 
 //-----------------------------------------------------------------------------
@@ -304,11 +300,11 @@ void categorizeSymlinkByTime(SymlinkPair& symlink)
             break;
 
         case TimeResult::LEFT_INVALID:
-            symlink.setCategoryConflict(getConflictInvalidDate(AFS::getDisplayPath(symlink.getAbstractPath<LEFT_SIDE>()), symlink.getLastWriteTime<LEFT_SIDE>()));
+            symlink.setCategoryConflict(getConflictInvalidDate<LEFT_SIDE>(symlink));
             break;
 
         case TimeResult::RIGHT_INVALID:
-            symlink.setCategoryConflict(getConflictInvalidDate(AFS::getDisplayPath(symlink.getAbstractPath<RIGHT_SIDE>()), symlink.getLastWriteTime<RIGHT_SIDE>()));
+            symlink.setCategoryConflict(getConflictInvalidDate<RIGHT_SIDE>(symlink));
             break;
     }
 }
@@ -356,11 +352,11 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
                 break;
 
             case TimeResult::LEFT_INVALID:
-                file->setCategoryConflict(getConflictInvalidDate(AFS::getDisplayPath(file->getAbstractPath<LEFT_SIDE>()), file->getLastWriteTime<LEFT_SIDE>()));
+                file->setCategoryConflict(getConflictInvalidDate<LEFT_SIDE>(*file));
                 break;
 
             case TimeResult::RIGHT_INVALID:
-                file->setCategoryConflict(getConflictInvalidDate(AFS::getDisplayPath(file->getAbstractPath<RIGHT_SIDE>()), file->getLastWriteTime<RIGHT_SIDE>()));
+                file->setCategoryConflict(getConflictInvalidDate<RIGHT_SIDE>(*file));
                 break;
         }
     }
@@ -729,7 +725,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
 
 //-----------------------------------------------------------------------------------------------
 
-//mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
+//uncheck excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
 void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filterProc)
 {
     for (FolderPair& folder : hierObj.refSubFolders())
@@ -766,8 +762,8 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::performComparison(const Resolv
 
     auto getDirValue = [&](const AbstractPath& folderPath) -> const DirectoryValue*
     {
-        auto it = directoryBuffer.find(DirectoryKey(folderPath, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-        return it != directoryBuffer.end() ? &it->second : nullptr;
+        auto it = directoryBuffer_.find(DirectoryKey(folderPath, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+        return it != directoryBuffer_.end() ? &it->second : nullptr;
     };
 
     const DirectoryValue* bufValueLeft  = getDirValue(fp.folderPathLeft);
@@ -899,26 +895,23 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
         callback.reportInfo(e.toString()); //may throw!
     }
 
-    //-------------------some basic checks:------------------------------------------
-
     const ResolvedBaseFolders& resInfo = initializeBaseFolders(cfgList, folderAccessTimeout, allowUserInteraction, callback);
-
     //directory existence only checked *once* to avoid race conditions!
     if (resInfo.resolvedPairs.size() != cfgList.size())
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
+    auto basefolderExisting = [&](const AbstractPath& folderPath) { return resInfo.existingBaseFolders.find(folderPath) != resInfo.existingBaseFolders.end(); };
+
+    //-----------execute basic checks all at once before starting comparison----------
+
     checkForIncompleteInput(resInfo.resolvedPairs, warnings.warningInputFieldEmpty,  callback);
     checkFolderDependency  (resInfo.resolvedPairs, warnings.warningDependentFolders, callback);
 
-    //list of directories that are *expected* to be existent (and need to be scanned)!
-
     //-------------------end of basic checks------------------------------------------
 
-    auto basefolderExisting = [&](const AbstractPath& folderPath) { return resInfo.existingBaseFolders.find(folderPath) != resInfo.existingBaseFolders.end(); };
-
-    std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> totalWorkLoad;
+    std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> workLoad;
     for (size_t i = 0; i < cfgList.size(); ++i)
-        totalWorkLoad.emplace_back(resInfo.resolvedPairs[i], cfgList[i]);
+        workLoad.emplace_back(resInfo.resolvedPairs[i], cfgList[i]);
 
     //lock (existing) directories before comparison
     if (createDirLocks)
@@ -936,9 +929,9 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
         //------------------- fill directory buffer ---------------------------------------------------
         std::set<DirectoryKey> dirsToRead;
 
-        for (const auto& w : totalWorkLoad)
+        for (const auto& w : workLoad)
         {
-            if (basefolderExisting(w.first.folderPathLeft)) //only traverse *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+            if (basefolderExisting(w.first.folderPathLeft)) //only traverse *currently existing* folders: at this point user is aware that non-ex + empty string are seen as empty folder!
                 dirsToRead.emplace(w.first.folderPathLeft,  w.second.filter.nameFilter, w.second.handleSymlinks);
             if (basefolderExisting(w.first.folderPathRight))
                 dirsToRead.emplace(w.first.folderPathRight, w.second.filter.nameFilter, w.second.handleSymlinks);
@@ -955,7 +948,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
             //process binary comparison as one junk
             std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> workLoadByContent;
-            for (const auto& w : totalWorkLoad)
+            for (const auto& w : workLoad)
                 switch (w.second.compareVar)
                 {
                     case CompareVariant::TIME_SIZE:
@@ -968,7 +961,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             std::list<std::shared_ptr<BaseFolderPair>> outputByContent = cmpBuff.compareByContent(workLoadByContent);
 
             //write output in expected order
-            for (const auto& w : totalWorkLoad)
+            for (const auto& w : workLoad)
                 switch (w.second.compareVar)
                 {
                     case CompareVariant::TIME_SIZE:
@@ -991,14 +984,14 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
         //--------- set initial sync-direction --------------------------------------------------
 
-        for (auto j = begin(output); j != end(output); ++j)
+        for (auto it = begin(output); it != end(output); ++it)
         {
-            const FolderPairCfg& fpCfg = cfgList[j - output.begin()];
+            const FolderPairCfg& fpCfg = cfgList[it - output.begin()];
 
             callback.reportStatus(_("Calculating sync directions..."));
             callback.forceUiRefresh();
 
-            zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
+            zen::redetermineSyncDirection(fpCfg.directionCfg, *it,
             [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); },
             [&](std::int64_t bytesDelta) { callback.requestUiRefresh(); });//throw X
         }

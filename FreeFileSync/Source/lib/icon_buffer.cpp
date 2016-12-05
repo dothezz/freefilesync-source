@@ -23,7 +23,6 @@ const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to hold in buffer:
 
 
 
-
 //destroys raw icon! Call from GUI thread only!
 wxBitmap extractWxBitmap(ImageHolder&& ih)
 {
@@ -286,14 +285,14 @@ public:
                  IconBuffer::IconSize st) :
         workload_(workload),
         buffer_(buffer),
-        iconSizeType(st) {}
+        iconSizeType_(st) {}
 
     void operator()() const; //thread entry
 
 private:
     std::shared_ptr<WorkLoad> workload_; //main/worker thread may access different shared_ptr instances safely (even though they have the same target!)
     std::shared_ptr<Buffer> buffer_;     //http://www.boost.org/doc/libs/1_43_0/libs/smart_ptr/shared_ptr.htm?sess=8153b05b34d890e02d48730db1ff7ddc#ThreadSafety
-    const IconBuffer::IconSize iconSizeType;
+    const IconBuffer::IconSize iconSizeType_;
 };
 
 
@@ -301,7 +300,6 @@ private:
 
 void WorkerThread::operator()() const //thread entry
 {
-
         for (;;)
         {
             interruptionPoint(); //throw ThreadInterruption
@@ -310,7 +308,7 @@ void WorkerThread::operator()() const //thread entry
             const AbstractPath itemPath = workload_->extractNextFile(); //throw ThreadInterruption
 
             if (!buffer_->hasIcon(itemPath)) //perf: workload may contain duplicate entries?
-                buffer_->insert(itemPath, getDisplayIcon(itemPath, iconSizeType));
+                buffer_->insert(itemPath, getDisplayIcon(itemPath, iconSizeType_));
         }
 
 }
@@ -325,7 +323,7 @@ struct IconBuffer::Impl
     InterruptibleThread worker;
 
     //-------------------------
-    std::map<Zstring, wxBitmap, LessFilePath> extensionIcons;
+    std::map<Zstring, wxBitmap, LessFilePath> extensionIcons; //no item count limit!? Test case C:\ ~ 3800 unique file extensions
 };
 
 
@@ -352,7 +350,6 @@ int IconBuffer::getSize(IconSize sz)
             return 24;
         case IconBuffer::SIZE_MEDIUM:
             return 48;
-
         case IconBuffer::SIZE_LARGE:
             return 128;
     }
@@ -369,7 +366,6 @@ bool IconBuffer::readyForRetrieval(const AbstractPath& filePath)
 
 Opt<wxBitmap> IconBuffer::retrieveFileIcon(const AbstractPath& filePath)
 {
-
     if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(filePath))
         return ico;
 
@@ -391,17 +387,17 @@ void IconBuffer::setWorkload(const std::vector<AbstractPath>& load)
 
 wxBitmap IconBuffer::getIconByExtension(const Zstring& filePath)
 {
-    const Zstring& extension = getFileExtension(filePath);
+    const Zstring& ext = getFileExtension(filePath);
 
     assert(std::this_thread::get_id() == mainThreadId);
 
-    auto it = pimpl->extensionIcons.find(extension);
+    auto it = pimpl->extensionIcons.find(ext);
     if (it == pimpl->extensionIcons.end())
     {
-        const Zstring& templateName(extension.empty() ? Zstr("file") : Zstr("file.") + extension);
+        const Zstring& templateName(ext.empty() ? Zstr("file") : Zstr("file.") + ext);
         //don't pass actual file name to getIconByTemplatePath(), e.g. "AUTHORS" has own mime type on Linux!!!
         //=> we want to buffer by extension only to minimize buffer-misses!
-        it = pimpl->extensionIcons.emplace(extension, extractWxBitmap(getIconByTemplatePath(templateName, IconBuffer::getSize(iconSizeType)))).first;
+        it = pimpl->extensionIcons.emplace(ext, extractWxBitmap(getIconByTemplatePath(templateName, IconBuffer::getSize(iconSizeType)))).first;
     }
     //need buffer size limit???
     return it->second;
@@ -429,7 +425,6 @@ wxBitmap IconBuffer::linkOverlayIcon(IconSize sz)
 
         if (pixelSize >= 128) return L"link_128";
         if (pixelSize >=  48) return L"link_48";
-        if (pixelSize >=  32) return L"link_32";
         if (pixelSize >=  24) return L"link_24";
         return L"link_16";
     }());
@@ -438,7 +433,7 @@ wxBitmap IconBuffer::linkOverlayIcon(IconSize sz)
 
 bool zen::hasLinkExtension(const Zstring& filepath)
 {
-    const Zstring& extension = getFileExtension(filepath);
-    return extension == "desktop";
+    const Zstring& ext = getFileExtension(filepath);
+    return ext == "desktop";
 
 }

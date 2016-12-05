@@ -93,7 +93,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 
 
 inline
-Global<const TranslationHandler>& getGlobalTranslationHandler()
+Global<const TranslationHandler>& refGlobalTranslationHandler()
 {
     //getTranslator() may be called even after static objects of this translation unit are destroyed!
     static Global<const TranslationHandler> inst; //external linkage even in header!
@@ -105,14 +105,14 @@ Global<const TranslationHandler>& getGlobalTranslationHandler()
 inline
 void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler)
 {
-    implementation::getGlobalTranslationHandler().set(std::move(newHandler));
+    implementation::refGlobalTranslationHandler().set(std::move(newHandler));
 }
 
 
 inline
 std::shared_ptr<const TranslationHandler> getTranslator()
 {
-    return implementation::getGlobalTranslationHandler().get();
+    return implementation::refGlobalTranslationHandler().get();
 }
 }
 

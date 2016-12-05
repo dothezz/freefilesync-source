@@ -196,6 +196,29 @@ public:
 
     void setItemPathForm(ItemPathFormat fmt) { itemPathFormat = fmt; }
 
+    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, AbstractPath>>& newLoad) //return (priority, filepath) list
+    {
+        if (iconMgr_)
+        {
+            const auto& rowsOnScreen = getVisibleRows(refGrid());
+            const ptrdiff_t visibleRowCount = rowsOnScreen.second - rowsOnScreen.first;
+
+            //preload icons not yet on screen:
+            const int preloadSize = 2 * std::max<ptrdiff_t>(20, visibleRowCount); //:= sum of lines above and below of visible range to preload
+            //=> use full visible height to handle "next page" command and a minimum of 20 for excessive mouse wheel scrolls
+
+            for (ptrdiff_t i = 0; i < preloadSize; ++i)
+            {
+                const ptrdiff_t currentRow = rowsOnScreen.first - (preloadSize + 1) / 2 + getAlternatingPos(i, visibleRowCount + preloadSize); //for odd preloadSize start one row earlier
+
+                const IconInfo ii = getIconInfo(currentRow);
+                if (ii.type == IconInfo::ICON_PATH)
+                    if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.fsObj->template getAbstractPath<side>()))
+                        newLoad.emplace_back(i, ii.fsObj->template getAbstractPath<side>()); //insert least-important items on outer rim first
+            }
+        }
+    }
+
     void updateNewAndGetUnbufferedIcons(std::vector<AbstractPath>& newLoad) //loads all not yet drawn icons
     {
         if (iconMgr_)
@@ -225,29 +248,6 @@ public:
                             newLoad.push_back(ii.fsObj->template getAbstractPath<side>());
                     }
                 }
-            }
-        }
-    }
-
-    void getUnbufferedIconsForPreload(std::vector<std::pair<ptrdiff_t, AbstractPath>>& newLoad) //return (priority, filepath) list
-    {
-        if (iconMgr_)
-        {
-            const auto& rowsOnScreen = getVisibleRows(refGrid());
-            const ptrdiff_t visibleRowCount = rowsOnScreen.second - rowsOnScreen.first;
-
-            //preload icons not yet on screen:
-            const int preloadSize = 2 * std::max<ptrdiff_t>(20, visibleRowCount); //:= sum of lines above and below of visible range to preload
-            //=> use full visible height to handle "next page" command and a minimum of 20 for excessive mouse wheel scrolls
-
-            for (ptrdiff_t i = 0; i < preloadSize; ++i)
-            {
-                const ptrdiff_t currentRow = rowsOnScreen.first - (preloadSize + 1) / 2 + getAlternatingPos(i, visibleRowCount + preloadSize); //for odd preloadSize start one row earlier
-
-                const IconInfo ii = getIconInfo(currentRow);
-                if (ii.type == IconInfo::ICON_PATH)
-                    if (!iconMgr_->refIconBuffer().readyForRetrieval(ii.fsObj->template getAbstractPath<side>()))
-                        newLoad.emplace_back(i, ii.fsObj->template getAbstractPath<side>()); //insert least-important items on outer rim first
             }
         }
     }
@@ -886,7 +886,7 @@ public:
                     }
         selectionInProgress = false;
 
-        //update highlight and tooltip: on OS X no mouse movement event is generated after a mouse button click (unlike on Windows)
+        //update highlight_ and tooltip: on OS X no mouse movement event is generated after a mouse button click (unlike on Windows)
         wxPoint clientPos = refGrid().getMainWin().ScreenToClient(wxGetMousePosition());
         onMouseMovement(clientPos);
     }
@@ -1635,14 +1635,14 @@ class IconUpdater : private wxEvtHandler //update file icons periodically: use S
 public:
     IconUpdater(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer& iconBuffer) : provLeft_(provLeft), provRight_(provRight), iconBuffer_(iconBuffer)
     {
-        timer.Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), nullptr, this);
+        timer_.Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), nullptr, this);
     }
 
-    void start() { if (!timer.IsRunning()) timer.Start(100); } //timer interval in [ms]
+    void start() { if (!timer_.IsRunning()) timer_.Start(100); } //timer interval in [ms]
     //don't check too often! give worker thread some time to fetch data
 
 private:
-    void stop() { if (timer.IsRunning()) timer.Stop(); }
+    void stop() { if (timer_.IsRunning()) timer_.Stop(); }
 
     void loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
     {
@@ -1671,7 +1671,7 @@ private:
     GridDataLeft& provLeft_;
     GridDataRight& provRight_;
     IconBuffer& iconBuffer_;
-    wxTimer timer;
+    wxTimer timer_;
 };
 
 

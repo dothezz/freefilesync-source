@@ -226,8 +226,7 @@ struct XmlGlobalSettings
         };
 
         time_t lastUpdateCheck = 0; //number of seconds since 00:00 hours, Jan 1, 1970 UTC
-        std::wstring lastOnlineVersion;
-        std::wstring lastOnlineChangeLog;
+        std::string lastOnlineVersion;
     } gui;
 };
 
