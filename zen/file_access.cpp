@@ -27,6 +27,107 @@
 using namespace zen;
 
 
+Opt<Zstring> zen::getParentFolderPath(const Zstring& itemPath)
+{
+	assert(startsWith(itemPath, L"/")); //we do NOT support relative paths!
+
+    if (itemPath == "/")
+        return NoValue();
+
+    const Zstring parentDir = beforeLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+    if (parentDir.empty())
+        return Zstring("/");
+    return parentDir;
+}
+
+
+ItemType zen::getItemType(const Zstring& itemPath) //throw FileError
+{
+    struct ::stat itemInfo = {};
+    if (::lstat(itemPath.c_str(), &itemInfo) != 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itemPath)), L"lstat");
+
+    if (S_ISLNK(itemInfo.st_mode))
+        return ItemType::SYMLINK;
+    if (S_ISDIR(itemInfo.st_mode))
+        return ItemType::FOLDER;
+    return ItemType::FILE; //S_ISREG || S_ISCHR || S_ISBLK || S_ISFIFO || S_ISSOCK
+}
+
+
+PathDetails zen::getPathDetails(const Zstring& itemPath) //throw FileError
+{
+    const Opt<Zstring> parentPath = getParentFolderPath(itemPath);
+    try
+    {
+        return { getItemType(itemPath), itemPath, {} }; //throw FileError
+    }
+    catch (FileError&)
+    {
+        if (!parentPath) //device root
+            throw;
+        //else: let's dig deeper... don't bother checking Win32 codes; e.g. not existing item may have the codes:
+        //  ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND, ERROR_INVALID_NAME, ERROR_INVALID_DRIVE,
+        //  ERROR_NOT_READY, ERROR_INVALID_PARAMETER, ERROR_BAD_PATHNAME, ERROR_BAD_NETPATH => not reliable
+    }
+    const Zstring itemName = afterLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
+    assert(!itemName.empty());
+
+    PathDetails pd = getPathDetails(*parentPath); //throw FileError
+    if (!pd.relPath.empty())
+    {
+        pd.relPath.push_back(itemName);
+        return { pd.existingType, pd.existingPath, pd.relPath };
+    }
+
+    try
+    {
+        traverseFolder(*parentPath,
+        [&](const FileInfo&    fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FILE; },
+        [&](const FolderInfo&  fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FOLDER; },
+        [&](const SymlinkInfo& si) { if (equalFilePath(si.itemName, itemName)) throw ItemType::SYMLINK; },
+        [](const std::wstring& errorMsg) { throw FileError(errorMsg); });
+
+        return { pd.existingType, *parentPath, { itemName } }; //throw FileError
+    }
+    catch (const ItemType& type) { return { type, itemPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
+    //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
+}
+
+
+Opt<ItemType> zen::getItemTypeIfExists(const Zstring& itemPath) //throw FileError
+{
+    const PathDetails pd = getPathDetails(itemPath); //throw FileError
+    if (pd.relPath.empty())
+        return pd.existingType;
+    return NoValue();
+}
+
+
+bool zen::fileAvailable(const Zstring& filePath) //noexcept
+{
+    //symbolic links (broken or not) are also treated as existing files!
+    struct ::stat fileInfo = {};
+    if (::stat(filePath.c_str(), &fileInfo) == 0) //follow symlinks!
+        return S_ISREG(fileInfo.st_mode);
+    return false;
+}
+
+
+bool zen::dirAvailable(const Zstring& dirPath) //noexcept
+{
+    //symbolic links (broken or not) are also treated as existing directories!
+    struct ::stat dirInfo = {};
+    if (::stat(dirPath.c_str(), &dirInfo) == 0) //follow symlinks!
+        return S_ISDIR(dirInfo.st_mode);
+    return false;
+}
+
+
+warn_static("remove following test functions after refactoring")
+
+
+
 bool zen::fileExists(const Zstring& filePath)
 {
     //symbolic links (broken or not) are also treated as existing files!
@@ -43,24 +144,6 @@ bool zen::dirExists(const Zstring& dirPath)
     struct ::stat dirInfo = {};
     if (::stat(dirPath.c_str(), &dirInfo) == 0) //follow symlinks!
         return S_ISDIR(dirInfo.st_mode);
-    return false;
-}
-
-
-bool zen::symlinkExists(const Zstring& linkPath)
-{
-    struct ::stat linkInfo = {};
-    if (::lstat(linkPath.c_str(), &linkInfo) == 0)
-        return S_ISLNK(linkInfo.st_mode);
-    return false;
-}
-
-
-bool zen::somethingExists(const Zstring& itemPath)
-{
-    struct ::stat fileInfo = {};
-    if (::lstat(itemPath.c_str(), &fileInfo) == 0)
-        return true;
     return false;
 }
 
@@ -109,36 +192,36 @@ Zstring zen::getTempFolderPath() //throw FileError
 }
 
 
-bool zen::removeFile(const Zstring& filePath) //throw FileError
+void zen::removeFilePlain(const Zstring& filePath) //throw FileError
 {
     const wchar_t functionName[] = L"unlink";
     if (::unlink(filePath.c_str()) != 0)
     {
         ErrorCode ec = getLastError(); //copy before directly/indirectly making other system calls!
-        if (!somethingExists(filePath)) //warning: changes global error code!!
-            return false; //neither file nor any other object (e.g. broken symlink) with that name existing - caveat: what if "access is denied"!?!??!?!?
-
         //begin of "regular" error reporting
-        const std::wstring errorMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtPath(filePath));
         std::wstring errorDescr = formatSystemError(functionName, ec);
 
-        throw FileError(errorMsg, errorDescr);
+        throw FileError(replaceCpy(_("Cannot delete file %x."), L"%x", fmtPath(filePath)), errorDescr);
     }
-    return true;
 }
 
 
-void zen::removeDirectorySimple(const Zstring& dirPath) //throw FileError
+void zen::removeSymlinkPlain(const Zstring& linkPath) //throw FileError
+{
+    removeFilePlain(linkPath); //throw FileError
+}
+
+
+void zen::removeDirectoryPlain(const Zstring& dirPath) //throw FileError
 {
     const wchar_t functionName[] = L"rmdir";
     if (::rmdir(dirPath.c_str()) != 0)
     {
-        const ErrorCode ec = getLastError(); //copy before making other system calls!
+        ErrorCode ec = getLastError(); //copy before making other system calls!
+        bool symlinkExists = false;
+        try { symlinkExists = getItemType(dirPath) == ItemType::SYMLINK; } /*throw FileError*/ catch (FileError&) {} //previous exception is more relevant
 
-        if (!somethingExists(dirPath)) //warning: changes global error code!!
-            return;
-
-        if (symlinkExists(dirPath))
+        if (symlinkExists)
         {
             if (::unlink(dirPath.c_str()) != 0)
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtPath(dirPath)), L"unlink");
@@ -161,43 +244,37 @@ namespace
 {
 void removeDirectoryImpl(const Zstring& folderPath) //throw FileError
 {
-    assert(dirExists(folderPath)); //[!] no symlinks in this context!!!
-    //attention: check if folderPath is a symlink! Do NOT traverse into it deleting contained files!!!
-
     std::vector<Zstring> filePaths;
-    std::vector<Zstring> folderSymlinkPaths;
+    std::vector<Zstring> symlinkPaths;
     std::vector<Zstring> folderPaths;
 
     //get all files and directories from current directory (WITHOUT subdirectories!)
     traverseFolder(folderPath,
-    [&](const FileInfo&    fi) { filePaths.push_back(fi.fullPath); },
-    [&](const DirInfo&     di) { folderPaths .push_back(di.fullPath); }, //defer recursion => save stack space and allow deletion of extremely deep hierarchies!
-    [&](const SymlinkInfo& si)
-    {
-            filePaths.push_back(si.fullPath);
-    },
+    [&](const FileInfo&    fi) { filePaths   .push_back(fi.fullPath); },
+    [&](const FolderInfo&  fi) { folderPaths .push_back(fi.fullPath); }, //defer recursion => save stack space and allow deletion of extremely deep hierarchies!
+    [&](const SymlinkInfo& si) { symlinkPaths.push_back(si.fullPath); },
     [](const std::wstring& errorMsg) { throw FileError(errorMsg); });
 
     for (const Zstring& filePath : filePaths)
-        removeFile(filePath); //throw FileError
+        removeFilePlain(filePath); //throw FileError
 
-    for (const Zstring& symlinkPath : folderSymlinkPaths)
-        removeDirectorySimple(symlinkPath); //throw FileError
+    for (const Zstring& symlinkPath : symlinkPaths)
+        removeSymlinkPlain(symlinkPath); //throw FileError
 
     //delete directories recursively
     for (const Zstring& subFolderPath : folderPaths)
         removeDirectoryImpl(subFolderPath); //throw FileError; call recursively to correctly handle symbolic links
 
-    removeDirectorySimple(folderPath); //throw FileError
+    removeDirectoryPlain(folderPath); //throw FileError
 }
 }
 
 
-void zen::removeDirectoryRecursively(const Zstring& dirPath) //throw FileError
+void zen::removeDirectoryPlainRecursion(const Zstring& dirPath) //throw FileError
 {
-    if (symlinkExists(dirPath))
-        removeDirectorySimple(dirPath); //throw FileError
-    else if (somethingExists(dirPath))
+    if (getItemType(dirPath) == ItemType::SYMLINK) //throw FileError
+        removeSymlinkPlain(dirPath); //throw FileError
+    else
         removeDirectoryImpl(dirPath); //throw FileError
 }
 
@@ -214,7 +291,8 @@ namespace
 //wrapper for file system rename function:
 void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 {
-    //rename() will never fail with EEXIST, but always (atomically) overwrite! => equivalent to SetFileInformationByHandle() + FILE_RENAME_INFO::ReplaceIfExists
+    //rename() will never fail with EEXIST, but always (atomically) overwrite!
+    //=> equivalent to SetFileInformationByHandle() + FILE_RENAME_INFO::ReplaceIfExists or ::MoveFileEx + MOVEFILE_REPLACE_EXISTING
     //=> Linux: renameat2() with RENAME_NOREPLACE -> still new, probably buggy
     //=> OS X: no solution
 
@@ -230,9 +308,15 @@ void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //thro
         throw FileError(errorMsg, errorDescr);
     };
 
-    if (!equalFilePath(pathSource, pathTarget)) //OS X: changing file name case is not an "already exists" error!
-        if (somethingExists(pathTarget))
+    if (!equalFilePath(pathSource, pathTarget)) //exception for OS X: changing file name case is not an "already exists" situation!
+	{
+		bool alreadyExists = true;
+		try {  /*ItemType type = */getItemType(pathTarget); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; } 
+
+        if (alreadyExists)
             throwException(EEXIST);
+		//else: nothing exists or other error (hopefully ::rename will also fail!)
+	}
 
     if (::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
         throwException(errno);
@@ -393,54 +477,48 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
         if (::lchown(targetPath.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0) // may require admin rights!
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(targetPath)), L"lchown");
 
-        if (!symlinkExists(targetPath) && //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
+        const bool isSymlinkTarget = getItemType(targetPath) == ItemType::SYMLINK; //throw FileError
+        if (!isSymlinkTarget && //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
             ::chmod(targetPath.c_str(), fileInfo.st_mode) != 0)
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(targetPath)), L"chmod");
     }
 
 }
+}
 
 
-void makeDirectoryRecursivelyImpl(const Zstring& dirPath) //FileError
+void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw FileError
 {
-    assert(!endsWith(dirPath, FILE_NAME_SEPARATOR)); //even "C:\" should be "C:" as input!
+    if (!getParentFolderPath(dirPath)) //device root
+        return static_cast<void>(/*ItemType =*/ getItemType(dirPath)); //throw FileError
 
     try
     {
-        copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+        copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting
     }
-    catch (const ErrorTargetExisting&) {} //*something* existing: folder or FILE!
-    catch (const ErrorTargetPathMissing&)
+    catch (FileError&)
     {
-        //we need to create parent directories first
-        const Zstring parentPath = beforeLast(dirPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-        if (!parentPath.empty())
-        {
-            //recurse...
-            makeDirectoryRecursivelyImpl(parentPath); //throw FileError
+        Opt<PathDetails> pd;
+        try { pd = getPathDetails(dirPath); /*throw FileError*/ }
+        catch (FileError&) {} //previous exception is more relevant
 
-            //now try again...
-            copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting), (ErrorTargetPathMissing)
+        if (pd && pd->existingType != ItemType::FILE)
+        {
+            Zstring intermediatePath = pd->existingPath;
+            for (const Zstring& itemName : pd->relPath)
+            {
+                intermediatePath = appendSeparator(intermediatePath) + itemName;
+                copyNewDirectory(Zstring(), intermediatePath, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting)
+            }
             return;
         }
         throw;
     }
 }
-}
-
-
-void zen::makeDirectoryRecursively(const Zstring& dirPath) //throw FileError
-{
-    //remove trailing separator (even for C:\ root directories)
-    const Zstring dirFormatted = endsWith(dirPath, FILE_NAME_SEPARATOR) ?
-                                 beforeLast(dirPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE) :
-                                 dirPath;
-    makeDirectoryRecursivelyImpl(dirFormatted); //FileError
-}
 
 
 //source path is optional (may be empty)
-void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, //throw FileError, ErrorTargetExisting
                            bool copyFilePermissions)
 {
     mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO; //0777, default for newly created directories
@@ -462,15 +540,15 @@ void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath,
 
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMsg, errorDescr);
-        else if (lastError == ENOENT)
-            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        //else if (lastError == ENOENT)
+        //    throw ErrorTargetPathMissing(errorMsg, errorDescr);
         throw FileError(errorMsg, errorDescr);
     }
 
     if (!sourcePath.empty())
     {
 
-        ZEN_ON_SCOPE_FAIL(try { removeDirectorySimple(targetPath); }
+        ZEN_ON_SCOPE_FAIL(try { removeDirectoryPlain(targetPath); }
         catch (FileError&) {});   //ensure cleanup:
 
         //enforce copying file permissions: it's advertized on GUI...
@@ -489,16 +567,8 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
         THROW_LAST_FILE_ERROR(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtPath(sourceLink)), L"%y", L"\n" + fmtPath(targetLink)), functionName);
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist!
-
-    auto cleanUp = [&]
-    {
-        try
-        {
-                removeFile(targetLink); //throw FileError
-        }
-        catch (FileError&) {}
-    };
-    ZEN_ON_SCOPE_FAIL(cleanUp());
+    ZEN_ON_SCOPE_FAIL(try { removeSymlinkPlain(targetLink); /*throw FileError*/ }
+    catch (FileError&) {});
 
     //file times: essential for sync'ing a symlink: enforce this! (don't just try!)
     struct ::stat sourceInfo = {};
@@ -541,7 +611,7 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
 
         throw FileError(errorMsg, errorDescr);
     }
-    ZEN_ON_SCOPE_FAIL( try { removeFile(targetFile); }
+    ZEN_ON_SCOPE_FAIL( try { removeFilePlain(targetFile); }
     catch (FileError&) {} );
     //transactional behavior: place guard after ::open() and before lifetime of FileOutput:
     //=> don't delete file that existed previously!!!
@@ -594,7 +664,7 @@ InSyncAttributes zen::copyNewFile(const Zstring& sourceFile, const Zstring& targ
     const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
     //at this point we know we created a new file, so it's fine to delete it for cleanup!
-    ZEN_ON_SCOPE_FAIL(try { removeFile(targetFile); }
+    ZEN_ON_SCOPE_FAIL(try { removeFilePlain(targetFile); }
     catch (FileError&) {});
 
     if (copyFilePermissions)

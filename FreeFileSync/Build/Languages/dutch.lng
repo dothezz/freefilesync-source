@@ -603,7 +603,7 @@ De opdracht wordt geactiveerd als:
 <target>Verwijderen van oude versies...</target>
 
 <source>Updating file %x</source>
-<target>File %x bijwerken</target>
+<target>Bestand %x bijwerken</target>
 
 <source>Updating symbolic link %x</source>
 <target>Symbolische link %x bijwerken</target>

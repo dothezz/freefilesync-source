@@ -7,11 +7,8 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Installation was registered on a different operating system.</source>
-<target>Die Installation wurde auf einem anderen Betriebssystem registriert.</target>
-
-<source>The server does not support authentication via %x.</source>
-<target>Der Server unterstützt keine Authentifizierung über %x.</target>
+<source>Cannot delete symbolic link %x.</source>
+<target>Die symbolischen Verknüpfung %x kann nicht gelöscht werden.</target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
@@ -28,11 +25,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.</target>
 
-<source>Creating folder %x</source>
-<target>Erstelle Ordner %x</target>
-
 <source>Creating file %x</source>
 <target>Erstelle Datei %x</target>
+
+<source>Creating folder %x</source>
+<target>Erstelle Ordner %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Erstelle symbolische Verknüpfung %x</target>
@@ -288,29 +285,32 @@ Tatsächlich: %y bytes
 <source>Cannot read directory %x.</source>
 <target>Das Verzeichnis %x kann nicht gelesen werden.</target>
 
+<source>Cannot read file %x.</source>
+<target>Die Datei %x kann nicht gelesen werden.</target>
+
 <source>Cannot read file attributes of %x.</source>
 <target>Die Dateiattribute von %x können nicht gelesen werden.</target>
-
-<source>Cannot find %x.</source>
-<target>%x wurde nicht gefunden.</target>
 
 <source>Cannot open file %x.</source>
 <target>Die Datei %x kann nicht geöffnet werden.</target>
 
-<source>Cannot read file %x.</source>
-<target>Die Datei %x kann nicht gelesen werden.</target>
-
 <source>Cannot find device %x.</source>
 <target>Das Gerät %x wurde nicht gefunden.</target>
+
+<source>Cannot find %x.</source>
+<target>%x wurde nicht gefunden.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Der Typ des Elements %x wird nicht unterstützt:</target>
 
 <source>Cannot create directory %x.</source>
 <target>Das Verzeichnis %x kann nicht erstellt werden.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Die Datei %x kann nicht gelöscht werden.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
@@ -329,6 +329,12 @@ Tatsächlich: %y bytes
 
 <source>Incorrect command line:</source>
 <target>Ungültige Befehlszeile:</target>
+
+<source>The server does not support authentication via %x.</source>
+<target>Der Server unterstützt keine Authentifizierung über %x.</target>
+
+<source>Required:</source>
+<target>Benötigt:</target>
 
 <source>Unable to access %x.</source>
 <target>Auf %x kann nicht zugegriffen werden.</target>
@@ -676,9 +682,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Not enough free disk space available in:</source>
 <target>Nicht genügend freier Speicher verfügbar für:</target>
-
-<source>Required:</source>
-<target>Benötigt:</target>
 
 <source>Available:</source>
 <target>Verfügbar:</target>
@@ -1777,6 +1780,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Consistency check failed for %x.</source>
 <target>Die Konsistenzprüfung für %x ist fehlgeschlagen.</target>
 
+<source>Installation was registered on a different operating system.</source>
+<target>Die Installation wurde auf einem anderen Betriebssystem registriert.</target>
+
 <source>Failed to activate FreeFileSync Donation Edition.</source>
 <target>Die Aktivierung der FreeFileSync Spendenversion ist fehlgeschlagen.</target>
 
@@ -1818,9 +1824,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Die Attribute können nicht von %x nach %y kopiert werden.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Der Typ des Elements %x wird nicht unterstützt:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>

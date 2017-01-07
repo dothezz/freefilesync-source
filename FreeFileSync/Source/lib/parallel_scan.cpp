@@ -316,7 +316,7 @@ public:
         level_(level) {}
 
     virtual void                               onFile   (const FileInfo&    fi) override; //
-    virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override; //throw ThreadInterruption
+    virtual std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) override; //throw ThreadInterruption
     virtual HandleLink                         onSymlink(const SymlinkInfo& li) override; //
 
     HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override; //throw ThreadInterruption
@@ -367,11 +367,11 @@ void DirCallback::onFile(const FileInfo& fi) //throw ThreadInterruption
 }
 
 
-std::unique_ptr<AFS::TraverserCallback> DirCallback::onDir(const DirInfo& di) //throw ThreadInterruption
+std::unique_ptr<AFS::TraverserCallback> DirCallback::onFolder(const FolderInfo& fi) //throw ThreadInterruption
 {
     interruptionPoint(); //throw ThreadInterruption
 
-    const Zstring& folderRelPath = parentRelPathPf_ + di.itemName;
+    const Zstring& folderRelPath = parentRelPathPf_ + fi.itemName;
 
     //update status information no matter whether item is excluded or not!
     if (cfg.acb_.mayReportCurrentFile(cfg.threadID_, cfg.lastReportTime_))
@@ -385,7 +385,7 @@ std::unique_ptr<AFS::TraverserCallback> DirCallback::onDir(const DirInfo& di) //
         return nullptr; //do NOT traverse subdirs
     //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
 
-    FolderContainer& subFolder = output_.addSubFolder(di.itemName);
+    FolderContainer& subFolder = output_.addSubFolder(fi.itemName, fi.symlinkInfo != nullptr);
     if (passFilter)
         cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
@@ -394,7 +394,7 @@ std::unique_ptr<AFS::TraverserCallback> DirCallback::onDir(const DirInfo& di) //
         if (!tryReportingItemError([&] //check after FolderContainer::addSubFolder()
     {
         throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, folderRelPath))), L"Endless recursion.");
-        }, *this, di.itemName))
+        }, *this, fi.itemName))
     return nullptr;
 
     return std::make_unique<DirCallback>(cfg, folderRelPath + FILE_NAME_SEPARATOR, subFolder, level_ + 1);
@@ -446,15 +446,15 @@ DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg, si
 {
     switch (cfg.acb_.reportError(msg, retryNumber)) //throw ThreadInterruption
     {
-        case FillBufferCallback::ON_ERROR_IGNORE:
+        case FillBufferCallback::ON_ERROR_CONTINUE:
             cfg.failedDirReads_[beforeLast(parentRelPathPf_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)] = msg;
-            return ON_ERROR_IGNORE;
+            return ON_ERROR_CONTINUE;
 
         case FillBufferCallback::ON_ERROR_RETRY:
             return ON_ERROR_RETRY;
     }
     assert(false);
-    return ON_ERROR_IGNORE;
+    return ON_ERROR_CONTINUE;
 }
 
 
@@ -462,15 +462,15 @@ DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, s
 {
     switch (cfg.acb_.reportError(msg, retryNumber)) //throw ThreadInterruption
     {
-        case FillBufferCallback::ON_ERROR_IGNORE:
+        case FillBufferCallback::ON_ERROR_CONTINUE:
             cfg.failedItemReads_[parentRelPathPf_ + itemName] =  msg;
-            return ON_ERROR_IGNORE;
+            return ON_ERROR_CONTINUE;
 
         case FillBufferCallback::ON_ERROR_RETRY:
             return ON_ERROR_RETRY;
     }
     assert(false);
-    return ON_ERROR_IGNORE;
+    return ON_ERROR_CONTINUE;
 }
 
 //------------------------------------------------------------------------------------------

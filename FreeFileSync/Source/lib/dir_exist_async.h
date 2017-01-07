@@ -26,7 +26,7 @@ namespace
 struct FolderStatus
 {
     std::set<AbstractPath, AFS::LessAbstractPath> existing;
-    std::set<AbstractPath, AFS::LessAbstractPath> missing;
+    std::set<AbstractPath, AFS::LessAbstractPath> notExisting;
     std::map<AbstractPath, FileError, AFS::LessAbstractPath> failedChecks;
 };
 
@@ -46,7 +46,8 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
             AFS::connectNetworkFolder(folderPath, allowUserInteraction); //throw FileError
 
             //2. check dir existence
-            return AFS::folderExistsThrowing(folderPath); //throw FileError
+            return static_cast<bool>(AFS::getItemTypeIfExists(folderPath)); //throw FileError
+            //TODO: consider ItemType:FILE a failure instead? In any case: return "false" IFF nothing (of any type) exists
         }));
 
     //don't wait (almost) endlessly like Win32 would on non-existing network shares:
@@ -70,7 +71,7 @@ FolderStatus getFolderStatusNonBlocking(const std::set<AbstractPath, AFS::LessAb
                 if (fi.second.get()) //throw FileError
                     output.existing.insert(fi.first);
                 else
-                    output.missing.insert(fi.first);
+                    output.notExisting.insert(fi.first);
             }
             catch (const FileError& e) { output.failedChecks.emplace(fi.first, e); }
         }

@@ -7,6 +7,8 @@
 #ifndef VERSION_ID_HEADER_2348769284769242
 #define VERSION_ID_HEADER_2348769284769242
 
+#include <ctime>
+#include <zen/basic_math.h>
 #include "../version/version.h"
 
 
@@ -38,14 +40,14 @@ time_t getVersionCheckInactiveId()
 inline
 time_t getVersionCheckCurrentTime()
 {
-	return std::time(nullptr);
+    return std::time(nullptr);
 }
 
 
 bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
 {
-	if (lastUpdateCheck == getVersionCheckInactiveId())
-		return false;
+    if (lastUpdateCheck == getVersionCheckInactiveId())
+        return false;
 
     const time_t now = std::time(nullptr);
     return numeric::dist(now, lastUpdateCheck) >= 7 * 24 * 3600; //check weekly

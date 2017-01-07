@@ -65,7 +65,7 @@ protected:
     }
 
     void updateProcessedData(int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersCurrent_, itemsDelta, bytesDelta); } //note: these methods MUST NOT throw in order
-    void updateTotalData    (int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersTotal_  , itemsDelta, bytesDelta); } //to properly allow undoing setting of statistics!
+    void updateTotalData    (int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersTotal_, itemsDelta, bytesDelta); }   //to properly allow undoing setting of statistics!
 
     void requestUiRefresh() override //throw X
     {
@@ -97,10 +97,10 @@ protected:
     Phase currentPhase() const override { return currentPhase_; }
 
     int getItemsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
-    int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
+    int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).first; }
 
     std::int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    std::int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
+    std::int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).second; }
 
     const std::wstring& currentStatusText() const override { return statusText_; }
 

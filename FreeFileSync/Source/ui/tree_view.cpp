@@ -565,13 +565,13 @@ void TreeView::updateCmpResult(bool showExcluded,
                                bool conflictFilesActive)
 {
     updateView([showExcluded, //make sure the predicate can be stored safely!
-                leftOnlyFilesActive,
-                rightOnlyFilesActive,
-                leftNewerFilesActive,
-                rightNewerFilesActive,
-                differentFilesActive,
-                equalFilesActive,
-                conflictFilesActive](const FileSystemObject& fsObj) -> bool
+                              leftOnlyFilesActive,
+                              rightOnlyFilesActive,
+                              leftNewerFilesActive,
+                              rightNewerFilesActive,
+                              differentFilesActive,
+                              equalFilesActive,
+                              conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
         if (!fsObj.isActive() && !showExcluded)
             return false;
@@ -612,15 +612,15 @@ void TreeView::updateSyncPreview(bool showExcluded,
                                  bool conflictFilesActive)
 {
     updateView([showExcluded, //make sure the predicate can be stored safely!
-                syncCreateLeftActive,
-                syncCreateRightActive,
-                syncDeleteLeftActive,
-                syncDeleteRightActive,
-                syncDirOverwLeftActive,
-                syncDirOverwRightActive,
-                syncDirNoneActive,
-                syncEqualActive,
-                conflictFilesActive](const FileSystemObject& fsObj) -> bool
+                              syncCreateLeftActive,
+                              syncCreateRightActive,
+                              syncDeleteLeftActive,
+                              syncDeleteRightActive,
+                              syncDirOverwLeftActive,
+                              syncDirOverwRightActive,
+                              syncDirNoneActive,
+                              syncEqualActive,
+                              conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
         if (!fsObj.isActive() && !showExcluded)
             return false;

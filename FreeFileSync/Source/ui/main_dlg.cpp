@@ -288,21 +288,26 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
 
 //##################################################################################################################################
 
-xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFile) //blocks on GUI on errors!
+xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFilePath) //blocks on GUI on errors!
 {
     using namespace xmlAccess;
+
     XmlGlobalSettings globalCfg;
-
     try
-    {
-        std::wstring warningMsg;
-        readConfig(globalConfigFile, globalCfg, warningMsg); //throw FileError
+    {		
+			std::wstring warningMsg;
+			readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
 
-        assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+			assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
     }
     catch (const FileError& e)
     {
-        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
+			bool notExisting = false;
+            try  { notExisting = !getItemTypeIfExists(globalConfigFilePath); /*throw FileError*/ }
+            catch (FileError&) {} //previous exception is more relevant
+
+			if (!notExisting) //existing or access error
+		        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
     }
     return globalCfg;
 }
@@ -315,13 +320,11 @@ Zstring MainDialog::getLastRunConfigPath()
 }
 
 
-void MainDialog::create(const Zstring& globalConfigFile)
+void MainDialog::create(const Zstring& globalConfigFilePath)
 {
     using namespace xmlAccess;
 
-    XmlGlobalSettings globalSettings;
-    if (fileExists(globalConfigFile)) //else: globalCfg already has default values
-        globalSettings = loadGlobalConfig(globalConfigFile);
+    const XmlGlobalSettings globalSettings = loadGlobalConfig(globalConfigFilePath);
 
     std::vector<Zstring> cfgFilePaths;
     for (const ConfigFileItem& item : globalSettings.gui.lastUsedConfigFiles)
@@ -329,10 +332,10 @@ void MainDialog::create(const Zstring& globalConfigFile)
 
     //------------------------------------------------------------------------------------------
     //check existence of all files in parallel:
-    GetFirstResult<FalseType> firstMissingDir;
+    GetFirstResult<FalseType> firstUnavailableFile;
 
     for (const Zstring& filePath : cfgFilePaths)
-        firstMissingDir.addJob([filePath] () -> Opt<FalseType>
+        firstUnavailableFile.addJob([filePath]() -> Opt<FalseType>
     {
         assert(!filePath.empty());
         if (filePath.empty() /*ever empty??*/ || !fileExists(filePath))
@@ -341,16 +344,16 @@ void MainDialog::create(const Zstring& globalConfigFile)
     });
 
     //potentially slow network access: give all checks 500ms to finish
-    const bool allFilesExist = firstMissingDir.timedWait(std::chrono::milliseconds(500)) && //false: time elapsed
-                               !firstMissingDir.get(); //no missing
-    if (!allFilesExist)
+    const bool allFilesAvailable = firstUnavailableFile.timedWait(std::chrono::milliseconds(500)) && //false: time elapsed
+                               !firstUnavailableFile.get(); //no missing
+    if (!allFilesAvailable)
         cfgFilePaths.clear(); //we do NOT want to show an error due to last config file missing on application start!
     //------------------------------------------------------------------------------------------
 
     if (cfgFilePaths.empty())
     {
         const Zstring lastRunConfigFilePath = getLastRunConfigPath();
-        if (zen::fileExists(lastRunConfigFilePath)) //3. try to load auto-save config
+        if (fileExists(lastRunConfigFilePath)) //3. try to load auto-save config
             cfgFilePaths.push_back(lastRunConfigFilePath);
     }
 
@@ -382,11 +385,11 @@ void MainDialog::create(const Zstring& globalConfigFile)
 
     //------------------------------------------------------------------------------------------
 
-    create(globalConfigFile, &globalSettings, guiCfg, cfgFilePaths, false);
+    create(globalConfigFilePath, &globalSettings, guiCfg, cfgFilePaths, false);
 }
 
 
-void MainDialog::create(const Zstring& globalConfigFile,
+void MainDialog::create(const Zstring& globalConfigFilePath,
                         const xmlAccess::XmlGlobalSettings* globalSettings,
                         const xmlAccess::XmlGuiConfig& guiCfg,
                         const std::vector<Zstring>& referenceFiles,
@@ -395,8 +398,8 @@ void MainDialog::create(const Zstring& globalConfigFile,
     xmlAccess::XmlGlobalSettings globSett;
     if (globalSettings)
         globSett = *globalSettings;
-    else if (fileExists(globalConfigFile))
-        globSett = loadGlobalConfig(globalConfigFile);
+    else
+        globSett = loadGlobalConfig(globalConfigFilePath);
     //else: globalCfg already has default values
 
     try
@@ -410,7 +413,7 @@ void MainDialog::create(const Zstring& globalConfigFile,
         //continue!
     }
 
-    MainDialog* frame = new MainDialog(globalConfigFile, guiCfg, referenceFiles, globSett, startComparison);
+    MainDialog* frame = new MainDialog(globalConfigFilePath, guiCfg, referenceFiles, globSett, startComparison);
     frame->Show();
 }
 
@@ -750,12 +753,16 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
             for (const AbstractPath& folderPath : folderPathsToCheck)
                 firstMissingDir.addJob([folderPath]() -> Opt<FalseType>
             {
-                if (!AFS::folderExists(folderPath))
-                    return FalseType();
-                return NoValue();
+                try
+                {
+                    if (AFS::getItemType(folderPath) != AFS::ItemType::FILE) //throw FileError
+                        return NoValue();
+                }
+                catch (FileError&) {}
+                return FalseType();
             });
 
-            const bool startComparisonNow = !firstMissingDir.timedWait(std::chrono::milliseconds(500)) || //= no result yet   => start comparison anyway!
+            const bool startComparisonNow = !firstMissingDir.timedWait(std::chrono::milliseconds(500)) || //= no result yet => start comparison anyway!
                                             !firstMissingDir.get(); //= all directories exist
 
             if (startComparisonNow)
@@ -2690,7 +2697,7 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& fileP
         std::list<std::future<bool>> fileEx;
 
         for (const Zstring& filePath : filePaths)
-            fileEx.push_back(zen::runAsync([=] { return somethingExists(filePath); }));
+            fileEx.push_back(zen::runAsync([=] { return fileExists(filePath); }));
 
         //potentially slow network access => limit maximum wait time!
         wait_for_all_timed(fileEx.begin(), fileEx.end(), std::chrono::milliseconds(1000));
@@ -3014,8 +3021,8 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 
     wxFileDialog filePicker(this,
                             wxString(),
-                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //set default dir
-                            wxString(),
+                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            wxString(), //default file
                             wxString(L"FreeFileSync (*.ffs_gui; *.ffs_batch)|*.ffs_gui;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE);
     if (filePicker.ShowModal() == wxID_OK)
@@ -3556,13 +3563,13 @@ void MainDialog::setViewFilterDefault()
     setButton(m_bpButtonShowRightNewer, def.rightNewer);
     setButton(m_bpButtonShowDifferent,  def.different);
 
-    setButton(m_bpButtonShowCreateLeft, def.createLeft);
-    setButton(m_bpButtonShowCreateRight,def.createRight);
-    setButton(m_bpButtonShowUpdateLeft, def.updateLeft);
-    setButton(m_bpButtonShowUpdateRight,def.updateRight);
-    setButton(m_bpButtonShowDeleteLeft, def.deleteLeft);
-    setButton(m_bpButtonShowDeleteRight,def.deleteRight);
-    setButton(m_bpButtonShowDoNothing,  def.doNothing);
+    setButton(m_bpButtonShowCreateLeft,  def.createLeft);
+    setButton(m_bpButtonShowCreateRight, def.createRight);
+    setButton(m_bpButtonShowUpdateLeft,  def.updateLeft);
+    setButton(m_bpButtonShowUpdateRight, def.updateRight);
+    setButton(m_bpButtonShowDeleteLeft,  def.deleteLeft);
+    setButton(m_bpButtonShowDeleteRight, def.deleteRight);
+    setButton(m_bpButtonShowDoNothing,   def.doNothing);
 }
 
 
@@ -3684,7 +3691,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     if (!globalCfg.soundFileCompareFinished.empty())
     {
         const Zstring soundFile = getResourceDirPf() + globalCfg.soundFileCompareFinished;
-        if (fileExists(soundFile))
+        if (fileAvailable(soundFile))
             wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
     }
 
@@ -3855,18 +3862,18 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         std::unique_ptr<LockHolder> dirLocks;
         if (globalCfg.createLockFile)
         {
-            std::set<Zstring, LessFilePath> dirPathsExisting;
+            std::set<Zstring, LessFilePath> availableDirPaths;
             for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
             {
-                if (it->isExisting<LEFT_SIDE>()) //do NOT check directory existence again!
+                if (it->isAvailable<LEFT_SIDE>()) //do NOT check directory existence again!
                     if (Opt<Zstring> nativeFolderPath = AFS::getNativeItemPath(it->getAbstractPath<LEFT_SIDE>())) //restrict directory locking to native paths until further
-                        dirPathsExisting.insert(*nativeFolderPath);
+                        availableDirPaths.insert(*nativeFolderPath);
 
-                if (it->isExisting<RIGHT_SIDE>())
+                if (it->isAvailable<RIGHT_SIDE>())
                     if (Opt<Zstring> nativeFolderPath = AFS::getNativeItemPath(it->getAbstractPath<RIGHT_SIDE>()))
-                        dirPathsExisting.insert(*nativeFolderPath);
+                        availableDirPaths.insert(*nativeFolderPath);
             }
-            dirLocks = std::make_unique<LockHolder>(dirPathsExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
+            dirLocks = std::make_unique<LockHolder>(availableDirPaths, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -4042,23 +4049,23 @@ void MainDialog::updateGridViewData()
         filesizeRightView  = result.filesizeRightView;
 
         //sync preview buttons
-        updateVisibility(m_bpButtonShowExcluded   , result.existsExcluded);
-        updateVisibility(m_bpButtonShowEqual      , result.existsEqual);
-        updateVisibility(m_bpButtonShowConflict   , result.existsConflict);
+        updateVisibility(m_bpButtonShowExcluded, result.existsExcluded);
+        updateVisibility(m_bpButtonShowEqual,    result.existsEqual);
+        updateVisibility(m_bpButtonShowConflict, result.existsConflict);
 
-        updateVisibility(m_bpButtonShowCreateLeft , result.existsSyncCreateLeft);
+        updateVisibility(m_bpButtonShowCreateLeft,  result.existsSyncCreateLeft);
         updateVisibility(m_bpButtonShowCreateRight, result.existsSyncCreateRight);
-        updateVisibility(m_bpButtonShowDeleteLeft , result.existsSyncDeleteLeft);
+        updateVisibility(m_bpButtonShowDeleteLeft,  result.existsSyncDeleteLeft);
         updateVisibility(m_bpButtonShowDeleteRight, result.existsSyncDeleteRight);
-        updateVisibility(m_bpButtonShowUpdateLeft , result.existsSyncDirLeft);
+        updateVisibility(m_bpButtonShowUpdateLeft,  result.existsSyncDirLeft);
         updateVisibility(m_bpButtonShowUpdateRight, result.existsSyncDirRight);
-        updateVisibility(m_bpButtonShowDoNothing  , result.existsSyncDirNone);
+        updateVisibility(m_bpButtonShowDoNothing,   result.existsSyncDirNone);
 
-        updateVisibility(m_bpButtonShowLeftOnly  , false);
-        updateVisibility(m_bpButtonShowRightOnly , false);
-        updateVisibility(m_bpButtonShowLeftNewer , false);
+        updateVisibility(m_bpButtonShowLeftOnly,   false);
+        updateVisibility(m_bpButtonShowRightOnly,  false);
+        updateVisibility(m_bpButtonShowLeftNewer,  false);
         updateVisibility(m_bpButtonShowRightNewer, false);
-        updateVisibility(m_bpButtonShowDifferent , false);
+        updateVisibility(m_bpButtonShowDifferent,  false);
     }
     else
     {
@@ -4078,23 +4085,23 @@ void MainDialog::updateGridViewData()
         filesizeRightView  = result.filesizeRightView;
 
         //comparison result view buttons
-        updateVisibility(m_bpButtonShowExcluded  , result.existsExcluded);
-        updateVisibility(m_bpButtonShowEqual     , result.existsEqual);
-        updateVisibility(m_bpButtonShowConflict  , result.existsConflict);
+        updateVisibility(m_bpButtonShowExcluded, result.existsExcluded);
+        updateVisibility(m_bpButtonShowEqual,    result.existsEqual);
+        updateVisibility(m_bpButtonShowConflict, result.existsConflict);
 
-        updateVisibility(m_bpButtonShowCreateLeft , false);
+        updateVisibility(m_bpButtonShowCreateLeft,  false);
         updateVisibility(m_bpButtonShowCreateRight, false);
-        updateVisibility(m_bpButtonShowDeleteLeft , false);
+        updateVisibility(m_bpButtonShowDeleteLeft,  false);
         updateVisibility(m_bpButtonShowDeleteRight, false);
-        updateVisibility(m_bpButtonShowUpdateLeft , false);
+        updateVisibility(m_bpButtonShowUpdateLeft,  false);
         updateVisibility(m_bpButtonShowUpdateRight, false);
-        updateVisibility(m_bpButtonShowDoNothing  , false);
+        updateVisibility(m_bpButtonShowDoNothing,   false);
 
-        updateVisibility(m_bpButtonShowLeftOnly  , result.existsLeftOnly);
-        updateVisibility(m_bpButtonShowRightOnly , result.existsRightOnly);
-        updateVisibility(m_bpButtonShowLeftNewer , result.existsLeftNewer);
+        updateVisibility(m_bpButtonShowLeftOnly,   result.existsLeftOnly);
+        updateVisibility(m_bpButtonShowRightOnly,  result.existsRightOnly);
+        updateVisibility(m_bpButtonShowLeftNewer,  result.existsLeftNewer);
         updateVisibility(m_bpButtonShowRightNewer, result.existsRightNewer);
-        updateVisibility(m_bpButtonShowDifferent , result.existsDifferent);
+        updateVisibility(m_bpButtonShowDifferent,  result.existsDifferent);
     }
 
     const bool anySelectViewButtonShown = m_bpButtonShowEqual      ->IsShown() ||
@@ -4374,7 +4381,7 @@ void MainDialog::OnShowFolderPairOptions(wxEvent& event)
             ContextMenu menu;
             menu.addItem(_("Add folder pair"), [this, pos] { insertAddFolderPair({ FolderPairEnh() },  pos); }, &getResourceImage(L"item_add_small"));
             menu.addSeparator();
-            menu.addItem(_("Move up"  ) + L"\tAlt+Page Up"  , [this, pos] { moveAddFolderPairUp(pos);     }, &getResourceImage(L"move_up_small"));
+            menu.addItem(_("Move up"  ) + L"\tAlt+Page Up",   [this, pos] { moveAddFolderPairUp(pos);     }, &getResourceImage(L"move_up_small"));
             menu.addItem(_("Move down") + L"\tAlt+Page Down", [this, pos] { moveAddFolderPairUp(pos + 1); }, &getResourceImage(L"move_down_small"), pos + 1 < makeSigned(additionalFolderPairs.size()));
 
             wxPoint ctxPos = (*it)->m_bpButtonFolderPairOptions->GetPosition();
@@ -4672,9 +4679,9 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     auto colAttrCenter = m_gridMainC->getColumnConfig();
     auto colAttrRight  = m_gridMainR->getColumnConfig();
 
-    erase_if(colAttrLeft  , [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+    erase_if(colAttrLeft,   [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
     erase_if(colAttrCenter, [](const Grid::ColumnAttribute& ca) { return !ca.visible_ || static_cast<ColumnTypeCenter>(ca.type_) == ColumnTypeCenter::CHECKBOX; });
-    erase_if(colAttrRight , [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+    erase_if(colAttrRight,  [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
 
     if (provLeft && provCenter && provRight)
     {

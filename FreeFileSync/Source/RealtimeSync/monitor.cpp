@@ -50,46 +50,47 @@ struct WaitResult
     enum ChangeType
     {
         CHANGE_DETECTED,
-        CHANGE_DIR_MISSING
+        CHANGE_DIR_UNAVAILABLE //not existing or can't access
     };
 
     WaitResult(const zen::DirWatcher::Entry& changedItem) : type(CHANGE_DETECTED), changedItem_(changedItem) {}
-    WaitResult(const Zstring& folderPath) : type(CHANGE_DIR_MISSING), folderPath_(folderPath) {}
+    WaitResult(const Zstring& folderPath) : type(CHANGE_DIR_UNAVAILABLE), folderPath_(folderPath) {}
 
     ChangeType type;
     zen::DirWatcher::Entry changedItem_; //for type == CHANGE_DETECTED: file or directory
-    Zstring folderPath_;                 //for type == CHANGE_DIR_MISSING
+    Zstring folderPath_;                 //for type == CHANGE_DIR_UNAVAILABLE
 };
 
 
 WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw FileError
                           const std::function<void(bool readyForSync)>& onRefreshGui)
 {
-    const std::vector<Zstring> folderPathsFmt = getFormattedDirs(folderPathPhrases); //throw FileError
-    if (folderPathsFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
+    const std::vector<Zstring> folderPaths = getFormattedDirs(folderPathPhrases); //throw FileError
+    if (folderPaths.empty()) //pathological case, but we have to check else this function will wait endlessly
         throw FileError(_("A folder input field is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
 
-    for (const Zstring& folderPathFmt : folderPathsFmt)
+    for (const Zstring& folderPath : folderPaths)
     {
         try
         {
             //a non-existent network path may block, so check existence asynchronously!
-            auto ftDirExists = runAsync([=] { return zen::dirExists(folderPathFmt); });
-            //we need to check dirExists(), not somethingExists(): it's not clear if DirWatcher detects a type clash (file instead of directory!)
-            while (ftDirExists.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
+            auto ftDirAvailable = runAsync([=] { return dirAvailable(folderPath); });
+            
+            while (ftDirAvailable.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
                 onRefreshGui(false /*readyForSync*/); //may throw!
-            if (!ftDirExists.get())
-                return WaitResult(folderPathFmt);
 
-            watches.emplace_back(folderPathFmt, std::make_shared<DirWatcher>(folderPathFmt)); //throw FileError
+            if (!ftDirAvailable.get()) //folder not existing or can't access
+                return WaitResult(folderPath);
+
+            watches.emplace_back(folderPath, std::make_shared<DirWatcher>(folderPath)); //throw FileError
         }
         catch (FileError&)
         {
-            if (!somethingExists(folderPathFmt)) //a benign(?) race condition with FileError
-                return WaitResult(folderPathFmt);
+            if (!dirAvailable(folderPath)) //folder not existing or can't access
+                return WaitResult(folderPath);
             throw;
         }
     }
@@ -97,7 +98,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
     auto lastCheckTime = std::chrono::steady_clock::now();
     for (;;)
     {
-        const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
+        const bool checkDirNow = [&]() -> bool //checking once per sec should suffice
         {
             const auto now = std::chrono::steady_clock::now();
 
@@ -116,8 +117,8 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
             DirWatcher& watcher = *(it->second);
 
             //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
-            if (checkDirExistNow)
-                if (!dirExists(folderPath)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED -> somethingExists() is NOT sufficient here!
+            if (checkDirNow)
+                if (!dirAvailable(folderPath)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
                     return WaitResult(folderPath);
             try
             {
@@ -138,7 +139,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
             }
             catch (FileError&)
             {
-                if (!somethingExists(folderPath)) //a benign(?) race condition with FileError
+                if (!dirAvailable(folderPath)) //a benign(?) race condition with FileError
                     return WaitResult(folderPath);
                 throw;
             }
@@ -156,33 +157,33 @@ void waitForMissingDirs(const std::vector<Zstring>& folderPathPhrases, //throw F
 {
     for (;;)
     {
-        bool allExisting = true;
+        bool allAvailable = true;
         //support specifying volume by name => call getResolvedFilePath() repeatedly
-        for (const Zstring& folderPathFmt : getFormattedDirs(folderPathPhrases)) //throw FileError
+        for (const Zstring& folderPath : getFormattedDirs(folderPathPhrases)) //throw FileError
         {
-            auto ftDirExisting = runAsync([=]
+            auto ftDirAvailable = runAsync([=]
             {
-                //2. check dir existence
-                return zen::dirExists(folderPathFmt);
+                //2. check dir availability
+                return dirAvailable(folderPath);
             });
-            while (ftDirExisting.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
-                onRefreshGui(folderPathFmt); //may throw!
+            while (ftDirAvailable.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
+                onRefreshGui(folderPath); //may throw!
 
-            if (!ftDirExisting.get())
+            if (!ftDirAvailable.get())
             {
-                allExisting = false;
+                allAvailable = false;
                 //wait some time...
                 const int refreshInterval = rts::UI_UPDATE_INTERVAL_MS / 2;
                 static_assert(FOLDER_EXISTENCE_CHECK_INTERVAL_SEC * 1000 % refreshInterval == 0, "");
                 for (int i = 0; i < FOLDER_EXISTENCE_CHECK_INTERVAL_SEC * 1000 / refreshInterval; ++i)
                 {
-                    onRefreshGui(folderPathFmt); //may throw!
+                    onRefreshGui(folderPath); //may throw!
                     std::this_thread::sleep_for(std::chrono::milliseconds(refreshInterval));
                 }
                 break;
             }
         }
-        if (allExisting)
+        if (allAvailable)
             return;
     }
 }
@@ -241,7 +242,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& folderPathPhrases, unsi
                     });
                     switch (res.type)
                     {
-                        case WaitResult::CHANGE_DIR_MISSING: //don't execute the command before all directories are available!
+                        case WaitResult::CHANGE_DIR_UNAVAILABLE: //don't execute the command before all directories are available!
                             callback.setPhase(MonitorCallback::MONITOR_PHASE_WAITING);
                             waitForMissingDirs(folderPathPhrases, [&](const Zstring& folderPath) { callback.requestUiRefresh(); }); //throw FileError
                             callback.setPhase(MonitorCallback::MONITOR_PHASE_ACTIVE);

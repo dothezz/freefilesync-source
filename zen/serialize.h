@@ -126,7 +126,7 @@ struct MemoryStreamIn
         return bytesRead;
     }
 
-	size_t pos() const { return pos_; }
+    size_t pos() const { return pos_; }
 
 private:
     const BinContainer buffer_;

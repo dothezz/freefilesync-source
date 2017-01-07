@@ -84,11 +84,11 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
         const FolderStatus status = getFolderStatusNonBlocking(uniqueBaseFolders, folderAccessTimeout, allowUserInteraction, callback); //re-check *all* directories on each try!
         output.existingBaseFolders = status.existing;
 
-        if (!status.missing.empty() || !status.failedChecks.empty())
+        if (!status.notExisting.empty() || !status.failedChecks.empty())
         {
             std::wstring errorMsg = _("Cannot find the following folders:") + L"\n";
 
-            for (const AbstractPath& folderPath : status.missing)
+            for (const AbstractPath& folderPath : status.notExisting)
                 errorMsg += L"\n" + AFS::getDisplayPath(folderPath);
 
             for (const auto& fc : status.failedChecks)
@@ -202,14 +202,14 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead, int
             switch (callback_.reportError(msg, retryNumber))
             {
                 case ProcessCallback::IGNORE_ERROR:
-                    return ON_ERROR_IGNORE;
+                    return ON_ERROR_CONTINUE;
 
                 case ProcessCallback::RETRY:
                     return ON_ERROR_RETRY;
             }
 
             assert(false);
-            return ON_ERROR_IGNORE;
+            return ON_ERROR_CONTINUE;
         }
 
     private:
@@ -367,24 +367,22 @@ std::shared_ptr<BaseFolderPair> ComparisonBuffer::compareByTimeSize(const Resolv
 void categorizeSymlinkByContent(SymlinkPair& symlink, ProcessCallback& callback)
 {
     //categorize symlinks that exist on both sides
-    Zstring targetPathRawL;
-    Zstring targetPathRawR;
+    std::string binaryContentL;
+    std::string binaryContentR;
     Opt<std::wstring> errMsg = tryReportingError([&]
     {
         callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtPath(AFS::getDisplayPath(symlink.getAbstractPath<LEFT_SIDE>()))));
-
-        targetPathRawL = AFS::getSymlinkContentBuffer(symlink.getAbstractPath<LEFT_SIDE>()); //throw FileError
+        binaryContentL = AFS::getSymlinkBinaryContent(symlink.getAbstractPath<LEFT_SIDE>()); //throw FileError
 
         callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtPath(AFS::getDisplayPath(symlink.getAbstractPath<RIGHT_SIDE>()))));
-        targetPathRawR = AFS::getSymlinkContentBuffer(symlink.getAbstractPath<RIGHT_SIDE>()); //throw FileError
+        binaryContentR = AFS::getSymlinkBinaryContent(symlink.getAbstractPath<RIGHT_SIDE>()); //throw FileError
     }, callback); //throw X?
 
     if (errMsg)
         symlink.setCategoryConflict(*errMsg);
     else
     {
-        if (targetPathRawL == targetPathRawR
-           )
+        if (binaryContentL == binaryContentR)
         {
             //Caveat:
             //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncFolder's mapping tables use short name as a key! see db_file.cpp
@@ -607,9 +605,9 @@ void MergeSides::fillOneSide(const FolderContainer& folderCont, const std::wstri
 
     for (const auto& dir : folderCont.folders)
     {
-        FolderPair& newFolder = output.addSubFolder<side>(dir.first);
+        FolderPair& newFolder = output.addSubFolder<side>(dir.first, dir.second.first);
         const std::wstring* errorMsgNew = checkFailedRead(newFolder, errorMsg);
-        fillOneSide<side>(dir.second, errorMsgNew, newFolder); //recurse
+        fillOneSide<side>(dir.second.second, errorMsgNew, newFolder); //recurse
     }
 }
 
@@ -699,27 +697,27 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
     linearMerge(lhs.folders, rhs.folders,
                 [&](const FolderData& dirLeft) //left only
     {
-        FolderPair& newFolder = output.addSubFolder<LEFT_SIDE>(dirLeft.first);
+        FolderPair& newFolder = output.addSubFolder<LEFT_SIDE>(dirLeft.first, dirLeft.second.first);
         const std::wstring* errorMsgNew = checkFailedRead(newFolder, errorMsg);
-        this->fillOneSide<LEFT_SIDE>(dirLeft.second, errorMsgNew, newFolder); //recurse
+        this->fillOneSide<LEFT_SIDE>(dirLeft.second.second, errorMsgNew, newFolder); //recurse
     },
     [&](const FolderData& dirRight) //right only
     {
-        FolderPair& newFolder = output.addSubFolder<RIGHT_SIDE>(dirRight.first);
+        FolderPair& newFolder = output.addSubFolder<RIGHT_SIDE>(dirRight.first, dirRight.second.first);
         const std::wstring* errorMsgNew = checkFailedRead(newFolder, errorMsg);
-        this->fillOneSide<RIGHT_SIDE>(dirRight.second, errorMsgNew, newFolder); //recurse
+        this->fillOneSide<RIGHT_SIDE>(dirRight.second.second, errorMsgNew, newFolder); //recurse
     },
 
     [&](const FolderData& dirLeft, const FolderData& dirRight) //both sides
     {
-        FolderPair& newFolder = output.addSubFolder(dirLeft.first, dirRight.first, DIR_EQUAL);
+        FolderPair& newFolder = output.addSubFolder(dirLeft.first, dirLeft.second.first, DIR_EQUAL, dirRight.first, dirRight.second.first);
         const std::wstring* errorMsgNew = checkFailedRead(newFolder, errorMsg);
 
         if (!errorMsgNew)
             if (dirLeft.first != dirRight.first)
                 newFolder.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(newFolder));
 
-        mergeTwoSides(dirLeft.second, dirRight.second, errorMsgNew, newFolder); //recurse
+        mergeTwoSides(dirLeft.second.second, dirRight.second.second, errorMsgNew, newFolder); //recurse
     });
 }
 

@@ -64,7 +64,7 @@ struct FillBufferCallback
     enum HandleError
     {
         ON_ERROR_RETRY,
-        ON_ERROR_IGNORE
+        ON_ERROR_CONTINUE
     };
     virtual HandleError reportError (const std::wstring& msg, size_t retryNumber) = 0; //may throw!
     virtual void        reportStatus(const std::wstring& msg, int    itemsTotal ) = 0; //

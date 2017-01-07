@@ -17,12 +17,9 @@ using namespace zen;
 
 
 
-bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
+bool zen::recycleOrDeleteIfExists(const Zstring& itemPath) //throw FileError
 {
-    if (!somethingExists(itempath)) //[!] do not optimize away, OS X needs this for reliable detection of "recycle bin missing"
-        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
-
-    GFile* file = ::g_file_new_for_path(itempath.c_str()); //never fails according to docu
+    GFile* file = ::g_file_new_for_path(itemPath.c_str()); //never fails according to docu
     ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
 
     GError* error = nullptr;
@@ -30,30 +27,29 @@ bool zen::recycleOrDelete(const Zstring& itempath) //throw FileError
 
     if (!::g_file_trash(file, nullptr, &error))
     {
-        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtPath(itempath));
+        const Opt<ItemType> type = getItemTypeIfExists(itemPath); //throw FileError
+        if (!type)
+            return false;
 
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtPath(itemPath));
         if (!error)
             throw FileError(errorMsg, L"g_file_trash: unknown error."); //user should never see this
 
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
         if (error->code == G_IO_ERROR_NOT_SUPPORTED)
         {
-            struct ::stat fileInfo = {};
-            if (::lstat(itempath.c_str(), &fileInfo) != 0)
-                return false;
-
-            if (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))
-                removeFile(itempath); //throw FileError
-            else if (S_ISDIR(fileInfo.st_mode))
-                removeDirectoryRecursively(itempath); //throw FileError
+            if (*type == ItemType::FOLDER)
+                removeDirectoryPlainRecursion(itemPath); //throw FileError
+            else
+                removeFilePlain(itemPath); //throw FileError
             return true;
         }
 
         throw FileError(errorMsg, replaceCpy<std::wstring>(L"Glib Error Code %x:", L"%x", numberTo<std::wstring>(error->code)) + L" " + utfCvrtTo<std::wstring>(error->message));
         //g_quark_to_string(error->domain)
     }
-
     return true;
+
 }
 
 

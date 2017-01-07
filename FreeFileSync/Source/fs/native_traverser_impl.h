@@ -91,7 +91,7 @@ private:
                 (itemName[1] == 0 || (itemName[1] == '.' && itemName[2] == 0)))
                 continue;
 
-			const Zstring& itemPath = appendSeparator(dirPath) + itemName;
+            const Zstring& itemPath = appendSeparator(dirPath) + itemName;
 
             struct ::stat statData = {};
             if (!tryReportingItemError([&]
@@ -122,7 +122,7 @@ private:
                         {
                             if (S_ISDIR(statDataTrg.st_mode)) //a directory
                             {
-                                if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onDir({ itemName }))
+                                if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onFolder({ itemName, &linkInfo }))
                                     traverse(itemPath, *trav);
                             }
                             else //a file or named pipe, ect.
@@ -141,7 +141,7 @@ private:
             }
             else if (S_ISDIR(statData.st_mode)) //a directory
             {
-                if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onDir({ itemName }))
+                if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onFolder({ itemName, nullptr }))
                     traverse(itemPath, *trav);
             }
             else //a file or named pipe, ect.

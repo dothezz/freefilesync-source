@@ -60,7 +60,7 @@ Zstring zen::getConfigDirPathPf()
     Zstring configDirPath = toZ(wxStandardPathsBase::Get().GetUserDataDir());
     try
     {
-        makeDirectoryRecursively(configDirPath); //throw FileError
+        createDirectoryIfMissingRecursion(configDirPath); //throw FileError
     }
     catch (const FileError&) { assert(false); }
 

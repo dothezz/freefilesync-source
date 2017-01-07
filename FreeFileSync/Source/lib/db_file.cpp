@@ -66,7 +66,6 @@ void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const 
         writeContainer<ByteArray>  (memStreamOut, stream.second);
     }
 
-    assert(!AFS::somethingExists(dbPath)); //orphan tmp files should have been cleaned up at this point!
 
     //save memory stream to file (as a transaction!)
     {
@@ -122,10 +121,15 @@ DbStreams loadStreams(const AbstractPath& dbPath, const std::function<void(std::
     }
     catch (FileError&)
     {
-        if (!AFS::somethingExists(dbPath)) //a benign(?) race condition with FileError
+        bool dbNotYetExisting = false;
+        try { dbNotYetExisting = !AFS::getItemTypeIfExists(dbPath); /*throw FileError*/ }
+        catch (FileError&) {} //previous exception is more relevant
+
+        if (dbNotYetExisting) //throw FileError
             throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
                                                replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtPath(AFS::getDisplayPath(dbPath))));
-        throw;
+        else
+            throw;
     }
     catch (UnexpectedEndOfStreamError&)
     {
@@ -651,12 +655,12 @@ std::shared_ptr<InSyncFolder> zen::loadLastSynchronousState(const BaseFolderPair
     const AbstractPath dbPathLeft  = getDatabaseFilePath< LEFT_SIDE>(baseFolder);
     const AbstractPath dbPathRight = getDatabaseFilePath<RIGHT_SIDE>(baseFolder);
 
-    if (!baseFolder.isExisting< LEFT_SIDE>() ||
-        !baseFolder.isExisting<RIGHT_SIDE>())
+    if (!baseFolder.isAvailable< LEFT_SIDE>() ||
+        !baseFolder.isAvailable<RIGHT_SIDE>())
     {
         //avoid race condition with directory existence check: reading sync.ffs_db may succeed although first dir check had failed => conflicts!
         //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430
-        const AbstractPath filePath = !baseFolder.isExisting<LEFT_SIDE>() ? dbPathLeft : dbPathRight;
+        const AbstractPath filePath = !baseFolder.isAvailable<LEFT_SIDE>() ? dbPathLeft : dbPathRight;
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" + //it could be due to a to-be-created target directory not yet existing => FileErrorDatabaseNotExisting
                                            replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtPath(AFS::getDisplayPath(filePath))));
     }
@@ -690,10 +694,6 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
 
     const AbstractPath dbPathLeftTmp  = getDatabaseFilePath< LEFT_SIDE>(baseFolder, true);
     const AbstractPath dbPathRightTmp = getDatabaseFilePath<RIGHT_SIDE>(baseFolder, true);
-
-    //delete old tmp file, if necessary -> throws if deletion fails!
-    AFS::removeFile(dbPathLeftTmp);  //
-    AFS::removeFile(dbPathRightTmp); //throw FileError
 
     //(try to) load old database files...
     DbStreams streamsLeft; //list of session ID + DirInfo-stream
@@ -765,15 +765,19 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
     streamsLeft [sessionID] = std::move(updatedStreamLeft);
     streamsRight[sessionID] = std::move(updatedStreamRight);
 
+    //delete old tmp file, if necessary -> throws if deletion fails!
+    AFS::removeFileIfExists(dbPathLeftTmp);  //
+    AFS::removeFileIfExists(dbPathRightTmp); //throw FileError
+
     //write (temp-) files as a transaction
     saveStreams(streamsLeft,  dbPathLeftTmp,  notifyProgress); //throw FileError
     saveStreams(streamsRight, dbPathRightTmp, notifyProgress); //
 
     //operation finished: rename temp files -> this should work (almost) transactionally:
     //if there were no write access, creation of temp files would have failed
-    AFS::removeFile(dbPathLeft);                  //throw FileError
+    AFS::removeFileIfExists(dbPathLeft);          //throw FileError
     AFS::renameItem(dbPathLeftTmp, dbPathLeft);   //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
 
-    AFS::removeFile(dbPathRight);                 //
+    AFS::removeFileIfExists(dbPathRight);         //
     AFS::renameItem(dbPathRightTmp, dbPathRight); //
 }

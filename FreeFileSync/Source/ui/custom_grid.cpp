@@ -707,7 +707,7 @@ private:
             visitFSObject(*fsObj, [&](const FolderPair& folder)
             {
                 out.type = IconInfo::FOLDER;
-                //todo: if ("is followed symlink") out.drawAsLink = true;
+                out.drawAsLink = folder.isFollowedSymlink<side>();
             },
 
             [&](const FilePair& file)

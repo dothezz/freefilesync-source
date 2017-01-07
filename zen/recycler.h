@@ -35,7 +35,7 @@ Already included in package "gtk+-2.0"!
 
 
 //move a file or folder to Recycle Bin (deletes permanently if recycler is not available) -> crappy semantics, but we have no choice thanks to Windows' design
-bool recycleOrDelete(const Zstring& itemPath); //throw FileError, return "true" if file/dir was actually deleted
+bool recycleOrDeleteIfExists(const Zstring& itemPath); //throw FileError, return "true" if file/dir was actually deleted
 
 
 }

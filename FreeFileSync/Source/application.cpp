@@ -205,13 +205,13 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             {
                 Zstring filePath = getResolvedFilePath(*it);
 
-                if (!fileExists(filePath)) //...be a little tolerant
+                if (!fileAvailable(filePath)) //...be a little tolerant
                 {
-                    if (fileExists(filePath + Zstr(".ffs_batch")))
+                    if (fileAvailable(filePath + Zstr(".ffs_batch")))
                         filePath += Zstr(".ffs_batch");
-                    else if (fileExists(filePath + Zstr(".ffs_gui")))
+                    else if (fileAvailable(filePath + Zstr(".ffs_gui")))
                         filePath += Zstr(".ffs_gui");
-                    else if (fileExists(filePath + Zstr(".xml")))
+                    else if (fileAvailable(filePath + Zstr(".xml")))
                         filePath += Zstr(".xml");
                     else
                     {
@@ -425,7 +425,7 @@ void showSyntaxHelp()
 }
 
 
-void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
+void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
 {
     auto notifyError = [&](const std::wstring& msg, FfsReturnCode rc)
     {
@@ -438,17 +438,21 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
     };
 
     XmlGlobalSettings globalCfg;
-    if (fileExists(globalConfigFile)) //else: globalCfg already has default values
         try
         {
             std::wstring warningMsg;
-            readConfig(globalConfigFile, globalCfg, warningMsg); //throw FileError
+            readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
 
             assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
         }
         catch (const FileError& e)
         {
-            return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
+			bool notExisting = false;
+            try  { notExisting = !getItemTypeIfExists(globalConfigFilePath); /*throw FileError*/ }
+            catch (FileError&) {} //previous exception is more relevant
+
+			if (!notExisting) //existing or access error
+				return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
         }
 
     try
@@ -537,12 +541,12 @@ void runBatchMode(const Zstring& globalConfigFile, const XmlBatchConfig& batchCf
     catch (BatchRequestSwitchToMainDialog&)
     {
         //open new toplevel window *after* progress dialog is gone => run on main event loop
-        return MainDialog::create(globalConfigFile, &globalCfg, xmlAccess::convertBatchToGui(batchCfg), { referenceFile }, true /*startComparison*/);
+        return MainDialog::create(globalConfigFilePath, &globalCfg, xmlAccess::convertBatchToGui(batchCfg), { referenceFile }, true /*startComparison*/);
     }
 
     try //save global settings to XML: e.g. ignored warnings
     {
-        xmlAccess::writeConfig(globalCfg, globalConfigFile); //FileError
+        xmlAccess::writeConfig(globalCfg, globalConfigFilePath); //FileError
     }
     catch (const FileError& e)
     {

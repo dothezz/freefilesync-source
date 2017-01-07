@@ -92,11 +92,11 @@ void Application::onEnterEventLoop(wxEvent& event)
     {
         Zstring filePath = getResolvedFilePath(toZ(argv[i]));
 
-        if (!fileExists(filePath)) //be a little tolerant
+        if (!fileAvailable(filePath)) //be a little tolerant
         {
-            if (fileExists(filePath + Zstr(".ffs_real")))
+            if (fileAvailable(filePath + Zstr(".ffs_real")))
                 filePath += Zstr(".ffs_real");
-            else if (fileExists(filePath + Zstr(".ffs_batch")))
+            else if (fileAvailable(filePath + Zstr(".ffs_batch")))
                 filePath += Zstr(".ffs_batch");
             else
             {

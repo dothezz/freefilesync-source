@@ -310,7 +310,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
                 if (getFilesize(lockFilePath) != fileSizeOld) //throw FileError
                     continue; //late life sign
 
-                removeFile(lockFilePath); //throw FileError
+                removeFilePlain(lockFilePath); //throw FileError
                 return;
             }
 
@@ -338,18 +338,23 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
     }
     catch (FileError&)
     {
-        if (!somethingExists(lockFilePath)) //a benign(?) race condition with FileError
-            return; //what we are waiting for...
+            try 
+			{ 
+				if (!getItemTypeIfExists(lockFilePath)) //throw FileError
+					return; //what we are waiting for...
+			}
+            catch (FileError&) {} //previous exception is more relevant
+
         throw;
     }
 }
 
 
-void releaseLock(const Zstring& lockFilePath) //throw ()
+void releaseLock(const Zstring& lockFilePath) //noexcept
 {
     try
     {
-        removeFile(lockFilePath); //throw FileError
+        removeFilePlain(lockFilePath); //throw FileError
     }
     catch (FileError&) {}
 }
@@ -370,7 +375,8 @@ bool tryLock(const Zstring& lockFilePath) //throw FileError
         else
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(lockFilePath)), L"open");
     }
-    ZEN_ON_SCOPE_FAIL( removeFile(lockFilePath); );
+    ZEN_ON_SCOPE_FAIL(try { removeFilePlain(lockFilePath); }
+    catch (FileError&) {});
     FileOutput fileOut(fileHandle, lockFilePath); //pass handle ownership
 
     //write housekeeping info: user, process info, lock GUID

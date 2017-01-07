@@ -31,7 +31,7 @@ private:
 #define DEFINE_NEW_FILE_ERROR(X) struct X : public FileError { X(const std::wstring& msg) : FileError(msg) {} X(const std::wstring& msg, const std::wstring& descr) : FileError(msg, descr) {} };
 
 DEFINE_NEW_FILE_ERROR(ErrorTargetExisting);
-DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);
+//DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);
 DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 

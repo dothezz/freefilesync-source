@@ -17,17 +17,40 @@ namespace zen
 {
 //note: certain functions require COM initialization! (vista_file_op.h)
 
+Opt<Zstring> getParentFolderPath(const Zstring& itemPath);
+
+//POSITIVE existence checks; if negative: 1. item not existing 2. different type 3.access error or similar
+bool fileAvailable(const Zstring& filePath); //noexcept
+bool dirAvailable (const Zstring& dirPath ); //
+
+
 bool fileExists     (const Zstring& filePath); //noexcept; check whether file      or file-symlink exists
 bool dirExists      (const Zstring& dirPath ); //noexcept; check whether directory or dir-symlink exists
-bool symlinkExists  (const Zstring& linkPath); //noexcept; check whether a symbolic link exists
-bool somethingExists(const Zstring& itemPath); //noexcept; check whether any object with this name exists
+
+enum class ItemType
+{
+    FILE,
+    FOLDER,
+    SYMLINK,
+};
+//(hopefully) fast: does not distinguish between error/not existing
+ItemType      getItemType        (const Zstring& itemPath); //throw FileError
+//execute potentially SLOW folder traversal but distinguish error/not existing
+Opt<ItemType> getItemTypeIfExists(const Zstring& itemPath); //throw FileError
+
+struct PathDetails
+{
+    ItemType existingType;
+    Zstring existingPath;         //itemPath =: existingPath + relPath
+    std::vector<Zstring> relPath; //
+};
+PathDetails getPathDetails(const Zstring& itemPath); //throw FileError
 
 enum class ProcSymlink
 {
     DIRECT,
     FOLLOW
 };
-
 void setFileTime(const Zstring& filePath, std::int64_t modificationTime, ProcSymlink procSl); //throw FileError
 
 //symlink handling: always evaluate target
@@ -37,11 +60,10 @@ VolumeId      getVolumeId(const Zstring& itemPath); //throw FileError
 //get per-user directory designated for temporary files:
 Zstring getTempFolderPath(); //throw FileError
 
-bool removeFile(const Zstring& filePath); //throw FileError; return "false" if file is not existing
-
-void removeDirectorySimple(const Zstring& dirPath); //throw FileError
-
-void removeDirectoryRecursively(const Zstring& dirPath); //throw FileError
+void removeFilePlain     (const Zstring& filePath);         //throw FileError; ERROR if not existing
+void removeSymlinkPlain  (const Zstring& linkPath);         //throw FileError; ERROR if not existing
+void removeDirectoryPlain(const Zstring& dirPath );         //throw FileError; ERROR if not existing
+void removeDirectoryPlainRecursion(const Zstring& dirPath); //throw FileError; ERROR if not existing
 
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& itemPathOld, const Zstring& itemPathNew); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
@@ -50,11 +72,11 @@ bool supportsPermissions(const Zstring& dirPath); //throw FileError, dereference
 
 //- no error if already existing
 //- create recursively if parent directory is not existing
-void makeDirectoryRecursively(const Zstring& dirPath); //throw FileError
+void createDirectoryIfMissingRecursion(const Zstring& dirPath); //throw FileError
 
 //fail if already existing or parent directory not existing:
 //source path is optional (may be empty)
-void copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, bool copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+void copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, bool copyFilePermissions); //throw FileError, ErrorTargetExisting
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
 

@@ -33,7 +33,7 @@ std::pair<std::unique_ptr<AFS::OutputStream>, AbstractPath> prepareNewLogfile(co
     assert(!jobName.empty());
 
     //create logfile folder if required
-    AFS::createFolderRecursively(logFolderPath); //throw FileError
+    AFS::createFolderIfMissingRecursion(logFolderPath); //throw FileError
 
     //const std::string colon = "\xcb\xb8"; //="modifier letter raised colon" => regular colon is forbidden in file names on Windows and OS X
     //=> too many issues, most notably cmd.exe is not Unicode-awere: http://www.freefilesync.org/forum/viewtopic.php?t=1679
@@ -76,11 +76,11 @@ struct LogTraverserCallback: public AFS::TraverserCallback
         if (onUpdateStatus_)
             onUpdateStatus_();
     }
-    std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) override { return nullptr; }
+    std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) override { return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
 
-    HandleError reportDirError (const std::wstring& msg, size_t retryNumber                         ) override { setError(msg); return ON_ERROR_IGNORE; }
-    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { setError(msg); return ON_ERROR_IGNORE; }
+    HandleError reportDirError (const std::wstring& msg, size_t retryNumber                         ) override { setError(msg); return ON_ERROR_CONTINUE; }
+    HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { setError(msg); return ON_ERROR_CONTINUE; }
 
     const std::vector<Zstring>& refFileNames() const { return logFileNames_; }
     const Opt<FileError>& getLastError() const { return lastError_; }
@@ -118,7 +118,7 @@ void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jo
         {
             try
             {
-                AFS::removeFile(AFS::appendRelPath(logFolderPath, logFileName)); //throw FileError
+                AFS::removeFilePlain(AFS::appendRelPath(logFolderPath, logFileName)); //throw FileError
             }
             catch (const FileError& e) { if (!lastError) lastError = e; };
 

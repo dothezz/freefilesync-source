@@ -81,7 +81,7 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
     const bool isDirectoryB = isDirectoryPair(b);
     const Zstring& relFolderB = isDirectoryB ?
                                 b.getPairRelativePath() : //directory
-                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR ,IF_MISSING_RETURN_NONE);
+                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
 
     //compare relative names without filepaths first
     const int rv = cmpFilePath(relFolderA.c_str(), relFolderA.size(),

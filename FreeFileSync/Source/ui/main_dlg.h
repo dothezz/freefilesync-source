@@ -217,8 +217,8 @@ private:
     void OnClose                (wxCloseEvent&   event) override;
 
     void OnCmpSettings    (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::COMPARISON, -1); }
-    void OnConfigureFilter(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER    , -1); }
-    void OnSyncSettings   (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC      , -1); }
+    void OnConfigureFilter(wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::FILTER,     -1); }
+    void OnSyncSettings   (wxCommandEvent& event) override { showConfigDialog(zen::SyncConfigPanel::SYNC,       -1); }
 
     void showConfigDialog(zen::SyncConfigPanel panelToShow, int localPairIndexToShow);
 

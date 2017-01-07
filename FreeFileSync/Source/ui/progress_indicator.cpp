@@ -1983,7 +1983,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             if (!soundFileSyncComplete_.empty())
             {
                 const Zstring soundFile = getResourceDirPf() + soundFileSyncComplete_;
-                if (fileExists(soundFile))
+                if (fileAvailable(soundFile))
                     wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
             }
             break;

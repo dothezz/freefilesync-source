@@ -379,8 +379,8 @@ InterruptibleThread::InterruptibleThread(Function&& f) : intStatus_(std::make_sh
     threadCompleted = pFinished.get_future();
 
     stdThread = std::thread([f = std::forward<Function>(f),
-                             intStatus = this->intStatus_,
-                             pFinished = std::move(pFinished)]() mutable
+                               intStatus = this->intStatus_,
+                               pFinished = std::move(pFinished)]() mutable
     {
         assert(!impl::refThreadLocalInterruptionStatus());
         impl::refThreadLocalInterruptionStatus() = intStatus.get();

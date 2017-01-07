@@ -57,7 +57,7 @@ ImageHolder getDisplayIcon(const AbstractPath& itemPath, IconBuffer::IconSize sz
             break;
     }
 
-    const Zstring& templateName = AFS::getFileShortName(itemPath);
+    const Zstring& templateName = AFS::getItemName(itemPath);
 
     //2. retrieve file icons
         if (ImageHolder ih = AFS::getFileIcon(itemPath, IconBuffer::getSize(sz)))

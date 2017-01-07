@@ -53,7 +53,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     };
     static Opt<PathComplement> getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs);
 
-    static Zstring getFileShortName(const AbstractPath& ap) { return ap.afs->getFileShortName(ap.itemPathImpl); }
+    static Zstring getItemName(const AbstractPath& ap) { assert(getParentFolderPath(ap)); return ap.afs->getItemName(ap.itemPathImpl); }
 
     static bool havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs)
     {
@@ -71,43 +71,53 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     }
 
     //----------------------------------------------------------------------------------------------------------------
-    static bool fileExists     (const AbstractPath& ap) { return ap.afs->fileExists     (ap.itemPathImpl); } //noexcept; check whether file      or file-symlink exists
-    static bool folderExists   (const AbstractPath& ap) { return ap.afs->folderExists   (ap.itemPathImpl); } //noexcept; check whether directory or dir-symlink exists
-    static bool symlinkExists  (const AbstractPath& ap) { return ap.afs->symlinkExists  (ap.itemPathImpl); } //noexcept; check whether a symbolic link exists
-    static bool somethingExists(const AbstractPath& ap) { return ap.afs->somethingExists(ap.itemPathImpl); } //noexcept; check whether any object with this name exists
+    enum class ItemType
+    {
+        FILE,
+        FOLDER,
+        SYMLINK,
+    };
+    struct PathDetails
+    {
+        ItemType existingType;
+        AbstractPath existingPath;    //itemPath =: existingPath + relPath
+        std::vector<Zstring> relPath; //
+    };
+    //(hopefully) fast: does not distinguish between error/not existing
+    static ItemType getItemType(const AbstractPath& ap) { return ap.afs->getItemType(ap.itemPathImpl); } //throw FileError
+    //execute potentially SLOW folder traversal but distinguish error/not existing
+    static Opt<ItemType> getItemTypeIfExists(const AbstractPath& ap); //throw FileError
+    static PathDetails getPathDetails(const AbstractPath& ap); //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
-    //should provide for single ATOMIC folder creation!
-    static void createFolderSimple(const AbstractPath& ap) { ap.afs->createFolderSimple(ap.itemPathImpl); } //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
-
-    //non-recursive folder deletion:
-    static void removeFolderSimple(const AbstractPath& ap) { ap.afs->removeFolderSimple(ap.itemPathImpl); } //throw FileError
+    //- error if already existing
+    //- does NOT create parent directories recursively if not existing
+    static void createFolderPlain(const AbstractPath& ap) { ap.afs->createFolderPlain(ap.itemPathImpl); } //throw FileError
 
     //- no error if already existing
-    //- create recursively if parent directory is not existing
-    static void createFolderRecursively(const AbstractPath& ap); //throw FileError
+    //- creates parent directories recursively if not existing
+    static void createFolderIfMissingRecursion(const AbstractPath& ap); //throw FileError
 
-    static void removeFolderRecursively(const AbstractPath& ap, //throw FileError
-                                        const std::function<void (const std::wstring& displayPath)>& onBeforeFileDeletion,    //optional
-                                        const std::function<void (const std::wstring& displayPath)>& onBeforeFolderDeletion); //one call for each *existing* object!
+    static bool removeFileIfExists   (const AbstractPath& ap); //throw FileError; return "false" if file is not existing
+    static bool removeSymlinkIfExists(const AbstractPath& ap); //
+    static void removeFolderIfExistsRecursion(const AbstractPath& ap, //throw FileError
+                                              const std::function<void (const std::wstring& displayPath)>& onBeforeFileDeletion,    //optional
+                                              const std::function<void (const std::wstring& displayPath)>& onBeforeFolderDeletion); //one call for each *existing* object!
 
-    static bool removeFile(const AbstractPath& ap) { return ap.afs->removeFile(ap.itemPathImpl); } //throw FileError; return "false" if file is not existing
-
+    static void removeFilePlain   (const AbstractPath& ap) { ap.afs->removeFilePlain   (ap.itemPathImpl); } //throw FileError
+    static void removeSymlinkPlain(const AbstractPath& ap) { ap.afs->removeSymlinkPlain(ap.itemPathImpl); } //throw FileError
+    static void removeFolderPlain (const AbstractPath& ap) { ap.afs->removeFolderPlain (ap.itemPathImpl); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-
     static void setModTime       (const AbstractPath& ap, std::int64_t modificationTime) { ap.afs->setModTime       (ap.itemPathImpl, modificationTime); } //throw FileError, follows symlinks
     static void setModTimeSymlink(const AbstractPath& ap, std::int64_t modificationTime) { ap.afs->setModTimeSymlink(ap.itemPathImpl, modificationTime); } //throw FileError
 
     static AbstractPath getResolvedSymlinkPath(const AbstractPath& ap) { return AbstractPath(ap.afs, ap.afs->getResolvedSymlinkPath(ap.itemPathImpl)); } //throw FileError
-
-    static Zstring getSymlinkContentBuffer(const AbstractPath& ap) { return ap.afs->getSymlinkContentBuffer(ap.itemPathImpl); } //throw FileError
-
+    static std::string getSymlinkBinaryContent(const AbstractPath& ap) { return ap.afs->getSymlinkBinaryContent(ap.itemPathImpl); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
     //noexcept; optional return value:
     static ImageHolder getFileIcon      (const AbstractPath& ap, int pixelSize) { return ap.afs->getFileIcon      (ap.itemPathImpl, pixelSize); }
     static ImageHolder getThumbnailImage(const AbstractPath& ap, int pixelSize) { return ap.afs->getThumbnailImage(ap.itemPathImpl, pixelSize); }
 
-    static bool folderExistsThrowing(const AbstractPath& ap) { return ap.afs->folderExistsThrowing(ap.itemPathImpl); } //throw FileError
     static void connectNetworkFolder(const AbstractPath& ap, bool allowUserInteraction) { return ap.afs->connectNetworkFolder(ap.itemPathImpl, allowUserInteraction); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
@@ -128,7 +138,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     {
         virtual ~OutputStreamImpl() {}
         virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract!
-        virtual size_t tryWrite(const void* data, size_t len) = 0; //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        virtual size_t tryWrite(const void* buffer, size_t bytesToWrite) = 0; //throw FileError; may return short! CONTRACT: bytesToWrite > 0
         virtual FileId finalize(const std::function<void()>& onUpdateStatus) = 0; //throw FileError
     };
 
@@ -163,39 +173,40 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
         struct SymlinkInfo
         {
-            const Zstring itemName;
+            Zstring itemName;
             std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
         };
 
         struct FileInfo
         {
-            const Zstring itemName;
+            Zstring itemName;
             std::uint64_t fileSize;      //unit: bytes!
             std::int64_t  lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
-            const FileId  id;            //optional: empty if not supported!
+            FileId id; //optional: empty if not supported!
             const SymlinkInfo* symlinkInfo; //only filled if file is a followed symlink
         };
 
-        struct DirInfo
+        struct FolderInfo
         {
-            const Zstring itemName;
+            Zstring itemName;
+            const SymlinkInfo* symlinkInfo; //only filled if folder is a followed symlink
         };
 
         enum HandleLink
         {
-            LINK_FOLLOW, //dereferences link, then calls "onDir()" or "onFile()"
+            LINK_FOLLOW, //dereferences link, then calls "onFolder()" or "onFile()"
             LINK_SKIP
         };
 
         enum HandleError
         {
             ON_ERROR_RETRY,
-            ON_ERROR_IGNORE
+            ON_ERROR_CONTINUE
         };
 
         virtual void                               onFile   (const FileInfo&    fi) = 0; //
         virtual HandleLink                         onSymlink(const SymlinkInfo& si) = 0; //throw X
-        virtual std::unique_ptr<TraverserCallback> onDir    (const DirInfo&     di) = 0; //
+        virtual std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) = 0; //
         //nullptr: ignore directory, non-nullptr: traverse into, using the (new) callback
 
         virtual HandleError reportDirError (const std::wstring& msg, size_t retryNumber) = 0; //failed directory traversal -> consider directory data at current level as incomplete!
@@ -217,11 +228,6 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     };
     //return current attributes at the time of copy
     //symlink handling: dereference source
-    static FileAttribAfterCopy copyFileAsStream(const AbstractPath& apSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                                //accummulated delta != file size! consider ADS, sparse, compressed files
-                                                const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //may be nullptr; throw X!
-    { return apSource.afs->copyFileAsStream(apSource.itemPathImpl, apTarget, notifyProgress); }
-
 
     //Note: it MAY happen that copyFileTransactional() leaves temp files behind, e.g. temporary network drop.
     // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
@@ -233,6 +239,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
                                                      //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
                                                      //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
                                                      const std::function<void()>& onDeleteTargetFile,
+                                                     //accummulated delta != file size! consider ADS, sparse, compressed files
                                                      const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
 
     static void copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
@@ -255,7 +262,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     //precondition: supportsRecycleBin() must return true!
     static std::unique_ptr<RecycleSession> createRecyclerSession(const AbstractPath& ap) { return ap.afs->createRecyclerSession(ap.itemPathImpl); } //throw FileError, return value must be bound!
 
-    static void recycleItemDirectly(const AbstractPath& ap) { ap.afs->recycleItemDirectly(ap.itemPathImpl); } //throw FileError
+    static void recycleItemIfExists(const AbstractPath& ap) { ap.afs->recycleItemIfExists(ap.itemPathImpl); } //throw FileError
 
     //================================================================================================================
 
@@ -267,6 +274,14 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 protected: //grant derived classes access to AbstractPath:
     static const AbstractFileSystem& getAfs         (const AbstractPath& ap) { return *ap.afs; }
     static Zstring                   getItemPathImpl(const AbstractPath& ap) { return ap.itemPathImpl; }
+
+    struct PathDetailsImpl
+    {
+        ItemType existingType;
+        Zstring existingPathImpl;    //itemPathImpl =: existingPathImpl + relPath
+        std::vector<Zstring> relPath; //
+    };
+    PathDetailsImpl getPathDetailsViaFolderTraversal(const Zstring& itemPathImpl) const; //throw FileError
 
     FileAttribAfterCopy copyFileAsStream(const Zstring& itemPathImplSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                          const std::function<void(std::int64_t bytesDelta)>& notifyProgress) const; //may be nullptr; throw X!
@@ -286,35 +301,30 @@ private:
 
     virtual bool lessItemPathSameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
 
-    //used during folder creation if parent folder is missing
     virtual Opt<Zstring> getParentFolderPathImpl(const Zstring& itemPathImpl) const = 0;
 
-    virtual Zstring getFileShortName(const Zstring& itemPathImpl) const = 0;
+    virtual Zstring getItemName(const Zstring& itemPathImpl) const = 0;
 
     virtual bool havePathDependencySameAfsType(const Zstring& itemPathImplLhs, const AbstractPath& apRhs) const = 0;
 
     //----------------------------------------------------------------------------------------------------------------
-    virtual bool fileExists     (const Zstring& itemPathImpl) const = 0; //noexcept
-    virtual bool folderExists   (const Zstring& itemPathImpl) const = 0; //noexcept
-    virtual bool symlinkExists  (const Zstring& itemPathImpl) const = 0; //noexcept
-    virtual bool somethingExists(const Zstring& itemPathImpl) const = 0; //noexcept
+    virtual ItemType getItemType(const Zstring& itemPathImpl) const = 0; //throw FileError
+    virtual PathDetailsImpl getPathDetails(const Zstring& itemPathImpl) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
-    //should provide for single ATOMIC folder creation!
-    virtual void createFolderSimple(const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    virtual void createFolderPlain(const Zstring& itemPathImpl) const = 0; //throw FileError
 
     //non-recursive folder deletion:
-    virtual void removeFolderSimple(const Zstring& itemPathImpl) const = 0; //throw FileError
-
-    virtual bool removeFile(const Zstring& itemPathImpl) const = 0; //throw FileError
-
+    virtual void removeFilePlain   (const Zstring& itemPathImpl) const = 0; //throw FileError
+    virtual void removeSymlinkPlain(const Zstring& itemPathImpl) const = 0; //throw FileError
+    virtual void removeFolderPlain (const Zstring& itemPathImpl) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
     virtual void setModTime       (const Zstring& itemPathImpl, std::int64_t modificationTime) const = 0; //throw FileError, follows symlinks
     virtual void setModTimeSymlink(const Zstring& itemPathImpl, std::int64_t modificationTime) const = 0; //throw FileError
 
     virtual Zstring getResolvedSymlinkPath(const Zstring& itemPathImpl) const = 0; //throw FileError
 
-    virtual Zstring getSymlinkContentBuffer(const Zstring& itemPathImpl) const = 0; //throw FileError
+    virtual std::string getSymlinkBinaryContent(const Zstring& itemPathImpl) const = 0; //throw FileError
 
     //----------------------------------------------------------------------------------------------------------------
     virtual std::unique_ptr<InputStream     > getInputStream (const Zstring& itemPathImpl) const = 0; //throw FileError, ErrorFileLocked
@@ -340,14 +350,13 @@ private:
     virtual ImageHolder getFileIcon      (const Zstring& itemPathImpl, int pixelSize) const = 0; //noexcept; optional return value
     virtual ImageHolder getThumbnailImage(const Zstring& itemPathImpl, int pixelSize) const = 0; //
 
-    virtual bool folderExistsThrowing(const Zstring& itemPathImpl) const = 0; //throw FileError
     virtual void connectNetworkFolder(const Zstring& itemPathImpl, bool allowUserInteraction) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
     virtual std::uint64_t getFreeDiskSpace(const Zstring& itemPathImpl) const = 0; //throw FileError, returns 0 if not available
     virtual bool supportsRecycleBin(const Zstring& itemPathImpl, const std::function<void ()>& onUpdateGui) const  = 0; //throw FileError
     virtual std::unique_ptr<RecycleSession> createRecyclerSession(const Zstring& itemPathImpl) const = 0; //throw FileError, return value must be bound!
-    virtual void recycleItemDirectly(const Zstring& itemPathImpl) const = 0; //throw FileError
+    virtual void recycleItemIfExists(const Zstring& itemPathImpl) const = 0; //throw FileError
 };
 
 
@@ -367,7 +376,7 @@ bool tryReportingDirError(Command cmd, AbstractFileSystem::TraverserCallback& ca
             {
                 case AbstractFileSystem::TraverserCallback::ON_ERROR_RETRY:
                     break;
-                case AbstractFileSystem::TraverserCallback::ON_ERROR_IGNORE:
+                case AbstractFileSystem::TraverserCallback::ON_ERROR_CONTINUE:
                     return false;
             }
         }
@@ -389,7 +398,7 @@ bool tryReportingItemError(Command cmd, AbstractFileSystem::TraverserCallback& c
             {
                 case AbstractFileSystem::TraverserCallback::ON_ERROR_RETRY:
                     break;
-                case AbstractFileSystem::TraverserCallback::ON_ERROR_IGNORE:
+                case AbstractFileSystem::TraverserCallback::ON_ERROR_CONTINUE:
                     return false;
             }
         }
@@ -493,7 +502,7 @@ AbstractFileSystem::OutputStream::~OutputStream()
     outStream_.reset(); //close file handle *before* remove!
 
     if (!finalizeSucceeded_) //transactional output stream! => clean up!
-        try { AbstractFileSystem::removeFile(filePath_); /*throw FileError*/ }
+        try { AbstractFileSystem::removeFilePlain(filePath_); /*throw FileError*/ }
         catch (FileError& e) { (void)e; assert(false); }
 }
 
@@ -541,7 +550,7 @@ void AbstractFileSystem::copyNewFolder(const AbstractPath& apSource, const Abstr
         throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(getDisplayPath(apTarget))),
                         _("Operation not supported for different base folder types."));
 
-    createFolderSimple(apTarget); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    createFolderPlain(apTarget); //throw FileError
 }
 
 

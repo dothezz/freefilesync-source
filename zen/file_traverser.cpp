@@ -18,8 +18,8 @@ using namespace zen;
 
 void zen::traverseFolder(const Zstring& dirPath,
                          const std::function<void (const FileInfo&    fi)>& onFile,
-                         const std::function<void (const DirInfo&     di)>& onDir,
-                         const std::function<void (const SymlinkInfo& si)>& onLink,
+                         const std::function<void (const FolderInfo&  fi)>& onFolder,
+                         const std::function<void (const SymlinkInfo& si)>& onSymlink,
                          const std::function<void (const std::wstring& errorMsg)>& onError)
 {
     try
@@ -75,18 +75,18 @@ void zen::traverseFolder(const Zstring& dirPath,
 
             if (S_ISLNK(statData.st_mode)) //on Linux there is no distinction between file and directory symlinks!
             {
-                if (onLink)
-                    onLink({ itemPath, statData.st_mtime});
+                if (onSymlink)
+                    onSymlink({ itemName, itemPath, statData.st_mtime});
             }
             else if (S_ISDIR(statData.st_mode)) //a directory
             {
-                if (onDir)
-                    onDir({ itemPath });
+                if (onFolder)
+                    onFolder({ itemName, itemPath });
             }
             else //a file or named pipe, ect.
             {
                 if (onFile)
-                    onFile({ itemPath, makeUnsigned(statData.st_size), statData.st_mtime });
+                    onFile({ itemName, itemPath, makeUnsigned(statData.st_size), statData.st_mtime });
             }
             /*
             It may be a good idea to not check "S_ISREG(statData.st_mode)" explicitly and to not issue an error message on other types to support these scenarios:

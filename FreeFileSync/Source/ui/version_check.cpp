@@ -88,7 +88,7 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
 #endif
 
     params.emplace_back("language", utfCvrtTo<std::string>(getIso639Language()));
-    params.emplace_back("country" , utfCvrtTo<std::string>(getIso3166Country()));
+    params.emplace_back("country",  utfCvrtTo<std::string>(getIso3166Country()));
 
     return params;
 }
@@ -112,7 +112,7 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
     }
     catch (const FileError& e) //fall back to regular update info dialog:
     {
-        updateDetailsMsg = e.toString() + L"\n\n" + updateDetailsMsg;
+        updateDetailsMsg = e.toString() + L"\n\n\n" + updateDetailsMsg;
     }
 
     switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().

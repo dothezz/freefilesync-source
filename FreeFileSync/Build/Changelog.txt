@@ -1,3 +1,20 @@
+FreeFileSync 8.8 [2017-01-08]
+-----------------------------
+Distinguish file access failure from not existing during sync
+Further optimized number of file I/O operations via file system abstraction
+Report unexpected prompts for keyboard-interactive SFTP authentication
+Mark followed directory symlinks on grid
+Fixed parent path determination for UNC
+Don't skip source files that cannot be accessed
+Don't consider a symlink type for SFTP when comparing by content
+Fixed invalid parameter error when setting file times on exFAT file system
+Don't allow overwriting folder with equally named file when copying from main dialog
+Fixed failure to create intermediate directories for Cryptomator/Webdav
+Refactored file system abstraction layer for future FTP support
+Fixed failure to change file name case on MTP devices
+Fixed late failure for batch recycling when parsing of single item fails
+
+
 FreeFileSync 8.7 [2016-12-06]
 -----------------------------
 New auto-updater feature for FreeFileSync Donation Edition

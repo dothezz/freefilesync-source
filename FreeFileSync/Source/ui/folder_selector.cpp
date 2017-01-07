@@ -131,17 +131,13 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
         auto fmtShellPath = [](const Zstring& shellItemPath)
         {
             const AbstractPath itemPath = createAbstractPath(shellItemPath);
-            if (!AFS::folderExists(itemPath))
+            try
             {
-                Zstring parentShellPath = beforeLast(shellItemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-                if (!parentShellPath.empty())
-                {
-                    const AbstractPath parentPath = createAbstractPath(parentShellPath);
-                    if (AFS::folderExists(parentPath))
-                        return AFS::getInitPathPhrase(parentPath);
-                    //else: keep original name unconditionally: usecase: inactive mapped network shares
-                }
+                if (AFS::getItemType(itemPath) == AFS::ItemType::FILE) //throw FileError
+                    if (Opt<AbstractPath> parentPath = AFS::getParentFolderPath(itemPath))
+                        return AFS::getInitPathPhrase(*parentPath);
             }
+            catch (FileError&) {} //e.g. good for inactive mapped network shares, not so nice for C:\pagefile.sys
             //make sure FFS-specific explicit MTP-syntax is applied!
             return AFS::getInitPathPhrase(itemPath);
         };
@@ -177,7 +173,14 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
     {
         auto folderExistsTimed = [](const AbstractPath& folderPath)
         {
-            auto ft = runAsync([folderPath] { return AFS::folderExists(folderPath); });
+            auto ft = runAsync([folderPath]
+            {
+                try
+                {
+                    return AFS::getItemType(folderPath) != AFS::ItemType::FILE; //throw FileError
+                }
+                catch (FileError&) { return false; }
+            });
             return ft.wait_for(std::chrono::milliseconds(200)) == std::future_status::ready && ft.get(); //potentially slow network access: wait 200ms at most
         };
 

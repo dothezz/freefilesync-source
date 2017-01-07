@@ -91,7 +91,7 @@ public:
     int realToScreenRound(double realPos) const //returns -1 and screenSize + 1 if out of bounds!
     {
         //catch large double values: if double is larger than what int can represent => undefined behavior!
-        numeric::clamp(realPos , outOfBoundsLow, outOfBoundsHigh);
+        numeric::clamp(realPos, outOfBoundsLow, outOfBoundsHigh);
         return numeric::round(realToScreen(realPos));
     }
 

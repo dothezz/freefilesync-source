@@ -139,8 +139,8 @@ public:
     void swap(FixedList& other)
     {
         std::swap(firstInsert_, other.firstInsert_);
-        std::swap(lastInsert_ , other.lastInsert_);
-        std::swap(sz_         , other.sz_);
+        std::swap(lastInsert_,  other.lastInsert_);
+        std::swap(sz_,          other.sz_);
     }
 
 private:
@@ -194,7 +194,7 @@ public:
     };
 
     using value_type      = T;
-    using iterator        = FixedIterator<typename std::vector<std::unique_ptr<T>>::iterator      ,       T>;
+    using iterator        = FixedIterator<typename std::vector<std::unique_ptr<T>>::iterator,             T>;
     using const_iterator  = FixedIterator<typename std::vector<std::unique_ptr<T>>::const_iterator, const T>;
     using reference       =       T&;
     using const_reference = const T&;

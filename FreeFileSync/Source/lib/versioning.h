@@ -47,9 +47,10 @@ public:
 
     bool revisionFile(const AbstractPath& filePath, //throw FileError; return "false" if file is not existing
                       const Zstring& relativePath,
-
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
                       const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //may be nullptr
+
+    bool revisionSymlink(const AbstractPath& linkPath, const Zstring& relativePath); //throw FileError; return "false" if file is not existing
 
     void revisionFolder(const AbstractPath& folderPath, const Zstring& relativePath, //throw FileError
 
@@ -67,9 +68,8 @@ private:
                             const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove,
                             const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
 
-    void moveItemToVersioning(const AbstractPath& itemPath, //throw FileError
-                              const Zstring& relativePath,
-                              const std::function<void(const AbstractPath& sourcePath, const AbstractPath& targetPath)>& moveItem); //may throw FileError
+    void moveItemToVersioning(const Zstring& relativePath, //throw FileError
+                              const std::function<void(const AbstractPath& targetPath)>& moveItem); //may throw FileError
 
     const AbstractPath versioningFolderPath_;
     const VersioningStyle versioningStyle_;

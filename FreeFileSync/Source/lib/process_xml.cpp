@@ -710,25 +710,25 @@ bool readStruc(const XmlElement& input, ViewFilterDefault& value)
     };
 
     XmlIn sharedView = in["Shared"];
-    readAttr(sharedView, "Equal"   , value.equal);
+    readAttr(sharedView, "Equal",    value.equal);
     readAttr(sharedView, "Conflict", value.conflict);
     readAttr(sharedView, "Excluded", value.excluded);
 
     XmlIn catView = in["CategoryView"];
-    readAttr(catView, "LeftOnly"  , value.leftOnly);
-    readAttr(catView, "RightOnly" , value.rightOnly);
-    readAttr(catView, "LeftNewer" , value.leftNewer);
+    readAttr(catView, "LeftOnly",   value.leftOnly);
+    readAttr(catView, "RightOnly",  value.rightOnly);
+    readAttr(catView, "LeftNewer",  value.leftNewer);
     readAttr(catView, "RightNewer", value.rightNewer);
-    readAttr(catView, "Different" , value.different);
+    readAttr(catView, "Different",  value.different);
 
     XmlIn actView = in["ActionView"];
-    readAttr(actView, "CreateLeft" , value.createLeft);
+    readAttr(actView, "CreateLeft",  value.createLeft);
     readAttr(actView, "CreateRight", value.createRight);
-    readAttr(actView, "UpdateLeft" , value.updateLeft);
+    readAttr(actView, "UpdateLeft",  value.updateLeft);
     readAttr(actView, "UpdateRight", value.updateRight);
-    readAttr(actView, "DeleteLeft" , value.deleteLeft);
+    readAttr(actView, "DeleteLeft",  value.deleteLeft);
     readAttr(actView, "DeleteRight", value.deleteRight);
-    readAttr(actView, "DoNothing"  , value.doNothing);
+    readAttr(actView, "DoNothing",   value.doNothing);
 
     return success; //[!] avoid short-circuit evaluation above
 }
@@ -739,25 +739,25 @@ void writeStruc(const ViewFilterDefault& value, XmlElement& output)
     XmlOut out(output);
 
     XmlOut sharedView = out["Shared"];
-    sharedView.attribute("Equal"   , value.equal);
+    sharedView.attribute("Equal",    value.equal);
     sharedView.attribute("Conflict", value.conflict);
     sharedView.attribute("Excluded", value.excluded);
 
     XmlOut catView = out["CategoryView"];
-    catView.attribute("LeftOnly"  , value.leftOnly);
-    catView.attribute("RightOnly" , value.rightOnly);
-    catView.attribute("LeftNewer" , value.leftNewer);
+    catView.attribute("LeftOnly",   value.leftOnly);
+    catView.attribute("RightOnly",  value.rightOnly);
+    catView.attribute("LeftNewer",  value.leftNewer);
     catView.attribute("RightNewer", value.rightNewer);
-    catView.attribute("Different" , value.different);
+    catView.attribute("Different",  value.different);
 
     XmlOut actView = out["ActionView"];
-    actView.attribute("CreateLeft" , value.createLeft);
+    actView.attribute("CreateLeft",  value.createLeft);
     actView.attribute("CreateRight", value.createRight);
-    actView.attribute("UpdateLeft" , value.updateLeft);
+    actView.attribute("UpdateLeft",  value.updateLeft);
     actView.attribute("UpdateRight", value.updateRight);
-    actView.attribute("DeleteLeft" , value.deleteLeft);
+    actView.attribute("DeleteLeft",  value.deleteLeft);
     actView.attribute("DeleteRight", value.deleteRight);
-    actView.attribute("DoNothing"  , value.doNothing);
+    actView.attribute("DoNothing",   value.doNothing);
 }
 }
 
@@ -1011,16 +1011,16 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failSafeFileCopy);
     inGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     inGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
-    inGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
-    inGeneral["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    inGeneral["AutomaticRetry"           ].attribute("Count",   config.automaticRetryCount);
+    inGeneral["AutomaticRetry"           ].attribute("Delay",   config.automaticRetryDelay);
     inGeneral["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     inGeneral["FolderAccessTimeout"      ].attribute("Seconds", config.folderAccessTimeout);
     inGeneral["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
     inGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     inGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    inGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    inGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes",   config.lastSyncsLogFileSizeMax);
     inGeneral["NotificationSound"        ].attribute("CompareFinished", config.soundFileCompareFinished);
-    inGeneral["NotificationSound"        ].attribute("SyncFinished"   , config.soundFileSyncFinished);
+    inGeneral["NotificationSound"        ].attribute("SyncFinished",    config.soundFileSyncFinished);
 
     XmlIn inOpt = inGeneral["OptionalDialogs"];
     inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
@@ -1053,8 +1053,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
 
     XmlIn inCopyToHistory = inCopyTo["FolderHistory"];
     inCopyToHistory(config.gui.mainDlg.copyToCfg.folderHistory);
-    inCopyToHistory.attribute("LastUsedPath" , config.gui.mainDlg.copyToCfg.lastUsedPath);
-    inCopyToHistory.attribute("MaxSize"      , config.gui.mainDlg.copyToCfg.historySizeMax);
+    inCopyToHistory.attribute("LastUsedPath", config.gui.mainDlg.copyToCfg.lastUsedPath);
+    inCopyToHistory.attribute("MaxSize",      config.gui.mainDlg.copyToCfg.historySizeMax);
 
     XmlIn inManualDel = inWnd["ManualDeletion"];
     inManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);
@@ -1447,16 +1447,16 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGeneral["FailSafeFileCopy"         ].attribute("Enabled", config.failSafeFileCopy);
     outGeneral["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
     outGeneral["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
-    outGeneral["AutomaticRetry"           ].attribute("Count"  , config.automaticRetryCount);
-    outGeneral["AutomaticRetry"           ].attribute("Delay"  , config.automaticRetryDelay);
+    outGeneral["AutomaticRetry"           ].attribute("Count",   config.automaticRetryCount);
+    outGeneral["AutomaticRetry"           ].attribute("Delay",   config.automaticRetryDelay);
     outGeneral["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
     outGeneral["FolderAccessTimeout"      ].attribute("Seconds", config.folderAccessTimeout);
     outGeneral["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
     outGeneral["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
     outGeneral["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
-    outGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
+    outGeneral["LastSyncsLogSizeMax"      ].attribute("Bytes",   config.lastSyncsLogFileSizeMax);
     outGeneral["NotificationSound"        ].attribute("CompareFinished", config.soundFileCompareFinished);
-    outGeneral["NotificationSound"        ].attribute("SyncFinished"   , config.soundFileSyncFinished);
+    outGeneral["NotificationSound"        ].attribute("SyncFinished",    config.soundFileSyncFinished);
 
     XmlOut outOpt = outGeneral["OptionalDialogs"];
     outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
@@ -1489,8 +1489,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     XmlOut outCopyToHistory = outCopyTo["FolderHistory"];
     outCopyToHistory(config.gui.mainDlg.copyToCfg.folderHistory);
-    outCopyToHistory.attribute("LastUsedPath" , config.gui.mainDlg.copyToCfg.lastUsedPath);
-    outCopyToHistory.attribute("MaxSize"      , config.gui.mainDlg.copyToCfg.historySizeMax);
+    outCopyToHistory.attribute("LastUsedPath", config.gui.mainDlg.copyToCfg.lastUsedPath);
+    outCopyToHistory.attribute("MaxSize",      config.gui.mainDlg.copyToCfg.historySizeMax);
 
     XmlOut outManualDel = outWnd["ManualDeletion"];
     outManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);

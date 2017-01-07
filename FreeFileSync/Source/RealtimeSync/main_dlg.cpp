@@ -77,7 +77,7 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
 
-    const Zstring currentConfigFile = cfgFileName.empty() ? lastRunConfigPath_ : cfgFileName;
+    const Zstring currentConfigFile = !cfgFileName.empty() ? cfgFileName : lastRunConfigPath_;
     bool loadCfgSuccess = false;
     if (!cfgFileName.empty() || fileExists(lastRunConfigPath_))
         try
@@ -281,7 +281,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
     wxFileDialog filePicker(this,
                             wxString(),
                             utfCvrtTo<wxString>(beforeLast(currentConfigFileName_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
-                            wxString(),
+                            wxString(), //default file
                             wxString(L"RealTimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)

@@ -16,19 +16,22 @@ namespace zen
 {
 struct FileInfo
 {
-    const Zstring& fullPath;
+    Zstring itemName;
+    Zstring fullPath;
     std::uint64_t fileSize;     //[bytes]
     std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
 };
 
-struct DirInfo
+struct FolderInfo
 {
-    const Zstring& fullPath;
+    Zstring itemName;
+    Zstring fullPath;
 };
 
 struct SymlinkInfo
 {
-    const Zstring& fullPath;
+    Zstring itemName;
+    Zstring fullPath;
     std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
 };
 
@@ -36,8 +39,8 @@ struct SymlinkInfo
 //- directory path may end with PATH_SEPARATOR
 void traverseFolder(const Zstring& dirPath, //noexcept
                     const std::function<void (const FileInfo&    fi)>& onFile,          //
-                    const std::function<void (const DirInfo&     di)>& onDir,           //optional
-                    const std::function<void (const SymlinkInfo& si)>& onLink,          //
+                    const std::function<void (const FolderInfo&  fi)>& onFolder,        //optional
+                    const std::function<void (const SymlinkInfo& si)>& onSymlink,       //
                     const std::function<void (const std::wstring& errorMsg)>& onError); //
 }
 

@@ -1150,26 +1150,36 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
         callback.reportInfo(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
     };
 
-    const std::wstring txtCreatingFolder(_("Creating folder %x"       ));
     const std::wstring txtCreatingFile  (_("Creating file %x"         ));
+    const std::wstring txtCreatingFolder(_("Creating folder %x"       ));
     const std::wstring txtCreatingLink  (_("Creating symbolic link %x"));
 
     auto copyItem = [&](const FileSystemObject& fsObj, const AbstractPath& targetPath) //throw FileError
     {
-        const std::function<void()> deleteTargetItem = [&]
+        const std::function<void()> removeTargetItem = [&]
         {
             if (overwriteIfExists)
                 try
                 {
                     //file or (broken) file-symlink:
-                    AFS::removeFile(targetPath); //throw FileError
+                    AFS::removeFilePlain(targetPath); //throw FileError
                 }
                 catch (FileError&)
                 {
-                    //folder or folder-symlink:
-                    if (AFS::folderExists(targetPath)) //directory or dir-symlink
-                        AFS::removeFolderRecursively(targetPath, nullptr /*onBeforeFileDeletion*/, nullptr /*onBeforeFolderDeletion*/); //throw FileError
-                    else
+                    //(folder-)symlink:
+                    bool symlinkExists = false;
+                    try
+                    {
+                        if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(targetPath)) //throw FileError
+                            symlinkExists = *type == AFS::ItemType::SYMLINK;
+                        else
+                            return;
+                    }
+                    catch (FileError&) {} //previous exception is more relevant
+
+                    if (symlinkExists)
+                        AFS::removeSymlinkPlain(targetPath); //throw FileError
+                    else //overwrite AFS::ItemType::FOLDER with FILE? => highly dubious, do not allow
                         throw;
                 }
         };
@@ -1178,13 +1188,20 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
         {
             StatisticsReporter statReporter(1, 0, callback);
             notifyItemCopy(txtCreatingFolder, AFS::getDisplayPath(targetPath));
-
             try
             {
-                //deleteTargetItem(); -> never delete pre-existing folders!!! => might delete child items we just copied!
+                //removeTargetItem(); -> never delete pre-existing folders!!! => might delete child items we just copied before!
                 AFS::copyNewFolder(folder.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
             }
-            catch (const FileError&) { if (!AFS::folderExists(targetPath)) throw; } //might already exist: see creation of intermediate directories below
+            catch (FileError&)
+            {
+                bool folderAlreadyExists = false;
+                try { folderAlreadyExists = AFS::getItemType(targetPath) == AFS::ItemType::FOLDER; } /*throw FileError*/ catch (FileError&) {} //previous exception is more relevant
+
+                if (!folderAlreadyExists)
+                    throw;
+                //folder might already exist: see creation of intermediate directories below
+            }
             statReporter.reportDelta(1, 0);
         },
 
@@ -1195,7 +1212,7 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
 
             auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
             AFS::copyFileTransactional(file.getAbstractPath<side>(), targetPath, //throw FileError, ErrorFileLocked
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, onNotifyCopyStatus);
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, removeTargetItem, onNotifyCopyStatus);
             statReporter.reportDelta(1, 0);
         },
 
@@ -1204,7 +1221,7 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             StatisticsReporter statReporter(1, 0, callback);
             notifyItemCopy(txtCreatingLink, AFS::getDisplayPath(targetPath));
 
-            deleteTargetItem();
+            removeTargetItem();
             AFS::copySymlink(symlink.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
             statReporter.reportDelta(1, 0);
         });
@@ -1222,16 +1239,26 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
         }
         catch (FileError&)
         {
+            warn_static("perf: combine with removeTargetItem!!!")
             //create intermediate directories if missing
-            const AbstractPath targetParentPath = AFS::appendRelPath(targetFolderPath, beforeLast(relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
-            if (!AFS::somethingExists(targetParentPath)) //->(minor) file system race condition!
+            if (Opt<AbstractPath> parentPath = AFS::getParentFolderPath(targetItemPath))
             {
-                AFS::createFolderRecursively(targetParentPath); //throw FileError
-                //retry: this should work now!
-                copyItem(*fsObj, targetItemPath); //throw FileError
+                Opt<AFS::PathDetails> pd;
+                try { pd = AFS::getPathDetails(*parentPath); /*throw FileError*/ }
+                catch (FileError&) {} //previous exception is more relevant
+
+                if (pd && !pd->relPath.empty()) //parent folder not existing
+                {
+                    AbstractPath intermediatePath = pd->existingPath;
+                    for (const Zstring& itemName : pd->relPath)
+                        AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
+
+                    //retry: this should work now!
+                    copyItem(*fsObj, targetItemPath); //throw FileError
+                    return;
+                }
             }
-            else
-                throw;
+            throw;
         }
     }, callback); //throw X?
 }
@@ -1316,7 +1343,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
                 if (useRecycleBin)
                 {
                     notifyItemDeletion(txtRemovingDirectory, AFS::getDisplayPath(folder.getAbstractPath<side>()));
-                    AFS::recycleItemDirectly(folder.getAbstractPath<side>()); //throw FileError
+                    AFS::recycleItemIfExists(folder.getAbstractPath<side>()); //throw FileError
                     statReporter.reportDelta(1, 0);
                 }
                 else
@@ -1332,7 +1359,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
                         notifyItemDeletion(txtRemovingDirectory, displayPath);
                     };
 
-                    AFS::removeFolderRecursively(folder.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
+                    AFS::removeFolderIfExistsRecursion(folder.getAbstractPath<side>(), onBeforeFileDeletion, onBeforeDirDeletion); //throw FileError
                 }
             },
 
@@ -1341,9 +1368,9 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
                 notifyItemDeletion(txtRemovingFile, AFS::getDisplayPath(file.getAbstractPath<side>()));
 
                 if (useRecycleBin)
-                    AFS::recycleItemDirectly(file.getAbstractPath<side>()); //throw FileError
+                    AFS::recycleItemIfExists(file.getAbstractPath<side>()); //throw FileError
                 else
-                    AFS::removeFile(file.getAbstractPath<side>()); //throw FileError
+                    AFS::removeFileIfExists(file.getAbstractPath<side>()); //throw FileError
                 statReporter.reportDelta(1, 0);
             },
 
@@ -1352,14 +1379,9 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
                 notifyItemDeletion(txtRemovingSymlink, AFS::getDisplayPath(symlink.getAbstractPath<side>()));
 
                 if (useRecycleBin)
-                    AFS::recycleItemDirectly(symlink.getAbstractPath<side>()); //throw FileError
+                    AFS::recycleItemIfExists(symlink.getAbstractPath<side>()); //throw FileError
                 else
-                {
-                    if (AFS::folderExists(symlink.getAbstractPath<side>())) //dir symlink
-                        AFS::removeFolderSimple(symlink.getAbstractPath<side>()); //throw FileError
-                    else //file symlink, broken symlink
-                        AFS::removeFile(symlink.getAbstractPath<side>()); //throw FileError
-                }
+                    AFS::removeSymlinkIfExists(symlink.getAbstractPath<side>()); //throw FileError
                 statReporter.reportDelta(1, 0);
             });
 
@@ -1529,7 +1551,7 @@ TempFileBuffer::~TempFileBuffer()
     if (!tempFolderPath.empty())
         try
         {
-            removeDirectoryRecursively(tempFolderPath); //throw FileError
+            removeDirectoryPlainRecursion(tempFolderPath); //throw FileError
         }
         catch (FileError&) { assert(false); }
 }
@@ -1569,7 +1591,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
             const uint32_t crc32 = getCrc32(guid);
             tempPathTmp += printNumber<Zstring>(Zstr("%08x"), static_cast<unsigned int>(crc32));
 
-            makeDirectoryRecursively(tempPathTmp); //throw FileError
+            createDirectoryIfMissingRecursion(tempPathTmp); //throw FileError
 
             tempFolderPath = tempPathTmp;
         }, callback); //throw X?
@@ -1590,7 +1612,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
         const uint16_t crc16 = getCrc16(cookie.ref());
         const Zstring detailsHash = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(crc16));
 
-        const Zstring fileName = AFS::getFileShortName(details.path);
+        const Zstring fileName = AFS::getItemName(details.path);
 
         auto it = std::find(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
         const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + detailsHash + Zstring(it, fileName.end());

@@ -62,7 +62,7 @@ private:
     };
 
     //------------- comparison panel ----------------------
-    void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"comparison-settings" , this); }
+    void OnHelpComparisonSettings(wxHyperlinkEvent& event) override { displayHelpEntry(L"comparison-settings",  this); }
     void OnHelpTimeShift         (wxHyperlinkEvent& event) override { displayHelpEntry(L"daylight-saving-time", this); }
 
     void OnToggleLocalCompSettings(wxCommandEvent& event) override { updateCompGui(); updateSyncGui(); /*affects sync settings, too!*/ }
@@ -125,8 +125,8 @@ private:
 
     void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion_); updateSyncGui(); }
 
-    void OnHelpDetectMovedFiles(wxHyperlinkEvent& event) override { displayHelpEntry(L"synchronization-settings" , this); }
-    void OnHelpVersioning      (wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning", this); }
+    void OnHelpDetectMovedFiles(wxHyperlinkEvent& event) override { displayHelpEntry(L"synchronization-settings", this); }
+    void OnHelpVersioning      (wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning",               this); }
 
     std::shared_ptr<const SyncConfig> getSyncConfig() const;
     void setSyncConfig(std::shared_ptr<const SyncConfig> syncCfg);
@@ -808,11 +808,11 @@ void updateSyncDirectionIcons(const DirectionConfig& directionCfg,
 
         const DirectionSet dirCfg = extractDirections(directionCfg);
 
-        updateButton(buttonLeftOnly  , dirCfg.exLeftSideOnly , L"so_delete_left", L"so_none", L"so_create_right", SO_DELETE_LEFT    , SO_DO_NOTHING, SO_CREATE_NEW_RIGHT);
-        updateButton(buttonRightOnly , dirCfg.exRightSideOnly, L"so_create_left", L"so_none", L"so_delete_right", SO_CREATE_NEW_LEFT, SO_DO_NOTHING, SO_DELETE_RIGHT    );
-        updateButton(buttonLeftNewer , dirCfg.leftNewer      , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
-        updateButton(buttonRightNewer, dirCfg.rightNewer     , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
-        updateButton(buttonDifferent , dirCfg.different      , L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT , SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+        updateButton(buttonLeftOnly,   dirCfg.exLeftSideOnly,  L"so_delete_left", L"so_none", L"so_create_right", SO_DELETE_LEFT,     SO_DO_NOTHING, SO_CREATE_NEW_RIGHT);
+        updateButton(buttonRightOnly,  dirCfg.exRightSideOnly, L"so_create_left", L"so_none", L"so_delete_right", SO_CREATE_NEW_LEFT, SO_DO_NOTHING, SO_DELETE_RIGHT    );
+        updateButton(buttonLeftNewer,  dirCfg.leftNewer,       L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT,  SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+        updateButton(buttonRightNewer, dirCfg.rightNewer,      L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT,  SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
+        updateButton(buttonDifferent,  dirCfg.different,       L"so_update_left", L"so_none", L"so_update_right", SO_OVERWRITE_LEFT,  SO_DO_NOTHING, SO_OVERWRITE_RIGHT );
 
         switch (dirCfg.conflict)
         {
