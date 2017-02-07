@@ -75,12 +75,12 @@ void SyncStatistics::processFile(const FilePair& file)
     {
         case SO_CREATE_NEW_LEFT:
             ++createLeft_;
-            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+            bytesToProcess_ += static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_CREATE_NEW_RIGHT:
             ++createRight_;
-            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+            bytesToProcess_ += static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_DELETE_LEFT:
@@ -108,13 +108,13 @@ void SyncStatistics::processFile(const FilePair& file)
 
         case SO_OVERWRITE_LEFT:
             ++updateLeft_;
-            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+            bytesToProcess_ += static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
             physicalDeleteLeft_ = true;
             break;
 
         case SO_OVERWRITE_RIGHT:
             ++updateRight_;
-            bytesToProcess_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+            bytesToProcess_ += static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
             physicalDeleteRight_ = true;
             break;
 
@@ -345,8 +345,8 @@ public:
     //clean-up temporary directory (recycle bin optimization)
     void tryCleanup(bool allowUserCallback); //throw FileError; throw X -> call this in non-exceptional coding, i.e. somewhere after sync!
 
-    template <class Function> void removeFileWithCallback (const AbstractPath& filePath, const Zstring& relativePath, Function onNotifyItemDeletion, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //
-    template <class Function> void removeDirWithCallback  (const AbstractPath& dirPath,  const Zstring& relativePath, Function onNotifyItemDeletion, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
+    template <class Function> void removeFileWithCallback (const AbstractPath& filePath, const Zstring& relativePath, Function onNotifyItemDeletion, const IOCallback& notifyUnbufferedIO); //
+    template <class Function> void removeDirWithCallback  (const AbstractPath& dirPath,  const Zstring& relativePath, Function onNotifyItemDeletion, const IOCallback& notifyUnbufferedIO); //throw FileError
     template <class Function> void removeLinkWithCallback (const AbstractPath& linkPath, const Zstring& relativePath, Function onNotifyItemDeletion); //
 
     const std::wstring& getTxtRemovingFile   () const { return txtRemovingFile_;    } //
@@ -480,7 +480,7 @@ template <class Function>
 void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
                                              const Zstring& relativePath,
                                              Function onNotifyItemDeletion,
-                                             const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //throw FileError
+                                             const IOCallback& notifyUnbufferedIO) //throw FileError
 {
     switch (deletionPolicy_)
     {
@@ -513,7 +513,7 @@ void DeletionHandling::removeDirWithCallback(const AbstractPath& folderPath,
             auto onBeforeFileMove   = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFile_,   displayPathFrom, displayPathTo); };
             auto onBeforeFolderMove = [&](const std::wstring& displayPathFrom, const std::wstring& displayPathTo) { notifyMove(txtMovingFolder_, displayPathFrom, displayPathTo); };
 
-            getOrCreateVersioner().revisionFolder(folderPath, relativePath, onBeforeFileMove, onBeforeFolderMove, onNotifyCopyStatus); //throw FileError
+            getOrCreateVersioner().revisionFolder(folderPath, relativePath, onBeforeFileMove, onBeforeFolderMove, notifyUnbufferedIO); //throw FileError
         }
         break;
     }
@@ -524,7 +524,7 @@ template <class Function>
 void DeletionHandling::removeFileWithCallback(const AbstractPath& filePath,
                                               const Zstring& relativePath,
                                               Function onNotifyItemDeletion,
-                                              const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //throw FileError
+                                              const IOCallback& notifyUnbufferedIO) //throw FileError
 {
     bool deleted = false;
 
@@ -540,7 +540,7 @@ void DeletionHandling::removeFileWithCallback(const AbstractPath& filePath,
                 deleted = getOrCreateRecyclerSession().recycleItem(filePath, relativePath); //throw FileError
                 break;
             case DeletionPolicy::VERSIONING:
-                deleted = getOrCreateVersioner().revisionFile(filePath, relativePath, onNotifyCopyStatus); //throw FileError
+                deleted = getOrCreateVersioner().revisionFile(filePath, relativePath, notifyUnbufferedIO); //throw FileError
                 break;
         }
     if (deleted)
@@ -583,7 +583,7 @@ void DeletionHandling::removeLinkWithCallback(const AbstractPath& linkPath, cons
 class MinimumDiskSpaceNeeded
 {
 public:
-    static std::pair<std::int64_t, std::int64_t> calculate(const BaseFolderPair& baseFolder)
+    static std::pair<int64_t, int64_t> calculate(const BaseFolderPair& baseFolder)
     {
         MinimumDiskSpaceNeeded inst;
         inst.recurse(baseFolder);
@@ -600,33 +600,33 @@ private:
             switch (file.getSyncOperation()) //evaluate comparison result and sync direction
             {
                 case SO_CREATE_NEW_LEFT:
-                    spaceNeededLeft_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+                    spaceNeededLeft_ += static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_CREATE_NEW_RIGHT:
-                    spaceNeededRight_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+                    spaceNeededRight_ += static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DELETE_LEFT:
                     //if (freeSpaceDelLeft_)
-                    spaceNeededLeft_ -= static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+                    spaceNeededLeft_ -= static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DELETE_RIGHT:
                     //if (freeSpaceDelRight_)
-                    spaceNeededRight_ -= static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+                    spaceNeededRight_ -= static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_LEFT:
                     //if (freeSpaceDelLeft_)
-                    spaceNeededLeft_ -= static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
-                    spaceNeededLeft_ += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
+                    spaceNeededLeft_ -= static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
+                    spaceNeededLeft_ += static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_RIGHT:
                     //if (freeSpaceDelRight_)
-                    spaceNeededRight_ -= static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>());
-                    spaceNeededRight_ += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>());
+                    spaceNeededRight_ -= static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>());
+                    spaceNeededRight_ += static_cast<int64_t>(file.getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DO_NOTHING:
@@ -649,8 +649,8 @@ private:
             recurse(folder);
     }
 
-    std::int64_t spaceNeededLeft_  = 0;
-    std::int64_t spaceNeededRight_ = 0;
+    int64_t spaceNeededLeft_  = 0;
+    int64_t spaceNeededRight_ = 0;
 };
 
 //----------------------------------------------------------------------------------------
@@ -721,7 +721,7 @@ private:
     AFS::FileAttribAfterCopy copyFileWithCallback(const AbstractPath& sourcePath,
                                                   const AbstractPath& targetPath,
                                                   const std::function<void()>& onDeleteTargetFile,
-                                                  const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const; //throw FileError
+                                                  const IOCallback& notifyUnbufferedIO) const; //throw FileError
 
     template <SelectedSide side>
     DeletionHandling& getDelHandling();
@@ -798,24 +798,31 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
     //this could still lead to a name-clash in obscure cases, if some file exists on the other side with
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
-
     for (int i = 0;; ++i)
+    {
+        const AbstractPath sourcePathTmp = AFS::appendRelPath(sourceObj.base().getAbstractPath<side>(), sourceRelPathTmp);
         try
         {
-            AbstractPath sourcePathTmp = AFS::appendRelPath(sourceObj.base().getAbstractPath<side>(), sourceRelPathTmp);
-
             reportInfo(txtMovingFile,
                        AFS::getDisplayPath(sourceObj.getAbstractPath<side>()),
                        AFS::getDisplayPath(sourcePathTmp));
 
-            AFS::renameItem(sourceObj.getAbstractPath<side>(), sourcePathTmp); //throw FileError, ErrorTargetExisting, (ErrorDifferentVolume)
+            AFS::renameItem(sourceObj.getAbstractPath<side>(), sourcePathTmp); //throw FileError, (ErrorDifferentVolume)
             break;
         }
-        catch (const ErrorTargetExisting&) //repeat until unique name found: no file system race condition!
+        catch (FileError&) //repeat until unique name found: no file system race condition!
         {
             if (i == 10) throw; //avoid endless recursion in pathological cases
+
+            bool alreadyExists = true;
+            try {  /*ItemType type =*/ AFS::getItemType(sourcePathTmp); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; } //previous exception is more relevant
+
+            if (!alreadyExists)
+                throw;
+
             sourceRelPathTmp = sourceObj.getItemName<side>() + Zchar('_') + numberTo<Zstring>(i) + AFS::TEMP_FILE_ENDING;
         }
+    }
 
     //TODO: prepare2StepMove: consider ErrorDifferentVolume! e.g. symlink aliasing!
 
@@ -951,7 +958,7 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
                         //move operation has failed! We cannot allow to continue and have move source's parent directory deleted, messing up statistics!
                         // => revert to ordinary "copy + delete"
 
-                        auto getStats = [&]() -> std::pair<int, std::int64_t>
+                        auto getStats = [&]() -> std::pair<int, int64_t>
                         {
                             SyncStatistics statSrc(*sourceObj);
                             SyncStatistics statTrg(*targetObj);
@@ -1160,12 +1167,12 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
             StatisticsReporter statReporter(1, file.getFileSize<sideSrc>(), procCallback_);
             try
             {
-                auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+                auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
                 const AFS::FileAttribAfterCopy newAttr = copyFileWithCallback(file.getAbstractPath<sideSrc>(),
                                                                               targetPath,
                                                                               nullptr, //no target to delete
-                                                                              onNotifyCopyStatus); //throw FileError
+                                                                              notifyUnbufferedIO); //throw FileError
                 statReporter.reportDelta(1, 0);
 
                 //update FilePair
@@ -1197,11 +1204,9 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 StatisticsReporter statReporter(1, 0, procCallback_);
 
                 auto onNotifyItemDeletion = [&] { statReporter.reportDelta(1, 0); };
-                auto onNotifyCopyStatus   = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+                auto notifyUnbufferedIO   = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
-                getDelHandling<sideTrg>().removeFileWithCallback(file.getAbstractPath<sideTrg>(), file.getPairRelativePath(), onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
-
-                //TODO: failure to access item during deletion is an error and should not be ignored!
+                getDelHandling<sideTrg>().removeFileWithCallback(file.getAbstractPath<sideTrg>(), file.getPairRelativePath(), onNotifyItemDeletion, notifyUnbufferedIO); //throw FileError
 
                 file.removeObject<sideTrg>(); //update FilePair
             }
@@ -1225,7 +1230,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
                 //TODO: synchronizeFileInt: consider ErrorDifferentVolume! e.g. symlink aliasing!
 
-                AFS::renameItem(oldPath, newPath); //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                AFS::renameItem(oldPath, newPath); //throw FileError, (ErrorDifferentVolume)
 
                 statReporter.reportDelta(1, 0);
 
@@ -1260,15 +1265,15 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
             if (file.isFollowedSymlink<sideTrg>()) //since we follow the link, we need to sync case sensitivity of the link manually!
                 if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
-                    AFS::renameItem(file.getAbstractPath<sideTrg>(), targetPathLogical); //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                    AFS::renameItem(file.getAbstractPath<sideTrg>(), targetPathLogical); //throw FileError, (ErrorDifferentVolume)
 
-            auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
             auto onDeleteTargetFile = [&] //delete target at appropriate time
             {
                 reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), AFS::getDisplayPath(targetPathResolvedOld));
 
-                this->getDelHandling<sideTrg>().removeFileWithCallback(targetPathResolvedOld, file.getPairRelativePath(), [] {}, onNotifyCopyStatus); //throw FileError;
+                this->getDelHandling<sideTrg>().removeFileWithCallback(targetPathResolvedOld, file.getPairRelativePath(), [] {}, notifyUnbufferedIO); //throw FileError;
                 //no (logical) item count update desired - but total byte count may change, e.g. move(copy) deleted file to versioning dir
 
                 //file.removeObject<sideTrg>(); -> doesn't make sense for isFollowedSymlink(); "file, sideTrg" evaluated below!
@@ -1282,7 +1287,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
             const AFS::FileAttribAfterCopy newAttr = copyFileWithCallback(file.getAbstractPath<sideSrc>(),
                                                                           targetPathResolvedNew,
                                                                           onDeleteTargetFile,
-                                                                          onNotifyCopyStatus); //throw FileError
+                                                                          notifyUnbufferedIO); //throw FileError
             statReporter.reportDelta(1, 0); //we model "delete + copy" as ONE logical operation
 
             //update FilePair
@@ -1305,7 +1310,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
                 assert(file.getItemName<sideTrg>() != file.getItemName<sideSrc>());
                 if (file.getItemName<sideTrg>() != file.getItemName<sideSrc>()) //have difference in case?
-                    AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                    AFS::renameItem(file.getAbstractPath<sideTrg>(), //throw FileError, (ErrorDifferentVolume)
                                     AFS::appendRelPath(file.base().getAbstractPath<sideTrg>(), file.getRelativePath<sideSrc>()));
 
 #if 0 //changing file time without copying content is not justified after CompareVariant::SIZE finds "equal" files! similar issue with CompareVariant::TIME_SIZE and FileTimeTolerance == -1
@@ -1412,8 +1417,6 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
 
                 getDelHandling<sideTrg>().removeLinkWithCallback(symlink.getAbstractPath<sideTrg>(), symlink.getPairRelativePath(), onNotifyItemDeletion); //throw FileError
 
-                //TODO: failure to access item during deletion is an error and should not be ignored!
-
                 symlink.removeObject<sideTrg>(); //update SymlinkPair
             }
             break;
@@ -1452,7 +1455,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
                 StatisticsReporter statReporter(1, 0, procCallback_);
 
                 if (symlink.getItemName<sideTrg>() != symlink.getItemName<sideSrc>()) //have difference in case?
-                    AFS::renameItem(symlink.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                    AFS::renameItem(symlink.getAbstractPath<sideTrg>(), //throw FileError, (ErrorDifferentVolume)
                                     AFS::appendRelPath(symlink.base().getAbstractPath<sideTrg>(), symlink.getRelativePath<sideSrc>()));
 
                 //if (symlink.getLastWriteTime<sideTrg>() != symlink.getLastWriteTime<sideSrc>())
@@ -1562,11 +1565,9 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
                 StatisticsReporter statReporter(1 + getCUD(subStats), subStats.getBytesToProcess(), procCallback_);
 
                 auto onNotifyItemDeletion = [&] { statReporter.reportDelta(1, 0); };
-                auto onNotifyCopyStatus   = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+                auto notifyUnbufferedIO   = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
-                getDelHandling<sideTrg>().removeDirWithCallback(folder.getAbstractPath<sideTrg>(), folder.getPairRelativePath(), onNotifyItemDeletion, onNotifyCopyStatus); //throw FileError
-
-                //TODO: failure to access item during deletion is an error and should not be ignored!
+                getDelHandling<sideTrg>().removeDirWithCallback(folder.getAbstractPath<sideTrg>(), folder.getPairRelativePath(), onNotifyItemDeletion, notifyUnbufferedIO); //throw FileError
 
                 folder.refSubFiles  ().clear(); //
                 folder.refSubLinks  ().clear(); //update FolderPair
@@ -1585,7 +1586,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
 
                 assert(folder.getItemName<sideTrg>() != folder.getItemName<sideSrc>());
                 if (folder.getItemName<sideTrg>() != folder.getItemName<sideSrc>()) //have difference in case?
-                    AFS::renameItem(folder.getAbstractPath<sideTrg>(), //throw FileError, (ErrorTargetExisting, ErrorDifferentVolume)
+                    AFS::renameItem(folder.getAbstractPath<sideTrg>(), //throw FileError, (ErrorDifferentVolume)
                                     AFS::appendRelPath(folder.base().getAbstractPath<sideTrg>(), folder.getRelativePath<sideSrc>()));
                 //copyFileTimes -> useless: modification time changes with each child-object creation/deletion
 
@@ -1615,7 +1616,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
 //###########################################################################################
 
 //--------------------- data verification -------------------------
-void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress)  //throw FileError
+void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath, const IOCallback& notifyUnbufferedIO)  //throw FileError
 {
     try
     {
@@ -1632,9 +1633,7 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(*nativeTargetPath)), L"fsync");
         } //close file handles!
 
-        if (notifyProgress) notifyProgress(0);
-
-        if (!filesHaveSameContent(sourcePath, targetPath, notifyProgress)) //throw FileError
+        if (!filesHaveSameContent(sourcePath, targetPath, notifyUnbufferedIO)) //throw FileError
             throw FileError(replaceCpy(replaceCpy(_("%x and %y have different content."),
                                                   L"%x", L"\n" + fmtPath(AFS::getDisplayPath(sourcePath))),
                                        L"%y", L"\n" + fmtPath(AFS::getDisplayPath(targetPath))));
@@ -1649,15 +1648,15 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
 AFS::FileAttribAfterCopy SynchronizeFolderPair::copyFileWithCallback(const AbstractPath& sourcePath,  //throw FileError
                                                                      const AbstractPath& targetPath,
                                                                      const std::function<void()>& onDeleteTargetFile,
-                                                                     const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) const //returns current attributes of source file
+                                                                     const IOCallback& notifyUnbufferedIO) const //returns current attributes of source file
 {
-    auto copyOperation = [this, &targetPath, &onDeleteTargetFile, &onNotifyCopyStatus](const AbstractPath& sourcePathTmp)
+    auto copyOperation = [this, &targetPath, &onDeleteTargetFile, &notifyUnbufferedIO](const AbstractPath& sourcePathTmp)
     {
         AFS::FileAttribAfterCopy newAttr = AFS::copyFileTransactional(sourcePathTmp, targetPath, //throw FileError, ErrorFileLocked
                                                                       copyFilePermissions_,
                                                                       failSafeFileCopy_,
                                                                       onDeleteTargetFile,
-                                                                      onNotifyCopyStatus);
+                                                                      notifyUnbufferedIO);
 
         //#################### Verification #############################
         if (verifyCopiedFiles_)
@@ -1666,7 +1665,7 @@ AFS::FileAttribAfterCopy SynchronizeFolderPair::copyFileWithCallback(const Abstr
             catch (FileError&) {});   //delete target if verification fails
 
             procCallback_.reportInfo(replaceCpy(txtVerifying, L"%x", fmtPath(AFS::getDisplayPath(targetPath))));
-            verifyFiles(sourcePathTmp, targetPath, [&](std::int64_t bytesDelta) { procCallback_.requestUiRefresh(); }); //throw FileError
+            verifyFiles(sourcePathTmp, targetPath, [&](int64_t bytesDelta) { procCallback_.requestUiRefresh(); }); //throw FileError
         }
         //#################### /Verification #############################
 
@@ -1860,7 +1859,7 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     std::vector<std::pair<AbstractPath, AbstractPath>> significantDiffPairs;
 
-    std::vector<std::pair<AbstractPath, std::pair<std::int64_t, std::int64_t>>> diskSpaceMissing; //base folder / space required / space available
+    std::vector<std::pair<AbstractPath, std::pair<int64_t, int64_t>>> diskSpaceMissing; //base folder / space required / space available
 
     //status of base directories which are set to DeletionPolicy::RECYCLER (and contain actual items to be deleted)
     std::map<AbstractPath, bool, AFS::LessAbstractPath> recyclerSupported; //expensive to determine on Win XP => buffer + check recycle bin existence only once per base folder!
@@ -1981,12 +1980,12 @@ void zen::synchronize(const TimeComp& timeStamp,
                                                   baseFolder.getAbstractPath<RIGHT_SIDE>());
 
         //check for sufficient free diskspace
-        auto checkSpace = [&](const AbstractPath& baseFolderPath, std::int64_t minSpaceNeeded)
+        auto checkSpace = [&](const AbstractPath& baseFolderPath, int64_t minSpaceNeeded)
         {
             if (!AFS::isNullPath(baseFolderPath))
                 try
                 {
-                    const std::int64_t freeSpace = AFS::getFreeDiskSpace(baseFolderPath); //throw FileError, returns 0 if not available
+                    const int64_t freeSpace = AFS::getFreeDiskSpace(baseFolderPath); //throw FileError, returns 0 if not available
 
                     if (0 < freeSpace && //zero means "request not supported" (e.g. see WebDav)
                         freeSpace < minSpaceNeeded)
@@ -1994,7 +1993,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 }
                 catch (FileError&) {} //for warning only => no need for tryReportingError()
         };
-        const std::pair<std::int64_t, std::int64_t> spaceNeeded = MinimumDiskSpaceNeeded::calculate(baseFolder);
+        const std::pair<int64_t, int64_t> spaceNeeded = MinimumDiskSpaceNeeded::calculate(baseFolder);
         checkSpace(baseFolder.getAbstractPath< LEFT_SIDE>(), spaceNeeded.first);
         checkSpace(baseFolder.getAbstractPath<RIGHT_SIDE>(), spaceNeeded.second);
 
@@ -2196,25 +2195,21 @@ void zen::synchronize(const TimeComp& timeStamp,
             //(try to gracefully) write database file
             if (folderPairCfg.saveSyncDB_)
             {
-                const std::wstring dbUpdateMsg = _("Generating database...");
-
-                callback.reportStatus(dbUpdateMsg);
+                callback.reportStatus(_("Generating database..."));
                 callback.forceUiRefresh();
 
                 tryReportingError([&]
                 {
-                    std::int64_t bytesWritten = 0;
-                    zen::saveLastSynchronousState(baseFolder, [&](std::int64_t bytesDelta) //throw FileError
-                    {
-                        bytesWritten += bytesDelta;
-                        callback.reportStatus(dbUpdateMsg + L" (" + filesizeToShortString(bytesWritten) + L")"); //throw X
-                    });
-                }, callback); //throw X?
+                    zen::saveLastSynchronousState(baseFolder, //throw FileError
+                    [&](const std::wstring& statusMsg) { callback.reportStatus(statusMsg); /*throw X*/});
+                }, callback); //throw X
             }
         }
     }
     catch (const std::exception& e)
     {
         callback.reportFatalError(utfCvrtTo<std::wstring>(e.what()));
+        callback.abortProcessNow(); //throw X
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
     }
 }

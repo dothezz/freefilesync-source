@@ -7,8 +7,11 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Cannot delete symbolic link %x.</source>
-<target>Die symbolischen Verknüpfung %x kann nicht gelöscht werden.</target>
+<source>Loading file %x...</source>
+<target>Lade Datei %x...</target>
+
+<source>Failed to get server information for %x.</source>
+<target></target>
 
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
@@ -250,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Aktualisiere Attribute des rechten Elements</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
-
 <source>Cannot write file %x.</source>
 <target>Die Datei %x kann nicht geschrieben werden.</target>
 
@@ -269,6 +266,12 @@ Unerwartete Größe des Datenstroms.
 Erwartet: %x bytes
 Tatsächlich: %y bytes
 </target>
+
+<source>Cannot write permissions of %x.</source>
+<target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
@@ -288,6 +291,15 @@ Tatsächlich: %y bytes
 <source>Cannot read file %x.</source>
 <target>Die Datei %x kann nicht gelesen werden.</target>
 
+<source>Cannot create directory %x.</source>
+<target>Das Verzeichnis %x kann nicht erstellt werden.</target>
+
+<source>Cannot delete file %x.</source>
+<target>Die Datei %x kann nicht gelöscht werden.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
+
 <source>Cannot read file attributes of %x.</source>
 <target>Die Dateiattribute von %x können nicht gelesen werden.</target>
 
@@ -303,14 +315,8 @@ Tatsächlich: %y bytes
 <source>Type of item %x is not supported:</source>
 <target>Der Typ des Elements %x wird nicht unterstützt:</target>
 
-<source>Cannot create directory %x.</source>
-<target>Das Verzeichnis %x kann nicht erstellt werden.</target>
-
-<source>Cannot delete file %x.</source>
-<target>Die Datei %x kann nicht gelöscht werden.</target>
-
-<source>Cannot delete directory %x.</source>
-<target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
+<source>Cannot delete symbolic link %x.</source>
+<target>Die symbolischen Verknüpfung %x kann nicht gelöscht werden.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
@@ -396,8 +402,11 @@ Tatsächlich: %y bytes
 <source>Database file is corrupted:</source>
 <target>Die Datenbankdatei ist beschädigt:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Die Datenbankdateien teilen keine gemeinsame Sitzung.</target>
+<source>Database files do not yet contain information about the last synchronisation.</source>
+<target>Die Datenbankdateien beinhalten noch keine Informationen zur letzten Synchronisation.</target>
+
+<source>Saving file %x...</source>
+<target>Speichere Datei %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Suche Ordner %x...</target>
@@ -425,9 +434,6 @@ Tatsächlich: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Ermittle aufgegebene Sperre...</target>
-
-<source>Saving file %x...</source>
-<target>Speichere Datei %x...</target>
 
 <source>Items processed:</source>
 <target>Verarbeitete Elemente:</target>
@@ -1867,8 +1873,8 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
 
-<source>Error Code %x:</source>
-<target>Fehlercode %x:</target>
+<source>Error Code %x</source>
+<target>Fehlercode %x</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Die Prüfung des Papierkorbs für Ordner %x ist fehlgeschlagen.</target>

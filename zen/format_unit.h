@@ -15,10 +15,10 @@
 
 namespace zen
 {
-std::wstring filesizeToShortString(std::int64_t filesize);
+std::wstring filesizeToShortString(int64_t filesize);
 std::wstring remainingTimeToString(double timeInSec);
 std::wstring fractionToString(double fraction); //within [0, 1]
-std::wstring utcToLocalTimeString(std::int64_t utcTime); //like Windows Explorer would...
+std::wstring utcToLocalTimeString(int64_t utcTime); //like Windows Explorer would...
 
 std::wstring formatTwoDigitPrecision  (double value); //format with fixed number of digits
 std::wstring formatThreeDigitPrecision(double value); //(unless value is too large)

@@ -5,8 +5,7 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-CXXFLAGS  = -std=c++14 -pipe -DWXINTL_NO_GETTEXT_MACRO -I../.. -I../../zenXml -include "zen/i18n.h" -Wall \
--O3 -DNDEBUG `wx-config --cxxflags --debug=no` -DZEN_LINUX -pthread
+CXXFLAGS  = -std=c++14 -pipe -DWXINTL_NO_GETTEXT_MACRO -I../.. -I../../zenXml -include "zen/i18n.h" -Wall -O3 -DNDEBUG `wx-config --cxxflags --debug=no` -pthread
 
 LINKFLAGS = -s `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_chrono -lboost_system -lz -pthread
 
@@ -79,6 +78,7 @@ CPP_LIST+=../../zen/file_traverser.cpp
 CPP_LIST+=../../zen/zstring.cpp
 CPP_LIST+=../../zen/format_unit.cpp
 CPP_LIST+=../../zen/process_priority.cpp
+CPP_LIST+=../../wx+/file_drop.cpp
 CPP_LIST+=../../wx+/grid.cpp
 CPP_LIST+=../../wx+/image_tools.cpp
 CPP_LIST+=../../wx+/graph.cpp

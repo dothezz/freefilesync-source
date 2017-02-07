@@ -22,12 +22,12 @@ std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCf
 void redetermineSyncDirection(const DirectionConfig& directConfig,
                               BaseFolderPair& baseFolder,
                               const std::function<void(const std::wstring& msg)>& reportWarning,
-                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
+                              const std::function<void(const std::wstring& msg)>& notifyStatus);
 
 void redetermineSyncDirection(const MainConfiguration& mainCfg,
                               FolderComparison& folderCmp,
                               const std::function<void(const std::wstring& msg)>& reportWarning,
-                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
+                              const std::function<void(const std::wstring& msg)>& notifyStatus);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 
@@ -38,7 +38,7 @@ void applyFiltering  (FolderComparison& folderCmp, const MainConfiguration& main
 void addHardFiltering(BaseFolderPair& baseFolder, const Zstring& excludeFilter);     //exclude additional entries only
 void addSoftFiltering(BaseFolderPair& baseFolder, const SoftFilter& timeSizeFilter); //exclude additional entries only
 
-void applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom, std::int64_t timeTo); //overwrite current active/inactive settings
+void applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t timeTo); //overwrite current active/inactive settings
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)
@@ -86,8 +86,8 @@ private:
     TempFileBuffer           (const TempFileBuffer&) = delete;
     TempFileBuffer& operator=(const TempFileBuffer&) = delete;
 
-    std::map<FileDetails, Zstring> tempFilePaths;
-    Zstring tempFolderPath;
+    std::map<FileDetails, Zstring> tempFilePaths_;
+    Zstring tempFolderPath_;
 };
 bool operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer::FileDetails& rhs);
 }

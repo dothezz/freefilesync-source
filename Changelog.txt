@@ -1,3 +1,20 @@
+FreeFileSync 8.9 [2017-02-08]
+-----------------------------
+Detect when database file was copied and avoid "second part missing" error
+Further reduced size of database files by 20%
+Reduced amortized number of file operations during versioning
+Added database file consistency checks to catch unexpected number of stream associations
+Improved file I/O by detecting cross-device moves via path
+Fixed path parsing failure when creating MTP directories
+Implemented buffered stream I/O abstraction to prepare for FTP
+Generalized file path handling for abstract file system implementations
+Warn about outdated AvmSnd.dll before crashing during sound playback
+Avoid libunity9 dependency for Ubuntu builds
+Refactored OpenSSL and libssh2 initialization/shutdown
+Case-insensitive grid sorting on Linux
+Added 32-bit precompiled Debian/Ubuntu release
+
+
 FreeFileSync 8.8 [2017-01-08]
 -----------------------------
 Distinguish file access failure from not existing during sync

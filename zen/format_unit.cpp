@@ -39,7 +39,7 @@ std::wstring zen::formatThreeDigitPrecision(double value)
 }
 
 
-std::wstring zen::filesizeToShortString(std::int64_t size)
+std::wstring zen::filesizeToShortString(int64_t size)
 {
     //if (size < 0) return _("Error"); -> really?
 
@@ -188,11 +188,11 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 }
 
 
-std::wstring zen::utcToLocalTimeString(std::int64_t utcTime)
+std::wstring zen::utcToLocalTimeString(int64_t utcTime)
 {
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 
-    zen::TimeComp loc = zen::localTime(utcTime);
+    TimeComp loc = getLocalTime(utcTime);
 
     std::wstring dateString = formatTime<std::wstring>(L"%x  %X", loc);
     return !dateString.empty() ? dateString : errorMsg();

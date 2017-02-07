@@ -52,7 +52,7 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
         return true;
 
     //sort directories and files/symlinks by short name
-    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
+    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
 }
 
 
@@ -65,7 +65,7 @@ bool lessFullPath(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(AFS::getDisplayPath(a.getAbstractPath<side>()),
+    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(AFS::getDisplayPath(a.getAbstractPath<side>()),
                                                                     AFS::getDisplayPath(b.getAbstractPath<side>()));
 }
 
@@ -95,7 +95,7 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
     else if (isDirectoryA)
         return true;
 
-    return LessFilePath()(a.getPairItemName(), b.getPairItemName());
+    return LessNoCase() /*even on Linux*/(a.getPairItemName(), b.getPairItemName());
 }
 
 
@@ -147,8 +147,8 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
     else if (!fileB && !symlinkB)
         return true; //directories last
 
-    const std::int64_t dateA = fileA ? fileA->getLastWriteTime<side>() : symlinkA->getLastWriteTime<side>();
-    const std::int64_t dateB = fileB ? fileB->getLastWriteTime<side>() : symlinkB->getLastWriteTime<side>();
+    const int64_t dateA = fileA ? fileA->getLastWriteTime<side>() : symlinkA->getLastWriteTime<side>();
+    const int64_t dateB = fileB ? fileB->getLastWriteTime<side>() : symlinkB->getLastWriteTime<side>();
 
     //return list beginning with newest files first
     return makeSortDirection(std::less<>(), Int2Type<ascending>())(dateA, dateB);
@@ -173,7 +173,7 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
         return afterLast(fsObj.getItemName<side>(), Zchar('.'), zen::IF_MISSING_RETURN_NONE);
     };
 
-    return makeSortDirection(LessFilePath(), Int2Type<ascending>())(getExtension(a), getExtension(b));
+    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(getExtension(a), getExtension(b));
 }
 
 

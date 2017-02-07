@@ -44,7 +44,7 @@ public:
         return text; //fallback
     }
 
-    std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) const override
+    std::wstring translate(const std::wstring& singular, const std::wstring& plural, int64_t n) const override
     {
         auto it = transMappingPl.find(std::make_pair(singular, plural));
         if (it != transMappingPl.end())
@@ -72,7 +72,7 @@ FFSTranslation::FFSTranslation(const Zstring& lngFilePath, wxLanguage langId) : 
     std::string inputStream;
     try
     {
-        inputStream = loadBinContainer<std::string>(lngFilePath,  nullptr); //throw FileError
+        inputStream = loadBinContainer<std::string>(lngFilePath,  nullptr /*notifyUnbufferedIO*/); //throw FileError
     }
     catch (const FileError& e)
     {
@@ -140,7 +140,7 @@ std::vector<TranslationInfo> loadTranslations()
 
     traverseFolder(zen::getResourceDirPf() + Zstr("Languages"), [&](const zen::FileInfo& fi) //FileInfo is ambiguous on OS X
     {
-        if (pathEndsWith(fi.fullPath, Zstr(".lng")))
+        if (endsWith(fi.fullPath, Zstr(".lng")))
             lngFilePaths.push_back(fi.fullPath);
     }, nullptr, nullptr, [&](const std::wstring& errorMsg) { assert(false); }); //errors are not really critical in this context
 
@@ -148,7 +148,7 @@ std::vector<TranslationInfo> loadTranslations()
     {
         try
         {
-            const std::string stream = loadBinContainer<std::string>(filePath,  nullptr); //throw FileError
+            const std::string stream = loadBinContainer<std::string>(filePath, nullptr /*notifyUnbufferedIO*/); //throw FileError
 
             lngfile::TransHeader lngHeader;
             lngfile::parseHeader(stream, lngHeader); //throw ParsingError

@@ -25,10 +25,11 @@ namespace
 //"Backup FreeFileSync 2013-09-15 015052 [Error].log"
 
 //return value always bound!
-std::pair<std::unique_ptr<AFS::OutputStream>, AbstractPath> prepareNewLogfile(const AbstractPath& logFolderPath, //throw FileError
-                                                                              const std::wstring& jobName,
-                                                                              const TimeComp& timeStamp,
-                                                                              const std::wstring& status)
+std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFolderPath, //throw FileError
+                                                     const std::wstring& jobName,
+                                                     const TimeComp& timeStamp,
+                                                     const std::wstring& status,
+                                                     ProcessCallback& pc)
 {
     assert(!jobName.empty());
 
@@ -49,12 +50,13 @@ std::pair<std::unique_ptr<AFS::OutputStream>, AbstractPath> prepareNewLogfile(co
         try
         {
             const AbstractPath logFilePath = AFS::appendRelPath(logFolderPath, logFileName);
-            auto outStream = AFS::getOutputStream(logFilePath, //throw FileError, ErrorTargetExisting
-                                                  nullptr, /*streamSize*/
-                                                  nullptr /*modificationTime*/);
-            return std::make_pair(std::move(outStream), logFilePath);
+
+            return AFS::getOutputStream(logFilePath, //throw FileError, ErrorTargetExisting
+                                        nullptr, /*streamSize*/
+                                        nullptr /*modificationTime*/,
+                                        OnUpdateLogfileStatusNoThrow(pc, AFS::getDisplayPath(logFilePath)));
         }
-        catch (const ErrorTargetExisting&)
+        catch (ErrorTargetExisting&)
         {
             if (i == 10) throw; //avoid endless recursion in pathological cases
             logFileName = body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
@@ -70,11 +72,10 @@ struct LogTraverserCallback: public AFS::TraverserCallback
 
     void onFile(const FileInfo& fi) override
     {
-        if (pathStartsWith(fi.itemName, prefix_) && pathEndsWith(fi.itemName, Zstr(".log")))
+        if (ciStartsWith(fi.itemName, prefix_) && endsWith(fi.itemName, Zstr(".log")))
             logFileNames_.push_back(fi.itemName);
 
-        if (onUpdateStatus_)
-            onUpdateStatus_();
+        if (onUpdateStatus_) onUpdateStatus_();
     }
     std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) override { return nullptr; }
     HandleLink                         onSymlink(const SymlinkInfo& si) override { return TraverserCallback::LINK_SKIP; }
@@ -122,8 +123,7 @@ void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jo
             }
             catch (const FileError& e) { if (!lastError) lastError = e; };
 
-            if (onUpdateStatus)
-                onUpdateStatus();
+            if (onUpdateStatus) onUpdateStatus();
         });
     }
 
@@ -250,22 +250,22 @@ BatchStatusHandler::~BatchStatusHandler()
 
     //----------------- write results into user-specified logfile ------------------------
     //create not before destruction: 1. avoid issues with FFS trying to sync open log file 2. simplify transactional retry on failure 3. no need to rename log file to include status
+    // 4. failure to write to particular stream must not be retried!
     if (logfilesCountLimit_ != 0)
     {
         auto requestUiRefreshNoThrow = [&] { try { requestUiRefresh();  /*throw X*/ } catch (...) {} };
 
         const AbstractPath logFolderPath = createAbstractPath(trimCpy(logFolderPathPhrase_).empty() ? getConfigDirPathPf() + Zstr("Logs") : logFolderPathPhrase_); //noexcept
+
         try
         {
             tryReportingError([&] //errors logged here do not impact final status calculation above! => not a problem!
             {
-                auto rv = prepareNewLogfile(logFolderPath, jobName_, timeStamp_, status); //throw FileError; return value always bound!
-                AFS::OutputStream& logFileStream = *rv.first;
-                const AbstractPath logFilePath   = rv.second;
+                std::unique_ptr<AFS::OutputStream> logFileStream = prepareNewLogfile(logFolderPath, jobName_, timeStamp_, status, *this); //throw FileError; return value always bound!
 
-                streamToLogFile(summary, errorLog_, logFileStream, OnUpdateLogfileStatusNoThrow(*this, AFS::getDisplayPath(logFilePath))); //throw FileError
-                logFileStream.finalize(requestUiRefreshNoThrow); //throw FileError
-            }, *this); //throw X?
+                streamToLogFile(summary, errorLog_, *logFileStream); //throw FileError, (X)
+                logFileStream->finalize();                           //throw FileError, (X)
+            }, *this); //throw X! by ProcessCallback!
         }
         catch (...) {}
 
@@ -279,7 +279,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 tryReportingError([&]
                 {
                     limitLogfileCount(logFolderPath, jobName_, logfilesCountLimit_, requestUiRefreshNoThrow); //throw FileError
-                }, *this); //throw X?
+                }, *this); //throw X
             }
             catch (...) {}
         }
@@ -323,7 +323,7 @@ BatchStatusHandler::~BatchStatusHandler()
 }
 
 
-void BatchStatusHandler::initNewPhase(int itemsTotal, std::int64_t bytesTotal, ProcessCallback::Phase phaseID)
+void BatchStatusHandler::initNewPhase(int itemsTotal, int64_t bytesTotal, ProcessCallback::Phase phaseID)
 {
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
     if (progressDlg_)
@@ -333,7 +333,7 @@ void BatchStatusHandler::initNewPhase(int itemsTotal, std::int64_t bytesTotal, P
 }
 
 
-void BatchStatusHandler::updateProcessedData(int itemsDelta, std::int64_t bytesDelta)
+void BatchStatusHandler::updateProcessedData(int itemsDelta, int64_t bytesDelta)
 {
     StatusHandler::updateProcessedData(itemsDelta, bytesDelta);
 

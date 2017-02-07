@@ -27,8 +27,9 @@ struct UrlRedirectError
 class HttpInputStream::Impl
 {
 public:
-    Impl(const std::wstring& url, const std::wstring& userAgent, //throw SysError, UrlRedirectError
-         const std::string* postParams) //issue POST if bound, GET otherwise
+    Impl(const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO, //throw SysError, UrlRedirectError
+         const std::string* postParams) : //issue POST if bound, GET otherwise
+        notifyUnbufferedIO_(notifyUnbufferedIO)
     {
         ZEN_ON_SCOPE_FAIL( cleanup(); /*destructor call would lead to member double clean-up!!!*/ );
 
@@ -73,10 +74,35 @@ public:
 
     ~Impl() { cleanup(); }
 
+    size_t read(void* buffer, size_t bytesToRead) //throw SysError, X; return "bytesToRead" bytes unless end of stream!
+    {
+        const size_t blockSize = getBlockSize();
+
+        while (memBuf_.size() < bytesToRead)
+        {
+            memBuf_.resize(memBuf_.size() + blockSize);
+            const size_t bytesRead = tryRead(&*(memBuf_.end() - blockSize), blockSize); //throw SysError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+            memBuf_.resize(memBuf_.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
+
+            if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
+
+            if (bytesRead == 0) //end of file
+                bytesToRead = memBuf_.size();
+        }
+
+        std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
+        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesToRead);
+        return bytesToRead;
+    }
+
+    size_t getBlockSize() const { return 64 * 1024; }
+
+private:
     size_t tryRead(void* buffer, size_t bytesToRead) //throw SysError; may return short, only 0 means EOF!
     {
         if (bytesToRead == 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
             throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        assert(bytesToRead == getBlockSize());
 
         httpStream_->Read(buffer, bytesToRead);
 
@@ -94,7 +120,6 @@ public:
         return bytesRead; //"zero indicates end of file"
     }
 
-private:
     Impl           (const Impl&) = delete;
     Impl& operator=(const Impl&) = delete;
 
@@ -104,6 +129,9 @@ private:
 
     wxHTTP webAccess_;
     std::unique_ptr<wxInputStream> httpStream_; //must be deleted BEFORE webAccess is closed
+
+    std::vector<char> memBuf_;
+    const IOCallback notifyUnbufferedIO_; //throw X
 };
 
 
@@ -111,40 +139,23 @@ HttpInputStream::HttpInputStream(std::unique_ptr<Impl>&& pimpl) : pimpl_(std::mo
 
 HttpInputStream::~HttpInputStream() {}
 
-size_t HttpInputStream::tryRead(void* buffer, size_t bytesToRead) { return pimpl_->tryRead(buffer, bytesToRead); } //throw SysError
+size_t HttpInputStream::read(void* buffer, size_t bytesToRead) { return pimpl_->read(buffer, bytesToRead); } //throw SysError, X; return "bytesToRead" bytes unless end of stream!
 
+size_t HttpInputStream::getBlockSize() const { return pimpl_->getBlockSize(); }
 
-std::string HttpInputStream::readAll() //throw SysError
-{
-    std::string buffer;
-    const size_t blockSize = getBlockSize();
-
-    for (;;)
-    {
-        buffer.resize(buffer.size() + blockSize);
-
-        const size_t bytesRead = pimpl_->tryRead(&*(buffer.end() - blockSize), blockSize); //throw SysError
-
-        if (bytesRead < blockSize)
-            buffer.resize(buffer.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
-
-        if (bytesRead == 0)
-            return buffer;
-    }
-}
-
+std::string HttpInputStream::readAll() { return bufferedLoad<std::string>(*pimpl_); } //throw SysError, X;
 
 namespace
 {
-std::unique_ptr<HttpInputStream::Impl> sendHttpRequestImpl(const std::wstring& url, const std::wstring& userAgent, //throw SysError
+std::unique_ptr<HttpInputStream::Impl> sendHttpRequestImpl(const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO, //throw SysError
                                                            const std::string* postParams) //issue POST if bound, GET otherwise
 {
-    std::wstring urlRed =  url;
+    std::wstring urlRed = url;
     //"A user agent should not automatically redirect a request more than five times, since such redirections usually indicate an infinite loop."
     for (int redirects = 0; redirects < 6; ++redirects)
         try
         {
-            return std::make_unique<HttpInputStream::Impl>(urlRed, userAgent, postParams); //throw SysError, UrlRedirectError
+            return std::make_unique<HttpInputStream::Impl>(urlRed, userAgent, notifyUnbufferedIO, postParams); //throw SysError, UrlRedirectError
         }
         catch (const UrlRedirectError& e) { urlRed = e.newUrl; }
     throw SysError(L"Too many redirects.");
@@ -222,17 +233,17 @@ std::vector<std::pair<std::string, std::string>> zen::xWwwFormUrlDecode(const st
 }
 
 
-HttpInputStream zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent,
+HttpInputStream zen::sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO,
                                   const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
 {
     const std::string encodedParams = xWwwFormUrlEncode(postParams);
-    return sendHttpRequestImpl(url, userAgent, &encodedParams); //throw SysError
+    return sendHttpRequestImpl(url, userAgent, notifyUnbufferedIO, &encodedParams); //throw SysError
 }
 
 
-HttpInputStream zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent) //throw SysError
+HttpInputStream zen::sendHttpGet(const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO) //throw SysError
 {
-    return sendHttpRequestImpl(url, userAgent, nullptr); //throw SysError
+    return sendHttpRequestImpl(url, userAgent, notifyUnbufferedIO, nullptr); //throw SysError
 }
 
 

@@ -27,17 +27,35 @@
 using namespace zen;
 
 
+Opt<PathComponents> zen::getPathComponents(const Zstring& itemPath)
+{
+    if (startsWith(itemPath, "/"))
+    {
+        Zstring relPath(itemPath.c_str() + 1);
+        if (endsWith(relPath, FILE_NAME_SEPARATOR))
+            relPath.pop_back();
+        return PathComponents({ "/", relPath });
+    }
+    //we do NOT support relative paths!
+    return NoValue();
+}
+
+
+
 Opt<Zstring> zen::getParentFolderPath(const Zstring& itemPath)
 {
-	assert(startsWith(itemPath, L"/")); //we do NOT support relative paths!
+    if (const Opt<PathComponents> comp = getPathComponents(itemPath))
+    {
+        if (comp->relPath.empty())
+            return NoValue();
 
-    if (itemPath == "/")
-        return NoValue();
-
-    const Zstring parentDir = beforeLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-    if (parentDir.empty())
-        return Zstring("/");
-    return parentDir;
+        const Zstring parentRelPath = beforeLast(comp->relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+        if (parentRelPath.empty())
+            return comp->rootPath;
+        return appendSeparator(comp->rootPath) + parentRelPath;
+    }
+    assert(false);
+    return NoValue();
 }
 
 
@@ -124,27 +142,13 @@ bool zen::dirAvailable(const Zstring& dirPath) //noexcept
 }
 
 
-warn_static("remove following test functions after refactoring")
-
-
-
-bool zen::fileExists(const Zstring& filePath)
+bool zen::itemNotExisting(const Zstring& itemPath)
 {
-    //symbolic links (broken or not) are also treated as existing files!
-    struct ::stat fileInfo = {};
-    if (::stat(filePath.c_str(), &fileInfo) == 0) //follow symlinks!
-        return S_ISREG(fileInfo.st_mode);
-    return false;
-}
-
-
-bool zen::dirExists(const Zstring& dirPath)
-{
-    //symbolic links (broken or not) are also treated as existing directories!
-    struct ::stat dirInfo = {};
-    if (::stat(dirPath.c_str(), &dirInfo) == 0) //follow symlinks!
-        return S_ISDIR(dirInfo.st_mode);
-    return false;
+    try
+    {
+        return !getItemTypeIfExists(itemPath); //throw FileError
+    }
+    catch (FileError&) { return false; }
 }
 
 
@@ -153,7 +157,7 @@ namespace
 }
 
 
-std::uint64_t zen::getFilesize(const Zstring& filePath) //throw FileError
+uint64_t zen::getFileSize(const Zstring& filePath) //throw FileError
 {
     struct ::stat fileInfo = {};
     if (::stat(filePath.c_str(), &fileInfo) != 0)
@@ -163,13 +167,13 @@ std::uint64_t zen::getFilesize(const Zstring& filePath) //throw FileError
 }
 
 
-std::uint64_t zen::getFreeDiskSpace(const Zstring& path) //throw FileError, returns 0 if not available
+uint64_t zen::getFreeDiskSpace(const Zstring& path) //throw FileError, returns 0 if not available
 {
     struct ::statfs info = {};
     if (::statfs(path.c_str(), &info) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot determine free disk space for %x."), L"%x", fmtPath(path)), L"statfs");
 
-    return static_cast<std::uint64_t>(info.f_bsize) * info.f_bavail;
+    return static_cast<uint64_t>(info.f_bsize) * info.f_bavail;
 }
 
 
@@ -309,14 +313,14 @@ void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //thro
     };
 
     if (!equalFilePath(pathSource, pathTarget)) //exception for OS X: changing file name case is not an "already exists" situation!
-	{
-		bool alreadyExists = true;
-		try {  /*ItemType type = */getItemType(pathTarget); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; } 
+    {
+        bool alreadyExists = true;
+        try {  /*ItemType type = */getItemType(pathTarget); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; }
 
         if (alreadyExists)
             throwException(EEXIST);
-		//else: nothing exists or other error (hopefully ::rename will also fail!)
-	}
+        //else: nothing exists or other error (hopefully ::rename will also fail!)
+    }
 
     if (::rename(pathSource.c_str(), pathTarget.c_str()) != 0)
         throwException(errno);
@@ -385,7 +389,7 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
 }
 
 
-void zen::setFileTime(const Zstring& filePath, std::int64_t modTime, ProcSymlink procSl) //throw FileError
+void zen::setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl) //throw FileError
 {
     struct ::timespec writeTime = {};
     writeTime.tv_sec = modTime;
@@ -586,10 +590,11 @@ namespace
 {
 InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting
                                     const Zstring& targetFile,
-                                    const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                                    const IOCallback& notifyUnbufferedIO)
 {
-    FileInput fileIn(sourceFile); //throw FileError, (ErrorFileLocked -> Windows-only)
-    if (notifyProgress) notifyProgress(0); //throw X!
+    int64_t totalUnbufferedIO = 0;
+
+    FileInput fileIn(sourceFile, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, (ErrorFileLocked -> Windows-only)
 
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getHandle(), &sourceInfo) != 0)
@@ -613,20 +618,18 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
     }
     ZEN_ON_SCOPE_FAIL( try { removeFilePlain(targetFile); }
     catch (FileError&) {} );
-    //transactional behavior: place guard after ::open() and before lifetime of FileOutput:
+    //place guard AFTER ::open() and BEFORE lifetime of FileOutput:
     //=> don't delete file that existed previously!!!
-    FileOutput fileOut(fdTarget, targetFile); //pass ownership
-    if (notifyProgress) notifyProgress(0); //throw X!
+    FileOutput fileOut(fdTarget, targetFile, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //pass ownership
 
-    unbufferedStreamCopy(fileIn, fileOut, notifyProgress); //throw FileError, X
-
+    bufferedStreamCopy(fileIn, fileOut); //throw FileError, X
+    fileOut.flushBuffers();              //throw FileError, X
     struct ::stat targetInfo = {};
     if (::fstat(fileOut.getHandle(), &targetInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(targetFile)), L"fstat");
 
     //close output file handle before setting file time; also good place to catch errors when closing stream!
-    fileOut.close(); //throw FileError
-    if (notifyProgress) notifyProgress(0); //throw X!
+    fileOut.finalize(); //throw FileError, (X)  essentially a close() since  buffers were already flushed
 
     //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
     //this triggers bugs on samba shares where the modification time is set to current time instead.
@@ -643,8 +646,7 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
     return newAttrib;
 }
 
-/*
-                    ------------------
+/*                  ------------------
                     |File Copy Layers|
                     ------------------
                        copyNewFile
@@ -659,9 +661,9 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsStream(::BackupRead/::Backu
 
 
 InSyncAttributes zen::copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                  const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                                  const IOCallback& notifyUnbufferedIO)
 {
-    const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
     //at this point we know we created a new file, so it's fine to delete it for cleanup!
     ZEN_ON_SCOPE_FAIL(try { removeFilePlain(targetFile); }

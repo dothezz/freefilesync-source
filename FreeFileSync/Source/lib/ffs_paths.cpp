@@ -57,7 +57,7 @@ Zstring zen::getConfigDirPathPf()
     if (isPortableVersion())
         return getExecutablePathPf();
     //use OS' standard paths
-    Zstring configDirPath = toZ(wxStandardPathsBase::Get().GetUserDataDir());
+    Zstring configDirPath = toZ(wxStandardPaths::Get().GetUserDataDir());
     try
     {
         createDirectoryIfMissingRecursion(configDirPath); //throw FileError

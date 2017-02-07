@@ -50,7 +50,7 @@ BinContainer compress(const BinContainer& stream, int level) //throw ZlibInterna
     if (!stream.empty()) //don't dereference iterator into empty container!
     {
         //save uncompressed stream size for decompression
-        const std::uint64_t uncompressedSize = stream.size(); //use portable number type!
+        const uint64_t uncompressedSize = stream.size(); //use portable number type!
         contOut.resize(sizeof(uncompressedSize));
         std::copy(reinterpret_cast<const char*>(&uncompressedSize),
                   reinterpret_cast<const char*>(&uncompressedSize) + sizeof(uncompressedSize),
@@ -80,7 +80,7 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
     if (!stream.empty()) //don't dereference iterator into empty container!
     {
         //retrieve size of uncompressed data
-        std::uint64_t uncompressedSize = 0; //use portable number type!
+        uint64_t uncompressedSize = 0; //use portable number type!
         if (stream.size() < sizeof(uncompressedSize))
             throw ZlibInternalError();
         std::copy(&*stream.begin(),

@@ -38,8 +38,8 @@ public:
                        std::vector<Zstring>& onCompletionHistory);
     ~BatchStatusHandler();
 
-    void initNewPhase       (int itemsTotal, std::int64_t bytesTotal, Phase phaseID) override;
-    void updateProcessedData(int itemsDelta, std::int64_t bytesDelta)                override;
+    void initNewPhase       (int itemsTotal, int64_t bytesTotal, Phase phaseID) override;
+    void updateProcessedData(int itemsDelta, int64_t bytesDelta)                override;
     void reportInfo         (const std::wstring& text)                               override;
     void forceUiRefresh     ()                                                       override;
 

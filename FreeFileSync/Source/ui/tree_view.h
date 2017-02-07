@@ -56,20 +56,20 @@ public:
     //---------------------------------------------------------------------
     struct Node
     {
-        Node(int percent, std::uint64_t bytes, int itemCount, unsigned int level, NodeStatus status) :
+        Node(int percent, uint64_t bytes, int itemCount, unsigned int level, NodeStatus status) :
             percent_(percent), level_(level), status_(status), bytes_(bytes), itemCount_(itemCount) {}
         virtual ~Node() {}
 
         const int percent_; //[0, 100]
         const unsigned int level_;
         const NodeStatus status_;
-        const std::uint64_t bytes_;
+        const uint64_t bytes_;
         const int itemCount_;
     };
 
     struct FilesNode : public Node
     {
-        FilesNode(int percent, std::uint64_t bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) :
+        FilesNode(int percent, uint64_t bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) :
             Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
 
         std::vector<FileSystemObject*> filesAndLinks_; //files and symlinks matching view filter; pointers are bound!
@@ -77,13 +77,13 @@ public:
 
     struct DirNode : public Node
     {
-        DirNode(int percent, std::uint64_t bytes, int itemCount, unsigned int level, NodeStatus status, FolderPair& folder) : Node(percent, bytes, itemCount, level, status), folder_(folder) {}
+        DirNode(int percent, uint64_t bytes, int itemCount, unsigned int level, NodeStatus status, FolderPair& folder) : Node(percent, bytes, itemCount, level, status), folder_(folder) {}
         FolderPair& folder_;
     };
 
     struct RootNode : public Node
     {
-        RootNode(int percent, std::uint64_t bytes, int itemCount, NodeStatus status, BaseFolderPair& baseFolder, const std::wstring& displayName) :
+        RootNode(int percent, uint64_t bytes, int itemCount, NodeStatus status, BaseFolderPair& baseFolder, const std::wstring& displayName) :
             Node(percent, bytes, itemCount, 0, status), baseFolder_(baseFolder), displayName_(displayName) {}
 
         BaseFolderPair& baseFolder_;
@@ -107,10 +107,10 @@ private:
 
     struct Container
     {
-        std::uint64_t bytesGross = 0;
-        std::uint64_t bytesNet   = 0; //bytes for files on view in this directory only
-        int itemCountGross = 0;
-        int itemCountNet   = 0; //number of files on view for in this directory only
+        uint64_t bytesGross = 0;
+        uint64_t bytesNet   = 0; //bytes for files on view in this directory only
+        int itemCountGross  = 0;
+        int itemCountNet    = 0; //number of files on view for in this directory only
 
         std::vector<DirNodeImpl> subDirs;
         FileSystemObject::ObjectId firstFileId = nullptr; //weak pointer to first FilePair or SymlinkPair

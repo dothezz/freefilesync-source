@@ -35,10 +35,6 @@ const int DETECT_ABANDONED_INTERVAL = 30; //assume abandoned lock; unit: [s]
 const char LOCK_FORMAT_DESCR[] = "FreeFileSync";
 const int LOCK_FORMAT_VER = 2; //lock file format version
 
-using MemStreamOut = MemoryStreamOut<ByteArray>;
-using MemStreamIn  = MemoryStreamIn <ByteArray>;
-
-
 
 
 //worker thread
@@ -166,11 +162,11 @@ LockInformation getLockInfoFromCurrentProcess() //throw FileError
 }
 
 
-LockInformation unserialize(MemStreamIn& stream) //throw UnexpectedEndOfStreamError
+LockInformation unserialize(MemoryStreamIn<ByteArray>& stream) //throw UnexpectedEndOfStreamError
 {
     char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
     readArray(stream, &tmp, sizeof(tmp));                         //file format header
-    const int lockFileVersion = readNumber<std::int32_t>(stream); //
+    const int lockFileVersion = readNumber<int32_t>(stream); //
 
     if (!std::equal(std::begin(tmp), std::end(tmp), std::begin(LOCK_FORMAT_DESCR)) ||
         lockFileVersion != LOCK_FORMAT_VER)
@@ -180,31 +176,31 @@ LockInformation unserialize(MemStreamIn& stream) //throw UnexpectedEndOfStreamEr
     lockInfo.lockId       = readContainer<std::string>(stream); //
     lockInfo.computerName = readContainer<std::string>(stream); //UnexpectedEndOfStreamError
     lockInfo.userId       = readContainer<std::string>(stream); //
-    lockInfo.sessionId    = static_cast<SessionId>(readNumber<std::uint64_t>(stream)); //[!] conversion
-    lockInfo.processId    = static_cast<ProcessId>(readNumber<std::uint64_t>(stream)); //[!] conversion
+    lockInfo.sessionId    = static_cast<SessionId>(readNumber<uint64_t>(stream)); //[!] conversion
+    lockInfo.processId    = static_cast<ProcessId>(readNumber<uint64_t>(stream)); //[!] conversion
     return lockInfo;
 }
 
 
-void serialize(const LockInformation& lockInfo, MemStreamOut& stream)
+void serialize(const LockInformation& lockInfo, MemoryStreamOut<ByteArray>& stream)
 {
     writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
-    writeNumber<std::int32_t>(stream, LOCK_FORMAT_VER);
+    writeNumber<int32_t>(stream, LOCK_FORMAT_VER);
 
-    static_assert(sizeof(lockInfo.processId) <= sizeof(std::uint64_t), ""); //ensure cross-platform compatibility!
-    static_assert(sizeof(lockInfo.sessionId) <= sizeof(std::uint64_t), ""); //
+    static_assert(sizeof(lockInfo.processId) <= sizeof(uint64_t), ""); //ensure cross-platform compatibility!
+    static_assert(sizeof(lockInfo.sessionId) <= sizeof(uint64_t), ""); //
 
     writeContainer(stream, lockInfo.lockId);
     writeContainer(stream, lockInfo.computerName);
     writeContainer(stream, lockInfo.userId);
-    writeNumber<std::uint64_t>(stream, lockInfo.sessionId);
-    writeNumber<std::uint64_t>(stream, lockInfo.processId);
+    writeNumber<uint64_t>(stream, lockInfo.sessionId);
+    writeNumber<uint64_t>(stream, lockInfo.processId);
 }
 
 
 LockInformation retrieveLockInfo(const Zstring& lockFilePath) //throw FileError
 {
-    MemStreamIn memStreamIn = loadBinContainer<ByteArray>(lockFilePath,  nullptr); //throw FileError
+    MemoryStreamIn<ByteArray> memStreamIn(loadBinContainer<ByteArray>(lockFilePath,  nullptr /*notifyUnbufferedIO*/)); //throw FileError
     try
     {
         return unserialize(memStreamIn); //throw UnexpectedEndOfStreamError
@@ -282,13 +278,13 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
         }
         catch (FileError&) {} //logfile may be only partly written -> this is no error!
 
-        std::uint64_t fileSizeOld = 0;
+        uint64_t fileSizeOld = 0;
         auto lastLifeSign = steady_clock::now();
 
         for (;;)
         {
             const auto now = steady_clock::now();
-            const std::uint64_t fileSizeNew = getFilesize(lockFilePath); //throw FileError
+            const uint64_t fileSizeNew = getFileSize(lockFilePath); //throw FileError
 
             if (fileSizeNew != fileSizeOld) //received life sign from lock
             {
@@ -307,7 +303,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
                     if (retrieveLockId(lockFilePath) != originalLockId) //throw FileError -> since originalLockId is filled, we are not expecting errors!
                         return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
-                if (getFilesize(lockFilePath) != fileSizeOld) //throw FileError
+                if (getFileSize(lockFilePath) != fileSizeOld) //throw FileError
                     continue; //late life sign
 
                 removeFilePlain(lockFilePath); //throw FileError
@@ -338,13 +334,8 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
     }
     catch (FileError&)
     {
-            try 
-			{ 
-				if (!getItemTypeIfExists(lockFilePath)) //throw FileError
-					return; //what we are waiting for...
-			}
-            catch (FileError&) {} //previous exception is more relevant
-
+        if (itemNotExisting(lockFilePath))
+            return; //what we are waiting for...
         throw;
     }
 }
@@ -377,14 +368,14 @@ bool tryLock(const Zstring& lockFilePath) //throw FileError
     }
     ZEN_ON_SCOPE_FAIL(try { removeFilePlain(lockFilePath); }
     catch (FileError&) {});
-    FileOutput fileOut(fileHandle, lockFilePath); //pass handle ownership
+    FileOutput fileOut(fileHandle, lockFilePath, nullptr /*notifyUnbufferedIO*/); //pass handle ownership
 
     //write housekeeping info: user, process info, lock GUID
-    MemStreamOut streamOut;
+    MemoryStreamOut<ByteArray> streamOut;
     serialize(getLockInfoFromCurrentProcess(), streamOut);
 
-    unbufferedSave(streamOut.ref(), fileOut, nullptr); //throw FileError
-    fileOut.close();                                   //
+    fileOut.write(&*streamOut.ref().begin(), streamOut.ref().size()); //throw FileError, (X)
+    fileOut.finalize();                                               //
     return true;
 }
 }

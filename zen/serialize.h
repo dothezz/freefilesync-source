@@ -54,42 +54,17 @@ private:
 };
 
 /*
----------------------------------
-|Unbuffered Input Stream Concept|
----------------------------------
-struct UnbufferedInputStream
-{
-    size_t getBlockSize();
-    size_t tryRead(void* buffer, size_t bytesToRead); //may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-};
-
-----------------------------------
-|Unbuffered Output Stream Concept|
-----------------------------------
-struct UnbufferedOutputStream
-{
-    size_t getBlockSize();
-    size_t tryWrite(const void* buffer, size_t bytesToWrite); //may return short! CONTRACT: bytesToWrite > 0
-};
-*/
-
-//functions based on unbuffered stream abstraction
-template <class UnbufferedInputStream, class UnbufferedOutputStream>
-void unbufferedStreamCopy(UnbufferedInputStream& streamIn, UnbufferedOutputStream& streamOut, const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //throw X
-
-template <class BinContainer, class UnbufferedOutputStream>
-void unbufferedSave(const BinContainer& buffer, UnbufferedOutputStream& streamOut, const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //throw X
-
-template <class BinContainer, class UnbufferedInputStream>
-BinContainer unbufferedLoad(UnbufferedInputStream& streamIn,                       const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //throw X
-
-/*
 -------------------------------
 |Buffered Input Stream Concept|
 -------------------------------
 struct BufferedInputStream
 {
-    size_t read(void* buffer, size_t bytesToRead); //return "len" bytes unless end of stream! throw ?
+    size_t read(void* buffer, size_t bytesToRead); //throw X; return "bytesToRead" bytes unless end of stream!
+
+Optional: support stream-copying
+--------------------------------
+    size_t getBlockSize() const;
+    const IOCallback& notifyUnbufferedIO
 };
 
 --------------------------------
@@ -97,18 +72,47 @@ struct BufferedInputStream
 --------------------------------
 struct BufferedOutputStream
 {
-    void write(const void* buffer, size_t bytesToWrite); //throw ?
+    void write(const void* buffer, size_t bytesToWrite); //throw X
+
+Optional: support stream-copying
+--------------------------------
+    const IOCallback& notifyUnbufferedIO
 };
 */
+using IOCallback = std::function<void(int64_t bytesDelta)>; //throw X
+
+
 //functions based on buffered stream abstraction
-template <class N, class BufferedOutputStream> void writeNumber   (BufferedOutputStream& stream, const N& num);                 //
-template <class C, class BufferedOutputStream> void writeContainer(BufferedOutputStream& stream, const C& str);                 //throw ()
-template <         class BufferedOutputStream> void writeArray    (BufferedOutputStream& stream, const void* data, size_t len); //
+template <class BufferedInputStream, class BufferedOutputStream>
+void bufferedStreamCopy(BufferedInputStream& streamIn, BufferedOutputStream& streamOut); //throw X
+
+template <class BinContainer, class BufferedInputStream> BinContainer
+bufferedLoad(BufferedInputStream& streamIn); //throw X
+
+template <class N, class BufferedOutputStream> void writeNumber   (BufferedOutputStream& stream, const N& num);                   //
+template <class C, class BufferedOutputStream> void writeContainer(BufferedOutputStream& stream, const C& str);                   //throw ()
+template <         class BufferedOutputStream> void writeArray    (BufferedOutputStream& stream, const void* buffer, size_t len); //
 //----------------------------------------------------------------------
 class UnexpectedEndOfStreamError {};
 template <class N, class BufferedInputStream> N    readNumber   (BufferedInputStream& stream); //throw UnexpectedEndOfStreamError (corrupted data)
 template <class C, class BufferedInputStream> C    readContainer(BufferedInputStream& stream); //
-template <         class BufferedInputStream> void readArray    (BufferedInputStream& stream, void* data, size_t len); //
+template <         class BufferedInputStream> void readArray    (BufferedInputStream& stream, void* buffer, size_t len); //
+
+
+struct IOCallbackDivider
+{
+    IOCallbackDivider(const IOCallback& notifyUnbufferedIO, int64_t& totalUnbufferedIO) : totalUnbufferedIO_(totalUnbufferedIO), notifyUnbufferedIO_(notifyUnbufferedIO) {}
+
+    void operator()(int64_t bytesDelta)
+    {
+        if (notifyUnbufferedIO_) notifyUnbufferedIO_((totalUnbufferedIO_ - totalUnbufferedIO_ / 2 * 2 + bytesDelta) / 2); //throw X!
+        totalUnbufferedIO_ += bytesDelta;
+    }
+
+private:
+    int64_t& totalUnbufferedIO_;
+    const IOCallback& notifyUnbufferedIO_;
+};
 
 //buffered input/output stream reference implementations:
 template <class BinContainer>
@@ -116,12 +120,12 @@ struct MemoryStreamIn
 {
     MemoryStreamIn(const BinContainer& cont) : buffer_(cont) {} //this better be cheap!
 
-    size_t read(void* data, size_t len) //return "len" bytes unless end of stream!
+    size_t read(void* buffer, size_t bytesToRead) //return "bytesToRead" bytes unless end of stream!
     {
         static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
-        const size_t bytesRead = std::min(len, buffer_.size() - pos_);
+        const size_t bytesRead = std::min(bytesToRead, buffer_.size() - pos_);
         auto itFirst = buffer_.begin() + pos_;
-        std::copy(itFirst, itFirst + bytesRead, static_cast<char*>(data));
+        std::copy(itFirst, itFirst + bytesRead, static_cast<char*>(buffer));
         pos_ += bytesRead;
         return bytesRead;
     }
@@ -129,6 +133,9 @@ struct MemoryStreamIn
     size_t pos() const { return pos_; }
 
 private:
+    MemoryStreamIn           (const MemoryStreamIn&) = delete;
+    MemoryStreamIn& operator=(const MemoryStreamIn&) = delete;
+
     const BinContainer buffer_;
     size_t pos_ = 0;
 };
@@ -136,17 +143,22 @@ private:
 template <class BinContainer>
 struct MemoryStreamOut
 {
-    void write(const void* data, size_t len)
+    MemoryStreamOut() = default;
+
+    void write(const void* buffer, size_t bytesToWrite)
     {
         static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
         const size_t oldSize = buffer_.size();
-        buffer_.resize(oldSize + len);
-        std::copy(static_cast<const char*>(data), static_cast<const char*>(data) + len, buffer_.begin() + oldSize);
+        buffer_.resize(oldSize + bytesToWrite);
+        std::copy(static_cast<const char*>(buffer), static_cast<const char*>(buffer) + bytesToWrite, buffer_.begin() + oldSize);
     }
 
     const BinContainer& ref() const { return buffer_; }
 
 private:
+    MemoryStreamOut           (const MemoryStreamOut&) = delete;
+    MemoryStreamOut& operator=(const MemoryStreamOut&) = delete;
+
     BinContainer buffer_;
 };
 
@@ -158,111 +170,52 @@ private:
 
 
 //-----------------------implementation-------------------------------
-template <class UnbufferedInputStream, class UnbufferedOutputStream> inline
-void unbufferedStreamCopy(UnbufferedInputStream& streamIn,   //throw X
-                          UnbufferedOutputStream& streamOut, //
-                          const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
-{
-    size_t unevenBytes = 0;
-    auto reportBytesProcessed = [&](size_t bytesReadOrWritten)
-    {
-        if (notifyProgress)
-        {
-            const size_t bytesToReport = (unevenBytes + bytesReadOrWritten) / 2;
-            notifyProgress(bytesToReport); //throw X!
-            unevenBytes = (unevenBytes + bytesReadOrWritten) - bytesToReport * 2; //unsigned arithmetics!
-        }
-    };
-
-    const size_t blockSizeIn  = streamIn .getBlockSize();
-    const size_t blockSizeOut = streamOut.getBlockSize();
-    if (blockSizeIn == 0 || blockSizeOut == 0)
-        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
-
-    std::vector<char> buffer;
-    for (;;)
-    {
-        buffer.resize(buffer.size() + blockSizeIn);
-        const size_t bytesRead = streamIn.tryRead(&*(buffer.end() - blockSizeIn), blockSizeIn); //throw X; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-        buffer.resize(buffer.size() - blockSizeIn + bytesRead); //caveat: unsigned arithmetics
-
-        reportBytesProcessed(bytesRead); //throw X!
-
-        size_t bytesRemaining = buffer.size();
-        while (bytesRemaining >= blockSizeOut)
-        {
-            const size_t bytesWritten = streamOut.tryWrite(&*(buffer.end() - bytesRemaining), blockSizeOut); //throw X; may return short! CONTRACT: bytesToWrite > 0
-            bytesRemaining -= bytesWritten;
-            reportBytesProcessed(bytesWritten); //throw X!
-        }
-        buffer.erase(buffer.begin(), buffer.end() - bytesRemaining);
-
-        if (bytesRead == 0) //end of file
-            break;
-    }
-
-    for (size_t bytesRemaining = buffer.size(); bytesRemaining > 0;)
-    {
-        const size_t bytesWritten = streamOut.tryWrite(&*(buffer.end() - bytesRemaining), bytesRemaining); //throw X; may return short! CONTRACT: bytesToWrite > 0
-        bytesRemaining -= bytesWritten;
-        reportBytesProcessed(bytesWritten); //throw X!
-    }
-
-    if (unevenBytes != 0)
-        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
-}
-
-
-template <class BinContainer, class UnbufferedOutputStream> inline
-void unbufferedSave(const BinContainer& buffer,
-                    UnbufferedOutputStream& streamOut, //throw X
-                    const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
-{
-    const size_t blockSize = streamOut.getBlockSize();
-    if (blockSize == 0)
-        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
-
-    static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
-
-    for (size_t bytesRemaining = buffer.size(); bytesRemaining > 0;)
-    {
-        const size_t bytesToWrite = std::min(bytesRemaining, blockSize);
-        const size_t bytesWritten = streamOut.tryWrite(&*(buffer.end() - bytesRemaining), bytesToWrite); //throw X; may return short! CONTRACT: bytesToWrite > 0
-        bytesRemaining -= bytesWritten;
-        if (notifyProgress) notifyProgress(bytesWritten); //throw X!
-    }
-}
-
-
-template <class BinContainer, class UnbufferedInputStream> inline
-BinContainer unbufferedLoad(UnbufferedInputStream& streamIn, //throw X
-                            const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
+template <class BufferedInputStream, class BufferedOutputStream> inline
+void bufferedStreamCopy(BufferedInputStream& streamIn,   //throw X
+                        BufferedOutputStream& streamOut) //
 {
     const size_t blockSize = streamIn.getBlockSize();
     if (blockSize == 0)
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
+    std::vector<char> buffer(blockSize);
+    for (;;)
+    {
+        const size_t bytesRead = streamIn.read(&buffer[0], blockSize); //throw X; return "bytesToRead" bytes unless end of stream!
+        streamOut.write(&buffer[0], bytesRead); //throw X
+
+        if (bytesRead < blockSize) //end of file
+            break;
+    }
+}
+
+
+template <class BinContainer, class BufferedInputStream> inline
+BinContainer bufferedLoad(BufferedInputStream& streamIn) //throw X
+{
     static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
+
+    const size_t blockSize = streamIn.getBlockSize();
+    if (blockSize == 0)
+        throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     BinContainer buffer;
     for (;;)
     {
         buffer.resize(buffer.size() + blockSize);
-        const size_t bytesRead = streamIn.tryRead(&*(buffer.end() - blockSize), blockSize); //throw X; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        const size_t bytesRead = streamIn.read(&*(buffer.end() - blockSize), blockSize); //throw X; return "bytesToRead" bytes unless end of stream!
         buffer.resize(buffer.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
 
-        if (notifyProgress) notifyProgress(bytesRead); //throw X!
-
-        if (bytesRead == 0) //end of file
+        if (bytesRead < blockSize) //end of file
             return buffer;
     }
 }
 
 
 template <class BufferedOutputStream> inline
-void writeArray(BufferedOutputStream& stream, const void* data, size_t len)
+void writeArray(BufferedOutputStream& stream, const void* buffer, size_t len)
 {
-    stream.write(data, len);
+    stream.write(buffer, len);
 }
 
 
@@ -278,16 +231,16 @@ template <class C, class BufferedOutputStream> inline
 void writeContainer(BufferedOutputStream& stream, const C& cont) //don't even consider UTF8 conversions here, we're handling arbitrary binary data!
 {
     const auto len = cont.size();
-    writeNumber(stream, static_cast<std::uint32_t>(len));
+    writeNumber(stream, static_cast<uint32_t>(len));
     if (len > 0)
         writeArray(stream, &*cont.begin(), sizeof(typename C::value_type) * len); //don't use c_str(), but access uniformly via STL interface
 }
 
 
 template <class BufferedInputStream> inline
-void readArray(BufferedInputStream& stream, void* data, size_t len) //throw UnexpectedEndOfStreamError
+void readArray(BufferedInputStream& stream, void* buffer, size_t len) //throw UnexpectedEndOfStreamError
 {
-    const size_t bytesRead = stream.read(data, len);
+    const size_t bytesRead = stream.read(buffer, len);
     if (bytesRead < len)
         throw UnexpectedEndOfStreamError();
 }
@@ -307,7 +260,7 @@ template <class C, class BufferedInputStream> inline
 C readContainer(BufferedInputStream& stream) //throw UnexpectedEndOfStreamError
 {
     C cont;
-    auto strLength = readNumber<std::uint32_t>(stream);
+    auto strLength = readNumber<uint32_t>(stream); //throw UnexpectedEndOfStreamError
     if (strLength > 0)
     {
         try

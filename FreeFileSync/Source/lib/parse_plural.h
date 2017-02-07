@@ -30,11 +30,11 @@ class PluralForm
 {
 public:
     PluralForm(const std::string& stream); //throw ParsingError
-    int getForm(std::int64_t n) const { n_ = std::abs(n) ; return static_cast<int>(expr->eval()); }
+    int getForm(int64_t n) const { n_ = std::abs(n) ; return static_cast<int>(expr->eval()); }
 
 private:
-    std::shared_ptr<Expr<std::int64_t>> expr;
-    mutable std::int64_t n_ = 0;
+    std::shared_ptr<Expr<int64_t>> expr;
+    mutable int64_t n_ = 0;
 };
 
 
@@ -154,21 +154,21 @@ private:
 };
 
 
-struct ConstNumberExp : public Expr<std::int64_t>
+struct ConstNumberExp : public Expr<int64_t>
 {
-    ConstNumberExp(std::int64_t n) : n_(n) {}
-    std::int64_t eval() const override { return n_; }
+    ConstNumberExp(int64_t n) : n_(n) {}
+    int64_t eval() const override { return n_; }
 private:
-    std::int64_t n_;
+    int64_t n_;
 };
 
 
-struct VariableNumberNExp : public Expr<std::int64_t>
+struct VariableNumberNExp : public Expr<int64_t>
 {
-    VariableNumberNExp(std::int64_t& n) : n_(n) {}
-    std::int64_t eval() const override { return n_; }
+    VariableNumberNExp(int64_t& n) : n_(n) {}
+    int64_t eval() const override { return n_; }
 private:
-    std::int64_t& n_;
+    int64_t& n_;
 };
 
 //-------------------------------------------------------------------------------
@@ -196,10 +196,10 @@ struct Token
     };
 
     Token(Type t) : type(t) {}
-    Token(std::int64_t num) : number(num) {}
+    Token(int64_t num) : number(num) {}
 
     Type type = TK_CONST_NUMBER;
-    std::int64_t number = 0; //if type == TK_CONST_NUMBER
+    int64_t number = 0; //if type == TK_CONST_NUMBER
 };
 
 class Scanner
@@ -226,7 +226,7 @@ public:
 
         if (digitEnd != pos)
         {
-            auto number = zen::stringTo<std::int64_t>(std::string(pos, digitEnd));
+            auto number = zen::stringTo<int64_t>(std::string(pos, digitEnd));
             pos = digitEnd;
             return number;
         }
@@ -271,14 +271,14 @@ private:
 class Parser
 {
 public:
-    Parser(const std::string& stream, std::int64_t& n) :
+    Parser(const std::string& stream, int64_t& n) :
         scn(stream),
         tk(scn.nextToken()),
         n_(n) {}
 
-    std::shared_ptr<Expr<std::int64_t>> parse() //throw ParsingError; return value always bound!
+    std::shared_ptr<Expr<int64_t>> parse() //throw ParsingError; return value always bound!
     {
-        auto e = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //throw ParsingError
+        auto e = std::dynamic_pointer_cast<Expr<int64_t>>(parseExpression()); //throw ParsingError
         if (!e)
             throw ParsingError();
         expectToken(Token::TK_END);
@@ -297,15 +297,15 @@ private:
             nextToken();
 
             auto ifExp   = std::dynamic_pointer_cast<Expr<bool>>(e);
-            auto thenExp = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //associativity: <-
+            auto thenExp = std::dynamic_pointer_cast<Expr<int64_t>>(parseExpression()); //associativity: <-
 
             expectToken(Token::TK_TERNARY_COLON);
             nextToken();
 
-            auto elseExp = std::dynamic_pointer_cast<Expr<std::int64_t>>(parseExpression()); //
+            auto elseExp = std::dynamic_pointer_cast<Expr<int64_t>>(parseExpression()); //
             if (!ifExp || !thenExp || !elseExp)
                 throw ParsingError();
-            return std::make_shared<ConditionalExp<std::int64_t>>(ifExp, thenExp, elseExp);
+            return std::make_shared<ConditionalExp<int64_t>>(ifExp, thenExp, elseExp);
         }
         return e;
     }
@@ -347,8 +347,8 @@ private:
             nextToken();
             std::shared_ptr<Expression> rhs = parseRelational();
 
-            if (t == Token::TK_EQUAL)     return makeBiExp<std::equal_to<>,     std::int64_t>(e, rhs); //throw ParsingError
-            if (t == Token::TK_NOT_EQUAL) return makeBiExp<std::not_equal_to<>, std::int64_t>(e, rhs); //
+            if (t == Token::TK_EQUAL)     return makeBiExp<std::equal_to<>,     int64_t>(e, rhs); //throw ParsingError
+            if (t == Token::TK_NOT_EQUAL) return makeBiExp<std::not_equal_to<>, int64_t>(e, rhs); //
         }
         return e;
     }
@@ -366,10 +366,10 @@ private:
             nextToken();
             std::shared_ptr<Expression> rhs = parseMultiplicative();
 
-            if (t == Token::TK_LESS)          return makeBiExp<std::less         <>, std::int64_t>(e, rhs); //
-            if (t == Token::TK_LESS_EQUAL)    return makeBiExp<std::less_equal   <>, std::int64_t>(e, rhs); //throw ParsingError
-            if (t == Token::TK_GREATER)       return makeBiExp<std::greater      <>, std::int64_t>(e, rhs); //
-            if (t == Token::TK_GREATER_EQUAL) return makeBiExp<std::greater_equal<>, std::int64_t>(e, rhs); //
+            if (t == Token::TK_LESS)          return makeBiExp<std::less         <>, int64_t>(e, rhs); //
+            if (t == Token::TK_LESS_EQUAL)    return makeBiExp<std::less_equal   <>, int64_t>(e, rhs); //throw ParsingError
+            if (t == Token::TK_GREATER)       return makeBiExp<std::greater      <>, int64_t>(e, rhs); //
+            if (t == Token::TK_GREATER_EQUAL) return makeBiExp<std::greater_equal<>, int64_t>(e, rhs); //
         }
         return e;
     }
@@ -388,7 +388,7 @@ private:
                 if (literal->eval() == 0)
                     throw ParsingError();
 
-            e = makeBiExp<std::modulus<>, std::int64_t>(e, rhs); //throw ParsingError
+            e = makeBiExp<std::modulus<>, int64_t>(e, rhs); //throw ParsingError
         }
         return e;
     }
@@ -402,7 +402,7 @@ private:
         }
         else if (token().type == Token::TK_CONST_NUMBER)
         {
-            const std::int64_t number = token().number;
+            const int64_t number = token().number;
             nextToken();
             return std::make_shared<ConstNumberExp>(number);
         }
@@ -430,7 +430,7 @@ private:
 
     Scanner scn;
     Token tk;
-    std::int64_t& n_;
+    int64_t& n_;
 };
 }
 

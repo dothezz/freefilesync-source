@@ -2217,4 +2217,4 @@ int Grid::getColWidthsSum(int mainWinWidth) const
     for (const ColumnWidth& cw : getColWidths(mainWinWidth))
         sum += cw.width_;
     return sum;
-};
+}

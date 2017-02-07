@@ -116,7 +116,7 @@ void StatusHandlerTemporaryPanel::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseID)
+void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, int64_t bytesTotal, Phase phaseID)
 {
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
 
@@ -365,7 +365,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
 }
 
 
-void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseID)
+void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, int64_t bytesTotal, Phase phaseID)
 {
     assert(phaseID == PHASE_SYNCHRONIZING);
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
@@ -376,7 +376,7 @@ void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, std::int64_t byte
 }
 
 
-void StatusHandlerFloatingDialog::updateProcessedData(int itemsDelta, std::int64_t bytesDelta)
+void StatusHandlerFloatingDialog::updateProcessedData(int itemsDelta, int64_t bytesDelta)
 {
     StatusHandler::updateProcessedData(itemsDelta, bytesDelta);
     if (progressDlg)

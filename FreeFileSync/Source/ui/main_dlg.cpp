@@ -93,8 +93,8 @@ bool acceptDialogFileDrop(const std::vector<Zstring>& shellItemPaths)
     return std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
     {
         const Zstring ext = getFileExtension(shellItemPath);
-        return equalNoCase(ext, Zstr("ffs_gui")) ||
-               equalNoCase(ext, Zstr("ffs_batch"));
+        return ciEqual(ext, Zstr("ffs_gui")) ||
+               ciEqual(ext, Zstr("ffs_batch"));
     });
 }
 }
@@ -288,26 +288,22 @@ void updateTopButton(wxBitmapButton& btn, const wxBitmap& bmp, const wxString& v
 
 //##################################################################################################################################
 
-xmlAccess::XmlGlobalSettings loadGlobalConfig(const Zstring& globalConfigFilePath) //blocks on GUI on errors!
+xmlAccess::XmlGlobalSettings tryLoadGlobalConfig(const Zstring& globalConfigFilePath) //blocks on GUI on errors!
 {
     using namespace xmlAccess;
 
     XmlGlobalSettings globalCfg;
     try
-    {		
-			std::wstring warningMsg;
-			readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
+    {
+        std::wstring warningMsg;
+        readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
 
-			assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+        assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
     }
     catch (const FileError& e)
     {
-			bool notExisting = false;
-            try  { notExisting = !getItemTypeIfExists(globalConfigFilePath); /*throw FileError*/ }
-            catch (FileError&) {} //previous exception is more relevant
-
-			if (!notExisting) //existing or access error
-		        showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
+        if (!itemNotExisting(globalConfigFilePath)) //existing or access error
+            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); //no parent window: main dialog not yet created!
     }
     return globalCfg;
 }
@@ -324,7 +320,7 @@ void MainDialog::create(const Zstring& globalConfigFilePath)
 {
     using namespace xmlAccess;
 
-    const XmlGlobalSettings globalSettings = loadGlobalConfig(globalConfigFilePath);
+    const XmlGlobalSettings globalSettings = tryLoadGlobalConfig(globalConfigFilePath);
 
     std::vector<Zstring> cfgFilePaths;
     for (const ConfigFileItem& item : globalSettings.gui.lastUsedConfigFiles)
@@ -338,14 +334,14 @@ void MainDialog::create(const Zstring& globalConfigFilePath)
         firstUnavailableFile.addJob([filePath]() -> Opt<FalseType>
     {
         assert(!filePath.empty());
-        if (filePath.empty() /*ever empty??*/ || !fileExists(filePath))
+        if (!fileAvailable(filePath))
             return FalseType();
         return NoValue();
     });
 
     //potentially slow network access: give all checks 500ms to finish
     const bool allFilesAvailable = firstUnavailableFile.timedWait(std::chrono::milliseconds(500)) && //false: time elapsed
-                               !firstUnavailableFile.get(); //no missing
+                                   !firstUnavailableFile.get(); //no missing
     if (!allFilesAvailable)
         cfgFilePaths.clear(); //we do NOT want to show an error due to last config file missing on application start!
     //------------------------------------------------------------------------------------------
@@ -353,8 +349,9 @@ void MainDialog::create(const Zstring& globalConfigFilePath)
     if (cfgFilePaths.empty())
     {
         const Zstring lastRunConfigFilePath = getLastRunConfigPath();
-        if (fileExists(lastRunConfigFilePath)) //3. try to load auto-save config
+        if (fileAvailable(lastRunConfigFilePath)) //3. try to load auto-save config (should not block)
             cfgFilePaths.push_back(lastRunConfigFilePath);
+        //else: not-existing/access error? => user may click on <Last Session> later
     }
 
     XmlGuiConfig guiCfg; //structure to receive gui settings with default values
@@ -395,12 +392,7 @@ void MainDialog::create(const Zstring& globalConfigFilePath,
                         const std::vector<Zstring>& referenceFiles,
                         bool startComparison)
 {
-    xmlAccess::XmlGlobalSettings globSett;
-    if (globalSettings)
-        globSett = *globalSettings;
-    else
-        globSett = loadGlobalConfig(globalConfigFilePath);
-    //else: globalCfg already has default values
+    const xmlAccess::XmlGlobalSettings globSett = globalSettings ? *globalSettings : tryLoadGlobalConfig(globalConfigFilePath);
 
     try
     {
@@ -425,7 +417,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
     globalConfigFile_(globalConfigFile),
-    lastRunConfigPath(getLastRunConfigPath())
+    lastRunConfigPath_(getLastRunConfigPath())
 {
     m_folderPathLeft ->init(folderHistoryLeft);
     m_folderPathRight->init(folderHistoryRight);
@@ -791,7 +783,7 @@ MainDialog::~MainDialog()
 
     try //save "LastRun.ffs_gui"
     {
-        writeConfig(getConfig(), lastRunConfigPath); //throw FileError
+        writeConfig(getConfig(), lastRunConfigPath_); //throw FileError
     }
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
     catch (const FileError&) {}
@@ -811,7 +803,7 @@ void MainDialog::onQueryEndSession()
     try { writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); }
     catch (const FileError&) {} //we try our best to do something useful in this extreme situation - no reason to notify or even log errors here!
 
-    try { writeConfig(getConfig(), lastRunConfigPath); }
+    try { writeConfig(getConfig(), lastRunConfigPath_); }
     catch (const FileError&) {}
 }
 
@@ -881,7 +873,7 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     std::reverse(cfgFilePaths.begin(), cfgFilePaths.end());
     //list is stored with last used files first in xml, however addFileToCfgHistory() needs them last!!!
 
-    cfgFilePaths.push_back(lastRunConfigPath); //make sure <Last session> is always part of history list (if existing)
+    cfgFilePaths.push_back(lastRunConfigPath_); //make sure <Last session> is always part of history list (if existing)
     addFileToCfgHistory(cfgFilePaths);
 
     removeObsoleteCfgHistoryItems(cfgFilePaths); //remove non-existent items (we need this only on startup)
@@ -1449,8 +1441,8 @@ void MainDialog::setStatusBarFileStatistics(size_t filesOnLeftView,
                                             size_t foldersOnLeftView,
                                             size_t filesOnRightView,
                                             size_t foldersOnRightView,
-                                            std::uint64_t filesizeLeftView,
-                                            std::uint64_t filesizeRightView)
+                                            uint64_t filesizeLeftView,
+                                            uint64_t filesizeRightView)
 {
 
     //select state
@@ -2605,13 +2597,13 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 wxString getFormattedHistoryElement(const Zstring& filepath)
 {
     Zstring output = afterLast(filepath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
-    if (pathEndsWith(output, Zstr(".ffs_gui")))
+    if (endsWith(output, Zstr(".ffs_gui")))
         output = beforeLast(output, Zstr('.'), IF_MISSING_RETURN_NONE);
     return utfCvrtTo<wxString>(output);
 }
 
 
-void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
+void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filePaths)
 {
     //determine highest "last use" index number of m_listBoxHistory
     int lastUseIndexMax = 0;
@@ -2623,7 +2615,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
 
     std::deque<bool> selections(m_listBoxHistory->GetCount()); //items to select after update of history list
 
-    for (const Zstring& filepath : filepaths)
+    for (const Zstring& filePath : filePaths)
     {
         //Do we need to additionally check for aliases of the same physical files here? (and aliases for lastRunConfigName?)
 
@@ -2632,7 +2624,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
                 if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
                 {
-                    if (equalFilePath(filepath, histData->cfgFile_))
+                    if (equalFilePath(filePath, histData->cfgFile_))
                         return std::make_pair(histData, i);
                 }
                 else
@@ -2652,12 +2644,12 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             wxString label;
             unsigned int newPos = 0;
 
-            if (equalFilePath(filepath, lastRunConfigPath))
+            if (equalFilePath(filePath, lastRunConfigPath_))
                 label = lastSessionLabel;
             else
             {
                 //workaround wxWidgets 2.9 bug on GTK screwing up the client data if the list box is sorted:
-                label = getFormattedHistoryElement(filepath);
+                label = getFormattedHistoryElement(filePath);
 
                 //"linear-time insertion sort":
                 for (; newPos < m_listBoxHistory->GetCount(); ++newPos)
@@ -2670,7 +2662,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
             }
 
             assert(!m_listBoxHistory->IsSorted());
-            m_listBoxHistory->Insert(label, newPos, new wxClientHistoryData(filepath, ++lastUseIndexMax));
+            m_listBoxHistory->Insert(label, newPos, new wxClientHistoryData(filePath, ++lastUseIndexMax));
 
             selections.insert(selections.begin() + newPos, true);
         }
@@ -2689,30 +2681,27 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filepaths)
 
 void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filePaths)
 {
-    //don't use wxString: NOT thread-safe! (e.g. non-atomic ref-count)
-
-    auto getMissingFilesAsync = [filePaths]
+    auto getUnavailableCfgFilesAsync = [filePaths] //don't use wxString: NOT thread-safe! (e.g. non-atomic ref-count)
     {
-        //check existence of all config files in parallel!
-        std::list<std::future<bool>> fileEx;
+        std::list<std::future<bool>> availableFiles; //check existence of all config files in parallel!
 
         for (const Zstring& filePath : filePaths)
-            fileEx.push_back(zen::runAsync([=] { return fileExists(filePath); }));
+            availableFiles.push_back(zen::runAsync([=] { return fileAvailable(filePath); }));
 
         //potentially slow network access => limit maximum wait time!
-        wait_for_all_timed(fileEx.begin(), fileEx.end(), std::chrono::milliseconds(1000));
+        wait_for_all_timed(availableFiles.begin(), availableFiles.end(), std::chrono::milliseconds(1000));
 
-        std::vector<Zstring> missingFiles;
+        std::vector<Zstring> filePathsForRemoval;
 
-        auto itFut = fileEx.begin();
+        auto itFut = availableFiles.begin();
         for (auto it = filePaths.begin(); it != filePaths.end(); ++it, ++itFut)
             if (isReady(*itFut) && !itFut->get()) //remove only files that are confirmed to be non-existent
-                missingFiles.push_back(*it);
+                filePathsForRemoval.push_back(*it); //file access error? probably not accessible network share or usb stick => remove cfg
 
-        return missingFiles;
+        return filePathsForRemoval;
     };
 
-    guiQueue.processAsync(getMissingFilesAsync, [this](const std::vector<Zstring>& files) { removeCfgHistoryItems(files); });
+    guiQueue.processAsync(getUnavailableCfgFilesAsync, [this](const std::vector<Zstring>& files) { removeCfgHistoryItems(files); });
 }
 
 
@@ -2734,7 +2723,7 @@ void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filePaths)
 
 void MainDialog::updateUnsavedCfgStatus()
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
 
     const bool haveUnsavedCfg = lastConfigurationSaved != getConfig();
 
@@ -2775,7 +2764,7 @@ void MainDialog::updateUnsavedCfgStatus()
 
 void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
 
     using namespace xmlAccess;
 
@@ -2827,13 +2816,13 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
     if (guiFilename)
     {
         targetFilename = *guiFilename;
-        assert(pathEndsWith(targetFilename, Zstr(".ffs_gui")));
+        assert(endsWith(targetFilename, Zstr(".ffs_gui")));
     }
     else
     {
-        Zstring defaultFileName = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
+        Zstring defaultFileName = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-        if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
+        if (endsWith(defaultFileName, Zstr(".ffs_batch")))
             defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_gui");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
@@ -2872,7 +2861,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
     //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "m_bpButtonViewTypeSyncAction" is negliable
 
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
     const XmlGuiConfig guiCfg = getConfig();
 
     //prepare batch config: reuse existing batch-specific settings from file if available
@@ -2909,7 +2898,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
     if (batchFileToUpdate)
     {
         targetFilename = *batchFileToUpdate;
-        assert(pathEndsWith(targetFilename, Zstr(".ffs_batch")));
+        assert(endsWith(targetFilename, Zstr(".ffs_batch")));
     }
     else
     {
@@ -2922,7 +2911,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
 
         Zstring defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : Zstr("BatchRun.ffs_batch");
         //attention: activeConfigFiles may be a *.ffs_gui file! We don't want to overwrite it with a BATCH config!
-        if (pathEndsWith(defaultFileName, Zstr(".ffs_gui")))
+        if (endsWith(defaultFileName, Zstr(".ffs_gui")))
             defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_batch");
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
@@ -2957,7 +2946,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 {
     if (lastConfigurationSaved != getConfig())
     {
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
 
         //notify user about changed settings
         if (globalCfg.optDialogs.popupOnConfigChange)
@@ -3017,7 +3006,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
 void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
-    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
 
     wxFileDialog filePicker(this,
                             wxString(),
@@ -3690,9 +3679,9 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     //play (optional) sound notification
     if (!globalCfg.soundFileCompareFinished.empty())
     {
-        const Zstring soundFile = getResourceDirPf() + globalCfg.soundFileCompareFinished;
-        if (fileAvailable(soundFile))
-            wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+        const Zstring soundFilePath = getResourceDirPf() + globalCfg.soundFileCompareFinished;
+        if (fileAvailable(soundFilePath))
+            wxSound::Play(utfCvrtTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
     }
 
     //add to folder history after successful comparison only
@@ -3835,7 +3824,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
     try
     {
         //PERF_START;
-        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath) ? activeConfigFiles[0] : Zstring();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && !equalFilePath(activeConfigFiles[0], lastRunConfigPath_) ? activeConfigFiles[0] : Zstring();
 
         const auto& guiCfg = getConfig();
 
@@ -3882,7 +3871,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
             throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
         //should never happen: sync button is deactivated if they are not in sync
 
-        synchronize(localTime(),
+        synchronize(getLocalTime(),
                     globalCfg.optDialogs,
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
@@ -4020,8 +4009,8 @@ void MainDialog::updateGridViewData()
     size_t foldersOnLeftView  = 0;
     size_t filesOnRightView   = 0;
     size_t foldersOnRightView = 0;
-    std::uint64_t filesizeLeftView  = 0;
-    std::uint64_t filesizeRightView = 0;
+    uint64_t filesizeLeftView  = 0;
+    uint64_t filesizeRightView = 0;
 
     auto updateVisibility = [](ToggleButton* btn, bool shown)
     {
@@ -4187,7 +4176,7 @@ void MainDialog::applySyncConfig()
             warningActive = !dontWarnAgain;
         }
     },
-    nullptr //[&](std::int64_t bytesDelta){ } -> status update while loading db file
+    nullptr //[&](const std::wstring& statusMsg){ } -> status update while loading db file
                                  );
 
     updateGui();
@@ -4639,7 +4628,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     wxBusyCursor dummy;
 
-    const Zstring filepath = utfCvrtTo<Zstring>(filePicker.GetPath());
+    const Zstring filePath = utfCvrtTo<Zstring>(filePicker.GetPath());
 
     //http://en.wikipedia.org/wiki/Comma-separated_values
     const lconv* localInfo = ::localeconv(); //always bound according to doc
@@ -4710,28 +4699,16 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         try
         {
             //write file
-            FileOutput fileOut(filepath, FileOutput::ACC_OVERWRITE); //throw FileError
-            const size_t blockSize = fileOut.getBlockSize();
-            std::string buffer;
+            FileOutput fileOut(filePath, FileOutput::ACC_OVERWRITE, nullptr /*notifyUnbufferedIO*/); //throw FileError
 
-            auto flushBlock = [&]
-            {
-                size_t bytesRemaining = buffer.size();
-                while (bytesRemaining >= blockSize)
-                {
-                    const size_t bytesWritten = fileOut.tryWrite(&*(buffer.end() - bytesRemaining), blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-                    bytesRemaining -= bytesWritten;
-                }
-                buffer.erase(buffer.begin(), buffer.end() - bytesRemaining);
-            };
-
-            buffer += header;
+            fileOut.write(&*header.begin(), header.size()); //throw FileError, (X)
             //main grid: write rows one after the other instead of creating one big string: memory allocation might fail; think 1 million rows!
             /*
             performance test case "export 600.000 rows" to CSV:
             aproach 1. assemble single temporary string, then write file:   4.6s
             aproach 2. write to buffered file output directly for each row: 6.4s
             */
+            std::string buffer;
             const size_t rowCount = m_gridMainL->getRowCount();
             for (size_t row = 0; row < rowCount; ++row)
             {
@@ -4753,10 +4730,11 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
                     buffer += CSV_SEP;
                 }
                 buffer += LINE_BREAK;
-                flushBlock(); //throw FileError
+
+                fileOut.write(&buffer[0], buffer.size()); //throw FileError, (X)
+                buffer.clear();
             }
-            unbufferedSave(buffer, fileOut, nullptr); //throw FileError
-            fileOut.close(); //throw FileError
+            fileOut.finalize(); //throw FileError, (X)
 
             flashStatusInformation(_("File list exported"));
         }

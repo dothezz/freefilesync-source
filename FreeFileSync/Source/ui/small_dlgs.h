@@ -52,7 +52,7 @@ ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig&
 
 ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
-ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
+ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo);
 
 
 enum class ReturnActivationDlg
@@ -67,12 +67,12 @@ ReturnActivationDlg showActivationDialog(wxWindow* parent, const std::wstring& l
 class DownloadProgressWindow //remporary progress info => life-time: stack
 {
 public:
-    DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize);
+    DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, uint64_t fileSize);
     ~DownloadProgressWindow();
 
     struct CancelPressed {};
     void requestUiRefresh(); //throw CancelPressed
-    void notifyProgress(std::uint64_t delta);
+    void notifyProgress(uint64_t delta);
 
 private:
     class Impl;

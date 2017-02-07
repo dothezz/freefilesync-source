@@ -31,9 +31,9 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
     std::set<Zstring, LessFilePath> folderPaths; //make unique
     for (const Zstring& phrase : std::set<Zstring, LessFilePath>(folderPathPhrases.begin(), folderPathPhrases.end()))
     {
-        if (pathStartsWith(trimCpy(phrase), Zstr("ftp:")) ||
-            pathStartsWith(trimCpy(phrase), Zstr("sftp:")) ||
-            pathStartsWith(trimCpy(phrase), Zstr("mtp:")))
+        if (ciStartsWith(trimCpy(phrase), Zstr("ftp:")) ||
+            ciStartsWith(trimCpy(phrase), Zstr("sftp:")) ||
+            ciStartsWith(trimCpy(phrase), Zstr("mtp:")))
             throw FileError(_("The following path does not support directory monitoring:") + L"\n\n" + fmtPath(phrase));
 
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
@@ -78,7 +78,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
         {
             //a non-existent network path may block, so check existence asynchronously!
             auto ftDirAvailable = runAsync([=] { return dirAvailable(folderPath); });
-            
+
             while (ftDirAvailable.wait_for(std::chrono::milliseconds(rts::UI_UPDATE_INTERVAL_MS / 2)) != std::future_status::ready)
                 onRefreshGui(false /*readyForSync*/); //may throw!
 
@@ -128,10 +128,10 @@ WaitResult waitForChanges(const std::vector<Zstring>& folderPathPhrases, //throw
                 erase_if(changedItems, [](const DirWatcher::Entry& e)
                 {
                     return
-                        //pathEndsWith(e.filepath_, Zstr(".ffs_tmp"))  ||
-                        pathEndsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
-                        pathEndsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
-                    //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
+                        //endsWith(e.filepath_, Zstr(".ffs_tmp"))  ||
+                        endsWith(e.filepath_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
+                        endsWith(e.filepath_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
+                    //no need to ignore temporary recycle bin directory: this must be caused by a file deletion anyway
                 });
 
                 if (!changedItems.empty())

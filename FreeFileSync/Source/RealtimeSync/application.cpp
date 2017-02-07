@@ -39,6 +39,8 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
+    //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
+
     ::gtk_rc_parse((zen::getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
@@ -60,10 +62,9 @@ bool Application::OnInit()
         //continue!
     }
 
+
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
-
-    //do not call wxApp::OnInit() to avoid using default commandline parser
 
     //Note: app start is deferred:  -> see FreeFileSync
     Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);

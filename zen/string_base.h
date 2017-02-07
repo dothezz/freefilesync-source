@@ -110,11 +110,11 @@ private:
     struct Descriptor
     {
         Descriptor(size_t len, size_t cap) :
-            length  (static_cast<std::uint32_t>(len)),
-            capacity(static_cast<std::uint32_t>(cap)) {}
+            length  (static_cast<uint32_t>(len)),
+            capacity(static_cast<uint32_t>(cap)) {}
 
-        std::uint32_t length;
-        std::uint32_t capacity; //allocated size without null-termination
+        uint32_t length;
+        uint32_t capacity; //allocated size without null-termination
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
@@ -179,19 +179,19 @@ protected:
     static void setLength(Char* ptr, size_t newLength)
     {
         assert(canWrite(ptr, newLength));
-        descr(ptr)->length = static_cast<std::uint32_t>(newLength);
+        descr(ptr)->length = static_cast<uint32_t>(newLength);
     }
 
 private:
     struct Descriptor
     {
         Descriptor(size_t len, size_t cap) :
-            length  (static_cast<std::uint32_t>(len)),
-            capacity(static_cast<std::uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "The atomic type is always lock-free"
+            length  (static_cast<uint32_t>(len)),
+            capacity(static_cast<uint32_t>(cap)) { static_assert(ATOMIC_INT_LOCK_FREE == 2, ""); } //2: "The atomic type is always lock-free"
 
         std::atomic<unsigned int> refCount { 1 }; //std:atomic is uninitialized by default!
-        std::uint32_t length;
-        std::uint32_t capacity; //allocated size without null-termination
+        uint32_t length;
+        uint32_t capacity; //allocated size without null-termination
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }

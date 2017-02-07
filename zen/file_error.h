@@ -45,14 +45,9 @@ DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 
 //----------- facilitate usage of std::wstring for error messages --------------------
 
-inline
-std::wstring fmtPath(const std::wstring& displayPath)
-{
-    return L'\"' + displayPath + L'\"';
-}
-
+inline std::wstring fmtPath(const std::wstring& displayPath) { return L'\"' + displayPath + L'\"'; }
 inline std::wstring fmtPath(const Zstring& displayPath) { return fmtPath(utfCvrtTo<std::wstring>(displayPath)); }
-inline std::wstring fmtPath(const wchar_t* displayPath) { return fmtPath(std::wstring(displayPath)); }
+inline std::wstring fmtPath(const wchar_t* displayPath) { return fmtPath(std::wstring(displayPath)); } //resolve overload ambiguity
 }
 
 #endif //FILE_ERROR_H_839567308565656789

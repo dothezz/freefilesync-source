@@ -32,7 +32,7 @@ struct TranslationHandler
 
     //C++11: std::wstring should be thread-safe like an int
     virtual std::wstring translate(const std::wstring& text) const = 0; //simple translation
-    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n) const = 0;
+    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int64_t n) const = 0;
 
 private:
     TranslationHandler           (const TranslationHandler&) = delete;
@@ -69,7 +69,7 @@ std::wstring translate(const std::wstring& text)
 //translate plural forms: "%x day" "%x days"
 //returns "1 day" if n == 1; "123 days" if n == 123 for english language
 inline
-std::wstring translate(const std::wstring& singular, const std::wstring& plural, std::int64_t n)
+std::wstring translate(const std::wstring& singular, const std::wstring& plural, int64_t n)
 {
     assert(contains(plural, L"%x"));
 
@@ -87,8 +87,8 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
 template <class T> inline
 std::wstring translate(const std::wstring& singular, const std::wstring& plural, T n)
 {
-    static_assert(sizeof(n) <= sizeof(std::int64_t), "");
-    return translate(singular, plural, static_cast<std::int64_t>(n));
+    static_assert(sizeof(n) <= sizeof(int64_t), "");
+    return translate(singular, plural, static_cast<int64_t>(n));
 }
 
 

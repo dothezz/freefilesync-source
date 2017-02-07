@@ -33,6 +33,7 @@
 #include "../lib/status_handler.h" //updateUiIsAllowed()
 
 
+
 using namespace zen;
 
 
@@ -725,7 +726,7 @@ ReturnSmallDlg::ButtonPressed zen::showOptionsDlg(wxWindow* parent, xmlAccess::X
 class SelectTimespanDlg : public SelectTimespanDlgGenerated
 {
 public:
-    SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo);
+    SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo);
 
 private:
     void OnOkay  (wxCommandEvent& event) override;
@@ -744,12 +745,12 @@ private:
     }
 
     //output-only parameters:
-    std::int64_t& timeFromOut;
-    std::int64_t& timeToOut;
+    int64_t& timeFromOut;
+    int64_t& timeToOut;
 };
 
 
-SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo) :
+SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo) :
     SelectTimespanDlgGenerated(parent),
     timeFromOut(timeFrom),
     timeToOut(timeTo)
@@ -764,8 +765,8 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, s
     m_calendarTo  ->SetWindowStyleFlag(style);
 
     //set default values
-    std::int64_t timeFromTmp = timeFrom;
-    std::int64_t timeToTmp   = timeTo;
+    int64_t timeFromTmp = timeFrom;
+    int64_t timeToTmp   = timeTo;
 
     if (timeToTmp == 0)
         timeToTmp = std::time(nullptr); //
@@ -815,7 +816,7 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, std::int64_t& timeFrom, std::int64_t& timeTo)
+ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo)
 {
     SelectTimespanDlg timeSpanDlg(parent, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
@@ -903,9 +904,9 @@ ReturnActivationDlg zen::showActivationDialog(wxWindow* parent, const std::wstri
 class DownloadProgressWindow::Impl : public DownloadProgressDlgGenerated
 {
 public:
-    Impl(wxWindow* parent, const Zstring& fileName, std::uint64_t fileSize);
+    Impl(wxWindow* parent, const Zstring& fileName, uint64_t fileSize);
 
-    void notifyProgress(std::uint64_t delta) { bytesCurrent_ += delta; }
+    void notifyProgress(uint64_t delta) { bytesCurrent_ += delta; }
 
     void requestUiRefresh() //throw CancelPressed
     {
@@ -932,13 +933,13 @@ private:
     }
 
     bool cancelled_ = false;
-    std::uint64_t bytesCurrent_ = 0;
-    const std::uint64_t bytesTotal_;
+    uint64_t bytesCurrent_ = 0;
+    const uint64_t bytesTotal_;
     const int GAUGE_FULL_RANGE = 1000000;
 };
 
 
-DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize) :
+DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, uint64_t fileSize) :
     DownloadProgressDlgGenerated(parent),
     bytesTotal_(fileSize)
 {
@@ -964,10 +965,10 @@ DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, st
 }
 
 
-zen::DownloadProgressWindow::DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, std::uint64_t fileSize) :
+zen::DownloadProgressWindow::DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, uint64_t fileSize) :
     pimpl_(new DownloadProgressWindow::Impl(parent, filePath, fileSize)) {}
 
 zen::DownloadProgressWindow::~DownloadProgressWindow() { pimpl_->Destroy(); }
 
-void zen::DownloadProgressWindow::notifyProgress(std::uint64_t delta) { pimpl_->notifyProgress(delta); }
+void zen::DownloadProgressWindow::notifyProgress(uint64_t delta) { pimpl_->notifyProgress(delta); }
 void zen::DownloadProgressWindow::requestUiRefresh() { pimpl_->requestUiRefresh(); } //throw CancelPressed

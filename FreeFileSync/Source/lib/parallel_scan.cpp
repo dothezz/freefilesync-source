@@ -261,7 +261,7 @@ private:
 
     std::mutex lockCurrentStatus_; //use a different lock for current file: continue traversing while some thread may process an error
     BasicWString currentFile_;
-    const std::int64_t reportingIntervalMs_;
+    const int64_t reportingIntervalMs_;
 
     const BasicWString textScanning_ { copyStringTo<BasicWString>(_("Scanning:")) }; //this one is (currently) not shared and could be made a std::wstring, but we stay consistent and use thread-safe variables in this class only!
 

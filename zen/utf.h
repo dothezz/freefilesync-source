@@ -56,8 +56,8 @@ size_t findUnicodePos(const UtfString& str, size_t unicodePos); //return positio
 //----------------------- implementation ----------------------------------
 namespace implementation
 {
-using CodePoint = std::uint32_t;
-using Char16    = std::uint16_t;
+using CodePoint = uint32_t;
+using Char16    = uint16_t;
 using Char8     = unsigned char;
 
 const CodePoint LEAD_SURROGATE      = 0xd800;

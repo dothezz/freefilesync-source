@@ -17,10 +17,10 @@
 
 namespace zen
 {
-XmlDoc loadXmlDocument(const Zstring& filepath); //throw FileError
-void checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath); //throw FileError
+XmlDoc loadXmlDocument(const Zstring& filePath); //throw FileError
+void checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filePath); //throw FileError
 
-void saveXmlDocument(const XmlDoc& doc, const Zstring& filepath); //throw FileError
+void saveXmlDocument(const XmlDoc& doc, const Zstring& filePath); //throw FileError
 }
 
 #endif //XML_IO_H_8914759321263879

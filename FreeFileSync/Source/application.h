@@ -20,6 +20,7 @@ private:
     int  OnRun() override;
     int  OnExit() override;
     bool OnExceptionInMainLoop() override { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
+    void OnUnhandledException () override { throw; } //just re-throw and avoid display of additional messagebox
 
     void onEnterEventLoop(wxEvent& event);
     void onQueryEndSession(wxEvent& event);

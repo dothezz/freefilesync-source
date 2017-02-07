@@ -11,28 +11,43 @@
 #include "serialize.h"
 
 
-
 namespace zen
 {
     const char LINE_BREAK[] = "\n"; //since OS X apple uses newline, too
 
-//OS-buffered file IO optimized for sequential read/write accesses + better error reporting + long path support + following symlinks
-
-    using FileHandle = int;
-
+/*
+OS-buffered file IO optimized for
+    - sequential read/write accesses
+    - better error reporting
+    - long path support
+    - follows symlinks
+    */
 class FileBase
 {
 public:
-    const Zstring& getFilePath() const { return filename_; }
+    const Zstring& getFilePath() const { return filePath_; }
+
+    using FileHandle = int;
+
+    FileHandle getHandle() { return fileHandle_; }
+
+    //Windows: use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632
+    //Linux: use st_blksize?
+    static size_t getBlockSize() { return 128 * 1024; };
 
 protected:
-    FileBase(const Zstring& filename) : filename_(filename)  {}
+    FileBase(FileHandle handle, const Zstring& filePath) : fileHandle_(handle), filePath_(filePath) {}
+    ~FileBase();
+
+    void close(); //throw FileError -> optional, but good place to catch errors when closing stream!
+    static const FileHandle invalidHandleValue;
 
 private:
     FileBase           (const FileBase&) = delete;
     FileBase& operator=(const FileBase&) = delete;
 
-    const Zstring filename_;
+    FileHandle fileHandle_ = invalidHandleValue;
+    const Zstring filePath_;
 };
 
 //-----------------------------------------------------------------------------------------------
@@ -40,19 +55,16 @@ private:
 class FileInput : public FileBase
 {
 public:
-    FileInput(const Zstring& filePath);                    //throw FileError, ErrorFileLocked
-    FileInput(FileHandle handle, const Zstring& filePath); //takes ownership!
-    ~FileInput();
+    FileInput(const Zstring& filePath, const IOCallback& notifyUnbufferedIO); //throw FileError, ErrorFileLocked
+    FileInput(FileHandle handle, const Zstring& filePath, const IOCallback& notifyUnbufferedIO); //takes ownership!
 
-    //Windows: better use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632
-    //Linux: use st_blksize?
-    size_t getBlockSize() const { return 128 * 1024; }
-    size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
-
-    FileHandle getHandle() { return fileHandle; }
+    size_t read(void* buffer, size_t bytesToRead); //throw FileError, X; return "bytesToRead" bytes unless end of stream!
 
 private:
-    FileHandle fileHandle;
+    size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
+
+    std::vector<char> memBuf_;
+    const IOCallback notifyUnbufferedIO_; //throw X
 };
 
 
@@ -64,42 +76,47 @@ public:
         ACC_OVERWRITE,
         ACC_CREATE_NEW
     };
-
-    FileOutput(const Zstring& filePath, AccessFlag access); //throw FileError, ErrorTargetExisting
-    FileOutput(FileHandle handle, const Zstring& filePath); //takes ownership!
+    FileOutput(const Zstring& filePath, AccessFlag access, const IOCallback& notifyUnbufferedIO); //throw FileError, ErrorTargetExisting
+    FileOutput(FileHandle handle, const Zstring& filePath, const IOCallback& notifyUnbufferedIO); //takes ownership!
     ~FileOutput();
 
-    FileOutput(FileOutput&& tmp);
+    void preAllocateSpaceBestEffort(uint64_t expectedSize); //throw FileError
 
-    size_t getBlockSize() const { return 128 * 1024; }
-    size_t tryWrite(const void* buffer, size_t bytesToWrite); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-
-    void close(); //throw FileError   -> optional, but good place to catch errors when closing stream!
-    FileHandle getHandle() { return fileHandle; }
+    void write(const void* buffer, size_t bytesToWrite); //throw FileError, X
+    void flushBuffers();                                 //throw FileError, X
+    void finalize(); /*= flushBuffers() + close()*/      //throw FileError, X
 
 private:
-    FileHandle fileHandle;
+    size_t tryWrite(const void* buffer, size_t bytesToWrite); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+
+    std::vector<char> memBuf_;
+    const IOCallback notifyUnbufferedIO_; //throw X
 };
 
+//-----------------------------------------------------------------------------------------------
 
 //native stream I/O convenience functions:
 
 template <class BinContainer> inline
 BinContainer loadBinContainer(const Zstring& filePath, //throw FileError
-                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
+                              const IOCallback& notifyUnbufferedIO)
 {
-    FileInput streamIn(filePath); //throw FileError, ErrorFileLocked
-    return unbufferedLoad<BinContainer>(streamIn, notifyProgress); //throw FileError
+    FileInput streamIn(filePath, notifyUnbufferedIO); //throw FileError, ErrorFileLocked
+    return bufferedLoad<BinContainer>(streamIn); //throw FileError, X;
 }
 
 
 template <class BinContainer> inline
 void saveBinContainer(const Zstring& filePath, const BinContainer& buffer, //throw FileError
-                      const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //optional
+                      const IOCallback& notifyUnbufferedIO)
 {
-    FileOutput fileOut(filePath, FileOutput::ACC_OVERWRITE); //
-    unbufferedSave(buffer, fileOut, notifyProgress);         //throw FileError
-    fileOut.close();                                         //
+    FileOutput fileOut(filePath, FileOutput::ACC_OVERWRITE, notifyUnbufferedIO); //throw FileError, (ErrorTargetExisting)
+    if (!buffer.empty())
+    {
+        /*snake oil?*/ fileOut.preAllocateSpaceBestEffort(buffer.size()); //throw FileError
+        fileOut.write(&*buffer.begin(), buffer.size()); //throw FileError, X
+    }
+    fileOut.finalize();                                 //throw FileError, X
 }
 }
 

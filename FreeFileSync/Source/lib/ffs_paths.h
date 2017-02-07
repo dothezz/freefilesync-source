@@ -14,8 +14,8 @@ namespace zen
 //------------------------------------------------------------------------------
 //global program directories
 //------------------------------------------------------------------------------
-Zstring getResourceDirPf(); //resource directory WITH path separator at end
-Zstring getConfigDirPathPf  (); //config directory WITH path separator at end
+Zstring getResourceDirPf  (); //resource directory WITH trailing path separator
+Zstring getConfigDirPathPf(); //config directory WITH trailing path separator
 //------------------------------------------------------------------------------
 
 bool isPortableVersion();

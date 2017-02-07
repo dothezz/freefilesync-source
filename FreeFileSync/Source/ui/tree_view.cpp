@@ -118,10 +118,10 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
 namespace
 {
 //generate nice percentage numbers which precisely sum up to 100
-void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
+void calcPercentage(std::vector<std::pair<uint64_t, int*>>& workList)
 {
-    const std::uint64_t total = std::accumulate(workList.begin(), workList.end(), std::uint64_t(),
-    [](std::uint64_t sum, const std::pair<std::uint64_t, int*>& pair) { return sum + pair.first; });
+    const uint64_t total = std::accumulate(workList.begin(), workList.end(), uint64_t(),
+    [](uint64_t sum, const std::pair<uint64_t, int*>& pair) { return sum + pair.first; });
 
     if (total == 0U) //this case doesn't work with the error minimizing algorithm below
     {
@@ -144,12 +144,12 @@ void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
     if (remainingPercent > 0)
     {
         std::nth_element(workList.begin(), workList.begin() + remainingPercent - 1, workList.end(),
-                         [total](const std::pair<std::uint64_t, int*>& lhs, const std::pair<std::uint64_t, int*>& rhs)
+                         [total](const std::pair<uint64_t, int*>& lhs, const std::pair<uint64_t, int*>& rhs)
         {
             return lhs.first * 100U % total > rhs.first * 100U % total;
         });
 
-        std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<std::uint64_t, int*>& pair) { ++*pair.second; });
+        std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<uint64_t, int*>& pair) { ++*pair.second; });
     }
 }
 }
@@ -157,6 +157,9 @@ void calcPercentage(std::vector<std::pair<std::uint64_t, int*>>& workList)
 
 std::wstring zen::getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight)
 {
+	warn_static("refactor using AfsPath")
+		warn_static("next: get rid of int cmpFilePath(const wchar_t*) on Linux/OS X!")
+
     const wchar_t sep = L'/';
     std::wstring fmtPathL = displayPathLeft;
     std::wstring fmtPathR = displayPathRight;
@@ -229,7 +232,7 @@ struct TreeView::LessShortName
         switch (lhs.type_)
         {
             case TreeView::TYPE_ROOT:
-                return makeSortDirection(LessFilePath(), Int2Type<ascending>())(static_cast<const RootNodeImpl*>(lhs.node_)->displayName,
+                return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(static_cast<const RootNodeImpl*>(lhs.node_)->displayName,
                                                                                 static_cast<const RootNodeImpl*>(rhs.node_)->displayName);
 
             case TreeView::TYPE_DIRECTORY:
@@ -242,7 +245,7 @@ struct TreeView::LessShortName
                 else if (!folderR)
                     return true;
 
-                return makeSortDirection(LessFilePath(), Int2Type<ascending>())(folderL->getPairItemName(), folderR->getPairItemName());
+                return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(folderL->getPairItemName(), folderR->getPairItemName());
             }
 
             case TreeView::TYPE_FILES:
@@ -257,7 +260,7 @@ struct TreeView::LessShortName
 template <bool ascending>
 void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi columnType)
 {
-    auto getBytes = [](const TreeLine& line) -> std::uint64_t
+    auto getBytes = [](const TreeLine& line) -> uint64_t
     {
         switch (line.type_)
         {
@@ -308,7 +311,7 @@ void TreeView::getChildren(const Container& cont, unsigned int level, std::vecto
 {
     output.clear();
     output.reserve(cont.subDirs.size() + 1); //keep pointers in "workList" valid
-    std::vector<std::pair<std::uint64_t, int*>> workList;
+    std::vector<std::pair<uint64_t, int*>> workList;
 
     for (const DirNodeImpl& subDir : cont.subDirs)
     {
@@ -378,7 +381,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
         //this were only possible if we replaced "std::vector<RootNodeImpl>" with "Container"!
 
         flatTree.reserve(folderCmpView.size()); //keep pointers in "workList" valid
-        std::vector<std::pair<std::uint64_t, int*>> workList;
+        std::vector<std::pair<uint64_t, int*>> workList;
 
         for (const RootNodeImpl& root : folderCmpView)
         {

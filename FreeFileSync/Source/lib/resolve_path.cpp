@@ -7,6 +7,7 @@
 #include <zen/optional.h>
 #include <zen/scope_guard.h>
 #include <zen/globals.h>
+#include <zen/file_access.h>
 
     #include <stdlib.h> //getenv()
     #include <unistd.h> //getcwd
@@ -84,19 +85,19 @@ Opt<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
                           const std::vector<std::pair<Zstring, Zstring>>& ext) //return nullptr if not resolved
 {
     //there exist environment variables named %TIME%, %DATE% so check for our internal macros first!
-    if (equalNoCase(macro, Zstr("time")))
+    if (ciEqual(macro, Zstr("time")))
         return formatTime<Zstring>(Zstr("%H%M%S"));
 
-    if (equalNoCase(macro, Zstr("date")))
+    if (ciEqual(macro, Zstr("date")))
         return formatTime<Zstring>(FORMAT_ISO_DATE);
 
-    if (equalNoCase(macro, Zstr("timestamp")))
+    if (ciEqual(macro, Zstr("timestamp")))
         return formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S")); //e.g. "2012-05-15 131513"
 
     Zstring timeStr;
     auto resolveTimePhrase = [&](const Zchar* phrase, const Zchar* format) -> bool
     {
-        if (!equalNoCase(macro, phrase))
+        if (!ciEqual(macro, phrase))
             return false;
 
         timeStr = formatTime<Zstring>(format);
@@ -114,7 +115,7 @@ Opt<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
 
     //check domain-specific extensions
     {
-        auto it = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return equalNoCase(macro, p.first); });
+        auto it = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return ciEqual(macro, p.first); });
         if (it != ext.end())
             return it->second;
     }
@@ -207,7 +208,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirPath, std::set<Zstring, Less
             const Zstring& macroName = item.first;
             const Zstring& macroPath = item.second;
 
-            const Zstring pathSubst = pathReplaceCpy(dirPath, macroPath, MACRO_SEP + macroName + MACRO_SEP);
+            const Zstring pathSubst = ciReplaceCpy(dirPath, macroPath, MACRO_SEP + macroName + MACRO_SEP); //ci on Linux, too? okay
             if (pathSubst != dirPath)
                 output.insert(pathSubst);
         }
@@ -248,8 +249,8 @@ Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
 
     //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
     trim(path, true, false);
-    while (endsWith(path, Zstr(' '))) //don't remove any whitespace from right, e.g. 0xa0 may be used as part of folder name
-        path.pop_back();
+    //don't remove all whitespace from right, e.g. 0xa0 may be used as part of folder name
+    trim(path, false, true, [](Zchar c) { return c == Zstr(' '); });
 
 
     path = expandVolumeName(path); //may block for slow USB sticks and idle HDDs!
@@ -268,15 +269,15 @@ Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
      */
     path = resolveRelativePath(path);
 
-    auto isVolumeRoot = [](const Zstring& dirPath)
-    {
-        return dirPath == "/";
-    };
-
     //remove trailing slash, unless volume root:
-    if (endsWith(path, FILE_NAME_SEPARATOR))
-        if (!isVolumeRoot(path))
-            path = beforeLast(path, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+    if (Opt<PathComponents> pc = getPathComponents(path))
+    {
+        //keep this brace for GCC: -Wparentheses
+        if (pc->relPath.empty())
+            path = pc->rootPath;
+        else
+            path = appendSeparator(pc->rootPath) + pc->relPath;
+    }
 
     return path;
 }

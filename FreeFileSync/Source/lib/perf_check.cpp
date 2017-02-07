@@ -77,8 +77,8 @@ zen::Opt<double> PerfCheck::getRemainingTimeSec(double dataRemaining) const
         const auto& itemFront = *blk.first;
         const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const std::int64_t timeDeltaMs = itemBack.first   - itemFront.first;
-        const double       bytesDelta   = itemBack.second.bytes_ - itemFront.second.bytes_;
+        const int64_t timeDeltaMs = itemBack.first   - itemFront.first;
+        const double  bytesDelta   = itemBack.second.bytes_ - itemFront.second.bytes_;
 
         //objects model logical operations *NOT* disk accesses, so we better play safe and use "bytes" only!
         //http://sourceforge.net/p/freefilesync/feature-requests/197/
@@ -98,11 +98,11 @@ zen::Opt<std::wstring> PerfCheck::getBytesPerSecond() const
         const auto& itemFront = *blk.first;
         const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const std::int64_t timeDeltaMs = itemBack.first   - itemFront.first;
+        const int64_t timeDeltaMs = itemBack.first   - itemFront.first;
         const double       bytesDelta  = itemBack.second.bytes_ - itemFront.second.bytes_;
 
         if (timeDeltaMs != 0)
-            return filesizeToShortString(static_cast<std::int64_t>(bytesDelta * 1000.0 / timeDeltaMs)) + _("/sec");
+            return filesizeToShortString(static_cast<int64_t>(bytesDelta * 1000.0 / timeDeltaMs)) + _("/sec");
     }
     return NoValue();
 }
@@ -179,7 +179,7 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
         const double X = dataCurrent - dataLast;
         dataLast = dataCurrent;
 
-        const std::int64_t timeCurrent = wxGetLocalTimeMillis();
+        const int64_t timeCurrent = wxGetLocalTimeMillis();
         const double F = (timeCurrent - timeLast).ToDouble();
         timeLast = timeCurrent;
 
@@ -204,7 +204,7 @@ wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
         const double X = dataCurrent - dataLast; //do not set dataLast, timeLast variables here, but write dummy record instead
         if (!isNull(X))
         {
-            const std::int64_t timeCurrent = wxGetLocalTimeMillis();
+            const int64_t timeCurrent = wxGetLocalTimeMillis();
             const double F = (timeCurrent - timeLast).ToDouble();
 
             record modifyEntry;

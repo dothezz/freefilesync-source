@@ -77,9 +77,15 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
 
-    const Zstring currentConfigFile = !cfgFileName.empty() ? cfgFileName : lastRunConfigPath_;
+    Zstring currentConfigFile = cfgFileName;
+    if (currentConfigFile.empty())
+    {
+        if (!itemNotExisting(lastRunConfigPath_)) //existing/access error? => user should be informed about access errors
+            currentConfigFile = lastRunConfigPath_;
+    }
+
     bool loadCfgSuccess = false;
-    if (!cfgFileName.empty() || fileExists(lastRunConfigPath_))
+    if (!currentConfigFile.empty())
         try
         {
             std::wstring warningMsg;
@@ -208,7 +214,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
     Zstring defaultFileName = currentConfigFileName_.empty() ? Zstr("Realtime.ffs_real") : currentConfigFileName_;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-    if (pathEndsWith(defaultFileName, Zstr(".ffs_batch")))
+    if (endsWith(defaultFileName, Zstr(".ffs_batch")))
         defaultFileName = beforeLast(defaultFileName, Zstr("."), IF_MISSING_RETURN_NONE) + Zstr(".ffs_real");
 
     wxFileDialog filePicker(this,

@@ -23,8 +23,11 @@ struct TimeComp //replaces std::tm and SYSTEMTIME
     int second = 0; //0-60 (including leap second)
 };
 
-TimeComp localTime   (time_t utc = std::time(nullptr)); //convert time_t (UTC) to local time components
+TimeComp getLocalTime(time_t utc = std::time(nullptr)); //convert time_t (UTC) to local time components
 time_t   localToTimeT(const TimeComp& comp);            //convert local time components to time_t (UTC), returns -1 on error
+
+TimeComp getUtcTime(time_t utc = std::time(nullptr)); //convert time_t (UTC) to UTC time components
+time_t   utcToTimeT(const TimeComp& comp);            //convert UTC time components to time_t (UTC), returns -1 on error
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +38,7 @@ format (current) date and time; example:
         formatTime<std::wstring>(FORMAT_TIME); -> "17:55:34"
 */
 template <class String, class String2>
-String formatTime(const String2& format, const TimeComp& comp = localTime()); //format as specified by "std::strftime", returns empty string on failure
+String formatTime(const String2& format, const TimeComp& comp = getLocalTime()); //format as specified by "std::strftime", returns empty string on failure
 
 //the "format" parameter of formatTime() is partially specialized with the following type tags:
 const struct FormatDateTag     {} FORMAT_DATE      = {}; //%x - locale dependent date representation: e.g. 08/23/01
@@ -227,14 +230,24 @@ String formatTime(FormatType, const TimeComp& comp, PredefinedFormatTag)
 
 
 inline
-TimeComp localTime(time_t utc)
+TimeComp getLocalTime(time_t utc)
 {
-    std::tm lt = {};
-
-    if (::localtime_r(&utc, &lt) == nullptr)
+    std::tm comp = {};
+    if (::localtime_r(&utc, &comp) == nullptr)
         return TimeComp();
 
-    return implementation::toZenTimeComponents(lt);
+    return implementation::toZenTimeComponents(comp);
+}
+
+
+inline
+TimeComp getUtcTime(time_t utc)
+{
+    std::tm comp = {};
+    if (::gmtime_r(&utc, &comp) == nullptr)
+        return TimeComp();
+
+    return implementation::toZenTimeComponents(comp);
 }
 
 
@@ -243,6 +256,15 @@ time_t localToTimeT(const TimeComp& comp) //returns -1 on error
 {
     std::tm ctc = implementation::toClibTimeComponents(comp);
     return std::mktime(&ctc);
+}
+
+
+inline
+time_t utcToTimeT(const TimeComp& comp) //returns -1 on error
+{
+    std::tm ctc = implementation::toClibTimeComponents(comp);
+    ctc.tm_isdst = 0; //"Zero (0) to indicate that standard time is in effect" => unused by _mkgmtime, but take no chances
+    return ::timegm(&ctc);
 }
 
 

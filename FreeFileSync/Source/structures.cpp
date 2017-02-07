@@ -280,9 +280,9 @@ int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 */
 
 
-std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
+int64_t resolve(size_t value, UnitTime unit, int64_t defaultVal)
 {
-    TimeComp locTimeStruc = zen::localTime();
+    TimeComp locTimeStruc = zen::getLocalTime();
 
     switch (unit)
     {
@@ -305,7 +305,7 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
         //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday   0-6
         //    // +6 == -1 in Z_7
 
-        //    return std::int64_t(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
+        //    return int64_t(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
         //}
 
         case UnitTime::THIS_MONTH:
@@ -327,7 +327,7 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
             locTimeStruc.second = 0; //0-61
             locTimeStruc.minute = 0; //0-59
             locTimeStruc.hour   = 0; //0-23
-            return localToTimeT(locTimeStruc) - std::int64_t(value) * 24 * 3600;
+            return localToTimeT(locTimeStruc) - static_cast<int64_t>(value) * 24 * 3600;
     }
 
     assert(false);
@@ -335,9 +335,9 @@ std::int64_t resolve(size_t value, UnitTime unit, std::int64_t defaultVal)
 }
 
 
-std::uint64_t resolve(size_t value, UnitSize unit, std::uint64_t defaultVal)
+uint64_t resolve(size_t value, UnitSize unit, uint64_t defaultVal)
 {
-    const std::uint64_t maxVal = std::numeric_limits<std::uint64_t>::max();
+    const uint64_t maxVal = std::numeric_limits<uint64_t>::max();
 
     switch (unit)
     {
@@ -360,13 +360,13 @@ std::uint64_t resolve(size_t value, UnitSize unit, std::uint64_t defaultVal)
 void zen::resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
                        size_t sizeMin,  UnitSize unitSizeMin,
                        size_t sizeMax,  UnitSize unitSizeMax,
-                       std::int64_t&  timeFrom,  //unit: UTC time, seconds
-                       std::uint64_t& sizeMinBy, //unit: bytes
-                       std::uint64_t& sizeMaxBy) //unit: bytes
+                       int64_t&  timeFrom,  //unit: UTC time, seconds
+                       uint64_t& sizeMinBy, //unit: bytes
+                       uint64_t& sizeMaxBy) //unit: bytes
 {
-    timeFrom  = resolve(timeSpan, unitTimeSpan, std::numeric_limits<std::int64_t>::min());
+    timeFrom  = resolve(timeSpan, unitTimeSpan, std::numeric_limits<int64_t>::min());
     sizeMinBy = resolve(sizeMin,  unitSizeMin, 0U);
-    sizeMaxBy = resolve(sizeMax,  unitSizeMax, std::numeric_limits<std::uint64_t>::max());
+    sizeMaxBy = resolve(sizeMax,  unitSizeMax, std::numeric_limits<uint64_t>::max());
 }
 
 
@@ -386,9 +386,9 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
     trim(out.excludeFilter, true, false);
 
     //soft filter
-    std::int64_t  loctimeFrom  = 0;
-    std::uint64_t locSizeMinBy = 0;
-    std::uint64_t locSizeMaxBy = 0;
+    int64_t  loctimeFrom  = 0;
+    uint64_t locSizeMinBy = 0;
+    uint64_t locSizeMaxBy = 0;
     resolveUnits(out.timeSpan, out.unitTimeSpan,
                  out.sizeMin,  out.unitSizeMin,
                  out.sizeMax,  out.unitSizeMax,
@@ -397,9 +397,9 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
                  locSizeMaxBy); //unit: bytes
 
     //soft filter
-    std::int64_t  glotimeFrom  = 0;
-    std::uint64_t gloSizeMinBy = 0;
-    std::uint64_t gloSizeMaxBy = 0;
+    int64_t  glotimeFrom  = 0;
+    uint64_t gloSizeMinBy = 0;
+    uint64_t gloSizeMaxBy = 0;
     resolveUnits(global.timeSpan, global.unitTimeSpan,
                  global.sizeMin,  global.unitSizeMin,
                  global.sizeMax,  global.unitSizeMax,

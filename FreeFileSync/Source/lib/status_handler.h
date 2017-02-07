@@ -42,8 +42,8 @@ struct Statistics
     virtual int getItemsCurrent(ProcessCallback::Phase phaseId) const = 0;
     virtual int getItemsTotal  (ProcessCallback::Phase phaseId) const = 0;
 
-    virtual std::int64_t getBytesCurrent(ProcessCallback::Phase phaseId) const = 0;
-    virtual std::int64_t getBytesTotal  (ProcessCallback::Phase phaseId) const = 0;
+    virtual int64_t getBytesCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual int64_t getBytesTotal  (ProcessCallback::Phase phaseId) const = 0;
 
     virtual const std::wstring& currentStatusText() const = 0;
 };
@@ -58,14 +58,14 @@ public:
 
 protected:
     //implement parts of ProcessCallback
-    void initNewPhase(int itemsTotal, std::int64_t bytesTotal, Phase phaseId) override //may throw
+    void initNewPhase(int itemsTotal, int64_t bytesTotal, Phase phaseId) override //may throw
     {
         currentPhase_ = phaseId;
         refNumbers(numbersTotal_, currentPhase_) = std::make_pair(itemsTotal, bytesTotal);
     }
 
-    void updateProcessedData(int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersCurrent_, itemsDelta, bytesDelta); } //note: these methods MUST NOT throw in order
-    void updateTotalData    (int itemsDelta, std::int64_t bytesDelta) override { updateData(numbersTotal_, itemsDelta, bytesDelta); }   //to properly allow undoing setting of statistics!
+    void updateProcessedData(int itemsDelta, int64_t bytesDelta) override { updateData(numbersCurrent_, itemsDelta, bytesDelta); } //note: these methods MUST NOT throw in order
+    void updateTotalData    (int itemsDelta, int64_t bytesDelta) override { updateData(numbersTotal_, itemsDelta, bytesDelta); }   //to properly allow undoing setting of statistics!
 
     void requestUiRefresh() override //throw X
     {
@@ -99,24 +99,24 @@ protected:
     int getItemsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
     int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).first; }
 
-    std::int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    std::int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).second; }
+    int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
+    int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).second; }
 
     const std::wstring& currentStatusText() const override { return statusText_; }
 
     bool abortIsRequested() const { return abortRequested; }
 
 private:
-    using StatNumbers = std::vector<std::pair<int, std::int64_t>>;
+    using StatNumbers = std::vector<std::pair<int, int64_t>>;
 
-    void updateData(StatNumbers& num, int itemsDelta, std::int64_t bytesDelta)
+    void updateData(StatNumbers& num, int itemsDelta, int64_t bytesDelta)
     {
         auto& st = refNumbers(num, currentPhase_);
         st.first  += itemsDelta;
         st.second += bytesDelta;
     }
 
-    static const std::pair<int, std::int64_t>& refNumbers(const StatNumbers& num, Phase phaseId)
+    static const std::pair<int, int64_t>& refNumbers(const StatNumbers& num, Phase phaseId)
     {
         switch (phaseId)
         {
@@ -133,7 +133,7 @@ private:
         return num[3]; //dummy entry!
     }
 
-    static std::pair<int, std::int64_t>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, std::int64_t>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
+    static std::pair<int, int64_t>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, int64_t>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
 
     Phase currentPhase_ = PHASE_NONE;
     StatNumbers numbersCurrent_;

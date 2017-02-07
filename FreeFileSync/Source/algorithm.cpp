@@ -27,9 +27,10 @@ using namespace zen;
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [](BaseFolderPair& baseFolder) { baseFolder.flip(); });
+
     redetermineSyncDirection(config, folderCmp,
-                             nullptr,  //onReportWarning
-                             nullptr); //onUpdateStatus -> status update while loading db file
+                             nullptr,  //reportWarning
+                             nullptr); //notifyStatus
 }
 
 //----------------------------------------------------------------------------------------------
@@ -676,7 +677,7 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
                                    BaseFolderPair& baseFolder,
                                    const std::function<void(const std::wstring& msg)>& reportWarning,
-                                   const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                                   const std::function<void(const std::wstring& msg)>& notifyStatus)
 {
     //try to load sync-database files
     std::shared_ptr<InSyncFolder> lastSyncState;
@@ -686,7 +687,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
             if (allItemsCategoryEqual(baseFolder))
                 return; //nothing to do: abort and don't even try to open db files
 
-            lastSyncState = loadLastSynchronousState(baseFolder, notifyProgress); //throw FileError, FileErrorDatabaseNotExisting
+            lastSyncState = loadLastSynchronousState(baseFolder, notifyStatus); //throw FileError, FileErrorDatabaseNotExisting
         }
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than confuse users
         catch (const FileError& e) //e.g. incompatible database version
@@ -717,7 +718,7 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
 void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
                                    FolderComparison& folderCmp,
                                    const std::function<void(const std::wstring& msg)>& reportWarning,
-                                   const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                                   const std::function<void(const std::wstring& msg)>& notifyStatus)
 {
     if (folderCmp.empty())
         return;
@@ -730,7 +731,7 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
     {
         const DirectionConfig& cfg = directCfgs[it - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **it, reportWarning, notifyProgress);
+        redetermineSyncDirection(cfg, **it, reportWarning, notifyStatus);
     }
 }
 
@@ -1045,12 +1046,12 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 class FilterByTimeSpan
 {
 public:
-    static void execute(HierarchyObject& hierObj, std::int64_t timeFrom, std::int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
+    static void execute(HierarchyObject& hierObj, int64_t timeFrom, int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
 
 private:
     FilterByTimeSpan(HierarchyObject& hierObj,
-                     std::int64_t timeFrom,
-                     std::int64_t timeTo) :
+                     int64_t timeFrom,
+                     int64_t timeTo) :
         timeFrom_(timeFrom),
         timeTo_(timeTo) { recurse(hierObj); }
 
@@ -1099,12 +1100,12 @@ private:
                obj.template getLastWriteTime<side>() <= timeTo_;
     }
 
-    const std::int64_t timeFrom_;
-    const std::int64_t timeTo_;
+    const int64_t timeFrom_;
+    const int64_t timeTo_;
 };
 
 
-void zen::applyTimeSpanFilter(FolderComparison& folderCmp, std::int64_t timeFrom, std::int64_t timeTo)
+void zen::applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t timeTo)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseFolderPair& baseFolder) { FilterByTimeSpan::execute(baseFolder, timeFrom, timeTo); });
 }
@@ -1149,60 +1150,95 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
     {
         callback.reportInfo(replaceCpy(statusText, L"%x", fmtPath(displayPath)));
     };
-
     const std::wstring txtCreatingFile  (_("Creating file %x"         ));
     const std::wstring txtCreatingFolder(_("Creating folder %x"       ));
     const std::wstring txtCreatingLink  (_("Creating symbolic link %x"));
 
-    auto copyItem = [&](const FileSystemObject& fsObj, const AbstractPath& targetPath) //throw FileError
+    auto copyItem = [overwriteIfExists](const AbstractPath& targetPath, //throw FileError
+                                        const std::function<void(const std::function<void()>& deleteTargetItem)>& copyItemPlain) //throw FileError
     {
-        const std::function<void()> removeTargetItem = [&]
+        Opt<FileError> deleteError; //files are copied with "transactionalCopy = true" => handle already existing target BEFORE failing after an expensive copy
+
+        auto tryDeleteTargetItem = [&]
         {
             if (overwriteIfExists)
-                try
-                {
-                    //file or (broken) file-symlink:
-                    AFS::removeFilePlain(targetPath); //throw FileError
-                }
-                catch (FileError&)
-                {
-                    //(folder-)symlink:
-                    bool symlinkExists = false;
-                    try
-                    {
-                        if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(targetPath)) //throw FileError
-                            symlinkExists = *type == AFS::ItemType::SYMLINK;
-                        else
-                            return;
-                    }
-                    catch (FileError&) {} //previous exception is more relevant
-
-                    if (symlinkExists)
-                        AFS::removeSymlinkPlain(targetPath); //throw FileError
-                    else //overwrite AFS::ItemType::FOLDER with FILE? => highly dubious, do not allow
-                        throw;
-                }
+                try { AFS::removeFilePlain(targetPath); /*throw FileError*/ }
+                catch (const FileError& e) { deleteError = e; } //probably "not existing" error, defer evaluation
         };
 
-        visitFSObject(fsObj, [&](const FolderPair& folder)
+        try
+        {
+            copyItemPlain(tryDeleteTargetItem); //throw FileError
+        }
+        catch (FileError&)
+        {
+            Opt<AFS::PathDetails> pd;
+            try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+            catch (FileError&) {} //previous exception is more relevant
+
+            if (pd)
+            {
+                if (pd->relPath.empty()) //already existing
+                {
+                    if (deleteError)
+                        throw* deleteError;
+                }
+                else if (pd->relPath.size() > 1) //parent folder missing
+                {
+                    AbstractPath intermediatePath = pd->existingPath;
+                    for (const Zstring& itemName : std::vector<Zstring>(pd->relPath.begin(), pd->relPath.end() - 1))
+                        AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
+
+                    //retry:
+                    copyItemPlain(nullptr /*deleteTargetItem*/); //throw FileError
+                    return;
+                }
+            }
+            throw;
+        }
+    };
+
+    for (const FileSystemObject* fsObj : rowsToCopy)
+        tryReportingError([&]
+    {
+        const Zstring& relPath = keepRelPaths ? fsObj->getRelativePath<side>() : fsObj->getItemName<side>();
+        const AbstractPath sourcePath = fsObj->getAbstractPath<side>();
+        const AbstractPath targetPath = AFS::appendRelPath(targetFolderPath, relPath);
+
+        visitFSObject(*fsObj, [&](const FolderPair& folder)
         {
             StatisticsReporter statReporter(1, 0, callback);
             notifyItemCopy(txtCreatingFolder, AFS::getDisplayPath(targetPath));
             try
             {
-                //removeTargetItem(); -> never delete pre-existing folders!!! => might delete child items we just copied before!
-                AFS::copyNewFolder(folder.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
+                AFS::createFolderPlain(targetPath); //throw FileError
+                statReporter.reportDelta(1, 0);
             }
             catch (FileError&)
             {
-                bool folderAlreadyExists = false;
-                try { folderAlreadyExists = AFS::getItemType(targetPath) == AFS::ItemType::FOLDER; } /*throw FileError*/ catch (FileError&) {} //previous exception is more relevant
+                Opt<AFS::PathDetails> pd;
+                try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+                catch (FileError&) {} //previous exception is more relevant
 
-                if (!folderAlreadyExists)
-                    throw;
-                //folder might already exist: see creation of intermediate directories below
+                if (pd)
+                {
+                    if (pd->relPath.empty()) //already existing
+                    {
+                        if (pd->existingType != AFS::ItemType::FILE)
+                            return; //folder might already exist: see creation of intermediate directories below
+                    }
+                    else if (pd->relPath.size() > 1) //parent folder missing
+                    {
+                        AbstractPath intermediatePath = pd->existingPath;
+                        for (const Zstring& itemName : pd->relPath)
+                            AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
+
+                        statReporter.reportDelta(1, 0);
+                        return;
+                    }
+                }
+                throw;
             }
-            statReporter.reportDelta(1, 0);
         },
 
         [&](const FilePair& file)
@@ -1210,9 +1246,13 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             StatisticsReporter statReporter(1, file.getFileSize<side>(), callback);
             notifyItemCopy(txtCreatingFile, AFS::getDisplayPath(targetPath));
 
-            auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
-            AFS::copyFileTransactional(file.getAbstractPath<side>(), targetPath, //throw FileError, ErrorFileLocked
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, removeTargetItem, onNotifyCopyStatus);
+            copyItem(targetPath, [&](const std::function<void()>& deleteTargetItem) //throw FileError
+            {
+                auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+
+                AFS::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
+                                           false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, notifyUnbufferedIO);
+            });
             statReporter.reportDelta(1, 0);
         },
 
@@ -1221,45 +1261,13 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             StatisticsReporter statReporter(1, 0, callback);
             notifyItemCopy(txtCreatingLink, AFS::getDisplayPath(targetPath));
 
-            removeTargetItem();
-            AFS::copySymlink(symlink.getAbstractPath<side>(), targetPath, false /*copyFilePermissions*/); //throw FileError
+            copyItem(targetPath, [&](const std::function<void()>& deleteTargetItem) //throw FileError
+            {
+                deleteTargetItem(); //throw FileError
+                AFS::copySymlink(sourcePath, targetPath, false /*copyFilePermissions*/); //throw FileError
+            });
             statReporter.reportDelta(1, 0);
         });
-    };
-
-    for (const FileSystemObject* fsObj : rowsToCopy)
-        tryReportingError([&]
-    {
-        const Zstring& relPath = keepRelPaths ? fsObj->getRelativePath<side>() : fsObj->getItemName<side>();
-        const AbstractPath targetItemPath = AFS::appendRelPath(targetFolderPath, relPath);
-
-        try
-        {
-            copyItem(*fsObj, targetItemPath); //throw FileError
-        }
-        catch (FileError&)
-        {
-            warn_static("perf: combine with removeTargetItem!!!")
-            //create intermediate directories if missing
-            if (Opt<AbstractPath> parentPath = AFS::getParentFolderPath(targetItemPath))
-            {
-                Opt<AFS::PathDetails> pd;
-                try { pd = AFS::getPathDetails(*parentPath); /*throw FileError*/ }
-                catch (FileError&) {} //previous exception is more relevant
-
-                if (pd && !pd->relPath.empty()) //parent folder not existing
-                {
-                    AbstractPath intermediatePath = pd->existingPath;
-                    for (const Zstring& itemName : pd->relPath)
-                        AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
-
-                    //retry: this should work now!
-                    copyItem(*fsObj, targetItemPath); //throw FileError
-                    return;
-                }
-            }
-            throw;
-        }
     }, callback); //throw X?
 }
 }
@@ -1278,15 +1286,15 @@ void zen::copyToAlternateFolder(const std::vector<const FileSystemObject*>& rows
     erase_if(itemSelectionRight, [](const FileSystemObject* fsObj) { return fsObj->isEmpty<RIGHT_SIDE>(); });
 
     const int itemTotal = static_cast<int>(itemSelectionLeft.size() + itemSelectionRight.size());
-    std::int64_t bytesTotal = 0;
+    int64_t bytesTotal = 0;
 
     for (const FileSystemObject* fsObj : itemSelectionLeft)
         visitFSObject(*fsObj, [](const FolderPair& folder) {},
-    [&](const FilePair& file) { bytesTotal += static_cast<std::int64_t>(file.getFileSize<LEFT_SIDE>()); }, [](const SymlinkPair& symlink) {});
+    [&](const FilePair& file) { bytesTotal += static_cast<int64_t>(file.getFileSize<LEFT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
     for (const FileSystemObject* fsObj : itemSelectionRight)
         visitFSObject(*fsObj, [](const FolderPair& folder) {},
-    [&](const FilePair& file) { bytesTotal += static_cast<std::int64_t>(file.getFileSize<RIGHT_SIDE>()); }, [](const SymlinkPair& symlink) {});
+    [&](const FilePair& file) { bytesTotal += static_cast<int64_t>(file.getFileSize<RIGHT_SIDE>()); }, [](const SymlinkPair& symlink) {});
 
     callback.initNewPhase(itemTotal, bytesTotal, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
@@ -1548,10 +1556,10 @@ bool zen::operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer
 
 TempFileBuffer::~TempFileBuffer()
 {
-    if (!tempFolderPath.empty())
+    if (!tempFolderPath_.empty())
         try
         {
-            removeDirectoryPlainRecursion(tempFolderPath); //throw FileError
+            removeDirectoryPlainRecursion(tempFolderPath_); //throw FileError
         }
         catch (FileError&) { assert(false); }
 }
@@ -1560,8 +1568,8 @@ TempFileBuffer::~TempFileBuffer()
 //returns empty if not available (item not existing, error during copy)
 Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
 {
-    auto it = tempFilePaths.find(details);
-    if (it != tempFilePaths.end())
+    auto it = tempFilePaths_.find(details);
+    if (it != tempFilePaths_.end())
         return it->second;
     return Zstring();
 }
@@ -1570,7 +1578,7 @@ Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
 void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback)
 {
     const int itemTotal = static_cast<int>(workLoad.size());
-    std::int64_t bytesTotal = 0;
+    int64_t bytesTotal = 0;
 
     for (const FileDetails& details : workLoad)
         bytesTotal += details.descr.fileSize;
@@ -1579,7 +1587,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
 
     //------------------------------------------------------------------------------
 
-    if (tempFolderPath.empty())
+    if (tempFolderPath_.empty())
     {
         Opt<std::wstring> errMsg = tryReportingError([&]
         {
@@ -1593,14 +1601,14 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
 
             createDirectoryIfMissingRecursion(tempPathTmp); //throw FileError
 
-            tempFolderPath = tempPathTmp;
+            tempFolderPath_ = tempPathTmp;
         }, callback); //throw X?
         if (errMsg) return;
     }
 
     for (const FileDetails& details : workLoad)
     {
-        assert(tempFilePaths.find(details) == tempFilePaths.end()); //ensure correct stats, NO overwrite-copy => caller-contract!
+        assert(tempFilePaths_.find(details) == tempFilePaths_.end()); //ensure correct stats, NO overwrite-copy => caller-contract!
 
         MemoryStreamOut<std::string> cookie; //create hash to distinguish different versions and file locations
         writeNumber   (cookie, details.descr.lastWriteTimeRaw);
@@ -1617,7 +1625,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
         auto it = std::find(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
         const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + detailsHash + Zstring(it, fileName.end());
 
-        const Zstring tempFilePath = appendSeparator(tempFolderPath) + tempFileName;
+        const Zstring tempFilePath = appendSeparator(tempFolderPath_) + tempFileName;
 
         tryReportingError([&]
         {
@@ -1625,12 +1633,13 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
 
             callback.reportInfo(replaceCpy(_("Creating file %x"), L"%x", fmtPath(tempFilePath)));
 
-            auto onNotifyCopyStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+
             AFS::copyFileTransactional(details.path, createItemPathNative(tempFilePath), //throw FileError, ErrorFileLocked
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, onNotifyCopyStatus);
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
             statReporter.reportDelta(1, 0);
 
-            tempFilePaths[details] = tempFilePath;
+            tempFilePaths_[details] = tempFilePath;
         }, callback); //throw X?
     }
 }

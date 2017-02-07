@@ -60,7 +60,7 @@ template <class Rep, class Period>
 void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime); //throw ThreadInterruption
 
 
-std::uint64_t getThreadId(); //simple integer thread id, unlike boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
+uint64_t getThreadId(); //simple integer thread id, unlike boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
 
 //------------------------------------------------------------------------------------------
 
@@ -403,11 +403,11 @@ void InterruptibleThread::interrupt() { intStatus_->interrupt(); }
 
 
 inline
-std::uint64_t getThreadId()
+uint64_t getThreadId()
 {
     //obviously "gettid()" is not available on Ubuntu/Debian/Suse => use the OpenSSL approach:
-    static_assert(sizeof(std::uint64_t) >= sizeof(void*), "");
-    return reinterpret_cast<std::uint64_t>(static_cast<void*>(&errno));
+    static_assert(sizeof(uint64_t) >= sizeof(void*), "");
+    return reinterpret_cast<uint64_t>(static_cast<void*>(&errno));
 
 }
 }

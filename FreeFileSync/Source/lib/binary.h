@@ -14,7 +14,7 @@ namespace zen
 {
 bool filesHaveSameContent(const AbstractPath& filePath1, //throw FileError
                           const AbstractPath& filePath2,
-                          const std::function<void(std::int64_t bytesDelta)>& notifyProgress); //may be nullptr
+                          const IOCallback& notifyUnbufferedIO); //may be nullptr
 }
 
 #endif //BINARY_H_3941281398513241134

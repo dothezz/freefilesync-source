@@ -15,17 +15,17 @@
 namespace zen
 {
 template <typename Function> inline
-zen::Opt<std::wstring> tryReportingError(Function cmd, ProcessCallback& handler) //throw X?; return ignored error message if available
+zen::Opt<std::wstring> tryReportingError(Function cmd, ProcessCallback& handler /*throw X*/) //return ignored error message if available
 {
     for (size_t retryNumber = 0;; ++retryNumber)
         try
         {
             cmd(); //throw FileError
-            return zen::NoValue();
+            return NoValue();
         }
-        catch (zen::FileError& error)
+        catch (FileError& error)
         {
-            switch (handler.reportError(error.toString(), retryNumber)) //throw ?
+            switch (handler.reportError(error.toString(), retryNumber)) //throw X
             {
                 case ProcessCallback::IGNORE_ERROR:
                     return error.toString();
@@ -40,7 +40,7 @@ zen::Opt<std::wstring> tryReportingError(Function cmd, ProcessCallback& handler)
 class StatisticsReporter
 {
 public:
-    StatisticsReporter(int itemsExpected, std::int64_t bytesExpected, ProcessCallback& cb) :
+    StatisticsReporter(int itemsExpected, int64_t bytesExpected, ProcessCallback& cb) :
         itemsExpected_(itemsExpected),
         bytesExpected_(bytesExpected),
         cb_(cb) {}
@@ -56,7 +56,7 @@ public:
             cb_.updateTotalData(itemsReported_ - itemsExpected_, bytesReported_ - bytesExpected_); //noexcept!
     }
 
-    void reportDelta(int itemsDelta, std::int64_t bytesDelta) //may throw!
+    void reportDelta(int itemsDelta, int64_t bytesDelta) //may throw!
     {
         cb_.updateProcessedData(itemsDelta, bytesDelta); //nothrow! -> ensure client and service provider are in sync!
         itemsReported_ += itemsDelta;
@@ -79,9 +79,9 @@ public:
 
 private:
     int itemsReported_ = 0;
-    std::int64_t bytesReported_ = 0;
+    int64_t bytesReported_ = 0;
     const int itemsExpected_;
-    const std::int64_t bytesExpected_;
+    const int64_t bytesExpected_;
     ProcessCallback& cb_;
     const int exeptionCount_ = getUncaughtExceptionCount();
 };

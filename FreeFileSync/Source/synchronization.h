@@ -40,8 +40,8 @@ public:
 
     int conflictCount() const { return static_cast<int>(conflictMsgs_.size()); }
 
-    std::int64_t getBytesToProcess() const { return bytesToProcess_; }
-    size_t       rowCount         () const { return rowsTotal_; }
+    int64_t getBytesToProcess() const { return bytesToProcess_; }
+    size_t  rowCount         () const { return rowsTotal_; }
 
     struct ConflictInfo
     {
@@ -66,7 +66,7 @@ private:
     bool physicalDeleteLeft_  = false; //at least 1 item will be deleted; considers most "update" cases which also delete items
     bool physicalDeleteRight_ = false; //
     std::vector<ConflictInfo> conflictMsgs_; //conflict texts to display as a warning message
-    std::int64_t bytesToProcess_ = 0;
+    int64_t bytesToProcess_ = 0;
     size_t rowsTotal_ = 0;
 };
 

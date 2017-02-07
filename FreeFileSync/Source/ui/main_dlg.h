@@ -126,7 +126,7 @@ private:
                                  const std::vector<zen::FileSystemObject*>& selectionRight); //selection may be empty
 
     //status bar supports one of the following two states at a time:
-    void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, std::uint64_t filesizeLeftView, std::uint64_t filesizeRightView);
+    void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, uint64_t filesizeLeftView, uint64_t filesizeRightView);
     //void setStatusBarFullText(const wxString& msg);
 
     void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFileStatistics)
@@ -295,7 +295,7 @@ private:
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
 
     static Zstring getLastRunConfigPath();
-    const Zstring lastRunConfigPath; //let's not use another static...
+    const Zstring lastRunConfigPath_; //let's not use another static...
     //-------------------------------------
 
     //UI view of FolderComparison structure (partially owns folderCmp)
@@ -326,8 +326,8 @@ private:
 
     wxString defaultPerspective;
 
-    std::int64_t manualTimeSpanFrom = 0;
-    std::int64_t manualTimeSpanTo   = 0; //buffer manual time span selection at session level
+    int64_t manualTimeSpanFrom = 0;
+    int64_t manualTimeSpanTo   = 0; //buffer manual time span selection at session level
 
     std::shared_ptr<FolderHistory> folderHistoryLeft  = std::make_shared<FolderHistory>();  //shared by all wxComboBox dropdown controls
     std::shared_ptr<FolderHistory> folderHistoryRight = std::make_shared<FolderHistory>(); //always bound!

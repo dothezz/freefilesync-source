@@ -62,11 +62,7 @@ bool impl::isMatchingVersion(const Zstring& shortname, const Zstring& shortnameV
 }
 
 
-/*
-create target super directories if missing
-*/
-void FileVersioner::moveItemToVersioning(const Zstring& relativePath, //throw FileError
-                                         const std::function<void(const AbstractPath& targetPath)>& moveExistingItem) //move source -> target; may throw FileError
+AbstractPath FileVersioner::generateVersionedPath(const Zstring& relativePath) const
 {
     assert(!startsWith(relativePath, FILE_NAME_SEPARATOR));
     assert(!endsWith  (relativePath, FILE_NAME_SEPARATOR));
@@ -85,127 +81,90 @@ void FileVersioner::moveItemToVersioning(const Zstring& relativePath, //throw Fi
             break;
     }
 
-    const AbstractPath versionedItemPath = AFS::appendRelPath(versioningFolderPath_, versionedRelPath);
-    try
-    {
-        moveExistingItem(versionedItemPath); //throw FileError
-    }
-    catch (const FileError&) //expected to fail if target directory is not yet existing!
-    {
-        warn_static("perf: combine with removeTarget!!!")
-
-        //create intermediate directories if missing
-        if (Opt<AbstractPath> parentPath = AFS::getParentFolderPath(versionedItemPath))
-        {
-            Opt<AFS::PathDetails> pd;
-            try { pd = AFS::getPathDetails(*parentPath); /*throw FileError*/ }
-            catch (FileError&) {} //previous exception is more relevant
-
-            if (pd && !pd->relPath.empty()) //parent folder not existing
-            {
-                AbstractPath intermediatePath = pd->existingPath;
-                for (const Zstring& itemName : pd->relPath)
-                    AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
-
-                //retry: this should work now!
-                moveExistingItem(versionedItemPath); //throw FileError
-                return;
-            }
-        }
-        throw;
-    }
+    return AFS::appendRelPath(versioningFolderPath_, versionedRelPath);
 }
 
 
 namespace
 {
-//move source to target across volumes
-//no need to check if super-directories of target exist: done by moveItemToVersioning()
-//if target already exists, it is overwritten, even if it is a different type, e.g. a directory!
+/*
+move source to target across volumes:
+- source is expected to exist
+- if target already exists, it is overwritten, unless it is of a different type, e.g. a directory!
+- target parent directories are created if missing
+*/
 template <class Function>
-void moveExistingItem(const AbstractPath& sourcePath, //throw FileError
-                      const AbstractPath& targetPath,
-                      Function copyDelete) //throw FileError; fallback if move failed
+void moveExistingItemToVersioning(const AbstractPath& sourcePath, const AbstractPath& targetPath, //throw FileError
+                                  Function copyNewItemPlain /*throw FileError*/)
 {
-    auto removeTarget = [&](bool expectExisting)
-    {
-        try
-        {
-            //file or (broken) file-symlink:
-            AFS::removeFilePlain(targetPath); //throw FileError
-        }
-        catch (FileError&)
-        {
-            //(folder-)symlink:
-            bool symlinkExists = false;
-            try
-            {
-                if (expectExisting) //perf, perf, perf, every file access counts!
-                    symlinkExists = AFS::getItemType(targetPath) == AFS::ItemType::SYMLINK; //throw FileError
-                else
-                {
-                    if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(targetPath)) //throw FileError
-                        symlinkExists = *type == AFS::ItemType::SYMLINK;
-                    else
-                        return;
-                }
-            }
-            catch (FileError&) {} //previous exception is more relevant
 
-            if (symlinkExists)
-                AFS::removeSymlinkPlain(targetPath); //throw FileError
-            else //overwrite AFS::ItemType::FOLDER with FILE? => highly dubious, do not allow
-                throw;
+    Opt<FileError> deleteError; //- files are copied with "transactionalCopy = true" => handle already existing target BEFORE failing after an expensive copy
+    //- even in the "same volume" case, a preemptive target deletion with deferred evaluation gives the best amortized performance considering that
+    //  "already existing" is the most common expected failure!
+    try { AFS::removeFilePlain(targetPath); /*throw FileError*/ }
+    catch (const FileError& e) { deleteError = e; } //probably "not existing" error, defer evaluation
+    //overwrite AFS::ItemType::FOLDER with FILE? => highly dubious, do not allow
+
+    auto fixedTargetPathIssues = [&] //throw FileError
+    {
+        Opt<AFS::PathDetails> pd;
+        try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+        catch (FileError&) {} //previous exception is more relevant
+
+        if (pd)
+        {
+            if (pd->relPath.empty()) //already existing
+            {
+                if (deleteError)
+                    throw* deleteError;
+            }
+            else if (pd->relPath.size() > 1) //parent folder missing
+            {
+                AbstractPath intermediatePath = pd->existingPath;
+                for (const Zstring& itemName : std::vector<Zstring>(pd->relPath.begin(), pd->relPath.end() - 1))
+                    AFS::createFolderPlain(intermediatePath = AFS::appendRelPath(intermediatePath, itemName)); //throw FileError
+                return true;
+            }
         }
+        return false;
     };
 
     try //first try to move directly without copying
     {
-        AFS::renameItem(sourcePath, targetPath); //throw FileError, ErrorTargetExisting, ErrorDifferentVolume
+        AFS::renameItem(sourcePath, targetPath); //throw FileError, ErrorDifferentVolume
         //great, we get away cheaply!
     }
-    catch (const ErrorDifferentVolume&)
+    catch (ErrorDifferentVolume&)
     {
-        removeTarget(false /*expectExisting*/); //throw FileError
-        copyDelete();   //
-    }
-    catch (const ErrorTargetExisting&)
-    {
-        removeTarget(true /*expectExisting*/); //throw FileError
         try
         {
-            AFS::renameItem(sourcePath, targetPath); //throw FileError, (ErrorTargetExisting), ErrorDifferentVolume
+            copyNewItemPlain(); //throw FileError
         }
-        catch (const ErrorDifferentVolume&)
+        catch (FileError&)
         {
-            copyDelete(); //throw FileError
+            if (!fixedTargetPathIssues()) //throw FileError
+                throw;
+            //retry
+            copyNewItemPlain(); //throw FileError
+        }
+        //[!] remove source file AFTER handling target path errors!
+        AFS::removeFilePlain(sourcePath); //throw FileError
+    }
+    catch (FileError&)
+    {
+        if (!fixedTargetPathIssues()) //throw FileError
+            throw;
+
+        try //retry
+        {
+            AFS::renameItem(sourcePath, targetPath); //throw FileError, ErrorDifferentVolume
+        }
+        catch (ErrorDifferentVolume&)
+        {
+            copyNewItemPlain(); //throw FileError
+            AFS::removeFilePlain(sourcePath); //throw FileError
         }
     }
-}
-
-
-void moveExistingFile(const AbstractPath& sourcePath, //throw FileError
-                      const AbstractPath& targetPath,
-                      const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //may be nullptr
-{
-    auto copyDelete = [&]
-    {
-        AFS::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
-        false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, onNotifyCopyStatus);
-        AFS::removeFilePlain(sourcePath); //throw FileError; newly copied item is NOT deleted if exception is thrown here!
-    };
-    moveExistingItem(sourcePath, targetPath, copyDelete); //throw FileError
-}
-
-
-void moveExistingSymlink(const AbstractPath& sourcePath, const AbstractPath& targetPath) //throw FileError
-{
-    auto copyDelete = [&]
-    {
-        AFS::copySymlink(sourcePath, targetPath, false /*copy filesystem permissions*/); //throw FileError
-        AFS::removeSymlinkPlain(sourcePath); //throw FileError; newly copied item is NOT deleted if exception is thrown here!
-    };
-    moveExistingItem(sourcePath, targetPath, copyDelete); //throw FileError
 }
 
 
@@ -233,26 +192,24 @@ private:
 }
 
 
-bool FileVersioner::revisionFile(const AbstractPath& filePath, const Zstring& relativePath, const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus) //throw FileError
+bool FileVersioner::revisionFile(const AbstractPath& filePath, const Zstring& relativePath, const IOCallback& notifyUnbufferedIO) //throw FileError
 {
     if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(filePath)) //throw FileError
     {
-        bool moveSuccessful = false;
+        const AbstractPath targetPath = generateVersionedPath(relativePath);
 
-        moveItemToVersioning(relativePath, //throw FileError
-                             [&](const AbstractPath& targetPath)
+        if (*type == AFS::ItemType::SYMLINK)
+            moveExistingItemToVersioning(filePath, targetPath, [&] { AFS::copySymlink(filePath, targetPath, false /*copy filesystem permissions*/); }); //throw FileError
+        else
+            moveExistingItemToVersioning(filePath, targetPath, [&] //throw FileError
         {
-            if (*type == AFS::ItemType::SYMLINK)
-                moveExistingSymlink(filePath, targetPath); //throw FileError
-            else
-                moveExistingFile(filePath, targetPath, onNotifyCopyStatus); //throw FileError
-
-            moveSuccessful = true;
+            AFS::copyFileTransactional(filePath, targetPath, //throw FileError, ErrorFileLocked
+            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
         });
-        return moveSuccessful;
+        return true;
     }
     else
-        return false; //missing source item is not an error => check BEFORE oerwriting target
+        return false; //missing source item is not an error => check BEFORE overwriting target
 }
 
 
@@ -260,15 +217,9 @@ bool FileVersioner::revisionSymlink(const AbstractPath& linkPath, const Zstring&
 {
     if (AFS::getItemTypeIfExists(linkPath)) //throw FileError
     {
-        bool moveSuccessful = false;
-
-        moveItemToVersioning(relativePath, //throw FileError
-                             [&](const AbstractPath& targetPath)
-        {
-            moveExistingSymlink(linkPath, targetPath); //throw FileError
-            moveSuccessful = true;
-        });
-        return moveSuccessful;
+        const AbstractPath targetPath = generateVersionedPath(relativePath);
+        moveExistingItemToVersioning(linkPath, targetPath, [&] { AFS::copySymlink(linkPath, targetPath, false /*copy filesystem permissions*/); }); //throw FileError
+        return true;
     }
     else
         return false;
@@ -278,22 +229,20 @@ bool FileVersioner::revisionSymlink(const AbstractPath& linkPath, const Zstring&
 void FileVersioner::revisionFolder(const AbstractPath& folderPath, const Zstring& relativePath, //throw FileError
                                    const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,
                                    const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove,
-                                   const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus)
+                                   const IOCallback& notifyUnbufferedIO)
 {
     if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(folderPath)) //throw FileError
     {
         if (*type ==  AFS::ItemType::SYMLINK) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
         {
-            moveItemToVersioning(relativePath, //throw FileError
-                                 [&](const AbstractPath& targetPath)
-            {
-                if (onBeforeFileMove)
-                    onBeforeFileMove(AFS::getDisplayPath(folderPath), AFS::getDisplayPath(targetPath));
-                moveExistingSymlink(folderPath, targetPath); //throw FileError
-            });
+            const AbstractPath targetPath = generateVersionedPath(relativePath);
+            if (onBeforeFileMove)
+                onBeforeFileMove(AFS::getDisplayPath(folderPath), AFS::getDisplayPath(targetPath));
+
+            moveExistingItemToVersioning(folderPath, targetPath, [&] { AFS::copySymlink(folderPath, targetPath, false /*copy filesystem permissions*/); }); //throw FileError
         }
         else
-            revisionFolderImpl(folderPath, relativePath, onBeforeFileMove, onBeforeFolderMove, onNotifyCopyStatus); //throw FileError
+            revisionFolderImpl(folderPath, relativePath, onBeforeFileMove, onBeforeFolderMove, notifyUnbufferedIO); //throw FileError
     }
     //no error situation if directory is not existing! manual deletion relies on it!
 }
@@ -302,7 +251,7 @@ void FileVersioner::revisionFolder(const AbstractPath& folderPath, const Zstring
 void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zstring& relativePath, //throw FileError
                                        const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,
                                        const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove,
-                                       const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus)
+                                       const IOCallback& notifyUnbufferedIO)
 {
 
     //create target directories only when needed in moveFileToVersioning(): avoid empty directories!
@@ -313,30 +262,36 @@ void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zst
     const Zstring relPathPf = appendSeparator(relativePath);
 
     for (const Zstring& fileName : ft.refFileNames())
-        moveItemToVersioning(relPathPf + fileName, //throw FileError
-                             [&](const AbstractPath& targetPath)
     {
         const AbstractPath sourcePath = AFS::appendRelPath(folderPath, fileName);
+        const AbstractPath targetPath = generateVersionedPath(relPathPf + fileName);
+
         if (onBeforeFileMove)
             onBeforeFileMove(AFS::getDisplayPath(sourcePath), AFS::getDisplayPath(targetPath));
-        moveExistingFile(sourcePath, targetPath, onNotifyCopyStatus); //throw FileError
-    });
+
+        moveExistingItemToVersioning(sourcePath, targetPath, [&] //throw FileError
+        {
+            AFS::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
+            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+        });
+    }
 
     for (const Zstring& symlinkName : ft.refSymlinkNames())
-        moveItemToVersioning(relPathPf + symlinkName, //throw FileError
-                             [&](const AbstractPath& targetPath)
     {
         const AbstractPath sourcePath = AFS::appendRelPath(folderPath, symlinkName);
+        const AbstractPath targetPath = generateVersionedPath(relPathPf + symlinkName);
+
         if (onBeforeFileMove)
             onBeforeFileMove(AFS::getDisplayPath(sourcePath), AFS::getDisplayPath(targetPath));
-        moveExistingSymlink(sourcePath, targetPath); //throw FileError
-    });
+
+        moveExistingItemToVersioning(sourcePath, targetPath, [&] { AFS::copySymlink(sourcePath, targetPath, false /*copy filesystem permissions*/); }); //throw FileError
+    }
 
     //move folders recursively
     for (const Zstring& folderName : ft.refFolderNames())
         revisionFolderImpl(AFS::appendRelPath(folderPath, folderName), //throw FileError
                            relPathPf + folderName,
-                           onBeforeFileMove, onBeforeFolderMove, onNotifyCopyStatus);
+                           onBeforeFileMove, onBeforeFolderMove, notifyUnbufferedIO);
     //delete source
     if (onBeforeFolderMove)
         onBeforeFolderMove(AFS::getDisplayPath(folderPath), AFS::getDisplayPath(AFS::appendRelPath(versioningFolderPath_, relativePath)));

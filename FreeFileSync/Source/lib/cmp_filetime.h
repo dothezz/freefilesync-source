@@ -14,7 +14,7 @@
 namespace zen
 {
 inline
-bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
+bool sameFileTime(int64_t lhs, int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     if (tolerance < 0) //:= unlimited tolerance by convention!
         return true;
@@ -22,7 +22,7 @@ bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::
     if (lhs < rhs)
         std::swap(lhs, rhs);
 
-    if (rhs > std::numeric_limits<std::int64_t>::max() - tolerance) //protect against overflow!
+    if (rhs > std::numeric_limits<int64_t>::max() - tolerance) //protect against overflow!
         return true;
 
     if (lhs <= rhs + tolerance)
@@ -33,10 +33,10 @@ bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::
         assert(minutes > 0);
         const int shiftSec = static_cast<int>(minutes) * 60;
 
-        std::int64_t low  = rhs;
-        std::int64_t high = lhs;
+        int64_t low  = rhs;
+        int64_t high = lhs;
 
-        if (low <= std::numeric_limits<std::int64_t>::max() - shiftSec) //protect against overflow!
+        if (low <= std::numeric_limits<int64_t>::max() - shiftSec) //protect against overflow!
             low += shiftSec;
         else
             high -= shiftSec;
@@ -44,7 +44,7 @@ bool sameFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::
         if (high < low)
             std::swap(high, low);
 
-        if (low > std::numeric_limits<std::int64_t>::max() - tolerance) //protect against overflow!
+        if (low > std::numeric_limits<int64_t>::max() - tolerance) //protect against overflow!
             return true;
 
         if (high <= low + tolerance)
@@ -67,10 +67,10 @@ enum class TimeResult
 
 
 inline
-TimeResult compareFileTime(std::int64_t lhs, std::int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
+TimeResult compareFileTime(int64_t lhs, int64_t rhs, int tolerance, const std::vector<unsigned int>& ignoreTimeShiftMinutes)
 {
     //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
-    static const std::int64_t oneYearFromNow = std::time(nullptr) + 365 * 24 * 3600;
+    static const int64_t oneYearFromNow = std::time(nullptr) + 365 * 24 * 3600;
 
     if (sameFileTime(lhs, rhs, tolerance, ignoreTimeShiftMinutes)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
         return TimeResult::EQUAL;

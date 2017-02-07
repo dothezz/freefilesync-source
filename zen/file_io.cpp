@@ -42,43 +42,64 @@ void checkForUnsupportedType(const Zstring& filePath) //throw FileError
         throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtPath(filePath)) + L" " + getTypeName(fileInfo.st_mode));
     }
 }
+}
 
-inline
-FileHandle getInvalidHandle()
+
+    const FileBase::FileHandle FileBase::invalidHandleValue = -1;
+
+
+FileBase::~FileBase()
 {
-    return -1;
+    if (fileHandle_ != invalidHandleValue)
+        try
+        {
+            close(); //throw FileError
+        }
+        catch (FileError&) { assert(false); }
 }
+
+
+void FileBase::close() //throw FileError
+{
+    if (fileHandle_ == invalidHandleValue)
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"Contract error: close() called more than once.");
+    ZEN_ON_SCOPE_EXIT(fileHandle_ = invalidHandleValue);
+
+    //no need to clean-up on failure here (just like there is no clean on FileOutput::write failure!) => FileOutput is not transactional!
+
+    if (::close(fileHandle_) != 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"close");
 }
 
+//----------------------------------------------------------------------------------------------------
 
-FileInput::FileInput(FileHandle handle, const Zstring& filePath) : FileBase(filePath), fileHandle(handle) {}
-
-
-FileInput::FileInput(const Zstring& filePath) : //throw FileError, ErrorFileLocked
-    FileBase(filePath), fileHandle(getInvalidHandle())
+namespace
+{
+FileBase::FileHandle openHandleForRead(const Zstring& filePath) //throw FileError, ErrorFileLocked
 {
     checkForUnsupportedType(filePath); //throw FileError; opening a named pipe would block forever!
 
     //don't use O_DIRECT: http://yarchive.net/comp/linux/o_direct.html
-    fileHandle = ::open(filePath.c_str(), O_RDONLY);
+    const FileBase::FileHandle fileHandle = ::open(filePath.c_str(), O_RDONLY);
     if (fileHandle == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(filePath)), L"open");
-
-    //------------------------------------------------------------------------------------------------------
-
-    ZEN_ON_SCOPE_FAIL(::close(fileHandle));
-
-    //optimize read-ahead on input file:
-    if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
-        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filePath)), L"posix_fadvise");
-
+    return fileHandle; //pass ownership
+}
 }
 
 
-FileInput::~FileInput()
+FileInput::FileInput(FileHandle handle, const Zstring& filePath, const IOCallback& notifyUnbufferedIO) :
+    FileBase(handle, filePath), notifyUnbufferedIO_(notifyUnbufferedIO) {}
+
+
+FileInput::FileInput(const Zstring& filePath, const IOCallback& notifyUnbufferedIO) :
+    FileBase(openHandleForRead(filePath), filePath), //throw FileError, ErrorFileLocked
+    notifyUnbufferedIO_(notifyUnbufferedIO)
 {
-    if (fileHandle != getInvalidHandle())
-        ::close(fileHandle);
+    //optimize read-ahead on input file:
+    if (::posix_fadvise(getHandle(), 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
+        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(filePath)), L"posix_fadvise");
+
 }
 
 
@@ -86,11 +107,12 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; m
 {
     if (bytesToRead == 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+    assert(bytesToRead == getBlockSize());
 
     ssize_t bytesRead = 0;
     do
     {
-        bytesRead = ::read(fileHandle, buffer, bytesToRead);
+        bytesRead = ::read(getHandle(), buffer, bytesToRead);
     }
     while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
 
@@ -99,23 +121,43 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; m
     if (static_cast<size_t>(bytesRead) > bytesToRead) //better safe than sorry
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"ReadFile: buffer overflow."); //user should never see this
 
-    //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead" => loop!
+    //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead"
 
     return bytesRead; //"zero indicates end of file"
 }
 
+
+size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+{
+    const size_t blockSize = getBlockSize();
+
+    while (memBuf_.size() < bytesToRead)
+    {
+        memBuf_.resize(memBuf_.size() + blockSize);
+        const size_t bytesRead = tryRead(&*(memBuf_.end() - blockSize), blockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        memBuf_.resize(memBuf_.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
+
+        if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
+
+        if (bytesRead == 0) //end of file
+            bytesToRead = memBuf_.size();
+    }
+
+    std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
+    memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesToRead);
+    return bytesToRead;
+}
+
 //----------------------------------------------------------------------------------------------------
 
-FileOutput::FileOutput(FileHandle handle, const Zstring& filePath) : FileBase(filePath), fileHandle(handle) {}
-
-
-FileOutput::FileOutput(const Zstring& filePath, AccessFlag access) : //throw FileError, ErrorTargetExisting
-    FileBase(filePath), fileHandle(getInvalidHandle())
+namespace
+{
+FileBase::FileHandle openHandleForWrite(const Zstring& filePath, FileOutput::AccessFlag access) //throw FileError, ErrorTargetExisting
 {
     //checkForUnsupportedType(filePath); -> not needed, open() + O_WRONLY should fail fast
 
-    fileHandle = ::open(filePath.c_str(), O_WRONLY | O_CREAT | (access == FileOutput::ACC_CREATE_NEW ? O_EXCL : O_TRUNC),
-                        S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); //0666
+    const FileBase::FileHandle fileHandle = ::open(filePath.c_str(), O_WRONLY | O_CREAT | (access == FileOutput::ACC_CREATE_NEW ? O_EXCL : O_TRUNC),
+                                                   S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); //0666
     if (fileHandle == -1)
     {
         const int ec = errno; //copy before making other system calls!
@@ -128,41 +170,26 @@ FileOutput::FileOutput(const Zstring& filePath, AccessFlag access) : //throw Fil
 
         throw FileError(errorMsg, errorDescr);
     }
-
-    //------------------------------------------------------------------------------------------------------
-
-    //ScopeGuard constructorGuard = zen::makeGuard
-
-    //guard handle when adding code!!!
-
-    //constructorGuard.dismiss();
+    return fileHandle; //pass ownership
+}
 }
 
 
-FileOutput::FileOutput(FileOutput&& tmp) : FileBase(tmp.getFilePath()), fileHandle(tmp.fileHandle) { tmp.fileHandle = getInvalidHandle(); }
+FileOutput::FileOutput(FileHandle handle, const Zstring& filePath, const IOCallback& notifyUnbufferedIO) :
+    FileBase(handle, filePath), notifyUnbufferedIO_(notifyUnbufferedIO) {}
+
+
+FileOutput::FileOutput(const Zstring& filePath, AccessFlag access, const IOCallback& notifyUnbufferedIO) :
+    FileBase(openHandleForWrite(filePath, access), filePath), notifyUnbufferedIO_(notifyUnbufferedIO) {} //throw FileError, ErrorTargetExisting
 
 
 FileOutput::~FileOutput()
 {
-    if (fileHandle != getInvalidHandle())
-        try
-        {
-            close(); //throw FileError
-        }
-        catch (FileError&) { assert(false); }
-}
-
-
-void FileOutput::close() //throw FileError
-{
-    if (fileHandle == getInvalidHandle())
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"Contract error: close() called more than once.");
-    ZEN_ON_SCOPE_EXIT(fileHandle = getInvalidHandle());
-
-    //no need to clean-up on failure here (just like there is no clean on FileOutput::write failure!) => FileOutput is not transactional!
-
-    if (::close(fileHandle) != 0)
-        THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getFilePath())), L"close");
+    try
+    {
+        flushBuffers(); //throw FileError, X
+    }
+    catch (...) { assert(false); }
 }
 
 
@@ -170,11 +197,12 @@ size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw Fil
 {
     if (bytesToWrite == 0)
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+    assert(bytesToWrite <= getBlockSize());
 
     ssize_t bytesWritten = 0;
     do
     {
-        bytesWritten = ::write(fileHandle, buffer, bytesToWrite);
+        bytesWritten = ::write(getHandle(), buffer, bytesToWrite);
     }
     while (bytesWritten < 0 && errno == EINTR);
 
@@ -190,4 +218,56 @@ size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw Fil
 
     //if ::write() is interrupted (EINTR) right in the middle, it will return successfully with "bytesWritten < bytesToWrite"!
     return bytesWritten;
+}
+
+
+void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError, X
+{
+    auto bufFirst = static_cast<const char*>(buffer);
+    memBuf_.insert(memBuf_.end(), bufFirst, bufFirst + bytesToWrite);
+
+    const size_t blockSize = getBlockSize();
+    size_t bytesRemaining = memBuf_.size();
+    ZEN_ON_SCOPE_EXIT(memBuf_.erase(memBuf_.begin(), memBuf_.end() - bytesRemaining));
+    while (bytesRemaining >= blockSize)
+    {
+        const size_t bytesWritten = tryWrite(&*(memBuf_.end() - bytesRemaining), blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        bytesRemaining -= bytesWritten;
+        if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
+    }
+}
+
+
+void FileOutput::flushBuffers() //throw FileError, X
+{
+    size_t bytesRemaining = memBuf_.size();
+    ZEN_ON_SCOPE_EXIT(memBuf_.erase(memBuf_.begin(), memBuf_.end() - bytesRemaining));
+    while (bytesRemaining > 0)
+    {
+        const size_t bytesWritten = tryWrite(&*(memBuf_.end() - bytesRemaining), bytesRemaining); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        bytesRemaining -= bytesWritten;
+        if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
+    }
+}
+
+
+void FileOutput::finalize() //throw FileError, X
+{
+    flushBuffers(); //throw FileError, X
+    //~FileBase() calls this one, too, but we want to propagate errors if any:
+    close(); //throw FileError
+}
+
+
+void FileOutput::preAllocateSpaceBestEffort(uint64_t expectedSize) //throw FileError
+{
+    const FileHandle fh = getHandle();
+    //don't use potentially inefficient ::posix_fallocate!
+    const int rv = ::fallocate(fh,            //int fd,
+                               0,             //int mode,
+                               0,             //off_t offset
+                               expectedSize); //off_t len
+    if (rv != 0)
+        return; //may fail with EOPNOTSUPP, unlike posix_fallocate
+
 }

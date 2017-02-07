@@ -13,24 +13,103 @@ using AFS = AbstractFileSystem;
 const Zchar* AFS::TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
 
-AFS::FileAttribAfterCopy AFS::copyFileAsStream(const Zstring& itemPathImplSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                               const std::function<void(std::int64_t bytesDelta)>& notifyProgress) const
+bool zen::isValidRelPath(const Zstring& relPath)
 {
-    auto streamIn = getInputStream(itemPathImplSource); //throw FileError, ErrorFileLocked
-    if (notifyProgress) notifyProgress(0); //throw X!
+    const bool check1 = !contains(relPath, '\\');
+    const bool check2 = !startsWith(relPath, FILE_NAME_SEPARATOR) && !endsWith(relPath, FILE_NAME_SEPARATOR);
+    const bool check3 = !contains(relPath, Zstring() + FILE_NAME_SEPARATOR + FILE_NAME_SEPARATOR);
+    return check1 && check2 && check3;
+}
 
-    std::uint64_t      fileSizeExpected = streamIn->getFileSize        (); //throw FileError
-    const std::int64_t modificationTime = streamIn->getModificationTime(); //throw FileError
-    const FileId       sourceFileId     = streamIn->getFileId          (); //throw FileError
 
-    auto streamOut = getOutputStream(apTarget, &fileSizeExpected, &modificationTime); //throw FileError, ErrorTargetExisting
-    if (notifyProgress) notifyProgress(0); //throw X!
+int AFS::compareAbstractPath(const AbstractPath& lhs, const AbstractPath& rhs)
+{
+    //note: in worst case, order is guaranteed to be stable only during each program run
+    if (typeid(*lhs.afs).before(typeid(*rhs.afs)))
+        return -1;
+    if (typeid(*rhs.afs).before(typeid(*lhs.afs)))
+        return 1;
+    assert(typeid(*lhs.afs) == typeid(*rhs.afs));
+    //caveat: typeid returns static type for pointers, dynamic type for references!!!
 
-    unbufferedStreamCopy(*streamIn, *streamOut, notifyProgress); //throw FileError
+    const int rv = lhs.afs->compareDeviceRootSameAfsType(*rhs.afs);
+    if (rv != 0)
+        return rv;
 
-    const FileId targetFileId = streamOut->finalize([&] { if (notifyProgress) notifyProgress(0); /*throw X*/ }); //throw FileError
+    return cmpFilePath(lhs.afsPath.value.c_str(), lhs.afsPath.value.size(),
+                       rhs.afsPath.value.c_str(), rhs.afsPath.value.size());
+}
+
+
+Opt<AFS::PathComplement> AFS::getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs)
+{
+    if (typeid(*lhs.afs) != typeid(*rhs.afs))
+        return NoValue();
+
+    const int rv = lhs.afs->compareDeviceRootSameAfsType(*rhs.afs);
+    if (rv != 0)
+        return NoValue();
+
+    const Zstring& lhsPf = appendSeparator(lhs.afsPath.value);
+    const Zstring& rhsPf = appendSeparator(rhs.afsPath.value);
+
+    const size_t lenMin = std::min(lhsPf.length(), rhsPf.length());
+
+    if (cmpFilePath(lhsPf.c_str(), lenMin,
+                    rhsPf.c_str(), lenMin) != 0)
+        return NoValue();
+
+    Zstring relPathL(lhsPf.begin() + lenMin, lhsPf.end());
+    Zstring relPathR(rhsPf.begin() + lenMin, rhsPf.end());
+
+    if (endsWith(relPathL, FILE_NAME_SEPARATOR)) relPathL.pop_back();
+    if (endsWith(relPathR, FILE_NAME_SEPARATOR)) relPathR.pop_back();
+
+    return PathComplement({ relPathL, relPathR });
+}
+
+
+bool AFS::havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs)
+{
+    warn_static("remove after migration")
+    return static_cast<bool>(getPathComplement(lhs, rhs));
+}
+
+
+Opt<AfsPath> AFS::getParentAfsPath(const AfsPath& afsPath)
+{
+    if (afsPath.value.empty())
+        return NoValue();
+
+    return AfsPath(beforeLast(afsPath.value, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
+}
+
+
+AFS::FileAttribAfterCopy AFS::copyFileAsStream(const AfsPath& afsPathSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                               const IOCallback& notifyUnbufferedIO) const
+{
+    int64_t totalUnbufferedIO = 0;
+
+    auto streamIn = getInputStream(afsPathSource, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorFileLocked
+
+    const uint64_t fileSizeExpected = streamIn->getFileSize        (); //throw FileError
+    const int64_t  modificationTime = streamIn->getModificationTime(); //throw FileError
+    const FileId   sourceFileId     = streamIn->getFileId          (); //throw FileError
+
+    auto streamOut = getOutputStream(apTarget, &fileSizeExpected, &modificationTime, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorTargetExisting
+
+    bufferedStreamCopy(*streamIn, *streamOut); //throw FileError, X
+
+    const FileId targetFileId = streamOut->finalize(); //throw FileError, X
     //- modification time should be set here!
     //- checks if "expected == actual number of bytes written"
+
+    //extra check: bytes reported via notifyUnbufferedIO() should match actual number of bytes written
+    if (totalUnbufferedIO != 2 * makeSigned(fileSizeExpected))
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(AFS::getDisplayPath(apTarget))),
+                        replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
+                                              L"%x", numberTo<std::wstring>(2 * fileSizeExpected)),
+                                   L"%y", numberTo<std::wstring>(totalUnbufferedIO)) + L" [notifyUnbufferedIO]");
 
     AFS::FileAttribAfterCopy attr;
     attr.fileSize         = fileSizeExpected;
@@ -45,25 +124,25 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
                                                     bool copyFilePermissions,
                                                     bool transactionalCopy,
                                                     const std::function<void()>& onDeleteTargetFile,
-                                                    const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                                                    const IOCallback& notifyUnbufferedIO)
 {
     auto copyFileBestEffort = [&](const AbstractPath& apTargetTmp)
     {
         //caveat: typeid returns static type for pointers, dynamic type for references!!!
         if (typeid(*apSource.afs) == typeid(*apTarget.afs))
-            return apSource.afs->copyFileForSameAfsType(apSource.itemPathImpl, apTargetTmp, copyFilePermissions, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+            return apSource.afs->copyFileForSameAfsType(apSource.afsPath, apTargetTmp, copyFilePermissions, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
         //fall back to stream-based file copy:
         if (copyFilePermissions)
             throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(AFS::getDisplayPath(apTargetTmp))),
                             _("Operation not supported for different base folder types."));
 
-        return apSource.afs->copyFileAsStream(apSource.itemPathImpl, apTargetTmp, notifyProgress); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return apSource.afs->copyFileAsStream(apSource.afsPath, apTargetTmp, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     };
 
     if (transactionalCopy)
     {
-        AbstractPath apTargetTmp(apTarget.afs, apTarget.itemPathImpl + TEMP_FILE_ENDING);
+        AbstractPath apTargetTmp(apTarget.afs, AfsPath(apTarget.afsPath.value + TEMP_FILE_ENDING));
         AFS::FileAttribAfterCopy attr;
 
         for (int i = 0;; ++i)
@@ -75,7 +154,7 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
             catch (const ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
             {
                 if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
-                apTargetTmp.itemPathImpl = apTarget.itemPathImpl + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
+                apTargetTmp.afsPath.value = apTarget.afsPath.value + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
             }
 
         //transactional behavior: ensure cleanup; not needed before copyFileBestEffort() which is already transactional
@@ -87,7 +166,7 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
             onDeleteTargetFile(); //throw X
 
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
-        renameItem(apTargetTmp, apTarget); //throw FileError
+        renameItem(apTargetTmp, apTarget); //throw FileError, (ErrorDifferentVolume)
 
         /*
         CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" does
@@ -160,39 +239,39 @@ private:
 }
 
 
-AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const Zstring& itemPathImpl) const //throw FileError
+AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const AfsPath& afsPath) const //throw FileError
 {
-    const Opt<Zstring> parentPathImpl = getParentFolderPathImpl(itemPathImpl);
+    const Opt<AfsPath> parentAfsPath = getParentAfsPath(afsPath);
     try
     {
-        return { getItemType(itemPathImpl), itemPathImpl, {} }; //throw FileError
+        return { getItemType(afsPath), afsPath, {} }; //throw FileError
     }
     catch (FileError&)
     {
-        if (!parentPathImpl) //device root
+        if (!parentAfsPath) //device root
             throw;
         //else: let's dig deeper... don't bother checking Win32 codes; e.g. not existing item may have the codes:
         //  ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND, ERROR_INVALID_NAME, ERROR_INVALID_DRIVE,
         //  ERROR_NOT_READY, ERROR_INVALID_PARAMETER, ERROR_BAD_PATHNAME, ERROR_BAD_NETPATH => not reliable
     }
-    const Zstring itemName = getItemName(itemPathImpl);
+    const Zstring itemName = getItemName(afsPath);
     assert(!itemName.empty());
 
-    PathDetailsImpl pd = getPathDetailsViaFolderTraversal(*parentPathImpl); //throw FileError
+    PathDetailsImpl pd = getPathDetailsViaFolderTraversal(*parentAfsPath); //throw FileError
     if (!pd.relPath.empty())
     {
         pd.relPath.push_back(itemName);
-        return { pd.existingType, pd.existingPathImpl, pd.relPath };
+        return { pd.existingType, pd.existingAfsPath, pd.relPath };
     }
 
     try
     {
         ItemSearchCallback iscb(itemName);
-        traverseFolder(*parentPathImpl, iscb); //throw FileError, ItemType
+        traverseFolder(*parentAfsPath, iscb); //throw FileError, ItemType
 
-        return { pd.existingType, *parentPathImpl, { itemName } }; //throw FileError
+        return { pd.existingType, *parentAfsPath, { itemName } }; //throw FileError
     }
-    catch (const ItemType& type) { return { type, itemPathImpl, {} }; } //yes, exceptions for control-flow are bad design... but, but...
+    catch (const ItemType& type) { return { type, afsPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
     //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
 }
 
@@ -208,45 +287,9 @@ Opt<AFS::ItemType> AFS::getItemTypeIfExists(const AbstractPath& ap) //throw File
 
 AFS::PathDetails AFS::getPathDetails(const AbstractPath& ap) //throw FileError
 {
-    const PathDetailsImpl pdi = ap.afs->getPathDetails(ap.itemPathImpl); //throw FileError
-    return { pdi.existingType, AbstractPath(ap.afs, pdi.existingPathImpl), pdi.relPath };
+    const PathDetailsImpl pdi = ap.afs->getPathDetails(ap.afsPath); //throw FileError
+    return { pdi.existingType, AbstractPath(ap.afs, pdi.existingAfsPath), pdi.relPath };
 }
-
-
-//boost::variant<AFS::ItemType, AFS::NotExistType> AFS::getItemTypeIfExistsByFolderTraversal(const Zstring& itemPathImpl) const //throw FileError
-//{
-//    const Opt<Zstring> parentPathImpl = getParentFolderPathImpl(itemPathImpl);
-//    try
-//    {
-//        return getItemType(itemPathImpl); //throw FileError
-//        //bonus: still find intermediate hidden/access-denied SFTP folders
-//    }
-//    catch (FileError&)
-//    {
-//        if (!parentPathImpl)
-//            throw;
-//        //else: let's dig deeper... don't bother checking Win32 codes; e.g. not existing item may have the codes:
-//        //  ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND, ERROR_INVALID_NAME, ERROR_INVALID_DRIVE,
-//        //  ERROR_NOT_READY, ERROR_INVALID_PARAMETER, ERROR_BAD_PATHNAME, ERROR_BAD_NETPATH => not reliable
-//    }
-//    const Zstring itemName = getItemName(itemPathImpl);
-//    assert(!itemName.empty());
-//    try
-//    {
-//        ItemSearchCallback iscb(itemName);
-//        traverseFolder(*parentPathImpl, iscb); //throw FileError, ItemType
-//        return NotExistType::PARENT_EXISTING;
-//    }
-//    catch (const ItemType& type) { return type; } //yes, exceptions for control-flow are bad design... but, but...
-//    //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
-//    catch (FileError&)
-//    {
-//        const auto var = getItemTypeIfExistsByFolderTraversal(*parentPathImpl); //throw FileError
-//        if (boost::get<NotExistType>(&var))
-//            return NotExistType::PARENT_NOT_EXISTING;
-//        throw;
-//    }
-//}
 
 
 namespace
@@ -340,15 +383,13 @@ bool AFS::removeFileIfExists(const AbstractPath& ap) //throw FileError
     }
     catch (FileError&)
     {
-        bool itemNotExisting = false;
         try
         {
-            itemNotExisting = !getItemTypeIfExists(ap); //throw FileError
+            if (!getItemTypeIfExists(ap)) //throw FileError
+                return false;
         }
         catch (FileError&) {} //previous exception is more relevant
 
-        if (itemNotExisting)
-            return false;
         throw;
     }
 }
@@ -363,15 +404,13 @@ bool AFS::removeSymlinkIfExists(const AbstractPath& ap) //throw FileError
     }
     catch (FileError&)
     {
-        bool itemNotExisting = false;
         try
         {
-            itemNotExisting = !getItemTypeIfExists(ap); //throw FileError
+            if (!getItemTypeIfExists(ap)) //throw FileError
+                return false;
         }
         catch (FileError&) {} //previous exception is more relevant
 
-        if (itemNotExisting)
-            return false;
         throw;
     }
 }

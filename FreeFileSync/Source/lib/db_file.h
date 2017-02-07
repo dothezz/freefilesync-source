@@ -17,30 +17,30 @@ const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as glob
 
 struct InSyncDescrFile //subset of FileDescriptor
 {
-    InSyncDescrFile(std::int64_t lastWriteTimeRawIn, const AFS::FileId& idIn) :
+    InSyncDescrFile(int64_t lastWriteTimeRawIn, const AFS::FileId& idIn) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileId(idIn) {}
 
-    std::int64_t lastWriteTimeRaw;
+    int64_t lastWriteTimeRaw;
     AFS::FileId fileId; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
 };
 
 struct InSyncDescrLink
 {
-    explicit InSyncDescrLink(std::int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
+    explicit InSyncDescrLink(int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
 
-    std::int64_t lastWriteTimeRaw;
+    int64_t lastWriteTimeRaw;
 };
 
 
 //artificial hierarchy of last synchronous state:
 struct InSyncFile
 {
-    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, CompareVariant cv, std::uint64_t fileSizeIn) : left(l), right(r), cmpVar(cv), fileSize(fileSizeIn) {}
-    InSyncDescrFile left;
-    InSyncDescrFile right;
+    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, CompareVariant cv, uint64_t fileSizeIn) : left(l), right(r), cmpVar(cv), fileSize(fileSizeIn) {}
+    InSyncDescrFile left;  //support flip()!
+    InSyncDescrFile right; //
     CompareVariant cmpVar; //the one active while finding "file in sync"
-    std::uint64_t fileSize; //file size must be identical on both sides!
+    uint64_t fileSize; //file size must be identical on both sides!
 };
 
 struct InSyncSymlink
@@ -80,7 +80,7 @@ struct InSyncFolder
         return folders.emplace(shortName, InSyncFolder(st)).first->second;
     }
 
-    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, std::uint64_t fileSize)
+    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, uint64_t fileSize)
     {
         files.emplace(shortName, InSyncFile(dataL, dataR, cmpVar, fileSize));
     }
@@ -95,10 +95,10 @@ struct InSyncFolder
 DEFINE_NEW_FILE_ERROR(FileErrorDatabaseNotExisting);
 
 std::shared_ptr<InSyncFolder> loadLastSynchronousState(const BaseFolderPair& baseDirObj, //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
-                                                       const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
+                                                       const std::function<void(const std::wstring& statusMsg)>& notifyStatus);
 
 void saveLastSynchronousState(const BaseFolderPair& baseDirObj, //throw FileError
-                              const std::function<void(std::int64_t bytesDelta)>& notifyProgress);
+                              const std::function<void(const std::wstring& statusMsg)>& notifyStatus);
 }
 
 #endif //DB_FILE_H_834275398588021574

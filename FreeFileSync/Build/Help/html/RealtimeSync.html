@@ -14,7 +14,12 @@
 
 	<p>
 		The primary purpose of RealTimeSync is to execute a command line each time it <b>detects changes</b> in one of the monitored directories
-		or when a <b>directory becomes available</b> (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.
+		or when a <b>directory becomes available</b> (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.<br>
+		<br>
+		
+		RealTimeSync will register to receive change notifications directly from the operating system in order to avoid the overhead of
+		repeatedly polling for changes.
+		Each time a file or folder is created/updated/deleted in the monitored directories or their sub directories, RealTimeSync will run the command line.		
 		<br><br>
 	</p>
 	

@@ -48,7 +48,7 @@ public:
     bool revisionFile(const AbstractPath& filePath, //throw FileError; return "false" if file is not existing
                       const Zstring& relativePath,
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                      const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //may be nullptr
+                      const IOCallback& notifyUnbufferedIO); //may be nullptr
 
     bool revisionSymlink(const AbstractPath& linkPath, const Zstring& relativePath); //throw FileError; return "false" if file is not existing
 
@@ -58,7 +58,7 @@ public:
                         const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,   //one call for each *existing* object!
                         const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove, //
                         //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
-                        const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus);
+                        const IOCallback& notifyUnbufferedIO);
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
@@ -66,10 +66,9 @@ private:
     void revisionFolderImpl(const AbstractPath& folderPath, const Zstring& relativePath,
                             const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFileMove,
                             const std::function<void(const std::wstring& displayPathFrom, const std::wstring& displayPathTo)>& onBeforeFolderMove,
-                            const std::function<void(std::int64_t bytesDelta)>& onNotifyCopyStatus); //throw FileError
+                            const IOCallback& notifyUnbufferedIO); //throw FileError
 
-    void moveItemToVersioning(const Zstring& relativePath, //throw FileError
-                              const std::function<void(const AbstractPath& targetPath)>& moveItem); //may throw FileError
+    AbstractPath generateVersionedPath(const Zstring& relativePath) const;
 
     const AbstractPath versioningFolderPath_;
     const VersioningStyle versioningStyle_;

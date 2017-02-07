@@ -16,7 +16,7 @@
 namespace zen
 {
 //write error message to a file (even with corrupted stack)- call in desperate situations when no other means of error handling is available
-void logFatalError(const std::string& msg); //throw()
+void logFatalError(const std::string& msg); //noexcept
 
 
 
@@ -28,13 +28,13 @@ void logFatalError(const std::string& msg); //throw()
 
 //##################### implementation ############################
 inline
-void logFatalError(const std::string& msg) //throw()
+void logFatalError(const std::string& msg) //noexcept
 {
     assert(false); //this is stuff we like to debug
     const std::string logEntry = "[" + formatTime<std::string>(FORMAT_DATE) + " "+ formatTime<std::string>(FORMAT_TIME) + "] " + msg;
     try
     {
-        saveBinContainer(getConfigDirPathPf() + Zstr("LastError.log"), logEntry, nullptr); //throw FileError
+        saveBinContainer(getConfigDirPathPf() + Zstr("LastError.log"), logEntry, nullptr /*notifyUnbufferedIO*/); //throw FileError
     }
     catch (const FileError&) {}
 }

@@ -7,7 +7,6 @@
 #include "binary.h"
 #include <vector>
 #include <chrono>
-//#include <zen/tick_count.h>
 
 using namespace zen;
 using AFS = AbstractFileSystem;
@@ -20,53 +19,43 @@ namespace
     => unbuffered access: same perf on USB stick, file mapping 30% slower on local disk
 
 2. Tests on Win7 x64 show that buffer size does NOT matter if files are located on different physical disks!
+
 Impact of buffer size when files are on same disk:
 
 buffer  MB/s
 ------------
-64      10
-128     19
-512     40
+  64    10
+ 128    19
+ 512    40
 1024    48
 2048    56
 4096    56
 8192    56
 */
-
 const size_t BLOCK_SIZE_MAX =  16 * 1024 * 1024;
 
 
 struct StreamReader
 {
-    StreamReader(const AbstractPath& filePath, const std::function<void(std::int64_t bytesDelta)>& notifyProgress, size_t& unevenBytes) :
-        stream_(AFS::getInputStream(filePath)), //throw FileError, (ErrorFileLocked)
+    StreamReader(const AbstractPath& filePath, const IOCallback& notifyUnbufferedIO) :
+        stream_(AFS::getInputStream(filePath, notifyUnbufferedIO)), //throw FileError, (ErrorFileLocked)
         defaultBlockSize_(stream_->getBlockSize()),
-        dynamicBlockSize_(defaultBlockSize_),
-        notifyProgress_(notifyProgress),
-        unevenBytes_(unevenBytes) {}
+        dynamicBlockSize_(defaultBlockSize_) { assert(defaultBlockSize_ > 0); }
 
-    void appendChunk(std::vector<char>& buffer) //throw FileError
+    void appendChunk(std::vector<char>& buffer) //throw FileError, X
     {
         assert(!eof_);
         if (eof_) return;
 
-        const auto startTime = std::chrono::steady_clock::now();
-
         buffer.resize(buffer.size() + dynamicBlockSize_);
-        const size_t bytesRead = stream_->tryRead(&*(buffer.end() - dynamicBlockSize_), dynamicBlockSize_); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-        buffer.resize(buffer.size() - dynamicBlockSize_ + bytesRead); //caveat: unsigned arithmetics
 
+        const auto startTime = std::chrono::steady_clock::now();
+        const size_t bytesRead = stream_->read(&*(buffer.end() - dynamicBlockSize_), dynamicBlockSize_); //throw FileError, X; return "bytesToRead" bytes unless end of stream!
         const auto stopTime = std::chrono::steady_clock::now();
 
-        //report bytes processed
-        if (notifyProgress_)
-        {
-            const size_t bytesToReport = (unevenBytes_ + bytesRead) / 2;
-            notifyProgress_(bytesToReport); //throw X!
-            unevenBytes_ = (unevenBytes_ + bytesRead) - bytesToReport * 2; //unsigned arithmetics!
-        }
+        buffer.resize(buffer.size() - dynamicBlockSize_ + bytesRead); //caveat: unsigned arithmetics
 
-        if (bytesRead == 0)
+        if (bytesRead < dynamicBlockSize_)
         {
             eof_ = true;
             return;
@@ -97,19 +86,18 @@ private:
     const std::unique_ptr<AFS::InputStream> stream_;
     const size_t defaultBlockSize_;
     size_t dynamicBlockSize_;
-    const std::function<void(std::int64_t bytesDelta)> notifyProgress_;
-    size_t& unevenBytes_;
     std::chrono::steady_clock::time_point lastDelayViolation_ = std::chrono::steady_clock::now();
     bool eof_ = false;
 };
 }
 
 
-bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath& filePath2, const std::function<void(std::int64_t bytesDelta)>& notifyProgress) //throw FileError
+bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath& filePath2, const IOCallback& notifyUnbufferedIO) //throw FileError
 {
-    size_t unevenBytes = 0;
-    StreamReader reader1(filePath1, notifyProgress, unevenBytes); //throw FileError, (ErrorFileLocked)
-    StreamReader reader2(filePath2, notifyProgress, unevenBytes); //
+    int64_t totalUnbufferedIO = 0;
+
+    StreamReader reader1(filePath1, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, (ErrorFileLocked)
+    StreamReader reader2(filePath2, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //
 
     StreamReader* readerLow  = &reader1;
     StreamReader* readerHigh = &reader2;
@@ -119,9 +107,7 @@ bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath
 
     for (;;)
     {
-        const size_t bytesChecked = bufferLow.size();
-
-        readerLow->appendChunk(bufferLow); //throw FileError
+        readerLow->appendChunk(bufferLow); //throw FileError, X
 
         if (bufferLow.size() > bufferHigh.size())
         {
@@ -129,8 +115,8 @@ bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath
             std::swap(readerLow, readerHigh);
         }
 
-        if (!std::equal(bufferLow. begin() + bytesChecked, bufferLow.end(),
-                        bufferHigh.begin() + bytesChecked))
+        if (!std::equal(bufferLow. begin(), bufferLow.end(),
+                        bufferHigh.begin()))
             return false;
 
         if (readerLow->isEof())
@@ -148,7 +134,7 @@ bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath
         bufferLow.clear();
     }
 
-    if (unevenBytes != 0)
+    if (totalUnbufferedIO % 2 != 0)
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     return true;

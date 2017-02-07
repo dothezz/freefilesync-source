@@ -39,15 +39,26 @@ class Opt
 public:
     Opt()        {}
     Opt(NoValue) {}
-    Opt(const T& val) : valid(true) { new (&rawMem) T(val); } //throw X
+    Opt(const T& val) : valid_(true) { new (&rawMem_) T(val); } //throw X
+    Opt(     T&& tmp) : valid_(true) { new (&rawMem_) T(std::move(tmp)); }
 
-    Opt(const Opt& other) : valid(other.valid)
+    Opt(const Opt& other) : valid_(other.valid_)
     {
         if (const T* val = other.get())
-            new (&rawMem) T(*val); //throw X
+            new (&rawMem_) T(*val); //throw X
     }
 
     ~Opt() { if (T* val = get()) val->~T(); }
+
+    Opt& operator=(NoValue) //support assignment to Opt<const T>
+    {
+        if (T* val = get())
+        {
+            valid_ = false;
+            val->~T();
+        }
+        return *this;
+    }
 
     Opt& operator=(const Opt& other) //strong exception-safety iff T::operator=() is strongly exception-safe
     {
@@ -57,22 +68,22 @@ public:
                 *val = *valOther; //throw X
             else
             {
-                valid = false;
+                valid_ = false;
                 val->~T();
             }
         }
         else if (const T* valOther = other.get())
         {
-            new (&rawMem) T(*valOther); //throw X
-            valid = true;
+            new (&rawMem_) T(*valOther); //throw X
+            valid_ = true;
         }
         return *this;
     }
 
-    explicit operator bool() const { return valid; } //thank you C++11!!!
+    explicit operator bool() const { return valid_; } //thank you, C++11!!!
 
-    const T* get() const { return valid ? reinterpret_cast<const T*>(&rawMem) : nullptr; }
-    T*       get()       { return valid ? reinterpret_cast<      T*>(&rawMem) : nullptr; }
+    const T* get() const { return valid_ ? reinterpret_cast<const T*>(&rawMem_) : nullptr; }
+    T*       get()       { return valid_ ? reinterpret_cast<      T*>(&rawMem_) : nullptr; }
 
     const T& operator*() const { return *get(); }
     /**/  T& operator*()       { return *get(); }
@@ -81,10 +92,9 @@ public:
     /**/  T* operator->()       { return get(); }
 
 private:
-    std::aligned_storage_t<sizeof(T), alignof(T)> rawMem; //don't require T to be default-constructible!
-    bool valid = false;
+    std::aligned_storage_t<sizeof(T), alignof(T)> rawMem_; //don't require T to be default-constructible!
+    bool valid_ = false;
 };
-
 }
 
 #endif //OPTIONAL_H_2857428578342203589

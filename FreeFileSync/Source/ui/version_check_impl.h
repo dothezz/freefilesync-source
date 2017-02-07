@@ -14,6 +14,7 @@
 
 namespace zen
 {
+inline
 time_t getVersionCheckInactiveId()
 {
     //use current version to calculate a changing number for the inactive state near UTC begin, in order to always check for updates after installing a new version
@@ -44,6 +45,7 @@ time_t getVersionCheckCurrentTime()
 }
 
 
+inline
 bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck)
 {
     if (lastUpdateCheck == getVersionCheckInactiveId())

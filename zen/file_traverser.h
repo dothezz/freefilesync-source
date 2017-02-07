@@ -18,8 +18,8 @@ struct FileInfo
 {
     Zstring itemName;
     Zstring fullPath;
-    std::uint64_t fileSize;     //[bytes]
-    std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+    uint64_t fileSize;     //[bytes]
+    int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
 };
 
 struct FolderInfo
@@ -32,7 +32,7 @@ struct SymlinkInfo
 {
     Zstring itemName;
     Zstring fullPath;
-    std::int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+    int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
 };
 
 //- non-recursive

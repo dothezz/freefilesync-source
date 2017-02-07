@@ -103,7 +103,7 @@ String formatMessageImpl(const LogEntry& entry) //internal linkage
         return std::wstring();
     };
 
-    String formattedText = L"[" + formatTime<String>(FORMAT_TIME, localTime(entry.time)) + L"] " + copyStringTo<String>(getTypeName()) + L": ";
+    String formattedText = L"[" + formatTime<String>(FORMAT_TIME, getLocalTime(entry.time)) + L"] " + copyStringTo<String>(getTypeName()) + L": ";
     const size_t prefixLen = formattedText.size();
 
     for (auto it = entry.message.begin(); it != entry.message.end(); )

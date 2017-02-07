@@ -79,22 +79,23 @@ std::wstring formatSystemError(const std::wstring& functionName, long long lastE
 inline
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec)
 {
-    return formatSystemError(functionName, numberTo<std::wstring>(ec), formatSystemErrorRaw(ec));
+    return formatSystemError(functionName, replaceCpy(_("Error Code %x"), L"%x", numberTo<std::wstring>(ec)), formatSystemErrorRaw(ec));
 }
 
 
 inline
 std::wstring formatSystemError(const std::wstring& functionName, const std::wstring& errorCode, const std::wstring& errorMsg)
 {
-    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", errorCode);
+    std::wstring output = errorCode + L":";
 
-    if (!errorMsg.empty())
+    const std::wstring errorMsgFmt = trimCpy(errorMsg);
+    if (!errorMsgFmt.empty())
     {
         output += L" ";
-        output += errorMsg;
+        output += errorMsgFmt;
     }
 
-    output += L" (" + functionName + L")";
+    output += L" [" + functionName + L"]";
 
     return output;
 }

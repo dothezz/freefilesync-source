@@ -11,11 +11,9 @@
 using namespace zen;
 
 
-XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
+XmlDoc zen::loadXmlDocument(const Zstring& filePath) //throw FileError
 {
-    //can't simply use zen::unbufferedLoad) due to the short-circuit xml-validation below!
-
-    FileInput fileIn(filepath); //throw FileError, ErrorFileLocked
+    FileInput fileIn(filePath, nullptr /*notifyUnbufferedIO*/); //throw FileError, ErrorFileLocked
     const size_t blockSize = fileIn.getBlockSize();
     const std::string xmlPrefix = "<?xml version=";
     bool xmlPrefixChecked = false;
@@ -24,7 +22,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
     for (;;)
     {
         buffer.resize(buffer.size() + blockSize);
-        const size_t bytesRead = fileIn.tryRead(&*(buffer.end() - blockSize), blockSize); //throw X; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        const size_t bytesRead = fileIn.read(&*(buffer.end() - blockSize), blockSize); //throw FileError, (X); return "bytesToRead" bytes unless end of stream!
         buffer.resize(buffer.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
 
         //quick test whether input is an XML: avoid loading large binary files up front!
@@ -33,10 +31,10 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
             xmlPrefixChecked = true;
             if (!startsWith(buffer, xmlPrefix) &&
                 !startsWith(buffer, BYTE_ORDER_MARK_UTF8 + xmlPrefix)) //allow BOM!
-                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filepath)));
+                throw FileError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtPath(filePath)));
         }
 
-        if (bytesRead == 0) //end of file
+        if (bytesRead < blockSize) //end of file
             break;
     }
 
@@ -48,31 +46,31 @@ XmlDoc zen::loadXmlDocument(const Zstring& filepath) //throw FileError
     {
         throw FileError(
             replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                             L"%x", fmtPath(filepath)),
+                                             L"%x", fmtPath(filePath)),
                                   L"%y", numberTo<std::wstring>(e.row + 1)),
                        L"%z", numberTo<std::wstring>(e.col + 1)));
     }
 }
 
 
-void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filepath) //throw FileError
+void zen::saveXmlDocument(const XmlDoc& doc, const Zstring& filePath) //throw FileError
 {
     const std::string stream = serialize(doc); //noexcept
 
     //only update xml file if there are real changes
     try
     {
-        if (getFilesize(filepath) == stream.size()) //throw FileError
-            if (loadBinContainer<std::string>(filepath, nullptr) == stream) //throw FileError
+        if (getFileSize(filePath) == stream.size()) //throw FileError
+            if (loadBinContainer<std::string>(filePath, nullptr /*notifyUnbufferedIO*/) == stream) //throw FileError
                 return;
     }
     catch (FileError&) {}
 
-    saveBinContainer(filepath, stream, nullptr); //throw FileError
+    saveBinContainer(filePath, stream, nullptr /*notifyUnbufferedIO*/); //throw FileError
 }
 
 
-void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath) //throw FileError
+void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filePath) //throw FileError
 {
     if (xmlInput.errorsOccured())
     {
@@ -80,6 +78,6 @@ void zen::checkForMappingErrors(const XmlIn& xmlInput, const Zstring& filepath) 
         for (const std::wstring& elem : xmlInput.getErrorsAs<std::wstring>())
             msg += L"\n" + elem;
 
-        throw FileError(replaceCpy(_("Configuration file %x is incomplete. The missing elements will be set to their default values."), L"%x", fmtPath(filepath)) + L"\n\n" + msg);
+        throw FileError(replaceCpy(_("Configuration file %x is incomplete. The missing elements will be set to their default values."), L"%x", fmtPath(filePath)) + L"\n\n" + msg);
     }
 }

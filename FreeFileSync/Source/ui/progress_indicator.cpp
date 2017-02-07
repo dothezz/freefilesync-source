@@ -365,10 +365,10 @@ void CompareProgressDialog::Impl::updateStatusPanelNow()
         case ProcessCallback::PHASE_SYNCHRONIZING:
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         {
-            const int          itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
-            const int          itemsTotal   = syncStat_->getItemsTotal  (syncStat_->currentPhase());
-            const std::int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
-            const std::int64_t bytesTotal   = syncStat_->getBytesTotal  (syncStat_->currentPhase());
+            const int     itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
+            const int     itemsTotal   = syncStat_->getItemsTotal  (syncStat_->currentPhase());
+            const int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
+            const int64_t bytesTotal   = syncStat_->getBytesTotal  (syncStat_->currentPhase());
 
             //add both bytes + item count, to handle "deletion-only" cases
             const double fractionTotal = bytesTotal + itemsTotal == 0 ? 0 : 1.0 * (bytesCurrent + itemsCurrent) / (bytesTotal + itemsTotal);
@@ -620,7 +620,7 @@ public:
                 {
                     case COL_TYPE_MSG_TIME:
                         if (entry->firstLine)
-                            return formatTime<std::wstring>(FORMAT_TIME, localTime(entry->time));
+                            return formatTime<std::wstring>(FORMAT_TIME, getLocalTime(entry->time));
                         break;
 
                     case COL_TYPE_MSG_CATEGORY:
@@ -1136,7 +1136,7 @@ struct LabelFormatterBytes : public LabelFormatter
         return e * numeric::nearMatch(a, std::begin(steps), std::end(steps));
     }
 
-    wxString formatText(double value, double optimalBlockSize) const override { return filesizeToShortString(static_cast<std::int64_t>(value)); }
+    wxString formatText(double value, double optimalBlockSize) const override { return filesizeToShortString(static_cast<int64_t>(value)); }
 };
 
 
@@ -1513,8 +1513,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::notifyProgressChange() //noexcept!
             case ProcessCallback::PHASE_COMPARING_CONTENT:
             case ProcessCallback::PHASE_SYNCHRONIZING:
             {
-                const std::int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
-                const int          itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
+                const int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
+                const int     itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
 
                 curveDataBytes->addRecord(timeElapsed.timeMs(), bytesCurrent);
                 curveDataItems->addRecord(timeElapsed.timeMs(), itemsCurrent);
@@ -1594,10 +1594,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         case ProcessCallback::PHASE_SYNCHRONIZING:
         {
-            const std::int64_t bytesCurrent  = syncStat_->getBytesCurrent(syncStat_->currentPhase());
-            const std::int64_t bytesTotal    = syncStat_->getBytesTotal  (syncStat_->currentPhase());
-            const int          itemsCurrent  = syncStat_->getItemsCurrent(syncStat_->currentPhase());
-            const int          itemsTotal    = syncStat_->getItemsTotal  (syncStat_->currentPhase());
+            const int64_t bytesCurrent  = syncStat_->getBytesCurrent(syncStat_->currentPhase());
+            const int64_t bytesTotal    = syncStat_->getBytesTotal  (syncStat_->currentPhase());
+            const int     itemsCurrent  = syncStat_->getItemsCurrent(syncStat_->currentPhase());
+            const int     itemsTotal    = syncStat_->getItemsTotal  (syncStat_->currentPhase());
 
             //add both data + obj-count, to handle "deletion-only" cases
             const double fractionTotal = bytesTotal + itemsTotal == 0 ? 0 : 1.0 * (bytesCurrent + itemsCurrent) / (bytesTotal + itemsTotal);
@@ -1876,10 +1876,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         case ProcessCallback::PHASE_COMPARING_CONTENT:
         case ProcessCallback::PHASE_SYNCHRONIZING:
         {
-            const int          itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
-            const int          itemsTotal   = syncStat_->getItemsTotal  (syncStat_->currentPhase());
-            const std::int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
-            const std::int64_t bytesTotal   = syncStat_->getBytesTotal  (syncStat_->currentPhase());
+            const int     itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
+            const int     itemsTotal   = syncStat_->getItemsTotal  (syncStat_->currentPhase());
+            const int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
+            const int64_t bytesTotal   = syncStat_->getBytesTotal  (syncStat_->currentPhase());
             assert(bytesCurrent <= bytesTotal);
 
             //set overall speed (instead of current speed)
@@ -1982,9 +1982,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
         case SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS:
             if (!soundFileSyncComplete_.empty())
             {
-                const Zstring soundFile = getResourceDirPf() + soundFileSyncComplete_;
-                if (fileAvailable(soundFile))
-                    wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+                const Zstring soundFilePath = getResourceDirPf() + soundFileSyncComplete_;
+                if (fileAvailable(soundFilePath))
+                    wxSound::Play(utfCvrtTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
             }
             break;
     }

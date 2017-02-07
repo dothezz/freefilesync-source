@@ -478,7 +478,7 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
     //finish categorization...
     const int itemsTotal = static_cast<int>(filesToCompareBytewise.size());
 
-    std::uint64_t bytesTotal = 0; //left and right filesizes are equal
+    uint64_t bytesTotal = 0; //left and right filesizes are equal
     for (FilePair* file : filesToCompareBytewise)
         bytesTotal += file->getFileSize<LEFT_SIDE>();
 
@@ -500,10 +500,10 @@ std::list<std::shared_ptr<BaseFolderPair>> ComparisonBuffer::compareByContent(co
         {
             StatisticsReporter statReporter(1, file->getFileSize<LEFT_SIDE>(), callback_);
 
-            auto onUpdateStatus = [&](std::int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
+            auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
             haveSameContent = filesHaveSameContent(file->getAbstractPath<LEFT_SIDE>(),
-                                                   file->getAbstractPath<RIGHT_SIDE>(), onUpdateStatus); //throw FileError
+                                                   file->getAbstractPath<RIGHT_SIDE>(), notifyUnbufferedIO); //throw FileError
             statReporter.reportDelta(1, 0);
         }, callback_); //throw X?
 
@@ -990,8 +990,8 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             callback.forceUiRefresh();
 
             zen::redetermineSyncDirection(fpCfg.directionCfg, *it,
-            [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); },
-            [&](std::int64_t bytesDelta) { callback.requestUiRefresh(); });//throw X
+            [&](const std::wstring& msg) { callback.reportWarning(msg, warnings.warningDatabaseError); }, //throw X
+            [&](const std::wstring& msg) { callback.reportStatus(msg); }); //throw X
         }
 
         return output;

@@ -43,8 +43,9 @@ template <class S, class T> S afterFirst (const S& str, const T& term, FailureRe
 template <class S, class T> S beforeFirst(const S& str, const T& term, FailureReturnVal rv);
 
 template <class S, class T> std::vector<S> split(const S& str, const T& delimiter);
-template <class S> void trim   (S& str, bool fromLeft = true, bool fromRight = true);
 template <class S> S    trimCpy(S  str, bool fromLeft = true, bool fromRight = true);
+template <class S> void trim   (S& str, bool fromLeft = true, bool fromRight = true);
+template <class S, class Function> void trim(S& str, bool fromLeft, bool fromRight, Function trimThisChar);
 template <class S, class T, class U> void replace   (      S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
 
@@ -293,45 +294,36 @@ S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
     static_assert(IsSameType<typename GetCharType<T>::Type, typename GetCharType<U>::Type>::value, "");
     const size_t oldLen = strLength(oldTerm);
     if (oldLen == 0)
-    {
-        assert(false);
         return str;
-    }
-
-    const auto*       strPos = strBegin(str);
-    const auto* const strEnd = strPos + strLength(str);
 
     const auto* const oldBegin = strBegin(oldTerm);
     const auto* const oldEnd   = oldBegin + oldLen;
 
-    //optimize "oldTerm not found": return ref-counted copy
-    const auto* strMatch = std::search(strPos, strEnd,
-                                       oldBegin, oldEnd);
-    if (strMatch == strEnd)
-        return str;
-
     const auto* const newBegin = strBegin(newTerm);
     const auto* const newEnd   = newBegin + strLength(newTerm);
+
     S output;
 
-    for (;;)
+    for (auto it = str.begin();;)
     {
-        impl::stringAppend(output, strPos, strMatch);
-        impl::stringAppend(output, newBegin, newEnd);
+        const auto itFound = std::search(it, str.end(),
+                                         oldBegin, oldEnd);
+        if (itFound == str.end() && it == str.begin())
+            return str; //optimize "oldTerm not found": return ref-counted copy
 
-        strPos = strMatch + oldLen;
+        impl::stringAppend(output, it, itFound);
+        if (itFound == str.end())
+            return output;
+
+        impl::stringAppend(output, newBegin, newEnd);
+        it = itFound + oldLen;
 
         if (!replaceAll)
-            break;
-
-        strMatch = std::search(strPos, strEnd,
-                               oldBegin, oldEnd);
-        if (strMatch == strEnd)
-            break;
+        {
+            impl::stringAppend(output, it, str.end());
+            return output;
+        }
     }
-    impl::stringAppend(output, strPos, strEnd);
-
-    return output;
 }
 
 
@@ -342,8 +334,8 @@ void replace(S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
 }
 
 
-template <class S> inline
-void trim(S& str, bool fromLeft, bool fromRight)
+template <class S, class Function> inline
+void trim(S& str, bool fromLeft, bool fromRight, Function trimThisChar)
 {
     assert(fromLeft || fromRight);
 
@@ -352,17 +344,25 @@ void trim(S& str, bool fromLeft, bool fromRight)
     const auto*       newEnd   = oldBegin + strLength(str);
 
     if (fromRight)
-        while (newBegin != newEnd && isWhiteSpace(newEnd[-1]))
+        while (newBegin != newEnd && trimThisChar(newEnd[-1]))
             --newEnd;
 
     if (fromLeft)
-        while (newBegin != newEnd && isWhiteSpace(*newBegin))
+        while (newBegin != newEnd && trimThisChar(*newBegin))
             ++newBegin;
 
     if (newBegin != oldBegin)
         str = S(newBegin, newEnd - newBegin); //minor inefficiency: in case "str" is not shared, we could save an allocation and do a memory move only
     else
         str.resize(newEnd - newBegin);
+}
+
+
+template <class S> inline
+void trim(S& str, bool fromLeft, bool fromRight)
+{
+    using CharType = typename GetCharType<S>::Type;
+    trim(str, fromLeft, fromRight, [](CharType c) { return isWhiteSpace(c); });
 }
 
 
@@ -398,6 +398,8 @@ T copyStringTo(S&& str) { return impl::CopyStringToString<std::decay_t<S>, T>().
 template <class S, class T> inline
 int cmpString(const S& lhs, const T& rhs)
 {
+    static_assert(IsSameType<typename GetCharType<S>::Type, typename GetCharType<T>::Type>::value, "");
+
     const size_t lenL = strLength(lhs);
     const size_t lenR = strLength(rhs);
 
@@ -422,21 +424,13 @@ namespace impl
 template <class Num> inline
 int saferPrintf(char* buffer, size_t bufferSize, const char* format, const Num& number) //there is no such thing as a "safe" printf ;)
 {
-#if defined _MSC_VER || defined __MINGW32__
-    return ::_snprintf(buffer, bufferSize, format, number); //by factor 10 faster than "std::snprintf" on MinGW and on par with std::sprintf()!!!
-#else
     return std::snprintf(buffer, bufferSize, format, number); //C99
-#endif
 }
 
 template <class Num> inline
 int saferPrintf(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const Num& number)
 {
-#ifdef __MINGW32__
-    return ::_snwprintf(buffer, bufferSize, format, number); //MinGW doesn't respect ISO C
-#else
     return std::swprintf(buffer, bufferSize, format, number); //C99
-#endif
 }
 }
 

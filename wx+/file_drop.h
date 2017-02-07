@@ -10,11 +10,8 @@
 #include <vector>
 #include <functional>
 #include <zen/zstring.h>
-#include <zen/utf.h>
 #include <wx/window.h>
 #include <wx/event.h>
-#include <wx/dnd.h>
-
 
 
 namespace zen
@@ -36,27 +33,8 @@ wnd.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), nul
 void MyDlg::OnFilesDropped(FileDropEvent& event);
 */
 
+extern const wxEventType EVENT_DROP_FILE;
 
-
-
-
-
-
-
-
-namespace impl
-{
-inline
-wxEventType getFileDropEventType()
-{
-    //inline functions have external linkage by default => this static is also extern, i.e. program wide unique! but defined in a header... ;)
-    static wxEventType dummy = wxNewEventType();
-    return dummy;
-}
-}
-
-//define new event type
-const wxEventType EVENT_DROP_FILE = impl::getFileDropEventType();
 
 class FileDropEvent : public wxCommandEvent
 {
@@ -71,6 +49,7 @@ private:
     const std::vector<Zstring> droppedPaths_;
 };
 
+
 using FileDropEventFunction = void (wxEvtHandler::*)(FileDropEvent&);
 
 #define FileDropEventHandler(func) \
@@ -80,41 +59,7 @@ using FileDropEventFunction = void (wxEvtHandler::*)(FileDropEvent&);
 
 
 
-namespace impl
-{
-class WindowDropTarget : public wxFileDropTarget
-{
-public:
-    WindowDropTarget(wxWindow& dropWindow) : dropWindow_(dropWindow) {}
-
-private:
-    bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray) override
-    {
-        /*Linux, MTP: we get an empty file array
-            => switching to wxTextDropTarget won't help (much): we'd get the format
-                mtp://[usb:001,002]/Telefonspeicher/Folder/file.txt
-            instead of
-                /run/user/1000/gvfs/mtp:host=%5Busb%3A001%2C002%5D/Telefonspeicher/Folder/file.txt
-        */
-
-        //wxPoint clientDropPos(x, y)
-        std::vector<Zstring> filePaths;
-        for (const wxString& file : fileArray)
-            filePaths.push_back(utfCvrtTo<Zstring>(file));
-
-        //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
-        if (wxEvtHandler* handler = dropWindow_.GetEventHandler())
-            handler->AddPendingEvent(FileDropEvent(filePaths));
-        return true;
-    }
-
-    wxWindow& dropWindow_;
-};
-}
-
-
-inline
-void setupFileDrop(wxWindow& wnd) { wnd.SetDropTarget(new impl::WindowDropTarget(wnd)); /*takes ownership*/ }
+void setupFileDrop(wxWindow& wnd);
 }
 
 #endif //FILE_DROP_H_09457802957842560325626

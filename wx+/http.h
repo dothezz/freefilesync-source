@@ -8,6 +8,7 @@
 #define HTTP_h_879083425703425702
 
 #include <zen/file_error.h>
+#include <zen/serialize.h>
 
 namespace zen
 {
@@ -20,11 +21,11 @@ namespace zen
 class HttpInputStream
 {
 public:
-    std::string readAll(); //throw SysError
+    //support zen/serialize.h buffered input stream concept
+    size_t read(void* buffer, size_t bytesToRead); //throw SysError, X; return "bytesToRead" bytes unless end of stream!
+    std::string readAll();                         //throw SysError, X
 
-    //support zen/serialize.h Unbuffered Input Stream Concept
-    size_t tryRead(void* buffer, size_t bytesToRead); //throw SysError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
-    size_t getBlockSize() const { return 64 * 1024; }
+    size_t getBlockSize() const;
 
     class Impl;
     HttpInputStream(std::unique_ptr<Impl>&& pimpl);
@@ -36,8 +37,8 @@ private:
 };
 
 
-HttpInputStream sendHttpGet (const std::wstring& url, const std::wstring& userAgent); //throw SysError
-HttpInputStream sendHttpPost(const std::wstring& url, const std::wstring& userAgent,
+HttpInputStream sendHttpGet (const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO); //throw SysError
+HttpInputStream sendHttpPost(const std::wstring& url, const std::wstring& userAgent, const IOCallback& notifyUnbufferedIO,
                              const std::vector<std::pair<std::string, std::string>>& postParams); //throw SysError
 bool internetIsAlive(); //noexcept
 

@@ -48,8 +48,8 @@ public:
         unsigned int filesOnRightView   = 0;
         unsigned int foldersOnRightView = 0;
 
-        std::uint64_t filesizeLeftView  = 0;
-        std::uint64_t filesizeRightView = 0;
+        uint64_t filesizeLeftView  = 0;
+        uint64_t filesizeRightView = 0;
     };
 
     //comparison results view
@@ -81,8 +81,8 @@ public:
         unsigned int filesOnRightView   = 0;
         unsigned int foldersOnRightView = 0;
 
-        std::uint64_t filesizeLeftView  = 0;
-        std::uint64_t filesizeRightView = 0;
+        uint64_t filesizeLeftView  = 0;
+        uint64_t filesizeRightView = 0;
     };
 
     //synchronization preview

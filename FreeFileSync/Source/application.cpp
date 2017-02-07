@@ -51,6 +51,8 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
+    //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
+
     ::gtk_init(nullptr, nullptr);
     //::gtk_rc_parse((getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
@@ -69,11 +71,10 @@ bool Application::OnInit()
     }
     catch (const FileError&) { assert(false); }
 
+
+
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
-
-
-    //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
 
     //Note: app start is deferred: batch mode requires the wxApp eventhandler to be established for UI update events. This is not the case at the time of OnInit()!
     Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
@@ -173,17 +174,17 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             if (it == arg.begin()) return false; //require at least one prefix character
 
             const Zstring argTmp(it, arg.end());
-            return equalNoCase(argTmp, Zstr("help")) ||
-                   equalNoCase(argTmp, Zstr("h"))    ||
+            return ciEqual(argTmp, Zstr("help")) ||
+                   ciEqual(argTmp, Zstr("h"))    ||
                    argTmp == Zstr("?");
         };
 
         for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
             if (syntaxHelpRequested(*it))
                 return showSyntaxHelp();
-            else if (equalNoCase(*it, optionEdit))
+            else if (ciEqual(*it, optionEdit))
                 openForEdit = true;
-            else if (equalNoCase(*it, optionLeftDir))
+            else if (ciEqual(*it, optionLeftDir))
             {
                 if (++it == commandArgs.end())
                 {
@@ -192,7 +193,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 }
                 dirPathPhrasesLeft.push_back(*it);
             }
-            else if (equalNoCase(*it, optionRightDir))
+            else if (ciEqual(*it, optionRightDir))
             {
                 if (++it == commandArgs.end())
                 {
@@ -301,7 +302,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
             if (!replaceDirectories(guiCfg.mainCfg))
                 return;
-            runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>(), !openForEdit);
+            runGuiMode(globalConfigFilePath, guiCfg, std::vector<Zstring>(), !openForEdit /*startComparison*/);
         }
     }
     else if (configFiles.size() == 1)
@@ -383,7 +384,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             notifyFatalError(e.toString(), _("Error"));
             return;
         }
-        runGuiMode(globalConfigFilePath, guiCfg, filepaths, !openForEdit);
+        runGuiMode(globalConfigFilePath, guiCfg, filepaths, !openForEdit /*startComparison*/);
     }
 }
 
@@ -438,22 +439,18 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
     };
 
     XmlGlobalSettings globalCfg;
-        try
-        {
-            std::wstring warningMsg;
-            readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
+    try
+    {
+        std::wstring warningMsg;
+        readConfig(globalConfigFilePath, globalCfg, warningMsg); //throw FileError
 
-            assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
-        }
-        catch (const FileError& e)
-        {
-			bool notExisting = false;
-            try  { notExisting = !getItemTypeIfExists(globalConfigFilePath); /*throw FileError*/ }
-            catch (FileError&) {} //previous exception is more relevant
-
-			if (!notExisting) //existing or access error
-				return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
-        }
+        assert(warningMsg.empty()); //ignore parsing errors: should be migration problems only *cross-fingers*
+    }
+    catch (const FileError& e)
+    {
+        if (!itemNotExisting(globalConfigFilePath)) //existing or access error
+            return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
+    }
 
     try
     {
@@ -474,7 +471,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        const TimeComp timeStamp = localTime();
+        const TimeComp timeStamp = getLocalTime();
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess, BatchRequestSwitchToMainDialog

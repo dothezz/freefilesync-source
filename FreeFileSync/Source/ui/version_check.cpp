@@ -18,6 +18,7 @@
 #include <wx+/image_resources.h>
 #include "../lib/ffs_paths.h"
 #include "small_dlgs.h"
+#include "version_check_impl.h"
 
 
 using namespace zen;
@@ -104,7 +105,7 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
         try //harmonize with wxHTTP: get_latest_changes.php must be accessible without https!!!
         {
             const std::string buf = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", ffsUpdateCheckUserAgent,
-            { { "since", zen::ffsVersion } }).readAll(); //throw SysError
+            nullptr /*notifyUnbufferedIO*/, { { "since", zen::ffsVersion } }).readAll(); //throw SysError
             updateDetailsMsg = utfCvrtTo<std::wstring>(buf);
         }
         catch (const zen::SysError& e) { throw FileError(_("Failed to retrieve update information."), e.toString()); }
@@ -135,7 +136,8 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
 std::string getOnlineVersion(const std::vector<std::pair<std::string, std::string>>& postParams) //throw SysError
 {
     //harmonize with wxHTTP: get_latest_version_number.php must be accessible without https!!!
-    const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", ffsUpdateCheckUserAgent, postParams).readAll(); //throw SysError
+    const std::string buffer = sendHttpPost(L"http://www.freefilesync.org/get_latest_version_number.php", ffsUpdateCheckUserAgent,
+                                            nullptr /*notifyUnbufferedIO*/, postParams).readAll(); //throw SysError
     return trimCpy(buffer);
 }
 

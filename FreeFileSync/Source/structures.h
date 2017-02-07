@@ -314,9 +314,9 @@ bool operator==(const FilterConfig& lhs, const FilterConfig& rhs)
 void resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
                   size_t sizeMin,  UnitSize unitSizeMin,
                   size_t sizeMax,  UnitSize unitSizeMax,
-                  std::int64_t&  timeFrom,   //unit: UTC time, seconds
-                  std::uint64_t& sizeMinBy,  //unit: bytes
-                  std::uint64_t& sizeMaxBy); //unit: bytes
+                  int64_t&  timeFrom,   //unit: UTC time, seconds
+                  uint64_t& sizeMinBy,  //unit: bytes
+                  uint64_t& sizeMaxBy); //unit: bytes
 
 
 struct FolderPairEnh //enhanced folder pairs with (optional) alternate configuration

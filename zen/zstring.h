@@ -20,10 +20,7 @@ using Zstring = zen::Zbase<Zchar>;
 
 
 int cmpStringNoCase(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen);
-    int cmpStringNoCase(const char*    lhs, size_t lhsLen, const char*    rhs, size_t rhsLen);
-
-template <class S, class T> inline
-bool equalNoCase(const S& lhs, const T& rhs) { using namespace zen; return cmpStringNoCase(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) == 0;  }
+    int cmpStringNoCase(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen);
 
 template <class S>
 S makeUpperCopy(S str);
@@ -32,6 +29,7 @@ S makeUpperCopy(S str);
 //Compare filepaths: Windows/OS X does NOT distinguish between upper/lower-case, while Linux DOES
 int cmpFilePath(const wchar_t* lhs, size_t lhsLen, const wchar_t* rhs, size_t rhsLen);
     int cmpFilePath(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen);
+
 
 template <class S, class T> inline
 bool equalFilePath(const S& lhs, const T& rhs) { using namespace zen; return cmpFilePath(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) == 0;  }
@@ -42,6 +40,12 @@ struct LessFilePath
     bool operator()(const S& lhs, const T& rhs) const { using namespace zen; return cmpFilePath(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) < 0; }
 };
 
+
+struct LessNoCase
+{
+    template <class S, class T>
+    bool operator()(const S& lhs, const T& rhs) const { using namespace zen; return cmpStringNoCase(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) < 0; }
+};
 
 
 inline
@@ -60,19 +64,23 @@ Zstring getFileExtension(const Zstring& filePath)
 
 
 template <class S, class T> inline
-bool pathStartsWith(const S& str, const T& prefix)
+bool ciEqual(const S& lhs, const T& rhs) { using namespace zen; return cmpStringNoCase(strBegin(lhs), strLength(lhs), strBegin(rhs), strLength(rhs)) == 0;  }
+
+
+template <class S, class T> inline
+bool ciStartsWith(const S& str, const T& prefix)
 {
     using namespace zen;
     const size_t pfLen = strLength(prefix);
     if (strLength(str) < pfLen)
         return false;
 
-    return cmpFilePath(strBegin(str), pfLen, strBegin(prefix), pfLen) == 0;
+    return cmpStringNoCase(strBegin(str), pfLen, strBegin(prefix), pfLen) == 0;
 }
 
 
 template <class S, class T> inline
-bool pathEndsWith(const S& str, const T& postfix)
+bool ciEndsWith(const S& str, const T& postfix)
 {
     using namespace zen;
     const size_t strLen = strLength(str);
@@ -80,12 +88,12 @@ bool pathEndsWith(const S& str, const T& postfix)
     if (strLen < pfLen)
         return false;
 
-    return cmpFilePath(strBegin(str) + strLen - pfLen, pfLen, strBegin(postfix), pfLen) == 0;
+    return cmpStringNoCase(strBegin(str) + strLen - pfLen, pfLen, strBegin(postfix), pfLen) == 0;
 }
 
 
 template <class S, class T, class U>
-S pathReplaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll = true);
+S ciReplaceCpy(const S& str, const T& oldTerm, const U& newTerm);
 
 
 
@@ -171,11 +179,39 @@ int cmpFilePath(const char* lhs, size_t lhsLen, const char* rhs, size_t rhsLen)
 
 
 template <class S, class T, class U> inline
-S pathReplaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
+S ciReplaceCpy(const S& str, const T& oldTerm, const U& newTerm)
 {
-    assert(!contains(str, Zchar('\0')));
+    using namespace zen;
+    static_assert(IsSameType<typename GetCharType<S>::Type, typename GetCharType<T>::Type>::value, "");
+    static_assert(IsSameType<typename GetCharType<T>::Type, typename GetCharType<U>::Type>::value, "");
+    const size_t oldLen = strLength(oldTerm);
+    if (oldLen == 0)
+        return str;
 
-    return replaceCpy(str, oldTerm, newTerm, replaceAll);
+    const S strU = makeUpperCopy(str); //S required to be a string class
+    const S oldU = makeUpperCopy<S>(oldTerm); //[!] T not required to be a string class
+    assert(strLength(strU) == strLength(str    ));
+    assert(strLength(oldU) == strLength(oldTerm));
+
+    const auto* const newBegin = strBegin(newTerm);
+    const auto* const newEnd   = newBegin + strLength(newTerm);
+
+    S output;
+
+    for (size_t pos = 0;;)
+    {
+        const auto itFound = std::search(strU.begin() + pos, strU.end(),
+                                         oldU.begin(), oldU.end());
+        if (itFound == strU.end() && pos == 0)
+            return str; //optimize "oldTerm not found": return ref-counted copy
+
+        impl::stringAppend(output, str.begin() + pos, str.begin() + (itFound - strU.begin()));
+        if (itFound == strU.end())
+            return output;
+
+        impl::stringAppend(output, newBegin, newEnd);
+        pos = (itFound - strU.begin()) + oldLen;
+    }
 }
 
 

@@ -875,7 +875,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair, int formatVer)
     in["Right"](enhPair.folderPathPhraseRight_);
 
     //TODO: remove after migration - 2016-07-24
-    auto ciReplace = [](Zstring& pathPhrase, const Zstring& oldTerm, const Zstring& newTerm) { pathPhrase = pathReplaceCpy(pathPhrase, oldTerm, newTerm); };
+    auto ciReplace = [](Zstring& pathPhrase, const Zstring& oldTerm, const Zstring& newTerm) { pathPhrase = ciReplaceCpy(pathPhrase, oldTerm, newTerm); };
     ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyDocuments%"), Zstr("%csidl_Documents%"));
     ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyMusic%"    ), Zstr("%csidl_Music%"));
     ciReplace(enhPair.folderPathPhraseLeft_,  Zstr("%csidl_MyPictures%" ), Zstr("%csidl_Pictures%"));

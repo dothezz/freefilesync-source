@@ -29,8 +29,8 @@ using AFS = AbstractFileSystem;
 struct FileDescriptor
 {
     FileDescriptor() {}
-    FileDescriptor(std::int64_t lastWriteTimeRawIn,
-                   std::uint64_t fileSizeIn,
+    FileDescriptor(int64_t lastWriteTimeRawIn,
+                   uint64_t fileSizeIn,
                    const AFS::FileId& idIn,
                    bool isSymlink) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
@@ -38,8 +38,8 @@ struct FileDescriptor
         fileId(idIn),
         isFollowedSymlink(isSymlink) {}
 
-    std::int64_t lastWriteTimeRaw = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
-    std::uint64_t fileSize = 0;
+    int64_t lastWriteTimeRaw = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    uint64_t fileSize = 0;
     AFS::FileId fileId {}; // optional!
     bool isFollowedSymlink = false;
 };
@@ -48,9 +48,9 @@ struct FileDescriptor
 struct LinkDescriptor
 {
     LinkDescriptor() {}
-    explicit LinkDescriptor(std::int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
+    explicit LinkDescriptor(int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
 
-    std::int64_t lastWriteTimeRaw = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    int64_t lastWriteTimeRaw = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
 };
 
 
@@ -313,8 +313,8 @@ public:
     inline friend ptrdiff_t operator-(const DerefIter& lhs, const DerefIter& rhs) { return lhs.it_ - rhs.it_; }
     inline friend bool operator==(const DerefIter& lhs, const DerefIter& rhs) { return lhs.it_ == rhs.it_; }
     inline friend bool operator!=(const DerefIter& lhs, const DerefIter& rhs) { return !(lhs == rhs); }
-    V& operator* () { return  **it_; }
-    V* operator->() { return &** it_; }
+    V& operator* () const { return  **it_; }
+    V* operator->() const { return &** it_; }
 private:
     IterImpl it_;
 };
@@ -526,10 +526,10 @@ public:
         dataLeft_(left),
         dataRight_(right) {}
 
-    template <SelectedSide side> std::int64_t getLastWriteTime() const;
-    template <SelectedSide side> std::uint64_t     getFileSize() const;
-    template <SelectedSide side> AFS::FileId       getFileId  () const;
-    template <SelectedSide side> bool        isFollowedSymlink() const;
+    template <SelectedSide side> int64_t getLastWriteTime() const;
+    template <SelectedSide side> uint64_t     getFileSize() const;
+    template <SelectedSide side> AFS::FileId  getFileId  () const;
+    template <SelectedSide side> bool   isFollowedSymlink() const;
 
     void setMoveRef(ObjectId refId) { moveFileRef_ = refId; } //reference to corresponding renamed file
     ObjectId getMoveRef() const { return moveFileRef_; } //may be nullptr
@@ -541,9 +541,9 @@ public:
 
     template <SelectedSide sideTrg>
     void setSyncedTo(const Zstring& itemName, //call after sync, sets FILE_EQUAL
-                     std::uint64_t fileSize,
-                     std::int64_t lastWriteTimeTrg,
-                     std::int64_t lastWriteTimeSrc,
+                     uint64_t fileSize,
+                     int64_t lastWriteTimeTrg,
+                     int64_t lastWriteTimeSrc,
                      const AFS::FileId& fileIdTrg,
                      const AFS::FileId& fileIdSrc,
                      bool isSymlinkTrg,
@@ -571,7 +571,7 @@ class SymlinkPair : public FileSystemObject //this class models a TRUE symbolic 
 public:
     void accept(FSObjectVisitor& visitor) const override;
 
-    template <SelectedSide side> std::int64_t getLastWriteTime() const; //write time of the link, NOT target!
+    template <SelectedSide side> int64_t getLastWriteTime() const; //write time of the link, NOT target!
 
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
 
@@ -587,8 +587,8 @@ public:
 
     template <SelectedSide sideTrg>
     void setSyncedTo(const Zstring& itemName, //call after sync, sets SYMLINK_EQUAL
-                     std::int64_t lastWriteTimeTrg,
-                     std::int64_t lastWriteTimeSrc);
+                     int64_t lastWriteTimeTrg,
+                     int64_t lastWriteTimeSrc);
 
 private:
     void flip()          override;
@@ -1028,14 +1028,14 @@ void FilePair::flip()
 
 
 template <SelectedSide side> inline
-std::int64_t FilePair::getLastWriteTime() const
+int64_t FilePair::getLastWriteTime() const
 {
     return SelectParam<side>::ref(dataLeft_, dataRight_).lastWriteTimeRaw;
 }
 
 
 template <SelectedSide side> inline
-std::uint64_t FilePair::getFileSize() const
+uint64_t FilePair::getFileSize() const
 {
     return SelectParam<side>::ref(dataLeft_, dataRight_).fileSize;
 }
@@ -1064,9 +1064,9 @@ bool FolderPair::isFollowedSymlink() const
 
 template <SelectedSide sideTrg> inline
 void FilePair::setSyncedTo(const Zstring& itemName,
-                           std::uint64_t fileSize,
-                           std::int64_t lastWriteTimeTrg,
-                           std::int64_t lastWriteTimeSrc,
+                           uint64_t fileSize,
+                           int64_t lastWriteTimeTrg,
+                           int64_t lastWriteTimeSrc,
                            const AFS::FileId& fileIdTrg,
                            const AFS::FileId& fileIdSrc,
                            bool isSymlinkTrg,
@@ -1085,8 +1085,8 @@ void FilePair::setSyncedTo(const Zstring& itemName,
 
 template <SelectedSide sideTrg> inline
 void SymlinkPair::setSyncedTo(const Zstring& itemName,
-                              std::int64_t lastWriteTimeTrg,
-                              std::int64_t lastWriteTimeSrc)
+                              int64_t lastWriteTimeTrg,
+                              int64_t lastWriteTimeSrc)
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
@@ -1112,7 +1112,7 @@ void FolderPair::setSyncedTo(const Zstring& itemName,
 
 
 template <SelectedSide side> inline
-std::int64_t SymlinkPair::getLastWriteTime() const
+int64_t SymlinkPair::getLastWriteTime() const
 {
     return SelectParam<side>::ref(dataLeft_, dataRight_).lastWriteTimeRaw;
 }

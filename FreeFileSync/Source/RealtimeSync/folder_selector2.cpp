@@ -97,13 +97,14 @@ void FolderSelector2::onFilesDropped(FileDropEvent& event)
         return;
 
     Zstring itemPath = itemPaths[0];
-    if (!dirExists(itemPath))
+    try
     {
-        Zstring parentPath = beforeLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-        if (dirExists(parentPath))
-            itemPath = parentPath;
-        //else: keep original name unconditionally: usecase: inactive mapped network shares
+        if (getItemType(itemPath) == ItemType::FILE) //throw FileError
+            if (Opt<Zstring> parentPath = getParentFolderPath(itemPath))
+                itemPath = *parentPath;
     }
+    catch (FileError&) {} //e.g. good for inactive mapped network shares, not so nice for C:\pagefile.sys
+
     setPath(itemPath);
 
     //event.Skip();
@@ -127,7 +128,7 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
         const Zstring folderPath = getResolvedFilePath(getPath());
         if (!folderPath.empty())
         {
-            auto ft = runAsync([folderPath] { return dirExists(folderPath); });
+            auto ft = runAsync([folderPath] { return dirAvailable(folderPath); });
 
             if (ft.wait_for(std::chrono::milliseconds(200)) == std::future_status::ready && ft.get()) //potentially slow network access: wait 200ms at most
                 defaultFolderPath = folderPath;
@@ -137,9 +138,9 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
     wxDirDialog dirPicker(&selectButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
     if (dirPicker.ShowModal() != wxID_OK)
         return;
-    const Zstring newFolder = toZ(dirPicker.GetPath());
+    const Zstring newFolderPath = toZ(dirPicker.GetPath());
 
-    setFolderPath(newFolder, &folderPathCtrl_, folderPathCtrl_, staticText_);
+    setFolderPath(newFolderPath, &folderPathCtrl_, folderPathCtrl_, staticText_);
 }
 
 

@@ -28,8 +28,8 @@ public:
                size_t sizeMin,  UnitSize unitSizeMin,
                size_t sizeMax,  UnitSize unitSizeMax);
 
-    bool matchTime(std::int64_t writeTime) const { return timeFrom_ <= writeTime; }
-    bool matchSize(std::uint64_t fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
+    bool matchTime(int64_t writeTime) const { return timeFrom_ <= writeTime; }
+    bool matchSize(uint64_t fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
     bool matchFolder() const { return matchesFolder_; }
     bool isNull() const; //filter is equivalent to NullFilter, but may be technically slower
 
@@ -37,14 +37,14 @@ public:
     friend SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second);
 
 private:
-    SoftFilter(std::int64_t timeFrom,
-               std::uint64_t sizeMin,
-               std::uint64_t sizeMax,
+    SoftFilter(int64_t timeFrom,
+               uint64_t sizeMin,
+               uint64_t sizeMax,
                bool matchesFolder);
 
-    std::int64_t timeFrom_ = 0; //unit: UTC, seconds
-    std::uint64_t sizeMin_ = 0; //unit: bytes
-    std::uint64_t sizeMax_ = 0; //unit: bytes
+    int64_t timeFrom_ = 0; //unit: UTC, seconds
+    uint64_t sizeMin_ = 0; //unit: bytes
+    uint64_t sizeMax_ = 0; //unit: bytes
     const bool matchesFolder_;
 };
 }
@@ -81,9 +81,9 @@ SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
 }
 
 inline
-SoftFilter::SoftFilter(std::int64_t timeFrom,
-                       std::uint64_t sizeMin,
-                       std::uint64_t sizeMax,
+SoftFilter::SoftFilter(int64_t timeFrom,
+                       uint64_t sizeMin,
+                       uint64_t sizeMax,
                        bool matchesFolder) :
     timeFrom_(timeFrom),
     sizeMin_ (sizeMin),
@@ -102,9 +102,9 @@ SoftFilter combineFilters(const SoftFilter& lhs, const SoftFilter& rhs)
 inline
 bool SoftFilter::isNull() const //filter is equivalent to NullFilter, but may be technically slower
 {
-    return timeFrom_ == std::numeric_limits<std::int64_t>::min() &&
+    return timeFrom_ == std::numeric_limits<int64_t>::min() &&
            sizeMin_  == 0U &&
-           sizeMax_  == std::numeric_limits<std::uint64_t>::max() &&
+           sizeMax_  == std::numeric_limits<uint64_t>::max() &&
            matchesFolder_ == true;
 }
 }

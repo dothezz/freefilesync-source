@@ -22,21 +22,20 @@ struct SummaryInfo
     std::wstring jobName; //may be empty
     std::wstring finalStatus;
     int itemsProcessed;
-    std::int64_t bytesProcessed;
+    int64_t bytesProcessed;
     int itemsTotal;
-    std::int64_t bytesTotal;
+    int64_t bytesTotal;
     int64_t totalTime; //unit: [sec]
 };
 
 void streamToLogFile(const SummaryInfo& summary, //throw FileError
                      const ErrorLog& log,
-                     AFS::OutputStream& streamOut,
-                     const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus);
+                     AFS::OutputStream& streamOut);
 
-void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
+void saveToLastSyncsLog(const SummaryInfo& summary, //throw FileError
                         const ErrorLog& log,
                         size_t maxBytesToWrite,
-                        const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus);
+                        const IOCallback& notifyUnbufferedIO);
 
 Zstring getLastSyncsLogfilePath();
 
@@ -47,7 +46,7 @@ struct OnUpdateLogfileStatusNoThrow
     OnUpdateLogfileStatusNoThrow(ProcessCallback& pc, const std::wstring& logfileDisplayPath) : pc_(pc),
         msg(replaceCpy(_("Saving file %x..."), L"%x", fmtPath(logfileDisplayPath))) {}
 
-    void operator()(std::int64_t bytesDelta)
+    void operator()(int64_t bytesDelta)
     {
         bytesWritten += bytesDelta;
         try { pc_.reportStatus(msg + L" (" + filesizeToShortString(bytesWritten) + L")"); /*throw X*/ }
@@ -56,7 +55,7 @@ struct OnUpdateLogfileStatusNoThrow
 
 private:
     ProcessCallback& pc_;
-    std::int64_t bytesWritten = 0;
+    int64_t bytesWritten = 0;
     const std::wstring msg;
 };
 
@@ -120,35 +119,24 @@ std::wstring generateLogHeader(const SummaryInfo& s)
 inline
 void streamToLogFile(const SummaryInfo& summary, //throw FileError
                      const ErrorLog& log,
-                     AFS::OutputStream& streamOut,
-                     const std::function<void(std::int64_t bytesDelta)>& notifyProgress)
+                     AFS::OutputStream& streamOut)
 {
+    const std::string header = replaceCpy(utfCvrtTo<std::string>(generateLogHeader(summary)), '\n', LINE_BREAK); //don't replace line break any earlier
+
+    streamOut.write(&header[0], header.size()); //throw FileError, X
+
     //write log items in blocks instead of creating one big string: memory allocation might fail; think 1 million entries!
-    const size_t blockSize = streamOut.getBlockSize();
     std::string buffer;
-
-    auto flushBlock = [&]
-    {
-        size_t bytesRemaining = buffer.size();
-        while (bytesRemaining >= blockSize)
-        {
-            const size_t bytesWritten = streamOut.tryWrite(&*(buffer.end() - bytesRemaining), blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-            bytesRemaining -= bytesWritten;
-            if (notifyProgress) notifyProgress(bytesWritten); //throw X!
-        }
-        buffer.erase(buffer.begin(), buffer.end() - bytesRemaining);
-    };
-
-    buffer += replaceCpy(utfCvrtTo<std::string>(generateLogHeader(summary)), '\n', LINE_BREAK); //don't replace line break any earlier
     buffer += LINE_BREAK;
 
     for (const LogEntry& entry : log)
     {
         buffer += replaceCpy(utfCvrtTo<std::string>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         buffer += LINE_BREAK;
-        flushBlock(); //throw FileError
+
+        streamOut.write(&buffer[0], buffer.size()); //throw FileError, X
+        buffer.clear();
     }
-    unbufferedSave(buffer, streamOut, notifyProgress); //throw FileError
 }
 
 
@@ -160,7 +148,7 @@ inline
 void saveToLastSyncsLog(const SummaryInfo& summary, //throw FileError
                         const ErrorLog& log,
                         size_t maxBytesToWrite, //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
-                        const std::function<void(std::int64_t bytesDelta)>& onUpdateSaveStatus)
+                        const IOCallback& notifyUnbufferedIO)
 {
     const Zstring filepath = getLastSyncsLogfilePath();
 
@@ -188,7 +176,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary, //throw FileError
         Utf8String oldStream;
         try
         {
-            oldStream = loadBinContainer<Utf8String>(filepath, onUpdateSaveStatus); //throw FileError
+            oldStream = loadBinContainer<Utf8String>(filepath, notifyUnbufferedIO); //throw FileError, X
             //Note: we also report the loaded bytes via onUpdateSaveStatus()!
         }
         catch (FileError&) {}
@@ -216,7 +204,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary, //throw FileError
         }
     }
 
-    saveBinContainer(filepath, newStream, onUpdateSaveStatus); //throw FileError
+    saveBinContainer(filepath, newStream, notifyUnbufferedIO); //throw FileError, X
 }
 }
 
