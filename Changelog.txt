@@ -1,3 +1,20 @@
+FreeFileSync 8.10 [2017-03-12]
+------------------------------
+Fully preserve case-sensitive file paths (Windows, macOS)
+Support SFTP connections to local hosts
+Warn if versioning folder is contained in a base folder
+Use natural string sorting algorithm for item lists
+Consider exclude filter settings for folder dependency checks
+Fixed file not found error on case-sensitive SFTP volume
+Fixed failure when creating MTP sub directories
+Fixed crash when loading database file during comparison
+Refactored UTF conversion routines
+Use pipe symbol as filter separator instead of semicolon
+Iterate over all matching SFTP connections available on a server (macOS)
+Reduced folder matching time by 12%, average memory use by 11%
+Added experimental FTP support
+
+
 FreeFileSync 8.9 [2017-02-08]
 -----------------------------
 Detect when database file was copied and avoid "second part missing" error

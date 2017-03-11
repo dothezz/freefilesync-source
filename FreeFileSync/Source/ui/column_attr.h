@@ -37,7 +37,7 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
     {
         { ColumnTypeRim::ITEM_PATH, -80, 1, true  }, //stretch to full width and substract sum of fixed-size widths!
         { ColumnTypeRim::EXTENSION,  60, 0, false },
-        { ColumnTypeRim::DATE,      112, 0, false },
+        { ColumnTypeRim::DATE,      140, 0, false },
         { ColumnTypeRim::SIZE,       80, 0, true  },
     };
 }
@@ -45,13 +45,7 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
-    return
-    {
-        { ColumnTypeRim::ITEM_PATH, -80, 1, true  },
-        { ColumnTypeRim::EXTENSION,  60, 0, false },
-        { ColumnTypeRim::DATE,      112, 0, false },
-        { ColumnTypeRim::SIZE,       80, 0, true  },
-    };
+    return getDefaultColumnAttributesLeft(); //*currently* same default
 }
 
 enum class ItemPathFormat

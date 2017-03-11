@@ -14,12 +14,12 @@ using namespace zen;
 
 
 
-void HierarchyObject::removeEmptyRec()
+void ContainerObject::removeEmptyRec()
 {
     bool emptyExisting = false;
     auto isEmpty = [&](const FileSystemObject& fsObj) -> bool
     {
-        const bool objEmpty = fsObj.isEmpty();
+        const bool objEmpty = fsObj.isPairEmpty();
         if (objEmpty)
             emptyExisting = true;
         return objEmpty;
@@ -30,7 +30,7 @@ void HierarchyObject::removeEmptyRec()
     refSubFolders().remove_if(isEmpty);
 
     if (emptyExisting) //notify if actual deletion happened
-        notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a FolderPair, may already be partially destroyed and existing as a pure HierarchyObject!
+        notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a FolderPair, may already be partially destroyed and existing as a pure ContainerObject!
 
     for (FolderPair& folder : refSubFolders())
         folder.removeEmptyRec(); //recurse
@@ -134,7 +134,7 @@ SyncOperation getIsolatedSyncOperation(bool itemExistsLeft,
 
 
 template <class Predicate> inline
-bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
+bool hasDirectChild(const ContainerObject& hierObj, Predicate p)
 {
     return std::any_of(hierObj.refSubFiles  ().begin(), hierObj.refSubFiles  ().end(), p) ||
            std::any_of(hierObj.refSubLinks  ().begin(), hierObj.refSubLinks  ().end(), p) ||
@@ -164,16 +164,13 @@ SyncOperation FileSystemObject::getSyncOperation() const
 
 SyncOperation FolderPair::getSyncOperation() const
 {
-    if (!haveBufferedSyncOp_)
+    if (!syncOpBuffered_) //redetermine...
     {
-        haveBufferedSyncOp_ = true;
-        //redetermine...
-
         //suggested operation *not* considering child elements
         syncOpBuffered_ = FileSystemObject::getSyncOperation();
 
         //action for child elements may occassionally have to overwrite parent task:
-        switch (syncOpBuffered_)
+        switch (*syncOpBuffered_)
         {
             case SO_MOVE_LEFT_SOURCE:
             case SO_MOVE_LEFT_TARGET:
@@ -205,11 +202,11 @@ SyncOperation FolderPair::getSyncOperation() const
                     }))
                     syncOpBuffered_ = SO_CREATE_NEW_LEFT;
                     //2. cancel parent deletion if only a single child is not also scheduled for deletion
-                    else if (syncOpBuffered_ == SO_DELETE_RIGHT &&
+                    else if (*syncOpBuffered_ == SO_DELETE_RIGHT &&
                              hasDirectChild(*this,
                                             [](const FileSystemObject& fsObj)
                 {
-                    if (fsObj.isEmpty())
+                    if (fsObj.isPairEmpty())
                             return false; //fsObj may already be empty because it once contained a "move source"
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_RIGHT &&
@@ -227,11 +224,11 @@ SyncOperation FolderPair::getSyncOperation() const
                                 op == SO_MOVE_RIGHT_TARGET;
                     }))
                     syncOpBuffered_ = SO_CREATE_NEW_RIGHT;
-                    else if (syncOpBuffered_ == SO_DELETE_LEFT &&
+                    else if (*syncOpBuffered_ == SO_DELETE_LEFT &&
                              hasDirectChild(*this,
                                             [](const FileSystemObject& fsObj)
                 {
-                    if (fsObj.isEmpty())
+                    if (fsObj.isPairEmpty())
                             return false;
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_LEFT &&
@@ -242,7 +239,7 @@ SyncOperation FolderPair::getSyncOperation() const
                 break;
         }
     }
-    return syncOpBuffered_;
+    return *syncOpBuffered_;
 }
 
 
@@ -315,7 +312,7 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
 
 std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
 {
-    const std::wstring footer = L"\n[" + utfCvrtTo<std::wstring>(fsObj. getPairItemName()) + L"]";
+    const std::wstring footer = L"\n[" + utfTo<std::wstring>(fsObj. getPairItemName()) + L"]";
 
     const CompareFilesResult cmpRes = fsObj.getCategory();
     switch (cmpRes)
@@ -396,7 +393,7 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
 
 std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
 {
-    const std::wstring footer = L"\n[" + utfCvrtTo<std::wstring>(fsObj. getPairItemName()) + L"]";
+    const std::wstring footer = L"\n[" + utfTo<std::wstring>(fsObj. getPairItemName()) + L"]";
 
     const SyncOperation op = fsObj.getSyncOperation();
     switch (op)
@@ -431,8 +428,8 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_RIGHT_TARGET:
-            if (const FilePair* sourceFile = dynamic_cast<const FilePair*>(&fsObj))
-                if (const FilePair* targetFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(sourceFile->getMoveRef())))
+            if (auto sourceFile = dynamic_cast<const FilePair*>(&fsObj))
+                if (auto targetFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(sourceFile->getMoveRef())))
                 {
                     const bool onLeft   = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_LEFT_TARGET;
                     const bool isSource = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_RIGHT_SOURCE;
@@ -442,8 +439,8 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
 
                     auto getRelName = [&](const FileSystemObject& fso, bool leftSide) { return leftSide ? fso.getRelativePath<LEFT_SIDE>() : fso.getRelativePath<RIGHT_SIDE>(); };
 
-                    const Zstring relSource = getRelName(*sourceFile,  onLeft);
-                    const Zstring relTarget = getRelName(*targetFile, !onLeft);
+                    const Zstring relSource = getRelName(*sourceFile, onLeft);
+                    const Zstring relTarget = getRelName(*targetFile, onLeft);
 
                     //attention: ::SetWindowText() doesn't handle tab characters correctly in combination with certain file names, so don't use them
                     return getSyncOpDescription(op) + L"\n" +

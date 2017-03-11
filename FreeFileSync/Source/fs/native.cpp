@@ -156,7 +156,7 @@ private:
 
     Zstring getInitPathPhrase(const AfsPath& afsPath) const override { return getNativePath(afsPath); }
 
-    std::wstring getDisplayPath(const AfsPath& afsPath) const override { return utfCvrtTo<std::wstring>(getNativePath(afsPath)); }
+    std::wstring getDisplayPath(const AfsPath& afsPath) const override { return utfTo<std::wstring>(getNativePath(afsPath)); }
 
     bool isNullFileSystem() const override { return rootPath_.empty(); }
 
@@ -164,8 +164,8 @@ private:
     {
         const Zstring& rootPathRhs = static_cast<const NativeFileSystem&>(afsRhs).rootPath_;
 
-        return cmpFilePath(rootPath_  .c_str(), rootPath_  .size(),
-                           rootPathRhs.c_str(), rootPathRhs.size());
+        return CmpFilePath()(rootPath_  .c_str(), rootPath_  .size(),
+                             rootPathRhs.c_str(), rootPathRhs.size());
     }
 
     //----------------------------------------------------------------------------------------------------------------
@@ -185,9 +185,9 @@ private:
         return AFS::ItemType::FILE;
     }
 
-    PathDetailsImpl getPathDetails(const AfsPath& afsPath) const override //throw FileError
+    PathStatusImpl getPathStatus(const AfsPath& afsPath) const override //throw FileError
     {
-        return getPathDetailsViaFolderTraversal(afsPath); //throw FileError
+        return getPathStatusViaFolderTraversal(afsPath); //throw FileError
     }
     //----------------------------------------------------------------------------------------------------------------
 
@@ -236,7 +236,7 @@ private:
         const Zstring nativePath = getNativePath(afsPath);
 
         const Zstring resolvedPath = zen::getResolvedSymlinkPath(nativePath); //throw FileError
-        const Opt<PathComponents> comp = getPathComponents(resolvedPath);
+        const Opt<zen::PathComponents> comp = parsePathComponents(resolvedPath);
         if (!comp)
             throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtPath(nativePath)),
                             replaceCpy<std::wstring>(L"Invalid path %x.", L"%x", fmtPath(resolvedPath)));
@@ -249,7 +249,7 @@ private:
         initComForThread(); //throw FileError
         const Zstring nativePath = getNativePath(afsPath);
 
-        std::string content = utfCvrtTo<std::string>(getSymlinkTargetRaw(nativePath)); //throw FileError
+        std::string content = utfTo<std::string>(getSymlinkTargetRaw(nativePath)); //throw FileError
         return content;
     }
 
@@ -424,7 +424,7 @@ bool zen::acceptsItemPathPhraseNative(const Zstring& itemPathPhrase) //noexcept
 
     //don't accept relative paths!!! indistinguishable from Explorer MTP paths!
     //don't accept paths missing the shared folder! (see drag & drop validation!)
-    return static_cast<bool>(getPathComponents(path));
+    return static_cast<bool>(parsePathComponents(path));
 }
 
 
@@ -438,11 +438,11 @@ AbstractPath zen::createItemPathNative(const Zstring& itemPathPhrase) //noexcept
 
 AbstractPath zen::createItemPathNativeNoFormatting(const Zstring& nativePath) //noexcept
 {
-    if (const Opt<PathComponents> comp = getPathComponents(nativePath))
+    if (const Opt<PathComponents> comp = parsePathComponents(nativePath))
         return AbstractPath(std::make_shared<NativeFileSystem>(comp->rootPath), AfsPath(comp->relPath));
     else
     {
-        assert(nativePath.empty());
+        //  assert(nativePath.empty());
         return AbstractPath(std::make_shared<NativeFileSystem>(nativePath), AfsPath(Zstring()));
     }
 }

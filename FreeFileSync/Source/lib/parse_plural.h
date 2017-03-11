@@ -272,8 +272,8 @@ class Parser
 {
 public:
     Parser(const std::string& stream, int64_t& n) :
-        scn(stream),
-        tk(scn.nextToken()),
+        scn_(stream),
+        tk_(scn_.nextToken()),
         n_(n) {}
 
     std::shared_ptr<Expr<int64_t>> parse() //throw ParsingError; return value always bound!
@@ -419,8 +419,8 @@ private:
             throw ParsingError();
     }
 
-    void nextToken() { tk = scn.nextToken(); }
-    const Token& token() const { return tk; }
+    void nextToken() { tk_ = scn_.nextToken(); }
+    const Token& token() const { return tk_; }
 
     void expectToken(Token::Type t) //throw ParsingError
     {
@@ -428,8 +428,8 @@ private:
             throw ParsingError();
     }
 
-    Scanner scn;
-    Token tk;
+    Scanner scn_;
+    Token tk_;
     int64_t& n_;
 };
 }

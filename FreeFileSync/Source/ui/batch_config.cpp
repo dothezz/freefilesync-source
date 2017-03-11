@@ -137,7 +137,7 @@ XmlBatchConfig BatchDialog::getConfig() const
 
     //load structure with batch settings "batchCfg"
     batchCfg.runMinimized     = m_checkBoxRunMinimized->GetValue();
-    batchCfg.logFolderPathPhrase = utfCvrtTo<Zstring>(logfileDir->getPath());
+    batchCfg.logFolderPathPhrase = utfTo<Zstring>(logfileDir->getPath());
     batchCfg.mainCfg.onCompletion = m_comboBoxOnCompletion->getValue();
     //get single parameter "logfiles limit" from all three checkboxes and spin ctrl:
     batchCfg.logfilesCountLimit = m_checkBoxGenerateLogfile->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;

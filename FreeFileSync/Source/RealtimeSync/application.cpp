@@ -11,7 +11,6 @@
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/tooltip.h>
-#include <wx+/string_conv.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "xml_proc.h"
@@ -57,7 +56,7 @@ bool Application::OnInit()
     }
     catch (const FileError& e)
     {
-        warn_static("Bug? (exit on frame delete)")
+        //following dialog does NOT trigger "exit on frame delete" while we are in OnInit(): http://docs.wxwidgets.org/trunk/overview_app.html#overview_app_shutdown
         showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
         //continue!
     }
@@ -91,7 +90,7 @@ void Application::onEnterEventLoop(wxEvent& event)
     std::vector<Zstring> commandArgs;
     for (int i = 1; i < argc; ++i)
     {
-        Zstring filePath = getResolvedFilePath(toZ(argv[i]));
+        Zstring filePath = getResolvedFilePath(utfTo<Zstring>(argv[i]));
 
         if (!fileAvailable(filePath)) //be a little tolerant
         {

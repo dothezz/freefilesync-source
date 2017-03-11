@@ -40,9 +40,9 @@ std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFold
     //=> too many issues, most notably cmd.exe is not Unicode-awere: http://www.freefilesync.org/forum/viewtopic.php?t=1679
 
     //assemble logfile name
-    Zstring body = utfCvrtTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
+    Zstring body = utfTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
     if (!status.empty())
-        body += utfCvrtTo<Zstring>(L" [" + status + L"]");
+        body += utfTo<Zstring>(L" [" + status + L"]");
 
     //ensure uniqueness; avoid file system race-condition!
     Zstring logFileName = body + Zstr(".log");
@@ -72,7 +72,7 @@ struct LogTraverserCallback: public AFS::TraverserCallback
 
     void onFile(const FileInfo& fi) override
     {
-        if (ciStartsWith(fi.itemName, prefix_) && endsWith(fi.itemName, Zstr(".log")))
+        if (startsWith(fi.itemName, prefix_, CmpFilePath() /*even on Linux!*/) && endsWith(fi.itemName, Zstr(".log"), CmpFilePath()))
             logFileNames_.push_back(fi.itemName);
 
         if (onUpdateStatus_) onUpdateStatus_();
@@ -102,7 +102,7 @@ private:
 
 void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jobname, size_t maxCount, const std::function<void()>& onUpdateStatus) //throw FileError
 {
-    const Zstring prefix = utfCvrtTo<Zstring>(jobname);
+    const Zstring prefix = utfTo<Zstring>(jobname);
 
     LogTraverserCallback lt(prefix, onUpdateStatus); //traverse source directory one level deep
     AFS::traverseFolder(logFolderPath, lt);
@@ -165,7 +165,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     //...
 
     //if (logFile)
-    //  ::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename()));
+    //  ::wxSetEnv(L"logfile", utfTo<wxString>(logFile->getFilename()));
 }
 
 
@@ -287,7 +287,7 @@ BatchStatusHandler::~BatchStatusHandler()
     //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog_, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
+        saveToLastSyncsLog(summary, errorLog_, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
     }
     catch (FileError&) { assert(false); }
 

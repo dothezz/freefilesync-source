@@ -140,7 +140,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, X; r
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
 
         if (bytesRead == 0) //end of file
-            bytesToRead = memBuf_.size();
+            bytesToRead = std::min(bytesToRead, memBuf_.size());
     }
 
     std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
@@ -185,9 +185,10 @@ FileOutput::FileOutput(const Zstring& filePath, AccessFlag access, const IOCallb
 
 FileOutput::~FileOutput()
 {
+    notifyUnbufferedIO_ = nullptr; //no call-backs during destruction!!!
     try
     {
-        flushBuffers(); //throw FileError, X
+        flushBuffers(); //throw FileError, (X)
     }
     catch (...) { assert(false); }
 }

@@ -14,7 +14,6 @@
 #include <zen/format_unit.h>
 #include <zen/scope_guard.h>
 #include <wx+/tooltip.h>
-#include <wx+/string_conv.h>
 #include <wx+/rtl.h>
 #include <wx+/image_tools.h>
 #include <wx+/image_resources.h>
@@ -362,21 +361,24 @@ private:
             {
                 value = [&]
                 {
+                    if (folder.isEmpty<side>())
+                        return std::wstring();
+
                     switch (colTypeRim)
                     {
                         case ColumnTypeRim::ITEM_PATH:
                             switch (itemPathFormat)
                             {
                                 case ItemPathFormat::FULL_PATH:
-                                    return folder.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(folder.getAbstractPath<side>());
+                                    return AFS::getDisplayPath(folder.getAbstractPath<side>());
                                 case ItemPathFormat::RELATIVE_PATH:
-                                    return utfCvrtTo<std::wstring>(folder.getRelativePath<side>());
+                                    return utfTo<std::wstring>(folder.getRelativePath<side>());
                                 case ItemPathFormat::ITEM_NAME:
-                                    return utfCvrtTo<std::wstring>(folder.getItemName<side>());
+                                    return utfTo<std::wstring>(folder.getItemName<side>());
                             }
                             break;
                         case ColumnTypeRim::SIZE:
-                            return folder.isEmpty<side>() ? std::wstring() : L"<" + _("Folder") + L">";
+                            return L"<" + _("Folder") + L">";
                         case ColumnTypeRim::DATE:
                             return std::wstring();
                         case ColumnTypeRim::EXTENSION:
@@ -391,26 +393,29 @@ private:
             {
                 value = [&]
                 {
+                    if (file.isEmpty<side>())
+                        return std::wstring();
+
                     switch (colTypeRim)
                     {
                         case ColumnTypeRim::ITEM_PATH:
                             switch (itemPathFormat)
                             {
                                 case ItemPathFormat::FULL_PATH:
-                                    return file.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(file.getAbstractPath<side>());
+                                    return AFS::getDisplayPath(file.getAbstractPath<side>());
                                 case ItemPathFormat::RELATIVE_PATH:
-                                    return utfCvrtTo<std::wstring>(file.getRelativePath<side>());
+                                    return utfTo<std::wstring>(file.getRelativePath<side>());
                                 case ItemPathFormat::ITEM_NAME:
-                                    return utfCvrtTo<std::wstring>(file.getItemName<side>());
+                                    return utfTo<std::wstring>(file.getItemName<side>());
                             }
                             break;
                         case ColumnTypeRim::SIZE:
-                            //return file.isEmpty<side>() ? std::wstring() : utfCvrtTo<std::wstring>(file.getFileId<side>()); // -> test file id
-                            return file.isEmpty<side>() ? std::wstring() : toGuiString(file.getFileSize<side>());
+                            //return utfTo<std::wstring>(file.getFileId<side>()); // -> test file id
+                            return toGuiString(file.getFileSize<side>());
                         case ColumnTypeRim::DATE:
-                            return file.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(file.getLastWriteTime<side>());
+                            return utcToLocalTimeString(file.getLastWriteTime<side>());
                         case ColumnTypeRim::EXTENSION:
-                            return utfCvrtTo<std::wstring>(getFileExtension(file.getItemName<side>()));
+                            return utfTo<std::wstring>(getFileExtension(file.getItemName<side>()));
                     }
                     assert(false);
                     return std::wstring();
@@ -421,25 +426,28 @@ private:
             {
                 value = [&]
                 {
+                    if (symlink.isEmpty<side>())
+                        return std::wstring();
+
                     switch (colTypeRim)
                     {
                         case ColumnTypeRim::ITEM_PATH:
                             switch (itemPathFormat)
                             {
                                 case ItemPathFormat::FULL_PATH:
-                                    return symlink.isEmpty<side>() ? std::wstring() : AFS::getDisplayPath(symlink.getAbstractPath<side>());
+                                    return AFS::getDisplayPath(symlink.getAbstractPath<side>());
                                 case ItemPathFormat::RELATIVE_PATH:
-                                    return utfCvrtTo<std::wstring>(symlink.getRelativePath<side>());
+                                    return utfTo<std::wstring>(symlink.getRelativePath<side>());
                                 case ItemPathFormat::ITEM_NAME:
-                                    return utfCvrtTo<std::wstring>(symlink.getItemName<side>());
+                                    return utfTo<std::wstring>(symlink.getItemName<side>());
                             }
                             break;
                         case ColumnTypeRim::SIZE:
-                            return symlink.isEmpty<side>() ? std::wstring() : L"<" + _("Symlink") + L">";
+                            return L"<" + _("Symlink") + L">";
                         case ColumnTypeRim::DATE:
-                            return symlink.isEmpty<side>() ? std::wstring() : utcToLocalTimeString(symlink.getLastWriteTime<side>());
+                            return utcToLocalTimeString(symlink.getLastWriteTime<side>());
                         case ColumnTypeRim::EXTENSION:
-                            return utfCvrtTo<std::wstring>(getFileExtension(symlink.getItemName<side>()));
+                            return utfTo<std::wstring>(getFileExtension(symlink.getItemName<side>()));
                     }
                     assert(false);
                     return std::wstring();
@@ -734,7 +742,7 @@ private:
             {
                 toolTip = getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
                           AFS::getDisplayPath(fsObj->getAbstractPath<side>()) :
-                          utfCvrtTo<std::wstring>(fsObj->getRelativePath<side>());
+                          utfTo<std::wstring>(fsObj->getRelativePath<side>());
 
                 visitFSObject(*fsObj, [](const FolderPair& folder) {},
                 [&](const FilePair& file)
@@ -767,7 +775,7 @@ public:
     GridDataLeft(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<LEFT_SIDE>(gridDataView, grid) {}
 
     void setNavigationMarker(std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,
-                             std::unordered_set<const HierarchyObject*>&& markedContainer)
+                             std::unordered_set<const ContainerObject*>&& markedContainer)
     {
         markedFilesAndLinks_.swap(markedFilesAndLinks);
         markedContainer_    .swap(markedContainer);
@@ -790,12 +798,12 @@ private:
 
                     if (auto folder = dynamic_cast<const FolderPair*>(fsObj))
                     {
-                        if (markedContainer_.find(folder) != markedContainer_.end()) //mark directories which *are* the given HierarchyObject*
+                        if (markedContainer_.find(folder) != markedContainer_.end()) //mark directories which *are* the given ContainerObject*
                             return true;
                     }
 
-                    //mark all objects which have the HierarchyObject as *any* matching ancestor
-                    const HierarchyObject* parent = &(fsObj->parent());
+                    //mark all objects which have the ContainerObject as *any* matching ancestor
+                    const ContainerObject* parent = &(fsObj->parent());
                     for (;;)
                     {
                         if (markedContainer_.find(parent) != markedContainer_.end())
@@ -820,7 +828,7 @@ private:
     }
 
     std::unordered_set<const FileSystemObject*> markedFilesAndLinks_; //mark files/symlinks directly within a container
-    std::unordered_set<const HierarchyObject*> markedContainer_;      //mark full container including all child-objects
+    std::unordered_set<const ContainerObject*> markedContainer_;      //mark full container including all child-objects
     //DO NOT DEREFERENCE!!!! NOT GUARANTEED TO BE VALID!!!
 };
 
@@ -1748,7 +1756,7 @@ void gridview::setScrollMaster(Grid& grid)
 
 void gridview::setNavigationMarker(Grid& gridLeft,
                                    std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,
-                                   std::unordered_set<const HierarchyObject*>&& markedContainer)
+                                   std::unordered_set<const ContainerObject*>&& markedContainer)
 {
     if (auto provLeft = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
         provLeft->setNavigationMarker(std::move(markedFilesAndLinks), std::move(markedContainer));

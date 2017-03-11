@@ -76,15 +76,16 @@ struct XmlBatchConfig
 
 struct OptionalDialogs
 {
-    bool warningDependentFolders          = true;
-    bool warningFolderPairRaceCondition   = true;
-    bool warningSignificantDifference     = true;
-    bool warningNotEnoughDiskSpace        = true;
-    bool warningUnresolvedConflicts       = true;
-    bool warningDatabaseError             = true;
-    bool warningRecyclerMissing           = true;
-    bool warningInputFieldEmpty           = true;
-    bool warningDirectoryLockFailed       = true;
+    bool warnDependentFolderPair          = true;
+    bool warnDependentBaseFolders         = true;
+    bool warnSignificantDifference        = true;
+    bool warnNotEnoughDiskSpace           = true;
+    bool warnUnresolvedConflicts          = true;
+    bool warnDatabaseError                = true;
+    bool warnRecyclerMissing              = true;
+    bool warnInputFieldEmpty              = true;
+    bool warnDirectoryLockFailed          = true;
+    bool warnVersioningFolderPartOfSync   = true;
     bool popupOnConfigChange              = true;
     bool confirmSyncStart                 = true;
     bool confirmExternalCommandMassInvoke = true;

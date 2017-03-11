@@ -134,8 +134,7 @@ bool matchesMask(const Zchar* path, const Zchar* mask)
                 break;
 
             case Zstr('*'):
-                //advance mask to next non-* char
-                do
+                do //advance mask to next non-* char
                 {
                     m = *++mask;
                 }
@@ -220,11 +219,11 @@ bool matchesMaskBegin(const Zstring& name, const std::vector<Zstring>& masks)
 
 std::vector<Zstring> zen::splitByDelimiter(const Zstring& filterString)
 {
-    //delimiters may be ';' or '\n'
+    //delimiters may be FILTER_ITEM_SEPARATOR or '\n'
     std::vector<Zstring> output;
 
-    for (const Zstring& str : split(filterString, Zchar(';'))) //split by less common delimiter first
-        for (Zstring entry : split(str, Zchar('\n')))
+    for (const Zstring& str : split(filterString, FILTER_ITEM_SEPARATOR, SplitType::SKIP_EMPTY)) //split by less common delimiter first (create few, large strings)
+        for (Zstring entry : split(str, Zchar('\n'), SplitType::SKIP_EMPTY))
         {
             trim(entry);
             if (!entry.empty())

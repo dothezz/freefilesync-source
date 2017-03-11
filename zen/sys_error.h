@@ -67,7 +67,7 @@ std::wstring formatSystemErrorRaw(ErrorCode ec) //return empty string on error
     std::wstring errorMsg;
     ZEN_ON_SCOPE_EXIT(errno = currentError);
 
-    errorMsg = utfCvrtTo<std::wstring>(::strerror(ec));
+    errorMsg = utfTo<std::wstring>(::strerror(ec));
     trim(errorMsg); //Windows messages seem to end with a blank...
 
     return errorMsg;

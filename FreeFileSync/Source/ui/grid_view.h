@@ -25,8 +25,8 @@ public:
     const FileSystemObject* getObject(size_t row) const; //returns nullptr if object is not found; complexity: constant!
     /**/
     FileSystemObject* getObject(size_t row);        //
-    size_t rowsOnView() const { return viewRef  .size(); } //only visible elements
-    size_t rowsTotal () const { return sortedRef.size(); } //total rows available
+    size_t rowsOnView() const { return viewRef_  .size(); } //only visible elements
+    size_t rowsTotal () const { return sortedRef_.size(); } //total rows available
 
     //get references to FileSystemObject: no nullptr-check needed! Everything's bound.
     std::vector<FileSystemObject*> getAllFileRef(const std::vector<size_t>& rows);
@@ -112,13 +112,13 @@ public:
         bool onLeft_;
         bool ascending_;
     };
-    const SortInfo* getSortInfo() const { return currentSort.get(); } //return nullptr if currently not sorted
+    const SortInfo* getSortInfo() const { return currentSort_.get(); } //return nullptr if currently not sorted
 
     ptrdiff_t findRowDirect(FileSystemObject::ObjectIdConst objId) const; // find an object's row position on view list directly, return < 0 if not found
-    ptrdiff_t findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of FolderPair or BaseFolderPair *on sorted sub view*
+    ptrdiff_t findRowFirstChild(const ContainerObject* hierObj)    const; // find first child of FolderPair or BaseFolderPair *on sorted sub view*
     //"hierObj" may be invalid, it is NOT dereferenced, return < 0 if not found
 
-    size_t getFolderPairCount() const { return folderPairCount; } //count non-empty pairs to distinguish single/multiple folder pair cases
+    size_t getFolderPairCount() const { return folderPairCount_; } //count non-empty pairs to distinguish single/multiple folder pair cases
 
 private:
     GridView           (const GridView&) = delete;
@@ -136,20 +136,20 @@ private:
     template <class Predicate> void updateView(Predicate pred);
 
 
-    std::unordered_map<FileSystemObject::ObjectIdConst, size_t> rowPositions; //find row positions on sortedRef directly
-    std::unordered_map<const void*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
-    //void* instead of HierarchyObject*: these are weak pointers and should *never be dereferenced*!
+    std::unordered_map<FileSystemObject::ObjectIdConst, size_t> rowPositions_; //find row positions on sortedRef directly
+    std::unordered_map<const void*, size_t> rowPositionsFirstChild_; //find first child on sortedRef of a hierarchy object
+    //void* instead of ContainerObject*: these are weak pointers and should *never be dereferenced*!
 
-    std::vector<FileSystemObject::ObjectId> viewRef; //partial view on sortedRef
+    std::vector<FileSystemObject::ObjectId> viewRef_; //partial view on sortedRef
     /*             /|\
                     | (update...)
                     |                         */
-    std::vector<RefIndex> sortedRef; //flat view of weak pointers on folderCmp; may be sorted
+    std::vector<RefIndex> sortedRef_; //flat view of weak pointers on folderCmp; may be sorted
     /*             /|\
                     | (setData...)
                     |                         */
     //std::shared_ptr<FolderComparison> folderCmp; //actual comparison data: owned by GridView!
-    size_t folderPairCount = 0; //number of non-empty folder pairs
+    size_t folderPairCount_ = 0; //number of non-empty folder pairs
 
 
     class SerializeHierarchy;
@@ -179,7 +179,7 @@ private:
     template <bool ascending>
     struct LessSyncDirection;
 
-    Opt<SortInfo> currentSort;
+    Opt<SortInfo> currentSort_;
 };
 
 
@@ -193,8 +193,8 @@ private:
 inline
 const FileSystemObject* GridView::getObject(size_t row) const
 {
-    return row < viewRef.size() ?
-           FileSystemObject::retrieve(viewRef[row]) : nullptr;
+    return row < viewRef_.size() ?
+           FileSystemObject::retrieve(viewRef_[row]) : nullptr;
 }
 
 inline

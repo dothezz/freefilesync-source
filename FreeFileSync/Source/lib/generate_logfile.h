@@ -121,7 +121,7 @@ void streamToLogFile(const SummaryInfo& summary, //throw FileError
                      const ErrorLog& log,
                      AFS::OutputStream& streamOut)
 {
-    const std::string header = replaceCpy(utfCvrtTo<std::string>(generateLogHeader(summary)), '\n', LINE_BREAK); //don't replace line break any earlier
+    const std::string header = replaceCpy(utfTo<std::string>(generateLogHeader(summary)), '\n', LINE_BREAK); //don't replace line break any earlier
 
     streamOut.write(&header[0], header.size()); //throw FileError, X
 
@@ -131,7 +131,7 @@ void streamToLogFile(const SummaryInfo& summary, //throw FileError
 
     for (const LogEntry& entry : log)
     {
-        buffer += replaceCpy(utfCvrtTo<std::string>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
+        buffer += replaceCpy(utfTo<std::string>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         buffer += LINE_BREAK;
 
         streamOut.write(&buffer[0], buffer.size()); //throw FileError, X
@@ -152,14 +152,14 @@ void saveToLastSyncsLog(const SummaryInfo& summary, //throw FileError
 {
     const Zstring filepath = getLastSyncsLogfilePath();
 
-    Utf8String newStream = utfCvrtTo<Utf8String>(generateLogHeader(summary));
+    Utf8String newStream = utfTo<Utf8String>(generateLogHeader(summary));
     replace(newStream, '\n', LINE_BREAK); //don't replace line break any earlier
     newStream += LINE_BREAK;
 
     //check size of "newStream": memory allocation might fail - think 1 million entries!
     for (const LogEntry& entry : log)
     {
-        newStream += replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
+        newStream += replaceCpy(utfTo<Utf8String>(formatMessage<std::wstring>(entry)), '\n', LINE_BREAK);
         newStream += LINE_BREAK;
 
         if (newStream.size() > maxBytesToWrite)

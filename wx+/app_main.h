@@ -21,12 +21,6 @@ bool mainWindowWasSet();
 
 
 
-
-
-
-
-
-
 //######################## implementation ########################
 inline
 bool& refMainWndStatus()

@@ -323,8 +323,10 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_listBoxFolderPair->Append(_("Main config"));
     for (const LocalPairConfig& cfg : folderPairConfig)
     {
-        const bool pairNameEmpty = trimCpy(cfg.folderPairName).empty();
-        m_listBoxFolderPair->Append(L"     " + (pairNameEmpty ? L"<" + _("empty") + L">" : cfg.folderPairName));
+        auto fpName = utfTo<std::wstring>(cfg.folderPairName);
+        if (trimCpy(fpName).empty())
+            fpName = L"<" + _("empty") + L">";
+        m_listBoxFolderPair->Append(L"     " + fpName);
     }
 
     if (folderPairConfig.empty())
@@ -584,8 +586,8 @@ void ConfigDialog::onFilterKeyEvent(wxKeyEvent& event)
 
 FilterConfig ConfigDialog::getFilterConfig() const
 {
-    Zstring includeFilter = utfCvrtTo<Zstring>(m_textCtrlInclude->GetValue());
-    Zstring exludeFilter  = utfCvrtTo<Zstring>(m_textCtrlExclude->GetValue());
+    Zstring includeFilter = utfTo<Zstring>(m_textCtrlInclude->GetValue());
+    Zstring exludeFilter  = utfTo<Zstring>(m_textCtrlExclude->GetValue());
 
 
     return FilterConfig(includeFilter, exludeFilter,
@@ -600,8 +602,8 @@ FilterConfig ConfigDialog::getFilterConfig() const
 
 void ConfigDialog::setFilterConfig(const FilterConfig& filter)
 {
-    m_textCtrlInclude->ChangeValue(utfCvrtTo<wxString>(filter.includeFilter));
-    m_textCtrlExclude->ChangeValue(utfCvrtTo<wxString>(filter.excludeFilter));
+    m_textCtrlInclude->ChangeValue(utfTo<wxString>(filter.includeFilter));
+    m_textCtrlExclude->ChangeValue(utfTo<wxString>(filter.excludeFilter));
 
     setEnumVal(enumTimeDescr_, *m_choiceUnitTimespan, filter.unitTimeSpan);
     setEnumVal(enumSizeDescr_, *m_choiceUnitMinSize,  filter.unitSizeMin);
@@ -987,7 +989,7 @@ void ConfigDialog::updateSyncGui()
     {
         updateTooltipEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle);
 
-        const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
+        const std::wstring pathSep = utfTo<std::wstring>(FILE_NAME_SEPARATOR);
         switch (getEnumVal(enumVersioningStyle_, *m_choiceVersioningStyle))
         {
             case VersioningStyle::REPLACE:

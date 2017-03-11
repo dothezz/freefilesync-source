@@ -7,7 +7,6 @@
 #include "folder_history_box.h"
 #include <list>
 #include <zen/scope_guard.h>
-#include <wx+/string_conv.h>
 #include "../lib/resolve_path.h"
     #include <gtk/gtk.h>
 
@@ -62,18 +61,18 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& folderPathPhrase)
     std::vector<wxString> dirList;
     {
         //add some aliases to allow user changing to volume name and back, if possible
-        std::vector<Zstring> aliases = getDirectoryAliases(toZ(folderPathPhrase)); //may block when resolving [<volume name>]
-        std::transform(aliases.begin(), aliases.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfCvrtTo<wxString>(str); });
+        std::vector<Zstring> aliases = getDirectoryAliases(utfTo<Zstring>(folderPathPhrase)); //may block when resolving [<volume name>]
+        std::transform(aliases.begin(), aliases.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfTo<wxString>(str); });
     }
     if (sharedHistory_.get())
     {
         std::vector<Zstring> tmp = sharedHistory_->getList();
-        std::sort(tmp.begin(), tmp.end(), LessNoCase() /*even on Linux*/);
+        std::sort(tmp.begin(), tmp.end(), LessNaturalSort() /*even on Linux*/);
 
         if (!dirList.empty() && !tmp.empty())
             dirList.push_back(FolderHistory::separationLine());
 
-        std::transform(tmp.begin(), tmp.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfCvrtTo<wxString>(str); });
+        std::transform(tmp.begin(), tmp.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfTo<wxString>(str); });
     }
 
     //###########################################################################################
@@ -114,7 +113,7 @@ void FolderHistoryBox::OnKeyEvent(wxKeyEvent& event)
 
             //delete selected row
             if (sharedHistory_.get())
-                sharedHistory_->delItem(toZ(GetString(pos)));
+                sharedHistory_->delItem(utfTo<Zstring>(GetString(pos)));
             SetString(pos, wxString()); //in contrast to "Delete(pos)", this one does not kill the drop-down list and gives a nice visual feedback!
 
             this->SetValue(currentVal);

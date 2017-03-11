@@ -150,7 +150,7 @@ DbStreams loadStreams(const AbstractPath& dbPath, const IOCallback& notifyUnbuff
     catch (const std::bad_alloc& e) //still required?
     {
         throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(AFS::getDisplayPath(dbPath)),
-                        _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
+                        _("Out of memory.") + L" " + utfTo<std::wstring>(e.what()));
     }
 }
 
@@ -259,7 +259,7 @@ private:
         }
     }
 
-    static void writeUtf8(MemoryStreamOut<ByteArray>& streamOut, const Zstring& str) { writeContainer(streamOut, utfCvrtTo<Zbase<char>>(str)); }
+    static void writeUtf8(MemoryStreamOut<ByteArray>& streamOut, const Zstring& str) { writeContainer(streamOut, utfTo<Zbase<char>>(str)); }
 
     static void writeFileDescr(MemoryStreamOut<ByteArray>& streamOut, const InSyncDescrFile& descr)
     {
@@ -388,7 +388,7 @@ public:
         catch (const std::bad_alloc& e)
         {
             throw FileError(_("Database file is corrupted:") + L"\n" + fmtPath(displayFilePathL) + L"\n" + fmtPath(displayFilePathR),
-                            _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
+                            _("Out of memory.") + L" " + utfTo<std::wstring>(e.what()));
         }
     }
 
@@ -445,7 +445,7 @@ private:
         }
     }
 
-    static Zstring readUtf8(MemoryStreamIn<ByteArray>& streamIn) { return utfCvrtTo<Zstring>(readContainer<Zbase<char>>(streamIn)); } //throw UnexpectedEndOfStreamError
+    static Zstring readUtf8(MemoryStreamIn<ByteArray>& streamIn) { return utfTo<Zstring>(readContainer<Zbase<char>>(streamIn)); } //throw UnexpectedEndOfStreamError
     //optional: use null-termiation: 5% overall size reduction
     //optional: split into streamInText_/streamInSmallNum_: overall size increase! (why?)
 
@@ -543,11 +543,11 @@ private:
         filter_(filter),
         activeCmpVar_(activeCmpVar) {}
 
-    void recurse(const HierarchyObject& hierObj, InSyncFolder& dbFolder)
+    void recurse(const ContainerObject& hierObj, InSyncFolder& dbFolder)
     {
-        process(hierObj.refSubFiles  (), hierObj.getPairRelativePathPf(), dbFolder.files);
-        process(hierObj.refSubLinks  (), hierObj.getPairRelativePathPf(), dbFolder.symlinks);
-        process(hierObj.refSubFolders(), hierObj.getPairRelativePathPf(), dbFolder.folders);
+        process(hierObj.refSubFiles  (), hierObj.getPairRelativePath(), dbFolder.files);
+        process(hierObj.refSubLinks  (), hierObj.getPairRelativePath(), dbFolder.symlinks);
+        process(hierObj.refSubFolders(), hierObj.getPairRelativePath(), dbFolder.folders);
     }
 
     template <class M, class V>
@@ -584,12 +584,12 @@ private:
         */
     }
 
-    void process(const HierarchyObject::FileList& currentFiles, const Zstring& parentRelPathPf, InSyncFolder::FileList& dbFiles)
+    void process(const ContainerObject::FileList& currentFiles, const Zstring& parentRelPath, InSyncFolder::FileList& dbFiles)
     {
         std::unordered_set<const InSyncFile*> toPreserve; //referencing fixed-in-memory std::map elements
 
         for (const FilePair& file : currentFiles)
-            if (!file.isEmpty())
+            if (!file.isPairEmpty())
             {
                 if (file.getCategory() == FILE_EQUAL) //data in sync: write current state
                 {
@@ -623,18 +623,18 @@ private:
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
             //all items not existing in "currentFiles" have either been deleted meanwhile or been excluded via filter:
-            const Zstring& itemRelPath = parentRelPathPf + v.first;
+            const Zstring& itemRelPath = AFS::appendPaths(parentRelPath, v.first, FILE_NAME_SEPARATOR);
             return filter_.passFileFilter(itemRelPath);
             //note: items subject to traveral errors are also excluded by this file filter here! see comparison.cpp, modified file filter for read errors
         });
     }
 
-    void process(const HierarchyObject::SymlinkList& currentSymlinks, const Zstring& parentRelPathPf, InSyncFolder::SymlinkList& dbSymlinks)
+    void process(const ContainerObject::SymlinkList& currentSymlinks, const Zstring& parentRelPath, InSyncFolder::SymlinkList& dbSymlinks)
     {
         std::unordered_set<const InSyncSymlink*> toPreserve;
 
         for (const SymlinkPair& symlink : currentSymlinks)
-            if (!symlink.isEmpty())
+            if (!symlink.isPairEmpty())
             {
                 if (symlink.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
                 {
@@ -661,17 +661,17 @@ private:
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
             //all items not existing in "currentSymlinks" have either been deleted meanwhile or been excluded via filter:
-            const Zstring& itemRelPath = parentRelPathPf + v.first;
+            const Zstring& itemRelPath = AFS::appendPaths(parentRelPath, v.first, FILE_NAME_SEPARATOR);
             return filter_.passFileFilter(itemRelPath);
         });
     }
 
-    void process(const HierarchyObject::FolderList& currentFolders, const Zstring& parentRelPathPf, InSyncFolder::FolderList& dbFolders)
+    void process(const ContainerObject::FolderList& currentFolders, const Zstring& parentRelPath, InSyncFolder::FolderList& dbFolders)
     {
         std::unordered_set<const InSyncFolder*> toPreserve;
 
         for (const FolderPair& folder : currentFolders)
-            if (!folder.isEmpty())
+            if (!folder.isPairEmpty())
                 switch (folder.getDirCategory())
                 {
                     case DIR_EQUAL:
@@ -723,7 +723,7 @@ private:
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
 
-            const Zstring& itemRelPath = parentRelPathPf + v.first;
+            const Zstring& itemRelPath = AFS::appendPaths(parentRelPath, v.first, FILE_NAME_SEPARATOR);
             //if directory is not included in "currentDirs", it is either not existing anymore, in which case it should be deleted from database
             //or it was excluded via filter and the database entry should be preserved
 

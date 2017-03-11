@@ -8,7 +8,6 @@
 #include <wx/wupdlock.h>
 #include <wx/filedlg.h>
 #include <wx+/bitmap_button.h>
-#include <wx+/string_conv.h>
 #include <wx+/font_size.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
@@ -195,7 +194,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     xmlAccess::XmlRealConfig currentCfg = getConfiguration();
 
-    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName_))))
+    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfTo<Zstring>(currentConfigFileName_))))
     {
         case rts::EXIT_APP:
             Close();
@@ -220,14 +219,14 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     wxFileDialog filePicker(this,
                             wxString(),
                             //OS X really needs dir/file separated like this:
-                            utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
-                            utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
+                            utfTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            utfTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                             wxString(L"RealTimeSync (*.ffs_real)|*.ffs_real") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (filePicker.ShowModal() != wxID_OK)
         return;
 
-    const Zstring newFileName = utfCvrtTo<Zstring>(filePicker.GetPath());
+    const Zstring newFileName = utfTo<Zstring>(filePicker.GetPath());
 
     //write config to XML
     const xmlAccess::XmlRealConfig currentCfg = getConfiguration();
@@ -276,7 +275,7 @@ void MainDialog::setLastUsedConfig(const Zstring& filepath)
     }
     else
     {
-        SetTitle(utfCvrtTo<wxString>(filepath));
+        SetTitle(utfTo<wxString>(filepath));
         currentConfigFileName_ = filepath;
     }
 }
@@ -286,12 +285,12 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxString(),
-                            utfCvrtTo<wxString>(beforeLast(currentConfigFileName_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            utfTo<wxString>(beforeLast(currentConfigFileName_, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             wxString(), //default file
                             wxString(L"RealTimeSync (*.ffs_real; *.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)
-        loadConfig(utfCvrtTo<Zstring>(filePicker.GetPath()));
+        loadConfig(utfTo<Zstring>(filePicker.GetPath()));
 }
 
 
@@ -299,7 +298,7 @@ void MainDialog::onFilesDropped(FileDropEvent& event)
 {
     const auto& filePaths = event.getPaths();
     if (!filePaths.empty())
-        loadConfig(utfCvrtTo<Zstring>(filePaths[0]));
+        loadConfig(utfTo<Zstring>(filePaths[0]));
 }
 
 
@@ -319,7 +318,7 @@ void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
     }
 
     //fill commandline
-    m_textCtrlCommand->SetValue(utfCvrtTo<wxString>(cfg.commandline));
+    m_textCtrlCommand->SetValue(utfTo<wxString>(cfg.commandline));
 
     //set delay
     m_spinCtrlDelay->SetValue(static_cast<int>(cfg.delay));
@@ -330,11 +329,11 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 {
     xmlAccess::XmlRealConfig output;
 
-    output.directories.push_back(utfCvrtTo<Zstring>(dirpathFirst->getPath()));
+    output.directories.push_back(utfTo<Zstring>(dirpathFirst->getPath()));
     for (const DirectoryPanel* dne : dirpathsExtra)
-        output.directories.push_back(utfCvrtTo<Zstring>(dne->getPath()));
+        output.directories.push_back(utfTo<Zstring>(dne->getPath()));
 
-    output.commandline = utfCvrtTo<Zstring>(m_textCtrlCommand->GetValue());
+    output.commandline = utfTo<Zstring>(m_textCtrlCommand->GetValue());
     output.delay       = m_spinCtrlDelay->GetValue();
 
     return output;
@@ -343,7 +342,7 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 
 void MainDialog::OnAddFolder(wxCommandEvent& event)
 {
-    const Zstring topFolder = utfCvrtTo<Zstring>(dirpathFirst->getPath());
+    const Zstring topFolder = utfTo<Zstring>(dirpathFirst->getPath());
 
     //clear existing top folder first
     dirpathFirst->setPath(Zstring());

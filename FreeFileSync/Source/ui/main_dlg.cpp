@@ -16,7 +16,6 @@
 #include <wx/filedlg.h>
 #include <wx/display.h>
 #include <wx+/context_menu.h>
-#include <wx+/string_conv.h>
 #include <wx+/bitmap_button.h>
 #include <wx+/app_main.h>
 #include <wx+/toggle_button.h>
@@ -93,8 +92,8 @@ bool acceptDialogFileDrop(const std::vector<Zstring>& shellItemPaths)
     return std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
     {
         const Zstring ext = getFileExtension(shellItemPath);
-        return ciEqual(ext, Zstr("ffs_gui")) ||
-               ciEqual(ext, Zstr("ffs_batch"));
+        return strEqual(ext, Zstr("ffs_gui"),   CmpFilePath()) ||
+               strEqual(ext, Zstr("ffs_batch"), CmpFilePath());
     });
 }
 }
@@ -1073,7 +1072,7 @@ void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRe
     }
     catch (const std::bad_alloc& e)
     {
-        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what())));
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Out of memory.") + L" " + utfTo<std::wstring>(e.what())));
     }
 }
 
@@ -1203,7 +1202,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
                                  folderCmp,
                                  extractDirectionCfg(getConfig().mainCfg),
                                  globalCfg.gui.mainDlg.manualDeletionUseRecycler,
-                                 globalCfg.optDialogs.warningRecyclerMissing,
+                                 globalCfg.optDialogs.warnRecyclerMissing,
                                  statusHandler);
 
         m_gridMainL->clearSelection(ALLOW_GRID_EVENT);
@@ -1285,13 +1284,11 @@ void invokeCommandLine(const Zstring& commandLinePhrase, //throw FileError
         const AbstractPath basePath  = fsObj->base().getAbstractPath<side >();
         const AbstractPath basePath2 = fsObj->base().getAbstractPath<side2>();
 
-        const Zstring& relPath = fsObj->getPairRelativePath();
-        const Zstring& relPathParent = beforeLast(relPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
         //full path, even if item is not (yet) existing:
-        const Zstring itemPath    = !AFS::isNullPath(basePath ) ? toZ(AFS::getDisplayPath(AFS::appendRelPath(basePath,  relPath      ))) : Zstr("");
-        const Zstring itemPath2   = !AFS::isNullPath(basePath2) ? toZ(AFS::getDisplayPath(AFS::appendRelPath(basePath2, relPath      ))) : Zstr("");
-        const Zstring folderPath  = !AFS::isNullPath(basePath ) ? toZ(AFS::getDisplayPath(AFS::appendRelPath(basePath,  relPathParent))) : Zstr("");
-        const Zstring folderPath2 = !AFS::isNullPath(basePath2) ? toZ(AFS::getDisplayPath(AFS::appendRelPath(basePath2, relPathParent))) : Zstr("");
+        const Zstring itemPath    = AFS::isNullPath(basePath ) ? Zstr("") : utfTo<Zstring>(AFS::getDisplayPath(fsObj->getAbstractPath<side >()));
+        const Zstring itemPath2   = AFS::isNullPath(basePath2) ? Zstr("") : utfTo<Zstring>(AFS::getDisplayPath(fsObj->getAbstractPath<side2>()));
+        const Zstring folderPath  = AFS::isNullPath(basePath ) ? Zstr("") : utfTo<Zstring>(AFS::getDisplayPath(fsObj->parent().getAbstractPath<side >()));
+        const Zstring folderPath2 = AFS::isNullPath(basePath2) ? Zstr("") : utfTo<Zstring>(AFS::getDisplayPath(fsObj->parent().getAbstractPath<side2>()));
 
         Zstring localPath;
         Zstring localPath2;
@@ -1306,8 +1303,8 @@ void invokeCommandLine(const Zstring& commandLinePhrase, //throw FileError
         else
             extractFileDetails<side2>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath2 = tempFileBuf.getTempPath(details); });
 
-        if (localPath .empty()) localPath  = replaceCpy(toZ(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath );
-        if (localPath2.empty()) localPath2 = replaceCpy(toZ(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath2);
+        if (localPath .empty()) localPath  = replaceCpy(utfTo<Zstring>(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath );
+        if (localPath2.empty()) localPath2 = replaceCpy(utfTo<Zstring>(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath2);
 
         Zstring command = commandLinePhrase;
         replace(command, Zstr("%item_path%"),    itemPath);
@@ -1347,7 +1344,7 @@ void MainDialog::openExternalApplication(const Zstring& commandLinePhrase, bool 
         {
             try
             {
-                shellExecute("xdg-open \"" + toZ(AFS::getDisplayPath(folderPath)) + "\"", EXEC_TYPE_ASYNC); //
+                shellExecute("xdg-open \"" + utfTo<Zstring>(AFS::getDisplayPath(folderPath)) + "\"", EXEC_TYPE_ASYNC); //
             }
             catch (const FileError& e) { showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString())); }
         };
@@ -1981,7 +1978,7 @@ void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
 
     //get selection on navigation tree and set corresponding markers on main grid
     std::unordered_set<const FileSystemObject*> markedFilesAndLinks; //mark files/symlinks directly
-    std::unordered_set<const HierarchyObject*> markedContainer;      //mark full container including child-objects
+    std::unordered_set<const ContainerObject*> markedContainer;      //mark full container including child-objects
 
     for (size_t row : m_gridNavi->getSelectedRows())
         if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(row))
@@ -2045,13 +2042,13 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
             Zstring labelShort = Zstring(Zstr("*")) + FILE_NAME_SEPARATOR + selection[0]->getPairItemName();
             if (isFolder)
                 labelShort += FILE_NAME_SEPARATOR;
-            submenu.addItem(utfCvrtTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
+            submenu.addItem(utfTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
 
             //by relative path
             Zstring labelRel = FILE_NAME_SEPARATOR + selection[0]->getPairRelativePath();
             if (isFolder)
                 labelRel += FILE_NAME_SEPARATOR;
-            submenu.addItem(utfCvrtTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
+            submenu.addItem(utfTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
 
             menu.addSubmenu(label, submenu, &getResourceImage(iconName));
         }
@@ -2170,9 +2167,9 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             //by extension
             if (!isFolder)
             {
-                const Zstring extension = getFileExtension(selection[0]->getPairRelativePath());
+                const Zstring extension = getFileExtension(selection[0]->getPairItemName());
                 if (!extension.empty())
-                    submenu.addItem(L"*." + utfCvrtTo<wxString>(extension),
+                    submenu.addItem(L"*." + utfTo<wxString>(extension),
                                     [this, extension, include] { filterExtension(extension, include); });
             }
 
@@ -2180,13 +2177,13 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             Zstring labelShort = Zstring(Zstr("*")) + FILE_NAME_SEPARATOR + selection[0]->getPairItemName();
             if (isFolder)
                 labelShort += FILE_NAME_SEPARATOR;
-            submenu.addItem(utfCvrtTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
+            submenu.addItem(utfTo<wxString>(labelShort), [this, &selection, include] { filterShortname(*selection[0], include); });
 
             //by relative path
             Zstring labelRel = FILE_NAME_SEPARATOR + selection[0]->getPairRelativePath();
             if (isFolder)
                 labelRel += FILE_NAME_SEPARATOR;
-            submenu.addItem(utfCvrtTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
+            submenu.addItem(utfTo<wxString>(labelRel), [this, &selection, include] { filterItems(selection, include); });
 
             menu.addSubmenu(label, submenu, &getResourceImage(iconName));
         }
@@ -2264,7 +2261,7 @@ void MainDialog::onMainGridContextRim(bool leftSide)
 
 
 
-void MainDialog::filterPhrase(const Zstring& phrase, bool include, bool addNewLine)
+void MainDialog::addFilterPhrase(const Zstring& phrase, bool include, bool requireNewLine)
 {
     Zstring& filterString = [&]() -> Zstring&
     {
@@ -2279,17 +2276,19 @@ void MainDialog::filterPhrase(const Zstring& phrase, bool include, bool addNewLi
             return currentCfg.mainCfg.globalFilter.excludeFilter;
     }();
 
-    if (addNewLine)
+    if (requireNewLine)
     {
-        if (!filterString.empty() && !endsWith(filterString, Zstr("\n")))
+        trim(filterString, false, true, [](Zchar c) { return c == FILTER_ITEM_SEPARATOR || c == Zstr('\n'); });
+        if (!filterString.empty())
             filterString += Zstr("\n");
         filterString += phrase;
     }
     else
     {
-        if (!filterString.empty() && !endsWith(filterString, Zstr("\n")) && !endsWith(filterString, Zstr(";")))
+        trim(filterString, false, true, [](Zchar c) { return c == Zstr('\n'); });
+        if (!filterString.empty() && !endsWith(filterString, FILTER_ITEM_SEPARATOR))
             filterString += Zstr("\n");
-        filterString += phrase + Zstr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
+        filterString += phrase + FILTER_ITEM_SEPARATOR; //append FILTER_ITEM_SEPARATOR to 'mark' that next extension exclude should write to same line
     }
 
     updateGlobalFilterButton();
@@ -2306,7 +2305,7 @@ void MainDialog::filterPhrase(const Zstring& phrase, bool include, bool addNewLi
 void MainDialog::filterExtension(const Zstring& extension, bool include)
 {
     assert(!extension.empty());
-    filterPhrase(Zstr("*.") + extension, include, false);
+    addFilterPhrase(Zstr("*.") + extension, include, false);
 }
 
 
@@ -2317,7 +2316,7 @@ void MainDialog::filterShortname(const FileSystemObject& fsObj, bool include)
     if (isFolder)
         phrase += FILE_NAME_SEPARATOR;
 
-    filterPhrase(phrase, include, true);
+    addFilterPhrase(phrase, include, true);
 }
 
 
@@ -2340,7 +2339,7 @@ void MainDialog::filterItems(const std::vector<FileSystemObject*>& selection, bo
             if (isFolder)
                 phrase += FILE_NAME_SEPARATOR;
         }
-        filterPhrase(phrase, include, true);
+        addFilterPhrase(phrase, include, true);
     }
 }
 
@@ -2594,12 +2593,12 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 }
 
 
-wxString getFormattedHistoryElement(const Zstring& filepath)
+Zstring getFormattedHistoryElement(const Zstring& filepath)
 {
     Zstring output = afterLast(filepath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
     if (endsWith(output, Zstr(".ffs_gui")))
         output = beforeLast(output, Zstr('.'), IF_MISSING_RETURN_NONE);
-    return utfCvrtTo<wxString>(output);
+    return output;
 }
 
 
@@ -2641,28 +2640,31 @@ void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filePaths)
         {
             const wxString lastSessionLabel = L"<" + _("Last session") + L">";
 
-            wxString label;
+            wxString newLabel;
             unsigned int newPos = 0;
 
             if (equalFilePath(filePath, lastRunConfigPath_))
-                label = lastSessionLabel;
+                newLabel = lastSessionLabel;
             else
             {
                 //workaround wxWidgets 2.9 bug on GTK screwing up the client data if the list box is sorted:
-                label = getFormattedHistoryElement(filePath);
+                const Zstring labelFmt = getFormattedHistoryElement(filePath);
+                newLabel = utfTo<wxString>(labelFmt);
 
                 //"linear-time insertion sort":
                 for (; newPos < m_listBoxHistory->GetCount(); ++newPos)
                 {
-                    const wxString& itemLabel = m_listBoxHistory->GetString(newPos);
-                    if (itemLabel != lastSessionLabel) //last session label should always be at top position!
-                        if (label.CmpNoCase(itemLabel) < 0)
-                            break;
+                    if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(newPos)))
+                        if (equalFilePath(histData->cfgFile_, lastRunConfigPath_))
+                            continue; //last session label should always be at top position!
+
+                    if (LessNaturalSort()(labelFmt, utfTo<Zstring>(m_listBoxHistory->GetString(newPos))))
+                        break;
                 }
             }
 
             assert(!m_listBoxHistory->IsSorted());
-            m_listBoxHistory->Insert(label, newPos, new wxClientHistoryData(filePath, ++lastUseIndexMax));
+            m_listBoxHistory->Insert(newLabel, newPos, new wxClientHistoryData(filePath, ++lastUseIndexMax));
 
             selections.insert(selections.begin() + newPos, true);
         }
@@ -2748,7 +2750,7 @@ void MainDialog::updateUnsavedCfgStatus()
         title += L'*';
 
     if (!activeCfgFilename.empty())
-        title += toWx(activeCfgFilename);
+        title += utfTo<wxString>(activeCfgFilename);
     else if (activeConfigFiles.size() > 1)
     {
         const wchar_t* EM_DASH = L" \u2014 ";
@@ -2828,13 +2830,13 @@ bool MainDialog::trySaveConfig(const Zstring* guiFilename) //return true if save
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxString(),
                                 //OS X really needs dir/file separated like this:
-                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
-                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
+                                utfTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                                utfTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                                 wxString(L"FreeFileSync (*.ffs_gui)|*.ffs_gui") + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
             return false;
-        targetFilename = toZ(filePicker.GetPath());
+        targetFilename = utfTo<Zstring>(filePicker.GetPath());
     }
 
     const xmlAccess::XmlGuiConfig guiCfg = getConfig();
@@ -2917,13 +2919,13 @@ bool MainDialog::trySaveBatchConfig(const Zstring* batchFileToUpdate)
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxString(),
                                 //OS X really needs dir/file separated like this:
-                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
-                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
+                                utfTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                                utfTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)), //default file
                                 _("FreeFileSync batch") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
             return false;
-        targetFilename = toZ(filePicker.GetPath());
+        targetFilename = utfTo<Zstring>(filePicker.GetPath());
     }
 
     try
@@ -2955,7 +2957,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
             {
                 bool neverSaveChanges = false;
                 switch (showConfirmationDialog3(this, DialogInfoType::INFO, PopupDialogCfg3().
-                                                setTitle(toWx(activeCfgFilename)).
+                                                setTitle(utfTo<wxString>(activeCfgFilename)).
                                                 setMainInstructions(replaceCpy(_("Do you want to save changes to %x?"), L"%x",
                                                                                fmtPath(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)))).
                                                 setCheckBox(neverSaveChanges, _("Never save &changes"), ConfirmationButton3::DO_IT),
@@ -3010,7 +3012,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 
     wxFileDialog filePicker(this,
                             wxString(),
-                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
+                            utfTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE)), //default dir
                             wxString(), //default file
                             wxString(L"FreeFileSync (*.ffs_gui; *.ffs_batch)|*.ffs_gui;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE);
@@ -3018,9 +3020,12 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
     {
         wxArrayString tmp;
         filePicker.GetPaths(tmp);
-        std::vector<wxString> filepaths(tmp.begin(), tmp.end());
 
-        loadConfiguration(toZ(filepaths));
+        std::vector<Zstring> filePaths;
+        for (const wxString& path : tmp)
+            filePaths.push_back(utfTo<Zstring>(path));
+
+        loadConfiguration(filePaths);
     }
 }
 
@@ -3306,8 +3311,8 @@ void MainDialog::showConfigDialog(SyncConfigPanel panelToShow, int localPairInde
     auto addPairCfg = [&](const FolderPairEnh& fp)
     {
         LocalPairConfig fpCfg;
-        fpCfg.folderPairName = getShortDisplayNameForFolderPair(AFS::getDisplayPath(createAbstractPath(fp.folderPathPhraseLeft_ )),
-                                                                AFS::getDisplayPath(createAbstractPath(fp.folderPathPhraseRight_)));
+        fpCfg.folderPairName = getShortDisplayNameForFolderPair(createAbstractPath(fp.folderPathPhraseLeft_ ),
+                                                                createAbstractPath(fp.folderPathPhraseRight_));
         fpCfg.altCmpConfig  = fp.altCmpConfig;
         fpCfg.altSyncConfig = fp.altSyncConfig;
         fpCfg.localFilter   = fp.localFilter;
@@ -3493,14 +3498,14 @@ inline
 wxBitmap buttonPressed(const std::string& name)
 {
     wxBitmap background = getResourceImage(L"buttonPressed");
-    return mirrorIfRtl(layOver(background, getResourceImage(utfCvrtTo<wxString>(name))));
+    return mirrorIfRtl(layOver(background, getResourceImage(utfTo<wxString>(name))));
 }
 
 
 inline
 wxBitmap buttonReleased(const std::string& name)
 {
-    wxImage output = getResourceImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    wxImage output = getResourceImage(utfTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
     //zen::moveImage(output, 1, 0); //move image right one pixel
 
     brighten(output, 80);
@@ -3681,12 +3686,12 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     {
         const Zstring soundFilePath = getResourceDirPf() + globalCfg.soundFileCompareFinished;
         if (fileAvailable(soundFilePath))
-            wxSound::Play(utfCvrtTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+            wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
     }
 
     //add to folder history after successful comparison only
-    folderHistoryLeft ->addItem(toZ(m_folderPathLeft ->GetValue()));
-    folderHistoryRight->addItem(toZ(m_folderPathRight->GetValue()));
+    folderHistoryLeft ->addItem(utfTo<Zstring>(m_folderPathLeft ->GetValue()));
+    folderHistoryRight->addItem(utfTo<Zstring>(m_folderPathRight->GetValue()));
 
     if (oldFocus == m_buttonCompare)
         oldFocus = m_buttonSync;
@@ -3862,7 +3867,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     if (Opt<Zstring> nativeFolderPath = AFS::getNativeItemPath(it->getAbstractPath<RIGHT_SIDE>()))
                         availableDirPaths.insert(*nativeFolderPath);
             }
-            dirLocks = std::make_unique<LockHolder>(availableDirPaths, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
+            dirLocks = std::make_unique<LockHolder>(availableDirPaths, globalCfg.optDialogs.warnDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -4167,7 +4172,7 @@ void MainDialog::applySyncConfig()
     zen::redetermineSyncDirection(getConfig().mainCfg, folderCmp,
                                   [&](const std::wstring& warning)
     {
-        bool& warningActive = globalCfg.optDialogs.warningDatabaseError;
+        bool& warningActive = globalCfg.optDialogs.warnDatabaseError;
         if (warningActive)
         {
             bool dontWarnAgain = false;
@@ -4247,7 +4252,7 @@ void MainDialog::hideFindPanel()
 
 void MainDialog::startFindNext(bool searchAscending) //F3 or ENTER in m_textCtrlSearchTxt
 {
-    Zstring searchString = utfCvrtTo<Zstring>(trimCpy(m_textCtrlSearchTxt->GetValue()));
+    Zstring searchString = utfTo<Zstring>(trimCpy(m_textCtrlSearchTxt->GetValue()));
 
 
     if (searchString.empty())
@@ -4262,7 +4267,7 @@ void MainDialog::startFindNext(bool searchAscending) //F3 or ENTER in m_textCtrl
             std::swap(grid1, grid2); //select side to start search at grid cursor position
 
         wxBeginBusyCursor(wxHOURGLASS_CURSOR);
-        const std::pair<const Grid*, ptrdiff_t> result = findGridMatch(*grid1, *grid2, utfCvrtTo<std::wstring>(searchString),
+        const std::pair<const Grid*, ptrdiff_t> result = findGridMatch(*grid1, *grid2, utfTo<std::wstring>(searchString),
                                                                        m_checkBoxMatchCase->GetValue(), searchAscending); //parameter owned by GUI, *not* globalCfg structure! => we should better implement a getGlocalCfg()!
         wxEndBusyCursor();
 
@@ -4628,7 +4633,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     wxBusyCursor dummy;
 
-    const Zstring filePath = utfCvrtTo<Zstring>(filePicker.GetPath());
+    const Zstring filePath = utfTo<Zstring>(filePicker.GetPath());
 
     //http://en.wikipedia.org/wiki/Comma-separated_values
     const lconv* localInfo = ::localeconv(); //always bound according to doc
@@ -4638,7 +4643,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     auto fmtValue = [&](const wxString& val) -> std::string
     {
-        std::string&& tmp = utfCvrtTo<std::string>(val);
+        std::string&& tmp = utfTo<std::string>(val);
 
         if (contains(tmp, CSV_SEP))
             return '\"' + tmp + '\"';
@@ -4651,11 +4656,10 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     //base folders
     header += fmtValue(_("Folder Pairs")) + LINE_BREAK;
-    std::for_each(begin(folderCmp), end(folderCmp),
-                  [&](BaseFolderPair& baseFolder)
+    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseFolderPair& baseFolder)
     {
-        header += utfCvrtTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath< LEFT_SIDE>())) + CSV_SEP;
-        header += utfCvrtTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath<RIGHT_SIDE>())) + LINE_BREAK;
+        header += utfTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath< LEFT_SIDE>())) + CSV_SEP;
+        header += utfTo<std::string>(AFS::getDisplayPath(baseFolder.getAbstractPath<RIGHT_SIDE>())) + LINE_BREAK;
     });
     header += LINE_BREAK;
 

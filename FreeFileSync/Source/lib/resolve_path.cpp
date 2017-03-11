@@ -80,24 +80,23 @@ Zstring resolveRelativePath(const Zstring& relativePath)
 
 
 
-
-Opt<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
-                          const std::vector<std::pair<Zstring, Zstring>>& ext) //return nullptr if not resolved
+//returns value if resolved
+Opt<Zstring> tryResolveMacro(const Zstring& macro) //macro without %-characters
 {
     //there exist environment variables named %TIME%, %DATE% so check for our internal macros first!
-    if (ciEqual(macro, Zstr("time")))
+    if (strEqual(macro, Zstr("time"), CmpAsciiNoCase()))
         return formatTime<Zstring>(Zstr("%H%M%S"));
 
-    if (ciEqual(macro, Zstr("date")))
+    if (strEqual(macro, Zstr("date"), CmpAsciiNoCase()))
         return formatTime<Zstring>(FORMAT_ISO_DATE);
 
-    if (ciEqual(macro, Zstr("timestamp")))
+    if (strEqual(macro, Zstr("timestamp"), CmpAsciiNoCase()))
         return formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S")); //e.g. "2012-05-15 131513"
 
     Zstring timeStr;
     auto resolveTimePhrase = [&](const Zchar* phrase, const Zchar* format) -> bool
     {
-        if (!ciEqual(macro, phrase))
+        if (!strEqual(macro, phrase, CmpAsciiNoCase()))
             return false;
 
         timeStr = formatTime<Zstring>(format);
@@ -113,13 +112,6 @@ Opt<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
     if (resolveTimePhrase(Zstr("min"    ), Zstr("%M"))) return timeStr;
     if (resolveTimePhrase(Zstr("sec"    ), Zstr("%S"))) return timeStr;
 
-    //check domain-specific extensions
-    {
-        auto it = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return ciEqual(macro, p.first); });
-        if (it != ext.end())
-            return it->second;
-    }
-
     //try to resolve as environment variable
     if (Opt<Zstring> value = getEnvironmentVar(macro))
         return *value;
@@ -129,9 +121,10 @@ Opt<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
 }
 
 const Zchar MACRO_SEP = Zstr('%');
+}
 
 //returns expanded or original string
-Zstring expandMacros(const Zstring& text, const std::vector<std::pair<Zstring, Zstring>>& ext)
+Zstring zen::expandMacros(const Zstring& text)
 {
     if (contains(text, MACRO_SEP))
     {
@@ -142,18 +135,14 @@ Zstring expandMacros(const Zstring& text, const std::vector<std::pair<Zstring, Z
             Zstring potentialMacro = beforeFirst(rest, MACRO_SEP, IF_MISSING_RETURN_NONE);
             Zstring postfix        = afterFirst (rest, MACRO_SEP, IF_MISSING_RETURN_NONE); //text == prefix + MACRO_SEP + potentialMacro + MACRO_SEP + postfix
 
-            if (Opt<Zstring> value = resolveMacro(potentialMacro, ext))
-                return prefix + *value + expandMacros(postfix, ext);
+            if (Opt<Zstring> value = tryResolveMacro(potentialMacro))
+                return prefix + *value + expandMacros(postfix);
             else
-                return prefix + MACRO_SEP + potentialMacro + expandMacros(MACRO_SEP + postfix, ext);
+                return prefix + MACRO_SEP + potentialMacro + expandMacros(MACRO_SEP + postfix);
         }
     }
     return text;
 }
-}
-
-
-Zstring zen::expandMacros(const Zstring& text) { return ::expandMacros(text, std::vector<std::pair<Zstring, Zstring>>()); }
 
 
 namespace
@@ -270,7 +259,7 @@ Zstring zen::getResolvedFilePath(const Zstring& pathPhrase) //noexcept
     path = resolveRelativePath(path);
 
     //remove trailing slash, unless volume root:
-    if (Opt<PathComponents> pc = getPathComponents(path))
+    if (Opt<PathComponents> pc = parsePathComponents(path))
     {
         //keep this brace for GCC: -Wparentheses
         if (pc->relPath.empty())

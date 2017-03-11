@@ -43,7 +43,7 @@ void TreeView::compressNode(Container& cont) //remove single-element sub-trees -
 
 
 template <class Function> //(const FileSystemObject&) -> bool
-void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
+void TreeView::extractVisibleSubtree(ContainerObject& hierObj,  //in
                                      TreeView::Container& cont, //out
                                      Function pred)
 {
@@ -155,63 +155,45 @@ void calcPercentage(std::vector<std::pair<uint64_t, int*>>& workList)
 }
 
 
-std::wstring zen::getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight)
+Zstring zen::getShortDisplayNameForFolderPair(const AbstractPath& itemPathL, const AbstractPath& itemPathR)
 {
-	warn_static("refactor using AfsPath")
-		warn_static("next: get rid of int cmpFilePath(const wchar_t*) on Linux/OS X!")
-
-    const wchar_t sep = L'/';
-    std::wstring fmtPathL = displayPathLeft;
-    std::wstring fmtPathR = displayPathRight;
-    if (!startsWith(fmtPathL, sep)) fmtPathL = sep + fmtPathL;
-    if (!startsWith(fmtPathR, sep)) fmtPathR = sep + fmtPathR;
-
-    auto itL = fmtPathL.end();
-    auto itR = fmtPathR.end();
+    Zstring commonTrail;
+    AbstractPath tmpPathL = itemPathL;
+    AbstractPath tmpPathR = itemPathR;
     for (;;)
     {
-        auto itLPrev = find_last(fmtPathL.begin(), itL, sep); //c:\file, d:\1file have no common postfix!
-        auto itRPrev = find_last(fmtPathR.begin(), itR, sep);
-
-        if (itLPrev == itL ||
-            itRPrev == itR)
+        Opt<AbstractPath> parentPathL = AFS::getParentFolderPath(tmpPathL);
+        Opt<AbstractPath> parentPathR = AFS::getParentFolderPath(tmpPathR);
+        if (!parentPathL || !parentPathR)
             break;
 
-        if (cmpFilePath(&*itLPrev, itL - itLPrev,
-                        &*itRPrev, itR - itRPrev) != 0)
+        const Zstring itemNameL = AFS::getItemName(tmpPathL);
+        const Zstring itemNameR = AFS::getItemName(tmpPathR);
+        if (!strEqual(itemNameL, itemNameR, CmpNaturalSort())) //let's compare case-insensitively even on Linux!
             break;
-        itL = itLPrev;
-        itR = itRPrev;
+
+        tmpPathL = *parentPathL;
+        tmpPathR = *parentPathR;
+
+        commonTrail = AFS::appendPaths(itemNameL, commonTrail, FILE_NAME_SEPARATOR);
     }
+    if (!commonTrail.empty())
+        return commonTrail;
 
-    if (itL != fmtPathL.end() && *itL == sep)
-        ++itL;
-
-    const size_t postFixLen = fmtPathL.end() - itL;
-    if (postFixLen > 0)
-        return std::wstring(&*(displayPathLeft.end() - postFixLen), postFixLen);
-
-    auto getLastComponent = [sep](const std::wstring& displayPath) -> std::wstring
+    auto getLastComponent = [](const AbstractPath& itemPath)
     {
-        const std::wstring fmtPath = displayPath;
-        auto itEnd = fmtPath.end();
-        if (endsWith(fmtPath, sep)) //preserve trailing separator, support "C:\"
-            --itEnd;
-
-        auto it = find_last(fmtPath.begin(), itEnd, sep);
-        if (it == itEnd)
-            it = fmtPath.begin();
-        else ++it;
-
-        return displayPath.c_str() + (it - fmtPath.begin());
+        if (!AFS::getParentFolderPath(itemPath)) //= device root
+            return utfTo<Zstring>(AFS::getDisplayPath(itemPath));
+        return AFS::getItemName(itemPath);
     };
-    if (displayPathLeft.empty())
-        return getLastComponent(displayPathRight);
-    else if (displayPathRight.empty())
-        return getLastComponent(displayPathLeft);
+
+    if (AFS::isNullPath(itemPathL))
+        return getLastComponent(itemPathR);
+    else if (AFS::isNullPath(itemPathR))
+        return getLastComponent(itemPathL);
     else
-        return getLastComponent(displayPathLeft) + L" \u2212 " + //= unicode minus
-               getLastComponent(displayPathRight);
+        return getLastComponent(itemPathL) + utfTo<Zstring>(L" \u2212 ") + //= unicode minus
+               getLastComponent(itemPathR);
 }
 
 
@@ -232,8 +214,8 @@ struct TreeView::LessShortName
         switch (lhs.type_)
         {
             case TreeView::TYPE_ROOT:
-                return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(static_cast<const RootNodeImpl*>(lhs.node_)->displayName,
-                                                                                static_cast<const RootNodeImpl*>(rhs.node_)->displayName);
+                return makeSortDirection(LessNaturalSort() /*even on Linux*/, Int2Type<ascending>())(static_cast<const RootNodeImpl*>(lhs.node_)->displayName,
+                        static_cast<const RootNodeImpl*>(rhs.node_)->displayName);
 
             case TreeView::TYPE_DIRECTORY:
             {
@@ -245,7 +227,7 @@ struct TreeView::LessShortName
                 else if (!folderR)
                     return true;
 
-                return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(folderL->getPairItemName(), folderR->getPairItemName());
+                return makeSortDirection(LessNaturalSort() /*even on Linux*/, Int2Type<ascending>())(folderL->getPairItemName(), folderR->getPairItemName());
             }
 
             case TreeView::TYPE_FILES:
@@ -336,7 +318,7 @@ void TreeView::getChildren(const Container& cont, unsigned int level, std::vecto
 void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
 {
     //preserve current node expansion status
-    auto getHierAlias = [](const TreeView::TreeLine& tl) -> const HierarchyObject*
+    auto getHierAlias = [](const TreeView::TreeLine& tl) -> const ContainerObject*
     {
         switch (tl.type_)
         {
@@ -354,7 +336,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
         return nullptr;
     };
 
-    std::unordered_set<const HierarchyObject*> expandedNodes;
+    std::unordered_set<const ContainerObject*> expandedNodes;
     if (!flatTree.empty())
     {
         auto it = flatTree.begin();
@@ -434,8 +416,8 @@ void TreeView::updateView(Predicate pred)
         else
         {
             root.baseFolder = baseObj;
-            root.displayName = getShortDisplayNameForFolderPair(AFS::getDisplayPath(baseObj->getAbstractPath< LEFT_SIDE>()),
-                                                                AFS::getDisplayPath(baseObj->getAbstractPath<RIGHT_SIDE>()));
+            root.displayName = getShortDisplayNameForFolderPair(baseObj->getAbstractPath< LEFT_SIDE>(),
+                                                                baseObj->getAbstractPath<RIGHT_SIDE>());
 
             this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
         }
@@ -706,7 +688,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
                 if (auto firstFile = FileSystemObject::retrieve(parentDir->firstFileId))
                 {
                     std::vector<FileSystemObject*> filesAndLinks;
-                    HierarchyObject& parent = firstFile->parent();
+                    ContainerObject& parent = firstFile->parent();
 
                     //lazy evaluation: recheck "lastViewFilterPred" again rather than buffer and bloat "lastViewFilterPred"
                     for (FileSystemObject& fsObj : parent.refSubFiles())
@@ -832,9 +814,9 @@ private:
                 {
                     case ColumnTypeNavi::FOLDER_NAME:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-                            return root->displayName_;
+                            return utfTo<std::wstring>(root->displayName_);
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
-                            return utfCvrtTo<std::wstring>(dir->folder_.getPairItemName());
+                            return utfTo<std::wstring>(dir->folder_.getPairItemName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
                             return _("Files");
                         break;

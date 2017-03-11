@@ -87,36 +87,25 @@ FFSTranslation::FFSTranslation(const Zstring& lngFilePath, wxLanguage langId) : 
 
     for (const auto& item : transInput)
     {
-        const std::wstring original    = utfCvrtTo<std::wstring>(item.first);
-        const std::wstring translation = utfCvrtTo<std::wstring>(item.second);
+        const std::wstring original    = utfTo<std::wstring>(item.first);
+        const std::wstring translation = utfTo<std::wstring>(item.second);
         transMapping.emplace(original, translation);
     }
 
     for (const auto& item : transPluralInput)
     {
-        const std::wstring engSingular = utfCvrtTo<std::wstring>(item.first.first);
-        const std::wstring engPlural   = utfCvrtTo<std::wstring>(item.first.second);
+        const std::wstring engSingular = utfTo<std::wstring>(item.first.first);
+        const std::wstring engPlural   = utfTo<std::wstring>(item.first.second);
 
         std::vector<std::wstring> plFormsWide;
         for (const std::string& pf : item.second)
-            plFormsWide.push_back(utfCvrtTo<std::wstring>(pf));
+            plFormsWide.push_back(utfTo<std::wstring>(pf));
 
         transMappingPl.emplace(std::make_pair(engSingular, engPlural), plFormsWide);
     }
 
     pluralParser = std::make_unique<parse_plural::PluralForm>(header.pluralDefinition); //throw parse_plural::ParsingError
 }
-
-
-struct LessTranslation
-{
-    bool operator()(const TranslationInfo& lhs, const TranslationInfo& rhs) const
-    {
-        //use a more "natural" sort: ignore case and diacritics
-        return ::wcscasecmp(lhs.languageName.c_str(), rhs.languageName.c_str()) < 0; //ignores case; locale-dependent!
-
-    }
-};
 
 
 std::vector<TranslationInfo> loadTranslations()
@@ -165,13 +154,13 @@ std::vector<TranslationInfo> loadTranslations()
                 wxLANGUAGE_SPANISH //non-unique, but still mapped correctly (or is it incidentally???)
                 wxLANGUAGE_SERBIAN //
             */
-            if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(lngHeader.localeName)))
+            if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfTo<wxString>(lngHeader.localeName)))
             {
                 TranslationInfo newEntry;
                 newEntry.languageID     = static_cast<wxLanguage>(locInfo->Language);
-                newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
-                newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
-                newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
+                newEntry.languageName   = utfTo<std::wstring>(lngHeader.languageName);
+                newEntry.translatorName = utfTo<std::wstring>(lngHeader.translatorName);
+                newEntry.languageFlag   = utfTo<std::wstring>(lngHeader.flagFile);
                 newEntry.langFilePath   = filePath;
                 locMapping.push_back(newEntry);
             }
@@ -181,7 +170,11 @@ std::vector<TranslationInfo> loadTranslations()
         catch (lngfile::ParsingError&) { assert(false); } //better not show an error message here; scenario: batch jobs
     }
 
-    std::sort(locMapping.begin(), locMapping.end(), LessTranslation());
+    std::sort(locMapping.begin(), locMapping.end(), [](const TranslationInfo& lhs, const TranslationInfo& rhs)
+    {
+        return LessNaturalSort()(utfTo<Zstring>(lhs.languageName),
+                                 utfTo<Zstring>(rhs.languageName)); //use a more "natural" sort: ignore case and diacritics
+    });
     return locMapping;
 }
 

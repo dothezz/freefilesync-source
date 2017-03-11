@@ -8,7 +8,6 @@
 #include <zen/file_access.h>
 #include <wx/stdpaths.h>
 #include <wx/app.h>
-#include <wx+/string_conv.h>
 
 
 using namespace zen;
@@ -19,7 +18,7 @@ namespace
 inline
 Zstring getExecutablePathPf() //directory containing executable WITH path separator at end
 {
-    return appendSeparator(beforeLast(utfCvrtTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
+    return appendSeparator(beforeLast(utfTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE));
 }
 }
 
@@ -43,7 +42,7 @@ Zstring zen::getResourceDirPf()
     if (isPortableVersion())
         return getExecutablePathPf();
     else //use OS' standard paths
-        return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
+        return appendSeparator(utfTo<Zstring>(wxStandardPathsBase::Get().GetResourcesDir()));
 }
 
 
@@ -57,7 +56,7 @@ Zstring zen::getConfigDirPathPf()
     if (isPortableVersion())
         return getExecutablePathPf();
     //use OS' standard paths
-    Zstring configDirPath = toZ(wxStandardPaths::Get().GetUserDataDir());
+    Zstring configDirPath = utfTo<Zstring>(wxStandardPaths::Get().GetUserDataDir());
     try
     {
         createDirectoryIfMissingRecursion(configDirPath); //throw FileError

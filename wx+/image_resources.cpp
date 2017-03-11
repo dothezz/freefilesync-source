@@ -76,7 +76,7 @@ void GlobalBitmaps::init(const Zstring& filepath)
 {
     assert(bitmaps.empty() && anims.empty());
 
-    wxFFileInputStream input(utfCvrtTo<wxString>(filepath));
+    wxFFileInputStream input(utfTo<wxString>(filepath));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

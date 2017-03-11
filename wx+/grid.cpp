@@ -142,7 +142,7 @@ wxSize GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& 
     wxSize extentTrunc = dc.GetTextExtent(textTrunc);
     if (extentTrunc.GetWidth() > rect.width)
     {
-        //unlike Windows 7 Explorer, we truncate UTF-16 correctly: e.g. CJK-Ideogramm encodes to TWO wchar_t: utfCvrtTo<std::wstring>("\xf0\xa4\xbd\x9c");
+        //unlike Windows 7 Explorer, we truncate UTF-16 correctly: e.g. CJK-Ideogramm encodes to TWO wchar_t: utfTo<std::wstring>("\xf0\xa4\xbd\x9c");
         size_t low  = 0;                   //number of unicode chars!
         size_t high = unicodeLength(text); //
         if (high > 1)
@@ -159,7 +159,7 @@ wxSize GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& 
                     break;
                 }
 
-                const std::wstring& candidate = std::wstring(strBegin(text), findUnicodePos(text, middle)) + ELLIPSIS;
+                const std::wstring& candidate = getUnicodeSubstring(text, 0, middle) + ELLIPSIS;
                 const wxSize extentCand = dc.GetTextExtent(candidate); //perf: most expensive call of this routine!
 
                 if (extentCand.GetWidth() <= rect.width)

@@ -37,7 +37,7 @@ private:
         //wxPoint clientDropPos(x, y)
         std::vector<Zstring> filePaths;
         for (const wxString& file : fileArray)
-            filePaths.push_back(utfCvrtTo<Zstring>(file));
+            filePaths.push_back(utfTo<Zstring>(file));
 
         //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
         if (wxEvtHandler* handler = dropWindow_.GetEventHandler())

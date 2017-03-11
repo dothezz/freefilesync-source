@@ -20,7 +20,7 @@ class SyncStatistics //this class counts *logical* operations, (create, update, 
     //-> note the fundamental difference compared to counting disk accesses!
 public:
     SyncStatistics(const FolderComparison& folderCmp);
-    SyncStatistics(const HierarchyObject& hierObj);
+    SyncStatistics(const ContainerObject& hierObj);
     SyncStatistics(const FilePair& file);
 
     template <SelectedSide side>
@@ -51,7 +51,7 @@ public:
     const std::vector<ConflictInfo>& getConflicts() const { return conflictMsgs_; }
 
 private:
-    void recurse(const HierarchyObject& hierObj);
+    void recurse(const ContainerObject& hierObj);
 
     void processFile  (const FilePair& file);
     void processLink  (const SymlinkPair& link);

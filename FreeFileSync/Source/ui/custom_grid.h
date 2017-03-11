@@ -36,7 +36,7 @@ void setScrollMaster(Grid& grid);
 //mark rows selected in navigation/compressed tree and navigate to leading object
 void setNavigationMarker(Grid& gridLeft,
                          std::unordered_set<const FileSystemObject*>&& markedFilesAndLinks,//mark files/symlinks directly within a container
-                         std::unordered_set<const HierarchyObject*>&& markedContainer);    //mark full container including child-objects
+                         std::unordered_set<const ContainerObject*>&& markedContainer);    //mark full container including child-objects
 }
 
 wxBitmap getSyncOpImage(SyncOperation syncOp);

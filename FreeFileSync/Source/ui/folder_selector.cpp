@@ -9,7 +9,6 @@
 #include <zen/file_access.h>
 #include <wx/dirdlg.h>
 #include <wx/scrolwin.h>
-#include <wx+/string_conv.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/context_menu.h>
 #include <wx+/image_resources.h>
@@ -30,19 +29,19 @@ namespace
 void setFolderPathPhrase(const Zstring& folderPathPhrase, FolderHistoryBox* comboBox, wxWindow& tooltipWnd, wxStaticText* staticText) //pointers are optional
 {
     if (comboBox)
-        comboBox->setValue(toWx(folderPathPhrase));
+        comboBox->setValue(utfTo<wxString>(folderPathPhrase));
 
     const Zstring folderPathPhraseFmt = AFS::getInitPathPhrase(createAbstractPath(folderPathPhrase)); //noexcept
     //may block when resolving [<volume name>]
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
-    tooltipWnd.SetToolTip(toWx(folderPathPhraseFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
+    tooltipWnd.SetToolTip(utfTo<wxString>(folderPathPhraseFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
 
     if (staticText)
     {
         //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
         staticText->SetLabel(equalFilePath(appendSeparator(trimCpy(folderPathPhrase)), appendSeparator(folderPathPhraseFmt)) ?
-                             wxString(_("Drag && drop")) : toWx(folderPathPhraseFmt));
+                             wxString(_("Drag && drop")) : utfTo<wxString>(folderPathPhraseFmt));
     }
 }
 
@@ -158,7 +157,7 @@ void FolderSelector::onFilesDropped(FileDropEvent& event)
 
 void FolderSelector::onEditFolderPath(wxCommandEvent& event)
 {
-    setFolderPathPhrase(toZ(event.GetString()), nullptr, folderComboBox_, staticText_);
+    setFolderPathPhrase(utfTo<Zstring>(event.GetString()), nullptr, folderComboBox_, staticText_);
 
     wxCommandEvent dummy(EVENT_ON_FOLDER_MANUAL_EDIT);
     ProcessEvent(dummy);
@@ -195,14 +194,14 @@ void FolderSelector::onSelectFolder(wxCommandEvent& event)
     }
 
     //wxDirDialog internally uses lame-looking SHBrowseForFolder(); we better use IFileDialog() instead! (remembers size and position!)
-    wxDirDialog dirPicker(&selectFolderButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
+    wxDirDialog dirPicker(&selectFolderButton_, _("Select a folder"), utfTo<wxString>(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
 
     //-> following doesn't seem to do anything at all! still "Show hidden" is available as a context menu option:
     //::gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(dirPicker.m_widget), true /*show_hidden*/);
 
     if (dirPicker.ShowModal() != wxID_OK)
         return;
-    const Zstring newFolderPathPhrase = toZ(dirPicker.GetPath());
+    const Zstring newFolderPathPhrase = utfTo<Zstring>(dirPicker.GetPath());
 
     setFolderPathPhrase(newFolderPathPhrase, &folderComboBox_, folderComboBox_, staticText_);
 
@@ -219,7 +218,7 @@ void FolderSelector::onSelectAltFolder(wxCommandEvent& event)
 
 Zstring FolderSelector::getPath() const
 {
-    Zstring path = utfCvrtTo<Zstring>(folderComboBox_.GetValue());
+    Zstring path = utfTo<Zstring>(folderComboBox_.GetValue());
 
     return path;
 }

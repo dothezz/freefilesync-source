@@ -47,7 +47,7 @@ void displayHelpEntry(const wxString& topic, wxWindow* parent)
         -> what if FFS is blocked, but the web browser would have internet access??
     {
         const wxString section = L"html/" + topic + L".html";
-        wxHtmlModalHelp dlg(parent, utfCvrtTo<wxString>(zen::getResourceDirPf()) + L"Help/FreeFileSync.hhp", section,
+        wxHtmlModalHelp dlg(parent, utfTo<wxString>(zen::getResourceDirPf()) + L"Help/FreeFileSync.hhp", section,
         wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
             (void)dlg;
             //-> solves modal help craziness on OSX!

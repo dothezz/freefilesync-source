@@ -7,7 +7,6 @@
 #include "xml_proc.h"
 #include <zen/file_access.h>
 #include <wx/filefn.h>
-#include <wx+/string_conv.h>
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
 

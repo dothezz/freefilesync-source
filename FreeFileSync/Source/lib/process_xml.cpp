@@ -24,8 +24,8 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const int XML_FORMAT_VER_GLOBAL    = 4;
-const int XML_FORMAT_VER_FFS_GUI   = 6;
-const int XML_FORMAT_VER_FFS_BATCH = 6;
+const int XML_FORMAT_VER_FFS_GUI   = 7; //2017-02-16
+const int XML_FORMAT_VER_FFS_BATCH = 7; //
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -135,8 +135,8 @@ namespace
 std::vector<Zstring> splitFilterByLines(const Zstring& filterPhrase)
 {
     if (filterPhrase.empty())
-        return std::vector<Zstring>();
-    return split(filterPhrase, Zstr('\n'));
+        return {};
+    return split(filterPhrase, Zstr('\n'), SplitType::ALLOW_EMPTY);
 }
 
 Zstring mergeFilterLines(const std::vector<Zstring>& filterLines)
@@ -157,7 +157,7 @@ void writeText(const wxLanguage& value, std::string& output)
     //use description as unique wxLanguage identifier, see localization.cpp
     //=> handle changes to wxLanguage enum between wxWidgets versions
     if (const wxLanguageInfo* lngInfo = wxLocale::GetLanguageInfo(value))
-        output = utfCvrtTo<std::string>(lngInfo->Description);
+        output = utfTo<std::string>(lngInfo->Description);
     else
     {
         assert(false);
@@ -168,7 +168,7 @@ void writeText(const wxLanguage& value, std::string& output)
 template <> inline
 bool readText(const std::string& input, wxLanguage& value)
 {
-    if (const wxLanguageInfo* lngInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(input)))
+    if (const wxLanguageInfo* lngInfo = wxLocale::FindLanguageInfo(utfTo<wxString>(input)))
     {
         value = static_cast<wxLanguage>(lngInfo->Language);
         return true;
@@ -785,7 +785,7 @@ namespace zen
 template <> inline
 bool readText(const std::string& input, ConfigFileItem& value)
 {
-    value.filePath_ = resolveFreeFileSyncDriveMacro(utfCvrtTo<Zstring>(input));
+    value.filePath_ = resolveFreeFileSyncDriveMacro(utfTo<Zstring>(input));
     return true;
 }
 
@@ -793,7 +793,7 @@ bool readText(const std::string& input, ConfigFileItem& value)
 template <> inline
 void writeText(const ConfigFileItem& value, std::string& output)
 {
-    output = utfCvrtTo<std::string>(substituteFreeFileSyncDriveLetter(value.filePath_));
+    output = utfTo<std::string>(substituteFreeFileSyncDriveLetter(value.filePath_));
 }
 }
 
@@ -847,15 +847,19 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 }
 
 
-void readConfig(const XmlIn& in, FilterConfig& filter)
+void readConfig(const XmlIn& in, FilterConfig& filter, int formatVer)
 {
-    std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //save default value
-    in["Include"](tmp);
-    filter.includeFilter = mergeFilterLines(tmp);
+    std::vector<Zstring> tmpIn = splitFilterByLines(filter.includeFilter); //consider default value
+    in["Include"](tmpIn);
+    filter.includeFilter = mergeFilterLines(tmpIn);
 
-    std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //save default value
-    in["Exclude"](tmp2);
-    filter.excludeFilter = mergeFilterLines(tmp2);
+    std::vector<Zstring> tmpEx = splitFilterByLines(filter.excludeFilter); //consider default value
+    in["Exclude"](tmpEx);
+    filter.excludeFilter = mergeFilterLines(tmpEx);
+
+    //TODO: remove macro migration after some time! 2017-02-16
+    if (formatVer <= 6) replace(filter.includeFilter, Zstr(';'), Zstr('|'));
+    if (formatVer <= 6) replace(filter.excludeFilter, Zstr(';'), Zstr('|'));
 
     in["TimeSpan"](filter.timeSpan);
     in["TimeSpan"].attribute("Type", filter.unitTimeSpan);
@@ -927,7 +931,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair, int formatVer)
     //###########################################################
     //alternate filter configuration
     if (XmlIn inLocFilter = in["LocalFilter"])
-        readConfig(inLocFilter, enhPair.localFilter);
+        readConfig(inLocFilter, enhPair.localFilter, formatVer);
 }
 
 
@@ -944,7 +948,7 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg, int formatVer)
     //###########################################################
 
     //read filter settings
-    readConfig(inMain["GlobalFilter"], mainCfg.globalFilter);
+    readConfig(inMain["GlobalFilter"], mainCfg.globalFilter, formatVer);
 
     //###########################################################
     //read all folder pairs
@@ -1023,17 +1027,18 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inGeneral["NotificationSound"        ].attribute("SyncFinished",    config.soundFileSyncFinished);
 
     XmlIn inOpt = inGeneral["OptionalDialogs"];
-    inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
-    inOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
-    inOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
-    inOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warningRecyclerMissing);
-    inOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warningInputFieldEmpty);
-    inOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warningDatabaseError);
-    inOpt["WarnDependentFolders"       ].attribute("Enabled", config.optDialogs.warningDependentFolders);
-    inOpt["WarnFolderPairRaceCondition"].attribute("Enabled", config.optDialogs.warningFolderPairRaceCondition);
-    inOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
-    inOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
-    inOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
+    inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warnUnresolvedConflicts);
+    inOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warnNotEnoughDiskSpace);
+    inOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warnSignificantDifference);
+    inOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warnRecyclerMissing);
+    inOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warnInputFieldEmpty);
+    inOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
+    inOpt["WarnDependentFolderPair"    ].attribute("Enabled", config.optDialogs.warnDependentFolderPair);
+    inOpt["WarnDependentBaseFolders"   ].attribute("Enabled", config.optDialogs.warnDependentBaseFolders);
+    inOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warnDirectoryLockFailed);
+    inOpt["WarnVersioningFolderPartOfSync"  ].attribute("Enabled", config.optDialogs.warnVersioningFolderPartOfSync);
+    inOpt["ConfirmSaveConfig"               ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
+    inOpt["ConfirmStartSync"                ].attribute("Enabled", config.optDialogs.confirmSyncStart);
     inOpt["ConfirmExternalCommandMassInvoke"].attribute("Enabled", config.optDialogs.confirmExternalCommandMassInvoke);
 
     //gui specific global settings (optional)
@@ -1459,17 +1464,18 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGeneral["NotificationSound"        ].attribute("SyncFinished",    config.soundFileSyncFinished);
 
     XmlOut outOpt = outGeneral["OptionalDialogs"];
-    outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
-    outOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
-    outOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
-    outOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warningRecyclerMissing);
-    outOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warningInputFieldEmpty);
-    outOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warningDatabaseError);
-    outOpt["WarnDependentFolders"       ].attribute("Enabled", config.optDialogs.warningDependentFolders);
-    outOpt["WarnFolderPairRaceCondition"].attribute("Enabled", config.optDialogs.warningFolderPairRaceCondition);
-    outOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
-    outOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
-    outOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
+    outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warnUnresolvedConflicts);
+    outOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warnNotEnoughDiskSpace);
+    outOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warnSignificantDifference);
+    outOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warnRecyclerMissing);
+    outOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warnInputFieldEmpty);
+    outOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
+    outOpt["WarnDependentFolderPair"    ].attribute("Enabled", config.optDialogs.warnDependentFolderPair);
+    outOpt["WarnDependentBaseFolders"   ].attribute("Enabled", config.optDialogs.warnDependentBaseFolders);
+    outOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warnDirectoryLockFailed);
+    outOpt["WarnVersioningFolderPartOfSync"  ].attribute("Enabled", config.optDialogs.warnVersioningFolderPartOfSync);
+    outOpt["ConfirmSaveConfig"               ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
+    outOpt["ConfirmStartSync"                ].attribute("Enabled", config.optDialogs.confirmSyncStart);
     outOpt["ConfirmExternalCommandMassInvoke"].attribute("Enabled", config.optDialogs.confirmExternalCommandMassInvoke);
 
     //gui specific global settings (optional)
@@ -1592,5 +1598,5 @@ std::wstring xmlAccess::extractJobName(const Zstring& configFilename)
 {
     const Zstring shortName = afterLast(configFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
     const Zstring jobName   = beforeLast(shortName, Zstr('.'), IF_MISSING_RETURN_ALL);
-    return utfCvrtTo<std::wstring>(jobName);
+    return utfTo<std::wstring>(jobName);
 }

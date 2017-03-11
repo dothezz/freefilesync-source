@@ -241,6 +241,7 @@ template <class BufferedInputStream> inline
 void readArray(BufferedInputStream& stream, void* buffer, size_t len) //throw UnexpectedEndOfStreamError
 {
     const size_t bytesRead = stream.read(buffer, len);
+    assert(bytesRead <= len); //buffer overflow otherwise not always detected!
     if (bytesRead < len)
         throw UnexpectedEndOfStreamError();
 }

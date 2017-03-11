@@ -18,7 +18,11 @@ template <class T>
 class Global
 {
 public:
-    Global() { static_assert(std::is_trivially_destructible<Pod>::value, "this memory needs to live forever"); }
+    Global()
+    {
+        static_assert(std::is_trivially_destructible<Pod>::value, "this memory needs to live forever");
+        assert(!pod.inst && !pod.spinLock); //we depend on static zero-initialization!
+    }
     explicit Global(std::unique_ptr<T>&& newInst) { set(std::move(newInst)); }
     ~Global() { set(nullptr); }
 
@@ -50,9 +54,9 @@ private:
     //=> use trivially-destructible POD only!!!
     struct Pod
     {
-        std::shared_ptr<T>* inst = nullptr;
+        std::shared_ptr<T>* inst;   // = nullptr;
+        std::atomic<bool> spinLock; // { false }; rely entirely on static zero-initialization! => avoid potential contention with worker thread during Global<> construction!
         //serialize access; can't use std::mutex: has non-trival destructor
-        std::atomic<bool> spinLock { false };
     } pod;
 };
 

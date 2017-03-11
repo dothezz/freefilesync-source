@@ -7,10 +7,10 @@
 #include "application.h"
 #include <memory>
 #include <zen/file_access.h>
+#include <zen/perf.h>
 #include <wx/tooltip.h>
 #include <wx/log.h>
 #include <wx+/app_main.h>
-#include <wx+/string_conv.h>
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "comparison.h"
@@ -40,7 +40,7 @@ std::vector<Zstring> getCommandlineArgs(const wxApp& app)
 {
     std::vector<Zstring> args;
     for (int i = 1; i < app.argc; ++i) //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
-        args.push_back(toZ(wxString(app.argv[i]))); //so we are forced to use this pitiful excuse for a range construction!!
+        args.push_back(utfTo<Zstring>(wxString(app.argv[i]))); //so we are forced to use this pitiful excuse for a range construction!!
     return args;
 }
 
@@ -150,7 +150,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
         //error handling strategy unknown and no sync log output available at this point! => show message box
 
-        logFatalError(utfCvrtTo<std::string>(msg));
+        logFatalError(utfTo<std::string>(msg));
 
         wxSafeShowMessage(title, msg);
 
@@ -174,30 +174,30 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             if (it == arg.begin()) return false; //require at least one prefix character
 
             const Zstring argTmp(it, arg.end());
-            return ciEqual(argTmp, Zstr("help")) ||
-                   ciEqual(argTmp, Zstr("h"))    ||
+            return strEqual(argTmp, Zstr("help"), CmpAsciiNoCase()) ||
+                   strEqual(argTmp, Zstr("h"),    CmpAsciiNoCase()) ||
                    argTmp == Zstr("?");
         };
 
         for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
             if (syntaxHelpRequested(*it))
                 return showSyntaxHelp();
-            else if (ciEqual(*it, optionEdit))
+            else if (strEqual(*it, optionEdit, CmpAsciiNoCase()))
                 openForEdit = true;
-            else if (ciEqual(*it, optionLeftDir))
+            else if (strEqual(*it, optionLeftDir, CmpAsciiNoCase()))
             {
                 if (++it == commandArgs.end())
                 {
-                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), _("Syntax error"));
+                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfTo<std::wstring>(optionLeftDir)), _("Syntax error"));
                     return;
                 }
                 dirPathPhrasesLeft.push_back(*it);
             }
-            else if (ciEqual(*it, optionRightDir))
+            else if (strEqual(*it, optionRightDir, CmpAsciiNoCase()))
             {
                 if (++it == commandArgs.end())
                 {
-                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), _("Syntax error"));
+                    notifyFatalError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfTo<std::wstring>(optionRightDir)), _("Syntax error"));
                     return;
                 }
                 dirPathPhrasesRight.push_back(*it);
@@ -433,7 +433,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
         if (batchCfg.handleError == ON_ERROR_POPUP)
             showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(msg));
         else //"exit" or "ignore"
-            logFatalError(utfCvrtTo<std::string>(msg));
+            logFatalError(utfTo<std::string>(msg));
 
         raiseReturnCode(returnCode, rc);
     };

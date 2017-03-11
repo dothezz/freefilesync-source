@@ -57,7 +57,7 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), utfCvrtTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
+            wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), utfTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -262,7 +262,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
         {
             const LockInformation& lockInfo = retrieveLockInfo(lockFilePath); //throw FileError
             //enhance status message and show which user is holding the lock:
-            infoMsg += L" | " + _("Lock owner:") +  L' ' + utfCvrtTo<std::wstring>(lockInfo.userId);
+            infoMsg += L" | " + _("Lock owner:") +  L' ' + utfTo<std::wstring>(lockInfo.userId);
 
             originalLockId = lockInfo.lockId;
             switch (getProcessStatus(lockInfo)) //throw FileError

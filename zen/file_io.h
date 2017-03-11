@@ -90,7 +90,7 @@ private:
     size_t tryWrite(const void* buffer, size_t bytesToWrite); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
 
     std::vector<char> memBuf_;
-    const IOCallback notifyUnbufferedIO_; //throw X
+    IOCallback notifyUnbufferedIO_; //throw X
 };
 
 //-----------------------------------------------------------------------------------------------

@@ -10,7 +10,6 @@
 #include <zen/optional.h>
 #include <wx/dirdlg.h>
 #include <wx/scrolwin.h>
-#include <wx+/string_conv.h>
 #include <wx+/popup_dlg.h>
 #include "../lib/resolve_path.h"
     #include <gtk/gtk.h>
@@ -24,15 +23,15 @@ namespace
 void setFolderPath(const Zstring& dirpath, wxTextCtrl* txtCtrl, wxWindow& tooltipWnd, wxStaticText* staticText) //pointers are optional
 {
     if (txtCtrl)
-        txtCtrl->ChangeValue(toWx(dirpath));
+        txtCtrl->ChangeValue(utfTo<wxString>(dirpath));
 
     const Zstring folderPathFmt = getResolvedFilePath(dirpath); //may block when resolving [<volume name>]
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
-    tooltipWnd.SetToolTip(toWx(folderPathFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
+    tooltipWnd.SetToolTip(utfTo<wxString>(folderPathFmt)); //who knows when the real bugfix reaches mere mortals via an official release...
 
     if (staticText) //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
-        staticText->SetLabel(equalFilePath(appendSeparator(trimCpy(dirpath)), appendSeparator(folderPathFmt)) ? wxString(_("Drag && drop")) : toWx(folderPathFmt));
+        staticText->SetLabel(equalFilePath(appendSeparator(trimCpy(dirpath)), appendSeparator(folderPathFmt)) ? wxString(_("Drag && drop")) : utfTo<wxString>(folderPathFmt));
 }
 }
 
@@ -113,7 +112,7 @@ void FolderSelector2::onFilesDropped(FileDropEvent& event)
 
 void FolderSelector2::onEditFolderPath(wxCommandEvent& event)
 {
-    setFolderPath(toZ(event.GetString()), nullptr, folderPathCtrl_, staticText_);
+    setFolderPath(utfTo<Zstring>(event.GetString()), nullptr, folderPathCtrl_, staticText_);
     event.Skip();
 }
 
@@ -135,10 +134,10 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
         }
     }
 
-    wxDirDialog dirPicker(&selectButton_, _("Select a folder"), toWx(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
+    wxDirDialog dirPicker(&selectButton_, _("Select a folder"), utfTo<wxString>(defaultFolderPath)); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
     if (dirPicker.ShowModal() != wxID_OK)
         return;
-    const Zstring newFolderPath = toZ(dirPicker.GetPath());
+    const Zstring newFolderPath = utfTo<Zstring>(dirPicker.GetPath());
 
     setFolderPath(newFolderPath, &folderPathCtrl_, folderPathCtrl_, staticText_);
 }
@@ -146,7 +145,7 @@ void FolderSelector2::onSelectDir(wxCommandEvent& event)
 
 Zstring FolderSelector2::getPath() const
 {
-    Zstring path = utfCvrtTo<Zstring>(folderPathCtrl_.GetValue());
+    Zstring path = utfTo<Zstring>(folderPathCtrl_.GetValue());
 
     return path;
 }

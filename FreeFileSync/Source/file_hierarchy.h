@@ -151,18 +151,46 @@ class FileSystemObject;
 /*------------------------------------------------------------------
     inheritance diagram:
 
-                  ObjectMgr
-                     /|\
-                      |
-               FileSystemObject         HierarchyObject
-                     /|\                      /|\
-       _______________|_______________   ______|______
-      |               |               | |             |
- SymlinkPair       FilePair        FolderPair   BaseFolderPair
+         ObjectMgr        PathInformation
+            /|\                 /|\
+             |________  _________|_________
+                      ||                   |
+               FileSystemObject     ContainerObject
+                     /|\                  /|\
+           ___________|___________   ______|______
+          |           |           | |             |
+     SymlinkPair   FilePair    FolderPair   BaseFolderPair
 
 ------------------------------------------------------------------*/
 
-class HierarchyObject
+struct PathInformation //diamond-shaped inheritence!
+{
+    virtual ~PathInformation() {}
+
+    template <SelectedSide side> AbstractPath getAbstractPath() const;
+    template <SelectedSide side> Zstring      getRelativePath() const; //get path relative to base sync dir (without leading/trailing FILE_NAME_SEPARATOR)
+
+    Zstring getPairRelativePath() const;
+
+private:
+    virtual AbstractPath getAbstractPathL() const = 0; //implemented by FileSystemObject + BaseFolderPair
+    virtual AbstractPath getAbstractPathR() const = 0; //
+
+    virtual Zstring getRelativePathL() const = 0; //implemented by SymlinkPair/FilePair + ContainerObject
+    virtual Zstring getRelativePathR() const = 0; //
+};
+
+template <> inline AbstractPath PathInformation::getAbstractPath<LEFT_SIDE >() const { return getAbstractPathL(); }
+template <> inline AbstractPath PathInformation::getAbstractPath<RIGHT_SIDE>() const { return getAbstractPathR(); }
+
+template <> inline Zstring PathInformation::getRelativePath<LEFT_SIDE >() const { return getRelativePathL(); }
+template <> inline Zstring PathInformation::getRelativePath<RIGHT_SIDE>() const { return getRelativePathR(); }
+
+inline Zstring PathInformation::getPairRelativePath() const { return getRelativePathL(); } //side doesn't matter
+
+//------------------------------------------------------------------
+
+class ContainerObject : public virtual PathInformation
 {
     friend class FolderPair;
     friend class FileSystemObject;
@@ -172,30 +200,30 @@ public:
     using SymlinkList = FixedList<SymlinkPair>; //
     using FolderList  = FixedList<FolderPair>;
 
-    FolderPair& addSubFolder(const Zstring& itemNameLeft,
-                             const FolderDescriptor& left,          //file exists on both sides
-                             CompareDirResult defaultCmpResult,
-                             const Zstring& itemNameRight,
+    FolderPair& addSubFolder(const Zstring&          itemNameL,
+                             const FolderDescriptor& left,    //file exists on both sides
+                             CompareDirResult        defaultCmpResult,
+                             const Zstring&          itemNameR,
                              const FolderDescriptor& right);
 
     template <SelectedSide side>
     FolderPair& addSubFolder(const Zstring& itemName, //dir exists on one side only
                              const FolderDescriptor& descr);
 
-    FilePair& addSubFile(const Zstring&        itemNameLeft,
+    FilePair& addSubFile(const Zstring&        itemNameL,
                          const FileDescriptor& left,          //file exists on both sides
                          CompareFilesResult    defaultCmpResult,
-                         const Zstring&        itemNameRight,
+                         const Zstring&        itemNameR,
                          const FileDescriptor& right);
 
     template <SelectedSide side>
-    FilePair& addSubFile(const Zstring&          itemName, //file exists on one side only
-                         const FileDescriptor&   descr);
+    FilePair& addSubFile(const Zstring&        itemName, //file exists on one side only
+                         const FileDescriptor& descr);
 
-    SymlinkPair& addSubLink(const Zstring&        itemNameLeft,
+    SymlinkPair& addSubLink(const Zstring&        itemNameL,
                             const LinkDescriptor& left,  //link exists on both sides
                             CompareSymlinkResult  defaultCmpResult,
-                            const Zstring&        itemNameRight,
+                            const Zstring&        itemNameR,
                             const LinkDescriptor& right);
 
     template <SelectedSide side>
@@ -213,37 +241,43 @@ public:
 
     BaseFolderPair& getBase() { return base_; }
 
-    const Zstring& getPairRelativePathPf() const { return pairRelPathPf_; } //postfixed or empty!
-
 protected:
-    HierarchyObject(const Zstring& relPathPf,
-                    BaseFolderPair& baseFolder) :
-        pairRelPathPf_(relPathPf),
-        base_(baseFolder) {}
+    ContainerObject(BaseFolderPair& baseFolder) : //used during BaseFolderPair constructor
+        base_(baseFolder) {} //take reference only: baseFolder *not yet* fully constructed at this point!
 
-    virtual ~HierarchyObject() {} //don't need polymorphic deletion, but we have a vtable anyway
+    ContainerObject(const FileSystemObject& fsAlias); //used during FolderPair constructor
+
+    virtual ~ContainerObject() {} //don't need polymorphic deletion, but we have a vtable anyway
 
     virtual void flip();
 
     void removeEmptyRec();
 
+    template <SelectedSide side>
+    void updateRelPathsRecursion(const FileSystemObject& fsAlias);
+
 private:
+    ContainerObject           (const ContainerObject&) = delete; //this class is referenced by its child elements => make it non-copyable/movable!
+    ContainerObject& operator=(const ContainerObject&) = delete;
+
     virtual void notifySyncCfgChanged() {}
 
-    HierarchyObject           (const HierarchyObject&) = delete; //this class is referenced by it's child elements => make it non-copyable/movable!
-    HierarchyObject& operator=(const HierarchyObject&) = delete;
+    Zstring getRelativePathL() const override { return relPathL_; }
+    Zstring getRelativePathR() const override { return relPathR_; }
 
-    FileList    subFiles_;   //contained file maps
-    SymlinkList subLinks_;   //contained symbolic link maps
-    FolderList  subFolders_; //contained directory maps
+    FileList    subFiles_;
+    SymlinkList subLinks_;
+    FolderList  subFolders_;
 
-    Zstring pairRelPathPf_; //postfixed or empty
+    Zstring relPathL_; //path relative to base sync dir (without leading/trailing FILE_NAME_SEPARATOR)
+    Zstring relPathR_; //
+
     BaseFolderPair& base_;
 };
 
 //------------------------------------------------------------------
 
-class BaseFolderPair : public HierarchyObject //synchronization base directory
+class BaseFolderPair : public ContainerObject //synchronization base directory
 {
 public:
     BaseFolderPair(const AbstractPath& folderPathLeft,
@@ -254,14 +288,12 @@ public:
                    CompareVariant cmpVar,
                    int fileTimeTolerance,
                    const std::vector<unsigned int>& ignoreTimeShiftMinutes) :
-        HierarchyObject(Zstring(), *this),
+        ContainerObject(*this), //trust that ContainerObject knows that *this is not yet fully constructed!
         filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance), ignoreTimeShiftMinutes_(ignoreTimeShiftMinutes),
         folderAvailableLeft_ (folderAvailableLeft),
         folderAvailableRight_(folderAvailableRight),
         folderPathLeft_(folderPathLeft),
         folderPathRight_(folderPathRight) {}
-
-    template <SelectedSide side> const AbstractPath& getAbstractPath() const;
 
     static void removeEmpty(BaseFolderPair& baseFolder) { baseFolder.removeEmptyRec(); } //physically remove all invalid entries (where both sides are empty) recursively
 
@@ -277,6 +309,9 @@ public:
     void flip() override;
 
 private:
+    AbstractPath getAbstractPathL() const override { return folderPathLeft_; }
+    AbstractPath getAbstractPathR() const override { return folderPathRight_; }
+
     const HardFilter::FilterRef filter_; //filter used while scanning directory: represents sub-view of actual files!
     const CompareVariant cmpVar_;
     const int fileTimeTolerance_;
@@ -288,13 +323,6 @@ private:
     AbstractPath folderPathLeft_;
     AbstractPath folderPathRight_;
 };
-
-
-template <> inline
-const AbstractPath& BaseFolderPair::getAbstractPath<LEFT_SIDE>() const { return folderPathLeft_; }
-
-template <> inline
-const AbstractPath& BaseFolderPair::getAbstractPath<RIGHT_SIDE>() const { return folderPathRight_; }
 
 
 //get rid of shared_ptr indirection
@@ -374,19 +402,17 @@ private:
 
 //------------------------------------------------------------------
 
-class FileSystemObject : public ObjectMgr<FileSystemObject>
+class FileSystemObject : public ObjectMgr<FileSystemObject>, public virtual PathInformation
 {
 public:
     virtual void accept(FSObjectVisitor& visitor) const = 0;
 
-    Zstring getPairItemName    () const; //like getItemName() but also returns value if either side is empty
-    Zstring getPairRelativePath() const; //like getRelativePath() but also returns value if either side is empty
-    template <SelectedSide side>           bool isEmpty()         const;
-    template <SelectedSide side> const Zstring& getItemName()     const; //case sensitive!
-    template <SelectedSide side>       Zstring  getRelativePath() const; //get path relative to base sync dir without FILE_NAME_SEPARATOR prefix
+    Zstring getPairItemName    () const; //like getItemName() but without bias to which side is returned
+    bool isPairEmpty() const; //true, if both sides are empty
 
-public:
-    template <SelectedSide side> AbstractPath getAbstractPath() const; //precondition: !isEmpty<side>()
+    //path getters always return valid values, even if isEmpty<side>()!
+    template <SelectedSide side> const Zstring& getItemName() const; //case sensitive!
+    template <SelectedSide side> bool isEmpty() const;
 
     //comparison result
     CompareFilesResult getCategory() const { return cmpResult_; }
@@ -407,10 +433,8 @@ public:
 
     template <SelectedSide side> void removeObject();    //removes file or directory (recursively!) without physically removing the element: used by manual deletion
 
-    bool isEmpty() const; //true, if both sides are empty
-
-    const HierarchyObject& parent() const { return parent_; }
-    /**/  HierarchyObject& parent()       { return parent_; }
+    const ContainerObject& parent() const { return parent_; }
+    /**/  ContainerObject& parent()       { return parent_; }
     const BaseFolderPair& base() const  { return parent_.getBase(); }
     /**/  BaseFolderPair& base()        { return parent_.getBase(); }
 
@@ -420,21 +444,21 @@ public:
     void setCategoryDiffMetadata(const std::wstring& description);
 
 protected:
-    FileSystemObject(const Zstring& itemNameLeft,
-                     const Zstring& itemNameRight,
-                     HierarchyObject& parentObj,
+    FileSystemObject(const Zstring& itemNameL,
+                     const Zstring& itemNameR,
+                     ContainerObject& parent,
                      CompareFilesResult defaultCmpResult) :
         cmpResult_(defaultCmpResult),
-        itemNameLeft_(itemNameLeft),
-        itemNameRight_(itemNameRight),
-        //itemNameRight_(itemNameRight == itemNameLeft ? itemNameLeft : itemNameRight), -> strangely doesn't seem to shrink peak memory consumption at all!
-        parent_(parentObj)
+        itemNameL_(itemNameL),
+        itemNameR_(itemNameL == itemNameR ? itemNameL : itemNameR), //perf: no measurable speed drawback; -3% peak memory => further needed by ContainerObject construction!
+        parent_(parent)
     {
+        assert(itemNameL_.c_str() == itemNameR_.c_str() || itemNameL_ != itemNameR_); //also checks ref-counted string precondition
         parent_.notifySyncCfgChanged();
     }
 
     virtual ~FileSystemObject() {} //don't need polymorphic deletion, but we have a vtable anyway
-    //mustn't call parent here, it is already partially destroyed and nothing more than a pure HierarchyObject!
+    //must not call parent here, it is already partially destroyed and nothing more than a pure ContainerObject!
 
     virtual void flip();
     virtual void notifySyncCfgChanged() { parent().notifySyncCfgChanged(); /*propagate!*/ }
@@ -445,8 +469,14 @@ private:
     FileSystemObject           (const FileSystemObject&) = delete;
     FileSystemObject& operator=(const FileSystemObject&) = delete;
 
+    AbstractPath getAbstractPathL() const override { return AFS::appendRelPath(base().getAbstractPath<LEFT_SIDE >(), getRelativePath<LEFT_SIDE >()); }
+    AbstractPath getAbstractPathR() const override { return AFS::appendRelPath(base().getAbstractPath<RIGHT_SIDE>(), getRelativePath<RIGHT_SIDE>()); }
+
     virtual void removeObjectL() = 0;
     virtual void removeObjectR() = 0;
+
+    template <SelectedSide side>
+    void propagateChangedItemName(const Zstring& itemNameOld); //required after any itemName changes
 
     //categorization
     std::unique_ptr<std::wstring> cmpResultDescr_; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
@@ -459,33 +489,34 @@ private:
     std::unique_ptr<std::wstring> syncDirectionConflict_; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
 
-    Zstring itemNameLeft_;  //slightly redundant under linux, but on windows the "same" filepaths can differ in case
-    Zstring itemNameRight_; //use as indicator: an empty name means: not existing!
+    Zstring itemNameL_; //slightly redundant under linux, but on windows the "same" file paths can differ in case
+    Zstring itemNameR_; //use as indicator: an empty name means: not existing on this side!
 
-    HierarchyObject& parent_;
+    ContainerObject& parent_;
 };
 
 //------------------------------------------------------------------
 
-class FolderPair : public FileSystemObject, public HierarchyObject
+
+class FolderPair : public FileSystemObject, public ContainerObject
 {
-    friend class HierarchyObject;
+    friend class ContainerObject;
 
 public:
     void accept(FSObjectVisitor& visitor) const override;
 
     CompareDirResult getDirCategory() const; //returns actually used subset of CompareFilesResult
 
-    FolderPair(const Zstring& itemNameLeft,  //use empty itemName if "not existing"
-               const FolderDescriptor& left,
+    FolderPair(const Zstring& itemNameL, //use empty itemName if "not existing"
+               const FolderDescriptor& descrL,
                CompareDirResult defaultCmpResult,
-               const Zstring& itemNameRight,
-               const FolderDescriptor& right,
-               HierarchyObject& parentObj) :
-        FileSystemObject(itemNameLeft, itemNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
-        HierarchyObject(getPairRelativePath() + FILE_NAME_SEPARATOR, parentObj.getBase()),
-        dataLeft_(left),
-        dataRight_(right) {}
+               const Zstring& itemNameR,
+               const FolderDescriptor& descrR,
+               ContainerObject& parent) :
+        FileSystemObject(itemNameL, itemNameR, parent, static_cast<CompareFilesResult>(defaultCmpResult)),
+        ContainerObject(static_cast<FileSystemObject&>(*this)), //FileSystemObject fully constructed at this point!
+        descrL_(descrL),
+        descrR_(descrR) {}
 
     template <SelectedSide side> bool isFollowedSymlink() const;
 
@@ -498,33 +529,33 @@ private:
     void flip         () override;
     void removeObjectL() override;
     void removeObjectR() override;
-    void notifySyncCfgChanged() override { haveBufferedSyncOp_ = false; FileSystemObject::notifySyncCfgChanged(); HierarchyObject::notifySyncCfgChanged(); }
+    void notifySyncCfgChanged() override { syncOpBuffered_ = NoValue(); FileSystemObject::notifySyncCfgChanged(); ContainerObject::notifySyncCfgChanged(); }
 
-    mutable SyncOperation syncOpBuffered_ = SO_DO_NOTHING; //determining sync-op for directory may be expensive as it depends on child-objects -> buffer it
-    mutable bool haveBufferedSyncOp_      = false;         //
+    mutable Opt<SyncOperation> syncOpBuffered_; //determining sync-op for directory may be expensive as it depends on child-objects => buffer
 
-    FolderDescriptor dataLeft_;
-    FolderDescriptor dataRight_;
+    FolderDescriptor descrL_;
+    FolderDescriptor descrR_;
 };
+
 
 //------------------------------------------------------------------
 
 class FilePair : public FileSystemObject
 {
-    friend class HierarchyObject; //construction
+    friend class ContainerObject; //construction
 
 public:
     void accept(FSObjectVisitor& visitor) const override;
 
-    FilePair(const Zstring&        itemNameLeft, //use empty string if "not existing"
-             const FileDescriptor& left,
+    FilePair(const Zstring&        itemNameL, //use empty string if "not existing"
+             const FileDescriptor& descrL,
              CompareFilesResult    defaultCmpResult,
-             const Zstring&        itemNameRight, //
-             const FileDescriptor& right,
-             HierarchyObject& parentObj) :
-        FileSystemObject(itemNameLeft, itemNameRight, parentObj, defaultCmpResult),
-        dataLeft_(left),
-        dataRight_(right) {}
+             const Zstring&        itemNameR, //
+             const FileDescriptor& descrR,
+             ContainerObject& parent) :
+        FileSystemObject(itemNameL, itemNameR, parent, defaultCmpResult),
+        descrL_(descrL),
+        descrR_(descrR) {}
 
     template <SelectedSide side> int64_t getLastWriteTime() const;
     template <SelectedSide side> uint64_t     getFileSize() const;
@@ -550,14 +581,17 @@ public:
                      bool isSymlinkSrc);
 
 private:
+    Zstring getRelativePathL() const override { return AFS::appendPaths(parent().getRelativePath<LEFT_SIDE >(), getItemName<LEFT_SIDE >(), FILE_NAME_SEPARATOR); }
+    Zstring getRelativePathR() const override { return AFS::appendPaths(parent().getRelativePath<RIGHT_SIDE>(), getItemName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR); }
+
     SyncOperation applyMoveOptimization(SyncOperation op) const;
 
     void flip         () override;
-    void removeObjectL() override { dataLeft_  = FileDescriptor(); }
-    void removeObjectR() override { dataRight_ = FileDescriptor(); }
+    void removeObjectL() override { descrL_ = FileDescriptor(); }
+    void removeObjectR() override { descrR_ = FileDescriptor(); }
 
-    FileDescriptor dataLeft_;
-    FileDescriptor dataRight_;
+    FileDescriptor descrL_;
+    FileDescriptor descrR_;
 
     ObjectId moveFileRef_ = nullptr; //optional, filled by redetermineSyncDirection()
 };
@@ -566,7 +600,7 @@ private:
 
 class SymlinkPair : public FileSystemObject //this class models a TRUE symbolic link, i.e. one that is NEVER dereferenced: deref-links should be directly placed in class File/FolderPair
 {
-    friend class HierarchyObject; //construction
+    friend class ContainerObject; //construction
 
 public:
     void accept(FSObjectVisitor& visitor) const override;
@@ -575,15 +609,15 @@ public:
 
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
 
-    SymlinkPair(const Zstring&         itemNameLeft, //use empty string if "not existing"
-                const LinkDescriptor&  left,
+    SymlinkPair(const Zstring&         itemNameL, //use empty string if "not existing"
+                const LinkDescriptor&  descrL,
                 CompareSymlinkResult   defaultCmpResult,
-                const Zstring&         itemNameRight, //use empty string if "not existing"
-                const LinkDescriptor&  right,
-                HierarchyObject& parentObj) :
-        FileSystemObject(itemNameLeft, itemNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
-        dataLeft_(left),
-        dataRight_(right) {}
+                const Zstring&         itemNameR, //use empty string if "not existing"
+                const LinkDescriptor&  descrR,
+                ContainerObject& parent) :
+        FileSystemObject(itemNameL, itemNameR, parent, static_cast<CompareFilesResult>(defaultCmpResult)),
+        descrL_(descrL),
+        descrR_(descrR) {}
 
     template <SelectedSide sideTrg>
     void setSyncedTo(const Zstring& itemName, //call after sync, sets SYMLINK_EQUAL
@@ -591,12 +625,15 @@ public:
                      int64_t lastWriteTimeSrc);
 
 private:
-    void flip()          override;
-    void removeObjectL() override { dataLeft_  = LinkDescriptor(); }
-    void removeObjectR() override { dataRight_ = LinkDescriptor(); }
+    Zstring getRelativePathL() const override { return AFS::appendPaths(parent().getRelativePath<LEFT_SIDE >(), getItemName<LEFT_SIDE >(), FILE_NAME_SEPARATOR); }
+    Zstring getRelativePathR() const override { return AFS::appendPaths(parent().getRelativePath<RIGHT_SIDE>(), getItemName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR); }
 
-    LinkDescriptor dataLeft_;
-    LinkDescriptor dataRight_;
+    void flip()          override;
+    void removeObjectL() override { descrL_ = LinkDescriptor(); }
+    void removeObjectR() override { descrR_ = LinkDescriptor(); }
+
+    LinkDescriptor descrL_;
+    LinkDescriptor descrR_;
 };
 
 //------------------------------------------------------------------
@@ -726,12 +763,12 @@ void FileSystemObject::setActive(bool active)
 template <SelectedSide side> inline
 bool FileSystemObject::isEmpty() const
 {
-    return SelectParam<side>::ref(itemNameLeft_, itemNameRight_).empty();
+    return SelectParam<side>::ref(itemNameL_, itemNameR_).empty();
 }
 
 
 inline
-bool FileSystemObject::isEmpty() const
+bool FileSystemObject::isPairEmpty() const
 {
     return isEmpty<LEFT_SIDE>() && isEmpty<RIGHT_SIDE>();
 }
@@ -740,72 +777,63 @@ bool FileSystemObject::isEmpty() const
 template <SelectedSide side> inline
 const Zstring& FileSystemObject::getItemName() const
 {
-    return SelectParam<side>::ref(itemNameLeft_, itemNameRight_); //empty if not existing
-}
+    assert(!itemNameL_.empty() || !itemNameR_.empty());
 
-
-template <SelectedSide side> inline
-Zstring FileSystemObject::getRelativePath() const
-{
-    if (isEmpty<side>()) //avoid ternary-WTF! (implicit copy-constructor call!!!!!!)
-        return Zstring();
-    return parent_.getPairRelativePathPf() + getItemName<side>();
-}
-
-
-inline
-Zstring FileSystemObject::getPairRelativePath() const
-{
-    return parent_.getPairRelativePathPf() + getPairItemName();
+    const Zstring& itemName = SelectParam<side>::ref(itemNameL_, itemNameR_); //empty if not existing
+    if (!itemName.empty()) //avoid ternary-WTF! (implicit copy-constructor call!!!!!!)
+        return itemName;
+    return SelectParam<OtherSide<side>::result>::ref(itemNameL_, itemNameR_); //empty if not existing
 }
 
 
 inline
 Zstring FileSystemObject::getPairItemName() const
 {
-    assert(!isEmpty<LEFT_SIDE>() || !isEmpty<RIGHT_SIDE>());
-    return isEmpty<LEFT_SIDE>() ? getItemName<RIGHT_SIDE>() : getItemName<LEFT_SIDE>();
-}
-
-
-template <SelectedSide side> inline
-AbstractPath FileSystemObject::getAbstractPath() const
-{
-    assert(!isEmpty<side>());
-    const Zstring& itemName = isEmpty<side>() ? getItemName<OtherSide<side>::result>() : getItemName<side>();
-    return AFS::appendRelPath(base().getAbstractPath<side>(), parent_.getPairRelativePathPf() + itemName);
+    return getItemName<LEFT_SIDE>(); //side doesn't matter
 }
 
 
 template <> inline
 void FileSystemObject::removeObject<LEFT_SIDE>()
 {
+    const Zstring itemNameOld = getItemName<LEFT_SIDE>();
+
     cmpResult_ = isEmpty<RIGHT_SIDE>() ? FILE_EQUAL : FILE_RIGHT_SIDE_ONLY;
-    itemNameLeft_.clear();
+    itemNameL_.clear();
     removeObjectL();
 
     setSyncDir(SyncDirection::NONE); //calls notifySyncCfgChanged()
+    propagateChangedItemName<LEFT_SIDE>(itemNameOld);
 }
 
 
 template <> inline
 void FileSystemObject::removeObject<RIGHT_SIDE>()
 {
+    const Zstring itemNameOld = getItemName<RIGHT_SIDE>();
+
     cmpResult_ = isEmpty<LEFT_SIDE>() ? FILE_EQUAL : FILE_LEFT_SIDE_ONLY;
-    itemNameRight_.clear();
+    itemNameR_.clear();
     removeObjectR();
 
     setSyncDir(SyncDirection::NONE); //calls notifySyncCfgChanged()
+    propagateChangedItemName<RIGHT_SIDE>(itemNameOld);
 }
 
 
 inline
 void FileSystemObject::setSynced(const Zstring& itemName)
 {
-    assert(!isEmpty());
-    itemNameRight_ = itemNameLeft_ = itemName;
+    const Zstring itemNameOldL = getItemName<LEFT_SIDE>();
+    const Zstring itemNameOldR = getItemName<RIGHT_SIDE>();
+
+    assert(!isPairEmpty());
+    itemNameR_ = itemNameL_ = itemName;
     cmpResult_ = FILE_EQUAL;
     setSyncDir(SyncDirection::NONE);
+
+    propagateChangedItemName<LEFT_SIDE >(itemNameOldL);
+    propagateChangedItemName<RIGHT_SIDE>(itemNameOldR);
 }
 
 
@@ -836,7 +864,7 @@ void FileSystemObject::setCategoryDiffMetadata(const std::wstring& description)
 inline
 void FileSystemObject::flip()
 {
-    std::swap(itemNameLeft_, itemNameRight_);
+    std::swap(itemNameL_, itemNameR_);
 
     switch (cmpResult_)
     {
@@ -863,8 +891,48 @@ void FileSystemObject::flip()
 }
 
 
+template <SelectedSide side> inline
+void FileSystemObject::propagateChangedItemName(const Zstring& itemNameOld)
+{
+    if (itemNameL_.empty() && itemNameR_.empty()) return; //both sides might just have been deleted by removeObject<>
+
+    if (itemNameOld != getItemName<side>()) //perf: premature optimization?
+        if (auto hierObj = dynamic_cast<ContainerObject*>(this))
+            hierObj->updateRelPathsRecursion<side>(*this);
+}
+
+
+template <SelectedSide side> inline
+void ContainerObject::updateRelPathsRecursion(const FileSystemObject& fsAlias)
+{
+    assert(SelectParam<side>::ref(relPathL_, relPathR_) != //perf: only call if actual item name changed!
+           AFS::appendPaths(fsAlias.parent().getRelativePath<side>(), fsAlias.getItemName<side>(), FILE_NAME_SEPARATOR));
+
+    SelectParam<side>::ref(relPathL_, relPathR_) = AFS::appendPaths(fsAlias.parent().getRelativePath<side>(), fsAlias.getItemName<side>(), FILE_NAME_SEPARATOR);
+
+    for (FolderPair& folder : subFolders_)
+        folder.updateRelPathsRecursion<side>(folder);
+}
+
+
 inline
-void HierarchyObject::flip()
+ContainerObject::ContainerObject(const FileSystemObject& fsAlias) :
+    relPathL_(AFS::appendPaths(fsAlias.parent().relPathL_, fsAlias.getItemName<LEFT_SIDE>(), FILE_NAME_SEPARATOR)),
+    relPathR_(
+        fsAlias.parent().relPathL_.c_str() ==        //
+        fsAlias.parent().relPathR_.c_str() &&        //take advantage of FileSystemObject's Zstring reuse:
+        fsAlias.getItemName<LEFT_SIDE >().c_str() == //=> perf: 12% faster merge phase; -4% peak memory
+        fsAlias.getItemName<RIGHT_SIDE>().c_str() ?  //
+        relPathL_ : //ternary-WTF! (implicit copy-constructor call!!) => no big deal for a Zstring
+        AFS::appendPaths(fsAlias.parent().relPathR_, fsAlias.getItemName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR)),
+    base_(fsAlias.parent().base_)
+{
+    assert(relPathL_.c_str() == relPathR_.c_str() || relPathL_ != relPathR_);
+}
+
+
+inline
+void ContainerObject::flip()
 {
     for (FilePair& file : refSubFiles())
         file.flip();
@@ -872,23 +940,25 @@ void HierarchyObject::flip()
         link.flip();
     for (FolderPair& folder : refSubFolders())
         folder.flip();
+
+    std::swap(relPathL_, relPathR_);
 }
 
 
 inline
-FolderPair& HierarchyObject::addSubFolder(const Zstring& itemNameLeft,
+FolderPair& ContainerObject::addSubFolder(const Zstring& itemNameL,
                                           const FolderDescriptor& left,
                                           CompareDirResult defaultCmpResult,
-                                          const Zstring& itemNameRight,
+                                          const Zstring& itemNameR,
                                           const FolderDescriptor& right)
 {
-    subFolders_.emplace_back(itemNameLeft, left, defaultCmpResult, itemNameRight, right, *this);
+    subFolders_.emplace_back(itemNameL, left, defaultCmpResult, itemNameR, right, *this);
     return subFolders_.back();
 }
 
 
 template <> inline
-FolderPair& HierarchyObject::addSubFolder<LEFT_SIDE>(const Zstring& itemName, const FolderDescriptor& descr)
+FolderPair& ContainerObject::addSubFolder<LEFT_SIDE>(const Zstring& itemName, const FolderDescriptor& descr)
 {
     subFolders_.emplace_back(itemName, descr, DIR_LEFT_SIDE_ONLY, Zstring(), FolderDescriptor(), *this);
     return subFolders_.back();
@@ -896,7 +966,7 @@ FolderPair& HierarchyObject::addSubFolder<LEFT_SIDE>(const Zstring& itemName, co
 
 
 template <> inline
-FolderPair& HierarchyObject::addSubFolder<RIGHT_SIDE>(const Zstring& itemName, const FolderDescriptor& descr)
+FolderPair& ContainerObject::addSubFolder<RIGHT_SIDE>(const Zstring& itemName, const FolderDescriptor& descr)
 {
     subFolders_.emplace_back(Zstring(), FolderDescriptor(), DIR_RIGHT_SIDE_ONLY, itemName, descr, *this);
     return subFolders_.back();
@@ -904,19 +974,19 @@ FolderPair& HierarchyObject::addSubFolder<RIGHT_SIDE>(const Zstring& itemName, c
 
 
 inline
-FilePair& HierarchyObject::addSubFile(const Zstring&        itemNameLeft,
+FilePair& ContainerObject::addSubFile(const Zstring&        itemNameL,
                                       const FileDescriptor& left,          //file exists on both sides
                                       CompareFilesResult    defaultCmpResult,
-                                      const Zstring&        itemNameRight,
+                                      const Zstring&        itemNameR,
                                       const FileDescriptor& right)
 {
-    subFiles_.emplace_back(itemNameLeft, left, defaultCmpResult, itemNameRight, right, *this);
+    subFiles_.emplace_back(itemNameL, left, defaultCmpResult, itemNameR, right, *this);
     return subFiles_.back();
 }
 
 
 template <> inline
-FilePair& HierarchyObject::addSubFile<LEFT_SIDE>(const Zstring& itemName, const FileDescriptor& descr)
+FilePair& ContainerObject::addSubFile<LEFT_SIDE>(const Zstring& itemName, const FileDescriptor& descr)
 {
     subFiles_.emplace_back(itemName, descr, FILE_LEFT_SIDE_ONLY, Zstring(), FileDescriptor(), *this);
     return subFiles_.back();
@@ -924,7 +994,7 @@ FilePair& HierarchyObject::addSubFile<LEFT_SIDE>(const Zstring& itemName, const 
 
 
 template <> inline
-FilePair& HierarchyObject::addSubFile<RIGHT_SIDE>(const Zstring& itemName, const FileDescriptor& descr)
+FilePair& ContainerObject::addSubFile<RIGHT_SIDE>(const Zstring& itemName, const FileDescriptor& descr)
 {
     subFiles_.emplace_back(Zstring(), FileDescriptor(), FILE_RIGHT_SIDE_ONLY, itemName, descr, *this);
     return subFiles_.back();
@@ -932,19 +1002,19 @@ FilePair& HierarchyObject::addSubFile<RIGHT_SIDE>(const Zstring& itemName, const
 
 
 inline
-SymlinkPair& HierarchyObject::addSubLink(const Zstring&        itemNameLeft,
+SymlinkPair& ContainerObject::addSubLink(const Zstring&        itemNameL,
                                          const LinkDescriptor& left,  //link exists on both sides
                                          CompareSymlinkResult  defaultCmpResult,
-                                         const Zstring&        itemNameRight,
+                                         const Zstring&        itemNameR,
                                          const LinkDescriptor& right)
 {
-    subLinks_.emplace_back(itemNameLeft, left, defaultCmpResult, itemNameRight, right, *this);
+    subLinks_.emplace_back(itemNameL, left, defaultCmpResult, itemNameR, right, *this);
     return subLinks_.back();
 }
 
 
 template <> inline
-SymlinkPair& HierarchyObject::addSubLink<LEFT_SIDE>(const Zstring& itemName, const LinkDescriptor& descr)
+SymlinkPair& ContainerObject::addSubLink<LEFT_SIDE>(const Zstring& itemName, const LinkDescriptor& descr)
 {
     subLinks_.emplace_back(itemName, descr, SYMLINK_LEFT_SIDE_ONLY, Zstring(), LinkDescriptor(), *this);
     return subLinks_.back();
@@ -952,7 +1022,7 @@ SymlinkPair& HierarchyObject::addSubLink<LEFT_SIDE>(const Zstring& itemName, con
 
 
 template <> inline
-SymlinkPair& HierarchyObject::addSubLink<RIGHT_SIDE>(const Zstring& itemName, const LinkDescriptor& descr)
+SymlinkPair& ContainerObject::addSubLink<RIGHT_SIDE>(const Zstring& itemName, const LinkDescriptor& descr)
 {
     subLinks_.emplace_back(Zstring(), LinkDescriptor(), SYMLINK_RIGHT_SIDE_ONLY, itemName, descr, *this);
     return subLinks_.back();
@@ -962,7 +1032,7 @@ SymlinkPair& HierarchyObject::addSubLink<RIGHT_SIDE>(const Zstring& itemName, co
 inline
 void BaseFolderPair::flip()
 {
-    HierarchyObject::flip();
+    ContainerObject::flip();
     std::swap(folderAvailableLeft_, folderAvailableRight_);
     std::swap(folderPathLeft_,      folderPathRight_);
 }
@@ -971,9 +1041,9 @@ void BaseFolderPair::flip()
 inline
 void FolderPair::flip()
 {
-    HierarchyObject ::flip(); //call base class versions
+    ContainerObject ::flip(); //call base class versions
     FileSystemObject::flip(); //
-    std::swap(dataLeft_, dataRight_);
+    std::swap(descrL_, descrR_);
 }
 
 
@@ -987,7 +1057,7 @@ void FolderPair::removeObjectL()
     for (FolderPair& folder : refSubFolders())
         folder.removeObject<LEFT_SIDE>();
 
-    dataLeft_ = FolderDescriptor();
+    descrL_ = FolderDescriptor();
 }
 
 
@@ -1001,7 +1071,7 @@ void FolderPair::removeObjectR()
     for (FolderPair& folder : refSubFolders())
         folder.removeObject<RIGHT_SIDE>();
 
-    dataRight_ = FolderDescriptor();
+    descrR_ = FolderDescriptor();
 }
 
 
@@ -1023,42 +1093,42 @@ inline
 void FilePair::flip()
 {
     FileSystemObject::flip(); //call base class version
-    std::swap(dataLeft_, dataRight_);
+    std::swap(descrL_, descrR_);
 }
 
 
 template <SelectedSide side> inline
 int64_t FilePair::getLastWriteTime() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).lastWriteTimeRaw;
+    return SelectParam<side>::ref(descrL_, descrR_).lastWriteTimeRaw;
 }
 
 
 template <SelectedSide side> inline
 uint64_t FilePair::getFileSize() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).fileSize;
+    return SelectParam<side>::ref(descrL_, descrR_).fileSize;
 }
 
 
 template <SelectedSide side> inline
 AFS::FileId FilePair::getFileId() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).fileId;
+    return SelectParam<side>::ref(descrL_, descrR_).fileId;
 }
 
 
 template <SelectedSide side> inline
 bool FilePair::isFollowedSymlink() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).isFollowedSymlink;
+    return SelectParam<side>::ref(descrL_, descrR_).isFollowedSymlink;
 }
 
 
 template <SelectedSide side> inline
 bool FolderPair::isFollowedSymlink() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).isFollowedSymlink;
+    return SelectParam<side>::ref(descrL_, descrR_).isFollowedSymlink;
 }
 
 
@@ -1075,8 +1145,8 @@ void FilePair::setSyncedTo(const Zstring& itemName,
     //FILE_EQUAL is only allowed for same short name and file size: enforced by this method!
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
-    SelectParam<sideTrg>::ref(dataLeft_, dataRight_) = FileDescriptor(lastWriteTimeTrg, fileSize, fileIdTrg, isSymlinkTrg);
-    SelectParam<sideSrc>::ref(dataLeft_, dataRight_) = FileDescriptor(lastWriteTimeSrc, fileSize, fileIdSrc, isSymlinkSrc);
+    SelectParam<sideTrg>::ref(descrL_, descrR_) = FileDescriptor(lastWriteTimeTrg, fileSize, fileIdTrg, isSymlinkTrg);
+    SelectParam<sideSrc>::ref(descrL_, descrR_) = FileDescriptor(lastWriteTimeSrc, fileSize, fileIdSrc, isSymlinkSrc);
 
     moveFileRef_ = nullptr;
     FileSystemObject::setSynced(itemName); //set FileSystemObject specific part
@@ -1090,8 +1160,8 @@ void SymlinkPair::setSyncedTo(const Zstring& itemName,
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
-    SelectParam<sideTrg>::ref(dataLeft_, dataRight_) = LinkDescriptor(lastWriteTimeTrg);
-    SelectParam<sideSrc>::ref(dataLeft_, dataRight_) = LinkDescriptor(lastWriteTimeSrc);
+    SelectParam<sideTrg>::ref(descrL_, descrR_) = LinkDescriptor(lastWriteTimeTrg);
+    SelectParam<sideSrc>::ref(descrL_, descrR_) = LinkDescriptor(lastWriteTimeSrc);
 
     FileSystemObject::setSynced(itemName); //set FileSystemObject specific part
 }
@@ -1104,8 +1174,8 @@ void FolderPair::setSyncedTo(const Zstring& itemName,
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
-    SelectParam<sideTrg>::ref(dataLeft_, dataRight_) = FolderDescriptor(isSymlinkTrg);
-    SelectParam<sideSrc>::ref(dataLeft_, dataRight_) = FolderDescriptor(isSymlinkSrc);
+    SelectParam<sideTrg>::ref(descrL_, descrR_) = FolderDescriptor(isSymlinkTrg);
+    SelectParam<sideSrc>::ref(descrL_, descrR_) = FolderDescriptor(isSymlinkSrc);
 
     FileSystemObject::setSynced(itemName); //set FileSystemObject specific part
 }
@@ -1114,7 +1184,7 @@ void FolderPair::setSyncedTo(const Zstring& itemName,
 template <SelectedSide side> inline
 int64_t SymlinkPair::getLastWriteTime() const
 {
-    return SelectParam<side>::ref(dataLeft_, dataRight_).lastWriteTimeRaw;
+    return SelectParam<side>::ref(descrL_, descrR_).lastWriteTimeRaw;
 }
 
 
@@ -1129,7 +1199,7 @@ inline
 void SymlinkPair::flip()
 {
     FileSystemObject::flip(); //call base class versions
-    std::swap(dataLeft_, dataRight_);
+    std::swap(descrL_, descrR_);
 }
 }
 

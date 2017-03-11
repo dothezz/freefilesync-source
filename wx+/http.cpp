@@ -33,9 +33,9 @@ public:
     {
         ZEN_ON_SCOPE_FAIL( cleanup(); /*destructor call would lead to member double clean-up!!!*/ );
 
-        assert(!startsWith(makeUpperCopy(url), L"HTTPS:")); //not supported by wxHTTP!
-        const std::wstring urlFmt = startsWith(makeUpperCopy(url), L"HTTP://") ||
-                                    startsWith(makeUpperCopy(url), L"HTTPS://") ? afterFirst(url, L"://", IF_MISSING_RETURN_NONE) : url;
+        assert(!startsWith(url, L"https:", CmpAsciiNoCase())); //not supported by wxHTTP!
+        const std::wstring urlFmt = startsWith(url, L"http://",  CmpAsciiNoCase()) ||
+                                    startsWith(url, L"https://", CmpAsciiNoCase()) ? afterFirst(url, L"://", IF_MISSING_RETURN_NONE) : url;
         const std::wstring server =       beforeFirst(urlFmt, L'/', IF_MISSING_RETURN_ALL);
         const std::wstring page   = L'/' + afterFirst(urlFmt, L'/', IF_MISSING_RETURN_NONE);
 
@@ -49,7 +49,7 @@ public:
             throw SysError(L"wxHTTP::Connect");
 
         if (postParams)
-            if (!webAccess_.SetPostText(L"application/x-www-form-urlencoded", utfCvrtTo<wxString>(*postParams)))
+            if (!webAccess_.SetPostText(L"application/x-www-form-urlencoded", utfTo<wxString>(*postParams)))
                 throw SysError(L"wxHTTP::SetPostText");
 
         httpStream_.reset(webAccess_.GetInputStream(page)); //pass ownership
@@ -87,7 +87,7 @@ public:
             if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
 
             if (bytesRead == 0) //end of file
-                bytesToRead = memBuf_.size();
+                bytesToRead = std::min(bytesToRead, memBuf_.size());
         }
 
         std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
@@ -225,8 +225,7 @@ std::vector<std::pair<std::string, std::string>> zen::xWwwFormUrlDecode(const st
 {
     std::vector<std::pair<std::string, std::string>> output;
 
-    for (const std::string& nvPair : split(str, '&'))
-        if (!nvPair.empty())
+    for (const std::string& nvPair : split(str, '&', SplitType::SKIP_EMPTY))
             output.emplace_back(urldecode(beforeFirst(nvPair, '=', IF_MISSING_RETURN_ALL)),
                                 urldecode(afterFirst (nvPair, '=', IF_MISSING_RETURN_NONE)));
     return output;

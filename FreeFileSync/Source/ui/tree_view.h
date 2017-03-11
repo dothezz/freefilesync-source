@@ -83,11 +83,11 @@ public:
 
     struct RootNode : public Node
     {
-        RootNode(int percent, uint64_t bytes, int itemCount, NodeStatus status, BaseFolderPair& baseFolder, const std::wstring& displayName) :
+        RootNode(int percent, uint64_t bytes, int itemCount, NodeStatus status, BaseFolderPair& baseFolder, const Zstring& displayName) :
             Node(percent, bytes, itemCount, 0, status), baseFolder_(baseFolder), displayName_(displayName) {}
 
         BaseFolderPair& baseFolder_;
-        const std::wstring displayName_;
+        const Zstring displayName_;
     };
 
     std::unique_ptr<Node> getLine(size_t row) const; //return nullptr on error
@@ -115,7 +115,7 @@ private:
         std::vector<DirNodeImpl> subDirs;
         FileSystemObject::ObjectId firstFileId = nullptr; //weak pointer to first FilePair or SymlinkPair
         //- "compress" algorithm may hide file nodes for directories with a single included file, i.e. itemCountGross == itemCountNet == 1
-        //- a HierarchyObject* would be a better fit, but we need weak pointer semantics!
+        //- a ContainerObject* would be a better fit, but we need weak pointer semantics!
         //- a std::vector<FileSystemObject::ObjectId> would be a better design, but we don't want a second memory structure as large as custom grid!
     };
 
@@ -127,7 +127,7 @@ private:
     struct RootNodeImpl : public Container
     {
         std::shared_ptr<BaseFolderPair> baseFolder;
-        std::wstring displayName;
+        Zstring displayName;
     };
 
     enum NodeType
@@ -149,7 +149,7 @@ private:
 
     static void compressNode(Container& cont);
     template <class Function>
-    static void extractVisibleSubtree(HierarchyObject& hierObj, Container& cont, Function includeObject);
+    static void extractVisibleSubtree(ContainerObject& hierObj, Container& cont, Function includeObject);
     void getChildren(const Container& cont, unsigned int level, std::vector<TreeLine>& output);
     template <class Predicate> void updateView(Predicate pred);
     void applySubView(std::vector<RootNodeImpl>&& newView);
@@ -173,7 +173,7 @@ private:
 };
 
 
-std::wstring getShortDisplayNameForFolderPair(const std::wstring& displayPathLeft, const std::wstring& displayPathRight);
+Zstring getShortDisplayNameForFolderPair(const AbstractPath& itemPathL, const AbstractPath& itemPathR);
 
 
 namespace treeview

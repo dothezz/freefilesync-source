@@ -28,26 +28,26 @@ public:
     template <class Function>
     InterruptibleThread(Function&& f);
 
-    bool joinable () const { return stdThread.joinable(); }
+    bool joinable () const { return stdThread_.joinable(); }
     void interrupt();
-    void join     () { stdThread.join(); }
-    void detach   () { stdThread.detach(); }
+    void join     () { stdThread_.join(); }
+    void detach   () { stdThread_.detach(); }
 
     template <class Rep, class Period>
     bool tryJoinFor(const std::chrono::duration<Rep, Period>& relTime)
     {
-        if (threadCompleted.wait_for(relTime) == std::future_status::ready)
+        if (threadCompleted_.wait_for(relTime) == std::future_status::ready)
         {
-            stdThread.join(); //runs thread-local destructors => this better be fast!!!
+            stdThread_.join(); //runs thread-local destructors => this better be fast!!!
             return true;
         }
         return false;
     }
 
 private:
-    std::thread stdThread;
+    std::thread stdThread_;
     std::shared_ptr<InterruptionStatus> intStatus_;
-    std::future<void> threadCompleted;
+    std::future<void> threadCompleted_;
 };
 
 //context of worker thread:
@@ -376,9 +376,9 @@ template <class Function> inline
 InterruptibleThread::InterruptibleThread(Function&& f) : intStatus_(std::make_shared<InterruptionStatus>())
 {
     std::promise<void> pFinished;
-    threadCompleted = pFinished.get_future();
+    threadCompleted_ = pFinished.get_future();
 
-    stdThread = std::thread([f = std::forward<Function>(f),
+    stdThread_ = std::thread([f = std::forward<Function>(f),
                                intStatus = this->intStatus_,
                                pFinished = std::move(pFinished)]() mutable
     {

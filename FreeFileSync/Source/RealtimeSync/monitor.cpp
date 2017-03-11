@@ -31,9 +31,9 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
     std::set<Zstring, LessFilePath> folderPaths; //make unique
     for (const Zstring& phrase : std::set<Zstring, LessFilePath>(folderPathPhrases.begin(), folderPathPhrases.end()))
     {
-        if (ciStartsWith(trimCpy(phrase), Zstr("ftp:")) ||
-            ciStartsWith(trimCpy(phrase), Zstr("sftp:")) ||
-            ciStartsWith(trimCpy(phrase), Zstr("mtp:")))
+        if (startsWith(trimCpy(phrase), Zstr("ftp:"),  CmpAsciiNoCase()) ||
+            startsWith(trimCpy(phrase), Zstr("sftp:"), CmpAsciiNoCase()) ||
+            startsWith(trimCpy(phrase), Zstr("mtp:"),  CmpAsciiNoCase()))
             throw FileError(_("The following path does not support directory monitoring:") + L"\n\n" + fmtPath(phrase));
 
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
@@ -257,7 +257,7 @@ void rts::monitorDirectories(const std::vector<Zstring>& folderPathPhrases, unsi
             }
             catch (ExecCommandNowException&) {}
 
-            ::wxSetEnv(L"change_path", utfCvrtTo<wxString>(lastChangeDetected.filepath_)); //some way to output what file changed to the user
+            ::wxSetEnv(L"change_path", utfTo<wxString>(lastChangeDetected.filepath_)); //some way to output what file changed to the user
             ::wxSetEnv(L"change_action", toString(lastChangeDetected.action_)); //
 
             //execute command

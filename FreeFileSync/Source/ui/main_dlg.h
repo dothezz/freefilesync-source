@@ -225,7 +225,7 @@ private:
     void filterExtension(const Zstring& extension, bool include);
     void filterShortname(const zen::FileSystemObject& fsObj, bool include);
     void filterItems(const std::vector<zen::FileSystemObject*>& selection, bool include);
-    void filterPhrase(const Zstring& phrase, bool include, bool addNewLine);
+    void addFilterPhrase(const Zstring& phrase, bool include, bool requireNewLine);
 
     void OnTopFolderPairAdd   (wxCommandEvent& event) override;
     void OnTopFolderPairRemove(wxCommandEvent& event) override;

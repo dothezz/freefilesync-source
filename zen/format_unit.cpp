@@ -5,7 +5,7 @@
 // *****************************************************************************
 
 #include "format_unit.h"
-#include <cwchar> //swprintf
+//#include <cwchar> //swprintf
 #include <ctime>
 #include <cstdio>
 #include "basic_math.h"
@@ -168,7 +168,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 
     //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
     const lconv* localInfo = ::localeconv(); //always bound according to doc
-    const std::wstring& thousandSep = utfCvrtTo<std::wstring>(localInfo->thousands_sep);
+    const std::wstring& thousandSep = utfTo<std::wstring>(localInfo->thousands_sep);
 
     // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t>>(std::locale("")).thousands_sep(); - why not working?
     // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t>>(std::locale("")).decimal_point();

@@ -665,7 +665,7 @@ void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
             descriptionTransToEng[description] = it->first;
 
         m_gridCustomCommand->SetCellValue(row, 0, description);
-        m_gridCustomCommand->SetCellValue(row, 1, utfCvrtTo<wxString>(it->second)); //commandline
+        m_gridCustomCommand->SetCellValue(row, 1, utfTo<wxString>(it->second)); //commandline
     }
 }
 
@@ -676,7 +676,7 @@ xmlAccess::ExternalApps OptionsDlg::getExtApp() const
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
     {
         auto description = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 0));
-        auto commandline = utfCvrtTo<Zstring>        (m_gridCustomCommand->GetCellValue(i, 1));
+        auto commandline = utfTo<Zstring>        (m_gridCustomCommand->GetCellValue(i, 1));
 
         //try to undo translation of description for GlobalSettings.xml
         auto it = descriptionTransToEng.find(description);
@@ -952,7 +952,7 @@ DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, ui
 
     m_gaugeProgress->SetRange(GAUGE_FULL_RANGE);
 
-    m_staticTextDetails->SetLabel(utfCvrtTo<std::wstring>(filePath));
+    m_staticTextDetails->SetLabel(utfTo<std::wstring>(filePath));
 
     updateGui();
 

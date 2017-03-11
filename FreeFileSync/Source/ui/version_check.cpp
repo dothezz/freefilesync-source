@@ -73,7 +73,7 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
 
     const wxLinuxDistributionInfo distribInfo = wxGetLinuxDistributionInfo();
     assert(contains(distribInfo.Release, L'.'));
-    std::vector<wxString> digits = split<wxString>(distribInfo.Release, L'.'); //e.g. "15.04"
+    std::vector<wxString> digits = split<wxString>(distribInfo.Release, L'.', SplitType::ALLOW_EMPTY); //e.g. "15.04"
     digits.resize(2);
     //distribInfo.Id //e.g. "Ubuntu"
 
@@ -88,8 +88,8 @@ std::vector<std::pair<std::string, std::string>> geHttpPostParameters()
     params.emplace_back("os_arch", "64");
 #endif
 
-    params.emplace_back("language", utfCvrtTo<std::string>(getIso639Language()));
-    params.emplace_back("country",  utfCvrtTo<std::string>(getIso3166Country()));
+    params.emplace_back("language", utfTo<std::string>(getIso639Language()));
+    params.emplace_back("country",  utfTo<std::string>(getIso3166Country()));
 
     return params;
 }
@@ -106,7 +106,7 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
         {
             const std::string buf = sendHttpPost(L"http://www.freefilesync.org/get_latest_changes.php", ffsUpdateCheckUserAgent,
             nullptr /*notifyUnbufferedIO*/, { { "since", zen::ffsVersion } }).readAll(); //throw SysError
-            updateDetailsMsg = utfCvrtTo<std::wstring>(buf);
+            updateDetailsMsg = utfTo<std::wstring>(buf);
         }
         catch (const zen::SysError& e) { throw FileError(_("Failed to retrieve update information."), e.toString()); }
 
@@ -119,7 +119,7 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
     switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
                                    setIcon(getResourceImage(L"update_available")).
                                    setTitle(_("Check for Program Updates")).
-                                   setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + utfCvrtTo<std::wstring>(onlineVersion) + L"\n" + _("Download now?")).
+                                   setMainInstructions(_("A new version of FreeFileSync is available:")  + L" " + utfTo<std::wstring>(onlineVersion) + L"\n" + _("Download now?")).
                                    setDetailInstructions(updateDetailsMsg),
                                    _("&Download")))
     {
@@ -145,7 +145,7 @@ std::string getOnlineVersion(const std::vector<std::pair<std::string, std::strin
 std::vector<size_t> parseVersion(const std::string& version)
 {
     std::vector<size_t> output;
-    for (const std::string& digit : split(version, FFS_VERSION_SEPARATOR))
+    for (const std::string& digit : split(version, FFS_VERSION_SEPARATOR, SplitType::ALLOW_EMPTY))
         output.push_back(stringTo<size_t>(digit));
     return output;
 }

@@ -43,6 +43,15 @@ void applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)
 
+struct PathDependency
+{
+    AbstractPath basePathParent;
+    AbstractPath basePathChild;
+    Zstring relPath; //filled if child path is sub folder of parent path; empty if child path == parent path
+};
+Opt<PathDependency> getPathDependency(const AbstractPath& basePathL, const HardFilter& filterL,
+                                      const AbstractPath& basePathR, const HardFilter& filterR);
+
 std::pair<std::wstring, int> getSelectedItemsAsString( //returns string with item names and total count of selected(!) items, NOT total files/dirs!
     const std::vector<const FileSystemObject*>& selectionLeft,   //all pointers need to be bound!
     const std::vector<const FileSystemObject*>& selectionRight); //
@@ -62,7 +71,7 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          const std::vector<DirectionConfig>& directCfgs,
                          bool useRecycleBin,
                          //global warnings:
-                         bool& warningRecyclerMissing,
+                         bool& warnRecyclerMissing,
                          ProcessCallback& callback);
 
 //get native Win32 paths or create temporary copy for SFTP/MTP, ect.

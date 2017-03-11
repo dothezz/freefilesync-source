@@ -40,12 +40,12 @@ namespace
 class Redetermine
 {
 public:
-    static void execute(const DirectionSet& dirCfgIn, HierarchyObject& hierObj) { Redetermine(dirCfgIn).recurse(hierObj); }
+    static void execute(const DirectionSet& dirCfgIn, ContainerObject& hierObj) { Redetermine(dirCfgIn).recurse(hierObj); }
 
 private:
     Redetermine(const DirectionSet& dirCfgIn) : dirCfg(dirCfgIn) {}
 
-    void recurse(HierarchyObject& hierObj) const
+    void recurse(ContainerObject& hierObj) const
     {
         for (FilePair& file : hierObj.refSubFiles())
             processFile(file);
@@ -168,7 +168,7 @@ private:
 //---------------------------------------------------------------------------------------------------------------
 
 //test if non-equal items exist in scanned data
-bool allItemsCategoryEqual(const HierarchyObject& hierObj)
+bool allItemsCategoryEqual(const ContainerObject& hierObj)
 {
     return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
     [](const FilePair& file) { return file.getCategory() == FILE_EQUAL; })&&   //files
@@ -338,7 +338,7 @@ private:
             detectMovePairs(dbFolder);
     }
 
-    void recurse(HierarchyObject& hierObj, const InSyncFolder* dbFolder)
+    void recurse(ContainerObject& hierObj, const InSyncFolder* dbFolder)
     {
         for (FilePair& file : hierObj.refSubFiles())
         {
@@ -510,7 +510,7 @@ private:
         recurse(baseFolder, &dbFolder);
     }
 
-    void recurse(HierarchyObject& hierObj, const InSyncFolder* dbFolder) const
+    void recurse(ContainerObject& hierObj, const InSyncFolder* dbFolder) const
     {
         for (FilePair& file : hierObj.refSubFiles())
             processFile(file, dbFolder);
@@ -791,7 +791,7 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
 namespace
 {
 template <bool include>
-void inOrExcludeAllRows(HierarchyObject& hierObj)
+void inOrExcludeAllRows(ContainerObject& hierObj)
 {
     for (FilePair& file : hierObj.refSubFiles())
         file.setActive(include);
@@ -860,12 +860,12 @@ template <FilterStrategy strategy>
 class ApplyHardFilter
 {
 public:
-    static void execute(HierarchyObject& hierObj, const HardFilter& filterProcIn) { ApplyHardFilter(hierObj, filterProcIn); }
+    static void execute(ContainerObject& hierObj, const HardFilter& filterProcIn) { ApplyHardFilter(hierObj, filterProcIn); }
 
 private:
-    ApplyHardFilter(HierarchyObject& hierObj, const HardFilter& filterProcIn) : filterProc(filterProcIn)  { recurse(hierObj); }
+    ApplyHardFilter(ContainerObject& hierObj, const HardFilter& filterProcIn) : filterProc(filterProcIn)  { recurse(hierObj); }
 
-    void recurse(HierarchyObject& hierObj) const
+    void recurse(ContainerObject& hierObj) const
     {
         for (FilePair& file : hierObj.refSubFiles())
             processFile(file);
@@ -912,12 +912,12 @@ template <FilterStrategy strategy>
 class ApplySoftFilter //falsify only! -> can run directly after "hard/base filter"
 {
 public:
-    static void execute(HierarchyObject& hierObj, const SoftFilter& timeSizeFilter) { ApplySoftFilter(hierObj, timeSizeFilter); }
+    static void execute(ContainerObject& hierObj, const SoftFilter& timeSizeFilter) { ApplySoftFilter(hierObj, timeSizeFilter); }
 
 private:
-    ApplySoftFilter(HierarchyObject& hierObj, const SoftFilter& timeSizeFilter) : timeSizeFilter_(timeSizeFilter) { recurse(hierObj); }
+    ApplySoftFilter(ContainerObject& hierObj, const SoftFilter& timeSizeFilter) : timeSizeFilter_(timeSizeFilter) { recurse(hierObj); }
 
-    void recurse(zen::HierarchyObject& hierObj) const
+    void recurse(zen::ContainerObject& hierObj) const
     {
         for (FilePair& file : hierObj.refSubFiles())
             processFile(file);
@@ -1046,16 +1046,16 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 class FilterByTimeSpan
 {
 public:
-    static void execute(HierarchyObject& hierObj, int64_t timeFrom, int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
+    static void execute(ContainerObject& hierObj, int64_t timeFrom, int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
 
 private:
-    FilterByTimeSpan(HierarchyObject& hierObj,
+    FilterByTimeSpan(ContainerObject& hierObj,
                      int64_t timeFrom,
                      int64_t timeTo) :
         timeFrom_(timeFrom),
         timeTo_(timeTo) { recurse(hierObj); }
 
-    void recurse(HierarchyObject& hierObj) const
+    void recurse(ContainerObject& hierObj) const
     {
         for (FilePair& file : hierObj.refSubFiles())
             processFile(file);
@@ -1108,6 +1108,45 @@ private:
 void zen::applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t timeTo)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseFolderPair& baseFolder) { FilterByTimeSpan::execute(baseFolder, timeFrom, timeTo); });
+}
+
+
+Opt<PathDependency> zen::getPathDependency(const AbstractPath& basePathL, const HardFilter& filterL,
+                                           const AbstractPath& basePathR, const HardFilter& filterR)
+{
+    if (!AFS::isNullPath(basePathL) && !AFS::isNullPath(basePathR))
+    {
+        const AFS::PathComponents compL = AFS::getPathComponents(basePathL);
+        const AFS::PathComponents compR = AFS::getPathComponents(basePathR);
+        if (AFS::compareAbstractPath(compL.rootPath, compR.rootPath) == 0)
+        {
+            const bool leftParent = compL.relPath.size() <= compR.relPath.size();
+
+            const auto& relPathP = leftParent ? compL.relPath : compR.relPath;
+            const auto& relPathC = leftParent ? compR.relPath : compL.relPath;
+
+            if (std::equal(relPathP.begin(), relPathP.end(), relPathC.begin(), [](const Zstring& lhs, const Zstring& rhs) { return equalFilePath(lhs, rhs); }))
+            {
+                Zstring relDirPath;
+                std::for_each(relPathC.begin() + relPathP.size(), relPathC.end(), [&](const Zstring& itemName)
+                {
+                    relDirPath = AFS::appendPaths(relDirPath, itemName, FILE_NAME_SEPARATOR);
+                });
+                const AbstractPath& basePathP = leftParent ? basePathL : basePathR;
+                const AbstractPath& basePathC = leftParent ? basePathR : basePathL;
+
+                const HardFilter& filterP = leftParent ? filterL : filterR;
+                //if there's a dependency, check if the sub directory is (fully) excluded via filter
+                //=> easy to check but still insufficient in general:
+                // - one folder may have a *.txt include-filter, the other a *.lng include filter => no dependencies, but "childItemMightMatch = true" below!
+                // - user may have manually excluded the conflicting items or changed the filter settings without running a re-compare
+                bool childItemMightMatch = true;
+                if (relDirPath.empty() || filterP.passDirFilter(relDirPath, &childItemMightMatch) || childItemMightMatch)
+                    return PathDependency({ basePathP, basePathC, relDirPath });
+            }
+        }
+    }
+    return NoValue();
 }
 
 //############################################################################################################
@@ -1172,8 +1211,8 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
         }
         catch (FileError&)
         {
-            Opt<AFS::PathDetails> pd;
-            try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+            Opt<AFS::PathStatus> pd;
+            try { pd = AFS::getPathStatus(targetPath); /*throw FileError*/ }
             catch (FileError&) {} //previous exception is more relevant
 
             if (pd)
@@ -1216,8 +1255,8 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             }
             catch (FileError&)
             {
-                Opt<AFS::PathDetails> pd;
-                try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+                Opt<AFS::PathStatus> pd;
+                try { pd = AFS::getPathStatus(targetPath); /*throw FileError*/ }
                 catch (FileError&) {} //previous exception is more relevant
 
                 if (pd)
@@ -1441,7 +1480,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                               FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                               const std::vector<DirectionConfig>& directCfgs,
                               bool useRecycleBin,
-                              bool& warningRecyclerMissing,
+                              bool& warnRecyclerMissing,
                               ProcessCallback& callback)
 {
     if (folderCmp.empty())
@@ -1524,7 +1563,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
             if (!item.second)
                 msg += L"\n" + AFS::getDisplayPath(item.first);
 
-        callback.reportWarning(msg, warningRecyclerMissing); //throw?
+        callback.reportWarning(msg, warnRecyclerMissing); //throw?
     }
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteRecylerLeft,   true,  callback);

@@ -8,6 +8,7 @@
 #include "sorting.h"
 #include "../synchronization.h"
 #include <zen/stl_tools.h>
+#include <zen/perf.h>
 
 using namespace zen;
 
@@ -52,24 +53,24 @@ void addNumbers(const FileSystemObject& fsObj, StatusResult& result)
 template <class Predicate>
 void GridView::updateView(Predicate pred)
 {
-    viewRef.clear();
-    rowPositions.clear();
-    rowPositionsFirstChild.clear();
+    viewRef_.clear();
+    rowPositions_.clear();
+    rowPositionsFirstChild_.clear();
 
-    for (const RefIndex& ref : sortedRef)
+    for (const RefIndex& ref : sortedRef_)
     {
         if (const FileSystemObject* fsObj = FileSystemObject::retrieve(ref.objId))
             if (pred(*fsObj))
             {
                 //save row position for direct random access to FilePair or FolderPair
-                this->rowPositions.emplace(ref.objId, viewRef.size()); //costs: 0.28 µs per call - MSVC based on std::set
+                this->rowPositions_.emplace(ref.objId, viewRef_.size()); //costs: 0.28 µs per call - MSVC based on std::set
                 //"this->" required by two-pass lookup as enforced by GCC 4.7
 
                 //save row position to identify first child *on sorted subview* of FolderPair or BaseFolderPair in case latter are filtered out
-                const HierarchyObject* parent = &fsObj->parent();
+                const ContainerObject* parent = &fsObj->parent();
                 for (;;) //map all yet unassociated parents to this row
                 {
-                    const auto rv = this->rowPositionsFirstChild.emplace(parent, viewRef.size());
+                    const auto rv = this->rowPositionsFirstChild_.emplace(parent, viewRef_.size());
                     if (!rv.second)
                         break;
 
@@ -80,7 +81,7 @@ void GridView::updateView(Predicate pred)
                 }
 
                 //build subview
-                this->viewRef.push_back(ref.objId);
+                this->viewRef_.push_back(ref.objId);
             }
     }
 }
@@ -88,14 +89,14 @@ void GridView::updateView(Predicate pred)
 
 ptrdiff_t GridView::findRowDirect(FileSystemObject::ObjectIdConst objId) const
 {
-    auto it = rowPositions.find(objId);
-    return it != rowPositions.end() ? it->second : -1;
+    auto it = rowPositions_.find(objId);
+    return it != rowPositions_.end() ? it->second : -1;
 }
 
-ptrdiff_t GridView::findRowFirstChild(const HierarchyObject* hierObj) const
+ptrdiff_t GridView::findRowFirstChild(const ContainerObject* hierObj) const
 {
-    auto it = rowPositionsFirstChild.find(hierObj);
-    return it != rowPositionsFirstChild.end() ? it->second : -1;
+    auto it = rowPositionsFirstChild_.find(hierObj);
+    return it != rowPositionsFirstChild_.end() ? it->second : -1;
 }
 
 
@@ -239,13 +240,13 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //map
 
 std::vector<FileSystemObject*> GridView::getAllFileRef(const std::vector<size_t>& rows)
 {
-    const size_t viewSize = viewRef.size();
+    const size_t viewSize = viewRef_.size();
 
     std::vector<FileSystemObject*> output;
 
     for (size_t pos : rows)
         if (pos < viewSize)
-            if (FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef[pos]))
+            if (FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef_[pos]))
                 output.push_back(fsObj);
 
     return output;
@@ -254,59 +255,82 @@ std::vector<FileSystemObject*> GridView::getAllFileRef(const std::vector<size_t>
 
 void GridView::removeInvalidRows()
 {
-    viewRef.clear();
-    rowPositions.clear();
-    rowPositionsFirstChild.clear();
+    viewRef_.clear();
+    rowPositions_.clear();
+    rowPositionsFirstChild_.clear();
 
     //remove rows that have been deleted meanwhile
-    erase_if(sortedRef, [&](const RefIndex& refIdx) { return !FileSystemObject::retrieve(refIdx.objId); });
+    erase_if(sortedRef_, [&](const RefIndex& refIdx) { return !FileSystemObject::retrieve(refIdx.objId); });
 }
 
 
 class GridView::SerializeHierarchy
 {
 public:
-    static void execute(HierarchyObject& hierObj, std::vector<GridView::RefIndex>& sortedRef, size_t index) { SerializeHierarchy(sortedRef, index).recurse(hierObj); }
+    static void execute(ContainerObject& hierObj, std::vector<GridView::RefIndex>& sortedRef, size_t index) { SerializeHierarchy(sortedRef, index).recurse(hierObj); }
 
 private:
     SerializeHierarchy(std::vector<GridView::RefIndex>& sortedRef, size_t index) :
         index_(index),
-        sortedRef_(sortedRef) {}
+        output_(sortedRef) {}
+    /*
+    Spend additional CPU cycles to sort the standard file list?
 
-    void recurse(HierarchyObject& hierObj)
+        Test case: 690.000 item pairs, Windows 7 x64 (C:\ vs I:\)
+        ----------------------
+        CmpNaturalSort: 850 ms
+        CmpFilePath:    233 ms
+        CmpAsciiNoCase: 189 ms
+        No sorting:      30 ms
+    */
+#if  0
+    template <class ItemPair>
+    static std::vector<ItemPair*> getItemsSorted(FixedList<ItemPair>& itemList)
+    {
+        std::vector<ItemPair*> output;
+        for (ItemPair& item : itemList)
+            output.push_back(&item);
+
+        std::sort(output.begin(), output.end(), [](const ItemPair* lhs, const ItemPair* rhs) { return LessNaturalSort()(lhs->getPairItemName(), rhs->getPairItemName()); });
+        return output;
+    }
+#endif
+    void recurse(ContainerObject& hierObj)
     {
         for (FilePair& file : hierObj.refSubFiles())
-            sortedRef_.emplace_back(index_, file.getId());
+            output_.emplace_back(index_, file.getId());
+
         for (SymlinkPair& symlink : hierObj.refSubLinks())
-            sortedRef_.emplace_back(index_, symlink.getId());
+            output_.emplace_back(index_, symlink.getId());
+
         for (FolderPair& folder : hierObj.refSubFolders())
         {
-            sortedRef_.emplace_back(index_, folder.getId());
+            output_.emplace_back(index_, folder.getId());
             recurse(folder); //add recursion here to list sub-objects directly below parent!
         }
     }
 
-    size_t index_;
-    std::vector<GridView::RefIndex>& sortedRef_;
+    const size_t index_;
+    std::vector<GridView::RefIndex>& output_;
 };
 
 
 void GridView::setData(FolderComparison& folderCmp)
 {
     //clear everything
-    std::vector<FileSystemObject::ObjectId>().swap(viewRef); //free mem
-    std::vector<RefIndex>().swap(sortedRef);                 //
-    currentSort = NoValue();
+    std::vector<FileSystemObject::ObjectId>().swap(viewRef_); //free mem
+    std::vector<RefIndex>().swap(sortedRef_);                 //
+    currentSort_ = NoValue();
 
-    folderPairCount = std::count_if(begin(folderCmp), end(folderCmp),
-                                    [](const BaseFolderPair& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
+    folderPairCount_ = std::count_if(begin(folderCmp), end(folderCmp),
+                                     [](const BaseFolderPair& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
     {
         return !AFS::isNullPath(baseObj.getAbstractPath< LEFT_SIDE>()) ||
                !AFS::isNullPath(baseObj.getAbstractPath<RIGHT_SIDE>());
     });
 
     for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
-        SerializeHierarchy::execute(*it, sortedRef, it - begin(folderCmp));
+        SerializeHierarchy::execute(*it, sortedRef_, it - begin(folderCmp));
 }
 
 
@@ -472,10 +496,10 @@ bool GridView::getDefaultSortDirection(ColumnTypeRim type) //true: ascending; fa
 
 void GridView::sortView(ColumnTypeRim type, ItemPathFormat pathFmt, bool onLeft, bool ascending)
 {
-    viewRef.clear();
-    rowPositions.clear();
-    rowPositionsFirstChild.clear();
-    currentSort = SortInfo(type, onLeft, ascending);
+    viewRef_.clear();
+    rowPositions_.clear();
+    rowPositionsFirstChild_.clear();
+    currentSort_ = SortInfo(type, onLeft, ascending);
 
     switch (type)
     {
@@ -483,43 +507,43 @@ void GridView::sortView(ColumnTypeRim type, ItemPathFormat pathFmt, bool onLeft,
             switch (pathFmt)
             {
                 case ItemPathFormat::FULL_PATH:
-                    if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  LEFT_SIDE >());
-                    else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<true,  RIGHT_SIDE>());
-                    else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, LEFT_SIDE >());
-                    else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFullPath<false, RIGHT_SIDE>());
+                    if      ( ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFullPath<true,  LEFT_SIDE >());
+                    else if ( ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFullPath<true,  RIGHT_SIDE>());
+                    else if (!ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFullPath<false, LEFT_SIDE >());
+                    else if (!ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFullPath<false, RIGHT_SIDE>());
                     break;
 
                 case ItemPathFormat::RELATIVE_PATH:
-                    if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<true>());
-                    else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeFolder<false>());
+                    if      ( ascending) std::sort(sortedRef_.begin(), sortedRef_.end(), LessRelativeFolder<true>());
+                    else if (!ascending) std::sort(sortedRef_.begin(), sortedRef_.end(), LessRelativeFolder<false>());
                     break;
 
                 case ItemPathFormat::ITEM_NAME:
-                    if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
-                    else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>());
-                    else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >());
-                    else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>());
+                    if      ( ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessShortFileName<true,  LEFT_SIDE >());
+                    else if ( ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessShortFileName<true,  RIGHT_SIDE>());
+                    else if (!ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessShortFileName<false, LEFT_SIDE >());
+                    else if (!ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessShortFileName<false, RIGHT_SIDE>());
                     break;
             }
             break;
 
         case ColumnTypeRim::SIZE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >());
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>());
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, LEFT_SIDE >());
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, RIGHT_SIDE>());
+            if      ( ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFilesize<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFilesize<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFilesize<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFilesize<false, RIGHT_SIDE>());
             break;
         case ColumnTypeRim::DATE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  LEFT_SIDE >());
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  RIGHT_SIDE>());
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, LEFT_SIDE >());
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, RIGHT_SIDE>());
+            if      ( ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFiletime<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFiletime<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFiletime<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef_.begin(), sortedRef_.end(), LessFiletime<false, RIGHT_SIDE>());
             break;
         case ColumnTypeRim::EXTENSION:
-            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  LEFT_SIDE >());
-            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>());
-            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >());
-            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>());
+            if      ( ascending &&  onLeft) std::stable_sort(sortedRef_.begin(), sortedRef_.end(), LessExtension<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::stable_sort(sortedRef_.begin(), sortedRef_.end(), LessExtension<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::stable_sort(sortedRef_.begin(), sortedRef_.end(), LessExtension<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::stable_sort(sortedRef_.begin(), sortedRef_.end(), LessExtension<false, RIGHT_SIDE>());
             break;
     }
 }

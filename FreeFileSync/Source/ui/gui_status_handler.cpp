@@ -332,7 +332,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     //----------------- write results into LastSyncs.log------------------------
     try
     {
-        saveToLastSyncsLog(summary, errorLog_, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfCvrtTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
+        saveToLastSyncsLog(summary, errorLog_, lastSyncsLogFileSizeMax_, OnUpdateLogfileStatusNoThrow(*this, utfTo<std::wstring>(getLastSyncsLogfilePath()))); //throw FileError
     }
     catch (FileError&) { assert(false); }
 

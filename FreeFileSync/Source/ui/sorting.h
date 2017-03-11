@@ -52,7 +52,7 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
         return true;
 
     //sort directories and files/symlinks by short name
-    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
+    return makeSortDirection(LessNaturalSort() /*even on Linux*/, Int2Type<ascending>())(a.getItemName<side>(), b.getItemName<side>());
 }
 
 
@@ -65,8 +65,9 @@ bool lessFullPath(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(AFS::getDisplayPath(a.getAbstractPath<side>()),
-                                                                    AFS::getDisplayPath(b.getAbstractPath<side>()));
+    return makeSortDirection(LessNaturalSort() /*even on Linux*/, Int2Type<ascending>())(
+               utfTo<Zstring>(AFS::getDisplayPath(a.getAbstractPath<side>())),
+               utfTo<Zstring>(AFS::getDisplayPath(b.getAbstractPath<side>())));
 }
 
 
@@ -75,27 +76,27 @@ bool lessRelativeFolder(const FileSystemObject& a, const FileSystemObject& b)
 {
     const bool isDirectoryA = isDirectoryPair(a);
     const Zstring& relFolderA = isDirectoryA ?
-                                a.getPairRelativePath() : //directory
-                                beforeLast(a.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+                                a.getPairRelativePath() :
+                                a.parent().getPairRelativePath();
 
     const bool isDirectoryB = isDirectoryPair(b);
     const Zstring& relFolderB = isDirectoryB ?
-                                b.getPairRelativePath() : //directory
-                                beforeLast(b.getPairRelativePath(), FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+                                b.getPairRelativePath() :
+                                b.parent().getPairRelativePath();
 
     //compare relative names without filepaths first
-    const int rv = cmpFilePath(relFolderA.c_str(), relFolderA.size(),
-                               relFolderB.c_str(), relFolderB.size());
+    const int rv = CmpNaturalSort()(relFolderA.c_str(), relFolderA.size(),
+                                    relFolderB.c_str(), relFolderB.size());
     if (rv != 0)
         return makeSortDirection(std::less<int>(), Int2Type<ascending>())(rv, 0);
 
-    //compare the filepaths
-    if (isDirectoryB) //directories shall appear before files
+    //make directories always appear before contained files
+    if (isDirectoryB)
         return false;
     else if (isDirectoryA)
         return true;
 
-    return LessNoCase() /*even on Linux*/(a.getPairItemName(), b.getPairItemName());
+    return makeSortDirection(LessNaturalSort(), Int2Type<ascending>())(a.getPairItemName(), b.getPairItemName());
 }
 
 
@@ -173,7 +174,7 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
         return afterLast(fsObj.getItemName<side>(), Zchar('.'), zen::IF_MISSING_RETURN_NONE);
     };
 
-    return makeSortDirection(LessNoCase() /*even on Linux*/, Int2Type<ascending>())(getExtension(a), getExtension(b));
+    return makeSortDirection(LessNaturalSort() /*even on Linux*/, Int2Type<ascending>())(getExtension(a), getExtension(b));
 }
 
 

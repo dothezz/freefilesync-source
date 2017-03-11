@@ -27,7 +27,7 @@
 using namespace zen;
 
 
-Opt<PathComponents> zen::getPathComponents(const Zstring& itemPath)
+Opt<PathComponents> zen::parsePathComponents(const Zstring& itemPath)
 {
     if (startsWith(itemPath, "/"))
     {
@@ -44,7 +44,7 @@ Opt<PathComponents> zen::getPathComponents(const Zstring& itemPath)
 
 Opt<Zstring> zen::getParentFolderPath(const Zstring& itemPath)
 {
-    if (const Opt<PathComponents> comp = getPathComponents(itemPath))
+    if (const Opt<PathComponents> comp = parsePathComponents(itemPath))
     {
         if (comp->relPath.empty())
             return NoValue();
@@ -73,7 +73,7 @@ ItemType zen::getItemType(const Zstring& itemPath) //throw FileError
 }
 
 
-PathDetails zen::getPathDetails(const Zstring& itemPath) //throw FileError
+PathStatus zen::getPathStatus(const Zstring& itemPath) //throw FileError
 {
     const Opt<Zstring> parentPath = getParentFolderPath(itemPath);
     try
@@ -91,7 +91,7 @@ PathDetails zen::getPathDetails(const Zstring& itemPath) //throw FileError
     const Zstring itemName = afterLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
     assert(!itemName.empty());
 
-    PathDetails pd = getPathDetails(*parentPath); //throw FileError
+    PathStatus pd = getPathStatus(*parentPath); //throw FileError
     if (!pd.relPath.empty())
     {
         pd.relPath.push_back(itemName);
@@ -115,7 +115,7 @@ PathDetails zen::getPathDetails(const Zstring& itemPath) //throw FileError
 
 Opt<ItemType> zen::getItemTypeIfExists(const Zstring& itemPath) //throw FileError
 {
-    const PathDetails pd = getPathDetails(itemPath); //throw FileError
+    const PathStatus pd = getPathStatus(itemPath); //throw FileError
     if (pd.relPath.empty())
         return pd.existingType;
     return NoValue();
@@ -502,8 +502,8 @@ void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw File
     }
     catch (FileError&)
     {
-        Opt<PathDetails> pd;
-        try { pd = getPathDetails(dirPath); /*throw FileError*/ }
+        Opt<PathStatus> pd;
+        try { pd = getPathStatus(dirPath); /*throw FileError*/ }
         catch (FileError&) {} //previous exception is more relevant
 
         if (pd && pd->existingType != ItemType::FILE)

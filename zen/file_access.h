@@ -22,7 +22,7 @@ struct PathComponents
     Zstring rootPath; //itemPath = rootPath + (FILE_NAME_SEPARATOR?) + relPath
     Zstring relPath;  //
 };
-Opt<PathComponents> getPathComponents(const Zstring& itemPath); //no value on failure
+Opt<PathComponents> parsePathComponents(const Zstring& itemPath); //no value on failure
 
 Opt<Zstring> getParentFolderPath(const Zstring& itemPath);
 
@@ -43,13 +43,13 @@ ItemType      getItemType        (const Zstring& itemPath); //throw FileError
 //execute potentially SLOW folder traversal but distinguish error/not existing
 Opt<ItemType> getItemTypeIfExists(const Zstring& itemPath); //throw FileError
 
-struct PathDetails
+struct PathStatus
 {
     ItemType existingType;
     Zstring existingPath;         //itemPath =: existingPath + relPath
     std::vector<Zstring> relPath; //
 };
-PathDetails getPathDetails(const Zstring& itemPath); //throw FileError
+PathStatus getPathStatus(const Zstring& itemPath); //throw FileError
 
 enum class ProcSymlink
 {

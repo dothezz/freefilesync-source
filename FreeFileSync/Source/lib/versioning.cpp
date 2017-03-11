@@ -107,8 +107,8 @@ void moveExistingItemToVersioning(const AbstractPath& sourcePath, const Abstract
 
     auto fixedTargetPathIssues = [&] //throw FileError
     {
-        Opt<AFS::PathDetails> pd;
-        try { pd = AFS::getPathDetails(targetPath); /*throw FileError*/ }
+        Opt<AFS::PathStatus> pd;
+        try { pd = AFS::getPathStatus(targetPath); /*throw FileError*/ }
         catch (FileError&) {} //previous exception is more relevant
 
         if (pd)
@@ -233,7 +233,7 @@ void FileVersioner::revisionFolder(const AbstractPath& folderPath, const Zstring
 {
     if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(folderPath)) //throw FileError
     {
-        if (*type ==  AFS::ItemType::SYMLINK) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
+        if (*type == AFS::ItemType::SYMLINK) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
         {
             const AbstractPath targetPath = generateVersionedPath(relativePath);
             if (onBeforeFileMove)

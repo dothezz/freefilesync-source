@@ -36,43 +36,23 @@ int AFS::compareAbstractPath(const AbstractPath& lhs, const AbstractPath& rhs)
     if (rv != 0)
         return rv;
 
-    return cmpFilePath(lhs.afsPath.value.c_str(), lhs.afsPath.value.size(),
-                       rhs.afsPath.value.c_str(), rhs.afsPath.value.size());
+    return CmpFilePath()(lhs.afsPath.value.c_str(), lhs.afsPath.value.size(),
+                         rhs.afsPath.value.c_str(), rhs.afsPath.value.size());
 }
 
 
-Opt<AFS::PathComplement> AFS::getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs)
+AFS::PathComponents AFS::getPathComponents(const AbstractPath& ap)
 {
-    if (typeid(*lhs.afs) != typeid(*rhs.afs))
-        return NoValue();
-
-    const int rv = lhs.afs->compareDeviceRootSameAfsType(*rhs.afs);
-    if (rv != 0)
-        return NoValue();
-
-    const Zstring& lhsPf = appendSeparator(lhs.afsPath.value);
-    const Zstring& rhsPf = appendSeparator(rhs.afsPath.value);
-
-    const size_t lenMin = std::min(lhsPf.length(), rhsPf.length());
-
-    if (cmpFilePath(lhsPf.c_str(), lenMin,
-                    rhsPf.c_str(), lenMin) != 0)
-        return NoValue();
-
-    Zstring relPathL(lhsPf.begin() + lenMin, lhsPf.end());
-    Zstring relPathR(rhsPf.begin() + lenMin, rhsPf.end());
-
-    if (endsWith(relPathL, FILE_NAME_SEPARATOR)) relPathL.pop_back();
-    if (endsWith(relPathR, FILE_NAME_SEPARATOR)) relPathR.pop_back();
-
-    return PathComplement({ relPathL, relPathR });
+    return { AbstractPath(ap.afs, AfsPath(Zstring())), split(ap.afsPath.value, FILE_NAME_SEPARATOR, SplitType::SKIP_EMPTY) };
 }
 
 
-bool AFS::havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs)
+Opt<AbstractPath> AFS::getParentFolderPath(const AbstractPath& ap)
 {
-    warn_static("remove after migration")
-    return static_cast<bool>(getPathComplement(lhs, rhs));
+    if (const Opt<AfsPath> parentAfsPath = getParentAfsPath(ap.afsPath))
+        return AbstractPath(ap.afs, *parentAfsPath);
+
+    return NoValue();
 }
 
 
@@ -91,7 +71,7 @@ AFS::FileAttribAfterCopy AFS::copyFileAsStream(const AfsPath& afsPathSource, con
     int64_t totalUnbufferedIO = 0;
 
     auto streamIn = getInputStream(afsPathSource, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorFileLocked
-
+	warn_static("save following file access to improve SFTP perf?")
     const uint64_t fileSizeExpected = streamIn->getFileSize        (); //throw FileError
     const int64_t  modificationTime = streamIn->getModificationTime(); //throw FileError
     const FileId   sourceFileId     = streamIn->getFileId          (); //throw FileError
@@ -205,8 +185,8 @@ void AFS::createFolderIfMissingRecursion(const AbstractPath& ap) //throw FileErr
     }
     catch (FileError&)
     {
-        Opt<PathDetails> pd;
-        try { pd = getPathDetails(ap); /*throw FileError*/ }
+        Opt<PathStatus> pd;
+        try { pd = getPathStatus(ap); /*throw FileError*/ }
         catch (FileError&) {} //previous exception is more relevant
 
         if (pd && pd->existingType != ItemType::FILE)
@@ -239,7 +219,7 @@ private:
 }
 
 
-AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const AfsPath& afsPath) const //throw FileError
+AFS::PathStatusImpl AFS::getPathStatusViaFolderTraversal(const AfsPath& afsPath) const //throw FileError
 {
     const Opt<AfsPath> parentAfsPath = getParentAfsPath(afsPath);
     try
@@ -257,11 +237,11 @@ AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const AfsPath& afsPat
     const Zstring itemName = getItemName(afsPath);
     assert(!itemName.empty());
 
-    PathDetailsImpl pd = getPathDetailsViaFolderTraversal(*parentAfsPath); //throw FileError
-    if (!pd.relPath.empty())
+    PathStatusImpl ps = getPathStatusViaFolderTraversal(*parentAfsPath); //throw FileError
+    if (!ps.relPath.empty())
     {
-        pd.relPath.push_back(itemName);
-        return { pd.existingType, pd.existingAfsPath, pd.relPath };
+        ps.relPath.push_back(itemName);
+        return { ps.existingType, ps.existingAfsPath, ps.relPath };
     }
 
     try
@@ -269,7 +249,7 @@ AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const AfsPath& afsPat
         ItemSearchCallback iscb(itemName);
         traverseFolder(*parentAfsPath, iscb); //throw FileError, ItemType
 
-        return { pd.existingType, *parentAfsPath, { itemName } }; //throw FileError
+        return { ps.existingType, *parentAfsPath, { itemName } }; //throw FileError
     }
     catch (const ItemType& type) { return { type, afsPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
     //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
@@ -278,16 +258,16 @@ AFS::PathDetailsImpl AFS::getPathDetailsViaFolderTraversal(const AfsPath& afsPat
 
 Opt<AFS::ItemType> AFS::getItemTypeIfExists(const AbstractPath& ap) //throw FileError
 {
-    const PathDetails pd = getPathDetails(ap); //throw FileError
+    const PathStatus pd = getPathStatus(ap); //throw FileError
     if (pd.relPath.empty())
         return pd.existingType;
     return NoValue();
 }
 
 
-AFS::PathDetails AFS::getPathDetails(const AbstractPath& ap) //throw FileError
+AFS::PathStatus AFS::getPathStatus(const AbstractPath& ap) //throw FileError
 {
-    const PathDetailsImpl pdi = ap.afs->getPathDetails(ap.afsPath); //throw FileError
+    const PathStatusImpl pdi = ap.afs->getPathStatus(ap.afsPath); //throw FileError
     return { pdi.existingType, AbstractPath(ap.afs, pdi.existingAfsPath), pdi.relPath };
 }
 
@@ -360,7 +340,7 @@ void AFS::removeFolderIfExistsRecursion(const AbstractPath& ap, //throw FileErro
 {
     if (Opt<ItemType> type = AFS::getItemTypeIfExists(ap)) //throw FileError
     {
-        if (*type ==  AFS::ItemType::SYMLINK)
+        if (*type == AFS::ItemType::SYMLINK)
         {
             if (onBeforeFileDeletion)
                 onBeforeFileDeletion(AFS::getDisplayPath(ap));

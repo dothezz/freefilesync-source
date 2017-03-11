@@ -44,7 +44,7 @@ const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 
 bool isCloseProgressDlgCommand(const Zstring& value)
 {
-    return trimCpy(utfCvrtTo<std::wstring>(value)) == getCmdTxtCloseProgressDlg();
+    return trimCpy(utfTo<std::wstring>(value)) == getCmdTxtCloseProgressDlg();
 }
 
 
@@ -59,7 +59,7 @@ OnCompletionBox::OnCompletionBox(wxWindow* parent,
                                  const wxValidator& validator,
                                  const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name),
-    defaultCommands(getDefaultCommands())
+    defaultCommands_(getDefaultCommands())
 {
     //#####################################
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
@@ -78,14 +78,14 @@ void OnCompletionBox::addItemHistory()
 {
     const Zstring command = trimCpy(getValue());
 
-    if (command == utfCvrtTo<Zstring>(getSeparationLine()) || //do not add sep. line
-        command == utfCvrtTo<Zstring>(getCmdTxtCloseProgressDlg()) || //do not add special command
+    if (command == utfTo<Zstring>(getSeparationLine()) || //do not add sep. line
+        command == utfTo<Zstring>(getCmdTxtCloseProgressDlg()) || //do not add special command
         command.empty())
         return;
 
     //do not add built-in commands to history
-    for (const auto& item : defaultCommands)
-        if (command == utfCvrtTo<Zstring>(item.first) ||
+    for (const auto& item : defaultCommands_)
+        if (command == utfTo<Zstring>(item.first) ||
             equalFilePath(command, item.second))
             return;
 
@@ -105,13 +105,13 @@ Zstring OnCompletionBox::getValue() const
     if (value == implementation::translate(getCmdTxtCloseProgressDlg())) //undo translation for config file storage
         value = getCmdTxtCloseProgressDlg();
 
-    return utfCvrtTo<Zstring>(value);
+    return utfTo<Zstring>(value);
 }
 
 
 void OnCompletionBox::setValue(const Zstring& value)
 {
-    auto tmp = trimCpy(utfCvrtTo<std::wstring>(value));
+    auto tmp = trimCpy(utfTo<std::wstring>(value));
 
     if (tmp == getCmdTxtCloseProgressDlg())
         tmp = implementation::translate(getCmdTxtCloseProgressDlg()); //have this symbolic constant translated properly
@@ -131,16 +131,18 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     items.push_back(implementation::translate(getCmdTxtCloseProgressDlg()));
 
     //2. built in commands
-    for (const auto& item : defaultCommands)
+    for (const auto& item : defaultCommands_)
         items.push_back(item.first);
 
     //3. history elements
     if (!history_.empty())
     {
+        auto histSorted = history_;
+        std::sort(histSorted.begin(), histSorted.end(), LessNaturalSort() /*even on Linux*/);
+
         items.push_back(getSeparationLine());
-        for (const Zstring& hist : history_)
-            items.push_back(utfCvrtTo<std::wstring>(hist));
-        std::sort(items.end() - history_.size(), items.end());
+        for (const Zstring& hist : histSorted)
+            items.push_back(utfTo<std::wstring>(hist));
     }
 
     //attention: if the target value is not part of the dropdown list, SetValue() will look for a string that *starts with* this value:
@@ -180,9 +182,9 @@ void OnCompletionBox::OnValidateSelection(wxCommandEvent& event)
     if (value == getSeparationLine())
         return setValueAndUpdateList(std::wstring());
 
-    for (const auto& item : defaultCommands)
+    for (const auto& item : defaultCommands_)
         if (item.first == value)
-            return setValueAndUpdateList(utfCvrtTo<std::wstring>(item.second)); //replace GUI name by actual command string
+            return setValueAndUpdateList(utfTo<std::wstring>(item.second)); //replace GUI name by actual command string
 }
 
 
@@ -209,7 +211,7 @@ void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
                 (GetValue() != GetString(pos) || //avoid problems when a character shall be deleted instead of list item
                  GetValue().empty())) //exception: always allow removing empty entry
             {
-                const auto selValue = utfCvrtTo<Zstring>(GetString(pos));
+                const auto selValue = utfTo<Zstring>(GetString(pos));
 
                 if (std::find(history_.begin(), history_.end(), selValue) != history_.end()) //only history elements may be deleted
                 {

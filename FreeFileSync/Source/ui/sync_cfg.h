@@ -31,7 +31,7 @@ enum class SyncConfigPanel
 
 struct LocalPairConfig
 {
-    std::wstring folderPairName; //read-only!
+    Zstring folderPairName; //read-only!
     std::shared_ptr<const CompConfig> altCmpConfig;  //optional
     std::shared_ptr<const SyncConfig> altSyncConfig; //
     FilterConfig localFilter;

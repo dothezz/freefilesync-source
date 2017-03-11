@@ -491,7 +491,7 @@ inline
 wxBitmap getImageButtonReleased(const wchar_t* name)
 {
     return greyScale(getResourceImage(name)).ConvertToImage();
-    //getResourceImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    //getResourceImage(utfTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
     //brighten(output, 30);
 
     //zen::moveImage(output, 1, 0); //move image right one pixel
@@ -505,7 +505,7 @@ class MessageView
 public:
     MessageView(const ErrorLog& log) : log_(log) {}
 
-    size_t rowsOnView() const { return viewRef.size(); }
+    size_t rowsOnView() const { return viewRef_.size(); }
 
     struct LogEntryView
     {
@@ -517,9 +517,9 @@ public:
 
     Opt<LogEntryView> getEntry(size_t row) const
     {
-        if (row < viewRef.size())
+        if (row < viewRef_.size())
         {
-            const Line& line = viewRef[row];
+            const Line& line = viewRef_[row];
 
             LogEntryView output;
             output.time = line.logIt_->time;
@@ -533,7 +533,7 @@ public:
 
     void updateView(int includedTypes) //TYPE_INFO | TYPE_WARNING, ect. see error_log.h
     {
-        viewRef.clear();
+        viewRef_.clear();
 
         for (auto it = log_.begin(); it != log_.end(); ++it)
             if (it->type & includedTypes)
@@ -547,7 +547,7 @@ public:
                     if (c == L'\n')
                     {
                         if (!lastCharNewline) //do not reference empty lines!
-                            viewRef.emplace_back(it, rowNumber);
+                            viewRef_.emplace_back(it, rowNumber);
                         ++rowNumber;
                         lastCharNewline = true;
                     }
@@ -555,7 +555,7 @@ public:
                         lastCharNewline = false;
 
                 if (!lastCharNewline)
-                    viewRef.emplace_back(it, rowNumber);
+                    viewRef_.emplace_back(it, rowNumber);
             }
     }
 
@@ -588,7 +588,7 @@ private:
         size_t rowNumber_; //LogEntry::message may span multiple rows
     };
 
-    std::vector<Line> viewRef; //partial view on log_
+    std::vector<Line> viewRef_; //partial view on log_
     /*          /|\
                  | updateView()
                  |                      */
@@ -984,7 +984,7 @@ private:
         }
         catch (const std::bad_alloc& e)
         {
-            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what())));
+            showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setMainInstructions(_("Out of memory.") + L" " + utfTo<std::wstring>(e.what())));
         }
     }
 
@@ -1984,7 +1984,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             {
                 const Zstring soundFilePath = getResourceDirPf() + soundFileSyncComplete_;
                 if (fileAvailable(soundFilePath))
-                    wxSound::Play(utfCvrtTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+                    wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
             }
             break;
     }

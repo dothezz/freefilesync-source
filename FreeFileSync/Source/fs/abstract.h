@@ -59,30 +59,22 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     static std::wstring getDisplayPath(const AbstractPath& ap) { return ap.afs->getDisplayPath(ap.afsPath); }
 
-    static bool isNullPath(const AbstractPath& ap) { return ap.afsPath.value.empty() && ap.afs->isNullFileSystem(); }
+    static bool isNullPath(const AbstractPath& ap) { return ap.afs->isNullFileSystem() /*&& ap.afsPath.value.empty()*/; }
 
     static AbstractPath appendRelPath(const AbstractPath& ap, const Zstring& relPath);
 
-    struct PathComplement
-    {
-        Zstring relPathL; //- relative path is filled only if the corresponding abstract path is a sub folder of the other (=> both relative paths are empty if abstract paths match)
-        Zstring relPathR; //- without FILE_NAME_SEPARATOR prefix/postfix
-    };
-    static Opt<PathComplement> getPathComplement(const AbstractPath& lhs, const AbstractPath& rhs);
-
     static Zstring getItemName(const AbstractPath& ap) { assert(getParentFolderPath(ap)); return getItemName(ap.afsPath); }
-
-    static bool havePathDependency(const AbstractPath& lhs, const AbstractPath& rhs);
 
     static Opt<Zstring> getNativeItemPath(const AbstractPath& ap) { return ap.afs->getNativeItemPath(ap.afsPath); }
 
-    static Opt<AbstractPath> getParentFolderPath(const AbstractPath& ap)
-    {
-        if (const Opt<AfsPath> parentAfsPath = getParentAfsPath(ap.afsPath))
-            return AbstractPath(ap.afs, *parentAfsPath);
-        return NoValue();
-    }
+    static Opt<AbstractPath> getParentFolderPath(const AbstractPath& ap);
 
+    struct PathComponents
+    {
+        AbstractPath rootPath;       //itemPath =: rootPath + relPath
+        std::vector<Zstring> relPath;
+    };
+    static PathComponents getPathComponents(const AbstractPath& ap);
     //----------------------------------------------------------------------------------------------------------------
     enum class ItemType
     {
@@ -90,7 +82,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
         FOLDER,
         SYMLINK,
     };
-    struct PathDetails
+    struct PathStatus
     {
         ItemType existingType;
         AbstractPath existingPath;    //itemPath =: existingPath + relPath
@@ -100,7 +92,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     static ItemType getItemType(const AbstractPath& ap) { return ap.afs->getItemType(ap.afsPath); } //throw FileError
     //execute potentially SLOW folder traversal but distinguish error/not existing
     static Opt<ItemType> getItemTypeIfExists(const AbstractPath& ap); //throw FileError
-    static PathDetails getPathDetails(const AbstractPath& ap); //throw FileError
+    static PathStatus getPathStatus(const AbstractPath& ap); //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
     //- error if already existing
@@ -292,13 +284,13 @@ protected: //grant derived classes access to AbstractPath:
     static Zstring getItemName(const AfsPath& afsPath) { return afterLast(afsPath.value, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL); }
     static Opt<AfsPath> getParentAfsPath(const AfsPath& afsPath);
 
-    struct PathDetailsImpl
+    struct PathStatusImpl
     {
         ItemType existingType;
         AfsPath existingAfsPath;      //afsPath =: existingAfsPath + relPath
         std::vector<Zstring> relPath; //
     };
-    PathDetailsImpl getPathDetailsViaFolderTraversal(const AfsPath& afsPath) const; //throw FileError
+    PathStatusImpl getPathStatusViaFolderTraversal(const AfsPath& afsPath) const; //throw FileError
 
     FileAttribAfterCopy copyFileAsStream(const AfsPath& afsPathSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
                                          const IOCallback& notifyUnbufferedIO) const; //may be nullptr; throw X!
@@ -316,7 +308,7 @@ private:
 
     //----------------------------------------------------------------------------------------------------------------
     virtual ItemType getItemType(const AfsPath& afsPath) const = 0; //throw FileError
-    virtual PathDetailsImpl getPathDetails(const AfsPath& afsPath) const = 0; //throw FileError
+    virtual PathStatusImpl getPathStatus(const AfsPath& afsPath) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
     virtual void createFolderPlain(const AfsPath& afsPath) const = 0; //throw FileError
@@ -446,7 +438,11 @@ Zstring AbstractFileSystem::appendPaths(const Zstring& basePath, const Zstring& 
             return basePath + (relPath.c_str() + 1);
     }
     else if (!endsWith(basePath, pathSep))
-        return basePath + pathSep + relPath;
+    {
+        Zstring output = basePath;
+        output.reserve(basePath.size() + 1 + relPath.size()); //append all three strings using a single memory allocation
+        return std::move(output) + pathSep + relPath;         //
+    }
 
     return basePath + relPath;
 }

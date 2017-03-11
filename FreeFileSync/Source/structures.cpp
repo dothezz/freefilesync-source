@@ -21,7 +21,7 @@ std::vector<unsigned int> zen::fromTimeShiftPhrase(const std::wstring& timeShift
     replace(tmp, L'-', L""); //there is no negative shift => treat as positive!
 
     std::set<unsigned int> minutes;
-    for (const std::wstring& part : split(tmp, L','))
+    for (const std::wstring& part : split(tmp, L',', SplitType::SKIP_EMPTY))
     {
         if (contains(part, L':'))
             minutes.insert(stringTo<unsigned int>(beforeFirst(part, L':', IF_MISSING_RETURN_NONE)) * 60 +

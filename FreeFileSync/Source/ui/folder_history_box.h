@@ -35,7 +35,7 @@ public:
 
     void addItem(const Zstring& folderPathPhrase)
     {
-        if (folderPathPhrase.empty() || folderPathPhrase == zen::utfCvrtTo<Zstring>(separationLine()))
+        if (folderPathPhrase.empty() || folderPathPhrase == zen::utfTo<Zstring>(separationLine()))
             return;
 
         const Zstring nameTmp = zen::trimCpy(folderPathPhrase);

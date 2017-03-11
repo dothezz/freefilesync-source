@@ -19,7 +19,7 @@ class LockHolder
 {
 public:
     LockHolder(const std::set<Zstring, LessFilePath>& dirpathsExisting, //resolved paths
-               bool& warningDirectoryLockFailed,
+               bool& warnDirectoryLockFailed,
                ProcessCallback& procCallback)
     {
         for (const Zstring& dirpath : dirpathsExisting)
@@ -42,7 +42,7 @@ public:
             catch (const FileError& e)
             {
                 const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtPath(dirpath)) + L"\n\n" + e.toString();
-                procCallback.reportWarning(msg, warningDirectoryLockFailed); //may throw!
+                procCallback.reportWarning(msg, warnDirectoryLockFailed); //may throw!
             }
         }
     }

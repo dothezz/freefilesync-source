@@ -115,6 +115,7 @@ private:
     const NameFilter second_;
 };
 
+const Zchar FILTER_ITEM_SEPARATOR = Zstr('|');
 
 
 

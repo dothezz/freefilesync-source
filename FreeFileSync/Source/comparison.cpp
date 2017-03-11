@@ -101,7 +101,7 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
             {
                 errorMsg += L"\n___________________________________________";
                 for (const auto& fc : status.failedChecks)
-                    errorMsg += std::wstring(L"\n\n") + replaceCpy(fc.second.toString(), L"\n\n", L"\n");
+                    errorMsg += L"\n\n" + replaceCpy(fc.second.toString(), L"\n\n", L"\n");
             }
 
             throw FileError(errorMsg);
@@ -109,48 +109,6 @@ ResolvedBaseFolders initializeBaseFolders(const std::vector<FolderPairCfg>& cfgL
     }, callback); //throw X?
 
     return output;
-}
-
-
-void checkForIncompleteInput(const std::vector<ResolvedFolderPair>& folderPairs, bool& warningInputFieldEmpty, ProcessCallback& callback)
-{
-    bool havePartialPair = false;
-    bool haveFullPair    = false;
-
-    for (const ResolvedFolderPair& fp : folderPairs)
-        if (AFS::isNullPath(fp.folderPathLeft) != AFS::isNullPath(fp.folderPathRight))
-            havePartialPair = true;
-        else if (!AFS::isNullPath(fp.folderPathLeft))
-            haveFullPair = true;
-
-    if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-folder comparison scenario
-        callback.reportWarning(_("A folder input field is empty.") + L" \n\n" +
-                               _("The corresponding folder will be considered as empty."), warningInputFieldEmpty);
-}
-
-
-//check whether one side is subdirectory of other side (folder pair wise!)
-//similar check if one directory is read/written by multiple pairs not before beginning of synchronization
-void checkFolderDependency(const std::vector<ResolvedFolderPair>& folderPairs, bool& warningDependentFolders, ProcessCallback& callback) //returns warning message, empty if all ok
-{
-    std::vector<ResolvedFolderPair> dependentFolderPairs;
-
-    for (const ResolvedFolderPair& fp : folderPairs)
-        if (!AFS::isNullPath(fp.folderPathLeft) && !AFS::isNullPath(fp.folderPathRight)) //empty folders names may be accepted by user
-            //test wheter leftDirectory begins with rightDirectory or the other way round
-            if (AFS::havePathDependency(fp.folderPathLeft, fp.folderPathRight))
-                dependentFolderPairs.push_back(fp);
-
-    if (!dependentFolderPairs.empty())
-    {
-        std::wstring warningMsg = _("The following folder paths are dependent from each other:");
-        for (const ResolvedFolderPair& pair : dependentFolderPairs)
-            warningMsg += L"\n\n" +
-                          AFS::getDisplayPath(pair.folderPathLeft) + L"\n" +
-                          AFS::getDisplayPath(pair.folderPathRight);
-
-        callback.reportWarning(warningMsg, warningDependentFolders);
-    }
 }
 
 //#############################################################################################################################
@@ -546,7 +504,7 @@ public:
         undefinedFiles(undefinedFilesOut),
         undefinedSymlinks(undefinedSymlinksOut) {}
 
-    void execute(const FolderContainer& lhs, const FolderContainer& rhs, HierarchyObject& output)
+    void execute(const FolderContainer& lhs, const FolderContainer& rhs, ContainerObject& output)
     {
         auto it = failedItemReads_.find(Zstring()); //empty path if read-error for whole base directory
 
@@ -556,10 +514,10 @@ public:
     }
 
 private:
-    void mergeTwoSides(const FolderContainer& lhs, const FolderContainer& rhs, const std::wstring* errorMsg, HierarchyObject& output);
+    void mergeTwoSides(const FolderContainer& lhs, const FolderContainer& rhs, const std::wstring* errorMsg, ContainerObject& output);
 
     template <SelectedSide side>
-    void fillOneSide(const FolderContainer& folderCont, const std::wstring* errorMsg, HierarchyObject& output);
+    void fillOneSide(const FolderContainer& folderCont, const std::wstring* errorMsg, ContainerObject& output);
 
     const std::wstring* checkFailedRead(FileSystemObject& fsObj, const std::wstring* errorMsg);
 
@@ -589,7 +547,7 @@ const std::wstring* MergeSides::checkFailedRead(FileSystemObject& fsObj, const s
 
 
 template <SelectedSide side>
-void MergeSides::fillOneSide(const FolderContainer& folderCont, const std::wstring* errorMsg, HierarchyObject& output)
+void MergeSides::fillOneSide(const FolderContainer& folderCont, const std::wstring* errorMsg, ContainerObject& output)
 {
     for (const auto& file : folderCont.files)
     {
@@ -653,7 +611,7 @@ void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnl
 }
 
 
-void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer& rhs, const std::wstring* errorMsg, HierarchyObject& output)
+void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer& rhs, const std::wstring* errorMsg, ContainerObject& output)
 {
     using FileData = const FolderContainer::FileList::value_type;
 
@@ -670,7 +628,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
                                               fileRight.second);
         if (!checkFailedRead(newItem, errorMsg))
             undefinedFiles.push_back(&newItem);
-        static_assert(IsSameType<HierarchyObject::FileList, FixedList<FilePair>>::value, ""); //HierarchyObject::addSubFile() must NOT invalidate references used in "undefinedFiles"!
+        static_assert(IsSameType<ContainerObject::FileList, FixedList<FilePair>>::value, ""); //ContainerObject::addSubFile() must NOT invalidate references used in "undefinedFiles"!
     });
 
     //-----------------------------------------------------------------------------------------------
@@ -724,7 +682,7 @@ void MergeSides::mergeTwoSides(const FolderContainer& lhs, const FolderContainer
 //-----------------------------------------------------------------------------------------------
 
 //uncheck excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
-void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filterProc)
+void stripExcludedDirectories(ContainerObject& hierObj, const HardFilter& filterProc)
 {
     for (FolderPair& folder : hierObj.refSubFolders())
         stripExcludedDirectories(folder, filterProc);
@@ -732,7 +690,7 @@ void stripExcludedDirectories(HierarchyObject& hierObj, const HardFilter& filter
     //remove superfluous directories:
     //   this does not invalidate "std::vector<FilePair*>& undefinedFiles", since we delete folders only
     //   and there is no side-effect for memory positions of FilePair and SymlinkPair thanks to zen::FixedList!
-    static_assert(IsSameType<FixedList<FolderPair>, HierarchyObject::FolderList>::value, "");
+    static_assert(IsSameType<FixedList<FolderPair>, ContainerObject::FolderList>::value, "");
 
     hierObj.refSubFolders().remove_if([&](FolderPair& folder)
     {
@@ -900,16 +858,51 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
     auto basefolderExisting = [&](const AbstractPath& folderPath) { return resInfo.existingBaseFolders.find(folderPath) != resInfo.existingBaseFolders.end(); };
 
-    //-----------execute basic checks all at once before starting comparison----------
-
-    checkForIncompleteInput(resInfo.resolvedPairs, warnings.warningInputFieldEmpty,  callback);
-    checkFolderDependency  (resInfo.resolvedPairs, warnings.warningDependentFolders, callback);
-
-    //-------------------end of basic checks------------------------------------------
 
     std::vector<std::pair<ResolvedFolderPair, FolderPairCfg>> workLoad;
     for (size_t i = 0; i < cfgList.size(); ++i)
         workLoad.emplace_back(resInfo.resolvedPairs[i], cfgList[i]);
+
+    //-----------execute basic checks all at once before starting comparison----------
+
+    //check for incomplete input
+    {
+        bool havePartialPair = false;
+        bool haveFullPair    = false;
+
+        for (const ResolvedFolderPair& fp : resInfo.resolvedPairs)
+            if (AFS::isNullPath(fp.folderPathLeft) != AFS::isNullPath(fp.folderPathRight))
+                havePartialPair = true;
+            else if (!AFS::isNullPath(fp.folderPathLeft))
+                haveFullPair = true;
+
+        if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-folder comparison scenario
+            callback.reportWarning(_("A folder input field is empty.") + L" \n\n" +
+                                   _("The corresponding folder will be considered as empty."), warnings.warnInputFieldEmpty);
+    }
+
+    //check whether one side is a sub directory of the other side (folder-pair-wise!)
+    //similar check (warnDependentBaseFolders) if one directory is read/written by multiple pairs not before beginning of synchronization
+    {
+        std::wstring msg;
+
+        for (const auto& w : workLoad)
+            if (Opt<PathDependency> pd = getPathDependency(w.first.folderPathLeft,  *w.second.filter.nameFilter,
+                                                           w.first.folderPathRight, *w.second.filter.nameFilter))
+            {
+                msg += L"\n\n" +
+                       AFS::getDisplayPath(w.first.folderPathLeft) + L"\n" +
+                       AFS::getDisplayPath(w.first.folderPathRight);
+                if (!pd->relPath.empty())
+                    msg += L"\n" + _("Exclude:") + L" " + utfTo<std::wstring>(FILE_NAME_SEPARATOR + pd->relPath + FILE_NAME_SEPARATOR);
+            }
+
+        if (!msg.empty())
+            callback.reportWarning(_("One base folder of a folder pair is contained in the other one.") + L"\n" +
+                                   _("You may want to exclude it from synchronization via filter.") + msg, warnings.warnDependentFolderPair);
+    }
+
+    //-------------------end of basic checks------------------------------------------
 
     //lock (existing) directories before comparison
     if (createDirLocks)
@@ -919,7 +912,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             if (Opt<Zstring> nativePath = AFS::getNativeItemPath(folderPath)) //restrict directory locking to native paths until further
                 dirPathsExisting.insert(*nativePath);
 
-        dirLocks = std::make_unique<LockHolder>(dirPathsExisting, warnings.warningDirectoryLockFailed, callback);
+        dirLocks = std::make_unique<LockHolder>(dirPathsExisting, warnings.warnDirectoryLockFailed, callback);
     }
 
     try
@@ -990,7 +983,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             callback.forceUiRefresh();
 
             zen::redetermineSyncDirection(fpCfg.directionCfg, *it,
-            [&](const std::wstring& msg) { callback.reportWarning(msg, warnings.warningDatabaseError); }, //throw X
+            [&](const std::wstring& msg) { callback.reportWarning(msg, warnings.warnDatabaseError); }, //throw X
             [&](const std::wstring& msg) { callback.reportStatus(msg); }); //throw X
         }
 
@@ -998,7 +991,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
     }
     catch (const std::bad_alloc& e)
     {
-        callback.reportFatalError(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
+        callback.reportFatalError(_("Out of memory.") + L" " + utfTo<std::wstring>(e.what()));
         //we need to maintain the "output.size() == cfgList.size()" contract in ALL cases! => abort
         callback.abortProcessNow(); //throw X
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
