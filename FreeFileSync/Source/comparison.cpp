@@ -29,13 +29,13 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
                    [&](const FolderPairEnh& enhPair) -> FolderPairCfg
     {
         return FolderPairCfg(enhPair.folderPathPhraseLeft_, enhPair.folderPathPhraseRight_,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
-        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->ignoreTimeShiftMinutes : mainCfg.cmpConfig.ignoreTimeShiftMinutes,
+                             enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar       : mainCfg.cmpConfig.compareVar,
+                             enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks   : mainCfg.cmpConfig.handleSymlinks,
+                             enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->ignoreTimeShiftMinutes : mainCfg.cmpConfig.ignoreTimeShiftMinutes,
 
-        normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
+                             normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
 
-        enhPair.altSyncConfig.get() ? enhPair.altSyncConfig->directionCfg : mainCfg.syncCfg.directionCfg);
+                             enhPair.altSyncConfig.get() ? enhPair.altSyncConfig->directionCfg : mainCfg.syncCfg.directionCfg);
     });
     return output;
 }
@@ -899,7 +899,7 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
 
         if (!msg.empty())
             callback.reportWarning(_("One base folder of a folder pair is contained in the other one.") + L"\n" +
-                                   _("You may want to exclude it from synchronization via filter.") + msg, warnings.warnDependentFolderPair);
+                                   _("The folder should be excluded from synchronization via filter.") + msg, warnings.warnDependentFolderPair);
     }
 
     //-------------------end of basic checks------------------------------------------

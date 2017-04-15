@@ -53,7 +53,6 @@ std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFold
 
             return AFS::getOutputStream(logFilePath, //throw FileError, ErrorTargetExisting
                                         nullptr, /*streamSize*/
-                                        nullptr /*modificationTime*/,
                                         OnUpdateLogfileStatusNoThrow(pc, AFS::getDisplayPath(logFilePath)));
         }
         catch (ErrorTargetExisting&)
@@ -345,8 +344,8 @@ void BatchStatusHandler::updateProcessedData(int itemsDelta, int64_t bytesDelta)
 
 void BatchStatusHandler::reportInfo(const std::wstring& text)
 {
-    StatusHandler::reportInfo(text);
-    errorLog_.logMsg(text, TYPE_INFO);
+    errorLog_.logMsg(text, TYPE_INFO); //log first!
+    StatusHandler::reportInfo(text); //throw X
 }
 
 

@@ -230,13 +230,13 @@ std::wstring zen::getSymbol(SyncOperation op)
             return L"delete <-";
         case SO_DELETE_RIGHT:
             return L"delete ->";
-        case SO_MOVE_LEFT_SOURCE:
+        case SO_MOVE_LEFT_FROM:
             return L"move from <-";
-        case SO_MOVE_LEFT_TARGET:
+        case SO_MOVE_LEFT_TO:
             return L"move to <-";
-        case SO_MOVE_RIGHT_SOURCE:
+        case SO_MOVE_RIGHT_FROM:
             return L"move from ->";
-        case SO_MOVE_RIGHT_TARGET:
+        case SO_MOVE_RIGHT_TO:
             return L"move to ->";
         case SO_OVERWRITE_LEFT:
         case SO_COPY_METADATA_TO_LEFT:

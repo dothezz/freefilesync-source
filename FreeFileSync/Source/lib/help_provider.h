@@ -48,7 +48,7 @@ void displayHelpEntry(const wxString& topic, wxWindow* parent)
     {
         const wxString section = L"html/" + topic + L".html";
         wxHtmlModalHelp dlg(parent, utfTo<wxString>(zen::getResourceDirPf()) + L"Help/FreeFileSync.hhp", section,
-        wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
+                            wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
             (void)dlg;
             //-> solves modal help craziness on OSX!
             //-> Suse Linux: avoids program hang on exit if user closed help parent dialog before the help dialog itself was closed (why is this even possible???)

@@ -18,6 +18,8 @@
 	<div class="bluebox">
 		<b>Note</b><br>In case the SFTP server sets file modification times to the current time 
 		you can do a <a href="comparison-settings.html">Compare by File Size</a> as a workaround.
+		Another solution is to set up the <i>Two way</i> variant and have the files with the newer dates
+		copied back from the server during the next synchronization.
 	</div>	
 	<br>
 	
@@ -36,7 +38,7 @@
 				setting up too many connections and channels might actually slow the overall process down.
 				Creating extra connections is slower than creating extra channels.<br>&nbsp;
 			
-			<li>SFTP servers have internal limits on the number of connections and channels. Generally servers expect
+			<li>SFTP servers have internal limits on the number of allowed connections and channels. Generally servers expect
 				one connection per user, so this number should be kept rather low. If too many connections and channels are used the server
 				may decide to stop responding.
 		</ul>

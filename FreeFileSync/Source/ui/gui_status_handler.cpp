@@ -57,9 +57,9 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : main
                 wxAuiPaneInfo& paneInfo = paneArray[i];
 
                 if (&paneInfo != &statusPanel &&
-                paneInfo.dock_layer     == statusPanel.dock_layer &&
-                paneInfo.dock_direction == statusPanel.dock_direction &&
-                paneInfo.dock_row       == statusPanel.dock_row)
+                    paneInfo.dock_layer     == statusPanel.dock_layer &&
+                    paneInfo.dock_direction == statusPanel.dock_direction &&
+                    paneInfo.dock_row       == statusPanel.dock_row)
                     return true;
             }
             return false;
@@ -128,8 +128,8 @@ void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, int64_t bytesTota
 
 void StatusHandlerTemporaryPanel::reportInfo(const std::wstring& text)
 {
-    StatusHandler::reportInfo(text);
-    errorLog.logMsg(text, TYPE_INFO);
+    errorLog.logMsg(text, TYPE_INFO); //log first!
+    StatusHandler::reportInfo(text); //throw X
 }
 
 
@@ -387,8 +387,8 @@ void StatusHandlerFloatingDialog::updateProcessedData(int itemsDelta, int64_t by
 
 void StatusHandlerFloatingDialog::reportInfo(const std::wstring& text)
 {
-    StatusHandler::reportInfo(text);
-    errorLog_.logMsg(text, TYPE_INFO);
+    errorLog_.logMsg(text, TYPE_INFO); //log first!
+    StatusHandler::reportInfo(text); //throw X
 }
 
 

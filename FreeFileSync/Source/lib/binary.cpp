@@ -38,7 +38,7 @@ const size_t BLOCK_SIZE_MAX =  16 * 1024 * 1024;
 struct StreamReader
 {
     StreamReader(const AbstractPath& filePath, const IOCallback& notifyUnbufferedIO) :
-        stream_(AFS::getInputStream(filePath, notifyUnbufferedIO)), //throw FileError, (ErrorFileLocked)
+        stream_(AFS::getInputStream(filePath, notifyUnbufferedIO)), //throw FileError, (ErrorFileLocked), X
         defaultBlockSize_(stream_->getBlockSize()),
         dynamicBlockSize_(defaultBlockSize_) { assert(defaultBlockSize_ > 0); }
 
@@ -96,7 +96,7 @@ bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath
 {
     int64_t totalUnbufferedIO = 0;
 
-    StreamReader reader1(filePath1, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, (ErrorFileLocked)
+    StreamReader reader1(filePath1, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, (ErrorFileLocked), X
     StreamReader reader2(filePath2, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //
 
     StreamReader* readerLow  = &reader1;

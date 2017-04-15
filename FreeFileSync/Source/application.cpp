@@ -523,7 +523,6 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
             throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         synchronize(timeStamp,
-                    globalCfg.optDialogs,
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,
@@ -532,6 +531,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
                     globalCfg.folderAccessTimeout,
                     syncProcessCfg,
                     cmpResult,
+                    globalCfg.optDialogs,
                     statusHandler); //throw ?
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler

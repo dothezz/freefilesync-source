@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setting default synchronisation directions: Old files will be overwritten with newer files.</target>
 
-<source>Creating folder %x</source>
-<target>Creating folder %x</target>
-
 <source>Creating file %x</source>
 <target>Creating file %x</target>
+
+<source>Creating folder %x</source>
+<target>Creating folder %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Creating symbolic link %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</target>
 
-<source>A folder input field is empty.</source>
-<target>A folder input field is empty.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>The corresponding folder will be considered as empty.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>The following folder paths are dependent from each other:</target>
-
 <source>File %x has an invalid date.</source>
 <target>File %x has an invalid date.</target>
 
 <source>Date:</source>
 <target>Date:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Files %x have the same date but a different size.</target>
+<source>Files have the same date but a different size.</source>
+<target>Files have the same date but a different size.</target>
 
 <source>Size:</source>
 <target>Size:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Content comparison was skipped for excluded files %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Content comparison was skipped for excluded files.</target>
 
 <source>Items differ in attributes only</source>
 <target>Items differ in attributes only</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Starting comparison</target>
+
+<source>A folder input field is empty.</source>
+<target>A folder input field is empty.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>The corresponding folder will be considered as empty.</target>
+
+<source>Exclude:</source>
+<target>Exclude:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>One base folder of a folder pair is contained in the other one.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>The folder should be excluded from synchronisation via filter.</target>
 
 <source>Calculating sync directions...</source>
 <target>Calculating sync directions...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Update attributes on right</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Cannot write permissions of %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operation not supported for different base folder types.</target>
-
 <source>Cannot write file %x.</source>
 <target>Cannot write file %x.</target>
 
@@ -267,38 +267,44 @@ Expected: %x bytes
 Actual: %y bytes
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Cannot write permissions of %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operation not supported for different base folder types.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Cannot copy symbolic link %x to %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Cannot move file %x to %y.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Cannot enumerate directory %x.</target>
+<source>Unable to connect to %x.</source>
+<target>Unable to connect to %x.</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>Cannot read file attributes of %x.</target>
+<source>Failed to get information about server %x.</source>
+<target>Failed to get information about server %x.</target>
 
-<source>Cannot find %x.</source>
-<target>Cannot find %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Cannot open directory %x.</target>
 
-<source>Cannot open file %x.</source>
-<target>Cannot open file %x.</target>
+<source>Cannot read directory %x.</source>
+<target>Cannot read directory %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>Cannot read file %x.</target>
 
-<source>Cannot find device %x.</source>
-<target>Cannot find device %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Cannot create directory %x.</target>
+
+<source>Cannot delete file %x.</source>
+<target>Cannot delete file %x.</target>
 
 <source>Cannot delete directory %x.</source>
 <target>Cannot delete directory %x.</target>
 
-<source>Cannot delete file %x.</source>
-<target>Cannot delete file %x.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Cannot read file attributes of %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Cannot write modification time of %x.</target>
@@ -309,23 +315,65 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Cannot resolve symbolic link %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Cannot open directory %x.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Unable to move %x to the recycle bin.</target>
+
+<source>Cannot open file %x.</source>
+<target>Cannot open file %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Cannot find device %x.</target>
+
+<source>Cannot find %x.</source>
+<target>Cannot find %x.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Type of item %x is not supported:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Cannot delete symbolic link %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>Cannot determine free disk space for %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Unable to move %x to the recycle bin.</target>
-
 <source>Incorrect command line:</source>
 <target>Incorrect command line:</target>
 
-<source>Error Code %x:</source>
-<target>Error Code %x:</target>
+<source>Error Code %x</source>
+<target>Error Code %x</target>
 
-<source>Unable to connect to %x.</source>
-<target>Unable to connect to %x.</target>
+<source>The server does not support authentication via %x.</source>
+<target>The server does not support authentication via %x.</target>
+
+<source>Required:</source>
+<target>Required:</target>
+
+<source>Unable to access %x.</source>
+<target>Unable to access %x.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>Active connections: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>Failed to open SFTP channel number %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -357,11 +405,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Database file %x does not yet exist.</target>
 
-<source>Database file is corrupt:</source>
-<target>Database file is corrupt:</target>
+<source>Database file is corrupted:</source>
+<target>Database file is corrupted:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Database files do not share a common session.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>The database files do not yet contain information about the last synchronisation.</target>
+
+<source>Loading file %x...</source>
+<target>Loading file %x...</target>
+
+<source>Saving file %x...</source>
+<target>Saving file %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Searching for folder %x...</target>
@@ -389,9 +443,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Detecting abandoned lock...</target>
-
-<source>Saving file %x...</source>
-<target>Saving file %x...</target>
 
 <source>Items processed:</source>
 <target>Elements processed:</target>
@@ -647,20 +698,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>Not enough free disk space available in:</target>
 
-<source>Required:</source>
-<target>Required:</target>
-
 <source>Available:</source>
 <target>Available:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Multiple folder pairs write to a common subfolder. Please review your configuration.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Some files will be synchronised as part of multiple base folders.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</target>
+
+<source>Versioning folder:</source>
+<target>Versioning folder:</target>
+
+<source>Base folder:</source>
+<target>Base folder:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>The versioning folder will be synchronised because it is contained in a base folder.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronising folder pair:</target>
 
 <source>Generating database...</source>
 <target>Generating database...</target>
+
+<source>Loading...</source>
+<target>Loading...</target>
 
 <source>job name</source>
 <target>job name</target>
@@ -785,15 +848,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Please select a folder on a local file system, network or an MTP device.</target>
 
-<source>SFTP folder</source>
-<target>SFTP folder</target>
-
-<source>Select SFTP folder</source>
-<target>Select SFTP folder</target>
-
-<source>Select alternative folder type</source>
-<target>Select alternative folder type</target>
-
 <source>&New</source>
 <target>&New</target>
 
@@ -839,11 +893,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>&Tools</target>
 
-<source>&Check for new version</source>
-<target>&Check for new version</target>
-
-<source>&Check now</source>
-<target>&Check now</target>
+<source>&Check for updates now</source>
+<target>&Check for updates now</target>
 
 <source>Check &automatically once a week</source>
 <target>Check &automatically once a week</target>
@@ -862,6 +913,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Remove folder pair</target>
+
+<source>Access online storage</source>
+<target>Access online storage</target>
 
 <source>Swap sides</source>
 <target>Swap sides</target>
@@ -950,9 +1004,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>Include:</target>
 
-<source>Exclude:</source>
-<target>Exclude:</target>
-
 <source>Show examples</source>
 <target>Show examples</target>
 
@@ -1036,8 +1087,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>Arrange folder pair</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Enter your SFTP login details:</target>
+<source>Enter your login details:</source>
+<target>Enter your login details:</target>
+
+<source>Connection type:</source>
+<target>Connection type:</target>
 
 <source>Server name or IP address:</source>
 <target>Server name or IP address:</target>
@@ -1045,17 +1099,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>Port:</target>
 
+<source>Encryption:</source>
+<target>Encryption:</target>
+
+<source>&Disabled</source>
+<target>&Disabled</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Explicit SSL/TLS</target>
+
+<source>Authentication:</source>
+<target>Authentication:</target>
+
+<source>&Password</source>
+<target>&Password</target>
+
+<source>&Key file</source>
+<target>&Key file</target>
+
 <source>User name:</source>
 <target>User name:</target>
 
-<source>Password:</source>
-<target>Password:</target>
+<source>Private key file:</source>
+<target>Private key file:</target>
 
 <source>&Show password</source>
 <target>&Show password</target>
 
 <source>Directory on server:</source>
 <target>Directory on server:</target>
+
+<source>Performance improvements:</source>
+<target>Performance improvements:</target>
+
+<source>How to get best performance?</source>
+<target>How to get best performance?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>SSH connections for directory reading:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>Suggested range: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>SFTP channels per connection:</target>
+
+<source>Detect server limit</source>
+<target>Detect server limit</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 connections x 10 channels = 20 times faster directory reading</target>
 
 <source>Select a directory on the server:</source>
 <target>Select a directory on the server:</target>
@@ -1186,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Source code written in C++ using:</target>
 
+<source>Donation details</source>
+<target>Donation details</target>
+
 <source>If you like FreeFileSync:</source>
 <target>If you like FreeFileSync:</target>
 
@@ -1195,8 +1291,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback and suggestions are welcome</target>
 
-<source>Homepage</source>
-<target>Homepage</target>
+<source>Home page</source>
+<target>Home page</target>
 
 <source>Email</source>
 <target>E-mail</target>
@@ -1207,8 +1303,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Many thanks for localisation:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH File Transfer Protocol</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Activate the FreeFileSync Donation Edition by one of the following methods:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Activate via internet now:</target>
+
+<source>Activate online</source>
+<target>Activate online</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Retrieve an offline activation key from the following URL:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Copy to clipboard</target>
+
+<source>Enter activation key:</source>
+<target>Enter activation key:</target>
+
+<source>Activate offline</source>
+<target>Activate offline</target>
 
 <source>Save as Batch Job</source>
 <target>Save as Batch Job</target>
@@ -1224,6 +1338,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>Select Time Span</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync Donation Edition</target>
 
 <source>&Options</source>
 <target>&Options</target>
@@ -1246,8 +1363,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Overview</target>
 
-<source>&Download</source>
-<target>&Download</target>
+<source>&Show details</source>
+<target>&Show details</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>A new version of FreeFileSync is available:</target>
@@ -1486,8 +1603,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Log</target>
 
-<source>Loading...</source>
-<target>Loading...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Installation files are corrupted. Please reinstall FreeFileSync.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Thank you, %x, for your donation and support!</target>
+
+<source>Password:</source>
+<target>Password:</target>
+
+<source>Key password:</source>
+<target>Key password:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1545,6 +1671,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Show</target>
+
+<source>Downloading update...</source>
+<target>Downloading update...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Identify equal files by comparing modification time and size.</target>
@@ -1639,11 +1768,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Percentage</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Failed to retrieve update information.</target>
+
+<source>Automatic updates:</source>
+<target>Automatic updates:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Requires FreeFileSync Donation Edition</target>
+
 <source>Check for Program Updates</source>
 <target>Check for Program Updates</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Auto-update now or download manually from the FreeFileSync home page?</target>
+
+<source>&Auto-update</source>
+<target>&Auto-update</target>
+
+<source>&Home page</source>
+<target>&Home page</target>
+
 <source>Download now?</source>
 <target>Download now?</target>
+
+<source>&Download</source>
+<target>&Download</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync is up to date.</target>
@@ -1657,14 +1807,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>Consistency check failed for %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Cannot find system function %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Installation was registered on a different operating system.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Failed to activate FreeFileSync Donation Edition.</target>
+
+<source>Incorrect activation key.</source>
+<target>Incorrect activation key.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Unable to register to receive system messages.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Installation files are corrupt. Please reinstall FreeFileSync.</target>
+<source>Cannot find system function %x.</source>
+<target>Cannot find system function %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Unable to register device notifications for %x.</target>
@@ -1695,9 +1851,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Cannot copy attributes from %x to %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Type of item %x is not supported:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1749,9 +1902,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Configuration file %x is incomplete. The missing elements will be set to their default values.</target>
-
-<source>Internet access failed.</source>
-<target>Internet access failed.</target>
 
 <source>Prepare installation</source>
 <target>Prepare installation</target>
@@ -1822,18 +1972,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Edit with FreeFileSync</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Thanks for your donation and support!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>This FreeFileSync installer for donors has reached its daily installation limit.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Download the regular version from the FreeFileSync homepage now?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>The portable version cannot install into the selected folder.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Please choose the local installation type or select a different folder for installation.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>The silent installation mode is only available in the FreeFileSync Donation Edition.</target>
 

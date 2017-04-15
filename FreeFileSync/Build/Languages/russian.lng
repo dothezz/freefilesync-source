@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Настройка направления синхронизации по умолчанию: Старые файлы будут перезаписаны более новыми файлами.</target>
 
-<source>Creating folder %x</source>
-<target>Создание папки %x</target>
-
 <source>Creating file %x</source>
 <target>Создание файла %x</target>
+
+<source>Creating folder %x</source>
+<target>Создание папки %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Создание символьной ссылки %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Если эта ошибка будет проигнорирована, то папки выше будут рассматриваться как пустые. Недостающие папки создаются автоматически, когда это необходимо.</target>
 
-<source>A folder input field is empty.</source>
-<target>Поле ввода папки пустое.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Соответствующая папка будет считаться пустой.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Следующие пути папок зависят друг от друга:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Файл %x имеет недействительную дату.</target>
 
 <source>Date:</source>
 <target>Дата:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Файлы %x имеют одинаковую дату, но различаются по размеру.</target>
+<source>Files have the same date but a different size.</source>
+<target>Файлы имеют одинаковую дату, но различаются по размеру.</target>
 
 <source>Size:</source>
 <target>Размер:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Сравнение содержания было пропущено для исключенного файла %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Сравнение содержания было пропущено для исключенных файлов.</target>
 
 <source>Items differ in attributes only</source>
 <target>Элементы различаются только атрибутами</target>
@@ -187,6 +178,21 @@
 <source>Starting comparison</source>
 <target>Начать сравнение</target>
 
+<source>A folder input field is empty.</source>
+<target>Поле ввода папки пустое.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Соответствующая папка будет считаться пустой.</target>
+
+<source>Exclude:</source>
+<target>Исключить:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>Одна базовая папка из пары папок содержится в другой папке.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Папка должна быть исключена из синхронизации с помощью фильтра.</target>
+
 <source>Calculating sync directions...</source>
 <target>Расчет направлений синхронизации...</target>
 
@@ -215,10 +221,10 @@
 <target>Конфликт/элемент невозможно отнести к какой-либо категории</target>
 
 <source>Copy new item to left</source>
-<target>Скопировать новый элемент налево</target>
+<target>Копировать новый элемент налево</target>
 
 <source>Copy new item to right</source>
-<target>Скопировать новый элемент направо</target>
+<target>Копировать новый элемент направо</target>
 
 <source>Delete left item</source>
 <target>Удалить элемент слева</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Обновление атрибутов справа</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Невозможно записать права доступа %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Операция не поддерживается для разных базовых типов папок.</target>
-
 <source>Cannot write file %x.</source>
 <target>Невозможно записать файл %x.</target>
 
@@ -267,38 +267,44 @@ Actual: %y bytes
 Фактический: %y байт
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Невозможно записать права доступа %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Операция не поддерживается для разных базовых типов папок.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Невозможно скопировать символьную ссылку %x в %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Невозможно перенести файл %x в %y.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Невозможно прочесть папку %x.</target>
+<source>Unable to connect to %x.</source>
+<target>Невозможно соединиться с %x.</target>
+
+<source>Failed to get information about server %x.</source>
+<target>Не удалось получить информацию о сервере %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Невозможно открыть папку %x.</target>
+
+<source>Cannot read directory %x.</source>
+<target>Невозможно прочитать папку %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Невозможно прочитать атрибуты файла %x.</target>
 
-<source>Cannot find %x.</source>
-<target>Невозможно найти %x.</target>
-
-<source>Cannot open file %x.</source>
-<target>Невозможно открыть файл %x.</target>
-
 <source>Cannot read file %x.</source>
 <target>Невозможно прочитать файл %x.</target>
-
-<source>Cannot find device %x.</source>
-<target>Невозможно найти устройство %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Невозможно создать папку %x.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Невозможно удалить папку %x.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Невозможно удалить файл %x.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Невозможно удалить папку %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Невозможно записать время изменения файла %x.</target>
@@ -309,23 +315,67 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Невозможно разрешить символьную ссылку %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Невозможно открыть папку %x.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Невозможно переместить %x в "Корзину".</target>
+
+<source>Cannot open file %x.</source>
+<target>Невозможно открыть файл %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Невозможно найти устройство %x.</target>
+
+<source>Cannot find %x.</source>
+<target>Невозможно найти %x.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Тип элемента %x не поддерживается:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Невозможно удалить символьную ссылку %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>Невозможно определить свободное место на диске для %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Невозможно переместить %x в "Корзину".</target>
-
 <source>Incorrect command line:</source>
 <target>Неверная командная строка:</target>
 
-<source>Error Code %x:</source>
-<target>Код ошибки %x:</target>
+<source>Error Code %x</source>
+<target>Код ошибки %x</target>
 
-<source>Unable to connect to %x.</source>
-<target>Невозможно соединиться с %x.</target>
+<source>The server does not support authentication via %x.</source>
+<target>Сервер не поддерживает аутентификацию с помощью %x.</target>
+
+<source>Required:</source>
+<target>Требуется:</target>
+
+<source>Unable to access %x.</source>
+<target>Невозможно получить доступ к %x.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>Время ожидания соединения истекает через %x сукунду.</pluralform>
+<pluralform>Время ожидания соединения истекает через %x сукунды.</pluralform>
+<pluralform>Время ожидания соединения истекает через %x сукунд.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>Невозможно обработать более %x соединения за раз.</pluralform>
+<pluralform>Невозможно обработать более %x соединений за раз.</pluralform>
+<pluralform>Невозможно обработать более %x соединений за раз.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>Активные соединения: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>Не удалось открыть SFTP канал номер %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -358,11 +408,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Файл базы данных %x еще не существует.</target>
 
-<source>Database file is corrupt:</source>
+<source>Database file is corrupted:</source>
 <target>Файл базы данных поврежден:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Файлы баз данных не имеют общей сессии.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>Файлы базы данных еще не содержат информацию о последней синхронизации.</target>
+
+<source>Loading file %x...</source>
+<target>Загрузка файла %x...</target>
+
+<source>Saving file %x...</source>
+<target>Сохранение файла %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Поиск папки %x...</target>
@@ -391,9 +447,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Обнаружение заброшенной блокировки...</target>
-
-<source>Saving file %x...</source>
-<target>Сохранение файла %x...</target>
 
 <source>Items processed:</source>
 <target>Элементов обработано:</target>
@@ -481,7 +534,7 @@ Actual: %y bytes
 <target>&Справка</target>
 
 <source>&About</source>
-<target>&О программе</target>
+<target>О &программе</target>
 
 <source>&Help</source>
 <target>&Помощь</target>
@@ -650,20 +703,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>Не достаточно свободного места в:</target>
 
-<source>Required:</source>
-<target>Требуется:</target>
-
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Несколько пар папок пишут в общую папку. Пожалуйста, проверьте конфигурацию.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Некоторые файлы будут синхронизированы как часть нескольких базовых папок.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>Чтобы избежать конфликтов, настройте фильтры исключения так, чтобы каждый обновленный файл учитывался только одной базовой папкой.</target>
+
+<source>Versioning folder:</source>
+<target>Папка для архивирования файлов:</target>
+
+<source>Base folder:</source>
+<target>Базовая папка:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Папка для архивирования файлов будет синхронизирована, поскольку она содержится в базовой папке.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизация пары папок:</target>
 
 <source>Generating database...</source>
 <target>Создание базы данных...</target>
+
+<source>Loading...</source>
+<target>Загрузка...</target>
 
 <source>job name</source>
 <target>название</target>
@@ -789,15 +854,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Пожалуйста, выберите папку в локальной файловой системе, сети или MTP устройстве.</target>
 
-<source>SFTP folder</source>
-<target>Папка SFTP</target>
-
-<source>Select SFTP folder</source>
-<target>Выберите папку SFTP</target>
-
-<source>Select alternative folder type</source>
-<target>Выберите альтернативный тип папки</target>
-
 <source>&New</source>
 <target>&Новая</target>
 
@@ -843,11 +899,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>&Инструменты</target>
 
-<source>&Check for new version</source>
-<target>&Проверка обновлений</target>
-
-<source>&Check now</source>
-<target>&Проверить сейчас</target>
+<source>&Check for updates now</source>
+<target>Проверить наличие &обновлений сейчас</target>
 
 <source>Check &automatically once a week</source>
 <target>Проверять &автоматически раз в неделю</target>
@@ -866,6 +919,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Удалить пару папок</target>
+
+<source>Access online storage</source>
+<target>Доступ к онлайн-хранилищу</target>
 
 <source>Swap sides</source>
 <target>Поменять направление</target>
@@ -954,9 +1010,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>Включить:</target>
 
-<source>Exclude:</source>
-<target>Исключить:</target>
-
 <source>Show examples</source>
 <target>Показать примеры</target>
 
@@ -1040,8 +1093,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>Упорядочить пару папок</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Введите свои регистрационные данные SFTP:</target>
+<source>Enter your login details:</source>
+<target>Введите свои данные для входа:</target>
+
+<source>Connection type:</source>
+<target>Тип соединения:</target>
 
 <source>Server name or IP address:</source>
 <target>Имя сервера или IP адрес:</target>
@@ -1049,17 +1105,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>Порт:</target>
 
+<source>Encryption:</source>
+<target>Шифрование:</target>
+
+<source>&Disabled</source>
+<target>&Запрещено</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Явный SSL/TLS</target>
+
+<source>Authentication:</source>
+<target>Аутентификация:</target>
+
+<source>&Password</source>
+<target>&Пароль</target>
+
+<source>&Key file</source>
+<target>&Файл ключа</target>
+
 <source>User name:</source>
 <target>Имя пользователя:</target>
 
-<source>Password:</source>
-<target>Пароль:</target>
+<source>Private key file:</source>
+<target>Файл закрытого ключа:</target>
 
 <source>&Show password</source>
-<target>&Показать пароль</target>
+<target>П&оказать пароль</target>
 
 <source>Directory on server:</source>
 <target>Папка на сервере:</target>
+
+<source>Performance improvements:</source>
+<target>Повышение производительности:</target>
+
+<source>How to get best performance?</source>
+<target>Как получить лучшую производительность?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>Количество SSH соединений:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>Рекомендуемый диапазон: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>Количество SFTP каналов на одно соединение:</target>
+
+<source>Detect server limit</source>
+<target>Выявить лимит сервера</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 соединения x 10 каналов = в 20 раз быстрее чтение папок</target>
 
 <source>Select a directory on the server:</source>
 <target>Выберите папку на сервере:</target>
@@ -1190,6 +1285,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Исходный код написан на C++ с использованием:</target>
 
+<source>Donation details</source>
+<target>Детали оплаты</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Если Вам понравился FreeFileSync:</target>
 
@@ -1199,8 +1297,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>Замечания и предложения приветствуются</target>
 
-<source>Homepage</source>
-<target>Оф.сайт</target>
+<source>Home page</source>
+<target>Домашняя страница</target>
 
 <source>Email</source>
 <target>Почта</target>
@@ -1211,8 +1309,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Большое спасибо за перевод:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH протокол передачи файлов</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Активировать платную версию FreeFileSync одним из следующих способов:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Активировать через интернет сейчас:</target>
+
+<source>Activate online</source>
+<target>Активировать онлайн</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Получить автономный ключ активации со следующего URL-адреса:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Копировать в буфер обмена</target>
+
+<source>Enter activation key:</source>
+<target>Введите ключ активации:</target>
+
+<source>Activate offline</source>
+<target>Активировать в офлайн режиме</target>
 
 <source>Save as Batch Job</source>
 <target>Сохранение пакетного задания</target>
@@ -1228,6 +1344,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>Выбор промежутка времени</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>Платная версия FreeFileSync</target>
 
 <source>&Options</source>
 <target>&Настройки</target>
@@ -1250,8 +1369,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Главная</target>
 
-<source>&Download</source>
-<target>&Загрузить</target>
+<source>&Show details</source>
+<target>&Показать детали</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Доступна новая версия FreeFileSync:</target>
@@ -1494,17 +1613,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог (журнал)</target>
 
-<source>Loading...</source>
-<target>Загрузка...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Установочные файлы повреждены. Переустановите FreeFileSync.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Благодарим вас, %x, за пожертвование и поддержку!</target>
+
+<source>Password:</source>
+<target>Пароль:</target>
+
+<source>Key password:</source>
+<target>Пароль:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
 <pluralform>Copy the following %x items to another folder?</pluralform>
 </source>
 <target>
-<pluralform>Скопировать следующий %x элемент в другую папку?</pluralform>
-<pluralform>Скопировать следующие %x элемента в другую папку?</pluralform>
-<pluralform>Скопировать следующие %x элементов в другую папку?</pluralform>
+<pluralform>Копировать следующий %x элемент в другую папку?</pluralform>
+<pluralform>Копировать следующие %x элемента в другую папку?</pluralform>
+<pluralform>Копировать следующие %x элементов в другую папку?</pluralform>
 </target>
 
 <source>Please enter a target folder.</source>
@@ -1556,6 +1684,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Показать</target>
+
+<source>Downloading update...</source>
+<target>Загрузка обновления...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Определять одинаковые файлы путем сравнения времени изменения и размера.</target>
@@ -1650,11 +1781,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Проценты</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Не удалось получить информацию об обновлении.</target>
+
+<source>Automatic updates:</source>
+<target>Автоматические обновления:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Требуется платная версия FreeFileSync</target>
+
 <source>Check for Program Updates</source>
 <target>Проверка обновления программы</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Обновить автоматически сейчас или загрузить вручную с домашней страницы FreeFileSync?</target>
+
+<source>&Auto-update</source>
+<target>&Автоматическое обновление</target>
+
+<source>&Home page</source>
+<target>&Домашняя страница</target>
+
 <source>Download now?</source>
 <target>Загрузить сейчас?</target>
+
+<source>&Download</source>
+<target>&Загрузить</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>У Вас самая последняя версия FreeFileSync.</target>
@@ -1668,20 +1820,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>Последовательная проверка не удалась для %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Невозможно найти системную функцию %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Установка была зарегистрирована в другой операционной системе.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Не удалось активировать платную версию FreeFileSync.</target>
+
+<source>Incorrect activation key.</source>
+<target>Недействительный ключ активации.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Невозможно зарегистрироваться для получения системных сообщений.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Установочные файлы повреждены. Пожалуйста, переустановите FreeFileSync.</target>
+<source>Cannot find system function %x.</source>
+<target>Невозможно найти системную функцию %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не удалось зарегистрировать уведомления устройств для %x.</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>Невозможно наблюдать папку %x.</target>
+<target>Невозможно отследить папку %x.</target>
 
 <source>The file is locked by another process:</source>
 <target>Файл заблокирован другим процессом:</target>
@@ -1706,9 +1864,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Невозможно скопировать атрибуты от %x к %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Тип элемента %x не поддерживается:</target>
 
 <source>%x TB</source>
 <target>%x ТБ</target>
@@ -1763,9 +1918,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Файл конфигурации %x является неполным. Недостающие элементы будут установлены в значения по умолчанию.</target>
-
-<source>Internet access failed.</source>
-<target>Отсутствует доступ в Интернет.</target>
 
 <source>Prepare installation</source>
 <target>Подготовка установки</target>
@@ -1836,18 +1988,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Редактировать с помощью FreeFileSync</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Спасибо за Ваше пожертвование и поддержку!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Этот установщик FreeFileSync для доноров достиг дневного лимита установок.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Загрузить обычную версию с домашней страницы FreeFileSync сейчас?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>Портативная версия не может быть установлена в выбранную папку.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Пожалуйста, выберите локальный тип установки или выберите другую папку для установки.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>Режим автоматической установки доступен только в платной версии FreeFileSync.</target>
 

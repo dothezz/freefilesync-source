@@ -361,7 +361,7 @@ void DirCallback::onFile(const FileInfo& fi) //throw ThreadInterruption
         Linux: retrieveFileID takes about 50% longer in VM! (avoidable because of redundant stat() call!)
     */
 
-    output_.addSubFile(fi.itemName, FileDescriptor(fi.lastWriteTime, fi.fileSize, fi.id, fi.symlinkInfo != nullptr));
+    output_.addSubFile(fi.itemName, FileAttributes(fi.modTime, fi.fileSize, fi.fileId, fi.symlinkInfo != nullptr));
 
     cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 }
@@ -419,7 +419,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const SymlinkInfo& si) //throw Th
         case SymLinkHandling::DIRECT:
             if (cfg.filter_->passFileFilter(linkRelPath)) //always use file filter: Link type may not be "stable" on Linux!
             {
-                output_.addSubLink(si.itemName, LinkDescriptor(si.lastWriteTime));
+                output_.addSubLink(si.itemName, LinkAttributes(si.modTime));
                 cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
             }
             return LINK_SKIP;

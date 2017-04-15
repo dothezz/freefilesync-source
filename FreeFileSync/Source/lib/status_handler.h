@@ -53,7 +53,8 @@ struct Statistics
 class StatusHandler : public ProcessCallback, public AbortCallback, public Statistics
 {
 public:
-    StatusHandler() : numbersCurrent_(4),   //init with phase count
+    StatusHandler() :
+        numbersCurrent_(4),   //init with phase count
         numbersTotal_  (4) {} //
 
 protected:
@@ -78,13 +79,19 @@ protected:
             forceUiRefresh();
     }
 
-    void reportStatus(const std::wstring& text) override
+    void reportStatus(const std::wstring& text) override //throw X
     {
         //assert(!text.empty()); -> possible, start of parallel scan
         if (!abortRequested) statusText_ = text;
-        requestUiRefresh(); /*throw X */
+        requestUiRefresh(); //throw X
     }
-    void reportInfo(const std::wstring& text) override { assert(!text.empty()); if (!abortRequested) statusText_ = text; requestUiRefresh(); /*throw X */ } //log text in derived class
+    void reportInfo(const std::wstring& text) override //throw X
+    {
+        assert(!text.empty());
+        if (!abortRequested) statusText_ = text;
+        requestUiRefresh(); //throw X
+        //log text in derived class
+    }
 
     //implement AbortCallback
     void requestAbortion() override

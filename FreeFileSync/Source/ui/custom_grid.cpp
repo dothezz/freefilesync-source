@@ -1141,16 +1141,16 @@ private:
                 case SO_CREATE_NEW_LEFT:
                 case SO_OVERWRITE_LEFT:
                 case SO_DELETE_LEFT:
-                case SO_MOVE_LEFT_SOURCE:
-                case SO_MOVE_LEFT_TARGET:
+                case SO_MOVE_LEFT_FROM:
+                case SO_MOVE_LEFT_TO:
                 case SO_COPY_METADATA_TO_LEFT:
                     return getColorSyncBlue();
 
                 case SO_CREATE_NEW_RIGHT:
                 case SO_OVERWRITE_RIGHT:
                 case SO_DELETE_RIGHT:
-                case SO_MOVE_RIGHT_SOURCE:
-                case SO_MOVE_RIGHT_TARGET:
+                case SO_MOVE_RIGHT_FROM:
+                case SO_MOVE_RIGHT_TO:
                 case SO_COPY_METADATA_TO_RIGHT:
                     return getColorSyncGreen();
 
@@ -1244,13 +1244,13 @@ private:
                                 return L"so_delete_left";
                             case SO_DELETE_RIGHT:
                                 return L"so_delete_right";
-                            case SO_MOVE_LEFT_SOURCE:
+                            case SO_MOVE_LEFT_FROM:
                                 return L"so_move_left_source";
-                            case SO_MOVE_LEFT_TARGET:
+                            case SO_MOVE_LEFT_TO:
                                 return L"so_move_left_target";
-                            case SO_MOVE_RIGHT_SOURCE:
+                            case SO_MOVE_RIGHT_FROM:
                                 return L"so_move_right_source";
-                            case SO_MOVE_RIGHT_TARGET:
+                            case SO_MOVE_RIGHT_TO:
                                 return L"so_move_right_target";
                             case SO_OVERWRITE_LEFT:
                                 return L"so_update_left";
@@ -1788,13 +1788,13 @@ wxBitmap zen::getSyncOpImage(SyncOperation syncOp)
             return getResourceImage(L"so_delete_left_small");
         case SO_DELETE_RIGHT:
             return getResourceImage(L"so_delete_right_small");
-        case SO_MOVE_LEFT_SOURCE:
+        case SO_MOVE_LEFT_FROM:
             return getResourceImage(L"so_move_left_source_small");
-        case SO_MOVE_LEFT_TARGET:
+        case SO_MOVE_LEFT_TO:
             return getResourceImage(L"so_move_left_target_small");
-        case SO_MOVE_RIGHT_SOURCE:
+        case SO_MOVE_RIGHT_FROM:
             return getResourceImage(L"so_move_right_source_small");
-        case SO_MOVE_RIGHT_TARGET:
+        case SO_MOVE_RIGHT_TO:
             return getResourceImage(L"so_move_right_target_small");
         case SO_OVERWRITE_LEFT:
             return getResourceImage(L"so_update_left_small");

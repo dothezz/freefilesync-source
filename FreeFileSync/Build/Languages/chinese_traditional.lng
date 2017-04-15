@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>設定預設同步方向：舊檔案會被較新的檔案覆蓋。</target>
 
-<source>Creating folder %x</source>
-<target>正在新建資料夾 %x</target>
-
 <source>Creating file %x</source>
 <target>正在新建檔案 %x</target>
+
+<source>Creating folder %x</source>
+<target>正在新建資料夾 %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>正在新建符號連結 %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>如果忽略此錯誤的資料夾將視為空。在需要時會自動新建缺少的資料夾。</target>
 
-<source>A folder input field is empty.</source>
-<target>資料夾輸入欄位是空白。</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>對應的資料夾將視為空。</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>下列資料夾路徑是相互依賴：</target>
-
 <source>File %x has an invalid date.</source>
 <target>檔案 %x 的日期無效。</target>
 
 <source>Date:</source>
 <target>日期：</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>檔案 %x 日期相同但大小不同。</target>
+<source>Files have the same date but a different size.</source>
+<target>檔案的日期相同但大小不同。</target>
 
 <source>Size:</source>
 <target>大小：</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>內容比對已跳過排除檔案 %x。</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>內容比對被設定排除檔案跳過。</target>
 
 <source>Items differ in attributes only</source>
 <target>只有項目的屬性不同</target>
@@ -164,7 +155,7 @@
 <target>複製被鎖定的檔案</target>
 
 <source>Copy file access permissions</source>
-<target>複製檔存取權限</target>
+<target>複製檔案存取權限</target>
 
 <source>File time tolerance</source>
 <target>檔案時間差</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>開始比對</target>
+
+<source>A folder input field is empty.</source>
+<target>資料夾輸入欄位是空白。</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>對應的資料夾將視為空。</target>
+
+<source>Exclude:</source>
+<target>排除：</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>一個基本資料夾中的配對資料夾包含在另一個中。</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>應該從同步透過篩選器中排除資料夾。</target>
 
 <source>Calculating sync directions...</source>
 <target>正在計算同步方向…</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>更新右邊的屬性</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>無法寫入 %x 的權限。</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>不支援不同基本資料夾類型的操作。</target>
-
 <source>Cannot write file %x.</source>
 <target>無法寫入檔案 %x。</target>
 
@@ -267,37 +267,43 @@ Actual: %y bytes
 實際：%y 位元組
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>無法寫入 %x 的權限。</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>不支援不同基本資料夾類型的操作。</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>無法複製符號連結 %x 到 %y。</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>無法移動檔案 %x 到 %y。</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>無法枚舉目錄 %x。</target>
+<source>Unable to connect to %x.</source>
+<target>無法連接到 %x。</target>
+
+<source>Failed to get information about server %x.</source>
+<target>無法獲取有關伺服器 %x 的資訊。</target>
+
+<source>Cannot open directory %x.</source>
+<target>無法開啟目錄 %x。</target>
+
+<source>Cannot read directory %x.</source>
+<target>無法讀取目錄 %x。</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>無法讀取 %x 的檔案屬性。</target>
 
-<source>Cannot find %x.</source>
-<target>找不到 %x。</target>
-
-<source>Cannot open file %x.</source>
-<target>無法開啟檔案 %x。</target>
-
 <source>Cannot read file %x.</source>
 <target>無法讀取檔案 %x。</target>
-
-<source>Cannot find device %x.</source>
-<target>找不到裝置 %x。</target>
 
 <source>Cannot create directory %x.</source>
 <target>無法新建目錄 %x。</target>
 
-<source>Cannot delete directory %x.</source>
+<source>Cannot delete file %x.</source>
 <target>無法刪除目錄 %x。</target>
 
-<source>Cannot delete file %x.</source>
+<source>Cannot delete directory %x.</source>
 <target>無法刪除目錄 %x。</target>
 
 <source>Cannot write modification time of %x.</source>
@@ -309,23 +315,63 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>無法解析符號連結 %x。</target>
 
-<source>Cannot open directory %x.</source>
-<target>無法開啟目錄 %x。</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>無法將 %x 移動到資源回收筒。</target>
+
+<source>Cannot open file %x.</source>
+<target>無法開啟檔案 %x。</target>
+
+<source>Cannot find device %x.</source>
+<target>找不到裝置 %x。</target>
+
+<source>Cannot find %x.</source>
+<target>找不到 %x。</target>
+
+<source>Type of item %x is not supported:</source>
+<target>項目類型 %x 不被支援：</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>無法刪除符號連結 %x。</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>無法確定 %x 的可用磁碟空間。</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>無法將 %x 移動到資源回收筒。</target>
-
 <source>Incorrect command line:</source>
 <target>不正確的命令列：</target>
 
-<source>Error Code %x:</source>
-<target>錯誤代碼 %x：</target>
+<source>Error Code %x</source>
+<target>錯誤代碼 %x</target>
 
-<source>Unable to connect to %x.</source>
-<target>無法連接到 %x。</target>
+<source>The server does not support authentication via %x.</source>
+<target>伺服器不支援透過 %x 進行身份驗證。</target>
+
+<source>Required:</source>
+<target>必要：</target>
+
+<source>Unable to access %x.</source>
+<target>無法存取 %x。</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>操作在 %x 秒後超時。</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>無法一次等待超過 %x 個連接數。</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>活動連接數：%x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>無法開啟SFTP通道號 %x。</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -356,11 +402,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>資料庫檔案 %x 並不存在。</target>
 
-<source>Database file is corrupt:</source>
-<target>資料庫檔案已損毀：</target>
+<source>Database file is corrupted:</source>
+<target>資料庫檔案已損壞：</target>
 
-<source>Database files do not share a common session.</source>
-<target>資料庫檔案不會共享一個共同的連線。</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>資料庫檔案尚未包含有關上次同步資訊。</target>
+
+<source>Loading file %x...</source>
+<target>正在讀取檔案 %x…</target>
+
+<source>Saving file %x...</source>
+<target>正在儲存檔案 %x…</target>
 
 <source>Searching for folder %x...</source>
 <target>正在搜尋資料夾 %x…</target>
@@ -387,9 +439,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>正在檢測廢棄鎖…</target>
-
-<source>Saving file %x...</source>
-<target>正在儲存檔案 %x…</target>
 
 <source>Items processed:</source>
 <target>已處理項目：</target>
@@ -433,7 +482,7 @@ Actual: %y bytes
 <target>瀏覽目錄</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>無法讀取卷影複製服務。</target>
+<target>無法存取卷影複製服務。</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
 <target>請在此系統上執行64位元版本的FreeFileSync新建卷影副本。</target>
@@ -644,20 +693,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>沒有足夠的可用空間：</target>
 
-<source>Required:</source>
-<target>必要：</target>
-
 <source>Available:</source>
 <target>可用：</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>多個配對資料夾寫入一個共同的子資料夾。請檢查您的配置。</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>某些檔案將作為多個基本資料夾的一部分進行同步。</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>為了避免衝突，設定排除過濾器，以便每個更新的檔案被視為只有一個基本資料夾。</target>
+
+<source>Versioning folder:</source>
+<target>版本控制資料夾：</target>
+
+<source>Base folder:</source>
+<target>基本資料夾：</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>版本控制檔案夾將被同步，因為它包含在基本資料夾中。</target>
 
 <source>Synchronizing folder pair:</source>
 <target>同步配對資料夾：</target>
 
 <source>Generating database...</source>
 <target>正在產生資料庫…</target>
+
+<source>Loading...</source>
+<target>正在載入…</target>
 
 <source>job name</source>
 <target>作業名稱</target>
@@ -758,7 +819,7 @@ The command is triggered if:
 <target>本機篩選器</target>
 
 <source>Active</source>
-<target>啟用</target>
+<target>活動</target>
 
 <source>None</source>
 <target>無</target>
@@ -780,15 +841,6 @@ The command is triggered if:
 
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>請選擇一個本機檔案系統、網路或MTP設備上的資料夾。</target>
-
-<source>SFTP folder</source>
-<target>SFTP資料夾</target>
-
-<source>Select SFTP folder</source>
-<target>選擇SFTP資料夾</target>
-
-<source>Select alternative folder type</source>
-<target>選擇備用資料夾類型</target>
 
 <source>&New</source>
 <target>新增(&N)</target>
@@ -835,11 +887,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>工具(&T)</target>
 
-<source>&Check for new version</source>
-<target>檢查新版本(&C)</target>
-
-<source>&Check now</source>
-<target>現在檢查(&C)</target>
+<source>&Check for updates now</source>
+<target>現在檢查更新(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>每週自動檢查一次(&a)</target>
@@ -858,6 +907,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>移除配對資料夾</target>
+
+<source>Access online storage</source>
+<target>存取線上儲存空間</target>
 
 <source>Swap sides</source>
 <target>兩邊交換</target>
@@ -946,9 +998,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>包括：</target>
 
-<source>Exclude:</source>
-<target>排除：</target>
-
 <source>Show examples</source>
 <target>顯示範例</target>
 
@@ -1032,8 +1081,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>排列配對資料夾</target>
 
-<source>Enter your SFTP login details:</source>
-<target>請輸入您的SFTP登錄詳細資訊：</target>
+<source>Enter your login details:</source>
+<target>請輸入您的登錄資訊：</target>
+
+<source>Connection type:</source>
+<target>連線類型：</target>
 
 <source>Server name or IP address:</source>
 <target>伺服器名稱或IP位址：</target>
@@ -1041,17 +1093,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>連接埠：</target>
 
+<source>Encryption:</source>
+<target>加密：</target>
+
+<source>&Disabled</source>
+<target>已禁用(&D)</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>顯式SSL/TLS(&E)</target>
+
+<source>Authentication:</source>
+<target>身份驗證：</target>
+
+<source>&Password</source>
+<target>密碼(&P)：</target>
+
+<source>&Key file</source>
+<target>金鑰檔案(&K)</target>
+
 <source>User name:</source>
 <target>使用者名稱：</target>
 
-<source>Password:</source>
-<target>密碼：</target>
+<source>Private key file:</source>
+<target>私密金鑰檔案：</target>
 
 <source>&Show password</source>
 <target>顯示密碼(&S)：</target>
 
 <source>Directory on server:</source>
 <target>在伺服器上的目錄：</target>
+
+<source>Performance improvements:</source>
+<target>性能改進：</target>
+
+<source>How to get best performance?</source>
+<target>如何獲得最佳的性能？</target>
+
+<source>SSH connections for directory reading:</source>
+<target>用於目錄閱讀的SSH連接：</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>建議範圍：[1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>每個連接SFTP通道數：</target>
+
+<source>Detect server limit</source>
+<target>檢測伺服器限制</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2連接數 x 10通道 = 20倍更快的目錄讀取速度</target>
 
 <source>Select a directory on the server:</source>
 <target>選擇伺服器上的目錄：</target>
@@ -1182,6 +1273,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>使用C++編寫的原始碼：</target>
 
+<source>Donation details</source>
+<target>捐款詳情</target>
+
 <source>If you like FreeFileSync:</source>
 <target>如果您喜歡FreeFileSync：</target>
 
@@ -1191,8 +1285,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>歡迎反映意見和建議</target>
 
-<source>Homepage</source>
-<target>首頁</target>
+<source>Home page</source>
+<target>主頁</target>
 
 <source>Email</source>
 <target>信箱</target>
@@ -1203,8 +1297,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>非常感謝本地化語系翻譯工作人員：</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH檔案傳輸協議</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>透過以下其中一種方法來啟動FreeFileSync捐贈版：</target>
+
+<source>1. Activate via internet now:</source>
+<target>1.現在透過網際網路啟動：</target>
+
+<source>Activate online</source>
+<target>線上啟動</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2.從下面的URL檢索離線啟用金鑰：</target>
+
+<source>&Copy to clipboard</source>
+<target>複製到剪貼簿(&C)</target>
+
+<source>Enter activation key:</source>
+<target>輸入啟用金鑰：</target>
+
+<source>Activate offline</source>
+<target>離線啟動</target>
 
 <source>Save as Batch Job</source>
 <target>另存為批次處理作業</target>
@@ -1220,6 +1332,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>選擇時間間隔</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync捐贈版</target>
 
 <source>&Options</source>
 <target>選項(&O)</target>
@@ -1242,8 +1357,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>摘要</target>
 
-<source>&Download</source>
-<target>下載(&D)</target>
+<source>&Show details</source>
+<target>顯示詳細資訊(&S)</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync有新版本可用：</target>
@@ -1473,13 +1588,22 @@ This guarantees a consistent state even in case of a serious error.
 <target>繼續(&C)</target>
 
 <source>Progress</source>
-<target>進展</target>
+<target>進度</target>
 
 <source>Log</source>
 <target>日誌</target>
 
-<source>Loading...</source>
-<target>正在載入…</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>安裝檔已損壞。請重新安裝FreeFileSync。</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>%x，感謝你的捐款和支持！</target>
+
+<source>Password:</source>
+<target>密碼：</target>
+
+<source>Key password:</source>
+<target>金鑰密碼：</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1534,6 +1658,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>顯示(&S)</target>
+
+<source>Downloading update...</source>
+<target>正在下載更新…</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>由修改時間和檔案大小比對來判斷相同檔案。</target>
@@ -1628,11 +1755,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>百分比</target>
 
+<source>Failed to retrieve update information.</source>
+<target>無法檢索更新訊息。</target>
+
+<source>Automatic updates:</source>
+<target>自動更新：</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>需要FreeFileSync捐贈版</target>
+
 <source>Check for Program Updates</source>
 <target>檢查程式更新</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>要現在自動更新或是從FreeFileSync主頁手動下載？</target>
+
+<source>&Auto-update</source>
+<target>自動更新(&A)</target>
+
+<source>&Home page</source>
+<target>主頁(&H)</target>
+
 <source>Download now?</source>
-<target>要立即下載嗎？</target>
+<target>要現在下載嗎？</target>
+
+<source>&Download</source>
+<target>下載(&D)</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync已經是最新版本。</target>
@@ -1646,17 +1794,23 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>%x 的一致性檢查失敗。</target>
 
+<source>Installation was registered on a different operating system.</source>
+<target>已安裝註冊在不同的作業系統上。</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>無法啟動FreeFileSync捐贈版。</target>
+
+<source>Incorrect activation key.</source>
+<target>不正確的啟用金鑰。</target>
+
+<source>Unable to register to receive system messages.</source>
+<target>無法註冊以接收系統訊息。</target>
+
 <source>Cannot find system function %x.</source>
 <target>找不到系統函數 %x。</target>
 
-<source>Unable to register to receive system messages.</source>
-<target>無法登錄接收系統訊息。</target>
-
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>安裝檔已損壞。請重新安裝FreeFileSync。</target>
-
 <source>Unable to register device notifications for %x.</source>
-<target>%x 無法註冊裝置通知。</target>
+<target>無法註冊 %x 的裝置通知。</target>
 
 <source>Cannot monitor directory %x.</source>
 <target>無法監測目錄 %x。</target>
@@ -1684,9 +1838,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>無法複製從 %x 到 %y 的屬性。</target>
-
-<source>Type of item %x is not supported:</source>
-<target>項目類型 %x 不被支援：</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1735,9 +1886,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>配置檔案 %x 是不完整的。缺少的元素將設定為其預設值。</target>
-
-<source>Internet access failed.</source>
-<target>網際網路連線失敗。</target>
 
 <source>Prepare installation</source>
 <target>準備安裝</target>
@@ -1808,18 +1956,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>使用FreeFileSync進行編輯</target>
 
-<source>Thanks for your donation and support!</source>
-<target>感謝您的捐贈和支援！</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>捐贈者的FreeFileSync安裝程式已達到其日常的安裝限制。</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>現在要從FreeFileSync首頁下載普通版嗎？</target>
-
 <source>The portable version cannot install into the selected folder.</source>
-<target>可擕式版本不能安裝到所選的資料夾。</target>
+<target>可攜式版本不能安裝到所選的資料夾。</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>請選擇本地安裝類型或選擇不同的安裝資料夾。</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>無干擾安裝模式僅在FreeFileSync捐贈版才可使用。</target>
 

@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setter standard synkroniserings-retning: Gamle filer vil bli overskrevet med nyere filer.</target>
 
-<source>Creating folder %x</source>
-<target>Lager mappen %x</target>
-
 <source>Creating file %x</source>
 <target>Lager filen %x</target>
+
+<source>Creating folder %x</source>
+<target>Lager mappen %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Oppretter den symbolske forbindelsen %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Hvis denne feilen blir ignorert vil mappene bli vurdert som tomme. Manglende mapper opprettes automatisk ved behov.</target>
 
-<source>A folder input field is empty.</source>
-<target>Der er ikke skrevet inn noe mappenavn.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Den samsvarende mappen betraktes som tom.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>De følgende mappestier er avhengige av hverandre:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Filen %x har en ugyldig dato.</target>
 
 <source>Date:</source>
 <target>Dato:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Filene %x har den samme datoen men har forskjellig størrelse.</target>
+<source>Files have the same date but a different size.</source>
+<target>Filene har samme dato, men en annen størrelse.</target>
 
 <source>Size:</source>
 <target>Størrelse:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Innholdsanalyse er utelatt for ekskluderte filer %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Innholdssammenligningen ble hoppet over for ekskluderte filer.</target>
 
 <source>Items differ in attributes only</source>
 <target>Elementene har kun forskjellige attributter</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Starter sammenligning</target>
+
+<source>A folder input field is empty.</source>
+<target>Der er ikke skrevet inn noe mappenavn.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Den samsvarende mappen betraktes som tom.</target>
+
+<source>Exclude:</source>
+<target>Ekskludér:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>En basismappe til et mappepar finnes i den andre.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Mappen bør utelukkes fra synkronisering via filter.</target>
 
 <source>Calculating sync directions...</source>
 <target>Beregner synkroniserings-retninger...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Oppdater attributter til høyre</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Kan ikke skrive tillatelsene til %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operasjonen støttes ikke for ulike typer basismapper.</target>
-
 <source>Cannot write file %x.</source>
 <target>Kan ikke opprette filen %x.</target>
 
@@ -267,6 +267,12 @@ Forventet: %x bytes
 Faktisk: %y bytes
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Kan ikke skrive tillatelsene til %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operasjonen støttes ikke for ulike typer basismapper.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan ikke kopiere symbolsk forbindelse %x til %y.</target>
 
@@ -276,35 +282,29 @@ Faktisk: %y bytes
 <source>Unable to connect to %x.</source>
 <target>Kan ikke koble til %x.</target>
 
+<source>Failed to get information about server %x.</source>
+<target>Kunne ikke få informasjon om server %x.</target>
+
 <source>Cannot open directory %x.</source>
 <target>Kan ikke åpne katalog %x.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Kan ikke oppsummere katalog %x.</target>
+<source>Cannot read directory %x.</source>
+<target>Kan ikke lese katalogen %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Kan ikke lese filattributterne på %x.</target>
 
-<source>Cannot find %x.</source>
-<target>Kan ikke finne %x.</target>
-
-<source>Cannot open file %x.</source>
-<target>Kan ikke åpne filen %x.</target>
-
 <source>Cannot read file %x.</source>
 <target>Kan ikke lese filen %x.</target>
-
-<source>Cannot find device %x.</source>
-<target>Kan ikke finne enhet %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Kan ikke lage katalog %x.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Kan ikke slette katalog %x.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Kan ikke slette filen %x.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Kan ikke slette katalog %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Kan ikke oppdatere tidsendring på %x.</target>
@@ -315,14 +315,38 @@ Faktisk: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan ikke løse den symbolske forbindelsen %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Kan ikke fastslå ledig diskplass for %x.</target>
-
 <source>Unable to move %x to the recycle bin.</source>
 <target>Kunne ikke flytte %x til papirkurven.</target>
 
+<source>Cannot open file %x.</source>
+<target>Kan ikke åpne filen %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Kan ikke finne enhet %x.</target>
+
+<source>Cannot find %x.</source>
+<target>Kan ikke finne %x.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Elementtypen %x støttes ikke:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Kan ikke slette symbolsk lenke %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Kan ikke fastslå ledig diskplass for %x.</target>
+
 <source>Incorrect command line:</source>
 <target>Ugyldig kommando:</target>
+
+<source>Error Code %x</source>
+<target>Feilkode %x</target>
+
+<source>The server does not support authentication via %x.</source>
+<target>Tjeneren støtter ikke autentisering via %x.</target>
+
+<source>Required:</source>
+<target>Krav:</target>
 
 <source>Unable to access %x.</source>
 <target>Får ikke tilgang til %x.</target>
@@ -381,11 +405,17 @@ Faktisk: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Databasefilen %x finnes ikke ennå.</target>
 
-<source>Database file is corrupt:</source>
-<target>Databasefilen er ødelagt:</target>
+<source>Database file is corrupted:</source>
+<target>Databasefilen er skadet:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Databasefiler kan ikke dele en felles handling.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>Databasefilene inneholder ennå ikke informasjon om siste synkronisering.</target>
+
+<source>Loading file %x...</source>
+<target>Laster fil %x ...</target>
+
+<source>Saving file %x...</source>
+<target>Lagrer filen %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Søker etter mappen %x...</target>
@@ -413,9 +443,6 @@ Faktisk: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Finner etterlatt lås...</target>
-
-<source>Saving file %x...</source>
-<target>Lagrer filen %x...</target>
 
 <source>Items processed:</source>
 <target>Elementer behandlet:</target>
@@ -671,20 +698,32 @@ Kommandoen utføres hvis:
 <source>Not enough free disk space available in:</source>
 <target>Ikke nok ledig diskplass på:</target>
 
-<source>Required:</source>
-<target>Krav:</target>
-
 <source>Available:</source>
 <target>Tilgjengelig:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Flere mappepar skriver til en felles undermappe. Sjekk oppsettet ditt.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Noen filer vil bli synkronisert som en del av flere basemapper.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>For å unngå konflikter, sett opp utelukkelsesfiltre, slik at hver oppdaterte fil regnes av bare én basemappe.</target>
+
+<source>Versioning folder:</source>
+<target>Versjonsmappe:</target>
+
+<source>Base folder:</source>
+<target>Basemappe:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Versjonsmappen synkroniseres fordi den finnes i en basemappe.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synkroniserer mappepar:</target>
 
 <source>Generating database...</source>
 <target>Lager database...</target>
+
+<source>Loading...</source>
+<target>Laster...</target>
 
 <source>job name</source>
 <target>jobbnavn</target>
@@ -809,15 +848,6 @@ Kommandoen utføres hvis:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Velg en mappe på lokalt filsystem, nettverk eller på en MTP-enhet.</target>
 
-<source>SFTP folder</source>
-<target>SFTP-mappe</target>
-
-<source>Select SFTP folder</source>
-<target>Velg SFTF mappa</target>
-
-<source>Select alternative folder type</source>
-<target>Velg alternativ mappetype</target>
-
 <source>&New</source>
 <target>&Ny</target>
 
@@ -863,11 +893,8 @@ Kommandoen utføres hvis:
 <source>&Tools</source>
 <target>&Verktøy</target>
 
-<source>&Check for new version</source>
-<target>&Søk etter ny versjon</target>
-
-<source>&Check now</source>
-<target>&Søk nå</target>
+<source>&Check for updates now</source>
+<target>&Sjekk etter oppdateringer nå</target>
 
 <source>Check &automatically once a week</source>
 <target>Søk &automatisk en gang i uken</target>
@@ -886,6 +913,9 @@ Kommandoen utføres hvis:
 
 <source>Remove folder pair</source>
 <target>Fjern mappe-par</target>
+
+<source>Access online storage</source>
+<target>Få tilgang til nettlagring</target>
 
 <source>Swap sides</source>
 <target>Bytt sider</target>
@@ -974,9 +1004,6 @@ Kommandoen utføres hvis:
 <source>Include:</source>
 <target>Inkludér:</target>
 
-<source>Exclude:</source>
-<target>Ekskludér:</target>
-
 <source>Show examples</source>
 <target>Vis eksempler</target>
 
@@ -1060,14 +1087,26 @@ Kommandoen utføres hvis:
 <source>Arrange folder pair</source>
 <target>Ordne mappepar</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Skriv inn dine SFTP innloggings-opplysninger:</target>
+<source>Enter your login details:</source>
+<target>Skriv inn dine innloggingsdetaljer:</target>
+
+<source>Connection type:</source>
+<target>Tilkoblingstype:</target>
 
 <source>Server name or IP address:</source>
 <target>Servernavn eller IP-adresse:</target>
 
 <source>Port:</source>
 <target>Post:</target>
+
+<source>Encryption:</source>
+<target>Kryptering:</target>
+
+<source>&Disabled</source>
+<target>&Utkoplet</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Eksplisitt SSL/TLS</target>
 
 <source>Authentication:</source>
 <target>Autentisering:</target>
@@ -1196,7 +1235,10 @@ Kommandoen utføres hvis:
 Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
 </source>
-<target>Kopiér til en midlertidig fil (*.ffs_tmp) før overskriving. Sikrer prosessen ved alvorlige feil.</target>
+<target>
+Kopiér til en midlertidig fil (*.ffs_tmp) før overskriving. 
+Sikrer prosessen ved alvorlige feil.
+</target>
 
 <source>(recommended)</source>
 <target>(anbefalt)</target>
@@ -1237,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Kildekoden er skrevet i C++ med hjelp fra:</target>
 
+<source>Donation details</source>
+<target>Donasjon detaljer</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Hvis du liker FreeFileSync:</target>
 
@@ -1246,7 +1291,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>Tilbakemeldinger og forslag er ønsket</target>
 
-<source>Homepage</source>
+<source>Home page</source>
 <target>Hjemmeside</target>
 
 <source>Email</source>
@@ -1258,8 +1303,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Takk for oversettelse:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH filoverførings-protokoll</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Aktivér FreeFileSync Donation Versjon med en av følgende metoder:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Aktivér via internett nå:</target>
+
+<source>Activate online</source>
+<target>Aktivér på nett</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Hent en aktiveringsnøkkel fra følgende URL:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Kopiér til utklippstavla</target>
+
+<source>Enter activation key:</source>
+<target>Skriv inn en aktiveringsnøkkel:</target>
+
+<source>Activate offline</source>
+<target>Aktivér frakoplet</target>
 
 <source>Save as Batch Job</source>
 <target>Lagre som batchfil</target>
@@ -1275,6 +1338,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>Velg tids-intervall</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync Donation Edition</target>
 
 <source>&Options</source>
 <target>&Valg</target>
@@ -1297,8 +1363,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Oversikt</target>
 
-<source>&Download</source>
-<target>&Last ned</target>
+<source>&Show details</source>
+<target>&Vis detaljer</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>En ny versjon av FreeFileSync er tilgjengelig:</target>
@@ -1537,8 +1603,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Logg</target>
 
-<source>Loading...</source>
-<target>Laster...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Installasjonsfilene er ødelagte. Installer FreeFileSync på nytt.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Takk, %x, for ditt bidrag og støtte!</target>
 
 <source>Password:</source>
 <target>Passord:</target>
@@ -1602,6 +1671,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Vis</target>
+
+<source>Downloading update...</source>
+<target>Laster ned oppdatering...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Gjennkjenn like filer ved å sammenligne filtid og størrelse.</target>
@@ -1696,11 +1768,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Prosent</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Kunne ikke hente oppdateringsinformasjon.</target>
+
+<source>Automatic updates:</source>
+<target>Automatiske oppdateringer:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Behøver FreeFileSync Donation Edition</target>
+
 <source>Check for Program Updates</source>
 <target>Søk etter program-oppdateringer</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Auto-oppdatér nå, eller laste ned manuelt fra FreeFileSyncs hjemmeside?</target>
+
+<source>&Auto-update</source>
+<target>&Auto-oppdatér</target>
+
+<source>&Home page</source>
+<target>&Hjemmeside</target>
+
 <source>Download now?</source>
 <target>Last ned nå ?</target>
+
+<source>&Download</source>
+<target>&Last ned</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync er oppdatert.</target>
@@ -1714,14 +1807,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>Innholdssjekken gikk galt for %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Kan ikke finne systemfunksjonen %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Installasjon ble registrert på et annet operativsystem.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Kunne ikke aktivere FreeFileSync Donation Edition.</target>
+
+<source>Incorrect activation key.</source>
+<target>Feil aktiveringsnøkkel.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Kunne ikke registrere for å motta systembeskjeder.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Installasjonsfila er ødelagt. Reeinstaller FreeFileSync.</target>
+<source>Cannot find system function %x.</source>
+<target>Kan ikke finne systemfunksjonen %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Kunne ikke registere enhets-varsler for %x.</target>
@@ -1752,9 +1851,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Kan ikke kopiere attributtene fra %x til %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Elementtypen %x støttes ikke:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1798,9 +1894,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Kan ikke endre I/O prioriteter.</target>
 
-<source>Error Code %x:</source>
-<target>Feilkode %x:</target>
-
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Det å sjekke papirkurven gikk galt for mappen %x.</target>
 
@@ -1809,9 +1902,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfigurasjonsfil %x er ufullstendig. De manglende elementene vil bli satt til standardverdiene .</target>
-
-<source>Internet access failed.</source>
-<target>Internett-tilgang gikk galt.</target>
 
 <source>Prepare installation</source>
 <target>Forbered installering</target>
@@ -1881,15 +1971,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Edit with FreeFileSync</source>
 <target>Rediger med FreeFileSync</target>
-
-<source>Thank you, %x, for your donation and support!</source>
-<target>Takk, %x, for ditt bidrag og støtte!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Denne FreeFileSync installasjon for donorer har nått sin daglige installasjonsgrense.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Last ned standardversjonen fra FreeFileSync sin hjemmeside nå</target>
 
 <source>The portable version cannot install into the selected folder.</source>
 <target>Den bærbare versjonen kan ikke installere i den valgte mappen.</target>

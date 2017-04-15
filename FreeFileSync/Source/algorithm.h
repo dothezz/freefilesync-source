@@ -10,6 +10,7 @@
 #include <functional>
 #include "file_hierarchy.h"
 #include "lib/soft_filter.h"
+#include "lib/process_xml.h"
 #include "process_callback.h"
 
 
@@ -62,6 +63,7 @@ void copyToAlternateFolder(const std::vector<const FileSystemObject*>& rowsToCop
                            const Zstring& targetFolderPathPhrase,
                            bool keepRelPaths,
                            bool overwriteIfExists,
+                           xmlAccess::OptionalDialogs& warnings,
                            ProcessCallback& callback);
 
 //manual deletion of files on main grid
@@ -74,6 +76,13 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          bool& warnRecyclerMissing,
                          ProcessCallback& callback);
 
+struct FileDescriptor
+{
+    AbstractPath path;
+    FileAttributes attr;
+};
+bool operator<(const FileDescriptor& lhs, const FileDescriptor& rhs);
+
 //get native Win32 paths or create temporary copy for SFTP/MTP, ect.
 class TempFileBuffer
 {
@@ -81,23 +90,17 @@ public:
     TempFileBuffer() {}
     ~TempFileBuffer();
 
-    struct FileDetails
-    {
-        AbstractPath path;
-        FileDescriptor descr;
-    };
-    Zstring getTempPath(const FileDetails& details) const; //returns empty if not in buffer (item not existing, error during copy)
+    Zstring getTempPath(const FileDescriptor& descr) const; //returns empty if not in buffer (item not existing, error during copy)
 
     //contract: only add files not yet in the buffer!
-    void createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback);
+    void createTempFiles(const std::set<FileDescriptor>& workLoad, ProcessCallback& callback);
 
 private:
     TempFileBuffer           (const TempFileBuffer&) = delete;
     TempFileBuffer& operator=(const TempFileBuffer&) = delete;
 
-    std::map<FileDetails, Zstring> tempFilePaths_;
+    std::map<FileDescriptor, Zstring> tempFilePaths_;
     Zstring tempFolderPath_;
 };
-bool operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer::FileDetails& rhs);
 }
 #endif //ALGORITHM_H_34218518475321452548

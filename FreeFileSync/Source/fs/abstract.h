@@ -113,10 +113,9 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     static void removeSymlinkPlain(const AbstractPath& ap) { ap.afs->removeSymlinkPlain(ap.afsPath); } //throw FileError
     static void removeFolderPlain (const AbstractPath& ap) { ap.afs->removeFolderPlain (ap.afsPath); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-    static void setModTime       (const AbstractPath& ap, int64_t modificationTime) { ap.afs->setModTime       (ap.afsPath, modificationTime); } //throw FileError, follows symlinks
-    static void setModTimeSymlink(const AbstractPath& ap, int64_t modificationTime) { ap.afs->setModTimeSymlink(ap.afsPath, modificationTime); } //throw FileError
+    static void setModTime(const AbstractPath& ap, int64_t modTime) { ap.afs->setModTime       (ap.afsPath, modTime); } //throw FileError, follows symlinks
 
-    static AbstractPath getResolvedSymlinkPath(const AbstractPath& ap) { return ap.afs->getResolvedSymlinkPath(ap.afsPath); } //throw FileError
+    static AbstractPath getSymlinkResolvedPath(const AbstractPath& ap) { return ap.afs->getSymlinkResolvedPath(ap.afsPath); } //throw FileError
     static std::string getSymlinkBinaryContent(const AbstractPath& ap) { return ap.afs->getSymlinkBinaryContent(ap.afsPath); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
     //noexcept; optional return value:
@@ -128,15 +127,22 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     using FileId = Zbase<char>;
 
+    struct StreamAttributes
+    {
+        int64_t modTime; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+        uint64_t fileSize;
+        FileId fileId; //optional!
+    };
+
     //----------------------------------------------------------------------------------------------------------------
     struct InputStream
     {
         virtual ~InputStream() {}
         virtual size_t read(void* buffer, size_t bytesToRead) = 0; //throw FileError, X; return "bytesToRead" bytes unless end of stream!
         virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract! it's implementers job to always give a reasonable buffer size!
-        virtual FileId   getFileId          () = 0; //throw FileError
-        virtual int64_t  getModificationTime() = 0; //throw FileError
-        virtual uint64_t getFileSize        () = 0; //throw FileError
+
+        //only returns attributes if they are already buffered within stream handle and determination would be otherwise expensive (e.g. FTP/SFTP):
+        virtual Opt<StreamAttributes> getBufferedAttributes() = 0; //throw FileError
     };
 
     struct OutputStreamImpl
@@ -163,14 +169,13 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     };
 
     //return value always bound:
-    static std::unique_ptr<InputStream > getInputStream (const AbstractPath& ap, const IOCallback& notifyUnbufferedIO) //throw FileError, ErrorFileLocked
+    static std::unique_ptr<InputStream > getInputStream(const AbstractPath& ap, const IOCallback& notifyUnbufferedIO) //throw FileError, ErrorFileLocked, X
     { return ap.afs->getInputStream(ap.afsPath, notifyUnbufferedIO); }
 
     static std::unique_ptr<OutputStream> getOutputStream(const AbstractPath& ap, //throw FileError, ErrorTargetExisting
-                                                         const uint64_t* streamSize,      //
-                                                         const int64_t* modificationTime, //optional
+                                                         const uint64_t* streamSize,           //optional
                                                          const IOCallback& notifyUnbufferedIO) //
-    { return std::make_unique<OutputStream>(ap.afs->getOutputStream(ap.afsPath, streamSize, modificationTime, notifyUnbufferedIO), ap, streamSize); }
+    { return std::make_unique<OutputStream>(ap.afs->getOutputStream(ap.afsPath, streamSize, notifyUnbufferedIO), ap, streamSize); }
     //----------------------------------------------------------------------------------------------------------------
 
     struct TraverserCallback
@@ -180,15 +185,15 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
         struct SymlinkInfo
         {
             Zstring itemName;
-            int64_t lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+            int64_t modTime; //number of seconds since Jan. 1st 1970 UTC
         };
 
         struct FileInfo
         {
             Zstring itemName;
-            uint64_t fileSize;      //unit: bytes!
-            int64_t  lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
-            FileId id; //optional: empty if not supported!
+            uint64_t fileSize; //unit: bytes!
+            int64_t modTime; //number of seconds since Jan. 1st 1970 UTC
+            FileId fileId; //optional: empty if not supported!
             const SymlinkInfo* symlinkInfo; //only filled if file is a followed symlink
         };
 
@@ -225,12 +230,13 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     static bool supportPermissionCopy(const AbstractPath& apSource, const AbstractPath& apTarget); //throw FileError
 
-    struct FileAttribAfterCopy
+    struct FileCopyResult
     {
         uint64_t fileSize = 0;
-        int64_t modificationTime = 0; //time_t UTC compatible
+        int64_t modTime = 0; //time_t-compatible (UTC)
         FileId sourceFileId;
         FileId targetFileId;
+        Opt<FileError> errorModTime; //failure to set modification time
     };
     //return current attributes at the time of copy
     //symlink handling: dereference source
@@ -239,14 +245,15 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
     static const Zchar* TEMP_FILE_ENDING; //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
-    static FileAttribAfterCopy copyFileTransactional(const AbstractPath& apSource, const AbstractPath& apTarget, //throw FileError, ErrorFileLocked
-                                                     bool copyFilePermissions,
-                                                     bool transactionalCopy,
-                                                     //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
-                                                     //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
-                                                     const std::function<void()>& onDeleteTargetFile,
-                                                     //accummulated delta != file size! consider ADS, sparse, compressed files
-                                                     const IOCallback& notifyUnbufferedIO);
+    static FileCopyResult copyFileTransactional(const AbstractPath& apSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
+                                                const AbstractPath& apTarget,
+                                                bool copyFilePermissions,
+                                                bool transactionalCopy,
+                                                //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
+                                                //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
+                                                const std::function<void()>& onDeleteTargetFile,
+                                                //accummulated delta != file size! consider ADS, sparse, compressed files
+                                                const IOCallback& notifyUnbufferedIO);
 
     static void copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
     static void copySymlink  (const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
@@ -292,8 +299,8 @@ protected: //grant derived classes access to AbstractPath:
     };
     PathStatusImpl getPathStatusViaFolderTraversal(const AfsPath& afsPath) const; //throw FileError
 
-    FileAttribAfterCopy copyFileAsStream(const AfsPath& afsPathSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                         const IOCallback& notifyUnbufferedIO) const; //may be nullptr; throw X!
+    FileCopyResult copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                    const AbstractPath& apTarget, const IOCallback& notifyUnbufferedIO) const; //may be nullptr; throw X!
 
 private:
     virtual Opt<Zstring> getNativeItemPath(const AfsPath& afsPath) const { return NoValue(); };
@@ -318,27 +325,24 @@ private:
     virtual void removeSymlinkPlain(const AfsPath& afsPath) const = 0; //throw FileError
     virtual void removeFolderPlain (const AfsPath& afsPath) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-    virtual void setModTime       (const AfsPath& afsPath, int64_t modificationTime) const = 0; //throw FileError, follows symlinks
-    virtual void setModTimeSymlink(const AfsPath& afsPath, int64_t modificationTime) const = 0; //throw FileError
+    virtual void setModTime(const AfsPath& afsPath, int64_t modTime) const = 0; //throw FileError, follows symlinks
 
-    virtual AbstractPath getResolvedSymlinkPath(const AfsPath& afsPath) const = 0; //throw FileError
-
+    virtual AbstractPath getSymlinkResolvedPath(const AfsPath& afsPath) const = 0; //throw FileError
     virtual std::string getSymlinkBinaryContent(const AfsPath& afsPath) const = 0; //throw FileError
-
     //----------------------------------------------------------------------------------------------------------------
-    virtual std::unique_ptr<InputStream     > getInputStream (const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const = 0; //throw FileError, ErrorFileLocked
-    virtual std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath,  //throw FileError, ErrorTargetExisting
-                                                              const uint64_t* streamSize,                 //
-                                                              const int64_t* modificationTime,            //optional
+    virtual std::unique_ptr<InputStream     > getInputStream (const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const = 0; //throw FileError, ErrorFileLocked, X
+    virtual std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError, ErrorTargetExisting
+                                                              const uint64_t* streamSize,                      //optional
                                                               const IOCallback& notifyUnbufferedIO) const = 0; //
     //----------------------------------------------------------------------------------------------------------------
     virtual void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
 
     //symlink handling: follow link!
-    virtual FileAttribAfterCopy copyFileForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                                       //accummulated delta != file size! consider ADS, sparse, compressed files
-                                                       const IOCallback& notifyUnbufferedIO) const = 0; //may be nullptr; throw X!
+    virtual FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                                  const AbstractPath& apTarget, bool copyFilePermissions,
+                                                  //accummulated delta != file size! consider ADS, sparse, compressed files
+                                                  const IOCallback& notifyUnbufferedIO) const = 0; //may be nullptr; throw X!
 
     //symlink handling: follow link!
     virtual void copyNewFolderForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const = 0; //throw FileError

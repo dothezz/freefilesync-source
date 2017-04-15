@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き.</target>
 
-<source>Creating folder %x</source>
-<target>フォルダ %x を作成中</target>
-
 <source>Creating file %x</source>
 <target>ファイル %x を作成中</target>
+
+<source>Creating folder %x</source>
+<target>フォルダ %x を作成中</target>
 
 <source>Creating symbolic link %x</source>
 <target>シンボリックリンク %x を作成中</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>このエラーを無視した場合、空のフォルダが考慮され、必要に応じて不足しているフォルダが自動的に生成されます.</target>
 
-<source>A folder input field is empty.</source>
-<target>フォルダ入力欄が空白です.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>対応するフォルダは空であるとみなされます.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>以下のフォルダパスは互いに依存関係にあります:</target>
-
 <source>File %x has an invalid date.</source>
 <target>ファイル %x の日付は無効なものです.</target>
 
 <source>Date:</source>
 <target>日時:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>ファイル %x は、同じ時間ですがサイズが異なっています.</target>
+<source>Files have the same date but a different size.</source>
+<target>日時は同じでサイズが異なるファイル.</target>
 
 <source>Size:</source>
 <target>サイズ:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>除外されたファイル %x の内容の比較をスキップ.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>除外ファイルにより比較をスキップされた内容.</target>
 
 <source>Items differ in attributes only</source>
 <target>属性のみ異なる項目</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>比較処理を開始中</target>
+
+<source>A folder input field is empty.</source>
+<target>フォルダ入力欄が空白です.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>対応するフォルダは空であるとみなされます.</target>
+
+<source>Exclude:</source>
+<target>除外:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>フォルダ ペアの一方の基準フォルダがもう一方に含まれています.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>このフォルダはフィルターで同期から除外する必要があります.</target>
 
 <source>Calculating sync directions...</source>
 <target>同期方向を計算しています...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>右の属性を更新</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>%x のﾊﾟｰﾐｯｼｮﾝを書き込めません.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>別の基準フォルダタイプでは対応していない操作.</target>
-
 <source>Cannot write file %x.</source>
 <target>ファイル %x に書き込めません.</target>
 
@@ -267,38 +267,44 @@ Actual: %y bytes
 実際の値: %y バイト
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>%x のﾊﾟｰﾐｯｼｮﾝを書き込めません.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>別の基準フォルダタイプでは対応していない操作.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>シンボリックリンク %x を %y にコピーできません.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>ファイル %x を %y に移動できません.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>ディレクトリ %x を列挙できません.</target>
+<source>Unable to connect to %x.</source>
+<target>%x に接続できません.</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>%x のファイル属性を読み込めません.</target>
+<source>Failed to get information about server %x.</source>
+<target>%x サーバからの情報取得に失敗しました.</target>
 
-<source>Cannot find %x.</source>
-<target>%x がみつかりません.</target>
+<source>Cannot open directory %x.</source>
+<target>ディレクトリ %x を開けません.</target>
 
-<source>Cannot open file %x.</source>
-<target>ファイル %x を開けません.</target>
+<source>Cannot read directory %x.</source>
+<target>ディレクトリ %x を読み取れません.</target>
 
 <source>Cannot read file %x.</source>
 <target>ファイル %x を読み込めません.</target>
 
-<source>Cannot find device %x.</source>
-<target>デバイス %x がみつかりません.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>%x のファイル属性を読み込めません.</target>
 
 <source>Cannot create directory %x.</source>
 <target>ディレクトリ %x を作成できません.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>ディレクトリ %x を削除できません.</target>
-
 <source>Cannot delete file %x.</source>
 <target>ファイル %x を削除出来ません.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>ディレクトリ %x を削除できません.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>%x の更新時刻を書き込めませんでした.</target>
@@ -309,23 +315,63 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>シンボリックリンク %x を解決できません.</target>
 
-<source>Cannot open directory %x.</source>
-<target>ディレクトリ %x を開けません.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x をゴミ箱に移動できません.</target>
+
+<source>Cannot open file %x.</source>
+<target>ファイル %x を開けません.</target>
+
+<source>Cannot find device %x.</source>
+<target>デバイス %x がみつかりません.</target>
+
+<source>Cannot find %x.</source>
+<target>%x がみつかりません.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>項目 %x には対応していません:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>シンボリック リンク %x を削除できません.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>%x の空きディスク領域を検出できません.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x をゴミ箱に移動できません.</target>
-
 <source>Incorrect command line:</source>
 <target>不正なコマンドライン:</target>
 
-<source>Error Code %x:</source>
-<target>エラーコード %x:</target>
+<source>Error Code %x</source>
+<target>エラーコード %x.</target>
 
-<source>Unable to connect to %x.</source>
-<target>%x に接続できません.</target>
+<source>The server does not support authentication via %x.</source>
+<target>このサーバは %x による認証に対応していません.</target>
+
+<source>Required:</source>
+<target>必須:</target>
+
+<source>Unable to access %x.</source>
+<target>%x にアクセスできません.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>%x 秒経過で操作をタイムアウト.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>一度に %x 以上の接続を行うことはできません.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>アクティブな接続: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>SFTP チャンネル %x を開けません.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -356,11 +402,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>データベース %x は存在しません.</target>
 
-<source>Database file is corrupt:</source>
-<target>破損しているデータベース:</target>
+<source>Database file is corrupted:</source>
+<target>データベースが破損しています:</target>
 
-<source>Database files do not share a common session.</source>
-<target>データベースは一般セッションで共有できません.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>このデータベース ファイルには前回の同期に関する情報がまだ含まれていません.</target>
+
+<source>Loading file %x...</source>
+<target>ファイル %x を読み込み中...</target>
+
+<source>Saving file %x...</source>
+<target>ファイル %x を保存中...</target>
 
 <source>Searching for folder %x...</source>
 <target>フォルダ %x を検索中...</target>
@@ -387,9 +439,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>放棄されたロックを検出中...</target>
-
-<source>Saving file %x...</source>
-<target>ファイル %x を保存中...</target>
 
 <source>Items processed:</source>
 <target>処理された要素:</target>
@@ -644,20 +693,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>利用可能なディスク空き容量が足りません:</target>
 
-<source>Required:</source>
-<target>必須:</target>
-
 <source>Available:</source>
 <target>利用可能:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>共通サブフォルダに複数フォルダペアの書き込みがあります。構成を確認してください.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>いくつかのファイルは複数の基準フォルダの一部として同期されます.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>競合を避けたい場合は、各ファイルがひとつの基準フォルダで更新されるように除外フィルターをセットします.</target>
+
+<source>Versioning folder:</source>
+<target>バージョン管理フォルダ:</target>
+
+<source>Base folder:</source>
+<target>基準フォルダ:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>このバージョン管理フォルダは、基準フォルダに含まれるため同期の対象となります.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>フォルダペアを同期処理:</target>
 
 <source>Generating database...</source>
 <target>データベースを作成中...</target>
+
+<source>Loading...</source>
+<target>読み込み中...</target>
 
 <source>job name</source>
 <target>ジョブ名</target>
@@ -781,15 +842,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>ローカルファイルシステム、ネットワークまたは MTP デバイス上のフォルダを選択.</target>
 
-<source>SFTP folder</source>
-<target>SFTP フォルダ</target>
-
-<source>Select SFTP folder</source>
-<target>SFTPフォルダを選択</target>
-
-<source>Select alternative folder type</source>
-<target>代替フォルダ タイプを選択</target>
-
 <source>&New</source>
 <target>新規(&N)</target>
 
@@ -835,11 +887,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>ツール(&T)</target>
 
-<source>&Check for new version</source>
-<target>新バージョンの確認(&C)</target>
-
-<source>&Check now</source>
-<target>今すぐ確認(&C)</target>
+<source>&Check for updates now</source>
+<target>今すぐ更新を確認(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>週に一回、自動的に確認する(&A)</target>
@@ -858,6 +907,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>フォルダペアを除去</target>
+
+<source>Access online storage</source>
+<target>オンライン ストレージにアクセス</target>
 
 <source>Swap sides</source>
 <target>パネルを入れ替え</target>
@@ -946,9 +998,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>含める:</target>
 
-<source>Exclude:</source>
-<target>除外:</target>
-
 <source>Show examples</source>
 <target>入力例を表示</target>
 
@@ -1032,8 +1081,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>フォルダ ペアの配置</target>
 
-<source>Enter your SFTP login details:</source>
-<target>SFTP ログインの詳細を入力:</target>
+<source>Enter your login details:</source>
+<target>ログインの詳細を入力:</target>
+
+<source>Connection type:</source>
+<target>接続の種類:</target>
 
 <source>Server name or IP address:</source>
 <target>サーバ名、または IP アドレス:</target>
@@ -1041,17 +1093,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>ポート:</target>
 
+<source>Encryption:</source>
+<target>暗号化:</target>
+
+<source>&Disabled</source>
+<target>無効化(&D)</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>明示的な SSL/TLS(&E)</target>
+
+<source>Authentication:</source>
+<target>認証方式:</target>
+
+<source>&Password</source>
+<target>パスワード(&P)</target>
+
+<source>&Key file</source>
+<target>キーファイル(&K)</target>
+
 <source>User name:</source>
 <target>ユーザ名:</target>
 
-<source>Password:</source>
-<target>パスワード:</target>
+<source>Private key file:</source>
+<target>秘密キーファイル:</target>
 
 <source>&Show password</source>
 <target>パスワードを表示(&S)</target>
 
 <source>Directory on server:</source>
 <target>サーバ上のディレクトリ:</target>
+
+<source>Performance improvements:</source>
+<target>パフォーマンス向上:</target>
+
+<source>How to get best performance?</source>
+<target>最適なパフォーマンスとは?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>ディレクトリ読み取りのSSH接続:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>推奨される範囲: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>接続当たりの SFTP チャンネル数:</target>
+
+<source>Detect server limit</source>
+<target>サーバ制限の検出</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 接続 x 10 チャンネル = ディレクトリ読み取りが 20 倍高速化</target>
 
 <source>Select a directory on the server:</source>
 <target>サーバ上のディレクトリを選択:</target>
@@ -1182,6 +1273,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>ソースコードは C++ で書かれています:</target>
 
+<source>Donation details</source>
+<target>寄付の詳細</target>
+
 <source>If you like FreeFileSync:</source>
 <target>FreeFileSync を気に入ってくれた方へ:</target>
 
@@ -1191,8 +1285,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>フィードバック、提案などはこちらから</target>
 
-<source>Homepage</source>
-<target>ホームページ</target>
+<source>Home page</source>
+<target>ホーム ページ</target>
 
 <source>Email</source>
 <target>E-メール</target>
@@ -1203,8 +1297,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>ローカライズのご協力に感謝します:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH ファイル転送プロトコル</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>FreeFileSync 寄付版のアクティベートは次のいずれかの方法で行います:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. ネット経由でアクティベート:</target>
+
+<source>Activate online</source>
+<target>オンライン アクティベート</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. 次のURLからオフライン アクティベーションキーを取得:</target>
+
+<source>&Copy to clipboard</source>
+<target>クリップボードにコピー(&C)</target>
+
+<source>Enter activation key:</source>
+<target>アクティベーションキーの入力:</target>
+
+<source>Activate offline</source>
+<target>オフライン アクティベート</target>
 
 <source>Save as Batch Job</source>
 <target>一括ジョブを保存</target>
@@ -1220,6 +1332,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>タイムスパンを選択</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync 寄付版</target>
 
 <source>&Options</source>
 <target>設定(&O)</target>
@@ -1242,8 +1357,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>概要</target>
 
-<source>&Download</source>
-<target>ダウンロード(&D)</target>
+<source>&Show details</source>
+<target>詳細表示(&S)</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync の新しいバージョンが利用できます:</target>
@@ -1478,8 +1593,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>ログ</target>
 
-<source>Loading...</source>
-<target>読み込み中...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>インストール ファイルが破損しています、FreeFileSync を再インストールしてください.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>ありがとう %x, あなたの寄付と支援に感謝します!!</target>
+
+<source>Password:</source>
+<target>パスワード:</target>
+
+<source>Key password:</source>
+<target>キーパスワード:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1534,6 +1658,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>表示(&S)</target>
+
+<source>Downloading update...</source>
+<target>アップデートをダウンロード中...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>更新時刻とサイズを比較して、同一ファイルを識別します.</target>
@@ -1628,11 +1755,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>パーセント</target>
 
+<source>Failed to retrieve update information.</source>
+<target>更新情報の取得に失敗.</target>
+
+<source>Automatic updates:</source>
+<target>自動アップデート:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>FreeFileSync 寄付版が必要です</target>
+
 <source>Check for Program Updates</source>
 <target>プログラムのアップデートを確認</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>今すぐ自動更新、または FreeFileSync 公式サイトから手動でダウンロードしますか?</target>
+
+<source>&Auto-update</source>
+<target>自動更新(&A)</target>
+
+<source>&Home page</source>
+<target>ホームページ(&H)</target>
+
 <source>Download now?</source>
 <target>ダウンロードしますか?</target>
+
+<source>&Download</source>
+<target>ダウンロード(&D)</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync は最新です.</target>
@@ -1646,14 +1794,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>%x の整合性チェックに失敗.</target>
 
-<source>Cannot find system function %x.</source>
-<target>システム関数 %x がみつかりません.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>インストールは別の OS に登録されています.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>FreeFileSync 寄付版のアクティベートに失敗.</target>
+
+<source>Incorrect activation key.</source>
+<target>キーに誤りがあります.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>システム受信メッセージに登録できません.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>ファイルが破損しています、FreeFileSync を再インストールしてください.</target>
+<source>Cannot find system function %x.</source>
+<target>システム関数 %x がみつかりません.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x のデバイス通知を登録できません.</target>
@@ -1684,9 +1838,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>属性 を %x から %y にコピーできません.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>項目 %x には対応していません:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1735,9 +1886,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>構成設定ファイル %x は不完全です。存在しない要素が既定値としてセットされています.</target>
-
-<source>Internet access failed.</source>
-<target>インターネットのアクセスに失敗.</target>
 
 <source>Prepare installation</source>
 <target>インストールの準備</target>
@@ -1808,18 +1956,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync で編集</target>
 
-<source>Thanks for your donation and support!</source>
-<target>あなたの寄付と支援に感謝します!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>この FreeFileSync インストーラは日付の制限に達しています.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>FreeFileSync の標準版を今ホームページからダウンロードしますか?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>選択したフォルダにはポータブル版をインストールできません.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>ローカル インストールを選択するか、別のインストール先を選択してください.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>サイレント インストール モードは、FreeFileSync 寄付版でのみ使用できます.</target>
 

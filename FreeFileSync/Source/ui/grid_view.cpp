@@ -203,15 +203,15 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool showExcluded, //map
                 break;
             case SO_OVERWRITE_RIGHT:
             case SO_COPY_METADATA_TO_RIGHT: //no extra button on screen
-            case SO_MOVE_RIGHT_SOURCE:
-            case SO_MOVE_RIGHT_TARGET:
+            case SO_MOVE_RIGHT_FROM:
+            case SO_MOVE_RIGHT_TO:
                 output.existsSyncDirRight = true;
                 if (!syncDirOverwRightActive) return false;
                 break;
             case SO_OVERWRITE_LEFT:
             case SO_COPY_METADATA_TO_LEFT: //no extra button on screen
-            case SO_MOVE_LEFT_TARGET:
-            case SO_MOVE_LEFT_SOURCE:
+            case SO_MOVE_LEFT_TO:
+            case SO_MOVE_LEFT_FROM:
                 output.existsSyncDirLeft = true;
                 if (!syncDirOverwLeftActive) return false;
                 break;

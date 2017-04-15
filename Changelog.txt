@@ -1,3 +1,17 @@
+FreeFileSync 9.0
+----------------
+Support synchronization via FTP (File Transfer Protocol) and FTPS (SSL/TLS)
+Notify failure to set modification time as a warning instead of an error
+Allow intermediate non-folder components when checking path status
+Prevent file drop events from propagating to parent windows
+Create Downloads folder if not yet existing when running auto-updater
+Get all MTP input stream attributes as a single device access
+Improved SFTP input stream copying time by 20%
+Buffer (S)FTP sessions based on all login information
+Finalize all installation steps before showing finished page
+Updated translation files
+
+
 FreeFileSync 8.10 [2017-03-12]
 ------------------------------
 Fully preserve case-sensitive file paths (Windows, macOS)

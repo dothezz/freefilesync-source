@@ -56,7 +56,7 @@ enum class ProcSymlink
     DIRECT,
     FOLLOW
 };
-void setFileTime(const Zstring& filePath, int64_t modificationTime, ProcSymlink procSl); //throw FileError
+void setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl); //throw FileError
 
 //symlink handling: always evaluate target
 uint64_t getFileSize(const Zstring& filePath); //throw FileError
@@ -85,17 +85,18 @@ void copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, bool
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
 
-struct InSyncAttributes
+struct FileCopyResult
 {
     uint64_t fileSize = 0;
-    int64_t modificationTime = 0; //time_t UTC compatible
+    int64_t modTime = 0; //time_t-compatible (UTC)
     FileId sourceFileId;
     FileId targetFileId;
+    Opt<FileError> errorModTime; //failure to set modification time
 };
 
-InSyncAttributes copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                             //accummulated delta != file size! consider ADS, sparse, compressed files
-                             const IOCallback& notifyUnbufferedIO); //may be nullptr; throw X!
+FileCopyResult copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                           //accummulated delta != file size! consider ADS, sparse, compressed files
+                           const IOCallback& notifyUnbufferedIO); //may be nullptr; throw X!
 }
 
 #endif //FILE_ACCESS_H_8017341345614857

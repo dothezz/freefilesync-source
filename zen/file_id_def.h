@@ -20,7 +20,7 @@ using VolumeId  = decltype(impl::StatDummy::st_dev);
 using FileIndex = decltype(impl::StatDummy::st_ino);
 
 
-struct FileId  //always available on Linux, and *generally* available on Windows)
+struct FileId //always available on Linux, and *generally* available on Windows)
 {
     FileId() {}
     FileId(VolumeId volId, FileIndex fIdx) : volumeId(volId), fileIndex(fIdx) {}

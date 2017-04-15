@@ -426,7 +426,7 @@ private:
         { "?>",    Token::TK_DECL_END      },
         { "</",    Token::TK_LESS_SLASH    },
         { "/>",    Token::TK_SLASH_GREATER },
-        { "<",     Token::TK_LESS          },  //evaluate after TK_DECL_BEGIN!
+        { "<",     Token::TK_LESS          }, //evaluate after TK_DECL_BEGIN!
         { ">",     Token::TK_GREATER       },
         { "=",     Token::TK_EQUAL         },
         { "\"",    Token::TK_QUOTE         },

@@ -52,9 +52,8 @@ AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile
 
 void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const IOCallback& notifyUnbufferedIO) //throw FileError
 {
-    const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath,  //throw FileError, ErrorTargetExisting
+    const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath, //throw FileError, ErrorTargetExisting
                                                                                   nullptr /*streamSize*/,
-                                                                                  nullptr /*modificationTime*/,
                                                                                   notifyUnbufferedIO /*throw X*/);
     //write FreeFileSync file identifier
     writeArray(*fileStreamOut, FILE_FORMAT_DESCR, sizeof(FILE_FORMAT_DESCR)); //throw FileError, X
@@ -83,7 +82,7 @@ DbStreams loadStreams(const AbstractPath& dbPath, const IOCallback& notifyUnbuff
 {
     try
     {
-        const std::unique_ptr<AFS::InputStream> fileStreamIn = AFS::getInputStream(dbPath, notifyUnbufferedIO); //throw FileError, ErrorFileLocked
+        const std::unique_ptr<AFS::InputStream> fileStreamIn = AFS::getInputStream(dbPath, notifyUnbufferedIO); //throw FileError, ErrorFileLocked, X
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
@@ -263,14 +262,14 @@ private:
 
     static void writeFileDescr(MemoryStreamOut<ByteArray>& streamOut, const InSyncDescrFile& descr)
     {
-        writeNumber<std::int64_t>(streamOut, descr.lastWriteTimeRaw);
+        writeNumber<std::int64_t>(streamOut, descr.modTime);
         writeContainer(streamOut, descr.fileId);
         static_assert(IsSameType<decltype(descr.fileId), Zbase<char>>::value, "");
     }
 
     static void writeLinkDescr(MemoryStreamOut<ByteArray>& streamOut, const InSyncDescrLink& descr)
     {
-        writeNumber<int64_t>(streamOut, descr.lastWriteTimeRaw);
+        writeNumber<int64_t>(streamOut, descr.modTime);
     }
 
     //maximize zlib compression by grouping similar data (=> 20% size reduction!)
@@ -452,16 +451,16 @@ private:
     static InSyncDescrFile readFileDescr(MemoryStreamIn<ByteArray>& streamIn) //throw UnexpectedEndOfStreamError
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        const auto lastWriteTimeRaw = readNumber<int64_t>(streamIn); //throw UnexpectedEndOfStreamError
+        const auto modTime = readNumber<int64_t>(streamIn); //throw UnexpectedEndOfStreamError
         const AFS::FileId fileId = readContainer<Zbase<char>>(streamIn);
 
-        return InSyncDescrFile(lastWriteTimeRaw, fileId);
+        return InSyncDescrFile(modTime, fileId);
     }
 
     static InSyncDescrLink readLinkDescr(MemoryStreamIn<ByteArray>& streamIn) //throw UnexpectedEndOfStreamError
     {
-        const auto lastWriteTimeRaw = readNumber<int64_t>(streamIn);
-        return InSyncDescrLink(lastWriteTimeRaw);
+        const auto modTime = readNumber<int64_t>(streamIn);
+        return InSyncDescrLink(modTime);
     }
 
     //TODO: remove migration code at some time! 2017-02-01
@@ -777,7 +776,7 @@ private:
 
 
 std::pair<DbStreams::const_iterator,
-    DbStreams::const_iterator> getCommonSession(const DbStreams& streamsLeft, const DbStreams& streamsRight,  //throw FileError, FileErrorDatabaseNotExisting
+    DbStreams::const_iterator> getCommonSession(const DbStreams& streamsLeft, const DbStreams& streamsRight, //throw FileError, FileErrorDatabaseNotExisting
                                                 const std::wstring& displayFilePathL, //used for diagnostics only
                                                 const std::wstring& displayFilePathR)
 {
@@ -805,7 +804,7 @@ std::pair<DbStreams::const_iterator,
 
     if (itCommonL == streamsLeft.end())
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
-                                           _("Database files do not yet contain information about the last synchronisation."));
+                                           _("The database files do not yet contain information about the last synchronization."));
 
     return std::make_pair(itCommonL, itCommonR);
 }

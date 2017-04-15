@@ -172,10 +172,10 @@ SyncOperation FolderPair::getSyncOperation() const
         //action for child elements may occassionally have to overwrite parent task:
         switch (*syncOpBuffered_)
         {
-            case SO_MOVE_LEFT_SOURCE:
-            case SO_MOVE_LEFT_TARGET:
-            case SO_MOVE_RIGHT_SOURCE:
-            case SO_MOVE_RIGHT_TARGET:
+            case SO_MOVE_LEFT_FROM:
+            case SO_MOVE_LEFT_TO:
+            case SO_MOVE_RIGHT_FROM:
+            case SO_MOVE_RIGHT_TO:
                 assert(false);
             case SO_CREATE_NEW_LEFT:
             case SO_CREATE_NEW_RIGHT:
@@ -198,7 +198,7 @@ SyncOperation FolderPair::getSyncOperation() const
                 {
                     const SyncOperation op = fsObj.getSyncOperation();
                         return  op == SO_CREATE_NEW_LEFT ||
-                                op == SO_MOVE_LEFT_TARGET;
+                                op == SO_MOVE_LEFT_TO;
                     }))
                     syncOpBuffered_ = SO_CREATE_NEW_LEFT;
                     //2. cancel parent deletion if only a single child is not also scheduled for deletion
@@ -210,7 +210,7 @@ SyncOperation FolderPair::getSyncOperation() const
                             return false; //fsObj may already be empty because it once contained a "move source"
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_RIGHT &&
-                               op != SO_MOVE_RIGHT_SOURCE;
+                               op != SO_MOVE_RIGHT_FROM;
                     }))
                     syncOpBuffered_ = SO_DO_NOTHING;
                 }
@@ -221,7 +221,7 @@ SyncOperation FolderPair::getSyncOperation() const
                 {
                     const SyncOperation op = fsObj.getSyncOperation();
                         return  op == SO_CREATE_NEW_RIGHT ||
-                                op == SO_MOVE_RIGHT_TARGET;
+                                op == SO_MOVE_RIGHT_TO;
                     }))
                     syncOpBuffered_ = SO_CREATE_NEW_RIGHT;
                     else if (*syncOpBuffered_ == SO_DELETE_LEFT &&
@@ -232,7 +232,7 @@ SyncOperation FolderPair::getSyncOperation() const
                             return false;
                         const SyncOperation op = fsObj.getSyncOperation();
                         return op != SO_DELETE_LEFT &&
-                               op != SO_MOVE_LEFT_SOURCE;
+                               op != SO_MOVE_LEFT_FROM;
                     }))
                     syncOpBuffered_ = SO_DO_NOTHING;
                 }
@@ -257,16 +257,16 @@ SyncOperation FilePair::applyMoveOptimization(SyncOperation op) const
 
             if (op    == SO_CREATE_NEW_LEFT &&
                 opRef == SO_DELETE_LEFT)
-                op = SO_MOVE_LEFT_TARGET;
+                op = SO_MOVE_LEFT_TO;
             else if (op    == SO_DELETE_LEFT &&
                      opRef == SO_CREATE_NEW_LEFT)
-                op = SO_MOVE_LEFT_SOURCE;
+                op = SO_MOVE_LEFT_FROM;
             else if (op    == SO_CREATE_NEW_RIGHT &&
                      opRef == SO_DELETE_RIGHT)
-                op = SO_MOVE_RIGHT_TARGET;
+                op = SO_MOVE_RIGHT_TO;
             else if (op    == SO_DELETE_RIGHT &&
                      opRef == SO_CREATE_NEW_RIGHT)
-                op = SO_MOVE_RIGHT_SOURCE;
+                op = SO_MOVE_RIGHT_FROM;
         }
     return op;
 }
@@ -331,15 +331,15 @@ std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
             visitFSObject(fsObj, [](const FolderPair& folder) {},
             [&](const FilePair& file)
             {
-                descr = descr + L"\n" +
-                        arrowLeft  + L" " + zen::utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-                        arrowRight + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>());
+                descr += std::wstring(L"\n") +
+                         arrowLeft  + L" " + zen::utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                         arrowRight + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>());
             },
             [&](const SymlinkPair& symlink)
             {
-                descr = descr + L"\n" +
-                        arrowLeft  + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-                        arrowRight + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<RIGHT_SIDE>());
+                descr += std::wstring(L"\n") +
+                         arrowLeft  + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                         arrowRight + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<RIGHT_SIDE>());
             });
             return descr + footer;
         }
@@ -365,11 +365,11 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
             return _("Delete left item");
         case SO_DELETE_RIGHT:
             return _("Delete right item");
-        case SO_MOVE_LEFT_SOURCE:
-        case SO_MOVE_LEFT_TARGET:
+        case SO_MOVE_LEFT_FROM:
+        case SO_MOVE_LEFT_TO:
             return _("Move file on left"); //move only supported for files
-        case SO_MOVE_RIGHT_SOURCE:
-        case SO_MOVE_RIGHT_TARGET:
+        case SO_MOVE_RIGHT_FROM:
+        case SO_MOVE_RIGHT_TO:
             return _("Move file on right");
         case SO_OVERWRITE_LEFT:
             return _("Update left item");
@@ -424,15 +424,15 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         }
         return getSyncOpDescription(op) + footer; //fallback
 
-        case SO_MOVE_LEFT_SOURCE:
-        case SO_MOVE_LEFT_TARGET:
-        case SO_MOVE_RIGHT_SOURCE:
-        case SO_MOVE_RIGHT_TARGET:
+        case SO_MOVE_LEFT_FROM:
+        case SO_MOVE_LEFT_TO:
+        case SO_MOVE_RIGHT_FROM:
+        case SO_MOVE_RIGHT_TO:
             if (auto sourceFile = dynamic_cast<const FilePair*>(&fsObj))
                 if (auto targetFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(sourceFile->getMoveRef())))
                 {
-                    const bool onLeft   = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_LEFT_TARGET;
-                    const bool isSource = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_RIGHT_SOURCE;
+                    const bool onLeft   = op == SO_MOVE_LEFT_FROM || op == SO_MOVE_LEFT_TO;
+                    const bool isSource = op == SO_MOVE_LEFT_FROM || op == SO_MOVE_RIGHT_FROM;
 
                     if (!isSource)
                         std::swap(sourceFile, targetFile);

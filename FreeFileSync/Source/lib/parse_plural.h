@@ -30,10 +30,10 @@ class PluralForm
 {
 public:
     PluralForm(const std::string& stream); //throw ParsingError
-    int getForm(int64_t n) const { n_ = std::abs(n) ; return static_cast<int>(expr->eval()); }
+    int getForm(int64_t n) const { n_ = std::abs(n) ; return static_cast<int>(expr_->eval()); }
 
 private:
-    std::shared_ptr<Expr<int64_t>> expr;
+    std::shared_ptr<Expr<int64_t>> expr_;
     mutable int64_t n_ = 0;
 };
 
@@ -46,9 +46,9 @@ class PluralFormInfo
 public:
     PluralFormInfo(const std::string& definition, int pluralCount); //throw InvalidPluralForm
 
-    int getCount() const { return static_cast<int>(forms.size()); }
-    bool isSingleNumberForm(int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].count == 1 : false; }
-    int  getFirstNumber    (int index) const { return 0 <= index && index < static_cast<int>(forms.size()) ? forms[index].firstNumber : -1; }
+    int getCount() const { return static_cast<int>(forms_.size()); }
+    bool isSingleNumberForm(int index) const { return 0 <= index && index < static_cast<int>(forms_.size()) ? forms_[index].count == 1 : false; }
+    int  getFirstNumber    (int index) const { return 0 <= index && index < static_cast<int>(forms_.size()) ? forms_[index].firstNumber : -1; }
 
 private:
     struct FormInfo
@@ -56,7 +56,7 @@ private:
         int count       = 0;
         int firstNumber = 0; //which maps to the plural form index position
     };
-    std::vector<FormInfo> forms;
+    std::vector<FormInfo> forms_;
 };
 
 
@@ -205,65 +205,62 @@ struct Token
 class Scanner
 {
 public:
-    Scanner(const std::string& stream) : stream_(stream), pos(stream_.begin()) {}
+    Scanner(const std::string& stream) : stream_(stream), pos_(stream_.begin()) {}
 
     Token nextToken()
     {
         //skip whitespace
-        pos = std::find_if(pos, stream_.end(), [](char c) { return !zen::isWhiteSpace(c); });
+        pos_ = std::find_if(pos_, stream_.end(), [](char c) { return !zen::isWhiteSpace(c); });
 
-        if (pos == stream_.end())
+        if (pos_ == stream_.end())
             return Token::TK_END;
 
-        for (const auto& item : tokens)
+        for (const auto& item : tokens_)
             if (startsWith(item.first))
             {
-                pos += item.first.size();
+                pos_ += item.first.size();
                 return Token(item.second);
             }
 
-        auto digitEnd = std::find_if(pos, stream_.end(), [](char c) { return !zen::isDigit(c); });
+        auto digitEnd = std::find_if(pos_, stream_.end(), [](char c) { return !zen::isDigit(c); });
+        if (pos_ == digitEnd)
+            throw ParsingError(); //unknown token
 
-        if (digitEnd != pos)
-        {
-            auto number = zen::stringTo<int64_t>(std::string(pos, digitEnd));
-            pos = digitEnd;
-            return number;
-        }
-
-        throw ParsingError(); //unknown token
+        auto number = zen::stringTo<int64_t>(std::string(pos_, digitEnd));
+        pos_ = digitEnd;
+        return number;
     }
 
 private:
     bool startsWith(const std::string& prefix) const
     {
-        if (stream_.end() - pos < static_cast<ptrdiff_t>(prefix.size()))
+        if (stream_.end() - pos_ < static_cast<ptrdiff_t>(prefix.size()))
             return false;
-        return std::equal(prefix.begin(), prefix.end(), pos);
+        return std::equal(prefix.begin(), prefix.end(), pos_);
     }
 
     using TokenList = std::vector<std::pair<std::string, Token::Type>>;
-    const TokenList tokens
+    const TokenList tokens_
     {
-        { "?", Token::TK_TERNARY_QUEST },
-        { ":", Token::TK_TERNARY_COLON },
+        { "?",  Token::TK_TERNARY_QUEST },
+        { ":",  Token::TK_TERNARY_COLON },
         { "||", Token::TK_OR            },
         { "&&", Token::TK_AND           },
         { "==", Token::TK_EQUAL         },
         { "!=", Token::TK_NOT_EQUAL     },
         { "<=", Token::TK_LESS_EQUAL    },
-        { "<", Token::TK_LESS          },
+        { "<",  Token::TK_LESS          },
         { ">=", Token::TK_GREATER_EQUAL },
-        { ">", Token::TK_GREATER       },
-        { "%", Token::TK_MODULUS       },
-        { "n", Token::TK_VARIABLE_N    },
-        { "N", Token::TK_VARIABLE_N    },
-        { "(", Token::TK_BRACKET_LEFT  },
-        { ")", Token::TK_BRACKET_RIGHT },
+        { ">",  Token::TK_GREATER       },
+        { "%",  Token::TK_MODULUS       },
+        { "n",  Token::TK_VARIABLE_N    },
+        { "N",  Token::TK_VARIABLE_N    },
+        { "(",  Token::TK_BRACKET_LEFT  },
+        { ")",  Token::TK_BRACKET_RIGHT },
     };
 
     const std::string stream_;
-    std::string::const_iterator pos;
+    std::string::const_iterator pos_;
 };
 
 //-------------------------------------------------------------------------------
@@ -441,7 +438,7 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
     if (pluralCount < 1)
         throw InvalidPluralForm();
 
-    forms.resize(pluralCount);
+    forms_.resize(pluralCount);
     try
     {
         parse_plural::PluralForm pf(definition); //throw parse_plural::ParsingError
@@ -451,12 +448,12 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
         //=> 1000 iterations should be fast enough and still detect all "single number forms"
         for (int j = 0; j < 1000; ++j)
         {
-            int form = pf.getForm(j);
-            if (0 <= form && form < static_cast<int>(forms.size()))
+            const int form = pf.getForm(j);
+            if (0 <= form && form < static_cast<int>(forms_.size()))
             {
-                if (forms[form].count == 0)
-                    forms[form].firstNumber = j;
-                ++forms[form].count;
+                if (forms_[form].count == 0)
+                    forms_[form].firstNumber = j;
+                ++forms_[form].count;
             }
             else
                 throw InvalidPluralForm();
@@ -468,13 +465,13 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
     }
 
     //ensure each form is used at least once:
-    if (!std::all_of(forms.begin(), forms.end(), [](const FormInfo& fi) { return fi.count >= 1; }))
+    if (!std::all_of(forms_.begin(), forms_.end(), [](const FormInfo& fi) { return fi.count >= 1; }))
     throw InvalidPluralForm();
 }
 
 
 inline
-PluralForm::PluralForm(const std::string& stream) : expr(implementation::Parser(stream, n_).parse()) {} //throw ParsingError
+PluralForm::PluralForm(const std::string& stream) : expr_(implementation::Parser(stream, n_).parse()) {} //throw ParsingError
 }
 
 #endif //PARSE_PLURAL_H_180465845670839576

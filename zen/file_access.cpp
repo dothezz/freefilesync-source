@@ -91,25 +91,22 @@ PathStatus zen::getPathStatus(const Zstring& itemPath) //throw FileError
     const Zstring itemName = afterLast(itemPath, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
     assert(!itemName.empty());
 
-    PathStatus pd = getPathStatus(*parentPath); //throw FileError
-    if (!pd.relPath.empty())
-    {
-        pd.relPath.push_back(itemName);
-        return { pd.existingType, pd.existingPath, pd.relPath };
-    }
-
-    try
-    {
-        traverseFolder(*parentPath,
-        [&](const FileInfo&    fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FILE; },
-        [&](const FolderInfo&  fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FOLDER; },
-        [&](const SymlinkInfo& si) { if (equalFilePath(si.itemName, itemName)) throw ItemType::SYMLINK; },
-        [](const std::wstring& errorMsg) { throw FileError(errorMsg); });
-
-        return { pd.existingType, *parentPath, { itemName } }; //throw FileError
-    }
-    catch (const ItemType& type) { return { type, itemPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
+    PathStatus ps = getPathStatus(*parentPath); //throw FileError
+    if (ps.relPath.empty() &&
+        ps.existingType != ItemType::FILE) //obscure, but possible (and not an error)
+        try
+        {
+            traverseFolder(*parentPath,
+            [&](const FileInfo&    fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FILE; },
+            [&](const FolderInfo&  fi) { if (equalFilePath(fi.itemName, itemName)) throw ItemType::FOLDER; },
+            [&](const SymlinkInfo& si) { if (equalFilePath(si.itemName, itemName)) throw ItemType::SYMLINK; },
+            [](const std::wstring& errorMsg) { throw FileError(errorMsg); });
+        }
+        catch (const ItemType& type) { return { type, itemPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
     //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
+
+    ps.relPath.push_back(itemName);
+    return ps;
 }
 
 
@@ -337,7 +334,7 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
     {
         renameFile_sub(pathSource, pathTarget); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
     }
-    catch (const ErrorTargetExisting&)
+    catch (ErrorTargetExisting&)
     {
         throw;
     }
@@ -388,7 +385,7 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
 
 }
 
-
+warn_static("remove after test")
 void zen::setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl) //throw FileError
 {
     struct ::timespec writeTime = {};
@@ -588,9 +585,9 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 
 namespace
 {
-InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting
-                                    const Zstring& targetFile,
-                                    const IOCallback& notifyUnbufferedIO)
+FileCopyResult copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, ErrorTargetExisting
+                                  const Zstring& targetFile,
+                                  const IOCallback& notifyUnbufferedIO)
 {
     int64_t totalUnbufferedIO = 0;
 
@@ -631,19 +628,28 @@ InSyncAttributes copyFileOsSpecific(const Zstring& sourceFile, //throw FileError
     //close output file handle before setting file time; also good place to catch errors when closing stream!
     fileOut.finalize(); //throw FileError, (X)  essentially a close() since  buffers were already flushed
 
+Opt<FileError> errorModTime;
+		try
+	{
     //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
     //this triggers bugs on samba shares where the modification time is set to current time instead.
     //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
     //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
     //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
     setWriteTimeNative(targetFile, sourceInfo.st_mtim, ProcSymlink::FOLLOW); //throw FileError
+	}
+	catch (const FileError& e)
+	{
+	errorModTime = FileError(e.toString()); //avoid slicing
+	}
 
-    InSyncAttributes newAttrib;
-    newAttrib.fileSize         = sourceInfo.st_size;
-    newAttrib.modificationTime = sourceInfo.st_mtim.tv_sec; //
-    newAttrib.sourceFileId     = extractFileId(sourceInfo);
-    newAttrib.targetFileId     = extractFileId(targetInfo);
-    return newAttrib;
+    FileCopyResult result;
+    result.fileSize = sourceInfo.st_size;
+    result.modTime = sourceInfo.st_mtim.tv_sec; //
+    result.sourceFileId = extractFileId(sourceInfo);
+    result.targetFileId = extractFileId(targetInfo);
+	result.errorModTime = errorModTime;
+    return result;
 }
 
 /*                  ------------------
@@ -660,10 +666,10 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsStream(::BackupRead/::Backu
 }
 
 
-InSyncAttributes zen::copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                  const IOCallback& notifyUnbufferedIO)
+FileCopyResult zen::copyNewFile(const Zstring& sourceFile, const Zstring& targetFile, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                const IOCallback& notifyUnbufferedIO)
 {
-    const InSyncAttributes attr = copyFileOsSpecific(sourceFile, targetFile, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    const FileCopyResult result = copyFileOsSpecific(sourceFile, targetFile, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
     //at this point we know we created a new file, so it's fine to delete it for cleanup!
     ZEN_ON_SCOPE_FAIL(try { removeFilePlain(targetFile); }
@@ -672,5 +678,5 @@ InSyncAttributes zen::copyNewFile(const Zstring& sourceFile, const Zstring& targ
     if (copyFilePermissions)
         copyItemPermissions(sourceFile, targetFile, ProcSymlink::FOLLOW); //throw FileError
 
-    return attr;
+    return result;
 }

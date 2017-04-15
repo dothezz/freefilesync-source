@@ -60,56 +60,35 @@ struct InputStreamNative : public AbstractFileSystem::InputStream
 {
     InputStreamNative(const Zstring& filePath, const IOCallback& notifyUnbufferedIO) : fi_(filePath, notifyUnbufferedIO) {} //throw FileError, ErrorFileLocked
 
-    size_t        read(void* buffer, size_t bytesToRead) override { return fi_.read(buffer, bytesToRead); } //throw FileError, X; return "bytesToRead" bytes unless end of stream!
-    size_t        getBlockSize()  const override { return fi_.getBlockSize(); } //non-zero block size is AFS contract!
-    AFS::FileId   getFileId     () override; //throw FileError
-    int64_t  getModificationTime() override; //throw FileError
-    uint64_t getFileSize        () override; //throw FileError
+    size_t read(void* buffer, size_t bytesToRead) override { return fi_.read(buffer, bytesToRead); } //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+    size_t getBlockSize() const override { return fi_.getBlockSize(); } //non-zero block size is AFS contract!
+    Opt<AFS::StreamAttributes> getBufferedAttributes() override; //throw FileError
 
 private:
-    const FileAttribs& getBufferedAttributes() //throw FileError
-    {
-        if (!fileAttr_)
-            fileAttr_ = getFileAttributes(fi_.getHandle(), fi_.getFilePath()); //throw FileError
-        return *fileAttr_;
-    }
-
     FileInput fi_;
-    Opt<FileAttribs> fileAttr_;
 };
 
 
-inline
-AFS::FileId InputStreamNative::getFileId()
+Opt<AFS::StreamAttributes> InputStreamNative::getBufferedAttributes() //throw FileError
 {
-    return convertToAbstractFileId(extractFileId(getBufferedAttributes())); //throw FileError
-}
+    const FileAttribs fileAttr = getFileAttributes(fi_.getHandle(), fi_.getFilePath()); //throw FileError
 
+    const int64_t modTime = fileAttr.st_mtime;
 
-inline
-int64_t InputStreamNative::getModificationTime()
-{
-    return getBufferedAttributes().st_mtime; //throw FileError
-}
+    const uint64_t fileSize = makeUnsigned(fileAttr.st_size);
 
+    const AFS::FileId fileId = convertToAbstractFileId(extractFileId(fileAttr));
 
-inline
-uint64_t InputStreamNative::getFileSize()
-{
-    const FileAttribs& fa = getBufferedAttributes(); //throw FileError
-    return makeUnsigned(fa.st_size); //throw FileError
+    return AFS::StreamAttributes({ modTime, fileSize, fileId });
 }
 
 //===========================================================================================================================
 
 struct OutputStreamNative : public AbstractFileSystem::OutputStreamImpl
 {
-    OutputStreamNative(const Zstring& filePath, const uint64_t* streamSize, const int64_t* modTime, const IOCallback& notifyUnbufferedIO) :
+    OutputStreamNative(const Zstring& filePath, const uint64_t* streamSize, const IOCallback& notifyUnbufferedIO) :
         fo_(filePath, FileOutput::ACC_CREATE_NEW, notifyUnbufferedIO) //throw FileError, ErrorTargetExisting
     {
-        if (modTime)
-            modTime_ = *modTime;
-
         if (streamSize) //pre-allocate file space, because we can
             fo_.preAllocateSpaceBestEffort(*streamSize); //throw FileError
     }
@@ -122,24 +101,11 @@ struct OutputStreamNative : public AbstractFileSystem::OutputStreamImpl
 
         fo_.finalize(); //throw FileError, X
 
-        try
-        {
-            if (modTime_)
-                zen::setFileTime(fo_.getFilePath(), *modTime_, ProcSymlink::FOLLOW); //throw FileError
-        }
-        catch (FileError&)
-        {
-            throw;
-            //Failing to set modification time is not a serious problem from synchronization
-            //perspective (treated like external update), except for the inconvenience.
-            //Support additional scenarios like writing to FTP on Linux? Keep strict handling for now.
-        }
         return fileId;
     }
 
 private:
     FileOutput fo_;
-    Opt<int64_t> modTime_;
 };
 
 //===========================================================================================================================
@@ -217,25 +183,18 @@ private:
     }
 
     //----------------------------------------------------------------------------------------------------------------
-
-    void setModTime(const AfsPath& afsPath, int64_t modificationTime) const override //throw FileError, follows symlinks
+    void setModTime(const AfsPath& afsPath, int64_t modTime) const override //throw FileError, follows symlinks
     {
         initComForThread(); //throw FileError
-        zen::setFileTime(getNativePath(afsPath), modificationTime, ProcSymlink::FOLLOW); //throw FileError
+        zen::setFileTime(getNativePath(afsPath), modTime, ProcSymlink::FOLLOW); //throw FileError
     }
 
-    void setModTimeSymlink(const AfsPath& afsPath, int64_t modificationTime) const override //throw FileError
-    {
-        initComForThread(); //throw FileError
-        zen::setFileTime(getNativePath(afsPath), modificationTime, ProcSymlink::DIRECT); //throw FileError
-    }
-
-    AbstractPath getResolvedSymlinkPath(const AfsPath& afsPath) const override //throw FileError
+    AbstractPath getSymlinkResolvedPath(const AfsPath& afsPath) const override //throw FileError
     {
         initComForThread(); //throw FileError
         const Zstring nativePath = getNativePath(afsPath);
 
-        const Zstring resolvedPath = zen::getResolvedSymlinkPath(nativePath); //throw FileError
+        const Zstring resolvedPath = zen::getSymlinkResolvedPath(nativePath); //throw FileError
         const Opt<zen::PathComponents> comp = parsePathComponents(resolvedPath);
         if (!comp)
             throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtPath(nativePath)),
@@ -252,22 +211,21 @@ private:
         std::string content = utfTo<std::string>(getSymlinkTargetRaw(nativePath)); //throw FileError
         return content;
     }
-
     //----------------------------------------------------------------------------------------------------------------
+
     //return value always bound:
-    std::unique_ptr<InputStream> getInputStream(const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const override //throw FileError, ErrorFileLocked
+    std::unique_ptr<InputStream> getInputStream(const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const override //throw FileError, ErrorFileLocked, (X)
     {
         initComForThread(); //throw FileError
         return std::make_unique<InputStreamNative>(getNativePath(afsPath), notifyUnbufferedIO); //throw FileError, ErrorFileLocked
     }
 
-    std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath,  //throw FileError, ErrorTargetExisting
-                                                      const uint64_t* streamSize,                     //
-                                                      const int64_t* modificationTime,                //optional
+    std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError, ErrorTargetExisting
+                                                      const uint64_t* streamSize,                          //optional
                                                       const IOCallback& notifyUnbufferedIO) const override //
     {
         initComForThread(); //throw FileError
-        return std::make_unique<OutputStreamNative>(getNativePath(afsPath), streamSize, modificationTime, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting
+        return std::make_unique<OutputStreamNative>(getNativePath(afsPath), streamSize, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting
     }
 
     //----------------------------------------------------------------------------------------------------------------
@@ -278,21 +236,22 @@ private:
     //----------------------------------------------------------------------------------------------------------------
 
     //symlink handling: follow link!
-    FileAttribAfterCopy copyFileForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                               const IOCallback& notifyUnbufferedIO) const override //may be nullptr; throw X!
+    FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                          const AbstractPath& apTarget, bool copyFilePermissions, const IOCallback& notifyUnbufferedIO) const override //may be nullptr; throw X!
     {
         const Zstring nativePathTarget = static_cast<const NativeFileSystem&>(getAfs(apTarget)).getNativePath(getAfsPath(apTarget));
 
         initComForThread(); //throw FileError
 
-        const InSyncAttributes attrNew = copyNewFile(getNativePath(afsPathSource), nativePathTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                                     copyFilePermissions, notifyUnbufferedIO); //may be nullptr; throw X!
-        FileAttribAfterCopy attrOut;
-        attrOut.fileSize         = attrNew.fileSize;
-        attrOut.modificationTime = attrNew.modificationTime;
-        attrOut.sourceFileId     = convertToAbstractFileId(attrNew.sourceFileId);
-        attrOut.targetFileId     = convertToAbstractFileId(attrNew.targetFileId);
-        return attrOut;
+        const zen::FileCopyResult nativeResult = copyNewFile(getNativePath(afsPathSource), nativePathTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                                             copyFilePermissions, notifyUnbufferedIO); //may be nullptr; throw X!
+        FileCopyResult result;
+        result.fileSize     = nativeResult.fileSize;
+        result.modTime      = nativeResult.modTime;
+        result.sourceFileId = convertToAbstractFileId(nativeResult.sourceFileId);
+        result.targetFileId = convertToAbstractFileId(nativeResult.targetFileId);
+        result.errorModTime = nativeResult.errorModTime;
+        return result;
     }
 
     //symlink handling: follow link!

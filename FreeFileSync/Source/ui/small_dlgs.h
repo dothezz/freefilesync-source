@@ -27,8 +27,6 @@ struct ReturnSmallDlg
 
 void showAboutDialog(wxWindow* parent);
 
-ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, FilterConfig& filter, const wxString& caption);
-
 ReturnSmallDlg::ButtonPressed showCopyToDialog(wxWindow* parent,
                                                const std::vector<const FileSystemObject*>& rowsOnLeft,
                                                const std::vector<const FileSystemObject*>& rowsOnRight,
@@ -48,8 +46,6 @@ ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,
                                                       const SyncStatistics& statistics,
                                                       bool& dontShowAgain);
 
-ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig, const wxString& title);
-
 ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo);
@@ -64,7 +60,7 @@ enum class ReturnActivationDlg
 ReturnActivationDlg showActivationDialog(wxWindow* parent, const std::wstring& lastErrorMsg, const std::wstring& manualActivationUrl, std::wstring& manualActivationKey);
 
 
-class DownloadProgressWindow //remporary progress info => life-time: stack
+class DownloadProgressWindow //temporary progress info => life-time: stack
 {
 public:
     DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, uint64_t fileSize);

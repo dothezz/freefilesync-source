@@ -69,7 +69,7 @@ FolderSelector::FolderSelector(wxWindow&         dropWindow,
     auto setupDragDrop = [&](wxWindow& dropWin)
     {
         setupFileDrop(dropWin);
-        dropWin.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
+        dropWin.Connect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onKeyFileDropped), nullptr, this);
     };
 
     setupDragDrop(dropWindow_);
@@ -88,10 +88,10 @@ FolderSelector::FolderSelector(wxWindow&         dropWindow,
 
 FolderSelector::~FolderSelector()
 {
-    dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
+    dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onKeyFileDropped), nullptr, this);
 
     if (dropWindow2_)
-        dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onFilesDropped), nullptr, this);
+        dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(FolderSelector::onKeyFileDropped), nullptr, this);
 
     folderComboBox_       .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (FolderSelector::onMouseWheel     ), nullptr, this);
     folderComboBox_       .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(FolderSelector::onEditFolderPath ), nullptr, this);
@@ -119,7 +119,7 @@ void FolderSelector::onMouseWheel(wxMouseEvent& event)
 }
 
 
-void FolderSelector::onFilesDropped(FileDropEvent& event)
+void FolderSelector::onKeyFileDropped(FileDropEvent& event)
 {
     const auto& itemPaths = event.getPaths();
     if (itemPaths.empty())

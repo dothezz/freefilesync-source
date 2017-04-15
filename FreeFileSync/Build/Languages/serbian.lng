@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Постављам подразумеване синхронизацијске смерове: Старе датотеке биће замењене новијим датотекама.</target>
 
-<source>Creating folder %x</source>
-<target>Креирам фолдер %x</target>
-
 <source>Creating file %x</source>
 <target>Правим датотеку %x</target>
+
+<source>Creating folder %x</source>
+<target>Креирам фолдер %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Креирам симболичну везу %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Ако се ова грешка игнорише фолдери ће се сматрати празним. Недостајући фолдери креираће се аутоматски по потреби.</target>
 
-<source>A folder input field is empty.</source>
-<target>Поље за одабир фолдера је празно.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Одговарајући фолдер сматраће се празним.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Следећи фолдерски парови зависни су један од другог:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Датотека %x има невалидни датум.</target>
 
 <source>Date:</source>
 <target>Датум:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Датотеке %x имају исти датум али другачију величину.</target>
+<source>Files have the same date but a different size.</source>
+<target></target>
 
 <source>Size:</source>
 <target>Величина:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Упоређење по садржају је изостављено за искључене датотеке %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target></target>
 
 <source>Items differ in attributes only</source>
 <target>Ставке се разликују само у атрибутима</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Покретање упоређивања</target>
+
+<source>A folder input field is empty.</source>
+<target>Поље за одабир фолдера је празно.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Одговарајући фолдер сматраће се празним.</target>
+
+<source>Exclude:</source>
+<target>Искључи:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target></target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target></target>
 
 <source>Calculating sync directions...</source>
 <target>Одређујем смерове синхронизације...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Освежи атрибуте десно</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Не могу уписати овлашћења за %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Операција није подржана за различите типове основних фолдера.</target>
-
 <source>Cannot write file %x.</source>
 <target>Не могу уписати датотеку %x.</target>
 
@@ -267,6 +267,12 @@ Actual: %y bytes
 Стварно: %y бајтова
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Не могу уписати овлашћења за %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Операција није подржана за различите типове основних фолдера.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Не могу копирати симболичну везу %x у %y.</target>
 
@@ -276,35 +282,29 @@ Actual: %y bytes
 <source>Unable to connect to %x.</source>
 <target>Не може се успоставити веза са %x.</target>
 
+<source>Failed to get information about server %x.</source>
+<target></target>
+
 <source>Cannot open directory %x.</source>
 <target>Не могу отворити фолдер %x.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Не могу излистати фолдер %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>Не могу прочитати атрибуте од %x.</target>
-
-<source>Cannot find %x.</source>
-<target>Не могу пронаћи %x.</target>
-
-<source>Cannot open file %x.</source>
-<target>Не могу отворити датотеку %x.</target>
+<source>Cannot read directory %x.</source>
+<target></target>
 
 <source>Cannot read file %x.</source>
 <target>Не могу читати датотеку %x.</target>
 
-<source>Cannot find device %x.</source>
-<target>Не могу пронаћи уређај %x.</target>
-
 <source>Cannot create directory %x.</source>
 <target>Не могу креирати фолдер %x.</target>
+
+<source>Cannot delete file %x.</source>
+<target>Не могу избрисати датотеку %x.</target>
 
 <source>Cannot delete directory %x.</source>
 <target>Не могу избрисати фолдер %x.</target>
 
-<source>Cannot delete file %x.</source>
-<target>Не могу избрисати датотеку %x.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Не могу прочитати атрибуте од %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Не могу уписати време промене %x.</target>
@@ -315,14 +315,59 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>Не могу разрешити симболичну везу %x.</target>
 
-<source>Cannot determine free disk space for %x.</source>
-<target>Не могу одредити слободан простор на диску за %x.</target>
-
 <source>Unable to move %x to the recycle bin.</source>
 <target>Није могуће преместити %x у Корпи за смеће.</target>
 
+<source>Cannot open file %x.</source>
+<target>Не могу отворити датотеку %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Не могу пронаћи уређај %x.</target>
+
+<source>Cannot find %x.</source>
+<target>Не могу пронаћи %x.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Тип ставке %x није подржан:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target></target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Не могу одредити слободан простор на диску за %x.</target>
+
 <source>Incorrect command line:</source>
 <target>Нетачна командна линија:</target>
+
+<source>Error Code %x</source>
+<target></target>
+
+<source>The server does not support authentication via %x.</source>
+<target></target>
+
+<source>Required:</source>
+<target>Потребно:</target>
+
+<source>Unable to access %x.</source>
+<target></target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target></target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target></target>
+
+<source>Active connections: %x</source>
+<target></target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target></target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -355,11 +400,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Датотека базе %x још не постоји.</target>
 
-<source>Database file is corrupt:</source>
-<target>Датотека базе је оштећена:</target>
+<source>Database file is corrupted:</source>
+<target></target>
 
-<source>Database files do not share a common session.</source>
-<target>Датотеке базе не деле заједничку сесију.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target></target>
+
+<source>Loading file %x...</source>
+<target></target>
+
+<source>Saving file %x...</source>
+<target>Уписујем датотеку %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Тражим фолдер %x...</target>
@@ -388,9 +439,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Детекција обустављеног закључавања...</target>
-
-<source>Saving file %x...</source>
-<target>Уписујем датотеку %x...</target>
 
 <source>Items processed:</source>
 <target>Обрађени елементи:</target>
@@ -647,20 +695,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>Недовољно простора на диску у:</target>
 
-<source>Required:</source>
-<target>Потребно:</target>
-
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Више парова фолдера уписује у заједничком фолдеру. Молимо проверите вашу конфигурацију.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target></target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target></target>
+
+<source>Versioning folder:</source>
+<target></target>
+
+<source>Base folder:</source>
+<target></target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target></target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизовање фолдерског пара:</target>
 
 <source>Generating database...</source>
 <target>Генерисање базе података...</target>
+
+<source>Loading...</source>
+<target>Учитавање...</target>
 
 <source>job name</source>
 <target>име задатка</target>
@@ -786,15 +846,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Молимо одаберите фолдер на локалном систему, мрежи или на MTP уређају.</target>
 
-<source>SFTP folder</source>
-<target>SFTP фолдер</target>
-
-<source>Select SFTP folder</source>
-<target>Одаберите SFTP фолдер</target>
-
-<source>Select alternative folder type</source>
-<target>Одаберите алтернативни тип фолдера</target>
-
 <source>&New</source>
 <target>&Ново</target>
 
@@ -840,11 +891,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>&Алати</target>
 
-<source>&Check for new version</source>
-<target>&Провери постојање нове верзије</target>
-
-<source>&Check now</source>
-<target>&Провери сада</target>
+<source>&Check for updates now</source>
+<target></target>
 
 <source>Check &automatically once a week</source>
 <target>Провери &аутоматски једном недељно</target>
@@ -863,6 +911,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Уклони фолдер пар</target>
+
+<source>Access online storage</source>
+<target></target>
 
 <source>Swap sides</source>
 <target>Замени стране</target>
@@ -951,9 +1002,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>Укључи:</target>
 
-<source>Exclude:</source>
-<target>Искључи:</target>
-
 <source>Show examples</source>
 <target>Прикажи примере</target>
 
@@ -1037,8 +1085,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>Поређај фолдерски пар</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Унесите ваше SFTP податке логовања:</target>
+<source>Enter your login details:</source>
+<target></target>
+
+<source>Connection type:</source>
+<target></target>
 
 <source>Server name or IP address:</source>
 <target>Име сервера или IP адресу:</target>
@@ -1046,17 +1097,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>Порт:</target>
 
+<source>Encryption:</source>
+<target></target>
+
+<source>&Disabled</source>
+<target></target>
+
+<source>&Explicit SSL/TLS</source>
+<target></target>
+
+<source>Authentication:</source>
+<target></target>
+
+<source>&Password</source>
+<target></target>
+
+<source>&Key file</source>
+<target></target>
+
 <source>User name:</source>
 <target>Корисничко име:</target>
 
-<source>Password:</source>
-<target>Лозинка:</target>
+<source>Private key file:</source>
+<target></target>
 
 <source>&Show password</source>
 <target>&Прикажи лозинку</target>
 
 <source>Directory on server:</source>
 <target>Фолдер на серверу:</target>
+
+<source>Performance improvements:</source>
+<target></target>
+
+<source>How to get best performance?</source>
+<target></target>
+
+<source>SSH connections for directory reading:</source>
+<target></target>
+
+<source>Suggested range: [1 - 10]</source>
+<target></target>
+
+<source>SFTP channels per connection:</source>
+<target></target>
+
+<source>Detect server limit</source>
+<target></target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target></target>
 
 <source>Select a directory on the server:</source>
 <target>Одаберите фолдер на серверу:</target>
@@ -1187,6 +1277,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Изворни код написан у C++ уз коришћење:</target>
 
+<source>Donation details</source>
+<target></target>
+
 <source>If you like FreeFileSync:</source>
 <target>Ако вам се свиђа FreeFileSync:</target>
 
@@ -1196,8 +1289,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>Повратне информације и предлози су добродошли</target>
 
-<source>Homepage</source>
-<target>Веб страница</target>
+<source>Home page</source>
+<target></target>
 
 <source>Email</source>
 <target>И-меил</target>
@@ -1208,8 +1301,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Велике похвале за локализацију:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH протокол трансфера</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target></target>
+
+<source>1. Activate via internet now:</source>
+<target></target>
+
+<source>Activate online</source>
+<target></target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target></target>
+
+<source>&Copy to clipboard</source>
+<target></target>
+
+<source>Enter activation key:</source>
+<target></target>
+
+<source>Activate offline</source>
+<target></target>
 
 <source>Save as Batch Job</source>
 <target>Сачувај као беч задатак</target>
@@ -1225,6 +1336,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>Изаберите временски распон</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target></target>
 
 <source>&Options</source>
 <target>&Опције</target>
@@ -1247,8 +1361,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Преглед</target>
 
-<source>&Download</source>
-<target>&Преузми</target>
+<source>&Show details</source>
+<target></target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Нова верзија FreeFileSync је доступна:</target>
@@ -1491,8 +1605,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог</target>
 
-<source>Loading...</source>
-<target>Учитавање...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target></target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target></target>
+
+<source>Password:</source>
+<target>Лозинка:</target>
+
+<source>Key password:</source>
+<target></target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1553,6 +1676,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Прикажи</target>
+
+<source>Downloading update...</source>
+<target></target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Идентификуј једнаке датотеке упоређивањем времена промена и величина.</target>
@@ -1647,11 +1773,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Проценат</target>
 
+<source>Failed to retrieve update information.</source>
+<target></target>
+
+<source>Automatic updates:</source>
+<target></target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target></target>
+
 <source>Check for Program Updates</source>
 <target>Провери постојање надоградње програма</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target></target>
+
+<source>&Auto-update</source>
+<target></target>
+
+<source>&Home page</source>
+<target></target>
+
 <source>Download now?</source>
 <target>Преузети сада?</target>
+
+<source>&Download</source>
+<target>&Преузми</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync је ажуриран.</target>
@@ -1665,14 +1812,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>Није успела провера конзистентности за %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Не могу пронаћи системску функцију %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target></target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target></target>
+
+<source>Incorrect activation key.</source>
+<target></target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Није могућа регистрација примања системских порука.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Инсталационе датотеке су оштећене. Молим инсталирајте FreeFileSync поново.</target>
+<source>Cannot find system function %x.</source>
+<target>Не могу пронаћи системску функцију %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Не могу регистровати нотификацију уређаја за %x.</target>
@@ -1703,9 +1856,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Не могу копирати атрибуте од %x у %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Тип ставке %x није подржан:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1752,9 +1902,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Не може се променити процес I/O приоритета.</target>
 
-<source>Error Code %x:</source>
-<target>Грешка број %x:</target>
-
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Провера доступности Корпе за смеће није успела за фолдер %x.</target>
 
@@ -1763,9 +1910,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Конфигурациона датотека %x није комплетна. Недостајући елементи биће постављени на њихове подразумеване вредности.</target>
-
-<source>Internet access failed.</source>
-<target>Приступ интернету није успео.</target>
 
 <source>Prepare installation</source>
 <target>Припремање инсталације</target>
@@ -1836,18 +1980,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Уреди са FreeFileSync-ом</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Хвала за вашу донацију и подршку!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Ова FreeFileSync инсталација за донаторе достигла је своју границу дневног инсталисања.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Преузети регуларну верзију са веб странице FreeFileSync-а?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>Преносна верзија не може бити инсталисана у одабраном фолдеру.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Молим одаберите локални тип инсталације или одаберите други фолдер за инсталацију.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target></target>
 

@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Asetetaan oletussuunta täsmäytykselle: vanhat tiedostot korvataan uudemilla tiedostoilla.</target>
 
-<source>Creating folder %x</source>
-<target>Luodaan hakemisto %x</target>
-
 <source>Creating file %x</source>
 <target>Luodaan tiedosto %x</target>
+
+<source>Creating folder %x</source>
+<target>Luodaan hakemisto %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Luodaan pikakuvake %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Hakemistot luodaan tyhjinä jos virhe ohitetaan. Puuttuvat hakemistot luodaan tarvittaessa.</target>
 
-<source>A folder input field is empty.</source>
-<target>Hakemiston syötekenttä on tyhjä.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Vastaava hakemisto tulkitaan tyhjäksi.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Nämä polut ovat riippuvaisia toisistaan:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Tiedostolla %x on virheellinen päiväys.</target>
 
 <source>Date:</source>
 <target>Pvm:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Tiedostoilla %x on sama päiväys, mutta eri koko.</target>
+<source>Files have the same date but a different size.</source>
+<target>Tiedostojen päiväys täsmäämutta koke ei.</target>
 
 <source>Size:</source>
 <target>Koko:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Sisällön vertailu sivutettiin poissuljetuille tiedostoille %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Sisällön tarkastus ohitettiin, tiedosto suljettu pois.</target>
 
 <source>Items differ in attributes only</source>
 <target>Kohteet eroavat vain ominaisuuksiltaan</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Vertailu alkaa</target>
+
+<source>A folder input field is empty.</source>
+<target>Hakemiston syötekenttä on tyhjä.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Vastaava hakemisto tulkitaan tyhjäksi.</target>
+
+<source>Exclude:</source>
+<target>Sulje pois:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>Hakemiston yksi juurihakemisto sisältyy jo toiseen.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Sulje hakemisto pois käyttämällä suodinta.</target>
 
 <source>Calculating sync directions...</source>
 <target>Lasketaan täsmäytyksen suuntaa...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Päivitä määritteet oikealla</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Ei voi tallentaa %x:n oikeuksia.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Toiminto ei tue erilaisia lähdehakemistoja.</target>
-
 <source>Cannot write file %x.</source>
 <target>Tiedoston %x kirjoittaminen ei onnistu.</target>
 
@@ -267,38 +267,44 @@ Oletettu: %x tavua
 Todellinen: %y tavua
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Ei voi tallentaa %x:n oikeuksia.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Toiminto ei tue erilaisia lähdehakemistoja.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Pikakuvike %x - %y kopiointi epäonnistui.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Tiedostoa %x ei voida siirtää kohtaan %y.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Hakemistoa %x ei voi luetella.</target>
+<source>Unable to connect to %x.</source>
+<target>Yhteyttä %x:n ei voi luoda.</target>
+
+<source>Failed to get information about server %x.</source>
+<target>Palvelimen %x tietoja ei saatu.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Hakemistoa %x ei voi avata.</target>
+
+<source>Cannot read directory %x.</source>
+<target>Hekemisto %x on lukukelvoton.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Tiedoston %x määritteitä ei voitu lukea.</target>
 
-<source>Cannot find %x.</source>
-<target>%x ei löydy.</target>
-
-<source>Cannot open file %x.</source>
-<target>Tiedosto %x ei aukea.</target>
-
 <source>Cannot read file %x.</source>
-<target>Tiedoston %x lukeminen ei onnistu.</target>
-
-<source>Cannot find device %x.</source>
-<target>Laite %x ei löydy.</target>
+<target>Tiedosto %x on lukukelvoton.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Hakemistoa %x ei voitu luoda.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Hakemistoa %x ei voida poistaa.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Ei voi poistaa tiedostoa %x.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Hakemistoa %x ei voida poistaa.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Tiedoston %x aikaleimaa ei voida kirjoittaa.</target>
@@ -309,20 +315,65 @@ Todellinen: %y tavua
 <source>Cannot resolve symbolic link %x.</source>
 <target>Pikakuvike %x on virheellinen.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Hakemistoa %x ei voi avata.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x:n siirto Roskakoriin epäonnistui.</target>
+
+<source>Cannot open file %x.</source>
+<target>Tiedosto %x ei aukea.</target>
+
+<source>Cannot find device %x.</source>
+<target>Laite %x ei löydy.</target>
+
+<source>Cannot find %x.</source>
+<target>%x ei löydy.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Kohteen %x tyyppiä ei tueta:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Pikakuvike %x:n poisto ei onnistu.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>%x:n vaapaan tilan määrittely ei onnistu.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x:n siirto Roskakoriin epäonnistui.</target>
-
 <source>Incorrect command line:</source>
 <target>Virheellinen komento:</target>
 
-<source>Unable to connect to %x.</source>
-<target>Yhteyttä %x:n ei voi luoda.</target>
+<source>Error Code %x</source>
+<target>Virhe %x.</target>
+
+<source>The server does not support authentication via %x.</source>
+<target>Palvelin ei salli tunnistautumista %x:n kautta.</target>
+
+<source>Required:</source>
+<target>Vaadittu:</target>
+
+<source>Unable to access %x.</source>
+<target>Ei saatu yhteyttä %x:n.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>Toiminto keskeytyy 1 sekunnin kuluttua.</pluralform>
+<pluralform>Toiminto keskeytyy %x sekunnin kuluttua.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>Odottaminen sallittu vain 1 yhteydelle.</pluralform>
+<pluralform>Odottaminen sallittu vain %x yhtäaikaiselle yhteydelle.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>Aktiivinen yhteys: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>SFTP kanava %x ei voitu avata.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -354,11 +405,17 @@ Todellinen: %y tavua
 <source>Database file %x does not yet exist.</source>
 <target>Tietokantaa %x ei vielä ole.</target>
 
-<source>Database file is corrupt:</source>
-<target>Tietokanta on viottunut:</target>
+<source>Database file is corrupted:</source>
+<target>Tietokanta on tuhoutunut:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Tietokannan tiedostot ovat eri istunnoista.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>Tietokannasa ei vielä ole tietoja viimeisestä täsmäyksestä.</target>
+
+<source>Loading file %x...</source>
+<target>Ladataan tiedostoa %x...</target>
+
+<source>Saving file %x...</source>
+<target>Tallennetaan tiedostoa %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Etsitään hakemistoa %x...</target>
@@ -386,9 +443,6 @@ Todellinen: %y tavua
 
 <source>Detecting abandoned lock...</source>
 <target>Hylätyn lukituksen etsintä...</target>
-
-<source>Saving file %x...</source>
-<target>Tallennetaan tiedostoa %x...</target>
 
 <source>Items processed:</source>
 <target>Osioita käsitelty:</target>
@@ -644,20 +698,32 @@ Käsky suoritetaan jos:
 <source>Not enough free disk space available in:</source>
 <target>Vapaa levytila ei riitä:</target>
 
-<source>Required:</source>
-<target>Vaadittu:</target>
-
 <source>Available:</source>
 <target>Saatavilla:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Useat hakemistoparit tallentaa yhteen alikansioon. Tarkista asetukset.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Jotkut tiedostot täsmäytetään osana useampaa juurihakemistoa.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>Ristiriidan välttämiseksi, aseta poisulkeva suodin jotta tiedosto käsitellään vain yhdessä juurihakemistossa.</target>
+
+<source>Versioning folder:</source>
+<target>Versiointi hakemisto:</target>
+
+<source>Base folder:</source>
+<target>Juurihakemisto:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Verioinnin hakemisto täsmäytetään, on osana juurihakemistoa.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Täsmäytetään  hakemistoparia:</target>
 
 <source>Generating database...</source>
-<target>Tietokanta luodaan...</target>
+<target>Tietokantaa luodaan...</target>
+
+<source>Loading...</source>
+<target>Lataan...</target>
 
 <source>job name</source>
 <target>työnnimi</target>
@@ -782,15 +848,6 @@ Käsky suoritetaan jos:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Valitse kansio joka on paikallinen, verkossa tai MTP laitteella.</target>
 
-<source>SFTP folder</source>
-<target>SFTP kansio</target>
-
-<source>Select SFTP folder</source>
-<target>Valitse SFTP hakemisto</target>
-
-<source>Select alternative folder type</source>
-<target>Valitse toinen hakemistotyyppi</target>
-
 <source>&New</source>
 <target>&Uusi</target>
 
@@ -836,11 +893,8 @@ Käsky suoritetaan jos:
 <source>&Tools</source>
 <target>&Asetukset</target>
 
-<source>&Check for new version</source>
-<target>&Hae uusi versio</target>
-
-<source>&Check now</source>
-<target>&Tarkista nyt</target>
+<source>&Check for updates now</source>
+<target>&Etsi päivityksiä nyt</target>
 
 <source>Check &automatically once a week</source>
 <target>Tarkista &viikoittain</target>
@@ -859,6 +913,9 @@ Käsky suoritetaan jos:
 
 <source>Remove folder pair</source>
 <target>Poista hakemistopari</target>
+
+<source>Access online storage</source>
+<target>Osoita online taltiota</target>
 
 <source>Swap sides</source>
 <target>Puoltenvaihto</target>
@@ -947,9 +1004,6 @@ Käsky suoritetaan jos:
 <source>Include:</source>
 <target>Sisällytä:</target>
 
-<source>Exclude:</source>
-<target>Sulje pois:</target>
-
 <source>Show examples</source>
 <target>Näytä esimerkkejä</target>
 
@@ -1033,8 +1087,11 @@ Käsky suoritetaan jos:
 <source>Arrange folder pair</source>
 <target>Järjestä hakemistoparit</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Anna SFTP kirjautumis tietosi:</target>
+<source>Enter your login details:</source>
+<target>Anna kirjautumistietosi:</target>
+
+<source>Connection type:</source>
+<target>Yhteystapa:</target>
 
 <source>Server name or IP address:</source>
 <target>Palvelimen nimi ja IP:</target>
@@ -1042,17 +1099,56 @@ Käsky suoritetaan jos:
 <source>Port:</source>
 <target>Portti:</target>
 
+<source>Encryption:</source>
+<target>Salaus:</target>
+
+<source>&Disabled</source>
+<target>&Estetty</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Explisiittinen SSL/TLS</target>
+
+<source>Authentication:</source>
+<target>Todennus:</target>
+
+<source>&Password</source>
+<target>&Salasana</target>
+
+<source>&Key file</source>
+<target>&Avaintiedosto</target>
+
 <source>User name:</source>
 <target>Käyttäjä:</target>
 
-<source>Password:</source>
-<target>Salasana:</target>
+<source>Private key file:</source>
+<target>Yksityinen avaintiedosto:</target>
 
 <source>&Show password</source>
 <target>&Näytä salasana</target>
 
 <source>Directory on server:</source>
 <target>Palvelimen hakemisto:</target>
+
+<source>Performance improvements:</source>
+<target>Suorituskyvyn tehosteet:</target>
+
+<source>How to get best performance?</source>
+<target>Miten saan parhaan suorituskyvyn?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>SSH yhteys hakemistojen lukuun:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>Suositeltu: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>SFTP kanavia per yhteys:</target>
+
+<source>Detect server limit</source>
+<target>Tunnista palvelimen rajat</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 yhteyttä x 10 kanavaa = 20 kertaa nopeampi hakemistojen luku</target>
 
 <source>Select a directory on the server:</source>
 <target>Valitse palvelimelta hakemisto:</target>
@@ -1183,6 +1279,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Source code written in C++ using:</source>
 <target>Koodattu C++-kielellä käyttäen:</target>
 
+<source>Donation details</source>
+<target>Lahjoituksen tiedot</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Jos pidät FreeFileSyncistä:</target>
 
@@ -1192,7 +1291,7 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Feedback and suggestions are welcome</source>
 <target>Palaute ja uudet ehdotukset ovat tervetulleita</target>
 
-<source>Homepage</source>
+<source>Home page</source>
 <target>Kotisivu</target>
 
 <source>Email</source>
@@ -1204,8 +1303,26 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Many thanks for localization:</source>
 <target>Paljon kiitoksia kääntäjille:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH tidostosiirto protokolla</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Käynnistä FreeFileSyncin Lahjoittajan versiota käyttäen:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Internetin kautta:</target>
+
+<source>Activate online</source>
+<target>Aktivoi netissä</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Hae erillinen aktivointiavain sivulta:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Kopioi leikepöydälle</target>
+
+<source>Enter activation key:</source>
+<target>Syötä aktivointiavain:</target>
+
+<source>Activate offline</source>
+<target>Aktivoi yhteyttä</target>
 
 <source>Save as Batch Job</source>
 <target>Tallenna eräajona</target>
@@ -1221,6 +1338,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Select Time Span</source>
 <target>Valitse aikajakso</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync Lahjoittajan versio</target>
 
 <source>&Options</source>
 <target>&Asetukset</target>
@@ -1243,8 +1363,8 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Overview</source>
 <target>Yleiskatsaus</target>
 
-<source>&Download</source>
-<target>&Lataa</target>
+<source>&Show details</source>
+<target>&Näytä tarkenteet</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSyncin uusi versio on saatavilla:</target>
@@ -1483,8 +1603,17 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Log</source>
 <target>Loki</target>
 
-<source>Loading...</source>
-<target>Lataan...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Asennustiedostot ovat viottuneet. Yritä asentaa FreeFileSync uudestaan.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Kiitos %x, arvostan tukeasi ja lahjoitustasi!</target>
+
+<source>Password:</source>
+<target>Salasana:</target>
+
+<source>Key password:</source>
+<target>Pää salasana:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1542,6 +1671,9 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>&Show</source>
 <target>&Näytä</target>
+
+<source>Downloading update...</source>
+<target>Ladataan päivitystä...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Tunnista identtiset tiedostot aikaleimoja ja kokoa vertailemalla.</target>
@@ -1636,11 +1768,32 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Percentage</source>
 <target>Prosenttia</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Päivytyksen noutaminen epäonnistui.</target>
+
+<source>Automatic updates:</source>
+<target>Automaattinen päivitys:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Edellyttää FreeFileSyncin Lahjoittajan versiota</target>
+
 <source>Check for Program Updates</source>
 <target>Etsi ohjelmaan päivitystä</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Päivitä automaattisesti tai lataa päivitys FreeFileSyncin kotisivulta?</target>
+
+<source>&Auto-update</source>
+<target>&Automattisesti</target>
+
+<source>&Home page</source>
+<target>&Kotisivu</target>
+
 <source>Download now?</source>
 <target>Ladataanko nyt?</target>
+
+<source>&Download</source>
+<target>&Lataa</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync on ajan tasalla.</target>
@@ -1654,14 +1807,20 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Consistency check failed for %x.</source>
 <target>%x:n yhtenäisyystarkistus epäonnistui.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Järjestelmäfunktiota %x ei löydy.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Asennus on rekisteröity toiselle käyttöjärjestelmälle.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>FreeFileSyncin Lahjoittajan versio ei aktivoitunut.</target>
+
+<source>Incorrect activation key.</source>
+<target>Väärä aktivointiavain.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Kirjautuminen järjestelmäviestien vastaanottamiseksi ei onnistu.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Asennustiedosto on virheellinen. Asenna FreeFileSync uudestaan.</target>
+<source>Cannot find system function %x.</source>
+<target>Järjestelmäfunktiota %x ei löydy.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x laiteviestien kirjaaminen ei onnistu.</target>
@@ -1692,9 +1851,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Ominaisuuksien monistus %x:ltä %y:lle ei onnistu.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Kohteen %x tyyppiä ei tueta:</target>
 
 <source>%x TB</source>
 <target>%x Tt</target>
@@ -1738,9 +1894,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Cannot change process I/O priorities.</source>
 <target>Prosessin I/O-prioriteetin muutos ei onnistu.</target>
 
-<source>Error Code %x:</source>
-<target>Virhekoodi %x:</target>
-
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Roskakorin tarkistus hakemistolle %x epäonnistui.</target>
 
@@ -1749,9 +1902,6 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Kokoonpanotiedosto %x ladattu vain osittain. Puuttuvat asetetaan oletusarvoihin.</target>
-
-<source>Internet access failed.</source>
-<target>Ei pääsyä internettiin.</target>
 
 <source>Prepare installation</source>
 <target>Alusta asennus</target>
@@ -1822,18 +1972,12 @@ Tällä varmistetaan eheys, vaikka vakava virhe tapahtuisi.
 <source>Edit with FreeFileSync</source>
 <target>Muokkaa FreeFileSync:llä</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Kiitän tuesta ja lahjoituksista!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Tämä FreeFileSync lahjoittajaverion päivittäinen asennuskiintiö on täyttynyt.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Haluatko ladata vakioversion FreeFileSync-kotisivulta?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>Siirretävä versio ei voi asentaa tähän hakemistoon.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Valitse paikallinen asennus tai vaihda asennushakemistoa.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>Häiveasennus toimii vain FreeFileSyncin Lahjoittajan versiossa.</target>
 

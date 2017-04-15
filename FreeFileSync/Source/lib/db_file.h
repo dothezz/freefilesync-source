@@ -15,21 +15,21 @@ namespace zen
 {
 const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
-struct InSyncDescrFile //subset of FileDescriptor
+struct InSyncDescrFile //subset of FileAttributes
 {
-    InSyncDescrFile(int64_t lastWriteTimeRawIn, const AFS::FileId& idIn) :
-        lastWriteTimeRaw(lastWriteTimeRawIn),
+    InSyncDescrFile(int64_t modTimeIn, const AFS::FileId& idIn) :
+        modTime(modTimeIn),
         fileId(idIn) {}
 
-    int64_t lastWriteTimeRaw;
+    int64_t modTime;
     AFS::FileId fileId; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
 };
 
 struct InSyncDescrLink
 {
-    explicit InSyncDescrLink(int64_t lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
+    explicit InSyncDescrLink(int64_t modTimeIn) : modTime(modTimeIn) {}
 
-    int64_t lastWriteTimeRaw;
+    int64_t modTime;
 };
 
 

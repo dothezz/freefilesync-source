@@ -7,12 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Loading file %x...</source>
-<target>Lade Datei %x...</target>
-
-<source>Failed to get server information for %x.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -121,15 +115,6 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Wird dieser Fehler ignoriert, werden die Ordner als leer angesehen. Fehlende Ordner werden bei Bedarf automatisch erstellt.</target>
 
-<source>A folder input field is empty.</source>
-<target>Ein Ordnereingabefeld ist leer.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Der entsprechende Ordner wird als leer angesehen.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Die folgenden Ordnerpfade sind voneinander abhängig:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Die Datei %x hat ein ungültiges Datum.</target>
 
@@ -192,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Starte Vergleich</target>
+
+<source>A folder input field is empty.</source>
+<target>Ein Ordnereingabefeld ist leer.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Der entsprechende Ordner wird als leer angesehen.</target>
+
+<source>Exclude:</source>
+<target>Ausschließen:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>Ein Basisordner eines Ordnerpaares ist im anderen enthalben.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Der Ordner sollte von der Synchronisation über den Filter ausgeschlossen werden.</target>
 
 <source>Calculating sync directions...</source>
 <target>Berechne Synchronisationsrichtungen...</target>
@@ -282,6 +282,9 @@ Tatsächlich: %y bytes
 <source>Unable to connect to %x.</source>
 <target>Es kann keine Verbindung zu %x aufgebaut werden.</target>
 
+<source>Failed to get information about server %x.</source>
+<target>Informationen über den Server %x konnten nicht abgerufen werden.</target>
+
 <source>Cannot open directory %x.</source>
 <target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
 
@@ -290,6 +293,9 @@ Tatsächlich: %y bytes
 
 <source>Cannot read file %x.</source>
 <target>Die Datei %x kann nicht gelesen werden.</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>Die Dateiattribute von %x können nicht gelesen werden.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Das Verzeichnis %x kann nicht erstellt werden.</target>
@@ -300,8 +306,17 @@ Tatsächlich: %y bytes
 <source>Cannot delete directory %x.</source>
 <target>Das Verzeichnis %x kann nicht gelöscht werden.</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>Die Dateiattribute von %x können nicht gelesen werden.</target>
+<source>Cannot write modification time of %x.</source>
+<target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
+
+<source>Cannot determine final path for %x.</source>
+<target>Der endgültige Pfad für %x kann nicht ermittelt werden.</target>
+
+<source>Cannot resolve symbolic link %x.</source>
+<target>Die symbolische Verknüpfung %x kann nicht aufgelöst werden.</target>
+
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x kann nicht in den Papierkorb verschoben werden.</target>
 
 <source>Cannot open file %x.</source>
 <target>Die Datei %x kann nicht geöffnet werden.</target>
@@ -318,23 +333,14 @@ Tatsächlich: %y bytes
 <source>Cannot delete symbolic link %x.</source>
 <target>Die symbolischen Verknüpfung %x kann nicht gelöscht werden.</target>
 
-<source>Cannot write modification time of %x.</source>
-<target>Die Änderungszeit von %x kann nicht geschrieben werden.</target>
-
-<source>Cannot determine final path for %x.</source>
-<target>Der endgültige Pfad für %x kann nicht ermittelt werden.</target>
-
-<source>Cannot resolve symbolic link %x.</source>
-<target>Die symbolische Verknüpfung %x kann nicht aufgelöst werden.</target>
-
 <source>Cannot determine free disk space for %x.</source>
 <target>Der freie Speicherplatz für %x konnte nicht ermittelt werden.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x kann nicht in den Papierkorb verschoben werden.</target>
-
 <source>Incorrect command line:</source>
 <target>Ungültige Befehlszeile:</target>
+
+<source>Error Code %x</source>
+<target>Fehlercode %x</target>
 
 <source>The server does not support authentication via %x.</source>
 <target>Der Server unterstützt keine Authentifizierung über %x.</target>
@@ -402,8 +408,11 @@ Tatsächlich: %y bytes
 <source>Database file is corrupted:</source>
 <target>Die Datenbankdatei ist beschädigt:</target>
 
-<source>Database files do not yet contain information about the last synchronisation.</source>
+<source>The database files do not yet contain information about the last synchronization.</source>
 <target>Die Datenbankdateien beinhalten noch keine Informationen zur letzten Synchronisation.</target>
+
+<source>Loading file %x...</source>
+<target>Lade Datei %x...</target>
 
 <source>Saving file %x...</source>
 <target>Speichere Datei %x...</target>
@@ -692,14 +701,29 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Available:</source>
 <target>Verfügbar:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Mehrere Ordnerpaare schreiben in einen gemeinsamen Unterordner. Bitte überprüfen Sie ihre Konfiguration.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Einige Dateien werden als Teil mehrerer Basisordner synchronisiert werden.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>Um Konflikte zu vermeiden sollten Ausschlussfilter erstellt werden, so dass jede aktualisierte Datei nur von einem Basisordner berücksichtigt wird.</target>
+
+<source>Versioning folder:</source>
+<target>Versionierungsordner:</target>
+
+<source>Base folder:</source>
+<target>Basisordner:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Der Versionierungsordner wird synchronisiert werden, weil er in einem Basisordner enthalten ist.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisiere Ordnerpaar:</target>
 
 <source>Generating database...</source>
 <target>Erzeuge Synchronisationsdatenbank...</target>
+
+<source>Loading...</source>
+<target>Lade...</target>
 
 <source>job name</source>
 <target>Auftragsname</target>
@@ -824,15 +848,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Bitte wählen Sie einen Ordner auf einem lokalen Dateisystem, Netzwerk oder MTP Gerät.</target>
 
-<source>SFTP folder</source>
-<target>SFTP-Ordner</target>
-
-<source>Select SFTP folder</source>
-<target>SFTP-Ordner auswählen</target>
-
-<source>Select alternative folder type</source>
-<target>Alternativen Ordnertyp auswählen</target>
-
 <source>&New</source>
 <target>&Neu</target>
 
@@ -898,6 +913,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Remove folder pair</source>
 <target>Ordnerpaar entfernen</target>
+
+<source>Access online storage</source>
+<target>Auf Onlinespeicher zugreifen</target>
 
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
@@ -986,9 +1004,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Include:</source>
 <target>Einschließen:</target>
 
-<source>Exclude:</source>
-<target>Ausschließen:</target>
-
 <source>Show examples</source>
 <target>Beispiele zeigen</target>
 
@@ -1072,14 +1087,26 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Arrange folder pair</source>
 <target>Ordnerpaar anordnen</target>
 
-<source>Enter your SFTP login details:</source>
-<target>SFTP Anmeldedaten eingeben:</target>
+<source>Enter your login details:</source>
+<target>Anmeldedaten eingeben:</target>
+
+<source>Connection type:</source>
+<target>Verbindungstyp:</target>
 
 <source>Server name or IP address:</source>
 <target>Servername oder IP-Adresse:</target>
 
 <source>Port:</source>
 <target>Port:</target>
+
+<source>Encryption:</source>
+<target>Verschlüsselung:</target>
+
+<source>&Disabled</source>
+<target>&Deaktiviert</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Explizites SSL/TLS</target>
 
 <source>Authentication:</source>
 <target>Authentifizierung:</target>
@@ -1296,9 +1323,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Activate offline</source>
 <target>Offline aktivieren</target>
-
-<source>SSH File Transfer Protocol</source>
-<target>SSH File Transfer Protocol</target>
 
 <source>Save as Batch Job</source>
 <target>Als Batchauftrag speichern</target>
@@ -1578,9 +1602,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Log</source>
 <target>Protokoll</target>
-
-<source>Loading...</source>
-<target>Lade...</target>
 
 <source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
 <target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
@@ -1872,9 +1893,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
-
-<source>Error Code %x</source>
-<target>Fehlercode %x</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Die Prüfung des Papierkorbs für Ordner %x ist fehlgeschlagen.</target>

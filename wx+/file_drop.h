@@ -39,7 +39,7 @@ extern const wxEventType EVENT_DROP_FILE;
 class FileDropEvent : public wxCommandEvent
 {
 public:
-    FileDropEvent(const std::vector<Zstring>& droppedPaths) : wxCommandEvent(EVENT_DROP_FILE), droppedPaths_(droppedPaths) {}
+    FileDropEvent(const std::vector<Zstring>& droppedPaths) : wxCommandEvent(EVENT_DROP_FILE), droppedPaths_(droppedPaths) { StopPropagation(); }
 
     const std::vector<Zstring>& getPaths() const { return droppedPaths_; }
 

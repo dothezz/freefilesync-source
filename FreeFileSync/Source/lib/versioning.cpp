@@ -4,6 +4,7 @@
 using namespace zen;
 using AFS = AbstractFileSystem;
 
+
 namespace
 {
 inline
@@ -172,28 +173,31 @@ struct FlatTraverserCallback: public AFS::TraverserCallback
 {
     FlatTraverserCallback(const AbstractPath& folderPath) : folderPath_(folderPath) {}
 
-    const std::vector<Zstring>& refFileNames   () const { return fileNames_; }
-    const std::vector<Zstring>& refFolderNames () const { return folderNames_; }
-    const std::vector<Zstring>& refSymlinkNames() const { return symlinkNames_; }
+    const std::vector<FileInfo>&    refFiles   () const { return files_; }
+    const std::vector<FolderInfo>&  refFolders () const { return folders_; }
+    const std::vector<SymlinkInfo>& refSymlinks() const { return symlinks_; }
 
 private:
-    void                               onFile   (const FileInfo&    fi) override { fileNames_   .push_back(fi.itemName); }
-    std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) override { folderNames_ .push_back(fi.itemName); return nullptr; }
-    HandleLink                         onSymlink(const SymlinkInfo& si) override { symlinkNames_.push_back(si.itemName); return TraverserCallback::LINK_SKIP; }
+    void                               onFile   (const FileInfo&    fi) override { files_   .push_back(fi); }
+    std::unique_ptr<TraverserCallback> onFolder (const FolderInfo&  fi) override { folders_ .push_back(fi); return nullptr; }
+    HandleLink                         onSymlink(const SymlinkInfo& si) override { symlinks_.push_back(si); return TraverserCallback::LINK_SKIP; }
 
     HandleError reportDirError (const std::wstring& msg, size_t retryNumber)                          override { throw FileError(msg); }
     HandleError reportItemError(const std::wstring& msg, size_t retryNumber, const Zstring& itemName) override { throw FileError(msg); }
 
     const AbstractPath folderPath_;
-    std::vector<Zstring> fileNames_;
-    std::vector<Zstring> folderNames_;
-    std::vector<Zstring> symlinkNames_;
+    std::vector<FileInfo>    files_;
+    std::vector<FolderInfo>  folders_;
+    std::vector<SymlinkInfo> symlinks_;
 };
 }
 
 
-bool FileVersioner::revisionFile(const AbstractPath& filePath, const Zstring& relativePath, const IOCallback& notifyUnbufferedIO) //throw FileError
+bool FileVersioner::revisionFile(const FileDescriptor& fileDescr, const Zstring& relativePath, const IOCallback& notifyUnbufferedIO) //throw FileError
 {
+    const AbstractPath& filePath = fileDescr.path;
+    const AFS::StreamAttributes fileAttr{ fileDescr.attr.modTime, fileDescr.attr.fileSize, fileDescr.attr.fileId };
+
     if (Opt<AFS::ItemType> type = AFS::getItemTypeIfExists(filePath)) //throw FileError
     {
         const AbstractPath targetPath = generateVersionedPath(relativePath);
@@ -203,8 +207,10 @@ bool FileVersioner::revisionFile(const AbstractPath& filePath, const Zstring& re
         else
             moveExistingItemToVersioning(filePath, targetPath, [&] //throw FileError
         {
-            AFS::copyFileTransactional(filePath, targetPath, //throw FileError, ErrorFileLocked
-            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            AFS::copyFileTransactional(filePath, fileAttr, //throw FileError, ErrorFileLocked
+                                       targetPath,
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            //result.errorModTime? => irrelevant for versioning!
         });
         return true;
     }
@@ -261,25 +267,27 @@ void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zst
 
     const Zstring relPathPf = appendSeparator(relativePath);
 
-    for (const Zstring& fileName : ft.refFileNames())
+    for (const auto& fileInfo: ft.refFiles())
     {
-        const AbstractPath sourcePath = AFS::appendRelPath(folderPath, fileName);
-        const AbstractPath targetPath = generateVersionedPath(relPathPf + fileName);
+        const AbstractPath sourcePath = AFS::appendRelPath(folderPath, fileInfo.itemName);
+        const AbstractPath targetPath = generateVersionedPath(relPathPf + fileInfo.itemName);
+        const AFS::StreamAttributes sourceAttr{ fileInfo.modTime, fileInfo.fileSize, fileInfo.fileId };
 
         if (onBeforeFileMove)
             onBeforeFileMove(AFS::getDisplayPath(sourcePath), AFS::getDisplayPath(targetPath));
 
         moveExistingItemToVersioning(sourcePath, targetPath, [&] //throw FileError
         {
-            AFS::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
-            false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
+                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            //result.errorModTime? => irrelevant for versioning!
         });
     }
 
-    for (const Zstring& symlinkName : ft.refSymlinkNames())
+    for (const auto& linkInfo: ft.refSymlinks())
     {
-        const AbstractPath sourcePath = AFS::appendRelPath(folderPath, symlinkName);
-        const AbstractPath targetPath = generateVersionedPath(relPathPf + symlinkName);
+        const AbstractPath sourcePath = AFS::appendRelPath(folderPath, linkInfo.itemName);
+        const AbstractPath targetPath = generateVersionedPath(relPathPf + linkInfo.itemName);
 
         if (onBeforeFileMove)
             onBeforeFileMove(AFS::getDisplayPath(sourcePath), AFS::getDisplayPath(targetPath));
@@ -288,9 +296,9 @@ void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zst
     }
 
     //move folders recursively
-    for (const Zstring& folderName : ft.refFolderNames())
-        revisionFolderImpl(AFS::appendRelPath(folderPath, folderName), //throw FileError
-                           relPathPf + folderName,
+    for (const auto& folderInfo : ft.refFolders())
+        revisionFolderImpl(AFS::appendRelPath(folderPath, folderInfo.itemName), //throw FileError
+                           relPathPf + folderInfo.itemName,
                            onBeforeFileMove, onBeforeFolderMove, notifyUnbufferedIO);
     //delete source
     if (onBeforeFolderMove)

@@ -81,6 +81,7 @@ struct OptionalDialogs
     bool warnSignificantDifference        = true;
     bool warnNotEnoughDiskSpace           = true;
     bool warnUnresolvedConflicts          = true;
+    bool warnModificationTimeError        = true;
     bool warnDatabaseError                = true;
     bool warnRecyclerMissing              = true;
     bool warnInputFieldEmpty              = true;

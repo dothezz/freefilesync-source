@@ -65,73 +65,105 @@ Opt<AfsPath> AFS::getParentAfsPath(const AfsPath& afsPath)
 }
 
 
-AFS::FileAttribAfterCopy AFS::copyFileAsStream(const AfsPath& afsPathSource, const AbstractPath& apTarget, //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                                               const IOCallback& notifyUnbufferedIO) const
+AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                          const AbstractPath& apTarget, const IOCallback& notifyUnbufferedIO) const
 {
     int64_t totalUnbufferedIO = 0;
 
-    auto streamIn = getInputStream(afsPathSource, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorFileLocked
-	warn_static("save following file access to improve SFTP perf?")
-    const uint64_t fileSizeExpected = streamIn->getFileSize        (); //throw FileError
-    const int64_t  modificationTime = streamIn->getModificationTime(); //throw FileError
-    const FileId   sourceFileId     = streamIn->getFileId          (); //throw FileError
+    auto streamIn = getInputStream(afsPathSource, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorFileLocked, X
 
-    auto streamOut = getOutputStream(apTarget, &fileSizeExpected, &modificationTime, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorTargetExisting
+    StreamAttributes attrSourceNew = {};
+    //try to get the most current attributes if possible (input file might have changed after comparison!)
+    if (Opt<StreamAttributes> attr = streamIn->getBufferedAttributes()) //throw FileError
+        attrSourceNew = *attr; //Native/MTP
+    else //use more stale ones:
+        attrSourceNew = attrSource; //SFTP/FTP
+    warn_static("evaluate: consequences of stale attributes")
+
+    auto streamOut = getOutputStream(apTarget, &attrSourceNew.fileSize, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorTargetExisting
 
     bufferedStreamCopy(*streamIn, *streamOut); //throw FileError, X
 
     const FileId targetFileId = streamOut->finalize(); //throw FileError, X
-    //- modification time should be set here!
-    //- checks if "expected == actual number of bytes written"
 
-    //extra check: bytes reported via notifyUnbufferedIO() should match actual number of bytes written
-    if (totalUnbufferedIO != 2 * makeSigned(fileSizeExpected))
+    //check if "expected == actual number of bytes written"
+    //-> extra check: bytes reported via notifyUnbufferedIO() should match actual number of bytes written
+    if (totalUnbufferedIO != 2 * makeSigned(attrSourceNew.fileSize))
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(AFS::getDisplayPath(apTarget))),
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
-                                              L"%x", numberTo<std::wstring>(2 * fileSizeExpected)),
+                                              L"%x", numberTo<std::wstring>(2 * attrSourceNew.fileSize)),
                                    L"%y", numberTo<std::wstring>(totalUnbufferedIO)) + L" [notifyUnbufferedIO]");
 
-    AFS::FileAttribAfterCopy attr;
-    attr.fileSize         = fileSizeExpected;
-    attr.modificationTime = modificationTime;
-    attr.sourceFileId     = sourceFileId;
-    attr.targetFileId     = targetFileId;
-    return attr;
+    Opt<FileError> errorModTime;
+    try
+    {
+        /*
+        is setting modtime after closing the file handle a pessimization?
+            Native: no, needed for functional correctness, see file_access.cpp
+            MTP:    maybe a minor one (need to retrieve objectId one more time)
+            SFTP:   no, needed for functional correctness, just as for Native
+            FTP:    maybe a minor one: could set modtime via CURLOPT_POSTQUOTE (but this would internally trigger an extra round-trip anyway!)
+        */
+        setModTime(apTarget, attrSourceNew.modTime); //throw FileError, follows symlinks
+    }
+    catch (const FileError& e)
+    {
+        /*
+        Failing to set modification time is not a serious problem from synchronization perspective (treated like external update)
+
+        => Support additional scenarios:
+        - GVFS failing to set modTime for FTP: http://www.freefilesync.org/forum/viewtopic.php?t=2372
+        - GVFS failing to set modTime for MTP: http://www.freefilesync.org/forum/viewtopic.php?t=2803
+        - MTP failing to set modTime in general: fail non-silently rather than silently during file creation
+        - FTP failing to set modTime for servers lacking MFMT-support
+        */
+        errorModTime = FileError(e.toString()); //avoid slicing
+    }
+
+    AFS::FileCopyResult result;
+    result.fileSize     = attrSourceNew.fileSize;
+    result.modTime      = attrSourceNew.modTime;
+    result.sourceFileId = attrSourceNew.fileId;
+    result.targetFileId = targetFileId;
+    result.errorModTime = errorModTime;
+    return result;
 }
 
 
-AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource, const AbstractPath& apTarget, //throw FileError, ErrorFileLocked
-                                                    bool copyFilePermissions,
-                                                    bool transactionalCopy,
-                                                    const std::function<void()>& onDeleteTargetFile,
-                                                    const IOCallback& notifyUnbufferedIO)
+AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
+                                               const AbstractPath& apTarget,
+                                               bool copyFilePermissions,
+                                               bool transactionalCopy,
+                                               const std::function<void()>& onDeleteTargetFile,
+                                               const IOCallback& notifyUnbufferedIO)
 {
     auto copyFileBestEffort = [&](const AbstractPath& apTargetTmp)
     {
         //caveat: typeid returns static type for pointers, dynamic type for references!!!
         if (typeid(*apSource.afs) == typeid(*apTarget.afs))
-            return apSource.afs->copyFileForSameAfsType(apSource.afsPath, apTargetTmp, copyFilePermissions, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+            return apSource.afs->copyFileForSameAfsType(apSource.afsPath, attrSource,
+                                                        apTargetTmp, copyFilePermissions, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
 
         //fall back to stream-based file copy:
         if (copyFilePermissions)
             throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(AFS::getDisplayPath(apTargetTmp))),
                             _("Operation not supported for different base folder types."));
 
-        return apSource.afs->copyFileAsStream(apSource.afsPath, apTargetTmp, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return apSource.afs->copyFileAsStream(apSource.afsPath, attrSource, apTargetTmp, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
     };
 
     if (transactionalCopy)
     {
         AbstractPath apTargetTmp(apTarget.afs, AfsPath(apTarget.afsPath.value + TEMP_FILE_ENDING));
-        AFS::FileAttribAfterCopy attr;
+        AFS::FileCopyResult result;
 
         for (int i = 0;; ++i)
             try
             {
-                attr = copyFileBestEffort(apTargetTmp); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                result = copyFileBestEffort(apTargetTmp); //throw FileError, ErrorTargetExisting, ErrorFileLocked
                 break;
             }
-            catch (const ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
+            catch (ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
             {
                 if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
                 apTargetTmp.afsPath.value = apTarget.afsPath.value + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
@@ -155,7 +187,7 @@ AFS::FileAttribAfterCopy AFS::copyFileTransactional(const AbstractPath& apSource
         https://blogs.msdn.microsoft.com/oldnewthing/20050715-14/?p=34923
         http://support.microsoft.com/kb/172190/en-us
         */
-        return attr;
+        return result;
     }
     else
     {
@@ -219,6 +251,7 @@ private:
 }
 
 
+//essentially an (abstract) duplicate of zen::getPathStatus()
 AFS::PathStatusImpl AFS::getPathStatusViaFolderTraversal(const AfsPath& afsPath) const //throw FileError
 {
     const Opt<AfsPath> parentAfsPath = getParentAfsPath(afsPath);
@@ -238,21 +271,18 @@ AFS::PathStatusImpl AFS::getPathStatusViaFolderTraversal(const AfsPath& afsPath)
     assert(!itemName.empty());
 
     PathStatusImpl ps = getPathStatusViaFolderTraversal(*parentAfsPath); //throw FileError
-    if (!ps.relPath.empty())
-    {
-        ps.relPath.push_back(itemName);
-        return { ps.existingType, ps.existingAfsPath, ps.relPath };
-    }
-
-    try
-    {
-        ItemSearchCallback iscb(itemName);
-        traverseFolder(*parentAfsPath, iscb); //throw FileError, ItemType
-
-        return { ps.existingType, *parentAfsPath, { itemName } }; //throw FileError
-    }
-    catch (const ItemType& type) { return { type, afsPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
+    if (ps.relPath.empty() &&
+        ps.existingType != ItemType::FILE) //obscure, but possible (and not an error)
+        try
+        {
+            ItemSearchCallback iscb(itemName);
+            traverseFolder(*parentAfsPath, iscb); //throw FileError, ItemType
+        }
+        catch (const ItemType& type) { return { type, afsPath, {} }; } //yes, exceptions for control-flow are bad design... but, but...
     //we're not CPU-bound here and finding the item after getItemType() previously failed is exceptional (even C:\pagefile.sys should be found)
+
+    ps.relPath.push_back(itemName);
+    return ps;
 }
 
 

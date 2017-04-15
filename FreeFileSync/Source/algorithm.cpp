@@ -214,7 +214,7 @@ bool matchesDbEntry(const FilePair& file, const InSyncFolder::FileList::value_ty
     return file.getItemName<side>() == shortNameDb && //detect changes in case (windows)
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
            //we're not interested in "fileTimeTolerance" here!
-           sameFileTime(file.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, ignoreTimeShiftMinutes) &&
+           sameFileTime(file.getLastWriteTime<side>(), descrDb.modTime, 2, ignoreTimeShiftMinutes) &&
            file.getFileSize<side>() == dbFile->second.fileSize;
     //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
 }
@@ -230,7 +230,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, int fileTi
             if (dbFile.cmpVar == CompareVariant::CONTENT) return true; //special rule: this is certainly "good enough" for CompareVariant::TIME_SIZE!
 
             //case-sensitive short name match is a database invariant!
-            return sameFileTime(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
+            return sameFileTime(dbFile.left.modTime, dbFile.right.modTime, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CompareVariant::CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -267,7 +267,7 @@ bool matchesDbEntry(const SymlinkPair& symlink, const InSyncFolder::SymlinkList:
 
     return symlink.getItemName<side>() == shortNameDb &&
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
-           sameFileTime(symlink.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2, ignoreTimeShiftMinutes);
+           sameFileTime(symlink.getLastWriteTime<side>(), descrDb.modTime, 2, ignoreTimeShiftMinutes);
 }
 
 
@@ -282,7 +282,7 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, int fil
                 return true; //special rule: this is already "good enough" for CompareVariant::TIME_SIZE!
 
             //case-sensitive short name match is a database invariant!
-            return sameFileTime(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance, ignoreTimeShiftMinutes);
+            return sameFileTime(dbLink.left.modTime, dbLink.right.modTime, fileTimeTolerance, ignoreTimeShiftMinutes);
 
         case CompareVariant::CONTENT:
         case CompareVariant::SIZE: //== categorized by content! see comparison.cpp, ComparisonBuffer::compareBySize()
@@ -406,7 +406,7 @@ private:
     static bool sameSizeAndDate(const FilePair& file, const InSyncFile& dbFile)
     {
         return file.getFileSize<side>() == dbFile.fileSize &&
-               sameFileTime(file.getLastWriteTime<side>(), getDescriptor<side>(dbFile).lastWriteTimeRaw, 2, {});
+               sameFileTime(file.getLastWriteTime<side>(), getDescriptor<side>(dbFile).modTime, 2, {});
         //- respect 2 second FAT/FAT32 precision! not user-configurable!
         //- "ignoreTimeShiftMinutes" may lead to false positive move detections => let's be conservative and not allow it
         //  (time shift is only ever required during FAT DST switches)
@@ -1285,12 +1285,15 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             StatisticsReporter statReporter(1, file.getFileSize<side>(), callback);
             notifyItemCopy(txtCreatingFile, AFS::getDisplayPath(targetPath));
 
+            const FileAttributes attr = file.getAttributes<side>();
+            const AFS::StreamAttributes sourceAttr{ attr.modTime, attr.fileSize, attr.fileId };
+
             copyItem(targetPath, [&](const std::function<void()>& deleteTargetItem) //throw FileError
             {
                 auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
-
-                AFS::copyFileTransactional(sourcePath, targetPath, //throw FileError, ErrorFileLocked
-                                           false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, notifyUnbufferedIO);
+                const AFS::FileCopyResult result = AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
+                                                                              false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, notifyUnbufferedIO);
+                //result.errorModTime? => probably irrelevant (behave like Windows Explorer)
             });
             statReporter.reportDelta(1, 0);
         },
@@ -1317,6 +1320,7 @@ void zen::copyToAlternateFolder(const std::vector<const FileSystemObject*>& rows
                                 const Zstring& targetFolderPathPhrase,
                                 bool keepRelPaths,
                                 bool overwriteIfExists,
+                                xmlAccess::OptionalDialogs& warnings,
                                 ProcessCallback& callback)
 {
     std::vector<const FileSystemObject*> itemSelectionLeft  = rowsToCopyOnLeft;
@@ -1385,7 +1389,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDelete,
         if (!fsObj->isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
         {
             visitFSObject(*fsObj,
-            [&](const FolderPair& folder)
+                          [&](const FolderPair& folder)
             {
                 if (useRecycleBin)
                 {
@@ -1575,19 +1579,19 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
 //############################################################################################################
 
-bool zen::operator<(const TempFileBuffer::FileDetails& lhs, const TempFileBuffer::FileDetails& rhs)
+bool zen::operator<(const FileDescriptor& lhs, const FileDescriptor& rhs)
 {
-    if (lhs.descr.lastWriteTimeRaw != rhs.descr.lastWriteTimeRaw)
-        return lhs.descr.lastWriteTimeRaw < rhs.descr.lastWriteTimeRaw;
+    if (lhs.attr.modTime != rhs.attr.modTime)
+        return lhs.attr.modTime < rhs.attr.modTime;
 
-    if (lhs.descr.fileSize != rhs.descr.fileSize)
-        return lhs.descr.fileSize < rhs.descr.fileSize;
+    if (lhs.attr.fileSize != rhs.attr.fileSize)
+        return lhs.attr.fileSize < rhs.attr.fileSize;
 
-    if (lhs.descr.fileId != rhs.descr.fileId)
-        return lhs.descr.fileId < rhs.descr.fileId;
+    if (lhs.attr.fileId != rhs.attr.fileId)
+        return lhs.attr.fileId < rhs.attr.fileId;
 
-    if (lhs.descr.isFollowedSymlink != rhs.descr.isFollowedSymlink)
-        return lhs.descr.isFollowedSymlink < rhs.descr.isFollowedSymlink;
+    if (lhs.attr.isFollowedSymlink != rhs.attr.isFollowedSymlink)
+        return lhs.attr.isFollowedSymlink < rhs.attr.isFollowedSymlink;
 
     return AFS::LessAbstractPath()(lhs.path, rhs.path);
 }
@@ -1605,22 +1609,22 @@ TempFileBuffer::~TempFileBuffer()
 
 
 //returns empty if not available (item not existing, error during copy)
-Zstring TempFileBuffer::getTempPath(const FileDetails& details) const
+Zstring TempFileBuffer::getTempPath(const FileDescriptor& descr) const
 {
-    auto it = tempFilePaths_.find(details);
+    auto it = tempFilePaths_.find(descr);
     if (it != tempFilePaths_.end())
         return it->second;
     return Zstring();
 }
 
 
-void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, ProcessCallback& callback)
+void TempFileBuffer::createTempFiles(const std::set<FileDescriptor>& workLoad, ProcessCallback& callback)
 {
     const int itemTotal = static_cast<int>(workLoad.size());
     int64_t bytesTotal = 0;
 
-    for (const FileDetails& details : workLoad)
-        bytesTotal += details.descr.fileSize;
+    for (const FileDescriptor& descr : workLoad)
+        bytesTotal += descr.attr.fileSize;
 
     callback.initNewPhase(itemTotal, bytesTotal, ProcessCallback::PHASE_SYNCHRONIZING); //throw X
 
@@ -1645,40 +1649,44 @@ void TempFileBuffer::createTempFiles(const std::set<FileDetails>& workLoad, Proc
         if (errMsg) return;
     }
 
-    for (const FileDetails& details : workLoad)
+    for (const FileDescriptor& descr : workLoad)
     {
-        assert(tempFilePaths_.find(details) == tempFilePaths_.end()); //ensure correct stats, NO overwrite-copy => caller-contract!
+        assert(tempFilePaths_.find(descr) == tempFilePaths_.end()); //ensure correct stats, NO overwrite-copy => caller-contract!
 
         MemoryStreamOut<std::string> cookie; //create hash to distinguish different versions and file locations
-        writeNumber   (cookie, details.descr.lastWriteTimeRaw);
-        writeNumber   (cookie, details.descr.fileSize);
-        writeContainer(cookie, details.descr.fileId);
-        writeNumber   (cookie, details.descr.isFollowedSymlink);
-        writeContainer(cookie, AFS::getInitPathPhrase(details.path));
+        writeNumber   (cookie, descr.attr.modTime);
+        writeNumber   (cookie, descr.attr.fileSize);
+        writeContainer(cookie, descr.attr.fileId);
+        writeNumber   (cookie, descr.attr.isFollowedSymlink);
+        writeContainer(cookie, AFS::getInitPathPhrase(descr.path));
 
         const uint16_t crc16 = getCrc16(cookie.ref());
-        const Zstring detailsHash = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(crc16));
+        const Zstring descrHash = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(crc16));
 
-        const Zstring fileName = AFS::getItemName(details.path);
+        const Zstring fileName = AFS::getItemName(descr.path);
 
         auto it = std::find(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
-        const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + detailsHash + Zstring(it, fileName.end());
+        const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + descrHash + Zstring(it, fileName.end());
 
         const Zstring tempFilePath = appendSeparator(tempFolderPath_) + tempFileName;
+        const AFS::StreamAttributes sourceAttr{ descr.attr.modTime, descr.attr.fileSize, descr.attr.fileId };
 
         tryReportingError([&]
         {
-            StatisticsReporter statReporter(1, details.descr.fileSize, callback);
+            StatisticsReporter statReporter(1, descr.attr.fileSize, callback);
 
             callback.reportInfo(replaceCpy(_("Creating file %x"), L"%x", fmtPath(tempFilePath)));
 
             auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
-            AFS::copyFileTransactional(details.path, createItemPathNative(tempFilePath), //throw FileError, ErrorFileLocked
+            AFS::copyFileTransactional(descr.path, sourceAttr, //throw FileError, ErrorFileLocked
+                                       createItemPathNative(tempFilePath),
                                        false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            //result.errorModTime? => irrelevant for temp files!
+
             statReporter.reportDelta(1, 0);
 
-            tempFilePaths_[details] = tempFilePath;
+            tempFilePaths_[descr] = tempFilePath;
         }, callback); //throw X?
     }
 }

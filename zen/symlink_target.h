@@ -17,7 +17,7 @@
 namespace zen
 {
 
-Zstring getResolvedSymlinkPath(const Zstring& linkPath); //throw FileError; Win: requires Vista or later!
+Zstring getSymlinkResolvedPath(const Zstring& linkPath); //throw FileError; Win: requires Vista or later!
 Zstring getSymlinkTargetRaw   (const Zstring& linkPath); //throw FileError
 }
 
@@ -68,7 +68,7 @@ inline
 Zstring getSymlinkTargetRaw(const Zstring& linkPath) { return getSymlinkRawTargetString_impl(linkPath); }
 
 inline
-Zstring getResolvedSymlinkPath(const Zstring& linkPath) { return getResolvedSymlinkPath_impl(linkPath); }
+Zstring getSymlinkResolvedPath(const Zstring& linkPath) { return getResolvedSymlinkPath_impl(linkPath); }
 
 }
 

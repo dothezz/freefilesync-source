@@ -622,13 +622,13 @@ void TreeView::updateSyncPreview(bool showExcluded,
                 return syncDeleteRightActive;
             case SO_OVERWRITE_RIGHT:
             case SO_COPY_METADATA_TO_RIGHT:
-            case SO_MOVE_RIGHT_SOURCE:
-            case SO_MOVE_RIGHT_TARGET:
+            case SO_MOVE_RIGHT_FROM:
+            case SO_MOVE_RIGHT_TO:
                 return syncDirOverwRightActive;
             case SO_OVERWRITE_LEFT:
             case SO_COPY_METADATA_TO_LEFT:
-            case SO_MOVE_LEFT_SOURCE:
-            case SO_MOVE_LEFT_TARGET:
+            case SO_MOVE_LEFT_FROM:
+            case SO_MOVE_LEFT_TO:
                 return syncDirOverwLeftActive;
             case SO_DO_NOTHING:
                 return syncDirNoneActive;

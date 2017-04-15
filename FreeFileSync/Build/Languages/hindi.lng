@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>डिफ़ॉल्ट सिंक्रनाइज़ेशन दिशाएँ सेट हो रही हैं: पुराने फ़ाइल्स नए फ़ाइल्स से अधिलेखित होंगे।</target>
 
-<source>Creating folder %x</source>
-<target>फ़ोल्डर %x बनाया हा रहा है</target>
-
 <source>Creating file %x</source>
 <target>फ़ाइल %x बनाई जा रही है</target>
+
+<source>Creating folder %x</source>
+<target>फ़ोल्डर %x बनाया हा रहा है</target>
 
 <source>Creating symbolic link %x</source>
 <target>प्रतीकात्मक कड़ी %x बनाया जा रहा है</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>इस त्रुटि को अनदेखा कर दिया जाता है तो फ़ोल्डरों को खाली माना जाएगा। अनुपस्थित फ़ोलडर्स आवश्यकता होने पर स्वचालित रूप से बनाए जाते हैं।</target>
 
-<source>A folder input field is empty.</source>
-<target>कोई फ़ोल्डर इनपुट प्रविष्टि खाली है।</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>तद्नुरूप फ़ोल्डर को खाली माना जाएगा।</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>निम्न फ़ोलडर्स के पथ एक दूसरे पर निर्भर हैं:</target>
-
 <source>File %x has an invalid date.</source>
 <target>%x फ़ाइल का दिनांक अवैध है।</target>
 
 <source>Date:</source>
 <target>दिनांक:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>%x फ़ाइल्स का दिनांक समान है पर आकार भिन्न है।</target>
+<source>Files have the same date but a different size.</source>
+<target>फाइल्स का दिनांक समान है पर आकार भिन्न है।</target>
 
 <source>Size:</source>
 <target>आकार:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>%x अपवर्जित फ़ाइल्स के लिए सामग्री तुलना छोड़ दी गई।</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>अपवर्जित फ़ाइल्स के लिए सामग्री तुलना को छोड़ा गया।</target>
 
 <source>Items differ in attributes only</source>
 <target>आइटम्स के केवल गुण ही भिन्न हैं।</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>तुलना शुरू हो रही है</target>
+
+<source>A folder input field is empty.</source>
+<target>कोई फ़ोल्डर इनपुट प्रविष्टि खाली है।</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>तद्नुरूप फ़ोल्डर को खाली माना जाएगा।</target>
+
+<source>Exclude:</source>
+<target>वर्जित करें:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>फ़ोल्डर जोड़ी में से एक आधार फ़ोल्डर दूसरे में निहित है।</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>फ़ोल्डर को सिंक्रनाइज़ेशन से फ़िल्टर द्वारा अपवर्जित किया जाना चाहिए।</target>
 
 <source>Calculating sync directions...</source>
 <target>सिंक्रनाइज़ेशन दिशा का परिकलन हो रहा है...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>दाईं तरफ के गुण अद्यतन करें</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>%x की अनुमतियां लिख नहीं सकते।</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>भिन्न मूल फ़ोल्डर प्रकारों के लिए कार्यवाई समर्थित नहीं।</target>
-
 <source>Cannot write file %x.</source>
 <target>फ़ाइल %x लिखने में असमर्थ।</target>
 
@@ -267,38 +267,44 @@ Actual: %y bytes
 वास्तविक: %y बाइट्स
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>%x की अनुमतियां लिख नहीं सकते।</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>भिन्न आधार फ़ोल्डर प्रकारों के लिए कार्यवाई समर्थित नहीं।</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>सिंबॉलिक लिंक %x से %y प्रतिलिपित नहीं कर सकते।</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>फ़ाइल %x से %y ले जा नाहीं सकते।</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>निर्देशिका %x इन्यूमरेट नहीं कर सकते।</target>
+<source>Unable to connect to %x.</source>
+<target>%x से कनेक्ट करने में असमर्थ।</target>
+
+<source>Failed to get information about server %x.</source>
+<target>सर्वर %x की जानकारी प्राप्त करने में विफल।</target>
+
+<source>Cannot open directory %x.</source>
+<target>निर्देशिका %x खोल नहीं सकते।</target>
+
+<source>Cannot read directory %x.</source>
+<target>निर्देशिका %x को पढ़ा नहीं जा सकता।</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>%x के फ़ाइल गुण पढ़ने में असमर्थ।</target>
 
-<source>Cannot find %x.</source>
-<target>%x नहीं मिला।</target>
-
-<source>Cannot open file %x.</source>
-<target>%x फ़ाइल को खोलने में असमर्थ।</target>
-
 <source>Cannot read file %x.</source>
 <target>फ़ाइल %x पढ़ने में असमर्थ।</target>
-
-<source>Cannot find device %x.</source>
-<target>डिवाइस %x नहीं मिला।</target>
 
 <source>Cannot create directory %x.</source>
 <target>%x निर्देशिका बना नहीं सकते।</target>
 
-<source>Cannot delete directory %x.</source>
-<target>निर्देशिका %x हटा नहीं सकते।</target>
-
 <source>Cannot delete file %x.</source>
 <target>फ़ाइल %x हटा नहीं सकते।</target>
+
+<source>Cannot delete directory %x.</source>
+<target>निर्देशिका %x हटा नहीं सकते।</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>%x का संशोधन समय लिख नहीं सकते।</target>
@@ -309,23 +315,65 @@ Actual: %y bytes
 <source>Cannot resolve symbolic link %x.</source>
 <target>सिंबॉलिक लिंक %x को हल नहीं कर सकते।</target>
 
-<source>Cannot open directory %x.</source>
-<target>निर्देशिका %x खोल नहीं सकते।</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x को रीसायकल बिन ले जाने में असमर्थ।</target>
+
+<source>Cannot open file %x.</source>
+<target>%x फ़ाइल को खोलने में असमर्थ।</target>
+
+<source>Cannot find device %x.</source>
+<target>डिवाइस %x नहीं मिला।</target>
+
+<source>Cannot find %x.</source>
+<target>%x नहीं मिला।</target>
+
+<source>Type of item %x is not supported:</source>
+<target>%x प्रकार का आइटम समर्थित नहीं है:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>प्रतीकात्मक कड़ी %x हटाया नहीं जा सकता।</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>%x के लिए खाली डिस्क जगह निर्धारित नहीं कर सकते।</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>%x को रीसायकल बिन ले जाने में असमर्थ।</target>
-
 <source>Incorrect command line:</source>
 <target>अनुचित आदेश-पंक्ति:</target>
 
-<source>Error Code %x:</source>
-<target>त्रुटि कोड %x:</target>
+<source>Error Code %x</source>
+<target>त्रुटि कोड %x</target>
 
-<source>Unable to connect to %x.</source>
-<target>%x से कनेक्ट करने में असमर्थ।</target>
+<source>The server does not support authentication via %x.</source>
+<target>सर्वर पर %x द्वारा प्रमाणन समर्थित नहीं है।</target>
+
+<source>Required:</source>
+<target>आवश्यक:</target>
+
+<source>Unable to access %x.</source>
+<target>%x तक पहुँचने में असमर्थ।</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>1 सेकंड के बाद कार्यवाई का काल समाप्त हुआ।</pluralform>
+<pluralform>%x सेकंड्स के बाद कार्यवाई का काल समाप्त हुआ।</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>एक समय में 1 कनेक्शन से अधिक पर प्रतीक्षा नहीं कर सकते।</pluralform>
+<pluralform>एक समय में %x कनेक्शन्स से अधिक पर प्रतीक्षा नहीं कर सकते।</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>सक्रिय कनेक्शन्स: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>SFTP चैनल संख्या %x को खोलने में विफल।</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -357,11 +405,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>डेटाबेस फ़ाइल %x अभी तक मौजूद नहीं है।</target>
 
-<source>Database file is corrupt:</source>
+<source>Database file is corrupted:</source>
 <target>डेटाबेस फ़ाइल दूषित है:</target>
 
-<source>Database files do not share a common session.</source>
-<target>डेटाबेस फ़ाइल्स कोई आम सत्र साझा नहीं करते।</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>डेटाबेस फ़ाइल्स में अभी तक पिछले सिंक्रनाइज़ेशन की जानकारी नहीं है।</target>
+
+<source>Loading file %x...</source>
+<target>फ़ाइल %x को लोड किया जा रहा है...</target>
+
+<source>Saving file %x...</source>
+<target>फ़ाइल %x सहेजी जा रही है...</target>
 
 <source>Searching for folder %x...</source>
 <target>फ़ोल्डर %x की खोज हो रही है...</target>
@@ -389,9 +443,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>अपसर्जित अवरोध पता लगाया जा रहा है...</target>
-
-<source>Saving file %x...</source>
-<target>फ़ाइल %x सहेजी जा रही है...</target>
 
 <source>Items processed:</source>
 <target>संसाधित आइटम्स:</target>
@@ -647,20 +698,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>यहाँ पर्याप्त खाली डिस्क जगह उपलब्ध नहीं:</target>
 
-<source>Required:</source>
-<target>आवश्यक:</target>
-
 <source>Available:</source>
 <target>उपलब्ध:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>एकाधिक फ़ोल्डर जोडें समान उपफ़ोल्डर में लिखते हैं। कृपया अपने कॉन्फ़िगरेशन की समीक्षा करें।</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>कुछ फ़ाइल्स को एकाधिक आधार फ़ोल्डर्स के भाग के रूप में सिंक्रनाइज़ किया जाएगा।</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>विरोधों से बचने के लिए अपवर्जित फ़िल्टर्स सेट करें ताकि प्रत्येक अद्यतित फ़ाइल केवल एक ही आधार फ़ोल्डर से मानी जाएगी।</target>
+
+<source>Versioning folder:</source>
+<target>संस्करण फ़ोल्डर:</target>
+
+<source>Base folder:</source>
+<target>आधार फ़ोल्डर:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>संस्करण फ़ोल्डर को सिंक्रनाइज़ किया जाएगा क्योंकी वह एक आधार फ़ोल्डर में निहित है।</target>
 
 <source>Synchronizing folder pair:</source>
 <target>यह फ़ोल्डर जोडा सिंक्रनाइज़ हो रहा है:</target>
 
 <source>Generating database...</source>
 <target>डेटाबेस बनाया जा रहा है...</target>
+
+<source>Loading...</source>
+<target>लोड हो रहा है...</target>
 
 <source>job name</source>
 <target>कार्य नाम</target>
@@ -785,15 +848,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>स्थानीय फ़ाइल सिस्टम, नेटवर्क या MTP डिव्हाइस पर कोई निर्देशिका चुनें।</target>
 
-<source>SFTP folder</source>
-<target>SFTP फ़ोल्डर</target>
-
-<source>Select SFTP folder</source>
-<target>SFTP फ़ोल्डर चुनें</target>
-
-<source>Select alternative folder type</source>
-<target>वैकल्पिक फ़ोल्डर प्रकार चुनें</target>
-
 <source>&New</source>
 <target>नया (&N)</target>
 
@@ -839,11 +893,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>उपकरण (&T)</target>
 
-<source>&Check for new version</source>
-<target>नए संस्करण के लिए जांचें (&C)</target>
-
-<source>&Check now</source>
-<target>अभी जांचें (&C)</target>
+<source>&Check for updates now</source>
+<target>अद्यतन के लिए अभी जाँचें (&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>सप्ताह में एक बार स्वचालित रूप से जांचें (&a)</target>
@@ -862,6 +913,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>फ़ोल्डर जोडा निकालें</target>
+
+<source>Access online storage</source>
+<target>ऑनलाइन संग्रहण पहुँच प्राप्त करें</target>
 
 <source>Swap sides</source>
 <target>पक्ष गमागम करें</target>
@@ -950,9 +1004,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>शामिल करें:</target>
 
-<source>Exclude:</source>
-<target>वर्जित करें:</target>
-
 <source>Show examples</source>
 <target>उदाहरण दिखाएं</target>
 
@@ -1036,8 +1087,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>फ़ोल्डर जोडा व्यवस्थित करें</target>
 
-<source>Enter your SFTP login details:</source>
-<target>आपके SFTP लॉगइन विवरण प्रविष्ट करें:</target>
+<source>Enter your login details:</source>
+<target>अपना लॉगिन विवरण प्रविष्ट करें:</target>
+
+<source>Connection type:</source>
+<target>कनेक्शन प्रकार:</target>
 
 <source>Server name or IP address:</source>
 <target>सर्वर नाम या IP पता:</target>
@@ -1045,17 +1099,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>पोर्ट:</target>
 
+<source>Encryption:</source>
+<target>एन्क्रिप्शन:</target>
+
+<source>&Disabled</source>
+<target>अक्षम (&D)</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>सुस्पष्ट SSL/TLS (&E)</target>
+
+<source>Authentication:</source>
+<target>प्रमाणन:</target>
+
+<source>&Password</source>
+<target>पासवर्ड (&P)</target>
+
+<source>&Key file</source>
+<target>कुंजी फ़ाइल (&K)</target>
+
 <source>User name:</source>
 <target>उपयोगकर्ता नाम:</target>
 
-<source>Password:</source>
-<target>पासवर्ड:</target>
+<source>Private key file:</source>
+<target>निजी कुंजी फ़ाइल:</target>
 
 <source>&Show password</source>
 <target>पासवर्ड दिखाएं (&S)</target>
 
 <source>Directory on server:</source>
 <target>सर्वर पर निर्देशिका:</target>
+
+<source>Performance improvements:</source>
+<target>प्रदर्शन सुधार:</target>
+
+<source>How to get best performance?</source>
+<target>सर्वश्रेष्ठ प्रदर्शन कैसे पाएं?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>निर्देशिका पठन के लिए SSH कनेक्शन्स:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>सुझाई श्रेणी: [१ - १०]</target>
+
+<source>SFTP channels per connection:</source>
+<target>SFTP चैनल्स प्रति कनेक्शन:</target>
+
+<source>Detect server limit</source>
+<target>सर्वर सीमा का पता लगाएँ</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>२ कनेक्शन्स x १० चैनल्स = २० गुना तीव्रतम निर्देशिका पठन</target>
 
 <source>Select a directory on the server:</source>
 <target>सर्वर पर कोई निर्देशिका चुनें:</target>
@@ -1186,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>स्रोत कोड C++ में लिखा गया इनके प्रयोग से:</target>
 
+<source>Donation details</source>
+<target>दान विवरण</target>
+
 <source>If you like FreeFileSync:</source>
 <target>यदि आपको FreeFileSync पसंद है:</target>
 
@@ -1195,8 +1291,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>प्रतिक्रिया और सुझावों का स्वागत है</target>
 
-<source>Homepage</source>
-<target>मुखपृष्ठ</target>
+<source>Home page</source>
+<target>मुख पृष्ठ</target>
 
 <source>Email</source>
 <target>ई-मेल</target>
@@ -1207,8 +1303,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>स्थानीयकरण के लिए अनेक आभार:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH फ़ाइल स्थानांतरण प्रोटोकॉल</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>FreeFileSync दान संस्‍करण को निम्न विधियों में से एक के द्वारा सक्रिय करें:</target>
+
+<source>1. Activate via internet now:</source>
+<target>१. इंटरनेट द्वारा अभी सक्रिय करें:</target>
+
+<source>Activate online</source>
+<target>ऑनलाइन सक्रिय करें</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>२. ऑफ़लाइन सक्रियण कुंजी निम्न URL से प्राप्त करें:</target>
+
+<source>&Copy to clipboard</source>
+<target>क्लिपबोर्ड पर प्रतिलिपि बनाएँ (&C)</target>
+
+<source>Enter activation key:</source>
+<target>सक्रियण कुंजी प्रविष्ट करें:</target>
+
+<source>Activate offline</source>
+<target>ऑफ़लाइन सक्रिय करें</target>
 
 <source>Save as Batch Job</source>
 <target>बॅच जॉब के रूप में सहेजें</target>
@@ -1224,6 +1338,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>समय अवधि चुनें</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync दान संस्‍करण</target>
 
 <source>&Options</source>
 <target>विकल्प (&O)</target>
@@ -1246,8 +1363,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>अवलोकन</target>
 
-<source>&Download</source>
-<target>डाउनलोड (&D)</target>
+<source>&Show details</source>
+<target>विवरण दिखाएँ (&S)</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync का नया संस्करण उपलब्ध है:</target>
@@ -1486,8 +1603,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>लॉग</target>
 
-<source>Loading...</source>
-<target>लोड हो रहा है...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>स्थापना फ़ाइलें दूषित हैं। FreeFileSync पुनर्स्थापित करें।</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>धन्यवाद, %x, आपके दान और समर्थन के लिए!</target>
+
+<source>Password:</source>
+<target>पासवर्ड:</target>
+
+<source>Key password:</source>
+<target>कुंजी पासवर्ड:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1545,6 +1671,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>दिखाएं (&S)</target>
+
+<source>Downloading update...</source>
+<target>अद्यतन डाउनलोड हो रहा है...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>समान फ़ाइल्स पहचानने के लिए संशोधन समय और आकार की तुलना करें।</target>
@@ -1639,11 +1768,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>प्रतिशत</target>
 
+<source>Failed to retrieve update information.</source>
+<target>अद्यतन जानकारी प्राप्त करने में विफल।</target>
+
+<source>Automatic updates:</source>
+<target>स्वचालित अद्यतन:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>FreeFileSync दान संस्‍करण आवश्यक</target>
+
 <source>Check for Program Updates</source>
 <target>प्रोग्राम अद्यतनों के लिए जाँच करें</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>स्वत: अद्यतन करें या मैन्युअल रूप से FreeFileSync मुख पृष्ठ से डाउनलोड करें?</target>
+
+<source>&Auto-update</source>
+<target>स्वत: अद्यतन करें (&A)</target>
+
+<source>&Home page</source>
+<target>मुख पृष्ठ (&H))</target>
+
 <source>Download now?</source>
 <target>अभी डाउनलोड करें?</target>
+
+<source>&Download</source>
+<target>डाउनलोड (&D)</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync नवीनतम है।</target>
@@ -1657,14 +1807,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>%x की संगतता जाँच विफल।</target>
 
-<source>Cannot find system function %x.</source>
-<target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
+<source>Installation was registered on a different operating system.</source>
+<target>स्थापना किसी अन्य ऑपरेटिंग सिस्टम पर पंजीकृत है।</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>FreeFileSync दान संस्‍करण सक्रिय करने में विफल।</target>
+
+<source>Incorrect activation key.</source>
+<target>अनुचित सक्रियण कुंजी।</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>सिस्टम संदेशों को प्राप्त करने के लिए पंजीकृत करने में असमर्थ।</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>स्थापना फ़ाइल्स दूषित हैं। कृपया FreeFileSync पुन:-स्थापित करें।</target>
+<source>Cannot find system function %x.</source>
+<target>सिस्टम फ़ंकशन %x ढूंढ नहीं सकते।</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>%x के लिए डिवाइस सूचनाएँ पंजिकृत करने में असमर्थ।</target>
@@ -1695,9 +1851,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>%x से %y गुण प्रतिलिपित नहीं कर सकते।</target>
-
-<source>Type of item %x is not supported:</source>
-<target>%x प्रकार का आइटम समर्थित नहीं है:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1749,9 +1902,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>कॉन्फ़िगरेशन फ़ाइल %x अधूरी है। अनुपस्थित तत्व उनके डिफ़ॉल्ट मानों से सेट होंगे।</target>
-
-<source>Internet access failed.</source>
-<target>इंटरनेट पहुँच विफल।</target>
 
 <source>Prepare installation</source>
 <target>स्थापना तैयारी</target>
@@ -1822,18 +1972,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync के साथ संपादित करें</target>
 
-<source>Thanks for your donation and support!</source>
-<target>आपके दान और समर्थन के लिए धन्यवाद!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>यह दाताओं के लिए FreeFileSync इंस्टॉलर अपनी दैनिक स्थापना सीमा तक पहुँचा है।</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>नियमित संस्करण FreeFileSync मुखपृष्ठ से अभी डाउनलोड करें?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>पोर्टेबल संस्करण चयनित फ़ोल्डर में स्थापित नहीं किया जा सकता।</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>स्थापना के लिए कृपया स्थानीय स्थापना प्रकार चयन करें या कोई और फ़ोल्डर चुनें।</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>अपरिचालित स्थापना केवल FreeFileSync दान संस्‍करण में ही उपलब्ध है।</target>
 

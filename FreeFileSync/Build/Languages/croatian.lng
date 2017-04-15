@@ -22,11 +22,11 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Postavljam zadani sinkronizacijski smjer: Stare datoteke će biti prepisane novim datotekama.</target>
 
-<source>Creating folder %x</source>
-<target>Kreiranje mape %x</target>
-
 <source>Creating file %x</source>
 <target>Izrađujem datoteku %x</target>
+
+<source>Creating folder %x</source>
+<target>Kreiranje mape %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Izrađujem simboličnu poveznicu %x</target>
@@ -115,29 +115,20 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Ukoliko ignorirate ovu pogrešku zanemarene mape će se smatrati praznima.Prazne mape se izrade automatski kad bude potrebno.</target>
 
-<source>A folder input field is empty.</source>
-<target>Polje za odabir mape je prazno.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Odgovarajuća mapa će se smatrati praznom.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Slijedeće putanje mapa su ovisne jedne o drugima:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Datoteka %x ima nevažeći datum.</target>
 
 <source>Date:</source>
 <target>Datum:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Datoteke %x imaju isti datum ali različitu veličinu.</target>
+<source>Files have the same date but a different size.</source>
+<target>Datoteke imaju isti datum ali različitu veličinu.</target>
 
 <source>Size:</source>
 <target>Veličina:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Usporedba sadržaja je preskočena za izdvojene datoteke %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Usporedba sadržaja je preskočena za izdvojene datoteke.</target>
 
 <source>Items differ in attributes only</source>
 <target>Stavke se razlikuju samo u atributima</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Pokretanje usporedbe</target>
+
+<source>A folder input field is empty.</source>
+<target>Polje za odabir mape je prazno.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Odgovarajuća mapa će se smatrati praznom.</target>
+
+<source>Exclude:</source>
+<target>Odvojiti:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>Jedna bazna mapa od para mapa se nalazi u drugoj mapi.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Mapa bi trebala biti izdvojena od sinkronizacije pomoću filtera.</target>
 
 <source>Calculating sync directions...</source>
 <target>Izračunavanje smjerova sinkronizacije...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Osvježi atribute desno</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Ne mogu zapisati dopuštenja za %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Operacija nije podržana za različite bazne mape.</target>
-
 <source>Cannot write file %x.</source>
 <target>Ne mogu zapisati datoteku %x.</target>
 
@@ -267,38 +267,44 @@ Očekivano: %x bajta
 Stvarno: %y bajta
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Ne mogu zapisati dopuštenja za %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Operacija nije podržana za različite bazne mape.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Ne može se kopirati simbolična poveznica %x prema %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Ne mogu premjestiti datoteku %x u %y.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Ne mogu specificirati direktorij %x.</target>
+<source>Unable to connect to %x.</source>
+<target>Nije moguće povezivanje na %x.</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>Ne mogu pročitati osobine od %x.</target>
+<source>Failed to get information about server %x.</source>
+<target>Nije moguće pristupiti informacijama servera %x.</target>
 
-<source>Cannot find %x.</source>
-<target>Nije moguće pronaći %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Ne mogu otvoriti mapu %x.</target>
 
-<source>Cannot open file %x.</source>
-<target>Ne mogu otvoriti datoteku %x.</target>
+<source>Cannot read directory %x.</source>
+<target>Nije moguće učitati mapu %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>Ne mogu čitati datoteku %x.</target>
 
-<source>Cannot find device %x.</source>
-<target>Nije moguće pronaći uređaj %x.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Ne mogu pročitati osobine od %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Ne mogu izraditi mapu %x.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Ne mogu izbrisati mapu %x.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Ne mogu izbrisati datoteku %x.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Ne mogu izbrisati mapu %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Ne mogu zapisati vrijeme izmjene %x.</target>
@@ -309,23 +315,67 @@ Stvarno: %y bajta
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ne mogu odrediti simboličnu poveznicu %x.</target>
 
-<source>Cannot open directory %x.</source>
-<target>Ne mogu otvoriti mapu %x.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Nije moguće premjestiti %x u koš za smeće.</target>
+
+<source>Cannot open file %x.</source>
+<target>Ne mogu otvoriti datoteku %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Nije moguće pronaći uređaj %x.</target>
+
+<source>Cannot find %x.</source>
+<target>Nije moguće pronaći %x.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Vrsta stavke %x koji nije podržan:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Nije moguće brisanje simbolične poveznice %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>Nije moguće izračunati slobodan prostor diska za %x.</target>
 
-<source>Unable to move %x to the recycle bin.</source>
-<target>Nije moguće premjestiti %x u koš za smeće.</target>
-
 <source>Incorrect command line:</source>
 <target>Netočna naredbena linija:</target>
 
-<source>Error Code %x:</source>
-<target>Pogreška broj %x:</target>
+<source>Error Code %x</source>
+<target>Kod greške %x.</target>
 
-<source>Unable to connect to %x.</source>
-<target>Nije moguće povezivanje na %x.</target>
+<source>The server does not support authentication via %x.</source>
+<target>Server ne podržava provjeru autentičnosti preko %x.</target>
+
+<source>Required:</source>
+<target>Potrebno:</target>
+
+<source>Unable to access %x.</source>
+<target>Nije moguće pristupiti %x.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>Vrijeme za operaciju je isteklo nakon %x sekundu.</pluralform>
+<pluralform>Vrijeme za operaciju je isteklo nakon %x sekundi.</pluralform>
+<pluralform>Vrijeme za operaciju je isteklo nakon %x sekundi.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>Ne može se čekati na više od %x konekcije istovremeno.</pluralform>
+<pluralform>Ne može se čekati na više od %x konekcija istovremeno.</pluralform>
+<pluralform>Ne može se čekati na više od %x konekcija istovremeno.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>Aktivne konekcije: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>Nije uspjelo povezivanje na SFTP kanal broj %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -358,11 +408,17 @@ Stvarno: %y bajta
 <source>Database file %x does not yet exist.</source>
 <target>Datoteka baze %x još ne postoji.</target>
 
-<source>Database file is corrupt:</source>
-<target>Baza je oštećena:</target>
+<source>Database file is corrupted:</source>
+<target>Datoteka baze je oštećena:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Datoteke baze podataka ne dijele zajedničku sesiju.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>Datoteke baze još uvijek ne sadrže informacije o zadnjoj sinkronizaciji.</target>
+
+<source>Loading file %x...</source>
+<target>Učitavam datoteku %x...</target>
+
+<source>Saving file %x...</source>
+<target>Spremanje datoteke %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Tražim mapu %x...</target>
@@ -391,9 +447,6 @@ Stvarno: %y bajta
 
 <source>Detecting abandoned lock...</source>
 <target>Pronalazim napušteni ključ...</target>
-
-<source>Saving file %x...</source>
-<target>Spremanje datoteke %x...</target>
 
 <source>Items processed:</source>
 <target>Obrađene stavke:</target>
@@ -650,20 +703,32 @@ Naredba će biti pokrenuta ako se:
 <source>Not enough free disk space available in:</source>
 <target>Nedovoljno prostora na disku:</target>
 
-<source>Required:</source>
-<target>Potrebno:</target>
-
 <source>Available:</source>
 <target>Dostupno:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Višestruki parovi mapa zapisuju u zajedničku podmapu. Molimo provjerite vaše postavke.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Neke datoteke će biti sinkronizirane kao dio više baznih mapa.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>Da bi izbjegli konflikt, postavite filtere za izdvajanje tako da se svaka ažurirana datoteka uzima u obzir samo kod jedne bazne mape.</target>
+
+<source>Versioning folder:</source>
+<target>Verzija mape:</target>
+
+<source>Base folder:</source>
+<target>Bazna mapa:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Mapa verzije će biti sinkronizirana jer je sadržana u baznoj mapi.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Mape sinkronizacije::</target>
 
 <source>Generating database...</source>
 <target>Izrađivanje baze podataka...</target>
+
+<source>Loading...</source>
+<target>Učitavam...</target>
 
 <source>job name</source>
 <target>Naziv zadatka</target>
@@ -789,15 +854,6 @@ Naredba će biti pokrenuta ako se:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Molimo odaberite mapu na lokalnom disku, mreži ili MTP uređaju.</target>
 
-<source>SFTP folder</source>
-<target>SFTP mapa</target>
-
-<source>Select SFTP folder</source>
-<target>Odaberite SFTP mapu</target>
-
-<source>Select alternative folder type</source>
-<target>Odaberite alternativni tip mape</target>
-
 <source>&New</source>
 <target>&Novo</target>
 
@@ -843,11 +899,8 @@ Naredba će biti pokrenuta ako se:
 <source>&Tools</source>
 <target>&Alati</target>
 
-<source>&Check for new version</source>
-<target>&Provjeri za novu verziju</target>
-
-<source>&Check now</source>
-<target>&Provjeri sada</target>
+<source>&Check for updates now</source>
+<target>&Provjeri nadogradnju sada</target>
 
 <source>Check &automatically once a week</source>
 <target>Provjeri &automatski jednom tjedno</target>
@@ -866,6 +919,9 @@ Naredba će biti pokrenuta ako se:
 
 <source>Remove folder pair</source>
 <target>Ukloni ovu mapu</target>
+
+<source>Access online storage</source>
+<target>Pristupi online pohrani</target>
 
 <source>Swap sides</source>
 <target>Zamjeni strane</target>
@@ -954,9 +1010,6 @@ Naredba će biti pokrenuta ako se:
 <source>Include:</source>
 <target>Obuhvati:</target>
 
-<source>Exclude:</source>
-<target>Odvojiti:</target>
-
 <source>Show examples</source>
 <target>Prikaži primjere</target>
 
@@ -1040,8 +1093,11 @@ Naredba će biti pokrenuta ako se:
 <source>Arrange folder pair</source>
 <target>Rasporedi par mapa</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Unesite SFTP pristupne podatke:</target>
+<source>Enter your login details:</source>
+<target>Unesite podatke za logiranje:</target>
+
+<source>Connection type:</source>
+<target>Tip konekcije:</target>
 
 <source>Server name or IP address:</source>
 <target>Naziv servera ili IP adresa:</target>
@@ -1049,17 +1105,56 @@ Naredba će biti pokrenuta ako se:
 <source>Port:</source>
 <target>Port:</target>
 
+<source>Encryption:</source>
+<target>Enkripcija:</target>
+
+<source>&Disabled</source>
+<target>&Isključeno</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Isključivo SSL/TLS</target>
+
+<source>Authentication:</source>
+<target>Provjera korisnika:</target>
+
+<source>&Password</source>
+<target>&Lozinka</target>
+
+<source>&Key file</source>
+<target>&Ključ</target>
+
 <source>User name:</source>
 <target>Korisničko ime:</target>
 
-<source>Password:</source>
-<target>Lozinka:</target>
+<source>Private key file:</source>
+<target>Privatni ključ:</target>
 
 <source>&Show password</source>
 <target>&Prikaži lozinku</target>
 
 <source>Directory on server:</source>
 <target>Mapa na serveru:</target>
+
+<source>Performance improvements:</source>
+<target>Poboljšanje perfomansi:</target>
+
+<source>How to get best performance?</source>
+<target>Kako dobiti najbolje perfomanse?</target>
+
+<source>SSH connections for directory reading:</source>
+<target>SSH konekcije za čitanje direktorija:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>Predložen raspon: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>SFTP kanala po konekciji:</target>
+
+<source>Detect server limit</source>
+<target>Detektiranje limita servera</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 konekcije x 10 kanala = 20 puta brže čitanje direktorija</target>
 
 <source>Select a directory on the server:</source>
 <target>Odaberi mapu na serveru:</target>
@@ -1190,6 +1285,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Source code written in C++ using:</source>
 <target>Izvorni kod napisan u C++ uz korištenje:</target>
 
+<source>Donation details</source>
+<target>Detalji donacije</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Ako volite FreeFileSync:</target>
 
@@ -1199,8 +1297,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Feedback and suggestions are welcome</source>
 <target>Povratne informacije i prijedlozi su dobrodošli</target>
 
-<source>Homepage</source>
-<target>Početna stranica</target>
+<source>Home page</source>
+<target>Web stranica</target>
 
 <source>Email</source>
 <target>Email</target>
@@ -1211,8 +1309,26 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Many thanks for localization:</source>
 <target>Velike zahvale idu:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH Protokol prijenosa datoteka</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Aktivirajte FreeFileSync Donatorsku Verziju pomoću sljedećih načina:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Aktivacija preko interneta:</target>
+
+<source>Activate online</source>
+<target>Aktiviraj online</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Preuzeti offline aktivacijski ključ sa sljedeće URL adrese:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Kopirati u međuspremnik</target>
+
+<source>Enter activation key:</source>
+<target>Unesite aktivacijski ključ:</target>
+
+<source>Activate offline</source>
+<target>Aktivacija offline</target>
 
 <source>Save as Batch Job</source>
 <target>Spremi kao slijedni zadatak</target>
@@ -1228,6 +1344,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Select Time Span</source>
 <target>Odaberite vremenski raspon</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>FreeFileSync Donatorska Verzija</target>
 
 <source>&Options</source>
 <target>&Opcije</target>
@@ -1250,8 +1369,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Overview</source>
 <target>Pregled</target>
 
-<source>&Download</source>
-<target>&Preuzmi</target>
+<source>&Show details</source>
+<target>&Prikaži detalje</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Nova verzija FreeFileSync je dostupna:</target>
@@ -1494,8 +1613,17 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Log</source>
 <target>Izvješće</target>
 
-<source>Loading...</source>
-<target>Učitavam...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Instalacijske datoteke su oštećene. Molimo ponovno instalirajte FreeFileSync.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Hvala Vam, %x, na vašoj donaciji i podršci!</target>
+
+<source>Password:</source>
+<target>Lozinka:</target>
+
+<source>Key password:</source>
+<target>Aktivacijski ključ:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1556,6 +1684,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>&Show</source>
 <target>&Prikaži</target>
+
+<source>Downloading update...</source>
+<target>Preuzimanje ažuriranja...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Ustanovi jednake datoteke uspoređujući vrijeme izmjene i veličinu.</target>
@@ -1650,11 +1781,32 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Percentage</source>
 <target>Postotak</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Preuzimanje informacija za ažuriranje nije bilo uspješno.</target>
+
+<source>Automatic updates:</source>
+<target>Automatsko ažuriranje:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Zahtjeva FreeFileSync Donatorsku Verziju</target>
+
 <source>Check for Program Updates</source>
 <target>Provjeri za nadogradnje programa</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Automatski ažurirati sada ili preuzeti manualno sa FreeFileSync stranice?</target>
+
+<source>&Auto-update</source>
+<target>&Automatsko ažuriranje</target>
+
+<source>&Home page</source>
+<target>&Web stranica</target>
+
 <source>Download now?</source>
 <target>Preuzeti sada?</target>
+
+<source>&Download</source>
+<target>&Preuzmi</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync je ažuran.</target>
@@ -1668,14 +1820,20 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Consistency check failed for %x.</source>
 <target>Provjera dosljednosti nije uspjela za %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Ne mogu pronaći sistemsku funkciju %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Instalacija je registrirana na drugom operacijskom sustavu.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Aktivacija Donatorske Verzije FreeFileSync nije bila uspješna.</target>
+
+<source>Incorrect activation key.</source>
+<target>Neispravan aktivacijski ključ.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nije moguće registriranje za primanje sistemskih poruka.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Instalacijske datoteke su oštećene. Molimo reinstalirajte FreeFileSync.</target>
+<source>Cannot find system function %x.</source>
+<target>Ne mogu pronaći sistemsku funkciju %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Nije moguće registrirati prijavu uređaja za %x.</target>
@@ -1706,9 +1864,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Nije moguće kopiranje atributa od %x prema %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Vrsta stavke %x koji nije podržan:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1763,9 +1918,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Konfiguracijska datoteka %x je nepotpuna. Nedostajući elementi će biti postavljeni na početne vrijednosti.</target>
-
-<source>Internet access failed.</source>
-<target>Mrežna veza nije dostupna.</target>
 
 <source>Prepare installation</source>
 <target>Pripremam instalaciju</target>
@@ -1836,18 +1988,12 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Edit with FreeFileSync</source>
 <target>Uredi pomoću FreeFileSynca</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Hvala na donaciji i podršci!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Ova instalacijska datoteka FreeFileSync donatorske verzije je dosegla dnevni limit instalacija.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Preuzeti standardnu verziju s FreeFileSync stranice sada?</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>Ova portabilna verzija se ne može instalirati u odabranu mapu.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Molimo odaberite lokalnu instalaciju ili odaberite drugu mapu za instalaciju.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>Skriveni instalacijski tip je dostupan samo u FreeFileSync Donatorskoj Verziji.</target>
 

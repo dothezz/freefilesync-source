@@ -1162,6 +1162,7 @@ void MainDialog::copyToAlternateFolder(const std::vector<zen::FileSystemObject*>
                                    globalCfg.gui.mainDlg.copyToCfg.lastUsedPath,
                                    globalCfg.gui.mainDlg.copyToCfg.keepRelPaths,
                                    globalCfg.gui.mainDlg.copyToCfg.overwriteIfExists,
+                                   globalCfg.optDialogs,
                                    statusHandler);
         //"clearSelection" not needed/desired
     }
@@ -1241,33 +1242,28 @@ AbstractPath getExistingParentFolder(const FileSystemObject& fsObj)
 
 
 template <SelectedSide side, class Function>
-void extractFileDetails(const FileSystemObject& fsObj, Function onDetails)
+void extractFileDescriptor(const FileSystemObject& fsObj, Function onDescriptor)
 {
     if (!fsObj.isEmpty<side>())
         visitFSObject(fsObj, [](const FolderPair& folder) {},
     [&](const FilePair& file)
     {
-        const TempFileBuffer::FileDetails details = { file.getAbstractPath<side>(),
-                                                      FileDescriptor(file.getLastWriteTime <side>(),
-                                                                     file.getFileSize      <side>(),
-                                                                     file.getFileId        <side>(),
-                                                                     file.isFollowedSymlink<side>())
-                                                    };
-        onDetails(details);
+        const FileDescriptor descr = { file.getAbstractPath<side>(), file.getAttributes<side>() };
+        onDescriptor(descr);
     }, [](const SymlinkPair& symlink) {});
 }
 
 
 template <SelectedSide side>
 void collectNonNativeFiles(const std::vector<FileSystemObject*>& selectedRows, const TempFileBuffer& tempFileBuf,
-                           std::set<TempFileBuffer::FileDetails>& workLoad)
+                           std::set<FileDescriptor>& workLoad)
 {
     for (const FileSystemObject* fsObj : selectedRows)
-        extractFileDetails<side>(*fsObj, [&](const TempFileBuffer::FileDetails& details)
+        extractFileDescriptor<side>(*fsObj, [&](const FileDescriptor& descr)
     {
-        if (!AFS::getNativeItemPath(details.path))
-            if (tempFileBuf.getTempPath(details).empty()) //TempFileBuffer::createTempFiles() contract!
-                workLoad.insert(details);
+        if (!AFS::getNativeItemPath(descr.path))
+            if (tempFileBuf.getTempPath(descr).empty()) //TempFileBuffer::createTempFiles() contract!
+                workLoad.insert(descr);
     });
 }
 
@@ -1296,12 +1292,12 @@ void invokeCommandLine(const Zstring& commandLinePhrase, //throw FileError
         if (AFS::getNativeItemPath(basePath))
             localPath = itemPath; //no matter if item exists or not
         else //returns empty if not available (item not existing, error during copy):
-            extractFileDetails<side>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath = tempFileBuf.getTempPath(details); });
+            extractFileDescriptor<side>(*fsObj, [&](const FileDescriptor& descr) { localPath = tempFileBuf.getTempPath(descr); });
 
         if (AFS::getNativeItemPath(basePath2))
             localPath2 = itemPath2;
         else
-            extractFileDetails<side2>(*fsObj, [&](const TempFileBuffer::FileDetails& details) { localPath2 = tempFileBuf.getTempPath(details); });
+            extractFileDescriptor<side2>(*fsObj, [&](const FileDescriptor& descr) { localPath2 = tempFileBuf.getTempPath(descr); });
 
         if (localPath .empty()) localPath  = replaceCpy(utfTo<Zstring>(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath );
         if (localPath2.empty()) localPath2 = replaceCpy(utfTo<Zstring>(L"<" + _("Local path not available for %x.") + L">"), Zstr("%x"), itemPath2);
@@ -1388,7 +1384,7 @@ void MainDialog::openExternalApplication(const Zstring& commandLinePhrase, bool 
             }
         }
 
-    std::set<TempFileBuffer::FileDetails> nonNativeFiles;
+    std::set<FileDescriptor> nonNativeFiles;
     if (contains(commandLinePhrase, Zstr("%local_path%")))
     {
         collectNonNativeFiles< LEFT_SIDE>(selectionLeft,  tempFileBuf, nonNativeFiles);
@@ -3877,7 +3873,6 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         //should never happen: sync button is deactivated if they are not in sync
 
         synchronize(getLocalTime(),
-                    globalCfg.optDialogs,
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,
@@ -3886,6 +3881,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     globalCfg.folderAccessTimeout,
                     syncProcessCfg,
                     folderCmp,
+                    globalCfg.optDialogs,
                     statusHandler);
     }
     catch (GuiAbortProcess&)

@@ -12,6 +12,7 @@
 #include <zen/file_error.h>
 #include "../structures.h"
 #include "../fs/abstract.h"
+#include "../algorithm.h"
 
 
 namespace zen
@@ -45,7 +46,7 @@ public:
             throw FileError(_("Unable to create time stamp for versioning:") + L" \"" + utfTo<std::wstring>(timeStamp_) + L"\"");
     }
 
-    bool revisionFile(const AbstractPath& filePath, //throw FileError; return "false" if file is not existing
+    bool revisionFile(const FileDescriptor& fileDescr, //throw FileError; return "false" if file is not existing
                       const Zstring& relativePath,
                       //called frequently if move has to revert to copy + delete => see zen::copyFile for limitations when throwing exceptions!
                       const IOCallback& notifyUnbufferedIO); //may be nullptr

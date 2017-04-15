@@ -22,14 +22,14 @@
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.</target>
 
-<source>Creating folder %x</source>
-<target>Δημιουργία του φακέλου %x</target>
-
 <source>Creating file %x</source>
 <target>Δημιουργία του αρχείου %x</target>
 
+<source>Creating folder %x</source>
+<target>Δημιουργία του φακέλου %x</target>
+
 <source>Creating symbolic link %x</source>
-<target>Δημιουργία της συμβολικής σύνδεσης %x</target>
+<target>Δημιουργία των συμβολικών συνδέσμων %x</target>
 
 <source>Moving file %x to the recycle bin</source>
 <target>Μεταφορά του αρχείου %x στον κάδο ανακύκλωσης</target>
@@ -38,7 +38,7 @@
 <target>Μεταφορά του φακέλου %x στον κάδο ανακύκλωσης</target>
 
 <source>Moving symbolic link %x to the recycle bin</source>
-<target>Μεταφορά της συμβολικής σύνδεσης %x στον κάδο ανακύκλωσης</target>
+<target>Μεταφορά του συμβολικού συνδέσμου %x στον κάδο ανακύκλωσης</target>
 
 <source>Deleting file %x</source>
 <target>Διαγραφή του αρχείου %x</target>
@@ -115,35 +115,26 @@
 <source>If this error is ignored the folders will be considered empty. Missing folders are created automatically when needed.</source>
 <target>Εάν αγνοηθεί αυτό το σφάλμα, οι φάκελοι θα θεωρηθούν κενοί. Φάκελοι που λείπουν θα δημιουργηθούν αυτόματα, όταν χρειαστούν.</target>
 
-<source>A folder input field is empty.</source>
-<target>Ένα πεδίο εισαγωγής φακέλων είναι άδειο.</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>Ο αντίστοιχος φάκελος θα θεωρηθεί κενός.</target>
-
-<source>The following folder paths are dependent from each other:</source>
-<target>Οι ακόλουθες διαδρομές εξαρτώνται η μια από την άλλη:</target>
-
 <source>File %x has an invalid date.</source>
 <target>Το αρχείο %x δεν έχει έγκυρη ημερομηνία.</target>
 
 <source>Date:</source>
 <target>Ημερομηνία:</target>
 
-<source>Files %x have the same date but a different size.</source>
-<target>Τα αρχεία %x έχουν την ίδια ημερομηνία αλλά διαφορετικό μέγεθος.</target>
+<source>Files have the same date but a different size.</source>
+<target>Τα αρχεία έχουν την ίδια ημερομηνία αλλά διαφορετικό μέγεθος.</target>
 
 <source>Size:</source>
 <target>Μέγεθος:</target>
 
-<source>Content comparison was skipped for excluded files %x.</source>
-<target>Η σύγκριση περιεχομένου παραλήφθηκε για τα εξαιρούμενα αρχεία %x.</target>
+<source>Content comparison was skipped for excluded files.</source>
+<target>Η σύγκριση των περιεχομένων έχει παραληφθεί για τα εξαιρεθέντα αρχεία.</target>
 
 <source>Items differ in attributes only</source>
 <target>Τα στοιχεία διαφέρουν μόνο ως προς τα χαρακτηριστικά τους</target>
 
 <source>Resolving symbolic link %x</source>
-<target>Επίλυση της συμβολικής σύνδεσης %x</target>
+<target>Επίλυση του συμβολικού συνδέσμου %x</target>
 
 <source>Comparing content of files %x</source>
 <target>Σύγκριση του περιεχομένου των αρχείων %x</target>
@@ -186,6 +177,21 @@
 
 <source>Starting comparison</source>
 <target>Έναρξη της σύγκρισης</target>
+
+<source>A folder input field is empty.</source>
+<target>Ένα πεδίο εισαγωγής φακέλων είναι άδειο.</target>
+
+<source>The corresponding folder will be considered as empty.</source>
+<target>Ο αντίστοιχος φάκελος θα θεωρηθεί κενός.</target>
+
+<source>Exclude:</source>
+<target>Εξαίρεση:</target>
+
+<source>One base folder of a folder pair is contained in the other one.</source>
+<target>Ο ένας βασικός φάκελος ενός ζεύγους φακέλων βρίσκεται μέσα στον άλλον.</target>
+
+<source>The folder should be excluded from synchronization via filter.</source>
+<target>Ο φάκελος θα έπρεπε να εξαιρεθεί από το συγχρονισμό μέσω φίλτρου.</target>
 
 <source>Calculating sync directions...</source>
 <target>Υπολογισμός των κατευθύνσεων συγχρονισμού...</target>
@@ -247,12 +253,6 @@
 <source>Update attributes on right</source>
 <target>Ενημέρωση των χαρακτηριστικών στα δεξιά</target>
 
-<source>Cannot write permissions of %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή των δικαιωμάτων πρόσβασης του %x.</target>
-
-<source>Operation not supported for different base folder types.</source>
-<target>Η λειτουργία δεν υποστηρίζεται για διαφορετικούς τύπους βασικών υποκαταλόγων.</target>
-
 <source>Cannot write file %x.</source>
 <target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
 
@@ -267,38 +267,44 @@ Actual: %y bytes
 Βρέθηκε: %y bytes
 </target>
 
+<source>Cannot write permissions of %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή των δικαιωμάτων πρόσβασης του %x.</target>
+
+<source>Operation not supported for different base folder types.</source>
+<target>Η λειτουργία δεν υποστηρίζεται για διαφορετικούς τύπους βασικών φακέλων.</target>
+
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>Αδυναμία αντιγραφής της συμβολικής σύνδεσης %x στο %y.</target>
+<target>Αδυναμία αντιγραφής του συμβολικού συνδέσμου %x στο %y.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Δεν μπορεί το αρχείο %x να μεταφερθεί στο %y.</target>
 
-<source>Cannot enumerate directory %x.</source>
-<target>Δεν είναι δυνατή η απαρίθμηση του υποκαταλόγου %x.</target>
+<source>Unable to connect to %x.</source>
+<target>Δεν μπορεί να πραγματοποιηθεί σύνδεση με το %x.</target>
+
+<source>Failed to get information about server %x.</source>
+<target>Αποτυχία λήψης πληροφοριών από τον διακομιστή %x.</target>
+
+<source>Cannot open directory %x.</source>
+<target>Δεν είναι δυνατό το άνοιγμα του υποκαταλόγου %x.</target>
+
+<source>Cannot read directory %x.</source>
+<target>Δεν μπορεί να γίνει ανάγνωση του καταλόγου %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Δεν μπορεί να γίνει ανάγνωση των χαρακτηριστικών του αρχείου %x.</target>
 
-<source>Cannot find %x.</source>
-<target>Το %x δεν μπορεί να βρεθεί.</target>
-
-<source>Cannot open file %x.</source>
-<target>Δεν είναι δυνατό το άνοιγμα του αρχείου %x.</target>
-
 <source>Cannot read file %x.</source>
 <target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
-
-<source>Cannot find device %x.</source>
-<target>Η συσκευή %x δεν μπορεί να βρεθεί.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Δεν μπορεί να δημιουργηθεί ο υποκατάλογος %x.</target>
 
-<source>Cannot delete directory %x.</source>
-<target>Δεν μπορεί να διαγραφεί ο υποκατάλογος %x.</target>
-
 <source>Cannot delete file %x.</source>
 <target>Δεν μπορεί να διαγραφεί το αρχείο %x.</target>
+
+<source>Cannot delete directory %x.</source>
+<target>Δεν μπορεί να διαγραφεί ο υποκατάλογος %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Δεν μπορεί να γίνει εγγραφή της ώρας τροποποίησης του %x.</target>
@@ -307,25 +313,67 @@ Actual: %y bytes
 <target>Δεν μπορεί να προσδιοριστεί η τελική διαδρομή για το %x.</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Η συμβολική σύνδεση %x δεν μπορεί να επιλυθεί.</target>
-
-<source>Cannot open directory %x.</source>
-<target>Δεν είναι δυνατό το άνοιγμα του υποκαταλόγου %x.</target>
-
-<source>Cannot determine free disk space for %x.</source>
-<target>Δεν μπορεί να υπολογιστεί ο ελεύθερος χώρος του δίσκου %x.</target>
+<target>Ο συμβολικός σύνδεσμος %x δεν μπορεί να επιλυθεί.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
 <target>Δεν ήταν δυνατή η μεταφορά του %x στον κάδο ανακύκλωσης.</target>
 
+<source>Cannot open file %x.</source>
+<target>Δεν είναι δυνατό το άνοιγμα του αρχείου %x.</target>
+
+<source>Cannot find device %x.</source>
+<target>Η συσκευή %x δεν μπορεί να βρεθεί.</target>
+
+<source>Cannot find %x.</source>
+<target>Το %x δεν μπορεί να βρεθεί.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Ο τύπος του στοιχείου %x δεν υποστηρίζεται:</target>
+
+<source>Cannot delete symbolic link %x.</source>
+<target>Δεν μπορεί να διαγραφεί ο συμβολικός σύνδεσμος %x.</target>
+
+<source>Cannot determine free disk space for %x.</source>
+<target>Δεν μπορεί να υπολογιστεί ο ελεύθερος χώρος του δίσκου %x.</target>
+
 <source>Incorrect command line:</source>
 <target>Εσφαλμένη γραμμή εντολών:</target>
 
-<source>Error Code %x:</source>
-<target>Κωδικός Σφάλματος %x:</target>
+<source>Error Code %x</source>
+<target>Κωδικός Σφάλματος %x</target>
 
-<source>Unable to connect to %x.</source>
-<target>Δεν μπορεί να πραγματοποιηθεί σύνδεση με το %x.</target>
+<source>The server does not support authentication via %x.</source>
+<target>Ο εξυπηρετητής δεν υποστηρίζει πιστοποίηση μέσω %x.</target>
+
+<source>Required:</source>
+<target>Απαιτείται:</target>
+
+<source>Unable to access %x.</source>
+<target>Δεν είναι δυνατή η πρόσβαση στο %x.</target>
+
+<source>
+<pluralform>Operation timed out after 1 second.</pluralform>
+<pluralform>Operation timed out after %x seconds.</pluralform>
+</source>
+<target>
+<pluralform>Το χρονικό όριο της λειτουργίας έληξε μετά από 1 δευτερόλεπτο.</pluralform>
+<pluralform>Το χρονικό όριο της λειτουργίας έληξε μετά από %x δευτερόλεπτα.</pluralform>
+</target>
+
+<source>
+<pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
+<pluralform>Cannot wait on more than %x connections at a time.</pluralform>
+</source>
+<target>
+<pluralform>Δεν είναι δυνατή η αναμονή περισσότερων από 1 σύνδεσης τη φορά.</pluralform>
+<pluralform>Δεν είναι δυνατή η αναμονή περισσότερων από %x συνδέσεων τη φορά.</pluralform>
+</target>
+
+<source>Active connections: %x</source>
+<target>Ενεργές συνδέσεις: %x</target>
+
+<source>Failed to open SFTP channel number %x.</source>
+<target>Αποτυχία ανοίγματος του SFTP καναλιού με αριθμό %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -357,11 +405,17 @@ Actual: %y bytes
 <source>Database file %x does not yet exist.</source>
 <target>Το αρχείο βάσης δεδομένων %x δεν έχει ακόμα δημιουργηθεί.</target>
 
-<source>Database file is corrupt:</source>
+<source>Database file is corrupted:</source>
 <target>Το αρχείο βάσης δεδομένων είναι κατεστραμμένο:</target>
 
-<source>Database files do not share a common session.</source>
-<target>Τα αρχεία βάσης δεδομένων δεν έχουν χρησιμοποιηθεί στον ίδιο συγχρονισμό.</target>
+<source>The database files do not yet contain information about the last synchronization.</source>
+<target>Τα αρχεία βάσης δεδομένων δεν περιέχουν ακόμα πληροφορίες για τον τελευταίο συγχρονισμό.</target>
+
+<source>Loading file %x...</source>
+<target>Λήψη του αρχείου %x...</target>
+
+<source>Saving file %x...</source>
+<target>Αποθήκευση του αρχείου %x...</target>
 
 <source>Searching for folder %x...</source>
 <target>Αναζήτηση του φακέλου %x...</target>
@@ -389,9 +443,6 @@ Actual: %y bytes
 
 <source>Detecting abandoned lock...</source>
 <target>Ανίχνευση κλειδώματος που εγκαταλείφθηκε...</target>
-
-<source>Saving file %x...</source>
-<target>Αποθήκευση του αρχείου %x...</target>
 
 <source>Items processed:</source>
 <target>Επεξεργάστηκαν στοιχεία:</target>
@@ -526,7 +577,7 @@ The command is triggered if:
 </source>
 <target>
 Αυτή η εντολή πραγματοποιείται εάν:
--αρχεία ή φάκελοι αλλάξουν
+-αρχεία ή υποφάκελοι αλλάξουν
 -παρουσιαστούν νέοι φάκελοι (π.χ. εισαχθεί ένα φλασάκι USB)
 </target>
 
@@ -597,7 +648,7 @@ The command is triggered if:
 <target>Μεταφορά του φακέλου %x στο %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>Μεταφορά της συμβολικής σύνδεσης %x στο %y</target>
+<target>Μεταφορά του συμβολικού σύνδεσμου %x στο %y</target>
 
 <source>Removing old versions...</source>
 <target>Διαγραφή παλιών εκδόσεων...</target>
@@ -606,7 +657,7 @@ The command is triggered if:
 <target>Ενημέρωση του αρχείου %x</target>
 
 <source>Updating symbolic link %x</source>
-<target>Ενημέρωση της συμβολικής σύνδεσης %x</target>
+<target>Ενημέρωση του συμβολικού σύνδεσμου %x</target>
 
 <source>Verifying file %x</source>
 <target>Επαλήθευση του αρχείου %x</target>
@@ -647,20 +698,32 @@ The command is triggered if:
 <source>Not enough free disk space available in:</source>
 <target>Δεν υπάρχει αρκετός διαθέσιμος χώρος στο δίσκο:</target>
 
-<source>Required:</source>
-<target>Απαιτείται:</target>
-
 <source>Available:</source>
 <target>Διαθέσιμος:</target>
 
-<source>Multiple folder pairs write to a common subfolder. Please review your configuration.</source>
-<target>Πολλά ζεύγη φάκελων γράφουν σε έναν κοινό υποκατάλογο. Παρακαλούμε ελέγξτε ξανά τη διάταξη που επιλέξατε.</target>
+<source>Some files will be synchronized as part of multiple base folders.</source>
+<target>Μερικά αρχεία θα συγχρονιστούν ως μέρη πολλαπλών βασικών φακέλων.</target>
+
+<source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
+<target>Για να αποφύγετε διενέξεις, δημιουργείστε φίλτρα εξαίρεσης, ώστε κάθε ενημερωμένο αρχείο να εξετάζεται μόνο από έναν βασικό φάκελο.</target>
+
+<source>Versioning folder:</source>
+<target>Διατήρηση παλιών εκδόσεων του φακέλου:</target>
+
+<source>Base folder:</source>
+<target>Βασικός φάκελος:</target>
+
+<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
+<target>Ο φάκελος διατήρησης παλιών εκδόσεων θα συγχρονιστεί γιατί βρίσκεται μέσα σε έναν βασικό φάκελο.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Συγχρονίζεται το ζευγάρι φακέλων:</target>
 
 <source>Generating database...</source>
 <target>Δημιουργία βάσης δεδομένων...</target>
+
+<source>Loading...</source>
+<target>Φόρτωση...</target>
 
 <source>job name</source>
 <target>όνομα ενέργειας</target>
@@ -726,7 +789,7 @@ The command is triggered if:
 <target>Φάκελος</target>
 
 <source>Symlink</source>
-<target>Συμβολική σύνδεση</target>
+<target>Συμβολικός σύνδεσμος</target>
 
 <source>Full path</source>
 <target>Πλήρης διαδρομή</target>
@@ -785,15 +848,6 @@ The command is triggered if:
 <source>Please select a folder on a local file system, network or an MTP device.</source>
 <target>Παρακαλούμε επιλέξτε ένα φάκελο σε ένα τοπικό σύστημα αρχείων, σε ένα δίκτυο ή σε μια συσκευή MTP.</target>
 
-<source>SFTP folder</source>
-<target>Φάκελος SFTP</target>
-
-<source>Select SFTP folder</source>
-<target>Επιλογή φακέλου SFTP</target>
-
-<source>Select alternative folder type</source>
-<target>Επιλογή εναλλακτικού τύπου φακέλου</target>
-
 <source>&New</source>
 <target>&Δημιουργία</target>
 
@@ -839,11 +893,8 @@ The command is triggered if:
 <source>&Tools</source>
 <target>&Εργαλεία</target>
 
-<source>&Check for new version</source>
-<target>Έλεγχος για &νέα έκδοση</target>
-
-<source>&Check now</source>
-<target>Έλεγχος &τώρα</target>
+<source>&Check for updates now</source>
+<target>Έλεγχος για ενημερώσεις &τώρα</target>
 
 <source>Check &automatically once a week</source>
 <target>&Aυτόματος έλεγχος μια φορά την εβδομάδα</target>
@@ -862,6 +913,9 @@ The command is triggered if:
 
 <source>Remove folder pair</source>
 <target>Διαγραφή του ζεύγους φακέλων</target>
+
+<source>Access online storage</source>
+<target>Πρόσβαση σε online χώρο αποθήκευσης</target>
 
 <source>Swap sides</source>
 <target>Ανταλλαγή πλευρών</target>
@@ -921,7 +975,7 @@ The command is triggered if:
 <target>Επιλογή μεθόδου:</target>
 
 <source>Include &symbolic links:</source>
-<target>Συμπερίληψη των &συμβολικών συνδέσεων:</target>
+<target>Συμπερίληψη των &συμβολικών συνδέσμων:</target>
 
 <source>&Follow</source>
 <target>Α&κολούθηση</target>
@@ -950,9 +1004,6 @@ The command is triggered if:
 <source>Include:</source>
 <target>Συμπερίληψη:</target>
 
-<source>Exclude:</source>
-<target>Αποκλεισμός:</target>
-
 <source>Show examples</source>
 <target>Εμφάνιση παραδειγμάτων</target>
 
@@ -969,7 +1020,7 @@ The command is triggered if:
 <target>Μέγιστο:</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Επιλογή κανόνων φιλτραρίσματος, ώστε να αποκλειστούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος φακέλων.</target>
+<target>Επιλογή κανόνων φιλτραρίσματος, ώστε να εξαιρεθούν ορισμένα αρχεία από το συγχρονισμό. Εισάγετε τις διαδρομές των αρχείων σχετικά με το αντίστοιχο ζεύγος φακέλων.</target>
 
 <source>C&lear</source>
 <target>&Καθαρισμός</target>
@@ -1036,8 +1087,11 @@ The command is triggered if:
 <source>Arrange folder pair</source>
 <target>Οργάνωση του ζεύγους φακέλων:</target>
 
-<source>Enter your SFTP login details:</source>
-<target>Εισάγετε τα στοιχεία σύνδεσης SFTP:</target>
+<source>Enter your login details:</source>
+<target>Εισάγετε τις λεπτομέρεις της σύνδεσης:</target>
+
+<source>Connection type:</source>
+<target>Τύπος σύνδεσης:</target>
 
 <source>Server name or IP address:</source>
 <target>Όνομα του διακομιστή ή διεύθυνση IP:</target>
@@ -1045,17 +1099,56 @@ The command is triggered if:
 <source>Port:</source>
 <target>Θύρα:</target>
 
+<source>Encryption:</source>
+<target>Κρυπτογράφηση:</target>
+
+<source>&Disabled</source>
+<target>&Απενεργοποίηση</target>
+
+<source>&Explicit SSL/TLS</source>
+<target>&Ρητά SSL/TLS</target>
+
+<source>Authentication:</source>
+<target>Πιστοποίηση:</target>
+
+<source>&Password</source>
+<target>&Κωδικός πρόσβασης</target>
+
+<source>&Key file</source>
+<target>&Αρχείο κλειδιού</target>
+
 <source>User name:</source>
 <target>Όνομα χρήστη:</target>
 
-<source>Password:</source>
-<target>Συνθηματικό:</target>
+<source>Private key file:</source>
+<target>Ιδιωτικό αρχείο κλειδιού:</target>
 
 <source>&Show password</source>
 <target>&Εμφάνιση συνθηματικού</target>
 
 <source>Directory on server:</source>
 <target>Υποκατάλογος στον διακομιστή:</target>
+
+<source>Performance improvements:</source>
+<target>Βελτιώσεις της απόδοσης:</target>
+
+<source>How to get best performance?</source>
+<target>Πώς να έχετε την καλύτερη απόδοση;</target>
+
+<source>SSH connections for directory reading:</source>
+<target>SSH συνδέσεις για ανάγνωση του καταλόγου:</target>
+
+<source>Suggested range: [1 - 10]</source>
+<target>Προτεινόμενο εύρος: [1 - 10]</target>
+
+<source>SFTP channels per connection:</source>
+<target>Αριθμός καναλιών SFTP ανά σύνδεση:</target>
+
+<source>Detect server limit</source>
+<target>Ανίχνευση ορίου του εξυπηρετητή</target>
+
+<source>2 connections x 10 channels = 20 times faster directory reading</source>
+<target>2 συνδέσεις X 10 κανάλια = 20 φορές πιο γρήγορη ανάγνωση του καταλόγου</target>
 
 <source>Select a directory on the server:</source>
 <target>Επιλογή ενός υποκαταλόγου στον διακομιστή:</target>
@@ -1186,6 +1279,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
 
+<source>Donation details</source>
+<target>Λεπτομέρειες δωρεάς</target>
+
 <source>If you like FreeFileSync:</source>
 <target>Αν σας αρέσει το FreeFileSync:</target>
 
@@ -1195,8 +1291,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Feedback and suggestions are welcome</source>
 <target>Τα σχόλια και οι προτάσεις σας είναι ευπρόσδεκτα</target>
 
-<source>Homepage</source>
-<target>Ιστοσελίδα</target>
+<source>Home page</source>
+<target>Αρχική σελίδα</target>
 
 <source>Email</source>
 <target>Email</target>
@@ -1207,8 +1303,26 @@ This guarantees a consistent state even in case of a serious error.
 <source>Many thanks for localization:</source>
 <target>Πολλές ευχαριστίες για τις μεταφράσεις:</target>
 
-<source>SSH File Transfer Protocol</source>
-<target>SSH File Transfer Protocol</target>
+<source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
+<target>Ενεργοποίηση της Έκδοσης Δωρητή του FreeFileSync μέσω μιας από τις παρακάτω μεθόδους:</target>
+
+<source>1. Activate via internet now:</source>
+<target>1. Ενεργοποίηση μέσω internet τώρα:</target>
+
+<source>Activate online</source>
+<target>Απευθείας ενεργοποίηση</target>
+
+<source>2. Retrieve an offline activation key from the following URL:</source>
+<target>2. Ανάκτηση ενός κλειδιού ενεργοποίησης χωρίς σύνδεση από το ακόλουθο URL:</target>
+
+<source>&Copy to clipboard</source>
+<target>&Αντιγραφή στο πρόχειρο</target>
+
+<source>Enter activation key:</source>
+<target>Εισαγωγή κλειδιού ενεργοποίησης:</target>
+
+<source>Activate offline</source>
+<target>Ενεργοποίηση χωρίς σύνδεση</target>
 
 <source>Save as Batch Job</source>
 <target>Αποθήκευση ως Δέσμη Εργασιών</target>
@@ -1224,6 +1338,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select Time Span</source>
 <target>Επιλογή Χρονικού Εύρους</target>
+
+<source>FreeFileSync Donation Edition</source>
+<target>Έκδοση Δωρητή του FreeFileSync</target>
 
 <source>&Options</source>
 <target>&Επιλογές</target>
@@ -1246,8 +1363,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Σύνοψη</target>
 
-<source>&Download</source>
-<target>&Λήψη</target>
+<source>&Show details</source>
+<target>&Προβολή λεπτομερειών</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
@@ -1486,8 +1603,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Καταγραφή</target>
 
-<source>Loading...</source>
-<target>Φόρτωση...</target>
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Τα αρχεία εγκατάστασης είναι κατεστραμμένα. Παρακαλούμε επανεγκαταστείστε το FreeFileSync.</target>
+
+<source>Thank you, %x, for your donation and support!</source>
+<target>Σας ευχαριστούμε, %x, για τη δωρεά και την υποστήριξή σας!</target>
+
+<source>Password:</source>
+<target>Συνθηματικό:</target>
+
+<source>Key password:</source>
+<target>Συνθηματικό κλειδιού:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1545,6 +1671,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show</source>
 <target>&Εμφάνιση</target>
+
+<source>Downloading update...</source>
+<target>Λήψη ενημέρωσης...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Αναγνώριση των ταυτόσημων αρχείων με σύγκριση του χρόνου τροποποίησης και του μεγέθους.</target>
@@ -1639,11 +1768,32 @@ This guarantees a consistent state even in case of a serious error.
 <source>Percentage</source>
 <target>Ποσοστό</target>
 
+<source>Failed to retrieve update information.</source>
+<target>Αποτυχία ανάκτησης πληροφοριών ενημέρωσης.</target>
+
+<source>Automatic updates:</source>
+<target>Αυτόματες ενημερώσεις:</target>
+
+<source>Requires FreeFileSync Donation Edition</source>
+<target>Απαιτεί την Έκδοση Δωρητή του FreeFileSync</target>
+
 <source>Check for Program Updates</source>
 <target>Έλεγχος για ενημερώσεις του προγράμματος</target>
 
+<source>Auto-update now or download manually from the FreeFileSync home page?</source>
+<target>Αυτόματη ενημέρωση τώρα ή χειροκίνητη λήψη από την ιστοσελίδα του FreeFileSync;</target>
+
+<source>&Auto-update</source>
+<target>&Αυτόματη ενημέρωση</target>
+
+<source>&Home page</source>
+<target>&Ιστοσελίδα</target>
+
 <source>Download now?</source>
 <target>Λήψη τώρα;</target>
+
+<source>&Download</source>
+<target>&Λήψη</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>Το FreeFileSync είναι ενημερωμένο.</target>
@@ -1657,14 +1807,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Consistency check failed for %x.</source>
 <target>Ο έλεγχος συνέπειας απέτυχε για το %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Δεν μπορεί να βρεθεί η λειτουργία συστήματος %x.</target>
+<source>Installation was registered on a different operating system.</source>
+<target>Η εγκατάσταση καταχωρήθηκε σε διαφορετικό λειτουργικό σύστημα.</target>
+
+<source>Failed to activate FreeFileSync Donation Edition.</source>
+<target>Αποτυχία ενεργοποίησης της Έκδοσης Δωρητή του  FreeFileSync.</target>
+
+<source>Incorrect activation key.</source>
+<target>Εσφαλμένο κλειδί ενεργοποίησης.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Δεν μπορεί να καταχωρηθεί η λήψη μηνυμάτων συστήματος.</target>
 
-<source>Installation files are corrupt. Please reinstall FreeFileSync.</source>
-<target>Τα αρχεία εγκατάστασης είναι κατεστραμμένα. Παρακαλούμε εγκαταστείστε ξανά το FreeFileSync.</target>
+<source>Cannot find system function %x.</source>
+<target>Δεν μπορεί να βρεθεί η λειτουργία συστήματος %x.</target>
 
 <source>Unable to register device notifications for %x.</source>
 <target>Δεν μπορούν να καταχωρηθεί η ειδοποίηση για τη συσκευή %x.</target>
@@ -1695,9 +1851,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Cannot copy attributes from %x to %y.</source>
 <target>Δεν μπορούν να αντιγραφούν τα χαρακτηριστικά του %x στο %y.</target>
-
-<source>Type of item %x is not supported:</source>
-<target>Ο τύπος του στοιχείου %x δεν υποστηρίζεται:</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1749,9 +1902,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
 <target>Το αρχείο διάταξης %x είναι ατελές. Τα στοιχεία που λείπουν θα αντικατασταθούν με τις προεπιλεγμένες τιμές τους.</target>
-
-<source>Internet access failed.</source>
-<target>Απέτυχε η πρόσβαση στο Internet.</target>
 
 <source>Prepare installation</source>
 <target>Προετοιμασία εγκατάστασης</target>
@@ -1822,18 +1972,12 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Επεξεργασία με FreeFileSync</target>
 
-<source>Thanks for your donation and support!</source>
-<target>Ευχαριστούμε για τη δωρεά και την υποστήριξή σας!</target>
-
-<source>This FreeFileSync installer for donors has reached its daily installation limit.</source>
-<target>Αυτό το πρόγραμμα εγκατάστασης του FreeFileSync για δωρητές έφτασε στο ημερήσιο του όριο.</target>
-
-<source>Download the regular version from the FreeFileSync homepage now?</source>
-<target>Θέλετε να κάνετε λήψη της κανονικής έκδοσης από την ιστοσελίδα του FreeFileSync τώρα;</target>
-
 <source>The portable version cannot install into the selected folder.</source>
 <target>Η φορητή έκδοση δεν μπορεί να εγκατασταθεί στον επιλεγμένο φάκελο.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Παρακαλούμε επιλέξτε την τοπική εγκατάσταση ή επιλέξτε έναν διαφορετικό φάκελο για εγκατάσταση.</target>
+
+<source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
+<target>Η λειτουργία σιωπηρής εγκατάστασης είναι διαθέσιμη μόνο στην Έκδοση Δωρητή FreeFileSync.</target>
 

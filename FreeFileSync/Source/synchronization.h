@@ -95,7 +95,6 @@ std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
 //FFS core routine:
 void synchronize(const TimeComp& timeStamp,
-                 xmlAccess::OptionalDialogs& warnings,
                  bool verifyCopiedFiles,
                  bool copyLockedFiles,
                  bool copyFilePermissions,
@@ -104,6 +103,7 @@ void synchronize(const TimeComp& timeStamp,
                  int folderAccessTimeout,
                  const std::vector<FolderPairSyncCfg>& syncConfig, //CONTRACT: syncConfig and folderCmp correspond row-wise!
                  FolderComparison& folderCmp,                      //
+                 xmlAccess::OptionalDialogs& warnings,
                  ProcessCallback& callback);
 }
 

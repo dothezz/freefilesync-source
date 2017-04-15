@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 21 2016)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -479,15 +479,18 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class SftpSetupDlgGenerated
+/// Class CloudSetupDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SftpSetupDlgGenerated : public wxDialog
+class CloudSetupDlgGenerated : public wxDialog
 {
 private:
 
 protected:
-    wxStaticBitmap* m_bitmapSftp;
+    wxStaticBitmap* m_bitmapCloud;
     wxStaticText* m_staticTextHeader;
+    wxStaticText* m_staticText136;
+    wxToggleButton* m_toggleBtnSftp;
+    wxToggleButton* m_toggleBtnFtp;
     wxStaticLine* m_staticline371;
     wxPanel* m_panel41;
     wxStaticText* m_staticText12311;
@@ -499,6 +502,12 @@ protected:
     wxStaticText* m_staticText138;
     wxStaticLine* m_staticline58;
     wxBoxSizer* bSizerAuth;
+    wxBoxSizer* bSizerFtpEncrypt;
+    wxStaticText* m_staticText1251;
+    wxRadioButton* m_radioBtnEncryptNone;
+    wxRadioButton* m_radioBtnEncryptSsl;
+    wxStaticLine* m_staticline5721;
+    wxBoxSizer* bSizerSftpAuth;
     wxStaticText* m_staticText125;
     wxRadioButton* m_radioBtnPassword;
     wxRadioButton* m_radioBtnKeyfile;
@@ -518,6 +527,7 @@ protected:
     wxStaticText* m_staticText1232;
     wxTextCtrl* m_textCtrlServerPath;
     wxButton* m_buttonSelectFolder;
+    wxBoxSizer* bSizerSftpTweaks;
     wxStaticLine* m_staticline571;
     wxStaticBitmap* m_bitmapSpeed;
     wxStaticText* m_staticText1361;
@@ -539,11 +549,13 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnConnectionSftp( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnConnectionFtp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnAuthPassword( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnAuthKeyfile( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSelectKeyfile( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleShowPassword( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnBrowseSftpFolder( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnBrowseCloudFolder( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnHelpSftpPerformance( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnDetectServerChannelLimit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
@@ -552,20 +564,20 @@ protected:
 
 public:
 
-    SftpSetupDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SSH File Transfer Protocol"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
-    ~SftpSetupDlgGenerated();
+    CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Access online storage"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
+    ~CloudSetupDlgGenerated();
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class SftpFolderPickerGenerated
+/// Class AbstractFolderPickerGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SftpFolderPickerGenerated : public wxDialog
+class AbstractFolderPickerGenerated : public wxDialog
 {
 private:
 
 protected:
-    wxStaticBitmap* m_bitmapSftp;
+    wxStaticBitmap* m_bitmapServer;
     wxStaticText* m_staticTextHeader;
     wxStaticLine* m_staticline371;
     wxPanel* m_panel41;
@@ -584,8 +596,8 @@ protected:
 
 public:
 
-    SftpFolderPickerGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SSH File Transfer Protocol"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
-    ~SftpFolderPickerGenerated();
+    AbstractFolderPickerGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
+    ~AbstractFolderPickerGenerated();
 
 };
 
