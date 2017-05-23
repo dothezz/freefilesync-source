@@ -26,9 +26,10 @@
 	<h2>Example: <span style="font-weight:normal">Real time synchronization - in combination with FreeFileSync</span></h2>
 	<p>
 		Start RealTimeSync.exe located in FreeFileSync's installation directory and 
-		enter all folders you want to monitor. Instead of doing this manually you can import a ffs_batch
-		file via <b>Menu &rarr; File &rarr; Open</b>. This not only extracts all directories relevant for synchronization
-		but also sets up the command line to execute the ffs_batch file each time changes are detected.
+		enter the folders you want to monitor. Instead of doing this manually you can import a ffs_batch
+		file via <b>Menu &rarr; File &rarr; Open</b> or simply via <b>drag and drop</b>.
+		RealTimeSync will not only extract all directories relevant for synchronization
+		but also set up the command line to execute the ffs_batch file each time changes are detected.
 		Now press <b>Start</b> to begin monitoring.
 	</p>
 	<div style="margin-left: 1.3cm">
@@ -39,18 +40,18 @@
 	<div class="bluebox">
 		<b>Note</b>
 		<ul style="margin: 0">
-			<li>The command should <b>not</b> <b>block</b> progress. If you call a FreeFileSync batch job, make 
-				sure it does not show any popup windows. See notes in <a href="command-line.html">Command Line Usage</a>.
+			<li>The command should <b>not</b> <b>block</b> progress. If you call a FreeFileSync batch job,
+				make sure it won't show any popup dialogs. See notes in <a href="command-line.html">Command Line Usage</a>.
 				<br>&nbsp;
 				
 			<li>RealTimeSync will skip showing the main dialog and begin monitoring immediately if 
-				you pass a ffs_real configuration file <b>or</b> a FreeFileSync ffs_batch file as first 
-				command line argument to RealTimeSync.exe. This helps you integrate RealTimeSync into your operating system's auto start:<br>				
+				you pass a ffs_real configuration file <b>or</b> a FreeFileSync ffs_batch file as the first 
+				command line argument to RealTimeSync.exe. This can be used to integrate RealTimeSync into the operating system's auto start:<br>				
 				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_real&quot;</div>
 				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_batch&quot;</div>
 				<br>
 	
-			<li>RealTimeSync is not tied to starting FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
+			<li>RealTimeSync is not required to start FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
 		</ul>
 	</div>
 	<br>
@@ -116,7 +117,7 @@
 	<p>
 		The command line usually starts a synchronization task using FreeFileSync which naturally leads to additional file change notifications.
 		Therefore the RealTimeSync change detection has to be deactivated to not go into an endless loop.
-		On the other hand it is not likely that changes (other than those from FreeFileSync) happen in first place since RealTimeSync runs the command line only after a user-specified idle time has passed.
+		On the other hand it is not likely that changes (other than those from FreeFileSync) happen in first place since RealTimeSync runs the command line only after the user-specified idle time has passed.
 		This makes sure the monitored folders are not in heavy use. In any case, files changed during the execution of FreeFileSync will be synchronized the next time FreeFileSync runs.
 	</p>
 </body>

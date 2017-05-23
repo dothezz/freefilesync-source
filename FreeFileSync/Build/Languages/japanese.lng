@@ -7,6 +7,9 @@
 	<plural_definition>0</plural_definition>
 </header>
 
+<source>The %x protocol does not support directory monitoring:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>前回最後の同期処理以降、両側とも変更があります.</target>
 
@@ -233,10 +236,10 @@
 <target>右の項目を削除</target>
 
 <source>Move file on left</source>
-<target>ファイルを左に移動</target>
+<target>左のファイルを移動</target>
 
 <source>Move file on right</source>
-<target>ファイルを右に移動</target>
+<target>右のファイルを移動</target>
 
 <source>Update left item</source>
 <target>左の項目を更新</target>
@@ -590,9 +593,6 @@ The command is triggered if:
 
 <source>Automated Synchronization</source>
 <target>自動同期</target>
-
-<source>The following path does not support directory monitoring:</source>
-<target>次のパスは、ディレクトリの監視に対応していません:</target>
 
 <source>Directory monitoring active</source>
 <target>ディレクトリの監視アクティブ</target>

@@ -407,13 +407,11 @@ void showSyntaxHelp()
                            setTitle(_("Command line")).
                            setDetailInstructions(_("Syntax:") + L"\n\n" +
                                                  L"./FreeFileSync " + L"\n" +
-                                                 L"    [" + _("global config file:") + L" GlobalSettings.xml]" + L"\n" +
                                                  L"    [" + _("config files:") + L" *.ffs_gui/*.ffs_batch]" + L"\n" +
                                                  L"    [-LeftDir " + _("directory") + L"] [-RightDir " + _("directory") + L"]" + L"\n" +
-                                                 L"    [-Edit]" + L"\n\n" +
-
-                                                 _("global config file:") + L"\n" +
-                                                 _("Path to an alternate GlobalSettings.xml file.") + L"\n\n" +
+                                                 L"    [-Edit]" + L"\n" +
+                                                 L"    [" + _("global config file:") + L" GlobalSettings.xml]" + L"\n" +
+							                      L"\n" +
 
                                                  _("config files:") + L"\n" +
                                                  _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n" +
@@ -422,7 +420,10 @@ void showSyntaxHelp()
                                                  _("Any number of alternative directory pairs for at most one config file.") + L"\n\n" +
 
                                                  L"-Edit" + L"\n" +
-                                                 _("Open configuration for editing without executing it.")));
+                                                 _("Open configuration for editing without executing it.") + L"\n\n" +
+						   
+                                                 _("global config file:") + L"\n" +
+                                                 _("Path to an alternate GlobalSettings.xml file.")));
 }
 
 

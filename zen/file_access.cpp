@@ -8,11 +8,13 @@
 #include <map>
 #include <algorithm>
 #include <stdexcept>
+#include <chrono>
 #include "file_traverser.h"
 #include "scope_guard.h"
 #include "symlink_target.h"
 #include "file_id_def.h"
 #include "file_io.h"
+#include "crc.h"
 
     #include <sys/vfs.h> //statfs
     #include <sys/time.h> //lutimes
@@ -282,6 +284,7 @@ void zen::removeDirectoryPlainRecursion(const Zstring& dirPath) //throw FileErro
 
 namespace
 {
+
 /* Usage overview: (avoid circular pattern!)
 
   renameFile()  -->  renameFile_sub()
@@ -336,6 +339,25 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
     }
     catch (ErrorTargetExisting&)
     {
+#if 0 //"Work around pen drive failing to change file name case" => enable if needed: https://www.freefilesync.org/forum/viewtopic.php?t=4279
+        const Zstring fileNameSrc   = afterLast (pathSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
+        const Zstring fileNameTrg   = afterLast (pathTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
+        const Zstring parentPathSrc = beforeLast(pathSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+        const Zstring parentPathTrg = beforeLast(pathTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
+        //some (broken) devices may fail to rename case directly: 
+        if (equalFilePath(parentPathSrc, parentPathTrg))
+        {
+            if (fileNameSrc == fileNameTrg)
+                return; //non-sensical request
+
+            const Zstring tempFilePath = getTemporaryPath8Dot3(pathSource); //throw FileError
+            renameFile_sub(pathSource, tempFilePath); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+            ZEN_ON_SCOPE_FAIL(renameFile_sub(tempFilePath, pathSource)); //"try" our best to be "atomic" :>
+            renameFile_sub(tempFilePath, pathTarget); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+            return;
+        }
+#endif
+
         throw;
     }
 }
@@ -385,7 +407,7 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
 
 }
 
-warn_static("remove after test")
+
 void zen::setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl) //throw FileError
 {
     struct ::timespec writeTime = {};
@@ -628,27 +650,27 @@ FileCopyResult copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, 
     //close output file handle before setting file time; also good place to catch errors when closing stream!
     fileOut.finalize(); //throw FileError, (X)  essentially a close() since  buffers were already flushed
 
-Opt<FileError> errorModTime;
-		try
-	{
-    //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
-    //this triggers bugs on samba shares where the modification time is set to current time instead.
-    //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
-    //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
-    //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
-    setWriteTimeNative(targetFile, sourceInfo.st_mtim, ProcSymlink::FOLLOW); //throw FileError
-	}
-	catch (const FileError& e)
-	{
-	errorModTime = FileError(e.toString()); //avoid slicing
-	}
+    Opt<FileError> errorModTime;
+    try
+    {
+        //we cannot set the target file times (::futimes) while the file descriptor is still open after a write operation:
+        //this triggers bugs on samba shares where the modification time is set to current time instead.
+        //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
+        //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
+        //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
+        setWriteTimeNative(targetFile, sourceInfo.st_mtim, ProcSymlink::FOLLOW); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        errorModTime = FileError(e.toString()); //avoid slicing
+    }
 
     FileCopyResult result;
     result.fileSize = sourceInfo.st_size;
     result.modTime = sourceInfo.st_mtim.tv_sec; //
     result.sourceFileId = extractFileId(sourceInfo);
     result.targetFileId = extractFileId(targetInfo);
-	result.errorModTime = errorModTime;
+    result.errorModTime = errorModTime;
     return result;
 }
 

@@ -1,5 +1,22 @@
-FreeFileSync 9.0
-----------------
+FreeFileSync 9.1  [2017-05-24]
+------------------------------
+Fixed crash when getting invalid data after item type check
+Fixed copying symlinks pointing to network folders
+Support resolving network paths in the NT namespace
+Support FTP servers with broken MLST command (Pure-FTPd)
+Fixed FTP access error on file names containing special chars
+Include raw FTP server response in error message
+Quickly check server connection using a single FEAT
+Don't change working directory when sending a single FTP command
+Support FTP Unix listings missing group name
+Support RFC-2640-non-compliant FTP servers having UTF8 disabled
+Support FTP servers returning non-routable IP in PASV response
+Support IPv6 when establishing FTP connections
+Start external application keyboard shortcuts with zero
+
+
+FreeFileSync 9.0 [2017-04-16]
+-----------------------------
 Support synchronization via FTP (File Transfer Protocol) and FTPS (SSL/TLS)
 Notify failure to set modification time as a warning instead of an error
 Allow intermediate non-folder components when checking path status

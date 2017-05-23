@@ -194,38 +194,38 @@ public:
     void reportFinished(Opt<T>&& result)
     {
         {
-            std::lock_guard<std::mutex> dummy(lockResult);
-            ++jobsFinished;
+            std::lock_guard<std::mutex> dummy(lockResult_);
+            ++jobsFinished_;
             if (!result_)
                 result_ = std::move(result);
         }
-        conditionJobDone.notify_all(); //better notify all, considering bugs like: https://svn.boost.org/trac/boost/ticket/7796
+        conditionJobDone_.notify_all(); //better notify all, considering bugs like: https://svn.boost.org/trac/boost/ticket/7796
     }
 
     //context: main thread
     template <class Duration>
     bool waitForResult(size_t jobsTotal, const Duration& duration)
     {
-        std::unique_lock<std::mutex> dummy(lockResult);
-        return conditionJobDone.wait_for(dummy, duration, [&] { return this->jobDone(jobsTotal); });
+        std::unique_lock<std::mutex> dummy(lockResult_);
+        return conditionJobDone_.wait_for(dummy, duration, [&] { return this->jobDone(jobsTotal); });
     }
 
     Opt<T> getResult(size_t jobsTotal)
     {
-        std::unique_lock<std::mutex> dummy(lockResult);
-        conditionJobDone.wait(dummy, [&] { return this->jobDone(jobsTotal); });
+        std::unique_lock<std::mutex> dummy(lockResult_);
+        conditionJobDone_.wait(dummy, [&] { return this->jobDone(jobsTotal); });
 
         return std::move(result_);
     }
 
 private:
-    bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished >= jobsTotal); } //call while locked!
+    bool jobDone(size_t jobsTotal) const { return result_ || (jobsFinished_ >= jobsTotal); } //call while locked!
 
 
-    std::mutex lockResult;
-    size_t jobsFinished = 0; //
-    Opt<T> result_;          //our condition is: "have result" or "jobsFinished == jobsTotal"
-    std::condition_variable conditionJobDone;
+    std::mutex lockResult_;
+    size_t jobsFinished_ = 0; //
+    Opt<T> result_;          //our condition is: "have result" or "jobsFinished_ == jobsTotal"
+    std::condition_variable conditionJobDone_;
 };
 
 
@@ -379,8 +379,8 @@ InterruptibleThread::InterruptibleThread(Function&& f) : intStatus_(std::make_sh
     threadCompleted_ = pFinished.get_future();
 
     stdThread_ = std::thread([f = std::forward<Function>(f),
-                               intStatus = this->intStatus_,
-                               pFinished = std::move(pFinished)]() mutable
+                                intStatus = this->intStatus_,
+                                pFinished = std::move(pFinished)]() mutable
     {
         assert(!impl::refThreadLocalInterruptionStatus());
         impl::refThreadLocalInterruptionStatus() = intStatus.get();

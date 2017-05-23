@@ -122,13 +122,13 @@
 <target>日期:</target>
 
 <source>Files have the same date but a different size.</source>
-<target></target>
+<target>文件有相同的日期但大小不同.</target>
 
 <source>Size:</source>
 <target>大小:</target>
 
 <source>Content comparison was skipped for excluded files.</source>
-<target></target>
+<target>对于已排除的文件跳过内容比对.</target>
 
 <source>Items differ in attributes only</source>
 <target>项目仅是文件属性不同</target>
@@ -188,10 +188,10 @@
 <target>排除:</target>
 
 <source>One base folder of a folder pair is contained in the other one.</source>
-<target></target>
+<target>文件夹对中的一个基础文件夹被另一个所包含.</target>
 
 <source>The folder should be excluded from synchronization via filter.</source>
-<target></target>
+<target>此文件夹须使用过滤器从同步中排除.</target>
 
 <source>Calculating sync directions...</source>
 <target>正在计算同步方向...</target>
@@ -283,16 +283,19 @@ Actual: %y bytes
 <target>无法连接到 %x.</target>
 
 <source>Failed to get information about server %x.</source>
-<target></target>
+<target>获取关于服务器 %x 的信息时失败.</target>
 
 <source>Cannot open directory %x.</source>
 <target>无法打开目录 %x.</target>
 
 <source>Cannot read directory %x.</source>
-<target></target>
+<target>无法读取目录 %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>无法读取文件 %x .</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>无法读取 %x 的文件属性.</target>
 
 <source>Cannot create directory %x.</source>
 <target>无法创建目录 %x.</target>
@@ -302,9 +305,6 @@ Actual: %y bytes
 
 <source>Cannot delete directory %x.</source>
 <target>无法删除目录 %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>无法读取 %x 的文件属性.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>无法写入 %x 的最后修改时间.</target>
@@ -328,10 +328,10 @@ Actual: %y bytes
 <target>无法找到 %x.</target>
 
 <source>Type of item %x is not supported:</source>
-<target>%x 的类型不被支持:</target>
+<target>项目 %x 的类型不被支持:</target>
 
 <source>Cannot delete symbolic link %x.</source>
-<target></target>
+<target>无法删除符号链接 %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>无法确定 %x 上的可用磁盘空间.</target>
@@ -340,34 +340,38 @@ Actual: %y bytes
 <target>不正确的命令行:</target>
 
 <source>Error Code %x</source>
-<target></target>
+<target>错误代码 %x</target>
 
 <source>The server does not support authentication via %x.</source>
-<target></target>
+<target>此服务器并不支持通过 %x 进行认证.</target>
 
 <source>Required:</source>
 <target>必需:</target>
 
 <source>Unable to access %x.</source>
-<target></target>
+<target>无法访问 %x.</target>
 
 <source>
 <pluralform>Operation timed out after 1 second.</pluralform>
 <pluralform>Operation timed out after %x seconds.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>%x 秒后操作超时.</pluralform>
+</target>
 
 <source>
 <pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
 <pluralform>Cannot wait on more than %x connections at a time.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>一次无法等待多于 %x 个的连接.</pluralform>
+</target>
 
 <source>Active connections: %x</source>
-<target></target>
+<target>活动的连接: %x</target>
 
 <source>Failed to open SFTP channel number %x.</source>
-<target></target>
+<target>打开SFTP通道号 %x 时失败.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -399,13 +403,13 @@ Actual: %y bytes
 <target>数据库文件 %x 还未存在.</target>
 
 <source>Database file is corrupted:</source>
-<target></target>
+<target>数据库文件已损坏:</target>
 
 <source>The database files do not yet contain information about the last synchronization.</source>
-<target></target>
+<target>此数据库文件并未包含有关最后同步的信息.</target>
 
 <source>Loading file %x...</source>
-<target></target>
+<target>正在加载文件 %x...</target>
 
 <source>Saving file %x...</source>
 <target>正在保存文件 %x...</target>
@@ -693,19 +697,19 @@ The command is triggered if:
 <target>可用:</target>
 
 <source>Some files will be synchronized as part of multiple base folders.</source>
-<target></target>
+<target>某些文件将作为多个基础文件夹的一部分被同步.</target>
 
 <source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
-<target></target>
+<target>为了避免冲突, 请设置排除过滤器, 以便每个已更新的文件仅被一个基础文件夹所考虑.</target>
 
 <source>Versioning folder:</source>
-<target></target>
+<target>历史版本文件夹:</target>
 
 <source>Base folder:</source>
-<target></target>
+<target>基础文件夹:</target>
 
 <source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target></target>
+<target>历史版本文件夹将会被同步因为它被包含在一个基础文件夹中.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>正在同步成对的文件夹:</target>
@@ -884,7 +888,7 @@ The command is triggered if:
 <target>工具(&T)</target>
 
 <source>&Check for updates now</source>
-<target></target>
+<target>现在就检查是否有更新(&C)</target>
 
 <source>Check &automatically once a week</source>
 <target>每周自动检查一次(&A)</target>
@@ -905,7 +909,7 @@ The command is triggered if:
 <target>移除文件夹对</target>
 
 <source>Access online storage</source>
-<target></target>
+<target>访问在线存储空间</target>
 
 <source>Swap sides</source>
 <target>两侧互换</target>
@@ -1078,10 +1082,10 @@ The command is triggered if:
 <target>排列文件夹对</target>
 
 <source>Enter your login details:</source>
-<target></target>
+<target>输入你的登录详细资料:</target>
 
 <source>Connection type:</source>
-<target></target>
+<target>连接类型:</target>
 
 <source>Server name or IP address:</source>
 <target>服务器名称或IP地址:</target>
@@ -1090,28 +1094,28 @@ The command is triggered if:
 <target>端口:</target>
 
 <source>Encryption:</source>
-<target></target>
+<target>加密:</target>
 
 <source>&Disabled</source>
-<target></target>
+<target>禁用(&D)</target>
 
 <source>&Explicit SSL/TLS</source>
-<target></target>
+<target>显式SSL/TLS(&E)</target>
 
 <source>Authentication:</source>
-<target></target>
+<target>认证:</target>
 
 <source>&Password</source>
-<target></target>
+<target>密码(&P)</target>
 
 <source>&Key file</source>
-<target></target>
+<target>密钥文件(&K)</target>
 
 <source>User name:</source>
 <target>用户名:</target>
 
 <source>Private key file:</source>
-<target></target>
+<target>私钥文件:</target>
 
 <source>&Show password</source>
 <target>显示密码(&S)</target>
@@ -1120,25 +1124,25 @@ The command is triggered if:
 <target>服务器上的目录:</target>
 
 <source>Performance improvements:</source>
-<target></target>
+<target>性能改进:</target>
 
 <source>How to get best performance?</source>
-<target></target>
+<target>如何取得最佳性能?</target>
 
 <source>SSH connections for directory reading:</source>
-<target></target>
+<target>用于目录读取的SSH连接:</target>
 
 <source>Suggested range: [1 - 10]</source>
-<target></target>
+<target>建议范围:[1 - 10]</target>
 
 <source>SFTP channels per connection:</source>
-<target></target>
+<target>每个连接的SFTP通道数:</target>
 
 <source>Detect server limit</source>
-<target></target>
+<target>检测服务器限制</target>
 
 <source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target></target>
+<target>2连接 x 10 通道 = 目录读取加快 20 倍</target>
 
 <source>Select a directory on the server:</source>
 <target>选择一个服务器上的目录:</target>
@@ -1267,7 +1271,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>源代码用如下C++工具写成:</target>
 
 <source>Donation details</source>
-<target></target>
+<target>捐款详情</target>
 
 <source>If you like FreeFileSync:</source>
 <target>如果你喜欢 FreeFileSync:</target>
@@ -1279,7 +1283,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>欢迎反馈意见和提出建议</target>
 
 <source>Home page</source>
-<target></target>
+<target>主页</target>
 
 <source>Email</source>
 <target>邮箱</target>
@@ -1291,25 +1295,25 @@ This guarantees a consistent state even in case of a serious error.
 <target>非常感谢以下本地化翻译者:</target>
 
 <source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
-<target></target>
+<target>激活FreeFileSync捐赠版可用如下方式之一:</target>
 
 <source>1. Activate via internet now:</source>
-<target></target>
+<target>1. 现在就通过互联网激活:</target>
 
 <source>Activate online</source>
-<target></target>
+<target>在线激活</target>
 
 <source>2. Retrieve an offline activation key from the following URL:</source>
-<target></target>
+<target>从如下网址接收一个离线激活码:</target>
 
 <source>&Copy to clipboard</source>
-<target></target>
+<target>复制到剪贴板(&C)</target>
 
 <source>Enter activation key:</source>
-<target></target>
+<target>输入激活码:</target>
 
 <source>Activate offline</source>
-<target></target>
+<target>在线激活</target>
 
 <source>Save as Batch Job</source>
 <target>另存为批处理作业</target>
@@ -1327,7 +1331,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>选择时间跨度</target>
 
 <source>FreeFileSync Donation Edition</source>
-<target></target>
+<target>FreeFileSync捐赠版</target>
 
 <source>&Options</source>
 <target>选项(&O)</target>
@@ -1351,7 +1355,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>摘要</target>
 
 <source>&Show details</source>
-<target></target>
+<target>显示详情(&S)</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>已经有新版本的FreeFileSync可用:</target>
@@ -1587,16 +1591,16 @@ This guarantees a consistent state even in case of a serious error.
 <target>日志</target>
 
 <source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>安装文件已损坏, 请重新安装FreeFileSync.</target>
 
 <source>Thank you, %x, for your donation and support!</source>
-<target></target>
+<target>谢谢你, %x , 对我们的捐款和支持!</target>
 
 <source>Password:</source>
 <target>密码:</target>
 
 <source>Key password:</source>
-<target></target>
+<target>密钥密码:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1653,7 +1657,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>显示(&S)</target>
 
 <source>Downloading update...</source>
-<target></target>
+<target>正在下载更新...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>以比较修改时间和文件大小来识别相同文件.</target>
@@ -1749,25 +1753,25 @@ This guarantees a consistent state even in case of a serious error.
 <target>百分比</target>
 
 <source>Failed to retrieve update information.</source>
-<target></target>
+<target>无法检索更新信息.</target>
 
 <source>Automatic updates:</source>
-<target></target>
+<target>自动更新:</target>
 
 <source>Requires FreeFileSync Donation Edition</source>
-<target></target>
+<target>需要FreeFileSync捐赠版</target>
 
 <source>Check for Program Updates</source>
 <target>检查程序的更新</target>
 
 <source>Auto-update now or download manually from the FreeFileSync home page?</source>
-<target></target>
+<target>现在就自动更新或者从FreeFileSync主页上手动下载?</target>
 
 <source>&Auto-update</source>
-<target></target>
+<target>自动更新(&A)</target>
 
 <source>&Home page</source>
-<target></target>
+<target>主页(&H)</target>
 
 <source>Download now?</source>
 <target>立即下载?</target>
@@ -1788,13 +1792,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>对于 %x 的一致性检测失败.</target>
 
 <source>Installation was registered on a different operating system.</source>
-<target></target>
+<target>安装被注册在一个不同的操作系统上.</target>
 
 <source>Failed to activate FreeFileSync Donation Edition.</source>
-<target></target>
+<target>无法激活FreeFileSync捐赠版.</target>
 
 <source>Incorrect activation key.</source>
-<target></target>
+<target>不正确的激活码.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>无法注册以接收系统信息.</target>
@@ -1956,5 +1960,5 @@ This guarantees a consistent state even in case of a serious error.
 <target>请选择本地安装类型或选择用于安装的不同文件夹.</target>
 
 <source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
-<target></target>
+<target>静默安装模式仅在FreeFileSync捐赠版上有效.</target>
 

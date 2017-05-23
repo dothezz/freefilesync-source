@@ -226,8 +226,8 @@ std::vector<std::pair<std::string, std::string>> zen::xWwwFormUrlDecode(const st
     std::vector<std::pair<std::string, std::string>> output;
 
     for (const std::string& nvPair : split(str, '&', SplitType::SKIP_EMPTY))
-            output.emplace_back(urldecode(beforeFirst(nvPair, '=', IF_MISSING_RETURN_ALL)),
-                                urldecode(afterFirst (nvPair, '=', IF_MISSING_RETURN_NONE)));
+        output.emplace_back(urldecode(beforeFirst(nvPair, '=', IF_MISSING_RETURN_ALL)),
+                            urldecode(afterFirst (nvPair, '=', IF_MISSING_RETURN_NONE)));
     return output;
 }
 

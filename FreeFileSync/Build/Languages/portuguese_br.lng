@@ -1070,7 +1070,7 @@ O comando é disparado se:
 <target>Tratamento de erros:</target>
 
 <source>&Pop-up</source>
-<target>&Pop-up</target>
+<target>&Alertar</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar pop-up em caso de erros ou avisos</target>

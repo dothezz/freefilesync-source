@@ -13,13 +13,13 @@
 		When you double-click on one of the rows on the main dialog, FreeFileSync opens the operating system's file browser 
 		by default. On Windows it calls <span class="command-line">explorer /select, &quot;%local_path%&quot;</span>, on 
 		Linux <span class="command-line">xdg-open &quot;%folder_path%&quot;</span> and on macOS <span class="command-line">open -R &quot;%local_path%&quot;</span>.
-		To customize this behavior and integrate other external applications into FreeFileSync, 
+		To customize this behavior or integrate other external applications into FreeFileSync, 
 		navigate to <b>Menu &rarr; Tools &rarr; Options &rarr; Customize context menu</b> and add or replace a command.
 	</p>
 		
 	<p>
-		The <b>first entry</b> will be executed when double-clicking a row on main grid or when pressing ENTER. All other entries can be accessed 		
-		quickly by pressing the associated numeric keys or via the context menu that is shown after a right mouse click.
+		The <b>first entry</b> will be executed when <b>double-clicking</b> a row on main grid or when pressing <b>ENTER</b>. All other entries can be accessed 		
+		quickly by pressing the associated <b>numeric keys</b> or via the context menu that is shown after a right mouse click.
 	</p>
 		
 	<p>
@@ -70,12 +70,15 @@
 		<div class="command-line">cmd /k cd /D &quot;%folder_path%&quot;</div><br>
 		
 		<li>Write list of selected file paths to a text file:<br>
-		<div class="command-line">cmd /c echo %item_path% >> %csidl_Desktop%\file_list.txt</div>
+		<div class="command-line">cmd /c echo %item_path% >> %csidl_Desktop%\file_list.txt</div><br>
+
+		<li>Preview files using Quick Look on macOS:<br>
+		<div class="command-line">qlmanage -p &quot;%local_path%&quot;</div>
 	</ul>
 
 	<div class="bluebox">
 		<b>Note</b><br>
-		You need to protect macros with quotation marks if they can resolve to file paths containing whitespace characters.		
+		Macros need to be protected with quotation marks if they can resolve to file paths containing whitespace characters.		
 	</div>
 </body>
 </html>

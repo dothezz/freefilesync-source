@@ -31,10 +31,15 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& folderPathPhra
     std::set<Zstring, LessFilePath> folderPaths; //make unique
     for (const Zstring& phrase : std::set<Zstring, LessFilePath>(folderPathPhrases.begin(), folderPathPhrases.end()))
     {
-        if (startsWith(trimCpy(phrase), Zstr("ftp:"),  CmpAsciiNoCase()) ||
-            startsWith(trimCpy(phrase), Zstr("sftp:"), CmpAsciiNoCase()) ||
-            startsWith(trimCpy(phrase), Zstr("mtp:"),  CmpAsciiNoCase()))
-            throw FileError(_("The following path does not support directory monitoring:") + L"\n\n" + fmtPath(phrase));
+        //hopefully clear enough now: https://www.freefilesync.org/forum/viewtopic.php?t=4302
+        auto checkProtocol = [&](const Zstring& protoName)
+        {
+            if (startsWith(trimCpy(phrase), protoName + Zstr(":"), CmpAsciiNoCase()))
+                throw FileError(replaceCpy(_("The %x protocol does not support directory monitoring:"), L"%x", utfTo<std::wstring>(protoName)) + L"\n\n" + fmtPath(phrase));
+        };
+        checkProtocol(Zstr("FTP"));  //
+        checkProtocol(Zstr("SFTP")); //throw FileError
+        checkProtocol(Zstr("MTP"));  //
 
         //make unique: no need to resolve duplicate phrases more than once! (consider "[volume name]" syntax) -> shouldn't this be already buffered by OS?
         folderPaths.insert(getResolvedFilePath(phrase));

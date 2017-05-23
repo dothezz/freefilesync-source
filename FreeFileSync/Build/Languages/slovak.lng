@@ -122,13 +122,13 @@
 <target>Dátum:</target>
 
 <source>Files have the same date but a different size.</source>
-<target></target>
+<target>Súbory majú rovnaký dátum, ale rozdielnú veľkosť.</target>
 
 <source>Size:</source>
 <target>Veľkosť:</target>
 
 <source>Content comparison was skipped for excluded files.</source>
-<target></target>
+<target>Porovnanie obsahu bolo vynechané pre vybrané súbory.</target>
 
 <source>Items differ in attributes only</source>
 <target>Položky se lišia iba v atribútoch</target>
@@ -188,10 +188,10 @@
 <target>Vynechať:</target>
 
 <source>One base folder of a folder pair is contained in the other one.</source>
-<target></target>
+<target>Jeden zo základných párov priečinkov je v obsahu druhej.</target>
 
 <source>The folder should be excluded from synchronization via filter.</source>
-<target></target>
+<target>Priečinok by mal byť vynechaný zo synchronizácie pomocou filtra.</target>
 
 <source>Calculating sync directions...</source>
 <target>Príprava adresárov synchronizácie...</target>
@@ -283,16 +283,19 @@ Aktuálne: %y b
 <target>Nie je možné vytvoriť pripojenie k %x.</target>
 
 <source>Failed to get information about server %x.</source>
-<target></target>
+<target>Získanie informácií o servere %x bolo neúspešné.</target>
 
 <source>Cannot open directory %x.</source>
 <target>Nie je možné otvoriť adresár %x.</target>
 
 <source>Cannot read directory %x.</source>
-<target></target>
+<target>Nie je možné načítať adresár %x.</target>
 
 <source>Cannot read file %x.</source>
-<target>Nie je možné čítať súbor %x.</target>
+<target>Nie je možné načítať súbor %x.</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>Nie je možné načítať atribúty súboru %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Nie je možné vytvoriť adresár %x.</target>
@@ -302,9 +305,6 @@ Aktuálne: %y b
 
 <source>Cannot delete directory %x.</source>
 <target>Nie je možné zmazať adresár %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>Nie je možné načítať atribúty súboru %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Nie je možné zmeniť atribút času zmeny pre %x.</target>
@@ -331,7 +331,7 @@ Aktuálne: %y b
 <target>Typ položky %x nie je podporovaný:</target>
 
 <source>Cannot delete symbolic link %x.</source>
-<target></target>
+<target>Nie je možné zmazať symbolický odkaz %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
 <target>Nie je možné zistiť voľné miesto na disku %x.</target>
@@ -340,34 +340,42 @@ Aktuálne: %y b
 <target>Neplatný príkaz:</target>
 
 <source>Error Code %x</source>
-<target></target>
+<target>Chybový kód %x</target>
 
 <source>The server does not support authentication via %x.</source>
-<target></target>
+<target>Server nepodporuje overenie pomocou %x.</target>
 
 <source>Required:</source>
 <target>Požadované:</target>
 
 <source>Unable to access %x.</source>
-<target></target>
+<target>Nie je možný prístup k %x.</target>
 
 <source>
 <pluralform>Operation timed out after 1 second.</pluralform>
 <pluralform>Operation timed out after %x seconds.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>Vypršal čas 1 sekundy pre dokončenie operácie.</pluralform>
+<pluralform>Vypršal čas %x sekúnd pre dokončenie operácie.</pluralform>
+<pluralform>Vypršal čas %x sekúnd pre dokončenie operácie.</pluralform>
+</target>
 
 <source>
 <pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
 <pluralform>Cannot wait on more than %x connections at a time.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>Nie je možné čakať na viac ako 1 pripojenie naraz.</pluralform>
+<pluralform>Nie je možné čakať na viac ako %x pripojenia naraz.</pluralform>
+<pluralform>Nie je možné čakať na viac ako %x pripojení naraz.</pluralform>
+</target>
 
 <source>Active connections: %x</source>
-<target></target>
+<target>Aktívne pripojenie: %x.</target>
 
 <source>Failed to open SFTP channel number %x.</source>
-<target></target>
+<target>Nie je možné otvoriť kanál číslo %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -401,13 +409,13 @@ Aktuálne: %y b
 <target>Databázový súbor %x neexistuje.</target>
 
 <source>Database file is corrupted:</source>
-<target></target>
+<target>Databázový súbor je poškodený:</target>
 
 <source>The database files do not yet contain information about the last synchronization.</source>
-<target></target>
+<target>Databázový súbor ešte neobsahuje informácie o poslednej synchronizácií.</target>
 
 <source>Loading file %x...</source>
-<target></target>
+<target>Načítavanie súboru %x...</target>
 
 <source>Saving file %x...</source>
 <target>Ukládanie súboru %x...</target>
@@ -699,19 +707,19 @@ Príkaz bude spustení ak:
 <target>K dispozícií:</target>
 
 <source>Some files will be synchronized as part of multiple base folders.</source>
-<target></target>
+<target>Niektoré súbory budú synchronizované ako súčasť viacerých základných priečinkov.</target>
 
 <source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
-<target></target>
+<target>Aby nedošlo ku konfliktom, je potrebné nastaviť filter tak, aby každý aktualiz. súbor mal iba jeden základný priečinok.</target>
 
 <source>Versioning folder:</source>
-<target></target>
+<target>Priečinok verzovania:</target>
 
 <source>Base folder:</source>
-<target></target>
+<target>Základný priečinok:</target>
 
 <source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target></target>
+<target>Priečinok verzovania bude synchronizovaný, pretože jr obsiahnutý v základnom priečinku.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronizácia dvojice priečinkov:</target>
@@ -892,7 +900,7 @@ Príkaz bude spustení ak:
 <target>&Nastavenie</target>
 
 <source>&Check for updates now</source>
-<target></target>
+<target>&Skontrolovať aktualizácie teraz</target>
 
 <source>Check &automatically once a week</source>
 <target>Kontrolovať &automaticky raz týždenne</target>
@@ -913,7 +921,7 @@ Príkaz bude spustení ak:
 <target>Odstrániť dvojicu priečinkov</target>
 
 <source>Access online storage</source>
-<target></target>
+<target>Prístup k online úložištiu</target>
 
 <source>Swap sides</source>
 <target>Zámena strán</target>
@@ -1086,10 +1094,10 @@ Príkaz bude spustení ak:
 <target>Usporiadať dvojicu priečinkov</target>
 
 <source>Enter your login details:</source>
-<target></target>
+<target>Zadajte prihlasovacie údaje:</target>
 
 <source>Connection type:</source>
-<target></target>
+<target>typ pripojenia:</target>
 
 <source>Server name or IP address:</source>
 <target>Meno servera alebo jeho IP adresa:</target>
@@ -1098,28 +1106,28 @@ Príkaz bude spustení ak:
 <target>Port:</target>
 
 <source>Encryption:</source>
-<target></target>
+<target>Šifrovanie:</target>
 
 <source>&Disabled</source>
-<target></target>
+<target>&Zakázané</target>
 
 <source>&Explicit SSL/TLS</source>
-<target></target>
+<target>&Explicitné SSl/TLS</target>
 
 <source>Authentication:</source>
-<target></target>
+<target>Overenie:</target>
 
 <source>&Password</source>
-<target></target>
+<target>&Heslo</target>
 
 <source>&Key file</source>
-<target></target>
+<target>&Súbor kľúča</target>
 
 <source>User name:</source>
 <target>Uživateľské meno:</target>
 
 <source>Private key file:</source>
-<target></target>
+<target>Súbor súkromného kľúča:</target>
 
 <source>&Show password</source>
 <target>&Zobraziť heslo</target>
@@ -1128,25 +1136,25 @@ Príkaz bude spustení ak:
 <target>Adresár na servery:</target>
 
 <source>Performance improvements:</source>
-<target></target>
+<target>Zlepšenie výkonu:</target>
 
 <source>How to get best performance?</source>
-<target></target>
+<target>Ako získať najlepší výkon:</target>
 
 <source>SSH connections for directory reading:</source>
-<target></target>
+<target>SSH pripojenie pre načítanie adresárov:</target>
 
 <source>Suggested range: [1 - 10]</source>
-<target></target>
+<target>Navrhovaný rozsah: [1 - 10]</target>
 
 <source>SFTP channels per connection:</source>
-<target></target>
+<target>SFTP kanály na pripojenie:</target>
 
 <source>Detect server limit</source>
-<target></target>
+<target>Zistiť limit serveru</target>
 
 <source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target></target>
+<target>2 pripojenia x 10 kanály = 20-krát rýchlejšie načítanie adresárov</target>
 
 <source>Select a directory on the server:</source>
 <target>Výber adresára na servery:</target>
@@ -1275,7 +1283,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Zdrojový kód bol napísaný kompletne v C++ pomocou:</target>
 
 <source>Donation details</source>
-<target></target>
+<target>Detajly darovania</target>
 
 <source>If you like FreeFileSync:</source>
 <target>Pokiaľ sa Vám FreeFileSync páči:</target>
@@ -1287,7 +1295,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Komentáre a námety sú vždy vítané</target>
 
 <source>Home page</source>
-<target></target>
+<target>Domovská stránka</target>
 
 <source>Email</source>
 <target>Email</target>
@@ -1299,25 +1307,25 @@ This guarantees a consistent state even in case of a serious error.
 <target>Poďakovanie za preklad FreeFileSync:</target>
 
 <source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
-<target></target>
+<target>aktivovať FreeFileSync Donation Edition pomocou jednej z nasledujúcich metód:</target>
 
 <source>1. Activate via internet now:</source>
-<target></target>
+<target>1. Aktivovať teraz cez internet:</target>
 
 <source>Activate online</source>
-<target></target>
+<target>Aktivovať online</target>
 
 <source>2. Retrieve an offline activation key from the following URL:</source>
-<target></target>
+<target>Získať offline aktivačný kľúč z URL adresy:</target>
 
 <source>&Copy to clipboard</source>
-<target></target>
+<target>&Skopírovať do schránky</target>
 
 <source>Enter activation key:</source>
-<target></target>
+<target>Zadať aktivačný kľúč:</target>
 
 <source>Activate offline</source>
-<target></target>
+<target>Aktivovať offline</target>
 
 <source>Save as Batch Job</source>
 <target>Uložiť ako dávku</target>
@@ -1335,7 +1343,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Zadať časové rozmedzie</target>
 
 <source>FreeFileSync Donation Edition</source>
-<target></target>
+<target>FreeFileSync Donation Edition</target>
 
 <source>&Options</source>
 <target>Nastavenie &programu</target>
@@ -1359,7 +1367,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Prehľad</target>
 
 <source>&Show details</source>
-<target></target>
+<target>&Zobraziť podrobnosti</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Je dostupná nová verzia FreeFileSync:</target>
@@ -1603,16 +1611,16 @@ This guarantees a consistent state even in case of a serious error.
 <target>Záznam spracovania</target>
 
 <source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Inštalačný súbor je poškodený. Prosím preinštalujte FreeFileSync.</target>
 
 <source>Thank you, %x, for your donation and support!</source>
-<target></target>
+<target>Ďakujem, %x, za dar a podporu!</target>
 
 <source>Password:</source>
 <target>Heslo:</target>
 
 <source>Key password:</source>
-<target></target>
+<target>Heslo kľúča:</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1675,7 +1683,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>&Zobraziť</target>
 
 <source>Downloading update...</source>
-<target></target>
+<target>Sťahovanie aktualizácie...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Rozpoznať rovnaké súbory porovnaním ich času úpravy a veľkosti.</target>
@@ -1771,25 +1779,25 @@ This guarantees a consistent state even in case of a serious error.
 <target>Percentný podiel</target>
 
 <source>Failed to retrieve update information.</source>
-<target></target>
+<target>Získanie informácie o aktualizácií bolo neúspešné.</target>
 
 <source>Automatic updates:</source>
-<target></target>
+<target>Automatická aktualizácia:</target>
 
 <source>Requires FreeFileSync Donation Edition</source>
-<target></target>
+<target>Je potrebná FreeFileSync Donation Edition</target>
 
 <source>Check for Program Updates</source>
 <target>Hľadanie aktualizácií programu</target>
 
 <source>Auto-update now or download manually from the FreeFileSync home page?</source>
-<target></target>
+<target>Automaticky aktualizovať teraz alebo ručne z domovskej stránky FreeFileSync?</target>
 
 <source>&Auto-update</source>
-<target></target>
+<target>&Automatická aktualizácia</target>
 
 <source>&Home page</source>
-<target></target>
+<target>&Domovská stránka</target>
 
 <source>Download now?</source>
 <target>Stiahúť teraz?</target>
@@ -1810,13 +1818,13 @@ This guarantees a consistent state even in case of a serious error.
 <target>Overenie konzistencie pre %x zlyhalo.</target>
 
 <source>Installation was registered on a different operating system.</source>
-<target></target>
+<target>Inštalácia bola registrovaná na inom operačnom systéme.</target>
 
 <source>Failed to activate FreeFileSync Donation Edition.</source>
-<target></target>
+<target>aktivácia FreeFileSync Donation Edition bola neúspešná.</target>
 
 <source>Incorrect activation key.</source>
-<target></target>
+<target>Neplatný aktivačný kľúč.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Nepodarilo sa registrovať k odberu systémových správ.</target>
@@ -1984,5 +1992,5 @@ This guarantees a consistent state even in case of a serious error.
 <target>Prosím zvoľte lokálny typ inštalácie alebo vyberte iný priečinok pre inštaláciu.</target>
 
 <source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
-<target></target>
+<target>Mód tichej inštalácie je možný iba v FreeFileSync Donation Edition.</target>
 

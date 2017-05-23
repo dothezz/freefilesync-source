@@ -150,18 +150,18 @@ class FolderPairCallback : public FolderPairPanelBasic<GuiPanel> //implements ca
 public:
     FolderPairCallback(GuiPanel& basicPanel, MainDialog& mainDialog) :
         FolderPairPanelBasic<GuiPanel>(basicPanel), //pass FolderPairPanelGenerated part...
-        mainDlg(mainDialog) {}
+        mainDlg_(mainDialog) {}
 
 private:
-    MainConfiguration getMainConfig() const override { return mainDlg.getConfig().mainCfg; }
-    wxWindow* getParentWindow() override { return &mainDlg; }
-    std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() override { return mainDlg.filterCfgOnClipboard; }
+    MainConfiguration getMainConfig() const override { return mainDlg_.getConfig().mainCfg; }
+    wxWindow* getParentWindow() override { return &mainDlg_; }
+    std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() override { return mainDlg_.filterCfgOnClipboard; }
 
-    void onAltCompCfgChange    () override { mainDlg.applyCompareConfig(false /*setDefaultViewType*/); }
-    void onAltSyncCfgChange    () override { mainDlg.applySyncConfig(); }
-    void onLocalFilterCfgChange() override { mainDlg.applyFilterConfig(); } //re-apply filter
+    void onAltCompCfgChange    () override { mainDlg_.applyCompareConfig(false /*setDefaultViewType*/); }
+    void onAltSyncCfgChange    () override { mainDlg_.applySyncConfig(); }
+    void onLocalFilterCfgChange() override { mainDlg_.applyFilterConfig(); } //re-apply filter
 
-    MainDialog& mainDlg;
+    MainDialog& mainDlg_;
 };
 
 
@@ -173,17 +173,17 @@ public:
     FolderPairPanel(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairPanelGenerated(parent),
         FolderPairCallback<FolderPairPanelGenerated>(static_cast<FolderPairPanelGenerated&>(*this), mainDialog), //pass FolderPairPanelGenerated part...
-        folderSelectorLeft (mainDialog, *m_panelLeft,  *m_buttonSelectFolderLeft,  *m_bpButtonSelectAltFolderLeft,  *m_folderPathLeft),
-        folderSelectorRight(mainDialog, *m_panelRight, *m_buttonSelectFolderRight, *m_bpButtonSelectAltFolderRight, *m_folderPathRight)
+        folderSelectorLeft_ (mainDialog, *m_panelLeft,  *m_buttonSelectFolderLeft,  *m_bpButtonSelectAltFolderLeft,  *m_folderPathLeft),
+        folderSelectorRight_(mainDialog, *m_panelRight, *m_buttonSelectFolderRight, *m_bpButtonSelectAltFolderRight, *m_folderPathRight)
     {
-        folderSelectorLeft .setSiblingSelector(&folderSelectorRight);
-        folderSelectorRight.setSiblingSelector(&folderSelectorLeft);
+        folderSelectorLeft_ .setSiblingSelector(&folderSelectorRight_);
+        folderSelectorRight_.setSiblingSelector(&folderSelectorLeft_);
 
-        folderSelectorLeft .Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
-        folderSelectorRight.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        folderSelectorLeft_ .Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        folderSelectorRight_.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
 
-        folderSelectorLeft .Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
-        folderSelectorRight.Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        folderSelectorLeft_ .Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        folderSelectorRight_.Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
 
         m_bpButtonFolderPairOptions->SetBitmapLabel(getResourceImage(L"button_arrow_down"));
     }
@@ -191,16 +191,16 @@ public:
     void setValues(const FolderPairEnh& fp)
     {
         setConfig(fp.altCmpConfig, fp.altSyncConfig, fp.localFilter);
-        folderSelectorLeft .setPath(fp.folderPathPhraseLeft_);
-        folderSelectorRight.setPath(fp.folderPathPhraseRight_);
+        folderSelectorLeft_ .setPath(fp.folderPathPhraseLeft_);
+        folderSelectorRight_.setPath(fp.folderPathPhraseRight_);
     }
 
-    FolderPairEnh getValues() const { return FolderPairEnh(folderSelectorLeft.getPath(), folderSelectorRight.getPath(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
+    FolderPairEnh getValues() const { return FolderPairEnh(folderSelectorLeft_.getPath(), folderSelectorRight_.getPath(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
 
 private:
     //support for drag and drop
-    FolderSelectorImpl folderSelectorLeft;
-    FolderSelectorImpl folderSelectorRight;
+    FolderSelectorImpl folderSelectorLeft_;
+    FolderSelectorImpl folderSelectorRight_;
 };
 
 
@@ -211,14 +211,14 @@ public:
         FolderPairCallback<MainDialogGenerated>(mainDialog, mainDialog),
 
         //prepare drag & drop
-        folderSelectorLeft(mainDialog,
+        folderSelectorLeft_(mainDialog,
                            *mainDialog.m_panelTopLeft,
                            *mainDialog.m_buttonSelectFolderLeft,
                            *mainDialog.m_bpButtonSelectAltFolderLeft,
                            *mainDialog.m_folderPathLeft,
                            mainDialog.m_staticTextResolvedPathL,
                            &mainDialog.m_gridMainL->getMainWin()),
-        folderSelectorRight(mainDialog,
+        folderSelectorRight_(mainDialog,
                             *mainDialog.m_panelTopRight,
                             *mainDialog.m_buttonSelectFolderRight,
                             *mainDialog.m_bpButtonSelectAltFolderRight,
@@ -226,14 +226,14 @@ public:
                             mainDialog.m_staticTextResolvedPathR,
                             &mainDialog.m_gridMainR->getMainWin())
     {
-        folderSelectorLeft .setSiblingSelector(&folderSelectorRight);
-        folderSelectorRight.setSiblingSelector(&folderSelectorLeft);
+        folderSelectorLeft_ .setSiblingSelector(&folderSelectorRight_);
+        folderSelectorRight_.setSiblingSelector(&folderSelectorLeft_);
 
-        folderSelectorLeft .Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
-        folderSelectorRight.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        folderSelectorLeft_ .Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        folderSelectorRight_.Connect(EVENT_ON_FOLDER_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
 
-        folderSelectorLeft .Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
-        folderSelectorRight.Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        folderSelectorLeft_ .Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        folderSelectorRight_.Connect(EVENT_ON_FOLDER_MANUAL_EDIT, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
 
         mainDialog.m_panelTopLeft  ->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::onTopFolderPairKeyEvent), nullptr, &mainDialog);
         mainDialog.m_panelTopCenter->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::onTopFolderPairKeyEvent), nullptr, &mainDialog);
@@ -243,16 +243,16 @@ public:
     void setValues(const FolderPairEnh& fp)
     {
         setConfig(fp.altCmpConfig, fp.altSyncConfig, fp.localFilter);
-        folderSelectorLeft .setPath(fp.folderPathPhraseLeft_);
-        folderSelectorRight.setPath(fp.folderPathPhraseRight_);
+        folderSelectorLeft_ .setPath(fp.folderPathPhraseLeft_);
+        folderSelectorRight_.setPath(fp.folderPathPhraseRight_);
     }
 
-    FolderPairEnh getValues() const { return FolderPairEnh(folderSelectorLeft.getPath(), folderSelectorRight.getPath(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
+    FolderPairEnh getValues() const { return FolderPairEnh(folderSelectorLeft_.getPath(), folderSelectorRight_.getPath(), getAltCompConfig(), getAltSyncConfig(), getAltFilterConfig()); }
 
 private:
     //support for drag and drop
-    FolderSelectorImpl folderSelectorLeft;
-    FolderSelectorImpl folderSelectorRight;
+    FolderSelectorImpl folderSelectorLeft_;
+    FolderSelectorImpl folderSelectorRight_;
 };
 
 
@@ -1796,13 +1796,13 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
 
     else
     {
-        //1 ... 9
+        //0 ... 9
         const size_t extAppPos = [&]() -> size_t
         {
-            if ('1' <= keyCode && keyCode <= '9')
-                return keyCode - '1';
-            if (WXK_NUMPAD1 <= keyCode && keyCode <= WXK_NUMPAD9)
-                return keyCode - WXK_NUMPAD1;
+            if ('0' <= keyCode && keyCode <= '9')
+                return keyCode - '0';
+            if (WXK_NUMPAD0 <= keyCode && keyCode <= WXK_NUMPAD9)
+                return keyCode - WXK_NUMPAD0;
             if (keyCode == WXK_RETURN || keyCode == WXK_NUMPAD_ENTER) //open with first external application
                 return 0;
             return static_cast<size_t>(-1);
@@ -2225,9 +2225,9 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             const size_t pos = it - globalCfg.gui.externelApplications.begin();
 
             if (pos == 0)
-                description += L"\tEnter, 1";
+                description += L"\tEnter, D-Click";
             else if (pos < 9)
-                description += L"\t" + numberTo<std::wstring>(pos + 1);
+                description += L"\t" + numberTo<std::wstring>(pos);
 
             menu.addItem(description, openApp, nullptr, !selectionLeft.empty() || !selectionRight.empty());
         }

@@ -7,6 +7,9 @@
 	<plural_definition>n <= 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>The %x protocol does not support directory monitoring:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Les deux côtés ont changé depuis la dernière synchronisation.</target>
 
@@ -53,7 +56,7 @@
 <target>Contrôle de la disponibilité de la Corbeille pour le dossier %x ...</target>
 
 <source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>La Corbeille n'est pas disponible por les dossiers suivants. Les fichiers seront détruits définitivement :</target>
+<target>La Corbeille n'est pas disponible pour les dossiers suivants. Les fichiers seront détruits définitivement :</target>
 
 <source>An exception occurred</source>
 <target>Une erreur s'est produite</target>
@@ -88,17 +91,14 @@
 <source>Syntax:</source>
 <target>Syntaxe :</target>
 
-<source>global config file:</source>
-<target>fichier de configuration globale :</target>
-
 <source>config files:</source>
 <target>fichier de configuration :</target>
 
 <source>directory</source>
 <target>répertoire</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Chemin d'un fichier GlobalSettings.xml distinct.</target>
+<source>global config file:</source>
+<target>fichier de configuration globale :</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>N'importe quel nombre de fichiers FreeFileSync .ffs_gui et/ou .ffs_batch.</target>
@@ -108,6 +108,9 @@
 
 <source>Open configuration for editing without executing it.</source>
 <target>Ouvre la configuration pour une mise à jour sans exécution.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Chemin d'un fichier GlobalSettings.xml distinct.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Impossible de trouver les dossiers suivants :</target>
@@ -122,13 +125,13 @@
 <target>Date :</target>
 
 <source>Files have the same date but a different size.</source>
-<target></target>
+<target>Les fichiers ont la même date mais une taille différente.</target>
 
 <source>Size:</source>
 <target>Taille :</target>
 
 <source>Content comparison was skipped for excluded files.</source>
-<target></target>
+<target>La comparaison des contenus est sautée pour les fichiers exclus.</target>
 
 <source>Items differ in attributes only</source>
 <target>Seuls les attributs des éléments diffèrent</target>
@@ -143,7 +146,7 @@
 <target>Génération de la liste des fichiers...</target>
 
 <source>Fail-safe file copy</source>
-<target>Copie de fichiers sécurisé</target>
+<target>Copie de fichiers sécurisés</target>
 
 <source>Enabled</source>
 <target>Activé</target>
@@ -152,7 +155,7 @@
 <target>Désactivé</target>
 
 <source>Copy locked files</source>
-<target>Copier les fichiers verrouillés</target>
+<target>Copie des fichiers verrouillés</target>
 
 <source>Copy file access permissions</source>
 <target>Copie des droits d'accès aux fichiers</target>
@@ -167,7 +170,7 @@
 <target>Exécution avec la priorité de tâche de fond.</target>
 
 <source>Lock directories during sync</source>
-<target>Vérouillage des répertoires pendant la synchronisation</target>
+<target>Verrouillage des répertoires pendant la synchronisation</target>
 
 <source>Verify copied files</source>
 <target>Vérification de la copie des fichiers</target>
@@ -179,7 +182,7 @@
 <target>Comparaison en cours</target>
 
 <source>A folder input field is empty.</source>
-<target>Une entrée dossier est vide.</target>
+<target>Un champ dossier est vide.</target>
 
 <source>The corresponding folder will be considered as empty.</source>
 <target>Le dossier correspondant sera considéré comme vide.</target>
@@ -188,10 +191,10 @@
 <target>Exclure :</target>
 
 <source>One base folder of a folder pair is contained in the other one.</source>
-<target></target>
+<target>Un dossier défini dans la paire des dossiers est contenu dans l'autre.</target>
 
 <source>The folder should be excluded from synchronization via filter.</source>
-<target></target>
+<target>Le dossier sera exclu de la synchronisation par le filtre.</target>
 
 <source>Calculating sync directions...</source>
 <target>Evaluation du sens des synchronisations ...</target>
@@ -283,16 +286,19 @@ Trouvé : %y octets
 <target>Impossible de se connecter à %x.</target>
 
 <source>Failed to get information about server %x.</source>
-<target></target>
+<target>Impossible de trouver le serveur %x.</target>
 
 <source>Cannot open directory %x.</source>
 <target>Impossible d'ouvrir le répertoire %x.</target>
 
 <source>Cannot read directory %x.</source>
-<target></target>
+<target>Impossible de lire le répertoire %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>Impossible de lire le fichier %x.</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>Impossible de lire les attributs du fichier %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Impossible de créer le répertoire %x.</target>
@@ -302,9 +308,6 @@ Trouvé : %y octets
 
 <source>Cannot delete directory %x.</source>
 <target>Impossible de supprimer le répertoire %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>Impossible de lire les attributs du fichier %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Impossible d'écrire la date de modification de %x.</target>
@@ -331,43 +334,49 @@ Trouvé : %y octets
 <target>Le type de l'élément %x n'est pas accepté :</target>
 
 <source>Cannot delete symbolic link %x.</source>
-<target></target>
+<target>Impossible de supprimer le lien symbolique %x.</target>
 
 <source>Cannot determine free disk space for %x.</source>
-<target>Impossible  de calculer l'espace disque libre de %x.</target>
+<target>Impossible  de calculer l'espace libre du disque %x.</target>
 
 <source>Incorrect command line:</source>
 <target>Ligne de commande incorrecte :</target>
 
 <source>Error Code %x</source>
-<target></target>
+<target>Code Erreur %x</target>
 
 <source>The server does not support authentication via %x.</source>
-<target></target>
+<target>Le serveur refuse l'authentification par %x.</target>
 
 <source>Required:</source>
 <target>Requis :</target>
 
 <source>Unable to access %x.</source>
-<target></target>
+<target>Impossible d'accéder à %x.</target>
 
 <source>
 <pluralform>Operation timed out after 1 second.</pluralform>
 <pluralform>Operation timed out after %x seconds.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>L'opération a expiré après %x seconde.</pluralform>
+<pluralform>L'opération a expiré après %x secondes.</pluralform>
+</target>
 
 <source>
 <pluralform>Cannot wait on more than 1 connection at a time.</pluralform>
 <pluralform>Cannot wait on more than %x connections at a time.</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>Impossible d'attendre plus de %x connexion à la fois.</pluralform>
+<pluralform>Impossible d'attendre plus de %x connexions à la fois.</pluralform>
+</target>
 
 <source>Active connections: %x</source>
-<target></target>
+<target>Connexions actives : %x</target>
 
 <source>Failed to open SFTP channel number %x.</source>
-<target></target>
+<target>Impossible d'ouvrir le port SFTP %x.</target>
 
 <source>
 <pluralform>1 byte</pluralform>
@@ -400,22 +409,22 @@ Trouvé : %y octets
 <target>La base de données %x n'existe plus.</target>
 
 <source>Database file is corrupted:</source>
-<target></target>
+<target>La base de données est abîmée :</target>
 
 <source>The database files do not yet contain information about the last synchronization.</source>
-<target></target>
+<target>La base de données ne contient plus aujourd'hui d'informations sur la dernière synchronisation.</target>
 
 <source>Loading file %x...</source>
-<target></target>
+<target>Chargement du fichier %x ...</target>
 
 <source>Saving file %x...</source>
-<target>Enregistrement du fichier %x...</target>
+<target>Enregistrement du fichier %x ...</target>
 
 <source>Searching for folder %x...</source>
-<target>Recherche du dossier %x...</target>
+<target>Recherche du dossier %x ...</target>
 
 <source>Timeout while searching for folder %x.</source>
-<target>Timeout lors de la recherche du dossier %x.</target>
+<target>La recherche du dossier %x a expirée.</target>
 
 <source>Cannot get process information.</source>
 <target>Impossible d'obtenir les informations du traitement.</target>
@@ -493,7 +502,7 @@ Trouvé : %y octets
 <target>Le nom de volume %x ne fait pas partie du chemin %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
-<target>Arrêt demandé : En attente de la fin de l'opération en cours...</target>
+<target>Arrêt demandé : En attente de la fin de l'opération en cours ...</target>
 
 <source>Unable to create time stamp for versioning:</source>
 <target>Impossible de générer l'horodatage pour la gestion des versions :</target>
@@ -550,7 +559,7 @@ Trouvé : %y octets
 <target>Ajout d'un dossier</target>
 
 <source>Remove folder</source>
-<target>Supprimer le dossier</target>
+<target>Suppression d'un dossier</target>
 
 <source>Browse</source>
 <target>Parcourir</target>
@@ -589,9 +598,6 @@ La commande est déclenchée si :
 
 <source>Automated Synchronization</source>
 <target>Synchronisation Automatique</target>
-
-<source>The following path does not support directory monitoring:</source>
-<target>Le chemin suivant n'accepte pas la gestion des répertoires :</target>
 
 <source>Directory monitoring active</source>
 <target>Gestion des répertoires active</target>
@@ -633,7 +639,7 @@ La commande est déclenchée si :
 <target>Personnaliser</target>
 
 <source>Multiple...</source>
-<target>Multiple...</target>
+<target>Multiple ...</target>
 
 <source>Moving file %x to %y</source>
 <target>Déplacement du fichier %x vers %y</target>
@@ -675,7 +681,7 @@ La commande est déclenchée si :
 <target>Le dossier destination %x existe déjà.</target>
 
 <source>Target folder input field must not be empty.</source>
-<target>L'entrée dossier de destination ne doit pas être vide.</target>
+<target>Le champ dossier de destination ne doit pas être vide.</target>
 
 <source>Source folder %x not found.</source>
 <target>Dossier source %x non trouvé.</target>
@@ -684,7 +690,7 @@ La commande est déclenchée si :
 <target>Veuillez entrer le dossier destinataire pour la gestion des versions.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>Les éléments suivants sont en conflit non résolu et ne seront pas synchronisés :</target>
+<target>Les éléments suivants sont en conflits non résolus et ne seront pas synchronisés :</target>
 
 <source>The following folders are significantly different. Please check that the correct folders are selected for synchronization.</source>
 <target>Les dossiers suivants sont assez différents. Veuillez contrôler que ce sont les bons dossiers qui sont sélectionnés pour la synchronisation.</target>
@@ -696,19 +702,19 @@ La commande est déclenchée si :
 <target>Disponible :</target>
 
 <source>Some files will be synchronized as part of multiple base folders.</source>
-<target></target>
+<target>Certains fichiers seront synchronisés comme éléments de plusieurs dossiers de base.</target>
 
 <source>To avoid conflicts, set up exclude filters so that each updated file is considered by only one base folder.</source>
-<target></target>
+<target>Pour éviter les conflits, configurez les filtres d'exclusion afin que chaque fichier mis à jour ne soit traité que par un seul dossier de base.</target>
 
 <source>Versioning folder:</source>
-<target></target>
+<target>Dossier de gestion des versions :</target>
 
 <source>Base folder:</source>
-<target></target>
+<target>Dossier de base :</target>
 
 <source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target></target>
+<target>Le dossier de gestion des versions sera synchronisé car il est contenu dans le dossier de base.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisation de la paire de dossiers :</target>
@@ -732,7 +738,7 @@ La commande est déclenchée si :
 <target>Synchronisation terminée avec des erreurs</target>
 
 <source>Synchronization completed with warnings</source>
-<target>Synchronisation terminée avec avertissements</target>
+<target>Synchronisation terminée avec des avertissements</target>
 
 <source>Warning</source>
 <target>Attention</target>
@@ -741,7 +747,7 @@ La commande est déclenchée si :
 <target>Rien à synchroniser</target>
 
 <source>Synchronization completed successfully</source>
-<target>Synchronisation terminée sans erreurs</target>
+<target>Synchronisation terminée sans erreur</target>
 
 <source>Cleaning up old log files...</source>
 <target>Nettoyage des anciens fichiers log ...</target>
@@ -849,7 +855,7 @@ La commande est déclenchée si :
 <target>&Sauvegarder</target>
 
 <source>Save as &batch job...</source>
-<target>Enregistrer en temps que job &batch...</target>
+<target>Enregistrer en temps que job &batch ...</target>
 
 <source>Start &comparison</source>
 <target>Démarrer la &comparaison</target>
@@ -882,13 +888,13 @@ La commande est déclenchée si :
 <target>&Réinitialiser la disposition</target>
 
 <source>&Export file list...</source>
-<target>&Exportation de la liste des fichiers...</target>
+<target>&Exportation de la liste des fichiers ...</target>
 
 <source>&Tools</source>
 <target>Ou&tils</target>
 
 <source>&Check for updates now</source>
-<target></target>
+<target>&Rechercher une mise à jour</target>
 
 <source>Check &automatically once a week</source>
 <target>Contrôler &automatiquement une fois par semaine</target>
@@ -909,7 +915,7 @@ La commande est déclenchée si :
 <target>Supprimer le couple de dossiers</target>
 
 <source>Access online storage</source>
-<target></target>
+<target>Accès au stockage en ligne</target>
 
 <source>Swap sides</source>
 <target>Permuter les côtés</target>
@@ -921,7 +927,7 @@ La commande est déclenchée si :
 <target>Rechercher :</target>
 
 <source>Match case</source>
-<target>Respecter la casse</target>
+<target>Respect de la casse</target>
 
 <source>New</source>
 <target>Nouveau</target>
@@ -933,7 +939,7 @@ La commande est déclenchée si :
 <target>Sauvegarder</target>
 
 <source>Save as...</source>
-<target>Sauvegarder sous...</target>
+<target>Sauvegarder sous ...</target>
 
 <source>View type:</source>
 <target>Type de vue :</target>
@@ -1014,7 +1020,7 @@ La commande est déclenchée si :
 <target>Maximum :</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Sélectionnez les règles de filtrage pour exclure certains fichiers de la synchronisation. Entrez les chemins des fichiers par rapport à leur paire de dossiers.</target>
+<target>Choisissez les règles de filtrage pour exclure certains fichiers de la synchronisation. Entrez les chemins des fichiers par rapport à leur paire de dossiers.</target>
 
 <source>C&lear</source>
 <target>&Effacer</target>
@@ -1067,10 +1073,10 @@ La commande est déclenchée si :
 <target>&Pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Montrer les messages d'avertissement ou d'erreur</target>
+<target>Montrer les avertissements et les messages d'erreur</target>
 
 <source>Hide all error and warning messages</source>
-<target>Masquer tous les messages d'erreurs et les avertissements</target>
+<target>Masquer tous les messages d'erreur et les avertissements</target>
 
 <source>On completion:</source>
 <target>A la fin :</target>
@@ -1082,10 +1088,10 @@ La commande est déclenchée si :
 <target>Coordonne la paire de dossiers</target>
 
 <source>Enter your login details:</source>
-<target></target>
+<target>Entrez vos identifiants :</target>
 
 <source>Connection type:</source>
-<target></target>
+<target>Type de connexion :</target>
 
 <source>Server name or IP address:</source>
 <target>Nom du serveur ou adresse IP :</target>
@@ -1094,28 +1100,28 @@ La commande est déclenchée si :
 <target>Port :</target>
 
 <source>Encryption:</source>
-<target></target>
+<target>Cryptage :</target>
 
 <source>&Disabled</source>
-<target></target>
+<target>&Désactivé</target>
 
 <source>&Explicit SSL/TLS</source>
-<target></target>
+<target>&Explicite SSL/TLS</target>
 
 <source>Authentication:</source>
-<target></target>
+<target>Authentication :</target>
 
 <source>&Password</source>
-<target></target>
+<target>Mot de &Passe</target>
 
 <source>&Key file</source>
-<target></target>
+<target>&Fichier clé</target>
 
 <source>User name:</source>
 <target>Nom de l'utilisateur :</target>
 
 <source>Private key file:</source>
-<target></target>
+<target>Fichier clé personnel :</target>
 
 <source>&Show password</source>
 <target>&Affiche le mot de passe</target>
@@ -1124,25 +1130,25 @@ La commande est déclenchée si :
 <target>Répertoire sur le serveur :</target>
 
 <source>Performance improvements:</source>
-<target></target>
+<target>Amélioration des performances :</target>
 
 <source>How to get best performance?</source>
-<target></target>
+<target>Comment améliorer les performances ?</target>
 
 <source>SSH connections for directory reading:</source>
-<target></target>
+<target>Connexions SSH pour la lecture des répertoires :</target>
 
 <source>Suggested range: [1 - 10]</source>
-<target></target>
+<target>Champ suggéré: [1 - 10]</target>
 
 <source>SFTP channels per connection:</source>
-<target></target>
+<target>Ports SFTP par connexion :</target>
 
 <source>Detect server limit</source>
-<target></target>
+<target>Détection des limites du serveur</target>
 
 <source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target></target>
+<target>2 connexions x 10 ports = lecture des répertoires 20 fois plus rapide</target>
 
 <source>Select a directory on the server:</source>
 <target>Sélectionner un répertoire sur le serveur :</target>
@@ -1175,7 +1181,7 @@ La commande est déclenchée si :
 <target>Eléments :</target>
 
 <source>Synchronizing...</source>
-<target>Synchronisation en cours...</target>
+<target>Synchronisation en cours ...</target>
 
 <source>Minimize to notification area</source>
 <target>Réduction à la zone de notification</target>
@@ -1205,7 +1211,7 @@ La commande est déclenchée si :
 <target>Exécution fenêtre réduite</target>
 
 <source>Save log:</source>
-<target>Sauvegarder le fichier log :</target>
+<target>Sauvegarde du fichier log :</target>
 
 <source>Limit:</source>
 <target>Limite :</target>
@@ -1274,10 +1280,10 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Code source écrit en C++ utilisant :</target>
 
 <source>Donation details</source>
-<target></target>
+<target>Détails pour les donations</target>
 
 <source>If you like FreeFileSync:</source>
-<target>Si vous aimez FreeFileSync:</target>
+<target>Si vous aimez FreeFileSync :</target>
 
 <source>Donate with PayPal</source>
 <target>Faites un don avec PayPal</target>
@@ -1286,7 +1292,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Vos commentaires et vos suggestions sont les bienvenus</target>
 
 <source>Home page</source>
-<target></target>
+<target>Page d'accueil</target>
 
 <source>Email</source>
 <target>Email</target>
@@ -1298,25 +1304,25 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Un grand merci pour la traduction à :</target>
 
 <source>Activate the FreeFileSync Donation Edition by one of the following methods:</source>
-<target></target>
+<target>Activez la FreeFileSync Donation Edition par l'une des méthodes suivantes :</target>
 
 <source>1. Activate via internet now:</source>
-<target></target>
+<target>1. Activez par internet maintenant :</target>
 
 <source>Activate online</source>
-<target></target>
+<target>Activez en ligne</target>
 
 <source>2. Retrieve an offline activation key from the following URL:</source>
-<target></target>
+<target>2. Récupérer une clé d'activation hors ligne à partir de l'URL suivante :</target>
 
 <source>&Copy to clipboard</source>
-<target></target>
+<target>& Copie dans le presse-papiers</target>
 
 <source>Enter activation key:</source>
-<target></target>
+<target>Entrez la clé d'activation :</target>
 
 <source>Activate offline</source>
-<target></target>
+<target>Activez hors ligne</target>
 
 <source>Save as Batch Job</source>
 <target>Sauvegarder comme Job Batch</target>
@@ -1334,7 +1340,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Sélection de l'Intervalle de Temps</target>
 
 <source>FreeFileSync Donation Edition</source>
-<target></target>
+<target>FreeFileSync Donation Edition</target>
 
 <source>&Options</source>
 <target>&Options</target>
@@ -1358,7 +1364,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Aperçu</target>
 
 <source>&Show details</source>
-<target></target>
+<target>&Afficher les détails</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Une nouvelle version de FreeFileSync est disponible :</target>
@@ -1415,7 +1421,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>sélection multiple</target>
 
 <source>Include via filter:</source>
-<target>Inclure via le filtre :</target>
+<target>Inclure à l'aide du filtre :</target>
 
 <source>Exclude via filter:</source>
 <target>Exclure à l'aide du filtre :</target>
@@ -1451,7 +1457,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Grand</target>
 
 <source>Select time span...</source>
-<target>Choisir un intervalle de temps...</target>
+<target>Choisir un intervalle de temps ...</target>
 
 <source>Show "%x"</source>
 <target>Afficher "%x"</target>
@@ -1559,25 +1565,25 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Fermer la fenêtre de progression</target>
 
 <source>Log off</source>
-<target>Quitter</target>
+<target>Déconnection</target>
 
 <source>Standby</source>
 <target>Pause</target>
 
 <source>Shut down</source>
-<target>Arrêter</target>
+<target>Arrêt</target>
 
 <source>Paused</source>
 <target>En pause</target>
 
 <source>Initializing...</source>
-<target>Initialisation...</target>
+<target>Initialisation ...</target>
 
 <source>Scanning...</source>
-<target>Lecture en cours...</target>
+<target>Lecture en cours ...</target>
 
 <source>Comparing content...</source>
-<target>Comparaison du contenu...</target>
+<target>Comparaison du contenu ...</target>
 
 <source>Completed</source>
 <target>Terminé</target>
@@ -1598,16 +1604,16 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Log</target>
 
 <source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target></target>
+<target>Un ou plusieurs fichiers installés sont abîmés. Veuillez réinstaller FreeFileSync.</target>
 
 <source>Thank you, %x, for your donation and support!</source>
-<target></target>
+<target>Merci %x pour votre don et votre aide !</target>
 
 <source>Password:</source>
 <target>Mot de passe :</target>
 
 <source>Key password:</source>
-<target></target>
+<target>Mot de passe clé :</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1667,7 +1673,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>&Afficher</target>
 
 <source>Downloading update...</source>
-<target></target>
+<target>Téléchargement de la mise à jour ...</target>
 
 <source>Identify equal files by comparing modification time and size.</source>
 <target>Reconnaître les fichiers identiques à l'aide de leur taille et de leur date.</target>
@@ -1763,25 +1769,25 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Pourcentage</target>
 
 <source>Failed to retrieve update information.</source>
-<target></target>
+<target>Impossible de retrouver les informations de mise à jour.</target>
 
 <source>Automatic updates:</source>
-<target></target>
+<target>Mise à jour automatique :</target>
 
 <source>Requires FreeFileSync Donation Edition</source>
-<target></target>
+<target>Nécessite FreeFileSync Donation Edition</target>
 
 <source>Check for Program Updates</source>
 <target>Recherche des Mises à Jour</target>
 
 <source>Auto-update now or download manually from the FreeFileSync home page?</source>
-<target></target>
+<target>Mise à jour automatique maintenant ou téléchargement manuel à partir du site de FreeFileSync ?</target>
 
 <source>&Auto-update</source>
-<target></target>
+<target>Mise à jour &automatique</target>
 
 <source>&Home page</source>
-<target></target>
+<target>&Téléchargement</target>
 
 <source>Download now?</source>
 <target>Télécharger maintenant ?</target>
@@ -1802,13 +1808,13 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Contrôle de cohérence incorrect pour %x.</target>
 
 <source>Installation was registered on a different operating system.</source>
-<target></target>
+<target>L'installation a été enregistré avec un système d'exploitation différent.</target>
 
 <source>Failed to activate FreeFileSync Donation Edition.</source>
-<target></target>
+<target>Impossible d'activer FreeFileSync Donation Edition.</target>
 
 <source>Incorrect activation key.</source>
-<target></target>
+<target>Clé d'activation incorrecte.</target>
 
 <source>Unable to register to receive system messages.</source>
 <target>Impossible d'enregistrer la réception des messages système.</target>
@@ -1889,7 +1895,7 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Impossible de modifier les priorités E/S des tâches.</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
-<target>Echec de la vérification de la corbeille pour le dossier %x.</target>
+<target>Echec de la vérification de la Corbeille pour le dossier %x.</target>
 
 <source>The following XML elements could not be read:</source>
 <target>Les éléments XML suivants ne peuvent être lus :</target>
@@ -1973,5 +1979,5 @@ Cela garantit la cohérence du système de fichiers en cas d'erreur grave.
 <target>Veuillez choisir le type d'installation locale ou sélectionner un autre dossier pour cette installation.</target>
 
 <source>The silent installation mode is only available in the FreeFileSync Donation Edition.</source>
-<target></target>
+<target>Le mode d'installation silencieuse n'est valable qu'en FreeFileSync Donation Edition.</target>
 

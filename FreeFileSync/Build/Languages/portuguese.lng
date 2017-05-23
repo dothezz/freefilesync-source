@@ -717,7 +717,7 @@ O comando é executado se:
 <target>A pasta de versão será sincronizada pois ela está contida em uma pasta base.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>A cincronizar o par de pastas:</target>
+<target>A sincronizar o par de pastas:</target>
 
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>
@@ -1070,7 +1070,7 @@ O comando é executado se:
 <target>Tratar erros:</target>
 
 <source>&Pop-up</source>
-<target>&Popup</target>
+<target>&Alertar</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar popup em caso de erros ou avisos</target>

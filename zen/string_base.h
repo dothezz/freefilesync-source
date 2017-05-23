@@ -573,14 +573,14 @@ template <class InputIterator> inline
 Zbase<Char, SP>& Zbase<Char, SP>::append(InputIterator first, InputIterator last)
 {
     const size_t len = std::distance(first, last);
-	if (len > 0) //avoid making this string unshared for no reason
-	{
-		const size_t thisLen = length();
-		reserve(thisLen + len); //make unshared and check capacity
+    if (len > 0) //avoid making this string unshared for no reason
+    {
+        const size_t thisLen = length();
+        reserve(thisLen + len); //make unshared and check capacity
 
-		*std::copy(first, last, rawStr_ + thisLen) = 0;
-		this->setLength(rawStr_, thisLen + len);
-	}
+        *std::copy(first, last, rawStr_ + thisLen) = 0;
+        this->setLength(rawStr_, thisLen + len);
+    }
     return *this;
 }
 

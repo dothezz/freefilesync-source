@@ -1234,12 +1234,12 @@ public:
 
     void stopTimer() override //halt all internal counters!
     {
-        pnl.m_animCtrlSyncing->Stop();
+        //pnl.m_animCtrlSyncing->Stop();
         timeElapsed.pause();
     }
     void resumeTimer() override
     {
-        pnl.m_animCtrlSyncing->Play();
+        //pnl.m_animCtrlSyncing->Play();
         timeElapsed.resume();
     }
 
@@ -1346,8 +1346,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     if (parentFrame_)
         parentFrameTitleBackup = parentFrame_->GetTitle(); //save old title (will be used as progress indicator)
 
-    pnl.m_animCtrlSyncing->SetAnimation(getResourceAnimation(L"working"));
-    pnl.m_animCtrlSyncing->Play();
+    //pnl.m_animCtrlSyncing->SetAnimation(getResourceAnimation(L"working"));
+    //pnl.m_animCtrlSyncing->Play();
 
     this->EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
 
@@ -1735,7 +1735,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
         pnl.m_bitmapStatus->SetBitmap(getResourceImage(bmpName));
         pnl.m_bitmapStatus->SetToolTip(tooltip);
         pnl.m_bitmapStatus->Show();
-        pnl.m_animCtrlSyncing->Hide();
+        //pnl.m_animCtrlSyncing->Hide();
     };
 
     const wxString dlgStatusTxt = getDialogPhaseText(syncStat_, paused_, finalResult);
@@ -1751,7 +1751,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
             switch (syncStat_->currentPhase())
             {
                 case ProcessCallback::PHASE_NONE:
-                    pnl.m_animCtrlSyncing->Hide();
+                    //pnl.m_animCtrlSyncing->Hide();
                     pnl.m_bitmapStatus->Hide();
                     break;
 
@@ -1767,8 +1767,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
                     pnl.m_bitmapStatus->SetBitmap(getResourceImage(L"status_syncing"));
                     pnl.m_bitmapStatus->SetToolTip(dlgStatusTxt);
                     pnl.m_bitmapStatus->Show();
-                    pnl.m_animCtrlSyncing->Show();
-                    pnl.m_animCtrlSyncing->SetToolTip(dlgStatusTxt);
+                    //pnl.m_animCtrlSyncing->Show();
+                    //pnl.m_animCtrlSyncing->SetToolTip(dlgStatusTxt);
                     break;
             }
     }
