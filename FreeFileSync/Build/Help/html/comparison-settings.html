@@ -24,7 +24,7 @@
 		This variant considers two files equal when both <b>modification time and file size</b> match.
 		It should be selected when synchronizing files with a backup location.
 		Whenever a file is changed, its file modification time is also updated. 
-		Therefore a compare by <i>File Time and size</i> will detect all files that should be synchronized.
+		Therefore, a comparison by <i>File Time and size</i> will detect all files that should be synchronized.
 		The following categories are distinguished:
 	</p>
 	<ol style="list-style: upper-roman">
@@ -54,8 +54,8 @@
 	<p>
 		Two files are marked as equal if they have <b>identical content</b>.
 		This variant should be selected when doing consistency checks to see if the files on both sides are bit-wise identical.
-		Naturally it is the slowest of all comparison variants, so its usefulness for the purpose of synchronization is limited.
-		If used for synchronization, it can serve as a fallback when modification times are not reliable: for example
+		Naturally, it is the slowest of all comparison variants, so its usefulness for the purpose of synchronization is limited.
+		If used for synchronization, it can serve as a fallback when modification times are not reliable. For example
 		certain mobile phones and legacy FTP servers do not preserve modification times, so the only way to detect different files when the 
 		file sizes are the same is by reading their content.
 	</p>
@@ -78,7 +78,7 @@
 	<p>
 		Two files are considered equal if they have the <b>same file size</b>.
 		Since it's possible for files that have the same size to have different content, this variant should only be used when file modification times are not
-		available or reliable, e.g. in certain MTP and FTP synchronization scenarios, and where a compare by content would be too slow.
+		available or reliable, e.g. in certain MTP and FTP synchronization scenarios, and where a comparison by content would be too slow.
 	</p>
 	<ol style="list-style: upper-roman">
 		<li><b>file exists on one side only</b>

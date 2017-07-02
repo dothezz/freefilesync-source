@@ -24,13 +24,11 @@ using namespace zen;
 //using namespace std::rel_ops;
 
 
-void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
+void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp) //throw FileError
 {
     std::for_each(begin(folderCmp), end(folderCmp), [](BaseFolderPair& baseFolder) { baseFolder.flip(); });
 
-    redetermineSyncDirection(config, folderCmp,
-                             nullptr,  //reportWarning
-                             nullptr); //notifyStatus
+    redetermineSyncDirection(config, folderCmp, nullptr /*notifyStatus*/); //throw FileError
 }
 
 //----------------------------------------------------------------------------------------------
@@ -674,11 +672,12 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
+void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, //throw FileError
                                    BaseFolderPair& baseFolder,
-                                   const std::function<void(const std::wstring& msg)>& reportWarning,
                                    const std::function<void(const std::wstring& msg)>& notifyStatus)
 {
+    Opt<FileError> dbLoadError; //defer until after default directions have been set!
+
     //try to load sync-database files
     std::shared_ptr<InSyncFolder> lastSyncState;
     if (dirCfg.var == DirectionConfig::TWO_WAY || detectMovedFilesEnabled(dirCfg))
@@ -689,13 +688,13 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
 
             lastSyncState = loadLastSynchronousState(baseFolder, notifyStatus); //throw FileError, FileErrorDatabaseNotExisting
         }
-        catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than confuse users
+        catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than to confuse users
         catch (const FileError& e) //e.g. incompatible database version
         {
-            if (reportWarning)
-                reportWarning(e.toString() +
-                              (dirCfg.var == DirectionConfig::TWO_WAY ?
-                               L" \n\n" + _("Setting default synchronization directions: Old files will be overwritten with newer files.") : std::wstring()));
+            if (dirCfg.var == DirectionConfig::TWO_WAY)
+                dbLoadError = FileError(e.toString(), _("Setting default synchronization directions: Old files will be overwritten with newer files."));
+            else
+                dbLoadError = e;
         }
 
     //set sync directions
@@ -712,12 +711,15 @@ void zen::redetermineSyncDirection(const DirectionConfig& dirCfg,
     //detect renamed files
     if (lastSyncState)
         DetectMovedFiles::execute(baseFolder, *lastSyncState);
+
+    //error reporting: not any time earlier
+    if (dbLoadError)
+        throw* dbLoadError;
 }
 
 
-void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
+void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, //throw FileError
                                    FolderComparison& folderCmp,
-                                   const std::function<void(const std::wstring& msg)>& reportWarning,
                                    const std::function<void(const std::wstring& msg)>& notifyStatus)
 {
     if (folderCmp.empty())
@@ -728,11 +730,21 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg,
     if (folderCmp.size() != directCfgs.size())
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
+    Opt<FileError> dbLoadError; //defer until after default directions have been set!
+
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
-    {
-        const DirectionConfig& cfg = directCfgs[it - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **it, reportWarning, notifyStatus);
-    }
+        try
+        {
+            redetermineSyncDirection(directCfgs[it - folderCmp.begin()], **it, notifyStatus); //throw FileError
+        }
+        catch (const FileError& e)
+        {
+            if (!dbLoadError)
+                dbLoadError = e;
+        }
+
+    if (dbLoadError)
+        throw* dbLoadError;
 }
 
 //---------------------------------------------------------------------------------------------------------------
@@ -1046,12 +1058,12 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 class FilterByTimeSpan
 {
 public:
-    static void execute(ContainerObject& hierObj, int64_t timeFrom, int64_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
+    static void execute(ContainerObject& hierObj, time_t timeFrom, time_t timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
 
 private:
     FilterByTimeSpan(ContainerObject& hierObj,
-                     int64_t timeFrom,
-                     int64_t timeTo) :
+                     time_t timeFrom,
+                     time_t timeTo) :
         timeFrom_(timeFrom),
         timeTo_(timeTo) { recurse(hierObj); }
 
@@ -1100,12 +1112,12 @@ private:
                obj.template getLastWriteTime<side>() <= timeTo_;
     }
 
-    const int64_t timeFrom_;
-    const int64_t timeTo_;
+    const time_t timeFrom_;
+    const time_t timeTo_;
 };
 
 
-void zen::applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t timeTo)
+void zen::applyTimeSpanFilter(FolderComparison& folderCmp, time_t timeFrom, time_t timeTo)
 {
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseFolderPair& baseFolder) { FilterByTimeSpan::execute(baseFolder, timeFrom, timeTo); });
 }
@@ -1196,13 +1208,15 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
     auto copyItem = [overwriteIfExists](const AbstractPath& targetPath, //throw FileError
                                         const std::function<void(const std::function<void()>& deleteTargetItem)>& copyItemPlain) //throw FileError
     {
-        Opt<FileError> deleteError; //files are copied with "transactionalCopy = true" => handle already existing target BEFORE failing after an expensive copy
-
+        //start deleting existing target as required by copyFileTransactional():
+        //best amortized performance if "target existing" is the most common case
+        Opt<FileError> deletionError;
         auto tryDeleteTargetItem = [&]
         {
             if (overwriteIfExists)
                 try { AFS::removeFilePlain(targetPath); /*throw FileError*/ }
-                catch (const FileError& e) { deleteError = e; } //probably "not existing" error, defer evaluation
+                catch (const FileError& e) { deletionError = e; } //probably "not existing" error, defer evaluation
+            //else: copyFileTransactional() undefined behavior (fail/overwrite/auto-rename)
         };
 
         try
@@ -1219,8 +1233,8 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             {
                 if (pd->relPath.empty()) //already existing
                 {
-                    if (deleteError)
-                        throw* deleteError;
+                    if (deletionError)
+                        throw* deletionError;
                 }
                 else if (pd->relPath.size() > 1) //parent folder missing
                 {
@@ -1250,6 +1264,7 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             notifyItemCopy(txtCreatingFolder, AFS::getDisplayPath(targetPath));
             try
             {
+                //target existing: undefined behavior! (fail/overwrite)
                 AFS::createFolderPlain(targetPath); //throw FileError
                 statReporter.reportDelta(1, 0);
             }
@@ -1291,8 +1306,8 @@ void copyToAlternateFolderFrom(const std::vector<const FileSystemObject*>& rowsT
             copyItem(targetPath, [&](const std::function<void()>& deleteTargetItem) //throw FileError
             {
                 auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
-                const AFS::FileCopyResult result = AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
-                                                                              false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, notifyUnbufferedIO);
+                /*const AFS::FileCopyResult result =*/ AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
+                                                                                  false /*copyFilePermissions*/, true /*transactionalCopy*/, deleteTargetItem, notifyUnbufferedIO);
                 //result.errorModTime? => probably irrelevant (behave like Windows Explorer)
             });
             statReporter.reportDelta(1, 0);
@@ -1638,9 +1653,8 @@ void TempFileBuffer::createTempFiles(const std::set<FileDescriptor>& workLoad, P
             Zstring tempPathTmp = appendSeparator(getTempFolderPath()); //throw FileError
             tempPathTmp += Zstr("FFS-");
 
-            const std::string guid = generateGUID(); //no need for full-blown (pseudo-)random numbers for this one-time invocation
-            const uint32_t crc32 = getCrc32(guid);
-            tempPathTmp += printNumber<Zstring>(Zstr("%08x"), static_cast<unsigned int>(crc32));
+            const uint32_t shortGuid = getCrc32(generateGUID()); //no need for full-blown (pseudo-)random numbers for this one-time invocation
+            tempPathTmp += printNumber<Zstring>(Zstr("%08x"), static_cast<unsigned int>(shortGuid));
 
             createDirectoryIfMissingRecursion(tempPathTmp); //throw FileError
 
@@ -1665,7 +1679,7 @@ void TempFileBuffer::createTempFiles(const std::set<FileDescriptor>& workLoad, P
 
         const Zstring fileName = AFS::getItemName(descr.path);
 
-        auto it = std::find(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
+        auto it = find_last(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
         const Zstring tempFileName = Zstring(fileName.begin(), it) + Zchar('-') + descrHash + Zstring(it, fileName.end());
 
         const Zstring tempFilePath = appendSeparator(tempFolderPath_) + tempFileName;
@@ -1679,9 +1693,9 @@ void TempFileBuffer::createTempFiles(const std::set<FileDescriptor>& workLoad, P
 
             auto notifyUnbufferedIO = [&](int64_t bytesDelta) { statReporter.reportDelta(0, bytesDelta); };
 
-            AFS::copyFileTransactional(descr.path, sourceAttr, //throw FileError, ErrorFileLocked
-                                       createItemPathNative(tempFilePath),
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            /*const AFS::FileCopyResult result =*/ AFS::copyFileTransactional(descr.path, sourceAttr, //throw FileError, ErrorFileLocked
+                                                                              createItemPathNative(tempFilePath),
+                                                                              false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
             //result.errorModTime? => irrelevant for temp files!
 
             statReporter.reportDelta(1, 0);

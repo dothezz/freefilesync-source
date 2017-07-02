@@ -29,16 +29,19 @@ using AFS = AbstractFileSystem;
 struct FileAttributes
 {
     FileAttributes() {}
-    FileAttributes(int64_t modTimeIn,
+    FileAttributes(time_t modTimeIn,
                    uint64_t fileSizeIn,
                    const AFS::FileId& idIn,
                    bool isSymlink) :
         modTime(modTimeIn),
         fileSize(fileSizeIn),
         fileId(idIn),
-        isFollowedSymlink(isSymlink) {}
+        isFollowedSymlink(isSymlink)
+    {
+        static_assert(std::is_signed<time_t>::value, "... and signed!");
+    }
 
-    int64_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    time_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC
     uint64_t fileSize = 0;
     AFS::FileId fileId; //optional!
     bool isFollowedSymlink = false;
@@ -48,9 +51,9 @@ struct FileAttributes
 struct LinkAttributes
 {
     LinkAttributes() {}
-    explicit LinkAttributes(int64_t modTimeIn) : modTime(modTimeIn) {}
+    explicit LinkAttributes(time_t modTimeIn) : modTime(modTimeIn) {}
 
-    int64_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    time_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC
 };
 
 
@@ -557,7 +560,7 @@ public:
         attrL_(attrL),
         attrR_(attrR) {}
 
-    template <SelectedSide side> int64_t     getLastWriteTime() const;
+    template <SelectedSide side> time_t      getLastWriteTime() const;
     template <SelectedSide side> uint64_t         getFileSize() const;
     template <SelectedSide side> AFS::FileId        getFileId() const;
     template <SelectedSide side> bool       isFollowedSymlink() const;
@@ -606,7 +609,7 @@ class SymlinkPair : public FileSystemObject //this class models a TRUE symbolic 
 public:
     void accept(FSObjectVisitor& visitor) const override;
 
-    template <SelectedSide side> int64_t getLastWriteTime() const; //write time of the link, NOT target!
+    template <SelectedSide side> time_t getLastWriteTime() const; //write time of the link, NOT target!
 
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
 
@@ -1106,7 +1109,7 @@ FileAttributes FilePair::getAttributes() const
 
 
 template <SelectedSide side> inline
-int64_t FilePair::getLastWriteTime() const
+time_t FilePair::getLastWriteTime() const
 {
     return SelectParam<side>::ref(attrL_, attrR_).modTime;
 }
@@ -1190,7 +1193,7 @@ void FolderPair::setSyncedTo(const Zstring& itemName,
 
 
 template <SelectedSide side> inline
-int64_t SymlinkPair::getLastWriteTime() const
+time_t SymlinkPair::getLastWriteTime() const
 {
     return SelectParam<side>::ref(attrL_, attrR_).modTime;
 }

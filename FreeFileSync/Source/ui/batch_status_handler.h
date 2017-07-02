@@ -7,8 +7,9 @@
 #ifndef BATCH_STATUS_HANDLER_H_857390451451234566
 #define BATCH_STATUS_HANDLER_H_857390451451234566
 
+#include <chrono>
 #include <zen/error_log.h>
-#include <zen/time.h>
+//#include <zen/time.h>
 #include "progress_indicator.h"
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
@@ -26,7 +27,7 @@ public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
                        const std::wstring& jobName, //should not be empty for a batch job!
                        const Zstring& soundFileSyncComplete,
-                       const zen::TimeComp& timeStamp,
+                       const std::chrono::system_clock::time_point& batchStartTime,
                        const Zstring& logFolderPathPhrase,
                        int logfilesCountLimit, //0: logging inactive; < 0: no limit
                        size_t lastSyncsLogFileSizeMax,
@@ -66,7 +67,7 @@ private:
     SyncProgressDialog* progressDlg_; //managed to have shorter lifetime than this handler!
 
     const std::wstring jobName_;
-    const zen::TimeComp timeStamp_;
+    const std::chrono::system_clock::time_point batchStartTime_;
     const time_t startTime_ = std::time(nullptr); //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
 
     const Zstring logFolderPathPhrase_;

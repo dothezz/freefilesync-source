@@ -95,12 +95,12 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     static PathStatus getPathStatus(const AbstractPath& ap); //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
-    //- error if already existing
-    //- does NOT create parent directories recursively if not existing
+    //target existing: undefined behavior! (fail/overwrite)
+    //does NOT create parent directories recursively if not existing
     static void createFolderPlain(const AbstractPath& ap) { ap.afs->createFolderPlain(ap.afsPath); } //throw FileError
 
-    //- no error if already existing
-    //- creates parent directories recursively if not existing
+    //no error if already existing
+    //creates parent directories recursively if not existing
     static void createFolderIfMissingRecursion(const AbstractPath& ap); //throw FileError
 
     static bool removeFileIfExists   (const AbstractPath& ap); //throw FileError; return "false" if file is not existing
@@ -113,7 +113,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     static void removeSymlinkPlain(const AbstractPath& ap) { ap.afs->removeSymlinkPlain(ap.afsPath); } //throw FileError
     static void removeFolderPlain (const AbstractPath& ap) { ap.afs->removeFolderPlain (ap.afsPath); } //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-    static void setModTime(const AbstractPath& ap, int64_t modTime) { ap.afs->setModTime       (ap.afsPath, modTime); } //throw FileError, follows symlinks
+    static void setModTime(const AbstractPath& ap, time_t modTime) { ap.afs->setModTime(ap.afsPath, modTime); } //throw FileError, follows symlinks
 
     static AbstractPath getSymlinkResolvedPath(const AbstractPath& ap) { return ap.afs->getSymlinkResolvedPath(ap.afsPath); } //throw FileError
     static std::string getSymlinkBinaryContent(const AbstractPath& ap) { return ap.afs->getSymlinkBinaryContent(ap.afsPath); } //throw FileError
@@ -129,7 +129,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     struct StreamAttributes
     {
-        int64_t modTime; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+        time_t modTime; //number of seconds since Jan. 1st 1970 UTC
         uint64_t fileSize;
         FileId fileId; //optional!
     };
@@ -139,10 +139,10 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     {
         virtual ~InputStream() {}
         virtual size_t read(void* buffer, size_t bytesToRead) = 0; //throw FileError, X; return "bytesToRead" bytes unless end of stream!
-        virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract! it's implementers job to always give a reasonable buffer size!
+        virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract! it's implementer's job to always give a reasonable buffer size!
 
         //only returns attributes if they are already buffered within stream handle and determination would be otherwise expensive (e.g. FTP/SFTP):
-        virtual Opt<StreamAttributes> getBufferedAttributes() = 0; //throw FileError
+        virtual Opt<StreamAttributes> getAttributesBuffered() = 0; //throw FileError
     };
 
     struct OutputStreamImpl
@@ -169,10 +169,11 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     };
 
     //return value always bound:
-    static std::unique_ptr<InputStream > getInputStream(const AbstractPath& ap, const IOCallback& notifyUnbufferedIO) //throw FileError, ErrorFileLocked, X
+    static std::unique_ptr<InputStream> getInputStream(const AbstractPath& ap, const IOCallback& notifyUnbufferedIO) //throw FileError, ErrorFileLocked, X
     { return ap.afs->getInputStream(ap.afsPath, notifyUnbufferedIO); }
 
-    static std::unique_ptr<OutputStream> getOutputStream(const AbstractPath& ap, //throw FileError, ErrorTargetExisting
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    static std::unique_ptr<OutputStream> getOutputStream(const AbstractPath& ap, //throw FileError
                                                          const uint64_t* streamSize,           //optional
                                                          const IOCallback& notifyUnbufferedIO) //
     { return std::make_unique<OutputStream>(ap.afs->getOutputStream(ap.afsPath, streamSize, notifyUnbufferedIO), ap, streamSize); }
@@ -185,14 +186,14 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
         struct SymlinkInfo
         {
             Zstring itemName;
-            int64_t modTime; //number of seconds since Jan. 1st 1970 UTC
+            time_t modTime; //number of seconds since Jan. 1st 1970 UTC
         };
 
         struct FileInfo
         {
             Zstring itemName;
             uint64_t fileSize; //unit: bytes!
-            int64_t modTime; //number of seconds since Jan. 1st 1970 UTC
+            time_t modTime; //number of seconds since Jan. 1st 1970 UTC
             FileId fileId; //optional: empty if not supported!
             const SymlinkInfo* symlinkInfo; //only filled if file is a followed symlink
         };
@@ -230,34 +231,40 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
 
     static bool supportPermissionCopy(const AbstractPath& apSource, const AbstractPath& apTarget); //throw FileError
 
-    struct FileCopyResult
-    {
-        uint64_t fileSize = 0;
-        int64_t modTime = 0; //time_t-compatible (UTC)
-        FileId sourceFileId;
-        FileId targetFileId;
-        Opt<FileError> errorModTime; //failure to set modification time
-    };
-    //return current attributes at the time of copy
-    //symlink handling: dereference source
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    static void renameItem(const AbstractPath& apSource, const AbstractPath& apTarget); //throw FileError, ErrorDifferentVolume
 
     //Note: it MAY happen that copyFileTransactional() leaves temp files behind, e.g. temporary network drop.
     // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
     static const Zchar* TEMP_FILE_ENDING; //don't use Zstring as global constant: avoid static initialization order problem in global namespace!
 
+    struct FileCopyResult
+    {
+        uint64_t fileSize = 0;
+        time_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC
+        FileId sourceFileId;
+        FileId targetFileId;
+        Opt<FileError> errorModTime; //failure to set modification time
+    };
+
+    //symlink handling: follow
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    //returns current attributes at the time of copy
     static FileCopyResult copyFileTransactional(const AbstractPath& apSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                                 const AbstractPath& apTarget,
                                                 bool copyFilePermissions,
                                                 bool transactionalCopy,
-                                                //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
+                                                //if target is existing user *must* implement deletion to avoid undefined behavior
                                                 //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
                                                 const std::function<void()>& onDeleteTargetFile,
                                                 //accummulated delta != file size! consider ADS, sparse, compressed files
                                                 const IOCallback& notifyUnbufferedIO);
 
+    //target existing: undefined behavior! (fail/overwrite)
+    //symlink handling: follow link!
     static void copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
+
     static void copySymlink  (const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions); //throw FileError
-    static void renameItem   (const AbstractPath& apSource, const AbstractPath& apTarget); //throw FileError, ErrorDifferentVolume
 
     //----------------------------------------------------------------------------------------------------------------
 
@@ -299,7 +306,8 @@ protected: //grant derived classes access to AbstractPath:
     };
     PathStatusImpl getPathStatusViaFolderTraversal(const AfsPath& afsPath) const; //throw FileError
 
-    FileCopyResult copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    FileCopyResult copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                     const AbstractPath& apTarget, const IOCallback& notifyUnbufferedIO) const; //may be nullptr; throw X!
 
 private:
@@ -318,6 +326,7 @@ private:
     virtual PathStatusImpl getPathStatus(const AfsPath& afsPath) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
 
+    //target existing: undefined behavior! (fail/overwrite)
     virtual void createFolderPlain(const AfsPath& afsPath) const = 0; //throw FileError
 
     //non-recursive folder deletion:
@@ -325,30 +334,38 @@ private:
     virtual void removeSymlinkPlain(const AfsPath& afsPath) const = 0; //throw FileError
     virtual void removeFolderPlain (const AfsPath& afsPath) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-    virtual void setModTime(const AfsPath& afsPath, int64_t modTime) const = 0; //throw FileError, follows symlinks
+    virtual void setModTime(const AfsPath& afsPath, time_t modTime) const = 0; //throw FileError, follows symlinks
 
     virtual AbstractPath getSymlinkResolvedPath(const AfsPath& afsPath) const = 0; //throw FileError
     virtual std::string getSymlinkBinaryContent(const AfsPath& afsPath) const = 0; //throw FileError
     //----------------------------------------------------------------------------------------------------------------
-    virtual std::unique_ptr<InputStream     > getInputStream (const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const = 0; //throw FileError, ErrorFileLocked, X
-    virtual std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError, ErrorTargetExisting
+    virtual std::unique_ptr<InputStream> getInputStream (const AfsPath& afsPath, const IOCallback& notifyUnbufferedIO) const = 0; //throw FileError, ErrorFileLocked, X
+
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    virtual std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError
                                                               const uint64_t* streamSize,                      //optional
                                                               const IOCallback& notifyUnbufferedIO) const = 0; //
     //----------------------------------------------------------------------------------------------------------------
     virtual void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink) const = 0; //noexcept
     //----------------------------------------------------------------------------------------------------------------
+    virtual bool supportsPermissions(const AfsPath& afsPath) const = 0; //throw FileError
+
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    virtual void renameItemForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget) const = 0; //throw FileError, ErrorDifferentVolume
 
     //symlink handling: follow link!
-    virtual FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    virtual FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                                   const AbstractPath& apTarget, bool copyFilePermissions,
                                                   //accummulated delta != file size! consider ADS, sparse, compressed files
                                                   const IOCallback& notifyUnbufferedIO) const = 0; //may be nullptr; throw X!
 
+
+    //target existing: undefined behavior! (fail/overwrite)
     //symlink handling: follow link!
     virtual void copyNewFolderForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const = 0; //throw FileError
-    virtual void copySymlinkForSameAfsType  (const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const = 0; //throw FileError
-    virtual void renameItemForSameAfsType   (const AfsPath& afsPathSource, const AbstractPath& apTarget) const = 0; //throw FileError, ErrorDifferentVolume
-    virtual bool supportsPermissions(const AfsPath& afsPath) const = 0; //throw FileError
+
+    virtual void copySymlinkForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const = 0; //throw FileError
 
     //----------------------------------------------------------------------------------------------------------------
     virtual ImageHolder getFileIcon      (const AfsPath& afsPath, int pixelSize) const = 0; //noexcept; optional return value
@@ -485,9 +502,9 @@ void AbstractFileSystem::OutputStream::write(const void* data, size_t len) //thr
 inline
 AbstractFileSystem::FileId AbstractFileSystem::OutputStream::finalize() //throw FileError, X
 {
-    //important check: catches corrupt sftp download with libssh2!
+    //important check: catches corrupt SFTP download with libssh2!
     if (bytesExpected_ && *bytesExpected_ != bytesWrittenTotal_)
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getDisplayPath(filePath_))),
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(getDisplayPath(filePath_))), //instead we should report the source file, but don't have it here...
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
                                               L"%x", numberTo<std::wstring>(*bytesExpected_)),
                                    L"%y", numberTo<std::wstring>(bytesWrittenTotal_)));
@@ -500,29 +517,13 @@ AbstractFileSystem::FileId AbstractFileSystem::OutputStream::finalize() //throw 
 //--------------------------------------------------------------------------
 
 inline
-void AbstractFileSystem::copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions) //throw FileError
+bool AbstractFileSystem::supportPermissionCopy(const AbstractPath& apSource, const AbstractPath& apTarget) //throw FileError
 {
-    if (typeid(*apSource.afs) == typeid(*apTarget.afs))
-        return apSource.afs->copyNewFolderForSameAfsType(apSource.afsPath, apTarget, copyFilePermissions); //throw FileError
+    if (typeid(*apSource.afs) != typeid(*apTarget.afs))
+        return false;
 
-    //fall back:
-    if (copyFilePermissions)
-        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(getDisplayPath(apTarget))),
-                        _("Operation not supported for different base folder types."));
-
-    createFolderPlain(apTarget); //throw FileError
-}
-
-
-inline
-void AbstractFileSystem::copySymlink(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions) //throw FileError
-{
-    if (typeid(*apSource.afs) == typeid(*apTarget.afs))
-        return apSource.afs->copySymlinkForSameAfsType(apSource.afsPath, apTarget, copyFilePermissions); //throw FileError
-
-    throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."),
-                                          L"%x", L"\n" + fmtPath(getDisplayPath(apSource))),
-                               L"%y", L"\n" + fmtPath(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
+    return apSource.afs->supportsPermissions(apSource.afsPath) && //throw FileError
+           apTarget.afs->supportsPermissions(apTarget.afsPath);
 }
 
 
@@ -538,14 +539,32 @@ void AbstractFileSystem::renameItem(const AbstractPath& apSource, const Abstract
 }
 
 
-inline
-bool AbstractFileSystem::supportPermissionCopy(const AbstractPath& apSource, const AbstractPath& apTarget) //throw FileError
-{
-    if (typeid(*apSource.afs) != typeid(*apTarget.afs))
-        return false;
 
-    return apSource.afs->supportsPermissions(apSource.afsPath) && //throw FileError
-           apTarget.afs->supportsPermissions(apTarget.afsPath);
+inline
+void AbstractFileSystem::copyNewFolder(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions) //throw FileError
+{
+    if (typeid(*apSource.afs) == typeid(*apTarget.afs))
+        return apSource.afs->copyNewFolderForSameAfsType(apSource.afsPath, apTarget, copyFilePermissions); //throw FileError
+
+    //fall back:
+    if (copyFilePermissions)
+        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(getDisplayPath(apTarget))),
+                        _("Operation not supported for different base folder types."));
+
+    //target existing: undefined behavior! (fail/overwrite)
+    createFolderPlain(apTarget); //throw FileError
+}
+
+
+inline
+void AbstractFileSystem::copySymlink(const AbstractPath& apSource, const AbstractPath& apTarget, bool copyFilePermissions) //throw FileError
+{
+    if (typeid(*apSource.afs) == typeid(*apTarget.afs))
+        return apSource.afs->copySymlinkForSameAfsType(apSource.afsPath, apTarget, copyFilePermissions); //throw FileError
+
+    throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."),
+                                          L"%x", L"\n" + fmtPath(getDisplayPath(apSource))),
+                               L"%y", L"\n" + fmtPath(getDisplayPath(apTarget))), _("Operation not supported for different base folder types."));
 }
 }
 

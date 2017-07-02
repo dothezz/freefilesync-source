@@ -11,6 +11,8 @@
 #include <zen/file_id_def.h>
 #include <zen/stl_tools.h>
 #include <zen/recycler.h>
+#include <zen/guid.h>
+#include <zen/crc.h>
 #include "../lib/resolve_path.h"
 #include "../lib/icon_loader.h"
 #include "native_traverser_impl.h"
@@ -62,18 +64,18 @@ struct InputStreamNative : public AbstractFileSystem::InputStream
 
     size_t read(void* buffer, size_t bytesToRead) override { return fi_.read(buffer, bytesToRead); } //throw FileError, X; return "bytesToRead" bytes unless end of stream!
     size_t getBlockSize() const override { return fi_.getBlockSize(); } //non-zero block size is AFS contract!
-    Opt<AFS::StreamAttributes> getBufferedAttributes() override; //throw FileError
+    Opt<AFS::StreamAttributes> getAttributesBuffered() override; //throw FileError
 
 private:
     FileInput fi_;
 };
 
 
-Opt<AFS::StreamAttributes> InputStreamNative::getBufferedAttributes() //throw FileError
+Opt<AFS::StreamAttributes> InputStreamNative::getAttributesBuffered() //throw FileError
 {
     const FileAttribs fileAttr = getFileAttributes(fi_.getHandle(), fi_.getFilePath()); //throw FileError
 
-    const int64_t modTime = fileAttr.st_mtime;
+    const time_t modTime = fileAttr.st_mtime;
 
     const uint64_t fileSize = makeUnsigned(fileAttr.st_size);
 
@@ -157,11 +159,11 @@ private:
     }
     //----------------------------------------------------------------------------------------------------------------
 
-    //should provide for single ATOMIC folder creation!
+    //target existing: undefined behavior! (fail/overwrite) => Native will fail and give a clear error message
     void createFolderPlain(const AfsPath& afsPath) const override //throw FileError
     {
         initComForThread(); //throw FileError
-        copyNewDirectory(Zstring(), getNativePath(afsPath), false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting
+        createDirectory(getNativePath(afsPath)); //throw FileError, ErrorTargetExisting
     }
 
     void removeFilePlain(const AfsPath& afsPath) const override //throw FileError
@@ -183,7 +185,7 @@ private:
     }
 
     //----------------------------------------------------------------------------------------------------------------
-    void setModTime(const AfsPath& afsPath, int64_t modTime) const override //throw FileError, follows symlinks
+    void setModTime(const AfsPath& afsPath, time_t modTime) const override //throw FileError, follows symlinks
     {
         initComForThread(); //throw FileError
         zen::setFileTime(getNativePath(afsPath), modTime, ProcSymlink::FOLLOW); //throw FileError
@@ -220,12 +222,13 @@ private:
         return std::make_unique<InputStreamNative>(getNativePath(afsPath), notifyUnbufferedIO); //throw FileError, ErrorFileLocked
     }
 
-    std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError, ErrorTargetExisting
+    //target existing: undefined behavior! (fail/overwrite/auto-rename) => Native will fail and give a clear error message
+    std::unique_ptr<OutputStreamImpl> getOutputStream(const AfsPath& afsPath, //throw FileError
                                                       const uint64_t* streamSize,                          //optional
                                                       const IOCallback& notifyUnbufferedIO) const override //
     {
         initComForThread(); //throw FileError
-        return std::make_unique<OutputStreamNative>(getNativePath(afsPath), streamSize, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting
+        return std::make_unique<OutputStreamNative>(getNativePath(afsPath), streamSize, notifyUnbufferedIO); //throw FileError
     }
 
     //----------------------------------------------------------------------------------------------------------------
@@ -236,7 +239,8 @@ private:
     //----------------------------------------------------------------------------------------------------------------
 
     //symlink handling: follow link!
-    FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+    //target existing: undefined behavior! (fail/overwrite/auto-rename) => Native will fail and give a clear error message
+    FileCopyResult copyFileForSameAfsType(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                           const AbstractPath& apTarget, bool copyFilePermissions, const IOCallback& notifyUnbufferedIO) const override //may be nullptr; throw X!
     {
         const Zstring nativePathTarget = static_cast<const NativeFileSystem&>(getAfs(apTarget)).getNativePath(getAfsPath(apTarget));
@@ -254,13 +258,24 @@ private:
         return result;
     }
 
+    //target existing: undefined behavior! (fail/overwrite) => Native will fail and give a clear error message
     //symlink handling: follow link!
     void copyNewFolderForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const override //throw FileError
     {
-        const Zstring nativePathTarget = static_cast<const NativeFileSystem&>(getAfs(apTarget)).getNativePath(getAfsPath(apTarget));
-
         initComForThread(); //throw FileError
-        zen::copyNewDirectory(getNativePath(afsPathSource), nativePathTarget, copyFilePermissions); //throw FileError, ErrorTargetExisting
+
+        const Zstring& sourcePath = getNativePath(afsPathSource);
+        const Zstring& targetPath = static_cast<const NativeFileSystem&>(getAfs(apTarget)).getNativePath(getAfsPath(apTarget));
+
+        zen::createDirectory(targetPath); //throw FileError, ErrorTargetExisting
+
+        ZEN_ON_SCOPE_FAIL(try { removeDirectoryPlain(targetPath); }
+        catch (FileError&) {});
+
+        tryCopyDirectoryAttributes(sourcePath, targetPath); //throw FileError
+
+        if (copyFilePermissions)
+            copyItemPermissions(sourcePath, targetPath, ProcSymlink::FOLLOW); //throw FileError
     }
 
     void copySymlinkForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget, bool copyFilePermissions) const override //throw FileError
@@ -271,6 +286,7 @@ private:
         zen::copySymlink(getNativePath(afsPathSource), nativePathTarget, copyFilePermissions); //throw FileError
     }
 
+    //target existing: undefined behavior! (fail/overwrite/auto-rename) => Native will fail and give a clear error message
     void renameItemForSameAfsType(const AfsPath& afsPathSource, const AbstractPath& apTarget) const override //throw FileError, ErrorDifferentVolume
     {
         //perf test: detecting different volumes by path is ~30 times faster than having MoveFileEx fail with ERROR_NOT_SAME_DEVICE (6µs vs 190µs)

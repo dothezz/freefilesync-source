@@ -23,11 +23,11 @@ using namespace xmlAccess;
 StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : mainDlg(dlg)
 {
     {
-        mainDlg.compareStatus->init(*this); //clear old values before showing panel
+        mainDlg.compareStatus_->init(*this); //clear old values before showing panel
 
         //------------------------------------------------------------------
-        const wxAuiPaneInfo& topPanel = mainDlg.auiMgr.GetPane(mainDlg.m_panelTopButtons);
-        wxAuiPaneInfo& statusPanel    = mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow());
+        const wxAuiPaneInfo& topPanel = mainDlg.auiMgr_.GetPane(mainDlg.m_panelTopButtons);
+        wxAuiPaneInfo& statusPanel    = mainDlg.auiMgr_.GetPane(mainDlg.compareStatus_->getAsWindow());
 
         //determine best status panel row near top panel
         switch (topPanel.dock_direction)
@@ -48,7 +48,7 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : main
                 //case wxAUI_DOCK_CENTRE:
         }
 
-        wxAuiPaneInfoArray& paneArray = mainDlg.auiMgr.GetAllPanes();
+        wxAuiPaneInfoArray& paneArray = mainDlg.auiMgr_.GetAllPanes();
 
         const bool statusRowTaken = [&]
         {
@@ -80,7 +80,7 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : main
         //------------------------------------------------------------------
 
         statusPanel.Show();
-        mainDlg.auiMgr.Update();
+        mainDlg.auiMgr_.Update();
     }
 
     mainDlg.Update(); //don't wait until idle event!
@@ -97,9 +97,9 @@ StatusHandlerTemporaryPanel::~StatusHandlerTemporaryPanel()
     mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(StatusHandlerTemporaryPanel::OnKeyPressed), nullptr, this);
     mainDlg.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StatusHandlerTemporaryPanel::OnAbortCompare), nullptr, this);
 
-    mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
-    mainDlg.auiMgr.Update();
-    mainDlg.compareStatus->teardown();
+    mainDlg.auiMgr_.GetPane(mainDlg.compareStatus_->getAsWindow()).Hide();
+    mainDlg.auiMgr_.Update();
+    mainDlg.compareStatus_->teardown();
 }
 
 
@@ -120,7 +120,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, int64_t bytesTota
 {
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
 
-    mainDlg.compareStatus->initNewPhase(); //call after "StatusHandler::initNewPhase"
+    mainDlg.compareStatus_->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
     forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
@@ -225,7 +225,7 @@ void StatusHandlerTemporaryPanel::reportWarning(const std::wstring& warningMessa
 
 void StatusHandlerTemporaryPanel::forceUiRefresh()
 {
-    mainDlg.compareStatus->updateStatusPanelNow();
+    mainDlg.compareStatus_->updateStatusPanelNow();
 }
 
 
@@ -409,7 +409,6 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
         }
         return ProcessCallback::RETRY;
     }
-
 
     //always, except for "retry":
     auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog_.logMsg(errorMessage, TYPE_ERROR); });

@@ -48,7 +48,7 @@ ReturnSmallDlg::ButtonPressed showSyncConfirmationDlg(wxWindow* parent,
 
 ReturnSmallDlg::ButtonPressed showOptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
-ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo);
+ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, time_t& timeFrom, time_t& timeTo);
 
 
 enum class ReturnActivationDlg

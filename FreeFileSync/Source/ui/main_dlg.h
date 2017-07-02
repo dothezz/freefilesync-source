@@ -20,7 +20,7 @@
 #include "sync_cfg.h"
 #include "tree_view.h"
 #include "folder_history_box.h"
-#include "../lib/process_xml.h"
+//#include "../lib/process_xml.h"
 #include "../algorithm.h"
 
 class FolderPairFirst;
@@ -257,6 +257,7 @@ private:
     void OnSearchPanelKeyPressed(wxKeyEvent& event);
 
     //menu events
+    void onOpenMenuTools(wxMenuEvent& event);
     void OnMenuOptions        (wxCommandEvent& event) override;
     void OnMenuExportFileList (wxCommandEvent& event) override;
     void OnMenuResetLayout    (wxCommandEvent& event) override { resetLayout(); }
@@ -268,79 +269,77 @@ private:
     void OnShowHelp           (wxCommandEvent& event) override;
     void OnMenuQuit           (wxCommandEvent& event) override { Close(); }
 
-    void OnMenuLanguageSwitch(wxCommandEvent& event);
-
     void switchProgramLanguage(wxLanguage langId);
 
-    void clearGrid(ptrdiff_t pos = -1);
+    std::set<wxMenuItem*> detachedMenuItemsLayout_; //owning pointers!!!
+    //alternatives: 1. std::set<unique_ptr<>>? key is const => no support for moving items out! 2. std::map<wxMenuItem*, unique_ptr<>>: redundant info, inconvenient use
 
-    using MenuItemID = int;
-    std::map<MenuItemID, wxLanguage> languageMenuItemMap; //needed to attach menu item events
+    void clearGrid(ptrdiff_t pos = -1);
 
     //***********************************************
     //application variables are stored here:
 
     //global settings shared by GUI and batch mode
-    xmlAccess::XmlGlobalSettings globalCfg;
+    xmlAccess::XmlGlobalSettings globalCfg_;
 
     const Zstring globalConfigFile_;
 
     //-------------------------------------
     //program configuration
-    xmlAccess::XmlGuiConfig currentCfg;
+    xmlAccess::XmlGuiConfig currentCfg_;
 
     //used when saving configuration
-    std::vector<Zstring> activeConfigFiles; //name of currently loaded config file (may be more than 1)
+    std::vector<Zstring> activeConfigFiles_; //name of currently loaded config file (may be more than 1)
 
-    xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
+    xmlAccess::XmlGuiConfig lastConfigurationSaved_; //support for: "Save changed configuration?" dialog
 
     static Zstring getLastRunConfigPath();
     const Zstring lastRunConfigPath_; //let's not use another static...
     //-------------------------------------
 
     //UI view of FolderComparison structure (partially owns folderCmp)
-    std::shared_ptr<zen::GridView> gridDataView; //always bound!
-    std::shared_ptr<zen::TreeView> treeDataView; //
+    std::shared_ptr<zen::GridView> gridDataView_; //always bound!
+    std::shared_ptr<zen::TreeView> treeDataView_; //
 
     //the prime data structure of this tool *bling*:
-    zen::FolderComparison folderCmp; //optional!: sync button not available if empty
+    zen::FolderComparison folderCmp_; //optional!: sync button not available if empty
 
     //folder pairs:
-    std::unique_ptr<FolderPairFirst> firstFolderPair; //always bound!!!
-    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the first pair
+    std::unique_ptr<FolderPairFirst> firstFolderPair_; //always bound!!!
+    std::vector<FolderPairPanel*> additionalFolderPairs_; //additional pairs to the first pair
     //-------------------------------------
 
     //***********************************************
     //status information
-    std::list<wxString> oldStatusMsgs; //the first one is the original/non-flash status message
+    std::list<wxString> oldStatusMsgs_; //the first one is the original/non-flash status message
 
     //compare status panel (hidden on start, shown when comparing)
-    std::unique_ptr<CompareProgressDialog> compareStatus; //always bound
+    std::unique_ptr<CompareProgressDialog> compareStatus_; //always bound
 
     //toggle to display configuration preview instead of comparison result:
     //for read access use: m_bpButtonViewTypeSyncAction->isActive()
     //when changing value use:
     void setViewTypeSyncAction(bool value);
 
-    wxAuiManager auiMgr; //implement dockable GUI design
+    wxAuiManager auiMgr_; //implement dockable GUI design
 
-    wxString defaultPerspective;
+    wxString defaultPerspective_;
 
-    int64_t manualTimeSpanFrom = 0;
-    int64_t manualTimeSpanTo   = 0; //buffer manual time span selection at session level
+    time_t manualTimeSpanFrom_ = 0;
+    time_t manualTimeSpanTo_   = 0; //buffer manual time span selection at session level
 
-    std::shared_ptr<FolderHistory> folderHistoryLeft  = std::make_shared<FolderHistory>();  //shared by all wxComboBox dropdown controls
-    std::shared_ptr<FolderHistory> folderHistoryRight = std::make_shared<FolderHistory>(); //always bound!
+    std::shared_ptr<FolderHistory> folderHistoryLeft_  = std::make_shared<FolderHistory>();  //shared by all wxComboBox dropdown controls
+    std::shared_ptr<FolderHistory> folderHistoryRight_ = std::make_shared<FolderHistory>(); //always bound!
 
-    zen::AsyncGuiQueue guiQueue; //schedule and run long-running tasks asynchronously, but process results on GUI queue
+    zen::AsyncGuiQueue guiQueue_; //schedule and run long-running tasks asynchronously, but process results on GUI queue
 
-    std::unique_ptr<zen::FilterConfig> filterCfgOnClipboard; //copy/paste of filter config
+    std::unique_ptr<zen::FilterConfig> filterCfgOnClipboard_; //copy/paste of filter config
 
-    wxWindow* focusWindowAfterSearch = nullptr; //used to restore focus after search panel is closed
+    wxWindow* focusWindowAfterSearch_ = nullptr; //used to restore focus after search panel is closed
 
-    bool localKeyEventsEnabled = true;
+    bool localKeyEventsEnabled_ = true;
 
-    zen::TempFileBuffer tempFileBuf; //buffer temporary copies of non-native files for %local_path%
+    zen::TempFileBuffer tempFileBuf_; //buffer temporary copies of non-native files for %local_path%
 };
 
 #endif //MAIN_DLG_H_8910481324545644545

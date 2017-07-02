@@ -15,6 +15,7 @@
 #include "file_id_def.h"
 #include "file_io.h"
 #include "crc.h"
+#include "guid.h"
 
     #include <sys/vfs.h> //statfs
     #include <sys/time.h> //lutimes
@@ -315,7 +316,7 @@ void renameFile_sub(const Zstring& pathSource, const Zstring& pathTarget) //thro
     if (!equalFilePath(pathSource, pathTarget)) //exception for OS X: changing file name case is not an "already exists" situation!
     {
         bool alreadyExists = true;
-        try {  /*ItemType type = */getItemType(pathTarget); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; }
+        try { /*ItemType type = */getItemType(pathTarget); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; }
 
         if (alreadyExists)
             throwException(EEXIST);
@@ -408,7 +409,7 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
 }
 
 
-void zen::setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl) //throw FileError
+void zen::setFileTime(const Zstring& filePath, time_t modTime, ProcSymlink procSl) //throw FileError
 {
     struct ::timespec writeTime = {};
     writeTime.tv_sec = modTime;
@@ -470,10 +471,11 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write security context of %x."), L"%x", fmtPath(target)), L"setfilecon");
 }
 #endif
+}
 
 
 //copy permissions for files, directories or symbolic links: requires admin rights
-void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, ProcSymlink procSl) //throw FileError
+void zen::copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, ProcSymlink procSl) //throw FileError
 {
 
 #ifdef HAVE_SELINUX  //copy SELinux security context
@@ -507,6 +509,24 @@ void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, P
     }
 
 }
+
+
+void zen::createDirectory(const Zstring& dirPath) //throw FileError, ErrorTargetExisting
+{
+    const mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO; //0777, default for newly created directories
+
+	if (::mkdir(dirPath.c_str(), mode) != 0)
+    {
+        const int lastError = errno; //copy before directly or indirectly making other system calls!
+        const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtPath(dirPath));
+        const std::wstring errorDescr = formatSystemError(L"mkdir", lastError);
+
+        if (lastError == EEXIST)
+            throw ErrorTargetExisting(errorMsg, errorDescr);
+        //else if (lastError == ENOENT)
+        //    throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        throw FileError(errorMsg, errorDescr);
+    }
 }
 
 
@@ -517,7 +537,7 @@ void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw File
 
     try
     {
-        copyNewDirectory(Zstring(), dirPath, false /*copyFilePermissions*/); //throw FileError, ErrorTargetExisting
+		createDirectory(dirPath); //throw FileError, ErrorTargetExisting
     }
     catch (FileError&)
     {
@@ -525,13 +545,15 @@ void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw File
         try { pd = getPathStatus(dirPath); /*throw FileError*/ }
         catch (FileError&) {} //previous exception is more relevant
 
-        if (pd && pd->existingType != ItemType::FILE)
+        if (pd &&
+            pd->existingType != ItemType::FILE &&
+            pd->relPath.size() != 1) //don't repeat the very same createDirectory() call from above!
         {
             Zstring intermediatePath = pd->existingPath;
             for (const Zstring& itemName : pd->relPath)
             {
                 intermediatePath = appendSeparator(intermediatePath) + itemName;
-                copyNewDirectory(Zstring(), intermediatePath, false /*copyFilePermissions*/); //throw FileError, (ErrorTargetExisting)
+                createDirectory(intermediatePath); //throw FileError, (ErrorTargetExisting)
             }
             return;
         }
@@ -540,44 +562,8 @@ void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw File
 }
 
 
-//source path is optional (may be empty)
-void zen::copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, //throw FileError, ErrorTargetExisting
-                           bool copyFilePermissions)
+void zen::tryCopyDirectoryAttributes(const Zstring& sourcePath, const Zstring& targetPath) //throw FileError
 {
-    mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO; //0777, default for newly created directories
-
-    struct ::stat dirInfo = {};
-    if (!sourcePath.empty())
-        if (::stat(sourcePath.c_str(), &dirInfo) == 0)
-        {
-            mode = dirInfo.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO); //analog to "cp" which copies "mode" (considering umask) by default
-            mode |= S_IRWXU; //FFS only: we need full access to copy child items! "cp" seems to apply permissions *after* copying child items
-        }
-    //=> need copyItemPermissions() only for "chown" and umask-agnostic permissions
-
-    if (::mkdir(targetPath.c_str(), mode) != 0)
-    {
-        const int lastError = errno; //copy before directly or indirectly making other system calls!
-        const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtPath(targetPath));
-        const std::wstring errorDescr = formatSystemError(L"mkdir", lastError);
-
-        if (lastError == EEXIST)
-            throw ErrorTargetExisting(errorMsg, errorDescr);
-        //else if (lastError == ENOENT)
-        //    throw ErrorTargetPathMissing(errorMsg, errorDescr);
-        throw FileError(errorMsg, errorDescr);
-    }
-
-    if (!sourcePath.empty())
-    {
-
-        ZEN_ON_SCOPE_FAIL(try { removeDirectoryPlain(targetPath); }
-        catch (FileError&) {});   //ensure cleanup:
-
-        //enforce copying file permissions: it's advertized on GUI...
-        if (copyFilePermissions)
-            copyItemPermissions(sourcePath, targetPath, ProcSymlink::FOLLOW); //throw FileError
-    }
 }
 
 

@@ -8,6 +8,8 @@
 #include <tuple>
 #include <zen/process_priority.h>
 #include <zen/perf.h>
+#include <zen/guid.h>
+#include <zen/crc.h>
 #include "algorithm.h"
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
@@ -722,6 +724,7 @@ private:
         procCallback_.reportInfo(replaceCpy(replaceCpy(rawText, L"%x", L"\n" + fmtPath(displayPath1)), L"%y", L"\n" + fmtPath(displayPath2)));
     }
 
+    //target existing after onDeleteTargetFile(): undefined behavior! (fail/overwrite/auto-rename)
     AFS::FileCopyResult copyFileWithCallback(const FileDescriptor& sourceDescr, //throw FileError
                                              const AbstractPath& targetPath,
                                              const std::function<void()>& onDeleteTargetFile,
@@ -800,35 +803,24 @@ template <SelectedSide side>
 void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
                                              FilePair& targetObj) //throw FileError
 {
-    Zstring sourceRelPathTmp = sourceObj.getItemName<side>() + AFS::TEMP_FILE_ENDING;
+    //generate (hopefully) unique file name to avoid clashing with some remnant ffs_tmp file
+    const Zstring shortGuid = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(getCrc16(generateGUID())));
+    const Zstring fileName = sourceObj.getItemName<side>();
+    auto it = find_last(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
+
+    const Zstring sourceRelPathTmp = Zstring(fileName.begin(), it) + Zchar('.') + shortGuid + AFS::TEMP_FILE_ENDING;
+    //-------------------------------------------------------------------------------------------
     //this could still lead to a name-clash in obscure cases, if some file exists on the other side with
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
-    //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
-    for (int i = 0;; ++i)
-    {
-        const AbstractPath sourcePathTmp = AFS::appendRelPath(sourceObj.base().getAbstractPath<side>(), sourceRelPathTmp);
-        try
-        {
-            reportInfo(txtMovingFile,
-                       AFS::getDisplayPath(sourceObj.getAbstractPath<side>()),
-                       AFS::getDisplayPath(sourcePathTmp));
+    //good news: even in this pathologic case, this may only prevent the copy of the other file, but not this move
 
-            AFS::renameItem(sourceObj.getAbstractPath<side>(), sourcePathTmp); //throw FileError, (ErrorDifferentVolume)
-            break;
-        }
-        catch (FileError&) //repeat until unique name found: no file system race condition!
-        {
-            if (i == 10) throw; //avoid endless recursion in pathological cases
+    const AbstractPath sourcePathTmp = AFS::appendRelPath(sourceObj.base().getAbstractPath<side>(), sourceRelPathTmp);
 
-            bool alreadyExists = true;
-            try {  /*ItemType type =*/ AFS::getItemType(sourcePathTmp); } /*throw FileError*/ catch (FileError&) { alreadyExists = false; } //previous exception is more relevant
+    reportInfo(txtMovingFile,
+               AFS::getDisplayPath(sourceObj.getAbstractPath<side>()),
+               AFS::getDisplayPath(sourcePathTmp));
 
-            if (!alreadyExists)
-                throw;
-
-            sourceRelPathTmp = sourceObj.getItemName<side>() + Zchar('_') + numberTo<Zstring>(i) + AFS::TEMP_FILE_ENDING;
-        }
-    }
+    AFS::renameItem(sourceObj.getAbstractPath<side>(), sourcePathTmp); //throw FileError, (ErrorDifferentVolume)
 
     //TODO: prepare2StepMove: consider ErrorDifferentVolume! e.g. symlink aliasing!
 
@@ -1172,7 +1164,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
 
                 const AFS::FileCopyResult result = copyFileWithCallback({ file.getAbstractPath<sideSrc>(), file.getAttributes<sideSrc>() },
                                                                         targetPath,
-                                                                        nullptr, //no target to delete
+                                                                        nullptr, //onDeleteTargetFile: nothing to delete; if existing: undefined behavior! (fail/overwrite/auto-rename)
                                                                         notifyUnbufferedIO); //throw FileError
                 if (result.errorModTime)
                     errorsModTime_.push_back(*result.errorModTime); //show all warnings later as a single message
@@ -1535,6 +1527,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(FolderPair& folder, SyncOperati
                 StatisticsReporter statReporter(1, 0, procCallback_);
                 try
                 {
+                    //target existing: undefined behavior! (fail/overwrite)
                     AFS::copyNewFolder(folder.getAbstractPath<sideSrc>(), targetPath, copyFilePermissions_); //throw FileError
                 }
                 catch (FileError&)
@@ -1665,6 +1658,7 @@ AFS::FileCopyResult SynchronizeFolderPair::copyFileWithCallback(const FileDescri
 
     auto copyOperation = [this, &sourceAttr, &targetPath, &onDeleteTargetFile, &notifyUnbufferedIO](const AbstractPath& sourcePathTmp)
     {
+        //target existing after onDeleteTargetFile(): undefined behavior! (fail/overwrite/auto-rename)
         const AFS::FileCopyResult result = AFS::copyFileTransactional(sourcePathTmp, sourceAttr, //throw FileError, ErrorFileLocked
                                                                       targetPath,
                                                                       copyFilePermissions_,
@@ -1745,7 +1739,7 @@ bool createBaseFolder(BaseFolderPair& baseFolder, int folderAccessTimeout, Proce
                 callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtPath(AFS::getDisplayPath(baseFolderPath))));
                 temporaryNetworkDrop = true;
 
-                //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
+                //Is it possible we're catching a "false positive" here, could FFS have created the directory indirectly after comparison?
                 //  1. deletion handling: recycler       -> no, temp directory created only at first deletion
                 //  2. deletion handling: versioning     -> "
                 //  3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
@@ -1766,7 +1760,7 @@ enum class FolderPairJobType
 }
 
 
-void zen::synchronize(const TimeComp& timeStamp,
+void zen::synchronize(const std::chrono::system_clock::time_point& syncStartTime,
                       bool verifyCopiedFiles,
                       bool copyLockedFiles,
                       bool copyFilePermissions,
@@ -2180,6 +2174,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                     return folderPairCfg.handleDeletion;
                 };
 
+                const TimeComp timeStamp = getLocalTime(std::chrono::system_clock::to_time_t(syncStartTime));
 
                 DeletionHandling delHandlerL(baseFolder.getAbstractPath<LEFT_SIDE>(),
                                              getEffectiveDeletionPolicy(baseFolder.getAbstractPath<LEFT_SIDE>()),

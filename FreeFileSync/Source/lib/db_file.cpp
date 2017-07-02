@@ -6,6 +6,7 @@
 
 #include "db_file.h"
 #include <zen/guid.h>
+#include <zen/crc.h>
 #include <wx+/zlib_wrap.h>
 
 
@@ -39,11 +40,18 @@ AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile
 {
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
     //precomposed/decomposed UTF? are UTC file times really compatible? what about endianess!?
-    //however 32 and 64 bit db files *are* designed to be binary compatible!
+    //however 32 and 64-bit FreeFileSync are designed to produce binary-identical db files!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
     const Zstring dbName = Zstr(".sync"); //files beginning with dots are hidden e.g. in Nautilus
-    const Zstring dbFileName = dbName + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
+    Zstring dbFileName;
+    if (tempfile) //generate (hopefully) unique file name to avoid clashing with some remnant ffs_tmp file
+    {
+        const Zstring shortGuid = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(getCrc16(generateGUID())));
+        dbFileName = dbName + Zchar('.') + shortGuid + AFS::TEMP_FILE_ENDING;
+    }
+    else
+        dbFileName = dbName + SYNC_DB_FILE_ENDING;
 
     return AFS::appendRelPath(baseFolder.getAbstractPath<side>(), dbFileName);
 }
@@ -52,7 +60,7 @@ AbstractPath getDatabaseFilePath(const BaseFolderPair& baseFolder, bool tempfile
 
 void saveStreams(const DbStreams& streamList, const AbstractPath& dbPath, const IOCallback& notifyUnbufferedIO) //throw FileError
 {
-    const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath, //throw FileError, ErrorTargetExisting
+    const std::unique_ptr<AFS::OutputStream> fileStreamOut = AFS::getOutputStream(dbPath, //throw FileError
                                                                                   nullptr /*streamSize*/,
                                                                                   notifyUnbufferedIO /*throw X*/);
     //write FreeFileSync file identifier
@@ -858,8 +866,8 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
     const AbstractPath dbPathLeft  = getDatabaseFilePath< LEFT_SIDE>(baseFolder);
     const AbstractPath dbPathRight = getDatabaseFilePath<RIGHT_SIDE>(baseFolder);
 
-    const AbstractPath dbPathLeftTmp  = getDatabaseFilePath< LEFT_SIDE>(baseFolder, true);
-    const AbstractPath dbPathRightTmp = getDatabaseFilePath<RIGHT_SIDE>(baseFolder, true);
+    const AbstractPath dbPathLeftTmp  = getDatabaseFilePath< LEFT_SIDE>(baseFolder, true /*tempfile*/);
+    const AbstractPath dbPathRightTmp = getDatabaseFilePath<RIGHT_SIDE>(baseFolder, true /*tempfile*/);
 
     StreamStatusNotifier notifyLoadL(replaceCpy(_("Loading file %x..."), L"%x", fmtPath(AFS::getDisplayPath(dbPathLeft) )), notifyStatus);
     StreamStatusNotifier notifyLoadR(replaceCpy(_("Loading file %x..."), L"%x", fmtPath(AFS::getDisplayPath(dbPathRight))), notifyStatus);
@@ -932,10 +940,6 @@ void zen::saveLastSynchronousState(const BaseFolderPair& baseFolder, const std::
 
     streamsLeft [sessionID] = std::move(sessionDataL);
     streamsRight[sessionID] = std::move(sessionDataR);
-
-    //delete old tmp file, if necessary -> throws if deletion fails!
-    AFS::removeFileIfExists(dbPathLeftTmp);  //
-    AFS::removeFileIfExists(dbPathRightTmp); //throw FileError
 
     //write (temp-) files as a transaction
     saveStreams(streamsLeft,  dbPathLeftTmp,  notifySaveL); //throw FileError

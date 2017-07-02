@@ -17,19 +17,19 @@ const Zchar SYNC_DB_FILE_ENDING[] = Zstr(".ffs_db"); //don't use Zstring as glob
 
 struct InSyncDescrFile //subset of FileAttributes
 {
-    InSyncDescrFile(int64_t modTimeIn, const AFS::FileId& idIn) :
+    InSyncDescrFile(time_t modTimeIn, const AFS::FileId& idIn) :
         modTime(modTimeIn),
         fileId(idIn) {}
 
-    int64_t modTime;
+    time_t modTime;
     AFS::FileId fileId; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
 };
 
 struct InSyncDescrLink
 {
-    explicit InSyncDescrLink(int64_t modTimeIn) : modTime(modTimeIn) {}
+    explicit InSyncDescrLink(time_t modTimeIn) : modTime(modTimeIn) {}
 
-    int64_t modTime;
+    time_t modTime;
 };
 
 

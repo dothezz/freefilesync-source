@@ -1230,17 +1230,17 @@ public:
     void notifyProgressChange() override;
     void updateGui           () override { updateGuiInt(true); }
 
-    Zstring getExecWhenFinishedCommand() const override { return pnl.m_comboBoxOnCompletion->getValue(); }
+    Zstring getExecWhenFinishedCommand() const override { return pnl_.m_comboBoxOnCompletion->getValue(); }
 
     void stopTimer() override //halt all internal counters!
     {
         //pnl.m_animCtrlSyncing->Stop();
-        timeElapsed.pause();
+        timeElapsed_.pause();
     }
     void resumeTimer() override
     {
         //pnl.m_animCtrlSyncing->Play();
-        timeElapsed.resume();
+        timeElapsed_.resume();
     }
 
 private:
@@ -1260,30 +1260,30 @@ private:
     void updateDialogStatus();
     void setExternalStatus(const wxString& status, const wxString& progress); //progress may be empty!
 
-    SyncProgressPanelGenerated& pnl; //wxPanel containing the GUI controls of *this
+    SyncProgressPanelGenerated& pnl_; //wxPanel containing the GUI controls of *this
 
     const wxString jobName_;
     const Zstring soundFileSyncComplete_;
-    StopWatch timeElapsed;
+    StopWatch timeElapsed_;
 
     wxFrame* parentFrame_; //optional
 
     std::function<void()> notifyWindowTerminate_; //call once in OnClose(), NOT in destructor which is called far too late somewhere in wxWidgets main loop!
 
-    bool wereDead = false; //set after wxWindow::Delete(), which equals "delete this" on OS X!
+    bool wereDead_ = false; //set after wxWindow::Delete(), which equals "delete this" on OS X!
 
     //status variables
     const Statistics* syncStat_;                  //
     AbortCallback*    abortCb_;                   //valid only while sync is running
     bool paused_ = false; //valid only while sync is running
-    SyncResult finalResult = RESULT_ABORTED; //set after sync
+    SyncResult finalResult_ = RESULT_ABORTED; //set after sync
 
     //remaining time
-    std::unique_ptr<PerfCheck> perf;
-    int64_t timeLastSpeedEstimateMs = -1000000; //used for calculating intervals between collecting perf samples
+    std::unique_ptr<PerfCheck> perf_;
+    int64_t timeLastSpeedEstimateMs_ = -1000000; //used for calculating intervals between collecting perf samples
 
     //help calculate total speed
-    int64_t phaseStartMs = 0; //begin of current phase in [ms]
+    int64_t phaseStartMs_ = 0; //begin of current phase in [ms]
 
     std::shared_ptr<CurveDataStatistics   > curveDataBytes       { std::make_shared<CurveDataStatistics>() };
     std::shared_ptr<CurveDataStatistics   > curveDataItems       { std::make_shared<CurveDataStatistics>() };
@@ -1292,8 +1292,8 @@ private:
     std::shared_ptr<CurveDataRectangleArea> curveDataBytesTotal  { std::make_shared<CurveDataRectangleArea>() };
     std::shared_ptr<CurveDataRectangleArea> curveDataItemsTotal  { std::make_shared<CurveDataRectangleArea>() };
 
-    wxString parentFrameTitleBackup;
-    std::unique_ptr<FfsTrayIcon> trayIcon; //optional: if filled all other windows should be hidden and conversely
+    wxString parentFrameTitleBackup_;
+    std::unique_ptr<FfsTrayIcon> trayIcon_; //optional: if filled all other windows should be hidden and conversely
     std::unique_ptr<Taskbar> taskbar_;
 };
 
@@ -1311,7 +1311,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
                                                                const Zstring& onCompletion,
                                                                std::vector<Zstring>& onCompletionHistory) :
     TopLevelDialog(parentFrame, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, style), //title is overwritten anyway in setExternalStatus()
-    pnl(*new SyncProgressPanelGenerated(this)), //ownership passed to "this"
+    pnl_(*new SyncProgressPanelGenerated(this)), //ownership passed to "this"
     jobName_  (jobName),
     soundFileSyncComplete_(soundFileSyncComplete),
     parentFrame_(parentFrame),
@@ -1326,32 +1326,32 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     //finish construction of this dialog:
     this->SetMinSize(wxSize(470, 280)); //== minimum size! no idea why SetMinSize() is not used...
     wxBoxSizer* bSizer170 = new wxBoxSizer(wxVERTICAL);
-    bSizer170->Add(&pnl, 1, wxEXPAND);
+    bSizer170->Add(&pnl_, 1, wxEXPAND);
     this->SetSizer(bSizer170); //pass ownership
 
     //lifetime of event sources is subset of this instance's lifetime => no wxEvtHandler::Disconnect() needed
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler  (SyncProgressDialogImpl<TopLevelDialog>::OnClose));
     this->Connect(wxEVT_ICONIZE,      wxIconizeEventHandler(SyncProgressDialogImpl<TopLevelDialog>::OnIconize));
     this->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressed), nullptr, this);
-    pnl.m_buttonClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnOkay  ), NULL, this);
-    pnl.m_buttonPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnPause ), NULL, this);
-    pnl.m_buttonStop ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnCancel), NULL, this);
-    pnl.m_bpButtonMinimizeToTray->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnMinimizeToTray), NULL, this);
+    pnl_.m_buttonClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnOkay  ), NULL, this);
+    pnl_.m_buttonPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnPause ), NULL, this);
+    pnl_.m_buttonStop ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnCancel), NULL, this);
+    pnl_.m_bpButtonMinimizeToTray->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnMinimizeToTray), NULL, this);
 
 
-    assert(pnl.m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
+    assert(pnl_.m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
-    setRelativeFontSize(*pnl.m_staticTextPhase, 1.5);
+    setRelativeFontSize(*pnl_.m_staticTextPhase, 1.5);
 
     if (parentFrame_)
-        parentFrameTitleBackup = parentFrame_->GetTitle(); //save old title (will be used as progress indicator)
+        parentFrameTitleBackup_ = parentFrame_->GetTitle(); //save old title (will be used as progress indicator)
 
     //pnl.m_animCtrlSyncing->SetAnimation(getResourceAnimation(L"working"));
     //pnl.m_animCtrlSyncing->Play();
 
     this->EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
 
-    timeElapsed.restart(); //measure total time
+    timeElapsed_.restart(); //measure total time
 
     if (wxFrame* frame = getTaskbarFrame(*this))
         try //try to get access to Windows 7/Ubuntu taskbar
@@ -1361,37 +1361,37 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
         catch (const TaskbarNotAvailable&) {}
 
     //hide "processed" statistics until end of process
-    pnl.m_notebookResult     ->Hide();
-    pnl.m_panelItemsProcessed->Hide();
-    pnl.m_buttonClose        ->Show(false);
+    pnl_.m_notebookResult     ->Hide();
+    pnl_.m_panelItemsProcessed->Hide();
+    pnl_.m_buttonClose        ->Show(false);
     //set std order after button visibility was set
-    setStandardButtonLayout(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonPause).setCancel(pnl.m_buttonStop));
+    setStandardButtonLayout(*pnl_.bSizerStdButtons, StdButtons().setAffirmative(pnl_.m_buttonPause).setCancel(pnl_.m_buttonStop));
 
-    pnl.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
+    pnl_.m_bpButtonMinimizeToTray->SetBitmapLabel(getResourceImage(L"minimize_to_tray"));
 
     //init graph
     const int xLabelHeight = this->GetCharHeight() + 2 * 1 /*border*/; //use same height for both graphs to make sure they stretch evenly
     const int yLabelWidth  = 70;
-    pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().
-                                         setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
-                                         setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterBytes>()).
-                                         setBackgroundColor(wxColor(208, 208, 208)). //light grey
-                                         setSelectionMode(Graph2D::SELECT_NONE));
+    pnl_.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().
+                                          setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
+                                          setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterBytes>()).
+                                          setBackgroundColor(wxColor(208, 208, 208)). //light grey
+                                          setSelectionMode(Graph2D::SELECT_NONE));
 
-    pnl.m_panelGraphItems->setAttributes(Graph2D::MainAttributes().
-                                         setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(false)).
-                                         setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterItemCount>()).
-                                         setBackgroundColor(wxColor(208, 208, 208)). //light grey
-                                         setSelectionMode(Graph2D::SELECT_NONE));
+    pnl_.m_panelGraphItems->setAttributes(Graph2D::MainAttributes().
+                                          setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(false)).
+                                          setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterItemCount>()).
+                                          setBackgroundColor(wxColor(208, 208, 208)). //light grey
+                                          setSelectionMode(Graph2D::SELECT_NONE));
 
-    pnl.m_panelGraphBytes->setCurve(curveDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
-    pnl.m_panelGraphItems->setCurve(curveDataItemsTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
+    pnl_.m_panelGraphBytes->setCurve(curveDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
+    pnl_.m_panelGraphItems->setCurve(curveDataItemsTotal, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(*wxWHITE).setColor(wxColor(192, 192, 192))); //medium grey
 
-    pnl.m_panelGraphBytes->addCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorBytesBackground()).setColor(getColorBytesBackgroundRim()));
-    pnl.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorItemsBackground()).setColor(getColorItemsBackgroundRim()));
+    pnl_.m_panelGraphBytes->addCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorBytesBackground()).setColor(getColorBytesBackgroundRim()));
+    pnl_.m_panelGraphItems->addCurve(curveDataItemsCurrent, Graph2D::CurveAttributes().setLineWidth(1).fillCurveArea(getColorItemsBackground()).setColor(getColorItemsBackgroundRim()));
 
-    pnl.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorBytes()).setColor(getColorBytesRim()));
-    pnl.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorItems()).setColor(getColorItemsRim()));
+    pnl_.m_panelGraphBytes->addCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorBytes()).setColor(getColorBytesRim()));
+    pnl_.m_panelGraphItems->addCurve(curveDataItems, Graph2D::CurveAttributes().setLineWidth(2).fillCurveArea(getColorItems()).setColor(getColorItemsRim()));
 
     //graph legend:
     auto generateSquareBitmap = [&](const wxColor& fillCol, const wxColor& borderCol)
@@ -1405,23 +1405,23 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
         }
         return bmpSquare;
     };
-    pnl.m_bitmapGraphKeyBytes->SetBitmap(generateSquareBitmap(getColorBytes(), getColorBytesRim()));
-    pnl.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(getColorItems(), getColorItemsRim()));
+    pnl_.m_bitmapGraphKeyBytes->SetBitmap(generateSquareBitmap(getColorBytes(), getColorBytesRim()));
+    pnl_.m_bitmapGraphKeyItems->SetBitmap(generateSquareBitmap(getColorItems(), getColorItemsRim()));
 
     //allow changing the "on completion" command
-    pnl.m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later
-    pnl.m_comboBoxOnCompletion->setValue(onCompletion);
+    pnl_.m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistory.size()); //-> we won't use addItemHistory() later
+    pnl_.m_comboBoxOnCompletion->setValue(onCompletion);
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks
 
     this->GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
-    pnl.Layout();
+    pnl_.Layout();
     this->Center(); //call *after* dialog layout update and *before* wxWindow::Show()!
 
     if (showProgress)
     {
         this->Show();
-        pnl.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
+        pnl_.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
 
         //clear gui flicker, remove dummy texts: window must be visible to make this work!
         updateGuiInt(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
@@ -1436,7 +1436,7 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
 {
     if (parentFrame_)
     {
-        parentFrame_->SetTitle(parentFrameTitleBackup); //restore title text
+        parentFrame_->SetTitle(parentFrameTitleBackup_); //restore title text
 
         //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
         parentFrame_->Show();
@@ -1457,15 +1457,15 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnKeyPressed(wxKeyEvent& event)
         wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
 
         //simulate click on abort button
-        if (pnl.m_buttonStop->IsShown()) //delegate to "cancel" button if available
+        if (pnl_.m_buttonStop->IsShown()) //delegate to "cancel" button if available
         {
-            if (wxEvtHandler* handler = pnl.m_buttonStop->GetEventHandler())
+            if (wxEvtHandler* handler = pnl_.m_buttonStop->GetEventHandler())
                 handler->ProcessEvent(dummy);
             return;
         }
-        else if (pnl.m_buttonClose->IsShown())
+        else if (pnl_.m_buttonClose->IsShown())
         {
-            if (wxEvtHandler* handler = pnl.m_buttonClose->GetEventHandler())
+            if (wxEvtHandler* handler = pnl_.m_buttonClose->GetEventHandler())
                 handler->ProcessEvent(dummy);
             return;
         }
@@ -1491,10 +1491,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
     notifyProgressChange(); //make sure graphs get initial values
 
     //start new measurement
-    perf = std::make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
-    timeLastSpeedEstimateMs = -1000000; //some big number
+    perf_ = std::make_unique<PerfCheck>(WINDOW_REMAINING_TIME_MS, WINDOW_BYTES_PER_SEC);
+    timeLastSpeedEstimateMs_ = -1000000; //some big number
 
-    phaseStartMs = timeElapsed.timeMs();
+    phaseStartMs_ = timeElapsed_.timeMs();
 
     updateGuiInt(false /*allowYield*/);
 }
@@ -1516,8 +1516,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::notifyProgressChange() //noexcept!
                 const int64_t bytesCurrent = syncStat_->getBytesCurrent(syncStat_->currentPhase());
                 const int     itemsCurrent = syncStat_->getItemsCurrent(syncStat_->currentPhase());
 
-                curveDataBytes->addRecord(timeElapsed.timeMs(), bytesCurrent);
-                curveDataItems->addRecord(timeElapsed.timeMs(), itemsCurrent);
+                curveDataBytes->addRecord(timeElapsed_.timeMs(), bytesCurrent);
+                curveDataItems->addRecord(timeElapsed_.timeMs(), itemsCurrent);
             }
             break;
         }
@@ -1543,8 +1543,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::setExternalStatus(const wxString& s
         title += L" - \"" + jobName_ + L"\"";
 
     //systray tooltip, if window is minimized
-    if (trayIcon.get())
-        trayIcon->setToolTip(systrayTooltip);
+    if (trayIcon_.get())
+        trayIcon_->setToolTip(systrayTooltip);
 
     //show text in dialog title (and at the same time in taskbar)
     if (parentFrame_)
@@ -1564,31 +1564,31 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         return;
 
     bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
-    const int64_t timeNowMs = timeElapsed.timeMs();
+    const int64_t timeNowMs = timeElapsed_.timeMs();
 
     //sync status text
-    setText(*pnl.m_staticTextStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
+    setText(*pnl_.m_staticTextStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
 
     switch (syncStat_->currentPhase()) //no matter if paused or not
     {
         case ProcessCallback::PHASE_NONE:
         case ProcessCallback::PHASE_SCANNING:
             //dialog caption, taskbar, systray tooltip
-            setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult), toGuiString(syncStat_->getItemsCurrent(ProcessCallback::PHASE_SCANNING))); //status text may be "paused"!
+            setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult_), toGuiString(syncStat_->getItemsCurrent(ProcessCallback::PHASE_SCANNING))); //status text may be "paused"!
 
             //progress indicators
-            if (trayIcon.get()) trayIcon->setProgress(1); //100% = regular FFS logo
+            if (trayIcon_.get()) trayIcon_->setProgress(1); //100% = regular FFS logo
 
             //ignore graphs: should already have been cleared in initNewPhase()
 
             //remaining objects and data
-            setText(*pnl.m_staticTextItemsRemaining, L"-", &layoutChanged);
-            setText(*pnl.m_staticTextBytesRemaining, L"", &layoutChanged);
+            setText(*pnl_.m_staticTextItemsRemaining, L"-", &layoutChanged);
+            setText(*pnl_.m_staticTextBytesRemaining, L"", &layoutChanged);
 
             //remaining time and speed
-            setText(*pnl.m_staticTextTimeRemaining, L"-", &layoutChanged);
-            pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setCornerText(wxString(), Graph2D::CORNER_TOP_LEFT));
-            pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setCornerText(wxString(), Graph2D::CORNER_TOP_LEFT));
+            setText(*pnl_.m_staticTextTimeRemaining, L"-", &layoutChanged);
+            pnl_.m_panelGraphBytes->setAttributes(pnl_.m_panelGraphBytes->getAttributes().setCornerText(wxString(), Graph2D::CORNER_TOP_LEFT));
+            pnl_.m_panelGraphItems->setAttributes(pnl_.m_panelGraphItems->getAttributes().setCornerText(wxString(), Graph2D::CORNER_TOP_LEFT));
             break;
 
         case ProcessCallback::PHASE_COMPARING_CONTENT:
@@ -1604,10 +1604,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             //----------------------------------------------------------------------------------------------------
 
             //dialog caption, taskbar, systray tooltip
-            setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult), fractionToString(fractionTotal)); //status text may be "paused"!
+            setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult_), fractionToString(fractionTotal)); //status text may be "paused"!
 
             //progress indicators
-            if (trayIcon.get()) trayIcon->setProgress(fractionTotal);
+            if (trayIcon_.get()) trayIcon_->setProgress(fractionTotal);
             if (taskbar_.get()) taskbar_->setProgress(fractionTotal);
 
             //constant line graph
@@ -1625,30 +1625,30 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             curveDataItems->addRecord(timeNowMs, itemsCurrent);
 
             //remaining item and byte count
-            setText(*pnl.m_staticTextItemsRemaining, toGuiString(itemsTotal - itemsCurrent), &layoutChanged);
-            setText(*pnl.m_staticTextBytesRemaining, L"(" + filesizeToShortString(bytesTotal - bytesCurrent) + L")", &layoutChanged);
+            setText(*pnl_.m_staticTextItemsRemaining, toGuiString(itemsTotal - itemsCurrent), &layoutChanged);
+            setText(*pnl_.m_staticTextBytesRemaining, L"(" + filesizeToShortString(bytesTotal - bytesCurrent) + L")", &layoutChanged);
             //it's possible data remaining becomes shortly negative if last file synced has ADS data and the bytesTotal was not yet corrected!
 
             //remaining time and speed
-            assert(perf);
-            if (perf)
-                if (numeric::dist(timeLastSpeedEstimateMs, timeNowMs) >= 500)
+            assert(perf_);
+            if (perf_)
+                if (numeric::dist(timeLastSpeedEstimateMs_, timeNowMs) >= 500)
                 {
-                    timeLastSpeedEstimateMs = timeNowMs;
+                    timeLastSpeedEstimateMs_ = timeNowMs;
 
-                    if (numeric::dist(phaseStartMs, timeNowMs) >= 1000) //discard stats for first second: probably messy
-                        perf->addSample(itemsCurrent, bytesCurrent, timeNowMs);
+                    if (numeric::dist(phaseStartMs_, timeNowMs) >= 1000) //discard stats for first second: probably messy
+                        perf_->addSample(itemsCurrent, bytesCurrent, timeNowMs);
 
                     //current speed -> Win 7 copy uses 1 sec update interval instead
-                    Opt<std::wstring> bps = perf->getBytesPerSecond();
-                    Opt<std::wstring> ips = perf->getItemsPerSecond();
-                    pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setCornerText(bps ? *bps : L"", Graph2D::CORNER_TOP_LEFT));
-                    pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setCornerText(ips ? *ips : L"", Graph2D::CORNER_TOP_LEFT));
+                    Opt<std::wstring> bps = perf_->getBytesPerSecond();
+                    Opt<std::wstring> ips = perf_->getItemsPerSecond();
+                    pnl_.m_panelGraphBytes->setAttributes(pnl_.m_panelGraphBytes->getAttributes().setCornerText(bps ? *bps : L"", Graph2D::CORNER_TOP_LEFT));
+                    pnl_.m_panelGraphItems->setAttributes(pnl_.m_panelGraphItems->getAttributes().setCornerText(ips ? *ips : L"", Graph2D::CORNER_TOP_LEFT));
 
                     //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
                     //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
-                    Opt<double> remTimeSec = perf->getRemainingTimeSec(bytesTotal - bytesCurrent);
-                    setText(*pnl.m_staticTextTimeRemaining, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
+                    Opt<double> remTimeSec = perf_->getRemainingTimeSec(bytesTotal - bytesCurrent);
+                    setText(*pnl_.m_staticTextTimeRemaining, remTimeSec ? remainingTimeToString(*remTimeSec) : L"-", &layoutChanged);
 
                     //update estimated total time marker with precision of "10% remaining time" only to avoid needless jumping around:
                     const double timeRemainingSec = remTimeSec ? *remTimeSec : 0;
@@ -1664,12 +1664,12 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
         }
     }
 
-    pnl.m_panelGraphBytes->Refresh();
-    pnl.m_panelGraphItems->Refresh();
+    pnl_.m_panelGraphBytes->Refresh();
+    pnl_.m_panelGraphItems->Refresh();
 
     //time elapsed
     const int64_t timeElapSec = timeNowMs / 1000;
-    setText(*pnl.m_staticTextTimeElapsed,
+    setText(*pnl_.m_staticTextTimeElapsed,
             timeElapSec < 3600 ?
             wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
             wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
@@ -1677,11 +1677,11 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
     //adapt layout after content changes above
     if (layoutChanged)
     {
-        pnl.m_panelProgress->Layout();
+        pnl_.m_panelProgress->Layout();
         //small statistics panels:
         //pnl.m_panelItemsProcessed->Layout();
-        pnl.m_panelItemsRemaining->Layout();
-        pnl.m_panelTimeRemaining ->Layout();
+        pnl_.m_panelItemsRemaining->Layout();
+        pnl_.m_panelTimeRemaining ->Layout();
         //pnl.m_panelTimeElapsed->Layout(); -> needed?
     }
 
@@ -1709,7 +1709,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
                 std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS));
             }
             //after SyncProgressDialogImpl::OnClose() called wxWindow::Destroy() on OS X this instance is instantly toast!
-            if (wereDead)
+            if (wereDead_)
                 return; //GTFO and don't call this->resumeTimer()
 
             resumeTimer();
@@ -1732,15 +1732,15 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
 {
     auto setStatusBitmap = [&](const wchar_t* bmpName, const wxString& tooltip)
     {
-        pnl.m_bitmapStatus->SetBitmap(getResourceImage(bmpName));
-        pnl.m_bitmapStatus->SetToolTip(tooltip);
-        pnl.m_bitmapStatus->Show();
+        pnl_.m_bitmapStatus->SetBitmap(getResourceImage(bmpName));
+        pnl_.m_bitmapStatus->SetToolTip(tooltip);
+        pnl_.m_bitmapStatus->Show();
         //pnl.m_animCtrlSyncing->Hide();
     };
 
-    const wxString dlgStatusTxt = getDialogPhaseText(syncStat_, paused_, finalResult);
+    const wxString dlgStatusTxt = getDialogPhaseText(syncStat_, paused_, finalResult_);
 
-    pnl.m_staticTextPhase->SetLabel(dlgStatusTxt);
+    pnl_.m_staticTextPhase->SetLabel(dlgStatusTxt);
 
     //status bitmap
     if (syncStat_) //sync running
@@ -1752,7 +1752,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
             {
                 case ProcessCallback::PHASE_NONE:
                     //pnl.m_animCtrlSyncing->Hide();
-                    pnl.m_bitmapStatus->Hide();
+                    pnl_.m_bitmapStatus->Hide();
                     break;
 
                 case ProcessCallback::PHASE_SCANNING:
@@ -1764,16 +1764,16 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
                     break;
 
                 case ProcessCallback::PHASE_SYNCHRONIZING:
-                    pnl.m_bitmapStatus->SetBitmap(getResourceImage(L"status_syncing"));
-                    pnl.m_bitmapStatus->SetToolTip(dlgStatusTxt);
-                    pnl.m_bitmapStatus->Show();
+                    pnl_.m_bitmapStatus->SetBitmap(getResourceImage(L"status_syncing"));
+                    pnl_.m_bitmapStatus->SetToolTip(dlgStatusTxt);
+                    pnl_.m_bitmapStatus->Show();
                     //pnl.m_animCtrlSyncing->Show();
                     //pnl.m_animCtrlSyncing->SetToolTip(dlgStatusTxt);
                     break;
             }
     }
     else //sync finished
-        switch (finalResult)
+        switch (finalResult_)
         {
             case RESULT_ABORTED:
                 setStatusBitmap(L"status_aborted", _("Synchronization stopped"));
@@ -1814,7 +1814,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
                 }
         }
         else //sync finished
-            switch (finalResult)
+            switch (finalResult_)
             {
                 case RESULT_ABORTED:
                 case RESULT_FINISHED_WITH_ERROR:
@@ -1830,9 +1830,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateDialogStatus() //depends on "
 
     //pause button
     if (syncStat_) //sync running
-        pnl.m_buttonPause->SetLabel(paused_ ? _("&Continue") : _("&Pause"));
+        pnl_.m_buttonPause->SetLabel(paused_ ? _("&Continue") : _("&Pause"));
 
-    pnl.Layout();
+    pnl_.Layout();
     this->Refresh(); //a few pixels below the status text need refreshing
 }
 
@@ -1883,97 +1883,97 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             assert(bytesCurrent <= bytesTotal);
 
             //set overall speed (instead of current speed)
-            const int64_t timeDelta = timeElapsed.timeMs() - phaseStartMs; //we need to consider "time within current phase" not total "timeElapsed"!
+            const int64_t timeDelta = timeElapsed_.timeMs() - phaseStartMs_; //we need to consider "time within current phase" not total "timeElapsed"!
 
             const wxString overallBytesPerSecond = timeDelta == 0 ? std::wstring() : filesizeToShortString(bytesCurrent * 1000 / timeDelta) + _("/sec");
             const wxString overallItemsPerSecond = timeDelta == 0 ? std::wstring() : replaceCpy(_("%x items/sec"), L"%x", formatThreeDigitPrecision(itemsCurrent * 1000.0 / timeDelta));
 
-            pnl.m_panelGraphBytes->setAttributes(pnl.m_panelGraphBytes->getAttributes().setCornerText(overallBytesPerSecond, Graph2D::CORNER_TOP_LEFT));
-            pnl.m_panelGraphItems->setAttributes(pnl.m_panelGraphItems->getAttributes().setCornerText(overallItemsPerSecond, Graph2D::CORNER_TOP_LEFT));
+            pnl_.m_panelGraphBytes->setAttributes(pnl_.m_panelGraphBytes->getAttributes().setCornerText(overallBytesPerSecond, Graph2D::CORNER_TOP_LEFT));
+            pnl_.m_panelGraphItems->setAttributes(pnl_.m_panelGraphItems->getAttributes().setCornerText(overallItemsPerSecond, Graph2D::CORNER_TOP_LEFT));
 
             //show new element "items processed"
-            pnl.m_panelItemsProcessed->Show();
-            pnl.m_staticTextItemsProcessed->SetLabel(toGuiString(itemsCurrent));
-            pnl.m_staticTextBytesProcessed->SetLabel(L"(" + filesizeToShortString(bytesCurrent) + L")");
+            pnl_.m_panelItemsProcessed->Show();
+            pnl_.m_staticTextItemsProcessed->SetLabel(toGuiString(itemsCurrent));
+            pnl_.m_staticTextBytesProcessed->SetLabel(L"(" + filesizeToShortString(bytesCurrent) + L")");
 
             //hide remaining elements...
             if (itemsCurrent == itemsTotal && //...if everything was processed successfully
                 bytesCurrent == bytesTotal)
-                pnl.m_panelItemsRemaining->Hide();
+                pnl_.m_panelItemsRemaining->Hide();
         }
         break;
     }
 
     //------- change class state -------
-    finalResult = resultId;
+    finalResult_ = resultId;
 
     syncStat_ = nullptr;
     abortCb_  = nullptr;
     //----------------------------------
 
     updateDialogStatus();
-    setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult), wxString());
+    setExternalStatus(getDialogPhaseText(syncStat_, paused_, finalResult_), wxString());
 
     resumeFromSystray(); //if in tray mode...
 
     this->EnableCloseButton(true);
 
-    pnl.m_bpButtonMinimizeToTray->Hide();
-    pnl.m_buttonStop->Disable();
-    pnl.m_buttonStop->Hide();
-    pnl.m_buttonPause->Disable();
-    pnl.m_buttonPause->Hide();
-    pnl.m_buttonClose->Show();
-    pnl.m_buttonClose->Enable();
+    pnl_.m_bpButtonMinimizeToTray->Hide();
+    pnl_.m_buttonStop->Disable();
+    pnl_.m_buttonStop->Hide();
+    pnl_.m_buttonPause->Disable();
+    pnl_.m_buttonPause->Hide();
+    pnl_.m_buttonClose->Show();
+    pnl_.m_buttonClose->Enable();
 
-    pnl.m_buttonClose->SetFocus();
+    pnl_.m_buttonClose->SetFocus();
 
-    pnl.bSizerOnCompletion->Show(false);
+    pnl_.bSizerOnCompletion->Show(false);
 
     //set std order after button visibility was set
-    setStandardButtonLayout(*pnl.bSizerStdButtons, StdButtons().setAffirmative(pnl.m_buttonClose));
+    setStandardButtonLayout(*pnl_.bSizerStdButtons, StdButtons().setAffirmative(pnl_.m_buttonClose));
 
     //hide current operation status
-    pnl.bSizerStatusText->Show(false);
+    pnl_.bSizerStatusText->Show(false);
 
     //show and prepare final statistics
-    pnl.m_notebookResult->Show();
+    pnl_.m_notebookResult->Show();
 
-    pnl.m_staticlineFooter->Hide(); //win: m_notebookResult already has a window frame
+    pnl_.m_staticlineFooter->Hide(); //win: m_notebookResult already has a window frame
 
     //hide remaining time
-    pnl.m_panelTimeRemaining->Hide();
+    pnl_.m_panelTimeRemaining->Hide();
 
     //1. re-arrange graph into results listbook
-    const bool wasDetached = pnl.bSizerRoot->Detach(pnl.m_panelProgress);
+    const bool wasDetached = pnl_.bSizerRoot->Detach(pnl_.m_panelProgress);
     assert(wasDetached);
     (void)wasDetached;
-    pnl.m_panelProgress->Reparent(pnl.m_notebookResult);
-    pnl.m_notebookResult->AddPage(pnl.m_panelProgress, _("Progress"), true);
+    pnl_.m_panelProgress->Reparent(pnl_.m_notebookResult);
+    pnl_.m_notebookResult->AddPage(pnl_.m_panelProgress, _("Progress"), true);
 
     //2. log file
     const size_t posLog = 1;
-    assert(pnl.m_notebookResult->GetPageCount() == 1);
-    LogPanel* logPanel = new LogPanel(pnl.m_notebookResult, log); //owned by m_notebookResult
-    pnl.m_notebookResult->AddPage(logPanel, _("Log"), false);
+    assert(pnl_.m_notebookResult->GetPageCount() == 1);
+    LogPanel* logPanel = new LogPanel(pnl_.m_notebookResult, log); //owned by m_notebookResult
+    pnl_.m_notebookResult->AddPage(logPanel, _("Log"), false);
     //bSizerHoldStretch->Insert(0, logPanel, 1, wxEXPAND);
 
     //show log instead of graph if errors occurred! (not required for ignored warnings)
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
-        pnl.m_notebookResult->ChangeSelection(posLog);
+        pnl_.m_notebookResult->ChangeSelection(posLog);
 
     //GetSizer()->SetSizeHints(this); //~=Fit() //not a good idea: will shrink even if window is maximized or was enlarged by the user
-    pnl.Layout();
+    pnl_.Layout();
 
-    pnl.m_panelProgress->Layout();
+    pnl_.m_panelProgress->Layout();
     //small statistics panels:
-    pnl.m_panelItemsProcessed->Layout();
-    pnl.m_panelItemsRemaining->Layout();
+    pnl_.m_panelItemsProcessed->Layout();
+    pnl_.m_panelItemsRemaining->Layout();
     //pnl.m_panelTimeRemaining->Layout();
     //pnl.m_panelTimeElapsed->Layout(); -> needed?
 
     //play (optional) sound notification after sync has completed -> only play when waiting on results dialog, seems to be pointless otherwise!
-    switch (finalResult)
+    switch (finalResult_)
     {
         case SyncProgressDialog::RESULT_ABORTED:
             break;
@@ -2038,7 +2038,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnClose(wxCloseEvent& event)
     syncStat_ = nullptr;
     abortCb_  = nullptr;
 
-    wereDead = true;
+    wereDead_ = true;
     this->Destroy(); //wxWidgets OS X: simple "delete"!!!!!!!
 }
 
@@ -2077,9 +2077,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnIconize(wxIconizeEvent& event)
 template <class TopLevelDialog>
 void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
 {
-    if (!trayIcon.get())
+    if (!trayIcon_.get())
     {
-        trayIcon = std::make_unique<FfsTrayIcon>([this] { this->resumeFromSystray(); }); //FfsTrayIcon lifetime is a subset of "this"'s lifetime!
+        trayIcon_ = std::make_unique<FfsTrayIcon>([this] { this->resumeFromSystray(); }); //FfsTrayIcon lifetime is a subset of "this"'s lifetime!
         //we may destroy FfsTrayIcon even while in the FfsTrayIcon callback!!!!
 
         updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused
@@ -2094,9 +2094,9 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
 template <class TopLevelDialog>
 void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
 {
-    if (trayIcon)
+    if (trayIcon_)
     {
-        trayIcon.reset();
+        trayIcon_.reset();
 
         if (parentFrame_)
         {

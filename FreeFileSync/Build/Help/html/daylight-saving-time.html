@@ -10,12 +10,12 @@
 	<h1>Daylight Saving Time<span style="font-weight: normal"> (Windows)</span></h1>
 
 	<p>
-		A common problem synchronization software has to handle are +-1 hour
+		A common problem synchronization software has to handle is +-1 hour
 		file time shifts after a Daylight Saving Time (DST) switch has
-		occurred. This can be observed for example when a FAT-formatted
+		occurred. This can be observed, for example, when a FAT-formatted
 		volume is compared against an NTFS volume, like when synchronizing a local disk against a
 		USB memory stick. Files that previously appeared to be in sync are
-		now shown with an one hour modification time offset, although they
+		now shown with a one hour modification time offset, although they
 		have not been modified by the user or the operating system.
 	</p>
 
@@ -27,9 +27,9 @@
 
 	<p>
 		When times of these two different formats are compared, one format
-		has to be converted into the other first. In either way Windows uses
+		has to be converted into the other first. In either way, Windows uses
 		the current DST status as well as the current time zone for
-		its calculations. Consequently the result of this comparison is
+		its calculations. Consequently, the result of this comparison is
 		dependent from current system settings with the effect that file times
 		that used to be the same show up as different after a DST switch or when the time zone has changed.
 	</p>
@@ -45,8 +45,8 @@
 	<ol>
 		<li><p>
 				In FreeFileSync's comparison settings you can enter one or more time shifts to ignore during comparison:
-				If you need to handle differences due to daylight saving time enter a single one hour shift. If the differences are caused by changing the time zone 
-				enter one or more time shifts as needed.
+				If you need to handle differences due to daylight saving time, enter a single one hour shift.
+				If the differences are caused by changing the time zone, enter one or more time shifts as needed.
 				<br>
 			</p>
 			<img src="../images/ignore-time-shift.png" alt="Ignore daylight saving time shift"><br>
@@ -54,11 +54,11 @@
 			<div class="bluebox">
 				<b>Note</b><br>
 				File times have to be equal or differ by exactly the time shift entered to be considered the same. 
-				Therefore the time shift setting should not be confused with a time interval or tolerance.
+				Therefore, the time shift setting should not be confused with a time interval or tolerance.
 			</div>
 			<br>
 		
-		<li>Alternatively you can avoid the problem in first place by only synchronizing from FAT to FAT or NTFS to NTFS file systems.
+		<li>Alternatively, you can avoid the problem in first place by only synchronizing from FAT to FAT or NTFS to NTFS file systems.
 			Since most local disks are formatted with NTFS and USB memory sticks with FAT, this situation could be handled by formatting the USB stick with NTFS as well.		
 	</ol>
 </body>

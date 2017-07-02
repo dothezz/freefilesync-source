@@ -855,7 +855,7 @@ La commande est déclenchée si :
 <target>&Sauvegarder</target>
 
 <source>Save as &batch job...</source>
-<target>Enregistrer en temps que job &batch ...</target>
+<target>Enregistrer en tant que job &batch ...</target>
 
 <source>Start &comparison</source>
 <target>Démarrer la &comparaison</target>

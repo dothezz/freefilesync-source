@@ -5,7 +5,8 @@
 // *****************************************************************************
 
 #include "small_dlgs.h"
-#include <chrono>
+//#include <chrono>
+#include <zen/time.h>
 #include <zen/format_unit.h>
 #include <zen/build_info.h>
 #include <zen/stl_tools.h>
@@ -726,7 +727,7 @@ ReturnSmallDlg::ButtonPressed zen::showOptionsDlg(wxWindow* parent, xmlAccess::X
 class SelectTimespanDlg : public SelectTimespanDlgGenerated
 {
 public:
-    SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo);
+    SelectTimespanDlg(wxWindow* parent, time_t& timeFrom, time_t& timeTo);
 
 private:
     void OnOkay  (wxCommandEvent& event) override;
@@ -745,12 +746,12 @@ private:
     }
 
     //output-only parameters:
-    int64_t& timeFromOut;
-    int64_t& timeToOut;
+    time_t& timeFromOut;
+    time_t& timeToOut;
 };
 
 
-SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo) :
+SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, time_t& timeFrom, time_t& timeTo) :
     SelectTimespanDlgGenerated(parent),
     timeFromOut(timeFrom),
     timeToOut(timeTo)
@@ -765,8 +766,8 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_
     m_calendarTo  ->SetWindowStyleFlag(style);
 
     //set default values
-    int64_t timeFromTmp = timeFrom;
-    int64_t timeToTmp   = timeTo;
+    time_t timeFromTmp = timeFrom;
+    time_t timeToTmp   = timeTo;
 
     if (timeToTmp == 0)
         timeToTmp = std::time(nullptr); //
@@ -774,8 +775,8 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_
         timeFromTmp = timeToTmp - 7 * 24 * 3600; //default time span: one week from "now"
 
     //wxDateTime models local(!) time (in contrast to what documentation says), but it has a constructor taking time_t UTC
-    m_calendarFrom->SetDate(static_cast<time_t>(timeFromTmp));
-    m_calendarTo  ->SetDate(static_cast<time_t>(timeToTmp  ));
+    m_calendarFrom->SetDate(timeFromTmp);
+    m_calendarTo  ->SetDate(timeToTmp  );
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
@@ -816,7 +817,7 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, int64_t& timeFrom, int64_t& timeTo)
+ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, time_t& timeFrom, time_t& timeTo)
 {
     SelectTimespanDlg timeSpanDlg(parent, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());

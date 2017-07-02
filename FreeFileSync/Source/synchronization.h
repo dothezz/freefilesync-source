@@ -7,7 +7,8 @@
 #ifndef SYNCHRONIZATION_H_8913470815943295
 #define SYNCHRONIZATION_H_8913470815943295
 
-#include <zen/time.h>
+//#include <zen/time.h>
+#include <chrono>
 #include "file_hierarchy.h"
 #include "lib/process_xml.h"
 #include "process_callback.h"
@@ -94,7 +95,7 @@ std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
 
 //FFS core routine:
-void synchronize(const TimeComp& timeStamp,
+void synchronize(const std::chrono::system_clock::time_point& syncStartTime,
                  bool verifyCopiedFiles,
                  bool copyLockedFiles,
                  bool copyFilePermissions,

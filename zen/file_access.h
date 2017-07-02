@@ -56,7 +56,7 @@ enum class ProcSymlink
     DIRECT,
     FOLLOW
 };
-void setFileTime(const Zstring& filePath, int64_t modTime, ProcSymlink procSl); //throw FileError
+void setFileTime(const Zstring& filePath, time_t modTime, ProcSymlink procSl); //throw FileError
 
 //symlink handling: always evaluate target
 uint64_t getFileSize(const Zstring& filePath); //throw FileError
@@ -73,22 +73,27 @@ void removeDirectoryPlainRecursion(const Zstring& dirPath); //throw FileError; E
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& itemPathOld, const Zstring& itemPathNew); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
-bool supportsPermissions(const Zstring& dirPath); //throw FileError, dereferences symlinks
+bool supportsPermissions(const Zstring& dirPath); //throw FileError, follows symlinks
+//copy permissions for files, directories or symbolic links: requires admin rights
+void copyItemPermissions(const Zstring& sourcePath, const Zstring& targetPath, ProcSymlink procSl); //throw FileError
+
+void createDirectory(const Zstring& dirPath); //throw FileError, ErrorTargetExisting
 
 //- no error if already existing
 //- create recursively if parent directory is not existing
 void createDirectoryIfMissingRecursion(const Zstring& dirPath); //throw FileError
 
-//fail if already existing or parent directory not existing:
-//source path is optional (may be empty)
-void copyNewDirectory(const Zstring& sourcePath, const Zstring& targetPath, bool copyFilePermissions); //throw FileError, ErrorTargetExisting
+//symlink handling: follow link!
+//expects existing source/target directories
+//reports note-worthy errors only
+void tryCopyDirectoryAttributes(const Zstring& sourcePath, const Zstring& targetPath); //throw FileError
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
 
 struct FileCopyResult
 {
     uint64_t fileSize = 0;
-    int64_t modTime = 0; //time_t-compatible (UTC)
+    time_t modTime = 0; //number of seconds since Jan. 1st 1970 UTC
     FileId sourceFileId;
     FileId targetFileId;
     Opt<FileError> errorModTime; //failure to set modification time

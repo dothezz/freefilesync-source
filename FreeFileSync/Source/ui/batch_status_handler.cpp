@@ -21,13 +21,13 @@ using namespace zen;
 
 namespace
 {
-//"Backup FreeFileSync 2013-09-15 015052.log" ->
-//"Backup FreeFileSync 2013-09-15 015052 [Error].log"
+//"Backup FreeFileSync 2013-09-15 015052.123.log" ->
+//"Backup FreeFileSync 2013-09-15 015052.123 [Error].log"
 
 //return value always bound!
 std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFolderPath, //throw FileError
                                                      const std::wstring& jobName,
-                                                     const TimeComp& timeStamp,
+                                                     const std::chrono::system_clock::time_point& batchStartTime,
                                                      const std::wstring& status,
                                                      ProcessCallback& pc)
 {
@@ -37,29 +37,24 @@ std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFold
     AFS::createFolderIfMissingRecursion(logFolderPath); //throw FileError
 
     //const std::string colon = "\xcb\xb8"; //="modifier letter raised colon" => regular colon is forbidden in file names on Windows and OS X
-    //=> too many issues, most notably cmd.exe is not Unicode-awere: http://www.freefilesync.org/forum/viewtopic.php?t=1679
+    //=> too many issues, most notably cmd.exe is not Unicode-aware: http://www.freefilesync.org/forum/viewtopic.php?t=1679
 
     //assemble logfile name
-    Zstring body = utfTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
+    const TimeComp timeStamp = getLocalTime(std::chrono::system_clock::to_time_t(batchStartTime));
+    const auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(batchStartTime.time_since_epoch()).count() % 1000;
+
+    Zstring logFileName = utfTo<Zstring>(jobName) +
+                          Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp) +
+                          Zstr(".") + printNumber<Zstring>(Zstr("%03d"), static_cast<int>(timeMs)); //[ms] should yield a fairly unique name
     if (!status.empty())
-        body += utfTo<Zstring>(L" [" + status + L"]");
+        logFileName += utfTo<Zstring>(L" [" + status + L"]");
+    logFileName += Zstr(".log");
 
-    //ensure uniqueness; avoid file system race-condition!
-    Zstring logFileName = body + Zstr(".log");
-    for (int i = 0;; ++i)
-        try
-        {
-            const AbstractPath logFilePath = AFS::appendRelPath(logFolderPath, logFileName);
+    const AbstractPath logFilePath = AFS::appendRelPath(logFolderPath, logFileName);
 
-            return AFS::getOutputStream(logFilePath, //throw FileError, ErrorTargetExisting
-                                        nullptr, /*streamSize*/
-                                        OnUpdateLogfileStatusNoThrow(pc, AFS::getDisplayPath(logFilePath)));
-        }
-        catch (ErrorTargetExisting&)
-        {
-            if (i == 10) throw; //avoid endless recursion in pathological cases
-            logFileName = body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
-        }
+    return AFS::getOutputStream(logFilePath, //throw FileError
+                                nullptr, /*streamSize*/
+                                OnUpdateLogfileStatusNoThrow(pc, AFS::getDisplayPath(logFilePath)));
 }
 
 
@@ -136,7 +131,7 @@ void limitLogfileCount(const AbstractPath& logFolderPath, const std::wstring& jo
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const std::wstring& jobName,
                                        const Zstring& soundFileSyncComplete,
-                                       const TimeComp& timeStamp,
+                                       const std::chrono::system_clock::time_point& batchStartTime,
                                        const Zstring& logFolderPathPhrase, //may be empty
                                        int logfilesCountLimit,
                                        size_t lastSyncsLogFileSizeMax,
@@ -155,7 +150,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     automaticRetryDelay_(automaticRetryDelay),
     progressDlg_(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, nullptr, showProgress, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory)),
              jobName_(jobName),
-             timeStamp_(timeStamp),
+             batchStartTime_(batchStartTime),
              logFolderPathPhrase_(logFolderPathPhrase)
 {
     //ATTENTION: "progressDlg_" is an unmanaged resource!!! However, at this point we already consider construction complete! =>
@@ -252,7 +247,7 @@ BatchStatusHandler::~BatchStatusHandler()
     // 4. failure to write to particular stream must not be retried!
     if (logfilesCountLimit_ != 0)
     {
-        auto requestUiRefreshNoThrow = [&] { try { requestUiRefresh();  /*throw X*/ } catch (...) {} };
+        auto requestUiRefreshNoThrow = [&] { try { requestUiRefresh(); /*throw X*/ } catch (...) {} };
 
         const AbstractPath logFolderPath = createAbstractPath(trimCpy(logFolderPathPhrase_).empty() ? getConfigDirPathPf() + Zstr("Logs") : logFolderPathPhrase_); //noexcept
 
@@ -260,7 +255,7 @@ BatchStatusHandler::~BatchStatusHandler()
         {
             tryReportingError([&] //errors logged here do not impact final status calculation above! => not a problem!
             {
-                std::unique_ptr<AFS::OutputStream> logFileStream = prepareNewLogfile(logFolderPath, jobName_, timeStamp_, status, *this); //throw FileError; return value always bound!
+                std::unique_ptr<AFS::OutputStream> logFileStream = prepareNewLogfile(logFolderPath, jobName_, batchStartTime_, status, *this); //throw FileError; return value always bound!
 
                 streamToLogFile(summary, errorLog_, *logFileStream); //throw FileError, (X)
                 logFileStream->finalize();                           //throw FileError, (X)

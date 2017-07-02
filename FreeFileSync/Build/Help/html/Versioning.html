@@ -9,9 +9,9 @@
 <body>
 	<h1>File Versioning</h1>
 	<p>
-		When you need to preserve files that have been deleted or overwritten it's
-		often sufficient to select <b>Recycle bin</b> in synchronization
-		settings. However this is only available for local drives and offers
+		When you need to preserve files that have been deleted or overwritten,
+		it's often sufficient to select <b>Recycle bin</b> in synchronization
+		settings. However, this is only available for local drives and offers
 		little control on how to store and how long to keep the files.
 		FreeFileSync therefore has an additional option, <b>Versioning</b>.
 		<br><br>
@@ -19,7 +19,7 @@
 
 	<h2>1. Keep only the most recent versions</h2>
 	<p>
-		In synchronization settings set deletion handling to <b>Versioning</b> and naming convention to
+		In synchronization settings, set deletion handling to <b>Versioning</b> and naming convention to
 		<b>Replace</b>. Deleted files will be moved to the specified folder
 		without any decoration and will replace already existing older
 		versions.<br>
@@ -54,8 +54,8 @@
 	<p>
 		With naming convention <b>Replace</b>
 		it is possible to refine the granularity of versions to keep by adding <a href="macros.html">Macros</a>
-		to the versioning folder path. For example you can save deleted files
-		on a per sync session basis by adding the <b><span class="command-line">%timestamp%</span></b> macro:
+		to the versioning folder path. For example, you can save deleted files
+		on a per-sync session basis by adding the <b><span class="command-line">%timestamp%</span></b> macro:
 	</p>
 
 	<p><b>Example:</b> Using the dynamically generated folder name <span class="file-path">C:\Revisions\%timestamp%</span></p>

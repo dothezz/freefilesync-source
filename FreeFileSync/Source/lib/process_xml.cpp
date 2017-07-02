@@ -1033,7 +1033,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warnRecyclerMissing);
     inOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warnInputFieldEmpty);
     inOpt["WarnModificationTimeError"  ].attribute("Enabled", config.optDialogs.warnModificationTimeError);
-    inOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
+    //inOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
     inOpt["WarnDependentFolderPair"    ].attribute("Enabled", config.optDialogs.warnDependentFolderPair);
     inOpt["WarnDependentBaseFolders"   ].attribute("Enabled", config.optDialogs.warnDependentBaseFolders);
     inOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warnDirectoryLockFailed);
@@ -1471,7 +1471,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warnRecyclerMissing);
     outOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warnInputFieldEmpty);
     outOpt["WarnModificationTimeError"  ].attribute("Enabled", config.optDialogs.warnModificationTimeError);
-    outOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
+    //outOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warnDatabaseError);
     outOpt["WarnDependentFolderPair"    ].attribute("Enabled", config.optDialogs.warnDependentFolderPair);
     outOpt["WarnDependentBaseFolders"   ].attribute("Enabled", config.optDialogs.warnDependentBaseFolders);
     outOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warnDirectoryLockFailed);

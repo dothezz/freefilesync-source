@@ -76,6 +76,8 @@ public:
         PopupDialogGenerated(parent),
         checkBoxValue_(cfg.checkBoxValue)
     {
+
+
         wxBitmap iconTmp;
         wxString titleTmp;
         switch (type)
@@ -83,7 +85,7 @@ public:
             case DialogInfoType::INFO:
                 //"Information" is meaningless as caption text!
                 //confirmation doesn't use info icon
-                //iconTmp  = getResourceImage(L"msg_info");
+                //iconTmp = getResourceImage(L"msg_info");
                 break;
             case DialogInfoType::WARNING:
                 iconTmp  = getResourceImage(L"msg_warning");

@@ -1,5 +1,21 @@
-FreeFileSync 9.1  [2017-05-24]
-------------------------------
+FreeFileSync 9.2 [2017-07-03]
+-----------------------------
+Replaced file existing handling with use of unique temporary names
+Support SFTP authentication via Pageant/SSH agent
+New menu option to restore hidden panels individually
+Use direct copy instead of transaction to speed up versioning
+Fixed GTK button icon being truncated (Linux)
+Fixed error dialog hiding behind progress dialog (macOS)
+Round out FTP symlink deletion handling
+Support four-digit year format on IIS FTP
+Fixed FTP parsing error for epoch time on Windows server
+Narrow contract for file system abstraction regarding existing files
+Treat failure to load database as error rather than warning
+Save root folder access for certain FTP path checks
+
+
+FreeFileSync 9.1 [2017-05-24]
+-----------------------------
 Fixed crash when getting invalid data after item type check
 Fixed copying symlinks pointing to network folders
 Support resolving network paths in the NT namespace
@@ -460,7 +476,7 @@ FreeFileSync 6.12 [2014-12-01]
 ------------------------------
 New "Actions" menu bar entry with basic operations
 Fixed crash after comparison while needlessly copying traversal results
-Support auto-updater URL redirection (Linux, OS X)
+Support update-checker URL redirection (Linux, OS X)
 Merged installer translations into .lng files
 Fully translated FreeFileSync context menu options and file types in Windows Explorer
 More structured symlink handling options
@@ -967,7 +983,7 @@ Dynamic save button and dialog title show unsaved configuration
 Exclude all folders if file size or time span filters are active
 Added macros %csidl_Nethood%, %csidl_Programs%, %csidl_Startup%
 Fixed crash on failed CRT parameter validation (Windows)
-Auto-updater handles moved web address for version check
+Update-checker handles moved web address
 Fixed configuration conversion error when deleting into versioning folder
 Avoid modal error dialogs in batch mode unless error handling is set to "pop up"
 Set return codes in batch mode even if modal dialogs are shown
@@ -1472,7 +1488,7 @@ Don't raise status dialog to the top after synchronization
 Embedded version information into executable (Windows)
 Migrated compiler to Visual C++ 2010 (Windows)
 Avoid losing manual changes when excluding via context menu
-Adjusted auto-updater web-address
+Adjusted update-checker web-address
 Updated translation files
 
 

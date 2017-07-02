@@ -16,18 +16,16 @@
 
 namespace zen
 {
-void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
+void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp); //throw FileError
 
 std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCfg);
 
-void redetermineSyncDirection(const DirectionConfig& directConfig,
+void redetermineSyncDirection(const DirectionConfig& directConfig, //throw FileError
                               BaseFolderPair& baseFolder,
-                              const std::function<void(const std::wstring& msg)>& reportWarning,
                               const std::function<void(const std::wstring& msg)>& notifyStatus);
 
-void redetermineSyncDirection(const MainConfiguration& mainCfg,
+void redetermineSyncDirection(const MainConfiguration& mainCfg, //throw FileError
                               FolderComparison& folderCmp,
-                              const std::function<void(const std::wstring& msg)>& reportWarning,
                               const std::function<void(const std::wstring& msg)>& notifyStatus);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
@@ -39,7 +37,7 @@ void applyFiltering  (FolderComparison& folderCmp, const MainConfiguration& main
 void addHardFiltering(BaseFolderPair& baseFolder, const Zstring& excludeFilter);     //exclude additional entries only
 void addSoftFiltering(BaseFolderPair& baseFolder, const SoftFilter& timeSizeFilter); //exclude additional entries only
 
-void applyTimeSpanFilter(FolderComparison& folderCmp, int64_t timeFrom, int64_t timeTo); //overwrite current active/inactive settings
+void applyTimeSpanFilter(FolderComparison& folderCmp, time_t timeFrom, time_t timeTo); //overwrite current active/inactive settings
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)

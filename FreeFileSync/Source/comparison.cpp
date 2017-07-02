@@ -982,9 +982,12 @@ FolderComparison zen::compare(xmlAccess::OptionalDialogs& warnings,
             callback.reportStatus(_("Calculating sync directions..."));
             callback.forceUiRefresh();
 
-            zen::redetermineSyncDirection(fpCfg.directionCfg, *it,
-            [&](const std::wstring& msg) { callback.reportWarning(msg, warnings.warnDatabaseError); }, //throw X
-            [&](const std::wstring& msg) { callback.reportStatus(msg); }); //throw X
+            tryReportingError([&]
+            {
+                zen::redetermineSyncDirection(fpCfg.directionCfg, *it, //throw FileError
+                [&](const std::wstring& msg) { callback.reportStatus(msg); }); //throw X
+
+            }, callback); //throw X?
         }
 
         return output;

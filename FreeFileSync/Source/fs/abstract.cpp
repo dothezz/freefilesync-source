@@ -6,6 +6,8 @@
 
 #include "abstract.h"
 #include <zen/serialize.h>
+#include <zen/guid.h>
+#include <zen/crc.h>
 
 using namespace zen;
 using AFS = AbstractFileSystem;
@@ -65,7 +67,8 @@ Opt<AfsPath> AFS::getParentAfsPath(const AfsPath& afsPath)
 }
 
 
-AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorTargetExisting, ErrorFileLocked
+//target existing: undefined behavior! (fail/overwrite/auto-rename)
+AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                           const AbstractPath& apTarget, const IOCallback& notifyUnbufferedIO) const
 {
     int64_t totalUnbufferedIO = 0;
@@ -74,13 +77,14 @@ AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const St
 
     StreamAttributes attrSourceNew = {};
     //try to get the most current attributes if possible (input file might have changed after comparison!)
-    if (Opt<StreamAttributes> attr = streamIn->getBufferedAttributes()) //throw FileError
+    if (Opt<StreamAttributes> attr = streamIn->getAttributesBuffered()) //throw FileError
         attrSourceNew = *attr; //Native/MTP
     else //use more stale ones:
         attrSourceNew = attrSource; //SFTP/FTP
-    warn_static("evaluate: consequences of stale attributes")
+    //TODO: evaluate: consequences of stale attributes
 
-    auto streamOut = getOutputStream(apTarget, &attrSourceNew.fileSize, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, ErrorTargetExisting
+    //target existing: undefined behavior! (fail/overwrite/auto-rename)
+    auto streamOut = getOutputStream(apTarget, &attrSourceNew.fileSize, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError
 
     bufferedStreamCopy(*streamIn, *streamOut); //throw FileError, X
 
@@ -89,7 +93,7 @@ AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const St
     //check if "expected == actual number of bytes written"
     //-> extra check: bytes reported via notifyUnbufferedIO() should match actual number of bytes written
     if (totalUnbufferedIO != 2 * makeSigned(attrSourceNew.fileSize))
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(AFS::getDisplayPath(apTarget))),
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getDisplayPath(afsPathSource))),
                         replaceCpy(replaceCpy(_("Unexpected size of data stream.\nExpected: %x bytes\nActual: %y bytes"),
                                               L"%x", numberTo<std::wstring>(2 * attrSourceNew.fileSize)),
                                    L"%y", numberTo<std::wstring>(totalUnbufferedIO)) + L" [notifyUnbufferedIO]");
@@ -130,6 +134,7 @@ AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const St
 }
 
 
+//target existing: undefined behavior! (fail/overwrite/auto-rename)
 AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, const StreamAttributes& attrSource, //throw FileError, ErrorFileLocked
                                                const AbstractPath& apTarget,
                                                bool copyFilePermissions,
@@ -137,41 +142,45 @@ AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, con
                                                const std::function<void()>& onDeleteTargetFile,
                                                const IOCallback& notifyUnbufferedIO)
 {
-    auto copyFileBestEffort = [&](const AbstractPath& apTargetTmp)
+    auto copyFilePlain = [&](const AbstractPath& apTargetTmp)
     {
         //caveat: typeid returns static type for pointers, dynamic type for references!!!
-        if (typeid(*apSource.afs) == typeid(*apTarget.afs))
+        if (typeid(*apSource.afs) == typeid(*apTargetTmp.afs))
             return apSource.afs->copyFileForSameAfsType(apSource.afsPath, attrSource,
-                                                        apTargetTmp, copyFilePermissions, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+                                                        apTargetTmp, copyFilePermissions, notifyUnbufferedIO); //throw FileError, ErrorFileLocked
+        //target existing: undefined behavior! (fail/overwrite/auto-rename)
 
         //fall back to stream-based file copy:
         if (copyFilePermissions)
             throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtPath(AFS::getDisplayPath(apTargetTmp))),
                             _("Operation not supported for different base folder types."));
 
-        return apSource.afs->copyFileAsStream(apSource.afsPath, attrSource, apTargetTmp, notifyUnbufferedIO); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return apSource.afs->copyFileAsStream(apSource.afsPath, attrSource, apTargetTmp, notifyUnbufferedIO); //throw FileError, ErrorFileLocked
+        //target existing: undefined behavior! (fail/overwrite/auto-rename)
     };
 
     if (transactionalCopy)
     {
-        AbstractPath apTargetTmp(apTarget.afs, AfsPath(apTarget.afsPath.value + TEMP_FILE_ENDING));
-        AFS::FileCopyResult result;
+        Opt<AbstractPath> parentPath = AFS::getParentFolderPath(apTarget);
+        if (!parentPath)
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtPath(AFS::getDisplayPath(apTarget))), L"Path is device root.");
+        const Zstring fileName = AFS::getItemName(apTarget);
 
-        for (int i = 0;; ++i)
-            try
-            {
-                result = copyFileBestEffort(apTargetTmp); //throw FileError, ErrorTargetExisting, ErrorFileLocked
-                break;
-            }
-            catch (ErrorTargetExisting&) //optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
-            {
-                if (i == 10) throw; //avoid endless recursion in pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
-                apTargetTmp.afsPath.value = apTarget.afsPath.value + Zchar('_') + numberTo<Zstring>(i) + TEMP_FILE_ENDING;
-            }
+        //- generate (hopefully) unique file name to avoid clashing with some remnant ffs_tmp file
+        //- do not loop and avoid pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
+        const Zstring shortGuid = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(getCrc16(generateGUID())));
+        auto it = find_last(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
+        const Zstring fileNameTmp = Zstring(fileName.begin(), it) + Zchar('.') + shortGuid + TEMP_FILE_ENDING;
 
-        //transactional behavior: ensure cleanup; not needed before copyFileBestEffort() which is already transactional
+        const AbstractPath apTargetTmp = AFS::appendRelPath(*parentPath, fileNameTmp);
+        //AbstractPath apTargetTmp(apTarget.afs, AfsPath(apTarget.afsPath.value + TEMP_FILE_ENDING));
+        //-------------------------------------------------------------------------------------------
+
+        const AFS::FileCopyResult result = copyFilePlain(apTargetTmp); //throw FileError, ErrorFileLocked
+
+        //transactional behavior: ensure cleanup; not needed before copyFilePlain() which is already transactional
         ZEN_ON_SCOPE_FAIL( try { AFS::removeFilePlain(apTargetTmp); }
-        catch (FileError&) {} );
+        catch (FileError&) {});
 
         //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
         if (onDeleteTargetFile)
@@ -181,11 +190,11 @@ AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, con
         renameItem(apTargetTmp, apTarget); //throw FileError, (ErrorDifferentVolume)
 
         /*
-        CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" does
-        NOT PRESERVE the creation time of the .ffs_tmp file, but SILENTLY "reuses" whatever creation time the old "file.txt" had!
-        This "feature" is called "File System Tunneling":
-        https://blogs.msdn.microsoft.com/oldnewthing/20050715-14/?p=34923
-        http://support.microsoft.com/kb/172190/en-us
+            CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" does
+            NOT PRESERVE the creation time of the .ffs_tmp file, but SILENTLY "reuses" whatever creation time the old "file.txt" had!
+            This "feature" is called "File System Tunneling":
+            https://blogs.msdn.microsoft.com/oldnewthing/20050715-14/?p=34923
+            http://support.microsoft.com/kb/172190/en-us
         */
         return result;
     }
@@ -201,7 +210,7 @@ AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, con
         if (onDeleteTargetFile)
             onDeleteTargetFile();
 
-        return copyFileBestEffort(apTarget); //throw FileError, ErrorTargetExisting, ErrorFileLocked
+        return copyFilePlain(apTarget); //throw FileError, ErrorFileLocked
     }
 }
 
@@ -213,6 +222,7 @@ void AFS::createFolderIfMissingRecursion(const AbstractPath& ap) //throw FileErr
 
     try
     {
+        //target existing: undefined behavior! (fail/overwrite)
         createFolderPlain(ap); //throw FileError
     }
     catch (FileError&)
@@ -221,7 +231,9 @@ void AFS::createFolderIfMissingRecursion(const AbstractPath& ap) //throw FileErr
         try { pd = getPathStatus(ap); /*throw FileError*/ }
         catch (FileError&) {} //previous exception is more relevant
 
-        if (pd && pd->existingType != ItemType::FILE)
+        if (pd &&
+            pd->existingType != ItemType::FILE &&
+            pd->relPath.size() != 1) //don't repeat the very same createFolderPlain() call from above!
         {
             AbstractPath intermediatePath = pd->existingPath;
             for (const Zstring& itemName : pd->relPath)
@@ -388,14 +400,14 @@ bool AFS::removeFileIfExists(const AbstractPath& ap) //throw FileError
 {
     try
     {
-        removeFilePlain(ap); //throw FileError
+        AFS::removeFilePlain(ap); //throw FileError
         return true;
     }
     catch (FileError&)
     {
         try
         {
-            if (!getItemTypeIfExists(ap)) //throw FileError
+            if (!AFS::getItemTypeIfExists(ap)) //throw FileError
                 return false;
         }
         catch (FileError&) {} //previous exception is more relevant
@@ -416,7 +428,7 @@ bool AFS::removeSymlinkIfExists(const AbstractPath& ap) //throw FileError
     {
         try
         {
-            if (!getItemTypeIfExists(ap)) //throw FileError
+            if (!AFS::getItemTypeIfExists(ap)) //throw FileError
                 return false;
         }
         catch (FileError&) {} //previous exception is more relevant

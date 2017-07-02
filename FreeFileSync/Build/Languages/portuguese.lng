@@ -1,4 +1,4 @@
-<header>
+﻿<header>
 	<language>Português</language>
 	<translator>Igor Rückert</translator>
 	<locale>pt_PT</locale>
@@ -20,7 +20,7 @@
 <target>A base de dados não está sincronizada com as definições correntes.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.</target>
+<target>Escolher a direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.</target>
 
 <source>Creating file %x</source>
 <target>Criar ficheiro %x</target>
@@ -89,10 +89,10 @@
 <target>Sintaxe:</target>
 
 <source>global config file:</source>
-<target>ficheiro configuração global:</target>
+<target>ficheiro de configuração global:</target>
 
 <source>config files:</source>
-<target>ficheiros configuração:</target>
+<target>ficheiros de configuração:</target>
 
 <source>directory</source>
 <target>directório</target>
@@ -291,9 +291,6 @@ Actual: %y bytes
 <source>Cannot read directory %x.</source>
 <target>Não é possível ler o directório %x.</target>
 
-<source>Cannot read file attributes of %x.</source>
-<target>Não é possível ler os atributos do ficheiro %x.</target>
-
 <source>Cannot read file %x.</source>
 <target>Não é possível ler o ficheiro %x.</target>
 
@@ -305,6 +302,9 @@ Actual: %y bytes
 
 <source>Cannot delete directory %x.</source>
 <target>Não é possível eliminar o directório %x.</target>
+
+<source>Cannot read file attributes of %x.</source>
+<target>Não é possível ler os atributos do ficheiro %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Não é possível alterar a data de modificação a %x.</target>
@@ -717,7 +717,7 @@ O comando é executado se:
 <target>A pasta de versão será sincronizada pois ela está contida em uma pasta base.</target>
 
 <source>Synchronizing folder pair:</source>
-<target>A sincronizar o par de pastas:</target>
+<target>A cincronizar o par de pastas:</target>
 
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>
@@ -1038,7 +1038,7 @@ O comando é executado se:
 </source>
 <target>
 - Não suportado em todos os sistemas
-- Requeri e cria ficheiros de base de dados
+- Requer e cria ficheiros de base de dados
 - A detecção não está disponível para a primeira sincronização
 </target>
 
@@ -1070,7 +1070,7 @@ O comando é executado se:
 <target>Tratar erros:</target>
 
 <source>&Pop-up</source>
-<target>&Alertar</target>
+<target>&Popup</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar popup em caso de erros ou avisos</target>
@@ -1775,7 +1775,7 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>Actualizações automáticas:</target>
 
 <source>Requires FreeFileSync Donation Edition</source>
-<target>Requeri o FreeFileSync Donation Edition</target>
+<target>Requer o FreeFileSync Donation Edition</target>
 
 <source>Check for Program Updates</source>
 <target>Procurar actualizações do programa</target>
@@ -1784,7 +1784,7 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <target>Actualizar agora ou descarregar manualmente do sítio do FreeFileSync?</target>
 
 <source>&Auto-update</source>
-<target>&Actualizar automático</target>
+<target>&Actualização automática</target>
 
 <source>&Home page</source>
 <target>&Sítio da web</target>

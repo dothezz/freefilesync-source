@@ -54,7 +54,7 @@ bool Application::OnInit()
     //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
 
     ::gtk_init(nullptr, nullptr);
-    //::gtk_rc_parse((getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((getResourceDirPf() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
     //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
     wxToolTip::Enable(true); //yawn, a wxWidgets screw-up: wxToolTip::SetAutoPop is no-op if global tooltip window is not yet constructed: wxToolTip::Enable creates it
@@ -411,7 +411,7 @@ void showSyntaxHelp()
                                                  L"    [-LeftDir " + _("directory") + L"] [-RightDir " + _("directory") + L"]" + L"\n" +
                                                  L"    [-Edit]" + L"\n" +
                                                  L"    [" + _("global config file:") + L" GlobalSettings.xml]" + L"\n" +
-							                      L"\n" +
+                                                 L"\n" +
 
                                                  _("config files:") + L"\n" +
                                                  _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n" +
@@ -421,7 +421,7 @@ void showSyntaxHelp()
 
                                                  L"-Edit" + L"\n" +
                                                  _("Open configuration for editing without executing it.") + L"\n\n" +
-						   
+
                                                  _("global config file:") + L"\n" +
                                                  _("Path to an alternate GlobalSettings.xml file.")));
 }
@@ -472,13 +472,13 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        const TimeComp timeStamp = getLocalTime();
+        const std::chrono::system_clock::time_point batchStartTime = std::chrono::system_clock::now();
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess, BatchRequestSwitchToMainDialog
                                          extractJobName(referenceFile),
                                          globalCfg.soundFileSyncFinished,
-                                         timeStamp,
+                                         batchStartTime,
                                          batchCfg.logFolderPathPhrase,
                                          batchCfg.logfilesCountLimit,
                                          globalCfg.lastSyncsLogFileSizeMax,
@@ -523,7 +523,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
         if (syncProcessCfg.size() != cmpResult.size())
             throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
-        synchronize(timeStamp,
+        synchronize(batchStartTime,
                     globalCfg.verifyFileCopy,
                     globalCfg.copyLockedFiles,
                     globalCfg.copyFilePermissions,

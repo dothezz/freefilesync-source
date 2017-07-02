@@ -3,11 +3,11 @@
 <head>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="base.css" >
-	<title>Synchronize with SFTP</title>
+	<title>Synchronize Files with SFTP</title>
 </head>
 
 <body>
-	<h1>Synchronize with SFTP <span style="font-weight: normal">(Windows, macOS)</span></h1>
+	<h1>Synchronize Files with SFTP <span style="font-weight: normal">(Windows, macOS)</span></h1>
 
 	<p>
 		FreeFileSync supports synchronization with SFTP natively. Just enter your SFTP login information into the dialog shown for cloud folder selection:
@@ -26,9 +26,9 @@
 	
 	<h2>Set up SFTP for best performance</h2>
 	<p>
-		By default FreeFileSync creates one connection to the server and uses one SFTP channel, i.e. only a single SFTP command can be sent and received at a time.
-		Since most of this time is spent waiting due to the high latency of the remote connection you can speed up reading large directory hierarchies
-		by increasing both connection and channel count.<br>
+		By default, FreeFileSync creates one connection to the server and uses one SFTP channel, i.e. only a single SFTP command can be sent and received at a time.
+		Since most of this time is spent waiting due to the high latency of the remote connection, you can speed up reading large directory hierarchies
+		by increasing both the connection and channel count.<br>
 		<br>
 		<em>The directory reading time is reduced by a factor of N x M when using N connections with M channels each.</em><br>
 		<br>
@@ -39,17 +39,17 @@
 				setting up too many connections and channels might actually slow the overall process down.
 				Creating extra connections is slower than creating extra channels.<br>&nbsp;
 			
-			<li>SFTP servers have internal limits on the number of allowed connections and channels. Generally servers expect
-				one connection per user, so this number should be kept rather low. If too many connections and channels are used the server
-				may decide to stop responding.
+			<li>SFTP servers have internal limits on the number of allowed connections and channels.
+				Generally, servers expect one connection per user, so this number should be kept rather low.
+				If too many connections and channels are used, the server may decide to stop responding.
 		</ul>
 	</p>
 	
 	<div class="bluebox">
 		<b>Advice</b><br>Start with low numbers and make tests with different combinations of connections and channels for your
 		particular SFTP synchronization scenario to see what gives the highest speed.
-		Note however that FreeFileSync <b>reuses existing</b> SFTP connections/channels.
-		Therefore you should <b>restart</b> FreeFileSync before measuring SFTP speed.
+		Note, however, that FreeFileSync <b>reuses existing</b> SFTP connections/channels.
+		Therefore, you should <b>restart</b> FreeFileSync before measuring SFTP speed.
 	</div>
 	<br>
 	

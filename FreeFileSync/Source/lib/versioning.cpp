@@ -98,12 +98,11 @@ template <class Function>
 void moveExistingItemToVersioning(const AbstractPath& sourcePath, const AbstractPath& targetPath, //throw FileError
                                   Function copyNewItemPlain /*throw FileError*/)
 {
-
-    Opt<FileError> deleteError; //- files are copied with "transactionalCopy = true" => handle already existing target BEFORE failing after an expensive copy
-    //- even in the "same volume" case, a preemptive target deletion with deferred evaluation gives the best amortized performance considering that
-    //  "already existing" is the most common expected failure!
+    //start deleting existing target as required by copyFileTransactional()/renameItem():
+    //best amortized performance if "target existing" is the most common case
+    std::exception_ptr deletionError;
     try { AFS::removeFilePlain(targetPath); /*throw FileError*/ }
-    catch (const FileError& e) { deleteError = e; } //probably "not existing" error, defer evaluation
+    catch (FileError&) { deletionError = std::current_exception(); } //probably "not existing" error, defer evaluation
     //overwrite AFS::ItemType::FOLDER with FILE? => highly dubious, do not allow
 
     auto fixedTargetPathIssues = [&] //throw FileError
@@ -116,8 +115,8 @@ void moveExistingItemToVersioning(const AbstractPath& sourcePath, const Abstract
         {
             if (pd->relPath.empty()) //already existing
             {
-                if (deleteError)
-                    throw* deleteError;
+                if (deletionError)
+                    std::rethrow_exception(deletionError);
             }
             else if (pd->relPath.size() > 1) //parent folder missing
             {
@@ -207,9 +206,11 @@ bool FileVersioner::revisionFile(const FileDescriptor& fileDescr, const Zstring&
         else
             moveExistingItemToVersioning(filePath, targetPath, [&] //throw FileError
         {
-            AFS::copyFileTransactional(filePath, fileAttr, //throw FileError, ErrorFileLocked
-                                       targetPath,
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            //target existing: copyFileTransactional() undefined behavior! (fail/overwrite/auto-rename) => not expected here:
+            /*const AFS::FileCopyResult result =*/ AFS::copyFileTransactional(filePath, fileAttr, targetPath, //throw FileError, ErrorFileLocked
+                                                                              false, //copyFilePermissions
+                                                                              false,  //transactionalCopy: not needed for versioning!
+                                                                              nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
             //result.errorModTime? => irrelevant for versioning!
         });
         return true;
@@ -278,8 +279,11 @@ void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zst
 
         moveExistingItemToVersioning(sourcePath, targetPath, [&] //throw FileError
         {
-            AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
-                                       false /*copyFilePermissions*/, true /*transactionalCopy*/, nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
+            //target existing: copyFileTransactional() undefined behavior! (fail/overwrite/auto-rename) => not expected here:
+            /*const AFS::FileCopyResult result =*/ AFS::copyFileTransactional(sourcePath, sourceAttr, targetPath, //throw FileError, ErrorFileLocked
+                                                                              false, //copyFilePermissions
+                                                                              false,  //transactionalCopy: not needed for versioning!
+                                                                              nullptr /*onDeleteTargetFile*/, notifyUnbufferedIO);
             //result.errorModTime? => irrelevant for versioning!
         });
     }
