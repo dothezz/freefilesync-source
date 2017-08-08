@@ -152,7 +152,7 @@ public:
 private:
     std::pair<double, double> getRangeX() const override { return std::make_pair(0, 1); }
 
-    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override
+    std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const override
     {
         const double yHigh = drawTop_ ? 3 :  1; //draw partially out of vertical bounds to not render top/bottom borders of the bars
         const double yLow  = drawTop_ ? 1 : -1; //
@@ -174,7 +174,7 @@ class CurveDataProgressSeparatorLine : public CurveData
 {
     std::pair<double, double> getRangeX() const override { return std::make_pair(0, 1); }
 
-    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override
+    std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const override
     {
         return
         {
@@ -999,13 +999,13 @@ namespace
 class CurveDataStatistics : public SparseCurveData
 {
 public:
-    CurveDataStatistics() : SparseCurveData(true) /*true: add steps*/ {}
+    CurveDataStatistics() : SparseCurveData(true /*addSteps*/) {}
 
-    void clear() { samples.clear(); lastSample = std::make_pair(0, 0); }
+    void clear() { samples_.clear(); lastSample_ = std::make_pair(0, 0); }
 
     void addRecord(int64_t timeNowMs, double value)
     {
-        assert((!samples.empty() || lastSample == std::pair<int64_t, double>(0, 0)));
+        assert((!samples_.empty() || lastSample_ == std::pair<int64_t, double>(0, 0)));
 
         //samples.clear();
         //samples.emplace(-1000, 0);
@@ -1014,28 +1014,28 @@ public:
         //samples.emplace(1000, 0);
         //return;
 
-        lastSample = std::make_pair(timeNowMs, value);
+        lastSample_ = std::make_pair(timeNowMs, value);
 
         //allow for at most one sample per 100ms (handles duplicate inserts, too!) => this is unrelated to UI_UPDATE_INTERVAL_MS!
-        if (!samples.empty()) //always unconditionally insert first sample!
-            if (timeNowMs / 100 == samples.rbegin()->first / 100)
+        if (!samples_.empty()) //always unconditionally insert first sample!
+            if (timeNowMs / 100 == samples_.rbegin()->first / 100)
                 return;
 
-        samples.insert(samples.end(), std::make_pair(timeNowMs, value)); //time is "expected" to be monotonously ascending
+        samples_.insert(samples_.end(), std::make_pair(timeNowMs, value)); //time is "expected" to be monotonously ascending
         //documentation differs about whether "hint" should be before or after the to be inserted element!
         //however "std::map<>::end()" is interpreted correctly by GCC and VS2010
 
-        if (samples.size() > MAX_BUFFER_SIZE) //limit buffer size
-            samples.erase(samples.begin());
+        if (samples_.size() > MAX_BUFFER_SIZE) //limit buffer size
+            samples_.erase(samples_.begin());
     }
 
 private:
     std::pair<double, double> getRangeX() const override
     {
-        if (samples.empty())
+        if (samples_.empty())
             return std::make_pair(0.0, 0.0);
 
-        double upperEndMs = std::max(samples.rbegin()->first, lastSample.first);
+        double upperEndMs = std::max(samples_.rbegin()->first, lastSample_.first);
 
         /*
         //report some additional width by 5% elapsed time to make graph recalibrate before hitting the right border
@@ -1044,7 +1044,7 @@ private:
         upperEndMs += 0.05 *(upperEndMs - samples.begin()->first);
         */
 
-        return std::make_pair(samples.begin()->first / 1000.0, //need not start with 0, e.g. "binary comparison, graph reset, followed by sync"
+        return std::make_pair(samples_.begin()->first / 1000.0, //need not start with 0, e.g. "binary comparison, graph reset, followed by sync"
                               upperEndMs / 1000.0);
     }
 
@@ -1052,14 +1052,14 @@ private:
     {
         const int64_t timex = std::floor(x * 1000);
         //------ add artifical last sample value -------
-        if (!samples.empty() && samples.rbegin()->first < lastSample.first)
-            if (lastSample.first <= timex)
-                return CurvePoint(lastSample.first / 1000.0, lastSample.second);
+        if (!samples_.empty() && samples_.rbegin()->first < lastSample_.first)
+            if (lastSample_.first <= timex)
+                return CurvePoint(lastSample_.first / 1000.0, lastSample_.second);
         //--------------------------------------------------
 
         //find first key > x, then go one step back: => samples must be a std::map, NOT std::multimap!!!
-        auto it = samples.upper_bound(timex);
-        if (it == samples.begin())
+        auto it = samples_.upper_bound(timex);
+        if (it == samples_.begin())
             return NoValue();
         //=> samples not empty in this context
         --it;
@@ -1070,21 +1070,21 @@ private:
     {
         const int64_t timex = std::ceil(x * 1000);
         //------ add artifical last sample value -------
-        if (!samples.empty() && samples.rbegin()->first < lastSample.first)
-            if (samples.rbegin()->first < timex && timex <= lastSample.first)
-                return CurvePoint(lastSample.first / 1000.0, lastSample.second);
+        if (!samples_.empty() && samples_.rbegin()->first < lastSample_.first)
+            if (samples_.rbegin()->first < timex && timex <= lastSample_.first)
+                return CurvePoint(lastSample_.first / 1000.0, lastSample_.second);
         //--------------------------------------------------
 
-        auto it = samples.lower_bound(timex);
-        if (it == samples.end())
+        auto it = samples_.lower_bound(timex);
+        if (it == samples_.end())
             return NoValue();
         return CurvePoint(it->first / 1000.0, it->second);
     }
 
     static const size_t MAX_BUFFER_SIZE = 2500000; //sizeof(single node) worst case ~ 3 * 8 byte ptr + 16 byte key/value = 40 byte
 
-    std::map <int64_t, double> samples; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
-    std::pair<int64_t, double> lastSample; //artificial most current record at the end of samples to visualize current time!
+    std::map <int64_t, double> samples_; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
+    std::pair<int64_t, double> lastSample_; //artificial most current record at the end of samples to visualize current time!
 };
 
 
@@ -1098,7 +1098,7 @@ public:
 private:
     std::pair<double, double> getRangeX() const override { return std::make_pair(x_, x_); } //conceptually just a vertical line!
 
-    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override
+    std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const override
     {
         return
         {
@@ -1228,7 +1228,7 @@ public:
 
     void initNewPhase        () override;
     void notifyProgressChange() override;
-    void updateGui           () override { updateGuiInt(true); }
+    void updateGui           () override { updateGuiInt(true /*allowYield*/); }
 
     Zstring getExecWhenFinishedCommand() const override { return pnl_.m_comboBoxOnCompletion->getValue(); }
 
@@ -1373,13 +1373,13 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     const int xLabelHeight = this->GetCharHeight() + 2 * 1 /*border*/; //use same height for both graphs to make sure they stretch evenly
     const int yLabelWidth  = 70;
     pnl_.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().
-                                          setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
+                                          setLabelX(Graph2D::LABEL_X_TOP,    xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
                                           setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterBytes>()).
                                           setBackgroundColor(wxColor(208, 208, 208)). //light grey
                                           setSelectionMode(Graph2D::SELECT_NONE));
 
     pnl_.m_panelGraphItems->setAttributes(Graph2D::MainAttributes().
-                                          setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(false)).
+                                          setLabelX(Graph2D::LABEL_X_BOTTOM, xLabelHeight, std::make_shared<LabelFormatterTimeElapsed>(true)).
                                           setLabelY(Graph2D::LABEL_Y_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterItemCount>()).
                                           setBackgroundColor(wxColor(208, 208, 208)). //light grey
                                           setSelectionMode(Graph2D::SELECT_NONE));
@@ -1424,7 +1424,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
         pnl_.m_buttonStop->SetFocus(); //don't steal focus when starting in sys-tray!
 
         //clear gui flicker, remove dummy texts: window must be visible to make this work!
-        updateGuiInt(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
+        updateGuiInt(true /*allowYield*/); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
     }
     else
         minimizeToTray();
@@ -1863,7 +1863,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
 
     //update numbers one last time (as if sync were still running)
     notifyProgressChange(); //make one last graph entry at the *current* time
-    updateGuiInt(false);
+    updateGuiInt(false /*allowYield*/);
 
     switch (syncStat_->currentPhase()) //no matter if paused or not
     {
@@ -1984,8 +1984,11 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
             {
                 const Zstring soundFilePath = getResourceDirPf() + soundFileSyncComplete_;
                 if (fileAvailable(soundFilePath))
-                    wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+                    wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC);
+                //warning: this may fail and show a wxWidgets error message! => must not play when running FFS without user interaction!
             }
+            //if (::GetForegroundWindow() != GetHWND())
+            //  RequestUserAttention(); -> probably too much since task bar already alreay is colorized with Taskbar::STATUS_ERROR or STATUS_NORMAL
             break;
     }
 
@@ -2082,7 +2085,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
         trayIcon_ = std::make_unique<FfsTrayIcon>([this] { this->resumeFromSystray(); }); //FfsTrayIcon lifetime is a subset of "this"'s lifetime!
         //we may destroy FfsTrayIcon even while in the FfsTrayIcon callback!!!!
 
-        updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused
+        updateGuiInt(false /*allowYield*/); //set tray tooltip + progress: e.g. no updates while paused
 
         this->Hide();
         if (parentFrame_)
@@ -2112,8 +2115,8 @@ void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
         this->Raise();
         this->SetFocus();
 
-        updateDialogStatus(); //restore Windows 7 task bar status   (e.g. required in pause mode)
-        updateGuiInt(false);  //restore Windows 7 task bar progress (e.g. required in pause mode)
+        updateDialogStatus();               //restore Windows 7 task bar status   (e.g. required in pause mode)
+        updateGuiInt(false) /*allowYield*/; //restore Windows 7 task bar progress (e.g. required in pause mode)
 
     }
 }

@@ -12,6 +12,7 @@
 #include "scope_guard.h"
 #include "type_traits.h"
 #include "optional.h"
+    #include <sys/prctl.h>
 
 
 namespace zen
@@ -46,7 +47,7 @@ public:
 
 private:
     std::thread stdThread_;
-    std::shared_ptr<InterruptionStatus> intStatus_;
+    std::shared_ptr<InterruptionStatus> intStatus_{ std::make_shared<InterruptionStatus>() };
     std::future<void> threadCompleted_;
 };
 
@@ -59,6 +60,7 @@ void interruptibleWait(std::condition_variable& cv, std::unique_lock<std::mutex>
 template <class Rep, class Period>
 void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime); //throw ThreadInterruption
 
+void setCurrentThreadName(const char* threadName);
 
 uint64_t getThreadId(); //simple integer thread id, unlike boost::thread::id: https://svn.boost.org/trac/boost/ticket/5754
 
@@ -121,7 +123,7 @@ public:
     template <class Function>
     void access(Function fun)
     {
-        std::lock_guard<std::mutex> dummy(lockValue);
+        std::lock_guard<std::mutex> dummy(lockValue_);
         fun(value_);
     }
 
@@ -129,7 +131,7 @@ private:
     Protected           (const Protected&) = delete;
     Protected& operator=(const Protected&) = delete;
 
-    std::mutex lockValue;
+    std::mutex lockValue_;
     T value_{};
 };
 
@@ -267,24 +269,24 @@ public:
     //context of InterruptibleThread instance:
     void interrupt()
     {
-        interrupted = true;
+        interrupted_ = true;
 
         {
-            std::lock_guard<std::mutex> dummy(lockSleep); //needed! makes sure the following signal is not lost!
+            std::lock_guard<std::mutex> dummy(lockSleep_); //needed! makes sure the following signal is not lost!
             //usually we'd make "interrupted" non-atomic, but this is already given due to interruptibleWait() handling
         }
-        conditionSleepInterruption.notify_all();
+        conditionSleepInterruption_.notify_all();
 
-        std::lock_guard<std::mutex> dummy(lockConditionPtr);
-        if (activeCondition)
-            activeCondition->notify_all(); //signal may get lost!
+        std::lock_guard<std::mutex> dummy(lockConditionPtr_);
+        if (activeCondition_)
+            activeCondition_->notify_all(); //signal may get lost!
         //alternative design locking the cv's mutex here could be dangerous: potential for dead lock!
     }
 
     //context of worker thread:
     void checkInterruption() //throw ThreadInterruption
     {
-        if (interrupted)
+        if (interrupted_)
             throw ThreadInterruption();
     }
 
@@ -296,7 +298,7 @@ public:
         ZEN_ON_SCOPE_EXIT(setConditionVar(nullptr));
 
         //"interrupted" is not protected by cv's mutex => signal may get lost!!! => add artifical time out to mitigate! CPU: 0.25% vs 0% for longer time out!
-        while (!cv.wait_for(lock, std::chrono::milliseconds(1), [&] { return this->interrupted || pred(); }))
+        while (!cv.wait_for(lock, std::chrono::milliseconds(1), [&] { return this->interrupted_ || pred(); }))
             ;
 
         checkInterruption(); //throw ThreadInterruption
@@ -306,26 +308,26 @@ public:
     template <class Rep, class Period>
     void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime) //throw ThreadInterruption
     {
-        std::unique_lock<std::mutex> lock(lockSleep);
-        if (conditionSleepInterruption.wait_for(lock, relTime, [this] { return static_cast<bool>(this->interrupted); }))
+        std::unique_lock<std::mutex> lock(lockSleep_);
+        if (conditionSleepInterruption_.wait_for(lock, relTime, [this] { return static_cast<bool>(this->interrupted_); }))
             throw ThreadInterruption();
     }
 
 private:
     void setConditionVar(std::condition_variable* cv)
     {
-        std::lock_guard<std::mutex> dummy(lockConditionPtr);
-        activeCondition = cv;
+        std::lock_guard<std::mutex> dummy(lockConditionPtr_);
+        activeCondition_ = cv;
     }
 
-    std::atomic<bool> interrupted{ false }; //std:atomic is uninitialized by default!!!
+    std::atomic<bool> interrupted_{ false }; //std:atomic is uninitialized by default!!!
     //"The default constructor is trivial: no initialization takes place other than zero initialization of static and thread-local objects."
 
-    std::condition_variable* activeCondition = nullptr;
-    std::mutex lockConditionPtr; //serialize pointer access (only!)
+    std::condition_variable* activeCondition_ = nullptr;
+    std::mutex lockConditionPtr_; //serialize pointer access (only!)
 
-    std::condition_variable conditionSleepInterruption;
-    std::mutex lockSleep;
+    std::condition_variable conditionSleepInterruption_;
+    std::mutex lockSleep_;
 };
 
 
@@ -373,7 +375,7 @@ void interruptibleSleep(const std::chrono::duration<Rep, Period>& relTime) //thr
 
 
 template <class Function> inline
-InterruptibleThread::InterruptibleThread(Function&& f) : intStatus_(std::make_shared<InterruptionStatus>())
+InterruptibleThread::InterruptibleThread(Function&& f)
 {
     std::promise<void> pFinished;
     threadCompleted_ = pFinished.get_future();
@@ -400,6 +402,14 @@ inline
 void InterruptibleThread::interrupt() { intStatus_->interrupt(); }
 
 
+
+
+inline
+void setCurrentThreadName(const char* threadName)
+{
+    ::prctl(PR_SET_NAME, threadName, 0, 0, 0);
+
+}
 
 
 inline

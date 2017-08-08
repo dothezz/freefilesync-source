@@ -69,14 +69,20 @@ std::wstring zen::getVariantName(CompareVariant var)
 
 std::wstring zen::getVariantName(DirectionConfig::Variant var)
 {
+    //const wchar_t arrowLeft [] = L"\u2190";
+    //const wchar_t arrowRight[] = L"\u2192"; unicode arrows -> too small
+    const wchar_t arrowLeft [] = L"\uFF1C\u2013"; //fullwidth less-than + en dash
+    const wchar_t arrowRight[] = L"\u2013\uFF1E"; //en dash + fullwidth greater-than
+    const wchar_t angleRight[] = L"\uFF1E";
+
     switch (var)
     {
         case DirectionConfig::TWO_WAY:
-            return L"<- " + _("Two way") + L" ->";
+            return std::wstring(arrowLeft) + L" " + _("Two way") + L" " + arrowRight;
         case DirectionConfig::MIRROR:
-            return _("Mirror") + L" ->";
+            return _("Mirror") + L" " + arrowRight;
         case DirectionConfig::UPDATE:
-            return _("Update") + L" >";
+            return _("Update") + L" " + angleRight;
         case DirectionConfig::CUSTOM:
             return _("Custom");
     }

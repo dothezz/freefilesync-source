@@ -619,7 +619,7 @@ void OptionsDlg::OnResetDialogs(wxCommandEvent& event)
                                    PopupDialogCfg().setMainInstructions(_("Show hidden dialogs and warning messages again?")),
                                    _("&Show")))
     {
-        case ConfirmationButton::DO_IT:
+        case ConfirmationButton::ACCEPT:
             globalSettingsOut.optDialogs = xmlAccess::OptionalDialogs();
             break;
         case ConfirmationButton::CANCEL:

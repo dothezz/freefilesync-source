@@ -825,13 +825,18 @@ void readConfig(const XmlIn& in, DirectionConfig& directCfg)
 {
     in["Variant"](directCfg.var);
 
-    XmlIn inCustDir = in["CustomDirections"];
-    inCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
-    inCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
-    inCustDir["LeftNewer" ](directCfg.custom.leftNewer);
-    inCustDir["RightNewer"](directCfg.custom.rightNewer);
-    inCustDir["Different" ](directCfg.custom.different);
-    inCustDir["Conflict"  ](directCfg.custom.conflict);
+    if (directCfg.var == DirectionConfig::CUSTOM)
+    {
+        XmlIn inCustDir = in["CustomDirections"];
+        inCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
+        inCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
+        inCustDir["LeftNewer" ](directCfg.custom.leftNewer);
+        inCustDir["RightNewer"](directCfg.custom.rightNewer);
+        inCustDir["Different" ](directCfg.custom.different);
+        inCustDir["Conflict"  ](directCfg.custom.conflict);
+    }
+    else
+        directCfg.custom = DirectionSet();
 
     in["DetectMovedFiles"](directCfg.detectMovedFiles);
 }
@@ -1313,13 +1318,16 @@ void writeConfig(const DirectionConfig& directCfg, XmlOut& out)
 {
     out["Variant"](directCfg.var);
 
-    XmlOut outCustDir = out["CustomDirections"];
-    outCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
-    outCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
-    outCustDir["LeftNewer" ](directCfg.custom.leftNewer);
-    outCustDir["RightNewer"](directCfg.custom.rightNewer);
-    outCustDir["Different" ](directCfg.custom.different);
-    outCustDir["Conflict"  ](directCfg.custom.conflict);
+    if (directCfg.var == DirectionConfig::CUSTOM)
+    {
+        XmlOut outCustDir = out["CustomDirections"];
+        outCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
+        outCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
+        outCustDir["LeftNewer" ](directCfg.custom.leftNewer);
+        outCustDir["RightNewer"](directCfg.custom.rightNewer);
+        outCustDir["Different" ](directCfg.custom.different);
+        outCustDir["Conflict"  ](directCfg.custom.conflict);
+    }
 
     out["DetectMovedFiles"](directCfg.detectMovedFiles);
 }

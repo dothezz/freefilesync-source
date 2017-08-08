@@ -226,7 +226,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     };
 
     //- client needs to handle duplicate file reports! (FilePlusTraverser fallback, retrying to read directory contents, ...)
-    static void traverseFolder(const AbstractPath& ap, TraverserCallback& sink) { ap.afs->traverseFolder(ap.afsPath, sink); }
+    static void traverseFolder(const AbstractPath& ap, TraverserCallback& sink /*throw X*/) { ap.afs->traverseFolder(ap.afsPath, sink); } //throw X
     //----------------------------------------------------------------------------------------------------------------
 
     static bool supportPermissionCopy(const AbstractPath& apSource, const AbstractPath& apTarget); //throw FileError
@@ -346,7 +346,7 @@ private:
                                                               const uint64_t* streamSize,                      //optional
                                                               const IOCallback& notifyUnbufferedIO) const = 0; //
     //----------------------------------------------------------------------------------------------------------------
-    virtual void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink) const = 0; //noexcept
+    virtual void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink /*throw X*/) const = 0; //throw X
     //----------------------------------------------------------------------------------------------------------------
     virtual bool supportsPermissions(const AfsPath& afsPath) const = 0; //throw FileError
 
@@ -383,7 +383,7 @@ private:
 
 //implement "retry" in a generic way:
 template <class Command> inline //function object expecting to throw FileError if operation fails
-bool tryReportingDirError(Command cmd, AbstractFileSystem::TraverserCallback& callback) //return "true" on success, "false" if error was ignored
+bool tryReportingDirError(Command cmd, AbstractFileSystem::TraverserCallback& callback) //throw X, return "true" on success, "false" if error was ignored
 {
     for (size_t retryNumber = 0;; ++retryNumber)
         try
@@ -405,7 +405,7 @@ bool tryReportingDirError(Command cmd, AbstractFileSystem::TraverserCallback& ca
 
 
 template <class Command> inline //function object expecting to throw FileError if operation fails
-bool tryReportingItemError(Command cmd, AbstractFileSystem::TraverserCallback& callback, const Zstring& itemName) //return "true" on success, "false" if error was ignored
+bool tryReportingItemError(Command cmd, AbstractFileSystem::TraverserCallback& callback, const Zstring& itemName) //throw X, return "true" on success, "false" if error was ignored
 {
     for (size_t retryNumber = 0;; ++retryNumber)
         try
@@ -482,12 +482,12 @@ AbstractFileSystem::OutputStream::OutputStream(std::unique_ptr<OutputStreamImpl>
 inline
 AbstractFileSystem::OutputStream::~OutputStream()
 {
-    //we delete the file on errors: => must fail if already existing BEFORE creating OutputStream instance!!
+    //we delete the file on errors: => file should not have existed prior to creating OutputStream instance!!
     outStream_.reset(); //close file handle *before* remove!
 
     if (!finalizeSucceeded_) //transactional output stream! => clean up!
         try { AbstractFileSystem::removeFilePlain(filePath_); /*throw FileError*/ }
-        catch (FileError& e) { (void)e; assert(false); }
+        catch (FileError& e) { (void)e; }
 }
 
 

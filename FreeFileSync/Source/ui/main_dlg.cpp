@@ -87,6 +87,46 @@ bool isComponentOf(const wxWindow* child, const wxWindow* top)
 }
 
 
+inline
+wxTopLevelWindow* getTopLevelWindow(wxWindow* child)
+{
+    for (wxWindow* wnd = child; wnd != nullptr; wnd = wnd->GetParent())
+        if (auto tlw = dynamic_cast<wxTopLevelWindow*>(wnd)) //why does wxWidgets use wxWindows::IsTopLevel() ??
+            return tlw;
+    return nullptr;
+}
+
+
+/*
+Preserving input focus has to be more clever than:
+    wxWindow* oldFocus = wxWindow::FindFocus();
+    ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus());
+
+=> wxWindow::SetFocus() internally calls Win32 ::SetFocus, which calls ::SetActiveWindow, which - lord knows why - changes the foreground window to the focus window
+    even if the user is currently busy using a different app! More curiosity: this foreground focus stealing happens only during the *first* SetFocus() after app start!
+    It also can be avoided by changing focus back and forth with some other app after start => wxWidgets bug or Win32 feature???
+*/
+struct FocusPreserver
+{
+    ~FocusPreserver()
+    {
+        //wxTopLevelWindow::IsActive() does NOT call Win32 ::GetActiveWindow()!
+        //Instead it checks if ::GetFocus() is set somewhere inside the top level
+        //Note: Both Win32 active and focus windows are *thread-local* values, while foreground window is global! https://blogs.msdn.microsoft.com/oldnewthing/20131016-00/?p=2913
+        if (oldFocus_)
+            if (wxTopLevelWindow* topWin = getTopLevelWindow(oldFocus_))
+                if (topWin->IsActive()) //Linux/macOS: already behaves just like ::GetForegroundWindow() on Windows!
+                    oldFocus_->SetFocus();
+    }
+
+    wxWindow* getFocus()        const { return oldFocus_; }
+    void      setFocus(wxWindow* win) { oldFocus_ = win; }
+
+private:
+    wxWindow* oldFocus_ = wxWindow::FindFocus();
+};
+
+
 bool acceptDialogFileDrop(const std::vector<Zstring>& shellItemPaths)
 {
     return std::any_of(shellItemPaths.begin(), shellItemPaths.end(), [](const Zstring& shellItemPath)
@@ -470,7 +510,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
                     wxAuiPaneInfo().Name(L"CenterPanel").CenterPane().PaneBorder(false));
     {
         //set comparison button label tentatively for m_panelTopButtons to receive final height:
-        updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false);
+        updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), L"Dummy", false /*makeGrey*/);
         m_panelTopButtons->GetSizer()->SetSizeHints(m_panelTopButtons); //~=Fit() + SetMinSize()
 
         setBitmapTextLabel(*m_buttonCancel, wxImage(), m_buttonCancel->GetLabel()); //we can't use a wxButton for cancel: it's rendered smaller on OS X than a wxBitmapButton!
@@ -1166,8 +1206,7 @@ void MainDialog::copyToAlternateFolder(const std::vector<zen::FileSystemObject*>
     if (rowsLeftTmp.empty() && rowsRightTmp.empty())
         return;
 
-    wxWindow* oldFocus = wxWindow::FindFocus();
-    ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus());
+    FocusPreserver fp;
 
     if (zen::showCopyToDialog(this,
                               rowsLeftTmp, rowsRightTmp,
@@ -1210,8 +1249,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
     if (rowsLeftTmp.empty() && rowsRightTmp.empty())
         return;
 
-    wxWindow* oldFocus = wxWindow::FindFocus();
-    ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus());
+    FocusPreserver fp;
 
     //sigh: do senseless vector<FileSystemObject*> -> vector<const FileSystemObject*> conversion:
     if (zen::showDeleteDialog(this, { rowsLeftTmp.begin(), rowsLeftTmp.end() }, { rowsRightTmp.begin(), rowsRightTmp.end() },
@@ -1404,7 +1442,7 @@ void MainDialog::openExternalApplication(const Zstring& commandLinePhrase, bool 
                                            setCheckBox(dontAskAgain, _("&Don't show this warning again")),
                                            _("&Execute")))
             {
-                case ConfirmationButton::DO_IT:
+                case ConfirmationButton::ACCEPT:
                     globalCfg_.optDialogs.confirmExternalCommandMassInvoke = !dontAskAgain;
                     break;
                 case ConfirmationButton::CANCEL:
@@ -1427,8 +1465,7 @@ void MainDialog::openExternalApplication(const Zstring& commandLinePhrase, bool 
     //##################### create temporary files for non-native paths ######################
     if (!nonNativeFiles.empty())
     {
-        wxWindow* oldFocus = wxWindow::FindFocus();
-        ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus());
+        FocusPreserver fp;
 
         disableAllElements(true); //StatusHandlerTemporaryPanel will internally process Window messages, so avoid unexpected callbacks!
         auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
@@ -1591,10 +1628,11 @@ void MainDialog::disableAllElements(bool enableAbort)
         //show abort button
         m_buttonCancel->Enable();
         m_buttonCancel->Show();
-        if (m_buttonCancel->IsShownOnScreen())
-            m_buttonCancel->SetFocus();
+        //if (m_buttonCancel->IsShownOnScreen()) -> needed?
+        m_buttonCancel->SetFocus();
         m_buttonCompare->Disable();
         m_buttonCompare->Hide();
+
         m_panelTopButtons->Layout();
     }
     else
@@ -2801,9 +2839,9 @@ void MainDialog::updateUnsavedCfgStatus()
         title += utfTo<wxString>(activeCfgFilename);
     else if (activeConfigFiles_.size() > 1)
     {
-        const wchar_t* EM_DASH = L" \u2014 ";
+        const wchar_t* EN_DASH = L" \u2013 ";
         title += xmlAccess::extractJobName(activeConfigFiles_[0]);
-        std::for_each(activeConfigFiles_.begin() + 1, activeConfigFiles_.end(), [&](const Zstring& filepath) { title += EM_DASH + xmlAccess::extractJobName(filepath); });
+        std::for_each(activeConfigFiles_.begin() + 1, activeConfigFiles_.end(), [&](const Zstring& filepath) { title += EN_DASH + xmlAccess::extractJobName(filepath); });
     }
     else
         title += L"FreeFileSync - " + _("Folder Comparison and Synchronization");
@@ -3004,14 +3042,14 @@ bool MainDialog::saveOldConfig() //return false on user abort
                 //only if check is active and non-default config file loaded
             {
                 bool neverSaveChanges = false;
-                switch (showConfirmationDialog3(this, DialogInfoType::INFO, PopupDialogCfg3().
-                                                setTitle(utfTo<wxString>(activeCfgFilename)).
-                                                setMainInstructions(replaceCpy(_("Do you want to save changes to %x?"), L"%x",
-                                                                               fmtPath(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)))).
-                                                setCheckBox(neverSaveChanges, _("Never save &changes"), ConfirmationButton3::DO_IT),
-                                                _("&Save"), _("Do&n't save")))
+                switch (showQuestionDialog(this, DialogInfoType::INFO, PopupDialogCfg().
+                                           setTitle(utfTo<wxString>(activeCfgFilename)).
+                                           setMainInstructions(replaceCpy(_("Do you want to save changes to %x?"), L"%x",
+                                                                          fmtPath(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL)))).
+                                           setCheckBox(neverSaveChanges, _("Never save &changes"), QuestionButton2::YES),
+                                           _("&Save"), _("Do&n't save")))
                 {
-                    case ConfirmationButton3::DO_IT: //save
+                    case QuestionButton2::YES: //save
                         using namespace xmlAccess;
 
                         try
@@ -3036,11 +3074,11 @@ bool MainDialog::saveOldConfig() //return false on user abort
                         }
                         break;
 
-                    case ConfirmationButton3::DONT_DO_IT: //don't save
+                    case QuestionButton2::NO: //don't save
                         globalCfg_.optDialogs.popupOnConfigChange = !neverSaveChanges;
                         break;
 
-                    case ConfirmationButton3::CANCEL:
+                    case QuestionButton2::CANCEL:
                         return false;
                 }
             }
@@ -3675,8 +3713,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 {
     //wxBusyCursor dummy; -> redundant: progress already shown in progress dialog!
 
-    wxWindow* oldFocus = wxWindow::FindFocus();
-    ZEN_ON_SCOPE_EXIT(if (oldFocus && oldFocus->IsShownOnScreen()) oldFocus->SetFocus()); //e.g. keep focus on config panel after pressing F5
+    FocusPreserver fp; //e.g. keep focus on config panel after pressing F5
 
     int scrollPosX = 0;
     int scrollPosY = 0;
@@ -3734,15 +3771,19 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     {
         const Zstring soundFilePath = getResourceDirPf() + globalCfg_.soundFileCompareFinished;
         if (fileAvailable(soundFilePath))
-            wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as batch!
+            wxSound::Play(utfTo<wxString>(soundFilePath), wxSOUND_ASYNC);
+        //warning: this may fail and show a wxWidgets error message! => must not play when running FFS without user interaction!
     }
+
+    if (!IsActive())
+        RequestUserAttention();
 
     //add to folder history after successful comparison only
     folderHistoryLeft_ ->addItem(utfTo<Zstring>(m_folderPathLeft ->GetValue()));
     folderHistoryRight_->addItem(utfTo<Zstring>(m_folderPathRight->GetValue()));
 
-    if (oldFocus == m_buttonCompare)
-        oldFocus = m_buttonSync;
+    if (fp.getFocus() == m_buttonCompare)
+        fp.setFocus(m_buttonSync);
 
     //prepare status information
     if (allElementsEqual(folderCmp_))
@@ -3752,7 +3793,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 
 void MainDialog::updateTopButtonImages()
 {
-    updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), getConfig().mainCfg.getCompVariantName(), false);
+    updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), getConfig().mainCfg.getCompVariantName(), false /*makeGrey*/);
     updateTopButton(*m_buttonSync,    getResourceImage(L"sync"),    getConfig().mainCfg.getSyncVariantName(), folderCmp_.empty());
 
     m_panelTopButtons->Layout();

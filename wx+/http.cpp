@@ -77,22 +77,29 @@ public:
     size_t read(void* buffer, size_t bytesToRead) //throw SysError, X; return "bytesToRead" bytes unless end of stream!
     {
         const size_t blockSize = getBlockSize();
-
-        while (memBuf_.size() < bytesToRead)
+        assert(memBuf_.size() <= blockSize);
+        char*       it    = static_cast<char*>(buffer);
+        char* const itEnd = it + bytesToRead;
+        for (;;)
         {
-            memBuf_.resize(memBuf_.size() + blockSize);
-            const size_t bytesRead = tryRead(&*(memBuf_.end() - blockSize), blockSize); //throw SysError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-            memBuf_.resize(memBuf_.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
+            const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), memBuf_.size());
+            std::copy    (memBuf_.begin(), memBuf_.begin() + junkSize, it);
+            memBuf_.erase(memBuf_.begin(), memBuf_.begin() + junkSize);
+            it += junkSize;
+
+            if (it == itEnd)
+                break;
+            //--------------------------------------------------------------------
+            memBuf_.resize(blockSize);
+            const size_t bytesRead = tryRead(&memBuf_[0], blockSize); //throw SysError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+            memBuf_.resize(bytesRead);
 
             if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
 
             if (bytesRead == 0) //end of file
-                bytesToRead = std::min(bytesToRead, memBuf_.size());
+                break;
         }
-
-        std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
-        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesToRead);
-        return bytesToRead;
+        return it - static_cast<char*>(buffer);
     }
 
     size_t getBlockSize() const { return 64 * 1024; }

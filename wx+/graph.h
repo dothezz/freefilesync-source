@@ -47,7 +47,7 @@ struct CurveData
     virtual ~CurveData() {}
 
     virtual std::pair<double, double> getRangeX() const = 0;
-    virtual std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const = 0; //points outside the draw area are automatically trimmed!
+    virtual std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const = 0; //points outside the draw area are automatically trimmed!
 };
 
 //special curve types:
@@ -56,7 +56,7 @@ struct ContinuousCurveData : public CurveData
     virtual double getValue(double x) const = 0;
 
 private:
-    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override;
+    std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const override;
 };
 
 struct SparseCurveData : public CurveData
@@ -67,7 +67,7 @@ struct SparseCurveData : public CurveData
     virtual Opt<CurvePoint> getGreaterEq(double x) const = 0;
 
 private:
-    std::vector<CurvePoint> getPoints(double minX, double maxX, int pixelWidth) const override;
+    std::vector<CurvePoint> getPoints(double minX, double maxX, const wxSize& areaSizePx) const override;
     const bool addSteps_;
 };
 

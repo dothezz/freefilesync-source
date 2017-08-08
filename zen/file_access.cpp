@@ -345,7 +345,7 @@ void zen::renameFile(const Zstring& pathSource, const Zstring& pathTarget) //thr
         const Zstring fileNameTrg   = afterLast (pathTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_ALL);
         const Zstring parentPathSrc = beforeLast(pathSource, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
         const Zstring parentPathTrg = beforeLast(pathTarget, FILE_NAME_SEPARATOR, IF_MISSING_RETURN_NONE);
-        //some (broken) devices may fail to rename case directly: 
+        //some (broken) devices may fail to rename case directly:
         if (equalFilePath(parentPathSrc, parentPathTrg))
         {
             if (fileNameSrc == fileNameTrg)
@@ -385,12 +385,12 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
     if (procSl == ProcSymlink::FOLLOW)
     {
         //hell knows why files on gvfs-mounted Samba shares fail to open(O_WRONLY) returning EOPNOTSUPP:
-        //http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works
+        //http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works (but not for gvfs SFTP)
         if (::utimensat(AT_FDCWD, itemPath.c_str(), newTimes, 0) == 0)
             return;
 
         //in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: http://www.freefilesync.org/forum/viewtopic.php?t=387
-        const int fdFile = ::open(itemPath.c_str(), O_WRONLY);
+        const int fdFile = ::open(itemPath.c_str(), O_WRONLY | O_APPEND); //2017-07-04: O_WRONLY | O_APPEND seems to avoid EOPNOTSUPP on gvfs SFTP!
         if (fdFile == -1)
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"open");
         ZEN_ON_SCOPE_EXIT(::close(fdFile));
@@ -515,7 +515,7 @@ void zen::createDirectory(const Zstring& dirPath) //throw FileError, ErrorTarget
 {
     const mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO; //0777, default for newly created directories
 
-	if (::mkdir(dirPath.c_str(), mode) != 0)
+    if (::mkdir(dirPath.c_str(), mode) != 0)
     {
         const int lastError = errno; //copy before directly or indirectly making other system calls!
         const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtPath(dirPath));
@@ -537,7 +537,7 @@ void zen::createDirectoryIfMissingRecursion(const Zstring& dirPath) //throw File
 
     try
     {
-		createDirectory(dirPath); //throw FileError, ErrorTargetExisting
+        createDirectory(dirPath); //throw FileError, ErrorTargetExisting
     }
     catch (FileError&)
     {
@@ -628,7 +628,10 @@ FileCopyResult copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, 
     FileOutput fileOut(fdTarget, targetFile, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //pass ownership
 
     bufferedStreamCopy(fileIn, fileOut); //throw FileError, X
+
+    //flush intermediate buffers before fiddling with the raw file handle
     fileOut.flushBuffers();              //throw FileError, X
+
     struct ::stat targetInfo = {};
     if (::fstat(fileOut.getHandle(), &targetInfo) != 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(targetFile)), L"fstat");

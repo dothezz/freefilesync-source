@@ -310,8 +310,9 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                     switch (showConfirmationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().
                                                    setDetailInstructions(msg), _("&Retry")))
                     {
-                        case ConfirmationButton::DO_IT: //retry
+                        case ConfirmationButton::ACCEPT: //retry
                             return;
+
                         case ConfirmationButton::CANCEL:
                             throw AbortMonitoring(SHOW_GUI);
                     }

@@ -16,11 +16,13 @@ namespace zen
 {
 struct StdButtons
 {
-    StdButtons& setAffirmative (wxButton* btn) { btnYes    = btn; return *this; }
-    StdButtons& setNegative    (wxButton* btn) { btnNo     = btn; return *this; }
-    StdButtons& setCancel      (wxButton* btn) { btnCancel = btn; return *this; }
+    StdButtons& setAffirmative   (wxButton* btn) { btnYes    = btn; return *this; }
+    StdButtons& setAffirmativeAll(wxButton* btn) { btnYesAll = btn; return *this; }
+    StdButtons& setNegative      (wxButton* btn) { btnNo     = btn; return *this; }
+    StdButtons& setCancel        (wxButton* btn) { btnCancel = btn; return *this; }
 
     wxButton* btnYes    = nullptr;
+    wxButton* btnYesAll = nullptr;
     wxButton* btnNo     = nullptr;
     wxButton* btnCancel = nullptr;
 };
@@ -64,6 +66,7 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
     };
 
     detach(buttonsTmp.btnYes);
+    detach(buttonsTmp.btnYesAll);
     detach(buttonsTmp.btnNo);
     detach(buttonsTmp.btnCancel);
 
@@ -106,11 +109,13 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
     sizer.Add(spaceRimH, 0);
     attach(buttonsTmp.btnNo);
     attach(buttonsTmp.btnCancel);
+    attach(buttonsTmp.btnYesAll);
     attach(buttonsTmp.btnYes);
 
     sizer.Add(spaceRimH, 0);
 
-    assert(buttonsTmp.btnCancel || buttonsTmp.btnYes); //OS X: there should be at least one button following the gap after the "dangerous" no-button
+    //OS X: there should be at least one button following the gap after the "dangerous" no-button
+    assert(buttonsTmp.btnYes);
 }
 }
 

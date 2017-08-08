@@ -76,30 +76,18 @@ ImageHolder getDisplayIcon(const AbstractPath& itemPath, IconBuffer::IconSize sz
 class WorkLoad
 {
 public:
-    //context of worker thread, blocking:
-    AbstractPath extractNextFile() //throw ThreadInterruption
-    {
-        assert(std::this_thread::get_id() != mainThreadId);
-        std::unique_lock<std::mutex> dummy(lockFiles);
-
-        interruptibleWait(conditionNewWork, dummy, [this] { return !workLoad.empty(); }); //throw ThreadInterruption
-
-        AbstractPath filePath = workLoad.back(); //
-        workLoad.pop_back();                     //yes, no strong exception guarantee (std::bad_alloc)
-        return filePath;                         //
-    }
-
-    void setWorkload(const std::vector<AbstractPath>& newLoad) //context of main thread
+    //context of main thread
+    void setWorkload(const std::vector<AbstractPath>& newLoad)
     {
         assert(std::this_thread::get_id() == mainThreadId);
         {
-            std::lock_guard<std::mutex> dummy(lockFiles);
+            std::lock_guard<std::mutex> dummy(lockFiles_);
 
-            workLoad.clear();
+            workLoad_.clear();
             for (const AbstractPath& filePath : newLoad)
-                workLoad.emplace_back(filePath);
+                workLoad_.emplace_back(filePath);
         }
-        conditionNewWork.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
+        conditionNewWork_.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
     }
 
@@ -107,17 +95,30 @@ public:
     {
         assert(std::this_thread::get_id() == mainThreadId);
         {
-            std::lock_guard<std::mutex> dummy(lockFiles);
-            workLoad.emplace_back(filePath); //set as next item to retrieve
+            std::lock_guard<std::mutex> dummy(lockFiles_);
+            workLoad_.emplace_back(filePath); //set as next item to retrieve
         }
-        conditionNewWork.notify_all();
+        conditionNewWork_.notify_all();
+    }
+
+    //context of worker thread, blocking:
+    AbstractPath extractNextFile() //throw ThreadInterruption
+    {
+        assert(std::this_thread::get_id() != mainThreadId);
+        std::unique_lock<std::mutex> dummy(lockFiles_);
+
+        interruptibleWait(conditionNewWork_, dummy, [this] { return !workLoad_.empty(); }); //throw ThreadInterruption
+
+        AbstractPath filePath = workLoad_.back(); //
+        workLoad_.pop_back();                     //yes, no strong exception guarantee (std::bad_alloc)
+        return filePath;                          //
     }
 
 private:
     //AbstractPath is thread-safe like an int!
-    std::vector<AbstractPath> workLoad; //processes last elements of vector first!
-    std::mutex                lockFiles;
-    std::condition_variable   conditionNewWork; //signal event: data for processing available
+    std::vector<AbstractPath> workLoad_; //processes last elements of vector first!
+    std::mutex                lockFiles_;
+    std::condition_variable   conditionNewWork_; //signal event: data for processing available
 };
 
 
@@ -127,7 +128,7 @@ public:
     //called by main and worker thread:
     bool hasIcon(const AbstractPath& filePath) const
     {
-        std::lock_guard<std::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList_);
         return iconList.find(filePath) != iconList.end();
     }
 
@@ -135,7 +136,7 @@ public:
     Opt<wxBitmap> retrieve(const AbstractPath& filePath)
     {
         assert(std::this_thread::get_id() == mainThreadId);
-        std::lock_guard<std::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList_);
 
         auto it = iconList.find(filePath);
         if (it == iconList.end())
@@ -155,7 +156,7 @@ public:
     //called by main and worker thread:
     void insert(const AbstractPath& filePath, ImageHolder&& icon)
     {
-        std::lock_guard<std::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList_);
 
         //thread safety: moving ImageHolder is free from side effects, but ~wxBitmap() is NOT! => do NOT delete items from iconList here!
         auto rc = iconList.emplace(filePath, makeValueObject());
@@ -172,11 +173,11 @@ public:
     void limitSize()
     {
         assert(std::this_thread::get_id() == mainThreadId);
-        std::lock_guard<std::mutex> dummy(lockIconList);
+        std::lock_guard<std::mutex> dummy(lockIconList_);
 
         while (iconList.size() > BUFFER_SIZE_MAX)
         {
-            auto itDelPos = firstInsertPos;
+            auto itDelPos = firstInsertPos_;
             priorityListPopFront();
             iconList.erase(itDelPos); //remove oldest element
         }
@@ -198,30 +199,30 @@ private:
     //call while holding lock:
     void priorityListPopFront()
     {
-        assert(firstInsertPos!= iconList.end());
-        firstInsertPos = refData(firstInsertPos).next_;
+        assert(firstInsertPos_!= iconList.end());
+        firstInsertPos_ = refData(firstInsertPos_).next_;
 
-        if (firstInsertPos != iconList.end())
-            refData(firstInsertPos).prev_ = iconList.end();
+        if (firstInsertPos_ != iconList.end())
+            refData(firstInsertPos_).prev_ = iconList.end();
         else //priority list size > BUFFER_SIZE_MAX in this context, but still for completeness:
-            lastInsertPos = iconList.end();
+            lastInsertPos_ = iconList.end();
     }
 
     //call while holding lock:
     void priorityListPushBack(FileIconMap::iterator it)
     {
-        if (lastInsertPos == iconList.end())
+        if (lastInsertPos_ == iconList.end())
         {
-            assert(firstInsertPos == iconList.end());
-            firstInsertPos = lastInsertPos = it;
+            assert(firstInsertPos_ == iconList.end());
+            firstInsertPos_ = lastInsertPos_ = it;
             refData(it).prev_ = refData(it).next_ = iconList.end();
         }
         else
         {
             refData(it).next_ = iconList.end();
-            refData(it).prev_ = lastInsertPos;
-            refData(lastInsertPos).next_ = it;
-            lastInsertPos = it;
+            refData(it).prev_ = lastInsertPos_;
+            refData(lastInsertPos_).next_ = it;
+            lastInsertPos_ = it;
         }
     }
 
@@ -238,7 +239,7 @@ private:
             }
             else
             {
-                assert(it == firstInsertPos);
+                assert(it == firstInsertPos_);
                 priorityListPopFront();
             }
             priorityListPushBack(it);
@@ -246,9 +247,9 @@ private:
         else
         {
             if (refData(it).prev_ != iconList.end())
-                assert(it == lastInsertPos); //nothing to do
+                assert(it == lastInsertPos_); //nothing to do
             else
-                assert(iconList.size() == 1 && it == firstInsertPos && it == lastInsertPos); //nothing to do
+                assert(iconList.size() == 1 && it == firstInsertPos_ && it == lastInsertPos_); //nothing to do
         }
     }
 
@@ -269,10 +270,10 @@ private:
         FileIconMap::iterator next_; //
     };
 
-    mutable std::mutex lockIconList;
+    mutable std::mutex lockIconList_;
     FileIconMap iconList; //shared resource; Zstring is thread-safe like an int
-    FileIconMap::iterator firstInsertPos = iconList.end();
-    FileIconMap::iterator lastInsertPos  = iconList.end();
+    FileIconMap::iterator firstInsertPos_ = iconList.end();
+    FileIconMap::iterator lastInsertPos_  = iconList.end();
 };
 
 //################################################################################################################################################
@@ -300,9 +301,11 @@ private:
 
 void WorkerThread::operator()() const //thread entry
 {
+    setCurrentThreadName("Icon Buffer Worker");
         for (;;)
         {
             interruptionPoint(); //throw ThreadInterruption
+            //needed? extractNextFile() is already interruptible...
 
             //start work: blocks until next icon to load is retrieved:
             const AbstractPath itemPath = workload_->extractNextFile(); //throw ThreadInterruption
@@ -335,7 +338,7 @@ IconBuffer::IconBuffer(IconSize sz) : pimpl(std::make_unique<Impl>()), iconSizeT
 
 IconBuffer::~IconBuffer()
 {
-    setWorkload({}); //make sure interruption point is always reached!
+    setWorkload({}); //make sure interruption point is always reached! //needed???
     pimpl->worker.interrupt();
     pimpl->worker.join();
 }

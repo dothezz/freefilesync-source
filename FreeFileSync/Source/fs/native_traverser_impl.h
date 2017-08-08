@@ -61,7 +61,7 @@ private:
 
     void traverse(const Zstring& dirPath, AFS::TraverserCallback& sink) //throw X
     {
-        tryReportingDirError([&]
+        tryReportingDirError([&] //throw X
         {
             traverseWithException(dirPath, sink); //throw FileError, X
         }, sink);
@@ -101,7 +101,7 @@ private:
             const Zstring& itemPath = appendSeparator(dirPath) + itemName;
 
             struct ::stat statData = {};
-            if (!tryReportingItemError([&]
+            if (!tryReportingItemError([&] //throw X
         {
             if (::lstat(itemPath.c_str(), &statData) != 0) //lstat() does not resolve symlinks
                     THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtPath(itemPath)), L"lstat");
@@ -119,7 +119,7 @@ private:
                         //try to resolve symlink (and report error on failure!!!)
                         struct ::stat statDataTrg = {};
 
-                        const bool validLink = tryReportingItemError([&]
+                        const bool validLink = tryReportingItemError([&] //throw X
                         {
                             if (::stat(itemPath.c_str(), &statDataTrg) != 0)
                                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtPath(itemPath)), L"stat");
@@ -130,7 +130,7 @@ private:
                             if (S_ISDIR(statDataTrg.st_mode)) //a directory
                             {
                                 if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onFolder({ itemName, &linkInfo })) //throw X
-                                    traverse(itemPath, *trav);
+                                    traverse(itemPath, *trav); //throw X
                             }
                             else //a file or named pipe, ect.
                             {
@@ -149,7 +149,7 @@ private:
             else if (S_ISDIR(statData.st_mode)) //a directory
             {
                 if (std::unique_ptr<AFS::TraverserCallback> trav = sink.onFolder({ itemName, nullptr })) //throw X
-                    traverse(itemPath, *trav);
+                    traverse(itemPath, *trav); //throw X
             }
             else //a file or named pipe, ect.
             {

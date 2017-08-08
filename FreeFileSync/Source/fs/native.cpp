@@ -232,9 +232,9 @@ private:
     }
 
     //----------------------------------------------------------------------------------------------------------------
-    void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink) const override //noexcept
+    void traverseFolder(const AfsPath& afsPath, TraverserCallback& sink /*throw X*/) const override //throw X
     {
-        DirTraverser::execute(getNativePath(afsPath), sink); //noexcept
+        DirTraverser::execute(getNativePath(afsPath), sink); //throw X
     }
     //----------------------------------------------------------------------------------------------------------------
 

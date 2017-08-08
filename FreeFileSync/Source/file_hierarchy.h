@@ -410,11 +410,11 @@ class FileSystemObject : public ObjectMgr<FileSystemObject>, public virtual Path
 public:
     virtual void accept(FSObjectVisitor& visitor) const = 0;
 
-    Zstring getPairItemName    () const; //like getItemName() but without bias to which side is returned
+    Zstring getPairItemName() const; //like getItemName() but without bias to which side is returned
     bool isPairEmpty() const; //true, if both sides are empty
 
     //path getters always return valid values, even if isEmpty<side>()!
-    template <SelectedSide side> const Zstring& getItemName() const; //case sensitive!
+    template <SelectedSide side> Zstring getItemName() const; //case sensitive!
     template <SelectedSide side> bool isEmpty() const;
 
     //comparison result
@@ -779,7 +779,7 @@ bool FileSystemObject::isPairEmpty() const
 
 
 template <SelectedSide side> inline
-const Zstring& FileSystemObject::getItemName() const
+Zstring FileSystemObject::getItemName() const
 {
     assert(!itemNameL_.empty() || !itemNameR_.empty());
 

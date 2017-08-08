@@ -1,9 +1,25 @@
+FreeFileSync 9.3
+----------------
+Support multiple connections per FTP folder traversal: N times speed up
+Improved folder traversal time by 35% for FTP servers supporting MLSD
+Use single CWD when changing FTP working directory
+Maximize FTP input/output speed using prefetch/output buffers and async execution
+Use larger socket buffer for significant FTP upload speed increase
+Fixed out of memory error when copying large files via FTP
+New popup dialog option to ignore all errors
+Reduced memory peaks by enforcing streaming buffer size limits
+Removed custom sync directions from config XML if not needed
+Fixed EOPNOTSUPP error on gvfs-mounted FTP (Linux)
+Prevent input focus stealing after manual comparison
+Flash task bar after comparison if other app has input focus
+
+
 FreeFileSync 9.2 [2017-07-03]
 -----------------------------
+Use direct copy instead of transaction to speed up versioning
 Replaced file existing handling with use of unique temporary names
 Support SFTP authentication via Pageant/SSH agent
 New menu option to restore hidden panels individually
-Use direct copy instead of transaction to speed up versioning
 Fixed GTK button icon being truncated (Linux)
 Fixed error dialog hiding behind progress dialog (macOS)
 Round out FTP symlink deletion handling

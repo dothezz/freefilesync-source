@@ -45,6 +45,8 @@ public:
 
     void operator()() const //throw ThreadInterruption
     {
+        setCurrentThreadName("Folder Lock Life Signs");
+
         try
         {
             for (;;)

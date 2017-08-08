@@ -18,7 +18,6 @@ namespace zen
 //this module requires error, warning and info image files in resources.zip, see <wx+/image_resources.h>
 
 struct PopupDialogCfg;
-struct PopupDialogCfg3;
 
 enum class DialogInfoType
 {
@@ -29,24 +28,37 @@ enum class DialogInfoType
 
 enum class ConfirmationButton3
 {
-    DO_IT,
-    DONT_DO_IT,
-    CANCEL
+    ACCEPT,
+    ACCEPT_ALL,
+    DECLINE,
+    CANCEL,
 };
-
 enum class ConfirmationButton
 {
-    DO_IT  = static_cast<int>(ConfirmationButton3::DO_IT ), //[!]
-    CANCEL = static_cast<int>(ConfirmationButton3::CANCEL), //Clang requires a "static_cast"
+    ACCEPT = static_cast<int>(ConfirmationButton3::ACCEPT), //[!] Clang requires a "static_cast"
+    CANCEL = static_cast<int>(ConfirmationButton3::CANCEL), //
+};
+enum class ConfirmationButton2
+{
+    ACCEPT     = static_cast<int>(ConfirmationButton3::ACCEPT),
+    ACCEPT_ALL = static_cast<int>(ConfirmationButton3::ACCEPT_ALL),
+    CANCEL     = static_cast<int>(ConfirmationButton3::CANCEL),
+};
+enum class QuestionButton2
+{
+    YES    = static_cast<int>(ConfirmationButton3::ACCEPT),
+    NO     = static_cast<int>(ConfirmationButton3::DECLINE),
+    CANCEL = static_cast<int>(ConfirmationButton3::CANCEL),
 };
 
-void                showNotificationDialog (wxWindow* parent, DialogInfoType type, const PopupDialogCfg&  cfg);
-ConfirmationButton  showConfirmationDialog (wxWindow* parent, DialogInfoType type, const PopupDialogCfg&  cfg, const wxString& labelDoIt);
-ConfirmationButton3 showConfirmationDialog3(wxWindow* parent, DialogInfoType type, const PopupDialogCfg3& cfg, const wxString& labelDoIt, const wxString& labelDontDoIt);
+void                showNotificationDialog(wxWindow* parent, DialogInfoType type, const PopupDialogCfg& cfg);
+ConfirmationButton  showConfirmationDialog(wxWindow* parent, DialogInfoType type, const PopupDialogCfg& cfg, const wxString& labelAccept);
+ConfirmationButton2 showConfirmationDialog(wxWindow* parent, DialogInfoType type, const PopupDialogCfg& cfg, const wxString& labelAccept, const wxString& labelAcceptAll);
+ConfirmationButton3 showConfirmationDialog(wxWindow* parent, DialogInfoType type, const PopupDialogCfg& cfg, const wxString& labelAccept, const wxString& labelAcceptAll, const wxString& labelDecline);
+QuestionButton2     showQuestionDialog    (wxWindow* parent, DialogInfoType type, const PopupDialogCfg& cfg, const wxString& labelYes, const wxString& labelNo);
 
 //----------------------------------------------------------------------------------------------------------------
 class StandardPopupDialog;
-class ConfirmationDialog3;
 
 struct PopupDialogCfg
 {
@@ -54,7 +66,13 @@ struct PopupDialogCfg
     PopupDialogCfg& setTitle             (const wxString& label) { title      = label; return *this; }
     PopupDialogCfg& setMainInstructions  (const wxString& label) { textMain   = label; return *this; } //set at least one of these!
     PopupDialogCfg& setDetailInstructions(const wxString& label) { textDetail = label; return *this; } //
-    PopupDialogCfg& setCheckBox(bool& value, const wxString& label) { checkBoxValue = &value; checkBoxLabel = label; return *this; }
+    PopupDialogCfg& setCheckBox(bool& value, const wxString& label, QuestionButton2 disableWhenChecked = QuestionButton2::CANCEL)
+    {
+        checkBoxValue = &value;
+        checkBoxLabel = label;
+        buttonToDisableWhenChecked = disableWhenChecked;
+        return *this;
+    }
 
 private:
     friend class StandardPopupDialog;
@@ -65,29 +83,7 @@ private:
     wxString textDetail;
     bool* checkBoxValue = nullptr; //in/out
     wxString checkBoxLabel;
-};
-
-
-struct PopupDialogCfg3
-{
-    PopupDialogCfg3& setIcon              (const wxBitmap& bmp  ) { pdCfg_.setIcon              (bmp);   return *this; }
-    PopupDialogCfg3& setTitle             (const wxString& label) { pdCfg_.setTitle             (label); return *this; }
-    PopupDialogCfg3& setMainInstructions  (const wxString& label) { pdCfg_.setMainInstructions  (label); return *this; } //set at least one of these!
-    PopupDialogCfg3& setDetailInstructions(const wxString& label) { pdCfg_.setDetailInstructions(label); return *this; } //
-    PopupDialogCfg3& setCheckBox(bool& value, const wxString& label) { pdCfg_.setCheckBox(value, label); return *this; }
-    PopupDialogCfg3& setCheckBox(bool& value, const wxString& label, ConfirmationButton3 disableWhenChecked)
-    {
-        assert(disableWhenChecked != ConfirmationButton3::CANCEL);
-        setCheckBox(value, label);
-        buttonToDisableWhenChecked_ = disableWhenChecked;
-        return *this;
-    }
-
-private:
-    friend class ConfirmationDialog3;
-
-    PopupDialogCfg pdCfg_;
-    ConfirmationButton3 buttonToDisableWhenChecked_ = ConfirmationButton3::CANCEL;
+    QuestionButton2 buttonToDisableWhenChecked = QuestionButton2::CANCEL;
 };
 }
 

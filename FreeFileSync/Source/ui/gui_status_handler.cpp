@@ -20,14 +20,14 @@ using namespace zen;
 using namespace xmlAccess;
 
 
-StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : mainDlg(dlg)
+StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : mainDlg_(dlg)
 {
     {
-        mainDlg.compareStatus_->init(*this); //clear old values before showing panel
+        mainDlg_.compareStatus_->init(*this); //clear old values before showing panel
 
         //------------------------------------------------------------------
-        const wxAuiPaneInfo& topPanel = mainDlg.auiMgr_.GetPane(mainDlg.m_panelTopButtons);
-        wxAuiPaneInfo& statusPanel    = mainDlg.auiMgr_.GetPane(mainDlg.compareStatus_->getAsWindow());
+        const wxAuiPaneInfo& topPanel = mainDlg_.auiMgr_.GetPane(mainDlg_.m_panelTopButtons);
+        wxAuiPaneInfo& statusPanel    = mainDlg_.auiMgr_.GetPane(mainDlg_.compareStatus_->getAsWindow());
 
         //determine best status panel row near top panel
         switch (topPanel.dock_direction)
@@ -48,7 +48,7 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : main
                 //case wxAUI_DOCK_CENTRE:
         }
 
-        wxAuiPaneInfoArray& paneArray = mainDlg.auiMgr_.GetAllPanes();
+        wxAuiPaneInfoArray& paneArray = mainDlg_.auiMgr_.GetAllPanes();
 
         const bool statusRowTaken = [&]
         {
@@ -80,26 +80,26 @@ StatusHandlerTemporaryPanel::StatusHandlerTemporaryPanel(MainDialog& dlg) : main
         //------------------------------------------------------------------
 
         statusPanel.Show();
-        mainDlg.auiMgr_.Update();
+        mainDlg_.auiMgr_.Update();
     }
 
-    mainDlg.Update(); //don't wait until idle event!
+    mainDlg_.Update(); //don't wait until idle event!
 
     //register keys
-    mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(StatusHandlerTemporaryPanel::OnKeyPressed), nullptr, this);
-    mainDlg.m_buttonCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StatusHandlerTemporaryPanel::OnAbortCompare), nullptr, this);
+    mainDlg_.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(StatusHandlerTemporaryPanel::OnKeyPressed), nullptr, this);
+    mainDlg_.m_buttonCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StatusHandlerTemporaryPanel::OnAbortCompare), nullptr, this);
 }
 
 
 StatusHandlerTemporaryPanel::~StatusHandlerTemporaryPanel()
 {
     //unregister keys
-    mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(StatusHandlerTemporaryPanel::OnKeyPressed), nullptr, this);
-    mainDlg.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StatusHandlerTemporaryPanel::OnAbortCompare), nullptr, this);
+    mainDlg_.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(StatusHandlerTemporaryPanel::OnKeyPressed), nullptr, this);
+    mainDlg_.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StatusHandlerTemporaryPanel::OnAbortCompare), nullptr, this);
 
-    mainDlg.auiMgr_.GetPane(mainDlg.compareStatus_->getAsWindow()).Hide();
-    mainDlg.auiMgr_.Update();
-    mainDlg.compareStatus_->teardown();
+    mainDlg_.auiMgr_.GetPane(mainDlg_.compareStatus_->getAsWindow()).Hide();
+    mainDlg_.auiMgr_.Update();
+    mainDlg_.compareStatus_->teardown();
 }
 
 
@@ -120,7 +120,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, int64_t bytesTota
 {
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
 
-    mainDlg.compareStatus_->initNewPhase(); //call after "StatusHandler::initNewPhase"
+    mainDlg_.compareStatus_->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
     forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
@@ -128,7 +128,7 @@ void StatusHandlerTemporaryPanel::initNewPhase(int itemsTotal, int64_t bytesTota
 
 void StatusHandlerTemporaryPanel::reportInfo(const std::wstring& text)
 {
-    errorLog.logMsg(text, TYPE_INFO); //log first!
+    errorLog_.logMsg(text, TYPE_INFO); //log first!
     StatusHandler::reportInfo(text); //throw X
 }
 
@@ -139,7 +139,7 @@ ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::ws
     //=> similar behavior like "ignoreErrors" which is also not used for the comparison phase in GUI mode
 
     //always, except for "retry":
-    auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
+    auto guardWriteLog = zen::makeGuard<ScopeGuardRunMode::ON_EXIT>([&] { errorLog_.logMsg(errorMessage, TYPE_ERROR); });
 
     switch (handleError_)
     {
@@ -147,20 +147,20 @@ ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::ws
         {
             forceUiRefresh();
 
-            bool ignoreNextErrors = false;
-            switch (showConfirmationDialog3(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg3().
-                                            setDetailInstructions(errorMessage).
-                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
-                                            _("&Ignore"), _("&Retry")))
+            switch (showConfirmationDialog(&mainDlg_, DialogInfoType::ERROR2, PopupDialogCfg().
+                                           setDetailInstructions(errorMessage),
+                                           _("&Ignore"), _("Ignore &all"), _("&Retry")))
             {
-                case ConfirmationButton3::DO_IT: //ignore
-                    if (ignoreNextErrors) //falsify only
-                        handleError_ = ON_GUIERROR_IGNORE;
+                case ConfirmationButton3::ACCEPT: //ignore
                     return ProcessCallback::IGNORE_ERROR;
 
-                case ConfirmationButton3::DONT_DO_IT: //retry
+                case ConfirmationButton3::ACCEPT_ALL: //ignore all
+                    handleError_ = ON_GUIERROR_IGNORE;
+                    return ProcessCallback::IGNORE_ERROR;
+
+                case ConfirmationButton3::DECLINE: //retry
                     guardWriteLog.dismiss();
-                    errorLog.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
+                    errorLog_.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
                     return ProcessCallback::RETRY;
 
                 case ConfirmationButton3::CANCEL:
@@ -181,16 +181,16 @@ ProcessCallback::Response StatusHandlerTemporaryPanel::reportError(const std::ws
 
 void StatusHandlerTemporaryPanel::reportFatalError(const std::wstring& errorMessage)
 {
-    errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
+    errorLog_.logMsg(errorMessage, TYPE_FATAL_ERROR);
 
     forceUiRefresh();
-    showNotificationDialog(&mainDlg, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(_("Serious Error")).setDetailInstructions(errorMessage));
+    showNotificationDialog(&mainDlg_, DialogInfoType::ERROR2, PopupDialogCfg().setTitle(_("Serious Error")).setDetailInstructions(errorMessage));
 }
 
 
 void StatusHandlerTemporaryPanel::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
-    errorLog.logMsg(warningMessage, TYPE_WARNING);
+    errorLog_.logMsg(warningMessage, TYPE_WARNING);
 
     if (!warningActive) //if errors are ignored, then warnings should also
         return;
@@ -202,12 +202,12 @@ void StatusHandlerTemporaryPanel::reportWarning(const std::wstring& warningMessa
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showConfirmationDialog(&mainDlg, DialogInfoType::WARNING,
+            switch (showConfirmationDialog(&mainDlg_, DialogInfoType::WARNING,
                                            PopupDialogCfg().setDetailInstructions(warningMessage).
                                            setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
                                            _("&Ignore")))
             {
-                case ConfirmationButton::DO_IT:
+                case ConfirmationButton::ACCEPT:
                     warningActive = !dontWarnAgain;
                     break;
                 case ConfirmationButton::CANCEL:
@@ -225,7 +225,7 @@ void StatusHandlerTemporaryPanel::reportWarning(const std::wstring& warningMessa
 
 void StatusHandlerTemporaryPanel::forceUiRefresh()
 {
-    mainDlg.compareStatus_->updateStatusPanelNow();
+    mainDlg_.compareStatus_->updateStatusPanelNow();
 }
 
 
@@ -252,12 +252,12 @@ StatusHandlerFloatingDialog::StatusHandlerFloatingDialog(wxFrame* parentDlg,
                                                          const Zstring& soundFileSyncComplete,
                                                          const Zstring& onCompletion,
                                                          std::vector<Zstring>& onCompletionHistory) :
-    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory)),
-            lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
-            handleError_(handleError),
-            automaticRetryCount_(automaticRetryCount),
-            automaticRetryDelay_(automaticRetryDelay),
-            jobName_(jobName),
+    progressDlg_(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, soundFileSyncComplete, onCompletion, onCompletionHistory)),
+             lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
+             handleError_(handleError),
+             automaticRetryCount_(automaticRetryCount),
+             automaticRetryDelay_(automaticRetryDelay),
+             jobName_(jobName),
 startTime_(std::time(nullptr)) {}
 
 
@@ -268,12 +268,12 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     //decide whether to stay on status screen or exit immediately...
     bool showFinalResults = true;
 
-    if (progressDlg)
+    if (progressDlg_)
     {
         //execute "on completion" command (even in case of ignored errors)
         if (!abortIsRequested()) //if aborted (manually), we don't execute the command
         {
-            const Zstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            const Zstring finalCommand = progressDlg_->getExecWhenFinishedCommand(); //final value (after possible user modification)
             if (!finalCommand.empty())
             {
                 if (isCloseProgressDlgCommand(finalCommand))
@@ -336,27 +336,27 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     }
     catch (FileError&) { assert(false); }
 
-    if (progressDlg)
+    if (progressDlg_)
     {
         //notify to progressDlg that current process has ended
         if (showFinalResults)
         {
             if (abortIsRequested())
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog_); //enable okay and close events
+                progressDlg_->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog_); //enable okay and close events
             else if (totalErrors > 0)
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog_);
+                progressDlg_->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog_);
             else if (totalWarnings > 0)
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog_);
+                progressDlg_->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog_);
             else
-                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog_);
+                progressDlg_->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog_);
         }
         else
-            progressDlg->closeWindowDirectly();
+            progressDlg_->closeWindowDirectly();
 
         //wait until progress dialog notified shutdown via onProgressDialogTerminate()
         //-> required since it has our "this" pointer captured in lambda "notifyWindowTerminate"!
         //-> nicely manages dialog lifetime
-        while (progressDlg)
+        while (progressDlg_)
         {
             wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
             std::this_thread::sleep_for(std::chrono::milliseconds(UI_UPDATE_INTERVAL_MS));
@@ -369,8 +369,8 @@ void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, int64_t bytesTota
 {
     assert(phaseID == PHASE_SYNCHRONIZING);
     StatusHandler::initNewPhase(itemsTotal, bytesTotal, phaseID);
-    if (progressDlg)
-        progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
+    if (progressDlg_)
+        progressDlg_->initNewPhase(); //call after "StatusHandler::initNewPhase"
 
     forceUiRefresh(); //throw ?; OS X needs a full yield to update GUI and get rid of "dummy" texts
 }
@@ -379,8 +379,8 @@ void StatusHandlerFloatingDialog::initNewPhase(int itemsTotal, int64_t bytesTota
 void StatusHandlerFloatingDialog::updateProcessedData(int itemsDelta, int64_t bytesDelta)
 {
     StatusHandler::updateProcessedData(itemsDelta, bytesDelta);
-    if (progressDlg)
-        progressDlg->notifyProgressChange(); //noexcept
+    if (progressDlg_)
+        progressDlg_->notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
@@ -417,22 +417,22 @@ ProcessCallback::Response StatusHandlerFloatingDialog::reportError(const std::ws
     {
         case ON_GUIERROR_POPUP:
         {
-            if (!progressDlg) abortProcessNow();
-            PauseTimers dummy(*progressDlg);
+            if (!progressDlg_) abortProcessNow();
+            PauseTimers dummy(*progressDlg_);
             forceUiRefresh();
 
-            bool ignoreNextErrors = false;
-            switch (showConfirmationDialog3(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg3().
-                                            setDetailInstructions(errorMessage).
-                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
-                                            _("&Ignore"), _("&Retry")))
+            switch (showConfirmationDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg().
+                                           setDetailInstructions(errorMessage),
+                                           _("&Ignore"), _("Ignore &all"), _("&Retry")))
             {
-                case ConfirmationButton3::DO_IT: //ignore
-                    if (ignoreNextErrors) //falsify only
-                        handleError_ = ON_GUIERROR_IGNORE;
+                case ConfirmationButton3::ACCEPT: //ignore
                     return ProcessCallback::IGNORE_ERROR;
 
-                case ConfirmationButton3::DONT_DO_IT: //retry
+                case ConfirmationButton3::ACCEPT_ALL: //ignore all
+                    handleError_ = ON_GUIERROR_IGNORE;
+                    return ProcessCallback::IGNORE_ERROR;
+
+                case ConfirmationButton3::DECLINE: //retry
                     guardWriteLog.dismiss();
                     errorLog_.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
                     return ProcessCallback::RETRY;
@@ -461,22 +461,23 @@ void StatusHandlerFloatingDialog::reportFatalError(const std::wstring& errorMess
     {
         case ON_GUIERROR_POPUP:
         {
-            if (!progressDlg) abortProcessNow();
-            PauseTimers dummy(*progressDlg);
+            if (!progressDlg_) abortProcessNow();
+            PauseTimers dummy(*progressDlg_);
             forceUiRefresh();
 
-            bool ignoreNextErrors = false;
-            switch (showConfirmationDialog(progressDlg->getWindowIfVisible(), DialogInfoType::ERROR2,
+            switch (showConfirmationDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::ERROR2,
                                            PopupDialogCfg().setTitle(_("Serious Error")).
-                                           setDetailInstructions(errorMessage).
-                                           setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors")),
-                                           _("&Ignore")))
+                                           setDetailInstructions(errorMessage),
+                                           _("&Ignore"), _("Ignore &all")))
             {
-                case ConfirmationButton::DO_IT:
-                    if (ignoreNextErrors) //falsify only
-                        handleError_ = ON_GUIERROR_IGNORE;
+                case ConfirmationButton2::ACCEPT:
                     break;
-                case ConfirmationButton::CANCEL:
+
+                case ConfirmationButton2::ACCEPT_ALL:
+                    handleError_ = ON_GUIERROR_IGNORE;
+                    break;
+
+                case ConfirmationButton2::CANCEL:
                     abortProcessNow();
                     break;
             }
@@ -500,17 +501,17 @@ void StatusHandlerFloatingDialog::reportWarning(const std::wstring& warningMessa
     {
         case ON_GUIERROR_POPUP:
         {
-            if (!progressDlg) abortProcessNow();
-            PauseTimers dummy(*progressDlg);
+            if (!progressDlg_) abortProcessNow();
+            PauseTimers dummy(*progressDlg_);
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showConfirmationDialog(progressDlg->getWindowIfVisible(), DialogInfoType::WARNING,
+            switch (showConfirmationDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::WARNING,
                                            PopupDialogCfg().setDetailInstructions(warningMessage).
                                            setCheckBox(dontWarnAgain, _("&Don't show this warning again")),
                                            _("&Ignore")))
             {
-                case ConfirmationButton::DO_IT:
+                case ConfirmationButton::ACCEPT:
                     warningActive = !dontWarnAgain;
                     break;
                 case ConfirmationButton::CANCEL:
@@ -528,8 +529,8 @@ void StatusHandlerFloatingDialog::reportWarning(const std::wstring& warningMessa
 
 void StatusHandlerFloatingDialog::forceUiRefresh()
 {
-    if (progressDlg)
-        progressDlg->updateGui();
+    if (progressDlg_)
+        progressDlg_->updateGui();
 }
 
 
@@ -543,5 +544,5 @@ void StatusHandlerFloatingDialog::abortProcessNow()
 void StatusHandlerFloatingDialog::onProgressDialogTerminate()
 {
     //it's responsibility of "progressDlg" to call requestAbortion() when closing dialog
-    progressDlg = nullptr;
+    progressDlg_ = nullptr;
 }

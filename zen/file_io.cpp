@@ -130,22 +130,29 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; m
 size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, X; return "bytesToRead" bytes unless end of stream!
 {
     const size_t blockSize = getBlockSize();
-
-    while (memBuf_.size() < bytesToRead)
+    assert(memBuf_.size() <= blockSize);
+    char*       it    = static_cast<char*>(buffer);
+    char* const itEnd = it + bytesToRead;
+    for (;;)
     {
-        memBuf_.resize(memBuf_.size() + blockSize);
-        const size_t bytesRead = tryRead(&*(memBuf_.end() - blockSize), blockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-        memBuf_.resize(memBuf_.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
+        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), memBuf_.size());
+        std::copy    (memBuf_.begin(), memBuf_.begin() + junkSize, it);
+        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + junkSize);
+        it += junkSize;
+
+        if (it == itEnd)
+            break;
+        //--------------------------------------------------------------------
+        memBuf_.resize(blockSize);
+        const size_t bytesRead = tryRead(&memBuf_[0], blockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        memBuf_.resize(bytesRead);
 
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
 
         if (bytesRead == 0) //end of file
-            bytesToRead = std::min(bytesToRead, memBuf_.size());
+            break;
     }
-
-    std::copy(memBuf_.begin(), memBuf_.begin() + bytesToRead, static_cast<char*>(buffer));
-    memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesToRead);
-    return bytesToRead;
+    return it - static_cast<char*>(buffer);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -224,16 +231,21 @@ size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw Fil
 
 void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError, X
 {
-    auto bufFirst = static_cast<const char*>(buffer);
-    memBuf_.insert(memBuf_.end(), bufFirst, bufFirst + bytesToWrite);
-
     const size_t blockSize = getBlockSize();
-    size_t bytesRemaining = memBuf_.size();
-    ZEN_ON_SCOPE_EXIT(memBuf_.erase(memBuf_.begin(), memBuf_.end() - bytesRemaining));
-    while (bytesRemaining >= blockSize)
+    assert(memBuf_.size() <= blockSize);
+    const char*       it   = static_cast<const char*>(buffer);
+    const char* const itEnd = it + bytesToWrite;
+    for (;;)
     {
-        const size_t bytesWritten = tryWrite(&*(memBuf_.end() - bytesRemaining), blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-        bytesRemaining -= bytesWritten;
+        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), blockSize - memBuf_.size());
+        memBuf_.insert(memBuf_.end(), it, it + junkSize);
+        it += junkSize;
+
+        if (it == itEnd)
+            return;
+        //--------------------------------------------------------------------
+        const size_t bytesWritten = tryWrite(&memBuf_[0], blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesWritten);
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
     }
 }
@@ -241,12 +253,11 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
 
 void FileOutput::flushBuffers() //throw FileError, X
 {
-    size_t bytesRemaining = memBuf_.size();
-    ZEN_ON_SCOPE_EXIT(memBuf_.erase(memBuf_.begin(), memBuf_.end() - bytesRemaining));
-    while (bytesRemaining > 0)
+    assert(memBuf_.size() <= getBlockSize());
+    while (!memBuf_.empty())
     {
-        const size_t bytesWritten = tryWrite(&*(memBuf_.end() - bytesRemaining), bytesRemaining); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-        bytesRemaining -= bytesWritten;
+        const size_t bytesWritten = tryWrite(&memBuf_[0], memBuf_.size()); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesWritten);
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
     }
 }

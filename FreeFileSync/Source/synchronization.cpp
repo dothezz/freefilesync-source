@@ -1627,7 +1627,7 @@ void verifyFiles(const AbstractPath& sourcePath, const AbstractPath& targetPath,
         // => it seems OS buffered are not invalidated by this: snake oil???
         if (Opt<Zstring> nativeTargetPath = AFS::getNativeItemPath(targetPath))
         {
-            const int fileHandle = ::open(nativeTargetPath->c_str(), O_WRONLY);
+            const int fileHandle = ::open(nativeTargetPath->c_str(), O_WRONLY | O_APPEND);
             if (fileHandle == -1)
                 THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot open file %x."), L"%x", fmtPath(*nativeTargetPath)), L"open");
             ZEN_ON_SCOPE_EXIT(::close(fileHandle));

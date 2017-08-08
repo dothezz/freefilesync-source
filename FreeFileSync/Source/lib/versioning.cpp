@@ -264,7 +264,7 @@ void FileVersioner::revisionFolderImpl(const AbstractPath& folderPath, const Zst
     //create target directories only when needed in moveFileToVersioning(): avoid empty directories!
 
     FlatTraverserCallback ft(folderPath); //traverse source directory one level deep
-    AFS::traverseFolder(folderPath, ft);
+    AFS::traverseFolder(folderPath, ft); //throw FileError
 
     const Zstring relPathPf = appendSeparator(relativePath);
 

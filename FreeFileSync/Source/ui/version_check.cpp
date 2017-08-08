@@ -123,7 +123,7 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
                                    setDetailInstructions(updateDetailsMsg),
                                    _("&Download")))
     {
-        case ConfirmationButton::DO_IT:
+        case ConfirmationButton::ACCEPT:
             wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
             break;
         case ConfirmationButton::CANCEL:
@@ -203,7 +203,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion)
                                            setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")).
                                            setDetailInstructions(e.toString()), _("&Check")))
             {
-                case ConfirmationButton::DO_IT:
+                case ConfirmationButton::ACCEPT:
                     wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
                     break;
                 case ConfirmationButton::CANCEL:
@@ -285,7 +285,7 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
                                            setDetailInstructions(result.error->toString()),
                                            _("&Check")))
             {
-                case ConfirmationButton::DO_IT:
+                case ConfirmationButton::ACCEPT:
                     wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
                     break;
                 case ConfirmationButton::CANCEL:

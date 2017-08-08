@@ -82,8 +82,8 @@ public:
     }
 
 private:
-	ContextMenu           (const ContextMenu&) = delete;
-	ContextMenu& operator=(const ContextMenu&) = delete;
+    ContextMenu           (const ContextMenu&) = delete;
+    ContextMenu& operator=(const ContextMenu&) = delete;
 
     void onSelection(wxCommandEvent& event)
     {
@@ -97,7 +97,7 @@ private:
         std::function<void()> fun_;
     };
 
-	std::unique_ptr<wxMenu> menu_ = std::make_unique<wxMenu>();
+    std::unique_ptr<wxMenu> menu_ = std::make_unique<wxMenu>();
     std::map<int, std::function<void()>> commandList_; //(item id, command)
 };
 }

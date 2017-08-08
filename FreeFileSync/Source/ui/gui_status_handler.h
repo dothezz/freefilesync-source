@@ -37,15 +37,15 @@ public:
     void forceUiRefresh() override;
     void abortProcessNow() override final; //throw GuiAbortProcess
 
-    zen::ErrorLog getErrorLog() const { return errorLog; }
+    zen::ErrorLog getErrorLog() const { return errorLog_; }
 
 private:
     void OnKeyPressed(wxKeyEvent& event);
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
 
-    MainDialog& mainDlg;
+    MainDialog& mainDlg_;
     xmlAccess::OnGuiError handleError_ = xmlAccess::ON_GUIERROR_POPUP;
-    zen::ErrorLog errorLog;
+    zen::ErrorLog errorLog_;
 };
 
 
@@ -78,7 +78,7 @@ public:
 private:
     void onProgressDialogTerminate();
 
-    SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
+    SyncProgressDialog* progressDlg_; //managed to have shorter lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog_;

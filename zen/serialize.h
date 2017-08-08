@@ -36,20 +36,20 @@ public:
     using iterator       = std::vector<char>::iterator;
     using const_iterator = std::vector<char>::const_iterator;
 
-    iterator begin() { return buffer->begin(); }
-    iterator end  () { return buffer->end  (); }
+    iterator begin() { return buffer_->begin(); }
+    iterator end  () { return buffer_->end  (); }
 
-    const_iterator begin() const { return buffer->begin(); }
-    const_iterator end  () const { return buffer->end  (); }
+    const_iterator begin() const { return buffer_->begin(); }
+    const_iterator end  () const { return buffer_->end  (); }
 
-    void resize(size_t len) { buffer->resize(len); }
-    size_t size() const { return buffer->size(); }
-    bool  empty() const { return buffer->empty(); }
+    void resize(size_t len) { buffer_->resize(len); }
+    size_t size() const { return buffer_->size(); }
+    bool  empty() const { return buffer_->empty(); }
 
-    inline friend bool operator==(const ByteArray& lhs, const ByteArray& rhs) { return *lhs.buffer == *rhs.buffer; }
+    inline friend bool operator==(const ByteArray& lhs, const ByteArray& rhs) { return *lhs.buffer_ == *rhs.buffer_; }
 
 private:
-    std::shared_ptr<std::vector<char>> buffer { std::make_shared<std::vector<char>>() }; //always bound!
+    std::shared_ptr<std::vector<char>> buffer_ { std::make_shared<std::vector<char>>() }; //always bound!
     //perf: shared_ptr indirection irrelevant: less than 1% slower!
 };
 
@@ -148,9 +148,8 @@ struct MemoryStreamOut
     void write(const void* buffer, size_t bytesToWrite)
     {
         static_assert(sizeof(typename BinContainer::value_type) == 1, ""); //expect: bytes
-        const size_t oldSize = buffer_.size();
-        buffer_.resize(oldSize + bytesToWrite);
-        std::copy(static_cast<const char*>(buffer), static_cast<const char*>(buffer) + bytesToWrite, buffer_.begin() + oldSize);
+        buffer_.resize(buffer_.size() + bytesToWrite);
+        std::copy(static_cast<const char*>(buffer), static_cast<const char*>(buffer) + bytesToWrite, buffer_.end() - bytesToWrite);
     }
 
     const BinContainer& ref() const { return buffer_; }

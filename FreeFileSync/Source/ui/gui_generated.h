@@ -535,19 +535,31 @@ protected:
     wxButton* m_buttonSelectFolder;
     wxBoxSizer* bSizerSftpTweaks;
     wxStaticLine* m_staticline571;
-    wxStaticBitmap* m_bitmapSpeed;
+    wxStaticBitmap* m_bitmapSpeedSftp;
     wxStaticText* m_staticText1361;
     wxHyperlinkCtrl* m_hyperlink171;
     wxStaticLine* m_staticline57;
     wxPanel* m_panel411;
     wxStaticText* m_staticText12341;
-    wxSpinCtrl* m_spinCtrlConnectionCount;
+    wxSpinCtrl* m_spinCtrlConnectionCountSftp;
     wxStaticText* m_staticText138111;
     wxStaticText* m_staticText1231111;
-    wxSpinCtrl* m_spinCtrlChannelCount;
+    wxSpinCtrl* m_spinCtrlChannelCountSftp;
     wxButton* m_button42;
     wxStaticText* m_staticText138112;
     wxStaticText* m_staticText13811;
+    wxBoxSizer* bSizerFtpTweaks;
+    wxStaticLine* m_staticline5711;
+    wxStaticBitmap* m_bitmapSpeedFtp;
+    wxStaticText* m_staticText13611;
+    wxHyperlinkCtrl* m_hyperlink1711;
+    wxStaticLine* m_staticline573;
+    wxPanel* m_panel4111;
+    wxStaticText* m_staticText123411;
+    wxSpinCtrl* m_spinCtrlConnectionCountFtp;
+    wxStaticText* m_staticText1381111;
+    wxStaticText* m_staticText1381121;
+    wxStaticText* m_staticText138113;
     wxStaticLine* m_staticline12;
     wxBoxSizer* bSizerStdButtons;
     wxButton* m_buttonOkay;
@@ -697,7 +709,6 @@ private:
 
 protected:
     wxBoxSizer* bSizer42;
-    wxBoxSizer* bSizer171;
     wxStaticText* m_staticText87;
 
 public:
@@ -708,6 +719,7 @@ public:
     wxBoxSizer* bSizerStatusText;
     wxStaticText* m_staticTextStatus;
     wxPanel* m_panelProgress;
+    zen::Graph2D* m_panelGraphBytes;
     wxPanel* m_panelItemsProcessed;
     wxStaticText* m_staticTextItemsProcessed;
     wxStaticText* m_staticTextBytesProcessed;
@@ -718,7 +730,6 @@ public:
     wxStaticText* m_staticTextTimeRemaining;
     wxStaticText* m_staticTextTimeElapsed;
     wxStaticBitmap* m_bitmapGraphKeyBytes;
-    zen::Graph2D* m_panelGraphBytes;
     wxStaticBitmap* m_bitmapGraphKeyItems;
     zen::Graph2D* m_panelGraphItems;
     wxNotebook* m_notebookResult;
@@ -1015,6 +1026,7 @@ protected:
     wxHyperlinkCtrl* m_hyperlink12;
     wxHyperlinkCtrl* m_hyperlink13;
     wxHyperlinkCtrl* m_hyperlink10;
+    wxHyperlinkCtrl* m_hyperlink101;
     wxHyperlinkCtrl* m_hyperlink18;
     wxHyperlinkCtrl* m_hyperlink9;
     wxPanel* m_panelThankYou;

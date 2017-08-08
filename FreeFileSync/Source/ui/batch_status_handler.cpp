@@ -360,22 +360,22 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showConfirmationDialog3(progressDlg_->getWindowIfVisible(), DialogInfoType::WARNING, PopupDialogCfg3().
-                                            setDetailInstructions(warningMessage + L"\n\n" + _("You can switch to FreeFileSync's main window to resolve this issue.")).
-                                            setCheckBox(dontWarnAgain, _("&Don't show this warning again"), ConfirmationButton3::DONT_DO_IT),
-                                            _("&Ignore"), _("&Switch")))
+            switch (showQuestionDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::WARNING, PopupDialogCfg().
+                                       setDetailInstructions(warningMessage + L"\n\n" + _("You can switch to FreeFileSync's main window to resolve this issue.")).
+                                       setCheckBox(dontWarnAgain, _("&Don't show this warning again"), QuestionButton2::NO),
+                                       _("&Ignore"), _("&Switch")))
             {
-                case ConfirmationButton3::DO_IT: //ignore
+                case QuestionButton2::YES: //ignore
                     warningActive = !dontWarnAgain;
                     break;
 
-                case ConfirmationButton3::DONT_DO_IT: //switch
+                case QuestionButton2::NO: //switch
                     errorLog_.logMsg(_("Switching to FreeFileSync's main window"), TYPE_INFO);
                     switchToGuiRequested_ = true; //treat as a special kind of cancel
                     requestAbortion();            //
                     throw BatchRequestSwitchToMainDialog();
 
-                case ConfirmationButton3::CANCEL:
+                case QuestionButton2::CANCEL:
                     abortProcessNow();
                     break;
             }
@@ -422,18 +422,18 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
             PauseTimers dummy(*progressDlg_);
             forceUiRefresh();
 
-            bool ignoreNextErrors = false;
-            switch (showConfirmationDialog3(progressDlg_->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg3().
-                                            setDetailInstructions(errorMessage).
-                                            setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors"), ConfirmationButton3::DONT_DO_IT),
-                                            _("&Ignore"), _("&Retry")))
+            switch (showConfirmationDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::ERROR2, PopupDialogCfg().
+                                           setDetailInstructions(errorMessage),
+                                           _("&Ignore"), _("Ignore &all"), _("&Retry")))
             {
-                case ConfirmationButton3::DO_IT: //ignore
-                    if (ignoreNextErrors) //falsify only
-                        handleError_ = xmlAccess::ON_ERROR_IGNORE;
+                case ConfirmationButton3::ACCEPT: //ignore
                     return ProcessCallback::IGNORE_ERROR;
 
-                case ConfirmationButton3::DONT_DO_IT: //retry
+                case ConfirmationButton3::ACCEPT_ALL: //ignore all
+                    handleError_ = xmlAccess::ON_ERROR_IGNORE;
+                    return ProcessCallback::IGNORE_ERROR;
+
+                case ConfirmationButton3::DECLINE: //retry
                     guardWriteLog.dismiss();
                     errorLog_.logMsg(errorMessage + L"\n-> " + _("Retrying operation..."), TYPE_INFO);
                     return ProcessCallback::RETRY;
@@ -470,18 +470,19 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
             PauseTimers dummy(*progressDlg_);
             forceUiRefresh();
 
-            bool ignoreNextErrors = false;
             switch (showConfirmationDialog(progressDlg_->getWindowIfVisible(), DialogInfoType::ERROR2,
                                            PopupDialogCfg().setTitle(_("Serious Error")).
-                                           setDetailInstructions(errorMessage).
-                                           setCheckBox(ignoreNextErrors, _("&Ignore subsequent errors")),
-                                           _("&Ignore")))
+                                           setDetailInstructions(errorMessage),
+                                           _("&Ignore"), _("Ignore &all")))
             {
-                case ConfirmationButton::DO_IT:
-                    if (ignoreNextErrors) //falsify only
-                        handleError_ = xmlAccess::ON_ERROR_IGNORE;
+                case ConfirmationButton2::ACCEPT:
                     break;
-                case ConfirmationButton::CANCEL:
+
+                case ConfirmationButton2::ACCEPT_ALL:
+                    handleError_ = xmlAccess::ON_ERROR_IGNORE;
+                    break;
+
+                case ConfirmationButton2::CANCEL:
                     abortProcessNow();
                     break;
             }

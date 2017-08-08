@@ -140,21 +140,21 @@ struct DirectionConfig //technical representation of sync-config
     bool detectMovedFiles = false; //dependent from Variant: e.g. always active for DirectionConfig::TWO_WAY! => use functions below for evaluation!
 };
 
-inline
-bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
-{
-    return lhs.var              == rhs.var &&
-           lhs.custom           == rhs.custom &&
-           lhs.detectMovedFiles == rhs.detectMovedFiles;
-    //adapt effectivelyEqual() on changes, too!
-}
-
 bool detectMovedFilesSelectable(const DirectionConfig& cfg);
 bool detectMovedFilesEnabled   (const DirectionConfig& cfg);
 
 DirectionSet extractDirections(const DirectionConfig& cfg); //get sync directions: DON'T call for DirectionConfig::TWO_WAY!
 
 std::wstring getVariantName(DirectionConfig::Variant var);
+
+inline
+bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
+{
+    return lhs.var == rhs.var &&
+           (lhs.var != DirectionConfig::CUSTOM || lhs.custom == rhs.custom) && //no need to consider custom directions if var != CUSTOM
+           lhs.detectMovedFiles == rhs.detectMovedFiles; //useful to remember this setting even if the current sync variant does not need it
+    //adapt effectivelyEqual() on changes, too!
+}
 
 inline
 bool effectivelyEqual(const DirectionConfig& lhs, const DirectionConfig& rhs)

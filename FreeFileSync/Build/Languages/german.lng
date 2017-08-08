@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>global config file:</source>
-<target>Globale Konfigurationsdatei:</target>
-
 <source>config files:</source>
 <target>Konfigurationsdateien:</target>
 
 <source>directory</source>
 <target>Verzeichnis</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Pfad zu alternativer GlobalSettings.xml Datei.</target>
+<source>global config file:</source>
+<target>Globale Konfigurationsdatei:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Beliebige Anzahl von FreeFileSync .ffs_gui und/oder .ffs_batch Konfigurationsdateien.</target>
@@ -108,6 +105,9 @@
 
 <source>Open configuration for editing without executing it.</source>
 <target>Konfiguration zum Editieren öffnen ohne sie auszuführen.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Pfad zu alternativer GlobalSettings.xml Datei.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Die folgenden Ordner wurden nicht gefunden:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Aktualisiere Attribute des rechten Elements</target>
 
-<source>Cannot write file %x.</source>
-<target>Die Datei %x kann nicht geschrieben werden.</target>
+<source>Cannot read file %x.</source>
+<target>Die Datei %x kann nicht gelesen werden.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Tatsächlich: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
+<source>Cannot write file %x.</source>
+<target>Die Datei %x kann nicht geschrieben werden.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Die Datei %x kann nicht nach %y verschoben werden.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Die symbolische Verknüpfung %x kann nicht nach %y kopiert werden.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Es kann keine Verbindung zu %x aufgebaut werden.</target>
@@ -290,9 +293,6 @@ Tatsächlich: %y bytes
 
 <source>Cannot read directory %x.</source>
 <target>Das Verzeichnis %x kann nicht gelesen werden.</target>
-
-<source>Cannot read file %x.</source>
-<target>Die Datei %x kann nicht gelesen werden.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Die Dateiattribute von %x können nicht gelesen werden.</target>
@@ -596,8 +596,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Automated Synchronization</source>
 <target>Automatisierte Synchronisation</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Der folgende Pfad unterstützt keine Verzeichnisüberwachung:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Das %x Protokoll unterstützt keine Verzeichnisüberwachung:</target>
 
 <source>Directory monitoring active</source>
 <target>Verzeichnisüberwachung ist aktiv</target>
@@ -776,8 +776,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <pluralform>Automatische Wiederholung in %x Sekunden...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Nachfolgende Fehler ignorieren</target>
+<source>Ignore &all</source>
+<target>&Alle ignorieren</target>
 
 <source>Retrying operation...</source>
 <target>Wiederhole Vorgang...</target>
@@ -884,11 +884,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Find...</source>
 <target>S&uchen...</target>
 
-<source>&Reset layout</source>
-<target>Oberfläche &zurücksetzen</target>
-
 <source>&Export file list...</source>
 <target>Dateiliste e&xportieren...</target>
+
+<source>&Reset layout</source>
+<target>Oberfläche &zurücksetzen</target>
 
 <source>&Tools</source>
 <target>E&xtras</target>
@@ -1117,6 +1117,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Key file</source>
 <target>&Schlüsseldatei</target>
 
+<source>&SSH agent</source>
+<target>&SSH Agent</target>
+
 <source>User name:</source>
 <target>Benutzername:</target>
 
@@ -1135,8 +1138,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>How to get best performance?</source>
 <target>Wie erhält man die beste Leistung?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH Verbindungen zum Lesen des Verzeichnisses:</target>
+<source>Connections for directory reading:</source>
+<target>Verbindungen zum Verzeichnislesen:</target>
 
 <source>Suggested range: [1 - 10]</source>
 <target>Empfohlener Bereich: [1 - 10]</target>
@@ -1149,6 +1152,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>2 connections x 10 channels = 20 times faster directory reading</source>
 <target>2 Verbindungen x 10 Kanäle = 20 mal schnelleres Lesen des Verzeichnisses</target>
+
+<source>4 connections = 4 times faster directory reading</source>
+<target>4 Verbindungen = 4 mal schnelleres Verzeichnislesen</target>
 
 <source>Select a directory on the server:</source>
 <target>Verzeichnis auf dem Server auswählen:</target>
@@ -1363,6 +1369,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Overview</source>
 <target>Übersicht</target>
 
+<source>Show "%x"</source>
+<target>Zeige "%x"</target>
+
 <source>&Show details</source>
 <target>&Zeige Details</target>
 
@@ -1458,9 +1467,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Select time span...</source>
 <target>Zeitspanne auswählen...</target>
-
-<source>Show "%x"</source>
-<target>Zeige "%x"</target>
 
 <source>Last session</source>
 <target>Letzte Sitzung</target>
@@ -1614,6 +1620,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Key password:</source>
 <target>Schlüsselpasswort:</target>
+
+<source>Please enter a file path.</source>
+<target>Bitte geben Sie einen Dateipfad ein.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>

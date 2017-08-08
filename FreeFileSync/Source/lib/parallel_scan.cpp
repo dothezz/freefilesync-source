@@ -182,7 +182,8 @@ public:
         return rv;
     }
 
-    void processErrors(FillBufferCallback& callback) //context of main thread, call repreatedly
+    //context of main thread, call repreatedly
+    void processErrors(FillBufferCallback& callback)
     {
         std::unique_lock<std::mutex> dummy(lockErrorInfo_);
         if (errorInfo_.get() && !errorResponse_.get())
@@ -391,7 +392,8 @@ std::unique_ptr<AFS::TraverserCallback> DirCallback::onFolder(const FolderInfo& 
 
     //------------------------------------------------------------------------------------
     if (level_ > 100) //Win32 traverser: stack overflow approximately at level 1000
-        if (!tryReportingItemError([&] //check after FolderContainer::addSubFolder()
+        //check after FolderContainer::addSubFolder()
+        if (!tryReportingItemError([&] //throw ThreadInterruption
     {
         throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", AFS::getDisplayPath(AFS::appendRelPath(cfg.baseFolderPath_, folderRelPath))), L"Endless recursion.");
         }, *this, fi.itemName))
@@ -480,38 +482,39 @@ class WorkerThread
 public:
     WorkerThread(int threadID,
                  const std::shared_ptr<AsyncCallback>& acb,
-                 const AbstractPath& baseFolderPath,   //always bound!
+                 const AbstractPath& baseFolderPath,  //always bound!
                  const HardFilter::FilterRef& filter, //
                  SymLinkHandling handleSymlinks,
                  DirectoryValue& dirOutput) :
         acb_(acb),
-        outputContainer(dirOutput.folderCont),
-        travCfg(threadID,
-                baseFolderPath,
-                filter,
-                handleSymlinks, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
-                dirOutput.failedFolderReads,
-                dirOutput.failedItemReads,
-                *acb_) {}
+        outputContainer_(dirOutput.folderCont),
+        travCfg_(threadID,
+                 baseFolderPath,
+                 filter,
+                 handleSymlinks, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
+                 dirOutput.failedFolderReads,
+                 dirOutput.failedItemReads,
+                 *acb_) {}
 
     void operator()() //thread entry
     {
+        setCurrentThreadName("Folder Traverser");
 
         acb_->incActiveWorker();
         ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker());
 
-        if (acb_->mayReportCurrentFile(travCfg.threadID_, travCfg.lastReportTime_))
-            acb_->reportCurrentFile(AFS::getDisplayPath(travCfg.baseFolderPath_)); //just in case first directory access is blocking
+        if (acb_->mayReportCurrentFile(travCfg_.threadID_, travCfg_.lastReportTime_))
+            acb_->reportCurrentFile(AFS::getDisplayPath(travCfg_.baseFolderPath_)); //just in case first directory access is blocking
 
-        DirCallback cb(travCfg, Zstring(), outputContainer, 0);
+        DirCallback cb(travCfg_, Zstring(), outputContainer_, 0);
 
-        AFS::traverseFolder(travCfg.baseFolderPath_, cb); //throw X
+        AFS::traverseFolder(travCfg_.baseFolderPath_, cb); //throw ThreadInterruption
     }
 
 private:
     std::shared_ptr<AsyncCallback> acb_;
-    FolderContainer& outputContainer;
-    TraverserConfig travCfg;
+    FolderContainer& outputContainer_;
+    TraverserConfig travCfg_;
 };
 }
 
@@ -528,7 +531,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
     ZEN_ON_SCOPE_FAIL
     (
         for (InterruptibleThread& wt : worker)
-        wt.interrupt(); //interrupt all at once first, then join
+        wt.interrupt(); //interrupt all first, then join
         for (InterruptibleThread& wt : worker)
             if (wt.joinable()) //= precondition of thread::join(), which throws an exception if violated!
                 wt.join();     //in this context it is possible a thread is *not* joinable anymore due to the thread::try_join_for() below!

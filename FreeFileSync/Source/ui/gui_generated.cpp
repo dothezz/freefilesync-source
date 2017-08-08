@@ -2317,7 +2317,7 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     m_panel41->SetSizer( bSizer185 );
     m_panel41->Layout();
     bSizer185->Fit( m_panel41 );
-    bSizer134->Add( m_panel41, 1, wxEXPAND, 5 );
+    bSizer134->Add( m_panel41, 0, wxEXPAND, 5 );
 
     bSizerSftpTweaks = new wxBoxSizer( wxVERTICAL );
 
@@ -2327,8 +2327,8 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     wxBoxSizer* bSizer219;
     bSizer219 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bitmapSpeed = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer219->Add( m_bitmapSpeed, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 10 );
+    m_bitmapSpeedSftp = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer219->Add( m_bitmapSpeedSftp, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 10 );
 
     m_staticText1361 = new wxStaticText( this, wxID_ANY, _("Performance improvements:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1361->Wrap( -1 );
@@ -2358,34 +2358,28 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     fgSizer1611->SetFlexibleDirection( wxBOTH );
     fgSizer1611->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-    m_staticText12341 = new wxStaticText( m_panel411, wxID_ANY, _("SSH connections for directory reading:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText12341 = new wxStaticText( m_panel411, wxID_ANY, _("Connections for directory reading:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText12341->Wrap( -1 );
     fgSizer1611->Add( m_staticText12341, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 
-    m_spinCtrlConnectionCount = new wxSpinCtrl( m_panel411, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
-    fgSizer1611->Add( m_spinCtrlConnectionCount, 0, wxALL, 5 );
-
-    wxBoxSizer* bSizer230;
-    bSizer230 = new wxBoxSizer( wxHORIZONTAL );
+    m_spinCtrlConnectionCountSftp = new wxSpinCtrl( m_panel411, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
+    fgSizer1611->Add( m_spinCtrlConnectionCountSftp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticText138111 = new wxStaticText( m_panel411, wxID_ANY, _("Suggested range: [1 - 10]"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText138111->Wrap( -1 );
     m_staticText138111->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    bSizer230->Add( m_staticText138111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    fgSizer1611->Add( bSizer230, 0, 0, 5 );
+    fgSizer1611->Add( m_staticText138111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticText1231111 = new wxStaticText( m_panel411, wxID_ANY, _("SFTP channels per connection:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1231111->Wrap( -1 );
     fgSizer1611->Add( m_staticText1231111, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_spinCtrlChannelCount = new wxSpinCtrl( m_panel411, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
-    fgSizer1611->Add( m_spinCtrlChannelCount, 0, wxALL, 5 );
+    m_spinCtrlChannelCountSftp = new wxSpinCtrl( m_panel411, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
+    fgSizer1611->Add( m_spinCtrlChannelCountSftp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_button42 = new wxButton( m_panel411, wxID_ANY, _("Detect server limit"), wxDefaultPosition, wxDefaultSize, 0 );
-    fgSizer1611->Add( m_button42, 0, wxALL, 5 );
+    fgSizer1611->Add( m_button42, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizer1851->Add( fgSizer1611, 0, wxALL, 5 );
@@ -2415,7 +2409,89 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     bSizerSftpTweaks->Add( m_panel411, 1, wxEXPAND, 5 );
 
 
-    bSizer134->Add( bSizerSftpTweaks, 0, wxEXPAND, 5 );
+    bSizer134->Add( bSizerSftpTweaks, 1, wxEXPAND, 5 );
+
+    bSizerFtpTweaks = new wxBoxSizer( wxVERTICAL );
+
+    m_staticline5711 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizerFtpTweaks->Add( m_staticline5711, 0, wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer2191;
+    bSizer2191 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_bitmapSpeedFtp = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer2191->Add( m_bitmapSpeedFtp, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 10 );
+
+    m_staticText13611 = new wxStaticText( this, wxID_ANY, _("Performance improvements:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText13611->Wrap( -1 );
+    bSizer2191->Add( m_staticText13611, 0, wxALL|wxALIGN_CENTER_VERTICAL, 10 );
+
+
+    bSizer2191->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    m_hyperlink1711 = new wxHyperlinkCtrl( this, wxID_ANY, _("How to get best performance?"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    bSizer2191->Add( m_hyperlink1711, 0, wxALL|wxALIGN_CENTER_VERTICAL, 10 );
+
+
+    bSizerFtpTweaks->Add( bSizer2191, 0, wxEXPAND, 5 );
+
+    m_staticline573 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizerFtpTweaks->Add( m_staticline573, 0, wxEXPAND, 5 );
+
+    m_panel4111 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+    m_panel4111->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
+    wxBoxSizer* bSizer18511;
+    bSizer18511 = new wxBoxSizer( wxVERTICAL );
+
+    wxFlexGridSizer* fgSizer16111;
+    fgSizer16111 = new wxFlexGridSizer( 0, 3, 0, 0 );
+    fgSizer16111->AddGrowableCol( 1 );
+    fgSizer16111->SetFlexibleDirection( wxBOTH );
+    fgSizer16111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+    m_staticText123411 = new wxStaticText( m_panel4111, wxID_ANY, _("Connections for directory reading:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText123411->Wrap( -1 );
+    fgSizer16111->Add( m_staticText123411, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+
+    m_spinCtrlConnectionCountFtp = new wxSpinCtrl( m_panel4111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
+    fgSizer16111->Add( m_spinCtrlConnectionCountFtp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_staticText1381111 = new wxStaticText( m_panel4111, wxID_ANY, _("Suggested range: [1 - 10]"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText1381111->Wrap( -1 );
+    m_staticText1381111->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
+
+    fgSizer16111->Add( m_staticText1381111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer18511->Add( fgSizer16111, 0, wxALL, 5 );
+
+    wxBoxSizer* bSizer2201;
+    bSizer2201 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText1381121 = new wxStaticText( m_panel4111, wxID_ANY, _("Example:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText1381121->Wrap( -1 );
+    m_staticText1381121->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
+
+    bSizer2201->Add( m_staticText1381121, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_staticText138113 = new wxStaticText( m_panel4111, wxID_ANY, _("4 connections = 4 times faster directory reading"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText138113->Wrap( -1 );
+    m_staticText138113->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
+
+    bSizer2201->Add( m_staticText138113, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer18511->Add( bSizer2201, 0, wxBOTTOM|wxRIGHT|wxLEFT, 10 );
+
+
+    m_panel4111->SetSizer( bSizer18511 );
+    m_panel4111->Layout();
+    bSizer18511->Fit( m_panel4111 );
+    bSizerFtpTweaks->Add( m_panel4111, 1, wxEXPAND, 5 );
+
+
+    bSizer134->Add( bSizerFtpTweaks, 1, wxEXPAND, 5 );
 
     m_staticline12 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer134->Add( m_staticline12, 0, wxEXPAND, 5 );
@@ -2453,6 +2529,7 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     m_buttonSelectFolder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CloudSetupDlgGenerated::OnBrowseCloudFolder ), NULL, this );
     m_hyperlink171->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( CloudSetupDlgGenerated::OnHelpSftpPerformance ), NULL, this );
     m_button42->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CloudSetupDlgGenerated::OnDetectServerChannelLimit ), NULL, this );
+    m_hyperlink1711->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( CloudSetupDlgGenerated::OnHelpSftpPerformance ), NULL, this );
     m_buttonOkay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CloudSetupDlgGenerated::OnOkay ), NULL, this );
     m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CloudSetupDlgGenerated::OnCancel ), NULL, this );
 }
@@ -2946,15 +3023,18 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     m_panelProgress->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer173;
-    bSizer173 = new wxBoxSizer( wxVERTICAL );
+    bSizer173 = new wxBoxSizer( wxHORIZONTAL );
 
-    bSizer171 = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer* bSizer161;
+    bSizer161 = new wxBoxSizer( wxVERTICAL );
 
+    m_panelGraphBytes = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( -1, -1 ), 0 );
+    m_panelGraphBytes->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
-    bSizer171->Add( 10, 0, 0, 0, 5 );
+    bSizer161->Add( m_panelGraphBytes, 1, wxEXPAND, 15 );
 
-    wxBoxSizer* bSizer164;
-    bSizer164 = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer* bSizer232;
+    bSizer232 = new wxBoxSizer( wxHORIZONTAL );
 
     m_panelItemsProcessed = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
     m_panelItemsProcessed->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
@@ -2993,7 +3073,7 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     m_panelItemsProcessed->SetSizer( bSizer165 );
     m_panelItemsProcessed->Layout();
     bSizer165->Fit( m_panelItemsProcessed );
-    bSizer164->Add( m_panelItemsProcessed, 0, wxEXPAND|wxTOP, 7 );
+    bSizer232->Add( m_panelItemsProcessed, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 10 );
 
     m_panelItemsRemaining = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
     m_panelItemsRemaining->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
@@ -3032,7 +3112,7 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     m_panelItemsRemaining->SetSizer( bSizer166 );
     m_panelItemsRemaining->Layout();
     bSizer166->Fit( m_panelItemsRemaining );
-    bSizer164->Add( m_panelItemsRemaining, 0, wxTOP|wxEXPAND, 7 );
+    bSizer232->Add( m_panelItemsRemaining, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 10 );
 
     m_panelTimeRemaining = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
     m_panelTimeRemaining->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
@@ -3061,7 +3141,7 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     m_panelTimeRemaining->SetSizer( bSizer167 );
     m_panelTimeRemaining->Layout();
     bSizer167->Fit( m_panelTimeRemaining );
-    bSizer164->Add( m_panelTimeRemaining, 0, wxTOP|wxEXPAND, 7 );
+    bSizer232->Add( m_panelTimeRemaining, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 10 );
 
     wxPanel* m_panelTimeElapsed;
     m_panelTimeElapsed = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
@@ -3091,49 +3171,44 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     m_panelTimeElapsed->SetSizer( bSizer168 );
     m_panelTimeElapsed->Layout();
     bSizer168->Fit( m_panelTimeElapsed );
-    bSizer164->Add( m_panelTimeElapsed, 0, wxTOP|wxEXPAND, 7 );
+    bSizer232->Add( m_panelTimeElapsed, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 10 );
 
-
-    bSizer171->Add( bSizer164, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer171->Add( 10, 0, 0, 0, 5 );
-
-    wxBoxSizer* bSizer161;
-    bSizer161 = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer* bSizer233;
+    bSizer233 = new wxBoxSizer( wxVERTICAL );
 
     wxBoxSizer* bSizer175;
     bSizer175 = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapGraphKeyBytes = new wxStaticBitmap( m_panelProgress, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer175->Add( m_bitmapGraphKeyBytes, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
+    bSizer175->Add( m_bitmapGraphKeyBytes, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
     wxStaticText* m_staticText99;
     m_staticText99 = new wxStaticText( m_panelProgress, wxID_ANY, _("Bytes copied:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText99->Wrap( -1 );
-    bSizer175->Add( m_staticText99, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer175->Add( m_staticText99, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer161->Add( bSizer175, 0, 0, 5 );
-
-    m_panelGraphBytes = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( -1, -1 ), 0 );
-    m_panelGraphBytes->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-
-    bSizer161->Add( m_panelGraphBytes, 1, wxEXPAND, 15 );
+    bSizer233->Add( bSizer175, 0, 0, 5 );
 
     wxBoxSizer* bSizer174;
     bSizer174 = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapGraphKeyItems = new wxStaticBitmap( m_panelProgress, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer174->Add( m_bitmapGraphKeyItems, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
+    bSizer174->Add( m_bitmapGraphKeyItems, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
     wxStaticText* m_staticText100;
     m_staticText100 = new wxStaticText( m_panelProgress, wxID_ANY, _("Items processed:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText100->Wrap( -1 );
-    bSizer174->Add( m_staticText100, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer174->Add( m_staticText100, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer161->Add( bSizer174, 0, 0, 5 );
+    bSizer233->Add( bSizer174, 0, wxTOP, 5 );
+
+
+    bSizer232->Add( bSizer233, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 10 );
+
+
+    bSizer161->Add( bSizer232, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM, 10 );
 
     m_panelGraphItems = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( -1, -1 ), 0 );
     m_panelGraphItems->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
@@ -3141,16 +3216,13 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     bSizer161->Add( m_panelGraphItems, 1, wxEXPAND, 15 );
 
 
-    bSizer161->Add( 450, 0, 0, 0, 5 );
+    bSizer161->Add( 550, 0, 0, 0, 5 );
 
 
-    bSizer171->Add( bSizer161, 1, wxEXPAND, 5 );
+    bSizer173->Add( bSizer161, 1, wxEXPAND|wxLEFT, 10 );
 
 
-    bSizer171->Add( 0, 310, 0, 0, 5 );
-
-
-    bSizer173->Add( bSizer171, 1, wxEXPAND, 5 );
+    bSizer173->Add( 0, 340, 0, 0, 5 );
 
 
     m_panelProgress->SetSizer( bSizer173 );
@@ -4055,9 +4127,9 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer172->Add( m_hyperlink15, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink12 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Google Test"), wxT("http://code.google.com/p/googletest"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink12 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("Google Test"), wxT("https://github.com/google/googletest"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink12->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink12->SetToolTip( _("http://code.google.com/p/googletest") );
+    m_hyperlink12->SetToolTip( _("https://github.com/google/googletest") );
 
     bSizer172->Add( m_hyperlink12, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
@@ -4067,11 +4139,17 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer172->Add( m_hyperlink13, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink10 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("libssh2"), wxT("http://www.libssh2.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink10 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("libssh2"), wxT("https://www.libssh2.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink10->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_hyperlink10->SetToolTip( _("http://www.libssh2.org") );
+    m_hyperlink10->SetToolTip( _("https://www.libssh2.org") );
 
     bSizer172->Add( m_hyperlink10, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink101 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("libcurl"), wxT("https://curl.haxx.se/libcurl"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink101->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_hyperlink101->SetToolTip( _("https://curl.haxx.se/libcurl") );
+
+    bSizer172->Add( m_hyperlink101, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_hyperlink18 = new wxHyperlinkCtrl( m_panel41, wxID_ANY, _("NSIS"), wxT("http://nsis.sourceforge.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink18->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );

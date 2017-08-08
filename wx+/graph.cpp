@@ -75,33 +75,33 @@ class ConvertCoord //convert between screen and input data coordinates
 public:
     ConvertCoord(double valMin, double valMax, size_t screenSize) :
         min_(valMin),
-        scaleToReal(screenSize == 0 ? 0 : (valMax - valMin) / screenSize),
-        scaleToScr(numeric::isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)),
-        outOfBoundsLow (-1 * scaleToReal + valMin),
-        outOfBoundsHigh((screenSize + 1) * scaleToReal + valMin) { if (outOfBoundsLow > outOfBoundsHigh) std::swap(outOfBoundsLow, outOfBoundsHigh); }
+        scaleToReal_(screenSize == 0 ? 0 : (valMax - valMin) / screenSize),
+        scaleToScr_(numeric::isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)),
+        outOfBoundsLow_ (-1 * scaleToReal_ + valMin),
+        outOfBoundsHigh_((screenSize + 1) * scaleToReal_ + valMin) { if (outOfBoundsLow_ > outOfBoundsHigh_) std::swap(outOfBoundsLow_, outOfBoundsHigh_); }
 
     double screenToReal(double screenPos) const //map [0, screenSize] -> [valMin, valMax]
     {
-        return screenPos * scaleToReal + min_;
+        return screenPos * scaleToReal_ + min_;
     }
     double realToScreen(double realPos) const //return screen position in pixel (but with double precision!)
     {
-        return (realPos - min_) * scaleToScr;
+        return (realPos - min_) * scaleToScr_;
     }
     int realToScreenRound(double realPos) const //returns -1 and screenSize + 1 if out of bounds!
     {
         //catch large double values: if double is larger than what int can represent => undefined behavior!
-        numeric::clamp(realPos, outOfBoundsLow, outOfBoundsHigh);
+        numeric::clamp(realPos, outOfBoundsLow_, outOfBoundsHigh_);
         return numeric::round(realToScreen(realPos));
     }
 
 private:
-    double min_;
-    double scaleToReal;
-    double scaleToScr;
+    const double min_;
+    const double scaleToReal_;
+    const double scaleToScr_;
 
-    double outOfBoundsLow;
-    double outOfBoundsHigh;
+    double outOfBoundsLow_;
+    double outOfBoundsHigh_;
 };
 
 
@@ -323,10 +323,11 @@ void cutPointsOutsideY(std::vector<CurvePoint>& curvePoints, std::vector<char>& 
 }
 
 
-std::vector<CurvePoint> ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth) const
+std::vector<CurvePoint> ContinuousCurveData::getPoints(double minX, double maxX, const wxSize& areaSizePx) const
 {
     std::vector<CurvePoint> points;
 
+    const int pixelWidth = areaSizePx.GetWidth();
     if (pixelWidth <= 1) return points;
     const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
 
@@ -352,9 +353,11 @@ std::vector<CurvePoint> ContinuousCurveData::getPoints(double minX, double maxX,
 }
 
 
-std::vector<CurvePoint> SparseCurveData::getPoints(double minX, double maxX, int pixelWidth) const
+std::vector<CurvePoint> SparseCurveData::getPoints(double minX, double maxX, const wxSize& areaSizePx) const
 {
     std::vector<CurvePoint> points;
+
+    const int pixelWidth = areaSizePx.GetWidth();
     if (pixelWidth <= 1) return points;
     const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
     const std::pair<double, double> rangeX = getRangeX();
@@ -640,7 +643,7 @@ void Graph2D::render(wxDC& dc) const
                 std::vector<CurvePoint>& points = curvePoints[index];
                 auto&                    marker = oobMarker  [index];
 
-                points = curve->getPoints(minX, maxX, graphArea.width);
+                points = curve->getPoints(minX, maxX, graphArea.GetSize());
                 marker.resize(points.size()); //default value: false
                 if (!points.empty())
                 {

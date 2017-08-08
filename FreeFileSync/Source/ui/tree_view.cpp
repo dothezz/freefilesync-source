@@ -23,6 +23,7 @@ using namespace zen;
 namespace
 {
 const int WIDTH_PERCENTAGE_BAR = 60;
+const wchar_t* EN_DASH = L"\u2013";
 }
 
 
@@ -192,7 +193,7 @@ Zstring zen::getShortDisplayNameForFolderPair(const AbstractPath& itemPathL, con
     else if (AFS::isNullPath(itemPathR))
         return getLastComponent(itemPathL);
     else
-        return getLastComponent(itemPathL) + utfTo<Zstring>(L" \u2212 ") + //= unicode minus
+        return getLastComponent(itemPathL) + Zstr(" ") + utfTo<Zstring>(EN_DASH) + Zstr(" ") +
                getLastComponent(itemPathR);
 }
 
@@ -794,7 +795,7 @@ private:
                                 return dirRight;
                             else if (dirRight.empty())
                                 return dirLeft;
-                            return dirLeft + L" \u2212 \n" + dirRight; //\u2212 = unicode minus
+                            return dirLeft + L" " + EN_DASH + L"\n" + dirRight;
                         }
                 break;
 
