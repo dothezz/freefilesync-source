@@ -2282,7 +2282,7 @@ void MainDialog::onMainGridContextRim(bool leftSide)
              ++it)
         {
             //translate default external apps on the fly: 1. "open in explorer" 2. "start directly"
-            wxString description = zen::implementation::translate(it->first);
+            wxString description = zen::translate(it->first);
             if (description.empty())
                 description = L" "; //wxWidgets doesn't like empty items
 

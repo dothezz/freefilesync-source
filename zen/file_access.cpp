@@ -14,8 +14,8 @@
 #include "symlink_target.h"
 #include "file_id_def.h"
 #include "file_io.h"
-#include "crc.h"
-#include "guid.h"
+#include "crc.h"  //boost dependency!
+#include "guid.h" //
 
     #include <sys/vfs.h> //statfs
     #include <sys/time.h> //lutimes
@@ -627,10 +627,13 @@ FileCopyResult copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, 
     //=> don't delete file that existed previously!!!
     FileOutput fileOut(fdTarget, targetFile, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //pass ownership
 
-    bufferedStreamCopy(fileIn, fileOut); //throw FileError, X
+    //fileOut.preAllocateSpaceBestEffort(sourceInfo.st_size); //throw FileError
+    //=> perf: seems like no real benefit...
+
+    bufferedStreamCopy(fileIn, fileOut); //throw FileError, (ErrorFileLocked), X
 
     //flush intermediate buffers before fiddling with the raw file handle
-    fileOut.flushBuffers();              //throw FileError, X
+    fileOut.flushBuffers(); //throw FileError, X
 
     struct ::stat targetInfo = {};
     if (::fstat(fileOut.getHandle(), &targetInfo) != 0)

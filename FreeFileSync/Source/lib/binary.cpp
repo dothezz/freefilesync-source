@@ -37,8 +37,8 @@ const size_t BLOCK_SIZE_MAX =  16 * 1024 * 1024;
 
 struct StreamReader
 {
-    StreamReader(const AbstractPath& filePath, const IOCallback& notifyUnbufferedIO) :
-        stream_(AFS::getInputStream(filePath, notifyUnbufferedIO)), //throw FileError, (ErrorFileLocked), X
+    StreamReader(const AbstractPath& filePath, const IOCallback& notifyUnbufferedIO) : //throw FileError, X
+        stream_(AFS::getInputStream(filePath, notifyUnbufferedIO)), //throw FileError, ErrorFileLocked, X
         defaultBlockSize_(stream_->getBlockSize()),
         dynamicBlockSize_(defaultBlockSize_) { assert(defaultBlockSize_ > 0); }
 
@@ -50,7 +50,7 @@ struct StreamReader
         buffer.resize(buffer.size() + dynamicBlockSize_);
 
         const auto startTime = std::chrono::steady_clock::now();
-        const size_t bytesRead = stream_->read(&*(buffer.end() - dynamicBlockSize_), dynamicBlockSize_); //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+        const size_t bytesRead = stream_->read(&*(buffer.end() - dynamicBlockSize_), dynamicBlockSize_); //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
         const auto stopTime = std::chrono::steady_clock::now();
 
         buffer.resize(buffer.size() - dynamicBlockSize_ + bytesRead); //caveat: unsigned arithmetics
@@ -96,7 +96,7 @@ bool zen::filesHaveSameContent(const AbstractPath& filePath1, const AbstractPath
 {
     int64_t totalUnbufferedIO = 0;
 
-    StreamReader reader1(filePath1, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, (ErrorFileLocked), X
+    StreamReader reader1(filePath1, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError, X
     StreamReader reader2(filePath2, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //
 
     StreamReader* readerLow  = &reader1;

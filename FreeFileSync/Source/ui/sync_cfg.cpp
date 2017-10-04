@@ -29,9 +29,6 @@ using namespace xmlAccess;
 
 namespace
 {
-void toggleDeletionPolicy(DeletionPolicy& deletionPolicy);
-
-
 class ConfigDialog : public ConfigDlgGenerated
 {
 public:
@@ -122,8 +119,6 @@ private:
     void OnDeletionPermanent  (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::PERMANENT;  updateSyncGui(); }
     void OnDeletionRecycler   (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::RECYCLER;   updateSyncGui(); }
     void OnDeletionVersioning (wxCommandEvent& event) override { handleDeletion_ = DeletionPolicy::VERSIONING; updateSyncGui(); }
-
-    void OnToggleDeletionType(wxCommandEvent& event) override { toggleDeletionPolicy(handleDeletion_); updateSyncGui(); }
 
     void OnHelpDetectMovedFiles(wxHyperlinkEvent& event) override { displayHelpEntry(L"synchronization-settings", this); }
     void OnHelpVersioning      (wxHyperlinkEvent& event) override { displayHelpEntry(L"versioning",               this); }
@@ -259,10 +254,6 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     m_toggleBtnByContent ->SetToolTip(getCompVariantDescription(CompareVariant::CONTENT));
     m_toggleBtnBySize    ->SetToolTip(getCompVariantDescription(CompareVariant::SIZE));
 
-    m_bitmapByTimeSize->SetToolTip(getCompVariantDescription(CompareVariant::TIME_SIZE));
-    m_bitmapByContent ->SetToolTip(getCompVariantDescription(CompareVariant::CONTENT));
-    m_bitmapBySize    ->SetToolTip(getCompVariantDescription(CompareVariant::SIZE));
-
     //------------- filter panel --------------------------
     assert(!contains(m_buttonClear->GetLabel(), L"&C") && !contains(m_buttonClear->GetLabel(), L"&c")); //gazillionth wxWidgets bug on OS X: Command + C mistakenly hits "&C" access key!
 
@@ -306,12 +297,16 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnUpdate, 1.25);
     setRelativeFontSize(*m_toggleBtnCustom, 1.25);
 
+    m_toggleBtnRecycler  ->SetToolTip(_("Back up deleted and overwritten files in the recycle bin"));
+    m_toggleBtnPermanent ->SetToolTip(_("Delete or overwrite files permanently"));
+    m_toggleBtnVersioning->SetToolTip(_("Move files to a user-defined folder"));
+
     enumVersioningStyle_.
     add(VersioningStyle::REPLACE,       _("Replace"),    _("Move files and replace if existing")).
     add(VersioningStyle::ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
 
     //use spacer to keep dialog height stable, no matter if versioning options are visible
-    bSizerDelHandling->Add(0, m_panelVersioning->GetSize().GetHeight());
+    //bSizerDelHandling->Add(0, m_panelVersioning->GetSize().GetHeight());
 
     //-----------------------------------------------------
 
@@ -528,6 +523,15 @@ void ConfigDialog::updateCompGui()
     m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::COMPARISON),
                              static_cast<int>(m_checkBoxUseLocalCmpOptions->GetValue() ? ConfigTypeImage::COMPARISON : ConfigTypeImage::COMPARISON_GREY));
 
+    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
+    {
+        if (active &&
+            m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+            bmpCtrl.SetBitmap(bmp);
+        else
+            bmpCtrl.SetBitmap(greyScale(bmp));
+    };
+
     //update toggle buttons -> they have no parameter-ownership at all!
     m_toggleBtnByTimeSize->SetValue(false);
     m_toggleBtnBySize    ->SetValue(false);
@@ -538,29 +542,21 @@ void ConfigDialog::updateCompGui()
         {
             case CompareVariant::TIME_SIZE:
                 m_toggleBtnByTimeSize->SetValue(true);
+                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-time"));
                 break;
             case CompareVariant::CONTENT:
                 m_toggleBtnByContent->SetValue(true);
+                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-content"));
                 break;
             case CompareVariant::SIZE:
                 m_toggleBtnBySize->SetValue(true);
+                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-size"));
                 break;
         }
 
-    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
-    {
-        if (active &&
-            m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
-            bmpCtrl.SetBitmap(bmp);
-        else
-            bmpCtrl.SetBitmap(greyScale(bmp));
-    };
-    setBitmap(*m_bitmapByTimeSize, localCmpVar_ == CompareVariant::TIME_SIZE, getResourceImage(L"file-time"));
-    setBitmap(*m_bitmapByContent,  localCmpVar_ == CompareVariant::CONTENT,   getResourceImage(L"file-content"));
-    setBitmap(*m_bitmapBySize,     localCmpVar_ == CompareVariant::SIZE,      getResourceImage(L"file-size"));
-
     //active variant description:
-    setText(*m_textCtrlCompVarDescription, L"\n" + getCompVariantDescription(localCmpVar_));
+    setText(*m_staticTextCompVarDescription, getCompVariantDescription(localCmpVar_));
+    m_staticTextCompVarDescription->Wrap(400); //needs to be reapplied after SetLabel()
 
     m_radioBtnSymlinksDirect->Enable(m_checkBoxSymlinksInclude->GetValue());
     m_radioBtnSymlinksFollow->Enable(m_checkBoxSymlinksInclude->GetValue());
@@ -836,23 +832,6 @@ void updateSyncDirectionIcons(const DirectionConfig& directionCfg,
 }
 
 
-void toggleDeletionPolicy(DeletionPolicy& deletionPolicy)
-{
-    switch (deletionPolicy)
-    {
-        case DeletionPolicy::PERMANENT:
-            deletionPolicy = DeletionPolicy::VERSIONING;
-            break;
-        case DeletionPolicy::RECYCLER:
-            deletionPolicy = DeletionPolicy::PERMANENT;
-            break;
-        case DeletionPolicy::VERSIONING:
-            deletionPolicy = DeletionPolicy::RECYCLER;
-            break;
-    }
-}
-
-
 std::shared_ptr<const SyncConfig> ConfigDialog::getSyncConfig() const
 {
     if (!m_checkBoxUseLocalSyncOptions->GetValue())
@@ -904,21 +883,20 @@ void ConfigDialog::updateSyncGui()
     m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg_));
     m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg_)); //parameter NOT owned by checkbox!
 
-    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
+    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, const wxBitmap& bmp)
     {
-        if (active &&
-            m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
             bmpCtrl.SetBitmap(bmp);
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
 
     //display only relevant sync options
-    m_bitmapDatabase     ->Show(directionCfg_.var == DirectionConfig::TWO_WAY);
-    fgSizerSyncDirections->Show(directionCfg_.var != DirectionConfig::TWO_WAY);
+    m_bitmapDatabase    ->Show(directionCfg_.var == DirectionConfig::TWO_WAY);
+    bSizerSyncDirections->Show(directionCfg_.var != DirectionConfig::TWO_WAY);
 
     if (directionCfg_.var == DirectionConfig::TWO_WAY)
-        setBitmap(*m_bitmapDatabase, true, getResourceImage(L"database"));
+        setBitmap(*m_bitmapDatabase, getResourceImage(L"database"));
     else
     {
         const CompareVariant activeCmpVar = m_checkBoxUseLocalCmpOptions->GetValue() ? localCmpVar_ : globalCfg_.cmpConfig.compareVar;
@@ -933,7 +911,8 @@ void ConfigDialog::updateSyncGui()
     }
 
     //active variant description:
-    setText(*m_textCtrlSyncVarDescription, L"\n" + getSyncVariantDescription(directionCfg_.var));
+    setText(*m_staticTextSyncVarDescription, getSyncVariantDescription(directionCfg_.var));
+    m_staticTextSyncVarDescription->Wrap(220); //needs to be reapplied after SetLabel()
 
     //update toggle buttons -> they have no parameter-ownership at all!
     m_toggleBtnTwoWay->SetValue(false);
@@ -958,32 +937,34 @@ void ConfigDialog::updateSyncGui()
                 break;
         }
 
+    m_toggleBtnRecycler  ->SetValue(false);
+    m_toggleBtnPermanent ->SetValue(false);
+    m_toggleBtnVersioning->SetValue(false);
+
     switch (handleDeletion_)
     {
-        case DeletionPolicy::PERMANENT:
-            m_radioBtnPermanent->SetValue(true);
-
-            m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_permanently"));
-            m_bpButtonDeletionType->SetToolTip(_("Delete or overwrite files permanently"));
-            break;
         case DeletionPolicy::RECYCLER:
-            m_radioBtnRecycler->SetValue(true);
-
-            m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_recycler"));
-            m_bpButtonDeletionType->SetToolTip(_("Back up deleted and overwritten files in the recycle bin"));
+            m_toggleBtnRecycler->SetValue(true);
+            setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_recycler"));
+            setText(*m_staticTextDeletionTypeDescription, _("Back up deleted and overwritten files in the recycle bin"));
+            break;
+        case DeletionPolicy::PERMANENT:
+            m_toggleBtnPermanent->SetValue(true);
+            setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_permanently"));
+            setText(*m_staticTextDeletionTypeDescription, _("Delete or overwrite files permanently"));
             break;
         case DeletionPolicy::VERSIONING:
-            m_radioBtnVersioning->SetValue(true);
-
-            m_bpButtonDeletionType->SetBitmapLabel(getResourceImage(L"delete_versioning"));
-            m_bpButtonDeletionType->SetToolTip(_("Move files to a user-defined folder"));
+            m_toggleBtnVersioning->SetValue(true);
+            setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_versioning_small"));
+            setText(*m_staticTextDeletionTypeDescription, _("Move files to a user-defined folder"));
             break;
     }
-    m_bpButtonDeletionType->SetBitmapDisabled(greyScale(m_bpButtonDeletionType->GetBitmap())); //fix wxWidgets' all-too-clever multi-state!
+    //m_staticTextDeletionTypeDescription->Wrap(200); //needs to be reapplied after SetLabel()
 
 
     const bool versioningSelected = handleDeletion_ == DeletionPolicy::VERSIONING;
-    m_panelVersioning->Show(versioningSelected);
+    m_panelVersioning    ->Show(versioningSelected);
+    m_hyperlinkVersioning->Show(versioningSelected);
 
     if (versioningSelected)
     {

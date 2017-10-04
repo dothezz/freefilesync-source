@@ -420,7 +420,7 @@ void showSyntaxHelp()
                                                  _("Any number of alternative directory pairs for at most one config file.") + L"\n\n" +
 
                                                  L"-Edit" + L"\n" +
-                                                 _("Open configuration for editing without executing it.") + L"\n\n" +
+                                                 _("Open the selected configuration for editing only without executing it.") + L"\n\n" +
 
                                                  _("global config file:") + L"\n" +
                                                  _("Path to an alternate GlobalSettings.xml file.")));

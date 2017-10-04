@@ -46,10 +46,10 @@ SyncOperation getIsolatedSyncOperation(bool itemExistsLeft,
                                        SyncDirection syncDir,
                                        bool hasDirectionConflict) //perf: std::wstring was wasteful here
 {
-    assert(( itemExistsLeft &&   itemExistsRight && cmpResult != FILE_LEFT_SIDE_ONLY && cmpResult != FILE_RIGHT_SIDE_ONLY) ||
-           ( itemExistsLeft &&  !itemExistsRight && cmpResult == FILE_LEFT_SIDE_ONLY ) ||
-           (!itemExistsLeft &&   itemExistsRight && cmpResult == FILE_RIGHT_SIDE_ONLY) ||
-           (!itemExistsLeft &&  !itemExistsRight && cmpResult == FILE_EQUAL && syncDir == SyncDirection::NONE && !hasDirectionConflict) ||
+    assert(( itemExistsLeft &&  itemExistsRight && cmpResult != FILE_LEFT_SIDE_ONLY && cmpResult != FILE_RIGHT_SIDE_ONLY) ||
+           ( itemExistsLeft && !itemExistsRight && cmpResult == FILE_LEFT_SIDE_ONLY ) ||
+           (!itemExistsLeft &&  itemExistsRight && cmpResult == FILE_RIGHT_SIDE_ONLY) ||
+           (!itemExistsLeft && !itemExistsRight && cmpResult == FILE_EQUAL && syncDir == SyncDirection::NONE && !hasDirectionConflict) ||
            cmpResult == FILE_CONFLICT);
 
     assert(!hasDirectionConflict || syncDir == SyncDirection::NONE);

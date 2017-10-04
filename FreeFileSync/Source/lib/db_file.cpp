@@ -94,12 +94,12 @@ DbStreams loadStreams(const AbstractPath& dbPath, const IOCallback& notifyUnbuff
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
-        readArray(*fileStreamIn, formatDescr, sizeof(formatDescr)); //throw FileError, X, UnexpectedEndOfStreamError
+        readArray(*fileStreamIn, formatDescr, sizeof(formatDescr)); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
             throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtPath(AFS::getDisplayPath(dbPath))));
 
-        const int version = readNumber<int32_t>(*fileStreamIn); //throw FileError, X, UnexpectedEndOfStreamError
+        const int version = readNumber<int32_t>(*fileStreamIn); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
 
         //TODO: remove migration code at some time! 2017-02-01
         if (version != 9 &&
@@ -109,18 +109,18 @@ DbStreams loadStreams(const AbstractPath& dbPath, const IOCallback& notifyUnbuff
         DbStreams output;
 
         //read stream list
-        size_t dbCount = readNumber<uint32_t>(*fileStreamIn); //throw FileError, X, UnexpectedEndOfStreamError
+        size_t dbCount = readNumber<uint32_t>(*fileStreamIn); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
         while (dbCount-- != 0)
         {
             //DB id of partner databases
-            std::string sessionID = readContainer<std::string>(*fileStreamIn); //throw FileError, X, UnexpectedEndOfStreamError
+            std::string sessionID = readContainer<std::string>(*fileStreamIn); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
 
             SessionData sessionData = {};
 
             //TODO: remove migration code at some time! 2017-02-01
             if (version == 9)
             {
-                sessionData.rawStream = readContainer<ByteArray>(*fileStreamIn); //throw FileError, X, UnexpectedEndOfStreamError
+                sessionData.rawStream = readContainer<ByteArray>(*fileStreamIn); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
 
                 MemoryStreamIn<ByteArray> streamIn(sessionData.rawStream);
                 const int streamVersion = readNumber<int32_t>(streamIn); //throw UnexpectedEndOfStreamError
@@ -130,8 +130,8 @@ DbStreams loadStreams(const AbstractPath& dbPath, const IOCallback& notifyUnbuff
             }
             else
             {
-                sessionData.isLeadStream = readNumber<int8_t>(*fileStreamIn) != 0; //throw FileError, X, UnexpectedEndOfStreamError
-                sessionData.rawStream    = readContainer<ByteArray>(*fileStreamIn); //throw FileError, X, UnexpectedEndOfStreamError
+                sessionData.isLeadStream = readNumber<int8_t>(*fileStreamIn) != 0;  //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
+                sessionData.rawStream    = readContainer<ByteArray>(*fileStreamIn); //throw FileError, ErrorFileLocked, X, UnexpectedEndOfStreamError
             }
 
             output[sessionID] = std::move(sessionData);
@@ -558,37 +558,13 @@ private:
     }
 
     template <class M, class V>
-    static V& updateItem(M& map, const Zstring& key, const V& value)
+    static V& mapAddOrUpdate(M& map, const Zstring& key, V&& value)
     {
-        auto rv = map.emplace(key, value);
-        if (!rv.second)
-        {
-            rv.first->second = value;
-        }
-        return rv.first->second;
+        auto rv = map.emplace(key, value); //C++11 emplace will move r-value arguments => don't use std::forward!
+        if (rv.second)
+            return rv.first->second;
 
-        //www.cplusplus.com claims that hint position for map<>::insert(iterator position, const value_type& val) changed with C++11 -> standard is unclear in [map.modifiers]
-        // => let's use the more generic and potentially less performant version above!
-
-        /*
-        //efficient create or update without "default-constructible" requirement (Effective STL, item 24)
-
-        //first check if key already exists (if yes, we're saving a value construction/destruction compared to std::map<>::insert
-        auto it = map.lower_bound(key);
-        if (it != map.end() && !(map.key_comp()(key, it->first)))
-        {
-        #if defined ZEN_WIN || defined ZEN_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
-            if (it->first != key)
-            {
-                map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
-                return map.emplace(key, value).first->second;
-            }
-        #endif
-            it->second = value;
-            return it->second;
-        }
-        return map.insert(it, typename M::value_type(key, value))->second;
-        */
+        return rv.first->second = std::forward<V>(value);
     }
 
     void process(const ContainerObject::FileList& currentFiles, const Zstring& parentRelPath, InSyncFolder::FileList& dbFiles)
@@ -607,7 +583,7 @@ private:
                     assert(file.getFileSize<LEFT_SIDE>() == file.getFileSize<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncFile& dbFile = updateItem(dbFiles, file.getPairItemName(),
+                    InSyncFile& dbFile = mapAddOrUpdate(dbFiles, file.getPairItemName(),
                                                     InSyncFile(InSyncDescrFile(file.getLastWriteTime< LEFT_SIDE>(),
                                                                                file.getFileId       < LEFT_SIDE>()),
                                                                InSyncDescrFile(file.getLastWriteTime<RIGHT_SIDE>(),
@@ -648,7 +624,7 @@ private:
                     assert(symlink.getItemName<LEFT_SIDE>() == symlink.getItemName<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncSymlink& dbSymlink = updateItem(dbSymlinks, symlink.getPairItemName(),
+                    InSyncSymlink& dbSymlink = mapAddOrUpdate(dbSymlinks, symlink.getPairItemName(),
                                                           InSyncSymlink(InSyncDescrLink(symlink.getLastWriteTime<LEFT_SIDE>()),
                                                                         InSyncDescrLink(symlink.getLastWriteTime<RIGHT_SIDE>()),
                                                                         activeCmpVar_));

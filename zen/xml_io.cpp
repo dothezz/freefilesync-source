@@ -22,7 +22,7 @@ XmlDoc zen::loadXmlDocument(const Zstring& filePath) //throw FileError
     for (;;)
     {
         buffer.resize(buffer.size() + blockSize);
-        const size_t bytesRead = fileIn.read(&*(buffer.end() - blockSize), blockSize); //throw FileError, (X); return "bytesToRead" bytes unless end of stream!
+        const size_t bytesRead = fileIn.read(&*(buffer.end() - blockSize), blockSize); //throw FileError, ErrorFileLocked, (X); return "bytesToRead" bytes unless end of stream!
         buffer.resize(buffer.size() - blockSize + bytesRead); //caveat: unsigned arithmetics
 
         //quick test whether input is an XML: avoid loading large binary files up front!

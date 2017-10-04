@@ -1,5 +1,23 @@
-FreeFileSync 9.3
-----------------
+FreeFileSync 9.4 [2017-10-05]
+-----------------------------
+Fixed copying files with locked byte ranges using VSS
+Fixed wrong FTP working directory reuse in libcurl
+Allow retry upon failure during online update check
+Repackaged Donation Edition to reduce AV false positives (Norton)
+Apply correct directory path encoding during FTP traversal
+Fixed strict weak ordering for SFTP session ID sorting
+Clean up read-only temporary files during failed sparse file copy
+Fixed access denied file copy error for ADS while using BackupWrite
+Workaround broken non-Windows SMB implementations reporting sparse support
+Support hash characters in FTP directory listing
+Prepared auto-updater to support new installer format
+Refined installer error reporting
+Streamlined sync config dialogs
+Resized installer window dimensions
+
+
+FreeFileSync 9.3 [2017-08-09]
+-----------------------------
 Support multiple connections per FTP folder traversal: N times speed up
 Improved folder traversal time by 35% for FTP servers supporting MLSD
 Use single CWD when changing FTP working directory

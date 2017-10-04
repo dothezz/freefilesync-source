@@ -33,6 +33,7 @@ public:
 
     //Windows: use 64kB ?? https://technet.microsoft.com/en-us/library/cc938632
     //Linux: use st_blksize?
+    //macOS: use f_iosize?
     static size_t getBlockSize() { return 128 * 1024; };
 
 protected:
@@ -58,10 +59,10 @@ public:
     FileInput(const Zstring& filePath, const IOCallback& notifyUnbufferedIO); //throw FileError, ErrorFileLocked
     FileInput(FileHandle handle, const Zstring& filePath, const IOCallback& notifyUnbufferedIO); //takes ownership!
 
-    size_t read(void* buffer, size_t bytesToRead); //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+    size_t read(void* buffer, size_t bytesToRead); //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
 
 private:
-    size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
+    size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError, ErrorFileLocked; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
 
     std::vector<char> memBuf_;
     const IOCallback notifyUnbufferedIO_; //throw X

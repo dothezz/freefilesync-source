@@ -103,7 +103,7 @@ FileInput::FileInput(const Zstring& filePath, const IOCallback& notifyUnbuffered
 }
 
 
-size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; may return short, only 0 means EOF!
+size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError, ErrorFileLocked; may return short, only 0 means EOF!
 {
     if (bytesToRead == 0) //"read() with a count of 0 returns zero" => indistinguishable from end of file! => check!
         throw std::logic_error("Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
@@ -127,7 +127,7 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError; m
 }
 
 
-size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
 {
     const size_t blockSize = getBlockSize();
     assert(memBuf_.size() <= blockSize);
@@ -144,7 +144,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, X; r
             break;
         //--------------------------------------------------------------------
         memBuf_.resize(blockSize);
-        const size_t bytesRead = tryRead(&memBuf_[0], blockSize); //throw FileError; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
+        const size_t bytesRead = tryRead(&memBuf_[0], blockSize); //throw FileError, ErrorFileLocked; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
         memBuf_.resize(bytesRead);
 
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X

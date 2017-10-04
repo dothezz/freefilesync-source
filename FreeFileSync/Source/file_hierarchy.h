@@ -345,10 +345,23 @@ public:
     inline friend bool operator==(const DerefIter& lhs, const DerefIter& rhs) { return lhs.it_ == rhs.it_; }
     inline friend bool operator!=(const DerefIter& lhs, const DerefIter& rhs) { return !(lhs == rhs); }
     V& operator* () const { return  **it_; }
-    V* operator->() const { return &** it_; }
+    V* operator->() const { return &**it_; }
 private:
     IterImpl it_;
 };
+
+/*
+C++17: specialize std::iterator_traits instead of inherting from std::iterator
+namespace std 
+{
+template <class IterImpl, class V>        
+struct iterator_traits<zen::DerefIter<IterImpl, V>> 
+{
+	using iterator_category = std::bidirectional_iterator_tag;
+	using value_type = V;
+};
+}
+*/
 
 using FolderComparison = std::vector<std::shared_ptr<BaseFolderPair>>; //make sure pointers to sub-elements remain valid
 //don't change this back to std::vector<BaseFolderPair> too easily: comparison uses push_back to add entries which may result in a full copy!

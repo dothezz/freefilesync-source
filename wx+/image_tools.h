@@ -32,7 +32,7 @@ enum class ImageStackAlignment
 };
 wxImage stackImages(const wxImage& img1, const wxImage& img2, ImageStackLayout dir, ImageStackAlignment align, int gap = 0);
 
-wxImage createImageFromText(const wxString& text, const wxFont& font, const wxColor& col);
+wxImage createImageFromText(const wxString& text, const wxFont& font, const wxColor& col, ImageStackAlignment textAlign = ImageStackAlignment::LEFT); //CENTER/LEFT/RIGHT
 
 wxBitmap layOver(const wxBitmap& background, const wxBitmap& foreground); //merge
 

@@ -23,11 +23,18 @@ struct TimeComp //replaces std::tm and SYSTEMTIME
     int second = 0; //0-60 (including leap second)
 };
 
+inline bool operator==(const TimeComp& lhs, const TimeComp& rhs)
+{
+    return lhs.year == rhs.year && lhs.month == rhs.month  && lhs.day == rhs.day && lhs.hour == rhs.hour && lhs.minute == rhs.minute && lhs.second == rhs.second;
+}
+
 TimeComp getLocalTime(time_t utc = std::time(nullptr)); //convert time_t (UTC) to local time components
 time_t   localToTimeT(const TimeComp& comp);            //convert local time components to time_t (UTC), returns -1 on error
 
 TimeComp getUtcTime(time_t utc = std::time(nullptr)); //convert time_t (UTC) to UTC time components
 time_t   utcToTimeT(const TimeComp& comp);            //convert UTC time components to time_t (UTC), returns -1 on error
+
+TimeComp getCompileTime();
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
@@ -268,6 +275,23 @@ time_t utcToTimeT(const TimeComp& comp) //returns -1 on error
 }
 
 
+inline
+TimeComp getCompileTime()
+{
+    //https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
+    char compileTime[] = __DATE__ " " __TIME__; //e.g. "Aug  1 2017 01:32:26"
+    if (compileTime[4] == ' ') //day is space-padded, but %d expects zero-padding
+        compileTime[4] = '0';
+
+    TimeComp tc = {};
+    if (parseTime("%b %d %Y %H:%M:%S", compileTime, tc))
+        return tc;
+
+    assert(false);
+    return TimeComp();
+}
+
+
 template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp)
 {
@@ -328,6 +352,25 @@ bool parseTime(const String& format, const String2& str, TimeComp& comp) //retur
                     if (!extractNumber(comp.month, 2))
                         return false;
                     break;
+                case 'b': //abbreviated month name: Jan-Dec
+                {
+                    if (strLast - itStr < 3)
+                        return false;
+
+                    const char* months[] = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+                    auto itMonth = std::find_if(std::begin(months), std::end(months), [&](const char* name)
+                    {
+                        return asciiToLower(itStr[0]) == name[0] &&
+                               asciiToLower(itStr[1]) == name[1] &&
+                               asciiToLower(itStr[2]) == name[2];
+                    });
+                    if (itMonth == std::end(months))
+                        return false;
+
+                    comp.month = 1 + static_cast<int>(itMonth - std::begin(months));
+                    itStr += 3;
+                }
+                break;
                 case 'd':
                     if (!extractNumber(comp.day, 2))
                         return false;

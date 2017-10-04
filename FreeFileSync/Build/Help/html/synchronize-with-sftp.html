@@ -30,8 +30,10 @@
 		Since most of this time is spent waiting due to the high latency of the remote connection, you can speed up reading large directory hierarchies
 		by increasing both the connection and channel count.<br>
 		<br>
-		<em>The directory reading time is reduced by a factor of N x M when using N connections with M channels each.</em><br>
-		<br>
+		<em>The directory reading time is reduced by a factor of <b>N</b> x <b>M</b> when using N connections with M channels each.</em>
+		<br><br>
+		<b>Example</b>: 2 connections using 10 channels each can yield a <b>20</b> times faster directory reading.
+		<br><br>
 		<img src="../images/sftp-performance.png" alt="Set up SFTP for best performance">
 		
 		<ul style="margin: 0">

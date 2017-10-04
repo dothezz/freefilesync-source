@@ -138,7 +138,7 @@ struct AbstractFileSystem //THREAD-SAFETY: "const" member functions must model t
     struct InputStream
     {
         virtual ~InputStream() {}
-        virtual size_t read(void* buffer, size_t bytesToRead) = 0; //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+        virtual size_t read(void* buffer, size_t bytesToRead) = 0; //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
         virtual size_t getBlockSize() const = 0; //non-zero block size is AFS contract! it's implementer's job to always give a reasonable buffer size!
 
         //only returns attributes if they are already buffered within stream handle and determination would be otherwise expensive (e.g. FTP/SFTP):

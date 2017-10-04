@@ -16,8 +16,8 @@
 //minimal layer enabling text translation - without platform/library dependencies!
 
 #define ZEN_TRANS_CONCAT_SUB(X, Y) X ## Y
-#define _(s) zen::implementation::translate(ZEN_TRANS_CONCAT_SUB(L, s))
-#define _P(s, p, n) zen::implementation::translate(ZEN_TRANS_CONCAT_SUB(L, s), ZEN_TRANS_CONCAT_SUB(L, p), n)
+#define _(s)        zen::translate(ZEN_TRANS_CONCAT_SUB(L, s))
+#define _P(s, p, n) zen::translate(ZEN_TRANS_CONCAT_SUB(L, s), ZEN_TRANS_CONCAT_SUB(L, p), n)
 //source and translation are required to use %x as number placeholder
 //for plural form, which will be substituted automatically!!!
 
@@ -58,47 +58,18 @@ std::shared_ptr<const TranslationHandler> getTranslator();
 namespace implementation
 {
 inline
-std::wstring translate(const std::wstring& text)
-{
-    if (std::shared_ptr<const TranslationHandler> t = getTranslator()) //std::shared_ptr => temporarily take (shared) ownership while using the interface!
-        return t->translate(text);
-    return text;
-}
-
-
-//translate plural forms: "%x day" "%x days"
-//returns "1 day" if n == 1; "123 days" if n == 123 for english language
-inline
-std::wstring translate(const std::wstring& singular, const std::wstring& plural, int64_t n)
-{
-    assert(contains(plural, L"%x"));
-
-    if (std::shared_ptr<const TranslationHandler> t = getTranslator())
-    {
-        std::wstring translation = t->translate(singular, plural, n);
-        assert(!contains(translation, L"%x"));
-        return translation;
-    }
-
-    return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n));
-}
-
-
-template <class T> inline
-std::wstring translate(const std::wstring& singular, const std::wstring& plural, T n)
-{
-    static_assert(sizeof(n) <= sizeof(int64_t), "");
-    return translate(singular, plural, static_cast<int64_t>(n));
-}
-
-
-inline
 Global<const TranslationHandler>& refGlobalTranslationHandler()
 {
     //getTranslator() may be called even after static objects of this translation unit are destroyed!
     static Global<const TranslationHandler> inst; //external linkage even in header!
     return inst;
 }
+}
+
+inline
+std::shared_ptr<const TranslationHandler> getTranslator()
+{
+    return implementation::refGlobalTranslationHandler().get();
 }
 
 
@@ -110,9 +81,32 @@ void setTranslator(std::unique_ptr<const TranslationHandler>&& newHandler)
 
 
 inline
-std::shared_ptr<const TranslationHandler> getTranslator()
+std::wstring translate(const std::wstring& text)
 {
-    return implementation::refGlobalTranslationHandler().get();
+    if (std::shared_ptr<const TranslationHandler> t = getTranslator()) //std::shared_ptr => temporarily take (shared) ownership while using the interface!
+        return t->translate(text);
+    return text;
+}
+
+
+//translate plural forms: "%x day" "%x days"
+//returns "1 day" if n == 1; "123 days" if n == 123 for english language
+template <class T> inline
+std::wstring translate(const std::wstring& singular, const std::wstring& plural, T n)
+{
+    static_assert(sizeof(n) <= sizeof(int64_t), "");
+    const auto n64 = static_cast<int64_t>(n);
+
+    assert(contains(plural, L"%x"));
+
+    if (std::shared_ptr<const TranslationHandler> t = getTranslator())
+    {
+        std::wstring translation = t->translate(singular, plural, n64);
+        assert(!contains(translation, L"%x"));
+        return translation;
+    }
+    //fallback:
+    return replaceCpy(std::abs(n64) == 1 ? singular : plural, L"%x", toGuiString(n));
 }
 }
 

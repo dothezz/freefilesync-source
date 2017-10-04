@@ -24,10 +24,9 @@ template <class T> T min(T a, T b, T c);
 template <class T> T max(T a, T b, T c);
 template <class T> bool isNull(T value);
 
-template <class T>
-void clamp(T& val, T minVal, T maxVal); //make sure minVal <= val && val <= maxVal
-template <class T>
-T clampCpy(T val, T minVal, T maxVal);
+template <class T> void clamp(T& val, T minVal, T maxVal); //make sure minVal <= val && val <= maxVal
+template <class T> T  clampCpy(T val, T minVal, T maxVal);
+//std::clamp() available with C++17
 
 template <class T, class InputIterator> //precondition: range must be sorted!
 auto nearMatch(const T& val, InputIterator first, InputIterator last);
@@ -64,6 +63,8 @@ const double pi    = 3.14159265358979323846;
 const double e     = 2.71828182845904523536;
 const double sqrt2 = 1.41421356237309504880;
 const double ln2   = 0.693147180559945309417;
+
+//static_assert(pi + e + sqrt2 + ln2 == 7.9672352249818781, "whoopsie");
 //----------------------------------------------------------------------------------
 
 
@@ -286,17 +287,16 @@ template <class RandomAccessIterator> inline
 double median(RandomAccessIterator first, RandomAccessIterator last) //note: invalidates input range!
 {
     const size_t n = last - first;
-    if (n > 0)
-    {
-        std::nth_element(first, first + n / 2, last); //complexity: O(n)
-        const double midVal = *(first + n / 2);
+    if (n == 0)
+	    return 0;
 
-        if (n % 2 != 0)
-            return midVal;
-        else //n is even and >= 2 in this context: return mean of two middle values
-            return 0.5 * (*std::max_element(first, first + n / 2) + midVal); //this operation is the reason why median() CANNOT support a comparison predicate!!!
-    }
-    return 0;
+	std::nth_element(first, first + n / 2, last); //complexity: O(n)
+    const double midVal = *(first + n / 2);
+
+    if (n % 2 != 0)
+        return midVal;
+    else //n is even and >= 2 in this context: return mean of two middle values
+        return 0.5 * (*std::max_element(first, first + n / 2) + midVal); //this operation is the reason why median() CANNOT support a comparison predicate!!!
 }
 
 
@@ -304,25 +304,22 @@ template <class RandomAccessIterator> inline
 double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invalidates input range!
 {
     //http://en.wikipedia.org/wiki/Median_absolute_deviation
-
     const size_t n = last - first;
-    if (n > 0)
-    {
-        const double m = median(first, last);
+    if (n == 0)
+	    return 0;
 
-        //the second median needs to operate on absolute residuals => avoid transforming input range which may have less than double precision!
+    const double m = median(first, last);
 
-        auto lessMedAbs = [m](double lhs, double rhs) { return abs(lhs - m) < abs(rhs - m); };
+    //the second median needs to operate on absolute residuals => avoid transforming input range which may have less than double precision!
+    auto lessMedAbs = [m](double lhs, double rhs) { return abs(lhs - m) < abs(rhs - m); };
 
-        std::nth_element(first, first + n / 2, last, lessMedAbs); //complexity: O(n)
-        const double midVal = abs(*(first + n / 2) - m);
+    std::nth_element(first, first + n / 2, last, lessMedAbs); //complexity: O(n)
+    const double midVal = abs(*(first + n / 2) - m);
 
-        if (n % 2 != 0)
-            return midVal;
-        else //n is even and >= 2 in this context: return mean of two middle values
-            return 0.5 * (abs(*std::max_element(first, first + n / 2, lessMedAbs) - m) + midVal);
-    }
-    return 0;
+    if (n % 2 != 0)
+        return midVal;
+    else //n is even and >= 2 in this context: return mean of two middle values
+        return 0.5 * (abs(*std::max_element(first, first + n / 2, lessMedAbs) - m) + midVal);
 }
 
 

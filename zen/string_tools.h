@@ -22,10 +22,11 @@
 //enhance arbitray string class with useful non-member functions:
 namespace zen
 {
-template <class Char> bool isWhiteSpace(Char ch);
-template <class Char> bool isDigit     (Char ch); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
-template <class Char> bool isHexDigit  (Char ch);
-template <class Char> bool isAsciiAlpha(Char ch);
+template <class Char> bool isWhiteSpace(Char c);
+template <class Char> bool isDigit     (Char c); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
+template <class Char> bool isHexDigit  (Char c);
+template <class Char> bool isAsciiAlpha(Char c);
+template <class Char> Char asciiToLower(Char c);
 
 //case-sensitive comparison (compile-time correctness:  use different number of arguments as STL comparison predicates!)
 struct CmpBinary { template <class Char> int operator()(const Char* lhs, size_t lhsLen, const Char* rhs, size_t rhsLen) const; };
@@ -105,28 +106,28 @@ template <class T, class S> T copyStringTo(S&& str);
 
 //---------------------- implementation ----------------------
 template <> inline
-bool isWhiteSpace(char ch)
+bool isWhiteSpace(char c)
 {
-    assert(ch != 0); //std C++ does not consider 0 as white space
+    assert(c != 0); //std C++ does not consider 0 as white space
     //caveat 1: std::isspace() takes an int, but expects an unsigned char
     //caveat 2: some parts of UTF-8 chars are erroneously seen as whitespace, e.g. the a0 from "\xec\x8b\xa0" (MSVC)
-    return static_cast<unsigned char>(ch) < 128 &&
-           std::isspace(static_cast<unsigned char>(ch)) != 0;
+    return static_cast<unsigned char>(c) < 128 &&
+           std::isspace(static_cast<unsigned char>(c)) != 0;
 }
 
 template <> inline
-bool isWhiteSpace(wchar_t ch)
+bool isWhiteSpace(wchar_t c)
 {
-    assert(ch != 0); //std C++ does not consider 0 as white space
-    return std::iswspace(ch) != 0;
+    assert(c != 0); //std C++ does not consider 0 as white space
+    return std::iswspace(c) != 0;
 }
 
 
 template <class Char> inline
-bool isDigit(Char ch) //similar to implmenetation of std::isdigit()!
+bool isDigit(Char c) //similar to implmenetation of std::isdigit()!
 {
     static_assert(IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value, "");
-    return static_cast<Char>('0') <= ch && ch <= static_cast<Char>('9');
+    return static_cast<Char>('0') <= c && c <= static_cast<Char>('9');
 }
 
 
@@ -146,6 +147,15 @@ bool isAsciiAlpha(Char c)
     static_assert(IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value, "");
     return (static_cast<Char>('A') <= c && c <= static_cast<Char>('Z')) ||
            (static_cast<Char>('a') <= c && c <= static_cast<Char>('z'));
+}
+
+
+template <class Char> inline
+Char asciiToLower(Char c)
+{
+    if (static_cast<Char>('A') <= c && c <= static_cast<Char>('Z'))
+        return static_cast<Char>(c - static_cast<Char>('A') + static_cast<Char>('a'));
+    return c;
 }
 
 
@@ -458,19 +468,11 @@ int CmpBinary::operator()(const Char* lhs, size_t lhsLen, const Char* rhs, size_
 template <class Char> inline
 int CmpAsciiNoCase::operator()(const Char* lhs, size_t lhsLen, const Char* rhs, size_t rhsLen) const
 {
-    auto asciiToLower = [](Char c) //ordering: lower-case chars have higher code points than uppper-case
-    {
-        if (static_cast<Char>('A') <= c && c <= static_cast<Char>('Z'))
-            return static_cast<Char>(c - static_cast<Char>('A') + static_cast<Char>('a'));
-        return c;
-    };
-
     const auto* const lhsLast = lhs + std::min(lhsLen, rhsLen);
-
     while (lhs != lhsLast)
     {
-        const Char charL = asciiToLower(*lhs++);
-        const Char charR = asciiToLower(*rhs++);
+        const Char charL = asciiToLower(*lhs++); //ordering: lower-case chars have higher code points than uppper-case
+        const Char charR = asciiToLower(*rhs++); //
         if (charL != charR)
             return static_cast<unsigned int>(charL) - static_cast<unsigned int>(charR); //unsigned char-comparison is the convention!
         //unsigned underflow is well-defined!

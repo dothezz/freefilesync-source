@@ -130,22 +130,43 @@ void calcAlphaForBlackWhiteImage(wxImage& image) //assume black text on white ba
 }
 
 
-wxSize getTextExtent(const wxString& text, const wxFont& font)
+std::vector<std::pair<wxString, wxSize>> getTextExtentInfo(const wxString& text, const wxFont& font)
 {
     wxMemoryDC dc; //the context used for bitmaps
     dc.SetFont(font); //the font parameter of GetMultiLineTextExtent() is not evalated on OS X, wxWidgets 2.9.5, so apply it to the DC directly!
-    return dc.GetMultiLineTextExtent(replaceCpy(text, L"&", L"", false)); //remove accelerator
+
+    std::vector<std::pair<wxString, wxSize>> lineInfo; //text + extent
+    for (const wxString& line : split(text, L"\n", SplitType::ALLOW_EMPTY))
+        lineInfo.emplace_back(line, line.empty() ? wxSize() : dc.GetTextExtent(line));
+
+    return lineInfo;
 }
 }
 
-wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const wxColor& col)
+wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const wxColor& col, ImageStackAlignment textAlign)
 {
-    //wxDC::DrawLabel() doesn't respect alpha channel => calculate alpha values manually:
+    //assert(!contains(text, L"&")); //accelerator keys not supported here
+    wxString textFmt = replaceCpy(text, L"&", L"", false);
 
-    if (text.empty())
+    //for some reason wxDC::DrawText messes up "weak" bidi characters even when wxLayout_RightToLeft is set! (--> arrows in hebrew/arabic)
+    //=> use mark characters instead:
+    const wchar_t rtlMark = L'\u200F'; //UTF-8: E2 80 8F
+    if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
+        textFmt = rtlMark + textFmt + rtlMark;
+
+    const std::vector<std::pair<wxString, wxSize>> lineInfo = getTextExtentInfo(textFmt, font);
+
+    int maxWidth   = 0;
+    int lineHeight = 0;
+    for (const auto& li : lineInfo)
+    {
+        maxWidth   = std::max(maxWidth,   li.second.GetWidth());
+        lineHeight = std::max(lineHeight, li.second.GetHeight()); //wxWidgets comment "GetTextExtent will return 0 for empty string"
+    }
+    if (maxWidth == 0 || lineHeight == 0)
         return wxImage();
 
-    wxBitmap newBitmap(getTextExtent(text, font)); //seems we don't need to pass 24-bit depth here even for high-contrast color schemes
+    wxBitmap newBitmap(maxWidth, lineHeight * lineInfo.size()); //seems we don't need to pass 24-bit depth here even for high-contrast color schemes
     {
         wxMemoryDC dc(newBitmap);
         dc.SetBackground(*wxWHITE_BRUSH);
@@ -155,22 +176,31 @@ wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const
         dc.SetTextBackground(*wxWHITE); //
         dc.SetFont(font);
 
-        //assert(!contains(text, L"&")); //accelerator keys not supported here; see also getTextExtent()
-        wxString textFmt = replaceCpy(text, L"&", L"", false);
+        int posY = 0;
+        for (const auto& li : lineInfo)
+        {
+            if (!li.first.empty())
+                switch (textAlign)
+                {
+                    case ImageStackAlignment::LEFT:
+                        dc.DrawText(li.first, wxPoint(0, posY));
+                        break;
+                    case ImageStackAlignment::RIGHT:
+                        dc.DrawText(li.first, wxPoint(maxWidth - li.second.GetWidth(), posY));
+                        break;
+                    case ImageStackAlignment::CENTER:
+                        dc.DrawText(li.first, wxPoint((maxWidth - li.second.GetWidth()) / 2, posY));
+                        break;
+                }
 
-        //for some reason wxDC::DrawText messes up "weak" bidi characters even when wxLayout_RightToLeft is set! (--> arrows in hebrew/arabic)
-        //=> use mark characters instead:
-        const wchar_t rtlMark = L'\u200F'; //UTF-8: E2 80 8F
-        if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
-            textFmt = rtlMark + textFmt + rtlMark;
-
-        dc.DrawText(textFmt, wxPoint());
+            posY += lineHeight;
+        }
     }
 
+    //wxDC::DrawLabel() doesn't respect alpha channel => calculate alpha values manually:
     wxImage output(newBitmap.ConvertToImage());
     output.SetAlpha();
 
-    //calculate alpha channel
     calcAlphaForBlackWhiteImage(output);
 
     //apply actual text color

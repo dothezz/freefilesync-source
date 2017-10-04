@@ -62,7 +62,7 @@ struct InputStreamNative : public AbstractFileSystem::InputStream
 {
     InputStreamNative(const Zstring& filePath, const IOCallback& notifyUnbufferedIO) : fi_(filePath, notifyUnbufferedIO) {} //throw FileError, ErrorFileLocked
 
-    size_t read(void* buffer, size_t bytesToRead) override { return fi_.read(buffer, bytesToRead); } //throw FileError, X; return "bytesToRead" bytes unless end of stream!
+    size_t read(void* buffer, size_t bytesToRead) override { return fi_.read(buffer, bytesToRead); } //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
     size_t getBlockSize() const override { return fi_.getBlockSize(); } //non-zero block size is AFS contract!
     Opt<AFS::StreamAttributes> getAttributesBuffered() override; //throw FileError
 

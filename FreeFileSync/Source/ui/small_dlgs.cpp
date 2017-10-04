@@ -62,7 +62,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     {
         m_panelThankYou->Hide();
-        m_bitmapDonate->SetBitmap(getResourceImage(L"paypal"));
+        m_bitmapDonate->SetBitmap(getResourceImage(L"freefilesync-heart"));
         setRelativeFontSize(*m_staticTextDonate, 1.25);
         setRelativeFontSize(*m_buttonDonate, 1.25);
     }
@@ -89,7 +89,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
 
     //build information
-    wxString build = __TDATE__;
+    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime());
     build += L" - Unicode";
 #ifndef wxUSE_UNICODE
 #error what is going on?
@@ -102,6 +102,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         L" x64";
 #endif
 
+
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
 
     //generate logo: put *after* first Fit()
@@ -112,7 +113,8 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
                                              *wxBLACK); //accessibility: align foreground/background colors!
     wxImage buildImg = createImageFromText(replaceCpy(_("Build: %x"), L"%x", build),
                                            *wxNORMAL_FONT,
-                                           *wxBLACK);
+                                           *wxBLACK,
+                                           ImageStackAlignment::CENTER);
     wxImage versionImage = stackImages(appnameImg, buildImg, ImageStackLayout::VERTICAL, ImageStackAlignment::CENTER, 0);
 
     const int BORDER_SIZE = 5;
@@ -650,7 +652,7 @@ void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
     auto extAppTmp = extApp;
     erase_if(extAppTmp, [](auto& entry) { return entry.first.empty() && entry.second.empty(); });
 
-    extAppTmp.resize(extAppTmp.size() + 1); //append empty row to facilitate insertions
+    extAppTmp.emplace_back(); //append empty row to facilitate insertions by user
 
     const int rowCount = m_gridCustomCommand->GetNumberRows();
     if (rowCount > 0)
@@ -661,7 +663,7 @@ void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
     {
         const int row = it - extAppTmp.begin();
 
-        const std::wstring description = zen::implementation::translate(it->first);
+        const std::wstring description = zen::translate(it->first);
         if (description != it->first) //remember english description to save in GlobalSettings.xml later rather than hard-code translation
             descriptionTransToEng[description] = it->first;
 
@@ -905,9 +907,10 @@ ReturnActivationDlg zen::showActivationDialog(wxWindow* parent, const std::wstri
 class DownloadProgressWindow::Impl : public DownloadProgressDlgGenerated
 {
 public:
-    Impl(wxWindow* parent, const Zstring& fileName, uint64_t fileSize);
+    Impl(wxWindow* parent, int64_t fileSizeTotal);
 
-    void notifyProgress(uint64_t delta) { bytesCurrent_ += delta; }
+    void notifyNewFile (const Zstring& filePath) { filePath_ = filePath; }
+    void notifyProgress(int64_t delta)           { bytesCurrent_ += delta; }
 
     void requestUiRefresh() //throw CancelPressed
     {
@@ -931,18 +934,21 @@ private:
         m_staticTextHeader->SetLabel(_("Downloading update...") + L" " +
                                      numberTo<std::wstring>(numeric::round(fraction * 100)) + L"% (" + filesizeToShortString(bytesCurrent_) + L")");
         m_gaugeProgress->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
+
+        m_staticTextDetails->SetLabel(utfTo<std::wstring>(filePath_));
     }
 
     bool cancelled_ = false;
-    uint64_t bytesCurrent_ = 0;
-    const uint64_t bytesTotal_;
+    int64_t bytesCurrent_ = 0;
+    const int64_t bytesTotal_;
+    Zstring filePath_;
     const int GAUGE_FULL_RANGE = 1000000;
 };
 
 
-DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, uint64_t fileSize) :
+DownloadProgressWindow::Impl::Impl(wxWindow* parent, int64_t fileSizeTotal) :
     DownloadProgressDlgGenerated(parent),
-    bytesTotal_(fileSize)
+    bytesTotal_(fileSizeTotal)
 {
 
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setCancel(m_buttonCancel));
@@ -952,8 +958,6 @@ DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, ui
     m_bitmapDownloading->SetBitmap(getResourceImage(L"website"));
 
     m_gaugeProgress->SetRange(GAUGE_FULL_RANGE);
-
-    m_staticTextDetails->SetLabel(utfTo<std::wstring>(filePath));
 
     updateGui();
 
@@ -966,10 +970,11 @@ DownloadProgressWindow::Impl::Impl(wxWindow* parent, const Zstring& filePath, ui
 }
 
 
-zen::DownloadProgressWindow::DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, uint64_t fileSize) :
-    pimpl_(new DownloadProgressWindow::Impl(parent, filePath, fileSize)) {}
+zen::DownloadProgressWindow::DownloadProgressWindow(wxWindow* parent, int64_t fileSizeTotal) :
+    pimpl_(new DownloadProgressWindow::Impl(parent, fileSizeTotal)) {}
 
 zen::DownloadProgressWindow::~DownloadProgressWindow() { pimpl_->Destroy(); }
 
-void zen::DownloadProgressWindow::notifyProgress(uint64_t delta) { pimpl_->notifyProgress(delta); }
-void zen::DownloadProgressWindow::requestUiRefresh() { pimpl_->requestUiRefresh(); } //throw CancelPressed
+void zen::DownloadProgressWindow::notifyNewFile(const Zstring& filePath) { pimpl_->notifyNewFile(filePath); }
+void zen::DownloadProgressWindow::notifyProgress(int64_t delta)          { pimpl_->notifyProgress(delta); }
+void zen::DownloadProgressWindow::requestUiRefresh()                     { pimpl_->requestUiRefresh(); } //throw CancelPressed

@@ -2041,7 +2041,7 @@ void zen::synchronize(const std::chrono::system_clock::time_point& syncStartTime
                 msg += L"\n" + AFS::getDisplayPath(item.first);
 
         if (!msg.empty())
-            callback.reportWarning(_("The recycle bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n" + msg,
+            callback.reportWarning(_("The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:") + L"\n" + msg,
                                    warnings.warnRecyclerMissing);
     }
 

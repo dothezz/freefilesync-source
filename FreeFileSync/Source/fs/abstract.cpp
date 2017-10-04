@@ -86,7 +86,7 @@ AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const St
     //target existing: undefined behavior! (fail/overwrite/auto-rename)
     auto streamOut = getOutputStream(apTarget, &attrSourceNew.fileSize, IOCallbackDivider(notifyUnbufferedIO, totalUnbufferedIO)); //throw FileError
 
-    bufferedStreamCopy(*streamIn, *streamOut); //throw FileError, X
+    bufferedStreamCopy(*streamIn, *streamOut); //throw FileError, ErrorFileLocked, X
 
     const FileId targetFileId = streamOut->finalize(); //throw FileError, X
 

@@ -7,6 +7,27 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Please enter a file path.</source>
+<target></target>
+
+<source>Support with a donation</source>
+<target></target>
+
+<source>4 connections = 4 times faster directory reading</source>
+<target></target>
+
+<source>Connections for directory reading:</source>
+<target></target>
+
+<source>&SSH agent</source>
+<target></target>
+
+<source>Ignore &all</source>
+<target></target>
+
+<source>The %x protocol does not support directory monitoring:</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -88,17 +109,14 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>global config file:</source>
-<target>global config file:</target>
-
 <source>config files:</source>
 <target>config files:</target>
 
 <source>directory</source>
 <target>directory</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Path to an alternate GlobalSettings.xml file.</target>
+<source>global config file:</source>
+<target>global config file:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</target>
@@ -108,6 +126,9 @@
 
 <source>Open configuration for editing without executing it.</source>
 <target>Open configuration for editing without executing it.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Path to an alternate GlobalSettings.xml file.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
@@ -253,8 +274,8 @@
 <source>Update attributes on right</source>
 <target>Update attributes on right</target>
 
-<source>Cannot write file %x.</source>
-<target>Cannot write file %x.</target>
+<source>Cannot read file %x.</source>
+<target>Cannot read file %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +294,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Operation not supported for different base folder types.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Cannot copy symbolic link %x to %y.</target>
+<source>Cannot write file %x.</source>
+<target>Cannot write file %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Cannot move file %x to %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Cannot copy symbolic link %x to %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Unable to connect to %x.</target>
@@ -291,8 +315,8 @@ Actual: %y bytes
 <source>Cannot read directory %x.</source>
 <target>Cannot read directory %x.</target>
 
-<source>Cannot read file %x.</source>
-<target>Cannot read file %x.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Cannot read file attributes of %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Cannot create directory %x.</target>
@@ -302,9 +326,6 @@ Actual: %y bytes
 
 <source>Cannot delete directory %x.</source>
 <target>Cannot delete directory %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>Cannot read file attributes of %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Cannot write modification time of %x.</target>
@@ -596,9 +617,6 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Automated Synchronisation</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>The following path does not support directory monitoring:</target>
-
 <source>Directory monitoring active</source>
 <target>Directory monitoring active</target>
 
@@ -776,9 +794,6 @@ The command is triggered if:
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignore subsequent errors</target>
-
 <source>Retrying operation...</source>
 <target>Retrying operation...</target>
 
@@ -884,11 +899,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&Find...</target>
 
-<source>&Reset layout</source>
-<target>&Reset layout</target>
-
 <source>&Export file list...</source>
 <target>&Export file list...</target>
+
+<source>&Reset layout</source>
+<target>&Reset layout</target>
 
 <source>&Tools</source>
 <target>&Tools</target>
@@ -1135,9 +1150,6 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>How to get best performance?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH connections for directory reading:</target>
-
 <source>Suggested range: [1 - 10]</source>
 <target>Suggested range: [1 - 10]</target>
 
@@ -1279,14 +1291,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Source code written in C++ using:</target>
 
-<source>Donation details</source>
-<target>Donation details</target>
-
 <source>If you like FreeFileSync:</source>
 <target>If you like FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Donate with PayPal</target>
+<source>Donation details</source>
+<target>Donation details</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback and suggestions are welcome</target>
@@ -1362,6 +1371,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Overview</source>
 <target>Overview</target>
+
+<source>Show "%x"</source>
+<target>Show "%x"</target>
 
 <source>&Show details</source>
 <target>&Show details</target>
@@ -1458,9 +1470,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select time span...</source>
 <target>Select time span...</target>
-
-<source>Show "%x"</source>
-<target>Show "%x"</target>
 
 <source>Last session</source>
 <target>Last session</target>

@@ -39,9 +39,6 @@ void append(std::set<T, LessType, Alloc>& s, const C& c);
 template <class KeyType, class ValueType, class LessType, class Alloc, class C>
 void append(std::map<KeyType, ValueType, LessType, Alloc>& m, const C& c);
 
-template <class M, class K, class V>
-V& map_add_or_update(M& map, const K& key, const V& value); //efficient add or update without "default-constructible" requirement (Effective STL, item 24)
-
 template <class T, class Alloc>
 void removeDuplicates(std::vector<T, Alloc>& v);
 
@@ -123,20 +120,6 @@ void append(std::set<T, LessType, Alloc>& s, const C& c) { s.insert(c.begin(), c
 
 template <class KeyType, class ValueType, class LessType, class Alloc, class C> inline
 void append(std::map<KeyType, ValueType, LessType, Alloc>& m, const C& c) { m.insert(c.begin(), c.end()); }
-
-
-template <class M, class K, class V> inline
-V& map_add_or_update(M& map, const K& key, const V& value) //efficient add or update without "default-constructible" requirement (Effective STL, item 24)
-{
-    auto it = map.lower_bound(key);
-    if (it != map.end() && !(map.key_comp()(key, it->first)))
-    {
-        it->second = value;
-        return it->second;
-    }
-    else
-        return map.insert(it, typename M::value_type(key, value))->second;
-}
 
 
 template <class T, class Alloc> inline

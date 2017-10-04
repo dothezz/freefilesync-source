@@ -13,6 +13,7 @@
 #include <wx+/image_resources.h>
 #include <zen/file_access.h>
 #include <zen/build_info.h>
+#include <zen/time.h>
 #include "xml_proc.h"
 #include "tray_menu.h"
 #include "app_icon.h"
@@ -157,7 +158,7 @@ void MainDialog::OnShowHelp(wxCommandEvent& event)
 
 void MainDialog::OnMenuAbout(wxCommandEvent& event)
 {
-    wxString build = __TDATE__;
+    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime());
     build += L" - Unicode";
 #ifndef wxUSE_UNICODE
 #error what is going on?

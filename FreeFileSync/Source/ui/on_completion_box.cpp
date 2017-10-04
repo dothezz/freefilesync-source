@@ -102,7 +102,7 @@ Zstring OnCompletionBox::getValue() const
 {
     auto value = trimCpy(copyStringTo<std::wstring>(GetValue()));
 
-    if (value == implementation::translate(getCmdTxtCloseProgressDlg())) //undo translation for config file storage
+    if (value == zen::translate(getCmdTxtCloseProgressDlg())) //undo translation for config file storage
         value = getCmdTxtCloseProgressDlg();
 
     return utfTo<Zstring>(value);
@@ -114,7 +114,7 @@ void OnCompletionBox::setValue(const Zstring& value)
     auto tmp = trimCpy(utfTo<std::wstring>(value));
 
     if (tmp == getCmdTxtCloseProgressDlg())
-        tmp = implementation::translate(getCmdTxtCloseProgressDlg()); //have this symbolic constant translated properly
+        tmp = zen::translate(getCmdTxtCloseProgressDlg()); //have this symbolic constant translated properly
 
     setValueAndUpdateList(tmp);
 }
@@ -128,7 +128,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
     std::deque<std::wstring> items;
 
     //1. special command
-    items.push_back(implementation::translate(getCmdTxtCloseProgressDlg()));
+    items.push_back(zen::translate(getCmdTxtCloseProgressDlg()));
 
     //2. built in commands
     for (const auto& item : defaultCommands_)

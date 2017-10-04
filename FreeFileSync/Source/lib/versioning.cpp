@@ -2,7 +2,6 @@
 #include <cstddef> //required by GCC 4.8.1 to find ptrdiff_t
 
 using namespace zen;
-using AFS = AbstractFileSystem;
 
 
 namespace

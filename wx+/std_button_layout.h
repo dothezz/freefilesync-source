@@ -115,7 +115,7 @@ void setStandardButtonLayout(wxBoxSizer& sizer, const StdButtons& buttons)
     sizer.Add(spaceRimH, 0);
 
     //OS X: there should be at least one button following the gap after the "dangerous" no-button
-    assert(buttonsTmp.btnYes);
+    assert(buttonsTmp.btnYes || buttonsTmp.btnCancel);
 }
 }
 

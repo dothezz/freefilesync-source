@@ -63,12 +63,13 @@ ReturnActivationDlg showActivationDialog(wxWindow* parent, const std::wstring& l
 class DownloadProgressWindow //temporary progress info => life-time: stack
 {
 public:
-    DownloadProgressWindow(wxWindow* parent, const Zstring& filePath, uint64_t fileSize);
+    DownloadProgressWindow(wxWindow* parent, int64_t fileSizeTotal);
     ~DownloadProgressWindow();
 
     struct CancelPressed {};
+    void notifyNewFile(const Zstring& filePath);
+    void notifyProgress(int64_t delta);
     void requestUiRefresh(); //throw CancelPressed
-    void notifyProgress(uint64_t delta);
 
 private:
     class Impl;

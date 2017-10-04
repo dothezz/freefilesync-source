@@ -7,6 +7,9 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Support with a donation</source>
+<target>Mit einer Spende unterstützen</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -1290,9 +1293,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>If you like FreeFileSync:</source>
 <target>Wenn Sie FreeFileSync mögen:</target>
-
-<source>Donate with PayPal</source>
-<target>Mit PayPal spenden</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback und Vorschläge sind willkommen</target>

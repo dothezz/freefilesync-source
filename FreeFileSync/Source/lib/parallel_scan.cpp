@@ -55,9 +55,9 @@ DiskInfo retrieveDiskInfo(const Zstring& itemPath)
     DiskInfo output;
 
     //full pathName need not yet exist!
-    if (!::GetVolumePathName(itemPath.c_str(),  //__in   LPCTSTR lpszFileName,
-                             &volName[0],       //__out  LPTSTR lpszVolumePathName,
-                             static_cast<DWORD>(volName.size()))) //__in   DWORD cchBufferLength
+    if (!::GetVolumePathName(itemPath.c_str(),                    //__in  LPCTSTR lpszFileName,
+                             &volName[0],                         //__out LPTSTR lpszVolumePathName,
+                             static_cast<DWORD>(volName.size()))) //__in  DWORD cchBufferLength
         return output;
 
     const Zstring rootPathName = &volName[0];
