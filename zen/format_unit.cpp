@@ -39,7 +39,7 @@ std::wstring zen::formatThreeDigitPrecision(double value)
 }
 
 
-std::wstring zen::filesizeToShortString(int64_t size)
+std::wstring zen::formatFilesizeShort(int64_t size)
 {
     //if (size < 0) return _("Error"); -> really?
 
@@ -122,7 +122,7 @@ std::wstring roundToBlock(double timeInHigh,
 }
 
 
-std::wstring zen::remainingTimeToString(double timeInSec)
+std::wstring zen::formatRemainingTime(double timeInSec)
 {
     const int steps10[] = { 1, 2, 5, 10 };
     const int steps24[] = { 1, 2, 3, 4, 6, 8, 12, 24 };
@@ -154,7 +154,7 @@ std::wstring zen::remainingTimeToString(double timeInSec)
 //}
 
 
-std::wstring zen::fractionToString(double fraction)
+std::wstring zen::formatFraction(double fraction)
 {
     return printNumber<std::wstring>(L"%.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
 }
@@ -188,7 +188,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 }
 
 
-std::wstring zen::utcToLocalTimeString(int64_t utcTime)
+std::wstring zen::formatUtcToLocalTime(int64_t utcTime)
 {
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 

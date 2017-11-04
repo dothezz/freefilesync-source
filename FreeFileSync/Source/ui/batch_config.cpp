@@ -9,9 +9,10 @@
 #include <wx+/std_button_layout.h>
 #include <wx+/font_size.h>
 #include <wx+/image_resources.h>
+#include <wx+/image_tools.h>
+#include <wx+/choice_enum.h>
 #include "gui_generated.h"
 #include "folder_selector.h"
-#include "../ui/on_completion_box.h"
 #include "../lib/help_provider.h"
 
 
@@ -21,21 +22,26 @@ using namespace xmlAccess;
 
 namespace
 {
+struct BatchDialogConfig
+{
+    BatchExclusiveConfig batchExCfg;
+    bool ignoreErrors = false;
+};
+
+
 class BatchDialog : public BatchDlgGenerated
 {
 public:
-    BatchDialog(wxWindow* parent,
-                XmlBatchConfig& batchCfg, //in/out
-                std::vector<Zstring>& onCompletionHistory,
-                size_t onCompletionHistoryMax);
+    BatchDialog(wxWindow* parent, BatchDialogConfig& dlgCfg);
 
 private:
     void OnClose       (wxCloseEvent&   event) override { EndModal(ReturnBatchConfig::BUTTON_CANCEL); }
     void OnCancel      (wxCommandEvent& event) override { EndModal(ReturnBatchConfig::BUTTON_CANCEL); }
     void OnSaveBatchJob(wxCommandEvent& event) override;
-    void OnErrorPopup  (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
-    void OnErrorIgnore (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
-    void OnErrorStop   (wxCommandEvent& event) override { localBatchCfg.handleError = ON_ERROR_STOP;   updateGui(); }
+
+    void OnToggleIgnoreErrors(wxCommandEvent& event) override { updateGui(); }
+    void OnToggleRunMinimized(wxCommandEvent& event) override { updateGui(); }
+
     void OnHelpScheduleBatch(wxHyperlinkEvent& event) override { displayHelpEntry(L"schedule-a-batch-job", this); }
 
     void OnToggleGenerateLogfile(wxCommandEvent& event) override { updateGui(); }
@@ -43,38 +49,38 @@ private:
 
     void updateGui(); //re-evaluate gui after config changes
 
-    void setConfig(const XmlBatchConfig& batchCfg);
-    XmlBatchConfig getConfig() const;
+    void setConfig(const BatchDialogConfig& batchCfg);
+    BatchDialogConfig getConfig() const;
 
-    XmlBatchConfig&       batchCfgOutRef; //output only!
-    std::vector<Zstring>& onCompletionHistoryOut; //
+    //output-only parameters
+    BatchDialogConfig& dlgCfgOut_;
 
-    XmlBatchConfig localBatchCfg; //a mixture of settings some of which have OWNERSHIP WITHIN GUI CONTROLS! use getConfig() to resolve
+    std::unique_ptr<FolderSelector> logfileDir_; //always bound, solve circular compile-time dependency
 
-    std::unique_ptr<FolderSelector> logfileDir; //always bound, solve circular compile-time dependency
+    EnumDescrList<PostSyncAction> enumPostSyncAction_;
 };
 
 //###################################################################################################################################
 
-BatchDialog::BatchDialog(wxWindow* parent,
-                         XmlBatchConfig& batchCfg,
-                         std::vector<Zstring>& onCompletionHistory,
-                         size_t onCompletionHistoryMax) :
+BatchDialog::BatchDialog(wxWindow* parent, BatchDialogConfig& dlgCfg) :
     BatchDlgGenerated(parent),
-    batchCfgOutRef(batchCfg),
-    onCompletionHistoryOut(onCompletionHistory)
+    dlgCfgOut_(dlgCfg)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
 
     m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
 
-    m_comboBoxOnCompletion->setHistory(onCompletionHistory, onCompletionHistoryMax);
-
     m_bitmapBatchJob->SetBitmap(getResourceImage(L"batch"));
 
-    logfileDir = std::make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogFolder, *m_bpButtonSelectAltLogFolder, *m_logFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
+    logfileDir_ = std::make_unique<FolderSelector>(*m_panelLogfile, *m_buttonSelectLogFolder, *m_bpButtonSelectAltLogFolder, *m_logFolderPath, nullptr /*staticText*/, nullptr /*wxWindow*/);
 
-    setConfig(batchCfg);
+    enumPostSyncAction_.
+    add(PostSyncAction::SUMMARY,  _("Show summary")).
+    add(PostSyncAction::EXIT,     replaceCpy(_("E&xit"), L"&", L"")). //reuse translation
+    add(PostSyncAction::SLEEP,    _("Sleep")).
+    add(PostSyncAction::SHUTDOWN, _("Shut down"));
+
+    setConfig(dlgCfg);
 
     GetSizer()->SetSizeHints(this); //~=Fit() + SetMinSize()
     //=> works like a charm for GTK2 with window resizing problems and title bar corruption; e.g. Debian!!!
@@ -86,81 +92,96 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
 void BatchDialog::updateGui() //re-evaluate gui after config changes
 {
-    XmlBatchConfig cfg = getConfig(); //resolve parameter ownership: some on GUI controls, others member variables
+    const BatchDialogConfig dlgCfg = getConfig(); //resolve parameter ownership: some on GUI controls, others member variables
 
-    m_panelLogfile        ->Enable(m_checkBoxGenerateLogfile->GetValue()); //enabled status is *not* directly dependent from resolved config! (but transitively)
-    m_spinCtrlLogfileLimit->Enable(m_checkBoxGenerateLogfile->GetValue() && m_checkBoxLogfilesLimit->GetValue());
+    m_bitmapIgnoreErrors->SetBitmap(getResourceImage(dlgCfg.ignoreErrors ? L"msg_error_medium_ignored" : L"msg_error_medium"));
 
-    m_radioBtnIgnoreErrors  ->SetValue(false);
-    m_radioBtnPopupOnErrors ->SetValue(false);
-    m_radioBtnStopOnError   ->SetValue(false);
-    switch (cfg.handleError) //*not* owned by GUI controls
-    {
-        case ON_ERROR_IGNORE:
-            m_radioBtnIgnoreErrors->SetValue(true);
-            break;
-        case ON_ERROR_POPUP:
-            m_radioBtnPopupOnErrors->SetValue(true);
-            break;
-        case ON_ERROR_STOP:
-            m_radioBtnStopOnError->SetValue(true);
-            break;
-    }
+    m_radioBtnErrorDialogShow  ->Enable(!dlgCfg.ignoreErrors);
+    m_radioBtnErrorDialogCancel->Enable(!dlgCfg.ignoreErrors);
+
+
+    m_bitmapMinimizeToTray->SetBitmap(dlgCfg.batchExCfg.runMinimized ? getResourceImage(L"minimize_to_tray") : greyScale(getResourceImage(L"minimize_to_tray")));
+
+
+    m_panelLogfile->Enable(m_checkBoxSaveLog->GetValue()); //enabled status is *not* directly dependent from resolved config! (but transitively)
+    m_bitmapLogFile->SetBitmap(m_checkBoxSaveLog->GetValue() ? getResourceImage(L"log_file") : greyScale(getResourceImage(L"log_file")));
+    m_checkBoxLogfilesLimit->Enable(m_checkBoxSaveLog->GetValue());
+    m_spinCtrlLogfileLimit ->Enable(m_checkBoxSaveLog->GetValue() && m_checkBoxLogfilesLimit->GetValue());
 }
 
 
-void BatchDialog::setConfig(const XmlBatchConfig& batchCfg)
+void BatchDialog::setConfig(const BatchDialogConfig& dlgCfg)
 {
 
-    localBatchCfg = batchCfg; //contains some parameters not owned by GUI controls
+    m_checkBoxIgnoreErrors->SetValue(dlgCfg.ignoreErrors);
 
     //transfer parameter ownership to GUI
-    m_checkBoxRunMinimized->SetValue(batchCfg.runMinimized);
-    logfileDir->setPath(batchCfg.logFolderPathPhrase);
-    m_comboBoxOnCompletion->setValue(batchCfg.mainCfg.onCompletion);
+    m_radioBtnErrorDialogShow  ->SetValue(false);
+    m_radioBtnErrorDialogCancel->SetValue(false);
+
+    switch (dlgCfg.batchExCfg.batchErrorDialog)
+    {
+        case BatchErrorDialog::SHOW:
+            m_radioBtnErrorDialogShow->SetValue(true);
+            break;
+        case BatchErrorDialog::CANCEL:
+            m_radioBtnErrorDialogCancel->SetValue(true);
+            break;
+    }
+
+    m_checkBoxRunMinimized->SetValue(dlgCfg.batchExCfg.runMinimized);
+    setEnumVal(enumPostSyncAction_, *m_choicePostSyncAction, dlgCfg.batchExCfg.postSyncAction);
+    logfileDir_->setPath(dlgCfg.batchExCfg.logFolderPathPhrase);
 
     //map single parameter "logfiles limit" to all three checkboxs and spin ctrl:
-    m_checkBoxGenerateLogfile->SetValue(batchCfg.logfilesCountLimit != 0);
-    m_checkBoxLogfilesLimit  ->SetValue(batchCfg.logfilesCountLimit >= 0);
-    m_spinCtrlLogfileLimit   ->SetValue(batchCfg.logfilesCountLimit >= 0 ? batchCfg.logfilesCountLimit : 100 /*XmlBatchConfig().logfilesCountLimit*/);
+    m_checkBoxSaveLog      ->SetValue(dlgCfg.batchExCfg.logfilesCountLimit != 0);
+    m_checkBoxLogfilesLimit->SetValue(dlgCfg.batchExCfg.logfilesCountLimit > 0);
+    m_spinCtrlLogfileLimit ->SetValue(dlgCfg.batchExCfg.logfilesCountLimit > 0 ? dlgCfg.batchExCfg.logfilesCountLimit : 100 /*XmlBatchConfig().logfilesCountLimit*/);
     //attention: emits a "change value" event!! => updateGui() called implicitly!
 
     updateGui(); //re-evaluate gui after config changes
 }
 
 
-XmlBatchConfig BatchDialog::getConfig() const
+BatchDialogConfig BatchDialog::getConfig() const
 {
-    XmlBatchConfig batchCfg = localBatchCfg;
+    BatchDialogConfig dlgCfg = {};
 
-    //load parameters with ownership within GIU controls...
+    dlgCfg.ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
 
-    //load structure with batch settings "batchCfg"
-    batchCfg.runMinimized     = m_checkBoxRunMinimized->GetValue();
-    batchCfg.logFolderPathPhrase = utfTo<Zstring>(logfileDir->getPath());
-    batchCfg.mainCfg.onCompletion = m_comboBoxOnCompletion->getValue();
-    //get single parameter "logfiles limit" from all three checkboxes and spin ctrl:
-    batchCfg.logfilesCountLimit = m_checkBoxGenerateLogfile->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;
+    dlgCfg.batchExCfg.batchErrorDialog    = m_radioBtnErrorDialogCancel->GetValue() ? BatchErrorDialog::CANCEL : BatchErrorDialog::SHOW;
+    dlgCfg.batchExCfg.runMinimized        = m_checkBoxRunMinimized->GetValue();
+    dlgCfg.batchExCfg.postSyncAction = getEnumVal(enumPostSyncAction_, *m_choicePostSyncAction);
+    dlgCfg.batchExCfg.logFolderPathPhrase = utfTo<Zstring>(logfileDir_->getPath());
 
-    return batchCfg;
+    dlgCfg.batchExCfg.logfilesCountLimit  = m_checkBoxSaveLog->GetValue() ? (m_checkBoxLogfilesLimit->GetValue() ? m_spinCtrlLogfileLimit->GetValue() : -1) : 0;
+    //get single parameter "logfiles limit" from all three checkboxes and spin ctrl
+
+    return dlgCfg;
 }
 
 
 void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
-    batchCfgOutRef = getConfig();
-    m_comboBoxOnCompletion->addItemHistory(); //a good place to commit current "on completion" history item
-    onCompletionHistoryOut = m_comboBoxOnCompletion->getHistory();
+    dlgCfgOut_ = getConfig();
     EndModal(ReturnBatchConfig::BUTTON_SAVE_AS);
 }
 }
 
 
-ReturnBatchConfig::ButtonPressed zen::customizeBatchConfig(wxWindow* parent,
-                                                           xmlAccess::XmlBatchConfig& batchCfg, //in/out
-                                                           std::vector<Zstring>& onCompletionHistory,
-                                                           size_t onCompletionHistoryMax)
+ReturnBatchConfig::ButtonPressed zen::showBatchConfigDialog(wxWindow* parent,
+                                                            BatchExclusiveConfig& batchExCfg,
+                                                            bool& ignoreErrors)
 {
-    BatchDialog batchDlg(parent, batchCfg, onCompletionHistory, onCompletionHistoryMax);
-    return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
+    BatchDialogConfig dlgCfg = { batchExCfg, ignoreErrors };
+
+    BatchDialog batchDlg(parent, dlgCfg);
+
+    const auto rv = static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
+    if (rv != ReturnBatchConfig::BUTTON_CANCEL)
+    {
+        batchExCfg   = dlgCfg.batchExCfg;
+        ignoreErrors = dlgCfg.ignoreErrors;
+    }
+    return rv;
 }

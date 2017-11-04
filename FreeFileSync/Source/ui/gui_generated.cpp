@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
+#include "command_box.h"
 #include "folder_history_box.h"
-#include "on_completion_box.h"
 #include "triple_splitter.h"
 #include "wx+/bitmap_button.h"
 #include "wx+/graph.h"
@@ -1140,7 +1140,6 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer2381->Add( m_toggleBtnByContent, 0, wxEXPAND|wxBOTTOM, 5 );
 
     m_toggleBtnBySize = new wxToggleButton( m_panelComparisonSettings, wxID_ANY, _("File size"), wxDefaultPosition, wxSize( -1, 30 ), 0 );
-    m_toggleBtnBySize->SetValue( true );
     m_toggleBtnBySize->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizer2381->Add( m_toggleBtnBySize, 0, wxEXPAND, 5 );
@@ -1158,8 +1157,6 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer2371 = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapCompVariant = new wxStaticBitmap( m_panelComparisonSettings, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1, -1 ), 0 );
-    m_bitmapCompVariant->SetToolTip( _("Detect synchronization directions with the help of database files") );
-
     bSizer2371->Add( m_bitmapCompVariant, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticTextCompVarDescription = new wxStaticText( m_panelComparisonSettings, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1661,8 +1658,6 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer233->Add( bSizerKeepVerticalHeight, 0, 0, 5 );
 
     m_bitmapDatabase = new wxStaticBitmap( m_panelSyncSettings, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1, -1 ), 0 );
-    m_bitmapDatabase->SetToolTip( _("Detect synchronization directions with the help of database files") );
-
     bSizer233->Add( m_bitmapDatabase, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxLEFT, 10 );
 
     m_staticTextSyncVarDescription = new wxStaticText( m_panelSyncSettings, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1, -1 ), 0 );
@@ -1717,7 +1712,6 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer234 = new wxBoxSizer( wxVERTICAL );
 
     m_toggleBtnRecycler = new wxToggleButton( m_panelSyncSettings, wxID_ANY, _("&Recycle bin"), wxDefaultPosition, wxSize( -1, -1 ), 0 );
-    m_toggleBtnRecycler->SetValue( true );
     bSizer234->Add( m_toggleBtnRecycler, 0, wxEXPAND, 5 );
 
     m_toggleBtnPermanent = new wxToggleButton( m_panelSyncSettings, wxID_ANY, _("&Permanent"), wxDefaultPosition, wxSize( -1, -1 ), 0 );
@@ -1835,38 +1829,42 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     bSizerMiscConfig = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText88 = new wxStaticText( m_panelSyncSettings, wxID_ANY, _("Handle errors:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText88->Wrap( -1 );
-    bSizerMiscConfig->Add( m_staticText88, 0, wxTOP|wxBOTTOM|wxLEFT, 10 );
+    wxBoxSizer* bSizer242;
+    bSizer242 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxBoxSizer* bSizer175;
-    bSizer175 = new wxBoxSizer( wxVERTICAL );
+    m_bitmapIgnoreErrors = new wxStaticBitmap( m_panelSyncSettings, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer242->Add( m_bitmapIgnoreErrors, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_radioBtnPopupOnErrors = new wxRadioButton( m_panelSyncSettings, wxID_ANY, _("&Pop-up"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
-    m_radioBtnPopupOnErrors->SetValue( true );
-    m_radioBtnPopupOnErrors->SetToolTip( _("Show pop-up on errors or warnings") );
+    m_checkBoxIgnoreErrors = new wxCheckBox( m_panelSyncSettings, wxID_ANY, _("&Ignore errors"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxIgnoreErrors->SetToolTip( _("Show pop-up on errors or warnings") );
 
-    bSizer175->Add( m_radioBtnPopupOnErrors, 0, wxEXPAND|wxALL, 5 );
-
-    m_radioBtnIgnoreErrors = new wxRadioButton( m_panelSyncSettings, wxID_ANY, _("&Ignore"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_radioBtnIgnoreErrors->SetToolTip( _("Hide all error and warning messages") );
-
-    bSizer175->Add( m_radioBtnIgnoreErrors, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+    bSizer242->Add( m_checkBoxIgnoreErrors, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizerMiscConfig->Add( bSizer175, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerMiscConfig->Add( bSizer242, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticline57 = new wxStaticLine( m_panelSyncSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
     bSizerMiscConfig->Add( m_staticline57, 0, wxEXPAND, 5 );
 
     bSizerOnCompletion = new wxBoxSizer( wxVERTICAL );
 
-    m_staticText89 = new wxStaticText( m_panelSyncSettings, wxID_ANY, _("On completion:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText89 = new wxStaticText( m_panelSyncSettings, wxID_ANY, _("Run command after synchronization:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText89->Wrap( -1 );
     bSizerOnCompletion->Add( m_staticText89, 0, wxBOTTOM, 5 );
 
-    m_comboBoxOnCompletion = new OnCompletionBox( m_panelSyncSettings, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-    bSizerOnCompletion->Add( m_comboBoxOnCompletion, 0, wxEXPAND, 5 );
+    wxBoxSizer* bSizer251;
+    bSizer251 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxArrayString m_choicePostSyncConditionChoices;
+    m_choicePostSyncCondition = new wxChoice( m_panelSyncSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choicePostSyncConditionChoices, 0 );
+    m_choicePostSyncCondition->SetSelection( 0 );
+    bSizer251->Add( m_choicePostSyncCondition, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_comboBoxPostSyncCommand = new CommandBox( m_panelSyncSettings, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+    bSizer251->Add( m_comboBoxPostSyncCommand, 1, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizerOnCompletion->Add( bSizer251, 0, wxEXPAND, 5 );
 
 
     bSizerMiscConfig->Add( bSizerOnCompletion, 1, wxALL, 10 );
@@ -1956,8 +1954,7 @@ ConfigDlgGenerated::ConfigDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_toggleBtnVersioning->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnDeletionVersioning ), NULL, this );
     m_hyperlinkVersioning->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( ConfigDlgGenerated::OnHelpVersioning ), NULL, this );
     m_choiceVersioningStyle->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ConfigDlgGenerated::OnChangeSyncOption ), NULL, this );
-    m_radioBtnPopupOnErrors->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigDlgGenerated::OnErrorPopup ), NULL, this );
-    m_radioBtnIgnoreErrors->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigDlgGenerated::OnErrorIgnore ), NULL, this );
+    m_checkBoxIgnoreErrors->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnToggleIgnoreErrors ), NULL, this );
     m_buttonOkay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnOkay ), NULL, this );
     m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigDlgGenerated::OnCancel ), NULL, this );
 }
@@ -2119,61 +2116,25 @@ CloudSetupDlgGenerated::CloudSetupDlgGenerated( wxWindow* parent, wxWindowID id,
     wxBoxSizer* bSizer185;
     bSizer185 = new wxBoxSizer( wxVERTICAL );
 
-    wxFlexGridSizer* fgSizer16;
-    fgSizer16 = new wxFlexGridSizer( 0, 2, 0, 0 );
-    fgSizer16->AddGrowableCol( 1 );
-    fgSizer16->SetFlexibleDirection( wxBOTH );
-    fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    wxBoxSizer* bSizer245;
+    bSizer245 = new wxBoxSizer( wxHORIZONTAL );
 
     m_staticText12311 = new wxStaticText( m_panel41, wxID_ANY, _("Server name or IP address:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText12311->Wrap( -1 );
-    fgSizer16->Add( m_staticText12311, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxTOP|wxBOTTOM|wxLEFT, 5 );
-
-    wxBoxSizer* bSizer183;
-    bSizer183 = new wxBoxSizer( wxHORIZONTAL );
+    bSizer245->Add( m_staticText12311, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
     m_textCtrlServer = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 260, -1 ), 0 );
-    bSizer183->Add( m_textCtrlServer, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer245->Add( m_textCtrlServer, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticText1233 = new wxStaticText( m_panel41, wxID_ANY, _("Port:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText1233->Wrap( -1 );
-    bSizer183->Add( m_staticText1233, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
+    bSizer245->Add( m_staticText1233, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
     m_textCtrlPort = new wxTextCtrl( m_panel41, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60, -1 ), 0 );
-    bSizer183->Add( m_textCtrlPort, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer245->Add( m_textCtrlPort, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    fgSizer16->Add( bSizer183, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-
-
-    fgSizer16->Add( 0, 0, 0, 0, 5 );
-
-    wxBoxSizer* bSizer181;
-    bSizer181 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText1381 = new wxStaticText( m_panel41, wxID_ANY, _("Example:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText1381->Wrap( -1 );
-    m_staticText1381->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-
-    bSizer181->Add( m_staticText1381, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_staticText1382 = new wxStaticText( m_panel41, wxID_ANY, _("website.com"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText1382->Wrap( -1 );
-    m_staticText1382->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-
-    bSizer181->Add( m_staticText1382, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_staticText138 = new wxStaticText( m_panel41, wxID_ANY, _("66.198.240.22"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText138->Wrap( -1 );
-    m_staticText138->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-
-    bSizer181->Add( m_staticText138, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-
-    fgSizer16->Add( bSizer181, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer185->Add( fgSizer16, 0, wxALL|wxEXPAND, 5 );
+    bSizer185->Add( bSizer245, 0, wxALL|wxEXPAND, 5 );
 
     m_staticline58 = new wxStaticLine( m_panel41, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer185->Add( m_staticline58, 0, wxEXPAND, 5 );
@@ -2899,35 +2860,45 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
     wxBoxSizer* bSizer199;
     bSizer199 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_panelProgressLabel = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-    m_panelProgressLabel->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+    bSizerProgressFooter = new wxBoxSizer( wxHORIZONTAL );
 
-    wxBoxSizer* bSizer201;
-    bSizer201 = new wxBoxSizer( wxVERTICAL );
+    m_bitmapIgnoreErrors = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizerProgressFooter->Add( m_bitmapIgnoreErrors, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_checkBoxIgnoreErrors = new wxCheckBox( this, wxID_ANY, _("&Ignore errors"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizerProgressFooter->Add( m_checkBoxIgnoreErrors, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+
+
+    bSizer199->Add( bSizerProgressFooter, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    bSizerProgressGraph = new wxBoxSizer( wxHORIZONTAL );
+
+    m_panelProgressGraph = new zen::Graph2D( this, wxID_ANY, wxDefaultPosition, wxSize( -1, -1 ), 0 );
+    m_panelProgressGraph->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+
+    bSizerProgressGraph->Add( m_panelProgressGraph, 1, wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer247;
+    bSizer247 = new wxBoxSizer( wxVERTICAL );
 
     wxStaticText* m_staticText99;
-    m_staticText99 = new wxStaticText( m_panelProgressLabel, wxID_ANY, _("Bytes:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText99 = new wxStaticText( this, wxID_ANY, _("Bytes"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText99->Wrap( -1 );
-    bSizer201->Add( m_staticText99, 0, wxALL, 5 );
+    bSizer247->Add( m_staticText99, 0, wxALL, 5 );
 
     wxStaticText* m_staticText100;
-    m_staticText100 = new wxStaticText( m_panelProgressLabel, wxID_ANY, _("Items:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText100 = new wxStaticText( this, wxID_ANY, _("Items"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText100->Wrap( -1 );
-    bSizer201->Add( m_staticText100, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+    bSizer247->Add( m_staticText100, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
 
-    m_panelProgressLabel->SetSizer( bSizer201 );
-    m_panelProgressLabel->Layout();
-    bSizer201->Fit( m_panelProgressLabel );
-    bSizer199->Add( m_panelProgressLabel, 0, 0, 5 );
-
-    m_panelGraphProgress = new zen::Graph2D( this, wxID_ANY, wxDefaultPosition, wxSize( -1, -1 ), 0 );
-    m_panelGraphProgress->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    bSizer199->Add( m_panelGraphProgress, 1, wxEXPAND, 5 );
+    bSizerProgressGraph->Add( bSizer247, 0, 0, 5 );
 
 
-    bSizer181->Add( bSizer199, 1, wxEXPAND|wxTOP, 5 );
+    bSizer199->Add( bSizerProgressGraph, 1, 0, 5 );
+
+
+    bSizer181->Add( bSizer199, 0, wxTOP|wxEXPAND, 5 );
 
 
     bSizer40->Add( bSizer181, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -2936,6 +2907,9 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
     this->SetSizer( bSizer40 );
     this->Layout();
     bSizer40->Fit( this );
+
+    // Connect Events
+    m_checkBoxIgnoreErrors->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( CompareProgressDlgGenerated::OnToggleIgnoreErrors ), NULL, this );
 }
 
 CompareProgressDlgGenerated::~CompareProgressDlgGenerated()
@@ -3189,6 +3163,26 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
 
     bSizer161->Add( 550, 0, 0, 0, 5 );
 
+    bSizerProgressFooter = new wxBoxSizer( wxHORIZONTAL );
+
+    m_bitmapIgnoreErrors = new wxStaticBitmap( m_panelProgress, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizerProgressFooter->Add( m_bitmapIgnoreErrors, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_checkBoxIgnoreErrors = new wxCheckBox( m_panelProgress, wxID_ANY, _("&Ignore errors"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizerProgressFooter->Add( m_checkBoxIgnoreErrors, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+
+    m_staticText137 = new wxStaticText( m_panelProgress, wxID_ANY, _("When finished:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText137->Wrap( -1 );
+    bSizerProgressFooter->Add( m_staticText137, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    wxArrayString m_choicePostSyncActionChoices;
+    m_choicePostSyncAction = new wxChoice( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choicePostSyncActionChoices, 0 );
+    m_choicePostSyncAction->SetSelection( 0 );
+    bSizerProgressFooter->Add( m_choicePostSyncAction, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer161->Add( bSizerProgressFooter, 0, wxEXPAND|wxBOTTOM|wxRIGHT, 10 );
+
 
     bSizer173->Add( bSizer161, 1, wxEXPAND|wxLEFT, 10 );
 
@@ -3202,6 +3196,8 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     bSizerRoot->Add( m_panelProgress, 1, wxEXPAND, 5 );
 
     m_notebookResult = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_FIXEDWIDTH );
+    m_notebookResult->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
 
     bSizerRoot->Add( m_notebookResult, 1, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
@@ -3209,27 +3205,6 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     bSizerRoot->Add( m_staticlineFooter, 0, wxEXPAND, 5 );
 
     bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
-
-    wxBoxSizer* bSizer160;
-    bSizer160 = new wxBoxSizer( wxHORIZONTAL );
-
-    bSizerOnCompletion = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText87 = new wxStaticText( this, wxID_ANY, _("On completion:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText87->Wrap( -1 );
-    bSizerOnCompletion->Add( m_staticText87, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
-    m_comboBoxOnCompletion = new OnCompletionBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-    bSizerOnCompletion->Add( m_comboBoxOnCompletion, 1, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer160->Add( bSizerOnCompletion, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer160->Add( 0, 0, 0, 0, 5 );
-
-
-    bSizerStdButtons->Add( bSizer160, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
     m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxSize( -1, -1 ), 0 );
     m_buttonClose->SetDefault();
@@ -3244,7 +3219,7 @@ SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWind
     bSizerStdButtons->Add( m_buttonStop, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 
 
-    bSizerRoot->Add( bSizerStdButtons, 0, wxEXPAND, 5 );
+    bSizerRoot->Add( bSizerStdButtons, 0, wxALIGN_RIGHT, 5 );
 
 
     this->SetSizer( bSizerRoot );
@@ -3258,10 +3233,7 @@ SyncProgressPanelGenerated::~SyncProgressPanelGenerated()
 
 LogPanelGenerated::LogPanelGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    wxBoxSizer* bSizer179;
-    bSizer179 = new wxBoxSizer( wxVERTICAL );
+    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
     wxBoxSizer* bSizer153;
     bSizer153 = new wxBoxSizer( wxHORIZONTAL );
@@ -3289,12 +3261,9 @@ LogPanelGenerated::LogPanelGenerated( wxWindow* parent, wxWindowID id, const wxP
     bSizer153->Add( m_gridMessages, 1, wxEXPAND, 5 );
 
 
-    bSizer179->Add( bSizer153, 1, wxEXPAND, 5 );
-
-
-    this->SetSizer( bSizer179 );
+    this->SetSizer( bSizer153 );
     this->Layout();
-    bSizer179->Fit( this );
+    bSizer153->Fit( this );
 
     // Connect Events
     m_bpButtonErrors->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LogPanelGenerated::OnErrors ), NULL, this );
@@ -3339,62 +3308,110 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer180;
     bSizer180 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText82 = new wxStaticText( m_panel35, wxID_ANY, _("Handle errors:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText82->Wrap( -1 );
-    bSizer180->Add( m_staticText82, 0, wxTOP|wxBOTTOM|wxLEFT, 10 );
+    wxBoxSizer* bSizer236;
+    bSizer236 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxBoxSizer* bSizer169;
-    bSizer169 = new wxBoxSizer( wxVERTICAL );
+    m_bitmapMinimizeToTray = new wxStaticBitmap( m_panel35, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer236->Add( m_bitmapMinimizeToTray, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_radioBtnPopupOnErrors = new wxRadioButton( m_panel35, wxID_ANY, _("&Pop-up"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_radioBtnPopupOnErrors->SetValue( true );
-    m_radioBtnPopupOnErrors->SetToolTip( _("Show pop-up on errors or warnings") );
-
-    bSizer169->Add( m_radioBtnPopupOnErrors, 0, wxEXPAND|wxALL, 5 );
-
-    m_radioBtnIgnoreErrors = new wxRadioButton( m_panel35, wxID_ANY, _("&Ignore"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_radioBtnIgnoreErrors->SetToolTip( _("Hide all error and warning messages") );
-
-    bSizer169->Add( m_radioBtnIgnoreErrors, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_radioBtnStopOnError = new wxRadioButton( m_panel35, wxID_ANY, _("&Stop"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_radioBtnStopOnError->SetToolTip( _("Stop synchronization at first error") );
-
-    bSizer169->Add( m_radioBtnStopOnError, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+    m_checkBoxRunMinimized = new wxCheckBox( m_panel35, wxID_ANY, _("Run minimized"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer236->Add( m_checkBoxRunMinimized, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
 
-    bSizer180->Add( bSizer169, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer180->Add( bSizer236, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticline26 = new wxStaticLine( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
     bSizer180->Add( m_staticline26, 0, wxEXPAND, 5 );
 
-    wxBoxSizer* bSizer170;
-    bSizer170 = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer* bSizer242;
+    bSizer242 = new wxBoxSizer( wxVERTICAL );
 
-    m_checkBoxRunMinimized = new wxCheckBox( m_panel35, wxID_ANY, _("Run minimized"), wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer170->Add( m_checkBoxRunMinimized, 0, wxEXPAND|wxALL, 5 );
+    wxBoxSizer* bSizer243;
+    bSizer243 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText81 = new wxStaticText( m_panel35, wxID_ANY, _("On completion:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText81->Wrap( -1 );
-    bSizer170->Add( m_staticText81, 0, wxALL, 5 );
+    m_bitmapIgnoreErrors = new wxStaticBitmap( m_panel35, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer243->Add( m_bitmapIgnoreErrors, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_comboBoxOnCompletion = new OnCompletionBox( m_panel35, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-    bSizer170->Add( m_comboBoxOnCompletion, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-
-    bSizer180->Add( bSizer170, 1, wxALL, 5 );
+    m_checkBoxIgnoreErrors = new wxCheckBox( m_panel35, wxID_ANY, _("&Ignore errors"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer243->Add( m_checkBoxIgnoreErrors, 1, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
 
-    bSizer172->Add( bSizer180, 0, wxEXPAND, 5 );
+    bSizer242->Add( bSizer243, 0, wxTOP|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    wxBoxSizer* bSizer246;
+    bSizer246 = new wxBoxSizer( wxVERTICAL );
+
+    m_radioBtnErrorDialogShow = new wxRadioButton( m_panel35, wxID_ANY, _("&Show error dialog"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+    m_radioBtnErrorDialogShow->SetValue( true );
+    m_radioBtnErrorDialogShow->SetToolTip( _("Show pop-up on errors or warnings") );
+
+    bSizer246->Add( m_radioBtnErrorDialogShow, 0, wxALL|wxEXPAND, 5 );
+
+    m_radioBtnErrorDialogCancel = new wxRadioButton( m_panel35, wxID_ANY, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_radioBtnErrorDialogCancel->SetToolTip( _("Stop synchronization at first error") );
+
+    bSizer246->Add( m_radioBtnErrorDialogCancel, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+
+
+    bSizer242->Add( bSizer246, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+    bSizer180->Add( bSizer242, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_staticline261 = new wxStaticLine( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
+    bSizer180->Add( m_staticline261, 0, wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer247;
+    bSizer247 = new wxBoxSizer( wxVERTICAL );
+
+    m_staticText137 = new wxStaticText( m_panel35, wxID_ANY, _("When finished:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText137->Wrap( -1 );
+    bSizer247->Add( m_staticText137, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+
+    wxArrayString m_choicePostSyncActionChoices;
+    m_choicePostSyncAction = new wxChoice( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choicePostSyncActionChoices, 0 );
+    m_choicePostSyncAction->SetSelection( 0 );
+    bSizer247->Add( m_choicePostSyncAction, 0, wxALL, 5 );
+
+
+    bSizer180->Add( bSizer247, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_staticline262 = new wxStaticLine( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
+    bSizer180->Add( m_staticline262, 0, wxEXPAND, 5 );
+
+
+    bSizer172->Add( bSizer180, 0, 0, 5 );
 
     m_staticline25 = new wxStaticLine( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer172->Add( m_staticline25, 0, wxEXPAND, 5 );
 
+    wxBoxSizer* bSizer237;
+    bSizer237 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_bitmapLogFile = new wxStaticBitmap( m_panel35, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer237->Add( m_bitmapLogFile, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
     wxBoxSizer* bSizer191;
     bSizer191 = new wxBoxSizer( wxVERTICAL );
 
-    m_checkBoxGenerateLogfile = new wxCheckBox( m_panel35, wxID_ANY, _("Save log:"), wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer191->Add( m_checkBoxGenerateLogfile, 0, wxEXPAND|wxALL, 5 );
+    wxBoxSizer* bSizer238;
+    bSizer238 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_checkBoxSaveLog = new wxCheckBox( m_panel35, wxID_ANY, _("Save log:"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer238->Add( m_checkBoxSaveLog, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_checkBoxLogfilesLimit = new wxCheckBox( m_panel35, wxID_ANY, _("Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxLogfilesLimit->SetToolTip( _("Limit maximum number of log files") );
+
+    bSizer238->Add( m_checkBoxLogfilesLimit, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_spinCtrlLogfileLimit = new wxSpinCtrl( m_panel35, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
+    m_spinCtrlLogfileLimit->SetToolTip( _("Limit maximum number of log files") );
+
+    bSizer238->Add( m_spinCtrlLogfileLimit, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+
+
+    bSizer191->Add( bSizer238, 0, wxEXPAND, 5 );
 
     m_panelLogfile = new wxPanel( m_panel35, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panelLogfile->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
@@ -3415,16 +3432,6 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer1721->Add( m_bpButtonSelectAltLogFolder, 0, wxEXPAND, 5 );
 
-    m_checkBoxLogfilesLimit = new wxCheckBox( m_panelLogfile, wxID_ANY, _("Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_checkBoxLogfilesLimit->SetToolTip( _("Limit maximum number of log files") );
-
-    bSizer1721->Add( m_checkBoxLogfilesLimit, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-
-    m_spinCtrlLogfileLimit = new wxSpinCtrl( m_panelLogfile, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 70, -1 ), wxSP_ARROW_KEYS, 1, 2000000000, 1 );
-    m_spinCtrlLogfileLimit->SetToolTip( _("Limit maximum number of log files") );
-
-    bSizer1721->Add( m_spinCtrlLogfileLimit, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
 
     m_panelLogfile->SetSizer( bSizer1721 );
     m_panelLogfile->Layout();
@@ -3432,7 +3439,10 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     bSizer191->Add( m_panelLogfile, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
 
-    bSizer172->Add( bSizer191, 0, wxEXPAND|wxALL, 5 );
+    bSizer237->Add( bSizer191, 1, 0, 5 );
+
+
+    bSizer172->Add( bSizer237, 0, wxEXPAND|wxALL, 5 );
 
     m_hyperlink17 = new wxHyperlinkCtrl( m_panel35, wxID_ANY, _("How can I schedule a batch job?"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     bSizer172->Add( m_hyperlink17, 0, wxALL, 10 );
@@ -3469,10 +3479,11 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( BatchDlgGenerated::OnClose ) );
-    m_radioBtnPopupOnErrors->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnErrorPopup ), NULL, this );
-    m_radioBtnIgnoreErrors->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnErrorIgnore ), NULL, this );
-    m_radioBtnStopOnError->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnErrorStop ), NULL, this );
-    m_checkBoxGenerateLogfile->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnToggleGenerateLogfile ), NULL, this );
+    m_checkBoxRunMinimized->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnToggleRunMinimized ), NULL, this );
+    m_checkBoxIgnoreErrors->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnToggleIgnoreErrors ), NULL, this );
+    m_radioBtnErrorDialogShow->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnErrorDialogShow ), NULL, this );
+    m_radioBtnErrorDialogCancel->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnErrorDialogCancel ), NULL, this );
+    m_checkBoxSaveLog->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnToggleGenerateLogfile ), NULL, this );
     m_checkBoxLogfilesLimit->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnToggleLogfilesLimit ), NULL, this );
     m_hyperlink17->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( BatchDlgGenerated::OnHelpScheduleBatch ), NULL, this );
     m_buttonSaveAs->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
@@ -3593,6 +3604,9 @@ CopyToDlgGenerated::CopyToDlgGenerated( wxWindow* parent, wxWindowID id, const w
     m_panel31 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     m_panel31->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
+    wxBoxSizer* bSizer242;
+    bSizer242 = new wxBoxSizer( wxVERTICAL );
+
     wxBoxSizer* bSizer185;
     bSizer185 = new wxBoxSizer( wxHORIZONTAL );
 
@@ -3606,29 +3620,32 @@ CopyToDlgGenerated::CopyToDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer185->Add( m_textCtrlFileList, 1, wxEXPAND, 5 );
 
 
-    m_panel31->SetSizer( bSizer185 );
-    m_panel31->Layout();
-    bSizer185->Fit( m_panel31 );
-    bSizer24->Add( m_panel31, 1, wxEXPAND, 5 );
+    bSizer242->Add( bSizer185, 1, wxEXPAND, 5 );
 
     wxBoxSizer* bSizer182;
     bSizer182 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_targetFolderPath = new FolderHistoryBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+    m_targetFolderPath = new FolderHistoryBox( m_panel31, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
     bSizer182->Add( m_targetFolderPath, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonSelectTargetFolder = new wxButton( this, wxID_ANY, _("Browse"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_buttonSelectTargetFolder = new wxButton( m_panel31, wxID_ANY, _("Browse"), wxDefaultPosition, wxDefaultSize, 0 );
     m_buttonSelectTargetFolder->SetToolTip( _("Select a folder") );
 
     bSizer182->Add( m_buttonSelectTargetFolder, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_bpButtonSelectAltTargetFolder = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 30, -1 ), wxBU_AUTODRAW );
+    m_bpButtonSelectAltTargetFolder = new wxBitmapButton( m_panel31, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 30, -1 ), wxBU_AUTODRAW );
     m_bpButtonSelectAltTargetFolder->SetToolTip( _("Access online storage") );
 
     bSizer182->Add( m_bpButtonSelectAltTargetFolder, 0, wxEXPAND, 5 );
 
 
-    bSizer24->Add( bSizer182, 0, wxEXPAND|wxALL, 5 );
+    bSizer242->Add( bSizer182, 0, wxALL|wxEXPAND, 10 );
+
+
+    m_panel31->SetSizer( bSizer242 );
+    m_panel31->Layout();
+    bSizer242->Fit( m_panel31 );
+    bSizer24->Add( m_panel31, 1, wxEXPAND, 5 );
 
     m_staticline9 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer24->Add( m_staticline9, 0, wxEXPAND, 5 );

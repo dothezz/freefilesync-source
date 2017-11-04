@@ -7,13 +7,28 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target></target>
+
 <source>Please enter a file path.</source>
+<target></target>
+
+<source>Recommended range:</source>
+<target></target>
+
+<source>Sleep</source>
+<target></target>
+
+<source>FreeFileSync %x is available!</source>
 <target></target>
 
 <source>Support with a donation</source>
 <target></target>
 
-<source>4 connections = 4 times faster directory reading</source>
+<source>&Cancel</source>
+<target></target>
+
+<source>Error dialog:</source>
 <target></target>
 
 <source>Connections for directory reading:</source>
@@ -22,10 +37,19 @@
 <source>&SSH agent</source>
 <target></target>
 
+<source>Stop on errors</source>
+<target></target>
+
 <source>Ignore &all</source>
 <target></target>
 
 <source>The %x protocol does not support directory monitoring:</source>
+<target></target>
+
+<source>Open the selected configuration for editing only without executing it.</source>
+<target></target>
+
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -72,9 +96,6 @@
 
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Checking recycle bin availability for folder %x...</target>
-
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</target>
 
 <source>An exception occurred</source>
 <target>An exception occurred</target>
@@ -123,9 +144,6 @@
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Any number of alternative directory pairs for at most one config file.</target>
-
-<source>Open configuration for editing without executing it.</source>
-<target>Open configuration for editing without executing it.</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
 <target>Path to an alternate GlobalSettings.xml file.</target>
@@ -989,6 +1007,9 @@ The command is triggered if:
 <source>Select a variant:</source>
 <target>Select a variant:</target>
 
+<source>Detect synchronization directions with the help of database files</source>
+<target>Detect synchronisation directions with the help of database files</target>
+
 <source>Include &symbolic links:</source>
 <target>Include &symbolic links:</target>
 
@@ -1040,9 +1061,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>C&lear</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detect synchronisation directions with the help of database files</target>
-
 <source>Detect moved files</source>
 <target>Detect moved files</target>
 
@@ -1063,35 +1081,17 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>&Recycle bin</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Back up deleted and overwritten files in the recycle bin</target>
-
 <source>&Permanent</source>
 <target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Delete or overwrite files permanently</target>
 
 <source>&Versioning</source>
 <target>&Versioning</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Move files to a user-defined folder</target>
-
 <source>Naming convention:</source>
 <target>Naming convention:</target>
 
-<source>Handle errors:</source>
-<target>Handle errors:</target>
-
-<source>&Pop-up</source>
-<target>&Pop-up</target>
-
 <source>Show pop-up on errors or warnings</source>
 <target>Show pop-up on errors or warnings</target>
-
-<source>Hide all error and warning messages</source>
-<target>Hide all error and warning messages</target>
 
 <source>On completion:</source>
 <target>On completion:</target>
@@ -1150,17 +1150,11 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>How to get best performance?</target>
 
-<source>Suggested range: [1 - 10]</source>
-<target>Suggested range: [1 - 10]</target>
-
 <source>SFTP channels per connection:</source>
 <target>SFTP channels per connection:</target>
 
 <source>Detect server limit</source>
 <target>Detect server limit</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 connections x 10 channels = 20 times faster directory reading</target>
 
 <source>Select a directory on the server:</source>
 <target>Select a directory on the server:</target>
@@ -1186,11 +1180,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Time elapsed:</target>
 
-<source>Bytes:</source>
-<target>Bytes:</target>
+<source>Bytes</source>
+<target>Bytes</target>
 
-<source>Items:</source>
-<target>Items:</target>
+<source>Items</source>
+<target>Items</target>
 
 <source>Synchronizing...</source>
 <target>Synchronising...</target>
@@ -1213,8 +1207,8 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Create a batch file for unattended synchronisation. To start, double-click this file or schedule in a task planner: %x</target>
 
-<source>&Stop</source>
-<target>&Stop</target>
+<source>&Show</source>
+<target>&Show</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stop synchronisation at first error</target>
@@ -1377,9 +1371,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show details</source>
 <target>&Show details</target>
-
-<source>A new version of FreeFileSync is available:</source>
-<target>A new version of FreeFileSync is available:</target>
 
 <source>Local path not available for %x.</source>
 <target>Local path not available for %x.</target>
@@ -1573,12 +1564,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Close progress dialog</source>
 <target>Close progress dialogue</target>
 
-<source>Log off</source>
-<target>Log off</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
 <source>Shut down</source>
 <target>Shut down</target>
 
@@ -1678,9 +1663,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Show hidden dialogues and warning messages again?</target>
 
-<source>&Show</source>
-<target>&Show</target>
-
 <source>Downloading update...</source>
 <target>Downloading update...</target>
 
@@ -1737,6 +1719,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>MB</source>
 <target>MB</target>
+
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Back up deleted and overwritten files in the recycle bin</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Delete or overwrite files permanently</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Move files to a user-defined folder</target>
 
 <source>Replace</source>
 <target>Replace</target>
@@ -1980,9 +1971,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Edit with FreeFileSync</source>
 <target>Edit with FreeFileSync</target>
-
-<source>The portable version cannot install into the selected folder.</source>
-<target>The portable version cannot install into the selected folder.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Please choose the local installation type or select a different folder for installation.</target>

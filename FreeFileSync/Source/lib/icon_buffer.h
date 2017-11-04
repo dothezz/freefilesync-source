@@ -45,7 +45,7 @@ public:
 
 private:
     struct Impl;
-    const std::unique_ptr<Impl> pimpl;
+    const std::unique_ptr<Impl> pimpl_;
 
     const IconSize iconSizeType;
 };

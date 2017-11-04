@@ -1174,11 +1174,11 @@ Käsky suoritetaan jos:
 <source>Time elapsed:</source>
 <target>Aikaa kulunut:</target>
 
-<source>Bytes:</source>
-<target>Tavua:</target>
+<source>Bytes</source>
+<target>Tavua</target>
 
-<source>Items:</source>
-<target>Kohteita:</target>
+<source>Items</source>
+<target>Kohteita</target>
 
 <source>Synchronizing...</source>
 <target>Täsmäytetään...</target>

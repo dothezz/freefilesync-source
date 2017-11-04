@@ -23,9 +23,9 @@ using namespace std::rel_ops;
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
-const int XML_FORMAT_VER_GLOBAL    = 4;
-const int XML_FORMAT_VER_FFS_GUI   = 7; //2017-02-16
-const int XML_FORMAT_VER_FFS_BATCH = 7; //
+const int XML_FORMAT_VER_GLOBAL    = 5; //
+const int XML_FORMAT_VER_FFS_GUI   = 8; //2017-10-24
+const int XML_FORMAT_VER_FFS_BATCH = 8; //
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -88,44 +88,19 @@ Zstring xmlAccess::getGlobalConfigFile()
 }
 
 
-xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg) //noexcept
+XmlGuiConfig xmlAccess::convertBatchToGui(const XmlBatchConfig& batchCfg) //noexcept
 {
     XmlGuiConfig output;
     output.mainCfg = batchCfg.mainCfg;
-
-    switch (batchCfg.handleError)
-    {
-        case ON_ERROR_POPUP:
-        case ON_ERROR_STOP:
-            output.handleError = ON_GUIERROR_POPUP;
-            break;
-        case ON_ERROR_IGNORE:
-            output.handleError = ON_GUIERROR_IGNORE;
-            break;
-    }
     return output;
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const XmlBatchConfig* referenceBatchCfg) //noexcept
+XmlBatchConfig xmlAccess::convertGuiToBatch(const XmlGuiConfig& guiCfg, const BatchExclusiveConfig& batchExCfg) //noexcept
 {
     XmlBatchConfig output;
-
-    //try to take over batch-specific settings from reference if available
-    if (referenceBatchCfg)
-        output = *referenceBatchCfg;
-    else
-        switch (guiCfg.handleError)
-        {
-            case ON_GUIERROR_POPUP:
-                output.handleError = ON_ERROR_POPUP;
-                break;
-            case ON_GUIERROR_IGNORE:
-                output.handleError = ON_ERROR_IGNORE;
-                break;
-        }
-
     output.mainCfg = guiCfg.mainCfg;
+    output.batchExCfg = batchExCfg;
     return output;
 }
 
@@ -244,32 +219,27 @@ bool readText(const std::string& input, SyncDirection& value)
 
 
 template <> inline
-void writeText(const OnError& value, std::string& output)
+void writeText(const BatchErrorDialog& value, std::string& output)
 {
     switch (value)
     {
-        case ON_ERROR_IGNORE:
-            output = "Ignore";
+        case BatchErrorDialog::SHOW:
+            output = "Show";
             break;
-        case ON_ERROR_POPUP:
-            output = "Popup";
-            break;
-        case ON_ERROR_STOP:
-            output = "Stop";
+        case BatchErrorDialog::CANCEL:
+            output = "Cancel";
             break;
     }
 }
 
 template <> inline
-bool readText(const std::string& input, OnError& value)
+bool readText(const std::string& input, BatchErrorDialog& value)
 {
     const std::string tmp = trimCpy(input);
-    if (tmp == "Ignore")
-        value = ON_ERROR_IGNORE;
-    else if (tmp == "Popup")
-        value = ON_ERROR_POPUP;
-    else if (tmp == "Stop")
-        value = ON_ERROR_STOP;
+    if (tmp == "Show")
+        value = BatchErrorDialog::SHOW;
+    else if (tmp == "Cancel")
+        value = BatchErrorDialog::CANCEL;
     else
         return false;
     return true;
@@ -277,27 +247,70 @@ bool readText(const std::string& input, OnError& value)
 
 
 template <> inline
-void writeText(const OnGuiError& value, std::string& output)
+void writeText(const PostSyncCondition& value, std::string& output)
 {
     switch (value)
     {
-        case ON_GUIERROR_IGNORE:
-            output = "Ignore";
+        case PostSyncCondition::COMPLETION:
+            output = "Completion";
             break;
-        case ON_GUIERROR_POPUP:
-            output = "Popup";
+        case PostSyncCondition::ERRORS:
+            output = "Errors";
+            break;
+        case PostSyncCondition::SUCCESS:
+            output = "Success";
             break;
     }
 }
 
 template <> inline
-bool readText(const std::string& input, OnGuiError& value)
+bool readText(const std::string& input, PostSyncCondition& value)
 {
     const std::string tmp = trimCpy(input);
-    if (tmp == "Ignore")
-        value = ON_GUIERROR_IGNORE;
-    else if (tmp == "Popup")
-        value = ON_GUIERROR_POPUP;
+    if (tmp == "Completion")
+        value = PostSyncCondition::COMPLETION;
+    else if (tmp == "Errors")
+        value = PostSyncCondition::ERRORS;
+    else if (tmp == "Success")
+        value = PostSyncCondition::SUCCESS;
+    else
+        return false;
+    return true;
+}
+
+
+template <> inline
+void writeText(const PostSyncAction& value, std::string& output)
+{
+    switch (value)
+    {
+        case PostSyncAction::SUMMARY:
+            output = "Summary";
+            break;
+        case PostSyncAction::EXIT:
+            output = "Exit";
+            break;
+        case PostSyncAction::SLEEP:
+            output = "Sleep";
+            break;
+        case PostSyncAction::SHUTDOWN:
+            output = "Shutdown";
+            break;
+    }
+}
+
+template <> inline
+bool readText(const std::string& input, PostSyncAction& value)
+{
+    const std::string tmp = trimCpy(input);
+    if (tmp == "Summary")
+        value = PostSyncAction::SUMMARY;
+    else if (tmp == "Exit")
+        value = PostSyncAction::EXIT;
+    else if (tmp == "Sleep")
+        value = PostSyncAction::SLEEP;
+    else if (tmp == "Shutdown")
+        value = PostSyncAction::SHUTDOWN;
     else
         return false;
     return true;
@@ -320,7 +333,6 @@ void writeText(const FileIconSize& value, std::string& output)
             break;
     }
 }
-
 
 template <> inline
 bool readText(const std::string& input, FileIconSize& value)
@@ -974,36 +986,104 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg, int formatVer)
             mainCfg.additionalPairs.push_back(newPair); //set additional folder pairs
     }
 
-    inMain["OnCompletion"](mainCfg.onCompletion);
+    //TODO: remove if parameter migration after some time! 2017-10-24
+    if (formatVer < 8)
+        inMain["OnCompletion"](mainCfg.postSyncCommand);
+    else
+    {
+        inMain["IgnoreErrors"](mainCfg.ignoreErrors);
+        inMain["PostSyncCommand"](mainCfg.postSyncCommand);
+        inMain["PostSyncCommand"].attribute("Condition", mainCfg.postSyncCondition);
+    }
 }
 
 
-void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config, int formatVer)
+void readConfig(const XmlIn& in, XmlGuiConfig& config, int formatVer)
 {
-    readConfig(in, config.mainCfg, formatVer); //read main config
+    //read main config
+    readConfig(in, config.mainCfg, formatVer);
 
     //read GUI specific config data
     XmlIn inGuiCfg = in["GuiConfig"];
 
-    inGuiCfg["HandleError"](config.handleError);
-
     std::string val;
     if (inGuiCfg["MiddleGridView"](val)) //refactor into enum!?
         config.highlightSyncAction = val == "Action";
+
+    //TODO: remove if clause after migration! 2017-10-24
+    if (formatVer < 8)
+    {
+        std::string str;
+        if (inGuiCfg["HandleError"](str))
+            config.mainCfg.ignoreErrors = str == "Ignore";
+
+        str = trimCpy(utfTo<std::string>(config.mainCfg.postSyncCommand));
+        if (str == "Close progress dialog")
+            config.mainCfg.postSyncCommand.clear();
+    }
 }
 
 
-void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config, int formatVer)
+void readConfig(const XmlIn& in, BatchExclusiveConfig& config, int formatVer)
 {
-    readConfig(in, config.mainCfg, formatVer); //read main config
-
-    //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
 
-    inBatchCfg["HandleError"  ](config.handleError);
+    //TODO: remove if clause after migration! 2017-10-24
+    if (formatVer < 8)
+    {
+        std::string str;
+        if (inBatchCfg["HandleError"](str))
+            config.batchErrorDialog = str == "Stop" ? BatchErrorDialog::CANCEL : BatchErrorDialog::SHOW;
+    }
+    else
+    {
+        inBatchCfg["ErrorDialog"](config.batchErrorDialog);
+        inBatchCfg["PostSyncAction"](config.postSyncAction);
+    }
+
     inBatchCfg["RunMinimized" ](config.runMinimized);
     inBatchCfg["LogfileFolder"](config.logFolderPathPhrase);
     inBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
+}
+
+
+void readConfig(const XmlIn& in, XmlBatchConfig& config, int formatVer)
+{
+    readConfig(in, config.mainCfg,    formatVer);
+    readConfig(in, config.batchExCfg, formatVer);
+
+    //TODO: remove if clause after migration! 2017-10-24
+    if (formatVer < 8)
+    {
+        std::string str;
+        if (in["BatchConfig"]["HandleError"](str))
+            config.mainCfg.ignoreErrors = str == "Ignore";
+
+        str = trimCpy(utfTo<std::string>(config.mainCfg.postSyncCommand));
+        if (str == "Close progress dialog")
+        {
+            config.batchExCfg.postSyncAction = PostSyncAction::EXIT;
+            config.mainCfg.postSyncCommand.clear();
+        }
+        else if (str == "rundll32.exe powrprof.dll,SetSuspendState Sleep" ||
+                 str == "rundll32.exe powrprof.dll,SetSuspendState" ||
+                 str == "systemctl suspend" ||
+                 str == "osascript -e \'tell application \"System Events\" to sleep\'")
+        {
+            config.batchExCfg.postSyncAction = PostSyncAction::SLEEP;
+            config.mainCfg.postSyncCommand.clear();
+        }
+        else if (str == "shutdown /s /t 60"  ||
+                 str == "shutdown -s -t 60"  ||
+                 str == "systemctl poweroff" ||
+                 str == "osascript -e \'tell application \"System Events\" to shut down\'")
+        {
+            config.batchExCfg.postSyncAction = PostSyncAction::SHUTDOWN;
+            config.mainCfg.postSyncCommand.clear();
+        }
+        else if (config.batchExCfg.runMinimized)
+            config.batchExCfg.postSyncAction = PostSyncAction::EXIT;
+    }
 }
 
 
@@ -1067,9 +1147,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inCopyToHistory.attribute("LastUsedPath", config.gui.mainDlg.copyToCfg.lastUsedPath);
     inCopyToHistory.attribute("MaxSize",      config.gui.mainDlg.copyToCfg.historySizeMax);
 
-    XmlIn inManualDel = inWnd["ManualDeletion"];
-    inManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);
-
     inWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.mainDlg.textSearchRespectCase);
     inWnd["FolderPairsVisible" ].attribute("Max",     config.gui.mainDlg.maxFolderPairsVisible);
 
@@ -1121,8 +1198,17 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
     inGui["FolderHistoryRight"](config.gui.folderHistoryRight);
     inGui["FolderHistoryLeft"].attribute("MaxSize", config.gui.folderHistMax);
 
-    inGui["OnCompletionHistory"](config.gui.onCompletionHistory);
-    inGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
+    //TODO: remove if clause after migration! 2017-10-24
+    if (formatVer < 5)
+    {
+        inGui["OnCompletionHistory"](config.gui.commandHistory);
+        inGui["OnCompletionHistory"].attribute("MaxSize", config.gui.commandHistoryMax);
+    }
+    else
+    {
+        inGui["CommandHistory"](config.gui.commandHistory);
+        inGui["CommandHistory"].attribute("MaxSize", config.gui.commandHistoryMax);
+    }
 
     //external applications
     //TODO: remove old parameter after migration! 2016-05-28
@@ -1174,7 +1260,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config, int formatVer)
 
 int getConfigFormatVersion(const XmlDoc& doc)
 {
-    //(try to) migrate old configuration if needed
     int xmlFormatVer = 0;
     /*bool success = */doc.root().getAttribute("XmlFormat", xmlFormatVer);
     return xmlFormatVer;
@@ -1198,7 +1283,7 @@ void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int curr
     {
         checkForMappingErrors(in, filepath); //throw FileError
 
-        //(try to) migrate old configuration if needed
+        //(try to) migrate old configuration automatically
         if (formatVer< currentXmlFormatVer)
             try { xmlAccess::writeConfig(cfg, filepath); /*throw FileError*/ }
             catch (FileError&) { assert(false); } //don't bother user!
@@ -1211,19 +1296,19 @@ void readConfig(const Zstring& filepath, XmlType type, ConfigType& cfg, int curr
 }
 
 
-void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlGuiConfig& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, XmlGuiConfig& cfg, std::wstring& warningMsg)
 {
     ::readConfig(filepath, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlBatchConfig& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, XmlBatchConfig& cfg, std::wstring& warningMsg)
 {
     ::readConfig(filepath, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, warningMsg); //throw FileError
 }
 
 
-void xmlAccess::readConfig(const Zstring& filepath, xmlAccess::XmlGlobalSettings& cfg, std::wstring& warningMsg)
+void xmlAccess::readConfig(const Zstring& filepath, XmlGlobalSettings& cfg, std::wstring& warningMsg)
 {
     ::readConfig(filepath, XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, warningMsg); //throw FileError
 }
@@ -1422,7 +1507,9 @@ void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
     for (const FolderPairEnh& fp : mainCfg.additionalPairs)
         writeConfig(fp, outFp);
 
-    outMain["OnCompletion"](mainCfg.onCompletion);
+    outMain["IgnoreErrors"](mainCfg.ignoreErrors);
+    outMain["PostSyncCommand"](mainCfg.postSyncCommand);
+    outMain["PostSyncCommand"].attribute("Condition", mainCfg.postSyncCondition);
 }
 
 
@@ -1433,22 +1520,26 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outGuiCfg = out["GuiConfig"];
 
-    outGuiCfg["HandleError"   ](config.handleError);
     outGuiCfg["MiddleGridView"](config.highlightSyncAction ? "Action" : "Category"); //refactor into enum!?
 }
 
-void writeConfig(const XmlBatchConfig& config, XmlOut& out)
+
+void writeConfig(const BatchExclusiveConfig& config, XmlOut& out)
 {
-
-    writeConfig(config.mainCfg, out); //write main config
-
-    //write GUI specific config data
     XmlOut outBatchCfg = out["BatchConfig"];
 
-    outBatchCfg["HandleError"  ](config.handleError);
+    outBatchCfg["ErrorDialog"  ](config.batchErrorDialog);
+    outBatchCfg["PostSyncAction"](config.postSyncAction);
     outBatchCfg["RunMinimized" ](config.runMinimized);
     outBatchCfg["LogfileFolder"](config.logFolderPathPhrase);
     outBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
+}
+
+
+void writeConfig(const XmlBatchConfig& config, XmlOut& out)
+{
+    writeConfig(config.mainCfg,    out);
+    writeConfig(config.batchExCfg, out);
 }
 
 
@@ -1508,9 +1599,6 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outCopyToHistory.attribute("LastUsedPath", config.gui.mainDlg.copyToCfg.lastUsedPath);
     outCopyToHistory.attribute("MaxSize",      config.gui.mainDlg.copyToCfg.historySizeMax);
 
-    XmlOut outManualDel = outWnd["ManualDeletion"];
-    outManualDel.attribute("UseRecycler", config.gui.mainDlg.manualDeletionUseRecycler);
-
     outWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.mainDlg.textSearchRespectCase);
     outWnd["FolderPairsVisible" ].attribute("Max",     config.gui.mainDlg.maxFolderPairsVisible);
 
@@ -1556,8 +1644,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGui["FolderHistoryRight"](config.gui.folderHistoryRight);
     outGui["FolderHistoryLeft" ].attribute("MaxSize", config.gui.folderHistMax);
 
-    outGui["OnCompletionHistory"](config.gui.onCompletionHistory);
-    outGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
+    outGui["CommandHistory"](config.gui.commandHistory);
+    outGui["CommandHistory"].attribute("MaxSize", config.gui.commandHistoryMax);
 
     //external applications
     outGui["ExternalApps"](config.gui.externelApplications);

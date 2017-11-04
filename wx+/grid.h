@@ -91,7 +91,6 @@ using GridColumnResizeEventFunction = void (wxEvtHandler::*)(GridColumnResizeEve
 //------------------------------------------------------------------------------------------------------------
 class Grid;
 
-void clearArea(wxDC& dc, const wxRect& rect, const wxColor& col);
 
 class GridData
 {

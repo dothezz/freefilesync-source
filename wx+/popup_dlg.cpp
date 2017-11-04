@@ -114,7 +114,7 @@ public:
             if (parent && parent->IsShownOnScreen())
                 SetTitle(titleTmp);
             else
-                SetTitle(wxTheApp->GetAppDisplayName() + L" - " + titleTmp);
+                SetTitle(wxTheApp->GetAppDisplayName() + SPACED_DASH + titleTmp);
         }
 
         int maxWidth  = 500;

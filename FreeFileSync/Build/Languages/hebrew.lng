@@ -1171,11 +1171,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>זמן שעבר:</target>
 
-<source>Bytes:</source>
-<target>בתים:</target>
+<source>Bytes</source>
+<target>בתים</target>
 
-<source>Items:</source>
-<target>פריטים:</target>
+<source>Items</source>
+<target>פריטים</target>
 
 <source>Synchronizing...</source>
 <target>מסנכרן...</target>

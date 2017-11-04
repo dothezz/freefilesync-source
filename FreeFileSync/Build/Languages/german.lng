@@ -7,9 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Support with a donation</source>
-<target>Mit einer Spende unterstützen</target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert.</target>
 
@@ -55,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Prüfe Verfügbarkeit des Papierkorbs für Ordner %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Dateien werden stattdessen permanent gelöscht:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Der Papierkorb wird von den folgenden Ordnern nicht unterstützt. Gelöschte oder überschriebene Dateien werden nicht wiederhergestellt werden können:</target>
 
 <source>An exception occurred</source>
 <target>Eine Ausnahme ist aufgetreten</target>
@@ -106,8 +103,8 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Beliebige Anzahl von alternativen Verzeichnispaaren für maximal eine Konfigurationsdatei.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Konfiguration zum Editieren öffnen ohne sie auszuführen.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Ausgewählte Konfiguration nur zum Editieren öffnen ohne sie auszuführen.</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
 <target>Pfad zu alternativer GlobalSettings.xml Datei.</target>
@@ -731,6 +728,15 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>job name</source>
 <target>Auftragsname</target>
 
+<source>Show summary</source>
+<target>Zusammenfassung zeigen</target>
+
+<source>Sleep</source>
+<target>Energie sparen</target>
+
+<source>Shut down</source>
+<target>Herunterfahren</target>
+
 <source>Synchronization stopped</source>
 <target>Synchronisation unterbrochen</target>
 
@@ -751,6 +757,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Synchronization completed successfully</source>
 <target>Synchronisation erfolgreich abgeschlossen</target>
+
+<source>Executing command %x</source>
+<target>Führe Befehl aus: %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Bereinige alte Protokolldateien...</target>
@@ -1028,9 +1037,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>C&lear</source>
 <target>&Löschen</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Ermittle die Synchronisationsrichtungen mit Hilfe von Datenbankdateien</target>
-
 <source>Detect moved files</source>
 <target>Verschobene Dateien erkennen</target>
 
@@ -1051,38 +1057,23 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Recycle bin</source>
 <target>Papier&korb</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
-
 <source>&Permanent</source>
 <target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Dateien endgültig löschen oder überschreiben</target>
 
 <source>&Versioning</source>
 <target>&Versionierung</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Dateien in einen benutzerdefinierten Ordner verschieben</target>
-
 <source>Naming convention:</source>
 <target>Namenskonvention:</target>
 
-<source>Handle errors:</source>
-<target>Fehlerbehandlung:</target>
-
-<source>&Pop-up</source>
-<target>&Nachfragen</target>
+<source>&Ignore errors</source>
+<target>&Fehler ignorieren</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Ein Auswahlfenster bei Fehlern oder Warnungen anzeigen</target>
 
-<source>Hide all error and warning messages</source>
-<target>Alle Fehler- und Warnmeldungen unterdrücken</target>
-
-<source>On completion:</source>
-<target>Nach Abschluss:</target>
+<source>Run command after synchronization:</source>
+<target>Befehl nach Synchronisation ausführen:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1144,20 +1135,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Connections for directory reading:</source>
 <target>Verbindungen zum Verzeichnislesen:</target>
 
-<source>Suggested range: [1 - 10]</source>
-<target>Empfohlener Bereich: [1 - 10]</target>
-
 <source>SFTP channels per connection:</source>
 <target>SFTP Kanäle je Verbindung:</target>
 
 <source>Detect server limit</source>
 <target>Ermittle Serverlimit</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 Verbindungen x 10 Kanäle = 20 mal schnelleres Lesen des Verzeichnisses</target>
-
-<source>4 connections = 4 times faster directory reading</source>
-<target>4 Verbindungen = 4 mal schnelleres Verzeichnislesen</target>
 
 <source>Select a directory on the server:</source>
 <target>Verzeichnis auf dem Server auswählen:</target>
@@ -1183,11 +1165,11 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Time elapsed:</source>
 <target>Vergangene Zeit:</target>
 
-<source>Bytes:</source>
-<target>Bytes:</target>
+<source>Bytes</source>
+<target>Bytes</target>
 
-<source>Items:</source>
-<target>Elemente:</target>
+<source>Items</source>
+<target>Elemente</target>
 
 <source>Synchronizing...</source>
 <target>Synchronisiere...</target>
@@ -1197,6 +1179,9 @@ Die Befehlszeile wird ausgelöst, wenn:
 
 <source>Bytes copied:</source>
 <target>Kopierte Datenmenge:</target>
+
+<source>When finished:</source>
+<target>Am Ende:</target>
 
 <source>Close</source>
 <target>Schließen</target>
@@ -1210,14 +1195,17 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Erstellt eine Batchdatei für die unbeaufsichtigte Synchronisation. Zum Starten die Datei doppelklicken oder in einen Taskplaner eintragen: %x</target>
 
-<source>&Stop</source>
-<target>&Stop</target>
+<source>Run minimized</source>
+<target>Minimiert ausführen</target>
+
+<source>&Show error dialog</source>
+<target>&Zeige Fehlerdialog</target>
+
+<source>&Cancel</source>
+<target>&Abbrechen</target>
 
 <source>Stop synchronization at first error</source>
 <target>Synchronisation beim ersten Fehler unterbrechen</target>
-
-<source>Run minimized</source>
-<target>Minimiert ausführen</target>
 
 <source>Save log:</source>
 <target>Protokoll speichern:</target>
@@ -1288,11 +1276,14 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Source code written in C++ using:</source>
 <target>Der Quellcode wurde in C++ geschrieben mit:</target>
 
-<source>Donation details</source>
-<target>Spendendetails</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Wenn Sie FreeFileSync mögen:</target>
+
+<source>Support with a donation</source>
+<target>Mit einer Spende unterstützen</target>
+
+<source>Donation details</source>
+<target>Spendendetails</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback und Vorschläge sind willkommen</target>
@@ -1375,8 +1366,8 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>&Show details</source>
 <target>&Zeige Details</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Eine neue Version von FreeFileSync ist verfügbar:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x ist verfügbar!</target>
 
 <source>Local path not available for %x.</source>
 <target>Lokaler Pfad ist nicht verfügbar für %x.</target>
@@ -1567,18 +1558,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Searching for program updates...</source>
 <target>Suche nach aktualisierten Programmversionen...</target>
 
-<source>Close progress dialog</source>
-<target>Schließe Verlaufsdialog</target>
-
-<source>Log off</source>
-<target>Abmelden</target>
-
-<source>Standby</source>
-<target>Energie sparen</target>
-
-<source>Shut down</source>
-<target>Herunterfahren</target>
-
 <source>Paused</source>
 <target>Angehalten</target>
 
@@ -1614,6 +1593,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Thank you, %x, for your donation and support!</source>
 <target>Danke %x für die Spende und Unterstützung!</target>
+
+<source>Recommended range:</source>
+<target>Empfohlener Bereich:</target>
 
 <source>Password:</source>
 <target>Passwort:</target>
@@ -1738,6 +1720,15 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>MB</source>
 <target>MB</target>
 
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Dateien endgültig löschen oder überschreiben</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Dateien in einen benutzerdefinierten Ordner verschieben</target>
+
 <source>Replace</source>
 <target>Ersetzen</target>
 
@@ -1749,6 +1740,15 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Append a time stamp to each file name</source>
 <target>Einen Zeitstempel an jeden Dateinamen anhängen</target>
+
+<source>On completion:</source>
+<target>Nach Abschluss:</target>
+
+<source>On errors:</source>
+<target>Bei Fehlern:</target>
+
+<source>On success:</source>
+<target>Bei Erfolg:</target>
 
 <source>Main config</source>
 <target>Hauptkonfiguration</target>
@@ -1770,9 +1770,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Name</source>
 <target>Name</target>
-
-<source>Items</source>
-<target>Elemente</target>
 
 <source>Percentage</source>
 <target>Prozent</target>
@@ -1903,6 +1900,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
 
+<source>Unable to shut down system.</source>
+<target>Das System kann nicht heruntergefahren werden.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Die Prüfung des Papierkorbs für Ordner %x ist fehlgeschlagen.</target>
 
@@ -1981,8 +1981,8 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Edit with FreeFileSync</source>
 <target>Mit FreeFileSync editieren</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Die portable Version kann nicht in den gewählten Ordner installiert werden.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Die portable Version von FreeFileSync kann nicht in einen Unterordner von %x installiert werden.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Bitte wählen Sie den lokalen Installationstyp oder einen anderen Ordner für die Installation.</target>

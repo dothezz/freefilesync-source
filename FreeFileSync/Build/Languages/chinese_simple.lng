@@ -1168,11 +1168,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>已用时间:</target>
 
-<source>Bytes:</source>
-<target>字节:</target>
+<source>Bytes</source>
+<target>字节</target>
 
-<source>Items:</source>
-<target>项目:</target>
+<source>Items</source>
+<target>项目</target>
 
 <source>Synchronizing...</source>
 <target>同步中...</target>

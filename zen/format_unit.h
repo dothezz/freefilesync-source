@@ -15,16 +15,16 @@
 
 namespace zen
 {
-std::wstring filesizeToShortString(int64_t filesize);
-std::wstring remainingTimeToString(double timeInSec);
-std::wstring fractionToString(double fraction); //within [0, 1]
-std::wstring utcToLocalTimeString(int64_t utcTime); //like Windows Explorer would...
+std::wstring formatFilesizeShort(int64_t filesize);
+std::wstring formatRemainingTime(double timeInSec);
+std::wstring formatFraction(double fraction); //within [0, 1]
+std::wstring formatUtcToLocalTime(int64_t utcTime); //like Windows Explorer would...
 
 std::wstring formatTwoDigitPrecision  (double value); //format with fixed number of digits
 std::wstring formatThreeDigitPrecision(double value); //(unless value is too large)
 
 template <class NumberType>
-std::wstring toGuiString(NumberType number); //format integer number including thousands separator
+std::wstring formatNumber(NumberType number); //format integer number including thousands separator
 
 
 
@@ -43,7 +43,7 @@ std::wstring includeNumberSeparator(const std::wstring& number);
 }
 
 template <class NumberType> inline
-std::wstring toGuiString(NumberType number)
+std::wstring formatNumber(NumberType number)
 {
     static_assert(IsInteger<NumberType>::value, "");
     return ffs_Impl::includeNumberSeparator(zen::numberTo<std::wstring>(number));

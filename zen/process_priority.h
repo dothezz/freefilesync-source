@@ -3,12 +3,12 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
+
 #ifndef PROCESS_PRIORITY_H_83421759082143245
 #define PROCESS_PRIORITY_H_83421759082143245
 
 #include <memory>
 #include "file_error.h"
-
 
 namespace zen
 {
@@ -20,7 +20,7 @@ public:
     ~PreventStandby();
 private:
     struct Impl;
-    const std::unique_ptr<Impl> pimpl;
+    const std::unique_ptr<Impl> pimpl_;
 };
 
 //lower CPU and file I/O priorities
@@ -31,7 +31,7 @@ public:
     ~ScheduleForBackgroundProcessing();
 private:
     struct Impl;
-    const std::unique_ptr<Impl> pimpl;
+    const std::unique_ptr<Impl> pimpl_;
 };
 }
 

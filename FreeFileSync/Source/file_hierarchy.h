@@ -345,20 +345,20 @@ public:
     inline friend bool operator==(const DerefIter& lhs, const DerefIter& rhs) { return lhs.it_ == rhs.it_; }
     inline friend bool operator!=(const DerefIter& lhs, const DerefIter& rhs) { return !(lhs == rhs); }
     V& operator* () const { return  **it_; }
-    V* operator->() const { return &**it_; }
+    V* operator->() const { return &** it_; }
 private:
     IterImpl it_;
 };
 
 /*
 C++17: specialize std::iterator_traits instead of inherting from std::iterator
-namespace std 
+namespace std
 {
-template <class IterImpl, class V>        
-struct iterator_traits<zen::DerefIter<IterImpl, V>> 
+template <class IterImpl, class V>
+struct iterator_traits<zen::DerefIter<IterImpl, V>>
 {
-	using iterator_category = std::bidirectional_iterator_tag;
-	using value_type = V;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = V;
 };
 }
 */

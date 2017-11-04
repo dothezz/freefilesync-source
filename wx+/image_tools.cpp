@@ -6,6 +6,7 @@
 
 #include "image_tools.h"
 #include <zen/string_tools.h>
+#include <zen/zstring.h>
 #include <wx/app.h>
 
 
@@ -150,9 +151,8 @@ wxImage zen::createImageFromText(const wxString& text, const wxFont& font, const
 
     //for some reason wxDC::DrawText messes up "weak" bidi characters even when wxLayout_RightToLeft is set! (--> arrows in hebrew/arabic)
     //=> use mark characters instead:
-    const wchar_t rtlMark = L'\u200F'; //UTF-8: E2 80 8F
     if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
-        textFmt = rtlMark + textFmt + rtlMark;
+        textFmt = RTL_MARK + textFmt + RTL_MARK;
 
     const std::vector<std::pair<wxString, wxSize>> lineInfo = getTextExtentInfo(textFmt, font);
 

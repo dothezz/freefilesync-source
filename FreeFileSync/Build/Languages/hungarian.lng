@@ -1174,11 +1174,11 @@ A parancs végrehajtódik, ha:
 <source>Time elapsed:</source>
 <target>Eltelt idő:</target>
 
-<source>Bytes:</source>
-<target>Bájt:</target>
+<source>Bytes</source>
+<target>Bájt</target>
 
-<source>Items:</source>
-<target>Tétel:</target>
+<source>Items</source>
+<target>Tétel</target>
 
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>

@@ -80,8 +80,6 @@ Zstring resolveRelativePath(const Zstring& relativePath)
 
 
 
-
-
 //returns value if resolved
 Opt<Zstring> tryResolveMacro(const Zstring& macro) //macro without %-characters
 {

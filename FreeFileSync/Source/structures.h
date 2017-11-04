@@ -361,6 +361,14 @@ bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
 }
 
 
+enum class PostSyncCondition
+{
+    COMPLETION,
+    ERRORS,
+    SUCCESS
+};
+
+
 struct MainConfiguration
 {
     CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings
@@ -370,7 +378,10 @@ struct MainConfiguration
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
-    Zstring onCompletion; //user-defined command line
+    bool ignoreErrors = false; //true: errors will still be logged
+
+    Zstring postSyncCommand; //user-defined command line
+    PostSyncCondition postSyncCondition = PostSyncCondition::COMPLETION;
 
     std::wstring getCompVariantName() const;
     std::wstring getSyncVariantName() const;
@@ -380,12 +391,14 @@ struct MainConfiguration
 inline
 bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
 {
-    return lhs.cmpConfig        == rhs.cmpConfig       &&
-           lhs.syncCfg          == rhs.syncCfg         &&
-           lhs.globalFilter     == rhs.globalFilter    &&
-           lhs.firstPair        == rhs.firstPair       &&
-           lhs.additionalPairs  == rhs.additionalPairs &&
-           lhs.onCompletion     == rhs.onCompletion;
+    return lhs.cmpConfig         == rhs.cmpConfig       &&
+           lhs.syncCfg           == rhs.syncCfg         &&
+           lhs.globalFilter      == rhs.globalFilter    &&
+           lhs.firstPair         == rhs.firstPair       &&
+           lhs.additionalPairs   == rhs.additionalPairs &&
+           lhs.ignoreErrors      == rhs.ignoreErrors    &&
+           lhs.postSyncCommand   == rhs.postSyncCommand &&
+           lhs.postSyncCondition == rhs.postSyncCondition;
 }
 
 

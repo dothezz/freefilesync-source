@@ -13,6 +13,7 @@
 #include <zen/stl_tools.h>
 #include <zen/format_unit.h>
 #include <wx+/rtl.h>
+#include <wx+/dc.h>
 #include <wx+/context_menu.h>
 #include <wx+/image_resources.h>
 #include "../lib/icon_buffer.h"
@@ -23,7 +24,6 @@ using namespace zen;
 namespace
 {
 const int WIDTH_PERCENTAGE_BAR = 60;
-const wchar_t* EN_DASH = L"\u2013";
 }
 
 
@@ -193,7 +193,7 @@ Zstring zen::getShortDisplayNameForFolderPair(const AbstractPath& itemPathL, con
     else if (AFS::isNullPath(itemPathR))
         return getLastComponent(itemPathL);
     else
-        return getLastComponent(itemPathL) + Zstr(" ") + utfTo<Zstring>(EN_DASH) + Zstr(" ") +
+        return getLastComponent(itemPathL) + utfTo<Zstring>(SPACED_DASH) +
                getLastComponent(itemPathR);
 }
 
@@ -795,7 +795,7 @@ private:
                                 return dirRight;
                             else if (dirRight.empty())
                                 return dirLeft;
-                            return dirLeft + L" " + EN_DASH + L"\n" + dirRight;
+                            return dirLeft + L" \u2013"/*en dash*/ + L"\n" + dirRight;
                         }
                 break;
 
@@ -823,10 +823,10 @@ private:
                         break;
 
                     case ColumnTypeNavi::ITEM_COUNT:
-                        return toGuiString(node->itemCount_);
+                        return formatNumber(node->itemCount_);
 
                     case ColumnTypeNavi::BYTES:
-                        return filesizeToShortString(node->bytes_);
+                        return formatFilesizeShort(node->bytes_);
                 }
         }
         return std::wstring();

@@ -1,3 +1,20 @@
+FreeFileSync 9.5 [2017-11-05]
+-----------------------------
+Allow to change error handling option on progress dialogs
+Set up shutdown behavior during sync (summary, exit, sleep, shutdown)
+Conditional execution of the post sync command line
+Directly use native shutdown/sleep API (Windows and macOS)
+Run post sync command even when fail on first error was set
+Merged batch and GUI error handling options
+Write post sync command to log file
+Update GUI-specific options when saving as batch job
+Progress graph area matches processed data ratio
+Delete files permanently with Shift+Del
+Apply correct quotation for CSV-exported folder list
+Replace Unicode arrow chars with ASCII for variant description
+Updated libcurl, OpenSSL to latest builds
+
+
 FreeFileSync 9.4 [2017-10-05]
 -----------------------------
 Fixed copying files with locked byte ranges using VSS

@@ -1174,11 +1174,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Изминало време:</target>
 
-<source>Bytes:</source>
-<target>Байтове:</target>
+<source>Bytes</source>
+<target>Байтове</target>
 
-<source>Items:</source>
-<target>Елементи:</target>
+<source>Items</source>
+<target>Елементи</target>
 
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>

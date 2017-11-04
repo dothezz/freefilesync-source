@@ -119,7 +119,7 @@ private:
                                const std::vector<zen::FileSystemObject*>& selectionRight);
 
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
-                             const std::vector<zen::FileSystemObject*>& selectionRight);
+                             const std::vector<zen::FileSystemObject*>& selectionRight, bool moveToRecycler);
 
     void openExternalApplication(const Zstring& commandLinePhrase, bool leftSide,
                                  const std::vector<zen::FileSystemObject*>& selectionLeft,

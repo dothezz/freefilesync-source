@@ -87,3 +87,8 @@ table td
 	font-weight: bold;
 	margin-bottom: 5px;
 }
+
+.screen-snippet
+{
+    box-shadow: 1px 1px 2px #888;
+}

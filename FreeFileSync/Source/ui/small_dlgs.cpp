@@ -89,8 +89,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
 
     //build information
-    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime());
-    build += L" - Unicode";
+    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime()) + SPACED_DASH + L"Unicode";
 #ifndef wxUSE_UNICODE
 #error what is going on?
 #endif
@@ -177,9 +176,9 @@ private:
     std::shared_ptr<FolderHistory> folderHistory_;
 
     //output-only parameters:
-    Zstring& lastUsedPathOut;
-    bool& keepRelPathsOut;
-    bool& overwriteIfExistsOut;
+    Zstring& lastUsedPathOut_;
+    bool& keepRelPathsOut_;
+    bool& overwriteIfExistsOut_;
 };
 
 
@@ -192,9 +191,9 @@ CopyToDialog::CopyToDialog(wxWindow* parent,
                            bool& overwriteIfExists) :
     CopyToDlgGenerated(parent),
     folderHistory_(folderHistory),
-    lastUsedPathOut(lastUsedPath),
-    keepRelPathsOut(keepRelPaths),
-    overwriteIfExistsOut(overwriteIfExists)
+    lastUsedPathOut_(lastUsedPath),
+    keepRelPathsOut_(keepRelPaths),
+    overwriteIfExistsOut_(overwriteIfExists)
 {
 
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
@@ -250,11 +249,11 @@ void CopyToDialog::OnOK(wxCommandEvent& event)
     }
     //-------------------------------------------------------------
 
-    lastUsedPathOut      = targetFolder->getPath();
-    keepRelPathsOut      = m_checkBoxKeepRelPath->GetValue();
-    overwriteIfExistsOut = m_checkBoxOverwriteIfExists->GetValue();
+    lastUsedPathOut_      = targetFolder->getPath();
+    keepRelPathsOut_      = m_checkBoxKeepRelPath->GetValue();
+    overwriteIfExistsOut_ = m_checkBoxOverwriteIfExists->GetValue();
 
-    folderHistory_->addItem(lastUsedPathOut);
+    folderHistory_->addItem(lastUsedPathOut_);
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -412,7 +411,7 @@ private:
     void OnClose    (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
     //output-only parameters:
-    bool& dontShowAgainOut;
+    bool& dontShowAgainOut_;
 };
 
 
@@ -421,7 +420,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
                                          const SyncStatistics& st,
                                          bool& dontShowAgain) :
     SyncConfirmationDlgGenerated(parent),
-    dontShowAgainOut(dontShowAgain)
+    dontShowAgainOut_(dontShowAgain)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
 
@@ -448,10 +447,10 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
 
     auto setIntValue = [&setValue](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
     {
-        setValue(txtControl, value == 0, toGuiString(value), bmpControl, bmpName);
+        setValue(txtControl, value == 0, formatNumber(value), bmpControl, bmpName);
     };
 
-    setValue(*m_staticTextData, st.getBytesToProcess() == 0, filesizeToShortString(st.getBytesToProcess()), *m_bitmapData,  L"data");
+    setValue(*m_staticTextData, st.getBytesToProcess() == 0, formatFilesizeShort(st.getBytesToProcess()), *m_bitmapData,  L"data");
     setIntValue(*m_staticTextCreateLeft,  st.createCount< LEFT_SIDE>(), *m_bitmapCreateLeft,  L"so_create_left_small");
     setIntValue(*m_staticTextUpdateLeft,  st.updateCount< LEFT_SIDE>(), *m_bitmapUpdateLeft,  L"so_update_left_small");
     setIntValue(*m_staticTextDeleteLeft,  st.deleteCount< LEFT_SIDE>(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
@@ -471,7 +470,7 @@ SyncConfirmationDlg::SyncConfirmationDlg(wxWindow* parent,
 
 void SyncConfirmationDlg::OnStartSync(wxCommandEvent& event)
 {
-    dontShowAgainOut = m_checkBoxDontShowAgain->GetValue();
+    dontShowAgainOut_ = m_checkBoxDontShowAgain->GetValue();
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
@@ -512,16 +511,16 @@ private:
     void setExtApp(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp() const;
 
-    std::map<std::wstring, std::wstring> descriptionTransToEng; //"translated description" -> "english" mapping for external application config
+    std::map<std::wstring, std::wstring> descriptionTransToEng_; //"translated description" -> "english" mapping for external application config
 
     //output-only parameters:
-    xmlAccess::XmlGlobalSettings& globalSettingsOut;
+    xmlAccess::XmlGlobalSettings& globalSettingsOut_;
 };
 
 
 OptionsDlg::OptionsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings) :
     OptionsDlgGenerated(parent),
-    globalSettingsOut(globalSettings)
+    globalSettingsOut_(globalSettings)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
@@ -602,14 +601,14 @@ void OptionsDlg::updateGui()
 void OptionsDlg::OnOkay(wxCommandEvent& event)
 {
     //write settings only when okay-button is pressed (except hidden dialog reset)!
-    globalSettingsOut.failSafeFileCopy    = m_checkBoxFailSafe->GetValue();
-    globalSettingsOut.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
-    globalSettingsOut.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
+    globalSettingsOut_.failSafeFileCopy    = m_checkBoxFailSafe->GetValue();
+    globalSettingsOut_.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
+    globalSettingsOut_.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
 
-    globalSettingsOut.automaticRetryCount = m_spinCtrlAutoRetryCount->GetValue();
-    globalSettingsOut.automaticRetryDelay = m_spinCtrlAutoRetryDelay->GetValue();
+    globalSettingsOut_.automaticRetryCount = m_spinCtrlAutoRetryCount->GetValue();
+    globalSettingsOut_.automaticRetryDelay = m_spinCtrlAutoRetryDelay->GetValue();
 
-    globalSettingsOut.gui.externelApplications = getExtApp();
+    globalSettingsOut_.gui.externelApplications = getExtApp();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
@@ -622,7 +621,7 @@ void OptionsDlg::OnResetDialogs(wxCommandEvent& event)
                                    _("&Show")))
     {
         case ConfirmationButton::ACCEPT:
-            globalSettingsOut.optDialogs = xmlAccess::OptionalDialogs();
+            globalSettingsOut_.optDialogs = xmlAccess::OptionalDialogs();
             break;
         case ConfirmationButton::CANCEL:
             break;
@@ -665,7 +664,7 @@ void OptionsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
 
         const std::wstring description = zen::translate(it->first);
         if (description != it->first) //remember english description to save in GlobalSettings.xml later rather than hard-code translation
-            descriptionTransToEng[description] = it->first;
+            descriptionTransToEng_[description] = it->first;
 
         m_gridCustomCommand->SetCellValue(row, 0, description);
         m_gridCustomCommand->SetCellValue(row, 1, utfTo<wxString>(it->second)); //commandline
@@ -682,8 +681,8 @@ xmlAccess::ExternalApps OptionsDlg::getExtApp() const
         auto commandline = utfTo<Zstring>        (m_gridCustomCommand->GetCellValue(i, 1));
 
         //try to undo translation of description for GlobalSettings.xml
-        auto it = descriptionTransToEng.find(description);
-        if (it != descriptionTransToEng.end())
+        auto it = descriptionTransToEng_.find(description);
+        if (it != descriptionTransToEng_.end())
             description = it->second;
 
         if (!description.empty() || !commandline.empty())
@@ -748,15 +747,15 @@ private:
     }
 
     //output-only parameters:
-    time_t& timeFromOut;
-    time_t& timeToOut;
+    time_t& timeFromOut_;
+    time_t& timeToOut_;
 };
 
 
 SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, time_t& timeFrom, time_t& timeTo) :
     SelectTimespanDlgGenerated(parent),
-    timeFromOut(timeFrom),
-    timeToOut(timeTo)
+    timeFromOut_(timeFrom),
+    timeToOut_(timeTo)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
@@ -799,8 +798,8 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
     to += wxTimeSpan::Day();
     to -= wxTimeSpan::Second(); //go back to end of previous day
 
-    timeFromOut = from.GetTicks();
-    timeToOut   = to  .GetTicks();
+    timeFromOut_ = from.GetTicks();
+    timeToOut_   = to  .GetTicks();
 
     /*
     {
@@ -932,7 +931,7 @@ private:
     {
         const double fraction = bytesTotal_ == 0 ? 0 : 1.0 * bytesCurrent_ / bytesTotal_;
         m_staticTextHeader->SetLabel(_("Downloading update...") + L" " +
-                                     numberTo<std::wstring>(numeric::round(fraction * 100)) + L"% (" + filesizeToShortString(bytesCurrent_) + L")");
+                                     numberTo<std::wstring>(numeric::round(fraction * 100)) + L"% (" + formatFilesizeShort(bytesCurrent_) + L")");
         m_gaugeProgress->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
 
         m_staticTextDetails->SetLabel(utfTo<std::wstring>(filePath_));

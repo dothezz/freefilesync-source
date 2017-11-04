@@ -69,13 +69,22 @@ std::wstring zen::getVariantName(CompareVariant var)
 
 std::wstring zen::getVariantName(DirectionConfig::Variant var)
 {
-    //const wchar_t arrowLeft [] = L"\u2190";
-    //const wchar_t arrowRight[] = L"\u2192"; unicode arrows -> too small
+    const wchar_t arrowLeft [] = L"<-";
+    const wchar_t arrowRight[] = L"->";
+    const wchar_t angleRight[] = L">";
+#if 0
+    //const wchar_t arrowLeft [] = L"\u2190"; unicode arrows -> too small
+    //const wchar_t arrowRight[] = L"\u2192";
     const wchar_t arrowLeft [] = L"\uFF1C\u2013"; //fullwidth less-than + en dash
     const wchar_t arrowRight[] = L"\u2013\uFF1E"; //en dash + fullwidth greater-than
     const wchar_t angleRight[] = L"\uFF1E";
+    => drawbacks:
+        - not drawn correctly before Vista
+        - used in sync log files where users expect ANSI: https://www.freefilesync.org/forum/viewtopic.php?t=4647
+        - RTL: the full width less-than does not swap automatically
+#endif
 
-    switch (var)
+        switch (var)
     {
         case DirectionConfig::TWO_WAY:
             return std::wstring(arrowLeft) + L" " + _("Two way") + L" " + arrowRight;
@@ -543,12 +552,14 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
     }
 
     //final assembly
-    zen::MainConfiguration cfgOut;
+    MainConfiguration cfgOut;
     cfgOut.cmpConfig    = cmpCfgHead;
     cfgOut.syncCfg      = syncCfgHead;
     cfgOut.globalFilter = globalFilter;
     cfgOut.firstPair    = fpMerged[0];
     cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());
-    cfgOut.onCompletion = mainCfgs[0].onCompletion;
+    cfgOut.ignoreErrors = std::all_of(mainCfgs.begin(), mainCfgs.end(), [](const MainConfiguration& mainCfg) { return mainCfg.ignoreErrors; });
+    //cfgOut.postSyncCommand   = mainCfgs[0].postSyncCommand;   -> better leave at default ... !?
+    //cfgOut.postSyncCondition = mainCfgs[0].postSyncCondition; ->
     return cfgOut;
 }

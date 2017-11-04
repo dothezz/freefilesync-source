@@ -38,23 +38,6 @@ struct LocalPairConfig
 };
 
 
-struct MiscSyncConfig
-{
-    xmlAccess::OnGuiError handleError = xmlAccess::ON_GUIERROR_POPUP;
-    Zstring onCompletionCommand;
-    std::vector<Zstring> onCompletionHistory;
-};
-
-
-struct GlobalSyncConfig
-{
-    CompConfig   cmpConfig;
-    SyncConfig   syncCfg;
-    FilterConfig filter;
-    MiscSyncConfig miscCfg;
-};
-
-
 ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
                                                   SyncConfigPanel panelToShow,
                                                   int localPairIndexToShow, //< 0 to show global config
@@ -65,11 +48,12 @@ ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
                                                   SyncConfig&   globalSyncCfg,
                                                   FilterConfig& globalFilter,
 
-                                                  xmlAccess::OnGuiError& handleError,
-                                                  Zstring& onCompletionCommand,
-                                                  std::vector<Zstring>& onCompletionHistory,
+                                                  bool& ignoreErrors,
+                                                  Zstring& postSyncCommand,
+                                                  PostSyncCondition& postSyncCondition,
+                                                  std::vector<Zstring>& commandHistory,
 
-                                                  size_t onCompletionHistoryMax);
+                                                  size_t commandHistoryMax);
 }
 
 #endif //SYNC_CFG_H_31289470134253425

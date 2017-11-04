@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
-#ifndef ON_COMPLETION_BOX_H_18947773210473214
-#define ON_COMPLETION_BOX_H_18947773210473214
+#ifndef COMMAND_BOX_H_18947773210473214
+#define COMMAND_BOX_H_18947773210473214
 
 #include <vector>
 #include <string>
@@ -16,23 +16,20 @@
 
 //combobox with history function + functionality to delete items (DEL)
 
-//special command
-bool isCloseProgressDlgCommand(const Zstring& value);
 
-
-class OnCompletionBox : public wxComboBox
+class CommandBox : public wxComboBox
 {
 public:
-    OnCompletionBox(wxWindow* parent,
-                    wxWindowID id,
-                    const wxString& value = {},
-                    const wxPoint& pos = wxDefaultPosition,
-                    const wxSize& size = wxDefaultSize,
-                    int n = 0,
-                    const wxString choices[] = nullptr,
-                    long style = 0,
-                    const wxValidator& validator = wxDefaultValidator,
-                    const wxString& name = wxComboBoxNameStr);
+    CommandBox(wxWindow* parent,
+               wxWindowID id,
+               const wxString& value = {},
+               const wxPoint& pos = wxDefaultPosition,
+               const wxSize& size = wxDefaultSize,
+               int n = 0,
+               const wxString choices[] = nullptr,
+               long style = 0,
+               const wxValidator& validator = wxDefaultValidator,
+               const wxString& name = wxComboBoxNameStr);
 
     void setHistory(const std::vector<Zstring>& history, size_t historyMax) { history_ = history; historyMax_ = historyMax; }
     std::vector<Zstring> getHistory() const { return history_; }
@@ -59,4 +56,4 @@ private:
 };
 
 
-#endif //ON_COMPLETION_BOX_H_18947773210473214
+#endif //COMMAND_BOX_H_18947773210473214

@@ -1186,11 +1186,11 @@ Ukaz se sproži če:
 <source>Time elapsed:</source>
 <target>Pretečeni čas:</target>
 
-<source>Bytes:</source>
-<target>Bitov:</target>
+<source>Bytes</source>
+<target>Bitov</target>
 
-<source>Items:</source>
-<target>Objektov:</target>
+<source>Items</source>
+<target>Objektov</target>
 
 <source>Synchronizing...</source>
 <target>Sinhroniziram...</target>

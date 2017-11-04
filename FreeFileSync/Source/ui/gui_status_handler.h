@@ -12,16 +12,13 @@
 #include "progress_indicator.h"
 #include "main_dlg.h"
 #include "../lib/status_handler.h"
-#include "../lib/process_xml.h"
+//#include "../lib/process_xml.h"
 
-
-//Exception class used to abort the "compare" and "sync" process
-class GuiAbortProcess {};
 
 //classes handling sync and compare errors as well as status feedback
 
 //StatusHandlerTemporaryPanel(CompareProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
-class StatusHandlerTemporaryPanel : private wxEvtHandler, public zen::StatusHandler //throw GuiAbortProcess
+class StatusHandlerTemporaryPanel : private wxEvtHandler, public zen::StatusHandler //throw AbortProcess
 {
 public:
     StatusHandlerTemporaryPanel(MainDialog& dlg);
@@ -35,7 +32,6 @@ public:
     void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
     void forceUiRefresh() override;
-    void abortProcessNow() override final; //throw GuiAbortProcess
 
     zen::ErrorLog getErrorLog() const { return errorLog_; }
 
@@ -44,24 +40,24 @@ private:
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
 
     MainDialog& mainDlg_;
-    xmlAccess::OnGuiError handleError_ = xmlAccess::ON_GUIERROR_POPUP;
     zen::ErrorLog errorLog_;
 };
 
 
 //StatusHandlerFloatingDialog(SyncProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
-class StatusHandlerFloatingDialog : public zen::StatusHandler
+class StatusHandlerFloatingDialog : public zen::StatusHandler //throw AbortProcess
 {
 public:
     StatusHandlerFloatingDialog(wxFrame* parentDlg,
                                 size_t lastSyncsLogFileSizeMax,
-                                xmlAccess::OnGuiError handleError,
+                                bool ignoreErrors,
                                 size_t automaticRetryCount,
                                 size_t automaticRetryDelay,
                                 const std::wstring& jobName,
                                 const Zstring& soundFileSyncComplete,
-                                const Zstring& onCompletion,
-                                std::vector<Zstring>& onCompletionHistory);
+                                const Zstring& postSyncCommand,
+                                zen::PostSyncCondition postSyncCondition,
+                                bool& exitAfterSync);
     ~StatusHandlerFloatingDialog();
 
     void initNewPhase       (int itemsTotal, int64_t bytesTotal, Phase phaseID) override;
@@ -73,19 +69,20 @@ public:
     void     reportWarning   (const std::wstring& warningMessage, bool& warningActive) override;
 
     void forceUiRefresh() override;
-    void abortProcessNow() override final; //throw GuiAbortProcess
 
 private:
     void onProgressDialogTerminate();
 
     SyncProgressDialog* progressDlg_; //managed to have shorter lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
-    xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog_;
     const size_t automaticRetryCount_;
     const size_t automaticRetryDelay_;
     const std::wstring jobName_;
     const time_t startTime_; //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
+    const Zstring postSyncCommand_;
+    const zen::PostSyncCondition postSyncCondition_;
+    bool& exitAfterSync_;
 };
 
 

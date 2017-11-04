@@ -124,7 +124,9 @@ int Application::OnRun()
     catch (const std::bad_alloc& e) //the only kind of exception we don't want crash dumps for
     {
         logFatalError(e.what()); //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        wxSafeShowMessage(L"RealTimeSync - " + _("An exception occurred"), e.what());
+
+        const auto title = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + SPACED_DASH + _("An exception occurred");
+        wxSafeShowMessage(title, e.what());
         return FFS_RC_EXCEPTION;
     }
     //catch (...) -> let it crash and create mini dump!!!

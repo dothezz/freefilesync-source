@@ -1180,11 +1180,11 @@ Comanda este declanșată dacă:
 <source>Time elapsed:</source>
 <target>Timp Scurs:</target>
 
-<source>Bytes:</source>
-<target>Baiți:</target>
+<source>Bytes</source>
+<target>Baiți</target>
 
-<source>Items:</source>
-<target>Elemente:</target>
+<source>Items</source>
+<target>Elemente</target>
 
 <source>Synchronizing...</source>
 <target>Sincronizare Aflată în Curs...</target>

@@ -1174,11 +1174,11 @@ De opdracht wordt geactiveerd als:
 <source>Time elapsed:</source>
 <target>Verstreken tijd:</target>
 
-<source>Bytes:</source>
-<target>Bytes:</target>
+<source>Bytes</source>
+<target>Bytes</target>
 
-<source>Items:</source>
-<target>Objecten:</target>
+<source>Items</source>
+<target>Objecten</target>
 
 <source>Synchronizing...</source>
 <target>Synchroniseren...</target>

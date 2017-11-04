@@ -14,8 +14,7 @@
 
 namespace zen
 {
-//A high-level exception class giving detailed context information for end users
-class FileError
+class FileError //A high-level exception class giving detailed context information for end users
 {
 public:
     explicit FileError(const std::wstring& msg) : msg_(msg) {}
@@ -28,7 +27,7 @@ private:
     std::wstring msg_;
 };
 
-#define DEFINE_NEW_FILE_ERROR(X) struct X : public FileError { X(const std::wstring& msg) : FileError(msg) {} X(const std::wstring& msg, const std::wstring& descr) : FileError(msg, descr) {} };
+#define DEFINE_NEW_FILE_ERROR(X) struct X : public zen::FileError { X(const std::wstring& msg) : FileError(msg) {} X(const std::wstring& msg, const std::wstring& descr) : FileError(msg, descr) {} };
 
 DEFINE_NEW_FILE_ERROR(ErrorTargetExisting);
 //DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);

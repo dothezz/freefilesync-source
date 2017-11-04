@@ -16,16 +16,16 @@
 		The primary purpose of RealTimeSync is to execute a command line each time it <b>detects changes</b> in one of the monitored directories,
 		or when a <b>directory becomes available</b> (e. g. insert of a USB-stick). Usually this command line will trigger a FreeFileSync batch job.<br>
 		<br>
-		
+
 		RealTimeSync will register to receive change notifications directly from the operating system in order to avoid the overhead of
 		repeatedly polling for changes.
-		Each time a file or folder is created/updated/deleted in the monitored directories or their sub directories, RealTimeSync will run the command line.		
+		Each time a file or folder is created/updated/deleted in the monitored directories or their sub directories, RealTimeSync will run the command line.
 		<br><br>
 	</p>
-	
+
 	<h2>Example: <span style="font-weight:normal">Real time synchronization - in combination with FreeFileSync</span></h2>
 	<p>
-		Start RealTimeSync.exe located in FreeFileSync's installation directory and 
+		Start RealTimeSync.exe located in FreeFileSync's installation directory and
 		enter the folders you want to monitor. Instead of doing this manually you can import an ffs_batch
 		file via <b>Menu &rarr; File &rarr; Open</b> or simply via <b>drag and drop</b>.
 		RealTimeSync will not only extract all directories relevant for synchronization,
@@ -43,14 +43,14 @@
 			<li>The command should <b>not</b> <b>block</b> progress. If you call a FreeFileSync batch job,
 				make sure it won't show any popup dialogs. See notes in <a href="command-line.html">Command Line Usage</a>.
 				<br>&nbsp;
-				
-			<li>RealTimeSync will skip showing the main dialog and begin monitoring immediately if 
-				you pass an ffs_real configuration file <b>or</b> a FreeFileSync ffs_batch file as the first 
-				command line argument to RealTimeSync.exe. This can be used to integrate RealTimeSync into the operating system's auto start:<br>				
+
+			<li>RealTimeSync will skip showing the main dialog and begin monitoring immediately if
+				you pass an ffs_real configuration file <b>or</b> a FreeFileSync ffs_batch file as the first
+				command line argument to RealTimeSync.exe. This can be used to integrate RealTimeSync into the operating system's auto start:<br>
 				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_real&quot;</div>
 				<div class="command-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;C:\Program Files\FreeFileSync\RealTimeSync.exe&quot; &quot;D:\Backup Projects.ffs_batch&quot;</div>
 				<br>
-	
+
 			<li>RealTimeSync is not required to start FreeFileSync. It can also be used in other scenarios, like sending an email whenever a certain directory is modified.
 		</ul>
 	</div>
@@ -58,16 +58,16 @@
 
 	<h2>Example: <span style="font-weight:normal">Automatic synchronization when a USB stick is inserted</span></h2>
 	<p>
-		Save an ffs_batch configuration in the USB stick's root directory, 
+		Save an ffs_batch configuration in the USB stick's root directory,
 		e.g. <span class="file-path">H:\</span> and let FreeFileSync run it when the stick is mounted.
-		But, instead of hard coding the USB drive letter <span class="file-path">H:\</span> (which may change occasionally), 
+		But, instead of hard coding the USB drive letter <span class="file-path">H:\</span> (which may change occasionally),
 		refer to the USB stick via its <a href="variable-drive-letters.html">volume name</a> instead.<br>
 		<br>
 		Configure RealTimeSync as follows:<br>
 	</p>
 	<div style="display:inline-block; margin-left: 1.3cm; text-align: center;">
 		<img src="../images/realtimesync-monitor-usb.png" alt="Monitor USB stick insert"><br>
-		
+
 		<i>"Backup" is the volume name of the USB stick in our example.</i>
 	</div>
 
@@ -77,7 +77,7 @@
 	</p>
 
 	<div class="bluebox">
-		<b>Note</b><br>	
+		<b>Note</b><br>
 		The full path of the last changed file and the action that triggered the
 		change notification (create, update or delete) are written
 		to the environment variables <b><span class="command-line">%change_path%</span></b> and <b><span class="command-line">%change_action%</span></b>.
@@ -87,13 +87,13 @@
 	<h2>Example: <span style="font-weight:normal">Log names of changed files and directories (Windows)</span></h2>
 	<p>
 		<div class="greybox">
-			Show which file or directory has triggered a change. Enter command line:<br>			
+			Show which file or directory has triggered a change. Enter command line:<br>
 			<div class="command-line">
 				&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &amp; pause
 			</div>
 			<br>
-			
-			Write a list of all changes to a log file:<br>			
+
+			Write a list of all changes to a log file:<br>
 			<div class="command-line">
 				&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo %change_action% &quot;%change_path%&quot; &gt;&gt; %csidl_Desktop%\log.txt
 			</div>

@@ -200,13 +200,12 @@ void drawYLabel(wxDC& dc, double yMin, double yMax, int blockCount, const Conver
 }
 
 
-void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Graph2D::PosCorner pos)
+void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Graph2D::PosCorner pos, const wxColor& backgroundColor)
 {
     if (txt.empty()) return;
     const int borderX = 5;
     const int borderY = 2; //it looks like wxDC::GetMultiLineTextExtent() precisely returns width, but too large a height: maybe they consider "text row height"?
 
-    wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
     wxSize txtExtent = dc.GetMultiLineTextExtent(txt);
     txtExtent.x += 2 * borderX;
     txtExtent.y += 2 * borderY;
@@ -227,6 +226,13 @@ void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Grap
             drawPos.y += graphArea.height - txtExtent.GetHeight();
             break;
     }
+
+	{
+		//add text shadow to improve readability:
+		wxDCTextColourChanger dummy(dc, backgroundColor);
+		dc.DrawText(txt, drawPos + wxPoint(borderX + 1, borderY + 1));
+	}
+    wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); 
     dc.DrawText(txt, drawPos + wxPoint(borderX, borderY));
 }
 
@@ -463,26 +469,26 @@ Graph2D::Graph2D(wxWindow* parent,
 void Graph2D::onPaintEvent(wxPaintEvent& event)
 {
     //wxAutoBufferedPaintDC dc(this); -> this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
-    BufferedPaintDC dc(*this, doubleBuffer);
+    BufferedPaintDC dc(*this, doubleBuffer_);
     render(dc);
 }
 
 
 void Graph2D::OnMouseLeftDown(wxMouseEvent& event)
 {
-    activeSel = std::make_unique<MouseSelection>(*this, event.GetPosition());
+    activeSel_ = std::make_unique<MouseSelection>(*this, event.GetPosition());
 
     if (!event.ControlDown())
-        oldSel.clear();
+        oldSel_.clear();
     Refresh();
 }
 
 
 void Graph2D::OnMouseMovement(wxMouseEvent& event)
 {
-    if (activeSel.get())
+    if (activeSel_.get())
     {
-        activeSel->refCurrentPos() = event.GetPosition(); //corresponding activeSel->refSelection() is updated in Graph2D::render()
+        activeSel_->refCurrentPos() = event.GetPosition(); //corresponding activeSel->refSelection() is updated in Graph2D::render()
         Refresh();
     }
 }
@@ -490,18 +496,18 @@ void Graph2D::OnMouseMovement(wxMouseEvent& event)
 
 void Graph2D::OnMouseLeftUp(wxMouseEvent& event)
 {
-    if (activeSel.get())
+    if (activeSel_.get())
     {
-        if (activeSel->getStartPos() != activeSel->refCurrentPos()) //if it's just a single mouse click: discard selection
+        if (activeSel_->getStartPos() != activeSel_->refCurrentPos()) //if it's just a single mouse click: discard selection
         {
-            GraphSelectEvent selEvent(activeSel->refSelection()); //fire off GraphSelectEvent
+            GraphSelectEvent selEvent(activeSel_->refSelection()); //fire off GraphSelectEvent
             if (wxEvtHandler* handler = GetEventHandler())
                 handler->AddPendingEvent(selEvent);
 
-            oldSel.push_back(activeSel->refSelection()); //commit selection
+            oldSel_.push_back(activeSel_->refSelection()); //commit selection
         }
 
-        activeSel.reset();
+        activeSel_.reset();
         Refresh();
     }
 }
@@ -509,7 +515,7 @@ void Graph2D::OnMouseLeftUp(wxMouseEvent& event)
 
 void Graph2D::OnMouseCaptureLost(wxMouseCaptureLostEvent& event)
 {
-    activeSel.reset();
+    activeSel_.reset();
     Refresh();
 }
 
@@ -536,18 +542,13 @@ void Graph2D::render(wxDC& dc) const
     using namespace numeric;
 
     //set label font right at the start so that it is considered by wxDC::GetTextExtent() below!
-    dc.SetFont(labelFont);
+    dc.SetFont(labelFont_);
 
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
-    {
-        //clear complete client area; set label background color
-        const wxColor backCol = GetBackgroundColour(); //user-configurable!
+
+	clearArea(dc, clientRect, GetBackgroundColour() /*user-configurable!*/);
         //wxPanel::GetClassDefaultAttributes().colBg :
         //wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
-        wxDCPenChanger   dummy (dc, backCol);
-        wxDCBrushChanger dummy2(dc, backCol);
-        dc.DrawRectangle(clientRect);
-    }
 
     /*
     -----------------------
@@ -560,28 +561,28 @@ void Graph2D::render(wxDC& dc) const
     int xLabelPosY = clientRect.y;
     int yLabelPosX = clientRect.x;
 
-    switch (attr.labelposX)
+    switch (attr_.labelposX)
     {
         case LABEL_X_TOP:
-            graphArea.y      += attr.xLabelHeight;
-            graphArea.height -= attr.xLabelHeight;
+            graphArea.y      += attr_.xLabelHeight;
+            graphArea.height -= attr_.xLabelHeight;
             break;
         case LABEL_X_BOTTOM:
-            xLabelPosY += clientRect.height - attr.xLabelHeight;
-            graphArea.height -= attr.xLabelHeight;
+            xLabelPosY += clientRect.height - attr_.xLabelHeight;
+            graphArea.height -= attr_.xLabelHeight;
             break;
         case LABEL_X_NONE:
             break;
     }
-    switch (attr.labelposY)
+    switch (attr_.labelposY)
     {
         case LABEL_Y_LEFT:
-            graphArea.x     += attr.yLabelWidth;
-            graphArea.width -= attr.yLabelWidth;
+            graphArea.x     += attr_.yLabelWidth;
+            graphArea.width -= attr_.yLabelWidth;
             break;
         case LABEL_Y_RIGHT:
-            yLabelPosX += clientRect.width - attr.yLabelWidth;
-            graphArea.width -= attr.yLabelWidth;
+            yLabelPosX += clientRect.width - attr_.yLabelWidth;
+            graphArea.width -= attr_.yLabelWidth;
             break;
         case LABEL_Y_NONE:
             break;
@@ -590,7 +591,7 @@ void Graph2D::render(wxDC& dc) const
     {
         //paint graph background (excluding label area)
         wxDCPenChanger   dummy (dc, getBorderColor());
-        wxDCBrushChanger dummy2(dc, attr.backgroundColor);
+        wxDCBrushChanger dummy2(dc, attr_.backgroundColor);
         //accessibility: consider system text and background colors; small drawback: color of graphs is NOT connected to the background! => responsibility of client to use correct colors
 
         dc.DrawRectangle(graphArea);
@@ -598,13 +599,13 @@ void Graph2D::render(wxDC& dc) const
     }
 
     //set label areas respecting graph area border!
-    const wxRect xLabelArea(graphArea.x, xLabelPosY, graphArea.width, attr.xLabelHeight);
-    const wxRect yLabelArea(yLabelPosX, graphArea.y, attr.yLabelWidth, graphArea.height);
+    const wxRect xLabelArea(graphArea.x, xLabelPosY, graphArea.width, attr_.xLabelHeight);
+    const wxRect yLabelArea(yLabelPosX, graphArea.y, attr_.yLabelWidth, graphArea.height);
     const wxPoint graphAreaOrigin = graphArea.GetTopLeft();
 
     //detect x value range
-    double minX = attr.minXauto ?  std::numeric_limits<double>::infinity() : attr.minX; //automatic: ensure values are initialized by first curve
-    double maxX = attr.maxXauto ? -std::numeric_limits<double>::infinity() : attr.maxX; //
+    double minX = attr_.minXauto ?  std::numeric_limits<double>::infinity() : attr_.minX; //automatic: ensure values are initialized by first curve
+    double maxX = attr_.maxXauto ? -std::numeric_limits<double>::infinity() : attr_.maxX; //
     for (auto it = curves_.begin(); it != curves_.end(); ++it)
         if (const CurveData* curve = it->first.get())
         {
@@ -612,9 +613,9 @@ void Graph2D::render(wxDC& dc) const
             assert(rangeX.first <= rangeX.second + 1.0e-9);
             //GCC fucks up badly when comparing two *binary identical* doubles and finds "begin > end" with diff of 1e-18
 
-            if (attr.minXauto)
+            if (attr_.minXauto)
                 minX = std::min(minX, rangeX.first);
-            if (attr.maxXauto)
+            if (attr_.maxXauto)
                 maxX = std::max(maxX, rangeX.second);
         }
 
@@ -624,15 +625,15 @@ void Graph2D::render(wxDC& dc) const
     {
         int blockCountX = 0;
         //enlarge minX, maxX to a multiple of a "useful" block size
-        if (attr.labelposX != LABEL_X_NONE && attr.labelFmtX.get())
+        if (attr_.labelposX != LABEL_X_NONE && attr_.labelFmtX.get())
             blockCountX = widenRange(minX, maxX, //in/out
                                      graphArea.width,
                                      minimalBlockSizePx.GetWidth() * 7,
-                                     *attr.labelFmtX);
+                                     *attr_.labelFmtX);
 
         //get raw values + detect y value range
-        double minY = attr.minYauto ?  std::numeric_limits<double>::infinity() : attr.minY; //automatic: ensure values are initialized by first curve
-        double maxY = attr.maxYauto ? -std::numeric_limits<double>::infinity() : attr.maxY; //
+        double minY = attr_.minYauto ?  std::numeric_limits<double>::infinity() : attr_.minY; //automatic: ensure values are initialized by first curve
+        double maxY = attr_.maxYauto ? -std::numeric_limits<double>::infinity() : attr_.maxY; //
 
         std::vector<std::vector<CurvePoint>> curvePoints(curves_.size());
         std::vector<std::vector<char>>       oobMarker  (curves_.size()); //effectively a std::vector<bool> marking points that start an out-of-bounds line
@@ -651,12 +652,12 @@ void Graph2D::render(wxDC& dc) const
                     const bool doPolygonCut = curves_[index].second.fillMode == CurveAttributes::FILL_POLYGON; //impacts auto minY/maxY!!
                     cutPointsOutsideX(points, marker, minX, maxX, doPolygonCut);
 
-                    if (attr.minYauto || attr.maxYauto)
+                    if (attr_.minYauto || attr_.maxYauto)
                     {
                         auto itPair = std::minmax_element(points.begin(), points.end(), [](const CurvePoint& lhs, const CurvePoint& rhs) { return lhs.y < rhs.y; });
-                        if (attr.minYauto)
+                        if (attr_.minYauto)
                             minY = std::min(minY, itPair.first->y);
-                        if (attr.maxYauto)
+                        if (attr_.maxYauto)
                             maxY = std::max(maxY, itPair.second->y);
                     }
                 }
@@ -666,11 +667,11 @@ void Graph2D::render(wxDC& dc) const
         {
             int blockCountY = 0;
             //enlarge minY, maxY to a multiple of a "useful" block size
-            if (attr.labelposY != LABEL_Y_NONE && attr.labelFmtY.get())
+            if (attr_.labelposY != LABEL_Y_NONE && attr_.labelFmtY.get())
                 blockCountY = widenRange(minY, maxY, //in/out
                                          graphArea.height,
                                          minimalBlockSizePx.GetHeight() * 3,
-                                         *attr.labelFmtY);
+                                         *attr_.labelFmtY);
 
             if (graphArea.width <= 1 || graphArea.height <= 1) return;
             const ConvertCoord cvrtX(minX, maxX, graphArea.width  - 1); //map [minX, maxX] to [0, pixelWidth - 1]
@@ -707,7 +708,7 @@ void Graph2D::render(wxDC& dc) const
             }
 
             //update active mouse selection
-            if (activeSel.get() && graphArea.width > 0 && graphArea.height > 0)
+            if (activeSel_.get() && graphArea.width > 0 && graphArea.height > 0)
             {
                 auto widen = [](double* low, double* high)
                 {
@@ -717,8 +718,8 @@ void Graph2D::render(wxDC& dc) const
                     *high += 0.5;
                 };
 
-                const wxPoint screenStart   = activeSel->getStartPos()   - graphAreaOrigin; //make relative to graphArea
-                const wxPoint screenCurrent = activeSel->refCurrentPos() - graphAreaOrigin;
+                const wxPoint screenStart   = activeSel_->getStartPos()   - graphAreaOrigin; //make relative to graphArea
+                const wxPoint screenCurrent = activeSel_->refCurrentPos() - graphAreaOrigin;
 
                 //normalize positions: a mouse selection is symmetric and *not* an half-open range!
                 double screenFromX = clampCpy(screenStart  .x, 0, graphArea.width  - 1);
@@ -729,10 +730,10 @@ void Graph2D::render(wxDC& dc) const
                 widen(&screenFromY, &screenToY);
 
                 //save current selection as "double" coordinates
-                activeSel->refSelection().from = CurvePoint(cvrtX.screenToReal(screenFromX),
+                activeSel_->refSelection().from = CurvePoint(cvrtX.screenToReal(screenFromX),
                                                             cvrtY.screenToReal(screenFromY));
 
-                activeSel->refSelection().to = CurvePoint(cvrtX.screenToReal(screenToX),
+                activeSel_->refSelection().to = CurvePoint(cvrtX.screenToReal(screenToX),
                                                           cvrtY.screenToReal(screenToY));
             }
 
@@ -751,9 +752,9 @@ void Graph2D::render(wxDC& dc) const
                 }
 
             //2. draw all currently set mouse selections (including active selection)
-            std::vector<SelectionBlock> allSelections = oldSel;
-            if (activeSel)
-                allSelections.push_back(activeSel->refSelection());
+            std::vector<SelectionBlock> allSelections = oldSel_;
+            if (activeSel_)
+                allSelections.push_back(activeSel_->refSelection());
             {
                 //alpha channel not supported on wxMSW, so draw selection before curves
                 wxDCBrushChanger dummy(dc, wxColor(168, 202, 236)); //light blue
@@ -788,7 +789,7 @@ void Graph2D::render(wxDC& dc) const
                                                       numeric::round(screenFromY)) + graphAreaOrigin;
                     const wxPoint pixelTo = wxPoint(numeric::round(screenToX),
                                                     numeric::round(screenToY)) + graphAreaOrigin;
-                    switch (attr.mouseSelMode)
+                    switch (attr_.mouseSelMode)
                     {
                         case SELECT_NONE:
                             break;
@@ -806,8 +807,8 @@ void Graph2D::render(wxDC& dc) const
             }
 
             //3. draw labels and background grid
-            drawXLabel(dc, minX, maxX, blockCountX, cvrtX, graphArea, xLabelArea, *attr.labelFmtX);
-            drawYLabel(dc, minY, maxY, blockCountY, cvrtY, graphArea, yLabelArea, *attr.labelFmtY);
+            drawXLabel(dc, minX, maxX, blockCountX, cvrtX, graphArea, xLabelArea, *attr_.labelFmtX);
+            drawYLabel(dc, minY, maxY, blockCountY, cvrtY, graphArea, yLabelArea, *attr_.labelFmtY);
 
             //4. finally draw curves
             {
@@ -843,8 +844,8 @@ void Graph2D::render(wxDC& dc) const
             }
 
             //5. draw corner texts
-            for (const auto& ct : attr.cornerTexts)
-                drawCornerText(dc, graphArea, ct.second, ct.first);
+            for (const auto& ct : attr_.cornerTexts)
+                drawCornerText(dc, graphArea, ct.second, ct.first, attr_.backgroundColor);
         }
     }
 }

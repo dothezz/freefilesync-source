@@ -1180,11 +1180,11 @@ Komenda jest wykonywana gdy:
 <source>Time elapsed:</source>
 <target>Upłynęło:</target>
 
-<source>Bytes:</source>
-<target>Bajty:</target>
+<source>Bytes</source>
+<target>Bajty</target>
 
-<source>Items:</source>
-<target>Elementy:</target>
+<source>Items</source>
+<target>Elementy</target>
 
 <source>Synchronizing...</source>
 <target>Synchronizuję...</target>

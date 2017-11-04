@@ -102,7 +102,7 @@ zen::Opt<std::wstring> PerfCheck::getBytesPerSecond() const
         const double       bytesDelta  = itemBack.second.bytes_ - itemFront.second.bytes_;
 
         if (timeDeltaMs != 0)
-            return filesizeToShortString(static_cast<int64_t>(bytesDelta * 1000.0 / timeDeltaMs)) + _("/sec");
+            return formatFilesizeShort(static_cast<int64_t>(bytesDelta * 1000.0 / timeDeltaMs)) + _("/sec");
     }
     return NoValue();
 }

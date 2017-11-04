@@ -31,7 +31,7 @@ public:
 
     const std::vector<Zstring>& getList() const { return folderPathPhrases_; }
 
-    static const wxString separationLine() { return L"---------------------------------------------------------------------------------------------------------------"; }
+    static const wxString separationLine() { return wxString(50, EM_DASH); }
 
     void addItem(const Zstring& folderPathPhrase)
     {

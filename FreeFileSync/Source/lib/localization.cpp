@@ -51,9 +51,9 @@ public:
         {
             const size_t formNo = pluralParser->getForm(n);
             if (formNo < it->second.size())
-                return replaceCpy(it->second[formNo], L"%x", toGuiString(n));
+                return replaceCpy(it->second[formNo], L"%x", formatNumber(n));
         }
-        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", toGuiString(n)); //fallback
+        return replaceCpy(std::abs(n) == 1 ? singular : plural, L"%x", formatNumber(n)); //fallback
     }
 
 private:
@@ -112,12 +112,10 @@ std::vector<TranslationInfo> loadTranslations()
 {
     std::vector<TranslationInfo> locMapping;
     {
-        const wchar_t ltrMark = L'\u200E'; //UTF-8: E2 80 8E
-
         //default entry:
         TranslationInfo newEntry;
         newEntry.languageID     = wxLANGUAGE_ENGLISH_US;
-        newEntry.languageName   = std::wstring(L"English (US)") + ltrMark; //handle weak ")" for bidi-algorithm
+        newEntry.languageName   = std::wstring(L"English (US)") + LTR_MARK; //handle weak ")" for bidi-algorithm
         newEntry.translatorName = L"Zenju";
         newEntry.languageFlag   = L"flag_usa.png";
         newEntry.langFilePath   = Zstr("");

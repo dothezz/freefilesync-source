@@ -49,7 +49,7 @@ struct OnUpdateLogfileStatusNoThrow
     void operator()(int64_t bytesDelta)
     {
         bytesWritten += bytesDelta;
-        try { pc_.reportStatus(msg + L" (" + filesizeToShortString(bytesWritten) + L")"); /*throw X*/ }
+        try { pc_.reportStatus(msg + L" (" + formatFilesizeShort(bytesWritten) + L")"); /*throw X*/ }
         catch (...) {}
     }
 
@@ -84,16 +84,16 @@ std::wstring generateLogHeader(const SummaryInfo& s)
 
     const wchar_t tabSpace[] = L"    ";
 
-    std::wstring itemsProc = tabSpace + _("Items processed:") + L" " + toGuiString(s.itemsProcessed); //show always, even if 0!
+    std::wstring itemsProc = tabSpace + _("Items processed:") + L" " + formatNumber(s.itemsProcessed); //show always, even if 0!
     if (s.itemsProcessed != 0 || s.bytesProcessed != 0) //[!] don't show 0 bytes processed if 0 items were processed
-        itemsProc += + L" (" + filesizeToShortString(s.bytesProcessed) + L")";
+        itemsProc += + L" (" + formatFilesizeShort(s.bytesProcessed) + L")";
     results.push_back(itemsProc);
 
     if (s.itemsTotal != 0 || s.bytesTotal != 0) //=: sync phase was reached and there were actual items to sync
     {
         if (s.itemsProcessed != s.itemsTotal ||
             s.bytesProcessed  != s.bytesTotal)
-            results.push_back(tabSpace + _("Items remaining:") + L" " + toGuiString(s.itemsTotal - s.itemsProcessed) + L" (" + filesizeToShortString(s.bytesTotal - s.bytesProcessed) + L")");
+            results.push_back(tabSpace + _("Items remaining:") + L" " + formatNumber(s.itemsTotal - s.itemsProcessed) + L" (" + formatFilesizeShort(s.bytesTotal - s.bytesProcessed) + L")");
     }
 
     results.push_back(tabSpace + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(s.totalTime).Format()));

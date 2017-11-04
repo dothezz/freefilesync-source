@@ -1174,11 +1174,11 @@ O comando é disparado se:
 <source>Time elapsed:</source>
 <target>Tempo decorrido:</target>
 
-<source>Bytes:</source>
-<target>Bytes:</target>
+<source>Bytes</source>
+<target>Bytes</target>
 
-<source>Items:</source>
-<target>Itens:</target>
+<source>Items</source>
+<target>Itens</target>
 
 <source>Synchronizing...</source>
 <target>Sincronizando...</target>

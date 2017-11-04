@@ -24,11 +24,21 @@ Updating GUI is fast!
     - Synchronization  0.74 ms (despite complex graph control!)
 */
 
+//Exception class used to abort the "compare" and "sync" process
+class AbortProcess {};
+
+
+enum class AbortTrigger
+{
+    USER,
+    PROGRAM,
+};
+
 //gui may want to abort process
 struct AbortCallback
 {
     virtual ~AbortCallback() {}
-    virtual void requestAbortion() = 0;
+    virtual void userRequestAbort() = 0;
 };
 
 
@@ -57,73 +67,90 @@ public:
         numbersCurrent_(4),   //init with phase count
         numbersTotal_  (4) {} //
 
-protected:
     //implement parts of ProcessCallback
     void initNewPhase(int itemsTotal, int64_t bytesTotal, Phase phaseId) override //may throw
     {
         currentPhase_ = phaseId;
-        refNumbers(numbersTotal_, currentPhase_) = std::make_pair(itemsTotal, bytesTotal);
+        refNumbers(numbersTotal_, currentPhase_) = { itemsTotal, bytesTotal };
     }
 
     void updateProcessedData(int itemsDelta, int64_t bytesDelta) override { updateData(numbersCurrent_, itemsDelta, bytesDelta); } //note: these methods MUST NOT throw in order
-    void updateTotalData    (int itemsDelta, int64_t bytesDelta) override { updateData(numbersTotal_, itemsDelta, bytesDelta); }   //to properly allow undoing setting of statistics!
+    void updateTotalData    (int itemsDelta, int64_t bytesDelta) override { updateData(numbersTotal_,   itemsDelta, bytesDelta); } //to properly allow undoing setting of statistics!
 
     void requestUiRefresh() override //throw X
     {
-        if (abortRequested) //triggered by requestAbortion()
+        if (abortRequested_) //triggered by requestAbortion()
         {
             forceUiRefresh();
-            abortProcessNow(); //throw X
+            throw AbortProcess();
         }
-        else if (updateUiIsAllowed()) //test if specific time span between ui updates is over
+        if (updateUiIsAllowed())
             forceUiRefresh();
     }
 
     void reportStatus(const std::wstring& text) override //throw X
     {
-        //assert(!text.empty()); -> possible, start of parallel scan
-        if (!abortRequested) statusText_ = text;
+        //assert(!text.empty()); -> possible: start of parallel scan
+        if (!abortRequested_) statusText_ = text;
         requestUiRefresh(); //throw X
     }
     void reportInfo(const std::wstring& text) override //throw X
     {
         assert(!text.empty());
-        if (!abortRequested) statusText_ = text;
+        if (!abortRequested_) statusText_ = text;
         requestUiRefresh(); //throw X
         //log text in derived class
     }
 
-    //implement AbortCallback
-    void requestAbortion() override
+    void abortProcessNow() override
     {
-        abortRequested = true;
+        if (!abortRequested_) abortRequested_ = AbortTrigger::PROGRAM;
+        throw AbortProcess();
+    }
+
+    void userAbortProcessNow()
+    {
+        if (!abortRequested_) abortRequested_ = AbortTrigger::USER;
+        throw AbortProcess();
+    }
+
+    //implement AbortCallback
+    void userRequestAbort() override
+    {
+        if (!abortRequested_) abortRequested_ = AbortTrigger::USER;
         statusText_ = _("Stop requested: Waiting for current operation to finish...");
     } //called from GUI code: this does NOT call abortProcessNow() immediately, but later when we're out of the C GUI call stack
 
     //implement Statistics
     Phase currentPhase() const override { return currentPhase_; }
 
-    int getItemsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).first; }
-    int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).first; }
+    int getItemsCurrent(Phase phaseId) const override {                                    return refNumbers(numbersCurrent_, phaseId).items; }
+    int getItemsTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).items; }
 
-    int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
-    int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).second; }
+    int64_t getBytesCurrent(Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).bytes; }
+    int64_t getBytesTotal  (Phase phaseId) const override { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_,   phaseId).bytes; }
 
     const std::wstring& currentStatusText() const override { return statusText_; }
 
-    bool abortIsRequested() const { return abortRequested; }
+protected:
+    Opt<AbortTrigger> getAbortStatus() const { return abortRequested_; }
 
 private:
-    using StatNumbers = std::vector<std::pair<int, int64_t>>;
+    struct StatNumber
+    {
+        int     items = 0;
+        int64_t bytes = 0;
+    };
+    using StatNumbers = std::vector<StatNumber>;
 
     void updateData(StatNumbers& num, int itemsDelta, int64_t bytesDelta)
     {
         auto& st = refNumbers(num, currentPhase_);
-        st.first  += itemsDelta;
-        st.second += bytesDelta;
+        st.items += itemsDelta;
+        st.bytes += bytesDelta;
     }
 
-    static const std::pair<int, int64_t>& refNumbers(const StatNumbers& num, Phase phaseId)
+    static const StatNumber& refNumbers(const StatNumbers& num, Phase phaseId)
     {
         switch (phaseId)
         {
@@ -140,14 +167,14 @@ private:
         return num[3]; //dummy entry!
     }
 
-    static std::pair<int, int64_t>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, int64_t>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
+    static StatNumber& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<StatNumber&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
 
     Phase currentPhase_ = PHASE_NONE;
     StatNumbers numbersCurrent_;
     StatNumbers numbersTotal_;
     std::wstring statusText_;
 
-    bool abortRequested = false;
+    Opt<AbortTrigger> abortRequested_;
 };
 }
 

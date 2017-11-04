@@ -106,7 +106,7 @@ std::wstring translate(const std::wstring& singular, const std::wstring& plural,
         return translation;
     }
     //fallback:
-    return replaceCpy(std::abs(n64) == 1 ? singular : plural, L"%x", toGuiString(n));
+    return replaceCpy(std::abs(n64) == 1 ? singular : plural, L"%x", formatNumber(n));
 }
 }
 

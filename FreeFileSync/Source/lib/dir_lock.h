@@ -39,7 +39,7 @@ public:
 private:
     class LockAdmin;
     class SharedDirLock;
-    std::shared_ptr<SharedDirLock> sharedLock;
+    std::shared_ptr<SharedDirLock> sharedLock_;
 };
 }
 

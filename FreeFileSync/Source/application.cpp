@@ -114,7 +114,8 @@ int Application::OnRun()
     {
         logFatalError(e.what()); //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
 
-        wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), e.what());
+        const auto title = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + SPACED_DASH + _("An exception occurred");
+        wxSafeShowMessage(title, e.what());
         return FFS_RC_EXCEPTION;
     }
     //catch (...) -> let it crash and create mini dump!!!
@@ -146,13 +147,11 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     auto notifyFatalError = [&](const std::wstring& msg, const std::wstring& title)
     {
-        auto titleTmp = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + L" - " + title;
-
-        //error handling strategy unknown and no sync log output available at this point! => show message box
-
         logFatalError(utfTo<std::string>(msg));
 
-        wxSafeShowMessage(title, msg);
+        //error handling strategy unknown and no sync log output available at this point! => show message box
+        auto titleFmt = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + SPACED_DASH + title;
+        wxSafeShowMessage(titleFmt, msg);
 
         raiseReturnCode(returnCode, FFS_RC_ABORTED);
     };
@@ -429,9 +428,11 @@ void showSyntaxHelp()
 
 void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
 {
+    const bool showPopupAllowed = !batchCfg.mainCfg.ignoreErrors && batchCfg.batchExCfg.batchErrorDialog == BatchErrorDialog::SHOW;
+
     auto notifyError = [&](const std::wstring& msg, FfsReturnCode rc)
     {
-        if (batchCfg.handleError == ON_ERROR_POPUP)
+        if (showPopupAllowed)
             showNotificationDialog(nullptr, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(msg));
         else //"exit" or "ignore"
             logFatalError(utfTo<std::string>(msg));
@@ -475,34 +476,25 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
         const std::chrono::system_clock::time_point batchStartTime = std::chrono::system_clock::now();
 
         //class handling status updates and error messages
-        BatchStatusHandler statusHandler(!batchCfg.runMinimized, //throw BatchAbortProcess, BatchRequestSwitchToMainDialog
+        BatchStatusHandler statusHandler(!batchCfg.batchExCfg.runMinimized, //throw AbortProcess, BatchRequestSwitchToMainDialog
                                          extractJobName(referenceFile),
                                          globalCfg.soundFileSyncFinished,
                                          batchStartTime,
-                                         batchCfg.logFolderPathPhrase,
-                                         batchCfg.logfilesCountLimit,
+                                         batchCfg.batchExCfg.logFolderPathPhrase,
+                                         batchCfg.batchExCfg.logfilesCountLimit,
                                          globalCfg.lastSyncsLogFileSizeMax,
-                                         batchCfg.handleError,
+                                         batchCfg.mainCfg.ignoreErrors,
+                                         batchCfg.batchExCfg.batchErrorDialog,
                                          globalCfg.automaticRetryCount,
                                          globalCfg.automaticRetryDelay,
                                          returnCode,
-                                         batchCfg.mainCfg.onCompletion,
-                                         globalCfg.gui.onCompletionHistory);
+                                         batchCfg.mainCfg.postSyncCommand,
+                                         batchCfg.mainCfg.postSyncCondition,
+                                         batchCfg.batchExCfg.postSyncAction);
 
         logNonDefaultSettings(globalCfg, statusHandler); //inform about (important) non-default global settings
 
         const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
-
-        bool allowPwPrompt = false;
-        switch (batchCfg.handleError)
-        {
-            case ON_ERROR_POPUP:
-                allowPwPrompt = true;
-                break;
-            case ON_ERROR_IGNORE:
-            case ON_ERROR_STOP:
-                break;
-        }
 
         //batch mode: place directory locks on directories during both comparison AND synchronization
         std::unique_ptr<LockHolder> dirLocks;
@@ -510,7 +502,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
         //COMPARE DIRECTORIES
         FolderComparison cmpResult = compare(globalCfg.optDialogs,
                                              globalCfg.fileTimeTolerance,
-                                             allowPwPrompt, //allowUserInteraction
+                                             showPopupAllowed, //allowUserInteraction
                                              globalCfg.runWithBackgroundPriority,
                                              globalCfg.folderAccessTimeout,
                                              globalCfg.createLockFile,
@@ -535,7 +527,7 @@ void runBatchMode(const Zstring& globalConfigFilePath, const XmlBatchConfig& bat
                     globalCfg.optDialogs,
                     statusHandler); //throw ?
     }
-    catch (BatchAbortProcess&) {} //exit used by statusHandler
+    catch (AbortProcess&) {} //exit used by statusHandler
     catch (BatchRequestSwitchToMainDialog&)
     {
         //open new toplevel window *after* progress dialog is gone => run on main event loop

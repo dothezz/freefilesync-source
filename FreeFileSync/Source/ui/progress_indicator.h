@@ -12,6 +12,7 @@
 #include <zen/zstring.h>
 #include <wx/frame.h>
 #include "../lib/status_handler.h"
+#include "../lib/process_xml.h"
 
 
 class CompareProgressDialog
@@ -21,16 +22,20 @@ public:
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
-    void init(const zen::Statistics& syncStat); //begin of sync: make visible, set pointer to "syncStat", initialize all status values
+    void init(const zen::Statistics& syncStat, bool ignoreErrors); //begin of sync: make visible, set pointer to "syncStat", initialize all status values
     void teardown(); //end of sync: hide again, clear pointer to "syncStat"
 
     void initNewPhase(); //call after "StatusHandler::initNewPhase"
 
-    void updateStatusPanelNow();
+    void updateGui();
+
+    //allow changing a few options dynamically during sync
+    bool getOptionIgnoreErrors() const;
+    void setOptionIgnoreErrors(bool ignoreError);
 
 private:
     class Impl;
-    Impl* const pimpl;
+    Impl* const pimpl_;
 };
 
 
@@ -58,7 +63,10 @@ struct SyncProgressDialog
     virtual void notifyProgressChange() = 0; //noexcept, required by graph!
     virtual void updateGui           () = 0; //update GUI and process Window messages
 
-    virtual Zstring getExecWhenFinishedCommand() const = 0; //final value (after possible user modification)
+    //allow changing a few options dynamically during sync
+    virtual bool getOptionIgnoreErrors()           const = 0;
+    virtual void setOptionIgnoreErrors(bool ignoreError) = 0;
+    virtual xmlAccess::PostSyncAction getOptionPostSyncAction() const = 0;
 
     virtual void stopTimer  () = 0; //halt all internal timers!
     virtual void resumeTimer() = 0; //
@@ -75,8 +83,8 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          bool showProgress,
                                          const wxString& jobName,
                                          const Zstring& soundFileSyncComplete,
-                                         const Zstring& onCompletion,
-                                         std::vector<Zstring>& onCompletionHistory); //changing parameter!
+                                         bool ignoreErrors,
+                                         xmlAccess::PostSyncAction postSyncAction);
 //DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after processHasFinished() or closeWindowDirectly()
 
 

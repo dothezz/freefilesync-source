@@ -1280,7 +1280,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& file, SyncOperation syn
                 //file.removeObject<sideTrg>(); -> doesn't make sense for isFollowedSymlink(); "file, sideTrg" evaluated below!
 
                 //if fail-safe file copy is active, then the next operation will be a simple "rename"
-                //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated!
+                //=> don't risk reportStatus() throwing AbortProcess() leaving the target deleted rather than updated!
                 //=> if failSafeFileCopy_ : don't run callbacks that could throw
             };
 
@@ -1434,7 +1434,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& symlink, SyncOperati
 
                 //symlink.removeObject<sideTrg>(); -> "symlink, sideTrg" evaluated below!
 
-                //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated:
+                //=> don't risk reportStatus() throwing AbortProcess() leaving the target deleted rather than updated:
                 //reportStatus(txtOverwritingLink, AFS::getDisplayPath(symlink.getAbstractPath<sideTrg>())); //restore status text
 
                 AFS::copySymlink(symlink.getAbstractPath<sideSrc>(),
@@ -2027,8 +2027,8 @@ void zen::synchronize(const std::chrono::system_clock::time_point& syncStartTime
 
         for (const auto& item : diskSpaceMissing)
             msg += L"\n\n" + AFS::getDisplayPath(item.first) + L"\n" +
-                   _("Required:")  + L" " + filesizeToShortString(item.second.first)  + L"\n" +
-                   _("Available:") + L" " + filesizeToShortString(item.second.second);
+                   _("Required:")  + L" " + formatFilesizeShort(item.second.first)  + L"\n" +
+                   _("Available:") + L" " + formatFilesizeShort(item.second.second);
 
         callback.reportWarning(msg, warnings.warnNotEnoughDiskSpace);
     }

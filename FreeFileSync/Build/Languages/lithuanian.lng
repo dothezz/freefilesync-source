@@ -1180,11 +1180,11 @@ Komanda inicijuojama jei:
 <source>Time elapsed:</source>
 <target>Praėjęs laikas:</target>
 
-<source>Bytes:</source>
-<target>Baitai:</target>
+<source>Bytes</source>
+<target>Baitai</target>
 
-<source>Items:</source>
-<target>Elementai:</target>
+<source>Items</source>
+<target>Elementai</target>
 
 <source>Synchronizing...</source>
 <target>Suvienodinama...</target>

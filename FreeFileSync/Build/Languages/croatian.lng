@@ -1180,11 +1180,11 @@ Naredba će biti pokrenuta ako se:
 <source>Time elapsed:</source>
 <target>Proteklo vremena:</target>
 
-<source>Bytes:</source>
-<target>Bajta:</target>
+<source>Bytes</source>
+<target>Bajta</target>
 
-<source>Items:</source>
-<target>Stavke:</target>
+<source>Items</source>
+<target>Stavke</target>
 
 <source>Synchronizing...</source>
 <target>Sinkroniziranje...</target>

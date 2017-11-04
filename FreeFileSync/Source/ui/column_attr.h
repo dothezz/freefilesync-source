@@ -9,6 +9,7 @@
 
 #include <vector>
 
+
 namespace zen
 {
 enum class ColumnTypeRim
@@ -35,10 +36,10 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     return //harmonize with main_dlg.cpp::onGridLabelContextRim() => expects stretched ITEM_PATH and non-stretched other columns!
     {
-        { ColumnTypeRim::ITEM_PATH, -80, 1, true  }, //stretch to full width and substract sum of fixed-size widths!
-        { ColumnTypeRim::EXTENSION,  60, 0, false },
-        { ColumnTypeRim::DATE,      140, 0, false },
-        { ColumnTypeRim::SIZE,       80, 0, true  },
+        { ColumnTypeRim::ITEM_PATH, -100, 1, true  },
+        { ColumnTypeRim::EXTENSION,   60, 0, false },
+        { ColumnTypeRim::DATE,       140, 0, false },
+        { ColumnTypeRim::SIZE,       100, 0, true  },
     };
 }
 

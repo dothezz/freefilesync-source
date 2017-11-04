@@ -16,6 +16,7 @@
 #include <zen/file_io.h>
 #include <zen/optional.h>
 #include <wx/log.h>
+#include <wx/app.h>
 
     #include <fcntl.h>    //open()
     #include <sys/stat.h> //
@@ -45,7 +46,7 @@ public:
 
     void operator()() const //throw ThreadInterruption
     {
-        setCurrentThreadName("Folder Lock Life Signs");
+        setCurrentThreadName("DirLock: Life Signs");
 
         try
         {
@@ -59,7 +60,8 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), utfTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
+            const auto title = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + SPACED_DASH + _("An exception occurred");
+            wxSafeShowMessage(title, utfTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -325,7 +327,7 @@ void waitOnDirLock(const Zstring& lockFilePath, DirLockCallback* callback) //thr
                     if (now >= lastLifeSign + seconds(EMIT_LIFE_SIGN_INTERVAL + 1))
                     {
                         const int remainingSeconds = std::max<int>(0, DETECT_ABANDONED_INTERVAL - duration_cast<seconds>(steady_clock::now() - lastLifeSign).count());
-                        const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", toGuiString(remainingSeconds));
+                        const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", formatNumber(remainingSeconds));
                         callback->reportStatus(infoMsg + L" | " + _("Detecting abandoned lock...") + L' ' + remSecMsg);
                     }
                     else
@@ -392,13 +394,13 @@ public:
         while (!::tryLock(lockFilePath))             //throw FileError
             ::waitOnDirLock(lockFilePath, callback); //
 
-        lifeSignthread = InterruptibleThread(LifeSigns(lockFilePath));
+        lifeSignthread_ = InterruptibleThread(LifeSigns(lockFilePath));
     }
 
     ~SharedDirLock()
     {
-        lifeSignthread.interrupt(); //thread lifetime is subset of this instances's life
-        lifeSignthread.join();
+        lifeSignthread_.interrupt(); //thread lifetime is subset of this instances's life
+        lifeSignthread_.join();
 
         ::releaseLock(lockFilePath_); //throw ()
     }
@@ -408,7 +410,7 @@ private:
     SharedDirLock& operator=(const DirLock&) = delete;
 
     const Zstring lockFilePath_;
-    InterruptibleThread lifeSignthread;
+    InterruptibleThread lifeSignthread_;
 };
 
 
@@ -429,8 +431,8 @@ public:
         tidyUp();
 
         //optimization: check if we already own a lock for this path
-        auto iterGuid = fileToGuid.find(lockFilePath);
-        if (iterGuid != fileToGuid.end())
+        auto iterGuid = fileToGuid_.find(lockFilePath);
+        if (iterGuid != fileToGuid_.end())
             if (const std::shared_ptr<SharedDirLock>& activeLock = getActiveLock(iterGuid->second)) //returns null-lock if not found
                 return activeLock; //SharedDirLock is still active -> enlarge circle of shared ownership
 
@@ -439,7 +441,7 @@ public:
             const std::string lockId = retrieveLockId(lockFilePath); //throw FileError
             if (const std::shared_ptr<SharedDirLock>& activeLock = getActiveLock(lockId)) //returns null-lock if not found
             {
-                fileToGuid[lockFilePath] = lockId; //found an alias for one of our active locks
+                fileToGuid_[lockFilePath] = lockId; //found an alias for one of our active locks
                 return activeLock;
             }
         }
@@ -450,8 +452,8 @@ public:
         const std::string& newLockGuid = retrieveLockId(lockFilePath); //throw FileError
 
         //update registry
-        fileToGuid[lockFilePath] = newLockGuid; //throw()
-        guidToLock[newLockGuid]  = newLock;     //
+        fileToGuid_[lockFilePath] = newLockGuid; //throw()
+        guidToLock_[newLockGuid]  = newLock;     //
 
         return newLock;
     }
@@ -467,18 +469,18 @@ private:
 
     std::shared_ptr<SharedDirLock> getActiveLock(const UniqueId& lockId) //returns null if none found
     {
-        auto it = guidToLock.find(lockId);
-        return it != guidToLock.end() ? it->second.lock() : nullptr; //try to get shared_ptr; throw()
+        auto it = guidToLock_.find(lockId);
+        return it != guidToLock_.end() ? it->second.lock() : nullptr; //try to get shared_ptr; throw()
     }
 
     void tidyUp() //remove obsolete entries
     {
-        erase_if(guidToLock, [ ](const GuidToLockMap::value_type& v) { return !v.second.lock(); });
-        erase_if(fileToGuid, [&](const FileToGuidMap::value_type& v) { return guidToLock.find(v.second) == guidToLock.end(); });
+        erase_if(guidToLock_, [ ](const GuidToLockMap::value_type& v) { return !v.second.lock(); });
+        erase_if(fileToGuid_, [&](const FileToGuidMap::value_type& v) { return guidToLock_.find(v.second) == guidToLock_.end(); });
     }
 
-    FileToGuidMap fileToGuid; //lockname |-> GUID; locks can be referenced by a lockFilePath or alternatively a GUID
-    GuidToLockMap guidToLock; //GUID |-> "shared lock ownership"
+    FileToGuidMap fileToGuid_; //lockname |-> GUID; locks can be referenced by a lockFilePath or alternatively a GUID
+    GuidToLockMap guidToLock_; //GUID |-> "shared lock ownership"
 };
 
 
@@ -488,5 +490,5 @@ DirLock::DirLock(const Zstring& lockFilePath, DirLockCallback* callback) //throw
         callback->reportStatus(replaceCpy(_("Creating file %x"), L"%x", fmtPath(lockFilePath)));
 
 
-    sharedLock = LockAdmin::instance().retrieve(lockFilePath, callback); //throw FileError
+    sharedLock_ = LockAdmin::instance().retrieve(lockFilePath, callback); //throw FileError
 }

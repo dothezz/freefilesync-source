@@ -330,17 +330,17 @@ struct IconBuffer::Impl
 };
 
 
-IconBuffer::IconBuffer(IconSize sz) : pimpl(std::make_unique<Impl>()), iconSizeType(sz)
+IconBuffer::IconBuffer(IconSize sz) : pimpl_(std::make_unique<Impl>()), iconSizeType(sz)
 {
-    pimpl->worker = InterruptibleThread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
+    pimpl_->worker = InterruptibleThread(WorkerThread(pimpl_->workload, pimpl_->buffer, sz));
 }
 
 
 IconBuffer::~IconBuffer()
 {
     setWorkload({}); //make sure interruption point is always reached! //needed???
-    pimpl->worker.interrupt();
-    pimpl->worker.join();
+    pimpl_->worker.interrupt();
+    pimpl_->worker.join();
 }
 
 
@@ -363,18 +363,18 @@ int IconBuffer::getSize(IconSize sz)
 
 bool IconBuffer::readyForRetrieval(const AbstractPath& filePath)
 {
-    return pimpl->buffer->hasIcon(filePath);
+    return pimpl_->buffer->hasIcon(filePath);
 }
 
 
 Opt<wxBitmap> IconBuffer::retrieveFileIcon(const AbstractPath& filePath)
 {
-    if (Opt<wxBitmap> ico = pimpl->buffer->retrieve(filePath))
+    if (Opt<wxBitmap> ico = pimpl_->buffer->retrieve(filePath))
         return ico;
 
     //since this icon seems important right now, we don't want to wait until next setWorkload() to start retrieving
-    pimpl->workload->addToWorkload(filePath);
-    pimpl->buffer->limitSize();
+    pimpl_->workload->addToWorkload(filePath);
+    pimpl_->buffer->limitSize();
     return NoValue();
 }
 
@@ -383,8 +383,8 @@ void IconBuffer::setWorkload(const std::vector<AbstractPath>& load)
 {
     assert(load.size() < BUFFER_SIZE_MAX / 2);
 
-    pimpl->workload->setWorkload(load); //since buffer can only increase due to new workload,
-    pimpl->buffer->limitSize();         //this is the place to impose the limit from main thread!
+    pimpl_->workload->setWorkload(load); //since buffer can only increase due to new workload,
+    pimpl_->buffer->limitSize();         //this is the place to impose the limit from main thread!
 }
 
 
@@ -394,13 +394,13 @@ wxBitmap IconBuffer::getIconByExtension(const Zstring& filePath)
 
     assert(std::this_thread::get_id() == mainThreadId);
 
-    auto it = pimpl->extensionIcons.find(ext);
-    if (it == pimpl->extensionIcons.end())
+    auto it = pimpl_->extensionIcons.find(ext);
+    if (it == pimpl_->extensionIcons.end())
     {
         const Zstring& templateName(ext.empty() ? Zstr("file") : Zstr("file.") + ext);
         //don't pass actual file name to getIconByTemplatePath(), e.g. "AUTHORS" has own mime type on Linux!!!
         //=> we want to buffer by extension only to minimize buffer-misses!
-        it = pimpl->extensionIcons.emplace(ext, extractWxBitmap(getIconByTemplatePath(templateName, IconBuffer::getSize(iconSizeType)))).first;
+        it = pimpl_->extensionIcons.emplace(ext, extractWxBitmap(getIconByTemplatePath(templateName, IconBuffer::getSize(iconSizeType)))).first;
     }
     //need buffer size limit???
     return it->second;

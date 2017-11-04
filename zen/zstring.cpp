@@ -74,9 +74,12 @@ int cmpStringNaturalLinux(const char* lhs, size_t lhsLen, const char* rhs, size_
         - compare strings after conceptually creating blocks of whitespace/numbers/text
         - implement strict weak ordering!
         - don't follow broken "strnatcasecmp": https://github.com/php/php-src/blob/master/ext/standard/strnatcmp.c
-                1. incorrect non-ASCII CI-comparison 2. incorrect bounds checks
-                3. incorrect trimming of *all* whitespace 4. arbitrary handling of leading 0 only at string begin
-                5. incorrect handling of whitespace following a number 6. code is a mess
+                1. incorrect non-ASCII CI-comparison
+				2. incorrect bounds checks
+                3. incorrect trimming of *all* whitespace
+				4. arbitrary handling of leading 0 only at string begin
+                5. incorrect handling of whitespace following a number
+				6. code is a mess
     */
     for (;;)
     {

@@ -49,12 +49,12 @@ public:
 
     //subset of std::vector<> interface:
     using const_iterator = std::vector<LogEntry>::const_iterator;
-    const_iterator begin() const { return entries.begin(); }
-    const_iterator end  () const { return entries.end  (); }
-    bool empty() const { return entries.empty(); }
+    const_iterator begin() const { return entries_.begin(); }
+    const_iterator end  () const { return entries_.end  (); }
+    bool empty() const { return entries_.empty(); }
 
 private:
-    std::vector<LogEntry> entries; //list of non-resolved errors and warnings
+    std::vector<LogEntry> entries_; //list of non-resolved errors and warnings
 };
 
 
@@ -70,14 +70,14 @@ template <class String> inline
 void ErrorLog::logMsg(const String& text, zen::MessageType type)
 {
     const LogEntry newEntry = { std::time(nullptr), type, copyStringTo<MsgString>(text) };
-    entries.push_back(newEntry);
+    entries_.push_back(newEntry);
 }
 
 
 inline
 int ErrorLog::getItemCount(int typeFilter) const
 {
-    return static_cast<int>(std::count_if(entries.begin(), entries.end(), [&](const LogEntry& e) { return e.type & typeFilter; }));
+    return static_cast<int>(std::count_if(entries_.begin(), entries_.end(), [&](const LogEntry& e) { return e.type & typeFilter; }));
 }
 
 
@@ -103,7 +103,7 @@ String formatMessageImpl(const LogEntry& entry) //internal linkage
         return std::wstring();
     };
 
-    String formattedText = L"[" + formatTime<String>(FORMAT_TIME, getLocalTime(entry.time)) + L"] " + copyStringTo<String>(getTypeName()) + L": ";
+    String formattedText = L"[" + formatTime<String>(FORMAT_TIME, getLocalTime(entry.time)) + L"]  " + copyStringTo<String>(getTypeName()) + L":  ";
     const size_t prefixLen = formattedText.size();
 
     for (auto it = entry.message.begin(); it != entry.message.end(); )

@@ -27,17 +27,19 @@ enum XmlType
 XmlType getXmlType(const Zstring& filepath); //throw FileError
 
 
-enum OnError
+enum class BatchErrorDialog
 {
-    ON_ERROR_IGNORE,
-    ON_ERROR_POPUP,
-    ON_ERROR_STOP
+    SHOW,
+    CANCEL
 };
 
-enum OnGuiError
+
+enum class PostSyncAction
 {
-    ON_GUIERROR_POPUP,
-    ON_GUIERROR_IGNORE
+    SUMMARY,
+    EXIT,
+    SLEEP,
+    SHUTDOWN
 };
 
 using Description = std::wstring;
@@ -49,7 +51,6 @@ struct XmlGuiConfig
 {
     zen::MainConfiguration mainCfg;
 
-    OnGuiError handleError = ON_GUIERROR_POPUP; //reaction on error situation during synchronization
     bool highlightSyncAction = true;
 };
 
@@ -57,20 +58,25 @@ struct XmlGuiConfig
 inline
 bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 {
-    return lhs.mainCfg             == rhs.mainCfg           &&
-           lhs.handleError         == rhs.handleError       &&
+    return lhs.mainCfg             == rhs.mainCfg &&
            lhs.highlightSyncAction == rhs.highlightSyncAction;
 }
+
+
+struct BatchExclusiveConfig
+{
+    BatchErrorDialog batchErrorDialog = BatchErrorDialog::SHOW;
+    bool runMinimized = false;
+    PostSyncAction postSyncAction = PostSyncAction::SUMMARY;
+    Zstring logFolderPathPhrase;
+    int logfilesCountLimit = -1; //max logfiles; 0 := don't save logfiles; < 0 := no limit
+};
 
 
 struct XmlBatchConfig
 {
     zen::MainConfiguration mainCfg;
-
-    bool runMinimized = false;
-    Zstring logFolderPathPhrase;
-    int logfilesCountLimit = -1; //max logfiles; 0 := don't save logfiles; < 0 := no limit
-    OnError handleError = ON_ERROR_POPUP; //reaction on error situation during synchronization
+    BatchExclusiveConfig batchExCfg;
 };
 
 
@@ -177,7 +183,6 @@ struct XmlGlobalSettings
                 size_t  historySizeMax = 15;
             } copyToCfg;
 
-            bool manualDeletionUseRecycler = true;
             bool textSearchRespectCase = false; //good default for Linux, too!
             int maxFolderPairsVisible = 6;
 
@@ -214,8 +219,8 @@ struct XmlGlobalSettings
         std::vector<Zstring> folderHistoryRight;
         size_t folderHistMax = 15;
 
-        std::vector<Zstring> onCompletionHistory;
-        size_t onCompletionHistoryMax = 8;
+        std::vector<Zstring> commandHistory;
+        size_t commandHistoryMax = 8;
 
         ExternalApps externelApplications
         {
@@ -245,7 +250,7 @@ void readAnyConfig(const std::vector<Zstring>& filepaths, XmlGuiConfig& config, 
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg); //noexcept
-XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg, const XmlBatchConfig* referenceBatchCfg); //
+XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg, const BatchExclusiveConfig& batchExCfg); //
 
 std::wstring extractJobName(const Zstring& configFilename);
 }

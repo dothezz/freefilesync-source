@@ -24,10 +24,10 @@ struct ReturnBatchConfig
 
 
 //show and let user customize batch settings (without saving)
-ReturnBatchConfig::ButtonPressed customizeBatchConfig(wxWindow* parent,
-                                                      xmlAccess::XmlBatchConfig& batchCfg, //in/out
-                                                      std::vector<Zstring>& onCompletionHistory,
-                                                      size_t onCompletionHistoryMax);
+ReturnBatchConfig::ButtonPressed showBatchConfigDialog(wxWindow* parent,
+
+                                                       xmlAccess::BatchExclusiveConfig& batchExCfg,
+                                                       bool& ignoreErrors);
 }
 
 #endif //BATCH_CONFIG_H_3921674832168945

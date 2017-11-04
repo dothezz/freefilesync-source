@@ -11,8 +11,8 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+class CommandBox;
 class FolderHistoryBox;
-class OnCompletionBox;
 class ToggleButton;
 namespace zen { class BitmapTextButton; }
 namespace zen { class Graph2D; }
@@ -387,13 +387,12 @@ protected:
     wxStaticText* m_staticTextNamingCvtPart3;
     wxStaticLine* m_staticline582;
     wxBoxSizer* bSizerMiscConfig;
-    wxStaticText* m_staticText88;
-    wxRadioButton* m_radioBtnPopupOnErrors;
-    wxRadioButton* m_radioBtnIgnoreErrors;
+    wxStaticBitmap* m_bitmapIgnoreErrors;
+    wxCheckBox* m_checkBoxIgnoreErrors;
     wxStaticLine* m_staticline57;
     wxBoxSizer* bSizerOnCompletion;
     wxStaticText* m_staticText89;
-    OnCompletionBox* m_comboBoxOnCompletion;
+    CommandBox* m_comboBoxPostSyncCommand;
     wxBoxSizer* bSizerStdButtons;
     wxButton* m_buttonOkay;
     wxButton* m_buttonCancel;
@@ -438,14 +437,14 @@ protected:
     virtual void OnDeletionVersioning( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnHelpVersioning( wxHyperlinkEvent& event ) { event.Skip(); }
     virtual void OnChangeSyncOption( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleIgnoreErrors( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 
 
 public:
     wxBitmapButton* m_bpButtonSelectAltFolder;
+    wxChoice* m_choicePostSyncCondition;
 
     ConfigDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("dummy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxRESIZE_BORDER );
     ~ConfigDlgGenerated();
@@ -501,9 +500,6 @@ protected:
     wxTextCtrl* m_textCtrlServer;
     wxStaticText* m_staticText1233;
     wxTextCtrl* m_textCtrlPort;
-    wxStaticText* m_staticText1381;
-    wxStaticText* m_staticText1382;
-    wxStaticText* m_staticText138;
     wxStaticLine* m_staticline58;
     wxBoxSizer* bSizerAuth;
     wxBoxSizer* bSizerFtpEncrypt;
@@ -686,10 +682,17 @@ protected:
     wxStaticText* m_staticTextTimeRemaining;
     wxStaticText* m_staticTextTimeElapsed;
     wxStaticText* m_staticTextStatus;
-    wxPanel* m_panelProgressLabel;
+    wxBoxSizer* bSizerProgressGraph;
+    zen::Graph2D* m_panelProgressGraph;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnToggleIgnoreErrors( wxCommandEvent& event ) { event.Skip(); }
+
 
 public:
-    zen::Graph2D* m_panelGraphProgress;
+    wxBoxSizer* bSizerProgressFooter;
+    wxStaticBitmap* m_bitmapIgnoreErrors;
+    wxCheckBox* m_checkBoxIgnoreErrors;
 
     CompareProgressDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxRAISED_BORDER );
     ~CompareProgressDlgGenerated();
@@ -705,7 +708,7 @@ private:
 
 protected:
     wxBoxSizer* bSizer42;
-    wxStaticText* m_staticText87;
+    wxStaticText* m_staticText137;
 
 public:
     wxBoxSizer* bSizerRoot;
@@ -728,11 +731,13 @@ public:
     wxStaticBitmap* m_bitmapGraphKeyBytes;
     wxStaticBitmap* m_bitmapGraphKeyItems;
     zen::Graph2D* m_panelGraphItems;
+    wxBoxSizer* bSizerProgressFooter;
+    wxStaticBitmap* m_bitmapIgnoreErrors;
+    wxCheckBox* m_checkBoxIgnoreErrors;
+    wxChoice* m_choicePostSyncAction;
     wxNotebook* m_notebookResult;
     wxStaticLine* m_staticlineFooter;
     wxBoxSizer* bSizerStdButtons;
-    wxBoxSizer* bSizerOnCompletion;
-    OnCompletionBox* m_comboBoxOnCompletion;
     wxButton* m_buttonClose;
     wxButton* m_buttonPause;
     wxButton* m_buttonStop;
@@ -781,20 +786,23 @@ protected:
     wxStaticText* m_staticTextDescr;
     wxStaticLine* m_staticline18;
     wxPanel* m_panel35;
-    wxStaticText* m_staticText82;
-    wxRadioButton* m_radioBtnPopupOnErrors;
-    wxRadioButton* m_radioBtnIgnoreErrors;
-    wxRadioButton* m_radioBtnStopOnError;
-    wxStaticLine* m_staticline26;
+    wxStaticBitmap* m_bitmapMinimizeToTray;
     wxCheckBox* m_checkBoxRunMinimized;
-    wxStaticText* m_staticText81;
-    OnCompletionBox* m_comboBoxOnCompletion;
+    wxStaticLine* m_staticline26;
+    wxStaticBitmap* m_bitmapIgnoreErrors;
+    wxCheckBox* m_checkBoxIgnoreErrors;
+    wxRadioButton* m_radioBtnErrorDialogShow;
+    wxRadioButton* m_radioBtnErrorDialogCancel;
+    wxStaticLine* m_staticline261;
+    wxStaticText* m_staticText137;
+    wxStaticLine* m_staticline262;
     wxStaticLine* m_staticline25;
-    wxCheckBox* m_checkBoxGenerateLogfile;
-    wxPanel* m_panelLogfile;
-    wxButton* m_buttonSelectLogFolder;
+    wxStaticBitmap* m_bitmapLogFile;
+    wxCheckBox* m_checkBoxSaveLog;
     wxCheckBox* m_checkBoxLogfilesLimit;
     wxSpinCtrl* m_spinCtrlLogfileLimit;
+    wxPanel* m_panelLogfile;
+    wxButton* m_buttonSelectLogFolder;
     wxHyperlinkCtrl* m_hyperlink17;
     wxStaticLine* m_staticline13;
     wxBoxSizer* bSizerStdButtons;
@@ -803,9 +811,10 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnErrorStop( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleRunMinimized( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleIgnoreErrors( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnErrorDialogShow( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnErrorDialogCancel( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleGenerateLogfile( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleLogfilesLimit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnHelpScheduleBatch( wxHyperlinkEvent& event ) { event.Skip(); }
@@ -814,6 +823,7 @@ protected:
 
 
 public:
+    wxChoice* m_choicePostSyncAction;
     FolderHistoryBox* m_logFolderPath;
     wxBitmapButton* m_bpButtonSelectAltLogFolder;
 

@@ -20,6 +20,7 @@
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
+#include "../version/version.h"
 
     #include <gtk/gtk.h>
 
@@ -158,8 +159,7 @@ void MainDialog::OnShowHelp(wxCommandEvent& event)
 
 void MainDialog::OnMenuAbout(wxCommandEvent& event)
 {
-    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime());
-    build += L" - Unicode";
+    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime()) + SPACED_DASH + L"Unicode";
 #ifndef wxUSE_UNICODE
 #error what is going on?
 #endif
@@ -271,7 +271,7 @@ void MainDialog::setLastUsedConfig(const Zstring& filepath)
     //set title
     if (filepath == lastRunConfigPath_)
     {
-        SetTitle(L"RealTimeSync - " + _("Automated Synchronization"));
+        SetTitle(wxString(L"RealTimeSync ") + zen::ffsVersion + SPACED_DASH + _("Automated Synchronization"));
         currentConfigFileName_.clear();
     }
     else

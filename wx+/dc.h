@@ -31,10 +31,13 @@ class BufferedPaintDC
 */
 
 
-
-
-
-
+inline
+void clearArea(wxDC& dc, const wxRect& rect, const wxColor& col)
+{
+    wxDCPenChanger   dummy (dc, col);
+    wxDCBrushChanger dummy2(dc, col);
+    dc.DrawRectangle(rect);
+}
 
 
 
@@ -49,10 +52,10 @@ public:
         auto it = refDcToAreaMap().find(&dc);
         if (it != refDcToAreaMap().end())
         {
-            oldRect = it->second;
+            oldRect_ = it->second;
 
             wxRect tmp = r;
-            tmp.Intersect(*oldRect);    //better safe than sorry
+            tmp.Intersect(*oldRect_);    //better safe than sorry
             dc_.SetClippingRegion(tmp); //
             it->second = tmp;
         }
@@ -66,10 +69,10 @@ public:
     ~RecursiveDcClipper()
     {
         dc_.DestroyClippingRegion();
-        if (oldRect)
+        if (oldRect_)
         {
-            dc_.SetClippingRegion(*oldRect);
-            refDcToAreaMap()[&dc_] = *oldRect;
+            dc_.SetClippingRegion(*oldRect_);
+            refDcToAreaMap()[&dc_] = *oldRect_;
         }
         else
             refDcToAreaMap().erase(&dc_);
@@ -79,7 +82,7 @@ private:
     //associate "active" clipping area with each DC
     static std::unordered_map<wxDC*, wxRect>& refDcToAreaMap() { static std::unordered_map<wxDC*, wxRect> clippingAreas; return clippingAreas; }
 
-    Opt<wxRect> oldRect;
+    Opt<wxRect> oldRect_;
     wxDC& dc_;
 };
 
@@ -95,7 +98,7 @@ struct BufferedPaintDC : public wxPaintDC { BufferedPaintDC(wxWindow& wnd, Opt<w
 class BufferedPaintDC : public wxMemoryDC
 {
 public:
-    BufferedPaintDC(wxWindow& wnd, Opt<wxBitmap>& buffer) : buffer_(buffer), paintDc(&wnd)
+    BufferedPaintDC(wxWindow& wnd, Opt<wxBitmap>& buffer) : buffer_(buffer), paintDc_(&wnd)
     {
         const wxSize clientSize = wnd.GetClientSize();
         if (clientSize.GetWidth() > 0 && clientSize.GetHeight() > 0) //wxBitmap asserts this!! width may be 0; test case "Grid::CornerWin": compare both sides, then change config
@@ -105,7 +108,7 @@ public:
 
             SelectObject(*buffer);
 
-            if (paintDc.IsOk() && paintDc.GetLayoutDirection() == wxLayout_RightToLeft)
+            if (paintDc_.IsOk() && paintDc_.GetLayoutDirection() == wxLayout_RightToLeft)
                 SetLayoutDirection(wxLayout_RightToLeft);
         }
         else
@@ -118,18 +121,18 @@ public:
         {
             if (GetLayoutDirection() == wxLayout_RightToLeft)
             {
-                paintDc.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
+                paintDc_.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
                 SetLayoutDirection(wxLayout_LeftToRight);         //
             }
 
             const wxPoint origin = GetDeviceOrigin();
-            paintDc.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
+            paintDc_.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
         }
     }
 
 private:
     Opt<wxBitmap>& buffer_;
-    wxPaintDC paintDc;
+    wxPaintDC paintDc_;
 };
 #endif
 }

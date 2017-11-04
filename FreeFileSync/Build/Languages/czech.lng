@@ -1180,11 +1180,11 @@ Příkaz je spuštěn když:
 <source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
 
-<source>Bytes:</source>
-<target>Bajtů:</target>
+<source>Bytes</source>
+<target>Bajtů</target>
 
-<source>Items:</source>
-<target>Položek:</target>
+<source>Items</source>
+<target>Položek</target>
 
 <source>Synchronizing...</source>
 <target>Synchronizuji...</target>

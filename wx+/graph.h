@@ -27,8 +27,8 @@ Example:
                                 setLabelX(Graph2D::LABEL_X_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
                                 setLabelY(Graph2D::LABEL_Y_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
     //set graph data
-    std::shared_ptr<CurveData> curveDataBytes = ...
-    m_panelGraph->setCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
+    std::shared_ptr<CurveData> curveDataBytes_ = ...
+    m_panelGraph->setCurve(curveDataBytes_, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
 */
 
 struct CurvePoint
@@ -78,7 +78,7 @@ struct ArrayCurveData : public SparseCurveData
     virtual size_t getSize ()           const = 0;
 
 private:
-    std::pair<double, double> getRangeX() const override { const size_t sz = getSize(); return std::make_pair(0.0, sz == 0 ? 0.0 : sz - 1.0); }
+	std::pair<double, double> getRangeX() const override { const size_t sz = getSize(); return { 0.0, sz == 0 ? 0.0 : sz - 1.0}; }
 
     Opt<CurvePoint> getLessEq(double x) const override
     {
@@ -295,17 +295,17 @@ public:
         wxColor backgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
         SelMode mouseSelMode = SELECT_RECTANGLE;
     };
-    void setAttributes(const MainAttributes& newAttr) { attr = newAttr; Refresh(); }
-    MainAttributes getAttributes() const { return attr; }
+    void setAttributes(const MainAttributes& newAttr) { attr_ = newAttr; Refresh(); }
+    MainAttributes getAttributes() const { return attr_; }
 
-    std::vector<SelectionBlock> getSelections() const { return oldSel; }
+    std::vector<SelectionBlock> getSelections() const { return oldSel_; }
     void setSelections(const std::vector<SelectionBlock>& sel)
     {
-        oldSel = sel;
-        activeSel.reset();
+        oldSel_ = sel;
+        activeSel_.reset();
         Refresh();
     }
-    void clearSelection() { oldSel.clear(); Refresh(); }
+    void clearSelection() { oldSel_.clear(); Refresh(); }
 
 private:
     void OnMouseLeftDown(wxMouseEvent& event);
@@ -336,18 +336,18 @@ private:
         wxPoint posDragCurrent;
         SelectionBlock selBlock;
     };
-    std::vector<SelectionBlock>     oldSel; //applied selections
-    std::shared_ptr<MouseSelection> activeSel; //set during mouse selection
+    std::vector<SelectionBlock>     oldSel_; //applied selections
+    std::shared_ptr<MouseSelection> activeSel_; //set during mouse selection
 
-    MainAttributes attr; //global attributes
+    MainAttributes attr_; //global attributes
 
-    Opt<wxBitmap> doubleBuffer;
+    Opt<wxBitmap> doubleBuffer_;
 
     using CurveList = std::vector<std::pair<std::shared_ptr<CurveData>, CurveAttributes>>;
     CurveList curves_;
 
     //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
-    const wxFont labelFont { wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial" };
+    const wxFont labelFont_ { wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial" };
 };
 }
 

@@ -16,12 +16,11 @@
 #include "../lib/return_codes.h"
 
 
-//Exception classes used to abort the "compare" and "sync" process
-class BatchAbortProcess {};
 class BatchRequestSwitchToMainDialog {};
 
+
 //BatchStatusHandler(SyncProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
-class BatchStatusHandler : public zen::StatusHandler //throw BatchAbortProcess, BatchRequestSwitchToMainDialog
+class BatchStatusHandler : public zen::StatusHandler //throw AbortProcess, BatchRequestSwitchToMainDialog
 {
 public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
@@ -31,12 +30,14 @@ public:
                        const Zstring& logFolderPathPhrase,
                        int logfilesCountLimit, //0: logging inactive; < 0: no limit
                        size_t lastSyncsLogFileSizeMax,
-                       const xmlAccess::OnError handleError,
+                       bool ignoreErrors,
+                       xmlAccess::BatchErrorDialog batchErrorDialog,
                        size_t automaticRetryCount,
                        size_t automaticRetryDelay,
                        zen::FfsReturnCode& returnCode,
-                       const Zstring& onCompletion,
-                       std::vector<Zstring>& onCompletionHistory);
+                       const Zstring& postSyncCommand,
+                       zen::PostSyncCondition postSyncCondition,
+                       xmlAccess::PostSyncAction postSyncAction);
     ~BatchStatusHandler();
 
     void initNewPhase       (int itemsTotal, int64_t bytesTotal, Phase phaseID) override;
@@ -48,16 +49,13 @@ public:
     Response reportError     (const std::wstring& errorMessage, size_t retryNumber   ) override;
     void     reportFatalError(const std::wstring& errorMessage                       ) override;
 
-    void abortProcessNow() override final; //throw BatchAbortProcess
-
 private:
     void onProgressDialogTerminate();
 
-    bool showFinalResults_;
     bool switchToGuiRequested_ = false;
     const int logfilesCountLimit_;
     const size_t lastSyncsLogFileSizeMax_;
-    xmlAccess::OnError handleError_;
+    const xmlAccess::BatchErrorDialog batchErrorDialog_;
     zen::ErrorLog errorLog_; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;
 
@@ -71,6 +69,8 @@ private:
     const time_t startTime_ = std::time(nullptr); //don't use wxStopWatch: may overflow after a few days due to ::QueryPerformanceCounter()
 
     const Zstring logFolderPathPhrase_;
+    const Zstring postSyncCommand_;
+    const zen::PostSyncCondition postSyncCondition_;
 };
 
 #endif //BATCH_STATUS_HANDLER_H_857390451451234566

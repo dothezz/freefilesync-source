@@ -18,12 +18,12 @@
 		When comparing two folders, FreeFileSync analyses the <b>paths relative to the left and right base folders</b> of the contained files.
 		If the relative path matches, FreeFileSync decides how the file pair is categorized by considering the selected comparison variant:
 	</p>
-	
+
 	<b>I. Compare by <i>File time and size</i></b>
 	<p>
 		This variant considers two files equal when both <b>modification time and file size</b> match.
 		It should be selected when synchronizing files with a backup location.
-		Whenever a file is changed, its file modification time is also updated. 
+		Whenever a file is changed, its file modification time is also updated.
 		Therefore, a comparison by <i>File Time and size</i> will detect all files that should be synchronized.
 		The following categories are distinguished:
 	</p>
@@ -33,7 +33,7 @@
 				<li>left only
 				<li>right only
 			</ul>
-		
+
 		<li><b>file exists on both sides</b>
 			<ol style="list-style: lower-roman">
 				<li><b>different date</b>
@@ -49,14 +49,14 @@
 			</ol>
 	</ol>
 	<br>
-	
+
 	<b>II. Compare by <i>File content</i></b>
 	<p>
 		Two files are marked as equal if they have <b>identical content</b>.
 		This variant should be selected when doing consistency checks to see if the files on both sides are bit-wise identical.
 		Naturally, it is the slowest of all comparison variants, so its usefulness for the purpose of synchronization is limited.
 		If used for synchronization, it can serve as a fallback when modification times are not reliable. For example
-		certain mobile phones and legacy FTP servers do not preserve modification times, so the only way to detect different files when the 
+		certain mobile phones and legacy FTP servers do not preserve modification times, so the only way to detect different files when the
 		file sizes are the same is by reading their content.
 	</p>
 	<ol style="list-style: upper-roman">
@@ -65,7 +65,7 @@
 				<li>left only
 				<li>right only
 			</ul>
-			
+
 		<li><b>file exists on both sides</b>
 			<ul>
 				<li>equal
@@ -86,7 +86,7 @@
 				<li>left only
 				<li>right only
 			</ul>
-			
+
 		<li><b>file exists on both sides</b>
 			<ul>
 				<li>equal
@@ -97,7 +97,7 @@
 
 	<h2>Symbolic Link Handling</h2>
 	<p>
-		FreeFileSync lets you choose to include symbolic links (also called symlinks or soft links) 
+		FreeFileSync lets you choose to include symbolic links (also called symlinks or soft links)
 		when scanning directories rather than skipping over them. When included, you can select between two ways to handle them:
 	</p>
 
@@ -105,8 +105,8 @@
 		<li><b>Follow:</b>
 		Treat symbolic links like the object they are pointing to. Links
 		pointing to directories are traversed like ordinary directories and
-		the target of each link is copied during synchronization.<br>&nbsp;	
-		
+		the target of each link is copied during synchronization.<br>&nbsp;
+
 		<li><b>Direct:</b>
 		Evaluate the symbolic link object
 		directly. Symbolic links will be shown as separate entities.
@@ -118,9 +118,9 @@
 	<div class="bluebox">
 		<b>Note</b>
 		<ul style="margin: 0">
-			<li>Under Windows the symbolic link options apply to symbolic links, volume mount points and NTFS junction points.				
+			<li>Under Windows the symbolic link options apply to symbolic links, volume mount points and NTFS junction points.
 			<li>Copying symbolic links requires FreeFileSync to be started with administrator rights.
-		</ul>		
+		</ul>
 	</div>
 
 </body>

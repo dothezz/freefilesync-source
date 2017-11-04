@@ -4,82 +4,66 @@
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
-#include "on_completion_box.h"
+#include "command_box.h"
 #include <deque>
 #include <zen/i18n.h>
 #include <algorithm>
 #include <zen/stl_tools.h>
 #include <zen/utf.h>
-//#ifdef ZEN_WIN
-//    #include <zen/win_ver.h>
-//#endif
 
 using namespace zen;
 
 
 namespace
 {
-std::wstring getCmdTxtCloseProgressDlg() { return L"Close progress dialog"; } //special command //mark for extraction: _("Close progress dialog")
-
-std::wstring getSeparationLine() { return L"---------------------------------------------------------------------------------------------------------------"; }
+inline
+std::wstring getSeparationLine() { return std::wstring(50, EM_DASH); } //no space between dashes!
 
 
 std::vector<std::pair<std::wstring, Zstring>> getDefaultCommands() //(gui name/command) pairs
 {
-    std::vector<std::pair<std::wstring, Zstring>> output;
-
-    auto addEntry = [&](const std::wstring& name, const Zstring& value) { output.emplace_back(name, value); };
-
-    addEntry(_("Log off"  ), Zstr("gnome-session-quit --no-prompt")); //alternative requiring admin: sudo killall Xorg
-    //alternative without admin: dbus-send --session --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Logout uint32:1
-    addEntry(_("Standby"  ), Zstr("systemctl suspend"));  //alternative requiring admin: sudo pm-suspend
-    addEntry(_("Shut down"), Zstr("systemctl poweroff")); //alternative requiring admin: sudo shutdown -h 1
-
-    return output;
+    return
+    {
+        //{_("Sleep"), Zstr("rundll32.exe powrprof.dll,SetSuspendState Sleep")},
+    };
 }
+
 
 const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 }
 
 
-bool isCloseProgressDlgCommand(const Zstring& value)
-{
-    return trimCpy(utfTo<std::wstring>(value)) == getCmdTxtCloseProgressDlg();
-}
-
-
-OnCompletionBox::OnCompletionBox(wxWindow* parent,
-                                 wxWindowID id,
-                                 const wxString& value,
-                                 const wxPoint& pos,
-                                 const wxSize& size,
-                                 int n,
-                                 const wxString choices[],
-                                 long style,
-                                 const wxValidator& validator,
-                                 const wxString& name) :
+CommandBox::CommandBox(wxWindow* parent,
+                       wxWindowID id,
+                       const wxString& value,
+                       const wxPoint& pos,
+                       const wxSize& size,
+                       int n,
+                       const wxString choices[],
+                       long style,
+                       const wxValidator& validator,
+                       const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name),
     defaultCommands_(getDefaultCommands())
 {
-    //#####################################
-    /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
-    //#####################################
+    //####################################
+    /*#*/ SetMinSize(wxSize(150, -1)); //# workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
+    //####################################
 
-    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (OnCompletionBox::OnKeyEvent  ), nullptr, this);
-    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (OnCompletionBox::OnUpdateList), nullptr, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(OnCompletionBox::OnSelection ), nullptr, this);
-    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (OnCompletionBox::OnMouseWheel), nullptr, this);
+    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (CommandBox::OnKeyEvent  ), nullptr, this);
+    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (CommandBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CommandBox::OnSelection ), nullptr, this);
+    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (CommandBox::OnMouseWheel), nullptr, this);
 
-    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(OnCompletionBox::OnValidateSelection), nullptr, this);
+    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(CommandBox::OnValidateSelection), nullptr, this);
 }
 
 
-void OnCompletionBox::addItemHistory()
+void CommandBox::addItemHistory()
 {
     const Zstring command = trimCpy(getValue());
 
     if (command == utfTo<Zstring>(getSeparationLine()) || //do not add sep. line
-        command == utfTo<Zstring>(getCmdTxtCloseProgressDlg()) || //do not add special command
         command.empty())
         return;
 
@@ -98,52 +82,38 @@ void OnCompletionBox::addItemHistory()
 }
 
 
-Zstring OnCompletionBox::getValue() const
+Zstring CommandBox::getValue() const
 {
-    auto value = trimCpy(copyStringTo<std::wstring>(GetValue()));
-
-    if (value == zen::translate(getCmdTxtCloseProgressDlg())) //undo translation for config file storage
-        value = getCmdTxtCloseProgressDlg();
-
-    return utfTo<Zstring>(value);
+    return utfTo<Zstring>(trimCpy(GetValue()));
 }
 
 
-void OnCompletionBox::setValue(const Zstring& value)
+void CommandBox::setValue(const Zstring& value)
 {
-    auto tmp = trimCpy(utfTo<std::wstring>(value));
-
-    if (tmp == getCmdTxtCloseProgressDlg())
-        tmp = zen::translate(getCmdTxtCloseProgressDlg()); //have this symbolic constant translated properly
-
-    setValueAndUpdateList(tmp);
+    setValueAndUpdateList(trimCpy(utfTo<std::wstring>(value)));
 }
 
 
 //set value and update list are technically entangled: see potential bug description below
-void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
+void CommandBox::setValueAndUpdateList(const std::wstring& value)
 {
     //it may be a little lame to update the list on each mouse-button click, but it should be working and we dont't have to manipulate wxComboBox internals
 
     std::deque<std::wstring> items;
 
-    //1. special command
-    items.push_back(zen::translate(getCmdTxtCloseProgressDlg()));
-
-    //2. built in commands
+    //1. built in commands
     for (const auto& item : defaultCommands_)
         items.push_back(item.first);
 
-    //3. history elements
-    if (!history_.empty())
-    {
-        auto histSorted = history_;
-        std::sort(histSorted.begin(), histSorted.end(), LessNaturalSort() /*even on Linux*/);
+    //2. history elements
+    auto histSorted = history_;
+    std::sort(histSorted.begin(), histSorted.end(), LessNaturalSort() /*even on Linux*/);
 
+    if (!items.empty() && !histSorted.empty())
         items.push_back(getSeparationLine());
-        for (const Zstring& hist : histSorted)
-            items.push_back(utfTo<std::wstring>(hist));
-    }
+
+    for (const Zstring& hist : histSorted)
+        items.push_back(utfTo<std::wstring>(hist));
 
     //attention: if the target value is not part of the dropdown list, SetValue() will look for a string that *starts with* this value:
     //e.g. if the dropdown list contains "222" SetValue("22") will erroneously set and select "222" instead, while "111" would be set correctly!
@@ -165,7 +135,7 @@ void OnCompletionBox::setValueAndUpdateList(const std::wstring& value)
 }
 
 
-void OnCompletionBox::OnSelection(wxCommandEvent& event)
+void CommandBox::OnSelection(wxCommandEvent& event)
 {
     wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
     if (auto handler = GetEventHandler())
@@ -175,7 +145,7 @@ void OnCompletionBox::OnSelection(wxCommandEvent& event)
 }
 
 
-void OnCompletionBox::OnValidateSelection(wxCommandEvent& event)
+void CommandBox::OnValidateSelection(wxCommandEvent& event)
 {
     const auto value = copyStringTo<std::wstring>(GetValue());
 
@@ -188,14 +158,14 @@ void OnCompletionBox::OnValidateSelection(wxCommandEvent& event)
 }
 
 
-void OnCompletionBox::OnUpdateList(wxEvent& event)
+void CommandBox::OnUpdateList(wxEvent& event)
 {
     setValue(getValue());
     event.Skip();
 }
 
 
-void OnCompletionBox::OnKeyEvent(wxKeyEvent& event)
+void CommandBox::OnKeyEvent(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
 

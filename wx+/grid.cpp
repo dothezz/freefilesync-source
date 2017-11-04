@@ -13,10 +13,10 @@
 #include <wx/tooltip.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
-//#include <zen/tick_count.h>
 #include <zen/string_tools.h>
 #include <zen/scope_guard.h>
 #include <zen/utf.h>
+#include <zen/zstring.h>
 #include <zen/format_unit.h>
 #include "dc.h"
 
@@ -29,14 +29,6 @@ wxColor Grid::getColorSelectionGradientFrom() { return { 137, 172, 255 }; } //bl
 wxColor Grid::getColorSelectionGradientTo  () { return { 225, 234, 255 }; } //      HSL: 158, 255, 240   HSV: 222, 0.12, 1
 
 const int GridData::COLUMN_GAP_LEFT = 4;
-
-
-void zen::clearArea(wxDC& dc, const wxRect& rect, const wxColor& col)
-{
-    wxDCPenChanger   dummy (dc, col);
-    wxDCBrushChanger dummy2(dc, col);
-    dc.DrawRectangle(rect);
-}
 
 
 namespace
@@ -136,7 +128,6 @@ wxSize GridData::drawCellText(wxDC& dc, const wxRect& rect, const std::wstring& 
 
     //truncate large texts and add ellipsis
     assert(!contains(text, L"\n"));
-    const wchar_t ELLIPSIS = L'\u2026'; //"..."
 
     std::wstring textTrunc = text;
     wxSize extentTrunc = dc.GetTextExtent(textTrunc);
@@ -476,7 +467,7 @@ public:
     }
 
 private:
-    static std::wstring formatRow(size_t row) { return toGuiString(row + 1); } //convert number to std::wstring including thousands separator
+    static std::wstring formatRow(size_t row) { return formatNumber(row + 1); } //convert number to std::wstring including thousands separator
 
     bool AcceptsFocus() const override { return false; }
 

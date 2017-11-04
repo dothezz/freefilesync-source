@@ -19,9 +19,9 @@ Member variable:
 
 Constructor code:
     enumDescrMap.
-    add(ON_ERROR_POPUP , "Show pop-up"   , "Show pop-up on errors or warnings"). <- add localization
-    add(ON_ERROR_IGNORE, "Ignore errors" , "Hide all error and warning messages").
-    add(ON_ERROR_EXIT  , "Exit instantly", "Abort synchronization immediately");
+    add(ON_ERROR_POPUP,  "Show pop-up",    "Show pop-up on errors or warnings"). <- add localization
+    add(ON_ERROR_IGNORE, "Ignore errors",  "Hide all error and warning messages").
+    add(ON_ERROR_EXIT,   "Exit instantly", "Abort synchronization immediately");
 
 Set enum value:
     setEnumVal(enumDescrMap, *m_choiceHandleError, value);

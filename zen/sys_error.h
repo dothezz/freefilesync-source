@@ -26,6 +26,8 @@ ErrorCode getLastError();
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode ec);
 std::wstring formatSystemError(const std::wstring& functionName, const std::wstring& errorCode, const std::wstring& errorMsg);
 
+
+
 //A low-level exception class giving (non-translated) detail information only - same conceptional level like "GetLastError()"!
 class SysError
 {
@@ -37,7 +39,7 @@ private:
     std::wstring msg_;
 };
 
-#define DEFINE_NEW_SYS_ERROR(X) struct X : public SysError { X(const std::wstring& msg) : SysError(msg) {} };
+#define DEFINE_NEW_SYS_ERROR(X) struct X : public zen::SysError { X(const std::wstring& msg) : SysError(msg) {} };
 
 
 

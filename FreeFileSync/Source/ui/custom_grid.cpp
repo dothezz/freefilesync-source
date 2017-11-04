@@ -15,6 +15,7 @@
 #include <zen/scope_guard.h>
 #include <wx+/tooltip.h>
 #include <wx+/rtl.h>
+#include <wx+/dc.h>
 #include <wx+/image_tools.h>
 #include <wx+/image_resources.h>
 #include "../file_hierarchy.h"
@@ -411,9 +412,9 @@ private:
                             break;
                         case ColumnTypeRim::SIZE:
                             //return utfTo<std::wstring>(file.getFileId<side>()); // -> test file id
-                            return toGuiString(file.getFileSize<side>());
+                            return formatNumber(file.getFileSize<side>());
                         case ColumnTypeRim::DATE:
-                            return utcToLocalTimeString(file.getLastWriteTime<side>());
+                            return formatUtcToLocalTime(file.getLastWriteTime<side>());
                         case ColumnTypeRim::EXTENSION:
                             return utfTo<std::wstring>(getFileExtension(file.getItemName<side>()));
                     }
@@ -445,7 +446,7 @@ private:
                         case ColumnTypeRim::SIZE:
                             return L"<" + _("Symlink") + L">";
                         case ColumnTypeRim::DATE:
-                            return utcToLocalTimeString(symlink.getLastWriteTime<side>());
+                            return formatUtcToLocalTime(symlink.getLastWriteTime<side>());
                         case ColumnTypeRim::EXTENSION:
                             return utfTo<std::wstring>(getFileExtension(symlink.getItemName<side>()));
                     }
@@ -748,14 +749,14 @@ private:
                 [&](const FilePair& file)
                 {
                     toolTip += L"\n" +
-                               _("Size:") + L" " + zen::filesizeToShortString(file.getFileSize<side>()) + L"\n" +
-                               _("Date:") + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<side>());
+                               _("Size:") + L" " + zen::formatFilesizeShort(file.getFileSize<side>()) + L"\n" +
+                               _("Date:") + L" " + zen::formatUtcToLocalTime(file.getLastWriteTime<side>());
                 },
 
                 [&](const SymlinkPair& symlink)
                 {
                     toolTip += L"\n" +
-                               _("Date:") + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<side>());
+                               _("Date:") + L" " + zen::formatUtcToLocalTime(symlink.getLastWriteTime<side>());
                 });
             }
         return toolTip;

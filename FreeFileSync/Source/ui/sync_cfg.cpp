@@ -16,7 +16,7 @@
 #include <wx+/popup_dlg.h>
 #include <wx+/image_resources.h>
 #include "gui_generated.h"
-#include "on_completion_box.h"
+#include "command_box.h"
 #include "folder_selector.h"
 #include "../file_hierarchy.h"
 #include "../lib/help_provider.h"
@@ -29,6 +29,24 @@ using namespace xmlAccess;
 
 namespace
 {
+struct MiscSyncConfig
+{
+    bool ignoreErrors = false;
+    Zstring postSyncCommand;
+    PostSyncCondition postSyncCondition = PostSyncCondition::COMPLETION;
+    std::vector<Zstring> commandHistory;
+};
+
+
+struct GlobalSyncConfig
+{
+    CompConfig   cmpConfig;
+    SyncConfig   syncCfg;
+    FilterConfig filter;
+    MiscSyncConfig miscCfg;
+};
+
+
 class ConfigDialog : public ConfigDlgGenerated
 {
 public:
@@ -37,7 +55,7 @@ public:
                  int localPairIndexToShow,
                  std::vector<LocalPairConfig>& folderPairConfig,
                  GlobalSyncConfig& globalCfg,
-                 size_t onCompletionHistoryMax);
+                 size_t commandHistoryMax);
 
 private:
     void OnOkay  (wxCommandEvent& event) override;
@@ -128,10 +146,11 @@ private:
 
     void updateSyncGui();
 
+    EnumDescrList<PostSyncCondition> enumPostSyncCondition_;
+
     //-----------------------------------------------------
 
-    void OnErrorPopup (wxCommandEvent& event) override { onGuiError_ = ON_GUIERROR_POPUP;  updateMiscGui(); } //parameter NOT owned by radio button
-    void OnErrorIgnore(wxCommandEvent& event) override { onGuiError_ = ON_GUIERROR_IGNORE; updateMiscGui(); } //
+    void OnToggleIgnoreErrors(wxCommandEvent& event) override { updateMiscGui(); }
 
     MiscSyncConfig getMiscSyncOptions() const;
     void setMiscSyncOptions(const MiscSyncConfig& miscCfg);
@@ -141,7 +160,6 @@ private:
     //parameters with ownership NOT within GUI controls!
     DirectionConfig directionCfg_;
     DeletionPolicy handleDeletion_ = DeletionPolicy::RECYCLER; //use Recycler, delete permanently or move to user-defined location
-    OnGuiError onGuiError_ = ON_GUIERROR_POPUP;
 
     EnumDescrList<VersioningStyle> enumVersioningStyle_;
     FolderSelector versioningFolder_;
@@ -162,7 +180,7 @@ private:
     int selectedPairIndexToShow_ = EMPTY_PAIR_INDEX_SELECTED;
     static const int EMPTY_PAIR_INDEX_SELECTED = -2;
 
-    const size_t onCompletionHistoryMax_;
+    const size_t commandHistoryMax_;
 };
 
 //#################################################################################################################
@@ -206,14 +224,14 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
                            int localPairIndexToShow,
                            std::vector<LocalPairConfig>& folderPairConfig,
                            GlobalSyncConfig& globalCfg,
-                           size_t onCompletionHistoryMax) :
+                           size_t commandHistoryMax) :
     ConfigDlgGenerated(parent),
     versioningFolder_(*m_panelVersioning, *m_buttonSelectVersioningFolder, *m_bpButtonSelectAltFolder, *m_versioningFolderPath, nullptr /*staticText*/, nullptr /*dropWindow2*/),
     globalCfgOut_(globalCfg),
     folderPairConfigOut_(folderPairConfig),
     globalCfg_(globalCfg),
     folderPairConfig_(folderPairConfig),
-    onCompletionHistoryMax_(onCompletionHistoryMax)
+    commandHistoryMax_(commandHistoryMax)
 {
     setStandardButtonLayout(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
@@ -304,6 +322,14 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     enumVersioningStyle_.
     add(VersioningStyle::REPLACE,       _("Replace"),    _("Move files and replace if existing")).
     add(VersioningStyle::ADD_TIMESTAMP, _("Time stamp"), _("Append a time stamp to each file name"));
+
+    enumPostSyncCondition_.
+    add(PostSyncCondition::COMPLETION, _("On completion:")).
+    add(PostSyncCondition::ERRORS,     _("On errors:")).
+    add(PostSyncCondition::SUCCESS,    _("On success:"));
+
+    m_comboBoxPostSyncCommand->SetHint(_("Example:") + L" systemctl poweroff");
+
 
     //use spacer to keep dialog height stable, no matter if versioning options are visible
     //bSizerDelHandling->Add(0, m_panelVersioning->GetSize().GetHeight());
@@ -523,10 +549,9 @@ void ConfigDialog::updateCompGui()
     m_notebook->SetPageImage(static_cast<size_t>(SyncConfigPanel::COMPARISON),
                              static_cast<int>(m_checkBoxUseLocalCmpOptions->GetValue() ? ConfigTypeImage::COMPARISON : ConfigTypeImage::COMPARISON_GREY));
 
-    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
+    auto setBitmap = [&](wxStaticBitmap& bmpCtrl, const wxBitmap& bmp)
     {
-        if (active &&
-            m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (needed on Windows, NOT on Linux!)
             bmpCtrl.SetBitmap(bmp);
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
@@ -537,22 +562,32 @@ void ConfigDialog::updateCompGui()
     m_toggleBtnBySize    ->SetValue(false);
     m_toggleBtnByContent ->SetValue(false);
 
-    if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+    if (m_checkBoxUseLocalCmpOptions->GetValue()) //help wxWidgets a little to render inactive config state (needed on Windows, NOT on Linux!)
         switch (localCmpVar_)
         {
             case CompareVariant::TIME_SIZE:
                 m_toggleBtnByTimeSize->SetValue(true);
-                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-time"));
                 break;
             case CompareVariant::CONTENT:
                 m_toggleBtnByContent->SetValue(true);
-                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-content"));
                 break;
             case CompareVariant::SIZE:
                 m_toggleBtnBySize->SetValue(true);
-                setBitmap(*m_bitmapCompVariant, true, getResourceImage(L"file-size"));
                 break;
         }
+
+    switch (localCmpVar_) //unconditionally update image, including "local options off"
+    {
+        case CompareVariant::TIME_SIZE:
+            setBitmap(*m_bitmapCompVariant, getResourceImage(L"file-time"));
+            break;
+        case CompareVariant::CONTENT:
+            setBitmap(*m_bitmapCompVariant, getResourceImage(L"file-content"));
+            break;
+        case CompareVariant::SIZE:
+            setBitmap(*m_bitmapCompVariant, getResourceImage(L"file-size"));
+            break;
+    }
 
     //active variant description:
     setText(*m_staticTextCompVarDescription, getCompVariantDescription(localCmpVar_));
@@ -885,7 +920,7 @@ void ConfigDialog::updateSyncGui()
 
     auto setBitmap = [&](wxStaticBitmap& bmpCtrl, const wxBitmap& bmp)
     {
-        if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+        if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (needed on Windows, NOT on Linux!)
             bmpCtrl.SetBitmap(bmp);
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
@@ -920,7 +955,7 @@ void ConfigDialog::updateSyncGui()
     m_toggleBtnUpdate->SetValue(false);
     m_toggleBtnCustom->SetValue(false);
 
-    if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (need on Windows, NOT on Linux!)
+    if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (needed on Windows, NOT on Linux!)
         switch (directionCfg_.var)
         {
             case DirectionConfig::TWO_WAY:
@@ -941,26 +976,36 @@ void ConfigDialog::updateSyncGui()
     m_toggleBtnPermanent ->SetValue(false);
     m_toggleBtnVersioning->SetValue(false);
 
-    switch (handleDeletion_)
+    if (m_checkBoxUseLocalSyncOptions->GetValue()) //help wxWidgets a little to render inactive config state (needed on Windows, NOT on Linux!)
+        switch (handleDeletion_) //unconditionally update image, including "local options off"
+        {
+            case DeletionPolicy::RECYCLER:
+                m_toggleBtnRecycler->SetValue(true);
+                break;
+            case DeletionPolicy::PERMANENT:
+                m_toggleBtnPermanent->SetValue(true);
+                break;
+            case DeletionPolicy::VERSIONING:
+                m_toggleBtnVersioning->SetValue(true);
+                break;
+        }
+
+    switch (handleDeletion_) //unconditionally update image, including "local options off"
     {
         case DeletionPolicy::RECYCLER:
-            m_toggleBtnRecycler->SetValue(true);
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_recycler"));
             setText(*m_staticTextDeletionTypeDescription, _("Back up deleted and overwritten files in the recycle bin"));
             break;
         case DeletionPolicy::PERMANENT:
-            m_toggleBtnPermanent->SetValue(true);
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_permanently"));
             setText(*m_staticTextDeletionTypeDescription, _("Delete or overwrite files permanently"));
             break;
         case DeletionPolicy::VERSIONING:
-            m_toggleBtnVersioning->SetValue(true);
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_versioning_small"));
             setText(*m_staticTextDeletionTypeDescription, _("Move files to a user-defined folder"));
             break;
     }
     //m_staticTextDeletionTypeDescription->Wrap(200); //needs to be reapplied after SetLabel()
-
 
     const bool versioningSelected = handleDeletion_ == DeletionPolicy::VERSIONING;
     m_panelVersioning    ->Show(versioningSelected);
@@ -998,18 +1043,20 @@ MiscSyncConfig ConfigDialog::getMiscSyncOptions() const
     assert(selectedPairIndexToShow_ == -1);
 
     MiscSyncConfig miscCfg;
-    miscCfg.handleError         = onGuiError_;
-    miscCfg.onCompletionCommand = m_comboBoxOnCompletion->getValue();
-    miscCfg.onCompletionHistory = m_comboBoxOnCompletion->getHistory();
+    miscCfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
+    miscCfg.postSyncCommand   = m_comboBoxPostSyncCommand->getValue();
+    miscCfg.postSyncCondition = getEnumVal(enumPostSyncCondition_, *m_choicePostSyncCondition),
+            miscCfg.commandHistory    = m_comboBoxPostSyncCommand->getHistory();
     return miscCfg;
 }
 
 
 void ConfigDialog::setMiscSyncOptions(const MiscSyncConfig& miscCfg)
 {
-    onGuiError_ = miscCfg.handleError;
-    m_comboBoxOnCompletion->setValue(miscCfg.onCompletionCommand);
-    m_comboBoxOnCompletion->setHistory(miscCfg.onCompletionHistory, onCompletionHistoryMax_);
+    m_checkBoxIgnoreErrors->SetValue(miscCfg.ignoreErrors);
+    m_comboBoxPostSyncCommand->setValue(miscCfg.postSyncCommand);
+    setEnumVal(enumPostSyncCondition_, *m_choicePostSyncCondition, miscCfg.postSyncCondition),
+               m_comboBoxPostSyncCommand->setHistory(miscCfg.commandHistory, commandHistoryMax_);
 
     updateMiscGui();
 }
@@ -1017,15 +1064,9 @@ void ConfigDialog::setMiscSyncOptions(const MiscSyncConfig& miscCfg)
 
 void ConfigDialog::updateMiscGui()
 {
-    switch (onGuiError_)
-    {
-        case ON_GUIERROR_IGNORE:
-            m_radioBtnIgnoreErrors->SetValue(true);
-            break;
-        case ON_GUIERROR_POPUP:
-            m_radioBtnPopupOnErrors->SetValue(true);
-            break;
-    }
+    const MiscSyncConfig activeCfg = getMiscSyncOptions();
+
+    m_bitmapIgnoreErrors->SetBitmap(getResourceImage(activeCfg.ignoreErrors ? L"msg_error_medium_ignored" : L"msg_error_medium"));
 }
 
 
@@ -1102,7 +1143,7 @@ bool ConfigDialog::unselectFolderPairConfig()
 
     //-------------------------------------------------------------
 
-    m_comboBoxOnCompletion->addItemHistory(); //commit current "on completion" history item
+    m_comboBoxPostSyncCommand->addItemHistory(); //commit current "on completion" history item
 
     if (selectedPairIndexToShow_ < 0)
     {
@@ -1148,28 +1189,30 @@ ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
                                                        SyncConfig&   globalSyncCfg,
                                                        FilterConfig& globalFilter,
 
-                                                       xmlAccess::OnGuiError& handleError,
-                                                       Zstring& onCompletionCommand,
-                                                       std::vector<Zstring>& onCompletionHistory,
+                                                       bool& ignoreErrors,
+                                                       Zstring& postSyncCommand,
+                                                       PostSyncCondition& postSyncCondition,
+                                                       std::vector<Zstring>& commandHistory,
 
-                                                       size_t onCompletionHistoryMax)
+                                                       size_t commandHistoryMax)
 {
     GlobalSyncConfig globalCfg;
     globalCfg.cmpConfig = globalCmpConfig;
     globalCfg.syncCfg   = globalSyncCfg;
     globalCfg.filter    = globalFilter;
 
-    globalCfg.miscCfg.handleError         = handleError;
-    globalCfg.miscCfg.onCompletionCommand = onCompletionCommand;
-    globalCfg.miscCfg.onCompletionHistory = onCompletionHistory;
+    globalCfg.miscCfg.ignoreErrors      = ignoreErrors;
+    globalCfg.miscCfg.postSyncCommand   = postSyncCommand;
+    globalCfg.miscCfg.postSyncCondition = postSyncCondition;
+    globalCfg.miscCfg.commandHistory    = commandHistory;
 
     ConfigDialog syncDlg(parent,
                          panelToShow,
                          localPairIndexToShow,
                          folderPairConfig,
                          globalCfg,
-                         onCompletionHistoryMax);
-    auto rv = static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
+                         commandHistoryMax);
+    const auto rv = static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
 
     if (rv != ReturnSyncConfig::BUTTON_CANCEL)
     {
@@ -1177,9 +1220,10 @@ ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
         globalSyncCfg   = globalCfg.syncCfg;
         globalFilter    = globalCfg.filter;
 
-        handleError         = globalCfg.miscCfg.handleError;
-        onCompletionCommand = globalCfg.miscCfg.onCompletionCommand;
-        onCompletionHistory = globalCfg.miscCfg.onCompletionHistory;
+        ignoreErrors      = globalCfg.miscCfg.ignoreErrors;
+        postSyncCommand   = globalCfg.miscCfg.postSyncCommand ;
+        postSyncCondition = globalCfg.miscCfg.postSyncCondition;
+        commandHistory    = globalCfg.miscCfg.commandHistory;
     }
 
     return rv;

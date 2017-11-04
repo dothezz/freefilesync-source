@@ -140,9 +140,6 @@ bool hasDirectChild(const ContainerObject& hierObj, Predicate p)
            std::any_of(hierObj.refSubLinks  ().begin(), hierObj.refSubLinks  ().end(), p) ||
            std::any_of(hierObj.refSubFolders().begin(), hierObj.refSubFolders().end(), p);
 }
-
-const wchar_t arrowLeft [] = L"<-";
-const wchar_t arrowRight[] = L"->";
 }
 
 
@@ -310,6 +307,13 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
 }
 
 
+namespace
+{
+const wchar_t arrowLeft [] = L"<-";
+const wchar_t arrowRight[] = L"->";
+}
+
+
 std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
 {
     const std::wstring footer = L"\n[" + utfTo<std::wstring>(fsObj. getPairItemName()) + L"]";
@@ -332,14 +336,14 @@ std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
             [&](const FilePair& file)
             {
                 descr += std::wstring(L"\n") +
-                         arrowLeft  + L" " + zen::utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-                         arrowRight + L" " + zen::utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>());
+                         arrowLeft  + L" " + zen::formatUtcToLocalTime(file.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                         arrowRight + L" " + zen::formatUtcToLocalTime(file.getLastWriteTime<RIGHT_SIDE>());
             },
             [&](const SymlinkPair& symlink)
             {
                 descr += std::wstring(L"\n") +
-                         arrowLeft  + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-                         arrowRight + L" " + zen::utcToLocalTimeString(symlink.getLastWriteTime<RIGHT_SIDE>());
+                         arrowLeft  + L" " + zen::formatUtcToLocalTime(symlink.getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+                         arrowRight + L" " + zen::formatUtcToLocalTime(symlink.getLastWriteTime<RIGHT_SIDE>());
             });
             return descr + footer;
         }

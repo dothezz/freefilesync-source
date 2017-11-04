@@ -1174,11 +1174,11 @@ Kommandot triggas om:
 <source>Time elapsed:</source>
 <target>Förfluten tid:</target>
 
-<source>Bytes:</source>
-<target>Byte:</target>
+<source>Bytes</source>
+<target>Byte</target>
 
-<source>Items:</source>
-<target>Objekt:</target>
+<source>Items</source>
+<target>Objekt</target>
 
 <source>Synchronizing...</source>
 <target>Synkroniserar...</target>

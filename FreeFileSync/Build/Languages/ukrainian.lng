@@ -1180,11 +1180,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Пройшло часу:</target>
 
-<source>Bytes:</source>
-<target>Байт:</target>
+<source>Bytes</source>
+<target>Байт</target>
 
-<source>Items:</source>
-<target>Елементи:</target>
+<source>Items</source>
+<target>Елементи</target>
 
 <source>Synchronizing...</source>
 <target>Синхронізація...</target>

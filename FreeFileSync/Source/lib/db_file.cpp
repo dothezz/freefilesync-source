@@ -584,12 +584,12 @@ private:
 
                     //create or update new "in-sync" state
                     InSyncFile& dbFile = mapAddOrUpdate(dbFiles, file.getPairItemName(),
-                                                    InSyncFile(InSyncDescrFile(file.getLastWriteTime< LEFT_SIDE>(),
-                                                                               file.getFileId       < LEFT_SIDE>()),
-                                                               InSyncDescrFile(file.getLastWriteTime<RIGHT_SIDE>(),
-                                                                               file.getFileId       <RIGHT_SIDE>()),
-                                                               activeCmpVar_,
-                                                               file.getFileSize<LEFT_SIDE>()));
+                                                        InSyncFile(InSyncDescrFile(file.getLastWriteTime< LEFT_SIDE>(),
+                                                                                   file.getFileId       < LEFT_SIDE>()),
+                                                                   InSyncDescrFile(file.getLastWriteTime<RIGHT_SIDE>(),
+                                                                                   file.getFileId       <RIGHT_SIDE>()),
+                                                                   activeCmpVar_,
+                                                                   file.getFileSize<LEFT_SIDE>()));
                     toPreserve.insert(&dbFile);
                 }
                 else //not in sync: preserve last synchronous state
@@ -625,9 +625,9 @@ private:
 
                     //create or update new "in-sync" state
                     InSyncSymlink& dbSymlink = mapAddOrUpdate(dbSymlinks, symlink.getPairItemName(),
-                                                          InSyncSymlink(InSyncDescrLink(symlink.getLastWriteTime<LEFT_SIDE>()),
-                                                                        InSyncDescrLink(symlink.getLastWriteTime<RIGHT_SIDE>()),
-                                                                        activeCmpVar_));
+                                                              InSyncSymlink(InSyncDescrLink(symlink.getLastWriteTime<LEFT_SIDE>()),
+                                                                            InSyncDescrLink(symlink.getLastWriteTime<RIGHT_SIDE>()),
+                                                                            activeCmpVar_));
                     toPreserve.insert(&dbSymlink);
                 }
                 else //not in sync: preserve last synchronous state
@@ -749,7 +749,7 @@ struct StreamStatusNotifier
     void operator()(int64_t bytesDelta) //throw X
     {
         bytesTotal_ += bytesDelta;
-        if (notifyStatus_) notifyStatus_(msgPrefix_ + L" (" + filesizeToShortString(bytesTotal_) + L")"); //throw X
+        if (notifyStatus_) notifyStatus_(msgPrefix_ + L" (" + formatFilesizeShort(bytesTotal_) + L")"); //throw X
     }
 
 private:

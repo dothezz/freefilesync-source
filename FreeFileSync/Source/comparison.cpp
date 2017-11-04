@@ -196,15 +196,15 @@ template <SelectedSide side, class FileOrLinkPair> inline
 std::wstring getConflictInvalidDate(const FileOrLinkPair& file)
 {
     return replaceCpy(_("File %x has an invalid date."), L"%x", fmtPath(AFS::getDisplayPath(file.template getAbstractPath<side>()))) + L"\n" +
-           _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<side>());
+           _("Date:") + L" " + formatUtcToLocalTime(file.template getLastWriteTime<side>());
 }
 
 
 std::wstring getConflictSameDateDiffSize(const FilePair& file)
 {
     return _("Files have the same date but a different size.") + L"\n" +
-           arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime< LEFT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<LEFT_SIDE>()) + L"\n" +
-           arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(file.getFileSize<RIGHT_SIDE>());
+           arrowLeft  + L" " + _("Date:") + L" " + formatUtcToLocalTime(file.getLastWriteTime< LEFT_SIDE>()) + L"    " + _("Size:") + L" " + formatNumber(file.getFileSize<LEFT_SIDE>()) + L"\n" +
+           arrowRight + L" " + _("Date:") + L" " + formatUtcToLocalTime(file.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + formatNumber(file.getFileSize<RIGHT_SIDE>());
 }
 
 
@@ -226,8 +226,8 @@ template <class FileOrLinkPair>
 std::wstring getDescrDiffMetaDate(const FileOrLinkPair& file)
 {
     return _("Items differ in attributes only") + L"\n" +
-           arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime< LEFT_SIDE>()) + L"\n" +
-           arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(file.template getLastWriteTime<RIGHT_SIDE>());
+           arrowLeft  + L" " + _("Date:") + L" " + formatUtcToLocalTime(file.template getLastWriteTime< LEFT_SIDE>()) + L"\n" +
+           arrowRight + L" " + _("Date:") + L" " + formatUtcToLocalTime(file.template getLastWriteTime<RIGHT_SIDE>());
 }
 
 //-----------------------------------------------------------------------------

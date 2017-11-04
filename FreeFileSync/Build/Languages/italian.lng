@@ -1174,11 +1174,11 @@ Il comando è attivato se:
 <source>Time elapsed:</source>
 <target>Tempo trascorso:</target>
 
-<source>Bytes:</source>
-<target>Byte:</target>
+<source>Bytes</source>
+<target>Byte</target>
 
-<source>Items:</source>
-<target>Elementi:</target>
+<source>Items</source>
+<target>Elementi</target>
 
 <source>Synchronizing...</source>
 <target>Sincronizzazione...</target>

@@ -16,8 +16,8 @@
 		Therefore, you should <b>apply manual changes only while FreeFileSync is not running.</b><br>
 		 <br>
 		To locate this file on Windows, enter <b><span class="command-line">%appdata%\FreeFileSync</span></b> in the Windows Explorer address bar or go to the FreeFileSync
-		installation folder if you are using the portable installation. 
-		On Linux, you can find the file in <b><span class="command-line">~/.FreeFileSync</span></b> for the Launchpad release and in the installation folder for the portable version. 
+		installation folder if you are using the portable installation.
+		On Linux, you can find the file in <b><span class="command-line">~/.FreeFileSync</span></b> for the Launchpad release and in the installation folder for the portable version.
 		On macOS, go to <b><span class="command-line">~/Library/Application Support/FreeFileSync</span></b>.
 	</p>
 
@@ -64,9 +64,9 @@
 		In order to prevent multiple synchronization tasks from reading and writing the same files,
 		FreeFileSync instances are serialized with lock files (<span class="file-path">sync.ffs_lock</span>).
 		The lock files are only recognized by FreeFileSync and make sure that at most,
-		a single synchronization is running against a certain folder at a time while 
+		a single synchronization is running against a certain folder at a time while
 		other instances are queued to wait.
-		This ensures that only consistent sets of files are subject to synchronization.		
+		This ensures that only consistent sets of files are subject to synchronization.
 		The primary use case are network synchronization scenarios where
 		multiple users run FreeFileSync concurrently against a shared network folder.
 	</p>
@@ -88,10 +88,10 @@
 		The progress logs of the most recent synchronizations (for both GUI and batch jobs) are collected automatically in the file <span class="file-path">LastSyncs.log</span>.
 		The maximum size of this log file can be set here.
 	</p>
-	
+
 	<p>
 		<b>NotificationSound:</b><br>
 		Select sound files from the FreeFileSync installation directory to be played after comparison or synchronization. Set empty names if no sound should be played.
-	</p>	
+	</p>
 </body>
 </html>

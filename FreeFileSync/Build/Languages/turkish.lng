@@ -1174,11 +1174,11 @@ Komut şu durumlarda yürütülür:
 <source>Time elapsed:</source>
 <target>Geçen süre:</target>
 
-<source>Bytes:</source>
-<target>Bayt:</target>
+<source>Bytes</source>
+<target>Bayt</target>
 
-<source>Items:</source>
-<target>Öge:</target>
+<source>Items</source>
+<target>Öge</target>
 
 <source>Synchronizing...</source>
 <target>Eşitleniyor...</target>

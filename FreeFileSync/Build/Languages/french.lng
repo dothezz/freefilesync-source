@@ -1174,11 +1174,11 @@ La commande est déclenchée si :
 <source>Time elapsed:</source>
 <target>Temps écoulé :</target>
 
-<source>Bytes:</source>
-<target>Octets :</target>
+<source>Bytes</source>
+<target>Octets</target>
 
-<source>Items:</source>
-<target>Eléments :</target>
+<source>Items</source>
+<target>Eléments</target>
 
 <source>Synchronizing...</source>
 <target>Synchronisation en cours ...</target>

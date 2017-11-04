@@ -1174,11 +1174,11 @@ Kommandoen udføres hvis:
 <source>Time elapsed:</source>
 <target>Brugt tid:</target>
 
-<source>Bytes:</source>
-<target>Bytes:</target>
+<source>Bytes</source>
+<target>Bytes</target>
 
-<source>Items:</source>
-<target>Emner:</target>
+<source>Items</source>
+<target>Emner</target>
 
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
