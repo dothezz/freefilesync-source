@@ -7,9 +7,6 @@
 	<plural_definition>0</plural_definition>
 </header>
 
-<source>The %x protocol does not support directory monitoring:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>前回最後の同期処理以降、両側とも変更があります.</target>
 
@@ -55,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>フォルダ %x をゴミ箱として使用できるかを確認中...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>以下のフォルダではゴミ箱を利用できません。代替手段としてファイルの完全削除を利用することが出来ます:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>次のフォルダではゴミ箱に対応していないため、ファイルの削除、または上書き操作された場合、元に戻せません:</target>
 
 <source>An exception occurred</source>
 <target>例外が発生しました</target>
@@ -91,17 +88,14 @@
 <source>Syntax:</source>
 <target>構文:</target>
 
-<source>global config file:</source>
-<target>グローバル構成ファイル:</target>
-
 <source>config files:</source>
 <target>構成ファイル:</target>
 
 <source>directory</source>
 <target>ディレクトリ</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>代替グローバル設定.xml ファイルのパス.</target>
+<source>global config file:</source>
+<target>グローバル構成ファイル:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>任意の数の FreeFileSync 構成設定ファイル(.ffs_gui および/または .ffs_batch).</target>
@@ -109,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>任意の数の代替ディレクトリペア(ひとつの構成ファイル).</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>実行しないで編集のために構成設定を開く.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>選択された構成を実行しないで編集用に開きます.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>代替グローバル設定.xml ファイルのパス.</target>
 
 <source>Cannot find the following folders:</source>
 <target>以下のフォルダがみつかりません:</target>
@@ -256,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>右の属性を更新</target>
 
-<source>Cannot write file %x.</source>
-<target>ファイル %x に書き込めません.</target>
+<source>Cannot read file %x.</source>
+<target>ファイル %x を読み込めません.</target>
 
 <source>
 Unexpected size of data stream.
@@ -276,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>別の基準フォルダタイプでは対応していない操作.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>シンボリックリンク %x を %y にコピーできません.</target>
+<source>Cannot write file %x.</source>
+<target>ファイル %x に書き込めません.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>ファイル %x を %y に移動できません.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>シンボリックリンク %x を %y にコピーできません.</target>
 
 <source>Unable to connect to %x.</source>
 <target>%x に接続できません.</target>
@@ -293,9 +293,6 @@ Actual: %y bytes
 
 <source>Cannot read directory %x.</source>
 <target>ディレクトリ %x を読み取れません.</target>
-
-<source>Cannot read file %x.</source>
-<target>ファイル %x を読み込めません.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>%x のファイル属性を読み込めません.</target>
@@ -594,6 +591,9 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>自動同期</target>
 
+<source>The %x protocol does not support directory monitoring:</source>
+<target>%x プロトコルはディレクトリの監視に対応していません:</target>
+
 <source>Directory monitoring active</source>
 <target>ディレクトリの監視アクティブ</target>
 
@@ -708,8 +708,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>基準フォルダ:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>このバージョン管理フォルダは、基準フォルダに含まれるため同期の対象となります.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>バージョン管理フォルダは、基準フォルダ内に含まれています.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>フォルダペアを同期処理:</target>
@@ -722,6 +722,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>ジョブ名</target>
+
+<source>Show summary</source>
+<target>概要を表示</target>
+
+<source>Sleep</source>
+<target>スリープ</target>
+
+<source>Shut down</source>
+<target>シャットダウン</target>
 
 <source>Synchronization stopped</source>
 <target>同期処理を停止</target>
@@ -743,6 +752,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>同期処理はすべてが正常に完了しました</target>
+
+<source>Executing command %x</source>
+<target>コマンド %x を実行中</target>
 
 <source>Cleaning up old log files...</source>
 <target>古いログファイルをクリーン...</target>
@@ -770,8 +782,8 @@ The command is triggered if:
 <pluralform>%x 秒後に自動的に再試行...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>以降のエラーは無視する(&I)</target>
+<source>Ignore &all</source>
+<target>すべて無視(&A)</target>
 
 <source>Retrying operation...</source>
 <target>処理を再試行中...</target>
@@ -878,11 +890,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>検索(&F)...</target>
 
-<source>&Reset layout</source>
-<target>レイアウトをリセット(&R)</target>
-
 <source>&Export file list...</source>
 <target>ファイル一覧をエクスポート(&E)...</target>
+
+<source>&Reset layout</source>
+<target>レイアウトをリセット(&R)</target>
 
 <source>&Tools</source>
 <target>ツール(&T)</target>
@@ -1019,9 +1031,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>クリア(&L)</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>データベースファイルを利用して、同期の方向を検出します。</target>
-
 <source>Detect moved files</source>
 <target>移動済みのファイルを検出する</target>
 
@@ -1042,38 +1051,23 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>ゴミ箱(&R)</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>ファイルを削除/上書きする時に、ゴミ箱にバックアップをとる</target>
-
 <source>&Permanent</source>
 <target>完全消去(&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>ファイルを上書き/または完全に消去します</target>
 
 <source>&Versioning</source>
 <target>バージョン管理(&V)</target>
 
-<source>Move files to a user-defined folder</source>
-<target>ユーザ定義のフォルダにファイルを移動</target>
-
 <source>Naming convention:</source>
 <target>命名規則:</target>
 
-<source>Handle errors:</source>
-<target>エラーの取り扱い:</target>
-
-<source>&Pop-up</source>
-<target>ポップアップ(&P)</target>
+<source>&Ignore errors</source>
+<target>エラーを無視(&I)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>エラーと警告をポップアップで表示</target>
 
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-
-<source>On completion:</source>
-<target>完了時の動作:</target>
+<source>Run a command after synchronization:</source>
+<target>同期処理後に実行するコマンド:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1111,6 +1105,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>キーファイル(&K)</target>
 
+<source>&SSH agent</source>
+<target>&SSH エージェント</target>
+
 <source>User name:</source>
 <target>ユーザ名:</target>
 
@@ -1129,20 +1126,14 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>最適なパフォーマンスとは?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>ディレクトリ読み取りのSSH接続:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>推奨される範囲: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>ディレクトリの読み取り接続数:</target>
 
 <source>SFTP channels per connection:</source>
 <target>接続当たりの SFTP チャンネル数:</target>
 
 <source>Detect server limit</source>
 <target>サーバ制限の検出</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 接続 x 10 チャンネル = ディレクトリ読み取りが 20 倍高速化</target>
 
 <source>Select a directory on the server:</source>
 <target>サーバ上のディレクトリを選択:</target>
@@ -1183,6 +1174,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>バイトをコピー済:</target>
 
+<source>When finished:</source>
+<target>完了後:</target>
+
 <source>Close</source>
 <target>閉じる</target>
 
@@ -1195,14 +1189,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>無人で同期を行う為のバッチファイルを作成 - このファイルか、タスクプランナーからスケジュールをダブルクリックすることで開始: %x</target>
 
-<source>&Stop</source>
-<target>停止(&S)</target>
+<source>Run minimized</source>
+<target>最小化で起動</target>
+
+<source>&Show error dialog</source>
+<target>エラーダイアログを表示(&S)</target>
+
+<source>&Cancel</source>
+<target>キャンセル(&C)</target>
 
 <source>Stop synchronization at first error</source>
 <target>最初のエラーで同期処理を停止</target>
-
-<source>Run minimized</source>
-<target>最小化で起動</target>
 
 <source>Save log:</source>
 <target>ログ保存:</target>
@@ -1234,14 +1231,14 @@ This guarantees a consistent state even in case of a serious error.
 これにより、エラーが発生した場合も一貫性ある状態が保証されます.
 </target>
 
-<source>(recommended)</source>
-<target>(推奨)</target>
+<source>recommended</source>
+<target>推奨</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>共有、ロックされたファイルをボリュームシャドウコピーサービスを使用してコピー.</target>
 
-<source>(requires administrator rights)</source>
-<target>(管理者権限が必要)</target>
+<source>requires administrator rights</source>
+<target>管理者権限が必要</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>ファイルとフォルダのパーミッションを転送します.</target>
@@ -1273,14 +1270,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>ソースコードは C++ で書かれています:</target>
 
-<source>Donation details</source>
-<target>寄付の詳細</target>
-
 <source>If you like FreeFileSync:</source>
 <target>FreeFileSync を気に入ってくれた方へ:</target>
 
-<source>Donate with PayPal</source>
-<target>PayPal から寄付</target>
+<source>Support with a donation</source>
+<target>寄付によるサポート</target>
+
+<source>Donation details</source>
+<target>寄付の詳細</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>自動アップデートは管理者によって無効にされています.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>フィードバック、提案などはこちらから</target>
@@ -1318,7 +1318,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>オフライン アクティベート</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>一括ジョブを保存</target>
 
 <source>Delete Items</source>
@@ -1357,11 +1357,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>概要</target>
 
+<source>Show "%x"</source>
+<target>"%x" で表示</target>
+
 <source>&Show details</source>
 <target>詳細表示(&S)</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>FreeFileSync の新しいバージョンが利用できます:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x が利用できます!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>インストール ファイルが破損しています、FreeFileSync を再インストールしてください.</target>
 
 <source>Local path not available for %x.</source>
 <target>利用できないローカスパス %x.</target>
@@ -1448,9 +1454,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select time span...</source>
 <target>タイムスパンを選択...</target>
-
-<source>Show "%x"</source>
-<target>"%x" で表示</target>
 
 <source>Last session</source>
 <target>最後のセッション</target>
@@ -1551,18 +1554,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>アップデートを検索しています...</target>
 
-<source>Close progress dialog</source>
-<target>進捗ダイアログを閉じる</target>
-
-<source>Log off</source>
-<target>ログオフ</target>
-
-<source>Standby</source>
-<target>スリープ</target>
-
-<source>Shut down</source>
-<target>シャットダウン</target>
-
 <source>Paused</source>
 <target>一時停止中</target>
 
@@ -1593,17 +1584,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>ログ</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>インストール ファイルが破損しています、FreeFileSync を再インストールしてください.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>ありがとう %x, あなたの寄付と支援に感謝します!!</target>
+
+<source>Recommended range:</source>
+<target>推奨される範囲:</target>
 
 <source>Password:</source>
 <target>パスワード:</target>
 
 <source>Key password:</source>
 <target>キーパスワード:</target>
+
+<source>Please enter a file path.</source>
+<target>ファイルパスを入力.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1716,6 +1710,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>削除、上書きされたファイルをゴミ箱内に保持する</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>ファイルを完全に削除、または上書きする</target>
+
+<source>Move files to a user-defined folder</source>
+<target>ユーザ定義のフォルダにファイルを移動</target>
+
 <source>Replace</source>
 <target>置換</target>
 
@@ -1727,6 +1730,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>各ファイル名にタイムスタンプを付加</target>
+
+<source>On completion:</source>
+<target>完了時の動作:</target>
+
+<source>On errors:</source>
+<target>処理の失敗時:</target>
+
+<source>On success:</source>
+<target>処理の成功時:</target>
 
 <source>Main config</source>
 <target>メイン構成</target>
@@ -1748,9 +1760,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>名前</target>
-
-<source>Items</source>
-<target>項目</target>
 
 <source>Percentage</source>
 <target>パーセント</target>
@@ -1878,6 +1887,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>プロセスの I/O 優先度を変更できません.</target>
 
+<source>Unable to shut down the system.</source>
+<target>システムをシャットダウンできません.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>フォルダ %x のゴミ箱のチェックに失敗.</target>
 
@@ -1901,9 +1913,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Portable</source>
 <target>ポータブル</target>
-
-<source>recommended</source>
-<target>推奨</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>設定の保存先 "%APPDATA%\FreeFileSync"</target>
@@ -1956,8 +1965,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync で編集</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>選択したフォルダにはポータブル版をインストールできません.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>FreeFileSync ポータブル版は %x のサブフォルダにはインストールできません.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>ローカル インストールを選択するか、別のインストール先を選択してください.</target>

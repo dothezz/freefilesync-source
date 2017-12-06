@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -64,7 +64,7 @@ inline wxColor getColorItemsBackgroundRim() { return { 53,  25, 255 }; } //dark 
 
 //don't use wxStopWatch for long-running measurements: internally it uses ::QueryPerformanceCounter() which can overflow after only a few days:
 // std::chrono::system_clock is not a steady clock, but at least doesn't overflow!
-//http://www.freefilesync.org/forum/viewtopic.php?t=1426
+//https://www.freefilesync.org/forum/viewtopic.php?t=1426
 
 class StopWatch
 {
@@ -1106,7 +1106,7 @@ private:
         {
             { 0,  y_ },
             { x_, y_ },
-            { x_,  0 },
+            { x_, 0  },
         };
     }
 
@@ -1129,7 +1129,7 @@ private:
         {
             { 0,   y_ },
             { x1_, y_ },
-            { x1_,  0 },
+            { x1_, 0  },
             { x1_, y_ },
             { x2_, y_ },
         };
@@ -1248,8 +1248,8 @@ public:
     ~SyncProgressDialogImpl() override;
 
     //call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
-    void processHasFinished(SyncResult resultId, const ErrorLog& log) override;
-    void closeWindowDirectly() override;
+    void showSummary(SyncResult resultId, const ErrorLog& log) override;
+    void closeDirectly(bool restoreParentFrame) override;
 
     wxWindow* getWindowIfVisible() override { return this->IsShown() ? this : nullptr; }
     //workaround OS X bug: if "this" is used as parent window for a modal dialog then this dialog will erroneously un-hide its parent!
@@ -1274,7 +1274,8 @@ public:
     }
 
 private:
-    void OnKeyPressed(wxKeyEvent& event);
+    void OnKeyPressed      (wxKeyEvent& event);
+    void OnKeyPressedParent(wxKeyEvent& event);
     void OnOkay   (wxCommandEvent& event);
     void OnPause  (wxCommandEvent& event);
     void OnCancel (wxCommandEvent& event);
@@ -1372,6 +1373,9 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     pnl_.m_bpButtonMinimizeToTray->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnMinimizeToTray), NULL, this);
     pnl_.m_checkBoxIgnoreErrors->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(SyncProgressDialogImpl::OnToggleIgnoreErrors), NULL, this);
 
+    if (parentFrame_)
+        parentFrame_->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressedParent), nullptr, this);
+
 
     assert(pnl_.m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
@@ -1383,7 +1387,7 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
     //pnl.m_animCtrlSyncing->SetAnimation(getResourceAnimation(L"working"));
     //pnl.m_animCtrlSyncing->Play();
 
-    this->EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
+    //this->EnableCloseButton(false); //this is NOT honored on OS X or with ALT+F4 on Windows! -> why disable button at all??
 
     timeElapsed_.restart(); //measure total time
 
@@ -1477,9 +1481,11 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
 {
     if (parentFrame_)
     {
+        parentFrame_->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressedParent), nullptr, this);
+
         parentFrame_->SetTitle(parentTitleBackup_); //restore title text
 
-        //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
+        //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeDirectly()
         parentFrame_->Show();
         //if (parentFrame_->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
         //    parentFrame_->Iconize(false);
@@ -1510,6 +1516,22 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnKeyPressed(wxKeyEvent& event)
                 handler->ProcessEvent(dummy);
             return;
         }
+    }
+
+    event.Skip();
+}
+
+
+template <class TopLevelDialog>
+void SyncProgressDialogImpl<TopLevelDialog>::OnKeyPressedParent(wxKeyEvent& event)
+{
+    //redirect keys from main dialog to progress dialog
+    const int keyCode = event.GetKeyCode();
+    if (keyCode == WXK_ESCAPE)
+    {
+        this->SetFocus();
+        this->OnKeyPressed(event);
+        return;
     }
 
     event.Skip();
@@ -1886,22 +1908,30 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateStaticGui() //depends on "syn
 
 
 template <class TopLevelDialog>
-void SyncProgressDialogImpl<TopLevelDialog>::closeWindowDirectly() //this should really be called: do not call back + schedule deletion
+void SyncProgressDialogImpl<TopLevelDialog>::closeDirectly(bool restoreParentFrame) //this should really be called: do not call back + schedule deletion
 {
+    assert(syncStat_ && abortCb_);
+
+    if (!restoreParentFrame)
+        parentFrame_ = nullptr; //avoid destructor calls like parentFrame_->Show(), ::TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+
     paused_ = false; //you never know?
+
     //ATTENTION: dialog may live a little longer, so watch callbacks!
     //e.g. wxGTK calls OnIconize after wxWindow::Close() (better not ask why) and before physical destruction! => indirectly calls updateStaticGui(), which reads syncStat_!!!
     syncStat_ = nullptr;
     abortCb_  = nullptr;
-    //resumeFromSystray(); -> NO, instead ~SyncProgressDialogImpl() makes sure that main dialog is shown again!
+
+    //resumeFromSystray(); -> NO, instead ~SyncProgressDialogImpl() makes sure that main dialog is shown again! e.g. avoid calls to this/parentFrame_->Raise()
 
     this->Close(); //generate close event: do NOT destroy window unconditionally!
 }
 
 
 template <class TopLevelDialog>
-void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resultId, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
+void SyncProgressDialogImpl<TopLevelDialog>::showSummary(SyncResult resultId, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
 {
+    assert(syncStat_ && abortCb_);
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
@@ -1964,7 +1994,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
 
     resumeFromSystray(); //if in tray mode...
 
-    this->EnableCloseButton(true);
+    //this->EnableCloseButton(true);
 
     pnl_.m_bpButtonMinimizeToTray->Hide();
     pnl_.m_buttonStop->Disable();
@@ -2009,6 +2039,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     //show log instead of graph if errors occurred! (not required for ignored warnings)
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         pnl_.m_notebookResult->ChangeSelection(posLog);
+    warn_static("/|\ not working on linux")
 
     //GetSizer()->SetSizeHints(this); //~=Fit() //not a good idea: will shrink even if window is maximized or was enlarged by the user
     pnl_.Layout();
@@ -2074,17 +2105,17 @@ void SyncProgressDialogImpl<TopLevelDialog>::OnPause(wxCommandEvent& event)
 template <class TopLevelDialog>
 void SyncProgressDialogImpl<TopLevelDialog>::OnClose(wxCloseEvent& event)
 {
-    //this event handler may be called *during* sync, e.g. due to a system shutdown (Windows), anytime (OS X)
-    //try to stop sync gracefully and cross fingers:
+    //this event handler may be called *during* sync!
+    //=> try to stop sync gracefully and cross fingers:
     if (abortCb_)
         abortCb_->userRequestAbort();
     //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (like in batch mode)
 
-    notifyWindowTerminate_(); //don't wait until delayed "Destroy()" finally calls destructor -> avoid calls to processHasFinished()/closeWindowDirectly()
+    notifyWindowTerminate_(); //don't wait until delayed "Destroy()" finally calls destructor -> avoid calls to showSummary()/closeDirectly()
 
     paused_ = false; //[!] we could be pausing here!
 
-    //now that we notified window termination prematurely, and since processHasFinished()/closeWindowDirectly() won't be called, make sure we don't call back, too!
+    //now that we notified window termination prematurely, and since showSummary()/closeDirectly() won't be called, make sure we don't call back, too!
     //e.g. a second notifyWindowTerminate_() in ~SyncProgressDialogImpl()!!!
     syncStat_ = nullptr;
     abortCb_  = nullptr;

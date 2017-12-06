@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>التحقق من توافر سلة المحذوفات من أجل المجلد %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>سلة المهملات غير متوفرة للمجلدات التالية. سيتم حذف الملفات بشكل نهائي بدلاً عن ذلك:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>سلة المهملات غير مدعومة بواسطة المجلدات التالية. لن تتمكن من استعادة الملفات المحذوفة أو التي يتم استبدالها:</target>
 
 <source>An exception occurred</source>
 <target>حدث استثناء</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>بنية:</target>
 
-<source>global config file:</source>
-<target>ملف الخيارات العام:</target>
-
 <source>config files:</source>
 <target>ملفات الخيارات:</target>
 
 <source>directory</source>
 <target>مسار</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>تحديد مسار مختلف لملف GlobalSettings.xml.</target>
+<source>global config file:</source>
+<target>ملف الخيارات العام:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>أي عدد من ملفات تكوين FreeFileSync بامتداد .ffs_gui أو/و .ffs_batch.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>أي عدد من أزواج المسارات البديلة من أجل ملف خيارات واحد.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>فتح التكوين للتحرير دون تنفيذه.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>فتح التكوين المحدد لتعديله فقط بدون تنفيذه.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>تحديد مسار مختلف لملف GlobalSettings.xml.</target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>تحديث السمات على اليسار</target>
 
-<source>Cannot write file %x.</source>
-<target>لا يمكن كتابة الملف  %x.</target>
+<source>Cannot read file %x.</source>
+<target>لا يمكن قراءة الملف  %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>العملية غير مدعومة لأنواع المجلدات مختلفة الأساس.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>لا يمكن نسخ الرابط الرمزي من %x إلى %y.</target>
+<source>Cannot write file %x.</source>
+<target>لا يمكن كتابة الملف  %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>لا يمكن نقل الملف  %x إلى %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>لا يمكن نسخ الرابط الرمزي من %x إلى %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>لا يمكن الاتصال بـ %x.</target>
@@ -293,9 +296,6 @@ Actual: %y bytes
 
 <source>Cannot read file attributes of %x.</source>
 <target>لا يمكن قراءة سمات الملف %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>لا يمكن قراءة الملف  %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>لا يمكن إنشاء المسار %x.</target>
@@ -616,8 +616,8 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>مزامنة تلقائية</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>المسار التالي لا يدعم مراقبة الدليل:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>بروتوكول %x لا يدعم مراقبة المجلدات:</target>
 
 <source>Directory monitoring active</source>
 <target>مراقبة المسارات فعالة</target>
@@ -733,8 +733,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>المجلد الأساس:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>سيتم مزامنة مجلد الإصدار لأنه موجود في المجلد الأساس.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>مجلد الإصدار موجود داخل مجلد أساس.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>مزامنة زوج مجلدات:</target>
@@ -747,6 +747,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>اسم المهمة</target>
+
+<source>Show summary</source>
+<target>إظهار الملخص</target>
+
+<source>Sleep</source>
+<target>سكون</target>
+
+<source>Shut down</source>
+<target>إيقاف التشغيل</target>
 
 <source>Synchronization stopped</source>
 <target>توقفت عملية المزامنة</target>
@@ -768,6 +777,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>تمت المزامنة بنجاح</target>
+
+<source>Executing command %x</source>
+<target>تنفيذ الأمر %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>جاري تنظيف ملفات المتابعة القديمة...</target>
@@ -800,8 +812,8 @@ The command is triggered if:
 <pluralform>إعادة المحاولة بعد %x ثانية...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&تجاهلا الأخطاء المماثلة</target>
+<source>Ignore &all</source>
+<target>تجاهل &الكل</target>
 
 <source>Retrying operation...</source>
 <target>إعادة محاولة العملية...</target>
@@ -908,11 +920,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>&بحث...</target>
 
-<source>&Reset layout</source>
-<target>إعادة ال&تنسيق إلى الإفتراضي</target>
-
 <source>&Export file list...</source>
 <target>&تصدير قائمة الملفات...</target>
+
+<source>&Reset layout</source>
+<target>إعادة ال&تنسيق إلى الإفتراضي</target>
 
 <source>&Tools</source>
 <target>أ&دوات</target>
@@ -1049,9 +1061,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>إ&زالة</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>تحديد اتجاه المزامنة بالاستعانة بقواعد بيانات الملفات</target>
-
 <source>Detect moved files</source>
 <target>اكتشاف الملفات المنقولة</target>
 
@@ -1072,38 +1081,23 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>&سلة المهملات</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>نسخ احتياطي للملفات المحذوفة و المستبدلة في سلة المهملات</target>
-
 <source>&Permanent</source>
 <target>&دائم</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>حذف أو الكتابة فوق الملفات بشكل دائم</target>
 
 <source>&Versioning</source>
 <target>ال&وسم حسب الإصدار</target>
 
-<source>Move files to a user-defined folder</source>
-<target>نقل الملفات إلى المجلد المحدد من قبل المستخدم</target>
-
 <source>Naming convention:</source>
 <target>اصطلاح التسمية:</target>
 
-<source>Handle errors:</source>
-<target>التعامل مع الأخطاء:</target>
-
-<source>&Pop-up</source>
-<target>&منبثق</target>
+<source>&Ignore errors</source>
+<target>&تجاهل الأخطاء</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>إظهار إطارات منبثقة عند حصول أخطاء أو تحذيرات</target>
 
-<source>Hide all error and warning messages</source>
-<target>إخفاء جميع رسائل الأخطاء و التحذير</target>
-
-<source>On completion:</source>
-<target>عند الانتهاء:</target>
+<source>Run a command after synchronization:</source>
+<target>تشغيل أمر بعد المزامنة:</target>
 
 <source>OK</source>
 <target>موافق</target>
@@ -1141,6 +1135,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>&ملف المفتاح</target>
 
+<source>&SSH agent</source>
+<target>&عميل بروتوكول SSH</target>
+
 <source>User name:</source>
 <target>اسم المستخدم:</target>
 
@@ -1159,20 +1156,14 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>كيفية الحصول على أفضل أداء؟</target>
 
-<source>SSH connections for directory reading:</source>
-<target>اتصالات SSH لقراءة الدليل:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>النطاق المقترح: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>عدد الاتصالات لقراءة المجلد:</target>
 
 <source>SFTP channels per connection:</source>
 <target>قنوات SFTP لكل اتصال:</target>
 
 <source>Detect server limit</source>
 <target>اكتشاف حد الخادم</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>اتصالان × 10 قنوات = 20 مرات قراءة الدليل أسرع</target>
 
 <source>Select a directory on the server:</source>
 <target>تحديد دليل على الخادم:</target>
@@ -1213,6 +1204,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>Bytes المنسوخة:</target>
 
+<source>When finished:</source>
+<target>عند الانتهاء:</target>
+
 <source>Close</source>
 <target>إغلاق</target>
 
@@ -1225,14 +1219,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>إنشاء ملف دفعي من أجل عمليات المزامنة غير المحضورة. للبدأ, انقر نقراً مزدوجاً على الملف أو المهمة المجدولة في منظم المهام: %x</target>
 
-<source>&Stop</source>
-<target>&توقف</target>
+<source>Run minimized</source>
+<target>تشغيل بوضع التصغير</target>
+
+<source>&Show error dialog</source>
+<target>&إظهار نافذة الأخطاء</target>
+
+<source>&Cancel</source>
+<target>&إلغاء</target>
 
 <source>Stop synchronization at first error</source>
 <target>إحباط المزامنة عند أول خطأ</target>
-
-<source>Run minimized</source>
-<target>تشغيل بوضع التصغير</target>
 
 <source>Save log:</source>
 <target>حفظ السجل:</target>
@@ -1264,14 +1261,14 @@ This guarantees a consistent state even in case of a serious error.
 هذه العملية تضمن حالة مستقرة حتى في حال حدوث خطأ فادح.
 </target>
 
-<source>(recommended)</source>
-<target>(موصى به)</target>
+<source>recommended</source>
+<target>‏منصوح به‏</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>نسخ الملفات المشتركة مع مستخدمين آخرين أو المقفولة باستخدام خدمة نسخ الظل الوسيط.</target>
 
-<source>(requires administrator rights)</source>
-<target>(بحاجة امتيازات المدير)</target>
+<source>requires administrator rights</source>
+<target>يتطلب صلاحيات مسؤول</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>نقل أذونات الملفات و المجلدات.</target>
@@ -1303,14 +1300,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>الرماز المصدري مكتوب بلغة C++‎ باستخدام:</target>
 
-<source>Donation details</source>
-<target>تفاصيل التبرع</target>
-
 <source>If you like FreeFileSync:</source>
 <target>إذا أعجبك FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>تبرع باستخدام PayPal</target>
+<source>Support with a donation</source>
+<target>دعم عبر التبرع</target>
+
+<source>Donation details</source>
+<target>تفاصيل التبرع</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>تم تعطيل المحدث التلقائي بواسطة المسؤول.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>التعليقات و الاقتراحات موضع ترحيب</target>
@@ -1348,7 +1348,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>تنشيط دون اتصال</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>حفظ كمهمة دفعية</target>
 
 <source>Delete Items</source>
@@ -1387,11 +1387,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>نظرة عامة</target>
 
+<source>Show "%x"</source>
+<target>إظهار "%x"</target>
+
 <source>&Show details</source>
 <target>&عرض التفاصيل</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>يتوفر إصدار جديد من FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x متوفر!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>ملفات التثبيت تالفة. الرجاء إعادة تثبيت FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>المسار المحلي غير متوفر لـ %x.</target>
@@ -1499,9 +1505,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>حدد المجال الزمني...</target>
 
-<source>Show "%x"</source>
-<target>إظهار "%x"</target>
-
 <source>Last session</source>
 <target>مصدر الجلسة</target>
 
@@ -1601,18 +1604,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>جاري البحث عن تحديثات للبرنامج...</target>
 
-<source>Close progress dialog</source>
-<target>إنهاء نافذة حوار تقدم العملية</target>
-
-<source>Log off</source>
-<target>تسجيل الخروج</target>
-
-<source>Standby</source>
-<target>وضع الاستعداد</target>
-
-<source>Shut down</source>
-<target>إيقاف التشغيل</target>
-
 <source>Paused</source>
 <target>تم الإيقاف مؤقتاً</target>
 
@@ -1643,17 +1634,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>السجل</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>ملفات التثبيت تالفة. الرجاء إعادة تثبيت FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>شكرا لك، %x, للتبرع والدعم.</target>
+
+<source>Recommended range:</source>
+<target>النطاق المستحسن:</target>
 
 <source>Password:</source>
 <target>كلمة المرور:</target>
 
 <source>Key password:</source>
 <target>كلمة المرور الرئيسية:</target>
+
+<source>Please enter a file path.</source>
+<target>الرجاء إدخال مسار الملف.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1781,6 +1775,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>الاحتفاظ بالملفات المحذوفة والمستبدلة في سلة المهملات</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>حذف واستبدال الملفات نهائيا</target>
+
+<source>Move files to a user-defined folder</source>
+<target>نقل الملفات إلى المجلد المحدد من قبل المستخدم</target>
+
 <source>Replace</source>
 <target>استبدال</target>
 
@@ -1792,6 +1795,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>إلحاق ختم زمني بكل اسم ملف</target>
+
+<source>On completion:</source>
+<target>عند الانتهاء:</target>
+
+<source>On errors:</source>
+<target>عند حصول أخطاء:</target>
+
+<source>On success:</source>
+<target>عند النجاح:</target>
 
 <source>Main config</source>
 <target>التكوين الرئيسي</target>
@@ -1813,9 +1825,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>الاسم</target>
-
-<source>Items</source>
-<target>عناصر</target>
 
 <source>Percentage</source>
 <target>النسبة المئوية</target>
@@ -1958,6 +1967,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>تعذر تغيير أولويات I/O للعملية.</target>
 
+<source>Unable to shut down the system.</source>
+<target>غير فادر على إيقاف تشغيل النظام.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>فشل تصفح سلة المهملات من أجل الملف %x.</target>
 
@@ -1981,9 +1993,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Portable</source>
 <target>متنقل</target>
-
-<source>recommended</source>
-<target>‏منصوح به‏</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>حفظ الإعدادات إلى ‏‪"%APPDATA%\FreeFileSync"</target>
@@ -2036,8 +2045,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>تعديل بواسطة FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>النسخة المحمولة لا يمكن تثبيتها في المجلد المحدد.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>لا يمكن تثبيت النسخة المحمولة من FreeFileSync في مجلد فرعي داخل %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>الرجاء اختيار نوع التثبيت المحلي أو اختيار مجلد آخر للتثبيت.</target>

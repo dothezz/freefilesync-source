@@ -1,11 +1,11 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
-#ifndef HTTP_h_879083425703425702
-#define HTTP_h_879083425703425702
+#ifndef HTTP_H_879083425703425702
+#define HTTP_H_879083425703425702
 
 #include <zen/file_error.h>
 #include <zen/serialize.h>
@@ -46,4 +46,4 @@ std::string xWwwFormUrlEncode(const std::vector<std::pair<std::string, std::stri
 std::vector<std::pair<std::string, std::string>> xWwwFormUrlDecode(const std::string& str);
 }
 
-#endif //HTTP_h_879083425703425702
+#endif //HTTP_H_879083425703425702

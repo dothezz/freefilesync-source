@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -46,7 +46,7 @@ public:
 private:
     void OnOK    (wxCommandEvent& event) override { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
     void OnClose (wxCloseEvent&   event) override { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnDonate(wxCommandEvent& event) override { wxLaunchDefaultBrowser(L"http://www.freefilesync.org/donate.php"); }
+    void OnDonate(wxCommandEvent& event) override { wxLaunchDefaultBrowser(L"https://www.freefilesync.org/donate.php"); }
 };
 
 
@@ -88,8 +88,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     fgSizerTranslators->Fit(m_scrolledWindowTranslators);
 
 
-    //build information
-    wxString build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime()) + SPACED_DASH + L"Unicode";
+    std::wstring build = formatTime<std::wstring>(FORMAT_DATE, getCompileTime()) + SPACED_DASH + L"Unicode";
 #ifndef wxUSE_UNICODE
 #error what is going on?
 #endif

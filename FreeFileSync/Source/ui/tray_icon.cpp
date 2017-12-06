@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -216,7 +216,7 @@ FfsTrayIcon::~FfsTrayIcon()
     => !!!clicking on the icon after ~wxTaskBarIcon ran crashes the application!!!
 
     - if ~wxTaskBarIcon() ran from the SyncProgressDialog::updateGui() event loop (e.g. user manually clicking the icon) => icon removed on return
-    - if ~wxTaskBarIcon() ran from SyncProgressDialog::closeWindowDirectly() => leaves the icon dangling until user closes this dialog and outter event loop runs!
+    - if ~wxTaskBarIcon() ran from SyncProgressDialog::closeDirectly() => leaves the icon dangling until user closes this dialog and outter event loop runs!
     */
 
     trayIcon->RemoveIcon(); //required on Windows: unlike on OS X, wxPendingDelete does not kick in before main event loop!

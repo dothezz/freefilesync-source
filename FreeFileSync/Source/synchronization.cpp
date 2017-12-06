@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -2094,7 +2094,7 @@ void zen::synchronize(const std::chrono::system_clock::time_point& syncStartTime
                 msg += item.second;
         }
         if (!msg.empty())
-            callback.reportWarning(_("The versioning folder will be synchronized because it is contained in a base folder.") + L"\n" +
+            callback.reportWarning(_("The versioning folder is contained in a base folder.") + L"\n" +
                                    _("The folder should be excluded from synchronization via filter.") + msg, warnings.warnVersioningFolderPartOfSync);
     }
 

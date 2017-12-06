@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -75,11 +75,11 @@ int cmpStringNaturalLinux(const char* lhs, size_t lhsLen, const char* rhs, size_
         - implement strict weak ordering!
         - don't follow broken "strnatcasecmp": https://github.com/php/php-src/blob/master/ext/standard/strnatcmp.c
                 1. incorrect non-ASCII CI-comparison
-				2. incorrect bounds checks
+                2. incorrect bounds checks
                 3. incorrect trimming of *all* whitespace
-				4. arbitrary handling of leading 0 only at string begin
+                4. arbitrary handling of leading 0 only at string begin
                 5. incorrect handling of whitespace following a number
-				6. code is a mess
+                6. code is a mess
     */
     for (;;)
     {

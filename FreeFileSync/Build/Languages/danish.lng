@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Tjekker papirkurvs tilgængelighed for mappen %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Papirkurven kan ikke bruges til følgende mapper. Filerne slettes permanent:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Papirkurven understøttere ikke følgende mapper. Slettede eller overskrevne filer kan ikke gendannes:</target>
 
 <source>An exception occurred</source>
 <target>Undtagelse opstod</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Syntaks:</target>
 
-<source>global config file:</source>
-<target>global indstillingsfil:</target>
-
 <source>config files:</source>
 <target>indstillingsfiler:</target>
 
 <source>directory</source>
 <target>mappe</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Sti til alternativ GlobalSettings.xml fil.</target>
+<source>global config file:</source>
+<target>global indstillingsfil:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Vilkårligt antal FreeFileSync .ffs_gui og/eller .ffs_batch indstillingsfiler.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Vilkårligt antal alternative mappepar til højst en indstillingsfil.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Redigér indstillingsfil.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Åben  valgte indstilling for at redigere den.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Sti til alternativ GlobalSettings.xml fil.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finde følgende mapper:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Opdater attributter mod højre</target>
 
-<source>Cannot write file %x.</source>
-<target>Kan ikke oprette filen %x.</target>
+<source>Cannot read file %x.</source>
+<target>Kan ikke læse filen %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Aktuel: %y byte
 <source>Operation not supported for different base folder types.</source>
 <target>Handlingen understøtter ikke forskellige typer hovedmapper.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Kan ikke kopiere symlink fra %x til %y.</target>
+<source>Cannot write file %x.</source>
+<target>Kan ikke oprette filen %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Kan ikke flytte filen %x til %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan ikke kopiere symlink fra %x til %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Kan ikke kontakte %x.</target>
@@ -293,9 +296,6 @@ Aktuel: %y byte
 
 <source>Cannot read file attributes of %x.</source>
 <target>Kan ikke læse filattributterne på %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Kan ikke læse filen %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Kan ikke oprette mappen %x.</target>
@@ -596,8 +596,8 @@ Kommandoen udføres hvis:
 <source>Automated Synchronization</source>
 <target>Automatisk synkronisering</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Følgende placering understøtter ikke mappeovervågning:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Protokollen %x understøttere ikke mappeovervågning:</target>
 
 <source>Directory monitoring active</source>
 <target>Mappeovervågning aktiv</target>
@@ -713,8 +713,8 @@ Kommandoen udføres hvis:
 <source>Base folder:</source>
 <target>Basismappe:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Versioneringsmappen synkroniseres, da den er indeholdt i en basismappe.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Versioneringsmappen ligger i hovedmappen.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synkroniserer mappepar:</target>
@@ -727,6 +727,15 @@ Kommandoen udføres hvis:
 
 <source>job name</source>
 <target>Jobnavn</target>
+
+<source>Show summary</source>
+<target>Resultat</target>
+
+<source>Sleep</source>
+<target>Slumre</target>
+
+<source>Shut down</source>
+<target>Luk ned</target>
 
 <source>Synchronization stopped</source>
 <target>Synkronisering afbrudt</target>
@@ -748,6 +757,9 @@ Kommandoen udføres hvis:
 
 <source>Synchronization completed successfully</source>
 <target>Synkronisering gennemført</target>
+
+<source>Executing command %x</source>
+<target>Kører kommandoen %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Fjerner gamle logfiler...</target>
@@ -776,8 +788,8 @@ Kommandoen udføres hvis:
 <pluralform>Prøver igen om %x sekunder...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignorer efterfølgende fejl</target>
+<source>Ignore &all</source>
+<target>Ignorer &alle</target>
 
 <source>Retrying operation...</source>
 <target>Prøver igen...</target>
@@ -884,11 +896,11 @@ Kommandoen udføres hvis:
 <source>&Find...</source>
 <target>S&øg...</target>
 
-<source>&Reset layout</source>
-<target>N&ulstil layout</target>
-
 <source>&Export file list...</source>
 <target>&Eksporter filliste...</target>
+
+<source>&Reset layout</source>
+<target>N&ulstil layout</target>
 
 <source>&Tools</source>
 <target>&Værktøj</target>
@@ -1025,9 +1037,6 @@ Kommandoen udføres hvis:
 <source>C&lear</source>
 <target>R&yd</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Genkend synkretninger ved hjælp af databasefiler</target>
-
 <source>Detect moved files</source>
 <target>Genkend flyttede filer</target>
 
@@ -1048,38 +1057,23 @@ Kommandoen udføres hvis:
 <source>&Recycle bin</source>
 <target>&Papirkurv</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Flyt slettede og overskrevne filer til papirkurven</target>
-
 <source>&Permanent</source>
 <target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Slet eller overskriv filer permanent</target>
 
 <source>&Versioning</source>
 <target>&Versionering</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Flyt filer til brugerdefineret mappe</target>
-
 <source>Naming convention:</source>
 <target>Navneregler:</target>
 
-<source>Handle errors:</source>
-<target>Fejlhåndtering:</target>
-
-<source>&Pop-up</source>
-<target>&Besked</target>
+<source>&Ignore errors</source>
+<target>&Ignorer fejl</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Vis fejlbeskeder og advarsler</target>
 
-<source>Hide all error and warning messages</source>
-<target>Skjul fejlbeskeder og advarsler</target>
-
-<source>On completion:</source>
-<target>Ved gennemført:</target>
+<source>Run a command after synchronization:</source>
+<target>Kør kommando efter synkronisering:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1117,6 +1111,9 @@ Kommandoen udføres hvis:
 <source>&Key file</source>
 <target>&Nøglefil</target>
 
+<source>&SSH agent</source>
+<target>&SSH agent</target>
+
 <source>User name:</source>
 <target>Brugernavn:</target>
 
@@ -1135,20 +1132,14 @@ Kommandoen udføres hvis:
 <source>How to get best performance?</source>
 <target>Hvordan får du bedste ydelse?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH forbindelse for mappelæsning:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Foreslået interval: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Forbindelser til mappelæsning:</target>
 
 <source>SFTP channels per connection:</source>
 <target>SFTP kanaler pr. forbindelse:</target>
 
 <source>Detect server limit</source>
 <target>Genkend servergrænse</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 forbindelser x 10 kanaler = 20 gange hurtigere mappelæsning</target>
 
 <source>Select a directory on the server:</source>
 <target>Vælg servermappe:</target>
@@ -1189,6 +1180,9 @@ Kommandoen udføres hvis:
 <source>Bytes copied:</source>
 <target>Kopierede byte:</target>
 
+<source>When finished:</source>
+<target>Når gennemført:</target>
+
 <source>Close</source>
 <target>Luk</target>
 
@@ -1201,14 +1195,17 @@ Kommandoen udføres hvis:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Opret batchfil til automatisk synkronisering. Start med dobbeltklik på filen eller planlæg via opgavestyring: %x</target>
 
-<source>&Stop</source>
-<target>&Stop</target>
+<source>Run minimized</source>
+<target>Kør minimeret</target>
+
+<source>&Show error dialog</source>
+<target>&Vis fejlbesked</target>
+
+<source>&Cancel</source>
+<target>&Annuller</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stop synkronisering ved første fejl</target>
-
-<source>Run minimized</source>
-<target>Kør minimeret</target>
 
 <source>Save log:</source>
 <target>Gem log:</target>
@@ -1240,14 +1237,14 @@ Kopiér til midlertidig fil (*.ffs_tmp) før overskrivning.
 Sikrer processen ved alvorlige fejl.
 </target>
 
-<source>(recommended)</source>
-<target>(anbefalet)</target>
+<source>recommended</source>
+<target>anbefales</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiér delte eller låste filer med VSS kopiering.</target>
 
-<source>(requires administrator rights)</source>
-<target>(administrator)</target>
+<source>requires administrator rights</source>
+<target>kræver administratorrettigheder</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Overfør fil og mappetilladelser.</target>
@@ -1279,14 +1276,17 @@ Sikrer processen ved alvorlige fejl.
 <source>Source code written in C++ using:</source>
 <target>Kildekoden er skrevet i C++ med hjælp fra:</target>
 
-<source>Donation details</source>
-<target>Donationsdetaljer</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Er du glad for FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Donér med PayPal</target>
+<source>Support with a donation</source>
+<target>Donér for at støtte</target>
+
+<source>Donation details</source>
+<target>Donationsdetaljer</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Autoopdatering deaktiveret af administrator.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Kritik og forslag er meget velkomne</target>
@@ -1324,7 +1324,7 @@ Sikrer processen ved alvorlige fejl.
 <source>Activate offline</source>
 <target>Aktivér offline</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>Gem som batchfil</target>
 
 <source>Delete Items</source>
@@ -1363,11 +1363,17 @@ Sikrer processen ved alvorlige fejl.
 <source>Overview</source>
 <target>Oversigt</target>
 
+<source>Show "%x"</source>
+<target>Vis "%x"</target>
+
 <source>&Show details</source>
 <target>&Vis detaljer</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>FreeFileSync er blevet opdateret:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x er udkommet!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Ødelagte installationsfiler. Geninstaller FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Placeringen er ikke tilgængelig for %x.</target>
@@ -1458,9 +1464,6 @@ Sikrer processen ved alvorlige fejl.
 
 <source>Select time span...</source>
 <target>Vælg tidsinterval...</target>
-
-<source>Show "%x"</source>
-<target>Vis "%x"</target>
 
 <source>Last session</source>
 <target>Sidste opgave</target>
@@ -1561,18 +1564,6 @@ Sikrer processen ved alvorlige fejl.
 <source>Searching for program updates...</source>
 <target>Søger efter opdatering...</target>
 
-<source>Close progress dialog</source>
-<target>Luk dialogen</target>
-
-<source>Log off</source>
-<target>Log af</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Shut down</source>
-<target>Luk ned</target>
-
 <source>Paused</source>
 <target>Pauset</target>
 
@@ -1603,17 +1594,20 @@ Sikrer processen ved alvorlige fejl.
 <source>Log</source>
 <target>Log</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Ødelagte installationsfiler. Geninstaller FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Tak %x for donationen og støtten!</target>
+
+<source>Recommended range:</source>
+<target>Anbefalet interval:</target>
 
 <source>Password:</source>
 <target>Kodeord:</target>
 
 <source>Key password:</source>
 <target>Nøglekodeord:</target>
+
+<source>Please enter a file path.</source>
+<target>Angiv placering.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1729,6 +1723,15 @@ Sikrer processen ved alvorlige fejl.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Flyt slettede og overskrevne filer til papirkurv</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Slet og overskriv permanent</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Flyt filer til brugerdefineret mappe</target>
+
 <source>Replace</source>
 <target>Erstat</target>
 
@@ -1740,6 +1743,15 @@ Sikrer processen ved alvorlige fejl.
 
 <source>Append a time stamp to each file name</source>
 <target>Føj tidsstempel til hvert filnavn</target>
+
+<source>On completion:</source>
+<target>Ved gennemført:</target>
+
+<source>On errors:</source>
+<target>Ved fejl:</target>
+
+<source>On success:</source>
+<target>Ved gennemført:</target>
 
 <source>Main config</source>
 <target>Hovedindstilling</target>
@@ -1761,9 +1773,6 @@ Sikrer processen ved alvorlige fejl.
 
 <source>Name</source>
 <target>Navn</target>
-
-<source>Items</source>
-<target>Emner</target>
 
 <source>Percentage</source>
 <target>Procent</target>
@@ -1894,6 +1903,9 @@ Sikrer processen ved alvorlige fejl.
 <source>Cannot change process I/O priorities.</source>
 <target>Kan ikke ændre I/O prioriteter.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Kunne ikke lukke computeren.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Check papirkurv fejlede for mappen %x.</target>
 
@@ -1917,9 +1929,6 @@ Sikrer processen ved alvorlige fejl.
 
 <source>Portable</source>
 <target>Portable</target>
-
-<source>recommended</source>
-<target>anbefales</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Gemmer indstillinger i "%APPDATA%\FreeFileSync"</target>
@@ -1972,8 +1981,8 @@ Sikrer processen ved alvorlige fejl.
 <source>Edit with FreeFileSync</source>
 <target>Rediger med FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Portable udgaven kan ikke installeres i den valgte mappe.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>FreeFileSync portable kan ikke installeres i en undermappe til %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Installer normalt, eller vælg en anden mappe.</target>

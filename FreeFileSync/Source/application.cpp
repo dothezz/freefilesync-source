@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -72,7 +72,6 @@ bool Application::OnInit()
     catch (const FileError&) { assert(false); }
 
 
-
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
 
@@ -120,7 +119,7 @@ int Application::OnRun()
     }
     //catch (...) -> let it crash and create mini dump!!!
 
-    return returnCode;
+    return returnCode_;
 }
 
 
@@ -153,7 +152,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         auto titleFmt = copyStringTo<std::wstring>(wxTheApp->GetAppDisplayName()) + SPACED_DASH + title;
         wxSafeShowMessage(titleFmt, msg);
 
-        raiseReturnCode(returnCode, FFS_RC_ABORTED);
+        raiseReturnCode(returnCode_, FFS_RC_ABORTED);
     };
 
     //parse command line arguments
@@ -327,7 +326,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             if (!replaceDirectories(batchCfg.mainCfg))
                 return;
-            runBatchMode(globalConfigFilePath, batchCfg, filepath, returnCode);
+            runBatchMode(globalConfigFilePath, batchCfg, filepath, returnCode_);
         }
         //GUI mode: single config (ffs_gui *or* ffs_batch)
         else

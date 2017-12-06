@@ -1,6 +1,6 @@
-﻿<header>
+<header>
 	<language>Português</language>
-	<translator>Igor Rückert</translator>
+	<translator>igorruckert</translator>
 	<locale>pt_PT</locale>
 	<image>flag_portugal.png</image>
 	<plural_count>2</plural_count>
@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>A verificar a disponibilidade da reciclagem para a pasta %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>A reciclagem não está disponível para as seguintes pastas. Os ficheiros serão, em alternativa, eliminados permanentemente:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>A reciclagem não é suportada pelas seguintes pastas. Ficheiros eliminados ou sobrescritos não podem ser restaurados:</target>
 
 <source>An exception occurred</source>
 <target>Ocorreu uma excepção</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Sintaxe:</target>
 
-<source>global config file:</source>
-<target>ficheiro de configuração global:</target>
-
 <source>config files:</source>
 <target>ficheiros de configuração:</target>
 
 <source>directory</source>
 <target>directório</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Caminho para o ficheiro GlobalSettings.xml alternativo.</target>
+<source>global config file:</source>
+<target>ficheiro de configuração global:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Qualquer número de ficheiros de configuração .ffs_gui e/ou .ffs_batch do FreeFileSync.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Qualquer número de pares de directórios alternativos para apenas um ficheiro de configuração.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Abre a configuração para editar sem executar.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Abre a configuração seleccionada para somente editar sem executá-la.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Caminho para o ficheiro GlobalSettings.xml alternativo.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Não é possível encontrar as seguintes pastas:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Actualizar atributos à direita</target>
 
-<source>Cannot write file %x.</source>
-<target>Não é possível escrever o ficheiro %x.</target>
+<source>Cannot read file %x.</source>
+<target>Não é possível ler o ficheiro %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Operação sem suporte para tipos de pastas base distintas.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Não é possível criar o link simbólico de %x para %y.</target>
+<source>Cannot write file %x.</source>
+<target>Não é possível escrever o ficheiro %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Não é possível mover o ficheiro %x para %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Não é possível criar o link simbólico de %x para %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Não é possível conectar-se em %x.</target>
@@ -291,8 +294,8 @@ Actual: %y bytes
 <source>Cannot read directory %x.</source>
 <target>Não é possível ler o directório %x.</target>
 
-<source>Cannot read file %x.</source>
-<target>Não é possível ler o ficheiro %x.</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Não é possível ler os atributos do ficheiro %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Não é possível criar o directório %x.</target>
@@ -302,9 +305,6 @@ Actual: %y bytes
 
 <source>Cannot delete directory %x.</source>
 <target>Não é possível eliminar o directório %x.</target>
-
-<source>Cannot read file attributes of %x.</source>
-<target>Não é possível ler os atributos do ficheiro %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Não é possível alterar a data de modificação a %x.</target>
@@ -596,8 +596,8 @@ O comando é executado se:
 <source>Automated Synchronization</source>
 <target>Sincronização Automática</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>O seguinte caminho não suporta a monitorização de direcctório:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>O protocolo %x não suporta a monitorização de directórios:</target>
 
 <source>Directory monitoring active</source>
 <target>Monitorização de directório activa</target>
@@ -713,8 +713,8 @@ O comando é executado se:
 <source>Base folder:</source>
 <target>Pasta base:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>A pasta de versão será sincronizada pois ela está contida em uma pasta base.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>A pasta de versão está contida em uma pasta base.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>A cincronizar o par de pastas:</target>
@@ -727,6 +727,15 @@ O comando é executado se:
 
 <source>job name</source>
 <target>nome da tarefa</target>
+
+<source>Show summary</source>
+<target>Mostrar resumo</target>
+
+<source>Sleep</source>
+<target>Suspender</target>
+
+<source>Shut down</source>
+<target>Desligar</target>
 
 <source>Synchronization stopped</source>
 <target>Sincronização parada</target>
@@ -748,6 +757,9 @@ O comando é executado se:
 
 <source>Synchronization completed successfully</source>
 <target>Sincronização completa com sucesso</target>
+
+<source>Executing command %x</source>
+<target>A executar comando %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>A limpar ficheiros de log antigos...</target>
@@ -776,8 +788,8 @@ O comando é executado se:
 <pluralform>Repetir automaticamente dentro de %x segundos...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignorar erros subsequentes</target>
+<source>Ignore &all</source>
+<target>Ignorar &todos</target>
 
 <source>Retrying operation...</source>
 <target>A repetir a operação...</target>
@@ -884,11 +896,11 @@ O comando é executado se:
 <source>&Find...</source>
 <target>&Procurar...</target>
 
-<source>&Reset layout</source>
-<target>&Restaurar esquema</target>
-
 <source>&Export file list...</source>
 <target>&Exportar lista de ficheiros...</target>
+
+<source>&Reset layout</source>
+<target>&Restaurar esquema</target>
 
 <source>&Tools</source>
 <target>&Ferramentas</target>
@@ -1025,9 +1037,6 @@ O comando é executado se:
 <source>C&lear</source>
 <target>&Limpar</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detectar a direcção de sincronização com a ajuda de base de dados</target>
-
 <source>Detect moved files</source>
 <target>Detectar ficheiros movidos</target>
 
@@ -1048,38 +1057,23 @@ O comando é executado se:
 <source>&Recycle bin</source>
 <target>&Reciclagem</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Fazer backup dos ficheiros apagados e substituídos na reciclagem</target>
-
 <source>&Permanent</source>
 <target>&Permanente</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Apagar ou substituir ficheiros permanentemente</target>
 
 <source>&Versioning</source>
 <target>Controlo &Versões</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Mover ficheiros para uma pasta definida pelo utilizador</target>
-
 <source>Naming convention:</source>
 <target>Convenção de nomes:</target>
 
-<source>Handle errors:</source>
-<target>Tratar erros:</target>
-
-<source>&Pop-up</source>
-<target>&Popup</target>
+<source>&Ignore errors</source>
+<target>&Ignorar erros</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar popup em caso de erros ou avisos</target>
 
-<source>Hide all error and warning messages</source>
-<target>Ocultar todas as mensagens de erro/aviso</target>
-
-<source>On completion:</source>
-<target>Ao completar:</target>
+<source>Run a command after synchronization:</source>
+<target>Executar um comando após a sincronização:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1117,6 +1111,9 @@ O comando é executado se:
 <source>&Key file</source>
 <target>Ficheiro de &chave</target>
 
+<source>&SSH agent</source>
+<target>Agente &SSH</target>
+
 <source>User name:</source>
 <target>Utilizador:</target>
 
@@ -1135,20 +1132,14 @@ O comando é executado se:
 <source>How to get best performance?</source>
 <target>Como obter um melhor desempenho?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>Conexões SSH para leitura de directório:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Intervalo sugerido: [1 -10]</target>
+<source>Connections for directory reading:</source>
+<target>Conexões para ler directório:</target>
 
 <source>SFTP channels per connection:</source>
 <target>Canais SFTP por conexão:</target>
 
 <source>Detect server limit</source>
 <target>Detectar limite do servidor</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 conexões X 10 canais = leitura de directórios 20 vezes mais rápida</target>
 
 <source>Select a directory on the server:</source>
 <target>Seleccione um directório no servidor:</target>
@@ -1189,6 +1180,9 @@ O comando é executado se:
 <source>Bytes copied:</source>
 <target>Bytes copiados:</target>
 
+<source>When finished:</source>
+<target>Quando concluído:</target>
+
 <source>Close</source>
 <target>Fechar</target>
 
@@ -1201,14 +1195,17 @@ O comando é executado se:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Criar ficheiro batch para sincronização automática. Para iniciar, fazer duplo clique no ficheiro ou acrescentar ao planeador de tarefas: %x</target>
 
-<source>&Stop</source>
-<target>&Parar</target>
+<source>Run minimized</source>
+<target>Correr minimizado</target>
+
+<source>&Show error dialog</source>
+<target>Mo&strar diálogo de erro</target>
+
+<source>&Cancel</source>
+<target>&Cancelar</target>
 
 <source>Stop synchronization at first error</source>
 <target>Para sincronização ao primeiro erro</target>
-
-<source>Run minimized</source>
-<target>Correr minimizado</target>
 
 <source>Save log:</source>
 <target>Guardar registo:</target>
@@ -1240,14 +1237,14 @@ Copiar para um ficheiro temporário (*.ffs_tmp) antes de substituir.
 Isto garante um estado consistente mesmo em caso de falha grave.
 </target>
 
-<source>(recommended)</source>
-<target>(recomendado)</target>
+<source>recommended</source>
+<target>recomendada</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy.</target>
 
-<source>(requires administrator rights)</source>
-<target>(requer permissões de administrador)</target>
+<source>requires administrator rights</source>
+<target>requer direitos de administrador</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Transferir permissões de pasta e ficheiro.</target>
@@ -1279,14 +1276,17 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Source code written in C++ using:</source>
 <target>Código fonte escrito em C++ utilizando:</target>
 
-<source>Donation details</source>
-<target>Detalhes da doação</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Se gosta do FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Doar usando PayPal</target>
+<source>Support with a donation</source>
+<target>Apoiar com uma doação</target>
+
+<source>Donation details</source>
+<target>Detalhes da doação</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>A actualização automática foi desactivada pelo administrador.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Comentários e sugestões são apreciados</target>
@@ -1324,8 +1324,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Activate offline</source>
 <target>Activar offline</target>
 
-<source>Save as Batch Job</source>
-<target>Guardar como Ficheiro Batch</target>
+<source>Save as a Batch Job</source>
+<target>Salvar como Tarefa em Lote</target>
 
 <source>Delete Items</source>
 <target>Eliminar Itens</target>
@@ -1363,11 +1363,17 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Overview</source>
 <target>Vista</target>
 
+<source>Show "%x"</source>
+<target>Mostrar "%x"</target>
+
 <source>&Show details</source>
 <target>&Mostras detalhes</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Uma nova versão do FreeFileSync está disponível:</target>
+<source>FreeFileSync %x is available!</source>
+<target>O FreeFileSync %x está disponível!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Os ficheiros de instalação estão corrompidos. Por favor, reinstale o FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Caminho local não disponível para %x.</target>
@@ -1458,9 +1464,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Select time span...</source>
 <target>Seleccione o intervalo de tempo...</target>
-
-<source>Show "%x"</source>
-<target>Mostrar "%x"</target>
 
 <source>Last session</source>
 <target>Última Sessão</target>
@@ -1561,18 +1564,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Searching for program updates...</source>
 <target>A procurar actualizações do programa...</target>
 
-<source>Close progress dialog</source>
-<target>Fechar diálogo de progresso</target>
-
-<source>Log off</source>
-<target>Terminar sessão</target>
-
-<source>Standby</source>
-<target>Standby</target>
-
-<source>Shut down</source>
-<target>Desligar</target>
-
 <source>Paused</source>
 <target>Em pausa</target>
 
@@ -1603,17 +1594,20 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Log</source>
 <target>Log</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Os ficheiros de instalação estão corrompidos. Por favor, reinstale o FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Obrigado, %x, pela sua doação e suporte!</target>
+
+<source>Recommended range:</source>
+<target>Gama recomendada:</target>
 
 <source>Password:</source>
 <target>Palavra passe:</target>
 
 <source>Key password:</source>
 <target>Palavra passe da chave:</target>
+
+<source>Please enter a file path.</source>
+<target>Por favor, entre o caminho do ficheiro.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1729,6 +1723,15 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Reter ficheiros eliminados e substituídos na reciclagem</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Apagar e substituir ficheiros permanentemente</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Mover ficheiros para uma pasta definida pelo utilizador</target>
+
 <source>Replace</source>
 <target>Substituir</target>
 
@@ -1740,6 +1743,15 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Append a time stamp to each file name</source>
 <target>Adicione data/hora ao nome de cada ficheiro</target>
+
+<source>On completion:</source>
+<target>Ao completar:</target>
+
+<source>On errors:</source>
+<target>Em erros:</target>
+
+<source>On success:</source>
+<target>No sucesso:</target>
 
 <source>Main config</source>
 <target>Configuração principal</target>
@@ -1761,9 +1773,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Name</source>
 <target>Nome</target>
-
-<source>Items</source>
-<target>Itens</target>
 
 <source>Percentage</source>
 <target>Percentagem</target>
@@ -1894,6 +1903,9 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Cannot change process I/O priorities.</source>
 <target>Não é possível alterar as prioridades de E / S do processo.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Incapaz de desligar o sistema.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Verificar a reciclagem falhou no directório %x.</target>
 
@@ -1917,9 +1929,6 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 
 <source>Portable</source>
 <target>Portátil</target>
-
-<source>recommended</source>
-<target>recomendada</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Guardar as definições em "%APPDATA%\FreeFileSync"</target>
@@ -1972,8 +1981,8 @@ Isto garante um estado consistente mesmo em caso de falha grave.
 <source>Edit with FreeFileSync</source>
 <target>Editar com FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Não é possível instalar a versão portátil na pasta seleccionada.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>A versão portátil do FreeFileSync não pode ser instalada em uma sub-pasta de %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Por favor, escolha o tipo do local de instalação ou seleccione uma pasta diferente para instalar.</target>

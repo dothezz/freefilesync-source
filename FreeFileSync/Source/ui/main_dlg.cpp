@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -10,6 +10,7 @@
 #include <zen/file_io.h>
 #include <zen/thread.h>
 #include <zen/shell_execute.h>
+#include <zen/perf.h>
 #include <wx/clipbrd.h>
 #include <wx/wupdlock.h>
 #include <wx/sound.h>
@@ -670,7 +671,7 @@ MainDialog::MainDialog(const Zstring& globalConfigFile,
         }, menuItem->GetId());
 
         //"hide" menu items by default
-        detachedMenuItemsLayout_.insert(m_menuTools->Remove(menuItem)); //pass ownership
+        detachedMenuItems_.insert(m_menuTools->Remove(menuItem)); //pass ownership
     };
     setupLayoutMenuEvent(m_menuItemShowMain,       m_panelTopButtons);
     setupLayoutMenuEvent(m_menuItemShowFolders,    m_panelDirectoryPairs);
@@ -837,26 +838,27 @@ MainDialog::~MainDialog()
 {
     using namespace xmlAccess;
 
+    Opt<FileError> firstError;
     try //save "GlobalSettings.xml"
     {
         writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); //throw FileError
     }
-    catch (const FileError& e)
-    {
-        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(e.toString()));
-    }
+    catch (const FileError& e) { firstError = e; }
 
     try //save "LastRun.ffs_gui"
     {
         writeConfig(getConfig(), lastRunConfigPath_); //throw FileError
     }
+    catch (const FileError& e) { firstError = e; }
+
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
-    catch (const FileError&) {}
+    if (firstError)
+        showNotificationDialog(this, DialogInfoType::ERROR2, PopupDialogCfg().setDetailInstructions(firstError->toString()));
 
 
     auiMgr_.UnInit();
 
-    for (wxMenuItem* item : detachedMenuItemsLayout_)
+    for (wxMenuItem* item : detachedMenuItems_)
         delete item; //something's got to give
 
     //no need for wxEventHandler::Disconnect() here; event sources are components of this window and are destroyed, too
@@ -868,11 +870,40 @@ void MainDialog::onQueryEndSession()
 {
     using namespace xmlAccess;
 
+    //we try our best to do something useful in this extreme situation - no reason to notify or even log errors here!
     try { writeConfig(getGlobalCfgBeforeExit(), globalConfigFile_); }
-    catch (const FileError&) {} //we try our best to do something useful in this extreme situation - no reason to notify or even log errors here!
+    catch (const FileError&) {}
 
     try { writeConfig(getConfig(), lastRunConfigPath_); }
     catch (const FileError&) {}
+}
+
+
+void MainDialog::OnClose(wxCloseEvent& event)
+{
+    //attention: system shutdown is handled in onQueryEndSession()!
+
+    //regular destruction handling
+    if (event.CanVeto())
+    {
+        //=> veto all attempts to close the main window while comparison or synchronization are running:
+        if (!allowMainDialogClose_)
+        {
+            event.Veto();
+            Raise();    //=what Windows does when vetoing a close (via middle mouse on taskbar preview) while showing a modal dialog
+            SetFocus(); //
+            return;
+        }
+
+        const bool cancelled = !saveOldConfig(); //notify user about changed settings
+        if (cancelled)
+        {
+            event.Veto();
+            return;
+        }
+    }
+
+    Destroy();
 }
 
 
@@ -1377,7 +1408,6 @@ void invokeCommandLine(const Zstring& commandLinePhrase, //throw FileError
         replace(command, Zstr("%local_path%"),   localPath);
         replace(command, Zstr("%local_path2%"),  localPath2);
 
-        //caveat: spawning too many threads asynchronously can easily kill a user's desktop session on Ubuntu (resource drain)!
         shellExecute(command, selection.size() > EXT_APP_MASS_INVOKE_THRESHOLD ? EXEC_TYPE_SYNC : EXEC_TYPE_ASYNC); //throw FileError
     }
 }
@@ -1599,9 +1629,15 @@ void MainDialog::disableAllElements(bool enableAbort)
     //disables all elements (except abort button) that might receive user input during long-running processes:
     //when changing consider: comparison, synchronization, manual deletion
 
-    EnableCloseButton(false); //not allowed for synchronization! progress indicator is top window!
-
     //OS X: wxWidgets portability promise is again a mess: http://wxwidgets.10942.n7.nabble.com/Disable-panel-and-appropriate-children-windows-linux-macos-td35357.html
+
+    EnableCloseButton(false); //closing main dialog is not allowed during synchronization! crash!
+    //EnableCloseButton(false) just does not work reliably!
+    //- Windows: dialog can still be closed by clicking the task bar preview window with the middle mouse button or by pressing ALT+F4!
+    //- OS X: Quit/Preferences menu items still enabled during sync,
+    //       ([[m_macWindow standardWindowButton:NSWindowCloseButton] setEnabled:enable]) does not stick after calling Maximize() ([m_macWindow zoom:nil])
+    //- Linux: it just works! :)
+    allowMainDialogClose_ = false;
 
     localKeyEventsEnabled_ = false;
 
@@ -1620,9 +1656,9 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_panelConfig        ->Disable();
     m_gridOverview       ->Disable();
     m_panelSearch        ->Disable();
-    m_bpButtonCmpContext   ->Disable();
+    m_bpButtonCmpContext ->Disable();
+    m_bpButtonSyncContext->Disable();
     m_bpButtonFilterContext->Disable();
-    m_bpButtonSyncContext  ->Disable();
 
     if (enableAbort)
     {
@@ -1646,6 +1682,7 @@ void MainDialog::enableAllElements()
     //wxGTK, yet another QOI issue: some stupid bug, keeps moving main dialog to top!!
 
     EnableCloseButton(true);
+    allowMainDialogClose_ = true;
 
     localKeyEventsEnabled_ = true;
 
@@ -1664,9 +1701,9 @@ void MainDialog::enableAllElements()
     m_panelConfig        ->Enable();
     m_gridOverview       ->Enable();
     m_panelSearch        ->Enable();
-    m_bpButtonCmpContext   ->Enable();
+    m_bpButtonCmpContext ->Enable();
+    m_bpButtonSyncContext->Enable();
     m_bpButtonFilterContext->Enable();
-    m_bpButtonSyncContext  ->Enable();
 
     //show compare button
     m_buttonCancel->Disable();
@@ -2550,16 +2587,16 @@ void MainDialog::resetLayout()
 
 void MainDialog::onOpenMenuTools(wxMenuEvent& event)
 {
-    //each layout menu item is either shown and owned by m_menuTools OR detached from m_menuTools and owned by detachedMenuItemsLayout_:
+    //each layout menu item is either shown and owned by m_menuTools OR detached from m_menuTools and owned by detachedMenuItems_:
     auto filterLayoutItems = [&](wxMenuItem* menuItem, wxWindow* panelWindow)
     {
-        if (detachedMenuItemsLayout_.find(menuItem) == detachedMenuItemsLayout_.end())
-            detachedMenuItemsLayout_.insert(m_menuTools->Remove(menuItem)); //pass ownership
+        if (detachedMenuItems_.find(menuItem) == detachedMenuItems_.end())
+            detachedMenuItems_.insert(m_menuTools->Remove(menuItem)); //pass ownership
 
         wxAuiPaneInfo& paneInfo = this->auiMgr_.GetPane(panelWindow);
         if (!paneInfo.IsShown())
         {
-            detachedMenuItemsLayout_.erase(menuItem); //pass ownership
+            detachedMenuItems_.erase(menuItem); //pass ownership
             m_menuTools->Append(menuItem);            //
         }
     };
@@ -3264,26 +3301,6 @@ void MainDialog::OnCfgHistoryKeyEvent(wxKeyEvent& event)
 }
 
 
-void MainDialog::OnClose(wxCloseEvent& event)
-{
-    //attention: system shutdown is handled in onQueryEndSession()!
-
-    //regular destruction handling
-    if (event.CanVeto())
-    {
-        const bool cancelled = !saveOldConfig(); //notify user about changed settings
-        if (cancelled)
-        {
-            //attention: this Veto() will NOT cancel system shutdown since saveOldConfig() blocks on modal dialog
-            event.Veto();
-            return;
-        }
-    }
-
-    Destroy();
-}
-
-
 void MainDialog::onCheckRows(CheckRowsEvent& event)
 {
     std::vector<size_t> selectedRows;
@@ -3798,15 +3815,6 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 }
 
 
-void MainDialog::updateTopButtonImages()
-{
-    updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), getConfig().mainCfg.getCompVariantName(), false /*makeGrey*/);
-    updateTopButton(*m_buttonSync,    getResourceImage(L"sync"),    getConfig().mainCfg.getSyncVariantName(), folderCmp_.empty());
-
-    m_panelTopButtons->Layout();
-}
-
-
 void MainDialog::updateGui()
 {
     updateGridViewData(); //update gridDataView and write status information
@@ -3815,7 +3823,11 @@ void MainDialog::updateGui()
 
     updateUnsavedCfgStatus();
 
-    updateTopButtonImages();
+    updateTopButton(*m_buttonCompare, getResourceImage(L"compare"), getConfig().mainCfg.getCompVariantName(), false /*makeGrey*/);
+    updateTopButton(*m_buttonSync,    getResourceImage(L"sync"),    getConfig().mainCfg.getSyncVariantName(), folderCmp_.empty());
+    m_panelTopButtons->Layout();
+
+    m_menuItemExportList->Enable(!folderCmp_.empty()); //a CSV without even folder names confuses users: https://www.freefilesync.org/forum/viewtopic.php?t=4787
 
     auiMgr_.Update(); //fix small display distortion, if view filter panel is empty
 }
@@ -4871,12 +4883,12 @@ void MainDialog::OnMenuCheckVersionAutomatically(wxCommandEvent& event)
 
     m_menuItemCheckVersionAuto->Check(updateCheckActive(globalCfg_.gui.lastUpdateCheck));
 
-    if (shouldRunPeriodicUpdateCheck(globalCfg_.gui.lastUpdateCheck))
+    if (shouldRunAutomaticUpdateCheck(globalCfg_.gui.lastUpdateCheck))
     {
         flashStatusInformation(_("Searching for program updates..."));
         //synchronous update check is sufficient here:
-        periodicUpdateCheckEval(this, globalCfg_.gui.lastUpdateCheck, globalCfg_.gui.lastOnlineVersion,
-                                periodicUpdateCheckRunAsync(periodicUpdateCheckPrepare().get()).get());
+        automaticUpdateCheckEval(this, globalCfg_.gui.lastUpdateCheck, globalCfg_.gui.lastOnlineVersion,
+                                 automaticUpdateCheckRunAsync(automaticUpdateCheckPrepare().get()).get());
     }
 }
 
@@ -4886,17 +4898,17 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), nullptr, this);
 
-    if (shouldRunPeriodicUpdateCheck(globalCfg_.gui.lastUpdateCheck))
+    if (shouldRunAutomaticUpdateCheck(globalCfg_.gui.lastUpdateCheck))
     {
         flashStatusInformation(_("Searching for program updates..."));
 
-        std::shared_ptr<UpdateCheckResultPrep> resultPrep = periodicUpdateCheckPrepare(); //run on main thread:
+        std::shared_ptr<UpdateCheckResultPrep> resultPrep = automaticUpdateCheckPrepare(); //run on main thread:
 
-        guiQueue_.processAsync([resultPrep] { return periodicUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
+        guiQueue_.processAsync([resultPrep] { return automaticUpdateCheckRunAsync(resultPrep.get()); }, //run on worker thread: (long-running part of the check)
                                [this] (std::shared_ptr<UpdateCheckResult>&& resultAsync)
         {
-            periodicUpdateCheckEval(this, globalCfg_.gui.lastUpdateCheck, globalCfg_.gui.lastOnlineVersion,
-                                    resultAsync.get()); //run on main thread:
+            automaticUpdateCheckEval(this, globalCfg_.gui.lastUpdateCheck, globalCfg_.gui.lastOnlineVersion,
+                                     resultAsync.get()); //run on main thread:
         });
     }
 }

@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Provjeravanje dosupnosti kante za smeće za mapu %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Koš za smeće nije dostupna za sljedeće mape. Zbog toga će datoteke biti trajno obrisane:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Koš za smeće nije podržan od slijedećih mapa. Izbrisane ili prepisane datoteke neće biti moguće povratiti:</target>
 
 <source>An exception occurred</source>
 <target>Dogodilo se izuzeće</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Sintaksa:</target>
 
-<source>global config file:</source>
-<target>globalna config datoteka:</target>
-
 <source>config files:</source>
 <target>config datoteke:</target>
 
 <source>directory</source>
 <target>direktorij</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Putanja do alternativne GlobalSettings.xml datoteke.</target>
+<source>global config file:</source>
+<target>globalna config datoteka:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Bilo koji broj FreeFileSync .ffs_gui i/ili .ffs_batch konfiguracijskih datoteka.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Bilo koji broj alternativnih parova mapa za najmanje jednu config datoteku.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Otvori postavke za izmjenu bez pokretanja.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Otvorite odabrane postavke za izmjenu bez da ih izvršite.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Putanja do alternativne GlobalSettings.xml datoteke.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Ne mogu pronaći slijedeće mape:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Osvježi atribute desno</target>
 
-<source>Cannot write file %x.</source>
-<target>Ne mogu zapisati datoteku %x.</target>
+<source>Cannot read file %x.</source>
+<target>Ne mogu čitati datoteku %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Stvarno: %y bajta
 <source>Operation not supported for different base folder types.</source>
 <target>Operacija nije podržana za različite bazne mape.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Ne može se kopirati simbolična poveznica %x prema %y.</target>
+<source>Cannot write file %x.</source>
+<target>Ne mogu zapisati datoteku %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Ne mogu premjestiti datoteku %x u %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Ne može se kopirati simbolična poveznica %x prema %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Nije moguće povezivanje na %x.</target>
@@ -290,9 +293,6 @@ Stvarno: %y bajta
 
 <source>Cannot read directory %x.</source>
 <target>Nije moguće učitati mapu %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Ne mogu čitati datoteku %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Ne mogu pročitati osobine od %x.</target>
@@ -601,8 +601,8 @@ Naredba će biti pokrenuta ako se:
 <source>Automated Synchronization</source>
 <target>Automatska Sinkronizacija</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Slijedeća putanja ne podržava nadzor nad mapama:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>%x protokol ne podržava nadziranje mapa:</target>
 
 <source>Directory monitoring active</source>
 <target>Nadzor direktorija je aktivan</target>
@@ -718,8 +718,8 @@ Naredba će biti pokrenuta ako se:
 <source>Base folder:</source>
 <target>Bazna mapa:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Mapa verzije će biti sinkronizirana jer je sadržana u baznoj mapi.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Usporedni folder se nalazi u baznom folderu.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Mape sinkronizacije::</target>
@@ -732,6 +732,15 @@ Naredba će biti pokrenuta ako se:
 
 <source>job name</source>
 <target>Naziv zadatka</target>
+
+<source>Show summary</source>
+<target>Prikaži izvještaj</target>
+
+<source>Sleep</source>
+<target>U stanje pripravnosti</target>
+
+<source>Shut down</source>
+<target>Isključi računalo</target>
 
 <source>Synchronization stopped</source>
 <target>Sinkronizacija zaustavljena</target>
@@ -753,6 +762,9 @@ Naredba će biti pokrenuta ako se:
 
 <source>Synchronization completed successfully</source>
 <target>Sinkronizacija uspješno dovršena</target>
+
+<source>Executing command %x</source>
+<target>Izvršavanje naredbe %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Čistim stare datoteke o izvješću...</target>
@@ -782,8 +794,8 @@ Naredba će biti pokrenuta ako se:
 <pluralform>Automatski pokušaj za %x sekundi...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Zanemari naknadne pogreške</target>
+<source>Ignore &all</source>
+<target>Ignoriraj &sve</target>
 
 <source>Retrying operation...</source>
 <target>Ponavljam operaciju...</target>
@@ -890,11 +902,11 @@ Naredba će biti pokrenuta ako se:
 <source>&Find...</source>
 <target>&Pronađi...</target>
 
-<source>&Reset layout</source>
-<target>&Resetiraj prikaz</target>
-
 <source>&Export file list...</source>
 <target>&Izvoz popisa datoteka...</target>
+
+<source>&Reset layout</source>
+<target>&Resetiraj prikaz</target>
 
 <source>&Tools</source>
 <target>&Alati</target>
@@ -1031,9 +1043,6 @@ Naredba će biti pokrenuta ako se:
 <source>C&lear</source>
 <target>O&čisti</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Otkrij putanju sinkronizacije pomoću baze podataka</target>
-
 <source>Detect moved files</source>
 <target>Otkrij premještene datoteke</target>
 
@@ -1054,38 +1063,23 @@ Naredba će biti pokrenuta ako se:
 <source>&Recycle bin</source>
 <target>&Koš za smeće</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Spremi izbrisane ili prepisane datoteke u koš za smeće</target>
-
 <source>&Permanent</source>
 <target>&Trajno</target>
 
-<source>Delete or overwrite files permanently</source>
-<target>Trajno izbriši ili prepiši datoteke</target>
-
 <source>&Versioning</source>
-<target>&Označavanje</target>
-
-<source>Move files to a user-defined folder</source>
-<target>Premjesti datoteke u mapu određenu od korsnika</target>
+<target>&Odabir</target>
 
 <source>Naming convention:</source>
 <target>Naziv pravila:</target>
 
-<source>Handle errors:</source>
-<target>Obradi pogreške:</target>
-
-<source>&Pop-up</source>
-<target>&Pop-up</target>
+<source>&Ignore errors</source>
+<target>&Ignoriraj pogreške</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Prikaži skočni prozor pri greškama i upozorenjima</target>
 
-<source>Hide all error and warning messages</source>
-<target>Sakrij sve poruke za greške i upozorenja</target>
-
-<source>On completion:</source>
-<target>Pri dovršetku:</target>
+<source>Run a command after synchronization:</source>
+<target>Pokreni naredbu nakon sinkronizacije:</target>
 
 <source>OK</source>
 <target>U redu</target>
@@ -1123,6 +1117,9 @@ Naredba će biti pokrenuta ako se:
 <source>&Key file</source>
 <target>&Ključ</target>
 
+<source>&SSH agent</source>
+<target>&SSH upravitelj</target>
+
 <source>User name:</source>
 <target>Korisničko ime:</target>
 
@@ -1141,20 +1138,14 @@ Naredba će biti pokrenuta ako se:
 <source>How to get best performance?</source>
 <target>Kako dobiti najbolje perfomanse?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH konekcije za čitanje direktorija:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Predložen raspon: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Broj veza za čitanje mapa:</target>
 
 <source>SFTP channels per connection:</source>
 <target>SFTP kanala po konekciji:</target>
 
 <source>Detect server limit</source>
 <target>Detektiranje limita servera</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 konekcije x 10 kanala = 20 puta brže čitanje direktorija</target>
 
 <source>Select a directory on the server:</source>
 <target>Odaberi mapu na serveru:</target>
@@ -1195,6 +1186,9 @@ Naredba će biti pokrenuta ako se:
 <source>Bytes copied:</source>
 <target>Bajta kopirano:</target>
 
+<source>When finished:</source>
+<target>Nakon završetka:</target>
+
 <source>Close</source>
 <target>Zatvori</target>
 
@@ -1207,14 +1201,17 @@ Naredba će biti pokrenuta ako se:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Stvaranje slijednih datoteka za sinkronizaciju bez nadzora. Da započnete, dvostruko-kliknite na ovu datoteku ili planirajte u planeru zadataka: %x</target>
 
-<source>&Stop</source>
-<target>&Zaustavi</target>
+<source>Run minimized</source>
+<target>Pokreni minimizirano</target>
+
+<source>&Show error dialog</source>
+<target>&Prikaži pogreške</target>
+
+<source>&Cancel</source>
+<target>&Odustani</target>
 
 <source>Stop synchronization at first error</source>
 <target>Zaustavi sinkronizaciju pri prvoj pogrešci</target>
-
-<source>Run minimized</source>
-<target>Pokreni minimizirano</target>
 
 <source>Save log:</source>
 <target>Spremi izvještaj:</target>
@@ -1243,17 +1240,17 @@ This guarantees a consistent state even in case of a serious error.
 </source>
 <target>
 Kopiraj u privremenu datoteku (*.ffs_tmp) prije prepisivanja ciljne datoteke
-Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
+Ovo garantira stabilno stanje čak u slučaju ozbiljne greške.
 </target>
 
-<source>(recommended)</source>
-<target>(preporučeno)</target>
+<source>recommended</source>
+<target>preporučljivo</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiraj djeljene ili zaključane datoteke pomoću Volume Shadow Copy servisa.</target>
 
-<source>(requires administrator rights)</source>
-<target>(zahtjeva administratorske ovlasti)</target>
+<source>requires administrator rights</source>
+<target>zahtjeva administratorska prava</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Prenesi dopuštenja za datoteke i mape.</target>
@@ -1274,7 +1271,7 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <target>Opis</target>
 
 <source>Show hidden dialogs again</source>
-<target>Prikazuj skrivene prozore ponovno</target>
+<target>Prikaži skrivene prozore ponovno</target>
 
 <source>Show all permanently hidden dialogs and warning messages again</source>
 <target>Prikaži sve trajno skrivene prozore i poruke upozorenja ponovno</target>
@@ -1285,14 +1282,17 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Source code written in C++ using:</source>
 <target>Izvorni kod napisan u C++ uz korištenje:</target>
 
-<source>Donation details</source>
-<target>Detalji donacije</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Ako volite FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Donirajte s PayPal</target>
+<source>Support with a donation</source>
+<target>Podržite nas donacijom</target>
+
+<source>Donation details</source>
+<target>Detalji donacije</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Auto updater je onemogućen od strane administratora.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Povratne informacije i prijedlozi su dobrodošli</target>
@@ -1330,7 +1330,7 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Activate offline</source>
 <target>Aktivacija offline</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>Spremi kao slijedni zadatak</target>
 
 <source>Delete Items</source>
@@ -1369,11 +1369,17 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Overview</source>
 <target>Pregled</target>
 
+<source>Show "%x"</source>
+<target>Prikaži "%x"</target>
+
 <source>&Show details</source>
 <target>&Prikaži detalje</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Nova verzija FreeFileSync je dostupna:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x je dostupan!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Instalacijske datoteke su oštećene. Molimo ponovno instalirajte FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Nije dostupna lokalna putanja za %x.</target>
@@ -1468,9 +1474,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Select time span...</source>
 <target>Odaberite vremenski raspon...</target>
-
-<source>Show "%x"</source>
-<target>Prikaži "%x"</target>
 
 <source>Last session</source>
 <target>Zadnja sesija</target>
@@ -1571,18 +1574,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Searching for program updates...</source>
 <target>Tražim nadogradnju programa...</target>
 
-<source>Close progress dialog</source>
-<target>Zatvori prozor zadatka</target>
-
-<source>Log off</source>
-<target>Odlogiraj se</target>
-
-<source>Standby</source>
-<target>Spavaj</target>
-
-<source>Shut down</source>
-<target>Isključi računalo</target>
-
 <source>Paused</source>
 <target>Pauzirano</target>
 
@@ -1613,17 +1604,20 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Log</source>
 <target>Izvješće</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Instalacijske datoteke su oštećene. Molimo ponovno instalirajte FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Hvala Vam, %x, na vašoj donaciji i podršci!</target>
+
+<source>Recommended range:</source>
+<target>Predloženi raspon:</target>
 
 <source>Password:</source>
 <target>Lozinka:</target>
 
 <source>Key password:</source>
 <target>Aktivacijski ključ:</target>
+
+<source>Please enter a file path.</source>
+<target>Molimo unesite putanju datoteke.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1742,6 +1736,15 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Zadržati izbrisane i prepisane datoteke u košu za smeće</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Izbrisati i prepisat datoteke trajno</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Premjesti datoteke u mapu određenu od korsnika</target>
+
 <source>Replace</source>
 <target>Zamjeni</target>
 
@@ -1753,6 +1756,15 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Append a time stamp to each file name</source>
 <target>Dodijeli vremensku oznaku za svaki naziv datoteke</target>
+
+<source>On completion:</source>
+<target>Pri dovršetku:</target>
+
+<source>On errors:</source>
+<target>Uslijed grešaka:</target>
+
+<source>On success:</source>
+<target>Pri uspješnom dovršetku:</target>
 
 <source>Main config</source>
 <target>Glavne postavke</target>
@@ -1774,9 +1786,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Name</source>
 <target>Naziv</target>
-
-<source>Items</source>
-<target>Stavke</target>
 
 <source>Percentage</source>
 <target>Postotak</target>
@@ -1910,6 +1919,9 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Cannot change process I/O priorities.</source>
 <target>Ne može se promjeniti proces I/O prioriteta.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Nije moguće isključiti računalo.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Provjeravanje koša za smeće neuspješno za mapu %x.</target>
 
@@ -1933,9 +1945,6 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 
 <source>Portable</source>
 <target>Prenosivo</target>
-
-<source>recommended</source>
-<target>preporučljivo</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Spremi postavke u "%APPDATA%\FreeFileSync"</target>
@@ -1988,8 +1997,8 @@ Ovo garantira čvrsto stanje čak u slučaju ozbiljne greške.
 <source>Edit with FreeFileSync</source>
 <target>Uredi pomoću FreeFileSynca</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Ova portabilna verzija se ne može instalirati u odabranu mapu.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>FreeFileSync prijenosna verzija se ne može instalirati u podfolder od %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Molimo odaberite lokalnu instalaciju ili odaberite drugu mapu za instalaciju.</target>

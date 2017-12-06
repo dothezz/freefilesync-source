@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Kontrollerar papperskorgens tillgänglighet för %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Papperskorgen är inte tillgänglig för följande mappar. Filerna kommer istället att tas bort permanent:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Papperskorgen stöds inte av följande mappar. Borttagna eller överskrivna filer kommer inte att kunna återställas:</target>
 
 <source>An exception occurred</source>
 <target>Ett undantag inträffade</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Syntax:</target>
 
-<source>global config file:</source>
-<target>övergripande konfigurationsfil:</target>
-
 <source>config files:</source>
 <target>configurationsfiler:</target>
 
 <source>directory</source>
 <target>mapp</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Sökväg till en alternativ GlobalSettings.xml-fil.</target>
+<source>global config file:</source>
+<target>övergripande konfigurationsfil:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Valfritt antal FreeFileSync .ffs_gui och/eller .ffs_batch konfigurationsfiler.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Valfritt antal alternativa katalogpar för som mest, en konfigurationsfil.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Öppna konfigurationen för redigering utan att köra det.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Öppna den valda konfigurationen endast för redigering, utan att köra den.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Sökväg till en alternativ GlobalSettings.xml-fil.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan inte hitta följande mappar:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Uppdatera attribut på höger sida</target>
 
-<source>Cannot write file %x.</source>
-<target>Filen %x kan inte skrivas.</target>
+<source>Cannot read file %x.</source>
+<target>Filen %x kan inte läsas in.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Aktuell: %y byte
 <source>Operation not supported for different base folder types.</source>
 <target>Åtgärden stöder inte olika basmapptyper.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Kan inte kopiera den symboliska länken %x till %y.</target>
+<source>Cannot write file %x.</source>
+<target>Filen %x kan inte skrivas.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Kan inte flytta filen %x till %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan inte kopiera den symboliska länken %x till %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Kan inte ansluta till %x.</target>
@@ -290,9 +293,6 @@ Aktuell: %y byte
 
 <source>Cannot read directory %x.</source>
 <target>Kan inte läsa mappen %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Filen %x kan inte läsas in.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Kan inte läsa filattribut för %x.</target>
@@ -596,8 +596,8 @@ Kommandot triggas om:
 <source>Automated Synchronization</source>
 <target>Automatiserad synkronisering</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Följande sökväg stöder inte mappövervakning:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>%x-protokollet stödjer inte mappövervakning:</target>
 
 <source>Directory monitoring active</source>
 <target>Mappövervakning aktiv</target>
@@ -713,8 +713,8 @@ Kommandot triggas om:
 <source>Base folder:</source>
 <target>Basmapp:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Versionshanteringsmappen kommer att synkroniseras, eftersom den ligger i en basmapp.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Versionshanteringsmappen lagras i en basmapp.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synkroniserar katalogpar:</target>
@@ -727,6 +727,15 @@ Kommandot triggas om:
 
 <source>job name</source>
 <target>åtgärdsnamn</target>
+
+<source>Show summary</source>
+<target>Visa sammandrag</target>
+
+<source>Sleep</source>
+<target>Strömsparläge</target>
+
+<source>Shut down</source>
+<target>Stäng av datorn</target>
 
 <source>Synchronization stopped</source>
 <target>Synkroniseringen stoppad</target>
@@ -748,6 +757,9 @@ Kommandot triggas om:
 
 <source>Synchronization completed successfully</source>
 <target>Synkronisering slutförd</target>
+
+<source>Executing command %x</source>
+<target>Kör kommandot %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Rensar ut gamla loggfiler...</target>
@@ -776,8 +788,8 @@ Kommandot triggas om:
 <pluralform>Automatiskt återförsök om %x sekunder...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignorera efterföljande fel</target>
+<source>Ignore &all</source>
+<target>Ignorera &fel</target>
 
 <source>Retrying operation...</source>
 <target>Upprepar åtgärden...</target>
@@ -884,11 +896,11 @@ Kommandot triggas om:
 <source>&Find...</source>
 <target>&Sök...</target>
 
-<source>&Reset layout</source>
-<target>&Återställ layout</target>
-
 <source>&Export file list...</source>
 <target>&Exportera fillista...</target>
+
+<source>&Reset layout</source>
+<target>&Återställ layout</target>
 
 <source>&Tools</source>
 <target>&Verktyg</target>
@@ -1025,9 +1037,6 @@ Kommandot triggas om:
 <source>C&lear</source>
 <target>&Rensa</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Hitta synkroniseringsmappar med hjälp av databasfiler</target>
-
 <source>Detect moved files</source>
 <target>Hitta flyttade filer</target>
 
@@ -1048,38 +1057,23 @@ Kommandot triggas om:
 <source>&Recycle bin</source>
 <target>&Papperskorgen</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Kopiera borttagna och överskrivna filer till papperskorgen</target>
-
 <source>&Permanent</source>
 <target>&Permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Ta bort eller skriv över permanent</target>
 
 <source>&Versioning</source>
 <target>&Versionshantering</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Flytta filer till en fördefinierad mapp</target>
-
 <source>Naming convention:</source>
 <target>Regler för namngivning:</target>
 
-<source>Handle errors:</source>
-<target>Felhantering:</target>
-
-<source>&Pop-up</source>
-<target>&Popup</target>
+<source>&Ignore errors</source>
+<target>&Ignorera fel</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Visa popup vid fel och varningar</target>
 
-<source>Hide all error and warning messages</source>
-<target>Visa inte fel- och varningsmeddelanden</target>
-
-<source>On completion:</source>
-<target>Vid slutförd åtgärd:</target>
+<source>Run a command after synchronization:</source>
+<target>Kör ett kommando efter synkronisering:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1117,6 +1111,9 @@ Kommandot triggas om:
 <source>&Key file</source>
 <target>&Nyckel</target>
 
+<source>&SSH agent</source>
+<target>&SSH-agent</target>
+
 <source>User name:</source>
 <target>Användarnamn:</target>
 
@@ -1135,20 +1132,14 @@ Kommandot triggas om:
 <source>How to get best performance?</source>
 <target>Hur får man ut bästa prestanda?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH-anslutningar för katalogläsning:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Föreslaget intervall: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Anslutningar för mappläsning:</target>
 
 <source>SFTP channels per connection:</source>
 <target>SFTP-kanaler per anslutning:</target>
 
 <source>Detect server limit</source>
 <target>Identifiera serverbegränsning</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 anslutningar x 10 kanaler = 20 gånger snabbare katalogläsning</target>
 
 <source>Select a directory on the server:</source>
 <target>Välj en mapp på servern:</target>
@@ -1189,6 +1180,9 @@ Kommandot triggas om:
 <source>Bytes copied:</source>
 <target>Kopierade byte:</target>
 
+<source>When finished:</source>
+<target>Vid slutfört:</target>
+
 <source>Close</source>
 <target>Stäng</target>
 
@@ -1201,14 +1195,17 @@ Kommandot triggas om:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Skapa en batch-fil för obevakad synkronisering. Dubbelklicka på filen för att starta den, eller schemalägg i en åtgärdshanterare: %x</target>
 
-<source>&Stop</source>
-<target>&Stopp</target>
+<source>Run minimized</source>
+<target>Kör minimerad</target>
+
+<source>&Show error dialog</source>
+<target>&Visa feldialog</target>
+
+<source>&Cancel</source>
+<target>&Avbryt</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stoppa synkroniseringen vid första fel som uppstår</target>
-
-<source>Run minimized</source>
-<target>Kör minimerad</target>
 
 <source>Save log:</source>
 <target>Spara logg:</target>
@@ -1240,14 +1237,14 @@ Kopierar till en temporär fil (*.ffs_tmp), före överskrivning av målet.
 Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 </target>
 
-<source>(recommended)</source>
-<target>(rekommenderas)</target>
+<source>recommended</source>
+<target>rekommenderas</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopierar delade eller låsta filer med hjälp av tjänsten 'Volume Shadow Copy'.</target>
 
-<source>(requires administrator rights)</source>
-<target>(kräver administratörsbehörighet)</target>
+<source>requires administrator rights</source>
+<target>kräver administratörsrättigheter</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Överför behörighetsinställningar.</target>
@@ -1279,14 +1276,17 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Source code written in C++ using:</source>
 <target>Källkod skriven i C++ med hjälp av:</target>
 
-<source>Donation details</source>
-<target>Donationsuppgifter</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Om du gillar FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Donera via PayPal</target>
+<source>Support with a donation</source>
+<target>Stöd oss med en donation</target>
+
+<source>Donation details</source>
+<target>Donationsuppgifter</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Automatisk uppdatering inaktiverades av administratören.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Återkoppling och förslag är välkommna</target>
@@ -1324,7 +1324,7 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Activate offline</source>
 <target>Aktivera offline</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>Spara som batch-fil</target>
 
 <source>Delete Items</source>
@@ -1363,11 +1363,17 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Overview</source>
 <target>Översikt</target>
 
+<source>Show "%x"</source>
+<target>Visa "%x"</target>
+
 <source>&Show details</source>
 <target>&Visa detaljerat</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Det finns en ny version av FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x finns tillgänglig!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Installationsfilerna är skadade. Installera om FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Lokal sökväg ej tillgänglig för %x.</target>
@@ -1458,9 +1464,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Select time span...</source>
 <target>Välj tidsintervall...</target>
-
-<source>Show "%x"</source>
-<target>Visa "%x"</target>
 
 <source>Last session</source>
 <target>Senaste session</target>
@@ -1561,18 +1564,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Searching for program updates...</source>
 <target>Söker efter programuppdateringar...</target>
 
-<source>Close progress dialog</source>
-<target>Stäng förloppsindikator</target>
-
-<source>Log off</source>
-<target>Logga ut</target>
-
-<source>Standby</source>
-<target>Strömsparläge</target>
-
-<source>Shut down</source>
-<target>Stäng av datorn</target>
-
 <source>Paused</source>
 <target>Pausad</target>
 
@@ -1603,17 +1594,20 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Log</source>
 <target>Logg</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Installationsfilerna är skadade. Installera om FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Tack %x, för din donation och ditt stöd!</target>
+
+<source>Recommended range:</source>
+<target>Rekommenderat intervall:</target>
 
 <source>Password:</source>
 <target>Lösenord:</target>
 
 <source>Key password:</source>
 <target>Nyckellösenord:</target>
+
+<source>Please enter a file path.</source>
+<target>Ange en filsökväg.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1729,6 +1723,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Behåll borttagna och överskrivna filer i papperskorgen</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Ta bort och skriv över filer permanent</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Flytta filer till en fördefinierad mapp</target>
+
 <source>Replace</source>
 <target>Byt ut</target>
 
@@ -1740,6 +1743,15 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Append a time stamp to each file name</source>
 <target>Lägg till en tidsstämpel till varje filnamn</target>
+
+<source>On completion:</source>
+<target>Vid slutförd åtgärd:</target>
+
+<source>On errors:</source>
+<target>Vid fel:</target>
+
+<source>On success:</source>
+<target>Vid slutfört:</target>
 
 <source>Main config</source>
 <target>Huvudkonfiguration</target>
@@ -1761,9 +1773,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Name</source>
 <target>Namn</target>
-
-<source>Items</source>
-<target>Objekt</target>
 
 <source>Percentage</source>
 <target>Procent</target>
@@ -1894,6 +1903,9 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Cannot change process I/O priorities.</source>
 <target>Kan inte ändra I/O-prioritet.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Kan inte stänga av systemet.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Kontroll av papperskorgen misslyckades för %x.</target>
 
@@ -1917,9 +1929,6 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 
 <source>Portable</source>
 <target>Portabel</target>
-
-<source>recommended</source>
-<target>rekommenderas</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Sparar inställningar i "%APPDATA%\FreeFileSync"</target>
@@ -1972,8 +1981,8 @@ Detta garanterar ett konsekvent tillstånd även vid allvarliga fel.
 <source>Edit with FreeFileSync</source>
 <target>Redigera med FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Portabel version kan inte installeras i den valda mappen.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>FreeFileSync portabel version kan inte installeras i en undermapp till %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Välj lokal installationstyp eller välj en annan mapp för installationen.</target>

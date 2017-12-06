@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Sprawdzanie dostępności kosza dla katalogu %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Dla następujących katalogów kosz nie jest dostępny. Pliki zostaną usunięte bez możliwości ich przywrócenia:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Kosz systemowy nie jest wspierany przez poniższe foldery. Usunięte i nadpisane pliki nie będą mogły być przywrócone:</target>
 
 <source>An exception occurred</source>
 <target>Wystąpił wyjątek</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Składnia:</target>
 
-<source>global config file:</source>
-<target>globalny plik konfiguracyjny:</target>
-
 <source>config files:</source>
 <target>pliki konfiguracyjne:</target>
 
 <source>directory</source>
 <target>katalog</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Alternatywna ścieżka do pliku GlobalSettings.xml.</target>
+<source>global config file:</source>
+<target>globalny plik konfiguracyjny:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Dowolna ilość plików konfiguracyjnych FreeFileSync .ffs_gui/.ffs_batch.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Dowolna liczba alternatywnych par katalogów dla najwyżej jednego pliku konfiguracyjnego.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Otwórz konfigurację do edycji.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Otwórz wybraną konfigurację tylko do edycji (bez uruchomienia).</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Alternatywna ścieżka do pliku GlobalSettings.xml.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Aktualizuj atrybuty po prawej stronie</target>
 
-<source>Cannot write file %x.</source>
-<target>Nie można zapisać pliku %x.</target>
+<source>Cannot read file %x.</source>
+<target>Nie można odczytać pliku %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Przesłany: %y bajtów
 <source>Operation not supported for different base folder types.</source>
 <target>Operacja nie jest wspierana dla różnych typów katalogów.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Nie można skopiować linku symbolicznego %x do %y.</target>
+<source>Cannot write file %x.</source>
+<target>Nie można zapisać pliku %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Nie można przenieść pliku %x do %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nie można skopiować linku symbolicznego %x do %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Błąd połączenia do %x.</target>
@@ -290,9 +293,6 @@ Przesłany: %y bajtów
 
 <source>Cannot read directory %x.</source>
 <target>Nie można odczytać katalogu %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Nie można odczytać pliku %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Nie można odczytać atrybutów pliku %x.</target>
@@ -601,8 +601,8 @@ Komenda jest wykonywana gdy:
 <source>Automated Synchronization</source>
 <target>Automatyczna synchronizacja</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Następująca ścieżka nie wspiera monitorowania katalogów:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Protokuł %x nie wspiera monitorowania katalogów:</target>
 
 <source>Directory monitoring active</source>
 <target>Monitorowanie katalogów aktywne</target>
@@ -718,8 +718,8 @@ Komenda jest wykonywana gdy:
 <source>Base folder:</source>
 <target>Katalog źródłowy:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Katalog potrzebny do wersjonowania będzie zsynchronizowany ponieważ zawiera się w katalogu bazowym.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Katalog wersjonowania znajduje się w katalogu bazowym.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronizacja katalgów:</target>
@@ -732,6 +732,15 @@ Komenda jest wykonywana gdy:
 
 <source>job name</source>
 <target>nazwa zadania</target>
+
+<source>Show summary</source>
+<target>Pokaż podsumowanie</target>
+
+<source>Sleep</source>
+<target>Stan uśpienia</target>
+
+<source>Shut down</source>
+<target>Wyłącz komputer</target>
 
 <source>Synchronization stopped</source>
 <target>Synchronizacja przerwana</target>
@@ -753,6 +762,9 @@ Komenda jest wykonywana gdy:
 
 <source>Synchronization completed successfully</source>
 <target>Synchronizacja zakończona pomyślnie</target>
+
+<source>Executing command %x</source>
+<target>Wykonywanie polecenia %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Usuwanie starych plików logów...</target>
@@ -782,8 +794,8 @@ Komenda jest wykonywana gdy:
 <pluralform>Automatyczne ponowienie za %x sekund...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignoruj kolejne błędy</target>
+<source>Ignore &all</source>
+<target>Ignoruj &wszystkie</target>
 
 <source>Retrying operation...</source>
 <target>Ponawianie operacji...</target>
@@ -890,11 +902,11 @@ Komenda jest wykonywana gdy:
 <source>&Find...</source>
 <target>&Szukaj...</target>
 
-<source>&Reset layout</source>
-<target>&Resetuj układ okien</target>
-
 <source>&Export file list...</source>
 <target>&Eksportuj listę plików...</target>
+
+<source>&Reset layout</source>
+<target>&Resetuj układ okien</target>
 
 <source>&Tools</source>
 <target>&Narzędzia</target>
@@ -1031,9 +1043,6 @@ Komenda jest wykonywana gdy:
 <source>C&lear</source>
 <target>&Wyczyść</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Kierunki synchronizacji określane są przy pomocy bazy danych</target>
-
 <source>Detect moved files</source>
 <target>Wykryj przeniesione pliki</target>
 
@@ -1054,38 +1063,23 @@ Komenda jest wykonywana gdy:
 <source>&Recycle bin</source>
 <target>&Kosz systemowy</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Przechowuj pliki, które zostały usunięte lub nadpisane w koszu</target>
-
 <source>&Permanent</source>
 <target>&Permanentne</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Usuń lub nadpisz pliki na stałe</target>
 
 <source>&Versioning</source>
 <target>&Wersjonowanie</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Przenieś pliki do katalogu zdefiniowanego przez użytkownika</target>
-
 <source>Naming convention:</source>
 <target>Konwencja nazewnictwa:</target>
 
-<source>Handle errors:</source>
-<target>Obsługa błędów:</target>
-
-<source>&Pop-up</source>
-<target>&Pop-up</target>
+<source>&Ignore errors</source>
+<target>&Ignoruj błędy</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Pokazuj okna pop-up dla błędów i ostrzeżeń</target>
 
-<source>Hide all error and warning messages</source>
-<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
-
-<source>On completion:</source>
-<target>Po zakończeniu:</target>
+<source>Run a command after synchronization:</source>
+<target>Uruchom komendę po zakończonej synchronizacji:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1123,6 +1117,9 @@ Komenda jest wykonywana gdy:
 <source>&Key file</source>
 <target>Plik &klucza</target>
 
+<source>&SSH agent</source>
+<target>Agent &SSH</target>
+
 <source>User name:</source>
 <target>Nazwa użytkownika:</target>
 
@@ -1141,20 +1138,14 @@ Komenda jest wykonywana gdy:
 <source>How to get best performance?</source>
 <target>Jak uzyskać lepszą wydajność?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>Połączenie SSH dla katalogów:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Sugerowany zakres: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Połączenie do odczytu katalogów:</target>
 
 <source>SFTP channels per connection:</source>
 <target>Liczba kanałów dla połączenia SFTP:</target>
 
 <source>Detect server limit</source>
 <target>Wykryj limity serwera</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 połączenia x 10 kanałów = 20 razy szybsze odczytywanie katalogów</target>
 
 <source>Select a directory on the server:</source>
 <target>Określ katalog na serwerze:</target>
@@ -1195,6 +1186,9 @@ Komenda jest wykonywana gdy:
 <source>Bytes copied:</source>
 <target>Skopiowano bajtów:</target>
 
+<source>When finished:</source>
+<target>Gdy zakończono:</target>
+
 <source>Close</source>
 <target>Zamknij</target>
 
@@ -1207,14 +1201,17 @@ Komenda jest wykonywana gdy:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Utwórz plik wsadowy do zautomatyzowania procesu synchronizacji. Aby rozpocząć, klknij dwa razy plik lub zaplanuj zadanie w harmonogramie zadań: %x</target>
 
-<source>&Stop</source>
-<target>&Stop</target>
+<source>Run minimized</source>
+<target>Uruchom zminimalizowane</target>
+
+<source>&Show error dialog</source>
+<target>&Pokaż powiadomienie z błędem</target>
+
+<source>&Cancel</source>
+<target>&Anuluj</target>
 
 <source>Stop synchronization at first error</source>
 <target>Przerwij synchronizację przy pierwszym błędzie</target>
-
-<source>Run minimized</source>
-<target>Uruchom zminimalizowane</target>
 
 <source>Save log:</source>
 <target>Zapisz logi:</target>
@@ -1246,14 +1243,14 @@ Aby zagwarantować spójność synchronizacji nawet podczas błędu,
 program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadpisuje plik docelowy.
 </target>
 
-<source>(recommended)</source>
-<target>(rekomendowane)</target>
+<source>recommended</source>
+<target>rekomendowana</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiuj pliki współdzielone lub zablokowane używając usługi Volume Shadow Copy.</target>
 
-<source>(requires administrator rights)</source>
-<target>(wymagane uprawnienia administratora)</target>
+<source>requires administrator rights</source>
+<target>wymaga uprawnień administratora</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>kopiuj uprawnienia plików i katalogów.</target>
@@ -1285,14 +1282,17 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Source code written in C++ using:</source>
 <target>Kod stworzony w C++ z wykorzystaniem:</target>
 
-<source>Donation details</source>
-<target>Szczegóły dotacji</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Jeżeli lubisz FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Wesprzyj z PayPal</target>
+<source>Support with a donation</source>
+<target>Wesprzyj dotacją</target>
+
+<source>Donation details</source>
+<target>Szczegóły dotacji</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Auto aktualizacja została wyłączona przez administratora.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Wszelkie opinie i sugestie mile widziane</target>
@@ -1330,8 +1330,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Activate offline</source>
 <target>Aktywuj offline</target>
 
-<source>Save as Batch Job</source>
-<target>Zapisz w trybie wsadowym</target>
+<source>Save as a Batch Job</source>
+<target>Zapisz jako plik wsadowy.</target>
 
 <source>Delete Items</source>
 <target>Usuń elementy</target>
@@ -1369,11 +1369,17 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Overview</source>
 <target>Przegląd</target>
 
+<source>Show "%x"</source>
+<target>Pokaż "%x"</target>
+
 <source>&Show details</source>
 <target>&Pokaż szczegóły</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Dostępna jest nowa wersja FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x jest już dostępny!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Pliki instalacyjne są uszkodzone. Przeinstaluj program FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Lokalna ścieżka nie jest dostępna dla %x.</target>
@@ -1468,9 +1474,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Select time span...</source>
 <target>Określ przedział czasowy...</target>
-
-<source>Show "%x"</source>
-<target>Pokaż "%x"</target>
 
 <source>Last session</source>
 <target>Ostatnia sesja</target>
@@ -1571,18 +1574,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Searching for program updates...</source>
 <target>Wyszukiwanie aktualizacji...</target>
 
-<source>Close progress dialog</source>
-<target>Zamknij okno postępu</target>
-
-<source>Log off</source>
-<target>Wyloguj użytkownika</target>
-
-<source>Standby</source>
-<target>Przejdź w stan uśpienia</target>
-
-<source>Shut down</source>
-<target>Wyłącz komputer</target>
-
 <source>Paused</source>
 <target>Pauza</target>
 
@@ -1613,17 +1604,20 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Log</source>
 <target>Log</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Pliki instalacyjne są uszkodzone. Przeinstaluj program FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Dziękujemy %x za Twoje wsparcie!</target>
+
+<source>Recommended range:</source>
+<target>Rekomendowany zakres:</target>
 
 <source>Password:</source>
 <target>Hasło:</target>
 
 <source>Key password:</source>
 <target>Hasło klucza:</target>
+
+<source>Please enter a file path.</source>
+<target>Wprowadź ścieżkę do pliku.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1742,6 +1736,15 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Zachowaj pliku usunięte i nadpisane w koszy systemowym</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Usuwaj i nadpisuj pliki permanentnie</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Przenieś pliki do katalogu zdefiniowanego przez użytkownika</target>
+
 <source>Replace</source>
 <target>Zamień</target>
 
@@ -1753,6 +1756,15 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Append a time stamp to each file name</source>
 <target>Dołącz datę do nazwy każdego pliku</target>
+
+<source>On completion:</source>
+<target>Po zakończeniu:</target>
+
+<source>On errors:</source>
+<target>Przy błędach:</target>
+
+<source>On success:</source>
+<target>Przy sukcesie:</target>
 
 <source>Main config</source>
 <target>Główna konfiguracja</target>
@@ -1774,9 +1786,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Name</source>
 <target>Nazwa</target>
-
-<source>Items</source>
-<target>Elementy</target>
 
 <source>Percentage</source>
 <target>Procentowo</target>
@@ -1910,6 +1919,9 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Cannot change process I/O priorities.</source>
 <target>Nie można zmienić priorytetu I/O procesu.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Nie można wyłączyć systemu.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Sprawdzanie kosza systemowego dla katalogu %x zakończone niepowodzeniem.</target>
 
@@ -1933,9 +1945,6 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 
 <source>Portable</source>
 <target>Przenośna</target>
-
-<source>recommended</source>
-<target>rekomendowana</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Zapisuje ustawienia do "%APPDATA%\FreeFileSync"</target>
@@ -1988,8 +1997,8 @@ program kopiuje zawartość do pliku tymczasowego (*.ffs_tmp), a następnie nadp
 <source>Edit with FreeFileSync</source>
 <target>Edytuj przy użyciu FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Przenośna wersja programu nie możne zostać zainstalowana w wybranym katalogu.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Przenośna wersja FreeFileSync nie może być zainstalowana w podkatalogu w %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Wybierz lokalny typ instalacji lub określ inny katalog.</target>

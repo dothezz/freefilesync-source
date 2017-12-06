@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -227,12 +227,12 @@ void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Grap
             break;
     }
 
-	{
-		//add text shadow to improve readability:
-		wxDCTextColourChanger dummy(dc, backgroundColor);
-		dc.DrawText(txt, drawPos + wxPoint(borderX + 1, borderY + 1));
-	}
-    wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); 
+    {
+        //add text shadow to improve readability:
+        wxDCTextColourChanger dummy(dc, backgroundColor);
+        dc.DrawText(txt, drawPos + wxPoint(borderX + 1, borderY + 1));
+    }
+    wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
     dc.DrawText(txt, drawPos + wxPoint(borderX, borderY));
 }
 
@@ -546,9 +546,9 @@ void Graph2D::render(wxDC& dc) const
 
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
 
-	clearArea(dc, clientRect, GetBackgroundColour() /*user-configurable!*/);
-        //wxPanel::GetClassDefaultAttributes().colBg :
-        //wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+    clearArea(dc, clientRect, GetBackgroundColour() /*user-configurable!*/);
+    //wxPanel::GetClassDefaultAttributes().colBg :
+    //wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
 
     /*
     -----------------------
@@ -731,10 +731,10 @@ void Graph2D::render(wxDC& dc) const
 
                 //save current selection as "double" coordinates
                 activeSel_->refSelection().from = CurvePoint(cvrtX.screenToReal(screenFromX),
-                                                            cvrtY.screenToReal(screenFromY));
+                                                             cvrtY.screenToReal(screenFromY));
 
                 activeSel_->refSelection().to = CurvePoint(cvrtX.screenToReal(screenToX),
-                                                          cvrtY.screenToReal(screenToY));
+                                                           cvrtY.screenToReal(screenToY));
             }
 
             //#################### begin drawing ####################

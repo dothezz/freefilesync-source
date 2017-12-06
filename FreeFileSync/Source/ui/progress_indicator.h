@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -52,8 +52,8 @@ struct SyncProgressDialog
     };
     //essential to call one of these two methods in StatusUpdater derived class' destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    virtual void processHasFinished(SyncResult resultId, const zen::ErrorLog& log) = 0; //sync finished, still dialog may live on
-    virtual void closeWindowDirectly() = 0; //don't wait for user
+    virtual void showSummary(SyncResult resultId, const zen::ErrorLog& log) = 0; //sync finished, still dialog may live on
+    virtual void closeDirectly(bool restoreParentFrame) = 0; //don't wait for user
 
     //---------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          const Zstring& soundFileSyncComplete,
                                          bool ignoreErrors,
                                          xmlAccess::PostSyncAction postSyncAction);
-//DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after processHasFinished() or closeWindowDirectly()
+//DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after showSummary() or closeDirectly()
 
 
 class PauseTimers

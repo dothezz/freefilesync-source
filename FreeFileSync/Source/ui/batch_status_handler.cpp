@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -38,7 +38,7 @@ std::unique_ptr<AFS::OutputStream> prepareNewLogfile(const AbstractPath& logFold
     AFS::createFolderIfMissingRecursion(logFolderPath); //throw FileError
 
     //const std::string colon = "\xcb\xb8"; //="modifier letter raised colon" => regular colon is forbidden in file names on Windows and OS X
-    //=> too many issues, most notably cmd.exe is not Unicode-aware: http://www.freefilesync.org/forum/viewtopic.php?t=1679
+    //=> too many issues, most notably cmd.exe is not Unicode-aware: https://www.freefilesync.org/forum/viewtopic.php?t=1679
 
     //assemble logfile name
     const TimeComp timeStamp = getLocalTime(std::chrono::system_clock::to_time_t(batchStartTime));
@@ -299,7 +299,7 @@ BatchStatusHandler::~BatchStatusHandler()
     if (!commandLine.empty())
         try
         {
-            //use EXEC_TYPE_ASYNC until there is reason not to: http://www.freefilesync.org/forum/viewtopic.php?t=31
+            //use EXEC_TYPE_ASYNC until there is reason not to: https://www.freefilesync.org/forum/viewtopic.php?t=31
             tryReportingError([&] { shellExecute(expandMacros(commandLine), EXEC_TYPE_ASYNC); /*throw FileError*/ }, *this); //throw X
         }
         catch (...) {}
@@ -336,12 +336,12 @@ BatchStatusHandler::~BatchStatusHandler()
             showSummary = false;
 
         //close progress dialog
-        if (showSummary) //warning: wxWindow::Show() is called within processHasFinished()!
+        if (showSummary) //warning: wxWindow::Show() is called within showSummary()!
             //notify about (logical) application main window => program won't quit, but stay on this dialog
             //setMainWindow(progressDlg_->getAsWindow()); -> not required anymore since we block waiting until dialog is closed below
-            progressDlg_->processHasFinished(finalStatus, errorLog_);
+            progressDlg_->showSummary(finalStatus, errorLog_);
         else
-            progressDlg_->closeWindowDirectly(); //progressDlg_ is main window => program will quit shortly after
+            progressDlg_->closeDirectly(true /*restoreParentFrame: n/a here*/); //progressDlg_ is main window => program will quit shortly after
 
         //wait until progress dialog notified shutdown via onProgressDialogTerminate()
         //-> required since it has our "this" pointer captured in lambda "notifyWindowTerminate"!

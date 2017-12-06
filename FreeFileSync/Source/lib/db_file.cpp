@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -183,7 +183,7 @@ public:
             try
             {
                 /* Zlib: optimal level - testcase 1 million files
-                level/size [MB]/time [ms]
+                level|size [MB]|time [ms]
                   0    49.54      272 (uncompressed)
                   1    14.53     1013
                   2    14.13     1106

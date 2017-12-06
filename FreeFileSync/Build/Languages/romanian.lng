@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Verific dacă Reciclatorul e disponibil pentru dosarul %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Reciclatorul nu este disponibil pentru dosarele următoare. Filele șterse de acolo vor dispărea în mod definitiv:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Reciclatorul nu este suportat de dosarele următoare. Filele de acolo șterse sau suprascrise nu vor putea fi restaurate:</target>
 
 <source>An exception occurred</source>
 <target>A apărut o excepție</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Sintaxă:</target>
 
-<source>global config file:</source>
-<target>filă de configurare globală:</target>
-
 <source>config files:</source>
 <target>file de configurare:</target>
 
 <source>directory</source>
 <target>dosar</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Calea către o filă GlobalSettings.xml alternativă.</target>
+<source>global config file:</source>
+<target>filă de configurare globală:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Orice număr de file de configurare pentru FreeFileSync, de tipul .ffs_gui sau/și .ffs_batch.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Orice număr de perechi alternative de dosare pentru cel mult o filă de configurare.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Deschide configurația pentru editare fără a o executa.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Deschide configurația selectată doar pentru editare, fără a o executa.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Calea către o filă GlobalSettings.xml alternativă.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Actualizează atributele în partea dreaptă</target>
 
-<source>Cannot write file %x.</source>
-<target>Nu pot scrie fila %x.</target>
+<source>Cannot read file %x.</source>
+<target>Nu pot citi fila %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actuală: %y baiți
 <source>Operation not supported for different base folder types.</source>
 <target>Operație nesuportată pentru tipuri diferite de dosare bază (rădăcină).</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Nu pot copia legătura simbolică %x în %y.</target>
+<source>Cannot write file %x.</source>
+<target>Nu pot scrie fila %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Nu pot muta fila %x în %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nu pot copia legătura simbolică %x în %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Nu mă pot conecta la %x.</target>
@@ -293,9 +296,6 @@ Actuală: %y baiți
 
 <source>Cannot read file attributes of %x.</source>
 <target>Nu pot citi atributele filei %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Nu pot citi fila %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Nu pot crea dosarul %x.</target>
@@ -601,8 +601,8 @@ Comanda este declanșată dacă:
 <source>Automated Synchronization</source>
 <target>Sincronizare Automată</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Calea următoare nu suportă monitorizarea dosarelor:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Protocolul %x nu suportă monitorizarea dosarelor:</target>
 
 <source>Directory monitoring active</source>
 <target>Monitorizarea dosarelor este activă</target>
@@ -629,7 +629,7 @@ Comanda este declanșată dacă:
 <target>Conținutul Filelor</target>
 
 <source>File size</source>
-<target>Mărimea Filei</target>
+<target>Mărimea Filelor</target>
 
 <source>Two way</source>
 <target>Ambele Direcții</target>
@@ -718,8 +718,8 @@ Comanda este declanșată dacă:
 <source>Base folder:</source>
 <target>Dosar de Bază:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Dosarul de versionare va fi actualizat pentru că e conținut într-un dosar de bază.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Dosarul de versionare este conținut într-un dosar de bază.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizez perechea de dosare:</target>
@@ -732,6 +732,15 @@ Comanda este declanșată dacă:
 
 <source>job name</source>
 <target>numele sarcinii</target>
+
+<source>Show summary</source>
+<target>Arată sumarul (rezumatul)</target>
+
+<source>Sleep</source>
+<target>Pune în repaus [sleep]</target>
+
+<source>Shut down</source>
+<target>Închide PC-ul [Shut down]</target>
 
 <source>Synchronization stopped</source>
 <target>Sincronizare oprită</target>
@@ -753,6 +762,9 @@ Comanda este declanșată dacă:
 
 <source>Synchronization completed successfully</source>
 <target>Sincronizare realizată cu succes</target>
+
+<source>Executing command %x</source>
+<target>Execut comanda %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Curăț filele de jurnalizare vechi...</target>
@@ -782,8 +794,8 @@ Comanda este declanșată dacă:
 <pluralform>Reîncercare automată în %x de secunde...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ignoră erorile ulterioare</target>
+<source>Ignore &all</source>
+<target>Ignoră &Tot</target>
 
 <source>Retrying operation...</source>
 <target>Reîncerc operația...</target>
@@ -890,11 +902,11 @@ Comanda este declanșată dacă:
 <source>&Find...</source>
 <target>&Găsește...</target>
 
-<source>&Reset layout</source>
-<target>&Resetează Aspectul Grafic</target>
-
 <source>&Export file list...</source>
 <target>&Exportă Lista de File...</target>
+
+<source>&Reset layout</source>
+<target>&Resetează Aspectul Grafic</target>
 
 <source>&Tools</source>
 <target>&Unelte</target>
@@ -903,7 +915,7 @@ Comanda este declanșată dacă:
 <target>&Caută Actualizări Acum</target>
 
 <source>Check &automatically once a week</source>
-<target>Caută &Automat Săptămînal</target>
+<target>Caută Actualizări &Automat Săptămînal</target>
 
 <source>Cancel</source>
 <target>Anulează</target>
@@ -984,7 +996,7 @@ Comanda este declanșată dacă:
 <target>Include legăturile &simbolice:</target>
 
 <source>&Follow</source>
-<target>&Prin Urmărirea Lor</target>
+<target>&Prin urmărirea lor</target>
 
 <source>&Direct</source>
 <target>&Direct</target>
@@ -1031,9 +1043,6 @@ Comanda este declanșată dacă:
 <source>C&lear</source>
 <target>C&urăță</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detectează direcțiile de sincronizare cu ajutorul filelor bază de date</target>
-
 <source>Detect moved files</source>
 <target>Detectează filele mutate</target>
 
@@ -1054,38 +1063,23 @@ Comanda este declanșată dacă:
 <source>&Recycle bin</source>
 <target>&Reciclator</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Conservă [back up] în Reciclator filele șterse sau suprascrise</target>
-
 <source>&Permanent</source>
 <target>&Definitivă</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
 <source>&Versioning</source>
 <target>&Versionare</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Mută filele într-un dosar stabilit de utilizator</target>
-
 <source>Naming convention:</source>
 <target>Convenție de numire:</target>
 
-<source>Handle errors:</source>
-<target>Gestionarea Erorilor:</target>
-
-<source>&Pop-up</source>
-<target>&Popîc</target>
+<source>&Ignore errors</source>
+<target>&Ignoră Erorile</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>În caz de erori sau avertizări este arătată o fereastră popîc [popup]</target>
 
-<source>Hide all error and warning messages</source>
-<target>Mesajele de eroare și de avertizare nu sînt arătate</target>
-
-<source>On completion:</source>
-<target>La terminare:</target>
+<source>Run a command after synchronization:</source>
+<target>Rulează o comandă după sincronizare:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1123,6 +1117,9 @@ Comanda este declanșată dacă:
 <source>&Key file</source>
 <target>Filă C&heie</target>
 
+<source>&SSH agent</source>
+<target>Agent &SSH</target>
+
 <source>User name:</source>
 <target>Utilizator:</target>
 
@@ -1141,20 +1138,14 @@ Comanda este declanșată dacă:
 <source>How to get best performance?</source>
 <target>Cum obții cea mai bună performanță?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>Conexiuni SSH pentru citirea dosarelor:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Interval sugerat: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Conexiuni pentru citirea dosarelor:</target>
 
 <source>SFTP channels per connection:</source>
 <target>Canale SFTP per conexiune:</target>
 
 <source>Detect server limit</source>
 <target>Detectează limita serverului</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 conexiuni x 10 canale = citire a dosarelor de 20 de ori mai rapidă</target>
 
 <source>Select a directory on the server:</source>
 <target>Selectează un dosar de pe server:</target>
@@ -1195,6 +1186,9 @@ Comanda este declanșată dacă:
 <source>Bytes copied:</source>
 <target>Baiți copiați:</target>
 
+<source>When finished:</source>
+<target>La terminare:</target>
+
 <source>Close</source>
 <target>Închide</target>
 
@@ -1207,14 +1201,17 @@ Comanda este declanșată dacă:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Creează o filă set [batch file] pentru sincronizarea neasistată. Pentru efectuarea sincronizării, dublu-clichează această filă sau programează rularea ei folosind un Planificator de Sarcini [Task Scheduler]: %x</target>
 
-<source>&Stop</source>
-<target>&Oprește</target>
+<source>Run minimized</source>
+<target>Rulează minimizat</target>
+
+<source>&Show error dialog</source>
+<target>Arată dialo&gul erorilor</target>
+
+<source>&Cancel</source>
+<target>&Anulează</target>
 
 <source>Stop synchronization at first error</source>
 <target>Oprește sincronizarea la prima eroare întîlnită</target>
-
-<source>Run minimized</source>
-<target>Rulează minimizat</target>
 
 <source>Save log:</source>
 <target>Salvează jurnalul:</target>
@@ -1246,14 +1243,14 @@ Copiază într-o filă temporară (*.ffs_tmp) înainte de suprascrierea filei ț
 Aceasta garantează consecvența stării filelor chiar și în cazul apariției de erori serioase.
 </target>
 
-<source>(recommended)</source>
-<target>(recomandat)</target>
+<source>recommended</source>
+<target>recomandată</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Filele partajate sau zăvorîte sînt copiate folosind Serviciul de Conservare a Volumelor din Windows [Volume Shadow Copy].</target>
 
-<source>(requires administrator rights)</source>
-<target>(necesită drepturi de Administrator)</target>
+<source>requires administrator rights</source>
+<target>necesită drepturi de administrator</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Sînt transferate și permisiunile de accesare NTFS ale filelor și dosarelor (Atenție: doar pentru utilizatorii avansați!).</target>
@@ -1285,14 +1282,17 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Source code written in C++ using:</source>
 <target>Cod sursă scris în C++ folosind:</target>
 
-<source>Donation details</source>
-<target>Detaliile Donăriii</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Donează pentru FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Donează prin PayPal</target>
+<source>Support with a donation</source>
+<target>Sprijină cu o donație</target>
+
+<source>Donation details</source>
+<target>Detaliile Donăriii</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Actualizatorul automat a fost dezactivat de administrator.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Opiniile și sugestiile despre program sînt binevenite.</target>
@@ -1330,7 +1330,7 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Activate offline</source>
 <target>Activează neconectat [offline]</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>Salvează ca Sarcină Set</target>
 
 <source>Delete Items</source>
@@ -1369,11 +1369,17 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Overview</source>
 <target>Panoramă</target>
 
+<source>Show "%x"</source>
+<target>Arată "%x"</target>
+
 <source>&Show details</source>
 <target>&Arată Detalii</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Este disponibilă o versiune nouă de FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x este disponibil!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Filele de instalare sînt stricate (corupte). Reinstalează FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Calea locală nu este disponibilă pentru %x.</target>
@@ -1468,9 +1474,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Select time span...</source>
 <target>Selectează intervalul de timp...</target>
-
-<source>Show "%x"</source>
-<target>Arată "%x"</target>
 
 <source>Last session</source>
 <target>Ultima Sesiune</target>
@@ -1571,18 +1574,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Searching for program updates...</source>
 <target>Caut actualizări ale programului...</target>
 
-<source>Close progress dialog</source>
-<target>Închide Fereastra cu Progresul Sincr.</target>
-
-<source>Log off</source>
-<target>Deloghează Utilizatorul [Log off]</target>
-
-<source>Standby</source>
-<target>Pune PC-ul în Stare de Veghe [Stand-by]</target>
-
-<source>Shut down</source>
-<target>Închide PC-ul [Shut down]</target>
-
 <source>Paused</source>
 <target>Sincronizare Pauzată</target>
 
@@ -1613,17 +1604,20 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Log</source>
 <target>Jurnal</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Filele de instalare sînt stricate (corupte). Reinstalează FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Mulțumesc %x, pentru donație și sprijin!</target>
+
+<source>Recommended range:</source>
+<target>Interval recomandat:</target>
 
 <source>Password:</source>
 <target>Parolă:</target>
 
 <source>Key password:</source>
 <target>Parola Cheie:</target>
+
+<source>Please enter a file path.</source>
+<target>Introdu calea filei.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1742,6 +1736,15 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Păstrează în Reciclator filele șterse sau suprascrise</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Șterge și suprascrie filele în mod definitiv</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Mută filele într-un dosar stabilit de utilizator</target>
+
 <source>Replace</source>
 <target>Înlocuiește</target>
 
@@ -1753,6 +1756,15 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Append a time stamp to each file name</source>
 <target>Adaugă un marcaj temporal la numele fiecărei file</target>
+
+<source>On completion:</source>
+<target>La terminare:</target>
+
+<source>On errors:</source>
+<target>La erori:</target>
+
+<source>On success:</source>
+<target>La succes:</target>
 
 <source>Main config</source>
 <target>Configurația Principală</target>
@@ -1774,9 +1786,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Name</source>
 <target>Nume</target>
-
-<source>Items</source>
-<target>Elemente</target>
 
 <source>Percentage</source>
 <target>Procent</target>
@@ -1910,6 +1919,9 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Cannot change process I/O priorities.</source>
 <target>Nu pot schimba prioritățile I/O ale procesului.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Nu pot închide sistemul.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Verificarea disponibilității Reciclatorului a eșuat pentru dosarul %x.</target>
 
@@ -1933,9 +1945,6 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 
 <source>Portable</source>
 <target>Portabilă</target>
-
-<source>recommended</source>
-<target>recomandată</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Salvează setările în "%APPDATA%\FreeFileSync"</target>
@@ -1988,8 +1997,8 @@ Aceasta garantează consecvența stării filelor chiar și în cazul apariției 
 <source>Edit with FreeFileSync</source>
 <target>Editează cu FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Versiunea portabilă nu poate fi instalată în dosarul selectat.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Versiunea portabilă de FreeFileSync nu poate fi instalată într-un subdosar al %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Alege instalarea locală sau selectează un dosar diferit pentru instalare.</target>

@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -288,9 +288,9 @@ double median(RandomAccessIterator first, RandomAccessIterator last) //note: inv
 {
     const size_t n = last - first;
     if (n == 0)
-	    return 0;
+        return 0;
 
-	std::nth_element(first, first + n / 2, last); //complexity: O(n)
+    std::nth_element(first, first + n / 2, last); //complexity: O(n)
     const double midVal = *(first + n / 2);
 
     if (n % 2 != 0)
@@ -306,7 +306,7 @@ double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invali
     //http://en.wikipedia.org/wiki/Median_absolute_deviation
     const size_t n = last - first;
     if (n == 0)
-	    return 0;
+        return 0;
 
     const double m = median(first, last);
 

@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -194,8 +194,8 @@ SyncOperation FolderPair::getSyncOperation() const
                                        [](const FileSystemObject& fsObj)
                 {
                     const SyncOperation op = fsObj.getSyncOperation();
-                        return  op == SO_CREATE_NEW_LEFT ||
-                                op == SO_MOVE_LEFT_TO;
+                        return op == SO_CREATE_NEW_LEFT ||
+                               op == SO_MOVE_LEFT_TO;
                     }))
                     syncOpBuffered_ = SO_CREATE_NEW_LEFT;
                     //2. cancel parent deletion if only a single child is not also scheduled for deletion

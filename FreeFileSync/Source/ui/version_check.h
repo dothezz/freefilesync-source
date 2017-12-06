@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -18,18 +18,18 @@ void disableUpdateCheck(time_t& lastUpdateCheck);
 bool haveNewerVersionOnline(const std::string& onlineVersion);
 //----------------------------------------------------------------------------
 //periodic update check:
-bool shouldRunPeriodicUpdateCheck(time_t lastUpdateCheck);
+bool shouldRunAutomaticUpdateCheck(time_t lastUpdateCheck);
 
 struct UpdateCheckResultPrep;
 struct UpdateCheckResult;
 
 //run on main thread:
-std::shared_ptr<UpdateCheckResultPrep> periodicUpdateCheckPrepare();
+std::shared_ptr<UpdateCheckResultPrep> automaticUpdateCheckPrepare();
 //run on worker thread: (long-running part of the check)
-std::shared_ptr<UpdateCheckResult> periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep);
+std::shared_ptr<UpdateCheckResult> automaticUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep);
 //run on main thread:
-void periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion,
-                             const UpdateCheckResult* resultAsync);
+void automaticUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion,
+                              const UpdateCheckResult* resultAsync);
 //----------------------------------------------------------------------------
 //call from main thread:
 void checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion);

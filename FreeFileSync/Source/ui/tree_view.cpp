@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -63,7 +63,7 @@ void TreeView::extractVisibleSubtree(ContainerObject& hierObj,  //in
         //    }
 
         //prefer file-browser semantics over sync preview (=> always show useful numbers, even for SyncDirection::NONE)
-        //discussion: http://www.freefilesync.org/forum/viewtopic.php?t=1595
+        //discussion: https://www.freefilesync.org/forum/viewtopic.php?t=1595
         return std::max(file.getFileSize<LEFT_SIDE>(), file.getFileSize<RIGHT_SIDE>());
     };
 

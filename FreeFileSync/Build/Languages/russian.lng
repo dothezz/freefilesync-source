@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Проверка доступности "Корзины" для папки %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Для этого пути "Корзина" недоступна! Файлы будут удалены безвозвратно:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>"Корзина" не поддерживает следующие папки. Удаленные или перезаписанные файлы будет невозможно восстановить:</target>
 
 <source>An exception occurred</source>
 <target>Исключение произошло</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Синтаксис:</target>
 
-<source>global config file:</source>
-<target>глобальный конфигурационный файл:</target>
-
 <source>config files:</source>
 <target>конфигурационный файл:</target>
 
 <source>directory</source>
 <target>папка</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Путь к альтернативному файлу GlobalSettings.xml.</target>
+<source>global config file:</source>
+<target>глобальный конфигурационный файл:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Любое количество FreeFileSync .ffs_gui и/или .ffs_batch конфигурационных файлов.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Любое количество альтернативных пар папок для не более одного конфигурационного файла.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Открыть конфигурацию для редактирования программы без ее выполнения.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Открыть выбранную конфигурацию только для редактирования, не выполняя ее.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Путь к альтернативному файлу GlobalSettings.xml.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Невозможно найти следующие папки:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Обновление атрибутов справа</target>
 
-<source>Cannot write file %x.</source>
-<target>Невозможно записать файл %x.</target>
+<source>Cannot read file %x.</source>
+<target>Невозможно прочитать файл %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Операция не поддерживается для разных базовых типов папок.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Невозможно скопировать символьную ссылку %x в %y.</target>
+<source>Cannot write file %x.</source>
+<target>Невозможно записать файл %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Невозможно перенести файл %x в %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Невозможно скопировать символьную ссылку %x в %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Невозможно соединиться с %x.</target>
@@ -293,9 +296,6 @@ Actual: %y bytes
 
 <source>Cannot read file attributes of %x.</source>
 <target>Невозможно прочитать атрибуты файла %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Невозможно прочитать файл %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Невозможно создать папку %x.</target>
@@ -601,8 +601,8 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Автоматическая синхронизация</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Следующий путь не поддерживает мониторинг папок:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Протокол %x не поддерживает мониторинг папки:</target>
 
 <source>Directory monitoring active</source>
 <target>Слежение за папками активировано</target>
@@ -718,8 +718,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>Базовая папка:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Папка для архивирования файлов будет синхронизирована, поскольку она содержится в базовой папке.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Папка для архивирования файлов находится в базовой папке.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронизация пары папок:</target>
@@ -732,6 +732,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>название</target>
+
+<source>Show summary</source>
+<target>Показать статистику</target>
+
+<source>Sleep</source>
+<target>Спящий режим</target>
+
+<source>Shut down</source>
+<target>Завершение работы</target>
 
 <source>Synchronization stopped</source>
 <target>Синхронизация остановлена</target>
@@ -753,6 +762,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>Синхронизация завершена успешно</target>
+
+<source>Executing command %x</source>
+<target>Выполнение команды %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Очистка старых лог-файлов (журналов)...</target>
@@ -782,8 +794,8 @@ The command is triggered if:
 <pluralform>Автоматически повторить через %x секунд...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>И&гнорировать последующие ошибки</target>
+<source>Ignore &all</source>
+<target>Игнорировать &все</target>
 
 <source>Retrying operation...</source>
 <target>Повторение операции...</target>
@@ -890,11 +902,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>Н&айти...</target>
 
-<source>&Reset layout</source>
-<target>&Сбросить расположение</target>
-
 <source>&Export file list...</source>
 <target>&Экспортировать список файлов...</target>
+
+<source>&Reset layout</source>
+<target>&Сбросить расположение</target>
 
 <source>&Tools</source>
 <target>&Инструменты</target>
@@ -1031,9 +1043,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>&Очистить</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Обнаружение направления синхронизации с помощью базы данных</target>
-
 <source>Detect moved files</source>
 <target>Обнаруживать перемещенные файлы</target>
 
@@ -1054,38 +1063,23 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>В "&Корзину"</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Делать резервную копию удаленных и перезаписанных файлов в "Корзине"</target>
-
 <source>&Permanent</source>
 <target>&Удалять безвозвратно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Удалять или перезаписывать файлы, не помещая в "Корзину"</target>
 
 <source>&Versioning</source>
 <target>&Архивировать</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Перемещать файлы в пользовательскую папку</target>
-
 <source>Naming convention:</source>
 <target>Условие переименования:</target>
 
-<source>Handle errors:</source>
-<target>Обработка ошибкок:</target>
-
-<source>&Pop-up</source>
-<target>&Всплывающие окна</target>
+<source>&Ignore errors</source>
+<target>&Игнорировать ошибки</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показывать всплывающие окна при ошибках и предупреждениях</target>
 
-<source>Hide all error and warning messages</source>
-<target>Скрывать все ошибки и сообщения с предупреждениями</target>
-
-<source>On completion:</source>
-<target>По завершению:</target>
+<source>Run a command after synchronization:</source>
+<target>Запустить команду после синхронизации:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1123,6 +1117,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>&Файл ключа</target>
 
+<source>&SSH agent</source>
+<target>SSH &агент</target>
+
 <source>User name:</source>
 <target>Имя пользователя:</target>
 
@@ -1141,20 +1138,14 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>Как получить лучшую производительность?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>Количество SSH соединений:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Рекомендуемый диапазон: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Количество соединений для чтения папок:</target>
 
 <source>SFTP channels per connection:</source>
 <target>Количество SFTP каналов на одно соединение:</target>
 
 <source>Detect server limit</source>
 <target>Выявить лимит сервера</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 соединения x 10 каналов = в 20 раз быстрее чтение папок</target>
 
 <source>Select a directory on the server:</source>
 <target>Выберите папку на сервере:</target>
@@ -1180,11 +1171,11 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Времени прошло:</target>
 
-<source>Bytes:</source>
-<target>Байт(ы):</target>
+<source>Bytes</source>
+<target>Байт</target>
 
-<source>Items:</source>
-<target>Элементы:</target>
+<source>Items</source>
+<target>Элементов</target>
 
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>
@@ -1194,6 +1185,9 @@ The command is triggered if:
 
 <source>Bytes copied:</source>
 <target>Данных скопировано:</target>
+
+<source>When finished:</source>
+<target>По завершении:</target>
 
 <source>Close</source>
 <target>Закрыть</target>
@@ -1207,14 +1201,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Создать файл пакетного задания для автоматической синхронизации. Для запуска дважды кликните этот файл или запланируйте в планировщике задач: %x</target>
 
-<source>&Stop</source>
+<source>Run minimized</source>
+<target>Запустить свернутым</target>
+
+<source>&Show error dialog</source>
+<target>&Показать окно ошибки</target>
+
+<source>&Cancel</source>
 <target>&Остановить</target>
 
 <source>Stop synchronization at first error</source>
 <target>Остановить синхронизацию при первой ошибке</target>
-
-<source>Run minimized</source>
-<target>Запустить свернутым</target>
 
 <source>Save log:</source>
 <target>Сохранять лог-файлы (журналы):</target>
@@ -1246,14 +1243,14 @@ This guarantees a consistent state even in case of a serious error.
 Это гарантирует целостность заменяемых файлов даже в случае возникновения серьезной ошибки.
 </target>
 
-<source>(recommended)</source>
-<target>(рекомендовано)</target>
+<source>recommended</source>
+<target>рекомендуется</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома.</target>
 
-<source>(requires administrator rights)</source>
-<target>(требуются права Администратора)</target>
+<source>requires administrator rights</source>
+<target>требуются права администратора</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Передача прав доступа к файлам/папкам.</target>
@@ -1285,14 +1282,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Исходный код написан на C++ с использованием:</target>
 
-<source>Donation details</source>
-<target>Детали оплаты</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Если Вам понравился FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Отправить деньги через PayPal</target>
+<source>Support with a donation</source>
+<target>Помочь пожертвованием</target>
+
+<source>Donation details</source>
+<target>Детали оплаты</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Автоматическое обновление было отключено администратором.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Замечания и предложения приветствуются</target>
@@ -1330,8 +1330,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>Активировать в офлайн режиме</target>
 
-<source>Save as Batch Job</source>
-<target>Сохранение пакетного задания</target>
+<source>Save as a Batch Job</source>
+<target>Сохранить как пакетное задание</target>
 
 <source>Delete Items</source>
 <target>Удаление элементов</target>
@@ -1369,11 +1369,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Главная</target>
 
+<source>Show "%x"</source>
+<target>Показать "%x"</target>
+
 <source>&Show details</source>
 <target>&Показать детали</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Доступна новая версия FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x доступен!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Установочные файлы повреждены. Переустановите FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Локальный путь не доступен для %x.</target>
@@ -1468,9 +1474,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select time span...</source>
 <target>Выберите промежуток времени...</target>
-
-<source>Show "%x"</source>
-<target>Показать "%x"</target>
 
 <source>Last session</source>
 <target>Последняя сессия</target>
@@ -1571,18 +1574,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>Проверка обновлений программы...</target>
 
-<source>Close progress dialog</source>
-<target>Закрыть окно процесса</target>
-
-<source>Log off</source>
-<target>Выйти из системы (разлогиниться)</target>
-
-<source>Standby</source>
-<target>Перейти в ожидании</target>
-
-<source>Shut down</source>
-<target>Выключить компьютер</target>
-
 <source>Paused</source>
 <target>Пауза</target>
 
@@ -1613,17 +1604,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог (журнал)</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Установочные файлы повреждены. Переустановите FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Благодарим вас, %x, за пожертвование и поддержку!</target>
+
+<source>Recommended range:</source>
+<target>Рекомендуемый диапазон:</target>
 
 <source>Password:</source>
 <target>Пароль:</target>
 
 <source>Key password:</source>
 <target>Пароль:</target>
+
+<source>Please enter a file path.</source>
+<target>Пожалуйста, укажите путь к файлу.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1742,6 +1736,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>МБ</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Сохранять удаленные и перезаписанные файлы в "Корзине"</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Удалять или перезаписывать файлы безвозвратно</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Перемещать файлы в пользовательскую папку</target>
+
 <source>Replace</source>
 <target>Без переименования</target>
 
@@ -1753,6 +1756,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
+
+<source>On completion:</source>
+<target>По завершению:</target>
+
+<source>On errors:</source>
+<target>При ошибке:</target>
+
+<source>On success:</source>
+<target>При успехе:</target>
 
 <source>Main config</source>
 <target>Главная конфигурация</target>
@@ -1774,9 +1786,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>Имя</target>
-
-<source>Items</source>
-<target>Элементы</target>
 
 <source>Percentage</source>
 <target>Проценты</target>
@@ -1910,6 +1919,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Невозможно изменить приоритет процесса.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Невозможно завершить работу системы.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Проверка "Корзины" не удалась для папки %x.</target>
 
@@ -1932,10 +1944,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Локальная</target>
 
 <source>Portable</source>
-<target>Переносная</target>
-
-<source>recommended</source>
-<target>рекомендуется</target>
+<target>Портативная</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Сохраняет настройки в "%APPDATA%\FreeFileSync"</target>
@@ -1988,8 +1997,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Редактировать с помощью FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Портативная версия не может быть установлена в выбранную папку.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Портативная версия FreeFileSync не может быть установлена в подпапку %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Пожалуйста, выберите локальный тип установки или выберите другую папку для установки.</target>

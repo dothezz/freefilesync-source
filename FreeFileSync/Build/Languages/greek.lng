@@ -52,8 +52,8 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Έλεγχος της διαθεσιμότητας του κάδου ανακύκλωσης για το φάκελο %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Ο κάδος ανακύκλωσης δεν είναι διαθέσιμος για τους ακόλουθους φακέλους. Τα αρχεία θα διαγραφούν μόνιμα:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Ο Κάδος Ανακύκλωσης δεν υποστηρίζεται στους ακόλουθους φακέλους. Αρχεία που διαγράφησαν ή αντικαταστάθηκαν δεν θα μπορούν να επαναφερθούν:</target>
 
 <source>An exception occurred</source>
 <target>Παρουσιάστηκε μια εξαίρεση</target>
@@ -71,7 +71,7 @@
 <target>Σφάλμα</target>
 
 <source>File %x does not contain a valid configuration.</source>
-<target>Το αρχείο %x δεν περιέχει μια έγκυρη διάταξη.</target>
+<target>Το αρχείο %x δεν περιέχει έγκυρες παραμέτρους.</target>
 
 <source>Unequal number of left and right directories specified.</source>
 <target>Έχει οριστεί άνισος αριθμός υποκαταλόγων δεξιά από ό,τι αριστερά.</target>
@@ -80,7 +80,7 @@
 <target>Το αρχείο διάταξης δεν πρέπει να περιλαμβάνει ρυθμίσεις στο επίπεδο του ζεύγους των υποκαταλόγων, όταν οι φάκελοι ορίζονται μέσω της γραμμής εργασιών.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
-<target>Δεν μπορούν να οριστούν φάκελοι για περισσότερα από ένα αρχεία διάταξης.</target>
+<target>Δεν μπορούν να οριστούν φάκελοι για περισσότερα από ένα αρχεία παραμέτρων.</target>
 
 <source>Command line</source>
 <target>Γραμμή εντολών</target>
@@ -88,26 +88,26 @@
 <source>Syntax:</source>
 <target>Σύνταξη:</target>
 
-<source>global config file:</source>
-<target>αρχείο γενικών ρυθμίσεων:</target>
-
 <source>config files:</source>
 <target>αρχεία ρυθμίσεων:</target>
 
 <source>directory</source>
 <target>υποκατάλογος</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Διαδρομή σε ένα εναλλακτικό αρχείο GlobalSettings.xml.</target>
+<source>global config file:</source>
+<target>αρχείο γενικών ρυθμίσεων:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target>Οποιοσδήποτε αριθμός αρχείων διάταξης .ffs_gui ή/και .ffs_batch του FreeFileSync.</target>
+<target>Οποιοσδήποτε αριθμός από αρχεία παραμέτρων .ffs_gui ή/και .ffs_batch του FreeFileSync.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Οποιοσδήποτε αριθμός από εναλλακτικά ζεύγη υποκαταλόγων για το πολύ ένα αρχείο ρυθμίσεων.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Άνοιγμα της διάταξης για διόρθωση χωρίς να εκτελεστεί.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Άνοιγμα του επιλεγμένου αρχείου παραμέτρων μόνο για διόρθωση, χωρίς να εκτελεστεί.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Διαδρομή σε ένα εναλλακτικό αρχείο GlobalSettings.xml.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι φάκελοι δεν ήταν δυνατό να βρεθούν:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Ενημέρωση των χαρακτηριστικών στα δεξιά</target>
 
-<source>Cannot write file %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
+<source>Cannot read file %x.</source>
+<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Η λειτουργία δεν υποστηρίζεται για διαφορετικούς τύπους βασικών φακέλων.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Αδυναμία αντιγραφής του συμβολικού συνδέσμου %x στο %y.</target>
+<source>Cannot write file %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Δεν μπορεί το αρχείο %x να μεταφερθεί στο %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Αδυναμία αντιγραφής του συμβολικού συνδέσμου %x στο %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Δεν μπορεί να πραγματοποιηθεί σύνδεση με το %x.</target>
@@ -293,9 +296,6 @@ Actual: %y bytes
 
 <source>Cannot read file attributes of %x.</source>
 <target>Δεν μπορεί να γίνει ανάγνωση των χαρακτηριστικών του αρχείου %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
 
 <source>Cannot create directory %x.</source>
 <target>Δεν μπορεί να δημιουργηθεί ο υποκατάλογος %x.</target>
@@ -596,8 +596,8 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Αυτοματοποιημένος Συγχρονισμός</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Η παρακάτω διαδρομή δεν υποστηρίζει παρακολούθηση υποκαταλόγων:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Το πρωτόκολο %x δεν υποστηρίζει παρακολούθηση καταλόγων:</target>
 
 <source>Directory monitoring active</source>
 <target>Η παρακολούθηση των υποκαταλόγων είναι ενεργή</target>
@@ -713,8 +713,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>Βασικός φάκελος:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Ο φάκελος διατήρησης παλιών εκδόσεων θα συγχρονιστεί γιατί βρίσκεται μέσα σε έναν βασικό φάκελο.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Ο φάκελος διατήρησης παλιών εκδόσεων βρίσκεται μέσα σε κάποιον βασικό φάκελο.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Συγχρονίζεται το ζευγάρι φακέλων:</target>
@@ -727,6 +727,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>όνομα ενέργειας</target>
+
+<source>Show summary</source>
+<target>Εμφάνιση σύνοψης</target>
+
+<source>Sleep</source>
+<target>Αναστολή λειτουργίας</target>
+
+<source>Shut down</source>
+<target>Τερματισμός λειτουργίας</target>
 
 <source>Synchronization stopped</source>
 <target>Διακοπή του συγχρονισμού</target>
@@ -748,6 +757,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>Ο συγχρονισμός ολοκληρώθηκε επιτυχώς</target>
+
+<source>Executing command %x</source>
+<target>Εκτέλεση εντολής %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Καθαρισμός των παλιών αρχείων καταγραφής...</target>
@@ -776,8 +788,8 @@ The command is triggered if:
 <pluralform>Αυτόματη επανάληψη σε %x δευτερόλεπτα...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Αγνόηση επόμενων σφαλμάτων</target>
+<source>Ignore &all</source>
+<target>Παράβλεψη ό&λων</target>
 
 <source>Retrying operation...</source>
 <target>Επανάληψη της προσπάθειας...</target>
@@ -884,11 +896,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>Εύ&ρεση...</target>
 
-<source>&Reset layout</source>
-<target>&Αρχικοποίηση εμφάνισης</target>
-
 <source>&Export file list...</source>
 <target>Ε&ξαγωγή καταλόγου αρχείων...</target>
+
+<source>&Reset layout</source>
+<target>&Αρχικοποίηση εμφάνισης</target>
 
 <source>&Tools</source>
 <target>&Εργαλεία</target>
@@ -1025,9 +1037,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>&Καθαρισμός</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Ανίχνευση της κατεύθυνσης συγχρονισμού με τη βοήθεια αρχείων βάσης δεδομένων</target>
-
 <source>Detect moved files</source>
 <target>Ανίχνευση των αρχείων που μεταφέρθηκαν</target>
 
@@ -1048,38 +1057,23 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>&Κάδος ανακύκλωσης</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Μεταφορά όλων των διαγραμμένων και αντικατεστημένων αρχείων στον κάδο ανακύκλωσης</target>
-
 <source>&Permanent</source>
 <target>&Μόνιμη</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Μόνιμη διαγραφή ή αντικατάσταση των αρχείων</target>
 
 <source>&Versioning</source>
 <target>&Διατήρηση παλιών εκδόσεων</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Μεταφορά αρχείων σε έναν υποκατάλογο που ορίζεται από το χρήστη</target>
-
 <source>Naming convention:</source>
 <target>Κανόνας ονοματοθεσίας:</target>
 
-<source>Handle errors:</source>
-<target>Χειρισμός σφαλμάτων:</target>
-
-<source>&Pop-up</source>
-<target>&Αναδυόμενο</target>
+<source>&Ignore errors</source>
+<target>&Παράβλεψη σφαλμάτων</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
 
-<source>Hide all error and warning messages</source>
-<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
-
-<source>On completion:</source>
-<target>Μετά την ολοκλήρωση:</target>
+<source>Run a command after synchronization:</source>
+<target>Εκτέλεση εντολής μετά το συγχρονισμό:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1117,6 +1111,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>&Αρχείο κλειδιού</target>
 
+<source>&SSH agent</source>
+<target>Παράγοντας &SSH</target>
+
 <source>User name:</source>
 <target>Όνομα χρήστη:</target>
 
@@ -1135,20 +1132,14 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>Πώς να έχετε την καλύτερη απόδοση;</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH συνδέσεις για ανάγνωση του καταλόγου:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Προτεινόμενο εύρος: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>Συνδέσεις για ανάγνωση καταλόγου:</target>
 
 <source>SFTP channels per connection:</source>
 <target>Αριθμός καναλιών SFTP ανά σύνδεση:</target>
 
 <source>Detect server limit</source>
 <target>Ανίχνευση ορίου του εξυπηρετητή</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 συνδέσεις X 10 κανάλια = 20 φορές πιο γρήγορη ανάγνωση του καταλόγου</target>
 
 <source>Select a directory on the server:</source>
 <target>Επιλογή ενός υποκαταλόγου στον διακομιστή:</target>
@@ -1189,6 +1180,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>Bytes που αντιγράφτηκαν:</target>
 
+<source>When finished:</source>
+<target>Μετά την ολοκλήρωση:</target>
+
 <source>Close</source>
 <target>Κλείσιμο</target>
 
@@ -1201,14 +1195,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Δημιουργία ενός αρχείου δέσμης για αυτόματο συγχρονισμό. Για να ξεκινήσετε, κάντε διπλό κλικ σε αυτό το αρχείο ή ενσωματώστε το σε ένα χρονοδιάγραμμα εργασιών: %x</target>
 
-<source>&Stop</source>
-<target>&Διακοπή</target>
+<source>Run minimized</source>
+<target>Εκκίνηση σε ελαχιστοποιημένο παράθυρο</target>
+
+<source>&Show error dialog</source>
+<target>Εμ&φάνιση ειδοποιήσεων σφαλμάτων</target>
+
+<source>&Cancel</source>
+<target>Α&κύρωση</target>
 
 <source>Stop synchronization at first error</source>
 <target>Διακοπή του συγχρονισμού με το πρώτο σφάλμα</target>
-
-<source>Run minimized</source>
-<target>Εκκίνηση σε ελαχιστοποιημένο παράθυρο</target>
 
 <source>Save log:</source>
 <target>Αποθήκευση αρχείου καταγραφής:</target>
@@ -1240,14 +1237,14 @@ This guarantees a consistent state even in case of a serious error.
 Αυτό εγγυάται μια συνεπή κατάσταση ακόμα και στην περίπτωση σοβαρού σφάλματος.
 </target>
 
-<source>(recommended)</source>
-<target>(προτεινόμενο)</target>
+<source>recommended</source>
+<target>συνιστώμενη</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Αντιγραφή των κοινών ή κλειδωμένων αρχείων με τη χρήση της Υπηρεσίας Σκιωδών Αντιγράφων Τόμου.</target>
 
-<source>(requires administrator rights)</source>
-<target>(απαιτεί δικαιώματα διαχειριστή)</target>
+<source>requires administrator rights</source>
+<target>απαιτεί δικαιώματα διαχειριστή</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Μεταφορά των δικαιωμάτων πρόσβασης αρχείων και φακέλων.</target>
@@ -1279,14 +1276,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
 
-<source>Donation details</source>
-<target>Λεπτομέρειες δωρεάς</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Αν σας αρέσει το FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Κάντε μια δωρεά μέσω PayPal</target>
+<source>Support with a donation</source>
+<target>Υποστηρίξτε με μια δωρεά</target>
+
+<source>Donation details</source>
+<target>Λεπτομέρειες δωρεάς</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Η αυτόματη ενημέρωση απενεργοποιήθηκε από το διαχειριστή.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Τα σχόλια και οι προτάσεις σας είναι ευπρόσδεκτα</target>
@@ -1324,14 +1324,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>Ενεργοποίηση χωρίς σύνδεση</target>
 
-<source>Save as Batch Job</source>
-<target>Αποθήκευση ως Δέσμη Εργασιών</target>
+<source>Save as a Batch Job</source>
+<target>Αποθήκευση ως Δέσμη Ενεργειών</target>
 
 <source>Delete Items</source>
 <target>Διαγραφή Στοιχείων</target>
 
 <source>Copy items</source>
-<target>Αντιγραφή στοιχείων</target>
+<target>Αντιγραφή Στοιχείων</target>
 
 <source>Options</source>
 <target>Επιλογές</target>
@@ -1358,16 +1358,22 @@ This guarantees a consistent state even in case of a serious error.
 <target>Προβολή Ρυθμίσεων</target>
 
 <source>Configuration</source>
-<target>Διάταξη</target>
+<target>Παράμετροι</target>
 
 <source>Overview</source>
 <target>Σύνοψη</target>
 
+<source>Show "%x"</source>
+<target>Εμφάνιση της γραμμής "%x"</target>
+
 <source>&Show details</source>
 <target>&Προβολή λεπτομερειών</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
+<source>FreeFileSync %x is available!</source>
+<target>Το FreeFileSync %x είναι διαθέσιμο!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Τα αρχεία εγκατάστασης είναι κατεστραμμένα. Παρακαλούμε επανεγκαταστείστε το FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Η τοπική διαδρομή δεν είναι διαθέσιμη για το %x.</target>
@@ -1459,9 +1465,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Select time span...</source>
 <target>Επιλέξτε το χρονικό εύρος...</target>
 
-<source>Show "%x"</source>
-<target>Εμφάνιση της γραμμής "%x"</target>
-
 <source>Last session</source>
 <target>Τελευταία χρήση</target>
 
@@ -1469,7 +1472,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Σύγκριση Φακέλων και Συγχρονισμός</target>
 
 <source>Configuration saved</source>
-<target>Η διάταξη αποθηκεύτηκε</target>
+<target>Οι παράμετροι αποθηκεύτηκαν</target>
 
 <source>FreeFileSync batch</source>
 <target>Δέσμη ενεργειών του FreeFileSync</target>
@@ -1561,18 +1564,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>Αναζήτηση καινούριας έκδοσης...</target>
 
-<source>Close progress dialog</source>
-<target>Κλείσιμο του παράθυρου αναφοράς</target>
-
-<source>Log off</source>
-<target>Αποσύνδεση</target>
-
-<source>Standby</source>
-<target>Αναστολή λειτουργίας</target>
-
-<source>Shut down</source>
-<target>Τερματισμός λειτουργίας</target>
-
 <source>Paused</source>
 <target>Σε παύση</target>
 
@@ -1603,17 +1594,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Καταγραφή</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Τα αρχεία εγκατάστασης είναι κατεστραμμένα. Παρακαλούμε επανεγκαταστείστε το FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Σας ευχαριστούμε, %x, για τη δωρεά και την υποστήριξή σας!</target>
+
+<source>Recommended range:</source>
+<target>Προτεινόμενο εύρος:</target>
 
 <source>Password:</source>
 <target>Συνθηματικό:</target>
 
 <source>Key password:</source>
 <target>Συνθηματικό κλειδιού:</target>
+
+<source>Please enter a file path.</source>
+<target>Παρακαλούμε εισάγετε μια διαδρομή αρχείου.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1729,6 +1723,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Διατήρηση διαγραμμένων και αντικατεστημένων αρχείων στον κάδο ανακύκλωσης</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Μόνιμη διαγραφή και αντικατάσταση αρχείων</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Μεταφορά αρχείων σε έναν υποκατάλογο που ορίζεται από το χρήστη</target>
+
 <source>Replace</source>
 <target>Αντικατάσταση προηγούμενης</target>
 
@@ -1740,6 +1743,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Προσάρτηση χρονικής σήμανσης στο όνομα κάθε αρχείου</target>
+
+<source>On completion:</source>
+<target>Μετά την ολοκλήρωση:</target>
+
+<source>On errors:</source>
+<target>Μετά από σφάλμα:</target>
+
+<source>On success:</source>
+<target>Μετά από επιτυχία:</target>
 
 <source>Main config</source>
 <target>Κύρια διάταξη</target>
@@ -1761,9 +1773,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>Όνομα</target>
-
-<source>Items</source>
-<target>Στοιχεία</target>
 
 <source>Percentage</source>
 <target>Ποσοστό</target>
@@ -1894,6 +1903,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Δεν μπορούν να αλλάξουν οι προτεραιότητες I/O της διεργασίας.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Αδυναμία τερματισμού λειτουργίας του συστήματος.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Ο έλεγχος του κάδου ανακύκλωσης απέτυχε για τον υποκατάλογο %x.</target>
 
@@ -1901,7 +1913,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>Τα ακόλουθα στοιχεία XML δεν ήταν δυνατό να αναγνωσθούν:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target>Το αρχείο διάταξης %x είναι ατελές. Τα στοιχεία που λείπουν θα αντικατασταθούν με τις προεπιλεγμένες τιμές τους.</target>
+<target>Το αρχείο παραμέτρων %x είναι ατελές. Τα στοιχεία που λείπουν θα αντικατασταθούν με τις προεπιλεγμένες τιμές τους.</target>
 
 <source>Prepare installation</source>
 <target>Προετοιμασία εγκατάστασης</target>
@@ -1917,9 +1929,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Portable</source>
 <target>Φορητή</target>
-
-<source>recommended</source>
-<target>συνιστώμενη</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Αποθήκευση ρυθμίσεων στο "%APPDATA%\FreeFileSync"</target>
@@ -1972,8 +1981,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Επεξεργασία με FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Η φορητή έκδοση δεν μπορεί να εγκατασταθεί στον επιλεγμένο φάκελο.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Η φορητή έκδοση του FreeFileSync δεν μπορεί να εγκατασταθεί σε υποφάκελο του %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Παρακαλούμε επιλέξτε την τοπική εγκατάσταση ή επιλέξτε έναν διαφορετικό φάκελο για εγκατάσταση.</target>

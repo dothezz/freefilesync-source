@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+// C++ code generated with wxFormBuilder (version Nov  6 2017)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __GUI_GENERATED_H__
@@ -83,6 +83,7 @@ protected:
     wxMenuItem* m_menuItemOptions;
     wxMenu* m_menuLanguages;
     wxMenuItem* m_menuItemFind;
+    wxMenuItem* m_menuItemExportList;
     wxMenuItem* m_menuItemShowMain;
     wxMenuItem* m_menuItemShowFolders;
     wxMenuItem* m_menuItemShowViewFilter;
@@ -827,7 +828,7 @@ public:
     FolderHistoryBox* m_logFolderPath;
     wxBitmapButton* m_bpButtonSelectAltLogFolder;
 
-    BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Save as Batch Job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+    BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Save as a Batch Job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
     ~BatchDlgGenerated();
 
 };
@@ -917,12 +918,18 @@ protected:
     wxStaticLine* m_staticline20;
     wxPanel* m_panel39;
     wxCheckBox* m_checkBoxFailSafe;
+    wxStaticText* m_staticText911;
     wxStaticText* m_staticText91;
+    wxStaticText* m_staticText9111;
     wxBoxSizer* bSizerLockedFiles;
     wxCheckBox* m_checkBoxCopyLocked;
+    wxStaticText* m_staticText921;
     wxStaticText* m_staticText92;
+    wxStaticText* m_staticText922;
     wxCheckBox* m_checkBoxCopyPermissions;
+    wxStaticText* m_staticText931;
     wxStaticText* m_staticText93;
+    wxStaticText* m_staticText932;
     wxStaticLine* m_staticline39;
     wxStaticText* m_staticText95;
     wxStaticText* m_staticText96;
@@ -1045,6 +1052,7 @@ protected:
     wxStaticBitmap* m_bitmapThanks;
     wxStaticText* m_staticTextThanks;
     wxButton* m_buttonShowDonationDetails;
+    wxStaticText* m_staticTextNoAutoUpdate;
     wxStaticText* m_staticText94;
     wxStaticBitmap* m_bitmapHomepage;
     wxHyperlinkCtrl* m_hyperlink1;

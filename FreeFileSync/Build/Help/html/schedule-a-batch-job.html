@@ -16,20 +16,20 @@
 			<br><br>
 
 
-		<li>By default, FreeFileSync will show a progress dialog during synchronization and will wait while the results dialog is shown.
-			If the progress dialog is not needed, enable checkbox <b>Run minimized</b>. This will also skip the results dialog at the end.
-			<br><br>
-			Alternatively, if you want to see the progress, but not to wait at the results dialog, it's sufficient to only select the <i>On completion</i> action <b>Close progress dialog</b>.
+		<li>By default, FreeFileSync will show a progress dialog during synchronization and will wait while the summary dialog is shown.
+			If the progress dialog is not needed, enable checkbox <b>Run minimized</b> and
+			also set <i>When finished</i> to <b>Exit</b> if you want to skip the summary dialog at the end.
 			<br><br>
 
 			<div class="bluebox">
 				<b>Note</b><br>
-				 Even if the progress dialog is not shown at the beginning, you can make it visible later <b>during</b>
+				 Even if the progress dialog is not shown at the beginning, you can make it visible at any time <b>during</b>
 				 synchronization by double-clicking the FreeFileSync icon in the notification area.
 			</div>
 			<br>
 
-		<li>If you don't want error or warning messages to interrupt synchronization, set <b>Handle errors</b> to either <b>Ignore</b> or <b>Stop</b>.<br>
+		<li>If you don't want error or warning messages to stall synchronization when no user is available to respond,
+			either check <b>Ignore errors</b> or set <b>Cancel</b> to stop the synchronization at the first error.<br>
 			&nbsp;
 
 		<li>If log files are required, enable <b>Save log</b> and enter a folder path.

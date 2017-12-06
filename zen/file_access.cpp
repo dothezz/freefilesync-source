@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -379,17 +379,17 @@ void setWriteTimeNative(const Zstring& itemPath, const struct ::timespec& modTim
         using open()/futimens() for regular files and utimensat(AT_SYMLINK_NOFOLLOW) for symlinks is consistent with "cp" and "touch"!
     */
     struct ::timespec newTimes[2] = {};
-    newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs: http://www.freefilesync.org/forum/viewtopic.php?t=1701
+    newTimes[0].tv_sec = ::time(nullptr); //access time; using UTIME_OMIT for tv_nsec would trigger even more bugs: https://www.freefilesync.org/forum/viewtopic.php?t=1701
     newTimes[1] = modTime; //modification time
 
     if (procSl == ProcSymlink::FOLLOW)
     {
         //hell knows why files on gvfs-mounted Samba shares fail to open(O_WRONLY) returning EOPNOTSUPP:
-        //http://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works (but not for gvfs SFTP)
+        //https://www.freefilesync.org/forum/viewtopic.php?t=2803 => utimensat() works (but not for gvfs SFTP)
         if (::utimensat(AT_FDCWD, itemPath.c_str(), newTimes, 0) == 0)
             return;
 
-        //in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: http://www.freefilesync.org/forum/viewtopic.php?t=387
+        //in other cases utimensat() returns EINVAL for CIFS/NTFS drives, but open+futimens works: https://www.freefilesync.org/forum/viewtopic.php?t=387
         const int fdFile = ::open(itemPath.c_str(), O_WRONLY | O_APPEND); //2017-07-04: O_WRONLY | O_APPEND seems to avoid EOPNOTSUPP on gvfs SFTP!
         if (fdFile == -1)
             THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtPath(itemPath)), L"open");
@@ -649,7 +649,7 @@ FileCopyResult copyFileOsSpecific(const Zstring& sourceFile, //throw FileError, 
         //this triggers bugs on samba shares where the modification time is set to current time instead.
         //Linux: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
         //       http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
-        //OS X:  http://www.freefilesync.org/forum/viewtopic.php?t=356
+        //OS X:  https://www.freefilesync.org/forum/viewtopic.php?t=356
         setWriteTimeNative(targetFile, sourceInfo.st_mtim, ProcSymlink::FOLLOW); //throw FileError
     }
     catch (const FileError& e)

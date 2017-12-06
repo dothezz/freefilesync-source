@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -115,6 +115,8 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError, E
         bytesRead = ::read(getHandle(), buffer, bytesToRead);
     }
     while (bytesRead < 0 && errno == EINTR); //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+    //EINTR is not checked on macOS' copyfile: https://opensource.apple.com/source/copyfile/copyfile-146/copyfile.c.auto.html
+    //read() on macOS: https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man2/read.2.html
 
     if (bytesRead < 0)
         THROW_LAST_FILE_ERROR(replaceCpy(_("Cannot read file %x."), L"%x", fmtPath(getFilePath())), L"read");
@@ -129,23 +131,41 @@ size_t FileInput::tryRead(void* buffer, size_t bytesToRead) //throw FileError, E
 
 size_t FileInput::read(void* buffer, size_t bytesToRead) //throw FileError, ErrorFileLocked, X; return "bytesToRead" bytes unless end of stream!
 {
+    warn_static("implement PERF_AWESOME_BUFFER program wide for all buffers!?")
+
+    /*
+        FFS 8.9-9.5 perf issues on macOS: https://www.freefilesync.org/forum/viewtopic.php?t=4808
+            app-level buffering is essential to optimize random data sizes; e.g. "export file list":
+                => big perf improvement on Windows, Linux. No significant improvement on macOS in tests
+            impact on stream-based file copy:
+                => no drawback vs block-wise copy loop on Linux, HOWEVER: big perf issue on macOS!
+
+        Possible cause of macOS perf issue unclear:
+            - getting rid of std::vector::resize() and std::vector::erase() "fixed" the problem
+                => costly zero-initializing memory? problem with inlining? QOI issue of std:vector on clang/macOS?
+            - replacing std::copy() with memcpy() also *seems* to have improved speed "somewhat"
+    */
+
     const size_t blockSize = getBlockSize();
-    assert(memBuf_.size() <= blockSize);
+    assert(memBuf_.size() >= blockSize);
+    assert(bufPos_ <= bufPosEnd_ && bufPosEnd_ <= memBuf_.size());
+
     char*       it    = static_cast<char*>(buffer);
     char* const itEnd = it + bytesToRead;
     for (;;)
     {
-        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), memBuf_.size());
-        std::copy    (memBuf_.begin(), memBuf_.begin() + junkSize, it);
-        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + junkSize);
-        it += junkSize;
+        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), bufPosEnd_ - bufPos_);
+        std::memcpy(it, &memBuf_[bufPos_], junkSize);
+        bufPos_ += junkSize;
+        it      += junkSize;
 
         if (it == itEnd)
             break;
+
         //--------------------------------------------------------------------
-        memBuf_.resize(blockSize);
         const size_t bytesRead = tryRead(&memBuf_[0], blockSize); //throw FileError, ErrorFileLocked; may return short, only 0 means EOF! => CONTRACT: bytesToRead > 0
-        memBuf_.resize(bytesRead);
+        bufPos_ = 0;
+        bufPosEnd_ = bytesRead;
 
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesRead); //throw X
 
@@ -213,6 +233,7 @@ size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw Fil
         bytesWritten = ::write(getHandle(), buffer, bytesToWrite);
     }
     while (bytesWritten < 0 && errno == EINTR);
+    //write() on macOS: https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man2/write.2.html
 
     if (bytesWritten <= 0)
     {
@@ -232,20 +253,32 @@ size_t FileOutput::tryWrite(const void* buffer, size_t bytesToWrite) //throw Fil
 void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError, X
 {
     const size_t blockSize = getBlockSize();
-    assert(memBuf_.size() <= blockSize);
-    const char*       it   = static_cast<const char*>(buffer);
+    assert(memBuf_.size() >= blockSize);
+    assert(bufPos_ <= bufPosEnd_ && bufPosEnd_ <= memBuf_.size());
+
+    const char*       it    = static_cast<const char*>(buffer);
     const char* const itEnd = it + bytesToWrite;
     for (;;)
     {
-        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), blockSize - memBuf_.size());
-        memBuf_.insert(memBuf_.end(), it, it + junkSize);
-        it += junkSize;
+        if (memBuf_.size() - bufPos_ < blockSize) //support memBuf_.size() > blockSize to reduce memmove()s, but perf test shows: not really needed!
+            // || bufPos_ == bufPosEnd_) -> not needed while memBuf_.size() == blockSize
+        {
+            std::memmove(&memBuf_[0], &memBuf_[bufPos_], bufPosEnd_ - bufPos_);
+            bufPosEnd_ -= bufPos_;
+            bufPos_ = 0;
+        }
+
+        const size_t junkSize = std::min(static_cast<size_t>(itEnd - it), blockSize - (bufPosEnd_ - bufPos_));
+        std::memcpy(&memBuf_[bufPosEnd_], it, junkSize);
+        bufPosEnd_ += junkSize;
+        it         += junkSize;
 
         if (it == itEnd)
             return;
+
         //--------------------------------------------------------------------
-        const size_t bytesWritten = tryWrite(&memBuf_[0], blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesWritten);
+        const size_t bytesWritten = tryWrite(&memBuf_[bufPos_], blockSize); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        bufPos_ += bytesWritten;
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
     }
 }
@@ -253,11 +286,12 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
 
 void FileOutput::flushBuffers() //throw FileError, X
 {
-    assert(memBuf_.size() <= getBlockSize());
-    while (!memBuf_.empty())
+    assert(bufPosEnd_ - bufPos_ <= getBlockSize());
+    assert(bufPos_ <= bufPosEnd_ && bufPosEnd_ <= memBuf_.size());
+    while (bufPos_ != bufPosEnd_)
     {
-        const size_t bytesWritten = tryWrite(&memBuf_[0], memBuf_.size()); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
-        memBuf_.erase(memBuf_.begin(), memBuf_.begin() + bytesWritten);
+        const size_t bytesWritten = tryWrite(&memBuf_[bufPos_], bufPosEnd_ - bufPos_); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
+        bufPos_ += bytesWritten;
         if (notifyUnbufferedIO_) notifyUnbufferedIO_(bytesWritten); //throw X!
     }
 }

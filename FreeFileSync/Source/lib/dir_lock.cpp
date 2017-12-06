@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 #include "dir_lock.h"
@@ -102,8 +102,8 @@ Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
     if (::kill(processId, 0) != 0) //sig == 0: no signal sent, just existence check
         return NoValue();
 
-    pid_t procSid = ::getsid(processId); //NOT to be confused with "login session", e.g. not stable on OS X!!!
-    if (procSid == -1)
+    const pid_t procSid = ::getsid(processId); //NOT to be confused with "login session", e.g. not stable on OS X!!!
+    if (procSid < 0) //pids are never negative, empiric proof: https://linux.die.net/man/2/wait
         THROW_LAST_FILE_ERROR(_("Cannot get process information."), L"getsid");
 
     return procSid;

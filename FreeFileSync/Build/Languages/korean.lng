@@ -52,14 +52,14 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>폴더 %x을(를) 위한 휴지통 가용성 여부 확인 중...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>다음 폴더들을 위해 휴지통을 사용할 수 없습니다. 대신 파일들을 영구 삭제합니다:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>다음 폴더에서는 휴지통이 지원되지 않습니다. 삭제되거나 덮어 씌어진 파일은 복원할 수 없습니다:</target>
 
 <source>An exception occurred</source>
 <target>예외 발생</target>
 
 <source>A directory path is expected after %x.</source>
-<target>%x 이후 일반적으로 디렉토리 경로가 하나 나옵니다.</target>
+<target>%x 이후 일반적으로 디렉터리 경로가 하나 나옵니다.</target>
 
 <source>Syntax error</source>
 <target>구문 오류</target>
@@ -77,10 +77,10 @@
 <target>지정된 좌측 및 우측 디렉터리 개수가 같지 않음.</target>
 
 <source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target>명령줄을 통해 설정된 디렉토리의 경우, 설정 파일은 디렉토리 페어 상의 설정을 포함할 수 없습니다.</target>
+<target>명령줄을 통해 설정된 디렉터리의 경우, 설정 파일은 디렉터리 페어 상의 설정을 포함할 수 없습니다.</target>
 
 <source>Directories cannot be set for more than one configuration file.</source>
-<target>디렉토리는 하나 이상의 설정 파일을 위해 설정될 수 없습니다.</target>
+<target>디렉터리는 하나 이상의 설정 파일을 위해 설정될 수 없습니다.</target>
 
 <source>Command line</source>
 <target>명령줄(커맨드라인)</target>
@@ -88,26 +88,26 @@
 <source>Syntax:</source>
 <target>구문(Syntax):</target>
 
-<source>global config file:</source>
-<target>전체 설정 파일:</target>
-
 <source>config files:</source>
 <target>설정 파일:</target>
 
 <source>directory</source>
-<target>디렉토리</target>
+<target>디렉터리</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>GlobalSettings.xml 대체 파일에 대한 경로.</target>
+<source>global config file:</source>
+<target>전체 설정 파일:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>FreeFileSync .ffs_gui 또는 .ffs_batch 설정 파일 개수.</target>
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
-<target>최대 1개 설정파일에 대한 대체 디렉토리 페어 개수.</target>
+<target>최대 1개 설정파일에 대한 대체 디렉터리 페어 개수.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>실행하지 않은 상태로 편집 구성 열기.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>선택한 구성을 실행하지 않고 편집을 위해서만 열기.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>GlobalSettings.xml 대체 파일에 대한 경로.</target>
 
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다:</target>
@@ -167,7 +167,7 @@
 <target>배경 우선 순위로 실행</target>
 
 <source>Lock directories during sync</source>
-<target>동기화 중 디렉토리 잠금</target>
+<target>동기화 중 디렉터리 잠금</target>
 
 <source>Verify copied files</source>
 <target>복사된 파일 확인</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>우측 속성 업데이트</target>
 
-<source>Cannot write file %x.</source>
-<target>파일 %x을(를) 쓸 수 없습니다.</target>
+<source>Cannot read file %x.</source>
+<target>파일 %x을(를) 읽을 수 없습니다.</target>
 
 <source>
 Unexpected size of data stream.
@@ -262,9 +262,9 @@ Expected: %x bytes
 Actual: %y bytes
 </source>
 <target>
-예상 밖의 데이터 스트림 사이즈
-예상 사이즈: %x 바이트
-실제 사이즈: %y 바이트
+예상치 못한 데이터 스트림 크기
+예상 크기: %x 바이트
+실제 크기: %y 바이트
 </target>
 
 <source>Cannot write permissions of %x.</source>
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>다른 기본 폴더 유형에 대해 지원되지 않는 동작입니다.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>심볼릭 링크 %x을(를) %y(으)로 복사할 수 없습니다.</target>
+<source>Cannot write file %x.</source>
+<target>파일 %x을(를) 쓸 수 없습니다.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>파일 %x을(를) %y(으)로 이동할 수 없습니다.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>심볼릭 링크 %x을(를) %y(으)로 복사할 수 없습니다.</target>
 
 <source>Unable to connect to %x.</source>
 <target>%x에 연결할 수 없습니다.</target>
@@ -286,25 +289,22 @@ Actual: %y bytes
 <target>서버 %x에 대한 정보를 가져 오는데 실패했습니다.</target>
 
 <source>Cannot open directory %x.</source>
-<target>디렉토리 %x을(를) 열 수 없습니다.</target>
+<target>디렉터리 %x을(를) 열 수 없습니다.</target>
 
 <source>Cannot read directory %x.</source>
-<target>디렉토리 %x을(를) 읽을 수 없습니다.</target>
+<target>디렉터리 %x을(를) 읽을 수 없습니다.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>%x의 파일 속성을 읽을 수 없습니다.</target>
 
-<source>Cannot read file %x.</source>
-<target>파일 %x을(를) 읽을 수 없습니다.</target>
-
 <source>Cannot create directory %x.</source>
-<target>디렉토리 %x을(를) 생성할 수 없습니다.</target>
+<target>디렉터리 %x을(를) 생성할 수 없습니다.</target>
 
 <source>Cannot delete file %x.</source>
 <target>파일 %x을(를) 삭제할 수 없습니다.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>디렉토리 %x을(를) 삭제할 수 없습니다.</target>
+<target>디렉터리 %x을(를) 삭제할 수 없습니다.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>%x의 수정 시간을 쓸 수 없습니다.</target>
@@ -424,7 +424,7 @@ Actual: %y bytes
 <target>프로세스 정보를 얻을 수 없습니다.</target>
 
 <source>Waiting while directory is locked:</source>
-<target>디렉토리 잠금 대기 중:</target>
+<target>디렉터리 잠금 대기 중:</target>
 
 <source>Lock owner:</source>
 <target>잠금 권한자:</target>
@@ -453,7 +453,7 @@ Actual: %y bytes
 <target>분석 오류 - 파일: %x; 행: %y; 열: %z.</target>
 
 <source>Cannot set directory lock for %x.</source>
-<target>%x 에 대한 디렉토리 잠금을 설정할 수 없습니다.</target>
+<target>%x 에 대한 디렉터리 잠금을 설정할 수 없습니다.</target>
 
 <source>
 <pluralform>1 thread</pluralform>
@@ -479,10 +479,10 @@ Actual: %y bytes
 <target>기본값 응용 프로그램으로 열기</target>
 
 <source>Browse directory</source>
-<target>디렉토리 찾아보기</target>
+<target>디렉터리 찾아보기</target>
 
 <source>Cannot access the Volume Shadow Copy Service.</source>
-<target>Volume Shadow Copy Service에 접근할 수 없습니다.</target>
+<target>볼륨 섀도 복사본 서비스에 접근할 수 없습니다.</target>
 
 <source>Please run the 64-bit version of FreeFileSync to create shadow copies on this system.</source>
 <target>본 운영체제에서의 Shadow Copy 생성은 FreeFileSync 64-비트 버전을 사용하시기 바랍니다.</target>
@@ -500,7 +500,7 @@ Actual: %y bytes
 <target>버전 관리를 위한 타임 스탬프 생성 불가:</target>
 
 <source>Drag && drop</source>
-<target>드래그 앤 드랍(&&) [마우스로 파일 끌어다 놓기]</target>
+<target>끌어서 놓기(&&) [드래그-앤-드랍]</target>
 
 <source>Cannot find folder %x.</source>
 <target>%x 폴더를 찾을 수 없습니다.</target>
@@ -591,14 +591,14 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>자동 동기화</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>다음 경로는 디렉토리 모니터링을 지원하지 않습니다:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>%x 프로토콜은 디렉터리 모니터링을 지원하지 않습니다:</target>
 
 <source>Directory monitoring active</source>
-<target>디렉토리 모니터링 활성화</target>
+<target>디렉터리 모니터링 활성화</target>
 
 <source>Waiting until all directories are available...</source>
-<target>모든 디렉토리가 사용 가능할 때까지 대기 중...</target>
+<target>모든 디렉터리가 사용 가능할 때까지 대기 중...</target>
 
 <source>&Restore</source>
 <target>복원(&R)</target>
@@ -708,8 +708,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>기본 폴더:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>버전 관리 폴더는 기본 폴더에 포함되어 있기 때문에 동기화됩니다.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>버전 관리 폴더는 기본 폴더에 포함돼 있습니다.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>폴더 페어 동기화 진행 중:</target>
@@ -722,6 +722,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>작업 이름</target>
+
+<source>Show summary</source>
+<target>요약 표시</target>
+
+<source>Sleep</source>
+<target>절전</target>
+
+<source>Shut down</source>
+<target>종료</target>
 
 <source>Synchronization stopped</source>
 <target>동기화 중단</target>
@@ -743,6 +752,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>동기화가 성공적으로 완료 됐습니다</target>
+
+<source>Executing command %x</source>
+<target>%x 명령 실행 중</target>
 
 <source>Cleaning up old log files...</source>
 <target>이전 로그 파일 정리 중...</target>
@@ -770,8 +782,8 @@ The command is triggered if:
 <pluralform>%x초 이내에 자동 재시도...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>이후 오류 무시(&I)</target>
+<source>Ignore &all</source>
+<target>전체 무시(&a)</target>
 
 <source>Retrying operation...</source>
 <target>작업 재시도 중...</target>
@@ -878,11 +890,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>찾기(&F)...</target>
 
-<source>&Reset layout</source>
-<target>레이아웃 리셋(&R)</target>
-
 <source>&Export file list...</source>
 <target>파일 리스트 내보내기(&E)...</target>
+
+<source>&Reset layout</source>
+<target>레이아웃 다시 설정(&R)</target>
 
 <source>&Tools</source>
 <target>도구(&T)</target>
@@ -891,7 +903,7 @@ The command is triggered if:
 <target>업데이트 바로 확인(&C)</target>
 
 <source>Check &automatically once a week</source>
-<target>자동으로 주당 1회 확인(&a)</target>
+<target>일주일에 한 번 자동 확인(&a)</target>
 
 <source>Cancel</source>
 <target>취소</target>
@@ -1019,9 +1031,6 @@ The command is triggered if:
 <source>C&lear</source>
 <target>제거(&l)</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>데이터베이스 파일로 동기화 방향 감지</target>
-
 <source>Detect moved files</source>
 <target>이동 파일 탐지</target>
 
@@ -1042,41 +1051,26 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>휴지통(&R)</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>휴지통에 삭제되고 덮어 씌어진 파일 백업</target>
-
 <source>&Permanent</source>
 <target>영구(&P)</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>파일 영구 삭제 또는 덮어쓰기</target>
 
 <source>&Versioning</source>
 <target>버전 관리(&V)</target>
 
-<source>Move files to a user-defined folder</source>
-<target>사용자 정의 폴더로 파일 이동</target>
-
 <source>Naming convention:</source>
 <target>이름 지정:</target>
 
-<source>Handle errors:</source>
-<target>오류 발생시:</target>
-
-<source>&Pop-up</source>
-<target>팝업(&P)</target>
+<source>&Ignore errors</source>
+<target>오류 무시(&I)</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>오류 또는 경고에 대한 팝업 보이기</target>
 
-<source>Hide all error and warning messages</source>
-<target>모든 오류/경고 메세지 숨기기</target>
-
-<source>On completion:</source>
-<target>완료 시:</target>
+<source>Run a command after synchronization:</source>
+<target>동기화 이후 명령 실행:</target>
 
 <source>OK</source>
-<target>OK</target>
+<target>확인</target>
 
 <source>Arrange folder pair</source>
 <target>폴더 페어 정렬</target>
@@ -1111,8 +1105,11 @@ The command is triggered if:
 <source>&Key file</source>
 <target>키 파일(&K)</target>
 
+<source>&SSH agent</source>
+<target>SSH 에이전트(&S)</target>
+
 <source>User name:</source>
-<target>사용자 명:</target>
+<target>사용자 이름:</target>
 
 <source>Private key file:</source>
 <target>개인 키 파일:</target>
@@ -1121,7 +1118,7 @@ The command is triggered if:
 <target>비밀번호 표시(&S)</target>
 
 <source>Directory on server:</source>
-<target>서버 디렉토리:</target>
+<target>서버 디렉터리:</target>
 
 <source>Performance improvements:</source>
 <target>성능 향상:</target>
@@ -1129,11 +1126,8 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>최상의 성능을 얻는 방법은?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>디렉토리 읽기를 위한 SSH 연결:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>권장 범위: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>디렉토리 읽기를 위한 연결:</target>
 
 <source>SFTP channels per connection:</source>
 <target>연결 당 SFTP 채널 수:</target>
@@ -1141,11 +1135,8 @@ The command is triggered if:
 <source>Detect server limit</source>
 <target>서버 한계 감지</target>
 
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 연결 x 10 채널 = 20배 빠른 디렉토리 읽기</target>
-
 <source>Select a directory on the server:</source>
-<target>서버 디렉토리 선택:</target>
+<target>서버 디렉터리 선택:</target>
 
 <source>Select Folder</source>
 <target>폴더 선택</target>
@@ -1183,6 +1174,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>복사된 바이트:</target>
 
+<source>When finished:</source>
+<target>완료 시:</target>
+
 <source>Close</source>
 <target>닫기</target>
 
@@ -1195,14 +1189,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>직접 지켜보지 않는 자동 동기화의 경우, 배치 파일을 만듭니다. 시작하려면 파일을 더블 클릭하거나 작업 플래너에서 일정을 만드십시오: %x</target>
 
-<source>&Stop</source>
-<target>중지(&S)</target>
+<source>Run minimized</source>
+<target>최소화 실행</target>
+
+<source>&Show error dialog</source>
+<target>오류 대화 상자 표시(&S)</target>
+
+<source>&Cancel</source>
+<target>취소(&C)</target>
 
 <source>Stop synchronization at first error</source>
 <target>첫 오류 발생 시 동기화 중지</target>
-
-<source>Run minimized</source>
-<target>최소화 실행</target>
 
 <source>Save log:</source>
 <target>로그 저장:</target>
@@ -1234,14 +1231,14 @@ This guarantees a consistent state even in case of a serious error.
 이는 심각한 오류 발생시에도 일관된 상태 유지를 보장합니다.
 </target>
 
-<source>(recommended)</source>
-<target>(권장)</target>
+<source>recommended</source>
+<target>추천(맞춤)</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
-<target>Volume Shadow Copy Service를 사용하여 공유 또는 잠긴 파일 복사.</target>
+<target>볼륨 섀도 복사본 서비스를 사용하여 공유 또는 잠긴 파일 복사.</target>
 
-<source>(requires administrator rights)</source>
-<target>(관리자 권한 필요)</target>
+<source>requires administrator rights</source>
+<target>관리자 권한 필요</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>파일 및 폴더 권한 전송.</target>
@@ -1273,14 +1270,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>소스코드는 C++ 언어로 아래 툴을 사용하여 작성되었습니다:</target>
 
-<source>Donation details</source>
-<target>기부 관련 세부정보</target>
-
 <source>If you like FreeFileSync:</source>
 <target>FreeFileSync를 위한 기부:</target>
 
-<source>Donate with PayPal</source>
-<target>PayPal로 기부하기</target>
+<source>Support with a donation</source>
+<target>기부금 지원</target>
+
+<source>Donation details</source>
+<target>기부 관련 세부정보</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>관리자가 자동 업데이터를 비활성화했습니다.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>모든 의견 및 건의/제안을 환영합니다</target>
@@ -1318,7 +1318,7 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>오프라인 활성화</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>일괄 작업으로 저장</target>
 
 <source>Delete Items</source>
@@ -1357,11 +1357,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>개요</target>
 
+<source>Show "%x"</source>
+<target>"%x" 표시</target>
+
 <source>&Show details</source>
 <target>세부정보 표시(&S)</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>FreeFileSync 신규 버전 출시:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x 버전 출시!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>설치 파일이 손상되었습니다. FreeFileSync를 다시 설치하십시오.</target>
 
 <source>Local path not available for %x.</source>
 <target>%x에서 로컬 경로를 사용할 수 없습니다.</target>
@@ -1385,7 +1391,7 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>%x개 디렉토리</pluralform>
+<pluralform>%x개 디렉터리</pluralform>
 </target>
 
 <source>
@@ -1448,9 +1454,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select time span...</source>
 <target>시간간격(타임스팬) 선택...</target>
-
-<source>Show "%x"</source>
-<target>"%x" 표시</target>
 
 <source>Last session</source>
 <target>마지막 세션</target>
@@ -1551,18 +1554,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>프로그램 업데이트 검색 중...</target>
 
-<source>Close progress dialog</source>
-<target>진행 표시 창 닫기</target>
-
-<source>Log off</source>
-<target>로그오프</target>
-
-<source>Standby</source>
-<target>대기</target>
-
-<source>Shut down</source>
-<target>종료</target>
-
 <source>Paused</source>
 <target>일시정지 중</target>
 
@@ -1593,17 +1584,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>로그</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>설치 파일이 손상되었습니다. FreeFileSync를 다시 설치하십시오.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>%x님의 기부와 지원에 감사드립니다!</target>
+
+<source>Recommended range:</source>
+<target>권장 범위:</target>
 
 <source>Password:</source>
 <target>비밀번호:</target>
 
 <source>Key password:</source>
 <target>키 비밀번호:</target>
+
+<source>Please enter a file path.</source>
+<target>파일 경로를 입력하세요.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1716,6 +1710,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>삭제 되거나 덮어 쓴 파일을 휴지통에 보관</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>영구적으로 파일 삭제 및 덮어 쓰기</target>
+
+<source>Move files to a user-defined folder</source>
+<target>사용자 정의 폴더로 파일 이동</target>
+
 <source>Replace</source>
 <target>대체</target>
 
@@ -1727,6 +1730,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>각 파일 이름마다 타임 스탬프 추가</target>
+
+<source>On completion:</source>
+<target>완료 시:</target>
+
+<source>On errors:</source>
+<target>오류 발생 시:</target>
+
+<source>On success:</source>
+<target>성공 시:</target>
 
 <source>Main config</source>
 <target>주요 설정</target>
@@ -1748,9 +1760,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>이름</target>
-
-<source>Items</source>
-<target>항목</target>
 
 <source>Percentage</source>
 <target>퍼센티지(%)</target>
@@ -1813,7 +1822,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>%x에 대한 장치 알림 등록을 할 수 없습니다.</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>디렉토리 %x을(를) 모니터링 할 수 없습니다.</target>
+<target>디렉터리 %x을(를) 모니터링 할 수 없습니다.</target>
 
 <source>The file is locked by another process:</source>
 <target>파일이 다른 프로세스에 의해 잠겨 있습니다:</target>
@@ -1831,7 +1840,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>%x에서 %y(으)로의 권한을 복사할 수 없습니다.</target>
 
 <source>%x is not a regular directory name.</source>
-<target>%x(은)는 일반 디렉토리 이름이 아닙니다.</target>
+<target>%x(은)는 일반 디렉터리 이름이 아닙니다.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>파일 %x을(를) %y(으)로 복사할 수 없습니다.</target>
@@ -1878,6 +1887,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>프로세스 I/O 우선순위 변경을 할 수 없습니다.</target>
 
+<source>Unable to shut down the system.</source>
+<target>시스템을 종료할 수 없습니다.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>폴더 %x에 관한 휴지통 실패 확인 중.</target>
 
@@ -1885,7 +1897,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>다음 XML 요소를 읽을 수 없습니다:</target>
 
 <source>Configuration file %x is incomplete. The missing elements will be set to their default values.</source>
-<target>구성 파일 %x(이)가 불완전합니다. 누락된 요소는 기본 값으로 설정됩니다.</target>
+<target>구성 파일 %x이(가) 불완전합니다. 누락된 요소는 기본 값으로 설정됩니다.</target>
 
 <source>Prepare installation</source>
 <target>설치 준비</target>
@@ -1902,9 +1914,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Portable</source>
 <target>포터블</target>
 
-<source>recommended</source>
-<target>권장</target>
-
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>"%APPDATA%\FreeFileSync"에 설정 저장</target>
 
@@ -1915,7 +1924,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>익스플로러 컨텍스트 메뉴 항목 생성</target>
 
 <source>Save settings in installation directory</source>
-<target>설치 디렉토리에 설정 저장</target>
+<target>설치 디렉터리에 설정 저장</target>
 
 <source>Do not write to Registry</source>
 <target>레지스트리에 기록 안 함</target>
@@ -1924,7 +1933,7 @@ This guarantees a consistent state even in case of a serious error.
 <target>파일만 복사</target>
 
 <source>Choose a directory for installation:</source>
-<target>설치할 디렉토리를 선택하세요:</target>
+<target>설치할 디렉터리를 선택하세요:</target>
 
 <source>Create shortcuts:</source>
 <target>바로가기 생성:</target>
@@ -1956,8 +1965,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>FreeFileSync로 편집</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>휴대용 버전은 선택한 폴더에 설치할 수 없습니다.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>FreeFileSync 휴대용 버전은 %x의 하위 폴더에 설치할 수 없습니다.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>로컬 설치 유형을 선택하거나 설치할 다른 폴더를 선택하십시오.</target>

@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -315,8 +315,8 @@ ConfigDialog::ConfigDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnUpdate, 1.25);
     setRelativeFontSize(*m_toggleBtnCustom, 1.25);
 
-    m_toggleBtnRecycler  ->SetToolTip(_("Back up deleted and overwritten files in the recycle bin"));
-    m_toggleBtnPermanent ->SetToolTip(_("Delete or overwrite files permanently"));
+    m_toggleBtnRecycler  ->SetToolTip(_("Retain deleted and overwritten files in the recycle bin"));
+    m_toggleBtnPermanent ->SetToolTip(_("Delete and overwrite files permanently"));
     m_toggleBtnVersioning->SetToolTip(_("Move files to a user-defined folder"));
 
     enumVersioningStyle_.
@@ -994,11 +994,11 @@ void ConfigDialog::updateSyncGui()
     {
         case DeletionPolicy::RECYCLER:
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_recycler"));
-            setText(*m_staticTextDeletionTypeDescription, _("Back up deleted and overwritten files in the recycle bin"));
+            setText(*m_staticTextDeletionTypeDescription, _("Retain deleted and overwritten files in the recycle bin"));
             break;
         case DeletionPolicy::PERMANENT:
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_permanently"));
-            setText(*m_staticTextDeletionTypeDescription, _("Delete or overwrite files permanently"));
+            setText(*m_staticTextDeletionTypeDescription, _("Delete and overwrite files permanently"));
             break;
         case DeletionPolicy::VERSIONING:
             setBitmap(*m_bitmapDeletionType, getResourceImage(L"delete_versioning_small"));

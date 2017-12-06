@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -10,7 +10,7 @@
 #if 1
 namespace zen
 {
-inline void displayHelpEntry(const wxString& topic, wxWindow* parent) { wxLaunchDefaultBrowser(L"http://www.freefilesync.org/manual.php?topic=" + topic); }
+inline void displayHelpEntry(const wxString& topic, wxWindow* parent) { wxLaunchDefaultBrowser(L"https://www.freefilesync.org/manual.php?topic=" + topic); }
 inline void uninitializeHelp() {}
 }
 
@@ -42,7 +42,7 @@ inline
 void displayHelpEntry(const wxString& topic, wxWindow* parent)
 {
     if (internetIsAlive()) //noexcept
-        wxLaunchDefaultBrowser(L"http://www.freefilesync.org/manual.php?topic=" + topic);
+        wxLaunchDefaultBrowser(L"https://www.freefilesync.org/manual.php?topic=" + topic);
     else
         -> what if FFS is blocked, but the web browser would have internet access??
     {

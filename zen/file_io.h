@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -64,8 +64,11 @@ public:
 private:
     size_t tryRead(void* buffer, size_t bytesToRead); //throw FileError, ErrorFileLocked; may return short, only 0 means EOF! =>  CONTRACT: bytesToRead > 0!
 
-    std::vector<char> memBuf_;
     const IOCallback notifyUnbufferedIO_; //throw X
+
+    std::vector<char> memBuf_ = std::vector<char>(getBlockSize());
+    size_t bufPos_   = 0;
+    size_t bufPosEnd_= 0;
 };
 
 
@@ -90,8 +93,11 @@ public:
 private:
     size_t tryWrite(const void* buffer, size_t bytesToWrite); //throw FileError; may return short! CONTRACT: bytesToWrite > 0
 
-    std::vector<char> memBuf_;
     IOCallback notifyUnbufferedIO_; //throw X
+
+    std::vector<char> memBuf_ = std::vector<char>(getBlockSize());
+    size_t bufPos_    = 0;
+    size_t bufPosEnd_ = 0;
 };
 
 //-----------------------------------------------------------------------------------------------

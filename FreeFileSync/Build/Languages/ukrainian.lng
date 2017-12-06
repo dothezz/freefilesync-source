@@ -32,13 +32,13 @@
 <target>Створення символьного посилання %x</target>
 
 <source>Moving file %x to the recycle bin</source>
-<target>Переміщення файлу %x до Корзини</target>
+<target>Переміщення файлу %x до корзини</target>
 
 <source>Moving folder %x to the recycle bin</source>
-<target>Переміщення папки %x до Корзини</target>
+<target>Переміщення папки %x до корзини</target>
 
 <source>Moving symbolic link %x to the recycle bin</source>
-<target>Переміщення символьного посилання %x до Корзини</target>
+<target>Переміщення символьного посилання %x до корзини</target>
 
 <source>Deleting file %x</source>
 <target>Вилучення файлу %x</target>
@@ -50,10 +50,10 @@
 <target>Вилучення символьного посилання %x</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target>Перевірка доступності Корзини для папки %x...</target>
+<target>Перевірка доступності корзини для папки %x...</target>
 
-<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Корзина не доступна для таких папок. Файли замість цього будуть видалені назавжди:</target>
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>Корзина недоступна для поточних папок. Видалені чи перезаписані файли буде неможливо відновити:</target>
 
 <source>An exception occurred</source>
 <target>Відбулось виключення</target>
@@ -88,17 +88,14 @@
 <source>Syntax:</source>
 <target>Синтаксис:</target>
 
-<source>global config file:</source>
-<target>глобальний конфігураційний файл:</target>
-
 <source>config files:</source>
 <target>файли конфігурації:</target>
 
 <source>directory</source>
 <target>папка</target>
 
-<source>Path to an alternate GlobalSettings.xml file.</source>
-<target>Шлях до альтернативного файлу GlobalSettings.xml.</target>
+<source>global config file:</source>
+<target>глобальний конфігураційний файл:</target>
 
 <source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
 <target>Будь-яка кількість FreeFileSync .ffs_gui та/або .ffs_batch файлів конфігурації.</target>
@@ -106,8 +103,11 @@
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Будь-яка кількість альтернативних пар папок для не більше одного конфігураційного файлу.</target>
 
-<source>Open configuration for editing without executing it.</source>
-<target>Відкрити конфігурацію для редагування без її запуску.</target>
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Відкрити вибрану конфігурацію тільки для редагування без її виконання.</target>
+
+<source>Path to an alternate GlobalSettings.xml file.</source>
+<target>Шлях до альтернативного файлу GlobalSettings.xml.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Не вдається знайти такі папки:</target>
@@ -253,8 +253,8 @@
 <source>Update attributes on right</source>
 <target>Оновити атрибути праворуч</target>
 
-<source>Cannot write file %x.</source>
-<target>Не вдається записати файл %x.</target>
+<source>Cannot read file %x.</source>
+<target>Не вдається прочитати файл %x.</target>
 
 <source>
 Unexpected size of data stream.
@@ -273,11 +273,14 @@ Actual: %y bytes
 <source>Operation not supported for different base folder types.</source>
 <target>Операція не підтримується для різних типів базових папок.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Не вдається скопіювати символьне посилання %x до %y.</target>
+<source>Cannot write file %x.</source>
+<target>Не вдається записати файл %x.</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Не вдається перемістити файл %x до %y.</target>
+
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Не вдається скопіювати символьне посилання %x до %y.</target>
 
 <source>Unable to connect to %x.</source>
 <target>Не вдається з'єднатися з %x.</target>
@@ -290,9 +293,6 @@ Actual: %y bytes
 
 <source>Cannot read directory %x.</source>
 <target>Не вдається прочитати папку %x.</target>
-
-<source>Cannot read file %x.</source>
-<target>Не вдається прочитати файл %x.</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Не вдається прочитати атрибути файлу %x.</target>
@@ -316,7 +316,7 @@ Actual: %y bytes
 <target>Не вдається вирішити символьне посилання %x.</target>
 
 <source>Unable to move %x to the recycle bin.</source>
-<target>Не вдається перемістити %x до Корзини.</target>
+<target>Не вдається перемістити %x до корзини.</target>
 
 <source>Cannot open file %x.</source>
 <target>Не вдається відкрити файл %x.</target>
@@ -501,7 +501,7 @@ Actual: %y bytes
 <target>Не вдалося встановити ім'я тому для %x.</target>
 
 <source>Volume name %x is not part of file path %y.</source>
-<target>Ім'я тому %x не є частиною файлового шляху %y.</target>
+<target>Ім'я тому %x не є частиною шляху до файлу %y.</target>
 
 <source>Stop requested: Waiting for current operation to finish...</source>
 <target>Запит зупинки: очікування завершення поточної операції...</target>
@@ -601,8 +601,8 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Автоматична Синхронізація</target>
 
-<source>The following path does not support directory monitoring:</source>
-<target>Наступний шлях не підтримує моніторинг папок:</target>
+<source>The %x protocol does not support directory monitoring:</source>
+<target>Протокол %x не підтримує моніторинг папок:</target>
 
 <source>Directory monitoring active</source>
 <target>Моніторинг папок активний</target>
@@ -718,8 +718,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>Основна папка:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Папка з версіями буде синхронізована, тому що вона міститься в основній папці.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Папка з версіями містить основну папку.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Синхронізація пари папок:</target>
@@ -732,6 +732,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>назва завдання</target>
+
+<source>Show summary</source>
+<target>Показати підсумки</target>
+
+<source>Sleep</source>
+<target>Перейти в режим сну</target>
+
+<source>Shut down</source>
+<target>Вимкнути комп'ютер</target>
 
 <source>Synchronization stopped</source>
 <target>Синхронізацію зупинено</target>
@@ -753,6 +762,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>Синхронізація успішно завершена</target>
+
+<source>Executing command %x</source>
+<target>Виконати команду %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Очистка старих журналів...</target>
@@ -782,8 +794,8 @@ The command is triggered if:
 <pluralform>Автоматичний повтор за %x секунд...</pluralform>
 </target>
 
-<source>&Ignore subsequent errors</source>
-<target>&Ігнорувати наступні помилки</target>
+<source>Ignore &all</source>
+<target>Ігнорувати &усі</target>
 
 <source>Retrying operation...</source>
 <target>Повтор операції...</target>
@@ -890,11 +902,11 @@ The command is triggered if:
 <source>&Find...</source>
 <target>З&найти...</target>
 
-<source>&Reset layout</source>
-<target>&Скинути розташування</target>
-
 <source>&Export file list...</source>
 <target>&Експортувати список файлів...</target>
+
+<source>&Reset layout</source>
+<target>&Скинути розташування</target>
 
 <source>&Tools</source>
 <target>&Інструменти</target>
@@ -1026,13 +1038,10 @@ The command is triggered if:
 <target>Максимум:</target>
 
 <source>Select filter rules to exclude certain files from synchronization. Enter file paths relative to their corresponding folder pair.</source>
-<target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи файлів відносно відповідної пари папок.</target>
+<target>Виберіть правила фільтрації для виключення деяких файлів із синхронізації. Введіть шляхи до файлів відносно відповідної пари папок.</target>
 
 <source>C&lear</source>
 <target>О&чистити</target>
-
-<source>Detect synchronization directions with the help of database files</source>
-<target>Визначити напрямок синхронізації за допомогою файлів баз даних</target>
 
 <source>Detect moved files</source>
 <target>Виявляти переміщені файли</target>
@@ -1054,38 +1063,23 @@ The command is triggered if:
 <source>&Recycle bin</source>
 <target>&Корзина</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Робити резервну копію вилучених та перезаписаних файлів в Корзині</target>
-
 <source>&Permanent</source>
 <target>&Безповоротно</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Вилучати чи перезаписувати файли безповоротно</target>
 
 <source>&Versioning</source>
 <target>&Управління версіями</target>
 
-<source>Move files to a user-defined folder</source>
-<target>Перемістити файли у визначену користувачем папку</target>
-
 <source>Naming convention:</source>
 <target>Метод іменування:</target>
 
-<source>Handle errors:</source>
-<target>Обробка помилок:</target>
-
-<source>&Pop-up</source>
-<target>&Спливаючі вікна</target>
+<source>&Ignore errors</source>
+<target>&Ігнорувати помилки</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Показувати виринаючі вікна при помилках та попередженнях</target>
 
-<source>Hide all error and warning messages</source>
-<target>Приховати всі помилки і повідомлення з попередженнями</target>
-
-<source>On completion:</source>
-<target>Після завершення:</target>
+<source>Run a command after synchronization:</source>
+<target>Виконати команду після синхронізації:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1123,6 +1117,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>&Файл ключа</target>
 
+<source>&SSH agent</source>
+<target>&SSH агент</target>
+
 <source>User name:</source>
 <target>Ім'я користувача:</target>
 
@@ -1141,20 +1138,14 @@ The command is triggered if:
 <source>How to get best performance?</source>
 <target>Як отримати найкращу швидкодію?</target>
 
-<source>SSH connections for directory reading:</source>
-<target>SSH з'єднання для читання папок:</target>
-
-<source>Suggested range: [1 - 10]</source>
-<target>Рекомендований діапазон: [1 - 10]</target>
+<source>Connections for directory reading:</source>
+<target>З'єднань для читання папок:</target>
 
 <source>SFTP channels per connection:</source>
 <target>SFTP канали на з'єднання:</target>
 
 <source>Detect server limit</source>
 <target>Визначити ліміти сервера</target>
-
-<source>2 connections x 10 channels = 20 times faster directory reading</source>
-<target>2 з'єднання x 10 каналів = у 20 раз швидше читання папок</target>
 
 <source>Select a directory on the server:</source>
 <target>Вибрати папку на сервері:</target>
@@ -1195,6 +1186,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>Байт скопійовано:</target>
 
+<source>When finished:</source>
+<target>Після завершення:</target>
+
 <source>Close</source>
 <target>Закрити</target>
 
@@ -1207,14 +1201,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Створити пакетний файл для автоматичної синхронізації. Щоб запустити двічі клацніть цей файл або заплануйте в планувальнику завдань: %x</target>
 
-<source>&Stop</source>
-<target>&Зупинити</target>
+<source>Run minimized</source>
+<target>Запустити згорнутим</target>
+
+<source>&Show error dialog</source>
+<target>&Показати діалог з помилками</target>
+
+<source>&Cancel</source>
+<target>&Відмінити</target>
 
 <source>Stop synchronization at first error</source>
 <target>Зупинити синхронізацію при першій помилці</target>
-
-<source>Run minimized</source>
-<target>Запустити згорнутим</target>
 
 <source>Save log:</source>
 <target>Зберегти журнал:</target>
@@ -1246,14 +1243,14 @@ This guarantees a consistent state even in case of a serious error.
 Це гарантує цілісність навіть у випадку серйозної помилки.
 </target>
 
-<source>(recommended)</source>
-<target>(рекомендовано)</target>
+<source>recommended</source>
+<target>рекомендовано</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Копіювати спільні та заблоковані файли за допомогою сервісу Тіньового Копіювання Тому.</target>
 
-<source>(requires administrator rights)</source>
-<target>(потрібні права адміністратора)</target>
+<source>requires administrator rights</source>
+<target>потрібні права адміністратора</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Перенести права доступу файлів і папок.</target>
@@ -1285,14 +1282,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Source code written in C++ using:</source>
 <target>Код програми написаний на C++ з використанням:</target>
 
-<source>Donation details</source>
-<target>Докладно про пожертвування</target>
-
 <source>If you like FreeFileSync:</source>
 <target>Якщо Вам сподобався FreeFileSync:</target>
 
-<source>Donate with PayPal</source>
-<target>Пожертвувати через PayPal</target>
+<source>Support with a donation</source>
+<target>Підтримати пожертвуванням.</target>
+
+<source>Donation details</source>
+<target>Докладно про пожертвування</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>Автоматичне оновлення було відключене адміністратором.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Відгуки та пропозиції вітаються</target>
@@ -1330,8 +1330,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>Активувати offline</target>
 
-<source>Save as Batch Job</source>
-<target>Зберегти як пакетне завдання</target>
+<source>Save as a Batch Job</source>
+<target>Зберегти як Пакетне Завдання</target>
 
 <source>Delete Items</source>
 <target>Вилучити Елементи</target>
@@ -1369,11 +1369,17 @@ This guarantees a consistent state even in case of a serious error.
 <source>Overview</source>
 <target>Огляд</target>
 
+<source>Show "%x"</source>
+<target>Показати "%x"</target>
+
 <source>&Show details</source>
 <target>&Показати докладніше</target>
 
-<source>A new version of FreeFileSync is available:</source>
-<target>Доступна нова версія FreeFileSync:</target>
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x доступний!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Файли встановлення пошкоджені. Будь ласка, перевстановіть FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Локальний шлях не доступний для %x.</target>
@@ -1468,9 +1474,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Select time span...</source>
 <target>Виберіть інтервал часу...</target>
-
-<source>Show "%x"</source>
-<target>Показати "%x"</target>
 
 <source>Last session</source>
 <target>Остання сесія</target>
@@ -1571,18 +1574,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>Пошук оновлень програми ...</target>
 
-<source>Close progress dialog</source>
-<target>Закрити вікно прогресу</target>
-
-<source>Log off</source>
-<target>Вийти із системи</target>
-
-<source>Standby</source>
-<target>Сплячий режим</target>
-
-<source>Shut down</source>
-<target>Вимкнути комп'ютер</target>
-
 <source>Paused</source>
 <target>Призупинено</target>
 
@@ -1613,17 +1604,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Лог</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Файли встановлення пошкоджені. Будь ласка, перевстановіть FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Дякуємо Вам, %x, за ваше пожертвування та підтримку!</target>
+
+<source>Recommended range:</source>
+<target>Рекомендований діапазон:</target>
 
 <source>Password:</source>
 <target>Пароль:</target>
 
 <source>Key password:</source>
 <target>Пароль ключа:</target>
+
+<source>Please enter a file path.</source>
+<target>Будь-ласка, введіть шлях до файлу.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1643,9 +1637,9 @@ This guarantees a consistent state even in case of a serious error.
 <pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Ви дійсно хочете перемістити цей %x елемент у Корзину?</pluralform>
-<pluralform>Ви дійсно хочете перемістити ці %x елементи у Корзину?</pluralform>
-<pluralform>Ви дійсно хочете перемістити ці %x елементів у Корзину?</pluralform>
+<pluralform>Ви дійсно хочете перемістити цей %x елемент у корзину?</pluralform>
+<pluralform>Ви дійсно хочете перемістити ці %x елементи у корзину?</pluralform>
+<pluralform>Ви дійсно хочете перемістити ці %x елементів у корзину?</pluralform>
 </target>
 
 <source>Move</source>
@@ -1742,6 +1736,15 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>МБ</target>
 
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Залишити видалені і перезаписані файли у корзині</target>
+
+<source>Delete and overwrite files permanently</source>
+<target>Видалити і перезаписати файли назавжди</target>
+
+<source>Move files to a user-defined folder</source>
+<target>Перемістити файли у визначену користувачем папку</target>
+
 <source>Replace</source>
 <target>Замінити</target>
 
@@ -1753,6 +1756,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Приєднати відмітку часу до кожної назви файлу</target>
+
+<source>On completion:</source>
+<target>Після завершення:</target>
+
+<source>On errors:</source>
+<target>Після завершення з помилками:</target>
+
+<source>On success:</source>
+<target>Після успішного завершення:</target>
 
 <source>Main config</source>
 <target>Головна конфігурація</target>
@@ -1774,9 +1786,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>Назва</target>
-
-<source>Items</source>
-<target>Елементи</target>
 
 <source>Percentage</source>
 <target>Проценти</target>
@@ -1910,8 +1919,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Не вдалося змінити пріоритетів Вх/Вих процесу.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Не вдається завершити роботу системи.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
-<target>Перевірка Корзини для папки %x не вдалася.</target>
+<target>Перевірка корзини для папки %x не вдалася.</target>
 
 <source>The following XML elements could not be read:</source>
 <target>Наступні XML елементи не вдалося прочитати:</target>
@@ -1933,9 +1945,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Portable</source>
 <target>Портативна</target>
-
-<source>recommended</source>
-<target>рекомендовано</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Зберегти налаштування в "%APPDATA%\FreeFileSync"</target>
@@ -1988,8 +1997,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Edit with FreeFileSync</source>
 <target>Редагувати за допомогою FreeFileSync</target>
 
-<source>The portable version cannot install into the selected folder.</source>
-<target>Портативна версія не може бути встановлена у вибрану папку.</target>
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>Портативна версія FreeFileSync не може бути встановлена в підпапку %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Будь ласка, виберіть локальний тип інсталяції чи іншу папку для встановлення.</target>

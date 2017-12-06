@@ -271,7 +271,7 @@ Tatsächlich: %y bytes
 <target>Die Berechtigungen von %x können nicht geschrieben werden.</target>
 
 <source>Operation not supported for different base folder types.</source>
-<target>Der Vorgang wird für unterschiedliche Basisordner nicht unterstützt.</target>
+<target>Der Vorgang wird für unterschiedliche Basisordnertypen nicht unterstützt.</target>
 
 <source>Cannot write file %x.</source>
 <target>Die Datei %x kann nicht geschrieben werden.</target>
@@ -713,8 +713,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Base folder:</source>
 <target>Basisordner:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>Der Versionierungsordner wird synchronisiert werden, weil er in einem Basisordner enthalten ist.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>Der Versionierungsordner ist in einem Basisordner enthalten.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisiere Ordnerpaar:</target>
@@ -1072,7 +1072,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Show pop-up on errors or warnings</source>
 <target>Ein Auswahlfenster bei Fehlern oder Warnungen anzeigen</target>
 
-<source>Run command after synchronization:</source>
+<source>Run a command after synchronization:</source>
 <target>Befehl nach Synchronisation ausführen:</target>
 
 <source>OK</source>
@@ -1237,14 +1237,14 @@ Kopiere in eine temporäre Datei (*.ffs_tmp) bevor das Ziel überschrieben wird.
 Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 </target>
 
-<source>(recommended)</source>
-<target>(Empfohlen)</target>
+<source>recommended</source>
+<target>empfohlen</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Kopiere gesperrte Dateien mit Hilfe des Volumenschattenkopie-Dienstes.</target>
 
-<source>(requires administrator rights)</source>
-<target>(Benötigt Administratorrechte)</target>
+<source>requires administrator rights</source>
+<target>Benötigt Administratorrechte</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Übertrage Datei- und Ordnerberechtigungen.</target>
@@ -1285,6 +1285,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Donation details</source>
 <target>Spendendetails</target>
 
+<source>The auto updater was disabled by the administrator.</source>
+<target>Die automatische Aktualisierung wurde vom Administrator deaktiviert.</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback und Vorschläge sind willkommen</target>
 
@@ -1321,7 +1324,7 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Activate offline</source>
 <target>Offline aktivieren</target>
 
-<source>Save as Batch Job</source>
+<source>Save as a Batch Job</source>
 <target>Als Batchauftrag speichern</target>
 
 <source>Delete Items</source>
@@ -1368,6 +1371,9 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>FreeFileSync %x is available!</source>
 <target>FreeFileSync %x ist verfügbar!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
 
 <source>Local path not available for %x.</source>
 <target>Lokaler Pfad ist nicht verfügbar für %x.</target>
@@ -1588,9 +1594,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Log</source>
 <target>Protokoll</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Die Installationsdateien sind beschädigt. Bitte installieren Sie FreeFileSync neu.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Danke %x für die Spende und Unterstützung!</target>
 
@@ -1720,11 +1723,11 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>MB</source>
 <target>MB</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Gelöschte und überschriebene Dateien im Papierkorb aufbewahren</target>
 
-<source>Delete or overwrite files permanently</source>
-<target>Dateien endgültig löschen oder überschreiben</target>
+<source>Delete and overwrite files permanently</source>
+<target>Dateien endgültig löschen und überschreiben</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Dateien in einen benutzerdefinierten Ordner verschieben</target>
@@ -1900,7 +1903,7 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess können nicht geändert werden.</target>
 
-<source>Unable to shut down system.</source>
+<source>Unable to shut down the system.</source>
 <target>Das System kann nicht heruntergefahren werden.</target>
 
 <source>Checking recycle bin failed for folder %x.</source>
@@ -1926,9 +1929,6 @@ Dadurch wird ein konsistenter Datenstand auch bei schweren Fehlern garantiert.
 
 <source>Portable</source>
 <target>Portabel</target>
-
-<source>recommended</source>
-<target>empfohlen</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Einstellungen unter "%APPDATA%\FreeFileSync" sichern</target>

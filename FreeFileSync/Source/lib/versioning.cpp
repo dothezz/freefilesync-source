@@ -108,7 +108,15 @@ void moveExistingItemToVersioning(const AbstractPath& sourcePath, const Abstract
     {
         Opt<AFS::PathStatus> pd;
         try { pd = AFS::getPathStatus(targetPath); /*throw FileError*/ }
-        catch (FileError&) {} //previous exception is more relevant
+        catch (FileError&)
+        {
+
+            warn_static("remove after test: https://www.freefilesync.org/forum/viewtopic.php?f=8&t=4765&p=15981#p15981")
+            warn_static("really? is previous exception is more relevant?")
+            throw;
+
+
+        } //previous exception is more relevant
 
         if (pd)
         {

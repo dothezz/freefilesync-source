@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -337,7 +337,7 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
     if (!commandLine.empty())
         try
         {
-            //use EXEC_TYPE_ASYNC until there is reason not to: http://www.freefilesync.org/forum/viewtopic.php?t=31
+            //use EXEC_TYPE_ASYNC until there is reason not to: https://www.freefilesync.org/forum/viewtopic.php?t=31
             tryReportingError([&] { shellExecute(expandMacros(commandLine), EXEC_TYPE_ASYNC); /*throw FileError*/ }, *this); //throw X
         }
         catch (...) {}
@@ -375,9 +375,9 @@ StatusHandlerFloatingDialog::~StatusHandlerFloatingDialog()
 
         //close progress dialog
         if (showSummary)
-            progressDlg_->processHasFinished(finalStatus, errorLog_);
+            progressDlg_->showSummary(finalStatus, errorLog_);
         else
-            progressDlg_->closeWindowDirectly();
+            progressDlg_->closeDirectly(false /*restoreParentFrame*/);
 
         //wait until progress dialog notified shutdown via onProgressDialogTerminate()
         //-> required since it has our "this" pointer captured in lambda "notifyWindowTerminate"!

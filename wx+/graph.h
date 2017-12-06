@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -78,7 +78,7 @@ struct ArrayCurveData : public SparseCurveData
     virtual size_t getSize ()           const = 0;
 
 private:
-	std::pair<double, double> getRangeX() const override { const size_t sz = getSize(); return { 0.0, sz == 0 ? 0.0 : sz - 1.0}; }
+    std::pair<double, double> getRangeX() const override { const size_t sz = getSize(); return { 0.0, sz == 0 ? 0.0 : sz - 1.0}; }
 
     Opt<CurvePoint> getLessEq(double x) const override
     {

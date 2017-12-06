@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -119,12 +119,12 @@ void showUpdateAvailableDialog(wxWindow* parent, const std::string& onlineVersio
     switch (showConfirmationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
                                    setIcon(getResourceImage(L"update_available")).
                                    setTitle(_("Check for Program Updates")).
-                                   setMainInstructions(replaceCpy(_("FreeFileSync %x is available!"), L"%x", utfTo<std::wstring>(onlineVersion)) + L"\n" + _("Download now?")).
+                                   setMainInstructions(replaceCpy(_("FreeFileSync %x is available!"), L"%x", utfTo<std::wstring>(onlineVersion)) + L" " + _("Download now?")).
                                    setDetailInstructions(updateDetailsMsg),
                                    _("&Download")))
     {
         case ConfirmationButton::ACCEPT:
-            wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
+            wxLaunchDefaultBrowser(L"https://www.freefilesync.org/get_latest.php");
             break;
         case ConfirmationButton::CANCEL:
             break;
@@ -185,7 +185,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion)
         lastOnlineVersion = onlineVersion;
 
         if (haveNewerVersionOnline(onlineVersion))
-            showUpdateAvailableDialog(parent, lastOnlineVersion);
+            showUpdateAvailableDialog(parent, onlineVersion);
         else
             showNotificationDialog(parent, DialogInfoType::INFO, PopupDialogCfg().
                                    setIcon(getResourceImage(L"update_check")).
@@ -204,7 +204,7 @@ void zen::checkForUpdateNow(wxWindow* parent, std::string& lastOnlineVersion)
                                        setDetailInstructions(e.toString()), _("&Check"), _("&Retry")))
             {
                 case QuestionButton2::YES:
-                    wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
+                    wxLaunchDefaultBrowser(L"https://www.freefilesync.org/get_latest.php");
                     break;
                 case QuestionButton2::NO: //retry
                     checkForUpdateNow(parent, lastOnlineVersion); //note: retry via recursion!!!
@@ -235,7 +235,7 @@ struct zen::UpdateCheckResultPrep
 };
 
 //run on main thread:
-std::shared_ptr<UpdateCheckResultPrep> zen::periodicUpdateCheckPrepare()
+std::shared_ptr<UpdateCheckResultPrep> zen::automaticUpdateCheckPrepare()
 {
     return nullptr;
 }
@@ -252,14 +252,14 @@ struct zen::UpdateCheckResult
 };
 
 //run on worker thread:
-std::shared_ptr<UpdateCheckResult> zen::periodicUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep)
+std::shared_ptr<UpdateCheckResult> zen::automaticUpdateCheckRunAsync(const UpdateCheckResultPrep* resultPrep)
 {
     return nullptr;
 }
 
 
 //run on main thread:
-void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion, const UpdateCheckResult* resultAsync)
+void zen::automaticUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std::string& lastOnlineVersion, const UpdateCheckResult* resultAsync)
 {
     UpdateCheckResult result;
     try
@@ -278,8 +278,8 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
         lastUpdateCheck   = getVersionCheckCurrentTime();
         lastOnlineVersion = result.onlineVersion;
 
-        if (haveNewerVersionOnline(result.onlineVersion))
-            showUpdateAvailableDialog(parent, lastOnlineVersion);
+            if (haveNewerVersionOnline(result.onlineVersion))
+                showUpdateAvailableDialog(parent, result.onlineVersion);
     }
     else
     {
@@ -287,21 +287,21 @@ void zen::periodicUpdateCheckEval(wxWindow* parent, time_t& lastUpdateCheck, std
         {
             lastOnlineVersion = "Unknown";
 
-            switch (showQuestionDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
-                                       setTitle(_("Check for Program Updates")).
-                                       setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")).
-                                       setDetailInstructions(result.error->toString()),
-                                       _("&Check"), _("&Retry")))
-            {
-                case QuestionButton2::YES:
-                    wxLaunchDefaultBrowser(L"http://www.freefilesync.org/get_latest.php");
-                    break;
-                case QuestionButton2::NO: //retry
-                    periodicUpdateCheckEval(parent, lastUpdateCheck, lastOnlineVersion, resultAsync); //note: retry via recursion!!!
-                    break;
-                case QuestionButton2::CANCEL:
-                    break;
-            }
+                switch (showQuestionDialog(parent, DialogInfoType::ERROR2, PopupDialogCfg().
+                                           setTitle(_("Check for Program Updates")).
+                                           setMainInstructions(_("Cannot find current FreeFileSync version number online. A newer version is likely available. Check manually now?")).
+                                           setDetailInstructions(result.error->toString()),
+                                           _("&Check"), _("&Retry")))
+                {
+                    case QuestionButton2::YES:
+                        wxLaunchDefaultBrowser(L"https://www.freefilesync.org/get_latest.php");
+                        break;
+                    case QuestionButton2::NO: //retry
+                        automaticUpdateCheckEval(parent, lastUpdateCheck, lastOnlineVersion, resultAsync); //note: retry via recursion!!!
+                        break;
+                    case QuestionButton2::CANCEL:
+                        break;
+                }
         }
         //else: ignore this error
     }

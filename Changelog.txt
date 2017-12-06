@@ -1,3 +1,19 @@
+FreeFileSync 9.6
+----------------
+New installation command line option /disable_updates
+Fixed crash when closing main dialog during sync
+Fixed RealTimeSync crash after recursive mutex locking
+Improved file copy performance on macOS
+Clean up obsolete files during installation
+Don't use threads for running async command line (Linux)
+Avoid main dialog flash after minimized sync
+Disable file list export until after comparison
+Directly close progress dialog during sync
+Redirect escape key from main dialog to progress dialog
+Fixed startup delay during consistency checks
+Updated translation files
+
+
 FreeFileSync 9.5 [2017-11-05]
 -----------------------------
 Allow to change error handling option on progress dialogs

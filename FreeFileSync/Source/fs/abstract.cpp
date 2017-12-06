@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -116,8 +116,8 @@ AFS::FileCopyResult AFS::copyFileAsStream(const AfsPath& afsPathSource, const St
         Failing to set modification time is not a serious problem from synchronization perspective (treated like external update)
 
         => Support additional scenarios:
-        - GVFS failing to set modTime for FTP: http://www.freefilesync.org/forum/viewtopic.php?t=2372
-        - GVFS failing to set modTime for MTP: http://www.freefilesync.org/forum/viewtopic.php?t=2803
+        - GVFS failing to set modTime for FTP: https://www.freefilesync.org/forum/viewtopic.php?t=2372
+        - GVFS failing to set modTime for MTP: https://www.freefilesync.org/forum/viewtopic.php?t=2803
         - MTP failing to set modTime in general: fail non-silently rather than silently during file creation
         - FTP failing to set modTime for servers lacking MFMT-support
         */
@@ -167,7 +167,7 @@ AFS::FileCopyResult AFS::copyFileTransactional(const AbstractPath& apSource, con
         const Zstring fileName = AFS::getItemName(apTarget);
 
         //- generate (hopefully) unique file name to avoid clashing with some remnant ffs_tmp file
-        //- do not loop and avoid pathological cases, e.g. http://www.freefilesync.org/forum/viewtopic.php?t=1592
+        //- do not loop and avoid pathological cases, e.g. https://www.freefilesync.org/forum/viewtopic.php?t=1592
         const Zstring shortGuid = printNumber<Zstring>(Zstr("%04x"), static_cast<unsigned int>(getCrc16(generateGUID())));
         auto it = find_last(fileName.begin(), fileName.end(), Zchar('.')); //gracefully handle case of missing "."
         const Zstring fileNameTmp = Zstring(fileName.begin(), it) + Zchar('.') + shortGuid + TEMP_FILE_ENDING;
@@ -263,7 +263,7 @@ private:
 }
 
 
-//essentially an (abstract) duplicate of zen::getPathStatus()
+//essentially a(n abstract) duplicate of zen::getPathStatus()
 AFS::PathStatusImpl AFS::getPathStatusViaFolderTraversal(const AfsPath& afsPath) const //throw FileError
 {
     const Opt<AfsPath> parentAfsPath = getParentAfsPath(afsPath);

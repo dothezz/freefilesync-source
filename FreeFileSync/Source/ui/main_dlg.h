@@ -1,6 +1,6 @@
 // *****************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under    *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl-3.0           *
+// * GNU General Public License: https://www.gnu.org/licenses/gpl-3.0          *
 // * Copyright (C) Zenju (zenju AT freefilesync DOT org) - All Rights Reserved *
 // *****************************************************************************
 
@@ -105,7 +105,6 @@ private:
     void updateGridViewData();     //
     void updateStatistics();       // more fine-grained updaters
     void updateUnsavedCfgStatus(); //
-    void updateTopButtonImages();  //
 
     //context menu functions
     std::vector<zen::FileSystemObject*> getGridSelection(bool fromLeft = true, bool fromRight = true) const;
@@ -271,7 +270,7 @@ private:
 
     void switchProgramLanguage(wxLanguage langId);
 
-    std::set<wxMenuItem*> detachedMenuItemsLayout_; //owning pointers!!!
+    std::set<wxMenuItem*> detachedMenuItems_; //owning pointers!!!
     //alternatives: 1. std::set<unique_ptr<>>? key is const => no support for moving items out! 2. std::map<wxMenuItem*, unique_ptr<>>: redundant info, inconvenient use
 
     void clearGrid(ptrdiff_t pos = -1);
@@ -328,7 +327,7 @@ private:
     time_t manualTimeSpanFrom_ = 0;
     time_t manualTimeSpanTo_   = 0; //buffer manual time span selection at session level
 
-    std::shared_ptr<FolderHistory> folderHistoryLeft_  = std::make_shared<FolderHistory>();  //shared by all wxComboBox dropdown controls
+    std::shared_ptr<FolderHistory> folderHistoryLeft_  = std::make_shared<FolderHistory>(); //shared by all wxComboBox dropdown controls
     std::shared_ptr<FolderHistory> folderHistoryRight_ = std::make_shared<FolderHistory>(); //always bound!
 
     zen::AsyncGuiQueue guiQueue_; //schedule and run long-running tasks asynchronously, but process results on GUI queue
@@ -338,6 +337,7 @@ private:
     wxWindow* focusWindowAfterSearch_ = nullptr; //used to restore focus after search panel is closed
 
     bool localKeyEventsEnabled_ = true;
+    bool allowMainDialogClose_ = true; //e.g. do NOT allow close while sync is running => crash!!!
 
     zen::TempFileBuffer tempFileBuf_; //buffer temporary copies of non-native files for %local_path%
 };

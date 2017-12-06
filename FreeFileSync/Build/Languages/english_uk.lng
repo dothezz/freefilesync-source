@@ -7,51 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
-<target></target>
-
-<source>Please enter a file path.</source>
-<target></target>
-
-<source>Recommended range:</source>
-<target></target>
-
-<source>Sleep</source>
-<target></target>
-
-<source>FreeFileSync %x is available!</source>
-<target></target>
-
-<source>Support with a donation</source>
-<target></target>
-
-<source>&Cancel</source>
-<target></target>
-
-<source>Error dialog:</source>
-<target></target>
-
-<source>Connections for directory reading:</source>
-<target></target>
-
-<source>&SSH agent</source>
-<target></target>
-
-<source>Stop on errors</source>
-<target></target>
-
-<source>Ignore &all</source>
-<target></target>
-
-<source>The %x protocol does not support directory monitoring:</source>
-<target></target>
-
-<source>Open the selected configuration for editing only without executing it.</source>
-<target></target>
-
-<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -96,6 +51,9 @@
 
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Checking recycle bin availability for folder %x...</target>
+
+<source>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</source>
+<target>The recycle bin is not supported by the following folders. Deleted or overwritten files will not be able to be restored:</target>
 
 <source>An exception occurred</source>
 <target>An exception occurred</target>
@@ -144,6 +102,9 @@
 
 <source>Any number of alternative directory pairs for at most one config file.</source>
 <target>Any number of alternative directory pairs for at most one config file.</target>
+
+<source>Open the selected configuration for editing only without executing it.</source>
+<target>Open the selected configuration for editing only without executing it.</target>
 
 <source>Path to an alternate GlobalSettings.xml file.</source>
 <target>Path to an alternate GlobalSettings.xml file.</target>
@@ -635,6 +596,9 @@ The command is triggered if:
 <source>Automated Synchronization</source>
 <target>Automated Synchronisation</target>
 
+<source>The %x protocol does not support directory monitoring:</source>
+<target>The %x protocol does not support directory monitoring:</target>
+
 <source>Directory monitoring active</source>
 <target>Directory monitoring active</target>
 
@@ -749,8 +713,8 @@ The command is triggered if:
 <source>Base folder:</source>
 <target>Base folder:</target>
 
-<source>The versioning folder will be synchronized because it is contained in a base folder.</source>
-<target>The versioning folder will be synchronised because it is contained in a base folder.</target>
+<source>The versioning folder is contained in a base folder.</source>
+<target>The versioning folder is contained in a base folder.</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronising folder pair:</target>
@@ -763,6 +727,15 @@ The command is triggered if:
 
 <source>job name</source>
 <target>job name</target>
+
+<source>Show summary</source>
+<target>Show summary</target>
+
+<source>Sleep</source>
+<target>Sleep</target>
+
+<source>Shut down</source>
+<target>Shut down</target>
 
 <source>Synchronization stopped</source>
 <target>Synchronisation stopped</target>
@@ -784,6 +757,9 @@ The command is triggered if:
 
 <source>Synchronization completed successfully</source>
 <target>Synchronisation completed successfully</target>
+
+<source>Executing command %x</source>
+<target>Executing command %x</target>
 
 <source>Cleaning up old log files...</source>
 <target>Cleaning up old log files...</target>
@@ -811,6 +787,9 @@ The command is triggered if:
 <pluralform>Automatic retry in 1 second...</pluralform>
 <pluralform>Automatic retry in %x seconds...</pluralform>
 </target>
+
+<source>Ignore &all</source>
+<target>Ignore &all</target>
 
 <source>Retrying operation...</source>
 <target>Retrying operation...</target>
@@ -1007,9 +986,6 @@ The command is triggered if:
 <source>Select a variant:</source>
 <target>Select a variant:</target>
 
-<source>Detect synchronization directions with the help of database files</source>
-<target>Detect synchronisation directions with the help of database files</target>
-
 <source>Include &symbolic links:</source>
 <target>Include &symbolic links:</target>
 
@@ -1090,11 +1066,14 @@ The command is triggered if:
 <source>Naming convention:</source>
 <target>Naming convention:</target>
 
+<source>&Ignore errors</source>
+<target>&Ignore errors</target>
+
 <source>Show pop-up on errors or warnings</source>
 <target>Show pop-up on errors or warnings</target>
 
-<source>On completion:</source>
-<target>On completion:</target>
+<source>Run a command after synchronization:</source>
+<target>Run a command after synchronization:</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -1132,6 +1111,9 @@ The command is triggered if:
 <source>&Key file</source>
 <target>&Key file</target>
 
+<source>&SSH agent</source>
+<target>&SSH agent</target>
+
 <source>User name:</source>
 <target>User name:</target>
 
@@ -1149,6 +1131,9 @@ The command is triggered if:
 
 <source>How to get best performance?</source>
 <target>How to get best performance?</target>
+
+<source>Connections for directory reading:</source>
+<target>Connections for directory reading:</target>
 
 <source>SFTP channels per connection:</source>
 <target>SFTP channels per connection:</target>
@@ -1195,6 +1180,9 @@ The command is triggered if:
 <source>Bytes copied:</source>
 <target>Bytes copied:</target>
 
+<source>When finished:</source>
+<target>When finished:</target>
+
 <source>Close</source>
 <target>Close</target>
 
@@ -1207,14 +1195,17 @@ The command is triggered if:
 <source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
 <target>Create a batch file for unattended synchronisation. To start, double-click this file or schedule in a task planner: %x</target>
 
-<source>&Show</source>
-<target>&Show</target>
+<source>Run minimized</source>
+<target>Run minimised</target>
+
+<source>&Show error dialog</source>
+<target>&Show error dialog</target>
+
+<source>&Cancel</source>
+<target>&Cancel</target>
 
 <source>Stop synchronization at first error</source>
 <target>Stop synchronisation at first error</target>
-
-<source>Run minimized</source>
-<target>Run minimised</target>
 
 <source>Save log:</source>
 <target>Save log:</target>
@@ -1246,14 +1237,14 @@ Copy to a temporary file (*.ffs_tmp) before overwriting target.
 This guarantees a consistent state even in case of a serious error.
 </target>
 
-<source>(recommended)</source>
-<target>(recommended)</target>
+<source>recommended</source>
+<target>recommended</target>
 
 <source>Copy shared or locked files using the Volume Shadow Copy Service.</source>
 <target>Copy shared or locked files using the Volume Shadow Copy Service.</target>
 
-<source>(requires administrator rights)</source>
-<target>(requires administrator rights)</target>
+<source>requires administrator rights</source>
+<target>requires administrator rights</target>
 
 <source>Transfer file and folder permissions.</source>
 <target>Transfer file and folder permissions.</target>
@@ -1288,8 +1279,14 @@ This guarantees a consistent state even in case of a serious error.
 <source>If you like FreeFileSync:</source>
 <target>If you like FreeFileSync:</target>
 
+<source>Support with a donation</source>
+<target>Support with a donation</target>
+
 <source>Donation details</source>
 <target>Donation details</target>
+
+<source>The auto updater was disabled by the administrator.</source>
+<target>The auto updater was disabled by the administrator.</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback and suggestions are welcome</target>
@@ -1327,8 +1324,8 @@ This guarantees a consistent state even in case of a serious error.
 <source>Activate offline</source>
 <target>Activate offline</target>
 
-<source>Save as Batch Job</source>
-<target>Save as Batch Job</target>
+<source>Save as a Batch Job</source>
+<target>Save as a Batch Job</target>
 
 <source>Delete Items</source>
 <target>Delete Items</target>
@@ -1371,6 +1368,12 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>&Show details</source>
 <target>&Show details</target>
+
+<source>FreeFileSync %x is available!</source>
+<target>FreeFileSync %x is available!</target>
+
+<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
+<target>Installation files are corrupted. Please reinstall FreeFileSync.</target>
 
 <source>Local path not available for %x.</source>
 <target>Local path not available for %x.</target>
@@ -1561,12 +1564,6 @@ This guarantees a consistent state even in case of a serious error.
 <source>Searching for program updates...</source>
 <target>Searching for program updates...</target>
 
-<source>Close progress dialog</source>
-<target>Close progress dialogue</target>
-
-<source>Shut down</source>
-<target>Shut down</target>
-
 <source>Paused</source>
 <target>Paused</target>
 
@@ -1597,17 +1594,20 @@ This guarantees a consistent state even in case of a serious error.
 <source>Log</source>
 <target>Log</target>
 
-<source>Installation files are corrupted. Please reinstall FreeFileSync.</source>
-<target>Installation files are corrupted. Please reinstall FreeFileSync.</target>
-
 <source>Thank you, %x, for your donation and support!</source>
 <target>Thank you, %x, for your donation and support!</target>
+
+<source>Recommended range:</source>
+<target>Recommended range:</target>
 
 <source>Password:</source>
 <target>Password:</target>
 
 <source>Key password:</source>
 <target>Key password:</target>
+
+<source>Please enter a file path.</source>
+<target>Please enter a file path.</target>
 
 <source>
 <pluralform>Copy the following item to another folder?</pluralform>
@@ -1662,6 +1662,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Show hidden dialogs and warning messages again?</source>
 <target>Show hidden dialogues and warning messages again?</target>
+
+<source>&Show</source>
+<target>&Show</target>
 
 <source>Downloading update...</source>
 <target>Downloading update...</target>
@@ -1720,11 +1723,11 @@ This guarantees a consistent state even in case of a serious error.
 <source>MB</source>
 <target>MB</target>
 
-<source>Back up deleted and overwritten files in the recycle bin</source>
-<target>Back up deleted and overwritten files in the recycle bin</target>
+<source>Retain deleted and overwritten files in the recycle bin</source>
+<target>Retain deleted and overwritten files in the recycle bin</target>
 
-<source>Delete or overwrite files permanently</source>
-<target>Delete or overwrite files permanently</target>
+<source>Delete and overwrite files permanently</source>
+<target>Delete and overwrite files permanently</target>
 
 <source>Move files to a user-defined folder</source>
 <target>Move files to a user-defined folder</target>
@@ -1740,6 +1743,15 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Append a time stamp to each file name</source>
 <target>Append a time stamp to each file name</target>
+
+<source>On completion:</source>
+<target>On completion:</target>
+
+<source>On errors:</source>
+<target>On errors:</target>
+
+<source>On success:</source>
+<target>On success:</target>
 
 <source>Main config</source>
 <target>Main config</target>
@@ -1761,9 +1773,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Name</source>
 <target>Name</target>
-
-<source>Items</source>
-<target>Items</target>
 
 <source>Percentage</source>
 <target>Percentage</target>
@@ -1894,6 +1903,9 @@ This guarantees a consistent state even in case of a serious error.
 <source>Cannot change process I/O priorities.</source>
 <target>Cannot change process I/O priorities.</target>
 
+<source>Unable to shut down the system.</source>
+<target>Unable to shut down the system.</target>
+
 <source>Checking recycle bin failed for folder %x.</source>
 <target>Checking recycle bin failed for folder %x.</target>
 
@@ -1917,9 +1929,6 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Portable</source>
 <target>Portable</target>
-
-<source>recommended</source>
-<target>recommended</target>
 
 <source>Save settings to "%APPDATA%\FreeFileSync"</source>
 <target>Save settings to "%APPDATA%\FreeFileSync"</target>
@@ -1971,6 +1980,9 @@ This guarantees a consistent state even in case of a serious error.
 
 <source>Edit with FreeFileSync</source>
 <target>Edit with FreeFileSync</target>
+
+<source>The FreeFileSync portable version cannot install into a subfolder of %x.</source>
+<target>The FreeFileSync portable version cannot install into a subfolder of %x.</target>
 
 <source>Please choose the local installation type or select a different folder for installation.</source>
 <target>Please choose the local installation type or select a different folder for installation.</target>
